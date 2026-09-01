@@ -348,12 +348,21 @@
       appears as that account's manager while managing no people. Two things
       follow. (1) NEVER read org structure off this edge, and never infer
       seniority from holding it — the field name is a structural artifact of
-      where FIDs sit in the tree. (2) The observed convergence (independent
-      SEAL role-holding and FCT ownership selecting the same people) is
-      therefore NOT a shared seniority bias; both select for technical
-      accountability, which is a stronger warrant than the seniority reading.
-      Recorded because the prose above invited exactly the wrong inference and
-      a reading session made it.
+      where FIDs sit in the tree. (2) OWNING FUNCTIONAL ACCOUNTS IS NOT OWNING
+      APPLICATIONS, and this edge must never be used as an attribution signal.
+      Measured against ServiceNow TOM the same day: one owner held 557
+      functional accounts and SIX owned business applications (+1 deployment);
+      14 of her 39 group memberships are IAM-approver groups, and the accounts
+      are per-application schema and service accounts for ONBOARDING, not
+      job-execution identity. The 557 is ACCESS BREADTH — a number ~80x too
+      large to read as ownership. "What does this person own" is answered from
+      ServiceNow TOM or SEAL Attribution, NEVER from an FCT-account count; SEAL
+      already had it right (seal_apps = 7 against TOM's 6 + PSF = 7).
+      Recorded because the prose above invited exactly the wrong inference,
+      a reading session made it, and its first correction then argued the
+      convergence proved technical accountability — also wrong: FCT ownership
+      tracks who APPROVES ACCESS, which correlates with seniority for an
+      unrelated reason.
 
       REPLACES seal_appuser_owned_by at G101 (2026-08-21) — the seal_ family §B3's census left out; same rule, gate
       vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
