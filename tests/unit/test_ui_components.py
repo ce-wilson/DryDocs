@@ -307,6 +307,14 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     LocationMap. Their mapper, lib/nvl-mapping.ts, is NOT here for the same
     reason loadMapModel.ts is not: the scan boundary is .tsx only and widening
     it waits on O42.
+    86 -> 88 at O90 (2026-09-01): WiringKey, BOUND to `loadmap` by directory
+    evidence — it lives under loadmap/ and serves exactly the module whose route
+    renders it, so both counts move by one and `loadmap` gains its own area (the
+    directory existed but held only loadMapModel.ts, which is .ts and outside the
+    scan boundary). tableControls, deliberately UNBOUND: it is a ui-primitive
+    extracted from DomainGridTable so a THIRD surface could stop copying it, and
+    binding a primitive to its first caller is the mistake RelEdge and
+    TrustLegend are unbound to avoid. Total therefore moves two, bound one.
     85 -> 86 at O62 (2026-08-31): FileReport, BOUND to `ask` by directory
     evidence. Both counts move by one.
     84 -> 85 at O60 (2026-08-31): SwimlaneView, BOUND to `lineage` by directory
@@ -334,6 +342,6 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     comps = _ui()["components"]
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
-        39,
-        86,
+        40,
+        88,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"

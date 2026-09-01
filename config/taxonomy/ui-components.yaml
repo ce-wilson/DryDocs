@@ -70,6 +70,7 @@ areas:
   - { id: explorer,      title: "Explorer module panes" }
   - { id: lineage,       title: "Lineage module panes" }
   - { id: loads,         title: "Loads module panes" }
+  - { id: loadmap,       title: "Load map module panes" }
   - { id: ownership,     title: "Ownership module panes" }
   - { id: underhood,     title: "/under-the-hood benchmark showcase" }
   - { id: software,      title: "Software registry / documentation-coverage panes" }
@@ -119,13 +120,14 @@ components:
   - { id: ExplorerRoute,           area: route,        path: routes/explorer/ExplorerRoute.tsx,           module: explorer,   module_evidence: route-name }
   - { id: ExplorerTowerRoute,      area: route,        path: routes/explorer/ExplorerTowerRoute.tsx,      module: explorer,   module_evidence: route-dir }
 
-  # --- ui-primitive (7) ---
+  # --- ui-primitive (8) ---
   - { id: EmptyState,              area: ui-primitive, path: components/ui/EmptyState.tsx }
   - { id: IdChip,                  area: ui-primitive, path: components/ui/IdChip.tsx }
   - { id: Meter,                   area: ui-primitive, path: components/ui/Meter.tsx }
   - { id: ResizableSplit,          area: ui-primitive, path: components/ui/ResizableSplit.tsx }
   - { id: StatusChip,              area: ui-primitive, path: components/ui/StatusChip.tsx }
   - { id: StatusItems,             area: ui-primitive, path: components/ui/StatusItems.tsx }   # O28 node-status envelope (also exports HealthGlyph)
+  - { id: tableControls,           area: ui-primitive, path: components/ui/tableControls.tsx }   # filter/sort/group/CSV, extracted from DomainGridTable
   - { id: Tabs,                    area: ui-primitive, path: components/ui/Tabs.tsx }
 
   # --- component (19) ---
@@ -192,6 +194,9 @@ components:
 
   # --- loads (1) ---
   - { id: LoadsTimeline,           area: loads,        path: loads/LoadsTimeline.tsx,                     module: loads,      module_evidence: directory }
+
+  # --- loadmap (1) ---
+  - { id: WiringKey,               area: loadmap,      path: loadmap/WiringKey.tsx,                       module: loadmap,    module_evidence: directory }
 
   # --- software (2) ---
   - { id: AcronymsPane,            area: software,     path: software/AcronymsPane.tsx,                   module: software,   module_evidence: directory }
