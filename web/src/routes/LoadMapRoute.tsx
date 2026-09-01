@@ -62,11 +62,15 @@ const SOURCE_COLUMNS: readonly { label: string; key: string | null }[] = [
   { label: 'Confirmed', key: 'confirmed' },
   { label: 'Wiring', key: null },
   { label: 'Ledger', key: null },
+  // Sorts on the capture PATH, not on a count. Only two of the forty sources
+  // carry a capture today, and blanks-sort-last brings exactly those two to the
+  // top; sorting on the count would bury them under thirty-eight zeroes.
+  { label: 'Taxonomy', key: 'taxonomy' },
   { label: 'Pipeline reach', key: null },
   { label: 'Loaders', key: null },
 ]
 
-const SOURCE_SEARCH_KEYS = ['id', 'system', 'origin', 'kind', 'authority', 'classification'] as const
+const SOURCE_SEARCH_KEYS = ['id', 'system', 'origin', 'kind', 'authority', 'classification', 'taxonomy'] as const
 
 function Table({
   headers,
@@ -107,13 +111,20 @@ export default function LoadMapRoute() {
   // partition what is left. Kept separate so a kind filter plus a sort reads as
   // two decisions rather than one compound state.
   const srcCtl = useTableControls()
-  const srcView = useTableView(shown as unknown as Record<string, unknown>[], {
+  // `taxonomy_captures` is a list, and a list sorts on its rendering rather than
+  // on data. Flattening it to the joined path gives the column one real value to
+  // sort and filter on, without inventing anything the row does not already say.
+  const srcDecorated = useMemo(
+    () => shown.map((s) => ({ ...s, taxonomy: s.taxonomy_captures.join(', ') })),
+    [shown],
+  )
+  const srcView = useTableView(srcDecorated as unknown as Record<string, unknown>[], {
     filter: srcCtl.filter,
     searchKeys: SOURCE_SEARCH_KEYS,
     sort: srcCtl.sort,
     groupKey: srcCtl.grouped ? 'system' : null,
   })
-  const srcRows = srcView.rows as unknown as LoadMapSource[]
+  const srcRows = srcView.rows as unknown as (LoadMapSource & { taxonomy: string })[]
 
   const banner = (
     <p className="shrink-0 rounded border border-edge bg-panel-2 px-2 py-1 text-[11px] text-muted">
@@ -171,7 +182,7 @@ export default function LoadMapRoute() {
 
   // One row renderer, used flat and inside groups — a second copy for the
   // grouped view is how the two drift.
-  function renderSourceRows(rows: LoadMapSource[], offset = 0) {
+  function renderSourceRows(rows: (LoadMapSource & { taxonomy: string })[], offset = 0) {
     return rows.map((s, idx) => {
       const i = idx + offset
             const reach = pipelineReach(s)
@@ -206,6 +217,11 @@ export default function LoadMapRoute() {
                 </td>
                 <td className={`${TD} font-mono text-[10px] text-muted`} title={path ?? undefined}>
                   {ledgerState(s.ledger)}
+                </td>
+                <td className={`${TD} font-mono text-[10px] ${s.taxonomy ? 'text-muted' : 'text-faint'}`}>
+                  {s.taxonomy_captures.length
+                    ? s.taxonomy_captures.map((c) => <div key={String(c)}>{String(c)}</div>)
+                    : '—'}
                 </td>
                 <td className={`${TD} text-[10px] ${reach.loaded ? 'text-text' : 'text-faint'}`}>{reach.label}</td>
                 <td className={`${TD} font-mono text-[10px] text-muted`}>
@@ -292,7 +308,7 @@ export default function LoadMapRoute() {
                     <span className="ml-2 font-normal text-faint">{g.rows.length}</span>
                   </td>
                 </tr>,
-                ...renderSourceRows(g.rows as unknown as LoadMapSource[], before),
+                ...renderSourceRows(g.rows as unknown as (LoadMapSource & { taxonomy: string })[], before),
               ]
             })
           : renderSourceRows(srcRows)}
