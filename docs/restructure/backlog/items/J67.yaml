@@ -14,7 +14,53 @@ inputs:
 - .github/workflows/ci.yml
 - pyproject.toml
 - poetry.lock
+- agents/requirements.txt
 acceptance: |
-  Stub minted per the I6 rule — the body lands in the next commit.
+  (a) DECIDE THE SUPPORTED SET, AND MAKE THE TWO STATEMENTS AGREE. `pyproject.toml` declares
+  `python = "^3.11"`; CI hardcodes `python-version: "3.12"` in BOTH jobs with no matrix, and
+  both run `ubuntu-latest`. One of the two moves: either CI exercises what the range claims,
+  or the range narrows to what CI proves. What must NOT survive this item is the current
+  state, where the declared range is an assertion nothing tests.
+
+  (b) IF THE RANGE STAYS, THE NEW LEG IS NON-BLOCKING FIRST. A 3.14 leg added as `continue-on-error`
+  (or its own advisory job) reports the truth without turning the trunk red on a resolver
+  problem nobody has triaged. Flipping it to blocking is a SEPARATE decision, taken once the
+  leg has been green long enough to be believed — the J10 stage-5 precedent, where a blocking
+  gate that nobody watched ran red for 100+ consecutive runs.
+
+  (c) THE OS AXIS IS THE HALF THAT WILL BE FORGOTTEN. Both jobs are Linux; all local work is
+  Windows. Say explicitly in the close whether Windows is in scope or ruled out, and if ruled
+  out, say what that costs — path handling, `getpass`, the `VIRTUAL_ENV` behaviour and the
+  CRLF/shebang rules the repo already carries `.gitattributes` for exist BECAUSE the two
+  platforms differ. Silence here reads as "covered".
+
+  (d) DO NOT TOUCH THE LOCK AS PART OF THIS. The item is about what gets TESTED, not about
+  which versions are pinned. Any resolver change belongs to whoever owns the lock, with its
+  own baseline — see the note below on why conflating them is expensive.
+
+  (e) THE AGENTS VENV IS OUT OF SCOPE AND SAY SO ON THE ROW. `agents/requirements.txt` is a
+  separate interpreter that leads the main project deliberately (`neo4j>=6.2,<7` against the
+  project's 5.x, "may lead, but only by declaration", G110). It is not covered by this CI and
+  this item does not extend coverage to it; naming that keeps the gap deliberate rather than
+  discovered again later.
 notes: |
-  Minted 2026-09-01. Body to follow.
+  Minted 2026-09-01 (desktop, ui-workstream worktree) from a port session's blocker, and the
+  MEASUREMENT MATTERS MORE THAN THE BLOCKER — the blocker was in another tree.
+
+  WHAT WAS ACTUALLY MEASURED HERE, 2026-09-01 (desktop, this machine): base interpreter
+  `C:\Python314\python.exe`, CPython 3.14.6. BOTH producer venvs — the ui-workstream
+  worktree's and the main checkout's — run 3.14.6 and match `poetry.lock` EXACTLY:
+  oracledb 2.5.1, neo4j 5.28.4, pytest 8.4.2. So "the lock cannot resolve on 3.14" is not a
+  property of this project; it resolved cleanly twice. Whatever drifted, drifted in one clone,
+  and the report that raised it did not name which — the J63 failure, applied to a venv rather
+  than to a tree.
+
+  THE REAL FINDING IS THE SHAPE, NOT THE INCIDENT: nothing anywhere tests 3.14, and nothing
+  anywhere tests Windows, while 3.14-on-Windows is where every line of this repo is written.
+  CI has no matrix — this was never a leg that was dropped, it is a leg that never existed.
+
+  WHY (d) IS A CLAUSE AND NOT AN ASIDE. The session this came from was weighing a venv rebuild
+  that would also have moved `neo4j 6.2.0 -> 5.28.4`, a MAJOR version, while re-baselining a
+  55-failure acceptance run. Two variables, one measurement, and no way afterwards to say which
+  moved the baseline. Keeping the interpreter question away from the pin question is the whole
+  reason this is its own item.
