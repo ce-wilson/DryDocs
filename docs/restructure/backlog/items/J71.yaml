@@ -1,0 +1,24 @@
+id: J71
+epic: release-infrastructure
+title: A per-entry merge rule that enumerates fields goes silently incomplete the next time a field
+  is added - make every rule total and guard the totality
+type: bug
+module: docs
+phase: 8
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on:
+- J68
+inputs:
+- PORT-MANIFEST.yaml
+- tests/unit/test_port_manifest.py
+- config/source-bindings.yaml
+- config/doc-source-registry.yaml
+- config/audit-fields.yaml
+- config/source-registry.yaml
+acceptance: |
+  STUB - body follows in the next commit (id minted per I6).
+notes: |
+  STUB.
