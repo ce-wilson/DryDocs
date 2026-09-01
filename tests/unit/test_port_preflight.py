@@ -74,6 +74,13 @@ OWED COMPANY-SIDE:
         "chore(Z5): claim — in_progress",
         "chore(O63): release claim — back to todo",
         "chore(backlog): O69 in_progress — refusal now cites ADR 0009",
+        # THE THIRD DRIFT (2026-09-01), same three categories again: the
+        # session-close snapshot under a `session` scope, a claim released with an
+        # article in it, and a claim written as a `backlog(<ID>)` TYPE.
+        "chore(session): depgraph snapshot at 02cadd7, taken after CI went green",
+        "chore(session): depgraph snapshot 2026-08-31, and the board catches up",
+        "chore(O26): release the claim - the SME HOLD is live",
+        "backlog(G125): claim in_progress (desktop)",
     ],
 )
 def test_ritual_subjects_need_no_ledger_step(subject: str) -> None:
@@ -114,6 +121,14 @@ def test_the_ledger_roll_commit_is_ritual_or_the_check_cannot_terminate() -> Non
         # Near-misses for the new patterns: the scope shape alone must not exempt.
         "chore(plan): the Lane B queue is empty — the handoff retires",
         "chore(snapshot): retire the newest-only retention ruling",
+        # Near-misses for the 2026-09-01 patterns. A `session` scope alone is not
+        # an exemption — the subject must say snapshot; a `backlog(<ID>)` type
+        # alone is not one either — it must open with claim; and a MINT is
+        # deliberately outside the ritual set, covered by footnote citation.
+        "chore(session): the depgraph pin moves to the scrubbed archive tag",
+        "backlog(O60): the BDAT layers become a second lane basis for the swimlane",
+        "chore(Idea-233): mint the id and its final title, per the I6 rule",
+        "chore(backlog): mint G132 + G133 (stubs) - home the folder-pull collector",
     ],
 )
 def test_substantive_subjects_are_never_ritual(subject: str) -> None:
