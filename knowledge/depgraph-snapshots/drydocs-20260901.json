@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-31T17:23:23",
-    "date": "20260831",
+    "captured_at": "2026-09-01T14:12:45",
+    "date": "20260901",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "2be98f8d",
-      "full": "2be98f8d9754d4de86893d4d86bbc35694533bbe",
+      "commit": "5d14003c",
+      "full": "5d14003c34dc2b8d7e9c0d40825358bfa9646912",
       "branch": "main",
-      "describe": "port-base-20260829-118-g2be98f8d",
-      "subject": "Merge branch 'feat/ui-web': Q28 ΓÇö register the 9.0.21 Parameters doc corpus",
+      "describe": "port-base-20260901-10-g5d14003c",
+      "subject": "docs(Idea-234): a green tip says nothing about the commits inside the range",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -6497,6 +6497,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/config/gate-prompts/replica-derivation-edge.yaml",
+      "name": "replica-derivation-edge.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/gate-prompts/replica-derivation-edge.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/config/gate-prompts/repo-manifest-data-profile.yaml",
       "name": "repo-manifest-data-profile.yaml",
       "extension": ".yaml",
@@ -6519,6 +6528,15 @@
       "name": "rua-load-shapes.yaml",
       "extension": ".yaml",
       "rel_path": "config/gate-prompts/rua-load-shapes.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/gate-prompts/schema-identifier-publish-ceiling-teams-edition.yaml",
+      "name": "schema-identifier-publish-ceiling-teams-edition.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/gate-prompts/schema-identifier-publish-ceiling-teams-edition.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -11856,6 +11874,24 @@
       "name": "J66.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/J66.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/J68.yaml",
+      "name": "J68.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/J68.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/J69.yaml",
+      "name": "J69.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/J69.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -20834,10 +20870,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260831-1530.json",
-      "name": "drydocs-20260831-1530.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260831.json",
+      "name": "drydocs-20260831.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260831-1530.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260831.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -22053,6 +22089,15 @@
       "name": "render_load_map.py",
       "extension": ".py",
       "rel_path": "scripts/render_load_map.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/scripts/render_port_dispositions.py",
+      "name": "render_port_dispositions.py",
+      "extension": ".py",
+      "rel_path": "scripts/render_port_dispositions.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -23529,6 +23574,15 @@
       "name": "test_port_backlog_union.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_port_backlog_union.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_port_dispositions.py",
+      "name": "test_port_dispositions.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_port_dispositions.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -28328,6 +28382,14 @@
     [
       "drydocs/scripts/render_load_map.py",
       "drydocs/drydocs_core/yaml_fragments.py"
+    ],
+    [
+      "drydocs/scripts/render_port_dispositions.py",
+      "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
+      "drydocs/scripts/render_port_dispositions.py",
+      "drydocs/tests/unit/test_port_reconcile_guards.py"
     ],
     [
       "drydocs/scripts/render_remediation_diff.py",
@@ -35506,6 +35568,11 @@
     [
       "drydocs/config/gate-prompts",
       "CONTAINS",
+      "drydocs/config/gate-prompts/replica-derivation-edge.yaml"
+    ],
+    [
+      "drydocs/config/gate-prompts",
+      "CONTAINS",
       "drydocs/config/gate-prompts/repo-manifest-data-profile.yaml"
     ],
     [
@@ -35517,6 +35584,11 @@
       "drydocs/config/gate-prompts",
       "CONTAINS",
       "drydocs/config/gate-prompts/rua-load-shapes.yaml"
+    ],
+    [
+      "drydocs/config/gate-prompts",
+      "CONTAINS",
+      "drydocs/config/gate-prompts/schema-identifier-publish-ceiling-teams-edition.yaml"
     ],
     [
       "drydocs/config/gate-prompts",
@@ -38447,6 +38519,16 @@
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
       "drydocs/docs/restructure/backlog/items/J66.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/J68.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/J69.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -43366,7 +43448,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260831-1530.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260831.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -43877,6 +43959,11 @@
       "drydocs/scripts",
       "CONTAINS",
       "drydocs/scripts/render_load_map.py"
+    ],
+    [
+      "drydocs/scripts",
+      "CONTAINS",
+      "drydocs/scripts/render_port_dispositions.py"
     ],
     [
       "drydocs/scripts",
@@ -44792,6 +44879,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_port_backlog_union.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_port_dispositions.py"
     ],
     [
       "drydocs/tests/unit",
@@ -46223,13 +46315,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2603,
-    "edges": 1406,
+    "files": 2609,
+    "edges": 1408,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2896,
+    "rels": 2902,
     "directories": 294
   }
 }
