@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - web/src/generated/load-map.json
@@ -72,3 +72,29 @@ notes: |
 
   INDEPENDENT OF O88/O89 ON PURPOSE. This is a rendering over a committed artifact — no
   capture, no anchors, no running API. It can ship first and is the cheapest of the three.
+  DONE 2026-08-31 (desktop, ui-workstream worktree, feat/ui-web). (a) No new field: the
+  cross is computed by wiringState() in web/src/loadmap/loadMapModel.ts and _wiring_state()
+  in scripts/render_load_map.py, both pure functions of the committed row; the registry and
+  its schema are untouched. (b) Census re-run at build, and all four cells are occupied --
+  16 wired / 9 planned / 1 built-awaiting-gate / 14 registered-only over 40 source rows. The
+  lone third-cell row is still bmc-docs-controlm-utilities, Q24's subject. (c) The guard
+  asserts the report/rule line directly: test_the_key_reports_and_never_rules fails if any
+  source row ever grows a wired/wiring/ready field, which is the shape of the mistake this
+  item could turn into. (d) Four cells with their own labels -- wired / planned / built,
+  awaiting gate / registered only -- and the legend states the two questions being crossed
+  rather than leaving them to be inferred. (e) Theme tokens on the console side
+  (--green/--yellow/--blue-br/--muted) and the print sheet's chip palette on the paper side;
+  every cell carries text, so it survives monochrome. (f) Counts are read from load-map.json
+  at render time; the guard pins the legend's numbers against the data and fails on a
+  hand-typed one.
+
+  SHIPPED ON BOTH SURFACES, which the item did not ask for and should have: the console
+  route is the interactive lens, but docs/plan/load-map.html is N5's paper surface over the
+  SAME rows, and the O88 capture work will put console pages on paper too. A key that
+  disagreed between screen and print would let a marked-up printout cite a state the screen
+  never showed, so test_screen_and_paper_use_the_same_labels pins the two renderers to one
+  vocabulary.
+
+  Verified: tsc -b clean, npm run build clean, vitest 93 passed, oxlint exit 0 (pre-existing
+  fast-refresh warnings only, none on the new files), ruff check + format clean, and the
+  python guard set 75 passed. Renders regenerated in-commit.

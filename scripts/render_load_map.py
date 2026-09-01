@@ -348,6 +348,10 @@ code,.mono{font-family:ui-monospace,monospace;font-size:.82rem}
 .st-planned{background:#e5e7eb;color:#374151}
 .st-rejected{background:#fecaca;color:#991b1b}
 .st-other{background:#e5e7eb;color:#374151}
+.wr-wired{background:#bbf7d0;color:#166534}
+.wr-planned{background:#fde68a;color:#92400e}
+.wr-awaiting{background:#e0e7ff;color:#3730a3}
+.wr-registered{background:#e5e7eb;color:#374151}
 ul.tight{margin:.2rem 0 .2rem 1.1rem;padding:0}
 ul.tight li{margin:.1rem 0}
 .muted{color:#9ca3af}
@@ -367,6 +371,63 @@ def _esc(text: object) -> str:
     import html
 
     return html.escape(str(text)) if text is not None else ""
+
+
+# ---- O90: the wiring key ----------------------------------------------------
+#
+# The SAME cross the console renders (web/src/loadmap/loadMapModel.ts
+# wiringState), kept in step deliberately: this is N5's paper surface for the
+# same rows, and a key that disagrees between screen and print is worse than no
+# key. Two axes the registry already records separately -- `confirmed` (a gate
+# ruled the meaning) and a non-empty `loaders` (something is built) -- crossed.
+#
+# It REPORTS; it does not rule. A registry field asserting wiring readiness is
+# gate territory and that gate is drafted and unsigned (N10,
+# config/gate-prompts/registry-wiring-readiness.yaml). Nothing here writes such
+# a field: it crosses two booleans already in the artifact.
+#
+# Four cells, not two -- the two middle ones are neither wired nor planned, and
+# flattening them is the conflation N10 exists to end.
+
+WIRING_STATES: tuple[tuple[str, str, str], ...] = (
+    ("wired", "wired", "a gate ruled its meaning and a loader is built"),
+    ("planned", "planned", "a gate ruled its meaning; nothing is built yet"),
+    ("awaiting", "built, awaiting gate", "a loader is built; no gate has ruled its meaning"),
+    ("registered", "registered only", "declared in the registry; neither ruled nor built"),
+)
+
+
+def _wiring_state(source: dict) -> str:
+    """Cross `confirmed` with loader presence. Pure function of the row."""
+    built = bool(source["loaders"])
+    if source["confirmed"]:
+        return "wired" if built else "planned"
+    return "awaiting" if built else "registered"
+
+
+def _wiring_chip(state: str) -> str:
+    label = next(lbl for sid, lbl, _ in WIRING_STATES if sid == state)
+    return f'<span class="chip wr-{state}">{label}</span>'
+
+
+def _wiring_key(sources: list[dict]) -> str:
+    """The legend, with counts read from the data rather than written down."""
+    counts: dict[str, int] = {sid: 0 for sid, _, _ in WIRING_STATES}
+    for s in sources:
+        counts[_wiring_state(s)] += 1
+    items = "".join(
+        f"<li>{_wiring_chip(sid)}&thinsp;{counts[sid]} &mdash; "
+        f'<span class="muted">{meaning}</span></li>'
+        for sid, _lbl, meaning in WIRING_STATES
+    )
+    return (
+        '<div class="warn" style="background:#f8fafc;border-color:#e5e7eb">'
+        "<b>Wiring key</b> &mdash; the cross of two things the registry records separately: "
+        "<i>has a gate ruled this dataset&rsquo;s meaning</i>, and "
+        "<i>is a loader built that writes it</i>. Four states, because the two middle ones "
+        "are neither wired nor planned."
+        f'<ul class="tight">{items}</ul></div>'
+    )
 
 
 def _status_chip(status: object) -> str:
@@ -460,10 +521,11 @@ def build_load_map_html(data: dict) -> str:
 
     # -- dataset summary -------------------------------------------------------
     add("<h2>Datasets — taxonomy · ontology · extract · load</h2>")
+    add(_wiring_key(data["sources"]))
     add(
         "<table><tr><th>dataset</th><th>system</th><th>origin</th><th>kind</th>"
         "<th>authority</th><th>classification</th>"
-        "<th>confirmed</th><th>column ledger</th><th>taxonomy</th>"
+        "<th>confirmed</th><th>wiring</th><th>column ledger</th><th>taxonomy</th>"
         "<th>ontology mappings</th><th>loaders</th></tr>"
     )
     for s in data["sources"]:
@@ -498,7 +560,8 @@ def build_load_map_html(data: dict) -> str:
             f"<td><code>{_esc(s['origin']) or '—'}</code></td>"
             f"<td>{_esc(s['kind'])}</td><td>{authority}</td>"
             f"<td>{_esc(s['classification'])}</td>"
-            f"<td>{confirmed}</td><td>{ledger_cell}</td><td>{captures}</td>"
+            f"<td>{confirmed}</td><td>{_wiring_chip(_wiring_state(s))}</td>"
+            f"<td>{ledger_cell}</td><td>{captures}</td>"
             f"<td>{mappings}</td><td>{loaders}</td></tr>"
         )
     add("</table>")

@@ -19,8 +19,10 @@ import {
   ledgerPath,
   ledgerState,
   pipelineReach,
+  wiringState,
   type LoadMapSource,
 } from '../loadmap/loadMapModel'
+import WiringKey from '../loadmap/WiringKey'
 
 // /load-map (O57) — the console lens on web/src/generated/load-map.json.
 //
@@ -154,6 +156,7 @@ export default function LoadMapRoute() {
           'Authority',
           'Classification',
           'Confirmed',
+          'Wiring',
           'Ledger',
           'Pipeline reach',
           'Loaders',
@@ -177,6 +180,19 @@ export default function LoadMapRoute() {
               <td className={`${TD} ${s.confirmed ? 'text-text' : 'text-faint'}`}>
                 {s.confirmed ? 'yes' : 'not yet'}
               </td>
+              <td className={TD}>
+                <span
+                  className="inline-flex items-center rounded-full border px-1.5 py-px font-mono text-[9.5px] font-semibold"
+                  style={{
+                    borderColor: `var(${wiringState(s).token})`,
+                    color: `var(${wiringState(s).token})`,
+                    background: `color-mix(in srgb, var(${wiringState(s).token}) 10%, transparent)`,
+                  }}
+                  title={wiringState(s).meaning}
+                >
+                  {wiringState(s).label}
+                </span>
+              </td>
               <td className={`${TD} font-mono text-[10px] text-muted`} title={path ?? undefined}>
                 {ledgerState(s.ledger)}
               </td>
@@ -188,6 +204,7 @@ export default function LoadMapRoute() {
           )
         })}
       </Table>
+      <WiringKey sources={shown} />
       <p className="shrink-0 text-[10px] text-faint">
         “Pipeline reach” names the stages a source has actually been taken through — it is not a score. A source that
         stops at <i>registered only</i> may be entirely correct; the registries say what exists, not what ought to.
