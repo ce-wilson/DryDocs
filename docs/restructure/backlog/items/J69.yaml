@@ -1,0 +1,22 @@
+id: J69
+epic: release-infrastructure
+title: A port applies by disposition and the port-prompt is organized by step - lead with the
+  disposition classes and demote the ledger to citation
+type: task
+module: docs
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- J68
+inputs:
+- docs/port/port-prompt.md
+- PORT-MANIFEST.yaml
+- drydocs/port_preflight.py
+- docs/decisions/0015-team-edition-template.md
+acceptance: |
+  STUB - body follows in the next commit (id minted per I6).
+notes: |
+  STUB.

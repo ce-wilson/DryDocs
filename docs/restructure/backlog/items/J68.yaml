@@ -1,0 +1,23 @@
+id: J68
+epic: release-infrastructure
+title: A port has two sources of disposition truth and they disagree - retire the skill's ledger rows,
+  give the two orphaned declarations their rows, and guard that a file and its guard match
+type: bug
+module: docs
+phase: 8
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- PORT-MANIFEST.yaml
+- .claude/skills/reconcile-port/SKILL.md
+- tests/unit/test_port_manifest.py
+- MODULE_MAP.md
+- config/source-registry.yaml
+- tests/unit/test_module_boundary.py
+acceptance: |
+  STUB - body follows in the next commit (id minted per I6).
+notes: |
+  STUB.
