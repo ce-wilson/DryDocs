@@ -783,8 +783,8 @@ rows:
       its value stays company-owned wherever the value is a path, a coordinate or
       anything else naming where something lives on one machine. `twin` (J71,
       2026-09-01) is the worked example: it points at the machine-local file holding a
-      carrier's coordinates, so the field crosses and
-      `internal-local/oracle-connection-consolidated.md` does not. `reason` on
+      carrier's coordinates, so the field crosses and the path it holds — under
+      internal-local/, gitignored, one machine only — does not. `reason` on
       `unbound[]` is company-owned outright — why a carrier is unbound is a fact about
       that side's estate. When a new field is genuinely ambiguous, KEEP YOURS: an
       unfamiliar producer value can point a consumer at something that does not exist,

@@ -1735,8 +1735,8 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   (G125) and `twin` landed the next day at `1bd29b42`; nobody went back to classify
   it. A per-entry merge with no instruction for a field has no defensible move.
   **AND TAKING IT WOULD ALSO HAVE BEEN WRONG,** which is the part worth reading:
-  `twin` holds `internal-local/oracle-connection-consolidated.md`, a machine-local
-  path. By the row's own principle — *the WHAT crosses and the WHERE never does* —
+  `twin` holds a path under internal-local/ — machine-local and gitignored, so it
+  exists on exactly one machine. By the row's own principle — *the WHAT crosses and the WHERE never does* —
   **the KEY is producer mechanism and the VALUE is yours.** Take the field and its
   header comment; point it at YOUR twin. Neither "take the file" nor "skip the file"
   was ever the right instruction, and the manifest said neither.
