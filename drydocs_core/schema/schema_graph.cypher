@@ -512,6 +512,10 @@ MATCH (a:SchemaMeta {name: 'AppUser'}), (b:SchemaMeta {name: 'SoftwareProduct'})
 MERGE (a)-[r:USES_SOFTWARE]->(b)
   SET r.vocab_id = 'reg_appuser_uses_software', r.prov_maps_to = null, r.domain = 'registry', r.status = 'planned';
 
+MATCH (a:SchemaMeta {name: 'DataAsset'})
+MERGE (a)-[r:DERIVED_FROM]->(a)
+  SET r.vocab_id = 'reg_derived_from', r.prov_maps_to = 'prov:wasDerivedFrom', r.domain = 'registry', r.status = 'planned';
+
 // ── domain: docs ────────────────────────────────────────────────────────────
 
 MATCH (a:SchemaMeta {name: 'Document'}), (b:SchemaMeta {name: 'SoftwareProduct'})

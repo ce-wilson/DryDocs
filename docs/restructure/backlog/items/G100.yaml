@@ -18,4 +18,37 @@ inputs:
 acceptance: |
   The vocabulary half LANDED 2026-08-18 on SME direction (G100 registration commit): :ServiceNowGroup + :SnowRole node classes, itsm_group_qualified_attribution and itsm_attribution_had_role, all status: planned, in a new `itsm` domain. This item is the GATE that ratifies them plus the build behind it. (a) RATIFY THE REGISTER as a closed set on the K5 fixed-scheme precedent: SME direction is developers -> SENG, production support -> ASUP. Rule whether those two are the whole set or a seed, and whether the tier numbering that pairs with them in the estate's group naming is modelled at all producer-side (it is deliberately NOT asserted today). (b) CONFIRM THE ONE-BACKBONE RULING: technicians resolve to :Employee on the SID, NOT to a second person class. The company model reaches people through :Worker {sid}; the producer does not mint that. This is what makes "which roles does this person hold across PAT, SEAL and ITSM" one traversal instead of three. (c) THE HAS_AGENT HOP IS REUSED, never twinned (C8 refuses duplicate (from,label,to); schema_graph.py raises). Confirm rather than re-derive. (d) FENCE HOLDS: the group -> application link (SUPPORTED_BY / HAS_SUPPORT_QUEUE / RESOLVED_BY) belongs to the company's SIGNED snow-hpsm-queue-to-group gate. This family models WHO STAFFS A GROUP only. Do not re-mint a competing group->app shape — the trap G98 named when it warned G35 off the same thing. (e) THE BUILD, after sign-off: an OOTB lookup over sys_user_group / sys_user_grmember / sys_user (no custom table), resolving members to :Employee by SID and emitting the attribution triple. Entries flip planned -> active WITH their supplement in the same change (flips-are-follow-ups). Nothing loads before sign-off; SnowRole concepts stay proposed.
 notes: |
+  EVIDENCE FOR THE GATE, CAPTURED 2026-08-31/09-01 (venue named per J18: ServiceNow via the
+  0.9.1 JSONv2 bypass; Neo4j desktop container neo4jtest db drydocs; the Oracle replica via the
+  kerberos jdbc-runner -- the replica's own name is redacted infrastructure and stays in
+  internal/, so the venue is named by ROLE here, not by string). This item was under-evidenced
+  when it was groomed; it is not now.
+  Clause (a) asked whether developers -> SENG and production support -> ASUP is the whole set or
+  a seed, and whether the tier numbering that pairs with them is modelled at all. A company-side
+  Snowflake query over the TOM assignment view now DERIVES TIER FROM THE GROUP-NAME TOKEN, with
+  four values not two: _SENG_ -> L3 (Software Engineering), _SSRE_ -> L3 (SRE), _ASUP_ -> L2
+  (Application Support), _ISUP_ -> L2 (Infrastructure Support), else NULL. So the SME's two are
+  demonstrably a SEED, not the closed set, and the tier numbering IS derivable from the naming
+  rather than needing separate assertion -- which is the clause (a) question answered from data.
+  The measured shape behind it: group-scoped TOM makes Incident Resolver variants the
+  highest-volume roles (SRE/DevOps, Application/Infrastructure Support, Escalated Triage,
+  Business Support), and for a four-person L2 support sample the group-scoped row counts are
+  118/129/190/237 across 65-153 CIs each while INDIVIDUAL TOM ownership is zero or near-zero.
+  That is direct evidence for clause (e)'s build shape (an OOTB lookup over sys_user_group /
+  sys_user_grmember / sys_user resolving members to :Employee by SID) -- the lookup is the right
+  one because group scope is where support accountability actually lives.
+  TWO CAUTIONS THAT MUST RIDE WITH THE NUMBERS. (1) Any count sourced from an ITSM console CSV
+  export is a FLOOR, not a measurement: every such export truncates at 200 rows, confirmed across
+  three separate files, one of which reached only 2 SEALs out of 215. Counts from the graph or
+  from a live query are clean; a gate that receives a truncated count as a measured one inherits
+  the truncation into a ruling. (2) The tier derivation above is a NAMING-CONVENTION inference,
+  and doc 09's standing rule forbids inferring an application from a name. A group-name token is
+  a declared convention rather than a coincidence, which is materially different -- but the
+  difference is itself a gate call and clause (a) should make it rather than assume it.
+  WHAT THIS DOES NOT TOUCH: clause (d)'s fence still holds. The group -> application link belongs
+  to the company's signed snow-hpsm-queue-to-group gate; nothing above proposes one.
+  STILL NOT ON THE DERIVED GATE QUEUE: this item has no `gates:` field and no
+  config/gate-prompts/ file, so it does not appear in gates.json. Every one of the 29 gates named
+  by a backlog item has a prompt; wiring this one means drafting that prompt, which is its own
+  unit of work and is NOT done here.
   SOURCE NOTE 2026-08-18 (SME), and it changes what clause (e) builds against: the ServiceNow extracts are being re-sourced INTERNALLY from hand-pulled CSV/YAML onto SQL over the Snowflake replica views. So the lookup here targets the SOURCED feed — snow@[db].[schema].<servicenow_table> per the grammar the `snow` system row already rules — not a CSV shape that is being retired underneath it. Name the dataset for the ServiceNow TABLE, never the V_-prefixed view wrapper (same row). Row models do not move; the SQL aliases columns onto existing field names. Full note: Idea-132, which also carries the two NET-NEW areas (per-CI TOM responsibilities, incidents) that are NOT part of this gate and need their own. Raised 2026-08-18 alongside the registration, at the G91 close. FOURTH family on the qualified-attribution pattern (SEAL K4, PAT products K5, PAT dev teams G91, ITSM here) — the shape is settled, so this gate rules the REGISTER and the identity join, not the modelling pattern. The SME's stated use case is a support team reaching applications through PEOPLE (members holding an operate-manager role) rather than through a develops edge, which is why the single :Employee backbone is the load-bearing part.

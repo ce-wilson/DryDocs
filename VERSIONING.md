@@ -14,10 +14,11 @@ DryDocs follows [Semantic Versioning 2.0.0](https://semver.org/): `MAJOR.MINOR.P
 Breaking-vs-additive is judged against the surfaces other tools/agents depend on:
 
 1. **The `drydocs` CLI** — command names, arguments, and exit-code contract.
-2. **The config schemas** — `drydocs.backlog.v2`, `source-registry`, `taxonomy-ontology-map`,
+2. **The config schemas** — `drydocs.backlog.v3`, `source-registry`, `taxonomy-ontology-map`,
    `classification`, `source-mapping`, `doc-outline` (their shape + the validators that guard them).
 3. **The graph model** — node labels and the **active** terms in
-   `drydocs_core/ontology/relationship_vocabulary.yaml`. (`status: planned` terms are not yet public.)
+   `drydocs_core/ontology/relationship_vocabulary/` (per-domain fragments; S5).
+   (`status: planned` terms are not yet public.)
 
 Internal refactors, docs, and anything behind the HITL gate that is still `planned` are **not**
 part of the public surface.
@@ -40,7 +41,7 @@ fix ⇒ PATCH).
 
 Every release has a section in [`CHANGELOG.md`](CHANGELOG.md) following
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Each section cross-references the
-backlog epic / item ids (`docs/restructure/backlog.yaml`) that the release covers.
+backlog epic / item ids (`docs/restructure/backlog/items/<id>.yaml`) that the release covers.
 
 ## Cutting a release (the ritual)
 

@@ -102,3 +102,59 @@
     loader:       ~                       # not built — the gate authorized the SHAPE only; the adhoc loader is a groomed follow-up
     domain:       registry
     status:       planned
+
+  # ── Replica derivation (C38; Idea-219) — CANDIDATE, gate not yet run ──────
+
+  - id:           reg_derived_from
+    neo4j_label:  DERIVED_FROM
+    inverse_label: "source of"
+    role:         ~
+    from_node:    DataAsset
+    to_node:      DataAsset
+    prov_maps_to: "prov:wasDerivedFrom"
+    note: >
+      CANDIDATE ONLY — status planned, nothing loads, and the MEANING IS THE
+      SME'S. Registered by C38 so the question can be taken to the gate as a
+      typed proposal rather than re-argued from scratch; Idea-219 ruled that
+      minting a derivation type is an ontology decision and inboxed itself
+      rather than proposing.
+
+      THE GAP. A replica currently says so THREE TIMES and as NO EDGE, and all
+      three spellings are ATTRIBUTES, so nothing is traversable and no query
+      can walk from a replica to its origin: (1) the id shape, where `origin`
+      differs from `system` (`controlm@[db].psgmgr.cm_def_vjob` — Control-M
+      data carried by psgmgr; `snow@[db].[schema].<table>` — ServiceNow data
+      carried by Snowflake); (2) the `authority` field reading `ADS` (an
+      AUTHORIZED DISTRIBUTION) rather than `SOR` — 12 rows against 17 today;
+      (3) prose in the row's `notes`. Three spellings of one fact, none of
+      them an edge.
+
+      THE PRECEDENT is DataHub's D-04 ruling: a typed lineage edge with a COPY
+      kind, released 2020-05-21 and patchable one edge at a time.
+
+      THE ANTI-PATTERN RIDES WITH THE PROPOSAL BECAUSE IT IS THE LOAD-BEARING
+      HALF. A sibling-style construct asserts "these are the same thing", and
+      DataHub's SiblingGraphService ACTIVELY DELETES any lineage relationship
+      between two siblings from the merged read path — which is the DEFAULT
+      path. Modelling replica-ness as aliasing therefore DESTROYS THE VERY FACT
+      being recorded. The SME must be able to reject the sibling shape
+      knowingly rather than by omission, which is why it is stated here and not
+      only in the review.
+
+      THE OPEN QUESTION THIS ENTRY DOES NOT ANSWER (D-04's second half): the
+      lineage TYPE does not survive graph traversal on any of DataHub's four
+      read paths, so the derivation KIND may also need keeping redundantly as
+      an edge PROPERTY (`derivation_kind: copy|replica|extract`). Whether to
+      record the how twice is a gate question, not a drafting choice — the
+      redundancy is a hedge against traversal loss, and it costs a property on
+      every edge.
+
+      EVIDENCE BY ANCHOR, never summarized: `docs/design/datahub-substrate-review.md`
+      anchor `replica-note` (and `what-changes` row 11, which inboxed this).
+      Endpoints are DataAsset → DataAsset on the dcat:Dataset proxy shape; the
+      matrix row is Entity → Entity = wasDerivedFrom, which is why the PROV
+      mapping is asserted here and not left local.
+    supplement:   ~                       # none — nothing loads until the gate rules
+    loader:       ~
+    domain:       registry
+    status:       planned

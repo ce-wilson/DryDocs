@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-08-31T15:30:30",
+    "captured_at": "2026-08-31T17:23:23",
     "date": "20260831",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "02cadd7a",
-      "full": "02cadd7a2093980f5e08ac168144fd2faaf5f1cf",
+      "commit": "2be98f8d",
+      "full": "2be98f8d9754d4de86893d4d86bbc35694533bbe",
       "branch": "main",
-      "describe": "port-base-20260829-111-g02cadd7a",
-      "subject": "docs(Idea-233): the body - a capture rung says how the bytes were obtained, which the trust axis does not",
+      "describe": "port-base-20260829-118-g2be98f8d",
+      "subject": "Merge branch 'feat/ui-web': Q28 ΓÇö register the 9.0.21 Parameters doc corpus",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -13796,6 +13796,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/Q28.yaml",
+      "name": "Q28.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/Q28.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/Q3.yaml",
       "name": "Q3.yaml",
       "extension": ".yaml",
@@ -20825,10 +20834,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260831.json",
-      "name": "drydocs-20260831.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260831-1530.json",
+      "name": "drydocs-20260831-1530.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260831.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260831-1530.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -39517,6 +39526,11 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/Q28.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/Q3.yaml"
     ],
     [
@@ -43352,7 +43366,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260831.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260831-1530.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -46209,13 +46223,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2602,
+    "files": 2603,
     "edges": 1406,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2895,
+    "rels": 2896,
     "directories": 294
   }
 }

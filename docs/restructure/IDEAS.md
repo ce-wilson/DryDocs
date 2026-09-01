@@ -1384,26 +1384,32 @@ question a 1,000-line file with the trail at the bottom could not answer.
   superseded shape, they want retiring on their side. Producer does nothing until the two
   ids are known — this is a question, not a defect.
 
-- **`Idea-163`** · 2026-08-24 · `[bug]` · **open — partially groomed → J54 (2026-08-26, the VERSIONING.md currency half only); the three RELEASE decisions stay the user's — push the v0.3.0 tag as-is or re-cut it post-squash, and whether the accumulated Unreleased section has earned a v0.4.0** · prio? **Med** —
-  **`v0.3.0` — the first tagged release — exists only as a local tag on the desktop, and it
-  points into orphaned history.** `git ls-remote --tags origin` returns only the six
-  `port-base-*` tags, so the annotated tag was never pushed and is absent from
-  `ce-wilson/DryDocs` and from the laptop. Its target `8645f81e` (2026-07-09) is NOT reachable
-  from `main`: the 2026-07-20 squash re-rooted `main` at `c5a84c37`, leaving the tag pointing
-  inside the pre-squash history held by `archive/old-history-2026-07-20`. Both of those refs are
-  desktop-local, so losing this machine's `.git` takes the repo's only record of the release with
-  it. VERSIONING.md's own ritual step 5 says to push the branch AND the tag
-  (`git push origin main --follow-tags`); that never completed for `v0.3.0`. **Not a port
-  defect** — `git-readme.md` step 24 rules that the annotated tag does not cherry-pick and that
-  the company keeps its own version string, so the company repo correctly has no `v0.3.0`; the
-  gap is producer-side only. **Three decisions ride on this, none automatic:** (1) push the tag
-  as-is, which publishes a ref into history unreachable from `main`, or re-cut it against a
-  post-squash commit, which changes what the first release points at; (2) `pyproject.toml` still
-  reads `0.3.0` while CHANGELOG `[Unreleased]` has accumulated everything since 2026-07-09 —
-  whether that has earned a `v0.4.0` is a release call; (3) VERSIONING.md is itself stale, citing
-  `drydocs.backlog.v2` and `docs/restructure/backlog.yaml` when the schema is v3 (ADR 0013) and
-  that file is a tombstone — either L19 doc-drift or folded in here. Surfaced while verifying a
-  company-side port-close review, which correctly flagged the tag's absence on their main.
+- **`Idea-163`** · 2026-08-24 · `[chore]` · **open — NARROWED 2026-08-31 to the release call alone; the durability and doc-drift halves are DONE (see below), so what is left is one decision and no discovery** · prio? **Med** —
+  **Has `[Unreleased]` earned a `v0.4.0`?** `pyproject.toml` still reads `0.3.0` while CHANGELOG
+  `[Unreleased]` has accumulated everything since 2026-07-09 — the whole of Epics J/K/L/N/O/Q and
+  the S-series module split among it. Cutting it means deciding the bump against VERSIONING.md's
+  public surface (CLI contract, config schemas, active vocabulary terms), then running its ritual,
+  whose step 5 is `git push origin main --follow-tags` — the step that never completed for
+  `v0.3.0` and produced the orphan problem now closed. **This is a judgment call, not a task:**
+  nothing is broken while it waits, and no agent should cut a release unasked.
+  **What was resolved 2026-08-31, so nobody re-opens it:** (a) `v0.3.0` was pushed **as-is**, still
+  pointing at `8645f81e`, on the user's ruling that the tag should record what actually shipped
+  rather than be re-cut against post-squash history; (b) its target is reachable on `origin`
+  because `archive/old-history-2026-07-20` (411 commits) was pushed alongside it, so the release
+  record is no longer one disk failure from gone; (c) the third sub-item — VERSIONING.md citing
+  `drydocs.backlog.v2` and the `backlog.yaml` tombstone — was fixed in `e0134168`, which also
+  caught a pointer this entry never recorded: the graph-model surface named
+  `relationship_vocabulary.yaml` as a file after S5 split it into per-domain fragments.
+  **Ruled separately:** the third orphan line, `pre-scrub-20260804`, was NOT pushable as it stood —
+  it carried `drydocs-20260804-1338.json` (blob `50b2dd6d`) with real Internal workbook values that
+  the U9 off-by-one had leaked. Its fix commit had ruled that acceptable while the leak stayed in
+  LOCAL history; pushing to a remote was held to be a different question. The line was rewritten
+  without the file and pushed as `archive/prescrub-20260804-scrubbed`, verified at 0 matching
+  blobs, and the unscrubbed original deleted on the user's instruction.
+  **Not a port defect** — `git-readme.md` step 24 rules that the annotated tag does not cherry-pick
+  and that the company keeps its own version string, so the company repo correctly has no `v0.3.0`.
+  Surfaced while verifying a company-side port-close review, which correctly flagged the tag's
+  absence on their main.
 
 - **`Idea-162`** · 2026-08-24 · `[chore]` · **parked → a producer `DD` letter series is actually proposed (re-read 2026-08-27: nothing to do until then; the disposition is already recorded in the body so the choice cannot be made by accident, which is the only way it would be)** · prio? **Low** —
   **The company occupies `DD1`–`DD10` in the PRODUCER band, in a letter series this repo

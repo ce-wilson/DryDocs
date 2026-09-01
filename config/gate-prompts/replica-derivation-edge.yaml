@@ -1,0 +1,107 @@
+# GATE replica-derivation-edge — DRAFTED 2026-09-01 by C38 (Idea-219). UNSIGNED.
+# Nothing here is ruled. reg_derived_from stays status: planned until sign-off.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: replica-derivation-edge
+title: >-
+  SME Gate — replica-ness is recorded three times and as no edge: does a typed derivation
+  relationship get minted, is the sibling shape rejected knowingly, and is the derivation kind
+  kept redundantly as a property
+step: >-
+  C38 (Idea-219), drafted 2026-09-01 — BEFORE any loader or supplement exists. The candidate
+  reg_derived_from is registered status: planned only; nothing loads and no entry flips active
+  until these sections are ruled.
+summary: >-
+  Rules whether a replica's origin becomes traversable. (a) THE GAP: a replica says so three times
+  and all three spellings are ATTRIBUTES — the id shape where origin differs from system
+  (controlm@[db].psgmgr.* is Control-M data on the psgmgr carrier; snow@[db].[schema].* is
+  ServiceNow data on the Snowflake carrier), the authority field reading ADS rather than SOR (12
+  rows against 17), and prose in notes. None is traversable, so no query can walk from a replica to
+  its origin. (b) THE CANDIDATE is a typed derivation edge on DataHub's D-04 precedent — a typed
+  lineage edge with a COPY kind, released 2020-05-21 and patchable one edge at a time. (c) THE
+  ANTI-PATTERN IS THE LOAD-BEARING HALF: a sibling-style construct asserts these are the same
+  thing, and DataHub's SiblingGraphService ACTIVELY DELETES any lineage relationship between two
+  siblings from the merged read path, which is the default — so modelling replica-ness as aliasing
+  destroys the fact being recorded. The SME must reject that shape knowingly rather than by
+  omission. (d) D-04's SECOND HALF asks whether the derivation kind is also kept as an edge
+  property, because the lineage type does not survive traversal on any of their four read paths.
+  Evidence is cited by anchor, never summarized.
+
+meta:
+  Module: >-
+    ontology — the artifact under discussion is
+    drydocs_core/ontology/relationship_vocabulary/44-local-registry.yaml (the reg_derived_from
+    candidate, status planned) and its deterministic render
+    drydocs_core/schema/schema_graph.cypher. No supplement and no loader exist by design.
+  Source: >-
+    config/source-registry.yaml — the as-built replica rows whose origin is currently
+    untraversable. Counts confirmed at this commit, not recalled.
+  Precedent: >-
+    DataHub D-04 (typed lineage edge with a COPY kind, 2020-05-21) for the shape, and its
+    SiblingGraphService merged-read-path deletion for the anti-pattern.
+  Registry ref: >-
+    reg_derived_from · domain registry · status planned · supplement ~ · loader ~
+  Classification: >-
+    Internal-Public — mechanism only. The bracketed [db] and [schema] placeholders stay redacted;
+    no host and no real identifier appears in this prompt.
+  Vocabulary: >-
+    DataAsset (dcat:Dataset, prov Entity) on both ends; matrix row Entity -> Entity =
+    prov:wasDerivedFrom.
+
+provenance:
+  - label: The gap as built — the three spellings, read from the registry not recalled
+    source_object: config/source-registry.yaml
+    key: id shape (origin != system) · authority field · notes prose
+    loader: NONE — no loader reads replica-ness today; it is a config-layer fact only.
+    properties:
+      - name: id_shape_origin_differs
+        origin: source
+        from: dataset ids of the form {origin}@[db].{schema}.{table} where origin != system
+      - name: authority_ads_vs_sor
+        origin: source
+        from: "authority: ADS on 12 rows, authority: SOR on 17, counted at this commit"
+      - name: notes_prose
+        origin: source
+        from: the row's own notes block, per-row and unstructured
+
+  - label: The precedent and its anti-pattern — cited by anchor, never summarized
+    source_object: docs/design/datahub-substrate-review.md
+    key: anchor replica-note · anchor what-changes row 11
+    loader: NONE — a design review, not a feed.
+    properties:
+      - name: d04_typed_copy_edge
+        origin: source
+        from: the review's replica-note anchor — a typed lineage edge with a COPY kind, released 2020-05-21
+      - name: sibling_graph_service_deletes_lineage
+        origin: source
+        from: the review's replica-note anchor, citing C-58/C-59 as its own highest-value verification item
+      - name: type_does_not_survive_traversal
+        origin: derived
+        from: D-04's second half, restated here as the open question in section D
+
+sections:
+  - title: A. The gap — three spellings, no edge, and whether traversal is even wanted
+    confirmations:
+      - "A1. THE THREE CURRENT SPELLINGS, as the as-built state: (1) the id shape, where `origin` differs from `system` — `controlm@[db].psgmgr.<table>` is Control-M data on the psgmgr carrier, `snow@[db].[schema].<table>` is ServiceNow data on the Snowflake carrier; (2) `authority: ADS`, an authorized distribution rather than `SOR` — 12 rows against 17 at this commit; (3) prose in the row's `notes`. All three are ATTRIBUTES and none is traversable. Confirm the gap, or name a fourth spelling."
+      - "A2. THE PRIOR QUESTION, asked before any edge is minted: is TRAVERSAL actually wanted? A reporting-only need — list the replicas and their origins — is already answered by the three attributes. Minting an edge is justified only by a traversal the attributes cannot serve. Name that traversal, or close this gate without minting."
+
+  - title: B. The candidate shape, direction and grain
+    confirmations:
+      - "B1. A TYPED DERIVATION EDGE on the D-04 precedent: DataAsset -> DataAsset, neo4j_label DERIVED_FROM, prov:wasDerivedFrom (matrix row Entity -> Entity). Confirm the shape and the endpoints, or re-draw."
+      - "B2. DIRECTION replica -> origin, inverse phrasing `source of`. Confirm, or invert."
+      - "B3. GRAIN is the DATASET pair, not the system pair: psgmgr carries ten Control-M objects, which is ten edges and not one. Confirm, or rule the system-grain alternative and say what happens when one carrier holds two origins — psgmgr already holds Control-M AND HR."
+
+  - title: C. The anti-pattern — rejected knowingly, not by omission
+    confirmations:
+      - "C1. THE SIBLING SHAPE IS THE TRAP AND IS THE LOAD-BEARING HALF OF THIS GATE. A sibling-style construct asserts these are the same thing. DataHub's SiblingGraphService ACTIVELY DELETES any lineage relationship between two siblings from the merged read path, which is the DEFAULT path — so modelling replica-ness as aliasing DESTROYS THE FACT BEING RECORDED. Confirm the sibling shape is REJECTED, and that the rejection is recorded as knowing rather than incidental."
+      - "C2. THE SAME-AS FAMILY (owl:sameAs, skos:exactMatch) inherits C1's defect for the same reason — it asserts identity where the fact is derivation. Confirm the family is out, or name the exception and why it escapes C1."
+
+  - title: D. Recording the HOW — redundantly, or not at all
+    confirmations:
+      - "D1. D-04's SECOND HALF: the lineage TYPE does not survive graph traversal on any of DataHub's four read paths, so the derivation KIND may need keeping redundantly as an edge PROPERTY. Rule whether the how is recorded twice. The redundancy is a hedge against traversal loss and it costs a property on every edge; declining is a legitimate ruling."
+      - "D2. IF YES, THE VALUE SET. Candidate: copy | replica | extract. Two cautions the SME should have: `copy` and `replica` are near-synonyms and one may be redundant, and `extract` is the TRANSFORMING case which may not belong on a derivation edge at all. Rule the enum as a closed set or an explicit seed."
+
+  - title: E. Fence
+    confirmations:
+      - "E1. NOTHING LOADS ON SIGN-OFF ALONE. The entry flips planned -> active WITH its supplement and loader in the same change (flips-are-follow-ups, N13). Confirm."
+      - "E2. OUT OF SCOPE HERE: whether the three attribute spellings become REDUNDANT once an edge exists. Deduplicating them is a registry change fenced by registry-wiring-readiness clause D2, and this gate does not touch the `authority` field, the id grammar, or the `notes` prose. Confirm the fence."

@@ -139,7 +139,7 @@ Index: [`reference/REGISTRY.yaml`](reference/REGISTRY.yaml)
 
 | Platform | What it is | How to call it |
 |----------|-----------|----------------|
-| **Neo4j** | the graph platform itself | `neo4j-skills` plugin — trimmed locally to 9 skills: cypher, modeling, import, graphrag, vector-index, gds, driver-python, query-tuning, security (see the trim note below) + [`reference/platforms/neo4j/`](reference/platforms/neo4j/README.md) |
+| **Neo4j** | the graph platform itself | `neo4j-skills` plugin — trimmed locally to 10 skills: cypher, modeling, import, document-import, graphrag, vector-index, gds, driver-python, query-tuning, security (see the trim note below) + [`reference/platforms/neo4j/`](reference/platforms/neo4j/README.md) |
 | **Ontology standards** | PROV-O, W3C ORG, DPROD/EKGF, **SOSA/SSN**, DCAT, SKOS | [`reference/standards/`](reference/standards/README.md) |
 | **Academic research** | papers backing modeling choices | [`reference/research/`](reference/research/README.md) |
 
@@ -176,8 +176,19 @@ Index: [`external/orchestration/README.md`](external/orchestration/README.md)
 | **AutoSys (CA/Broadcom)** | placeholder — map to baseline | [`external/orchestration/autosys/`](external/orchestration/autosys/README.md) |
 | **AWS Airflow / MWAA** | placeholder — map to baseline | [`external/orchestration/airflow/`](external/orchestration/airflow/README.md) |
 
-Oracle (source DB) and Snowflake (future) are **data platforms**, referenced via the Oracle
-`db` skill and [`reference/platforms/`](reference/platforms/README.md).
+Oracle (source DB) and Snowflake (future) are **data platforms**, indexed under
+[`reference/platforms/`](reference/platforms/README.md) and served by the
+[`oracle-db` skill](.claude/skills/oracle-db/SKILL.md) (general Oracle/PL-SQL/tuning guidance).
+**That skill is present and ported, but OFF producer-side** — `"off"` in `.claude/settings.local.json`
+`skillOverrides`, because the producer has no live Oracle connection for it to act on. The state is
+venue-specific and the enablement call is each repo's own (J18): `.claude/**` is `canonical-producer`,
+so the company inherits the skill tree while `settings.local.json` stays machine-local — the company
+side, which does have a live `psgmgr` connection, is expected to turn it on. Two adjacent pointers,
+so nobody re-fixes this line wrongly: the vendor plugin `db@oracle-skills` is a *different* thing and
+is `false` in `~/.claude/settings.json` `enabledPlugins`; and `reference/platforms/` currently carries
+**`neo4j/` only** — there is no `oracle/` directory behind that link yet. For the CM_ objects in the
+`psgmgr` schema, the entry point is the [`controlm-db` skill](.claude/skills/controlm-db/SKILL.md),
+which answers "which table holds X" against the replica and needs no connection at all.
 
 ---
 
