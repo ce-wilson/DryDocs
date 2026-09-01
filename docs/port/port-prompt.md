@@ -1768,6 +1768,50 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   `source-registry.yaml` rule that RELAY-18 announces was written the same morning and
   named 6 of that file's 29 fields. The defect reappeared in the row that fixed it.
 
+- **RELAY-20 — THE CONTENT-SIMILARITY CHECK YOU ASKED FOR IS BUILT AND PROVEN ON
+  THE REAL RENAMES; RUN IT BEFORE THE NEXT CLEAN-ADD SLICE** (new 2026-09-01; J72,
+  from your own request after the trap fired twice).
+  `[VERIFIED-PRODUCER]` — proven against real history, not fixtures.
+  **THE COMMAND**, from your checkout with the producer remote fetched:
+  ```
+  poetry run python scripts/port_rename_check.py --producer-ref port-base-20260901 --path-prefix config/
+  ```
+  Exit 0 = no proposed clean-add resembles a file you already hold. Exit 1 = at
+  least one does, and it names the pair. Drop `--path-prefix` for the whole tree;
+  add `--any-directory` only for a deliberate sweep (both known traps were
+  in-directory, and the wide compare is quadratic).
+  **PROVEN ON YOUR TWO TRAPS, on real commits.** Run across `496aa268~1..496aa268`
+  — the commit that actually applied the gate rename — it reports both pairs at
+  **id-set similarity 1.00**: `40-local-scheduler.yaml` ← `40-local-controlm.yaml`,
+  and `41-local-business-application.yaml` ← `41-local-seal.yaml`. That second pair
+  is the one that cost you 62 failures.
+  **TWO MEASURES, AND YOU NEED BOTH — your two traps have opposite shapes.** A
+  SPLIT (41-local-seal → business-application + human) diverges in prose and keeps
+  its ids, so the id-set measure catches it. A RENAME (the crosswalk prompt's
+  retired-acronym name → `cdo-crosswalk`) renames the id — the id IS the filename stem — and keeps its body,
+  so only the text measure catches it. The id measure ABSTAINS below three ids on
+  either side, precisely so a one-id-each miss cannot score the gate pair 0.00 and
+  silence the measure that scores it 0.88.
+  **IT REPORTS, IT DOES NOT DECIDE.** Every flagged pair is adopt / decline / false
+  positive, and the output says so. Your two failures came from acting without
+  looking, not from looking and choosing wrong — this restores the looking step and
+  nothing else.
+  **ONE FINDING FROM BUILDING IT THAT IS YOURS TOO.** Its first run raised
+  `UnicodeDecodeError: 'charmap' codec can't decode byte 0x9d` — `subprocess(...,
+  text=True)` decodes with the platform locale, cp1252 on Windows. **That is the
+  same trap you reported an hour earlier**, where a comparison script mojibaked
+  every em-dash and fabricated 18 of 25 "differences". Fixed here with an explicit
+  `encoding="utf-8"`, and worth applying to any comparison tooling you keep: a
+  similarity check that mis-decodes one side compares a corrupted document against
+  a clean one and reports the corruption as a difference. Both machines are Windows;
+  neither of us gets this for free.
+  **ACTION AT THE PORT THAT CARRIES THIS:** it lands after `port-base-20260901`, so
+  it is not in the range you are applying — take the three files by name if you want
+  it now (`drydocs/port_rename_detect.py`, `scripts/port_rename_check.py`,
+  `tests/unit/test_port_rename_detect.py`), or run it from the producer checkout
+  against your tree. Either way, run it before D/E/F, where ~430 files remain
+  unexamined and 217 of them classify as clean-adds.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has

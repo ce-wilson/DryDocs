@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p0
-status: todo
+status: done
 depends_on: []
 inputs:
 - drydocs/port_preflight.py
@@ -17,6 +17,68 @@ inputs:
 - PORT-MANIFEST.yaml
 - tests/unit/test_port_reconcile_guards.py
 acceptance: |
-  STUB - body follows in the next commit (id minted per I6).
+  (a) THE CHECK EXISTS AND IS RUNNABLE FROM THE CONSUMER. For each producer path absent
+  consumer-side - the paths a port classifies as clean-adds - compare CONTENT against consumer files
+  with a DIFFERENT name and report the pairs that look like one document.
+
+  (b) TWO MEASURES, STRONGER WINS, because the two known traps have opposite shapes. ID-SET for a
+  fragment split (entries move; the ids survive, the prose does not). NORMALIZED TEXT for a renamed
+  prose document (the header is rewritten; the body survives). Neither alone catches both.
+
+  (c) IT REPORTS, IT NEVER DECIDES. Every flagged pair is adopt / decline / false positive, and the
+  output says so. The port's failures came from acting without looking, not from looking and
+  choosing wrong.
+
+  (d) PROVEN ON THE REAL RENAMES, not only on fixtures.
+
+  (e) PORTS. Pure functions take TEXT and PATH MAPS, never a repository, so the guards run
+  producer-side where no consumer tree exists.
 notes: |
-  STUB.
+  REQUESTED BY THE COMPANY SESSION after the trap fired twice in one apply: "Before I take another
+  clean-add, I'd like to build the content-similarity check you offered. Cheap, and it's now failed
+  twice for want of it." ~430 files remained unexamined at that point.
+
+  THE DEFECT. A port classifies a path against PORT-MANIFEST.yaml; a path absent consumer-side is a
+  clean-add - apply untouched, no merge, no decision. That is correct about the PATH and blind to the
+  CONTENT, so a renamed file arrives as new. The manifest cannot help: it answers "how do I merge
+  this path", and the question here is "is this path new at all".
+
+  BOTH INSTANCES, and they are shaped differently, which is why one measure is not enough:
+  41-local-seal.yaml -> 41-local-business-application.yaml + 52-local-human.yaml at gate
+  vocabulary-domains-and-id-policy A1/A2 - a SPLIT, where prose diverges and ids survive; 16
+  duplicated ids, 62 failures, one revert. And the crosswalk gate prompt, whose retired-acronym
+  name became cdo-crosswalk.yaml - a rename where the ids diverge (the id is the filename stem)
+  and the body survives. The second is the worse
+  one: the producer copy reads SIGNED OFF, 13 confirmations, by name, where the company copy reads
+  DRAFT, unsigned, session pending - and config/gate-prompts/** is canonical-company. Applying it
+  would have fabricated a company ratification that never happened, in a file class whose contents
+  config/gate-log.md cites as authority. A dropped field is absent; a fabricated sign-off is present
+  and confident.
+
+  PROVEN ON REAL HISTORY (2026-09-01, producer desktop). Run against 496aa268~1 -> 496aa268 - the
+  actual commit that applied the gate rename - the detector reports both real pairs at id-set
+  similarity 1.00: 40-local-scheduler.yaml <- 40-local-controlm.yaml, and
+  41-local-business-application.yaml <- 41-local-seal.yaml. That second pair is the one that cost the
+  company 62 failures. Fixtures reconstruct a defect; this reproduces it.
+
+  A SELF-INFLICTED FINDING WORTH KEEPING. The first run of scripts/port_rename_check.py raised
+  UnicodeDecodeError: 'charmap' codec can't decode byte 0x9d - subprocess text=True decodes with the
+  platform locale, cp1252 on Windows. That is the SAME trap the company session reported an hour
+  earlier, where a comparison script mojibaked every em-dash and fabricated 18 of 25 "differences".
+  The tool built to catch their first trap fell into their second one on its first run. Worse than
+  cosmetic here: a similarity check that mis-decodes one side compares a corrupted document against a
+  clean one and reports the corruption as a difference - the failure it exists to prevent, wearing
+  the opposite sign. Fixed with an explicit encoding="utf-8" and the reason in the docstring, because
+  both machines are Windows and this will be reached for again.
+
+  WHY THE FLOOR IS LOW (0.35). The cost of a false positive is one diff; the cost of a false negative
+  is a duplicated vocabulary or an imported signature. Both known traps score far above it.
+
+  WHY THE ID MEASURE ABSTAINS BELOW THREE IDS. A gate prompt carries one id and a rename renames it,
+  so the id measure would score that pair 0.00 and silence the text measure that scores it 0.88 - the
+  signal meant to help would be the one that hid the gate-state regression. Guarded both directions:
+  a split the text measure ranks lower, and a rename the id measure would miss.
+
+  DONE 2026-09-01. drydocs/port_rename_detect.py + scripts/port_rename_check.py +
+  tests/unit/test_port_rename_detect.py (11 tests). MODULE_MAP row and the test_module_boundary
+  "port" group updated in the same commit, per the default-deny rule. RELAY-20 hands it over.
