@@ -91,6 +91,10 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
+- **`Idea-234`** · 2026-09-01 · `[idea]` · **open** · prio? **Low** —
+  **A branch tip can be green while commits inside it are red, and nothing records which — so a
+  bisect through the range fails on the guard rather than the defect.** STUB - body follows.
+
 - **`Idea-233`** · 2026-08-31 · `[idea]` · **open** · prio? **Med** —
   **Record HOW a source was captured, not only how much its content is trusted: a capture-rung
   alongside the VERBATIM/GROUNDED/SYNTHESIZED axis.** Every `SOURCE-MANIFEST` today carries a
