@@ -325,7 +325,7 @@
     to_node:      Employee
     prov_maps_to: ~
     note: >
-      The functional id's human OWNER-OF-RECORD — the manager the directory
+      The functional id's human OWNER-OF-RECORD — the person the directory
       names against the account, who RECERTIFIES ANNUALLY (gate
       fid-identity-and-scope Q7, RULED 2026-08-19: owner-of-record, not mere
       attestor). Accountability, NOT a contact point — explicitly not swept
@@ -340,6 +340,21 @@
       delegation of action, so no prov:actedOnBehalfOf — null-PROV on the
       recorded local-meaning precedent. NOTHING LOADS: planned until the
       build item lands.
+      SME INPUT 2026-08-31 (direction, ticks no clause) — "MANAGER" HERE IS A
+      HIERARCHY POSITION, NOT A PEOPLE-MANAGEMENT ROLE. The directory carries
+      functional accounts in the same hierarchy as people, and the account is
+      the LOWEST level, so whoever owns one is by construction listed as its
+      manager. An individual contributor who owns a schema or platform account
+      appears as that account's manager while managing no people. Two things
+      follow. (1) NEVER read org structure off this edge, and never infer
+      seniority from holding it — the field name is a structural artifact of
+      where FIDs sit in the tree. (2) The observed convergence (independent
+      SEAL role-holding and FCT ownership selecting the same people) is
+      therefore NOT a shared seniority bias; both select for technical
+      accountability, which is a stronger warrant than the seniority reading.
+      Recorded because the prose above invited exactly the wrong inference and
+      a reading session made it.
+
       REPLACES seal_appuser_owned_by at G101 (2026-08-21) — the seal_ family §B3's census left out; same rule, gate
       vocabulary-domains-and-id-policy §B1/§B3 (SIGNED 2026-08-12): the prefix is
       now the entry's own `domain:` field. Same label, direction, planned status
