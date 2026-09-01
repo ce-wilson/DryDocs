@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p1
-status: todo
+status: in_progress
 depends_on:
 - J68
 inputs:
@@ -19,6 +19,70 @@ inputs:
 - config/audit-fields.yaml
 - config/source-registry.yaml
 acceptance: |
-  STUB - body follows in the next commit (id minted per I6).
+  (a) EVERY PER-ENTRY RULE BECOMES TOTAL. A rule that enumerates fields is a rule with a hole in
+  it the moment a field is added, and enumerating harder does not fix that - the NEXT field
+  reopens it. Each per-entry `entry_rule` whose file carries fields the rule does not name gains
+  an explicit default: a clause naming which side owns everything not listed above. Convention
+  is a literal `UNNAMED FIELDS:` marker so it is greppable and cannot be satisfied by prose that
+  merely sounds like a default.
+
+  (b) THE FOUR KNOWN HOLES ARE CLOSED, and `twin` is classified on the row's own stated
+  principle rather than by preference. config/source-bindings.yaml (`twin`, `reason`),
+  config/doc-source-registry.yaml (`classification`, `describes_product`, `landing_zone`,
+  `replaces`, `source_url`), config/audit-fields.yaml (`decided_by`, `notes`, `objects`,
+  `status`), and config/source-registry.yaml - whose rule this session wrote hours earlier and
+  which names 6 of its 29 fields, so it is the same defect in a brand-new row.
+
+  (c) THE GUARD. tests/unit/test_port_manifest.py: for each per-entry row governing a YAML file
+  of list entries, every field present is either NAMED in the entry_rule or covered by the
+  row's `UNNAMED FIELDS:` default. Written RED FIRST against the current manifest and shown
+  failing on the four rows above. A companion test proves the detector catches an injected hole,
+  per the J26 idiom.
+
+  (d) THE RELAY, because the producer cannot repair the consumer's tree. The port-prompt carries
+  a relay naming each dropped field, which way it goes, and - for the WHERE-shaped ones - that
+  the KEY crosses while the VALUE does not, so neither "take it" nor "skip it" is the whole
+  instruction.
+
+  tests/unit green. No file content moves; this changes merge RULES and the guard over them.
 notes: |
-  STUB.
+  FOUND BY THE SME, 2026-09-01, from a real drop: the company port did not carry
+  config/source-bindings.yaml from `1bd29b42` (G129), which added `twin:` to every profile.
+
+  THE ROOT CAUSE IS NOT THE MISSED FILE. The row's field split enumerates - producer-owned
+  `id, carrier, platform, classification, serves, note` plus the env-map keys; company-owned the
+  variable names and `status`. `twin` and `reason` are in NEITHER list. The rule was written at
+  `683d85fe` (G125) and `twin` arrived the next day at `1bd29b42` (G129); nobody went back. A
+  per-entry merge with no instruction for a field has no defensible move, so it drops. That is
+  the rule failing, not the session.
+
+  AND "TAKE IT" WOULD ALSO HAVE BEEN WRONG, which is why this needed a ruling rather than a
+  sweep. `twin` holds a machine-local path (`internal-local/oracle-connection-consolidated.md`).
+  By the row's own principle - "the WHAT crosses and the WHERE never does" - the KEY is producer
+  mechanism and the VALUE is company-owned. Taking it wholesale points their profiles at paths
+  that do not exist on their machine; skipping the file loses the mechanism. Neither half alone
+  is right, and the manifest said neither.
+
+  MEASURED SCOPE (2026-09-01, producer desktop, entries parsed rather than grepped - a regex over
+  raw YAML matched prose inside `notes:` blocks and reported false positives across the backlog
+  items before it was replaced): source-bindings 2 of 10 fields unclassified,
+  doc-source-registry 5 of 19, audit-fields 4 of 5, source-registry 23 of 29. Commits in the
+  ported range touching them: source-bindings 2 (`683d85fe`, `1bd29b42`), doc-source-registry 5
+  (`87fca339`, `63de2acc`, `ff87227f`, `3afa8307`, `3c2bfcdd`), audit-fields 2 (`07d9caab`,
+  `3c2bfcdd`).
+
+  WHY TOTALITY RATHER THAN A LONGER LIST. The obvious fix is to add the missing names, and it is
+  the wrong one: it repairs today's four holes and leaves the mechanism that produced them
+  intact, so the next field added lands in exactly the same gap. A default clause gives every
+  future field an answer on the day it lands, and the guard then has something it can actually
+  check - "is this rule total" is decidable, "is this rule complete enough" is not.
+
+  RELATION TO J68, which is the same disease one level up. J68 was a DECLARATION and its GUARD
+  disagreeing about disposition; this is a FILE and its MERGE RULE drifting apart. Both are two
+  descriptions of one fact that nothing forced to agree. J68's fix was to remove the second
+  description; here the second description is load-bearing, so the fix is to make it total.
+
+  SELF-IMPLICATING, and recorded rather than quietly repaired: config/source-registry.yaml's
+  per-entry rule was written THIS SESSION, hours before this item, as part of J68 - and it names
+  6 of 29 fields. The defect it fixes reappeared in the row that fixed it, which is the strongest
+  available argument that enumeration is the wrong instrument.
