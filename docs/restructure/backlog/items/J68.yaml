@@ -18,6 +18,53 @@ inputs:
 - config/source-registry.yaml
 - tests/unit/test_module_boundary.py
 acceptance: |
-  STUB - body follows in the next commit (id minted per I6).
+  (a) THE SKILL STOPS ASSERTING DISPOSITIONS. `.claude/skills/reconcile-port/SKILL.md` line 92 says
+  `tests/unit/test_module_boundary.py` is "Canonical-here - take producer wholesale"; PORT-MANIFEST.yaml
+  says `per-entry`. The manifest is right and the skill is stale. Every row in that skill's collision
+  ledger that asserts a DISPOSITION is retired and replaced by a pointer to the manifest - the skill may
+  carry HOW to hand-merge a file, never WHETHER to take it. One source of disposition truth, and it is
+  PORT-MANIFEST.yaml. Rows that carry only merge guidance stay.
+
+  (b) THE TWO ORPHANED DECLARATIONS GET THEIR ROWS. `MODULE_MAP.md` is `canonical-producer` while the
+  guard that enforces it is `per-entry`; `config/source-registry.yaml` has no row at all and falls
+  through to the `config/**` canonical-producer default. Both become `per-entry` with an entry_rule
+  naming what each side owns, on the `test_module_boundary.py` / `lob-product-team.yaml` pattern.
+
+  (c) THE INVARIANT IS GUARDED, NOT WRITTEN DOWN. A new check in tests/unit/test_port_manifest.py:
+  a DECLARATION file and the GUARD that enforces it must resolve to the same disposition. The pairs are
+  declared in the test, each with the guard that reads it. Splitting a pair's disposition guarantees the
+  wholesale take that drops the other side's rows, which is what (b) is repairing.
+
+  (d) THE GUARD REPRODUCES THE BUG BEFORE THE FIX LANDS. Written red first against the current manifest
+  and shown failing on the MODULE_MAP pair; a guard that cannot reproduce the defect proves nothing.
+
+  (e) RELAY. The port-prompt carries a relay saying both rows changed and the skill rows are retired,
+  and states explicitly that this lands AFTER port-base-20260901 so it does not alter what the in-flight
+  apply should do.
+
+  Nothing in the company tree is touched and no id moves. tests/unit green.
 notes: |
-  STUB.
+  FOUND BY THE COMPANY SESSION during the 2026-09-01 apply, reported with the evidence, and every
+  claim verified producer-side before this item was written.
+
+  WHY THIS IS ONE ITEM AND NOT THREE. All three findings are the same defect: a disposition asserted in
+  two places that disagree. The skill says wholesale where the manifest says per-entry; MODULE_MAP.md
+  says canonical-producer where its own guard says per-entry; source-registry.yaml says nothing at all
+  and inherits an answer from a glob. Fixing the rows without fixing the DUPLICATION leaves the next
+  stale copy free to contradict the manifest again.
+
+  THE COST, MEASURED RATHER THAN ARGUED. The wholesale take of test_module_boundary.py dropped six
+  company-only module families (drydocs.scrapers.*, drydocs.docmeta.*, drydocs.seal_projection) and
+  the default-deny guard failed immediately. The wholesale take of source-registry.yaml drove
+  test_source_registry from 1 failure to 7. Both were caught by the company mid-apply and hand-merged,
+  so the damage was contained - this item removes the trap rather than the symptom.
+
+  IT HAS HAPPENED BEFORE, TWICE, AND BOTH ARE ON THE RECORD. PORT-MANIFEST.yaml's own entry_rule for
+  test_module_boundary.py says the file "was canonical-producer until a wholesale take dropped the
+  company's extended groups" - so the manifest already learned this lesson and the skill never did. And
+  the config/** default's note records "dev-environment.yaml sat here by omission until the 2026-07-28
+  port". source-registry.yaml is the third instance of that same omission.
+
+  WHAT THIS IS NOT. Not a criticism of the collision ledger, which is genuinely useful for the files it
+  describes how to merge - cli.py, the models exports, the CI workflows. The defect is narrow: a ledger
+  entry that answers WHETHER instead of HOW is answering a question the manifest owns.

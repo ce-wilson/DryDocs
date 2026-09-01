@@ -17,6 +17,43 @@ inputs:
 - drydocs/port_preflight.py
 - docs/decisions/0015-team-edition-template.md
 acceptance: |
-  STUB - body follows in the next commit (id minted per I6).
+  (a) THE APPLY SECTION LEADS WITH DISPOSITION. The port-prompt gains an apply section ordered by
+  manifest disposition class - canonical-producer, canonical-company (no action by rule), per-entry,
+  union-append, evaluate, DEFAULT, derived (regenerated last) - each carrying the paths in that class
+  for the range, the entry_rule where one exists, and the ledger steps that touch it as CITATIONS.
+
+  (b) THE STEP LEDGER SURVIVES INTACT. It moves below the apply section and is not rewritten,
+  summarized or renumbered. It is where the reasoning lives, and steps are cited BY the new section
+  rather than replaced by it.
+
+  (c) THE COVERAGE GUARD STILL READS. drydocs/port_preflight.py parses only between the `STEP LEDGER`
+  and `ACCEPTANCE GATE` markers (_LEDGER_START / _LEDGER_END). Those markers and everything between
+  them stay parseable, and `uncited_commits` returns zero on the current range after the restructure.
+  If the new section sits between the markers it becomes part of what the guard reads, so it goes
+  ABOVE `STEP LEDGER` - verify, do not assume.
+
+  (d) THE DISPOSITION LIST IS DERIVED, NOT HAND-KEPT. The per-range path list comes from classifying
+  the range's changed paths through PORT-MANIFEST.yaml, the same way the roll-ups on the board are
+  derived. A hand-maintained copy of the manifest inside the port-prompt would be a fourth source of
+  disposition truth, which is the defect J68 exists to remove.
+
+  tests/unit green; the preflight coverage check passes on the restructured file.
 notes: |
-  STUB.
+  WHY, IN ONE MEASUREMENT. The 2026-09-01 company apply bucketed 88 diverged paths into the manifest's
+  classes - canonical-producer 19, canonical-company 5, per-entry 24, union-append 11, evaluate 5,
+  DEFAULT 21, derived 3 - and worked them class by class, escalating two rows to per-entry mid-apply.
+  The 296-step ledger was reference material while that happened. The file's spine and the consumer's
+  spine are different, and the consumer's is the one that should lead.
+
+  THIS IS ALSO THE TEAMS EDITION MOVE. ADR 0015 D4 promotes the PORT-MANIFEST disposition vocabulary to
+  the template's file classes (canonical-template frozen / instance-owned scaffolded / derived
+  regenerated). Restructuring the port-prompt around dispositions is that same reorganization, done
+  once, on the surface that already carries the vocabulary. Doing it here first means TE inherits a
+  worked example rather than a proposal.
+
+  DEPENDS ON J68 DELIBERATELY. Leading with disposition while two rows are wrong and a skill contradicts
+  them would make the wrong answer more prominent, not less.
+
+  SEQUENCING. Lands as a relay in the roll after the in-flight apply. The company applied at the tag
+  port-base-20260901, so producer-side edits cannot move under them - but a restructured apply section
+  is only useful once it describes rows they have not already hand-merged.
