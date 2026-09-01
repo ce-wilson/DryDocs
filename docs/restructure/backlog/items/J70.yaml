@@ -16,6 +16,67 @@ inputs:
 - docs/restructure/backlog/items/J13.yaml
 - drydocs_core/ontology/relationship_vocabulary/41-local-business-application.yaml
 acceptance: |
-  Stub minted per the I6 rule — the body lands in the next commit.
+  (a) THE ESCALATION, FIRST, BECAUSE IT DECIDES WHETHER HALF THIS ITEM EXISTS.
+  `controlm@[db].psgmgr.cm_avg_run` -> `controlm@[db].[schema].cm_avg_run` asks to redact
+  the SCHEMA. J13 class 3 was RULED on 2026-08-11 and recorded in `config/gate-log.md`
+  ("RECORD: J13 publish-ceiling value classes 2, 3, 4"): schema/table/column ids get
+  "NO SWEEP OWED — already covered by the SIGNED N9 source-registry-v2 id grammar, which
+  redacts the database and publishes schema.table". The `[db]` in these ids is redacted ON
+  PURPOSE and `psgmgr` is published ON PURPOSE; that is the grammar working, not leaking.
+  So this half does NOT ship as an edit. It goes back to the SME as a re-ruling request, and
+  the item records the answer. Reversing a signed ruling is a gate decision, never an item's.
+
+  (b) THE RULING ALREADY ANSWERS THE `cm_escalation_db` CASE, AND SHOULD BE QUOTED AT IT.
+  The same record says: "cm_escalation_db reads as a database because of its suffix but is a
+  TABLE inside psgmgr." `seal@[db].psgmgr.cm_escalation_db` is therefore correctly formed —
+  origin `seal`, database redacted, schema `psgmgr`, table `cm_escalation_db`. The `_db`
+  suffix is the confusion, and the fix for a misleading suffix is a note on the row, not a
+  rewrite of the id. If the suffix keeps costing readings, renaming the TABLE is a different
+  and much larger conversation.
+
+  (c) THE OTHER TWO ARE ID RENAMES, AND THIS REPO RENAMES IDS THROUGH A LEDGER.
+  `dpl:pipeline-registry` -> `data:pipeline-registry` and `seal:app-extract` -> a
+  business-application origin are ORIGIN changes on registered ids. There are 17 retired ids
+  and a `replaces:` field precisely because an id rename is: mint the new id, set `replaces:`
+  to the old one, add the retired-ids row with its reason. A find-and-replace bypasses all
+  three, and the derived URN moves with the id — so the old string stops resolving with
+  nothing recording that it ever existed. Every rename here ships that way or not at all.
+
+  (d) THE `seal` -> BUSINESS-APPLICATION RENAME HAS A SIGNED PRECEDENT; FOLLOW ITS SPELLING.
+  Gate vocabulary-domains-and-id-policy §A2 already renamed the ontology fragment
+  `41-local-seal.yaml` -> `41-local-business-application.yaml`, and the gate's domain set is
+  scheduler / business_application / human. So the origin token is not open for invention:
+  it takes the spelling the signed gate uses. The request wrote "BusApp ?" with the question
+  mark; the answer is in the gate, and the item resolves it there rather than coining a
+  third spelling.
+
+  (e) `dpl` -> `data` NEEDS ITS OWN JUSTIFICATION, WHICH IS NOT SECRECY. DPL is a real
+  internal platform name, and J13 class 1 ruled platform tokens AUTHORED with no sweep owed.
+  So the case for `data:` is GENERALIZATION for the standalone-template goal, not publish
+  safety — a different motive with a different bar. Say which one is being invoked on the
+  row, because a reader who assumes "sanitization" will later try to sweep the other platform
+  tokens on the same reasoning and hit the class-1 ruling.
+
+  (f) COUNT THE BLAST RADIUS BEFORE TOUCHING ANYTHING. Measured 2026-09-01 (desktop, this
+  worktree): `psgmgr` appears in 242 tracked files, `cm_escalation_db` in 28,
+  `seal:app-extract` in 21, `dpl:pipeline-registry` in 16. Several are test pins and fixture
+  corpora that assert on the literal — the J13 class-1 ruling stopped a sweep for exactly
+  that reason, where `PRARAG` sat in ~36 files including five tests asserting on it. Enumerate
+  the consumers first; a rename that reds the suite is a rename that was not scoped.
 notes: |
-  Minted 2026-09-01. Body to follow.
+  Minted 2026-09-01 (desktop, ui-workstream worktree) from a request to find-and-replace four
+  id strings seen on the /load-map console table. The request is reasonable on its face and
+  three of the four have real answers — but not as a find-and-replace, and one of them is
+  already ruled the other way.
+
+  WHY THIS IS ONE ITEM AND NOT FOUR: the four strings look alike on screen and are four
+  different kinds of thing. One is the id grammar working correctly (a), one is a suffix that
+  misleads (b), and two are genuine renames that owe a ledger row (c). Splitting them apart is
+  most of the work; doing them as one sweep is the failure mode.
+
+  THE READING THAT PROMPTED IT IS WORTH KEEPING. `seal@[db].psgmgr.cm_escalation_db` was
+  flagged "especially" — and the signed ruling anticipated exactly that reading, in writing,
+  a month ago. That is a sign the id grammar is right and its LEGIBILITY is not: a correctly
+  formed id that a fluent reader parses wrongly is still a defect, just not the one the
+  request named. If (a) comes back declined, the residue is a legibility question about the
+  `_db` suffix, and that deserves its own entry rather than dying with the escalation.
