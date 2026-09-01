@@ -406,6 +406,7 @@
         "config/gate-prompts/repo-manifest-data-profile.yaml",
         "config/gate-prompts/rua-bundle-data-profile.yaml",
         "config/gate-prompts/rua-load-shapes.yaml",
+        "config/gate-prompts/schema-identifier-publish-ceiling-teams-edition.yaml",
         "config/gate-prompts/script-provenance-gaps.yaml",
         "config/gate-prompts/seal-app-ref-edge-reshape.yaml",
         "config/gate-prompts/seal-attribution-match-policy.yaml",

@@ -4259,3 +4259,45 @@ activation is a groomed follow-up (Q24/Q25, minted at this sign-off).
 - **Authority note.** This stub is a RECORD, not a ruling — J43's reconcile check treats DRAFTED
   stubs as non-authority; no registry field, envelope property, or term may cite this heading.
   Sign-off item: a follow-up to C38, not yet minted.
+
+## 2026-09-01 — RECORD: the schema segment's publish ceiling is re-asked for Teams Edition (`schema-identifier-publish-ceiling-teams-edition`, DRAFTED, UNSIGNED)
+
+- **Status:** DRAFTED 2026-09-01, awaiting the SME walk. Nothing is renamed, swept or
+  redacted. J70 clause (a) is the item; this is the escalation it routes to.
+- **What this is NOT.** It is not a claim that J13 class 3 (2026-08-11) was wrong. That
+  record closed class 3 as *ruled-elsewhere*, deferring to the SIGNED N9 `source-registry-v2`
+  grammar (§Q1, 2026-07-31), and it was right on the evidence it had — including its own
+  correct catch that `cm_escalation_db` is a TABLE inside `psgmgr` and not a database.
+- **What is actually re-asked: a CONDITION inside the clause it defers to.** N9 §Q1 keeps the
+  schema segment "when it is established public vocabulary — and it names `psgmgr` as exactly
+  that". Established *for whom*. Today's answer is this company's estate. **ADR 0015 Team
+  Edition (PROPOSED 2026-08-27) changes the audience** — copier-templated per-team instances
+  generated from a cherry-picked base, plus the standing standalone-template goal — and a
+  name that is ordinary vocabulary inside an estate is a local coinage outside it. New
+  evidence postdating a signed ruling is the only legitimate reason to reopen one, and this
+  is the first exercise of **C40**, the item minted to give a signed ruling that route.
+- **The motive is GENERALIZATION, not sanitization, and the distinction is fenced (§B2).**
+  The connection coordinate — the database — is already redacted, and `psgmgr` alone fails the
+  standing "could someone connect with this string alone" test. J13 **class 1** ruled platform
+  tokens AUTHORED with no sweep owed; if this gate is later misread as a sanitization
+  precedent, someone sweeps those tokens on the same reasoning and collides with a signed
+  ruling. §B2 exists to make that misreading fail.
+- **Blast radius, measured 2026-09-01 (producer desktop, this worktree), not estimated:**
+  `psgmgr` 242 tracked files, `cm_escalation_db` 28, `seal:app-extract` 21,
+  `dpl:pipeline-registry` 16. Several are tests pinning the literal — the class-1 `PRARAG`
+  sweep was stopped for exactly that reason. §C2 makes the SME choose ids-only, ids-plus-prose,
+  or everything, because those are three different pieces of work.
+- **Mechanism if it rules `no` (§C1):** mint the new id, set `replaces:`, add the retired-ids
+  row — the mechanism the 17 existing retired ids already use. Never a find-and-replace: the
+  derived URN moves with the id, so a textual sweep leaves the old string unresolvable with
+  nothing recording that it existed.
+- **One adjacent fact that may moot part of it (§C4):** ADR 0017 ruled `spiderdb` PUBLISHES
+  (it is the name, not the coordinate) while the ids still carry `[db]`. Resolving that in the
+  same change avoids touching the same 242 files twice.
+- **Residue kept deliberately (§D1):** `cm_escalation_db` is correctly formed and still
+  misreads, because the `_db` suffix makes a table look like a database — a LEGIBILITY defect
+  rather than a publish-ceiling one, and it survives whatever this gate rules, including a
+  ruling that closes the gate with no other work.
+- **Authority note.** This stub is a RECORD, not a ruling — J43's reconcile check treats
+  DRAFTED stubs as non-authority; no registry field, envelope property or term may cite this
+  heading. Sign-off item: J70 (`feat/ui-web`), whose `gates:` field takes this slug.

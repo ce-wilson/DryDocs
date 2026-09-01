@@ -1081,6 +1081,18 @@
       "unblocks": []
     },
     {
+      "kind": "log-entry",
+      "date": "2026-09-01",
+      "title": "RECORD: the schema segment's publish ceiling is re-asked for Teams Edition (`schema-identifier-publish-ceiling-teams-edition`, DRAFTED, UNSIGNED)",
+      "status": "recorded",
+      "prompt_files": [
+        "config/gate-prompts/schema-identifier-publish-ceiling-teams-edition.yaml",
+        "config/gate-prompts/source-registry-v2.yaml"
+      ],
+      "log_ref": "config/gate-log.md:4263",
+      "unblocks": []
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",

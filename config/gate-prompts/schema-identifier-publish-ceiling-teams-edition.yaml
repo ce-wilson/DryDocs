@@ -1,0 +1,117 @@
+# GATE schema-identifier-publish-ceiling-teams-edition — DRAFTED 2026-09-01 (J70 clause a).
+# UNSIGNED. Nothing is swept, renamed or redacted until this signs.
+#
+# This does NOT assert that J13 class 3 was wrong. It asks whether a CONDITION
+# inside the ruling it defers to still holds for a product that ships outside
+# this company.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: schema-identifier-publish-ceiling-teams-edition
+title: >-
+  SME Gate — the signed grammar publishes a schema name when it is "established public
+  vocabulary": does that condition still hold for psgmgr once Teams Edition ships the tree
+  outside this company, and if not, what is the mechanism
+step: >-
+  J70 clause (a), drafted 2026-09-01, and it exists BECAUSE the request was declined as an
+  edit. The SME asked for psgmgr to be redacted; J13 class 3 (2026-08-11) had already ruled
+  no sweep was owed. Reversing a signed ruling is a gate decision and never an item's, so the
+  request is put here instead of applied. Nothing is renamed until this signs.
+summary: >-
+  (a) WHAT IS ACTUALLY AT ISSUE — not the ruling, a CONDITION inside it. J13 class 3 does not
+  itself decide anything; it defers to the SIGNED N9 source-registry-v2 grammar (§Q1), which
+  publishes `{origin}@{db}.{schema}.{table}` with the database redacted to `[db]` and "the
+  schema kept WHEN IT IS ESTABLISHED PUBLIC VOCABULARY — and it names `psgmgr` as exactly
+  that." The clause is conditional. So the question is not "was 2026-08-11 wrong" (it was
+  right on what it had) but "is psgmgr still established public vocabulary for a tree that
+  leaves this company." (b) WHAT CHANGED — ADR 0015 Team Edition (PROPOSED 2026-08-27):
+  copier-templated per-team instances generated from a cherry-picked base, plus the standing
+  standalone-template goal. A schema name that is ordinary vocabulary INSIDE the estate is a
+  local coinage OUTSIDE it. That is new evidence postdating the ruling, which is the only
+  legitimate reason to reopen a signed one. (c) THE MOTIVE IS GENERALIZATION, NOT SECRECY,
+  and the distinction is load-bearing — see §B2. (d) THE MECHANISM IS NOT A FIND-AND-REPLACE:
+  242 tracked files, several of them tests pinning the literal, and this repo renames a
+  registered id through a retired-ids row and a `replaces:` field.
+
+meta:
+  Module: >-
+    config — the artifacts are config/source-registry.yaml (the ids and the id grammar) and
+    config/gate-log.md (the J13 class-3 record and the N9 §Q1 grammar it defers to). No loader
+    and no graph write is in scope.
+  Source: >-
+    config/gate-log.md — the 2026-08-11 J13 class-3 RECORD, quoted at §A1 verbatim rather than
+    summarized, and the N9 source-registry-v2 sign-off (2026-07-31) it defers to.
+  Precedent: >-
+    ADR 0015 (Team Edition, PROPOSED 2026-08-27) for the trigger. C40 for the instrument — a
+    signed ruling needs a declared way to be looked at again, and this is its first exercise.
+  Registry ref: >-
+    Affected id shapes: controlm@[db].psgmgr.<table>, seal@[db].psgmgr.cm_escalation_db, and
+    every dataset row whose schema segment is psgmgr. 17 retired ids already exist; the
+    `replaces:` field and the retired-ids block are the rename mechanism.
+  Classification: >-
+    Internal-Public — mechanism only. This prompt names psgmgr because the SIGNED grammar
+    publishes it today; if §B rules otherwise the prompt is itself in scope of the ruling.
+  Counts: >-
+    Measured 2026-09-01 (producer desktop, this worktree): psgmgr 242 tracked files,
+    cm_escalation_db 28, seal:app-extract 21, dpl:pipeline-registry 16.
+
+provenance:
+  - label: The signed ruling and the conditional clause inside it
+    source_object: config/gate-log.md
+    key: "2026-08-11 RECORD, J13 publish-ceiling value classes 2/3/4 — CLASS 3"
+    loader: NONE — a gate record, not a feed.
+    properties:
+      - name: class_3_defers_rather_than_decides
+        origin: source
+        from: >-
+          "NO SWEEP OWED; already covered by a SIGNED ruling ... The N9 source-registry-v2
+          gate (SIGNED 2026-07-31, §Q1 id grammar)"
+      - name: the_condition
+        origin: source
+        from: >-
+          "with the DATABASE redacted to [db] and the schema kept when it is established
+          public vocabulary — and it names psgmgr as exactly that"
+      - name: db_already_redacted
+        origin: source
+        from: "The connection coordinate — the database — is redacted already."
+  - label: What postdates the ruling
+    source_object: docs/decisions/0015-team-edition-template.md
+    key: status PROPOSED 2026-08-27; D4 distribution
+    loader: NONE — an ADR, and it is not yet accepted.
+    properties:
+      - name: tree_leaves_the_company
+        origin: source
+        from: copier-templated per-team instances generated from a cherry-picked base
+      - name: condition_may_no_longer_hold
+        origin: derived
+        from: >-
+          established-public-vocabulary is a property of an AUDIENCE, and Team Edition
+          changes the audience. Derived, and it is exactly what §A2 asks the SME to rule.
+
+sections:
+  - title: A. The question, stated so it cannot be answered by re-litigating 2026-08-11
+    confirmations:
+      - "A1. THE RULING IS NOT UNDER REVIEW AND WAS CORRECT ON WHAT IT HAD. J13 class 3 closed as ruled-elsewhere, deferring to N9 §Q1; the database is redacted, the schema is published, and `cm_escalation_db` was correctly identified as a TABLE inside psgmgr rather than a database. Confirm this is understood as the starting point, so that a decision to change the grammar is recorded as a CHANGE and not as a correction of an error that was not made."
+      - "A2. THE ACTUAL QUESTION: N9 §Q1 keeps the schema `when it is established public vocabulary`. Established FOR WHOM? Today's answer is this company's estate, where psgmgr is ordinary vocabulary. Team Edition ships the tree to other teams and the standalone-template goal ships it further. **Rule whether `established public vocabulary` is audience-relative, and if it is, whether psgmgr still satisfies it at the Team Edition audience.** A `no` here is what authorizes everything below; a `yes` closes this gate with no work owed."
+      - "A3. IF THE CONDITION IS AUDIENCE-RELATIVE, IT IS NOT ONLY ABOUT psgmgr. Every schema segment in the registry inherits the same test. Rule whether the answer is per-identifier or a general rule for the schema segment — a general rule is cheaper to hold and much larger to apply, and choosing per-identifier means someone must decide each one."
+
+  - title: B. The motive, and the fence that keeps it from spreading
+    confirmations:
+      - "B1. THIS IS GENERALIZATION, NOT SANITIZATION. Nothing here says psgmgr is a secret; the database — the connection coordinate — is already redacted, and the standing test is `could someone connect with this string alone`, which psgmgr alone fails. The case is that a distributed template should not carry one company's local coinage. Confirm the motive as recorded, because the motive sets the bar the work is judged against."
+      - "B2. THE FENCE, AND IT IS THE REASON B1 MATTERS. J13 CLASS 1 ruled platform tokens (DPL and its siblings) AUTHORED, with no sweep owed. If this gate is later read as a sanitization precedent, someone will sweep those tokens on the same reasoning and collide with a signed ruling. Confirm that a `no` at A2 authorizes work on the GENERALIZATION motive only, and reaches class 1 not at all unless class 1 is separately reopened."
+      - "B3. THE SAME MOTIVE IS ALREADY IN FLIGHT ELSEWHERE. J70 clause (e) proposes `dpl:` -> `data:` on exactly this generalization argument. Rule whether these are one decision or two — if one, this gate should rule the schema segment and the origin token together rather than leaving a second gate to re-derive the same reasoning."
+
+  - title: C. The mechanism, if A2 rules no
+    confirmations:
+      - "C1. NOT A FIND-AND-REPLACE. A registered id is renamed by minting the new id, setting `replaces:` to the old one, and adding a retired-ids row with its reason — the mechanism 17 retired ids already use. A textual sweep bypasses all three, and the derived URN moves with the id, so the old string stops resolving with nothing recording that it existed. Confirm the mechanism, or name the alternative."
+      - "C2. THE BLAST RADIUS IS MEASURED AND SOME OF IT IS TEST PINS: psgmgr 242 tracked files, cm_escalation_db 28. The J13 class-1 sweep was stopped for exactly this reason — `PRARAG` sat in ~36 files with five tests asserting on it. Rule whether the change is (i) the registry ids only, leaving prose and fixtures alone, (ii) ids plus prose, or (iii) everything including test pins and fixture corpora. These are three different pieces of work and only (i) is small."
+      - "C3. THE REPLACEMENT TOKEN IS NOT YET NAMED, and this gate should name it rather than leave it to the implementer. `[schema]` matches the existing `[db]` redaction spelling but reads as *redacted*, which contradicts B1's motive. A generic-but-real word (`warehouse`, `replica`) reads as *generalized*, which matches it. Rule the token."
+      - "C4. AND THE ADJACENT FACT THAT MAY MOOT PART OF THIS: ADR 0017 ruled `spiderdb` PUBLISHES — it is the name rather than the coordinate — while the ids still carry `[db]`. So the database segment is redacted in the ids by a rule that has since been relaxed. Rule whether resolving `[db]` -> `spiderdb` happens in the same change; doing it separately means touching the same 242 files twice."
+
+  - title: D. The residue, which is a real defect and is not this one
+    confirmations:
+      - "D1. `cm_escalation_db` IS CORRECTLY FORMED AND STILL MISREADS. The `_db` suffix makes a TABLE read as a database, and the signed record anticipated that exact misreading in writing a month before it happened again. A correctly-formed id that a fluent reader parses wrongly is a LEGIBILITY defect, not a publish-ceiling one. Confirm it is recorded as its own entry, so it does not die with whatever A2 rules — including, and especially, if A2 rules `yes` and this gate closes with no other work."
+
+  - title: E. Fence
+    confirmations:
+      - "E1. NOT REOPENED HERE: the `[db]` redaction as a rule (C4 asks only whether ADR 0017's spiderdb ruling is applied in the same change), J13 classes 1, 2 and 4, the N9 id GRAMMAR itself (`{origin}@{db}.{schema}.{table}` survives whatever the schema segment becomes), and the retired-id block's existing 17 rows. Confirm the fence."
+      - "E2. NOTHING MOVES ON SIGN-OFF ALONE. A ruling here authorizes an item; the item does the retired-id rows and the consumer sweep in a scoped change with the suite green. Confirm."

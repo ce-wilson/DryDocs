@@ -169,3 +169,9 @@ Thumbs.db
 
 # derived mapping-store materialization (plan M0) - rebuild via scripts/build_mapping_db.py
 var/
+
+# J69: the port disposition table is generated per-apply, from the base YOU are
+# applying from — `python scripts/render_port_dispositions.py <base-tag>`. Its range
+# is base..HEAD, so a committed copy goes stale on every commit; the renderer is
+# guarded (tests/unit/test_port_dispositions.py), the output is working state.
+docs/port/port-dispositions.md

@@ -1,0 +1,103 @@
+id: J69
+epic: release-infrastructure
+title: A port applies by disposition and the port-prompt is organized by step - lead with the
+  disposition classes and demote the ledger to citation
+type: task
+module: docs
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- J68
+inputs:
+- docs/port/port-prompt.md
+- PORT-MANIFEST.yaml
+- drydocs/port_preflight.py
+- docs/decisions/0015-team-edition-template.md
+acceptance: |
+  (a) THE APPLY SECTION LEADS WITH DISPOSITION. The port-prompt gains an apply section ordered by
+  manifest disposition class - canonical-producer, canonical-company (no action by rule), per-entry,
+  union-append, evaluate, DEFAULT, derived (regenerated last) - each carrying the paths in that class
+  for the range, the entry_rule where one exists, and the ledger steps that touch it as CITATIONS.
+
+  (b) THE STEP LEDGER SURVIVES INTACT. It moves below the apply section and is not rewritten,
+  summarized or renumbered. It is where the reasoning lives, and steps are cited BY the new section
+  rather than replaced by it.
+
+  (c) THE COVERAGE GUARD STILL READS. drydocs/port_preflight.py parses only between the `STEP LEDGER`
+  and `ACCEPTANCE GATE` markers (_LEDGER_START / _LEDGER_END). Those markers and everything between
+  them stay parseable, and `uncited_commits` returns zero on the current range after the restructure.
+  If the new section sits between the markers it becomes part of what the guard reads, so it goes
+  ABOVE `STEP LEDGER` - verify, do not assume.
+
+  (d) THE DISPOSITION LIST IS DERIVED, NOT HAND-KEPT. The per-range path list comes from classifying
+  the range's changed paths through PORT-MANIFEST.yaml, the same way the roll-ups on the board are
+  derived. A hand-maintained copy of the manifest inside the port-prompt would be a fourth source of
+  disposition truth, which is the defect J68 exists to remove.
+
+  tests/unit green; the preflight coverage check passes on the restructured file.
+notes: |
+  WHY, IN ONE MEASUREMENT. The 2026-09-01 company apply bucketed 88 diverged paths into the manifest's
+  classes - canonical-producer 19, canonical-company 5, per-entry 24, union-append 11, evaluate 5,
+  DEFAULT 21, derived 3 - and worked them class by class, escalating two rows to per-entry mid-apply.
+  The 296-step ledger was reference material while that happened. The file's spine and the consumer's
+  spine are different, and the consumer's is the one that should lead.
+
+  THIS IS ALSO THE TEAMS EDITION MOVE. ADR 0015 D4 promotes the PORT-MANIFEST disposition vocabulary to
+  the template's file classes (canonical-template frozen / instance-owned scaffolded / derived
+  regenerated). Restructuring the port-prompt around dispositions is that same reorganization, done
+  once, on the surface that already carries the vocabulary. Doing it here first means TE inherits a
+  worked example rather than a proposal.
+
+  DEPENDS ON J68 DELIBERATELY. Leading with disposition while two rows are wrong and a skill contradicts
+  them would make the wrong answer more prominent, not less.
+
+  SEQUENCING. Lands as a relay in the roll after the in-flight apply. The company applied at the tag
+  port-base-20260901, so producer-side edits cannot move under them - but a restructured apply section
+  is only useful once it describes rows they have not already hand-merged.
+
+  DONE 2026-09-01. All four clauses met.
+
+  (a)+(b) The port-prompt gains an APPLY BY DISPOSITION section ABOVE the step ledger, carrying the
+  nine-class apply order and why it is not alphabetical - wholesale takes first because they cannot be
+  got wrong, hand-merges in the middle where the thinking goes, `derived` last because a render
+  regenerated before its sources land is a render you throw away. The ledger moves nowhere, loses
+  nothing and is not summarized; the section says so in its own words, because a reader who thinks the
+  table replaced the ledger will stop reading the reasoning.
+
+  (c) THE TRAP WAS REAL AND IS NOW GUARDED. port_preflight reads ONLY between the STEP LEDGER and
+  ACCEPTANCE GATE markers, and `cited_shas` harvests every backticked sha in that span - so the new
+  section INSIDE the markers would have made commits read as cited because a disposition table
+  happened to name their sha. It sits above, and `test_the_apply_section_sits_above_the_ledger_the_
+  coverage_guard_reads` pins it there. Verified after the edit: the four uncited commits are exactly
+  the four made since port-base-20260901, which is the correct answer.
+
+  (d) DERIVED, NOT HAND-KEPT. scripts/render_port_dispositions.py classifies the range's changed paths
+  through PORT-MANIFEST.yaml and writes docs/port/port-dispositions.md. The port-prompt carries the
+  COMMAND and the class rules, never a path list - a hand-typed table would be the second source of
+  disposition truth J68 just removed.
+
+  A CORRECTION MADE MID-BUILD, because the first design was wrong. The artifact was going to be
+  committed and drift-guarded like the board - and its own guard caught the flaw on the first full
+  run: the range is base..HEAD, so the committed copy goes stale on EVERY commit and the guard would
+  red the suite constantly. A guard people learn to work around is worse than no guard, which is J66's
+  lesson arriving from the other end. So the output is gitignored working state, generated per apply
+  from the base YOU are applying from, and the guards moved onto the MECHANISM: classify() resolves in
+  manifest order (specific row, then glob, then default_ok, then DEFAULT) and render() buckets without
+  inventing a class. Those hold regardless of what HEAD does.
+
+  THE GUARD FOUND A GAP ON ITS FIRST RUN, which is the argument for it existing: `clean-add` is a
+  disposition the manifest uses and APPLY_ORDER had no rule for it, so it would have rendered as
+  "(not in APPLY_ORDER - add it)" - a fallback, not a plan. Added in first position.
+
+  MEASURED: 519 changed paths across 8 classes on port-base-20260826..HEAD (per-entry 154,
+  default_ok 165, canonical-producer 129, evaluate 29, union-append 16, canonical-company 14,
+  never-port 8, derived 4). The section states explicitly that this 519 and the company's 88 diverged
+  paths are NOT comparable - one counts paths the range touched, the other counts paths that exist on
+  both sides and differ - because two numbers on the same subject invite a discrepancy that is not one.
+
+  DISPOSITIONS OF THE NEW FILES, checked rather than assumed: the script is default_ok (it ports, so
+  they can run it), the rendered .md is never-port under docs/port/** (they generate their own from
+  their own base), the guard is default_ok. Suite 2938 passed / 9 skipped.

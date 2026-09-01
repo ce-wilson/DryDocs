@@ -1,0 +1,106 @@
+id: J68
+epic: release-infrastructure
+title: A port has two sources of disposition truth and they disagree - retire the skill's ledger rows,
+  give the two orphaned declarations their rows, and guard that a file and its guard match
+type: bug
+module: docs
+phase: 8
+agent: main
+model: sonnet
+priority: p1
+status: done
+depends_on: []
+inputs:
+- PORT-MANIFEST.yaml
+- .claude/skills/reconcile-port/SKILL.md
+- tests/unit/test_port_manifest.py
+- MODULE_MAP.md
+- config/source-registry.yaml
+- tests/unit/test_module_boundary.py
+acceptance: |
+  (a) THE SKILL STOPS ASSERTING DISPOSITIONS. `.claude/skills/reconcile-port/SKILL.md` line 92 says
+  `tests/unit/test_module_boundary.py` is "Canonical-here - take producer wholesale"; PORT-MANIFEST.yaml
+  says `per-entry`. The manifest is right and the skill is stale. Every row in that skill's collision
+  ledger that asserts a DISPOSITION is retired and replaced by a pointer to the manifest - the skill may
+  carry HOW to hand-merge a file, never WHETHER to take it. One source of disposition truth, and it is
+  PORT-MANIFEST.yaml. Rows that carry only merge guidance stay.
+
+  (b) THE TWO ORPHANED DECLARATIONS GET THEIR ROWS. `MODULE_MAP.md` is `canonical-producer` while the
+  guard that enforces it is `per-entry`; `config/source-registry.yaml` has no row at all and falls
+  through to the `config/**` canonical-producer default. Both become `per-entry` with an entry_rule
+  naming what each side owns, on the `test_module_boundary.py` / `lob-product-team.yaml` pattern.
+
+  (c) THE INVARIANT IS GUARDED, NOT WRITTEN DOWN. A new check in tests/unit/test_port_manifest.py:
+  a DECLARATION file and the GUARD that enforces it must resolve to the same disposition. The pairs are
+  declared in the test, each with the guard that reads it. Splitting a pair's disposition guarantees the
+  wholesale take that drops the other side's rows, which is what (b) is repairing.
+
+  (d) THE GUARD REPRODUCES THE BUG BEFORE THE FIX LANDS. Written red first against the current manifest
+  and shown failing on the MODULE_MAP pair; a guard that cannot reproduce the defect proves nothing.
+
+  (e) RELAY. The port-prompt carries a relay saying both rows changed and the skill rows are retired,
+  and states explicitly that this lands AFTER port-base-20260901 so it does not alter what the in-flight
+  apply should do.
+
+  Nothing in the company tree is touched and no id moves. tests/unit green.
+notes: |
+  FOUND BY THE COMPANY SESSION during the 2026-09-01 apply, reported with the evidence, and every
+  claim verified producer-side before this item was written.
+
+  WHY THIS IS ONE ITEM AND NOT THREE. All three findings are the same defect: a disposition asserted in
+  two places that disagree. The skill says wholesale where the manifest says per-entry; MODULE_MAP.md
+  says canonical-producer where its own guard says per-entry; source-registry.yaml says nothing at all
+  and inherits an answer from a glob. Fixing the rows without fixing the DUPLICATION leaves the next
+  stale copy free to contradict the manifest again.
+
+  THE COST, MEASURED RATHER THAN ARGUED. The wholesale take of test_module_boundary.py dropped six
+  company-only module families (drydocs.scrapers.*, drydocs.docmeta.*, drydocs.seal_projection) and
+  the default-deny guard failed immediately. The wholesale take of source-registry.yaml drove
+  test_source_registry from 1 failure to 7. Both were caught by the company mid-apply and hand-merged,
+  so the damage was contained - this item removes the trap rather than the symptom.
+
+  IT HAS HAPPENED BEFORE, TWICE, AND BOTH ARE ON THE RECORD. PORT-MANIFEST.yaml's own entry_rule for
+  test_module_boundary.py says the file "was canonical-producer until a wholesale take dropped the
+  company's extended groups" - so the manifest already learned this lesson and the skill never did. And
+  the config/** default's note records "dev-environment.yaml sat here by omission until the 2026-07-28
+  port". source-registry.yaml is the third instance of that same omission.
+
+  WHAT THIS IS NOT. Not a criticism of the collision ledger, which is genuinely useful for the files it
+  describes how to merge - cli.py, the models exports, the CI workflows. The defect is narrow: a ledger
+  entry that answers WHETHER instead of HOW is answering a question the manifest owns.
+
+  DONE 2026-09-01. All five clauses met, and the search found MORE than the item scoped.
+
+  (a) The collision ledger is re-headed "HOW to merge - never WHETHER to take", and no row may
+  assert that a file is taken wholesale, kept or dropped. FOUR stale disposition assertions were
+  found, not one: the reported test_module_boundary.py row; the step-3 Canonical-here bullet naming
+  `relationship_vocabulary.yaml` for a `git checkout` wholesale take (per-entry in the manifest, and
+  sharded out of existence at S5 - it would have flattened the company's own ontology entries,
+  including their 19-class TOM register, and never fired only because the path was already gone);
+  the same bullet naming `drydocs_core/controlm/`, which moved under orchestration/; and the
+  test_variable_* row, which asserted a disposition it happened to get RIGHT and was removed anyway,
+  because a correct copy is what the next stale copy grows from. The ledger's
+  EXPECTED_CONSTRAINTS = 44 was retired rather than updated - the company measured 55 at
+  PORT-REPORT-40c35724, and a count in a producer file rots between ports.
+
+  (b) MODULE_MAP.md canonical-producer -> per-entry (module rows union; the placement test, the
+  core-imports-nothing invariant, the S7 rule and the CORE_PREFIXES/COMPONENT_GROUP vocabulary cross
+  whole). config/source-registry.yaml gains its first row, per-entry, inserted BEFORE config/** so
+  the shadow guard passes.
+
+  (c)+(d) test_every_declaration_names_the_guard_that_reads_it, written RED FIRST and shown failing
+  on exactly the two reported pairs before either row changed. THE INVARIANT IS NARROWER THAN THIS
+  ITEM ASSUMED, and the tree corrected it: "a declaration and its guard share a disposition" is
+  FALSE. tests/unit/test_database_names.py is per-entry (SCANNED_PACKAGES is extensible) while the
+  01_databases.cypher it parses is canonical-producer (the topology is a signed gate's ruling), and
+  that split is correct and reasoned in the row's own note. The property that actually holds is
+  weaker and sufficient: the coupling must be NAMED in the manifest, so a session resolving either
+  file reads about the other. The database-names pair already did this and passes untouched; the two
+  broken pairs did not. Companion test proves the detector catches an injected defect (J26 idiom).
+
+  (e) RELAY-18, [VERIFIED-PRODUCER], stating up front that it lands after port-base-20260901 and
+  changes nothing about the in-flight apply.
+
+  Suite 2935 passed / 9 skipped (desktop; +2 over the pre-J68 2933). Note for whoever reads the
+  four findings as carelessness: the manifest was RIGHT every time. Only the hand-kept copies of it
+  were wrong, which is the whole argument for there being one.

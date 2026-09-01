@@ -297,8 +297,17 @@ FORCE_COLOR / Idea-101 findings that motivated J41.)
   blockers cleared, drift guard authored — see the tom-role-vocabulary
   divergence-ledger entry and its 2026-08-27 manifest row). New divergences
   from the report: the `detect.py` union (dossier 1) and the `run_as_detect.py`
-  ASCII fix (already ENDED producer-side, `64ec0e7e`). Next-port base =
-  `port-base-20260826`; producer commits past it ride the next roll.
+  ASCII fix (already ENDED producer-side, `64ec0e7e`).
+
+  **NEXT-PORT BASE — CURRENT AS OF 2026-09-01, and it supersedes the
+  `port-base-20260826` pointer this entry originally carried.** Two bases have
+  been certified since this port was applied and NEITHER has been applied
+  company-side, so they are ONE range for you, not two ports:
+  `port-base-20260829` (`e8e69a77`, steps 241–272) and **`port-base-20260901`
+  (cut at the commit carrying the fourth roll, steps 273–296)**. Take the whole
+  span `port-base-20260826..port-base-20260901` — **296 producer commits, 167 in
+  the first roll and 129 in the second** — and read step 272 FIRST: the nineteen-id re-mint is in the earlier half and a naive
+  union of the range re-introduces exactly the collisions it resolves.
 
 - **PRIOR — producer head `5417ef10`** (2026-08-07), applied company-side as
   **PORT-REPORT-5417ef10** — range `a14a8028..5417ef10` = **50 commits / 63 changed
@@ -1656,6 +1665,64 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   in YOUR ledger. Same asymmetry class as RELAY-6: the producer holds the code that
   mints; you hold the doc that forbids it and the loader that reconciles it.
 
+- **RELAY-18 — THE RECONCILE-PORT SKILL WAS ASSERTING DISPOSITIONS AND FOUR OF THEM
+  WERE WRONG; `PORT-MANIFEST.yaml` IS NOW THE ONLY SOURCE, AND TWO ROWS CHANGED**
+  (new 2026-09-01; from J68, which your own 2026-09-01 apply found).
+  `[VERIFIED-PRODUCER]` — every claim below re-checked against the producer tree
+  before this relay was written.
+  **THIS LANDS AFTER `port-base-20260901` AND CHANGES NOTHING ABOUT THE APPLY YOU
+  ARE RUNNING NOW.** You applied at the tag; these commits are past it and ride the
+  next roll. Nothing here asks you to redo work you have already hand-merged — you
+  reached the right answer on all three, by hand, which is the reason the producer
+  found the rest.
+  **WHAT YOU REPORTED, AND WHAT IT TURNED OUT TO BE.** You found the skill's
+  collision ledger saying `tests/unit/test_module_boundary.py` was "take producer
+  wholesale" while the manifest said `per-entry`, and you were right that the
+  guidance was stale. Chasing it producer-side found the same defect **four times**,
+  because a hand-kept list of dispositions rots against a manifest that is guarded:
+  1. `tests/unit/test_module_boundary.py` — the one you hit. Ledger said wholesale,
+     manifest says `per-entry`.
+  2. **The `Canonical-here` bullet in step 3 named `relationship_vocabulary.yaml` for
+     a `git checkout` wholesale take.** That file is `per-entry` in the manifest AND
+     no longer exists as a file (sharded into per-domain fragments at S5). Taking it
+     as instructed would have **flattened your own ontology entries — including the
+     19-class TOM register your G70 session ruled.** This is the one worth reading
+     twice; it never fired only because the path was already gone.
+  3. The same bullet named `drydocs_core/controlm/`, which moved under
+     `drydocs_core/orchestration/` and has not existed for some time.
+  4. The `tests/unit/test_variable_*` row asserted a disposition it happened to get
+     right — harmless, and still removed, because a correct copy of a fact is what
+     the next stale copy grows from.
+  **THE FIX:** the ledger is now headed *"HOW to merge — never WHETHER to take"*, and
+  no row in that skill may assert that a file is taken wholesale, kept or dropped.
+  Resolve disposition from `PORT-MANIFEST.yaml`, per path, always. On any
+  disagreement the manifest wins.
+  **TWO MANIFEST ROWS CHANGED, both from your findings:**
+  - `MODULE_MAP.md` — was `canonical-producer`, is now **`per-entry`**. Its guard was
+    already `per-entry`, and that split is what dropped your `drydocs.scrapers.*`,
+    `drydocs.docmeta.*` and `drydocs.seal_projection` rows. Module rows union;
+    producer mechanism (the placement test, the core-imports-nothing invariant, the
+    S7 rule, the `CORE_PREFIXES`/`COMPONENT_GROUP` vocabulary) crosses whole.
+  - `config/source-registry.yaml` — had **no row at all** and fell through to
+    `config/**` canonical-producer, which is what drove your `test_source_registry`
+    from 1 failure to 7. Now **`per-entry`**: your systems and datasets stay, the id
+    grammar and `authority` semantics cross whole. Third instance of that
+    fall-through — `dev-environment.yaml` (2026-07-28) and `source-bindings.yaml`
+    were the first two.
+  **AND A GUARD, so this is not a third round of the same lesson:**
+  `test_every_declaration_names_the_guard_that_reads_it` — a declaration file and
+  the guard that reads it must NAME each other in the manifest. Deliberately not
+  "must share a disposition": `01_databases.cypher` / `test_database_names.py` are
+  split on purpose (topology is a signed ruling, `SCANNED_PACKAGES` is extensible)
+  and that split is correct. Naming is the property that was missing.
+  **ACTION AT THE PORT THAT CARRIES THIS:** take both manifest rows before the files
+  they govern, then re-run your own classification of the range — the two rows move
+  paths out of your wholesale bucket and into per-entry, so a census taken before
+  this relay will disagree with one taken after. **One stale number you should not
+  copy:** the ledger's `EXPECTED_CONSTRAINTS = 44` is retired rather than updated —
+  PORT-REPORT-40c35724 measured 55 your side, and a count in a producer file rots
+  between ports. Read it from your own run.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
@@ -1940,13 +2007,77 @@ OWED COMPANY-SIDE:
   known-contested pending the G64/G65 gate rulings. Treat them as neither confirmed nor
   corrected until those sign.
 
+APPLY BY DISPOSITION — READ THIS BEFORE THE STEP LEDGER BELOW (J69, 2026-09-01)
+
+**A port is not applied chronologically, and this file was organized as though it
+were.** The step ledger below is 296 steps of reasoning in commit order; the work is
+done by DISPOSITION CLASS, one class at a time. Your own 2026-09-01 apply proved it —
+you bucketed the diverged paths into the manifest's classes and worked them class by
+class, escalating two rows to per-entry mid-apply, while the ledger sat open as
+reference. That is the right shape. This section makes it the file's shape too.
+
+**THE TABLE IS GENERATED, AND THAT IS THE POINT.** Run it against the base you are
+applying FROM:
+
+```
+PYTHONPATH=. python scripts/render_port_dispositions.py <your-base-tag>
+```
+
+It writes `docs/port/port-dispositions.md` — **gitignored working state, generated
+per apply and never committed.** Its range is `<base>..HEAD`, so a committed copy would
+be stale the moment anyone commits; the RENDERER is what carries guards. The file holds
+every changed path in the range, bucketed
+by the disposition `PORT-MANIFEST.yaml` resolves for it, with each row's `entry_rule`
+attached where one exists. **No disposition is typed into this file by hand.** J68
+(2026-09-01) removed four hand-kept disposition assertions from the reconcile-port
+skill, two of which had drifted into being wrong — one of them would have flattened
+your ontology entries. A generated table cannot drift; a typed one is how that
+happened. `PORT-MANIFEST.yaml` owns disposition, here as everywhere.
+
+**THE APPLY ORDER, and why it is not alphabetical.** Wholesale takes first because
+they are mechanical and cannot be got wrong; hand-merges in the middle, where the
+thinking goes; `derived` LAST, because a render regenerated before its sources land is
+a render you throw away.
+
+| # | Class | What you do |
+|---|---|---|
+| 1 | `canonical-producer` | take wholesale — `git checkout <producer-ref> -- <path>` |
+| 2 | `canonical-company` | **NO ACTION by rule** — keep yours, do not even diff |
+| 3 | `never-port` | **NO ACTION by rule** — never crosses, in either direction |
+| 4 | `per-entry` | **merge by entry** — read the row's `entry_rule` FIRST; this is where a wholesale take drops the other side's rows |
+| 5 | `union-append` | append the producer's entries; never reorder, never drop yours |
+| 6 | `evaluate` | hand-merge — an un-made decision until a human makes it |
+| 7 | DEFAULT | the manifest `default:` — clean-add when absent, evaluate when both sides have it |
+| 8 | `default_ok` | the default ON PURPOSE (J16) — the row exists to record that somebody thought about it |
+| 9 | `derived` | **regenerate, never carry** (J43) |
+
+**MEASURED AT THIS ROLL** (`port-base-20260826..HEAD`, the full span since your last
+applied base): **519 changed paths across 8 classes** — canonical-producer 129,
+per-entry 154, default_ok 165, evaluate 29, union-append 16, canonical-company 14,
+never-port 8, derived 4. **Do not compare that 519 against your own diverged-path
+count and call the gap a discrepancy:** they measure different things by construction.
+This counts every path the range TOUCHED; your census counts paths that exist on both
+sides and DIFFER. Your 88 and this 519 are both right.
+
+**THE STEP LEDGER IS NOT REPLACED BY THIS AND IS NOT SUMMARIZED BY IT.** It stays
+below, entire, and it is where the reasoning lives — why a change was made, what it
+cost, what it did NOT authorize. The disposition table tells you the ORDER and the
+RULE; the ledger tells you the MEANING, and a step is the thing you read when a
+per-entry merge needs a judgment call. Steps are cited from the classes, never folded
+into them.
+
+---
+
 STEP LEDGER — delta since `caa0406` (steps 43–123 collapsed above; 124–134 are the
 `ae21ee4..caa0406` range, DELIVERED and producer-reviewed but with an unconfirmed
 close-out, kept live for exactly that reason). Steps 135+ are the NEW delta this
 base certifies. Each sub-stream carries its producer-side verification status in
 [BRACKETS]; spend review on [UNRULED]. Grooms, claims, board/design renders and
 depgraph snapshots in the range are ritual — per-entry backlog union, derived
-regeneration, never-port outputs — and get no step.
+regeneration, never-port outputs — and get no step. **Steps 273–296 are the
+2026-09-01 (fourth) roll**, covering `port-base-20260829..port-base-20260901`;
+steps 241–272 remain live below them because that base was certified and never
+applied, so the two rolls are one range for the consumer.
 
 124. LOCAL-INFRA CHORES + ONE ADR [venue-pinned / docs] (`8c4ee1e` G49, `5a6208e`
     G50, `3304666` G49 follow-up, `034eb70` G53). G49/G50 are DESKTOP-VENUE facts —
@@ -3929,6 +4060,343 @@ loosening the pattern: `28c1181a`.
     did. `1ad05b8c` is unrelated content that rode the same cleanup: ADR 0015, a connector
     comparison and an internal brief, landed off a wip branch.
 
+
+273. ADR 0017 + G124/G125/G126 — THE SOURCE-BINDING SUBSTRATE [config + core, READ
+    FIRST OF THIS RANGE] (`03cc1227`/`83468602` G123 rules three merge-orphaned
+    amendments follow-up, `ab5d4aec` claim, `53359622` ADR 0017 PROPOSED, `9e5cd178`
+    Rev 2, `b9c9d1c0` the one open question named BEFORE acceptance, `81341df5` two
+    of three acceptance rulings, `163cc8b6` ACCEPTED, `89113a06` G126, `9ebdb5d8`,
+    `683d85fe` G125, `48c1e977` two follow-ups inboxed). The defect, measured rather
+    than asserted: fifteen of thirty dataset rows are `acquisition.mode: automated`
+    and declared NO binding at all — their system rows carried `locator.service: ~`
+    with a comment saying the value lives in `internal-local/`, and nothing resolves
+    a comment, so `drydocs landing-zones --check` reported a clean run over the
+    manual half and said nothing about the other half. A check that silently covers
+    half its subject reads as coverage. New: `config/source-bindings.yaml` +
+    `drydocs_core/source_bindings.py` — one profile per CONNECTION CARRIER (not per
+    origin: `origin: controlm` spans three systems and `system: psgmgr` carries
+    three origins), naming ENVIRONMENT VARIABLES and never holding a value. Four
+    carriers cover all fifteen. The system row carries `binding: <profile id>` or
+    `binding: ~` with a `binding_note`, guarded in BOTH directions. G126 declares
+    the credential file a read zone and makes an in-tree zone justify its place
+    (`config/data-zones.yaml`, `drydocs_core/data_zones.py`).
+    **APPLY NOTE — the manifest row is the load-bearing part.** `683d85fe` adds
+    `config/source-bindings.yaml` to `PORT-MANIFEST.yaml` as `per-entry` with a
+    FIELD SPLIT: producer-owned = id, carrier, platform, classification, serves,
+    note and the KEYS of the env map; **company-owned and NEVER overwritten by a
+    port = the VARIABLE NAMES those keys reference, and `status`.** Take the row
+    first, then the file. Without the row it inherits the `config/**` default and a
+    port carries ONE MACHINE'S BINDING onto the other side — the same omission that
+    put `dev-environment.yaml` under that default until the 2026-07-28 port. ADR
+    0017's reconciliation with ADR 0009 turns on that port test, and this row is
+    what makes the test TRUE rather than assumed.
+
+274. THE FIVE SUBSTRATE REVIEWS [design docs, default_ok, INFORMS C38 AND THE
+    REGISTRY] (`c4daa879` the source-registry identity review, `b480c35d` +
+    `cb5d45d8` DataHub passes four and five, `0b61b96b` OpenLineage read at source,
+    `ff5d6f4e` + `1be090d3` two rulings that came out of it, `b6e3b74c` the subset
+    qualifier, `dabb6d87` the `[taxonomy]`-prefixed id grammar assessed, `bdfbf6c2`
+    the BDAT layer is system-scoped). Read `1be090d3` and `ff5d6f4e` even if you
+    skip the rest: **psgmgr is a SCHEMA inside `spiderdb`, not a system of record**,
+    and `spiderdb` PUBLISHES because it is the pronounceable head of the TNS alias —
+    the name, not the coordinate. That closes the open question the identity review
+    opened, and it is the reasoning behind every registry id you will read.
+    `c4daa879` is the sharpest of the five: the redaction rule was deleting the
+    identifiers the registry exists to carry. The reviews are `default_ok` — take or
+    skip freely, they bind nothing — but the two rulings above are already applied
+    in config.
+
+275. THE COMPANY-SIDE BOOTSTRAP TRIAGE, TRANSCRIBED [internal, back-flow]
+    (`ef9c0934`). `internal/research/triage-bootstrap-2026-08-28.md` — your own
+    2026-08-28 session, transcribed producer-side and compared against main. It is a
+    record of YOUR tree, so its paths are statements about that tree (the
+    `is_record_document` convention). Nothing to apply; it exists so the producer can
+    answer questions about that session without asking you to re-run it.
+
+276. THE SUPPLEMENT CHAIN HAS BEEN FIVE SINCE Z3, AND NINE SURFACES SAID FOUR
+    [core + docs, correctness] (`58aec7bf`, Idea-211). `default_chain()` returns
+    base -> seal -> catalog -> registry -> infrastructure. Twelve occurrences across
+    nine first-party surfaces said four, for eleven days: the run-drydocs skill,
+    `cli.py`'s module header, the `apply-supplements` docstring, `supplements.py`'s
+    own registry comment, `MODULE_MAP.md`, the startup-refresh runbook (three times),
+    `RELATIONSHIP_GUIDE.md`, the SME checklist, `internal/repo-README.md` (twice).
+    **The sharpest instance is a CORRECTION NOTE** — written because an earlier
+    runbook left readers "quietly one supplement short" — which itself said the chain
+    "has FOUR members". The note that fixed the defect became the next instance of
+    it. Why no guard fired: `test_supplements.py` pinned the run-log envelope with a
+    PREFIX assertion that a five-member chain still satisfies. If your tree carries
+    any of those twelve sentences it carries the same wrong number; the text fix is
+    cheap and the guard is the durable half.
+
+277. G94 — WHICH STANDARD DOES A JOB VALIDATE AGAINST? [core] (`d8681e55`,
+    `c4ffc14f`). `drydocs_core/orchestration/controlm/standard_selection.py`:
+    `required_tokens(JobType)` selected on ONE dimension; the 2026-08-12 direction
+    rules the real selection a TREE — a file watcher takes the FileWatcher standard;
+    a command job selects on its ETL ENGINE first (DPL, Ab Initio, Informatica — the
+    invocation types the launcher registry already classifies); anything else takes a
+    generic standard AND SAYS WHY. Selection is separated from validation, so the
+    tree can be re-ruled without touching the parser. The DD-digit guardrail is
+    enforced structurally as well as functionally: the grammar version is ABSENT from
+    `select_standard`'s signature, so someone reaching for the version slot as a
+    selector has nowhere to put it. Unused is a convention; absent is enforcement.
+
+278. G128 — THE RESOLVERS READ THROUGH THE ONE EXPANSION FUNCTION [core]
+    (`2e929646`, `d1466b61`). Finishes what G125 started. The decision made first:
+    `DataRootNotSetError` SUBCLASSES `UnsetVariableError` rather than being replaced
+    by it — the specific type is load-bearing at two catch sites that print the data
+    root's own remediation, so one flat type would have made an unset
+    `NEO4J_PASSWORD` print advice about the data root. Exactly one exception identity
+    changed, and only its base; every existing except clause still catches what it
+    caught. `resolve_optional(name) -> (value, which_name)` is the non-raising
+    accessor for callers where raising is wrong (a log directory called from inside
+    `open()`); `expand()` still raises, which is right for a binding. Two functions,
+    one declaration list.
+
+279. G129 — THE INTERNAL TWIN BECOMES NAVIGABLE [core + tooling, AND IT FOUND A REAL
+    TRAP] (`a2d6af58`, `1bd29b42`). `drydocs env-doctor [--check|--json]` over
+    `drydocs_core/env_doctor.py`, plus `scripts/render_env_example.py` and
+    `scripts/set_env_var.py`. **No value is printed by any of the three verbs.**
+    Three states rather than two, for ADR 0017 clause 7's reason: the two machines
+    hold different subsets, so an unset variable is a GAP only when something here
+    wants it — it is required, or its profile is HALF configured. Every report names
+    its venue (J18).
+    **THE FINDING IS THE PART THAT MATTERS TO YOU — THERE ARE TWO CHANNELS.** The
+    settings classes declare `env_file=.env`, so pydantic reads the machine-local
+    file, while `env_refs.expand` reads `os.environ` and nothing else. **A variable
+    set in the FILE ONLY is visible to a loader and invisible to a binding check.**
+    Harmless producer-side today because no profile references the `NEO4J_*` names
+    that answer from the file — but an `ORACLE_DSN` set in `.env` would have a loader
+    connect while `landing-zones --check` calls the oracle carrier unbound. Your side
+    has the live Oracle connection; check which channel yours answers from before you
+    trust either report.
+
+280. I6 — THE ID ALLOCATOR, AND THE TWO RULES THAT FOLLOWED IT [canonical-producer,
+    CLAUDE.md] (`d11185cb`, `070a3b37`, `2317cfef` the union guard was testing the
+    machine rather than the code, `294c8fd6` a mint stub carries its FINAL TITLE,
+    `123c44a2` a mint stub carries its RENDER too). `--next-id` unions the local
+    items, every remote ref's tree listing, and every id ever added in history, and
+    returns max+1 — because next-free-in-my-tree is what produced the 2026-08-29
+    nineteen-id collision in step 272. The two follow-on rules are corrections caught
+    in flight: a title refined between the stub push and the body push reads to the
+    collision guard as two machines minting one number (observed on J66), and a mint
+    without its render fails `test_committed_roadmap_page_matches_its_sources` for the
+    whole window between the two pushes (observed on G132/G133) — the Y5 tolerance
+    forgives STATUS drift, not a new item. `CLAUDE.md` and `.claude/**` are
+    canonical-producer: take them.
+    **BAND NOTE, unchanged and worth re-stating on a port:** the allocator's bands
+    (producer 1–9999, company 10000+) separate the two REPOS. They never separated
+    the two producer machines, which is the collision that actually happened.
+
+281. J63 — EVERY REVIEW SURFACE NAMES THE TREE IT RAN AGAINST [canonical-producer,
+    AND IT IS ABOUT PORTS] (`1be32415`, `d069fa2a`).
+    `docs/style/review-provenance.md` + `python scripts/review_stamp.py`, applied to
+    all six existing design reviews and to `CLAUDE.md`'s working agreements. Every
+    review, triage or research artifact states its `reviewed_commit`,
+    `reviewed_branch` and `reviewed_port_base`. **The reason is your side:** without
+    the port base, *absent here* reads as **broken** when it means **not yet
+    ported** — which manufactured findings three times, most recently the 2026-08-28
+    triage that called three registered refresh verbs backwards and seven existing
+    commands unregistered. Note what this is NOT: J37 (read the importable object)
+    was followed correctly every time. Reading faithfully still reports a STALE tree
+    faithfully, so this is provenance and no method rule substitutes for it. This
+    commit also edits `docs/port/port-prompt.md` itself.
+
+282. G130 — BOOTSTRAP REPORTS LIVE-BUT-UNDECLARED CONSTRAINTS, AND FOUND ONE [guard +
+    live finding] (`908b32ec`, `01761011`). The D8 guard asserts every DECLARATION
+    landed; nothing asked the other question — what else is in there — which is how a
+    retired label's constraint survives a data wipe and goes on enforcing an old
+    identity rule against the next load that reuses the label. **It found one on its
+    first run**, so clause (d)'s re-verification is not a formality. Venue (J18):
+    producer desktop, `bolt://localhost:7687`, database `drydocs` — 56 live, 56
+    declared across the tree, one live-but-undeclared: `membership_id` on
+    `:Membership`, DROPPED at G99 (2026-08-18) with its last writer rather than ahead
+    of it. **Not a producer defect — and live residue on this desktop exactly as on
+    your instance, which the item did not predict.** Run it against yours before your
+    next load; a residue constraint is invisible until it refuses a write.
+
+283. J66 — A GUARD READS CODE, NOT THE PROSE AROUND IT [guard, canonical-producer]
+    (`845716b9` mint, `cda15ef5` groom, `ae4dc314` claim, `1ec181eb` the build).
+    `tests/source_scan.py` — `code_only` (comments and string literals stripped),
+    `imported_modules`, `called_names` — and four existing guards moved onto it. The
+    reason ships with the rule because the reason IS the rule: a guard that greps for
+    a forbidden pattern also matches the **comment explaining why it is forbidden**,
+    so it fails on the explanation and teaches people to stop writing explanations —
+    which, in a repo whose comments carry its rulings, costs more than the guard is
+    worth. It happened three times on 2026-08-30 alone (G128, G129, G130), each fixed
+    from scratch. The one exception is a guard whose subject IS the prose — an error
+    message, an operator-facing string — which reads raw source on purpose and says
+    so. This is J37's disease at the other end.
+
+284. G135 — THE DPL REGISTRY EXTRACTOR CAN REPORT A CONTRACT THAT IS WRONG, NOT ONLY
+    ONE THAT IS BROKEN [lineage, T13-adjacent] (`6d7e76ef` mint, `72b3912f` bodies,
+    `669a9c0a` the build). Every counter on `RegistryCoverage` was a SKIP counter, so
+    a record that staged fine with five of its six fields empty fired none of them and
+    the run summary was indistinguishable from a clean one. Now: `FieldCensus` per
+    kind per contract field (present / empty / absent), run BEFORE any skip and
+    reported as `"pipeline.version: absent 508/508"`; `active_absent` counted apart
+    from `active_unknown` (a missing field is a contract question, a strange value is
+    a data question); `seal_origin` / `seal_from_folder`, so a seal inferred from a
+    directory name is visible as inferred rather than asserted as read;
+    `_count_passed_over()`, so an intake-NAMING problem stops looking like an empty
+    directory. **NO FIELD NAME MOVES** — amending the mapping is gate territory
+    (G64/G65), and this is the instrument that measures it.
+
+285. G136 — THE DPL DATASET IDENTITY RIDER [gate-bound, NOTHING BUILT] (`92d3898d`).
+    `config/gate-prompts/dpl-dataset-identity-zone.yaml`, 3 sections / 9
+    confirmations, DRAFTED and UNSIGNED. The argument it turns on is worth your
+    attention because it is a reasoning defect and not a data defect:
+    `rua-load-shapes` section G1 ruled managed assets key on the GUID alone "with
+    version and zone as properties", and its sign-off cites `dpl_mac.py`'s own comment
+    as evidence that this "was already the code's own assumption". That reads as
+    corroboration and is not — **the comment is where the assumption came from. One
+    belief, quoted twice.** Not a criticism of the ruling, which was reasonable on
+    what was in hand; it is why a RIDER is the right instrument rather than a build.
+    B2 forces amend-vs-carve-out on section G1 rather than letting a general rule go
+    quietly false on its largest population.
+
+286. THE T13 REVISIT FIRED, AND ONE ENTRY STOPS INHERITING AN OUTCOME [ledgers,
+    note-only] (`07d9caab`, with `03d1c053` the CI fix that followed it). Note-only:
+    no status moves, no entry is re-ruled, nothing loads differently.
+    `dpl:pipeline-registry` records that a real export was pulled and profiled
+    company-side on 2026-08-31 and that its status stays `stub` until the gate signs —
+    a profile is evidence, not a ruling. `dpl:dataset-registry` now says what its
+    cross-reference carries and what it does not: it inherits the 2026-08-07 ARGUMENT
+    from its sibling and nothing else, because the two exports answer from different
+    endpoints, which is why G64 and G65 are separate gates. **T13's row in this file
+    changed with it** — the validation RAN, the amendment did not, so the row stays
+    pending and now says which is which. `03d1c053` is the currency guard learning
+    that `internal/research/G64-SME-MM-research.md` is a COMPANY-SIDE path: naming
+    your artifact is the citation, not a stale claim about this tree.
+
+287. O80 — THE CONSOLE GETS A TEST RUNNER [canonical-producer, CI CHANGES]
+    (`0a981199`, `ce90669f`, `dd445a71`, `9c9cb91f`, `8565904d`, `ae1de732` the
+    merge). Vitest for pure modules, Playwright for the browser path, both wired into
+    `.github/workflows/ci.yml`, plus `config/taxonomy/ui-tests.yaml` as the ledger and
+    `tests/unit/test_ui_tests_ledger.py` as its guard. **Two CI fixes ride it and both
+    are environment facts you will hit too:** the web job needs `--with api` because
+    it starts the API it tests, and it must declare a data root because the API
+    refuses to boot without one. `web/**` and `.github/**` — read the K7–K15
+    divergence block before taking `web/src` wholesale.
+
+288. O81 + O78 + O83 + O84 — THE GRAPH CANVAS AND THREE CONSOLE FIXES
+    [canonical-producer] (`534a9fbd`/`84d0ac6d` O81, the NVL canvas over QuerySpec
+    results; `3e77be70`/`52dc4d04` O78, MiniDag adopts the shared `RelEdge` overlay so
+    relationship names stop painting behind nodes; `aca4e3c1`/`b685c4b4` O83, the bolt
+    panel defaults to the PROJECT database rather than the driver's home database;
+    `29afe226`/`fad162fd` O84, first-party queries may only name labels the schema
+    declares and an empty preset says WHICH are missing). O83 and O84 are the two to
+    take early if you take nothing else from the console this port: both are the
+    console silently answering from the wrong place.
+
+289. O85 + O86 + O71 — THE CONSOLE AUTH BOUNDARY [canonical-producer + one gate draft]
+    (`2a222c07`, `c9b38a23`, `908d7a79` the origins guard skips where fastapi is
+    absent, `7acde151`). The console signs in where it says it does (a CORS origins
+    fix), each graph canvas gets its own full-page route, and
+    `config/gate-prompts/console-auth-boundary.yaml` is DRAFTED and UNSIGNED.
+    `7acde151` is the one to read: **P3 states the JWT trade WITHOUT a recommendation,
+    because its answer depends on a requirement nobody has stated.** A gate section
+    that cannot be answered from the tree says so rather than guessing.
+
+290. O58 + O61 + O60 + O62 — FOUR CONSOLE SURFACES, ONE UNRULED EDGE
+    [canonical-producer, ONE ITEM IS [UNRULED]] (`2ab58b44`/`b54d1ef7` O58 the
+    corpus-reconciliation surface and O61 the ownership product roll-up,
+    `b6949083`/`4e6ca693` O60 the lineage swimlane with the lane basis as a parameter,
+    `eece7b13` O62 the Ask file report and the first registered spec that actually
+    filters, `22349056` the BDAT layers as a second lane basis).
+    **[UNRULED] — O61 draws an edge the vocabulary has not ruled.** The commit subject
+    says so on purpose. It is a DEMO surface over demo data, not a loader, and nothing
+    writes it to a graph; do not let a rendered roll-up read as a ruled relationship.
+    O60 is the contrast: it is restricted to edges the vocabulary ALREADY ruled, and
+    `tests/unit/test_lineage_edge_backing.py` is what holds it there.
+
+291. O59 — THE /remediation INTAKE SURFACE [canonical-producer] (`1dc99090`,
+    `6984ba24`, `f105c403`). The machine reports what IS; the SME supplies what is NOT
+    THERE. `scripts/render_remediation_profile.py` generates
+    `web/src/generated/remediation-profile.json` and the route reads only the generated
+    artifact — the generated-artifact + drift-test pattern, so the page cannot drift
+    from its source without a guard failing.
+
+292. O26 — A CLAIM RELEASED RATHER THAN WORKED [backlog hygiene, one line] (`150e08d4`).
+    O26 was pulled and then released back to `todo` because an SME HOLD is live on it.
+    Recorded because the release is the correct move and because the board now shows
+    the gap: a `todo` item whose deps are all `done` still appears in Ready-to-pull
+    even when a hold exists — the blindness Idea-232 captures in the footnote below.
+
+293. CLAUDE.md ROUTING + Q28 [canonical-producer] (`d3f6e4f6` three stale routing
+    pointers, `536437b2` the Oracle pointer dropped, `188bc4a4` the Oracle pointer
+    RESTORED and venue-tagged, `9018b354`/`69955613`/`2be98f8d` Q28). The Oracle
+    sequence is a decision to read rather than a churn to skip: the skill was first
+    dropped producer-side for having no live connection, then RESTORED because **the
+    skill tree PORTS** — `.claude/**` is canonical-producer, so the company inherits
+    it while `settings.local.json` stays machine-local. The producer keeps `oracle-db`
+    `"off"` in `skillOverrides`; **your side has the live `psgmgr` connection and is
+    expected to turn it on.** Two adjacent pointers so nobody re-fixes this line
+    wrongly: the vendor plugin `db@oracle-skills` is a DIFFERENT thing and is disabled
+    at the user level, and `reference/platforms/` currently carries `neo4j/` only —
+    there is no `oracle/` directory behind that link yet. `d3f6e4f6` also fixes
+    `.claude/agents/backlog-groomer.md`'s schema pointer (`v2` -> `v3`). Q28 registers
+    the 9.0.21 Parameters doc corpus and records that the tree refuses at CAPTURE, not
+    at conversion.
+
+294. THREE SMALL CORRECTIONS [docs] (`e0134168` VERSIONING's public-surface list had
+    three stale pointers — `drydocs.backlog.v2` -> `v3`, `backlog.yaml` ->
+    `backlog/items/<id>.yaml`, and `relationship_vocabulary.yaml` -> the per-domain
+    fragment DIRECTORY (S5); `cd7ffa16` Idea-163 narrowed to the release call now that
+    its orphan and drift halves are closed; `cf73bee6` the `rua_inventory.py` §D3
+    comment now names G56, which resolved it, and states that the v1/v2 ambiguity is
+    answered by RE-COLLECTING at v3).
+
+295. THE THREE ONTOLOGY CORRECTIONS — OWNERSHIP IS NOT WHAT THE FIELD NAME SAYS
+    [ontology, per-entry, READ ALL THREE BEFORE ANY FID WORK] (`3f3036e3`, `b35f79ae`,
+    `f2e6d222`). All three amend ONE note — `human_appuser_owned_by` in
+    `drydocs_core/ontology/relationship_vocabulary/52-local-human.yaml` — and each was
+    a correction to the producer's own reading, kept in sequence rather than collapsed:
+    (a) `3f3036e3` — the employee-hierarchy listing says "manager" because a functional
+    account is the LOWEST level of the tree, so its owner is a manager BY TREE
+    POSITION. It does not mean the owner manages people. Every seniority inference
+    drawn from that field was drawn from a tree artifact.
+    (b) `b35f79ae` — owning functional accounts is NOT owning applications. The
+    convergence-means-technical-accountability reading was falsified by measurement:
+    557 accounts against 6 applications. FCT ownership tracks who APPROVES ACCESS.
+    (c) `f2e6d222` — "answered from ServiceNow TOM" is ambiguous, because **TOM has TWO
+    SCOPES**: individual-scoped (ownership, single-digit CI counts) and group-scoped
+    (support accountability, 65–153 CIs). A group-scoped answer reads as ownership if
+    the scope is not stated, and the FCT owner field lands in NEITHER scope.
+    **WHY THIS MATTERS ON YOUR SIDE SPECIFICALLY.** `52-local-human.yaml` is per-entry
+    by manifest; only the live entry is touched here, and the superseded
+    `seal_appuser_owned_by` twin deliberately keeps its original wording as filed
+    history. Adjacent and NOT reopened: your 2026-08-26 G70 re-rule of the role
+    register stands, protected by the per-entry `tom-role-vocabulary.yaml` manifest row
+    (`fdaffd2f`). **The producer file declares SIXTEEN roles; yours declares NINETEEN.
+    That gap is your re-rule, not producer drift — do not reconcile it by taking ours.**
+
+296. C38 + G100 — THE REPLICA DERIVATION EDGE, AND MEASURED TIER EVIDENCE [ontology
+    planned + gate-bound, NOTHING LOADS] (`0662e453` the claim, `cb7f58b9` C38,
+    `0fe79795` G100). C38 registers `reg_derived_from` (DataAsset -> DataAsset,
+    `prov:wasDerivedFrom`, domain `registry`) as **`status: planned`, with
+    `supplement: ~` and `loader: ~`**, and drafts
+    `config/gate-prompts/replica-derivation-edge.yaml` (5 sections / 11 confirmations),
+    logged in `config/gate-log.md` as a RECORD stub — non-authority under J43, so no
+    field may cite it. The gap it addresses: a replica says so THREE times and all
+    three spellings are ATTRIBUTES — the id shape where `origin` differs from `system`
+    (`controlm@[db].psgmgr.*`, `snow@[db].[schema].*`), `authority: ADS` against `SOR`
+    (12 rows of 17), and prose in `notes` — so no query can walk from a replica to its
+    origin. **Section A2 asks the prior question before any edge is minted: is
+    TRAVERSAL actually wanted?** A reporting-only need is already served by the three
+    attributes, and a gate that cannot end in "no edge" is not a gate. **Section C is
+    the load-bearing half:** the sibling shape is the trap, because DataHub's
+    `SiblingGraphService` ACTIVELY DELETES any lineage relationship between two
+    siblings from the merged read path, which is the default — modelling replica-ness
+    as aliasing DESTROYS the fact being recorded. The SME must reject it knowingly,
+    not by omission.
+    G100 gains the measured tier evidence: SENG/ASUP is a SEED, not the set — four
+    tokens, `_SENG_`/`_SSRE_` -> L3 and `_ASUP_`/`_ISUP_` -> L2 — with group-scoped
+    counts 118/129/190/237 and two cautions riding: console-export counts are FLOORS
+    (the 200-row truncation) and the tier derivation is a naming-convention inference
+    that doc 09's rule fences. **G100 is NOT on the derived gate queue** — it has no
+    `gates:` field and no prompt file, and wiring it is its own unit (C39 is the item
+    that makes the queue DECLARED rather than inferred).
+
 LEDGER COVERAGE FOOTNOTE (2026-08-29, THIRD ROLL) — the `port-base-20260826..HEAD`
 extension, cited here because the coverage check reads ONLY this section.
 IDEA CAPTURES — `docs/restructure/IDEAS.md` is `union-append` and an inbox entry is not
@@ -3951,6 +4419,55 @@ under either scope, `chore(plan): render`/`re-render`, an item-scoped `claim`, a
 spelled `<ID> in_progress`. Eighteen commits in this range stopped reading as uncited. A
 `close` is deliberately still substantive. The commit carrying this is a `chore(port):
 ledger` roll and is ritual by the terminating-write rule.
+
+LEDGER COVERAGE FOOTNOTE (2026-09-01, FOURTH ROLL) — the
+`port-base-20260829..port-base-20260901` extension, cited here because the coverage
+check reads ONLY this section. The commits below were enumerated at `0fe79795`, before
+the roll commit existed; the tagged range is 129 because the roll commit IS the tag.
+IDEA CAPTURES — `docs/restructure/IDEAS.md` is `union-append` and an inbox entry is not
+apply content, so these get a citation rather than a step. Step 272's warning still
+governs: apply the id set as it stands at the base, never a pre-renumber copy.
+`1a34280a` + `6baeb3d6` (Idea-206, and the correction that the snapshot's stamp is
+`meta.git`, not `meta.commit`), `aa04af2b` + `54a59b4c` (Idea-221, and the amendment
+that the MCP server is a READ surface chosen per datapoint), `67468aac` (Idea-222,
+access paths documented three times and never generalized), `c6b8a8cd` (Idea-228, the
+recommendation was the lesser answer — three strategies recorded instead), `3c171013`
+(Idea-229, a CANCELLED CI run is neither green nor red and nothing reads it as
+unverified — worth your side's attention, since your CI check has the same hole),
+`eafb0b2f` + `1cec2af3` + `2777476f` (Idea-230 and Idea-231, a dependency's growth has
+no route to its dependent, and the console's access designations have no guard),
+`6793d8df` + `fb5e9444` (Idea-232, the ready list is blind to a hold that exists
+because the deps are done — see step 292), `9be42050` + `02cadd7a` (Idea-233, a CAPTURE
+rung says how the bytes were obtained, which the trust axis does not).
+MINTS AND BODIES — a mint stub is a reservation with its final title and its render
+(I6, step 280), and a body fills it in. Neither is apply content on its own; the item
+crosses in the `per-entry` backlog union either way, so like the idea captures they get
+a citation, not a step: `845716b9` (J66), `cae680e7` + `6f141090` + `6cd0030f` (G132 +
+G133, and the clause that moved between them), `a284016c` + `6116b778` (G134),
+`2ba4ac82` + `a9526208` (O86), `6d7e76ef` + `72b3912f` (G135 + G136), `6f99d7a3` +
+`9c834249` (C39 + C40 — C39 declares the gate queue, C40 gives a signed ruling a way to
+be looked at again), `9018b354` + `69955613` (Q28, also in step 293).
+RITUAL PATTERN FIX, THIRD TIME — the same three categories drifted into three more
+spellings, and `drydocs/port_preflight.py` learns them rather than the ledger widening
+its policy: the session-close snapshot written under a `session` scope
+(`chore(session): depgraph snapshot at <sha> …`), a claim RELEASED with an article in
+it (`chore(O26): release the claim …`), and a claim written as a `backlog(<ID>):` TYPE
+(`backlog(G125): claim in_progress (desktop)`). Nine commits in this range stopped
+reading as uncited. **Deliberately NOT widened, and this is the second such fence
+after `close`:** `chore(<ID>): mint …` and `feat(backlog): <ID> body …`. A mint is not
+in the header's ritual list, and under I6 it carries the item's FINAL TITLE and its
+render — content, not bookkeeping. Mints are covered by the citation block above
+instead. Exempting them would be a policy change and it is the user's to make.
+PRODUCER-LOCAL HISTORY HYGIENE, stated so a new tag on the producer remote is not read
+as a port artifact: three orphan refs that existed only on one producer machine were
+pushed or retired on 2026-08-31 — `archive/old-history-2026-07-20` (411 commits, the
+pre-squash history) and the `v0.3.0` release tag were pushed as-is, and
+`pre-scrub-20260804` was REWRITTEN before pushing, as
+`archive/prescrub-20260804-scrubbed`, because it carried an Internal workbook blob; the
+unscrubbed original was deleted after equivalence verification. **None of this touches
+`main`, and none of it crosses the port** — the two repos' histories are disjoint by
+construction. It is recorded here only because those refs are now visible on
+`ce-wilson/DryDocs` and a fetch will show them.
 
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
