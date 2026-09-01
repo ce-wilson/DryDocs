@@ -2055,8 +2055,57 @@ beside the doc ones in `docs/design/feedback/` or in their own directory. It dep
 whether `doc:` can name a console route without confusing the graph loader, which is a
 question for whoever builds (a) with the loader in front of them.
 </p></div></div>
-<div class="card ready" id="card-O91" data-id="O91" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="o91 the console has 22 type sizes and no scale — collapse the half-pixels, retire the arbitrary values that duplicate a named one, and set a floor" tabindex="0"><div class="card-head"><span class="card-id">O91</span><span class="card-title">The console has 22 type sizes and no scale — collapse the half-pixels, retire the arbitrary values that duplicate a named one, and set a floor</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Stub minted per the I6 rule — the body lands in the next commit.
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-01. Body to follow.
+<div class="card ready" id="card-O91" data-id="O91" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="o91 the console has 22 type sizes and no scale — collapse the half-pixels, retire the arbitrary values that duplicate a named one, and set a floor" tabindex="0"><div class="card-head"><span class="card-id">O91</span><span class="card-title">The console has 22 type sizes and no scale — collapse the half-pixels, retire the arbitrary values that duplicate a named one, and set a floor</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE CENSUS IS THE STARTING POINT AND MUST BE RE-RUN, NOT TRUSTED. Measured
+2026-09-01 (desktop, this worktree): 698 size declarations across 22 distinct sizes —
+488 arbitrary `text-[Npx]` over 17 sizes, 210 named Tailwind over 5. Roughly seven in
+ten sizing decisions bypass the scale. These numbers move with every commit; re-measure
+at build and quote what you find in the close.
+
+(b) COLLAPSE THE HALF-PIXELS FIRST — it is the safe half. 43 uses across 15 files over
+7 sizes: 9.5, 10.5, 11.5, 12.5, 13.5, 14.5, 15.5. At the DPI this console is read on,
+each is indistinguishable from its whole-pixel neighbour, so the change is invisible and
+removes 7 of the 22 sizes on its own. Round to the nearest whole; where a rounding is
+genuinely load-bearing, keep it and say why on the line.
+
+(c) RETIRE ARBITRARY VALUES THAT DUPLICATE A NAMED ONE. `text-[12px]` (10 uses) renders
+identically to `text-xs`, which already has 158. Two spellings of one size is how a
+vocabulary stops being one. Same for any `text-[14px]` against `text-sm`. This is a
+rename, not a design change: nothing may look different afterwards.
+
+(d) SET A FLOOR AND MAKE THE EXCEPTIONS EXPLICIT. 9px appears in 10 files including
+OverviewRoute and DomainGridTable; TaskGraphPane goes to 8px and 7px. Decide the smallest
+size allowed for anything a reader must READ — as opposed to a graph label they scan —
+and turn every use below it into either a fix or a stated exception. 7px is not readable
+on a standard display and should not survive without an argument.
+
+(e) WHAT THIS ITEM MUST NOT DO: decide which size a given element ought to be. That is
+design, and mixing it into a mechanical cleanup means no reviewer can tell a rounding
+from a redesign in the same diff. Anything that changes how the page LOOKS belongs to a
+separate item with a before/after.
+
+(f) NO GLOBAL SWEEP. 698 sites, and a mechanical replace over all of them would flatten
+deliberate choices alongside accidental ones. Work clause by clause, each its own commit,
+each verifiable by reading the diff. `npm run build`, `npm run lint` and vitest stay green
+throughout, and the close names the surfaces actually eyeballed in a browser — a type
+change that only passed a typecheck has not been verified.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-01 (desktop, ui-workstream worktree) from a font-size review the user asked
+for after two ad-hoc bumps on /load-map — the page heading (ModuleTemplate, shared by all
+twelve module routes) and the &quot;Declared, not observed&quot; banner.
+
+THE FINDING IS THE SPREAD, NOT ANY ONE SIZE. Twenty-two distinct sizes is not a scale; it
+is the absence of one. Seven of them differ from a neighbour by half a pixel, which is a
+decision that costs maintenance and buys nothing a reader can see. The console is not
+visibly broken today, which is exactly why this is p3 and not higher — the cost is paid by
+whoever next tries to answer &quot;what size should this be?&quot; and finds no answer in the code.
+
+ONE OBSERVATION HELD BACK ON PURPOSE, because it is clause (e) territory and not cleanup:
+on /load-map the data rows carry identifiers at 10px while the prose explaining them sits
+at 12px, so the smallest text on the page is the part the page exists to show. That is a
+design judgement with a real answer, and it deserves its own item rather than riding in on
+a rounding pass.
+
+CORRECTION CARRIED FORWARD: the review that prompted this quoted 43 half-pixel uses as 63
+in conversation. 43 is the measured figure and is what (b) is scoped against.
 </p></div></div>
 <div class="card ready" id="card-P6" data-id="P6" data-module="config" data-phase="13" data-epic="runtime-topology" data-type="task" data-status="todo" data-search="p6 run the data-center collision probe on live psgmgr before any multi-data-center load — one table id in two data centers silently merges two folders into one graph node" tabindex="0"><div class="card-head"><span class="card-id">P6</span><span class="card-title">Run the data-center collision probe on live psgmgr before any multi-data-center load — one table id in two data centers silently merges two folders into one graph node</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P13</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">runtime-topology</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE PROBE. One grouped count over the folder-definition view: how many table ids appear in more than one data center. Counts only, never result rows — the producer side has no psgmgr access, so this is user-run on the internal network and the agent transcribes the conclusion, exactly the arrangement P1 records.
 
