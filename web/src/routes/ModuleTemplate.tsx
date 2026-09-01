@@ -45,10 +45,10 @@ export default function ModuleTemplate({ module, selection, graphPane, tabConten
       />
       <div className="flex flex-wrap items-end gap-2 px-4 pt-3">
         <div className="min-w-0 flex-1">
-          <h2 tabIndex={-1} data-view-heading className="text-lg font-semibold text-text outline-none">
+          <h2 tabIndex={-1} data-view-heading className="text-2xl font-semibold text-text outline-none">
             {module.label}
           </h2>
-          <p className="mt-0.5 text-xs text-faint">{module.tagline} · backs onto {module.backsOnto}</p>
+          <p className="mt-1 text-[13px] text-muted">{module.tagline} · backs onto {module.backsOnto}</p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
           {toolbarActions ?? (

@@ -393,7 +393,7 @@ WIRING_STATES: tuple[tuple[str, str, str], ...] = (
     ("wired", "wired", "a gate ruled its meaning and a loader is built"),
     ("planned", "planned", "a gate ruled its meaning; nothing is built yet"),
     ("awaiting", "built, awaiting gate", "a loader is built; no gate has ruled its meaning"),
-    ("registered", "registered only", "declared in the registry; neither ruled nor built"),
+    ("registered", "registered", "declared in the registry; neither ruled nor built"),
 )
 
 

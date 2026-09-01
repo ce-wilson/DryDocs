@@ -275,7 +275,7 @@ export const WIRING_STATES: readonly WiringState[] = [
   },
   {
     id: 'registered',
-    label: 'registered only',
+    label: 'registered',
     token: '--muted',
     meaning: 'declared in the registry; neither ruled nor built',
   },

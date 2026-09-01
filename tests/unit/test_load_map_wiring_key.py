@@ -95,7 +95,7 @@ def test_the_print_surface_carries_the_key_and_agrees_with_the_data() -> None:
             "wired": "wired",
             "planned": "planned",
             "awaiting": "built, awaiting gate",
-            "registered": "registered only",
+            "registered": "registered",
         }[state]
         needle = f'wr-{state}">{label}</span>&thinsp;{count}'
         assert needle in html, (
@@ -116,6 +116,6 @@ def test_screen_and_paper_use_the_same_labels() -> None:
     """
     ts = MODEL_TS.read_text(encoding="utf-8")
     py = RENDERER.read_text(encoding="utf-8")
-    for label in ("wired", "planned", "built, awaiting gate", "registered only"):
+    for label in ("wired", "planned", "built, awaiting gate", "registered"):
         assert f"'{label}'" in ts or f'"{label}"' in ts, f"console lost the {label!r} label"
         assert f'"{label}"' in py, f"print renderer lost the {label!r} label"

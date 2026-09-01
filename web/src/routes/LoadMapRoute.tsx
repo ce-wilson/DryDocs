@@ -84,7 +84,7 @@ function Table({
 }) {
   return (
     <div className="min-h-0 flex-1 overflow-auto rounded-md border border-edge">
-      <table className="w-full border-collapse text-left text-[11px]">
+      <table className="w-full border-collapse text-left text-sm">
         <thead className="sticky top-0 bg-panel-2">
           {headerRow ?? (
             <tr>
@@ -127,7 +127,7 @@ export default function LoadMapRoute() {
   const srcRows = srcView.rows as unknown as (LoadMapSource & { taxonomy: string })[]
 
   const banner = (
-    <p className="shrink-0 rounded border border-edge bg-panel-2 px-2 py-1 text-[11px] text-muted">
+    <p className="shrink-0 rounded border border-edge bg-panel-2 px-2 py-1 text-xs text-muted">
       <b>Declared, not observed.</b> Every row here comes from the registries via the generated
       <code className="mx-1">load-map.json</code> — what is registered to load and in what order. Whether a load
       actually ran is <b>/loads</b>. The {DOC_CORPUS_COUNT} doc-corpus sources are deliberately absent: they are
@@ -150,13 +150,13 @@ export default function LoadMapRoute() {
       {banner}
       <StatTiles tiles={tiles} />
       <div className="min-h-0 flex-1 overflow-auto rounded-md border border-edge bg-panel-2 p-2">
-        <p className="mb-1.5 text-[11px] font-semibold text-muted">Canonical load sequence</p>
+        <p className="mb-1.5 text-[12px] font-semibold text-muted">Canonical load sequence</p>
         <ol className="flex flex-wrap items-center gap-1.5">
           {SEQUENCE.map((step, i) => (
             <li key={`${step.command}-${i}`} className="flex items-center gap-1.5">
               <span
                 title={step.note ?? undefined}
-                className="rounded border border-edge bg-panel px-1.5 py-0.5 font-mono text-[10px] text-text"
+                className="rounded border border-edge bg-panel px-1.5 py-0.5 font-mono text-sm text-text"
               >
                 {step.command}
                 {step.loaders.length ? (
@@ -189,14 +189,18 @@ export default function LoadMapRoute() {
             const path = ledgerPath(s.ledger)
             return (
               <tr key={s.id} className={i % 2 ? 'bg-bg-2/40' : ''}>
-                <td className={`${TD} font-mono text-[10px] text-text`}>
+                <td className={`${TD} font-mono text-sm text-text`}>
                   {s.id}
                   {s.derived && <span className="ml-1 text-faint">· derived</span>}
-                  {s.replaces && <span className="ml-1 text-faint">· replaces {s.replaces}</span>}
+                  {/* The `replaces` id is NOT shown here. It is rename provenance, and it
+                      cost the id column roughly half its width on 25 of 30 rows to carry a
+                      string the reader is not looking up. The full mapping — retired id,
+                      replaced by, and why — is the Retired ids tab, which is the surface
+                      that exists for it. */}
                 </td>
                 <td className={`${TD} text-muted`}>{s.system ?? '—'}</td>
                 <td className={`${TD} text-muted`}>{s.origin ?? '—'}</td>
-                <td className={`${TD} font-mono text-[10px] text-muted`}>{s.kind}</td>
+                <td className={`${TD} font-mono text-sm text-muted`}>{s.kind}</td>
                 <td className={`${TD} text-muted`}>{s.authority ?? '—'}</td>
                 <td className={`${TD} text-muted`}>{s.classification ?? '—'}</td>
                 <td className={`${TD} ${s.confirmed ? 'text-text' : 'text-faint'}`}>
@@ -204,7 +208,7 @@ export default function LoadMapRoute() {
                 </td>
                 <td className={TD}>
                   <span
-                    className="inline-flex items-center rounded-full border px-1.5 py-px font-mono text-[9.5px] font-semibold"
+                    className="inline-flex items-center rounded-full border px-1.5 py-px font-mono text-xs font-semibold"
                     style={{
                       borderColor: `var(${wiringState(s).token})`,
                       color: `var(${wiringState(s).token})`,
@@ -215,20 +219,51 @@ export default function LoadMapRoute() {
                     {wiringState(s).label}
                   </span>
                 </td>
-                <td className={`${TD} font-mono text-[10px] text-muted`} title={path ?? undefined}>
+                <td className={`${TD} font-mono text-sm text-muted`} title={path ?? undefined}>
                   {ledgerState(s.ledger)}
                 </td>
-                <td className={`${TD} font-mono text-[10px] ${s.taxonomy ? 'text-muted' : 'text-faint'}`}>
+                <td className={`${TD} font-mono text-sm ${s.taxonomy ? 'text-muted' : 'text-faint'}`}>
                   {s.taxonomy_captures.length
                     ? s.taxonomy_captures.map((c) => <div key={String(c)}>{String(c)}</div>)
                     : '—'}
                 </td>
-                <td className={`${TD} text-[10px] ${reach.loaded ? 'text-text' : 'text-faint'}`}>{reach.label}</td>
-                <td className={`${TD} font-mono text-[10px] text-muted`}>
+                <td className={`${TD} text-sm ${reach.loaded ? 'text-text' : 'text-faint'}`}>{reach.label}</td>
+                <td className={`${TD} font-mono text-sm text-muted`}>
                   {s.loaders.map((l) => l.cli_name ?? l.name).join(', ') || '—'}
                 </td>
               </tr>
             )
+    })
+  }
+
+  // Grouped rendering. The zebra offset is a RUNNING COUNT, not a slice of the
+  // preceding groups: the earlier version cost O(n^2) per render and tripped
+  // test_the_route_renders_each_collection_whole, which bans the slice method
+  // outright. That ban is the right instinct — a slice in a table body is nearly
+  // always a truncation, and the guard should not have to tell the two apart.
+  // (Written without the call syntax on purpose: the guard is a raw substring
+  // scan over this file, so naming the method in its call form fails on the
+  // comment explaining it — the J66 trap, which has no code_only equivalent for
+  // TSX yet.)
+  function renderGroupedSourceRows(groups: { key: string; label: string; rows: Record<string, unknown>[] }[]) {
+    let offset = 0
+    return groups.flatMap((g) => {
+      const before = offset
+      offset += g.rows.length
+      return [
+        // The band spans the table so the system name reads as a heading rather
+        // than as a value in the first column.
+        <tr key={`grp-${g.key}`} className="bg-panel-2">
+          <td
+            className="border-y border-edge px-2.5 py-1 text-sm font-semibold text-text"
+            colSpan={SOURCE_COLUMNS.length}
+          >
+            {g.label}
+            <span className="ml-2 font-normal text-faint">{g.rows.length}</span>
+          </td>
+        </tr>,
+        ...renderSourceRows(g.rows as unknown as (LoadMapSource & { taxonomy: string })[], before),
+      ]
     })
   }
 
@@ -254,7 +289,7 @@ export default function LoadMapRoute() {
             onClick={() => setKind(kind === k ? null : k)}
             aria-pressed={kind === k}
             className={
-              'rounded border px-2 py-0.5 font-mono text-[10px] ' +
+              'rounded border px-2 py-0.5 font-mono text-sm ' +
               (kind === k ? 'border-blue-bright bg-panel-2 text-text' : 'border-edge text-muted hover:text-text')
             }
           >
@@ -296,22 +331,7 @@ export default function LoadMapRoute() {
           </tr>
         }
       >
-        {srcView.groups
-          ? srcView.groups.flatMap((g) => {
-              // The group header spans the table so the system name reads as a
-              // band rather than as a value in the first column.
-              const before = srcView.groups!.slice(0, srcView.groups!.indexOf(g)).reduce((n, x) => n + x.rows.length, 0)
-              return [
-                <tr key={`grp-${g.key}`} className="bg-panel-2">
-                  <td className="border-y border-edge px-2.5 py-1 text-[10px] font-semibold text-text" colSpan={SOURCE_COLUMNS.length}>
-                    {g.label}
-                    <span className="ml-2 font-normal text-faint">{g.rows.length}</span>
-                  </td>
-                </tr>,
-                ...renderSourceRows(g.rows as unknown as (LoadMapSource & { taxonomy: string })[], before),
-              ]
-            })
-          : renderSourceRows(srcRows)}
+        {srcView.groups ? renderGroupedSourceRows(srcView.groups) : renderSourceRows(srcRows)}
       </Table>
       <WiringKey sources={srcRows} />
       <p className="shrink-0 text-[10px] text-faint">
@@ -326,7 +346,7 @@ export default function LoadMapRoute() {
       <Table headers={['System', 'Name', 'Layer', 'Classification', 'Sources', 'Taxonomy captures']}>
         {SYSTEMS.map((sys, i) => (
           <tr key={sys.id} className={i % 2 ? 'bg-bg-2/40' : ''}>
-            <td className={`${TD} font-mono text-[10px] text-text`}>{sys.id}</td>
+            <td className={`${TD} font-mono text-sm text-text`}>{sys.id}</td>
             <td className={`${TD} text-muted`}>{sys.name}</td>
             <td className={`${TD} text-muted`}>{sys.layer ?? '—'}</td>
             <td className={`${TD} text-muted`}>{sys.classification ?? '—'}</td>
@@ -344,10 +364,10 @@ export default function LoadMapRoute() {
         {SEQUENCE.map((step, i) => (
           <tr key={`${step.command}-${i}`} className={i % 2 ? 'bg-bg-2/40' : ''}>
             <td className={`${TD} tabular-nums text-faint`}>{i + 1}</td>
-            <td className={`${TD} font-mono text-[10px] text-text`}>{step.command}</td>
+            <td className={`${TD} font-mono text-sm text-text`}>{step.command}</td>
             <td className={`${TD} text-muted`}>{step.mode}</td>
-            <td className={`${TD} font-mono text-[10px] text-muted`}>{step.profiles.join(', ') || '—'}</td>
-            <td className={`${TD} font-mono text-[10px] text-muted`}>
+            <td className={`${TD} font-mono text-sm text-muted`}>{step.profiles.join(', ') || '—'}</td>
+            <td className={`${TD} font-mono text-sm text-muted`}>
               {step.loaders.map((l) => l.cli_name ?? l.name).join(', ') || '—'}
             </td>
             <td className={`${TD} text-muted`}>{step.note ?? '—'}</td>
@@ -365,8 +385,8 @@ export default function LoadMapRoute() {
       <Table headers={['Retired id', 'Replaced by', 'Why']}>
         {RETIRED.map((r, i) => (
           <tr key={r.id} className={i % 2 ? 'bg-bg-2/40' : ''}>
-            <td className={`${TD} font-mono text-[10px] text-text`}>{r.id}</td>
-            <td className={`${TD} font-mono text-[10px] text-muted`}>
+            <td className={`${TD} font-mono text-sm text-text`}>{r.id}</td>
+            <td className={`${TD} font-mono text-sm text-muted`}>
               {r.replaced_by.length ? r.replaced_by.join(', ') : '—'}
             </td>
             <td className={`${TD} text-muted`}>{r.reason}</td>
@@ -402,9 +422,9 @@ export default function LoadMapRoute() {
             <Table headers={['Loader', 'Class', 'Commands', 'Stated reason']}>
               {SOURCELESS_LOADERS.map((l, i) => (
                 <tr key={l.name} className={i % 2 ? 'bg-bg-2/40' : ''}>
-                  <td className={`${TD} font-mono text-[10px] text-text`}>{l.name}</td>
-                  <td className={`${TD} font-mono text-[10px] text-muted`}>{l.class}</td>
-                  <td className={`${TD} font-mono text-[10px] text-muted`}>{l.commands.join(', ') || '—'}</td>
+                  <td className={`${TD} font-mono text-sm text-text`}>{l.name}</td>
+                  <td className={`${TD} font-mono text-sm text-muted`}>{l.class}</td>
+                  <td className={`${TD} font-mono text-sm text-muted`}>{l.commands.join(', ') || '—'}</td>
                   <td className={`${TD} text-muted`}>{l.reason}</td>
                 </tr>
               ))}
@@ -417,10 +437,10 @@ export default function LoadMapRoute() {
             <Table headers={['Entry', 'Status', 'Label', 'Names source', 'Exemption']}>
               {MAP_ENTRIES_WITHOUT_SOURCE.map((e, i) => (
                 <tr key={e.id} className={i % 2 ? 'bg-bg-2/40' : ''}>
-                  <td className={`${TD} font-mono text-[10px] text-text`}>{e.id}</td>
+                  <td className={`${TD} font-mono text-sm text-text`}>{e.id}</td>
                   <td className={`${TD} text-muted`}>{e.status}</td>
-                  <td className={`${TD} font-mono text-[10px] text-muted`}>{e.label}</td>
-                  <td className={`${TD} font-mono text-[10px] text-muted`}>{e.source}</td>
+                  <td className={`${TD} font-mono text-sm text-muted`}>{e.label}</td>
+                  <td className={`${TD} font-mono text-sm text-muted`}>{e.source}</td>
                   <td className={`${TD} text-muted`}>{e.exemption}</td>
                 </tr>
               ))}
@@ -433,8 +453,8 @@ export default function LoadMapRoute() {
             <Table headers={['CLI name', 'Class', 'Stated reason']}>
               {UNCHAINED_LOADERS.map((l, i) => (
                 <tr key={l.name} className={i % 2 ? 'bg-bg-2/40' : ''}>
-                  <td className={`${TD} font-mono text-[10px] text-text`}>{l.name}</td>
-                  <td className={`${TD} font-mono text-[10px] text-muted`}>{l.class}</td>
+                  <td className={`${TD} font-mono text-sm text-text`}>{l.name}</td>
+                  <td className={`${TD} font-mono text-sm text-muted`}>{l.class}</td>
                   <td className={`${TD} text-muted`}>
                     {l.reason ?? <b>SILENT — no written reason; the suite fails on this row</b>}
                   </td>
@@ -449,10 +469,10 @@ export default function LoadMapRoute() {
             <Table headers={['Command', 'Step', 'File', 'Searched', 'Why']}>
               {STEPS_WITH_UNCOMMITTED_INPUTS.map((s, i) => (
                 <tr key={`${s.step}-${s.file}`} className={i % 2 ? 'bg-bg-2/40' : ''}>
-                  <td className={`${TD} font-mono text-[10px] text-text`}>{s.command}</td>
-                  <td className={`${TD} font-mono text-[10px] text-muted`}>{s.step}</td>
-                  <td className={`${TD} font-mono text-[10px] text-muted`}>{s.file}</td>
-                  <td className={`${TD} font-mono text-[10px] text-muted`}>{s.searched}</td>
+                  <td className={`${TD} font-mono text-sm text-text`}>{s.command}</td>
+                  <td className={`${TD} font-mono text-sm text-muted`}>{s.step}</td>
+                  <td className={`${TD} font-mono text-sm text-muted`}>{s.file}</td>
+                  <td className={`${TD} font-mono text-sm text-muted`}>{s.searched}</td>
                   <td className={`${TD} text-muted`}>
                     {s.exemption ?? <b>MISSING — a real run fails at preflight (G78)</b>}
                   </td>
