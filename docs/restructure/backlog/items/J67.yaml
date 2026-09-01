@@ -1,0 +1,20 @@
+id: J67
+epic: release-infrastructure
+title: CI proves one interpreter on one OS while every local tree runs another on another —
+  either test the range pyproject declares or stop declaring it
+type: task
+module: docs
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- .github/workflows/ci.yml
+- pyproject.toml
+- poetry.lock
+acceptance: |
+  Stub minted per the I6 rule — the body lands in the next commit.
+notes: |
+  Minted 2026-09-01. Body to follow.
