@@ -18,7 +18,9 @@ Usage, from the company checkout with the producer remote fetched:
     poetry run python scripts/port_rename_check.py --producer-ref cewilson/main --any-directory
 
 Exit 0 = no proposed clean-add resembles a file you already hold. Exit 1 = at
-least one does; READ BOTH before applying either. Exit 2 = a side could not be
+least one does; READ BOTH before applying either. **Exit 0 is NOT a guarantee the
+slice is safe** — see the residual limitation in the report and in
+``port_rename_detect``. Necessary, not sufficient. Exit 2 = a side could not be
 read, which is a failure and never an empty set — the same rule
 ``port_backlog_union.py`` follows, and for the same reason: a check that reports
 "nothing found" when it actually found nothing to look at is worse than no check.

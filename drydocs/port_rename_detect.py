@@ -163,12 +163,102 @@ def compare(proposed_text: str, existing_text: str) -> tuple[float, str]:
     return text_score, "normalized-text"
 
 
+#: A leading numeric slot, as the vocabulary fragment directory uses it
+#: (``41-local-seal.yaml``). Where a directory numbers its files, the number IS the
+#: slot and the stem is just its current name — so same number + different stem is
+#: rename evidence that needs no content at all.
+_NUMERIC_SLOT = re.compile(r"^(\d+)[-_]")
+
+
+def slot_of(path: str) -> str | None:
+    """The numeric slot of a filename, or None if it does not use one."""
+    match = _NUMERIC_SLOT.match(Path(path).name)
+    return match.group(1) if match else None
+
+
+def structural_candidates(
+    proposed: dict[str, str], existing: dict[str, str]
+) -> list[RenameCandidate]:
+    """Same directory, same numeric slot, different stem — a rename, content-free.
+
+    CONTRIBUTED BY THE COMPANY SESSION (2026-09-01), and it exists because the
+    content measures FAILED on the incident this tool was built for. Measured
+    against the eight real pairs from that apply, the content check caught three:
+    it scored ``41-local-business-application.yaml`` against ``41-local-seal.yaml``
+    at **0.29** on a 0.35 floor — the pair that cost 62 failures.
+
+    WHY BOTH MEASURES DEGRADED AT ONCE, which is the assumption that broke. The
+    max-of-two design supposes id-overlap and text-similarity fail independently.
+    In a SPLIT-PLUS-RENAME they do not: the entries were redistributed across
+    files (text falls) in the same migration that renamed their ids (overlap
+    falls). Two measures, one common cause.
+
+    This signal shares no cause with either, because it reads no content at all.
+    """
+    out: list[RenameCandidate] = []
+    for new_path in sorted(proposed):
+        if new_path in existing:
+            continue
+        slot, new_dir = slot_of(new_path), str(Path(new_path).parent)
+        if slot is None:
+            continue
+        for old_path in sorted(existing):
+            if old_path == new_path or str(Path(old_path).parent) != new_dir:
+                continue
+            if slot_of(old_path) == slot:
+                out.append(RenameCandidate(new_path, old_path, 1.0, "same-slot-prefix"))
+    return out
+
+
+#: A vanished twin's content had to go SOMEWHERE, so the prior is far higher than
+#: for an arbitrary pair and the floor drops accordingly. Still a floor: a file the
+#: producer genuinely deleted should not drag in every unrelated add.
+VANISHED_TWIN_FLOOR = 0.15
+
+
+def vanished_twin_candidates(
+    proposed: dict[str, str],
+    existing: dict[str, str],
+    producer_paths: set[str],
+    *,
+    floor: float = VANISHED_TWIN_FLOOR,
+) -> list[RenameCandidate]:
+    """Consumer files the producer no longer has — find where their content went.
+
+    THE CASE NEITHER OTHER SIGNAL REACHES: a SPLIT INTO A NEW SLOT.
+    ``41-local-seal.yaml`` vanished and its entries went to TWO files, one of them
+    ``52-local-human.yaml``. The slot differs (52 vs 41) so the structural signal
+    cannot see it, and the content scored 0.30/0.28 because the same migration
+    that moved the entries also renamed their ids.
+
+    But a file that exists here and NOT on the producer side is a strong prior on
+    its own: the producer renamed it, split it, or deleted it, and all three are
+    decisions rather than defaults. So this searches the WHOLE proposed set
+    (ignoring slot and directory) at a lower floor, because the question has
+    already narrowed from "are these two files related" to "where did this
+    specific file's content go".
+
+    A genuine deletion reports nothing above the floor and says so, which is the
+    correct answer and still worth confirming.
+    """
+    out: list[RenameCandidate] = []
+    for old_path, old_text in sorted(existing.items()):
+        if old_path in producer_paths:
+            continue  # still there; not vanished
+        for new_path, new_text in sorted(proposed.items()):
+            score, _basis = compare(new_text, old_text)
+            if score >= floor:
+                out.append(RenameCandidate(new_path, old_path, score, "vanished-twin"))
+    return out
+
+
 def rename_candidates(
     proposed: dict[str, str],
     existing: dict[str, str],
     *,
     floor: float = SIMILARITY_FLOOR,
     same_directory_only: bool = True,
+    producer_paths: set[str] | None = None,
 ) -> list[RenameCandidate]:
     """Clean-adds that resemble an existing consumer file under a different name.
 
@@ -196,12 +286,43 @@ def rename_candidates(
                 best = RenameCandidate(new_path, old_path, score, basis)
         if best is not None:
             out.append(best)
-    return out
+
+    # The structural signal is added rather than compared against: it reads no
+    # content, so it cannot be outscored by a content measure and must not be
+    # suppressed by one. A pair found both ways appears once, structural first,
+    # because "same slot" is the stronger claim.
+    seen = {(c.proposed, c.existing) for c in out}
+    structural = structural_candidates(proposed, existing)
+    vanished = (
+        vanished_twin_candidates(proposed, existing, producer_paths)
+        if producer_paths is not None
+        else []
+    )
+    for candidate in [*structural, *vanished]:
+        key = (candidate.proposed, candidate.existing)
+        if key not in seen:
+            out.append(candidate)
+            seen.add(key)
+    return sorted(out, key=lambda c: (c.proposed, -c.score))
+
+
+#: Printed on a clean run, because the company session's measurement showed the
+#: content check catching only three of eight real pairs. Exit 0 said "clean" while
+#: the trap that cost 62 failures scored 0.29 on a 0.35 floor. The signals since
+#: added close the known cases; the honest claim is still NECESSARY, NOT SUFFICIENT.
+NOT_A_GUARANTEE = (
+    "NOT A GUARANTEE. This is necessary, not sufficient: a clean run means no "
+    "proposed add matched a KNOWN rename shape, not that the slice is safe. Every "
+    "clean-add still deserves a content look. Measured 2026-09-01, the content "
+    "measures alone caught 3 of 8 real pairs — the same-slot and vanished-twin "
+    "signals were added because of that miss, and the next shape is not yet known."
+)
 
 
 def report(candidates: list[RenameCandidate]) -> str:
     if not candidates:
-        return "no proposed clean-add resembles an existing file under another name."
+        clean = "no proposed clean-add resembles an existing file under another name."
+        return clean + "\n\n" + NOT_A_GUARANTEE
     lines = [
         f"{len(candidates)} proposed clean-add(s) resemble an existing file under "
         "ANOTHER NAME — stop and look before applying:",
@@ -218,5 +339,7 @@ def report(candidates: list[RenameCandidate]) -> str:
         "Check the CONTENT before choosing, and check the gate state: a gate prompt "
         "whose header says SIGNED where yours says DRAFT is a gate-state regression, "
         "not a content difference (config/gate-prompts/** is canonical-company).",
+        "",
+        NOT_A_GUARANTEE,
     ]
     return "\n".join(lines)

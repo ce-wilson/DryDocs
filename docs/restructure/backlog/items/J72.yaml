@@ -82,3 +82,34 @@ notes: |
   DONE 2026-09-01. drydocs/port_rename_detect.py + scripts/port_rename_check.py +
   tests/unit/test_port_rename_detect.py (11 tests). MODULE_MAP row and the test_module_boundary
   "port" group updated in the same commit, per the default-deny rule. RELAY-20 hands it over.
+
+  REOPENED AND EXTENDED 2026-09-01, same day, because the company MEASURED it instead of trusting
+  it. Against the eight real pairs from their apply the content measures caught THREE and missed
+  five - including 41-local-business-application <-> 41-local-seal at 0.29 against a 0.35 floor,
+  which is the pair that cost 62 failures. The tool missed the incident it was built for.
+
+  WHY THE PROOF LOOKED GOOD AND WAS NOT. The dossier proof ran across 496aa268~1..496aa268, the
+  commit that applied the FRAGMENT rename - ids unchanged, so id-set scored 1.00. The real trap is a
+  later state where the G101 migration ALSO renamed the ids. Reproduced here: 0.29 on the 41 pair,
+  0.30 and 0.21 on the two 52-local-human splits. Their measurement is exact.
+
+  THE ASSUMPTION THAT BROKE, stated because it is the transferable part: max-of-two supposes the two
+  measures fail INDEPENDENTLY. In a split-plus-rename they do not - the entries were redistributed
+  (text falls) by the same migration that renamed their ids (overlap falls). Two measures, one common
+  cause, and a max over correlated signals is one signal.
+
+  TWO SIGNALS ADDED, both sharing no cause with the content measures:
+  - SAME-SLOT-PREFIX (contributed by the company session): in a numbered directory the number is the
+    SLOT and the stem is its current name, so same number + different stem is rename evidence that
+    reads no content at all. Recovers three of the five misses - 41/41, 49/49, 50/50. Their note said
+    four; it is three, because 40/40 was already caught at 0.59 and is not among the misses.
+  - VANISHED-TWIN: a consumer file the producer no longer has was renamed, split or deleted, and all
+    three are decisions. Searches the whole proposed set at a lower floor (0.15), because the question
+    has narrowed from "are these related" to "where did this file's content go". This is the only
+    signal that reaches a SPLIT INTO A NEW SLOT, which is the last two misses. Verified live: it
+    reports 52-local-human <- 41-local-seal at 0.30, the pair both other signals miss.
+
+  AND THE FRAMING IS NOW IN THE TOOL. Their ruling - necessary, not sufficient - is printed on every
+  clean run, naming the 3-of-8 measurement, because exit 0 previously read as a guarantee while the
+  62-failure pair sat at 0.29. A tool that reports its own measured coverage is harder to over-trust
+  than one that reports a verdict.

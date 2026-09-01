@@ -17,7 +17,9 @@ from drydocs.port_rename_detect import (
     normalized_text,
     rename_candidates,
     report,
+    structural_candidates,
     text_similarity,
+    vanished_twin_candidates,
 )
 
 # ---- trap 1: the vocabulary fragment split -----------------------------------
@@ -238,3 +240,106 @@ def test_the_report_says_it_is_not_a_verdict() -> None:
     assert "ADOPT" in text and "DECLINE" in text and "false positive" in text
     assert "canonical-company" in text, "the gate-state trap must be named in the output"
     assert "no proposed clean-add" in report([])
+
+
+# ---- the two signals added AFTER the company measured the coverage ------------
+# The content measures caught 3 of 8 real pairs. The one that mattered most,
+# 41-local-business-application <-> 41-local-seal, scored 0.29 on a 0.35 floor —
+# the trap that cost 62 failures, missed by the tool built for it. These two
+# signals were contributed and motivated by that measurement.
+
+
+def test_the_same_slot_signal_catches_what_the_content_measures_missed() -> None:
+    """A numbered directory numbers its SLOTS, so same number + different stem is
+    rename evidence needing no content at all.
+
+    Reconstructed at the real scores: the content measures put this pair at 0.29,
+    below the floor. The structural signal does not consult content, so the
+    migration that moved entries AND renamed their ids cannot suppress it.
+    """
+    proposed = {
+        "vocab/41-local-business-application.yaml": (
+            "business_application_has_port owns_deployment qualified_attribution declared active"
+        )
+    }
+    existing = {
+        "vocab/41-local-seal.yaml": (
+            "seal_requires_scheduler batch_window escalation_route controlm_folder legacy"
+        )
+    }
+    assert (
+        compare(*proposed.values(), *existing.values())[0] < SIMILARITY_FLOOR
+    ), "the fixture must be BELOW the content floor, or this proves nothing"
+    found = rename_candidates(proposed, existing)
+    assert [c.basis for c in found] == ["same-slot-prefix"]
+    assert found[0].existing == "vocab/41-local-seal.yaml"
+
+
+def test_a_different_slot_is_not_a_slot_rename() -> None:
+    """The signal must stay narrow: 52- and 41- are different slots and a match
+    between them is a SPLIT, which the vanished-twin signal handles on a different
+    basis. Widening this one would flag every file in a numbered directory."""
+    assert not structural_candidates(
+        {"vocab/52-local-human.yaml": "a"}, {"vocab/41-local-seal.yaml": "a"}
+    )
+
+
+def test_the_vanished_twin_signal_catches_a_split_into_a_new_slot() -> None:
+    """The case NEITHER other signal reaches, and the last of the eight real pairs.
+
+    41-local-seal.yaml vanished; its entries went to two files, one of them
+    52-local-human.yaml. Different slot, so the structural signal is blind; the
+    same migration renamed the ids, so the content score fell to 0.30. But a file
+    the producer no longer has is a strong prior on its own — it was renamed,
+    split, or deleted, and all three are decisions.
+    """
+    proposed = {
+        "vocab/52-local-human.yaml": """
+local_relationships:
+  - id: seal_appuser_owned_by
+    status: deprecated
+    superseded_by: human_appuser_owned_by
+  - id: human_appuser_owned_by
+  - id: human_reports_to
+"""
+    }
+    existing = {
+        "vocab/41-local-seal.yaml": """
+local_relationships:
+  - id: seal_appuser_owned_by
+  - id: seal_has_port
+  - id: seal_owns_application
+"""
+    }
+    # The consumer file is absent from the producer tree — that is what "vanished"
+    # means. The content floor is raised out of the way so ONLY the vanished-twin
+    # signal can produce this pair: that independence is the property under test,
+    # and the real pair scored 0.30 against a 0.35 floor for exactly this reason.
+    found = rename_candidates(
+        proposed, existing, floor=0.9, producer_paths={"vocab/52-local-human.yaml"}
+    )
+    assert [c.basis for c in found] == ["vanished-twin"]
+
+    # WITHOUT the producer path set the signal cannot fire — it is opt-in, because
+    # only the caller knows which consumer paths the producer still has.
+    assert rename_candidates(proposed, existing, floor=0.9) == []
+
+
+def test_a_consumer_file_the_producer_still_has_is_not_vanished() -> None:
+    """The prior only holds for a file the producer DROPPED. A path present on both
+    sides is an ordinary collision and must not drag every add into the report."""
+    assert not vanished_twin_candidates(
+        {"vocab/new.yaml": "local_relationships:\n  - id: shared\n"},
+        {"vocab/kept.yaml": "local_relationships:\n  - id: shared\n"},
+        producer_paths={"vocab/kept.yaml", "vocab/new.yaml"},
+    )
+
+
+def test_a_clean_run_says_it_is_not_a_guarantee() -> None:
+    """Exit 0 meant "clean" while the 62-failure pair scored 0.29. The company's
+    framing — necessary, not sufficient — belongs in the tool, not just in the
+    session that discovered it, or the next reader trusts the exit code."""
+    text = report([])
+    assert "NOT A GUARANTEE" in text
+    assert "necessary, not sufficient" in text
+    assert "3 of 8" in text, "the measurement that motivated the extra signals is the evidence"
