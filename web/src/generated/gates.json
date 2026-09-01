@@ -1070,6 +1070,17 @@
       ]
     },
     {
+      "kind": "log-entry",
+      "date": "2026-09-01",
+      "title": "RECORD: gate `replica-derivation-edge` DRAFTED, unsigned (C38)",
+      "status": "recorded",
+      "prompt_files": [
+        "config/gate-prompts/replica-derivation-edge.yaml"
+      ],
+      "log_ref": "config/gate-log.md:4236",
+      "unblocks": []
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",

@@ -8,7 +8,7 @@ phase: 2
 agent: ontology-mapper
 model: fable
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - docs/RELATIONSHIP_GUIDE.md
@@ -45,6 +45,19 @@ acceptance: |
   Closes when the vocabulary entry exists with status planned, the gate question is drafted and
   listed in the gate log, and the validator plus the vocabulary guards are green.
 notes: |
+  DONE 2026-09-01 (desktop). Candidate `reg_derived_from` registered planned in
+  44-local-registry.yaml (DataAsset -> DataAsset, prov:wasDerivedFrom, supplement ~, loader ~);
+  gate prompt `replica-derivation-edge` drafted (5 sections, 11 confirmations) and logged as a
+  RECORD stub. schema_graph.cypher regenerated. Three acceptance points worth recording as
+  BUILT-AS-SPECIFIED: (c) the sibling anti-pattern rides in the prompt itself rather than only in
+  the review, because a gate that omits it invites the SME to reach for the obvious construct;
+  (d) the how-redundantly question is asked, not answered, with the cost named on both sides;
+  (e) evidence cited by anchor (replica-note, what-changes row 11), never summarized. ONE ADDITION
+  beyond the acceptance: section A2 asks whether TRAVERSAL is wanted at all, before any edge is
+  minted -- a reporting-only need is already served by the three attributes, so the gate can close
+  without minting. That question was implied by the acceptance's framing but not stated, and a
+  gate that cannot end in "no edge" is not a real gate. Also stated in B3: psgmgr already carries
+  Control-M AND HR, so the system-grain alternative has a live counter-example.
   Groomed 2026-08-30 (desktop, weekly groom) from Idea-219, which says in terms that minting a
   derivation relationship type is an ontology decision and inboxes itself rather than proposing.
   This item honours that - it takes the entry as far as planned and no further, which is exactly

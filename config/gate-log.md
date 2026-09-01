@@ -4230,3 +4230,32 @@ activation is a groomed follow-up (Q24/Q25, minted at this sign-off).
   DRAFTED stubs as non-authority; no registry field, envelope property, or term may cite this
   heading. Sign-off item: N19. The --csv closure (G121) and the S13 import fix build as plain
   defects and do not wait for this gate.
+
+---
+
+## 2026-09-01 — RECORD: gate `replica-derivation-edge` DRAFTED, unsigned (C38)
+
+- **What this records:** the prompt file `config/gate-prompts/replica-derivation-edge.yaml`
+  exists (5 sections, 11 confirmations). It puts to the SME: (A) the gap — replica-ness is
+  spelled three ways and all three are attributes, plus the prior question of whether
+  TRAVERSAL is actually wanted, since a reporting-only need is already answered; (B) the
+  candidate typed derivation edge `reg_derived_from` (DataAsset → DataAsset,
+  prov:wasDerivedFrom), its direction and its DATASET grain; (C) the sibling/same-as
+  anti-pattern, rejected knowingly rather than by omission; (D) whether the derivation KIND is
+  also kept redundantly as an edge property, and its value set; (E) the fence.
+- **Evidence base:** `docs/design/datahub-substrate-review.md`, anchors `replica-note` and
+  `what-changes` row 11 — cited by anchor, never summarized, so the reasoning is re-read rather
+  than re-derived. As-built counts confirmed against `config/source-registry.yaml` at this
+  commit: `authority: ADS` on 12 rows against `SOR` on 17.
+- **Why the anti-pattern is in the prompt and not only in the review:** DataHub's
+  `SiblingGraphService` actively DELETES any lineage relationship between two siblings from the
+  merged read path, which is the default. Modelling replica-ness as aliasing destroys the fact
+  being recorded, so the sibling shape must be rejected knowingly. A gate that omits it invites
+  the SME to reach for the obvious construct.
+- **Vocabulary state:** `reg_derived_from` is registered `status: planned` in
+  `drydocs_core/ontology/relationship_vocabulary/44-local-registry.yaml`, domain `registry`,
+  `supplement: ~` and `loader: ~` because nothing loads until this gate rules.
+  `drydocs_core/schema/schema_graph.cypher` regenerated.
+- **Authority note.** This stub is a RECORD, not a ruling — J43's reconcile check treats DRAFTED
+  stubs as non-authority; no registry field, envelope property, or term may cite this heading.
+  Sign-off item: a follow-up to C38, not yet minted.
