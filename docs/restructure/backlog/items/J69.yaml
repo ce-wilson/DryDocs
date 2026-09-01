@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on:
 - J68
 inputs:
@@ -57,3 +57,38 @@ notes: |
   SEQUENCING. Lands as a relay in the roll after the in-flight apply. The company applied at the tag
   port-base-20260901, so producer-side edits cannot move under them - but a restructured apply section
   is only useful once it describes rows they have not already hand-merged.
+
+  DONE 2026-09-01. All four clauses met.
+
+  (a)+(b) The port-prompt gains an APPLY BY DISPOSITION section ABOVE the step ledger, carrying the
+  nine-class apply order and why it is not alphabetical - wholesale takes first because they cannot be
+  got wrong, hand-merges in the middle where the thinking goes, `derived` last because a render
+  regenerated before its sources land is a render you throw away. The ledger moves nowhere, loses
+  nothing and is not summarized; the section says so in its own words, because a reader who thinks the
+  table replaced the ledger will stop reading the reasoning.
+
+  (c) THE TRAP WAS REAL AND IS NOW GUARDED. port_preflight reads ONLY between the STEP LEDGER and
+  ACCEPTANCE GATE markers, and `cited_shas` harvests every backticked sha in that span - so the new
+  section INSIDE the markers would have made commits read as cited because a disposition table
+  happened to name their sha. It sits above, and `test_the_apply_section_sits_above_the_ledger_the_
+  coverage_guard_reads` pins it there. Verified after the edit: the four uncited commits are exactly
+  the four made since port-base-20260901, which is the correct answer.
+
+  (d) DERIVED, NOT HAND-KEPT. scripts/render_port_dispositions.py classifies the range's changed paths
+  through PORT-MANIFEST.yaml and writes docs/port/port-dispositions.md, drift-guarded like the board
+  and the enforcement matrix. The port-prompt carries the COMMAND and the class rules, never a path
+  list - a hand-typed table would be the second source of disposition truth J68 just removed.
+
+  THE GUARD FOUND A GAP ON ITS FIRST RUN, which is the argument for it existing: `clean-add` is a
+  disposition the manifest uses and APPLY_ORDER had no rule for it, so it would have rendered as
+  "(not in APPLY_ORDER - add it)" - a fallback, not a plan. Added in first position.
+
+  MEASURED: 519 changed paths across 8 classes on port-base-20260826..HEAD (per-entry 154,
+  default_ok 165, canonical-producer 129, evaluate 29, union-append 16, canonical-company 14,
+  never-port 8, derived 4). The section states explicitly that this 519 and the company's 88 diverged
+  paths are NOT comparable - one counts paths the range touched, the other counts paths that exist on
+  both sides and differ - because two numbers on the same subject invite a discrepancy that is not one.
+
+  DISPOSITIONS OF THE NEW FILES, checked rather than assumed: the script is default_ok (it ports, so
+  they can run it), the rendered .md is never-port under docs/port/** (they generate their own from
+  their own base), the guard is default_ok. Suite 2938 passed / 9 skipped.

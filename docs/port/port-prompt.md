@@ -2007,6 +2007,64 @@ OWED COMPANY-SIDE:
   known-contested pending the G64/G65 gate rulings. Treat them as neither confirmed nor
   corrected until those sign.
 
+APPLY BY DISPOSITION — READ THIS BEFORE THE STEP LEDGER BELOW (J69, 2026-09-01)
+
+**A port is not applied chronologically, and this file was organized as though it
+were.** The step ledger below is 296 steps of reasoning in commit order; the work is
+done by DISPOSITION CLASS, one class at a time. Your own 2026-09-01 apply proved it —
+you bucketed the diverged paths into the manifest's classes and worked them class by
+class, escalating two rows to per-entry mid-apply, while the ledger sat open as
+reference. That is the right shape. This section makes it the file's shape too.
+
+**THE TABLE IS GENERATED, AND THAT IS THE POINT.** Run it against the base you are
+applying FROM:
+
+```
+PYTHONPATH=. python scripts/render_port_dispositions.py <your-base-tag>
+```
+
+It writes `docs/port/port-dispositions.md`: every changed path in the range, bucketed
+by the disposition `PORT-MANIFEST.yaml` resolves for it, with each row's `entry_rule`
+attached where one exists. **No disposition is typed into this file by hand.** J68
+(2026-09-01) removed four hand-kept disposition assertions from the reconcile-port
+skill, two of which had drifted into being wrong — one of them would have flattened
+your ontology entries. A generated table cannot drift; a typed one is how that
+happened. `PORT-MANIFEST.yaml` owns disposition, here as everywhere.
+
+**THE APPLY ORDER, and why it is not alphabetical.** Wholesale takes first because
+they are mechanical and cannot be got wrong; hand-merges in the middle, where the
+thinking goes; `derived` LAST, because a render regenerated before its sources land is
+a render you throw away.
+
+| # | Class | What you do |
+|---|---|---|
+| 1 | `canonical-producer` | take wholesale — `git checkout <producer-ref> -- <path>` |
+| 2 | `canonical-company` | **NO ACTION by rule** — keep yours, do not even diff |
+| 3 | `never-port` | **NO ACTION by rule** — never crosses, in either direction |
+| 4 | `per-entry` | **merge by entry** — read the row's `entry_rule` FIRST; this is where a wholesale take drops the other side's rows |
+| 5 | `union-append` | append the producer's entries; never reorder, never drop yours |
+| 6 | `evaluate` | hand-merge — an un-made decision until a human makes it |
+| 7 | DEFAULT | the manifest `default:` — clean-add when absent, evaluate when both sides have it |
+| 8 | `default_ok` | the default ON PURPOSE (J16) — the row exists to record that somebody thought about it |
+| 9 | `derived` | **regenerate, never carry** (J43) |
+
+**MEASURED AT THIS ROLL** (`port-base-20260826..HEAD`, the full span since your last
+applied base): **519 changed paths across 8 classes** — canonical-producer 129,
+per-entry 154, default_ok 165, evaluate 29, union-append 16, canonical-company 14,
+never-port 8, derived 4. **Do not compare that 519 against your own diverged-path
+count and call the gap a discrepancy:** they measure different things by construction.
+This counts every path the range TOUCHED; your census counts paths that exist on both
+sides and DIFFER. Your 88 and this 519 are both right.
+
+**THE STEP LEDGER IS NOT REPLACED BY THIS AND IS NOT SUMMARIZED BY IT.** It stays
+below, entire, and it is where the reasoning lives — why a change was made, what it
+cost, what it did NOT authorize. The disposition table tells you the ORDER and the
+RULE; the ledger tells you the MEANING, and a step is the thing you read when a
+per-entry merge needs a judgment call. Steps are cited from the classes, never folded
+into them.
+
+---
+
 STEP LEDGER — delta since `caa0406` (steps 43–123 collapsed above; 124–134 are the
 `ae21ee4..caa0406` range, DELIVERED and producer-reviewed but with an unconfirmed
 close-out, kept live for exactly that reason). Steps 135+ are the NEW delta this
