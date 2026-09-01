@@ -11,6 +11,7 @@ consumer tree exists.
 from __future__ import annotations
 
 from drydocs.port_rename_detect import (
+    MAX_MATCHES_PER_ADD,
     SIMILARITY_FLOOR,
     compare,
     id_set,
@@ -343,3 +344,42 @@ def test_a_clean_run_says_it_is_not_a_guarantee() -> None:
     assert "NOT A GUARANTEE" in text
     assert "necessary, not sufficient" in text
     assert "3 of 8" in text, "the measurement that motivated the extra signals is the evidence"
+
+
+def test_the_true_twin_is_not_hidden_behind_a_higher_scoring_coincidence() -> None:
+    """Found by the company sweep, 2026-09-01, and it is a reporting defect rather
+    than a scoring one.
+
+    `cdo-alignment.yaml` was reported against `ddlineage-retirement.yaml` while its
+    real twin — the retired-acronym `*-alignment.yaml` in the same directory — also
+    cleared the floor and was silently dropped, because only the best match per
+    proposed add was emitted. A best-match report is a RANKING presented as an
+    IDENTIFICATION, and the answer it suppresses is the one the reader wanted.
+    """
+    proposed = {"epics/cdo-alignment.yaml": "alignment crosswalk rows framework bindings shared"}
+    existing = {
+        # scores higher by accident — more shared filler tokens
+        "epics/ddlineage-retirement.yaml": (
+            "alignment crosswalk rows framework bindings shared retirement ledger extra"
+        ),
+        # the REAL twin, above the floor but ranked second
+        "epics/legacy-alignment.yaml": "alignment crosswalk rows framework bindings",
+    }
+    found = rename_candidates(proposed, existing)
+    reported = {c.existing for c in found}
+    assert "epics/legacy-alignment.yaml" in reported, (
+        "the true twin cleared the floor and must be reported even when another " "file outranks it"
+    )
+    assert len(found) >= 2, "both above-floor matches are evidence; one is a guess"
+    assert [c.score for c in found] == sorted(
+        (c.score for c in found), reverse=True
+    ), "still ranked — the cap is on how many, not on whether they are ordered"
+
+
+def test_the_match_list_is_capped_so_a_common_file_cannot_bury_the_signal() -> None:
+    """The failure at the other end: reporting everything makes a boilerplate-heavy
+    file match a dozen others and drowns the pair that matters."""
+    shared = "alignment crosswalk rows framework bindings"
+    existing = {f"epics/other-{n}.yaml": shared for n in range(10)}
+    found = rename_candidates({"epics/new.yaml": shared}, existing)
+    assert len(found) == MAX_MATCHES_PER_ADD

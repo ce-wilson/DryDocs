@@ -79,6 +79,11 @@ SIMILARITY_FLOOR = 0.35
 #: pair 0.00 on a one-id-each miss would silence the text measure that catches it.
 MIN_IDS_FOR_ID_MEASURE = 3
 
+#: Matches reported per proposed add. A cap rather than a best-of, because the
+#: true twin can score below a coincidence — but a file matching a dozen others
+#: is noise, not evidence, and burying the signal is the failure at the other end.
+MAX_MATCHES_PER_ADD = 3
+
 _COMMENT = re.compile(r"#.*$", re.M)
 _WS = re.compile(r"\s+")
 
@@ -275,17 +280,25 @@ def rename_candidates(
         if new_path in existing:
             continue  # a collision, not a rename — the manifest routes it
         new_dir = str(Path(new_path).parent)
-        best: RenameCandidate | None = None
+        matches: list[RenameCandidate] = []
         for old_path, old_text in existing.items():
             if old_path == new_path:
                 continue
             if same_directory_only and str(Path(old_path).parent) != new_dir:
                 continue
             score, basis = compare(new_text, old_text)
-            if score >= floor and (best is None or score > best.score):
-                best = RenameCandidate(new_path, old_path, score, basis)
-        if best is not None:
-            out.append(best)
+            if score >= floor:
+                matches.append(RenameCandidate(new_path, old_path, score, basis))
+        # EVERY match above the floor, not just the best one — capped, not filtered.
+        #
+        # Reporting only the winner HIDES THE TRUE TWIN behind a higher-scoring
+        # coincidence, which is not hypothetical: the company sweep on 2026-09-01
+        # found `cdo-alignment.yaml` reported against `ddlineage-retirement.yaml`
+        # while its real twin, the retired-acronym `*-alignment.yaml` sitting in the
+        # same directory, also cleared the floor and was silently dropped. A
+        # best-match report is a RANKING presented as an identification, and the one
+        # answer it suppresses is the one the reader needed.
+        out.extend(sorted(matches, key=lambda c: -c.score)[:MAX_MATCHES_PER_ADD])
 
     # The structural signal is added rather than compared against: it reads no
     # content, so it cannot be outscored by a content measure and must not be
