@@ -44,11 +44,18 @@ the accumulated lessons from prior ports. Read both.
 3. **Apply onto `main`** (skip the optional scratch branch unless asked):
    - **Clean-adds** (path absent here) → apply untouched.
    - **Canonical-here** → take the producer version wholesale, do **not**
-     hand-merge: `git checkout cewilson/main -- <path>`. This includes the
-     entire `drydocs_core/controlm/` package, `knowledge/standards/`, the Control-M
-     SQL/DDL, `relationship_vocabulary.yaml`, `catalog_ontology_supplement.cypher`,
-     **and the `tests/unit/test_variable_*` files** (taking these wholesale
-     avoids re-deriving the skip guards — see ledger note).
+     hand-merge: `git checkout cewilson/main -- <path>`. **Which paths those are
+     comes from `PORT-MANIFEST.yaml`, resolved per path — never from a list here.**
+     J68 (2026-09-01): this bullet used to name a fixed set, and by then two of
+     its five entries were wrong in the two ways such a list goes wrong.
+     `drydocs_core/controlm/` **no longer exists** (it moved under
+     `drydocs_core/orchestration/`), and `relationship_vocabulary.yaml` is both
+     **gone as a file** (sharded into per-domain fragments at S5) and **`per-entry`
+     in the manifest** — so a `git checkout` of it would have flattened the
+     company's own ontology entries, which is exactly what the per-entry row
+     exists to prevent, and exactly what the company's 19-class TOM register
+     would have lost. A hand-kept list of dispositions rots; the manifest is
+     regenerated against the tree and guarded.
    - **Collisions** → hand-merge per the ledger below.
 4. **Validate Track-1** (the contract — needs no data file).
 5. **CHECK THE BACKLOG UNION (J42).** The manifest's row for
@@ -78,18 +85,33 @@ extraction and insert in PYTHON reading the file as UTF-8, never by pasting from
 PowerShell output. The ae21ee4 port hit this live and routed around it; this note is
 the producer-side half of that lesson.
 
-## Collision ledger (resolve these by keeping the noted side)
+## Collision ledger (HOW to merge — never WHETHER to take)
 
-| Path | Resolution |
+> **`PORT-MANIFEST.yaml` owns disposition. This table does not.** Every row below
+> describes how to hand-merge a file whose disposition the manifest has already
+> ruled — which side's value wins inside the file, which imports union, which
+> option set to add. **A row here may never assert that a file is taken wholesale,
+> kept, or dropped;** resolve that from the manifest, always, and if a row and the
+> manifest disagree the manifest is right.
+>
+> J68 (2026-09-01), and the rule is written because it was broken: this table used
+> to say `tests/unit/test_module_boundary.py` was "Canonical-here — take producer
+> wholesale" while the manifest said `per-entry`. A company apply followed the
+> table, took the file wholesale, and dropped six company-only module families
+> (`drydocs.scrapers.*`, `drydocs.docmeta.*`, `drydocs.seal_projection`) — after
+> which the default-deny guard failed on every one of them. Two sources of
+> disposition truth is the defect; a stale copy is only how it surfaces.
+
+| Path | How to merge (disposition: see PORT-MANIFEST.yaml) |
 |---|---|
 | `drydocs/cli.py` | Keep company `m6-verify` (and `ingest-controlm-xml` etc.); **add** producer `analyze-variables` + `normalize-variables`, `m3-verify` (validates the ported M3 structural layer — keep it, it is **not** a stray), the `_scope_binds` / `--folder/--run-as/--developer-sid/--row-cap` options, and the `_oracle_adapter(query, bind_params=None)` change; merge imports. Confirm your `OracleAdapter` accepts `bind_params` and forwards it to `cursor.execute` (company Kerberos adapter already does). |
 | `drydocs_core/models/__init__.py` | Union — keep **all** row models from both sides in imports + `__all__`. |
 | `drydocs_core/models/controlm.py` | Keep company `ControlMQuantitativeRow`; add producer `ControlMVariableRow` (`AliasChoices` import is shared). |
-| `tests/unit/test_schema.py` | Keep company `EXPECTED_CONSTRAINTS = 44` (ahead of producer's 35). |
+| `tests/unit/test_schema.py` | The constraint count is **company-based** — yours, not the producer's, and re-derived on your tree rather than copied. **The `44`/`35` pair this row used to quote is stale** (PORT-REPORT-40c35724 measured 55 company-side); a number here rots between ports, so read it from your own run. |
 | `tests/unit/test_controlm_cypher.py` | Keep company version (`scope_key` + version_serial-as-property). |
-| `tests/unit/test_variable_classifier.py`, `test_variable_staging.py` | **Canonical-here — take producer wholesale.** They already carry `skipif(not SAMPLE.exists())` guards (producer commit `9e9fe1c`). Do not re-write your own guard; that caused redundant divergence in a prior port. |
+| `tests/unit/test_variable_classifier.py`, `test_variable_staging.py` | Merge guidance: they already carry `skipif(not SAMPLE.exists())` guards (producer commit `9e9fe1c`) — do not re-write your own, which caused redundant divergence in a prior port. (Disposition: the manifest's `tests/unit/test_variable_*.py` row.) |
 | `pyproject.toml` | Union — preserve company's Python-version constraints, Oracle/Kerberos deps, and any extra test deps; **add** producer's new deps: `requests` (aura manager) and `pypdf` (PDF ingestion). Neither conflicts with company deps. |
-| `tests/unit/test_module_boundary.py` | **Canonical-here — take producer wholesale.** It carries the `ENTRYPOINT_MODULES` exemption (`drydocs.cli` is the composition root and may wire any component), which is the settled resolution to the company `cli.py` → review-module cross-import failure — do NOT extract review commands into a sub-app or collapse groups to dodge the guard (that was options B/C, rejected; A is documented in `MODULE_MAP.md`). |
+| `tests/unit/test_module_boundary.py` | **Disposition is `per-entry` — see the manifest row, and take MODULE_MAP.md with it (they are one fact in two languages).** Merge guidance only: the `ENTRYPOINT_MODULES` exemption (`drydocs.cli` is the composition root and may wire any component) is producer mechanism and crosses whole — it is the settled resolution to the company `cli.py` → review-module cross-import failure, so do NOT extract review commands into a sub-app or collapse groups to dodge the guard (options B/C, rejected; A is documented in `MODULE_MAP.md`). **Company-only module groups are kept, not overwritten.** |
 
 **Skipped-commit policy:** the early overlap commits where company content is
 already richer (prior ports skipped `3bc7adb`, `0eb98a5`, `6c5b7b5`, `0063f07`)

@@ -1665,6 +1665,64 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   in YOUR ledger. Same asymmetry class as RELAY-6: the producer holds the code that
   mints; you hold the doc that forbids it and the loader that reconciles it.
 
+- **RELAY-18 — THE RECONCILE-PORT SKILL WAS ASSERTING DISPOSITIONS AND FOUR OF THEM
+  WERE WRONG; `PORT-MANIFEST.yaml` IS NOW THE ONLY SOURCE, AND TWO ROWS CHANGED**
+  (new 2026-09-01; from J68, which your own 2026-09-01 apply found).
+  `[VERIFIED-PRODUCER]` — every claim below re-checked against the producer tree
+  before this relay was written.
+  **THIS LANDS AFTER `port-base-20260901` AND CHANGES NOTHING ABOUT THE APPLY YOU
+  ARE RUNNING NOW.** You applied at the tag; these commits are past it and ride the
+  next roll. Nothing here asks you to redo work you have already hand-merged — you
+  reached the right answer on all three, by hand, which is the reason the producer
+  found the rest.
+  **WHAT YOU REPORTED, AND WHAT IT TURNED OUT TO BE.** You found the skill's
+  collision ledger saying `tests/unit/test_module_boundary.py` was "take producer
+  wholesale" while the manifest said `per-entry`, and you were right that the
+  guidance was stale. Chasing it producer-side found the same defect **four times**,
+  because a hand-kept list of dispositions rots against a manifest that is guarded:
+  1. `tests/unit/test_module_boundary.py` — the one you hit. Ledger said wholesale,
+     manifest says `per-entry`.
+  2. **The `Canonical-here` bullet in step 3 named `relationship_vocabulary.yaml` for
+     a `git checkout` wholesale take.** That file is `per-entry` in the manifest AND
+     no longer exists as a file (sharded into per-domain fragments at S5). Taking it
+     as instructed would have **flattened your own ontology entries — including the
+     19-class TOM register your G70 session ruled.** This is the one worth reading
+     twice; it never fired only because the path was already gone.
+  3. The same bullet named `drydocs_core/controlm/`, which moved under
+     `drydocs_core/orchestration/` and has not existed for some time.
+  4. The `tests/unit/test_variable_*` row asserted a disposition it happened to get
+     right — harmless, and still removed, because a correct copy of a fact is what
+     the next stale copy grows from.
+  **THE FIX:** the ledger is now headed *"HOW to merge — never WHETHER to take"*, and
+  no row in that skill may assert that a file is taken wholesale, kept or dropped.
+  Resolve disposition from `PORT-MANIFEST.yaml`, per path, always. On any
+  disagreement the manifest wins.
+  **TWO MANIFEST ROWS CHANGED, both from your findings:**
+  - `MODULE_MAP.md` — was `canonical-producer`, is now **`per-entry`**. Its guard was
+    already `per-entry`, and that split is what dropped your `drydocs.scrapers.*`,
+    `drydocs.docmeta.*` and `drydocs.seal_projection` rows. Module rows union;
+    producer mechanism (the placement test, the core-imports-nothing invariant, the
+    S7 rule, the `CORE_PREFIXES`/`COMPONENT_GROUP` vocabulary) crosses whole.
+  - `config/source-registry.yaml` — had **no row at all** and fell through to
+    `config/**` canonical-producer, which is what drove your `test_source_registry`
+    from 1 failure to 7. Now **`per-entry`**: your systems and datasets stay, the id
+    grammar and `authority` semantics cross whole. Third instance of that
+    fall-through — `dev-environment.yaml` (2026-07-28) and `source-bindings.yaml`
+    were the first two.
+  **AND A GUARD, so this is not a third round of the same lesson:**
+  `test_every_declaration_names_the_guard_that_reads_it` — a declaration file and
+  the guard that reads it must NAME each other in the manifest. Deliberately not
+  "must share a disposition": `01_databases.cypher` / `test_database_names.py` are
+  split on purpose (topology is a signed ruling, `SCANNED_PACKAGES` is extensible)
+  and that split is correct. Naming is the property that was missing.
+  **ACTION AT THE PORT THAT CARRIES THIS:** take both manifest rows before the files
+  they govern, then re-run your own classification of the range — the two rows move
+  paths out of your wholesale bucket and into per-entry, so a census taken before
+  this relay will disagree with one taken after. **One stale number you should not
+  copy:** the ledger's `EXPECTED_CONSTRAINTS = 44` is retired rather than updated —
+  PORT-REPORT-40c35724 measured 55 your side, and a count in a producer file rots
+  between ports. Read it from your own run.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has

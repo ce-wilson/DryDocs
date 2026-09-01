@@ -638,7 +638,28 @@ rows:
     disposition: never-port
     note: "the J34 side-local overlays (company / producer) — side-local by definition; each side owns exactly its own and a port must never carry one across"
   - path: "MODULE_MAP.md"
-    disposition: canonical-producer
+    disposition: per-entry
+    entry_rule: >
+      Module rows keyed by module name. Producer-owned MECHANISM crosses whole:
+      the header, the placement test (ADR 0002-A section 2), the core-imports-nothing
+      invariant, the S7 directory-name rule and the CORE_PREFIXES / COMPONENT_GROUP
+      vocabulary. Company-only MODULE ROWS stay — `drydocs.scrapers.*`,
+      `drydocs.docmeta.*`, `drydocs.seal_projection` are company packages the
+      producer does not have and cannot classify.
+      MOVES WITH `tests/unit/test_module_boundary.py`, ALWAYS. The map classifies
+      every module and that guard is DEFAULT-DENY over the classification, so the
+      two encode one fact in two languages and a module the map loses is a module
+      the guard rejects.
+    note: >
+      J68 (2026-09-01). This row was `canonical-producer` and its guard was
+      `per-entry`, which is the split that fails: measured on the 2026-09-01
+      company apply, a wholesale take of this file dropped the three company-only
+      module families above while the per-entry guard went on enforcing them, and
+      the default-deny check failed immediately. Same defect, same repair and same
+      reason as `tests/unit/test_module_boundary.py` — which the manifest's own
+      entry_rule records "was canonical-producer until a wholesale take dropped the
+      company's extended groups". The map had never been given the matching row.
+      Guarded by `test_every_declaration_names_the_guard_that_reads_it`.
   - path: "CLAUDE.md"
     disposition: canonical-producer
   - path: "PUBLISH-BOUNDARY.md"
@@ -757,6 +778,31 @@ rows:
       configured are local facts. ADR 0017's reconciliation with ADR 0009 turns
       on the port test, and this row is what makes that test TRUE rather than
       assumed.
+  - path: "config/source-registry.yaml"
+    disposition: per-entry
+    entry_rule: >
+      `systems[]` and `datasets[]` keyed by id. Producer-owned MECHANISM crosses
+      whole: the header, the id GRAMMAR (`{origin}@[db].{schema}.{table}`, the
+      origin-vs-carrier distinction), the field vocabulary, `authority` semantics
+      (SOR vs ADS) and the retired-id list — a retired id is a D4 refusal on both
+      sides and re-adding one is never the repair. Company-owned and NEVER
+      overwritten by a port: rows for systems and datasets the company registers
+      against ITS estate, and any `locator` / `binding` / `graph_locator` field on
+      a shared row (the WHERE is local, the same split as
+      `config/doc-source-registry.yaml` above).
+      MOVES WITH `tests/unit/test_source_registry.py`, ALWAYS — that guard
+      validates the rows this file declares, so a row lost here is a guard failure
+      rather than a silent absence.
+    note: >
+      J68 (2026-09-01), and this row exists because the alternative was measured.
+      The file had NO row and fell through to the `config/**` canonical-producer
+      default below; the 2026-09-01 company apply took it wholesale and drove
+      `test_source_registry` from 1 failure to 7. That default's own note already
+      records this exact class happening once — "A file of LOCAL infrastructure
+      facts does not belong under this default; dev-environment.yaml sat here by
+      omission until the 2026-07-28 port" — and `config/source-bindings.yaml` two
+      rows above records it a second time. This is the THIRD instance, which is
+      why J68 also adds the guard rather than only the row.
   - path: "config/**"
     disposition: canonical-producer
     note: "configuration layer default — the per-entry/canonical-company/union rows ABOVE override for the map, gate-prompts, review-labels, gate-log, dev-environment (first match wins). A file of LOCAL infrastructure facts does not belong under this default; dev-environment.yaml sat here by omission until the 2026-07-28 port"

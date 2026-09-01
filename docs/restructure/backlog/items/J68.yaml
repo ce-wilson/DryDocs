@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - PORT-MANIFEST.yaml
@@ -68,3 +68,39 @@ notes: |
   WHAT THIS IS NOT. Not a criticism of the collision ledger, which is genuinely useful for the files it
   describes how to merge - cli.py, the models exports, the CI workflows. The defect is narrow: a ledger
   entry that answers WHETHER instead of HOW is answering a question the manifest owns.
+
+  DONE 2026-09-01. All five clauses met, and the search found MORE than the item scoped.
+
+  (a) The collision ledger is re-headed "HOW to merge - never WHETHER to take", and no row may
+  assert that a file is taken wholesale, kept or dropped. FOUR stale disposition assertions were
+  found, not one: the reported test_module_boundary.py row; the step-3 Canonical-here bullet naming
+  `relationship_vocabulary.yaml` for a `git checkout` wholesale take (per-entry in the manifest, and
+  sharded out of existence at S5 - it would have flattened the company's own ontology entries,
+  including their 19-class TOM register, and never fired only because the path was already gone);
+  the same bullet naming `drydocs_core/controlm/`, which moved under orchestration/; and the
+  test_variable_* row, which asserted a disposition it happened to get RIGHT and was removed anyway,
+  because a correct copy is what the next stale copy grows from. The ledger's
+  EXPECTED_CONSTRAINTS = 44 was retired rather than updated - the company measured 55 at
+  PORT-REPORT-40c35724, and a count in a producer file rots between ports.
+
+  (b) MODULE_MAP.md canonical-producer -> per-entry (module rows union; the placement test, the
+  core-imports-nothing invariant, the S7 rule and the CORE_PREFIXES/COMPONENT_GROUP vocabulary cross
+  whole). config/source-registry.yaml gains its first row, per-entry, inserted BEFORE config/** so
+  the shadow guard passes.
+
+  (c)+(d) test_every_declaration_names_the_guard_that_reads_it, written RED FIRST and shown failing
+  on exactly the two reported pairs before either row changed. THE INVARIANT IS NARROWER THAN THIS
+  ITEM ASSUMED, and the tree corrected it: "a declaration and its guard share a disposition" is
+  FALSE. tests/unit/test_database_names.py is per-entry (SCANNED_PACKAGES is extensible) while the
+  01_databases.cypher it parses is canonical-producer (the topology is a signed gate's ruling), and
+  that split is correct and reasoned in the row's own note. The property that actually holds is
+  weaker and sufficient: the coupling must be NAMED in the manifest, so a session resolving either
+  file reads about the other. The database-names pair already did this and passes untouched; the two
+  broken pairs did not. Companion test proves the detector catches an injected defect (J26 idiom).
+
+  (e) RELAY-18, [VERIFIED-PRODUCER], stating up front that it lands after port-base-20260901 and
+  changes nothing about the in-flight apply.
+
+  Suite 2935 passed / 9 skipped (desktop; +2 over the pre-J68 2933). Note for whoever reads the
+  four findings as carelessness: the manifest was RIGHT every time. Only the hand-kept copies of it
+  were wrong, which is the whole argument for there being one.

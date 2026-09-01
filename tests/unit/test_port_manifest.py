@@ -168,3 +168,118 @@ def test_pyproject_row_pins_the_version_string_rule(manifest: dict) -> None:
     rule = row["entry_rule"].lower()
     assert "version string" in rule and "consumer" in rule, rule
     assert "tags never cherry-pick" in rule, rule
+
+
+# ---- J68: a declaration and its guard must find each other -------------------
+# A DECLARATION file (MODULE_MAP.md, source-registry.yaml, 01_databases.cypher)
+# and the GUARD that reads it encode ONE fact in two languages. Take one without
+# the other and the guard enforces rows the declaration no longer carries.
+#
+# The rule is deliberately NOT "both must share a disposition". The
+# test_database_names.py row is a worked counter-example: its guard is per-entry
+# because SCANNED_PACKAGES is extensible, while the cypher it reads is
+# canonical-producer because the TOPOLOGY is a signed gate's ruling. That split is
+# correct and reasoned, and a same-disposition rule would break it.
+#
+# What must hold is weaker and sufficient: THE COUPLING IS NAMED IN THE MANIFEST,
+# so a port session resolving either file reads about the other. That is exactly
+# what the test_database_names.py note does ("MOVES WITH ... ALWAYS") and exactly
+# what MODULE_MAP.md did not do — which is how a wholesale take of MODULE_MAP.md
+# dropped six company-only module families on 2026-09-01 while its per-entry guard
+# went on enforcing them.
+
+#: (declaration, guard, why the two are one fact). Hand-declared, because which
+#: guard reads which file is not derivable from paths — and a typed list is what
+#: forces a human look when a new pair appears.
+DECLARATION_GUARD_PAIRS: tuple[tuple[str, str, str], ...] = (
+    (
+        "MODULE_MAP.md",
+        "tests/unit/test_module_boundary.py",
+        "the map classifies every module; the guard is default-deny over that "
+        "classification, so a module the map loses is a module the guard rejects",
+    ),
+    (
+        "config/source-registry.yaml",
+        "tests/unit/test_source_registry.py",
+        "the registry declares the systems and datasets; the guard validates them, "
+        "so a row the registry loses is a guard failure and not a silent absence",
+    ),
+    (
+        "drydocs_core/schema/provisioning/01_databases.cypher",
+        "tests/unit/test_database_names.py",
+        "the cypher provisions the databases and the guard parses it back — one "
+        "topology ruling in two languages (document-content-topology, 32/32)",
+    ),
+)
+
+
+def _row_for(rows: list[dict], path: str) -> dict | None:
+    """The row governing ``path`` — first match wins, literal or glob."""
+    from tests.unit.test_port_reconcile_guards import glob_to_regex
+
+    for row in rows:
+        pattern = row["path"]
+        if pattern == path or glob_to_regex(pattern).match(path):
+            return row
+    return None
+
+
+def _row_text(row: dict | None) -> str:
+    return "" if row is None else f"{row.get('entry_rule', '')}\n{row.get('note', '')}"
+
+
+def uncoupled_pairs(
+    rows: list[dict], pairs: tuple[tuple[str, str, str], ...]
+) -> list[tuple[str, str]]:
+    """Pairs where NEITHER governing row names the other half.
+
+    Naming either direction is enough: a session resolving the declaration finds
+    the guard, or a session resolving the guard finds the declaration. Naming
+    neither is the case that fails.
+    """
+    out: list[tuple[str, str]] = []
+    for declaration, guard, _why in pairs:
+        declaration_text = _row_text(_row_for(rows, declaration))
+        guard_text = _row_text(_row_for(rows, guard))
+        if guard not in declaration_text and declaration not in guard_text:
+            out.append((declaration, guard))
+    return out
+
+
+def test_every_declaration_names_the_guard_that_reads_it(manifest: dict) -> None:
+    """J68 (c). Measured, not theorised: on 2026-09-01 a company apply took
+    MODULE_MAP.md wholesale (canonical-producer) while its guard stayed per-entry,
+    dropping drydocs.scrapers.*, drydocs.docmeta.* and drydocs.seal_projection —
+    six module families the guard then rejected. The manifest already carried the
+    coupling for ONE pair, in the test_database_names.py note; this makes it a
+    property of every declared pair instead of one row's good manners."""
+    gaps = uncoupled_pairs(manifest["rows"], DECLARATION_GUARD_PAIRS)
+    assert not gaps, (
+        "declaration/guard pairs where neither row names the other — a port "
+        "session resolving one will not learn about the other:\n  "
+        + "\n  ".join(f"{d}  <->  {g}" for d, g in gaps)
+    )
+
+
+def test_the_coupling_detector_catches_an_uncoupled_pair() -> None:
+    """The guard is watched to fail on the defect it exists for (the J26 idiom) —
+    otherwise a detector that silently matches nothing reads as a passing suite."""
+    pair = (("MODULE_MAP.md", "tests/unit/test_module_boundary.py", "why"),)
+    uncoupled = [
+        {"path": "MODULE_MAP.md", "disposition": "canonical-producer"},
+        {"path": "tests/unit/test_module_boundary.py", "entry_rule": "groups union"},
+    ]
+    assert uncoupled_pairs(uncoupled, pair) == [
+        ("MODULE_MAP.md", "tests/unit/test_module_boundary.py")
+    ]
+    # naming it from EITHER side closes the gap
+    from_declaration = [
+        {"path": "MODULE_MAP.md", "note": "moves with tests/unit/test_module_boundary.py"},
+        {"path": "tests/unit/test_module_boundary.py", "entry_rule": "groups union"},
+    ]
+    assert uncoupled_pairs(from_declaration, pair) == []
+    from_guard = [
+        {"path": "MODULE_MAP.md", "disposition": "canonical-producer"},
+        {"path": "tests/unit/test_module_boundary.py", "note": "reads MODULE_MAP.md"},
+    ]
+    assert uncoupled_pairs(from_guard, pair) == []
