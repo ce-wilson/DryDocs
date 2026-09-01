@@ -93,7 +93,33 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 - **`Idea-234`** · 2026-09-01 · `[idea]` · **open** · prio? **Low** —
   **A branch tip can be green while commits inside it are red, and nothing records which — so a
-  bisect through the range fails on the guard rather than the defect.** STUB - body follows.
+  bisect through the range fails on the guard rather than the defect.** Observed on
+  `feat/ui-web`, 2026-09-01, and reported by the session that made it rather than found by
+  anything: `e7e95f07` and `f44fb40d` shipped two console components without their
+  `config/taxonomy/ui-components.yaml` ledger rows and were RED on `test_ui_components` when
+  pushed; `e0c12d10` added the rows and the tip went green. The tip is the state anyone looks
+  at, so the range reads as healthy.
+  WHY IT IS WORTH A LINE RATHER THAN A SHRUG. The session ritual's CI check matches on HEAD's
+  sha precisely so that "green" means green at what you pushed — `snapshot.ps1` performs it
+  immediately before writing, warn-only. That check is per-push, and it does exactly what it
+  claims; nothing aggregates the answers, so a branch accumulates red commits and reports the
+  colour of its last one. The cost is not correctness — the tip is genuinely green — it is that
+  `git bisect` over such a range returns the commit where a LEDGER row was missing, not the
+  commit where behaviour changed, and the bisector cannot tell those apart without re-running
+  the suite by hand at each step.
+  WHAT MOSTLY NEUTRALIZES IT, and why this is Low rather than Med: CLAUDE.md already mandates
+  `--no-ff` for branch merges, so once `feat/ui-web` lands on `main` the red commits leave
+  main's FIRST-PARENT line entirely and `git bisect --first-parent` never visits them. The
+  hazard is real only while bisecting the branch itself, or a range that crosses the merge
+  boundary — which a port range does, since a port reads the full range and not the
+  first-parent walk.
+  DISPOSITION, if it is ever worth acting on: not a guard. A pre-push hook running the full
+  suite would cost minutes on every push to buy a property nobody has needed yet, and a red
+  intermediate commit is a normal, legitimate way to work (J68's own guard was written red
+  first on purpose — the difference is that it went green in the SAME commit). The cheap
+  version is a note: when a ledger roll describes a range, say which commits inside it were
+  red at push, the way step 272 says which ids were re-minted. That is one sentence per roll
+  and it is written by the session that already knows.
 
 - **`Idea-233`** · 2026-08-31 · `[idea]` · **open** · prio? **Med** —
   **Record HOW a source was captured, not only how much its content is trusted: a capture-rung
