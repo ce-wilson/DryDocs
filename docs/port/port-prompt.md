@@ -305,8 +305,8 @@ FORCE_COLOR / Idea-101 findings that motivated J41.)
   company-side, so they are ONE range for you, not two ports:
   `port-base-20260829` (`e8e69a77`, steps 241–272) and **`port-base-20260901`
   (cut at the commit carrying the fourth roll, steps 273–296)**. Take the whole
-  span `port-base-20260826..port-base-20260901` — **296 producer commits, 128 of
-  them in the second half** — and read step 272 FIRST: the nineteen-id re-mint is in the earlier half and a naive
+  span `port-base-20260826..port-base-20260901` — **296 producer commits, 167 in
+  the first roll and 129 in the second** — and read step 272 FIRST: the nineteen-id re-mint is in the earlier half and a naive
   union of the range re-introduces exactly the collisions it resolves.
 
 - **PRIOR — producer head `5417ef10`** (2026-08-07), applied company-side as
@@ -4303,7 +4303,8 @@ ledger` roll and is ritual by the terminating-write rule.
 
 LEDGER COVERAGE FOOTNOTE (2026-09-01, FOURTH ROLL) — the
 `port-base-20260829..port-base-20260901` extension, cited here because the coverage
-check reads ONLY this section.
+check reads ONLY this section. The commits below were enumerated at `0fe79795`, before
+the roll commit existed; the tagged range is 129 because the roll commit IS the tag.
 IDEA CAPTURES — `docs/restructure/IDEAS.md` is `union-append` and an inbox entry is not
 apply content, so these get a citation rather than a step. Step 272's warning still
 governs: apply the id set as it stands at the base, never a pre-renumber copy.
