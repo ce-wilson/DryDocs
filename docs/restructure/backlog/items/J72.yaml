@@ -1,0 +1,22 @@
+id: J72
+epic: release-infrastructure
+title: A rename reads as a clean-add on the receiving side - compare a proposed add's content against
+  existing consumer files with a different name, before it is applied
+type: bug
+module: docs
+phase: 8
+agent: main
+model: sonnet
+priority: p0
+status: todo
+depends_on: []
+inputs:
+- drydocs/port_preflight.py
+- drydocs/port_backlog_union.py
+- scripts/port_preflight.py
+- PORT-MANIFEST.yaml
+- tests/unit/test_port_reconcile_guards.py
+acceptance: |
+  STUB - body follows in the next commit (id minted per I6).
+notes: |
+  STUB.
