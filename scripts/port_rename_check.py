@@ -24,8 +24,8 @@ read, which is a failure and never an empty set — the same rule
 "nothing found" when it actually found nothing to look at is worse than no check.
 
 WHY IT EXISTS (2026-09-01, two instances in one apply): ``41-local-seal.yaml``
-became ``41-local-business-application.yaml`` and ``fcdo-crosswalk.yaml`` became
-``cdo-crosswalk.yaml``. Both were clean-adds BY PATH. The first duplicated 16
+became ``41-local-business-application.yaml``, and the crosswalk gate prompt
+became ``cdo-crosswalk.yaml`` from its retired-acronym name. Both were clean-adds BY PATH. The first duplicated 16
 vocabulary ids and cost 62 failures; the second would have imported a gate
 sign-off the company deliberately withholds, into a ``canonical-company`` path.
 """

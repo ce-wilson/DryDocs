@@ -11,7 +11,7 @@ about the PATH and blind to the CONTENT.
     renamed the fragment at gate ``vocabulary-domains-and-id-policy`` §A1/§A2.
     Applying it duplicated 16 vocabulary ids and cost 62 failures and a revert.
   * ``cdo-crosswalk.yaml`` was a clean-add by path. The consumer held the same gate
-    as ``fcdo-crosswalk.yaml`` — and the producer's copy carries a SIGNED-OFF
+    under its retired-acronym name — and the producer's copy carries a SIGNED-OFF
     header while the consumer's says DRAFT, unsigned, session pending. Applying it
     would have imported a signature the consumer deliberately withholds, into a
     file class the manifest declares ``canonical-company``. That is a gate-state
@@ -103,7 +103,7 @@ def normalized_text(text: str) -> str:
     """Comments stripped, whitespace collapsed, lowercased.
 
     Comments go because a rename usually rewrites the header while keeping the
-    body — ``cdo-crosswalk.yaml`` and ``fcdo-crosswalk.yaml`` differ most in their
+    body — the crosswalk prompt and its retired-acronym twin differ most in their
     header, which is precisely the part that must not dominate the comparison.
     """
     return _WS.sub(" ", _COMMENT.sub("", text)).strip().lower()
@@ -142,7 +142,7 @@ def compare(proposed_text: str, existing_text: str) -> tuple[float, str]:
     coverage is the point. Both known traps prove it.
 
     The gate prompts each carry exactly ONE id, and a rename renames the id too
-    (``fcdo-crosswalk`` -> ``cdo-crosswalk``), so the id measure scores them 0.00
+    (the retired-acronym stem -> ``cdo-crosswalk``), so the id measure scores them 0.00
     — the signal meant to help is the one that zeroes them. Their bodies are 0.88
     similar. Conversely a fragment SPLIT moves entries into a file whose prose
     shares little with the source, and there the ids are the only thing that
