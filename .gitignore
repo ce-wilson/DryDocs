@@ -175,3 +175,9 @@ var/
 # is base..HEAD, so a committed copy goes stale on every commit; the renderer is
 # guarded (tests/unit/test_port_dispositions.py), the output is working state.
 docs/port/port-dispositions.md
+
+# coverage data (T1, tech-debt review 2026-09-02): pytest-cov's parallel files
+# otherwise fall through PORT-MANIFEST default: and fail test_no_tracked_path_falls_through_silently
+.coverage
+.coverage.*
+htmlcov/
