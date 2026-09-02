@@ -22,7 +22,9 @@ the three things they owned are stated here in the shortest form that lets a ses
   `drydocs.deepdoc.mindmap.v1` (MM3): a root question, named branches, and slots that are
   `open` (the trailing `?`) or `filled` with an evidence ref and a date. A slot cannot move to
   `filled` without an evidence ref, and the file refuses to load if one did. The next search
-  targets the next open slot.
+  targets the next open slot. *Where it lives, as of 2026-09-02: MM3 is `done` on the branch
+  `feat/mm-deepdoc-investigate`, not yet merged — a reader on `main` will not find the module
+  until that branch lands, and until then the hinge is the log's Open-questions section.*
 - **The log shape**, by worked example: `internal/research/JOB-MFTS-MM-research.md` — YAML
   front matter (`central_question`, `subject`, `venue`, `sme_context`), a **Brain-map**, a
   **Trace ledger** of numbered hops (H-n), **CORRECTION** blocks that strike a hop in place,
@@ -171,7 +173,9 @@ kind `search`, MM3) records `tool / search / theme / novelty / results` per conn
 where `theme` is the mind-map slot the search targeted. The two row shapes describe the same
 act from two sides — this one classifies the outcome, that one scores the novelty — and
 whether they converge is Idea-238's question. Until it is answered, a hand-run session writes
-this JSONL; a connector-run search writes the search log.
+this JSONL; a connector-run search writes the search log. *Both the module and Idea-238 are on
+`feat/mm-deepdoc-investigate` as of 2026-09-02, unmerged; on `main` this JSONL is the only
+search record.*
 
 ---
 
