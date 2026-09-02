@@ -91,7 +91,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
-- **`Idea-241`** · 2026-09-02 · `[idea]` · **groomed → S16 (the build half: discovery in the composition root) + J73 (the port-prompt relay rule) (2026-09-02)** — the COMPANY-side adoption of the S8 split is their port action and is not a producer item · prio? **High** —
+- **`Idea-241`** · 2026-09-02 · `[idea]` · **groomed → S16 (the build half: discovery in the composition root) + J73 (the port-prompt relay rule) (2026-09-02)** · prio? **High** — the COMPANY-side adoption of the S8 split is their port action and is not a producer item · prio? **High** —
   **The S8 composition root should DISCOVER a consumer command module by convention, so
   `drydocs/cli.py` stops being an `evaluate` collision — the company never adopted the split
   and its monolith carries stale inline copies of every verb S8 moved.** Source: the
