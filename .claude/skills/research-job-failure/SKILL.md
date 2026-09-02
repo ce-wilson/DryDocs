@@ -168,7 +168,8 @@ An `inferred` edge is a candidate for the SME, not a fact.
 5. A **change correlation** exists, or an explicit *"none found in window, control passed"*.
 6. The connection map is drawn, with every edge marked observed / documented / inferred.
 7. Every negative carries an outcome class; every `exhausted*` a control.
-8. Whitelist updated; coverage and reuse recorded.
+8. The shared ledgers are updated — whitelist, `terms`, `platforms` (ownership surface, error
+   taxonomy), `id-shapes` — with evidence; coverage, reuse and re-discovery recorded.
 
 ---
 
@@ -179,6 +180,7 @@ An `inferred` edge is a candidate for the SME, not a fact.
 | Research log with hop ledger and connection map | `internal/research/<subject>-research.md` |
 | Probe log (JSONL, live) | `internal/research/_probes/<subject>-probes.jsonl` |
 | New / corrected whitelist rows | `internal/research/_registry/source-whitelist.yaml` |
+| New / corrected terms, platform and id-shape rows | `internal/research/_registry/terms.yaml`, `platforms.yaml`, `id-shapes.yaml` |
 | Preserved captures (notifications, exports, records) | the evidence root (`DRYDOCS_DATA_ROOT`) — cite the path |
 | Gaps worth fixing (e.g. ticketing not configured) | `docs/restructure/IDEAS.md`, minted through the allocator |
 

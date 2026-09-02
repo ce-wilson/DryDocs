@@ -269,9 +269,10 @@ place with the reason in `notes`, never deleted.
 - **This skill and its siblings are committed and mechanism-only** (`CLAUDE.md` §3): shapes,
   rules, field names, anonymized examples. **No real hosts, application ids, accounts, folder
   or job names.**
-- **The whitelist and probe logs are Internal** and live under `internal/research/` — tracked
-  in the private repo, excluded from every publish (`PUBLISH-BOUNDARY.md`). Real values belong
-  there.
+- **The four ledgers and the probe logs are Internal** and live under `internal/research/`
+  (`_registry/` and `_probes/`) — tracked in the private repo, excluded from every publish
+  (`PUBLISH-BOUNDARY.md`). Real values belong there; the templates under `references/` carry
+  only shapes.
 
 If a worked example needs a value to make sense, write it as a shape — `<account>`,
 `<space-key>`, `ftsi#####` — not as an instance.

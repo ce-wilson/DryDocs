@@ -152,8 +152,11 @@ The trace closes when **all** hold:
 2. Every open question names **who must rule it** — SME, gate, or a specific evidence pull.
 3. Every claim carries a **capture rung** and a **platform/scope stamp**.
 4. Every negative carries an **outcome class**, and every `exhausted*` a **control**.
-5. Sources are written to the **whitelist**, including the blocked and irrelevant ones.
-6. Coverage and reuse are recorded in the notes entry.
+5. The **shared ledgers are updated** — sources to the whitelist (including the blocked and
+   irrelevant ones), decoded terms to `terms.yaml`, the platform's identity to
+   `platforms.yaml`, any identifier whose join status was settled to `id-shapes.yaml` — each
+   with its evidence and its confidence as it stands.
+6. Coverage, reuse and re-discovery are recorded in the notes entry.
 
 ---
 
@@ -164,6 +167,7 @@ The trace closes when **all** hold:
 | Research log (two-phase, hop ledger, acronyms, open questions) | `internal/research/<subject>-research.md` |
 | Probe log (JSONL, written live) | `internal/research/_probes/<subject>-probes.jsonl` |
 | New / corrected whitelist rows | `internal/research/_registry/source-whitelist.yaml` |
+| New / corrected terms, platform and id-shape rows | `internal/research/_registry/terms.yaml`, `platforms.yaml`, `id-shapes.yaml` |
 | Preserved captures | the evidence root (`DRYDOCS_DATA_ROOT`); cite the path, never re-serialize |
 | Anything worth doing later | `docs/restructure/IDEAS.md`, minted through the allocator (the `groom-backlog` skill) |
 

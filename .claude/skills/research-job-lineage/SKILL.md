@@ -185,7 +185,9 @@ actually closed, instead of re-deriving the whole chain.
 4. Every definition/event grain difference is stated explicitly.
 5. Every unresolved link has a backlog item or IDEAS entry carrying its link number.
 6. Every negative has an outcome class; every `exhausted*` a control.
-7. Whitelist updated; coverage and reuse recorded.
+7. The shared ledgers are updated — whitelist, `terms`, `platforms` (grains, exports,
+   ownership surface), `id-shapes` (every handle with its `lifetime` and `join_key`) — with
+   evidence; coverage, reuse and re-discovery recorded.
 
 ---
 
@@ -196,6 +198,7 @@ actually closed, instead of re-deriving the whole chain.
 | Research log — hop ledger, candidate table, link results | `internal/research/<subject>-research.md` |
 | Probe log (JSONL, live) | `internal/research/_probes/<subject>-probes.jsonl` |
 | New / corrected whitelist rows | `internal/research/_registry/source-whitelist.yaml` |
+| New / corrected terms, platform and id-shape rows | `internal/research/_registry/terms.yaml`, `platforms.yaml`, `id-shapes.yaml` |
 | Backlog items with link-number acceptance | `docs/restructure/backlog/items/` (allocator-minted) |
 | Rulings and open questions | `docs/restructure/IDEAS.md` (allocator-minted) |
 | Preserved captures | the evidence root (`DRYDOCS_DATA_ROOT`) — cite the path |
