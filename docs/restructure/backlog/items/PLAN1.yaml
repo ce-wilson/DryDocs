@@ -1,0 +1,65 @@
+id: PLAN1
+epic: project-board
+title: Freeze the 27 legacy id series and mint every new item id by module code - the series
+  is the module
+type: task
+module: drydocs-plan
+phase: 8
+agent: main
+model: opus
+priority: p1
+status: in_progress
+depends_on: []
+inputs:
+- docs/restructure/backlog/modules.yaml
+- .claude/skills/groom-backlog/validate.py
+- tests/unit/test_backlog.py
+- .claude/skills/groom-backlog/SKILL.md
+- CLAUDE.md
+- docs/restructure/backlog/items/C41.yaml
+- config/gate-log.md
+acceptance: |
+  (a) THE LETTERS ARE FROZEN, at the highest number each had ever taken across local, every
+  remote ref and history, measured through the allocator on 2026-09-02: A4 B5 C44 D11 E2 F2
+  G136 GN2 H8 I8 J78 K30 L29 M4 MM14 N28 O92 P6 Q28 R23 S16 U27 V11 W3 X4 Y7 Z9. The snapshot
+  is a COMMITTED CONSTANT in validate.py and again in test_backlog.py, with a guard that the
+  two agree - never the current max, which rises with the file it guards. No id moves.
+
+  (b) THE SERIES IS THE MODULE. modules.yaml gains a `series:` map, one code per module, and
+  `validate.py --next-id --module <module>` derives the series from it. Codes are three or
+  more uppercase letters so none can be read as a frozen letter; none is DD. The allocator
+  refuses a frozen series, an unregistered series, DD, and the company band, each with the
+  reason and the command that replaces it.
+
+  (c) GUARDS, in test_backlog.py: every module has a code and no code can collide; no item
+  in a frozen series exceeds its frozen max; an item whose id carries a module code names
+  that module in `module:`; the allocator and the guard agree on the snapshot; the allocator
+  refuses a frozen and an unregistered series.
+
+  (d) THE RULING IS RECORDED where rulings live - config/gate-log.md, as a RECORD, since the
+  SME ruled it in-chat - and the mint rule in CLAUDE.md and the groom-backlog skill say
+  `--module` and say why. C41 is re-pointed: its item-series half is superseded by this, its
+  domain-registry half stays an ontology concern and stops citing the schema-identifier gate,
+  which never asked its questions.
+
+  (e) WHAT THIS IS NOT. It is not the edition prefix (`[<ED>-]<MODULE><n>`), which retires
+  the DD reserve and the numeric band and needs the port relay - that is the next item. It is
+  not the inbox shard. And it renumbers nothing: config/gate-log.md, the port-prompt and
+  IDEAS.md cite every legacy id and every one still resolves.
+
+  tests/unit green, ruff clean, the board and roadmap re-rendered; this item's own id is the
+  first mint under the rule, taken from the allocator it describes.
+notes: |
+  Minted 2026-09-02 (desktop, ui-workstream worktree, branch feat/backlog-series-by-module) as
+  the first id under the rule it establishes, from `--next-id --module drydocs-plan`.
+
+  WHY NOW AND NOT AT THE TEAMS EDITION GATE. C41 designed a domain registry and was blocked on
+  an ADR ruling; meanwhile every mint went into an epoch letter - 18 more in the groom that
+  landed this morning. The SME's direction on 2026-09-02: retire the old series and start by
+  module BEFORE Teams Edition, because the problem compounds daily. The module axis already
+  existed on 611 of 611 items as a required field; only the prefix was missing, which is why
+  this is a day's mechanism and not a design.
+
+  MODULE, NOT DOMAIN, for item series - the one place this departs from C41. Domain is the
+  ontology topic; module is the MODULE_MAP component an agent pulls against and the field
+  every item already carries. The domain registry remains an ontology concern.

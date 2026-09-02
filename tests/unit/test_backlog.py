@@ -282,8 +282,8 @@ def test_next_free_is_max_plus_one_and_never_fills_a_gap() -> None:
     citation inside a signed-off gate, which is worse than leaving a hole.
     """
     alloc = _allocator()
-    taken = {"Z1", "Z2", "Z5"}  # Z3 and Z4 are gaps
-    assert alloc.next_id("Z", taken) == ("Z6", 5)
+    taken = {"PLAN1", "PLAN2", "PLAN5"}  # PLAN3 and PLAN4 are gaps
+    assert alloc.next_id("PLAN", taken) == ("PLAN6", 5)
 
 
 def test_the_allocator_refuses_the_reserved_series() -> None:
@@ -295,7 +295,142 @@ def test_the_allocator_refuses_the_reserved_series() -> None:
 def test_the_allocator_refuses_to_cross_into_the_company_band() -> None:
     alloc = _allocator()
     with pytest.raises(SystemExit, match="COMPANY band"):
-        alloc.next_id("Z", {"Z" + str(PRODUCER_BAND_CEILING)})
+        alloc.next_id("PLAN", {"PLAN" + str(PRODUCER_BAND_CEILING)})
+
+
+# ---- the series is the module (ruling 2026-09-02) ----------------------------------
+# The letter was an epoch tag: plan.yaml mapped phases 1:1 to epics and to letters, so a
+# series recorded WHEN a phase opened, not what an item is about. G held 136 items across
+# six epics and "search the G series" meant nothing. Every item already carried the topic
+# axis as a REQUIRED field - `module:` - so the fix is to derive the series from it and
+# freeze the letters. No id moves (join keys; config/gate-log.md cites them inside signed
+# records). Forward-only, like the band: the freeze governs the NEXT id, and the frozen
+# max is a committed constant so it cannot rise with the file it guards.
+
+#: When the letters were frozen.
+FROZEN_ON = "2026-09-02"
+
+#: Each legacy series at the highest number it had ever taken - local, every remote ref
+#: and history unioned through the allocator - on the day of the ruling. Duplicated from
+#: validate.py DELIBERATELY (it runs where pytest does not) and asserted equal below.
+FROZEN_SERIES: dict[str, int] = {
+    "A": 4,
+    "B": 5,
+    "C": 44,
+    "D": 11,
+    "E": 2,
+    "F": 2,
+    "G": 136,
+    "GN": 2,
+    "H": 8,
+    "I": 8,
+    "J": 78,
+    "K": 30,
+    "L": 29,
+    "M": 4,
+    "MM": 14,
+    "N": 28,
+    "O": 92,
+    "P": 6,
+    "Q": 28,
+    "R": 23,
+    "S": 16,
+    "U": 27,
+    "V": 11,
+    "W": 3,
+    "X": 4,
+    "Y": 7,
+    "Z": 9,
+}
+
+
+def _module_series() -> dict[str, str]:
+    doc = yaml.safe_load((BACKLOG / "modules.yaml").read_text(encoding="utf-8")) or {}
+    return {str(k): str(v) for k, v in (doc.get("series") or {}).items()}
+
+
+def test_the_allocator_and_the_guard_agree_on_the_frozen_snapshot() -> None:
+    """Written down twice, so asserted equal - the same discipline as the ceiling."""
+    alloc = _allocator()
+    assert alloc.FROZEN_SERIES == FROZEN_SERIES
+    assert alloc.FROZEN_ON == FROZEN_ON
+
+
+def test_every_module_has_a_series_code_and_no_code_can_collide() -> None:
+    """One code per module, and a code that can never be mistaken for a frozen letter.
+
+    Three letters or more, because every frozen series is one or two; not DD, because the
+    company side occupied DD1..DD10 in a series this repo cannot see (Idea-162); unique,
+    because two modules sharing a series is the G problem reappearing under a new name.
+    """
+    doc = _load()
+    codes = _module_series()
+    missing = sorted(set(doc["modules"]) - set(codes))
+    assert not missing, f"modules with no series code in modules.yaml `series:`: {missing}"
+    orphan = sorted(set(codes) - set(doc["modules"]))
+    assert not orphan, f"series codes for modules the census does not list: {orphan}"
+    bad = sorted(
+        c
+        for c in codes.values()
+        if not (c.isalpha() and c.isupper() and len(c) >= 3) or c in FROZEN_SERIES or c == "DD"
+    )
+    assert (
+        not bad
+    ), f"series codes must be >=3 uppercase letters, not a frozen letter, not DD: {bad}"
+    values = list(codes.values())
+    dupes = sorted({c for c in values if values.count(c) > 1})
+    assert not dupes, f"two modules share a series code: {dupes}"
+
+
+def test_frozen_series_take_no_new_ids() -> None:
+    """Nothing minted after the freeze may land in a letter series.
+
+    An id above the frozen max is a mint that bypassed the allocator - the allocator
+    refuses every frozen series - and it goes back to be re-minted under its module.
+    """
+    doc = _load()
+    stray = []
+    for item in doc.get("items", []):
+        iid = str(item.get("id", ""))
+        series = "".join(ch for ch in iid if ch.isalpha())
+        digits = "".join(ch for ch in iid if ch.isdigit())
+        if series in FROZEN_SERIES and digits and int(digits) > FROZEN_SERIES[series]:
+            stray.append(iid)
+    assert not stray, (
+        f"ids minted in a FROZEN series after {FROZEN_ON}: {sorted(stray)}. The letters are "
+        "closed. Re-mint under the module: validate.py --next-id --module <module>."
+    )
+
+
+def test_a_module_series_id_belongs_to_that_module() -> None:
+    """An item whose id carries a module code names that module in `module:`.
+
+    This is what makes the id readable: LOAD12 IS a drydocs-load item, with no lookup.
+    The reverse is not asserted - legacy items keep their letters and their modules.
+    """
+    doc = _load()
+    codes = _module_series()
+    by_code = {v: k for k, v in codes.items()}
+    wrong = []
+    for item in doc.get("items", []):
+        iid = str(item.get("id", ""))
+        series = "".join(ch for ch in iid if ch.isalpha())
+        if series in by_code and item.get("module") != by_code[series]:
+            wrong.append(f"{iid} (module: {item.get('module')!r}, series says {by_code[series]!r})")
+    assert not wrong, f"module-series ids filed under a different module: {wrong}"
+
+
+def test_the_allocator_refuses_a_frozen_series() -> None:
+    alloc = _allocator()
+    with pytest.raises(SystemExit, match="FROZEN"):
+        alloc.next_id("G", {"G1"})
+
+
+def test_the_allocator_refuses_an_unregistered_series() -> None:
+    """A letter nobody registered is how the epoch tags started."""
+    alloc = _allocator()
+    with pytest.raises(SystemExit, match="not a registered module series"):
+        alloc.next_id("QQQ", set())
 
 
 def test_the_taken_set_is_a_union_of_all_three_sources() -> None:

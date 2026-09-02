@@ -17,3 +17,33 @@ modules:
 - config
 - graph-infra
 - docs
+
+# The item-id series for each module (ruling 2026-09-02, recorded in config/gate-log.md).
+# A new item's id is <SERIES><n>, and the series comes from THIS map, never from a letter
+# somebody picks: `validate.py --next-id --module <module>` derives it. The 27 legacy
+# series (A..Z, GN, MM) were frozen the same day at the highest number each had ever
+# taken - the letter recorded WHEN a phase opened, not what an item is about, and G alone
+# had absorbed 136 items across six epics. Codes are three letters or more so they can
+# never collide with a frozen letter, and none is DD, which the company side occupied.
+# `modules[]` above stays a plain list of names on purpose: PORT-MANIFEST unions it by
+# name and test_runbook_coverage reads it as the census; this map is a sibling, not a
+# reshape.
+series:
+  drydocs-core: CORE
+  drydocs-load: LOAD
+  drydocs-review: REV
+  drydocs-plan: PLAN
+  drydocs-docgen: DOCGEN
+  drydocs-lineage: LIN
+  drydocs-deepdoc: DEEP
+  drydocs-remediation: REM
+  drydocs-web: WEB
+  drydocs-api: API
+  drydocs-agents: AGENT
+  drydocs-docmeta: META
+  reference: REF
+  taxonomy: TAX
+  ontology: ONT
+  config: CFG
+  graph-infra: GRAPH
+  docs: DOC
