@@ -91,6 +91,11 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
+- **`Idea-241`** · 2026-09-02 · `[idea]` · **open** · prio? **High** —
+  **The S8 composition root should DISCOVER a consumer command module by convention, so
+  `drydocs/cli.py` stops being an `evaluate` collision — the company never adopted the split
+  and its monolith carries stale inline copies of every verb S8 moved.** STUB - body follows.
+
 - **`Idea-240`** · 2026-09-02 · `[idea]` · **open** · prio? **Med** —
   **The publish boundary is defined on the tracked tree and says nothing about git HISTORY —
   34 commit messages on main carry the retired org acronym, and whether the public push is
