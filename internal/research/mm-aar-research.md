@@ -7,8 +7,10 @@ reviews: internal/research/JOB-MFTS-MM-research.md
 ---
 
 <!-- PRODUCER-SIDE TRANSCRIPTION (2026-09-02) of seven company-side artifacts as they stood
-     on the company's dd-lineage worktree. The company files are the source of record; this
-     copy exists so producer-side items can cite them by path. Reproduced verbatim, each part
+     on the company's dd-lineage worktree - a RESEARCH FEATURE BRANCH that is not being merged
+     (user ruling, 2026-09-02). Nothing here describes company main: the four skills in Parts
+     4-7 do not exist there and are not port candidates. This copy exists so producer-side
+     items can cite the research method by path. Reproduced verbatim, each part
      under its original path. Anything marked [illegible] was cut off in the source render
      and is not guessed. Producer review stamp (J63): reviewed_branch main,
      reviewed_port_base port-base-20260901. -->
