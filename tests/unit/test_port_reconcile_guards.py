@@ -668,7 +668,7 @@ def test_before_text_missing_file_names_all_four(
 def glob_to_regex(pattern: str) -> re.Pattern[str]:
     """Compile a manifest path glob, anchored.
 
-    ``**`` spans separators, ``*`` and ``?`` do not — so ``drydocs/publishing/**``
+    ``**`` spans separators, ``*`` and ``?`` do not — so ``drydocs/review/publishing/**``
     covers the whole subtree while ``docs/*.md`` stays at one level and cannot
     quietly swallow ``docs/decisions/adr.md``. That distinction is the whole point
     of the allowlist's "prefer a narrow pattern" rule; fnmatch would erase it.
@@ -778,9 +778,9 @@ def fall_through_orphans(
 def test_glob_matcher_separator_and_first_match_rules() -> None:
     """Mechanics, pinned separately from the live tree so a matcher regression
     cannot masquerade as a clean manifest."""
-    subtree = glob_to_regex("drydocs/publishing/**")
-    assert subtree.match("drydocs/publishing/confluence/client.py")
-    assert not subtree.match("drydocs/publishing.py")
+    subtree = glob_to_regex("drydocs/review/publishing/**")
+    assert subtree.match("drydocs/review/publishing/confluence/client.py")
+    assert not subtree.match("drydocs/review/publishing.py")
 
     one_level = glob_to_regex("docs/*.md")
     assert one_level.match("docs/RELATIONSHIP_GUIDE.md")

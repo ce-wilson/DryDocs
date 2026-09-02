@@ -48,7 +48,7 @@
 #
 # Column names are source/loader mechanism (no data values) — classification:
 # Internal-Public, even though the real source row (config/source-registry.yaml)
-# is classification: Internal. Typed accessor: drydocs/source_mappings.py.
+# is classification: Internal. Typed accessor: drydocs/review/source_mappings.py.
 # Guarded by tests/unit/test_source_mapping_drift.py (registry-pointer + census
 # reconciliation; the SQL-drift guard does not apply — this is a report extract,
 # not a psgmgr SELECT).

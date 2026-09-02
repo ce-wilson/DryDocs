@@ -25,12 +25,12 @@ import sys
 import tempfile
 from pathlib import Path
 
-from drydocs.port_backlog_union import (
+from drydocs.port.port_backlog_union import (
     BACKLOG_PATH,
     BacklogUnionError,
     run_union_check,
 )
-from drydocs.port_preflight import REPO_ROOT
+from drydocs.port.port_preflight import REPO_ROOT
 
 
 def main() -> int:

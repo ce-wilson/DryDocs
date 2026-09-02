@@ -2,7 +2,7 @@
 
 Thin CLI entry point beside ``knowledge/depgraph-snapshots/snapshot.ps1`` (see backlog
 item I2 / CLAUDE.md §0 session ritual) until the ``drydocs/cli.py`` entrypoint-boundary
-TODO (MODULE_MAP.md) is resolved. Stdlib + ``drydocs.plan_board`` only.
+TODO (MODULE_MAP.md) is resolved. Stdlib + ``drydocs.plan.plan_board`` only.
 
 A default-paths run ALSO refreshes ``web/src/generated/gates.json`` (J17),
 ``web/src/generated/enforcement-matrix.json`` (J20),
@@ -30,7 +30,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from drydocs.plan_board import DEFAULT_BACKLOG_PATH, DEFAULT_BOARD_PATH, write_board
+from drydocs.plan.plan_board import DEFAULT_BACKLOG_PATH, DEFAULT_BOARD_PATH, write_board
 
 
 def main() -> None:

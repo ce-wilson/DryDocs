@@ -15,7 +15,7 @@ of repo-committed artifacts, three BaseLoader passes in a fixed order —
    when an author resolves to a real :Employee — never fabricated).
 
 Parsing is stdlib + PyYAML only and reuses the Epic L anchor contract
-(drydocs.doc_outline.ANCHOR_RE / DERIVED_ANCHOR_SEP). No LLM, no heuristic
+(drydocs.docgen.doc_outline.ANCHOR_RE / DERIVED_ANCHOR_SEP). No LLM, no heuristic
 beyond the documented cell-split + kind rules below — same determinism bar as
 the render pipeline.
 """
@@ -58,7 +58,7 @@ MATRIX_ANCHOR = "traceability-matrix"
 TEST_KIND_RULE_ID = "kind-rule-v1"
 
 # Front-matter facts — the SAME regex family the render pipeline keys on
-# (drydocs.design_doc): Rev + commit for the print footer; DESCRIPTIVE /
+# (drydocs.docgen.design_doc): Rev + commit for the print footer; DESCRIPTIVE /
 # PRESCRIPTIVE is the Epic L status vocabulary.
 _H1_RE = re.compile(r"^#\s+(.+?)\s*$", re.MULTILINE)
 _REV_RE = re.compile(r"\bRev\s+(\d+)\b")

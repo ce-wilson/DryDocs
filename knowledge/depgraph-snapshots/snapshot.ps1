@@ -212,6 +212,12 @@ Invoke-RefreshStep -Name "board" -Args @("run", "python", "scripts/render_board.
   "docs\plan\roadmap.html"
 )
 
+# --- refresh MODULE_MAP.md's component-map section (ADR 0018 D1) -------------
+# Rendered from drydocs_core/component_map.py; test_module_map_render.py fails on drift.
+Invoke-RefreshStep -Name "module-map" -Args @("run", "python", "scripts/render_module_map.py") -ExpectedOutputs @(
+  "MODULE_MAP.md"
+)
+
 # --- refresh the design docs (best-effort; part of the session-end ritual) ----
 # docs/design/*.md -> <stem>.html (one surface: screen + @media print; Epic L / L13). Deterministic render:
 # a resulting git diff on a doc render means the committed HTML was stale — commit it.

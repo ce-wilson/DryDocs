@@ -1,10 +1,10 @@
-"""Unit tests for gate_pages (drydocs/gate_pages.py) — pure, no Neo4j."""
+"""Unit tests for gate_pages (drydocs/review/gate_pages.py) — pure, no Neo4j."""
 
 from __future__ import annotations
 
 import pytest
 
-from drydocs.gate_pages import (
+from drydocs.review.gate_pages import (
     DEFAULT_GATE_PROMPTS_DIR,
     GateSpecError,
     draft_gate_log_entry,

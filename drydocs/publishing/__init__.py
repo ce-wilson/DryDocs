@@ -1,40 +1,17 @@
-"""drydocs-review docs-publish pipeline (``drydocs-review`` component).
+"""Re-export shim (ADR 0018 D4, 2026-09-02): this package moved to ``drydocs.review.publishing``.
 
-Manifest-driven publishing of review/doc pages: author XHTML fragments, assemble them
-via a template, validate (well-formed XML + a macro allow-list), preview locally, and
-push through a **pluggable publisher**. The real Confluence push is deliberately
-abstracted behind :class:`Publisher` — this public template ships offline publishers
-only; a company implementation supplies a ConfluencePublisher (space coordinates,
-auth, wrapper) in its gitignored twin. No internal push details live here.
-
-Offline tooling — assembling/validating/previewing needs no HITL gate. classification:
-Internal-Public.
+Kept for ONE port cycle so every old import path, patch target and citation resolves to
+the SAME module object (``sys.modules`` alias, so private names and monkeypatches work
+through either path). The submodules are aliased too, so ``drydocs.publishing.assembler``
+and ``drydocs.review.publishing.assembler`` are one object, not two copies of one file.
+Removed at the roll after next; new code imports the new path.
 """
 
-from __future__ import annotations
+import sys as _sys
 
-from .assembler import DEFAULT_TEMPLATE, assemble
-from .preview import write_preview
-from .publisher import LocalPublisher, NoopPublisher, Publisher, PublishResult
-from .validator import (
-    DEFAULT_ALLOWED_MACROS,
-    ValidationError,
-    validate,
-    validate_macros,
-    validate_xml,
-)
+from drydocs.review import publishing as _target
+from drydocs.review.publishing import assembler, preview, publisher, validator
 
-__all__ = [
-    "assemble",
-    "DEFAULT_TEMPLATE",
-    "write_preview",
-    "Publisher",
-    "NoopPublisher",
-    "LocalPublisher",
-    "PublishResult",
-    "validate",
-    "validate_xml",
-    "validate_macros",
-    "ValidationError",
-    "DEFAULT_ALLOWED_MACROS",
-]
+for _sub in (assembler, preview, publisher, validator):
+    _sys.modules[f"{__name__}.{_sub.__name__.rsplit('.', 1)[-1]}"] = _sub
+_sys.modules[__name__] = _target

@@ -33,7 +33,7 @@
 # counts, value domains), and the CM_HOSTS definition-side probes. Column names are
 # vendor-schema mechanism (no data values) — classification: Internal-Public,
 # even though the real source (config/source-registry.yaml) is classification:
-# Internal. Typed accessor: drydocs/source_mappings.py.
+# Internal. Typed accessor: drydocs/review/source_mappings.py.
 #
 # Guarded (doc 08 Phase 1, BUILT 2026-07-11 — N2): coverage/census reconciliation
 # (census_failures; pending census = nothing to reconcile, a recorded census must

@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from drydocs.graph_verify import Assertion, load_suite, run_case
+from drydocs.review.graph_verify import Assertion, load_suite, run_case
 from drydocs_api.query_specs import QUERY_SPECS
 from drydocs_core.ontology.tom_role_vocabulary import load_vocabulary
 

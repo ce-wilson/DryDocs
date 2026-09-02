@@ -66,14 +66,14 @@ What diverges, by stream:
 - **Architecture decisions + modular split (NEW)** — `docs/decisions/` ADRs (0001 ontology base
   scope; 0002 component & database topology + 0002-a core-extraction plan), `MODULE_MAP.md` +
   `tests/unit/test_module_boundary.py` (the core/component boundary guard), and the
-  `SDLC-Docs/extracted/` design trail. All **clean-adds** — take FROM this repo. ADR 0002 foretells a
+  `docs/history/genesis/` design trail (moved from `SDLC-Docs/extracted/` on 2026-09-02, ADR 0018 Q3). All **clean-adds** — take FROM this repo. ADR 0002 foretells a
   structural `drydocs/ → drydocs-core` move (Phase B, **EXECUTED 2026-07-10** — thin variant per
   ADR **0002-a-1**: core is physically `drydocs_core/`, the remainder KEEPS the `drydocs` name; see the
   dedicated section below). (ADR **0002-c** — depgraph-lineage re-home — is a newer clean-add in the same set.)
 - **`drydocs-review` back-flow (NEW — REVERSE direction)** — the company-authored SME/HITL toolkit,
   reproduced here generically. **Canonical-COMPANY on collision** — keep your version. See the dedicated
   "`drydocs-review` — back-flow stream" section below.
-- **`drydocs-plan` project board (NEW — Epic I)** — `drydocs/plan_board.py` + `scripts/render_board.py`
+- **`drydocs-plan` project board (NEW — Epic I)** — `drydocs/plan/plan_board.py` + `scripts/render_board.py`
   render `backlog.yaml` (now **schema v2**) into `docs/plan/board.html`; plus the `groom-backlog` skill and
   a new `tests/unit/test_backlog.py` schema guard. All **clean-adds** — take FROM this repo. `plan_board`
   is its own `plan` component group in the boundary guard (imports core only).
@@ -92,8 +92,8 @@ What diverges, by stream:
   producer target), but the **company-side live multi-DB deploy remains a port concern**. Full
   disposition table + two-track acceptance oracle: plan §6.
 - **`seal_app_ref` attribution (Epic K) — back-flow-origin, check before taking wholesale.** Additive
-  `status: planned`/`proposed` entries in `drydocs/ontology/relationship_vocabulary.yaml` +
-  `config/taxonomy-ontology-map.yaml` (both normally Canonical-here). It was **groomed from company
+  `status: planned`/`proposed` entries in `drydocs_core/ontology/relationship_vocabulary/` (the S5 fragment directory) +
+  `config/taxonomy-ontology-map/` (both normally Canonical-here; both were single files when this was written). It was **groomed from company
   reconciliation** — the concept came FROM you. While `planned`/`proposed` it is inert (no graph impact),
   so taking the producer files is safe. **But if company `main` has already promoted `m3_seal_app_ref` to
   `active`/`confirmed` (or has a live loader), that entry is a back-flow COLLISION — keep your active
@@ -144,11 +144,11 @@ What diverges, by stream:
       (M1: `WAS_GENERATED_BY` **delta-only**, `row_checksum`) SHIPPED; Control-M loaders/cyphers +
       `base.py` are Canonical-here; `graph-tests/provenance-diet.yaml` is a back-flow seed; confidential
       source→column maps authored company-side only (one-way). **Steps 15 + 22.**
-    - **Source-governance column ledger (doc 08 / N1)** — `drydocs/source_mappings.py` (pure config
-      accessor, parked in the review boundary group) + `config/source-mappings/controlm-psgmgr.yaml`;
+    - **Source-governance column ledger (doc 08 / N1)** — `drydocs/review/source_mappings.py` (pure config
+      accessor, parked in the review boundary group) + `config/source-mappings/psgmgr.yaml` (`controlm-psgmgr.yaml` when this shipped);
       clean-adds, but the `MODULE_MAP.md` row + boundary-guard membership must travel. **Step 23.**
     - **bmc-docs lexical corpus — docmeta P0, SHIPPED & gate-accepted** — converted BMC docs →
-      `Document`→`Chunk` lexical graph (`drydocs/loaders/bmc_docs.py` + cypher + `models/docs.py`,
+      `Document`→`Chunk` lexical graph (`drydocs/loaders/bmc_docs.py` + cypher + `drydocs_core/models/docs.py`,
       `load-bmc-docs`), 4 `active` `docs_*` edges, +2 constraints. Generic loader = clean-add;
       `config/gate-prompts/bmc-docs-lexical-load.yaml` + `graph-tests/bmc-docs-lexical.yaml` are back-flow
       (Canonical-COMPANY); `gate-log.md` union. **Step 22.**
@@ -172,7 +172,7 @@ paths don't exist there yet). Take them wholesale.
 | `CLAUDE.md` | routing brain: four layers, all external refs, sub-agents, precedence | clean-add |
 | `reference/` | Tier-1 external: Neo4j/Oracle platforms + ontology standards (PROV-O, ORG, DPROD, SOSA/SSN, DCAT) + research, indexed by `REGISTRY.yaml` | clean-add |
 | `external/orchestration/` | Tier-2 external: BMC baseline (moved from `vendor/bmc-controlm/`) + AutoSys/Airflow placeholders + crosswalks | rename + clean-add |
-| `config/` | configuration layer: `precedence.yaml`, `source-registry.yaml`, `classification.yaml` (sensitivity axis), `taxonomy-ontology-map.yaml`, `taxonomy/` (Control-M + BusinessApplication + LOB→Product→Team + Oracle-schema captured) | clean-add |
+| `config/` | configuration layer: `precedence.yaml`, `source-registry.yaml`, `classification.yaml` (sensitivity axis), `taxonomy-ontology-map/`, `taxonomy/` (Control-M + BusinessApplication + LOB→Product→Team + Oracle-schema captured) | clean-add |
 | `internal/` + `PUBLISH-BOUNDARY.md` | confidential split for the private-but-sometimes-public repo | clean-add |
 | `.claude/agents/` | four sub-agents (reference-librarian, taxonomy-importer, ontology-mapper, pipeline-config) | clean-add |
 | `docs/restructure/` | conceptual model, project plan, sub-agent backlog, HITL SME flow | clean-add |
@@ -230,7 +230,7 @@ take FROM this repo.
 | `docs/decisions/0002-*.md`, `0002-a-*.md`, `0002-b-*.md`, `0002-c-*.md` | ADR 0002 — component & database topology + core-extraction plan + spinoff-rebase checklist + depgraph-lineage re-home | clean-add |
 | `MODULE_MAP.md` | the `drydocs-core` ↔ component boundary (authoritative) | clean-add |
 | `tests/unit/test_module_boundary.py` | stdlib guard enforcing the boundary (Track-1 portable, no data) | clean-add |
-| `SDLC-Docs/extracted/*.md` | design trail (feasibility, C+D adoption, issue-driven loop, modular plan) | clean-add |
+| `docs/history/genesis/*.md` | design trail (feasibility, C+D adoption, issue-driven loop, modular plan) | clean-add |
 
 **The structural path-move LANDED (ADR 0002 D3, Phase B — EXECUTED 2026-07-10, thin variant per
 ADR 0002-a-1).** Core moved physically into `drydocs_core/` (models, adapters, controlm minus the
@@ -244,7 +244,7 @@ the per-component split is Phase C). Consequences for the NEXT port range:
   disagree, the manifest wins.
 - The port-frozen `oracle_adapter.py` and the per-entry `relationship_vocabulary.yaml` moved WITH
   core: apply the rename, keep your content (see their manifest notes).
-- `drydocs/controlm/staging.py` → `drydocs/staging.py` (stays in the remainder; core's
+- the former `controlm` staging module is now `drydocs/staging.py` (stays in the remainder; core's
   `controlm/__init__` no longer re-exports it — consumer code importing the staging builder from
   `drydocs.controlm` must repoint to `drydocs.staging`).
 The boundary guard is **Track-1 portable** (pure stdlib, no sample data) — it now enforces
@@ -271,10 +271,10 @@ them the **opposite** way to everything else in this guide:
 > the real Confluence wiring (`toby_publish_confluence`), the real `review-labels.yaml`,
 > the real space coordinates, and real `SME[SID]` data. Take **company wholesale** for:
 >
-> - `drydocs/graph_review.py`, `drydocs/graph_verify.py`, `drydocs/review_labels.py`,
->   `drydocs/sme_notes.py`
-> - `drydocs/gate_pages.py` (the HITL prompt-page generator) + any generated `pages/`
-> - `drydocs/publishing/**`
+> - `drydocs/review/graph_review.py`, `drydocs/review/graph_verify.py`, `drydocs/review/review_labels.py`,
+>   `drydocs/review/sme_notes.py`
+> - `drydocs/review/gate_pages.py` (the HITL prompt-page generator) + any generated `pages/`
+> - `drydocs/review/publishing/**`
 > - `config/review-labels.yaml`, `config/gate-prompts/**`, `graph-tests/**` (seed backbone,
 >   gate-prompt specs, acceptance suites — company's real ones win)
 
@@ -292,9 +292,9 @@ what forces your company-only modules to be classified rather than silently ungu
 **2026-07-07 update — three refinements to this stream** (details: port-prompt steps
 17–18):
 
-1. **Seed-file rename (ADR 0004):** `graph-tests/vendor-bmc-smoke.yaml` →
-   `bmc-docs-smoke.yaml` and `config/gate-prompts/vendor-bmc-example.yaml` →
-   `bmc-docs-example.yaml` (ids renamed too). The producer's generic tests now assert
+1. **Seed-file rename (ADR 0004):** the two `vendor-bmc-*` seed twins became
+   `graph-tests/bmc-docs-smoke.yaml` and `config/gate-prompts/bmc-docs-example.yaml`
+   (ids renamed too). The producer's generic tests now assert
    the new names — apply the same rename to your seed twins as a deliberate
    company-side commit; your real suites/specs under other filenames are untouched.
 2. **Gate-page STANDARD format:** `gate_pages.py` gained a generic meta-card +
@@ -307,427 +307,15 @@ what forces your company-only modules to be classified rather than silently ungu
 
 ---
 
-## Commit range to apply
-
-Don't hand-maintain a hash list — it goes stale and a rebase rewrites the SHAs.
-Regenerate it instead:
-
-The deliverable lives on `main` (the `controlm-spinoff` branch is not used for the
-port). On the company side, after fetching, list the commits to apply:
-
-```
-git log --oneline --reverse cewilson/main    # full line — histories are disjoint, so all of it is "new" vs company main
-```
-
-Hashes are transferred intact by `git fetch`, so a SHA you see locally resolves
-identically on the company side once the branch is fetched. Identify commits by
-**subject**, not SHA. The Control-M normalization stream is the three commits with
-subjects **"…variable taxonomy (Phase A)…" → "…variable resolver… (Phase B)…" →
-"…Phase C command/script parser…"**, applied in that order; everything else is
-additive docs + ontology.
-
 ---
 
-# Applying this work onto `<company-org>/DryDocs` `main` (disjoint histories)
-
-There is no merge-base, so this is a cherry-pick, not a true rebase. Each path is
-either a **clean-add** (applies untouched) or a **collision** (hand-reconcile).
-
-## How the company side applies it
-
-```
-git remote add cewilson https://github.com/ce-wilson/DryDocs.git
-git fetch cewilson main
-git switch -c drydocs-port main
-git cherry-pick <oldest>^..<newest>     # range from the log command above
-```
-
-Clean-adds apply silently. Cherry-pick stops on each collision; resolve per the
-Collisions table, `git add`, then `git cherry-pick --continue`. Equivalent path:
-`git format-patch` on the producer side + `git am --3way` on the company side.
-
-> **Private-remote / no-network alternative — `git bundle`.** The producer repo is
-> PRIVATE and must not be made public (`internal/**` is tracked here, and the
-> pre-rewrite history retains the deleted seal-sample twins — both gates recorded
-> in `config/classification.yaml`). When the company side cannot fetch github.com
-> directly, transfer a bundle instead — identical fetch semantics, SHAs intact:
->
-> ```
-> # producer:
-> git bundle create drydocs-<date>.bundle main
-> git bundle verify drydocs-<date>.bundle
-> # company (after verifying the bundle + its SHA-256 from the transfer note):
-> git remote add cewilson <path-to>/drydocs-<date>.bundle
-> git fetch cewilson main
-> ```
->
-> Send through an approved internal channel only — the full history rides inside.
-> Follow-up transfers can be incremental:
-> `git bundle create drydocs-inc.bundle <last-ported>..main`. Transfer notes +
-> the formatter-convergence boundary protocol: `docs/ruff-format-convergence.md`.
-
-## Canonical-here — take this repo's version wholesale on collision
-
-For these paths, **do not hand-merge** — this repo is authoritative; replace
-`main`'s version. They are local-authored in full:
-
-- `drydocs/controlm/` — the entire normalization package (Phase A/B/C).
-- `knowledge/standards/` — every file (naming standards, governance corpus, plans).
-- `drydocs/loaders/sql/controlm_variables.sql`, `drydocs/loaders/sql/ddl/controlm_staging_ddl.sql`.
-- `drydocs/ontology/relationship_vocabulary.yaml`, `drydocs/schema/catalog_ontology_supplement.cypher`.
-- **v1 restructure — entire new top-level layout (all canonical-here, take wholesale):**
-  `CLAUDE.md`, `PUBLISH-BOUNDARY.md`, `reference/`, `external/orchestration/`, `config/`,
-  `internal/`, `.claude/agents/`, `docs/restructure/`.
-
-`drydocs/data/` is `.gitignore`d — sample CSVs stay local and never transfer.
-
-## Clean-adds — apply untouched (paths absent on company `main`)
-
-| File | Phase | Purpose |
-|---|---|---|
-| `drydocs/controlm/variables.py` | A | `VariableKind` (9 kinds) + `classify_variable()` / `classify_job_variables()` |
-| `drydocs/controlm/variable_report.py` | A | `VariableCoverage` accumulator |
-| `drydocs/loaders/sql/controlm_variables.sql` | A | Variable extract query (`psgmgr.CM_DEF_SETVAR_VW` — **name VERIFIED live 2026-07-10**; carries its own `IS_CURRENT_VERSION`, filtered `= 'Y'` — literal corrected 2026-07-15, D4) |
-| `drydocs/loaders/sql/ddl/controlm_staging_ddl.sql` | A | Full staging-layer DDL (8 STG_ tables + views) |
-| `drydocs/controlm/resolver.py` | B | Offline AutoEdit substitution engine |
-| `drydocs/controlm/staging.py` | B (ext. C) | STG_ row builder — `build_staging_bundle` / `collect_jobs` |
-| `drydocs/controlm/commands.py` | C | Shell parser + `LAUNCHER_REGISTRY` |
-| `drydocs/controlm/paths.py` | C | Path canonicalization + ref_role classification |
-| `drydocs/controlm/facts.py` | C | Fact / notification routing |
-| `docs/controlm/controlm-c3-normalization-status.md` | B (ext. C) | Status + operational runbook |
-| `tests/unit/test_variable_classifier.py` | A | |
-| `tests/unit/test_variable_resolver.py` | B | |
-| `tests/unit/test_variable_staging.py` | B (ext. C) | |
-| `tests/unit/test_command_parser.py` | C | |
-
-## Collisions — git cannot auto-merge; reconcile by hand
-
-Two kinds of row here, and they collide differently:
-
-- **Integration points** — `drydocs/cli.py`, `drydocs/models/controlm.py`,
-  `drydocs/models/__init__.py`. These are pre-existing DryDocs infrastructure, so
-  they exist on company `main` and **will** conflict — hand-merge per the column.
-- **Phase-evolution rows** — `drydocs/controlm/*.py` (`__init__.py`, `variables.py`,
-  `staging.py`, `variable_report.py`). The multi-phase tag describes how they grew
-  A→B→C *here*. They collide on the company side **only if** company `main` already
-  has a `drydocs/controlm/` package; if not, they're clean-adds. Either way they're
-  Canonical-here — take this repo's version, don't merge.
-
-With no merge-base, cherry-pick conflicts on each integration point. Resolve by
-preserving the column below.
-
-| File | Phases | What to preserve when resolving |
-|---|---|---|
-| `drydocs/controlm/__init__.py` | A, B, C | Re-exports accumulate each phase. Final `__all__` must export: `VariableKind`, `ClassifiedVariable`, `classify_variable`, `classify_job_variables`, `VariableCoverage` (A); `ResolvedVariable`, `resolve_job`, `resolve_layers` (B); `Invocation`, `FileOp`, `parse_command`, `extract_container_command`, `FileRef`, `build_file_ref`, `canonicalize_path`, `classify_role`, `route_fact`, `build_staging_bundle`, `build_staging_rows`, `collect_jobs` (C). |
-| `drydocs/cli.py` | A, B, C | Adds two commands: `analyze-variables` (A, `--resolve` flag added in B) and `normalize-variables` (B, extended in C to write 8 CSVs). Imports from `.controlm` and `.controlm.staging`. No existing command bodies changed. |
-| `drydocs/models/controlm.py` | A | Adds `ControlMVariableRow` (and an `AliasChoices` import). Existing row models untouched — conflicts here mean someone else also edited the model file. |
-| `drydocs/models/__init__.py` | A | Adds `ControlMVariableRow` to imports + `__all__`. |
-| `drydocs/controlm/variables.py` | A, B | B reworked the token grammar (system-var registry, `%%$` century syntax, global/pool refs). If you patched A's `variables.py`, reapply onto B's grammar — see the `KNOWN_SYSTEM_VARIABLES` / `KNOWN_SYSTEM_FUNCS` registries. |
-| `drydocs/controlm/staging.py` | B, C | C restructured the B builder around `StagingBundle`. `build_staging_rows` survives as a back-compat shim returning `(variable, parse_quality)`. |
-| `drydocs/controlm/variable_report.py` | A, B | B added system-var / global-ref counters. |
-
-## Load / dependency order (import-time)
-
-```
-variables.py      (no intra-package deps)
-  ├── variable_report.py   (imports variables)
-  ├── resolver.py          (imports variables: ENV_LETTER_MAP, _is_system_func/_var)
-  ├── paths.py             (standalone)
-  ├── commands.py          (standalone)
-  ├── facts.py             (imports variables)
-  └── staging.py           (imports models, commands, facts, paths, resolver, variables)
-```
-
-`__init__.py` imports `staging` last (it pulls in everything). If you split or move
-any of these, keep `staging` downstream of the rest.
-
-## Acceptance oracle — how the company side confirms the port landed
-
-The code is re-applied, not byte-compared, so behavior is the contract. The
-variable-stream tests split in two: most are **inline** (no data file) and run
-anywhere; a few read the **production sample CSV**, which is `.gitignore`d and
-does not transfer. So there are two tracks.
-
-### Track 1 — portable (any clone, no sample present)
-
-```
-poetry run pytest tests/unit/test_variable_classifier.py \
-                  tests/unit/test_variable_resolver.py \
-                  tests/unit/test_variable_staging.py \
-                  tests/unit/test_command_parser.py -q
-```
-
-Expect **86 passed, 3 skipped** — the 3 skips are the sample-backed tests
-(`test_sample_*`), which skip (not fail) when the production CSV is absent. Full
-suite `pytest tests/unit/` is green: passing + sample-skips + the 4 `test_schema.py`
-PyYAML skips. **Zero failures is the Track-1 contract.** A `FileNotFoundError` on
-`controlm_variables__sample.csv` means the skip guard was lost in the port.
-
-### Track 2 — full (production sample present, or pulled fresh from `psgmgr`)
-
-Either restore a sample at `drydocs/data/samples/controlm_variables__sample.csv`,
-or pull fresh (read-only):
-
-```
-poetry run drydocs normalize-variables --use-oracle --folder 'CCB_AUTO_%' --row-cap 5000 --out-dir stg_out
-```
-
-With the **bundled sample**, the counts are deterministic and verified
-(2026-06-18): the four-file suite is **89 passed**; `normalize-variables` emits
-jobs=82, definitions=323, `stg_variable`=326, `stg_parse_quality`=82,
-**`stg_invocation`=6, `stg_file_op`=16, `stg_file_ref`=92, `stg_notification`=14,
-`stg_app_fact`=66**, fully_resolved=86.2%.
-
-With a **fresh production pull** the counts will differ (different population) — so
-judge it on *runs clean, no `UNKNOWN` invocation leakage, plausible coverage %*,
-not the bundled numbers. Every `psgmgr` extract accepts the scope binds
-`--folder`, `--developer-sid`, and `--row-cap` (NULL = full population);
-job-bearing extracts also take `--run-as`. `--run-as` = the tenant FID/service
-user (`J.OWNER`); `--developer-sid` = the human who authored/changed the def
-(`AUTHOR`/`CREATION_USER`/`CHANGE_USERID` on jobs, `LAST_UPDATED_USER` on
-folders) — Control-M SIDs start lowercase and a trailing lowercase `p` marks the
-automation release process, not a person. Use these to keep a fresh pull small
-and targeted. (Operational *who-ran-it* identity is separate and deferred — it
-lives in the action-audit table `psgmgr.CM_AUD_ACTS`, not the definition rows.)
-
-If a Track-1 test fails (not skips), the port is incomplete — diff the failing
-area against the phase descriptions below, not against commit hashes.
-
-> **History:** before `62753b3`, six tests in `test_schema.py`,
-> `test_folder_name_parser.py`, and `test_controlm_cypher.py` failed on `main`.
-> They were **not** Control-M-stream bugs — they asserted pre-refactor behavior
-> (constraint count, the `"Group Table/Smart folder"` label, the `(folder_id,
-> name)` Condition key, the `:WAS_INFORMED_BY` edge rename, and the
-> `ontology_supplement.cypher` rename) left stale by the schema-consolidation
-> work documented below. `62753b3` realigned them to the shipped code. If you
-> are rebasing across that boundary and see these resurface, take the updated
-> assertions — do not delete the tests; they guard live code.
-
-> **Concat-dot bugfix (`89d6648`):** `resolver.py` mishandled variable names
-> containing a dot-separator (e.g. `%%SCRIPT_PATH.%%ENV`). The token boundary
-> logic was treating the dot as part of the variable name rather than a literal
-> separator, causing over-substitution. If you are rebasing Phase B work across
-> this commit, re-verify resolver output on any variables that use the
-> `name.suffix` or `prefix.%%ref` concatenation pattern — the fix changes
-> resolved values, not just parse counts.
-
----
-
-# Control-M C3/C4 normalization — current state (push TO company)
-
-Three phases below the existing job-to-job lineage, all delivered here. The company
-site has a more complete Control-M *loader* implementation, but the **normalization
-pipeline (A/B/C) was authored here** and should be pushed TO company, not pulled over.
-Do not overwrite local files under `drydocs/loaders/controlm/`,
-`drydocs/schema/ontology_supplement.cypher` (Control-M content), or the Control-M SQL
-loaders with versions from elsewhere.
-
-Architecture: **SQL extract → Python normalize → Oracle staging (`DRYDOCS_STG`,
-QA in SQL Developer) → Neo4j under PROV `:JobRun`.** Variable resolution and command
-parsing happen in Python, not recursive SQL.
-
-## Phase A — variable taxonomy + staging output (`91882df`, output side completes the phase)
-
-`VariableKind` (9 kinds, precedence order):
-
-| Kind | Description |
-|---|---|
-| `MALFORMED` | Empty / whitespace / invalid name token |
-| `EMBEDDED_SHELL` | `PRECMD` / `POSTCMD` (+ observed `POSCMD` typo) — shell text for Phase C |
-| `PLUGIN_NS` | `%%FileWatch-*`, `%%UCM-*` — routed to APPL_TYPE handler |
-| `FLOW_REF` | `%%\VAR` global / `%%\\POOL\VAR` pool — cross-job shared state, kept verbatim |
-| `DYNAMIC_NAME` | Adjacent `%%refs` compose a name at runtime — per-env expansion in B |
-| `SEMANTIC_FACT` | Fact-registry name (SEAL, FID_*, DATAFLOW...) — mined into `STG_APP_FACT` |
-| `SYSTEM_FUNC` | Only system tokens (CALCDATE/SUBSTR/GETENV/WCALC/BLANK + system vars) |
-| `VAR_REF` | References other user `%%vars` — resolved in B |
-| `LITERAL` | None of the above |
-
-Output side (`staging.py` + `normalize-variables`) writes `STG_RUN`, `STG_VARIABLE`,
-`STG_PARSE_QUALITY` with columns matching the DDL exactly. ~1.1M variable rows across
-4 DCs (~18.8K folders / ~240.6K jobs); 59% of jobs have zero variables.
-
-## Phase B — variable resolver (`520f9ca`)
-
-`resolver.py` — offline AutoEdit simulation. Sequential assignment (ordered defs,
-last binding wins, forward refs stay unresolved); longest-defined-name matching at
-each `%%` site; canonical symbolic tokens (`{ODATE}`, CALCDATE compaction `{ODATE-1}`);
-cross-pass blocked-set kills self-reference loops; env-triplet variant expansion
-(`%%SCRIPT_PATH_%%HOSTNM`); global/pool refs kept verbatim. Sample: 86% fully resolved.
-
-Vendor validation (`external/orchestration/bmc-controlm/controlm-variables.md`) corrected three things in
-`variables.py`: system variables exist without `$` (`%%ORDERID`, `%%JOBNAME`); `%%$X`
-is century-format syntax; `%%\VAR` (global) vs `%%\\POOL\VAR` (pool) both captured.
-
-## Phase C — command / script parser (`cb6e056`)
-
-Parses the executable side into the five remaining staging tables.
-
-| Module | Produces |
-|---|---|
-| `commands.py` | `STG_INVOCATION` (data-driven `LAUNCHER_REGISTRY`: `.m`→ABINITIO, `pmcmd`→INFORMATICA, `run_data_validation.sh`→VALIDATION_UTIL, `python`→PYTHON/PYSPARK, …), `STG_FILE_OP` (mkdir/cp/mv/rm/sed) |
-| `paths.py` | `STG_FILE_REF` (canonical paths, `{TS16}` wildcards, ref_role) |
-| `facts.py` | `STG_APP_FACT` + `STG_NOTIFICATION` |
-
-`normalize-variables` now writes all 8 STG_ CSVs. Sample: 6 invocations (0 UNKNOWN),
-16 file ops, 92 file refs, 14 notifications, 66 app facts.
-
-Grow `LAUNCHER_REGISTRY` (add a `(basename regex, invocation_type, rule_id)` tuple)
-as the UNKNOWN backlog reveals new launchers — that is Phase E. Vendor docs read for
-this phase: `controlm-{os-job-parameters,file-watcher,api-job-types,file-transfer-job}.md`.
-
-## Staging DDL (`controlm_staging_ddl.sql`, schema `DRYDOCS_STG`)
-
-8 tables: `STG_RUN`, `STG_VARIABLE`, `STG_PARSE_QUALITY`, `STG_INVOCATION`,
-`STG_FILE_OP`, `STG_FILE_REF`, `STG_NOTIFICATION`, `STG_APP_FACT`, plus base read views
-and `STG_COVERAGE_SUMMARY`. Surrogate identity PKs (duplicate `(job, var_name)` defs are
-legitimate). All keys carry `DATA_CENTER` (TABLE_ID may collide across the 4 DCs).
-< 3M rows / < 2 GB; no partitioning.
-
-> **RESOLVED (2026-07-10, live psgmgr check):** the variable source object is the view
-> `psgmgr.CM_DEF_SETVAR_VW`, which carries its own `IS_CURRENT_VERSION`/`VERSION_SERIAL`
-> — the extracts filter `V.IS_CURRENT_VERSION = 'Y'` so superseded variable rows do not
-> leak. The old `CM_DEF_SETVAR` name and the DBA-verify TODO are retired.
-
-See `docs/controlm/controlm-c3-normalization-status.md` for the full status + operational runbook.
-
----
-
-## Take FROM this repo → company
-
-### 1. PAT Product Ontology — `AreaProduct` node + team alignment model
-
-**Commit: `6c5b7b5`**
-
-Added `AreaProduct` (Area Product Group / Team of Teams) as an intermediate org
-level between `Product` and `DevTeam`, team type edge properties on `SUPPORTS`,
-and the full PAT human role vocabulary.
-
-| File | What was added |
-|---|---|
-| `drydocs/ontology/relationship_vocabulary.yaml` | `AreaProduct` node classification + 6 new local relationships |
-| `drydocs/schema/catalog_ontology_supplement.cypher` | `AreaProduct` LocalClass, 5 LocalRelationship declarations, all 31 Role seeds |
-| `drydocs/schema/constraints.cypher` | `area_product_id` uniqueness constraint |
-| `drydocs/schema/schema_graph.cypher` | `AreaProduct` SchemaMeta node + 6 relationship MATCH/MERGE blocks |
-| `drydocs/models/catalog.py` | `AreaProductRow`, `PatProductMappingRow`, `PatTeamRoleRow` Pydantic models |
-| `drydocs/loaders/catalog.py` | `AreaProductsLoader`, `PatProductMappingLoader`, `PatTeamRolesLoader` |
-| `drydocs/loaders/cypher/area_products.cypher` | MERGE AreaProduct + HAS_AREA_PRODUCT to parent Product |
-| `drydocs/loaders/cypher/pat_product_mapping.cypher` | HAS_APPLICATION (Product→Application) + SUPPORTS edges |
-| `drydocs/loaders/cypher/pat_team_roles.cypher` | DevTeam HAS_MEMBERSHIP n-ary pattern |
-| `drydocs/models/seal.py` | Added `"tech partner": "CTO"` to `_ROLE_CANONICAL` |
-| `knowledge/ontology/NODE_QUICK_REFERENCE.md` | `AreaProduct` row in Catalog (active) table (rehomed from `docs/` — see the "Newer streams" note above) |
-| `knowledge/org/` | `product-overview.md`, `technology-team-types.md`, `technology-roles-and-responsibilities.md`, `org-quad-chart.mmd` (relocated from `docs/Product/` at S14, 2026-08-27; kebab-case at the move) |
-
-**New graph topology:**
-```
-Product -[:HAS_APPLICATION]-> Application
-Product -[:HAS_AREA_PRODUCT]-> AreaProduct -[:HAS_DEV_TEAM]-> DevTeam
-DevTeam -[:SUPPORTS {team_type, sponsored}]-> Product | AreaProduct
-DevTeam -[:HAS_MEMBERSHIP]-> Membership -[:OF_ROLE]-> Role -[:HELD_BY]-> Employee
-```
-
-- `team_type` on `SUPPORTS`: `aligned` | `flex` | `dedicated` (edge property, not node property)
-- `sponsored: bool` on `SUPPORTS`: edge property, not a separate relationship type
-- 31 Role nodes seeded — all MERGE on `name` to match how SEAL loaders MATCH roles at runtime
-
-**Key alias added to `models/seal.py`:**
-PAT calls the application-level tech lead "Tech Partner"; SEAL calls it "CTO".
-Without this alias, PAT contact data fails role canonicalization.
-
-### 2. `.gitignore` — exclude sample data
-
-`drydocs/data/` is now ignored. Sample CSVs stay local and off-repo.
-Apply this if the company repo is also tracking sample files you want to stop committing.
-
----
-
-## Schema consolidation — evaluate against company baseline
-
-These changes clean up patch files that existed because the M0 seed was stale.
-The company site may have already fixed this differently — review each change before applying.
-
-### Deleted files (absorbed elsewhere)
-
-| Deleted | Content moved to |
-|---|---|
-| `drydocs/schema/m3_constraints_upgrade.cypher` | `drydocs/schema/constraints.cypher` |
-| `drydocs/schema/m1_role_vocabulary_update.cypher` | Eliminated — roles now seeded correctly from the start in `catalog_ontology_supplement.cypher` |
-| `drydocs/schema/m3_ontology_supplement.cypher` | Renamed to `drydocs/schema/ontology_supplement.cypher` |
-
-### `constraints.cypher` — Control-M key corrections
-
-The M3 draft used incorrect composite keys (included `version_serial` and `cyclic_type`).
-Corrected to natural keys; loaders filter `IS_CURRENT_VERSION='Y'` so one canonical node per logical entity:
-
-```cypher
--- OLD (wrong)
-CREATE CONSTRAINT controlmjob_key FOR (j:ControlMJob) REQUIRE (j.job_id, j.version_serial) IS NODE KEY;
-CREATE CONSTRAINT condition_key   FOR (c:Condition)   REQUIRE (c.folder_id, c.name, c.cyclic_type) IS NODE KEY;
-
--- NEW (correct)
-DROP CONSTRAINT controlmjob_key IF EXISTS;
-CREATE CONSTRAINT controlmjob_key FOR (j:ControlMJob) REQUIRE (j.folder_id, j.job_id) IS NODE KEY;
-DROP CONSTRAINT condition_key IF EXISTS;
-CREATE CONSTRAINT condition_key   FOR (c:Condition)   REQUIRE (c.folder_id, c.name) IS NODE KEY;
-```
-
-### `ontology.cypher` — stale M0 role seeds removed
-
-The original M0 seed had 8 stale Role nodes with wrong names (`"App Owner"`,
-`"Agility Lead"`, `"Product Contact"`, etc.). These were removed. If the company
-site still has them, the correct nodes from `catalog_ontology_supplement.cypher`
-will coexist alongside the stale ones. Clean up stale nodes only if no
-memberships reference them:
-
-```cypher
-MATCH (r:Role) WHERE r.name IN ['App Owner', 'Agility Lead', 'Product Contact']
-AND NOT EXISTS { MATCH ()-[:OF_ROLE]->(r) }
-DELETE r;
-```
-
-### `cli.py` — command rename
-
-| Old | New |
-|---|---|
-| `apply-m3-supplement` | `apply-ontology-supplement` |
-
-Stale constants removed: `M1_ROLE_VOCAB_UPGRADE`, `M3_SUPPLEMENT_FILE`, `M3_CONSTRAINTS_UPGRADE`.
-Added: `ONTOLOGY_SUPPLEMENT_FILE`, `SOSA_SUPPLEMENT_FILE` (+ `apply-sosa-supplement` command — see
-below). Also fixed: `m3-verify` Cypher used `RUNS_ON` (now `SCHEDULED_ON`).
-
-### Context graph — SOSA/SSN (EXPERIMENTAL / early adoption, clean-add)
-
-Seeds the layer-4 observation/temporal vocabulary. SOSA/SSN is a W3C standard but **not a
-declared *company* standard**, so it is deliberately fenced off from the production model and
-every term carries `adoption:"experimental"`. All paths are **clean-adds / additive** — take
-FROM this repo. Files touched:
-
-| Path | Change |
-|---|---|
-| `drydocs/schema/sosa_experimental_supplement.cypher` | NEW — seeds 6 `sosa:` classes + 6 properties, `:CAN_ACT_AS` role wiring (ControlMJob/ControlMFolder → `sosa:FeatureOfInterest`), 4 `LocalRelationship`→`MAPS_TO`→`sosa:*` edges. Opt-in only. |
-| `drydocs/ontology/namespaces.py` | + `sosa` / `ssn` prefixes (note trailing `/`, not `#`) |
-| `drydocs/ontology/relationship_vocabulary.yaml` | + 4 SOSA node classes & 4 relationships (`domain: context`, `status: planned`); new `sosa_maps_to` field; `domain` enum gains `context` |
-| `config/taxonomy-ontology-map.yaml` | `jobrun-observation` unblocked + `adoption: experimental` |
-| `reference/standards/README.md` + `reference/REGISTRY.yaml` | standards split into **Declared/Adopted** vs **Experimental/Early-Adoption**; SOSA tagged `adoption: experimental` |
-| `drydocs/cli.py` | + `apply-sosa-supplement` (opt-in; NOT in bootstrap) |
-| `tests/unit/test_namespaces.py` | + sosa/ssn prefix + trailing-slash expand assertions |
-
-Promotion to **Declared/Adopted** happens only after the SME confirms the `jobrun-observation`
-mapping through the HITL gate (backlog Epic E); the `ontology-mapper` owns that step. No instance
-data (Observations/Sensors/Results) is loaded — that is the gated context-graph pilot (E2).
-
-### Bootstrap order (authoritative)
-
-```
-1. constraints.cypher
-2. ontology.cypher
-3. ontology_supplement.cypher         (was m3_ontology_supplement.cypher)
-4. seal_ontology_supplement.cypher
-5. catalog_ontology_supplement.cypher  (owns all 31 Role seeds)
-
-Optional / experimental — NOT part of `drydocs bootstrap`:
-6. sosa_experimental_supplement.cypher  (run via `drydocs apply-sosa-supplement`)
-```
-
-> Note: step 6's `:CAN_ACT_AS` role edges MATCH the Control-M anchors from step 3, so apply it
-> after the backbone exists. On a graph without the backbone it lands the self-contained terms
-> but silently no-ops the role wiring (re-run after bootstrap — idempotent).
+## Where the rest of this guide went
+
+The apply instructions that used to follow here — the commit range, the canonical-here /
+clean-add / collision lists, the Control-M C3/C4 phase tables, the PAT ontology and SOSA
+deltas, the bootstrap order — were the July 2026 port guide. They are superseded by
+[`docs/port/port-prompt.md`](docs/port/port-prompt.md) (the rolling ledger and the
+disposition-led apply section) and [`PORT-MANIFEST.yaml`](PORT-MANIFEST.yaml) (the rows), and
+kept as a record at
+[`docs/history/git-readme-port-guide-2026-07.md`](docs/history/git-readme-port-guide-2026-07.md).
+This file is the WHY guide for the cross-repo model; the port-prompt is the HOW.

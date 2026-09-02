@@ -7,7 +7,7 @@ phase: 6
 agent: main
 model: fable
 priority: p1
-status: todo
+status: done
 depends_on:
 - CORE1
 inputs:
@@ -16,6 +16,32 @@ inputs:
 - MODULE_MAP.md
 - docs/restructure/01-project-plan.md
 - docs/restructure/backlog/plan.yaml
-- SDLC-Docs/extracted
+- docs/history/genesis
 acceptance: |
-  STUB - minted 2026-09-02 under ADR 0018 D3/D5 and the Q2/Q3 rulings; body follows.
+  ADR 0018 D3/D5 and the Q2/Q3 rulings (2026-09-02).
+
+  (a) OWNERSHIP: every tracked top-level directory names its owning module through
+  drydocs_core.component_map.SURFACE_OWNERS, rendered into MODULE_MAP.md's component-map
+  section and guarded (test_module_boundary: every top-level directory has an owner;
+  SURFACE_OWNERS names registered modules and real directories). graph-tests -> review,
+  drydocs-icons -> web, knowledge/upgrade-plans -> docs, libs -> drydocs-libs (Q1).
+  (b) SDLC-Docs/extracted -> docs/history/genesis/ (Q3), six files as they were, lowercase
+  path, module docs; the orphan trailing fence in issue-driven-capture-loop.md removed
+  (docs/** is never carved out of the fence guard); references repointed in live files, the
+  manifest row dropped (docs/history/** covers it), ONT1's input repointed.
+  (c) THE ROUTING-DOC PATH GUARD: CLAUDE.md, MODULE_MAP.md, git-readme.md and
+  internal/repo-README.md join test_runbook_currency's document set - every backticked
+  repo-relative path resolves, verbs are registered - with a reason each.
+  (d) THE git-readme SWEEP under that guard: the July 2026 port-apply half (the commit range,
+  the canonical-here / clean-add / collision lists, the C3/C4 phase tables, the PAT and SOSA
+  deltas, the bootstrap order - 425 lines) moved to docs/history/git-readme-port-guide-2026-07.md
+  as a superseded record; the kept WHY guide's current-tense paths fixed (the S5 fragment
+  directory, the taxonomy-ontology-map directory, psgmgr.yaml, drydocs_core/models/docs.py,
+  the bmc-docs seed names); a closing section says where the rest went. MODULE_MAP's five
+  stale mentions reworded.
+  (e) 01-project-plan.md CUT AND LINKED (Q2): the six phase sections and the sequencing
+  diagram are gone; the file keeps the goal, the founding shape in one paragraph, the
+  carry-over and the definition of done, and points at plan.yaml / roadmap.html for the 18
+  phases. CLAUDE.md's last line says so.
+notes: |
+  DONE 2026-09-02 (desktop, feat/component-subpackages).

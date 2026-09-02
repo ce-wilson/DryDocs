@@ -12,7 +12,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from drydocs.plan_ideas import (
+from drydocs.docgen.plan_ideas import (
     DEFAULT_IDEAS_OUT_PATH,
     DEFAULT_IDEAS_PATH,
     render_ideas,

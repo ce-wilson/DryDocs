@@ -74,6 +74,17 @@ MODULE_EXEMPT: dict[str, str] = {
         "placeholder — no package. The board renderer is scripts/render_board.py, "
         "operated by the CLAUDE.md §0 session ritual, not by a module runbook"
     ),
+    "drydocs-port": (
+        "tooling, not an operable component — the J41 preflight, the J42 backlog union and "
+        "the J72 rename detector are operated by the reconcile-port skill and the port "
+        "ritual (docs/port/port-prompt.md), which ARE its runbook. Registered as a module "
+        "at ADR 0018 D2 (2026-09-02) so port work has an id series (PORT)"
+    ),
+    "drydocs-libs": (
+        "standalone drop-in helpers beside the product, not a part of it (ADR 0018 Q1, "
+        "2026-09-02: a server deployment is configured differently and never calls them). "
+        "libs/oracle_kerberos/ carries its own guide; nothing here has a chain to operate"
+    ),
     "drydocs-deepdoc": (
         "placeholder — 3 files / ~86 lines of seed code, no CLI verb and no importer "
         "anywhere in drydocs/ or drydocs_core/, so there is no operable surface yet. "

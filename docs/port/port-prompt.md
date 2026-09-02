@@ -1912,6 +1912,60 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   because it is regenerated from everything before it. Worth saying in the record so the
   next apply starts from classes, not directories.
 
+- **RELAY-23 — FOUR FLAT COMPONENTS BECAME SUBPACKAGES; APPLY IT AS ONE CARVED SLICE OF
+  RENAMES, YOUR CONTENT FIRST, THE SHIMS SECOND** (new 2026-09-02; ADR 0018 D4 as amended
+  at acceptance — the SME ruled "take the hit now, carve that into the sole port").
+  `[VERIFIED-PRODUCER]` for the move and the shims (3,071 unit tests green on the moved
+  tree); `[SME-REPORTED]` for the ruling.
+  **WHAT MOVED.** Eighteen modules and one package left the flat `drydocs/` root for four
+  subpackages, keeping their basenames: `drydocs/review/` (graph_verify, review_labels,
+  source_mappings, graph_review, sme_notes, gate_pages, fid_census, run_as_detect, and the
+  `publishing/` package), `drydocs/plan/` (plan_board, plan_roadmap), `drydocs/port/`
+  (port_preflight, port_backlog_union, port_rename_detect), `drydocs/docgen/` (doc_outline,
+  design_doc, doc_pdf, plan_ideas). `load` stays the package root. Every old path is now a
+  one-line `sys.modules` re-export SHIM — `drydocs.gate_pages` and
+  `drydocs.review.gate_pages` are the SAME module object, so every old import, patch
+  target and citation still resolves — for ONE port cycle; the shims retire at the roll
+  after next, and the manifest rows that pin them go with them.
+  **WHY IT IS ONE SLICE AND WHERE IT SITS.** It touches no vocabulary and no config value,
+  so it sits between the range's classes and the vocabulary migration (workplan chunks 4
+  and 5, `docs/reviews/port-test-review-and-workplan-2026-09-02.md`). `git diff -M
+  --diff-filter=R --name-status port-base-20260901..<next base> -- drydocs/` reproduces
+  the rename set exactly, with similarity 100 on every row; `scripts/port_rename_check.py`
+  reports the same pairs. Do not let the eighteen old paths classify as clean-adds of the
+  shims while the new paths classify as clean-adds of the modules — that is the J72 trap
+  with the sign flipped, and it would leave you two copies of every module.
+  **THE ORDER, and it is the RELAY-21 distinction again — names versus content.** Six of
+  the moved paths are `canonical-company` (the five review modules and `publishing/**`):
+  YOUR files carry the real wiring and the producer's are templates. The manifest rows now
+  name the NEW paths for that content. So: (1) `git mv` YOUR six files to their subpackage
+  paths — content moves, nothing crosses; (2) THEN take the producer's shims at the old
+  paths, which the manifest pins `canonical-producer` with a note saying exactly this;
+  (3) take the twelve plan/port/docgen modules at their new paths as ordinary
+  `default_ok` producer code (you hold producer copies; `evaluate` resolves to "take" unless
+  you extended one — the D-slice `cli.py` merge is the only place you did, and `cli.py`
+  did not move); (4) take the four `__init__.py` files and `drydocs_core/component_map.py`
+  (canonical-producer — it is the declaration the boundary test now imports, ADR 0018 D1).
+  A shim taken BEFORE step 1 overwrites your wiring with an alias to a file that is not
+  there yet.
+  **WHAT ELSE CROSSES WITH IT, all mechanism:** the boundary test imports the map and gains
+  four join guards (every group names a `modules.yaml` module; the registry is exactly
+  core + groups + the declared non-Python set; every top-level directory has an owner);
+  `modules.yaml` registers `drydocs-port` (series `PORT`) and `drydocs-libs` (`LIBS`) with
+  runbook-coverage exemptions and roadmap judgments — `modules.yaml` is per-entry, union
+  by name; `MODULE_MAP.md` gains a RENDERED component-map section between
+  `<!-- component-map:begin/end -->` markers (`scripts/render_module_map.py`,
+  `test_module_map_render.py` fails on drift — regenerate, never carry, J43; the hand tables
+  around it are per-entry as before); PORT-MANIFEST rows for the six canonical-company
+  paths now name the new paths, and nineteen shim rows pin the old ones; every guard
+  declaration in `config/**` that named a moved module by path (`review_labels.py`,
+  `source_mappings.py`, `fid_census.py`, `design_doc.py` in the gate prompts, source
+  mappings and `review-labels.yaml`) names the new path — those are per-entry files, so
+  the path string moves inside YOUR entry, not by taking the producer's file.
+  **THE ONE THING THAT DID NOT MOVE ON PURPOSE:** `drydocs/cli.py` and the six `cli_*.py`
+  command modules stay at the root (they ARE the load component's root, and your `cli.py`
+  is a surgical merge — Idea-241). Nothing in this relay touches them.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has

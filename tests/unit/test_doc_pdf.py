@@ -1,11 +1,11 @@
-"""Tests for drydocs.doc_pdf — the pure helpers (browser discovery, date normalization,
+"""Tests for drydocs.docgen.doc_pdf — the pure helpers (browser discovery, date normalization,
 flag construction). The actual headless render (html_to_pdf) shells out to a browser and
 is exercised manually / in the L4 run, not in unit tests.
 """
 
 from __future__ import annotations
 
-from drydocs.doc_pdf import find_browser, normalize_pdf_bytes, print_flags
+from drydocs.docgen.doc_pdf import find_browser, normalize_pdf_bytes, print_flags
 
 
 def test_find_browser_prefers_existing(tmp_path) -> None:

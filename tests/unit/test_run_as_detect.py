@@ -12,7 +12,7 @@ import json
 
 import pytest
 
-from drydocs.run_as_detect import (
+from drydocs.review.run_as_detect import (
     CLASS_APPLICATION,
     CLASS_PLATFORM,
     CLASS_UNRESOLVABLE,

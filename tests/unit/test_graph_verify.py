@@ -1,4 +1,4 @@
-"""Unit tests for graph_verify (drydocs/graph_verify.py).
+"""Unit tests for graph_verify (drydocs/review/graph_verify.py).
 
 The loader + evaluator are pure/offline, so these run with no Neo4j. The graph
 runner is exercised with a tiny fake that returns canned rows.
@@ -10,7 +10,7 @@ from typing import Any
 
 import pytest
 
-from drydocs.graph_verify import (
+from drydocs.review.graph_verify import (
     DEFAULT_GRAPH_TESTS_DIR,
     Assertion,
     GraphVerifyError,
@@ -22,7 +22,7 @@ from drydocs.graph_verify import (
     run_suite,
     unknown_targets,
 )
-from drydocs.review_labels import ReviewLabels
+from drydocs.review.review_labels import ReviewLabels
 
 
 # ---- evaluator (pure) -----------------------------------------------------
@@ -122,7 +122,7 @@ def test_run_suite_failure_exit_one() -> None:
 
 
 def _mini_suite() -> Suite:
-    from drydocs.graph_verify import Case
+    from drydocs.review.graph_verify import Case
 
     return Suite(
         name="mini",

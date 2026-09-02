@@ -10,7 +10,7 @@ consumer tree exists.
 
 from __future__ import annotations
 
-from drydocs.port_rename_detect import (
+from drydocs.port.port_rename_detect import (
     MAX_MATCHES_PER_ADD,
     SIMILARITY_FLOOR,
     compare,

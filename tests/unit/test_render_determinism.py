@@ -148,14 +148,15 @@ def test_the_matrix_renderer_orders_a_mixed_case_directory_by_string() -> None:
 
 #: Modules that write a COMMITTED surface. Repo-relative.
 COMMITTED_SURFACE_WRITERS = (
-    "drydocs/plan_board.py",
-    "drydocs/plan_ideas.py",
-    "drydocs/plan_roadmap.py",
-    "drydocs/design_doc.py",
+    "drydocs/plan/plan_board.py",
+    "drydocs/docgen/plan_ideas.py",
+    "drydocs/plan/plan_roadmap.py",
+    "drydocs/docgen/design_doc.py",
     "scripts/render_context_types.py",
     "scripts/render_enforcement_matrix.py",
     "scripts/render_gates.py",
     "scripts/render_load_map.py",
+    "scripts/render_module_map.py",  # MODULE_MAP.md component-map section (ADR 0018 D1)
     "scripts/render_remediation_diff.py",
     "scripts/render_software_registry.py",
     "knowledge/depgraph-snapshots/filter_ignored.py",

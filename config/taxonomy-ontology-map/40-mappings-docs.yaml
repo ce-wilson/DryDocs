@@ -56,7 +56,7 @@
     capture: >
       waived — the classification source is docs/design/templates/tdd.outline.yaml (schema
       drydocs.doc-outline.v1, the traceability-matrix block definition) and
-      docs/design/feedback/README.md (schema drydocs.design_doc.feedback_yaml); neither is a
+      docs/design/feedback/README.md (schema drydocs.docgen.design_doc.feedback_yaml); neither is a
       config/taxonomy/ import, so no capture file exists in that directory for design-doc
       structure — the taxonomy-first gap this field records rather than hides (same
       disposition as job-seal-app-ref / seal-tom-attribution).

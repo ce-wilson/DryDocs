@@ -21,7 +21,7 @@ from pathlib import Path
 
 import pytest
 
-from drydocs.port_backlog_union import (
+from drydocs.port.port_backlog_union import (
     UNION_EXCLUSIONS,
     BacklogUnionError,
     compare,

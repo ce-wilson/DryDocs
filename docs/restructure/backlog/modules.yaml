@@ -11,6 +11,8 @@ modules:
 - drydocs-api
 - drydocs-agents
 - drydocs-docmeta
+- drydocs-port
+- drydocs-libs
 - reference
 - taxonomy
 - ontology
@@ -41,6 +43,8 @@ series:
   drydocs-api: API
   drydocs-agents: AGENT
   drydocs-docmeta: META
+  drydocs-port: PORT
+  drydocs-libs: LIBS
   reference: REF
   taxonomy: TAX
   ontology: ONT

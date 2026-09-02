@@ -22,7 +22,7 @@ constraint but is exactly what ``db.schema.visualization()`` reads, so the answe
 is a separate database whose constraints describe LABELS, not job rows.
 
 House pattern: the same deterministic committed-render-matches-source idiom as the
-plan board (``drydocs.plan_board`` + ``scripts/render_board.py``). Thin CLI:
+plan board (``drydocs.plan.plan_board`` + ``scripts/render_board.py``). Thin CLI:
 ``scripts/render_schema_graph.py``. Drift guard: ``tests/unit/test_schema_graph.py``
 re-renders the vocabulary in-memory and fails when the committed file drifts.
 Rendering is deterministic — same vocabulary in, byte-identical Cypher out; no

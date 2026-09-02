@@ -103,7 +103,7 @@ def main(argv: list[str] | None = None) -> int:
         text = _EXTRACTORS[f.suffix.lower()](f)
         target = out_dir / (f.name + ".txt")
         # J49: LF — extracted text is diffed against re-extractions; the tracked
-        # SDLC-Docs/extracted/*.md predate this script and are not its output.
+        # docs/history/genesis/*.md (formerly SDLC-Docs/extracted/) predate this script and are not its output.
         target.write_text(text, encoding="utf-8", newline="\n")
         print(f"wrote {target}  ({len(text):,} chars)")
     return 0

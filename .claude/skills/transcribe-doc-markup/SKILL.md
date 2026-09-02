@@ -7,13 +7,13 @@ description: Turn a scanned/photographed, hand-annotated design-doc printout int
 
 **The mental model (`docs/design/feedback/README.md`):** two loops produce the SAME
 anchor-keyed YAML. The **digital** loop (L5) is a save-button on the `.html` that exports
-`{anchor, note}` pairs via `drydocs.design_doc.feedback_yaml`. This skill is the **paper**
+`{anchor, note}` pairs via `drydocs.docgen.design_doc.feedback_yaml`. This skill is the **paper**
 loop (L6): a printed page gets marked up by pen, scanned, and this procedure re-attaches
 each pen note to the same stable anchor — using the SAME `feedback_yaml` emitter, so L7
 ingests both loops identically. **Never hand-write the YAML from memory** — always drive it
 through `feedback_yaml`, exactly like the digital loop's clipboard export does.
 
-**Why this works at all:** `drydocs/design_doc.py` renders every anchored section's stable
+**Why this works at all:** `drydocs/docgen/design_doc.py` renders every anchored section's stable
 id into the page's left margin gutter — the tag ships in the doc's single `.html` and its
 `@media print` sheet shows it on paper only (L13; `_inject_margin_anchors`,
 `.dd-margin-tag` CSS) — plus a `Rev N · commit <hash>` footer on
@@ -51,7 +51,7 @@ the transcription is faithful before step 2.
 Match each confirmed transcribed note to its section anchor:
 
 - **Normal case:** the note already carries the margin tag text it was written next to —
-  that IS the anchor id (`drydocs/design_doc.py`'s gutter tag and the doc's
+  that IS the anchor id (`drydocs/docgen/design_doc.py`'s gutter tag and the doc's
   `<!-- anchor: id --> ` comments are the same namespace). Use it directly.
 - **Tag cropped/illegible in the scan:** infer from the visible heading text and confirm
   with the user — never silently invent an anchor id.
@@ -68,7 +68,7 @@ Build the `{anchor: note}` mapping from the confirmed, keyed notes and pass it t
 mirrors byte-for-byte:
 
 ```python
-from drydocs.design_doc import feedback_yaml
+from drydocs.docgen.design_doc import feedback_yaml
 
 notes = {
     "traceability-matrix": "FR-CMI-003 row cites the wrong design section -- should be design-data-mapping",
@@ -136,7 +136,7 @@ decision (transcribing the feedback is not the same as resolving it).
   alone.
 - `<N>` is the Rev **on the scanned page**, not necessarily the doc's current Rev — a scan
   can be transcribed well after the doc has moved on to a later Rev.
-- If `drydocs/design_doc.py` hasn't been re-rendered since the doc's `.md` last changed,
+- If `drydocs/docgen/design_doc.py` hasn't been re-rendered since the doc's `.md` last changed,
   the margin tags on a fresh printout may not match an old scan — always print a current
   render before annotating (`python scripts/render_design_doc.py docs/design/<doc>.md`,
   then `python scripts/doc_to_pdf.py docs/design/<doc>.html` if a physical printout

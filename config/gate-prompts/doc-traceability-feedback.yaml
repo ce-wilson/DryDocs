@@ -55,7 +55,7 @@ summary: >
   every confirmation below is ticked and logged to config/gate-log.md.
 meta:
   Module: "drydocs-core (ontology)"
-  Source: "docs/design/templates/tdd.outline.yaml (schema drydocs.doc-outline.v1, the traceability-matrix block definition) + docs/design/feedback/README.md (schema drydocs.design_doc.feedback_yaml) + the worked examples docs/design/controlm-ingestion-tdd.md and docs/design/feedback/drydocs-startup-refresh-runbook-rev1.yaml"
+  Source: "docs/design/templates/tdd.outline.yaml (schema drydocs.doc-outline.v1, the traceability-matrix block definition) + docs/design/feedback/README.md (schema drydocs.docgen.design_doc.feedback_yaml) + the worked examples docs/design/controlm-ingestion-tdd.md and docs/design/feedback/drydocs-startup-refresh-runbook-rev1.yaml"
   Registry ref: "No config/source-registry.yaml entry — design docs are repo-native content (docs/design/), not an external/ingested source; see capture disposition below"
   Classification: "Internal-Public (this page, mechanism only, and the tdd.outline.yaml template itself) · an individual design doc or feedback file inherits its OWN classification per docs/design/feedback/README.md ('keep confidential notes in internal/') — never assumed Internal-Public by default"
   Taxonomy: "None — no config/taxonomy/ capture file exists for design-doc structure (the classification source is the outline/feedback schema files themselves, not a config/taxonomy/ import). See capture disposition in the map entry."
@@ -94,7 +94,7 @@ mapping:
 
 provenance:
   - label: "node_classifications#DesignDoc / #DocSection / #Requirement / #Component / #TestCase / #FeedbackNote (relationship_vocabulary.yaml)"
-    source_object: "docs/design/templates/tdd.outline.yaml (sections/subsections, traceability: block) + docs/design/feedback/README.md (feedback_yaml format) + drydocs/doc_outline.py (ANCHOR_RE, feedback_anchor_valid)"
+    source_object: "docs/design/templates/tdd.outline.yaml (sections/subsections, traceability: block) + docs/design/feedback/README.md (feedback_yaml format) + drydocs/docgen/doc_outline.py (ANCHOR_RE, feedback_anchor_valid)"
     key: "SOURCE-NAMESPACED throughout (SaaS reframe — no single-repo assumption): DesignDoc (origin, doc_id) ; DocSection (origin, doc_id, anchor) ; Requirement (origin, requirement_id) ; Component (origin, ref) — same-basename ambiguity within one origin stays an SME-merge case ; TestCase (origin, ref) ; FeedbackNote has no independent key (one per anchor per feedback-file row within its origin). Connector #1 sets origin = drydocs-design-docs, doc_id = filename stem"
     loader: "~ (none yet — proposal only, no loader exists)"
     properties:
@@ -107,7 +107,7 @@ provenance:
     key: "the row's requirement id (loose format today) + the design-section / component / test cell text"
     loader: "~ (none yet — proposal only, no loader exists)"
     properties:
-      - {name: design_section_cell, origin: source, from: "matrix column 'design-section anchor' — must cite a known outline anchor (drydocs/doc_outline.py check())", note: "resolves to the SPECIFIED_IN target DocSection"}
+      - {name: design_section_cell, origin: source, from: "matrix column 'design-section anchor' — must cite a known outline anchor (drydocs/docgen/doc_outline.py check())", note: "resolves to the SPECIFIED_IN target DocSection"}
       - {name: component_cell, origin: source, from: "matrix column 'component/module' — free-text file/module/CLI-command citation", note: "resolves to the IMPLEMENTED_BY target Component; Component identity keying is an open question, section D"}
       - {name: test_cell, origin: source, from: "matrix column 'test/verify' — free-text pytest id / m3-verify check / gate name / graph-tests file", note: "resolves to the VERIFIED_BY target TestCase; heterogeneous citation kinds, section D"}
 

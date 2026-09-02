@@ -15,7 +15,7 @@ via the guided gate (`docs/restructure/03-hitl-sme-flow.md`).
 | [`taxonomy-ontology-map.yaml`](taxonomy-ontology-map.yaml) | The HITL-confirmed bindings: "this imported taxonomy → apply this ontology rule." |
 | `taxonomy/` | Imported raw hierarchies (apps, products, schemas, scripts, variables, LOB→Product→Team) as **pure classification** — no meaning-bearing edges yet. |
 | [`gate-log.md`](gate-log.md) | **Append-only** record of every HITL gate decision. |
-| `gate-prompts/` | SME gate-prompt specs (`drydocs.gate-prompt.v1`) — one per pending/decided gate; rendered to interactive gate pages by `drydocs/gate_pages.py`. |
+| `gate-prompts/` | SME gate-prompt specs (`drydocs.gate-prompt.v1`) — one per pending/decided gate; rendered to interactive gate pages by `drydocs/review/gate_pages.py`. |
 | `source-mappings/` | Per-source column ledgers (doc 08): every profiled column → projected / filter-only / excluded / deferred, with census reconciliation. |
 | `crosswalks/` | Orchestrator vendor→baseline term crosswalks (BMC is the baseline). |
 | `manual-loads/` | SME-authored CSV mappings — the tier-5 manual final option (manifest-gated). |

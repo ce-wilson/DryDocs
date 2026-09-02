@@ -663,7 +663,7 @@ node_classifications:
       ACTIVE (L7, gate doc-traceability-feedback signed off 2026-07-20, config/gate-log.md). One AUTHORED section of a DesignDoc, keyed
       (origin, doc_id, anchor) — the stable anchor id namespace the source connector
       guarantees. Carries anchor, heading, required. Connector #1: the
-      `<!-- anchor: id -->` ids (drydocs/doc_outline.py ANCHOR_RE) plus L11
+      `<!-- anchor: id -->` ids (drydocs/docgen/doc_outline.py ANCHOR_RE) plus L11
       content-derived subsection ids (`<authored-anchor>--<subsection-slug>`). Distinct
       from :Chunk (ingested/H2-chunked) per the managed-vs-ingested boundary. DocSection
       is the shared target of both traceability (Requirement -[:SPECIFIED_IN]->) and
@@ -728,7 +728,7 @@ node_classifications:
       (open|applied|rejected|superseded — the drydocs-startup-refresh-runbook rev1 ->
       Rev 2 loop is the worked precedent: notes were APPLIED and the doc says so).
       Connector #1: docs/design/feedback/<doc_id>-rev<N>.yaml rows (schema
-      drydocs.design_doc.feedback_yaml), doc_rev parsed from the filename. prov:Entity
+      drydocs.docgen.design_doc.feedback_yaml), doc_rev parsed from the filename. prov:Entity
       per the docs_describes "aboutness" precedent (an annotation is not a derivation
       of its target); W3C Web Annotation (oa:) alignment flagged in gate section D —
       heavier under the SaaS lens (annotation export/interop), still deferred.

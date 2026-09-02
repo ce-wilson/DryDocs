@@ -1,5 +1,5 @@
 """Control-M variable / command-line staging commands: export-cmdline-staging, parse-cmdline-staging, analyze-variables, normalize-variables. (resolve-cmdline-staging and fid-census stay in the root: they wire
-drydocs_lineage / drydocs.fid_census, and only the root may.)
+drydocs_lineage / drydocs.review.fid_census, and only the root may.)
 
 S8 (2026-08-21): split out of drydocs/cli.py. The root stays the composition
 root and the only module that may wire other components; this module holds

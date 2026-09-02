@@ -27,5 +27,5 @@ an agent can safely inspect and classify unattended.
 ## Naming
 
 `<doc-id>-rev<N>-scan<M>.<ext>` (e.g. `controlm-ingestion-tdd-rev3-scan1.pdf`) — `<N>` is
-the Rev printed in the page footer (`drydocs/design_doc.py:doc_rev_footer`) at the time it
+the Rev printed in the page footer (`drydocs/docgen/design_doc.py:doc_rev_footer`) at the time it
 was annotated, so a scan and its transcription can be matched back up.

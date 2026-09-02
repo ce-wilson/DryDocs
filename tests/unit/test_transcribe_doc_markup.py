@@ -1,7 +1,7 @@
 """Tests for the L6 paper-HITL loop's transcription -> feedback-yaml step (Epic L / L6).
 
 transcribe-doc-markup (.claude/skills/transcribe-doc-markup/SKILL.md) is a PROCEDURE, not
-new production code — its final step reuses ``drydocs.design_doc.feedback_yaml``, the same
+new production code — its final step reuses ``drydocs.docgen.design_doc.feedback_yaml``, the same
 canonical emitter the digital (L5) loop's clipboard export uses. That is the whole point:
 paper and digital feedback must land in an IDENTICAL schema so L7 ingests both the same way
 (docs/design/feedback/README.md).
@@ -17,7 +17,7 @@ from pathlib import Path
 
 import yaml
 
-from drydocs.design_doc import feedback_yaml
+from drydocs.docgen.design_doc import feedback_yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = (
@@ -51,7 +51,7 @@ def test_fixture_anchors_are_real_anchors_in_the_doc() -> None:
 
 def test_transcription_keys_to_feedback_yaml_schema() -> None:
     """The anchor-keying step: each transcribed row's margin_tag_seen (read straight off
-    the print-margin gutter tag, drydocs/design_doc.py:_inject_margin_anchors) becomes the
+    the print-margin gutter tag, drydocs/docgen/design_doc.py:_inject_margin_anchors) becomes the
     feedback_yaml anchor; the pen_note becomes the note text."""
     fx = _load_fixture()
     notes = {row["margin_tag_seen"]: row["pen_note"] for row in fx["faithful_transcription"]}

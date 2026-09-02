@@ -34,7 +34,7 @@
 # Ready-Done. Where any intent survives it lives in `docs/restructure/*.md` (process) or
 # the INTERNAL corpus — e.g. naming conventions are captured internally, NOT published.
 #
-# VALIDATION: drydocs/doc_outline.py (test: tests/unit/test_doc_outline.py) asserts a
+# VALIDATION: drydocs/docgen/doc_outline.py (test: tests/unit/test_doc_outline.py) asserts a
 # TDD contains every `required: true` anchor and honours the traceability contract below.
 # A required section may be satisfied by an explicit "N/A — <reason>"; the anchor must
 # still be present, so completeness is a real check, not busywork.

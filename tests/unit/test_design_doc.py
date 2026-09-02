@@ -1,4 +1,4 @@
-"""Tests for drydocs.design_doc — the deterministic Markdown-subset renderer (Epic L / L3).
+"""Tests for drydocs.docgen.design_doc — the deterministic Markdown-subset renderer (Epic L / L3).
 
 Unit tests exercise each block/inline construct on tiny fixtures; the final tests render the
 REAL Control-M TDD and assert the anchors survive as element ids with no comment leakage.
@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from drydocs.design_doc import (
+from drydocs.docgen.design_doc import (
     doc_rev_footer,
     doc_title,
     feedback_yaml,

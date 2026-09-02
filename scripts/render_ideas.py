@@ -1,7 +1,7 @@
 """render_ideas.py — render docs/restructure/IDEAS.md to docs/plan/ideas.html.
 
 Sibling of ``render_board.py``; a default-paths ``render_board.py`` run calls this
-too, so the ritual stays one command. Stdlib + ``drydocs.plan_ideas`` only.
+too, so the ritual stays one command. Stdlib + ``drydocs.docgen.plan_ideas`` only.
 
 Usage:
     python scripts/render_ideas.py
@@ -13,7 +13,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from drydocs.plan_ideas import DEFAULT_IDEAS_OUT_PATH, DEFAULT_IDEAS_PATH, write_ideas
+from drydocs.docgen.plan_ideas import DEFAULT_IDEAS_OUT_PATH, DEFAULT_IDEAS_PATH, write_ideas
 
 
 def main() -> None:

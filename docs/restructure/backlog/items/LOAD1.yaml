@@ -7,7 +7,7 @@ phase: 6
 agent: main
 model: fable
 priority: p0
-status: todo
+status: done
 depends_on:
 - CORE1
 inputs:
@@ -17,4 +17,32 @@ inputs:
 - docs/port/port-prompt.md
 - PORT-MANIFEST.yaml
 acceptance: |
-  STUB - minted 2026-09-02 under ADR 0018 D4 as amended at acceptance (Option B now, one carved slice of the port in flight); body follows.
+  ADR 0018 D4 as amended at acceptance (2026-09-02: "take the hit now, carve that into the
+  sole port").
+
+  (a) MOVED, basenames kept, as git renames: drydocs/review/ (graph_verify, review_labels,
+  source_mappings, graph_review, sme_notes, gate_pages, fid_census, run_as_detect,
+  publishing/), drydocs/plan/ (plan_board, plan_roadmap), drydocs/port/ (port_preflight,
+  port_backlog_union, port_rename_detect), drydocs/docgen/ (doc_outline, design_doc,
+  doc_pdf, plan_ideas). load stays the package root; cli.py and the cli_*.py modules do not
+  move (Idea-241: the company's cli.py is a surgical merge).
+  (b) SHIMS at every old path: a sys.modules alias, so old and new paths are ONE module
+  object (private names and monkeypatches work through either); the publishing shim
+  aliases its four submodules too. One port cycle; removed at the roll after next.
+  (c) EVERY REFERENCE REWRITTEN in live files - code, scripts, tests, config guard
+  declarations (gate prompts, source mappings, review-labels.yaml), skills, design docs,
+  MODULE_MAP rows, PORT-MANIFEST rows. Historical records (the port ledger, gate-log,
+  IDEAS, reviews, ADRs, sent company prompts, feedback captures) keep the old paths -
+  the shims keep them true; one ledger-cited submodule FILE is in HISTORICAL_PATHS.
+  (d) THE MAP lists both prefixes per group for the cycle; the stale drydocs.docs_verify
+  entry (moved to core at O58) came out - found by the new completeness guard.
+  (e) MODULE_MAP.md carries a RENDERED component-map section (scripts/render_module_map.py,
+  between markers) with a drift guard and a completeness guard (every declared prefix is
+  told in the hand tables); the renderer is a registered committed-surface writer and a
+  snapshot.ps1 refresh step.
+  (f) PORT: six canonical-company rows name the new paths; nineteen canonical-producer
+  shim rows pin the old ones with the apply order; RELAY-23 in the port-prompt says content
+  first (git mv yours), shims second, and why; DOC2's relay becomes RELAY-24.
+notes: |
+  DONE 2026-09-02 (desktop, feat/component-subpackages, merged --no-ff). Full unit suite
+  green on the moved tree.

@@ -6,7 +6,7 @@
 # component: graph-review renders one section per label; graph-verify validates a
 # suite's declared targets against it.
 #
-# Pure config — no Neo4j, no graph writes. Typed accessor: drydocs/review_labels.py.
+# Pure config — no Neo4j, no graph writes. Typed accessor: drydocs/review/review_labels.py.
 #
 # classification: Internal-Public. This committed backbone is seeded from the
 # bmc-docs baseline (generic Control-M object labels — publishable; corpus id

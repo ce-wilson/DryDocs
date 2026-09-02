@@ -18,7 +18,7 @@ its opener — and a line carrying an info string can only ever open.
 
 SCOPE (J44, 2026-08-21): EVERY tracked markdown file, with a named carve-out list.
 `docs/**` is what this repo authors and is held strictly. `internal/` holds
-captured transcripts and `.claude/skills/**` / `SDLC-Docs/extracted/` hold
+captured transcripts and `.claude/skills/**` / `docs/history/genesis/` hold
 vendored or extracted material — the same defect lives in five of those files,
 and editing them to satisfy a guard would edit somebody else's capture. They are
 CARVED OUT BY NAME with the reason (CAPTURED_PATHS, the FOREIGN_PATHS /
@@ -102,10 +102,6 @@ CAPTURED_PATHS: dict[str, str] = {
     ),
     ".claude/skills/data-context-extractor/references/example-output.md": (
         "vendored skill reference material — upstream's file, upstream's fence (line 112)"
-    ),
-    "SDLC-Docs/extracted/issue-driven-capture-loop.md": (
-        "text EXTRACTED from an office document at the initial import; the extraction "
-        "carries the document's fence as it found it (line 181)"
     ),
 }
 

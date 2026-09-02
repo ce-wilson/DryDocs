@@ -16,7 +16,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from drydocs.plan_roadmap import (
+from drydocs.plan.plan_roadmap import (
     DEFAULT_ROADMAP_BACKLOG_PATH,
     DEFAULT_ROADMAP_OUT_PATH,
     DEFAULT_ROADMAP_PATH,

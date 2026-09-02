@@ -1,4 +1,4 @@
-"""Unit tests for the source column ledger (drydocs/source_mappings.py) — pure, no Neo4j.
+"""Unit tests for the source column ledger (drydocs/review/source_mappings.py) — pure, no Neo4j.
 
 Covers the accessor's own validation (schema id, classification, disposition/origin
 enums, excluded-must-carry-reason) plus the committed `controlm-psgmgr.yaml` ledger
@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import pytest
 
-from drydocs.source_mappings import (
+from drydocs.review.source_mappings import (
     SourceMapping,
     SourceMappingError,
     UnknownMappingObjectError,
@@ -363,7 +363,7 @@ def test_cm_avg_run_is_staging_only_with_the_weak_join_key_documented(
 
 
 def test_all_columns_have_a_valid_disposition_and_origin(controlm: SourceMapping) -> None:
-    from drydocs.source_mappings import VALID_DISPOSITIONS, VALID_ORIGINS
+    from drydocs.review.source_mappings import VALID_DISPOSITIONS, VALID_ORIGINS
 
     for oname in _EXPECTED_OBJECTS:
         for col in controlm.get(oname).columns:

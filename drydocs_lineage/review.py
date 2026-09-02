@@ -9,7 +9,7 @@ pass emits), an assertion panel at the top
 (the FR/TC discipline without Cypher), and a per-folder comment box persisted to
 localStorage with one-click export of all notes as JSON.
 
-Pattern mirrors ``drydocs.graph_review`` (pure renderer, ontology-free, the SME
+Pattern mirrors ``drydocs.review.graph_review`` (pure renderer, ontology-free, the SME
 reviews *the data*) — mirrored, not imported: components never import each other.
 Everything shown here is CANDIDATE material (D2) — this page is exactly what the
 curation gate reviews before :func:`drydocs_lineage.writer.write_curated` may run.

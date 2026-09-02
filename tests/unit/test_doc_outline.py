@@ -1,4 +1,4 @@
-"""Tests for drydocs.doc_outline — the canonical-outline completeness + traceability guard.
+"""Tests for drydocs.docgen.doc_outline — the canonical-outline completeness + traceability guard.
 
 Unit tests run on tiny in-memory fixtures; the final test asserts the REAL Control-M TDD
 conforms to the REAL tdd.outline.yaml, so the exemplar can never silently drift from the
@@ -9,7 +9,13 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from drydocs.doc_outline import Outline, check, feedback_anchor_valid, load_outline, validate_paths
+from drydocs.docgen.doc_outline import (
+    Outline,
+    check,
+    feedback_anchor_valid,
+    load_outline,
+    validate_paths,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 TDD_OUTLINE = REPO_ROOT / "docs" / "design" / "templates" / "tdd.outline.yaml"

@@ -21,7 +21,7 @@ HLT/DAT naming standards, the Jira workflow — on top of two generic skills:
 |---|---|
 | `controlm-db` (generic) | CM_ replica schema map, ingest loaders, query cookbook, the derived `:WAS_INFORMED_BY` edge |
 | `data-context-extractor` | `:DataAsset` conventions (platform = property, never a node), lineage edge vocabulary |
-| review toolkit (`drydocs/graph_review.py` + gates) | every metadata change is a *proposal* through the HITL gate |
+| review toolkit (`drydocs/review/graph_review.py` + gates) | every metadata change is a *proposal* through the HITL gate |
 
 A template consumer adopting DryDocs should treat this skill as a **worked
 example of an instance workflow**, not part of the generic base.

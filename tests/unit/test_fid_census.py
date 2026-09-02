@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import pytest
 
-from drydocs.fid_census import (
+from drydocs.review.fid_census import (
     DEMAND_SOURCES,
     G5_READINGS,
     UNRULED,
