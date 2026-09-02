@@ -93,7 +93,35 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 - **`Idea-235`** · 2026-09-01 · `[idea]` · **open** · prio? **Med** —
   **The measurement apparatus corrupts the measurement, and it fails toward a REASSURING answer
-  rather than an alarming one.** STUB - body follows.
+  rather than an alarming one.** Three instances in one session (2026-09-01), across two machines
+  and two people, all during the same port:
+  1. **cp1252 decoding.** A comparison script read `git show` with `subprocess(text=True)`, which
+     decodes with the platform locale on Windows. It mojibaked every em-dash and **fabricated 18 of
+     25 reported "differences"**. The file on disk was clean the whole time.
+  2. **A truncated pipeline's exit code.** A sweep captured results as
+     `... | Select-Object -First N; $LASTEXITCODE`. `-First` terminates a native-command pipeline
+     early, so `$LASTEXITCODE` reflected something other than the command — **reporting exit 0 where
+     the raw code was 1**. Five prefixes had been declared clean on that basis, and a slice was about
+     to be started on it.
+  3. **A fixture written to match a hypothesis.** A guard was validated against test data authored to
+     make its author's theory true, so it passed and the theory was wrong. The real pair, measured on
+     the other tree, scored 0.08 where the fixture said it cleared the floor.
+  **THE COMMON SHAPE, and it is what makes this worth a rule rather than three fixes:** in every case
+  the instrument was the thing that was broken, the artifact under test was fine, and **the corrupted
+  measurement said everything was OK**. A tool that fails loudly gets fixed in minutes. A tool that
+  fails into "clean", "18 differences found", or "the test passes" gets ACTED ON. Both of this
+  session's failures that reached a commit came from tooling that quietly reported success.
+  **WHY IT IS NOT AN ACCIDENT that they all fail reassuringly.** Each is a default that optimises for
+  not-interrupting: a locale decoder that substitutes rather than raises, a pipeline that stops
+  reading when it has enough, a fixture that the author wrote and therefore believes. Defaults are
+  chosen to keep going, and "keep going" reads as "fine".
+  **DISPOSITION — the candidate rule, not yet ruled:** when a measurement contradicts an expectation,
+  **check the instrument before the subject**, and prefer the check that can fail loudly — read the
+  raw exit code before parsing, decode explicitly, reconstruct a fixture from the incident at its
+  real values rather than authoring one. Cheap in every case. The counter-argument is that it is a
+  discipline rather than a mechanism, and this repo's own history says a discipline nobody is forced
+  to follow rots — so the real question is whether any of the three admits a guard. Related:
+  [[feedback-verify-before-asserting]], and J72's own notes carry all three as worked examples.
 
 - **`Idea-234`** · 2026-09-01 · `[idea]` · **open** · prio? **Low** —
   **A branch tip can be green while commits inside it are red, and nothing records which — so a
