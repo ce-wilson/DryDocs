@@ -12,9 +12,8 @@ where is it written down?*
 control rules, the probe log and the whitelist all live there and are not repeated here. This
 skill adds only the **opening questions, the source order, and the exit criteria.**
 
-The log shape, the `?`-node hinge (`drydocs_deepdoc.mindmap` — on `feat/mm-deepdoc-investigate`
-until MM3 merges; see the backbone for where it lives) and the five capture rungs are stated
-once at the top of `research-probe-discipline`.
+The log shape, the `?`-node hinge (`drydocs_deepdoc.mindmap`, MM3) and the five capture rungs
+are stated once at the top of `research-probe-discipline`.
 
 ---
 

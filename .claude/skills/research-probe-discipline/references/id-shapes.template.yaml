@@ -18,8 +18,8 @@
 #
 # WHERE IT FEEDS: no config home. A shape ruled a join key is a candidate CLASS
 # for the shared entity extractor (drydocs_core.entity_extract, MM3 — today:
-# guid, folder_name, issue_key, table_name, distribution_list, application_id;
-# on feat/mm-deepdoc-investigate until merged). Adding a class is a code change
+# guid, folder_name, issue_key, table_name, distribution_list, application_id).
+# Adding a class is a code change
 # with tests; the KEY itself — what it identifies in the graph — is the gate's.
 #
 # CLASSIFICATION: the real file is Internal — real shapes are near-instances,
