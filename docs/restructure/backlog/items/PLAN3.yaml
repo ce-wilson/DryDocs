@@ -7,7 +7,7 @@ phase: 8
 agent: main
 model: fable
 priority: p0
-status: in_progress
+status: done
 depends_on: []
 gates:
 - ontology-domain-registry-and-edition-grain
@@ -18,5 +18,32 @@ inputs:
 - .claude/skills/groom-backlog/validate.py
 - tests/unit/test_backlog.py
 acceptance: |
-  STUB - minted 2026-09-02 from Idea-242 (trigger fired: PLAN1 is already 113 commits past
-  port-base-20260901, so the next roll carries the freeze before PLAN2 lands); body follows.
+  Minted 2026-09-02 from Idea-242 because its trigger fired: PLAN1 (the letter freeze)
+  merged AFTER port-base-20260901 - 113 commits already sit past the base - so the next
+  roll carries the freeze before PLAN2 can ship the band table, and without this table the
+  relay hands the company a red suite (review F3/F9).
+
+  (a) FROZEN_SERIES IS PRODUCER-MEASURED AND THE COMPANY'S LEGACY IDS FAIL IT. G tops out
+  at 136 on this tree; the company holds G10001-G10003 and DD10001-DD10003, minted under
+  the 10000+ band rule while it was in force, and test_frozen_series_take_no_new_ids fails
+  every one of them the day PLAN1 ports.
+
+  (b) A SECOND TABLE, ONE RULE: FROZEN_BAND = {G: 10003, DD: 10003} in validate.py and
+  test_backlog.py. A band-shaped number (above PRODUCER_BAND_CEILING) is judged against
+  FROZEN_BAND, a letter-shaped one against FROZEN_SERIES; a band-shaped number in a series
+  with no band entry is a stray. The allocator mints into neither - it already refuses G
+  (frozen) and DD (reserved); the table exists so the GUARD reads the company's six as
+  legacy rather than as strays.
+
+  (c) THE SAME AGREEMENT GUARD THE FIRST TABLE HAS:
+  test_the_allocator_and_the_guard_agree_on_the_frozen_snapshot asserts FROZEN_BAND equal
+  on both sides. And a fixture test, because the producer tree cannot exhibit the case
+  (no band id exists here): the six pass; G10004, DD10004, J10001 and G137 are strays;
+  PLAN3 and LOAD12 are outside both tables.
+
+  (d) THE DEPENDENTS ARE RE-POINTED: DOC2's freeze half depends on this item, not on
+  PLAN2, and PLAN2 (c) no longer carries the table. Ships on main before the next roll.
+notes: |
+  DONE 2026-09-02 (desktop, main): FROZEN_BAND in validate.py + test_backlog.py, agreement
+  guard extended, fixture test for the six legacy band ids, DOC2 freeze half re-pointed here,
+  PLAN2 (c) re-pointed. Ships before the next roll, which carries PLAN1.

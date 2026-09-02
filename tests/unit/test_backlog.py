@@ -349,11 +349,46 @@ def _module_series() -> dict[str, str]:
     return {str(k): str(v) for k, v in (doc.get("series") or {}).items()}
 
 
+#: The company's legacy band ids, frozen at the band's own max (PLAN3, 2026-09-02).
+#: FROZEN_SERIES is producer-measured; G10001-G10003 and DD10001-DD10003 exist only on
+#: the company side and were legal when minted. A band-shaped number is judged against
+#: this table, a letter-shaped one against FROZEN_SERIES. Duplicated from validate.py
+#: DELIBERATELY and asserted equal below.
+FROZEN_BAND: dict[str, int] = {
+    "G": 10003,
+    "DD": 10003,
+}
+
+
+def _frozen_strays(ids: list[str]) -> list[str]:
+    """The ids that were minted into a closed series after the freeze.
+
+    Two tables, one rule each: a number above PRODUCER_BAND_CEILING is a legacy BAND id
+    and must sit at or below FROZEN_BAND[series]; any other number in a frozen letter
+    must sit at or below FROZEN_SERIES[series]. A band-shaped number in a series with no
+    band entry is a stray - nobody ever minted there legally.
+    """
+    stray = []
+    for iid in ids:
+        series = "".join(ch for ch in iid if ch.isalpha())
+        digits = "".join(ch for ch in iid if ch.isdigit())
+        if not digits or (series not in FROZEN_SERIES and series not in FROZEN_BAND):
+            continue
+        n = int(digits)
+        if n > PRODUCER_BAND_CEILING:
+            if n > FROZEN_BAND.get(series, 0):
+                stray.append(iid)
+        elif series in FROZEN_SERIES and n > FROZEN_SERIES[series]:
+            stray.append(iid)
+    return stray
+
+
 def test_the_allocator_and_the_guard_agree_on_the_frozen_snapshot() -> None:
     """Written down twice, so asserted equal - the same discipline as the ceiling."""
     alloc = _allocator()
     assert alloc.FROZEN_SERIES == FROZEN_SERIES
     assert alloc.FROZEN_ON == FROZEN_ON
+    assert alloc.FROZEN_BAND == FROZEN_BAND
 
 
 def test_every_module_has_a_series_code_and_no_code_can_collide() -> None:
@@ -389,17 +424,30 @@ def test_frozen_series_take_no_new_ids() -> None:
     refuses every frozen series - and it goes back to be re-minted under its module.
     """
     doc = _load()
-    stray = []
-    for item in doc.get("items", []):
-        iid = str(item.get("id", ""))
-        series = "".join(ch for ch in iid if ch.isalpha())
-        digits = "".join(ch for ch in iid if ch.isdigit())
-        if series in FROZEN_SERIES and digits and int(digits) > FROZEN_SERIES[series]:
-            stray.append(iid)
+    stray = _frozen_strays([str(item.get("id", "")) for item in doc.get("items", [])])
     assert not stray, (
         f"ids minted in a FROZEN series after {FROZEN_ON}: {sorted(stray)}. The letters are "
         "closed. Re-mint under the module: validate.py --next-id --module <module>."
     )
+
+
+def test_the_legacy_band_ids_pass_and_the_next_one_does_not() -> None:
+    """The company's six band ids are legacy, not strays; G10004 and DD10004 are strays.
+
+    This is the case the producer tree cannot exhibit (no band id exists here), so it is
+    pinned as a fixture: without FROZEN_BAND the six fail the day PLAN1 ports (review F3).
+    """
+    legacy = ["G10001", "G10002", "G10003", "DD10001", "DD10002", "DD10003"]
+    assert _frozen_strays(legacy) == []
+    assert _frozen_strays(["G10004"]) == ["G10004"]
+    assert _frozen_strays(["DD10004"]) == ["DD10004"]
+    # a letter-shaped number still answers to the letter table, band or not
+    assert _frozen_strays(["G136"]) == []
+    assert _frozen_strays(["G137"]) == ["G137"]
+    # a band-shaped number in a series that never had a band is a stray
+    assert _frozen_strays(["J10001"]) == ["J10001"]
+    # module-series ids are outside both tables
+    assert _frozen_strays(["PLAN3", "LOAD12"]) == []
 
 
 def test_a_module_series_id_belongs_to_that_module() -> None:

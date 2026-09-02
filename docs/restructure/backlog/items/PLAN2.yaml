@@ -67,16 +67,13 @@ acceptance: |
   refused (it is frozen, like the letters). CLAUDE.md's mint rule and the skill gain the
   `--edition` case.
 
-  THE FROZEN TABLE IS PRODUCER-MEASURED AND THE COMPANY'S LEGACY IDS FAIL IT (review F3):
-  FROZEN_SERIES["G"] = 136 was measured across this repo's tree, refs and history; the
-  company holds G10001-G10003 and DD10001-DD10003, minted under a rule in force when they
-  were minted, and test_frozen_series_take_no_new_ids fails every one of them the day
-  PLAN1 ports. "Stay in the frozen table" therefore needs a second table: FROZEN_BAND =
-  {"G": 10003, "DD": 10003} - a legacy band id (number > 9999, minted before FROZEN_ON) is
-  frozen at the band's own max - consulted by the guard for band-shaped numbers only, with
-  the same allocator/test agreement guard the first table has. This is small enough to
-  ride with PLAN1's port (DOC2's freeze half), and it must: without it the freeze relay
-  hands the company a red suite (review F9).
+  THE FROZEN_BAND TABLE IS PLAN3'S, NOT THIS ITEM'S (re-pointed 2026-09-02). It was
+  first written here (review F3) and then pulled out, because PLAN1 merged after
+  port-base-20260901 and the next roll carries the freeze before this item can land -
+  Idea-242's trigger. PLAN3 ships FROZEN_BAND = {"G": 10003, "DD": 10003} with its
+  agreement guard on main before that roll; this item's band retirement (above) reads
+  FROZEN_BAND as it finds it and retires nothing in it - the six legacy band ids stay
+  legal forever, forward-only.
 
   THE FETCH FAILURE IS SILENT WHEN REMOTE REFS EXIST (review F12): `_git` returns "" on any
   failure, and the two warnings after the fetch (validate.py :360, :368) fire only when

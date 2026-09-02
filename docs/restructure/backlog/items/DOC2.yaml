@@ -10,6 +10,7 @@ priority: p1
 status: todo
 depends_on:
 - PLAN2
+- PLAN3
 gates:
 - ontology-domain-registry-and-edition-grain
 inputs:
@@ -35,9 +36,10 @@ acceptance: |
   was measured on the producer's tree and admits nothing above G136, so their G10001-G10003
   and DD10001-DD10003 fail test_frozen_series_take_no_new_ids the day this half lands.
   FROZEN_BAND = {G: 10003, DD: 10003} (a legacy band id is frozen at the band's own max) is
-  a producer-side change to validate.py and test_backlog.py that ships BEFORE this relay
-  rolls, not with PLAN2 - a freeze relay that hands the company a red suite is worse than
-  no relay. The relay says so, and says their three band ids are read and listed, not
+  PLAN3 - a producer-side change to validate.py and test_backlog.py that ships BEFORE this
+  relay rolls, not with PLAN2 (re-pointed 2026-09-02; this item now depends on PLAN3 for
+  its freeze half) - a freeze relay that hands the company a red suite is worse than no
+  relay. The relay says so, and says their six band ids are read and listed, not
   re-minted.
 
   (b) THE PREFIX HALF, which waits on PLAN2 landing: `[<EDITION>-]<MODULE><n>`; the company

@@ -112,7 +112,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
 - **`Idea-249`** · 2026-09-02 · `[chore]` · **open** · prio? **Low** —
   **board.html is 2.5 MB committed 722 times - render each item body once, on demand; and shard the 7,146-line IDEAS.md groomed trail.** Source: the 2026-09-02 tech-debt review (`docs/reviews/tech-debt-pre-restructure-2026-09-02.md`). C4 + Doc5. 638 cards at ~4 KB each because `_render_item_card` (`plan_board.py:214`) inlines every acceptance body; 722 of 1,885 commits touch it, 399 sampled blobs sum to 653 MB raw, `.git` is 296 MB. The render is governed (verbatim, deterministic) - its SIZE is not: a `<template id="body-<id>">` per item the card opens on demand, or a sibling JSON, keeps `data-id` anchors and determinism. `IDEAS.md`: the groomed audit-trail section starts at line 3,513, half the file is history - shard to `ideas/archive-<yyyy-mm>.md` on the 0013 shape; and delete the `Idea-N` placeholder (07-22, the capture-format example) sitting in the inbox as if real. Module drydocs-plan / docs.
 
-- **`Idea-242`** · 2026-09-02 · `[chore]` · **open** · prio? **High** —
+- **`Idea-242`** · 2026-09-02 · `[chore]` · **groomed → PLAN3 (2026-09-02, the trigger fired: PLAN1 is past the base)** · prio? **High** —
   **FROZEN_BAND is owed by two items and neither can ship it in time: mint it as its own
   PLAN-series chore if a port roll is scheduled before PLAN2 is pulled.** Source: the
   2026-09-02 design review (`docs/reviews/restructure-design-review-2026-09-02.md`, F3 and

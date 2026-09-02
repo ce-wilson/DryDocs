@@ -129,6 +129,22 @@ FROZEN_SERIES: dict[str, int] = {
     "Z": 9,
 }
 
+#: THE COMPANY'S LEGACY BAND IDS ARE FROZEN AT THE BAND'S OWN MAX (PLAN3, 2026-09-02).
+#: FROZEN_SERIES was measured on the PRODUCER's tree, refs and history - G tops out at
+#: 136 here - but the company holds G10001-G10003 and DD10001-DD10003, minted under the
+#: 10000+ band rule while it was in force (retired forward-only at gate
+#: ontology-domain-registry-and-edition-grain). Read against FROZEN_SERIES alone those six
+#: fail the freeze guard the day PLAN1 ports. So a band-shaped number (above
+#: PRODUCER_BAND_CEILING) is judged against THIS table, not the letter's: frozen at the
+#: highest the band ever took, per series, as a committed constant. The allocator never
+#: mints into either table; this exists so the GUARD can read the company's ids as legacy
+#: rather than as strays. Duplicated in tests/unit/test_backlog.py with the same agreement
+#: guard the first table has.
+FROZEN_BAND: dict[str, int] = {
+    "G": 10003,
+    "DD": 10003,
+}
+
 #: Producer allocates at or below this in EVERY series; company is above it.
 #: Duplicated from tests/unit/test_backlog.py DELIBERATELY -- this script runs
 #: where pytest does not, which is its whole reason to exist. The test wins if
