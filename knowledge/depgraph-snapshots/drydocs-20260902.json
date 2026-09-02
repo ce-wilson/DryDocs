@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-02T13:53:59",
+    "captured_at": "2026-09-02T16:16:09",
     "date": "20260902",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "fb310c06",
-      "full": "fb310c0650148891705182ea52394305d1931951",
+      "commit": "e7dc4153",
+      "full": "e7dc41539ebf47e321e0154412f52ed59f63ae58",
       "branch": "main",
-      "describe": "port-base-20260901-108-gfb310c06",
-      "subject": "docs(ONT2): acronyms get their own store - the software-registry block was a holding place (SME re-rules 2026-07-21 via C40); MFTS is a term AND a white-labeled product, never one row; C43 carries the white-label marker",
+      "describe": "port-base-20260901-116-ge7dc4153",
+      "subject": "feat(PLAN3): FROZEN_BAND - the company's six legacy band ids are frozen at the band's own max, so the letter freeze can port green",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -14102,6 +14102,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/PLAN3.yaml",
+      "name": "PLAN3.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/PLAN3.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/Q1.yaml",
       "name": "Q1.yaml",
       "extension": ".yaml",
@@ -15947,6 +15956,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/reviews/port-test-review-and-workplan-2026-09-02.md",
+      "name": "port-test-review-and-workplan-2026-09-02.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/port-test-review-and-workplan-2026-09-02.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/reviews/restructure-design-review-2026-09-02.md",
+      "name": "restructure-design-review-2026-09-02.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/restructure-design-review-2026-09-02.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/reviews/schema-matrix-2026-08-17.md",
       "name": "schema-matrix-2026-08-17.md",
       "extension": ".md",
@@ -15996,6 +16023,15 @@
       "name": "tech-debt-port-boundary.md",
       "extension": ".md",
       "rel_path": "docs/reviews/tech-debt-port-boundary.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/reviews/tech-debt-pre-restructure-2026-09-02.md",
+      "name": "tech-debt-pre-restructure-2026-09-02.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/tech-debt-pre-restructure-2026-09-02.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -21410,10 +21446,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260902.json",
-      "name": "drydocs-20260902.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260902-1353.json",
+      "name": "drydocs-20260902-1353.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260902.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260902-1353.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -40446,6 +40482,11 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/PLAN3.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/Q1.yaml"
     ],
     [
@@ -41226,6 +41267,16 @@
     [
       "drydocs/docs/reviews",
       "CONTAINS",
+      "drydocs/docs/reviews/port-test-review-and-workplan-2026-09-02.md"
+    ],
+    [
+      "drydocs/docs/reviews",
+      "CONTAINS",
+      "drydocs/docs/reviews/restructure-design-review-2026-09-02.md"
+    ],
+    [
+      "drydocs/docs/reviews",
+      "CONTAINS",
       "drydocs/docs/reviews/schema-matrix-2026-08-17.md"
     ],
     [
@@ -41252,6 +41303,11 @@
       "drydocs/docs/reviews",
       "CONTAINS",
       "drydocs/docs/reviews/tech-debt-port-boundary.md"
+    ],
+    [
+      "drydocs/docs/reviews",
+      "CONTAINS",
+      "drydocs/docs/reviews/tech-debt-pre-restructure-2026-09-02.md"
     ],
     [
       "drydocs/docs/reviews",
@@ -44436,7 +44492,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260902.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260902-1353.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -47343,13 +47399,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2671,
+    "files": 2675,
     "edges": 1427,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2970,
+    "rels": 2974,
     "directories": 300
   }
 }
