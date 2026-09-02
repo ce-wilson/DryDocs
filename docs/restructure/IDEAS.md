@@ -91,6 +91,11 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
+- **`Idea-240`** · 2026-09-02 · `[idea]` · **open** · prio? **Med** —
+  **The publish boundary is defined on the tracked tree and says nothing about git HISTORY —
+  34 commit messages on main carry the retired org acronym, and whether the public push is
+  tip-only or carries history is undocumented.** STUB - body follows.
+
 - **`Idea-239`** · 2026-09-02 · `[idea]` · **open** · prio? **Med** —
   **A config surface, its renderer's SURFACES row and the derived artifact it feeds are ONE
   coupling — a port slice carries all three or none, and the manifest should name the triple
