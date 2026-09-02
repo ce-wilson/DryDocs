@@ -7,6 +7,20 @@
 @import 'tailwindcss';
 @import './styles/tokens.css';
 
+/* O91(d) TYPE FLOOR. The smallest size allowed for text a reader must READ is
+   10px. Below that is reserved for labels a reader SCANS in place - the text
+   inside an SVG graph, where the label is positioned against a node and sits
+   in a dense diagram - and those may go to 9px, no lower. 8px and 7px used to
+   exist in TaskGraphPane and do not survive: they are not readable on a
+   standard display, and nobody had argued they should be.
+
+   Two callers hold the SVG exception, each marked at its declaration:
+   GraphSvg's GSUB/GEDGE and TaskGraphPane's node labels. A new one needs the
+   same comment, or it belongs at 10px.
+
+   This floor says how SMALL text may be, never what size a given element ought
+   to be - that stays a design question, deliberately outside O91. */
+
 :root {
   font-family: var(--sans);
   font-size: 15px;

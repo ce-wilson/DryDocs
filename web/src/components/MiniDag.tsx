@@ -69,7 +69,7 @@ function MiniDagNode({ data }: NodeProps<MiniDagRFNode>) {
         {def.sub}
       </div>
       {def.flag && (
-        <div className="mt-0.5 rounded border border-red/60 bg-red/10 px-1 font-mono text-[9px] text-brand-soft">
+        <div className="mt-0.5 rounded border border-red/60 bg-red/10 px-1 font-mono text-[10px] text-brand-soft">
           {def.flag}
         </div>
       )}

@@ -291,7 +291,7 @@ export default function DomainGridTable({
                         }
                       >
                         <span className="truncate">{k}</span>
-                        <span className="font-mono text-[9px] text-faint">
+                        <span className="font-mono text-[10px] text-faint">
                           {active ? (sort.dir === 'asc' ? '▲' : '▼') : ''}
                         </span>
                       </button>

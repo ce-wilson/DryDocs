@@ -91,17 +91,17 @@ export default function StatusItems({
             >
               <div className="flex items-center gap-1.5">
                 <span
-                  className="font-mono text-[9px] uppercase"
+                  className="font-mono text-[10px] uppercase"
                   style={{ color: `var(${LEVEL_TOKEN[item.level as StatusLevel]})` }}
                 >
                   {item.level}
                 </span>
                 {/* the namespace, not the whole type — the slug is in the message */}
-                <span className="truncate font-mono text-[9px] text-faint">{statusSource(item)}</span>
+                <span className="truncate font-mono text-[10px] text-faint">{statusSource(item)}</span>
               </div>
               <p className="mt-0.5 text-[11px] leading-snug text-text">{item.message}</p>
               {item.error && (
-                <p className="mt-0.5 truncate font-mono text-[9px] text-muted" title={item.error}>
+                <p className="mt-0.5 truncate font-mono text-[10px] text-muted" title={item.error}>
                   {item.error}
                 </p>
               )}

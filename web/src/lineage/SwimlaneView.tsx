@@ -61,7 +61,7 @@ export default function SwimlaneView() {
       <div className="flex shrink-0 flex-wrap items-center gap-2 rounded border border-edge bg-panel-2 px-2.5 py-1.5 text-[11px]">
         {/* WF-DFL-01 — the toolbar row the wireframe reserves for the picker. */}
         <span className="text-muted">Lane basis</span>
-        <span className="font-mono text-[9px] text-faint">WF-DFL-01</span>
+        <span className="font-mono text-[10px] text-faint">WF-DFL-01</span>
         {LANE_BASES.map((b) => (
           <button
             key={b.id}
@@ -111,7 +111,7 @@ export default function SwimlaneView() {
                       {item.wf && (
                         // The wireframe key, so SME feedback re-attaches to a
                         // component that exists.
-                        <p className="mt-0.5 font-mono text-[9px] text-faint">{item.wf}</p>
+                        <p className="mt-0.5 font-mono text-[10px] text-faint">{item.wf}</p>
                       )}
                     </div>
                   ))}
