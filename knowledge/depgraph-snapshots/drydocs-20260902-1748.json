@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-02T16:16:09",
+    "captured_at": "2026-09-02T17:48:40",
     "date": "20260902",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "e7dc4153",
-      "full": "e7dc41539ebf47e321e0154412f52ed59f63ae58",
+      "commit": "21fa5c30",
+      "full": "21fa5c30748d8b36aa463e79bfc546ab48fbfad9",
       "branch": "main",
-      "describe": "port-base-20260901-116-ge7dc4153",
-      "subject": "feat(PLAN3): FROZEN_BAND - the company's six legacy band ids are frozen at the band's own max, so the letter freeze can port green",
+      "describe": "port-base-20260901-125-g21fa5c30",
+      "subject": "Merge branch 'feat/component-subpackages' - ADR 0018: the component map is an importable object (CORE1), the four flat components become subpackages with one-cycle shims (LOAD1), routing docs stop lagging the code (DOC3)",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -5804,78 +5804,6 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/SDLC-Docs",
-      "name": "SDLC-Docs",
-      "extension": "",
-      "rel_path": "SDLC-Docs",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
-    },
-    {
-      "file_id": "drydocs/SDLC-Docs/extracted",
-      "name": "extracted",
-      "extension": "",
-      "rel_path": "SDLC-Docs/extracted",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
-    },
-    {
-      "file_id": "drydocs/SDLC-Docs/extracted/FCD-Requirements.md",
-      "name": "FCD-Requirements.md",
-      "extension": ".md",
-      "rel_path": "SDLC-Docs/extracted/FCD-Requirements.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/SDLC-Docs/extracted/adopt-bdd-sdd-howto.md",
-      "name": "adopt-bdd-sdd-howto.md",
-      "extension": ".md",
-      "rel_path": "SDLC-Docs/extracted/adopt-bdd-sdd-howto.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/SDLC-Docs/extracted/feasibility-memo-context-sufficiency.md",
-      "name": "feasibility-memo-context-sufficiency.md",
-      "extension": ".md",
-      "rel_path": "SDLC-Docs/extracted/feasibility-memo-context-sufficiency.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/SDLC-Docs/extracted/issue-driven-capture-loop.md",
-      "name": "issue-driven-capture-loop.md",
-      "extension": ".md",
-      "rel_path": "SDLC-Docs/extracted/issue-driven-capture-loop.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/SDLC-Docs/extracted/modular-architecture-plan.md",
-      "name": "modular-architecture-plan.md",
-      "extension": ".md",
-      "rel_path": "SDLC-Docs/extracted/modular-architecture-plan.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/SDLC-Docs/extracted/plan-incrementalContextLoop.prompt.md",
-      "name": "plan-incrementalContextLoop.prompt.md",
-      "extension": ".md",
-      "rel_path": "SDLC-Docs/extracted/plan-incrementalContextLoop.prompt.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
       "file_id": "drydocs/VERSIONING.md",
       "name": "VERSIONING.md",
       "extension": ".md",
@@ -7730,6 +7658,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/decisions/0018-component-identity-declared-not-directory.md",
+      "name": "0018-component-identity-declared-not-directory.md",
+      "extension": ".md",
+      "rel_path": "docs/decisions/0018-component-identity-declared-not-directory.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/decisions/README.md",
       "name": "README.md",
       "extension": ".md",
@@ -8882,6 +8819,78 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/history/genesis",
+      "name": "genesis",
+      "extension": "",
+      "rel_path": "docs/history/genesis",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/docs/history/genesis/FCD-Requirements.md",
+      "name": "FCD-Requirements.md",
+      "extension": ".md",
+      "rel_path": "docs/history/genesis/FCD-Requirements.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/history/genesis/adopt-bdd-sdd-howto.md",
+      "name": "adopt-bdd-sdd-howto.md",
+      "extension": ".md",
+      "rel_path": "docs/history/genesis/adopt-bdd-sdd-howto.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/history/genesis/feasibility-memo-context-sufficiency.md",
+      "name": "feasibility-memo-context-sufficiency.md",
+      "extension": ".md",
+      "rel_path": "docs/history/genesis/feasibility-memo-context-sufficiency.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/history/genesis/issue-driven-capture-loop.md",
+      "name": "issue-driven-capture-loop.md",
+      "extension": ".md",
+      "rel_path": "docs/history/genesis/issue-driven-capture-loop.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/history/genesis/modular-architecture-plan.md",
+      "name": "modular-architecture-plan.md",
+      "extension": ".md",
+      "rel_path": "docs/history/genesis/modular-architecture-plan.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/history/genesis/plan-incrementalContextLoop.prompt.md",
+      "name": "plan-incrementalContextLoop.prompt.md",
+      "extension": ".md",
+      "rel_path": "docs/history/genesis/plan-incrementalContextLoop.prompt.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/history/git-readme-port-guide-2026-07.md",
+      "name": "git-readme-port-guide-2026-07.md",
+      "extension": ".md",
+      "rel_path": "docs/history/git-readme-port-guide-2026-07.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/history/next-session-cron-prompt.md",
       "name": "next-session-cron-prompt.md",
       "extension": ".md",
@@ -10016,6 +10025,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/CORE1.yaml",
+      "name": "CORE1.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/CORE1.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/D1.yaml",
       "name": "D1.yaml",
       "extension": ".yaml",
@@ -10128,6 +10146,15 @@
       "name": "DOC2.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/DOC2.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/DOC3.yaml",
+      "name": "DOC3.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/DOC3.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -12765,6 +12792,15 @@
       "name": "L9.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/L9.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/LOAD1.yaml",
+      "name": "LOAD1.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/LOAD1.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -17189,6 +17225,60 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs/docgen",
+      "name": "docgen",
+      "extension": "",
+      "rel_path": "drydocs/docgen",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/drydocs/docgen/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "drydocs/docgen/__init__.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/docgen/design_doc.py",
+      "name": "design_doc.py",
+      "extension": ".py",
+      "rel_path": "drydocs/docgen/design_doc.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/docgen/doc_outline.py",
+      "name": "doc_outline.py",
+      "extension": ".py",
+      "rel_path": "drydocs/docgen/doc_outline.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/docgen/doc_pdf.py",
+      "name": "doc_pdf.py",
+      "extension": ".py",
+      "rel_path": "drydocs/docgen/doc_pdf.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/docgen/plan_ideas.py",
+      "name": "plan_ideas.py",
+      "extension": ".py",
+      "rel_path": "drydocs/docgen/plan_ideas.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs/docs_coverage.py",
       "name": "docs_coverage.py",
       "extension": ".py",
@@ -18125,6 +18215,42 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs/plan",
+      "name": "plan",
+      "extension": "",
+      "rel_path": "drydocs/plan",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/drydocs/plan/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "drydocs/plan/__init__.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/plan/plan_board.py",
+      "name": "plan_board.py",
+      "extension": ".py",
+      "rel_path": "drydocs/plan/plan_board.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/plan/plan_roadmap.py",
+      "name": "plan_roadmap.py",
+      "extension": ".py",
+      "rel_path": "drydocs/plan/plan_roadmap.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs/plan_board.py",
       "name": "plan_board.py",
       "extension": ".py",
@@ -18147,6 +18273,51 @@
       "name": "plan_roadmap.py",
       "extension": ".py",
       "rel_path": "drydocs/plan_roadmap.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/port",
+      "name": "port",
+      "extension": "",
+      "rel_path": "drydocs/port",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/drydocs/port/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "drydocs/port/__init__.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/port/port_backlog_union.py",
+      "name": "port_backlog_union.py",
+      "extension": ".py",
+      "rel_path": "drydocs/port/port_backlog_union.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/port/port_preflight.py",
+      "name": "port_preflight.py",
+      "extension": ".py",
+      "rel_path": "drydocs/port/port_preflight.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/port/port_rename_detect.py",
+      "name": "port_rename_detect.py",
+      "extension": ".py",
+      "rel_path": "drydocs/port/port_rename_detect.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -18197,37 +18368,145 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/drydocs/publishing/assembler.py",
+      "file_id": "drydocs/drydocs/review",
+      "name": "review",
+      "extension": "",
+      "rel_path": "drydocs/review",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/drydocs/review/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "drydocs/review/__init__.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/review/fid_census.py",
+      "name": "fid_census.py",
+      "extension": ".py",
+      "rel_path": "drydocs/review/fid_census.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/review/gate_pages.py",
+      "name": "gate_pages.py",
+      "extension": ".py",
+      "rel_path": "drydocs/review/gate_pages.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/review/graph_review.py",
+      "name": "graph_review.py",
+      "extension": ".py",
+      "rel_path": "drydocs/review/graph_review.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/review/graph_verify.py",
+      "name": "graph_verify.py",
+      "extension": ".py",
+      "rel_path": "drydocs/review/graph_verify.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/review/publishing",
+      "name": "publishing",
+      "extension": "",
+      "rel_path": "drydocs/review/publishing",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/drydocs/review/publishing/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "drydocs/review/publishing/__init__.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/review/publishing/assembler.py",
       "name": "assembler.py",
       "extension": ".py",
-      "rel_path": "drydocs/publishing/assembler.py",
+      "rel_path": "drydocs/review/publishing/assembler.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
     },
     {
-      "file_id": "drydocs/drydocs/publishing/preview.py",
+      "file_id": "drydocs/drydocs/review/publishing/preview.py",
       "name": "preview.py",
       "extension": ".py",
-      "rel_path": "drydocs/publishing/preview.py",
+      "rel_path": "drydocs/review/publishing/preview.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
     },
     {
-      "file_id": "drydocs/drydocs/publishing/publisher.py",
+      "file_id": "drydocs/drydocs/review/publishing/publisher.py",
       "name": "publisher.py",
       "extension": ".py",
-      "rel_path": "drydocs/publishing/publisher.py",
+      "rel_path": "drydocs/review/publishing/publisher.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
     },
     {
-      "file_id": "drydocs/drydocs/publishing/validator.py",
+      "file_id": "drydocs/drydocs/review/publishing/validator.py",
       "name": "validator.py",
       "extension": ".py",
-      "rel_path": "drydocs/publishing/validator.py",
+      "rel_path": "drydocs/review/publishing/validator.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/review/review_labels.py",
+      "name": "review_labels.py",
+      "extension": ".py",
+      "rel_path": "drydocs/review/review_labels.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/review/run_as_detect.py",
+      "name": "run_as_detect.py",
+      "extension": ".py",
+      "rel_path": "drydocs/review/run_as_detect.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/review/sme_notes.py",
+      "name": "sme_notes.py",
+      "extension": ".py",
+      "rel_path": "drydocs/review/sme_notes.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/review/source_mappings.py",
+      "name": "source_mappings.py",
+      "extension": ".py",
+      "rel_path": "drydocs/review/source_mappings.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -18633,6 +18912,15 @@
       "name": "backlog_store.py",
       "extension": ".py",
       "rel_path": "drydocs_core/backlog_store.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs_core/component_map.py",
+      "name": "component_map.py",
+      "extension": ".py",
+      "rel_path": "drydocs_core/component_map.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -21446,10 +21734,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260902-1353.json",
-      "name": "drydocs-20260902-1353.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260902.json",
+      "name": "drydocs-20260902.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260902-1353.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260902.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -22674,6 +22962,15 @@
       "name": "render_load_map.py",
       "extension": ".py",
       "rel_path": "scripts/render_load_map.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/scripts/render_module_map.py",
+      "name": "render_module_map.py",
+      "extension": ".py",
+      "rel_path": "scripts/render_module_map.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -24069,6 +24366,15 @@
       "name": "test_module_boundary.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_module_boundary.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_module_map_render.py",
+      "name": "test_module_map_render.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_module_map_render.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -27480,20 +27786,76 @@
       "drydocs/drydocs/loaders/code_snapshot.py"
     ],
     [
+      "drydocs/drydocs/design_doc.py",
+      "drydocs/drydocs/docgen/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/design_doc.py",
+      "drydocs/drydocs/docgen/design_doc.py"
+    ],
+    [
       "drydocs/drydocs/doc_outline.py",
+      "drydocs/drydocs/docgen/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/doc_outline.py",
+      "drydocs/drydocs/docgen/doc_outline.py"
+    ],
+    [
+      "drydocs/drydocs/doc_pdf.py",
+      "drydocs/drydocs/docgen/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/doc_pdf.py",
+      "drydocs/drydocs/docgen/doc_pdf.py"
+    ],
+    [
+      "drydocs/drydocs/docgen/doc_outline.py",
       "drydocs/drydocs_core/doc_anchors.py"
+    ],
+    [
+      "drydocs/drydocs/docgen/plan_ideas.py",
+      "drydocs/drydocs/docgen/design_doc.py"
+    ],
+    [
+      "drydocs/drydocs/docgen/plan_ideas.py",
+      "drydocs/drydocs_core/repo_paths.py"
     ],
     [
       "drydocs/drydocs/docs_coverage.py",
       "drydocs/drydocs_core/docs_verify.py"
     ],
     [
+      "drydocs/drydocs/fid_census.py",
+      "drydocs/drydocs/review/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/fid_census.py",
+      "drydocs/drydocs/review/fid_census.py"
+    ],
+    [
       "drydocs/drydocs/gate_pages.py",
-      "drydocs/drydocs_core/repo_paths.py"
+      "drydocs/drydocs/review/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/gate_pages.py",
+      "drydocs/drydocs/review/gate_pages.py"
+    ],
+    [
+      "drydocs/drydocs/graph_review.py",
+      "drydocs/drydocs/review/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/graph_review.py",
+      "drydocs/drydocs/review/graph_review.py"
     ],
     [
       "drydocs/drydocs/graph_verify.py",
-      "drydocs/drydocs_core/repo_paths.py"
+      "drydocs/drydocs/review/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/graph_verify.py",
+      "drydocs/drydocs/review/graph_verify.py"
     ],
     [
       "drydocs/drydocs/loaders/__init__.py",
@@ -27868,64 +28230,164 @@
       "drydocs/drydocs_core/source_registry.py"
     ],
     [
-      "drydocs/drydocs/plan_board.py",
+      "drydocs/drydocs/plan/plan_board.py",
       "drydocs/drydocs_core/backlog_store.py"
     ],
     [
-      "drydocs/drydocs/plan_board.py",
+      "drydocs/drydocs/plan/plan_board.py",
       "drydocs/drydocs_core/repo_paths.py"
     ],
     [
-      "drydocs/drydocs/plan_ideas.py",
-      "drydocs/drydocs/design_doc.py"
+      "drydocs/drydocs/plan/plan_roadmap.py",
+      "drydocs/drydocs/plan/plan_board.py"
     ],
     [
-      "drydocs/drydocs/plan_ideas.py",
-      "drydocs/drydocs_core/repo_paths.py"
-    ],
-    [
-      "drydocs/drydocs/plan_roadmap.py",
-      "drydocs/drydocs/plan_board.py"
-    ],
-    [
-      "drydocs/drydocs/plan_roadmap.py",
+      "drydocs/drydocs/plan/plan_roadmap.py",
       "drydocs/drydocs_core/backlog_store.py"
     ],
     [
+      "drydocs/drydocs/plan/plan_roadmap.py",
+      "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
+      "drydocs/drydocs/plan_board.py",
+      "drydocs/drydocs/plan/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/plan_board.py",
+      "drydocs/drydocs/plan/plan_board.py"
+    ],
+    [
+      "drydocs/drydocs/plan_ideas.py",
+      "drydocs/drydocs/docgen/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/plan_ideas.py",
+      "drydocs/drydocs/docgen/plan_ideas.py"
+    ],
+    [
       "drydocs/drydocs/plan_roadmap.py",
+      "drydocs/drydocs/plan/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/plan_roadmap.py",
+      "drydocs/drydocs/plan/plan_roadmap.py"
+    ],
+    [
+      "drydocs/drydocs/port/port_backlog_union.py",
+      "drydocs/drydocs_core/backlog_store.py"
+    ],
+    [
+      "drydocs/drydocs/port/port_preflight.py",
       "drydocs/drydocs_core/repo_paths.py"
     ],
     [
       "drydocs/drydocs/port_backlog_union.py",
-      "drydocs/drydocs_core/backlog_store.py"
+      "drydocs/drydocs/port/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/port_backlog_union.py",
+      "drydocs/drydocs/port/port_backlog_union.py"
     ],
     [
       "drydocs/drydocs/port_preflight.py",
+      "drydocs/drydocs/port/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/port_preflight.py",
+      "drydocs/drydocs/port/port_preflight.py"
+    ],
+    [
+      "drydocs/drydocs/port_rename_detect.py",
+      "drydocs/drydocs/port/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/port_rename_detect.py",
+      "drydocs/drydocs/port/port_rename_detect.py"
+    ],
+    [
+      "drydocs/drydocs/publishing/__init__.py",
+      "drydocs/drydocs/review/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/publishing/__init__.py",
+      "drydocs/drydocs/review/publishing/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/publishing/__init__.py",
+      "drydocs/drydocs/review/publishing/assembler.py"
+    ],
+    [
+      "drydocs/drydocs/publishing/__init__.py",
+      "drydocs/drydocs/review/publishing/preview.py"
+    ],
+    [
+      "drydocs/drydocs/publishing/__init__.py",
+      "drydocs/drydocs/review/publishing/publisher.py"
+    ],
+    [
+      "drydocs/drydocs/publishing/__init__.py",
+      "drydocs/drydocs/review/publishing/validator.py"
+    ],
+    [
+      "drydocs/drydocs/review/gate_pages.py",
       "drydocs/drydocs_core/repo_paths.py"
     ],
     [
-      "drydocs/drydocs/publishing/__init__.py",
-      "drydocs/drydocs/publishing/assembler.py"
+      "drydocs/drydocs/review/graph_verify.py",
+      "drydocs/drydocs_core/repo_paths.py"
     ],
     [
-      "drydocs/drydocs/publishing/__init__.py",
-      "drydocs/drydocs/publishing/preview.py"
+      "drydocs/drydocs/review/publishing/__init__.py",
+      "drydocs/drydocs/review/publishing/assembler.py"
     ],
     [
-      "drydocs/drydocs/publishing/__init__.py",
-      "drydocs/drydocs/publishing/publisher.py"
+      "drydocs/drydocs/review/publishing/__init__.py",
+      "drydocs/drydocs/review/publishing/preview.py"
     ],
     [
-      "drydocs/drydocs/publishing/__init__.py",
-      "drydocs/drydocs/publishing/validator.py"
+      "drydocs/drydocs/review/publishing/__init__.py",
+      "drydocs/drydocs/review/publishing/publisher.py"
+    ],
+    [
+      "drydocs/drydocs/review/publishing/__init__.py",
+      "drydocs/drydocs/review/publishing/validator.py"
+    ],
+    [
+      "drydocs/drydocs/review/review_labels.py",
+      "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
+      "drydocs/drydocs/review/source_mappings.py",
+      "drydocs/drydocs_core/repo_paths.py"
     ],
     [
       "drydocs/drydocs/review_labels.py",
-      "drydocs/drydocs_core/repo_paths.py"
+      "drydocs/drydocs/review/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/review_labels.py",
+      "drydocs/drydocs/review/review_labels.py"
+    ],
+    [
+      "drydocs/drydocs/run_as_detect.py",
+      "drydocs/drydocs/review/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/run_as_detect.py",
+      "drydocs/drydocs/review/run_as_detect.py"
     ],
     [
       "drydocs/drydocs/seal_samples.py",
       "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
+      "drydocs/drydocs/sme_notes.py",
+      "drydocs/drydocs/review/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/sme_notes.py",
+      "drydocs/drydocs/review/sme_notes.py"
     ],
     [
       "drydocs/drydocs/snapshots/__init__.py",
@@ -27937,7 +28399,11 @@
     ],
     [
       "drydocs/drydocs/source_mappings.py",
-      "drydocs/drydocs_core/repo_paths.py"
+      "drydocs/drydocs/review/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/source_mappings.py",
+      "drydocs/drydocs/review/source_mappings.py"
     ],
     [
       "drydocs/drydocs/staging.py",
@@ -28933,7 +29399,7 @@
     ],
     [
       "drydocs/scripts/doc_to_pdf.py",
-      "drydocs/drydocs/doc_pdf.py"
+      "drydocs/drydocs/docgen/doc_pdf.py"
     ],
     [
       "drydocs/scripts/external_vendor_scrape.py",
@@ -28957,19 +29423,19 @@
     ],
     [
       "drydocs/scripts/port_backlog_union.py",
-      "drydocs/drydocs/port_backlog_union.py"
+      "drydocs/drydocs/port/port_backlog_union.py"
     ],
     [
       "drydocs/scripts/port_backlog_union.py",
-      "drydocs/drydocs/port_preflight.py"
+      "drydocs/drydocs/port/port_preflight.py"
     ],
     [
       "drydocs/scripts/port_preflight.py",
-      "drydocs/drydocs/port_preflight.py"
+      "drydocs/drydocs/port/port_preflight.py"
     ],
     [
       "drydocs/scripts/port_rename_check.py",
-      "drydocs/drydocs/port_rename_detect.py"
+      "drydocs/drydocs/port/port_rename_detect.py"
     ],
     [
       "drydocs/scripts/port_rename_check.py",
@@ -28981,7 +29447,7 @@
     ],
     [
       "drydocs/scripts/render_board.py",
-      "drydocs/drydocs/plan_board.py"
+      "drydocs/drydocs/plan/plan_board.py"
     ],
     [
       "drydocs/scripts/render_board.py",
@@ -29025,7 +29491,7 @@
     ],
     [
       "drydocs/scripts/render_design_doc.py",
-      "drydocs/drydocs/design_doc.py"
+      "drydocs/drydocs/docgen/design_doc.py"
     ],
     [
       "drydocs/scripts/render_env_example.py",
@@ -29037,7 +29503,7 @@
     ],
     [
       "drydocs/scripts/render_ideas.py",
-      "drydocs/drydocs/plan_ideas.py"
+      "drydocs/drydocs/docgen/plan_ideas.py"
     ],
     [
       "drydocs/scripts/render_load_map.py",
@@ -29054,6 +29520,10 @@
     [
       "drydocs/scripts/render_load_map.py",
       "drydocs/drydocs_core/yaml_fragments.py"
+    ],
+    [
+      "drydocs/scripts/render_module_map.py",
+      "drydocs/drydocs_core/component_map.py"
     ],
     [
       "drydocs/scripts/render_port_dispositions.py",
@@ -29085,7 +29555,7 @@
     ],
     [
       "drydocs/scripts/render_roadmap.py",
-      "drydocs/drydocs/plan_roadmap.py"
+      "drydocs/drydocs/plan/plan_roadmap.py"
     ],
     [
       "drydocs/scripts/render_schema_graph.py",
@@ -29313,7 +29783,7 @@
     ],
     [
       "drydocs/tests/unit/test_cdo_crosswalk.py",
-      "drydocs/drydocs/gate_pages.py"
+      "drydocs/drydocs/review/gate_pages.py"
     ],
     [
       "drydocs/tests/unit/test_cdo_crosswalk.py",
@@ -29649,15 +30119,15 @@
     ],
     [
       "drydocs/tests/unit/test_design_doc.py",
-      "drydocs/drydocs/design_doc.py"
+      "drydocs/drydocs/docgen/design_doc.py"
     ],
     [
       "drydocs/tests/unit/test_doc_outline.py",
-      "drydocs/drydocs/doc_outline.py"
+      "drydocs/drydocs/docgen/doc_outline.py"
     ],
     [
       "drydocs/tests/unit/test_doc_pdf.py",
-      "drydocs/drydocs/doc_pdf.py"
+      "drydocs/drydocs/docgen/doc_pdf.py"
     ],
     [
       "drydocs/tests/unit/test_doc_traceability_guards.py",
@@ -29913,11 +30383,7 @@
     ],
     [
       "drydocs/tests/unit/test_fid_census.py",
-      "drydocs/drydocs/fid_census.py"
-    ],
-    [
-      "drydocs/tests/unit/test_folder_attribution.py",
-      "drydocs/drydocs/graph_verify.py"
+      "drydocs/drydocs/review/fid_census.py"
     ],
     [
       "drydocs/tests/unit/test_folder_attribution.py",
@@ -29934,6 +30400,10 @@
     [
       "drydocs/tests/unit/test_folder_attribution.py",
       "drydocs/drydocs/loaders/seal_attribution.py"
+    ],
+    [
+      "drydocs/tests/unit/test_folder_attribution.py",
+      "drydocs/drydocs/review/graph_verify.py"
     ],
     [
       "drydocs/tests/unit/test_folder_attribution.py",
@@ -29961,23 +30431,23 @@
     ],
     [
       "drydocs/tests/unit/test_gate_pages.py",
-      "drydocs/drydocs/gate_pages.py"
+      "drydocs/drydocs/review/gate_pages.py"
     ],
     [
       "drydocs/tests/unit/test_graph_review.py",
-      "drydocs/drydocs/graph_review.py"
+      "drydocs/drydocs/review/graph_review.py"
     ],
     [
       "drydocs/tests/unit/test_graph_review.py",
-      "drydocs/drydocs/review_labels.py"
+      "drydocs/drydocs/review/review_labels.py"
     ],
     [
       "drydocs/tests/unit/test_graph_verify.py",
-      "drydocs/drydocs/graph_verify.py"
+      "drydocs/drydocs/review/graph_verify.py"
     ],
     [
       "drydocs/tests/unit/test_graph_verify.py",
-      "drydocs/drydocs/review_labels.py"
+      "drydocs/drydocs/review/review_labels.py"
     ],
     [
       "drydocs/tests/unit/test_incremental_delete.py",
@@ -30368,6 +30838,14 @@
       "drydocs/drydocs_core/yaml_fragments.py"
     ],
     [
+      "drydocs/tests/unit/test_module_boundary.py",
+      "drydocs/drydocs_core/component_map.py"
+    ],
+    [
+      "drydocs/tests/unit/test_module_map_render.py",
+      "drydocs/drydocs_core/component_map.py"
+    ],
+    [
       "drydocs/tests/unit/test_namespaces.py",
       "drydocs/drydocs_core/ontology/namespaces.py"
     ],
@@ -30441,15 +30919,15 @@
     ],
     [
       "drydocs/tests/unit/test_plan_board.py",
-      "drydocs/drydocs/plan_board.py"
+      "drydocs/drydocs/plan/plan_board.py"
     ],
     [
       "drydocs/tests/unit/test_plan_ideas.py",
-      "drydocs/drydocs/plan_ideas.py"
+      "drydocs/drydocs/docgen/plan_ideas.py"
     ],
     [
       "drydocs/tests/unit/test_plan_roadmap.py",
-      "drydocs/drydocs/plan_roadmap.py"
+      "drydocs/drydocs/plan/plan_roadmap.py"
     ],
     [
       "drydocs/tests/unit/test_plan_roadmap.py",
@@ -30457,7 +30935,7 @@
     ],
     [
       "drydocs/tests/unit/test_port_backlog_union.py",
-      "drydocs/drydocs/port_backlog_union.py"
+      "drydocs/drydocs/port/port_backlog_union.py"
     ],
     [
       "drydocs/tests/unit/test_port_manifest.py",
@@ -30465,7 +30943,7 @@
     ],
     [
       "drydocs/tests/unit/test_port_preflight.py",
-      "drydocs/drydocs/port_preflight.py"
+      "drydocs/drydocs/port/port_preflight.py"
     ],
     [
       "drydocs/tests/unit/test_port_reconcile_guards.py",
@@ -30489,7 +30967,7 @@
     ],
     [
       "drydocs/tests/unit/test_port_rename_detect.py",
-      "drydocs/drydocs/port_rename_detect.py"
+      "drydocs/drydocs/port/port_rename_detect.py"
     ],
     [
       "drydocs/tests/unit/test_precedence.py",
@@ -30505,11 +30983,11 @@
     ],
     [
       "drydocs/tests/unit/test_publishing.py",
-      "drydocs/drydocs/publishing/__init__.py"
+      "drydocs/drydocs/review/publishing/__init__.py"
     ],
     [
       "drydocs/tests/unit/test_publishing.py",
-      "drydocs/drydocs/publishing/publisher.py"
+      "drydocs/drydocs/review/publishing/publisher.py"
     ],
     [
       "drydocs/tests/unit/test_query_spec_vocabulary.py",
@@ -30713,7 +31191,7 @@
     ],
     [
       "drydocs/tests/unit/test_review_labels.py",
-      "drydocs/drydocs/review_labels.py"
+      "drydocs/drydocs/review/review_labels.py"
     ],
     [
       "drydocs/tests/unit/test_row_checksum.py",
@@ -30741,7 +31219,7 @@
     ],
     [
       "drydocs/tests/unit/test_run_as_detect.py",
-      "drydocs/drydocs/run_as_detect.py"
+      "drydocs/drydocs/review/run_as_detect.py"
     ],
     [
       "drydocs/tests/unit/test_runbook_currency.py",
@@ -30865,7 +31343,7 @@
     ],
     [
       "drydocs/tests/unit/test_sme_notes.py",
-      "drydocs/drydocs/sme_notes.py"
+      "drydocs/drydocs/review/sme_notes.py"
     ],
     [
       "drydocs/tests/unit/test_software_registry.py",
@@ -30921,7 +31399,7 @@
     ],
     [
       "drydocs/tests/unit/test_source_mapping_drift.py",
-      "drydocs/drydocs/source_mappings.py"
+      "drydocs/drydocs/review/source_mappings.py"
     ],
     [
       "drydocs/tests/unit/test_source_mapping_drift.py",
@@ -30929,7 +31407,7 @@
     ],
     [
       "drydocs/tests/unit/test_source_mappings.py",
-      "drydocs/drydocs/source_mappings.py"
+      "drydocs/drydocs/review/source_mappings.py"
     ],
     [
       "drydocs/tests/unit/test_source_registry.py",
@@ -31017,7 +31495,7 @@
     ],
     [
       "drydocs/tests/unit/test_tom_required_contacts.py",
-      "drydocs/drydocs/graph_verify.py"
+      "drydocs/drydocs/review/graph_verify.py"
     ],
     [
       "drydocs/tests/unit/test_tom_required_contacts.py",
@@ -31037,7 +31515,7 @@
     ],
     [
       "drydocs/tests/unit/test_transcribe_doc_markup.py",
-      "drydocs/drydocs/design_doc.py"
+      "drydocs/drydocs/docgen/design_doc.py"
     ],
     [
       "drydocs/tests/unit/test_ui_concepts.py",
@@ -32593,11 +33071,6 @@
       "drydocs",
       "CONTAINS",
       "drydocs/README.md"
-    ],
-    [
-      "drydocs",
-      "CONTAINS",
-      "drydocs/SDLC-Docs"
     ],
     [
       "drydocs",
@@ -35855,41 +36328,6 @@
       "drydocs/.github/workflows/ci.yml"
     ],
     [
-      "drydocs/SDLC-Docs",
-      "CONTAINS",
-      "drydocs/SDLC-Docs/extracted"
-    ],
-    [
-      "drydocs/SDLC-Docs/extracted",
-      "CONTAINS",
-      "drydocs/SDLC-Docs/extracted/FCD-Requirements.md"
-    ],
-    [
-      "drydocs/SDLC-Docs/extracted",
-      "CONTAINS",
-      "drydocs/SDLC-Docs/extracted/adopt-bdd-sdd-howto.md"
-    ],
-    [
-      "drydocs/SDLC-Docs/extracted",
-      "CONTAINS",
-      "drydocs/SDLC-Docs/extracted/feasibility-memo-context-sufficiency.md"
-    ],
-    [
-      "drydocs/SDLC-Docs/extracted",
-      "CONTAINS",
-      "drydocs/SDLC-Docs/extracted/issue-driven-capture-loop.md"
-    ],
-    [
-      "drydocs/SDLC-Docs/extracted",
-      "CONTAINS",
-      "drydocs/SDLC-Docs/extracted/modular-architecture-plan.md"
-    ],
-    [
-      "drydocs/SDLC-Docs/extracted",
-      "CONTAINS",
-      "drydocs/SDLC-Docs/extracted/plan-incrementalContextLoop.prompt.md"
-    ],
-    [
       "drydocs/agents",
       "CONTAINS",
       "drydocs/agents/.env.example"
@@ -36972,6 +37410,11 @@
     [
       "drydocs/docs/decisions",
       "CONTAINS",
+      "drydocs/docs/decisions/0018-component-identity-declared-not-directory.md"
+    ],
+    [
+      "drydocs/docs/decisions",
+      "CONTAINS",
       "drydocs/docs/decisions/README.md"
     ],
     [
@@ -37597,7 +38040,47 @@
     [
       "drydocs/docs/history",
       "CONTAINS",
+      "drydocs/docs/history/genesis"
+    ],
+    [
+      "drydocs/docs/history",
+      "CONTAINS",
+      "drydocs/docs/history/git-readme-port-guide-2026-07.md"
+    ],
+    [
+      "drydocs/docs/history",
+      "CONTAINS",
       "drydocs/docs/history/next-session-cron-prompt.md"
+    ],
+    [
+      "drydocs/docs/history/genesis",
+      "CONTAINS",
+      "drydocs/docs/history/genesis/FCD-Requirements.md"
+    ],
+    [
+      "drydocs/docs/history/genesis",
+      "CONTAINS",
+      "drydocs/docs/history/genesis/adopt-bdd-sdd-howto.md"
+    ],
+    [
+      "drydocs/docs/history/genesis",
+      "CONTAINS",
+      "drydocs/docs/history/genesis/feasibility-memo-context-sufficiency.md"
+    ],
+    [
+      "drydocs/docs/history/genesis",
+      "CONTAINS",
+      "drydocs/docs/history/genesis/issue-driven-capture-loop.md"
+    ],
+    [
+      "drydocs/docs/history/genesis",
+      "CONTAINS",
+      "drydocs/docs/history/genesis/modular-architecture-plan.md"
+    ],
+    [
+      "drydocs/docs/history/genesis",
+      "CONTAINS",
+      "drydocs/docs/history/genesis/plan-incrementalContextLoop.prompt.md"
     ],
     [
       "drydocs/docs/overview",
@@ -38212,6 +38695,11 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/CORE1.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/D1.yaml"
     ],
     [
@@ -38273,6 +38761,11 @@
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
       "drydocs/docs/restructure/backlog/items/DOC2.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/DOC3.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -39738,6 +40231,11 @@
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
       "drydocs/docs/restructure/backlog/items/L9.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/LOAD1.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -41662,6 +42160,11 @@
     [
       "drydocs/drydocs",
       "CONTAINS",
+      "drydocs/drydocs/docgen"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
       "drydocs/drydocs/docs_coverage.py"
     ],
     [
@@ -41712,6 +42215,11 @@
     [
       "drydocs/drydocs",
       "CONTAINS",
+      "drydocs/drydocs/plan"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
       "drydocs/drydocs/plan_board.py"
     ],
     [
@@ -41723,6 +42231,11 @@
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/plan_roadmap.py"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
+      "drydocs/drydocs/port"
     ],
     [
       "drydocs/drydocs",
@@ -41743,6 +42256,11 @@
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/publishing"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
+      "drydocs/drydocs/review"
     ],
     [
       "drydocs/drydocs",
@@ -42265,6 +42783,31 @@
       "drydocs/drydocs/data/samples/email-extracts/sample-failure-with-hint.json"
     ],
     [
+      "drydocs/drydocs/docgen",
+      "CONTAINS",
+      "drydocs/drydocs/docgen/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/docgen",
+      "CONTAINS",
+      "drydocs/drydocs/docgen/design_doc.py"
+    ],
+    [
+      "drydocs/drydocs/docgen",
+      "CONTAINS",
+      "drydocs/drydocs/docgen/doc_outline.py"
+    ],
+    [
+      "drydocs/drydocs/docgen",
+      "CONTAINS",
+      "drydocs/drydocs/docgen/doc_pdf.py"
+    ],
+    [
+      "drydocs/drydocs/docgen",
+      "CONTAINS",
+      "drydocs/drydocs/docgen/plan_ideas.py"
+    ],
+    [
       "drydocs/drydocs/loaders",
       "CONTAINS",
       "drydocs/drydocs/loaders/README.md"
@@ -42735,29 +43278,119 @@
       "drydocs/drydocs/migrations/20260705_rename_jobfolder_to_controlmfolder.cypher"
     ],
     [
+      "drydocs/drydocs/plan",
+      "CONTAINS",
+      "drydocs/drydocs/plan/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/plan",
+      "CONTAINS",
+      "drydocs/drydocs/plan/plan_board.py"
+    ],
+    [
+      "drydocs/drydocs/plan",
+      "CONTAINS",
+      "drydocs/drydocs/plan/plan_roadmap.py"
+    ],
+    [
+      "drydocs/drydocs/port",
+      "CONTAINS",
+      "drydocs/drydocs/port/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/port",
+      "CONTAINS",
+      "drydocs/drydocs/port/port_backlog_union.py"
+    ],
+    [
+      "drydocs/drydocs/port",
+      "CONTAINS",
+      "drydocs/drydocs/port/port_preflight.py"
+    ],
+    [
+      "drydocs/drydocs/port",
+      "CONTAINS",
+      "drydocs/drydocs/port/port_rename_detect.py"
+    ],
+    [
       "drydocs/drydocs/publishing",
       "CONTAINS",
       "drydocs/drydocs/publishing/__init__.py"
     ],
     [
-      "drydocs/drydocs/publishing",
+      "drydocs/drydocs/review",
       "CONTAINS",
-      "drydocs/drydocs/publishing/assembler.py"
+      "drydocs/drydocs/review/__init__.py"
     ],
     [
-      "drydocs/drydocs/publishing",
+      "drydocs/drydocs/review",
       "CONTAINS",
-      "drydocs/drydocs/publishing/preview.py"
+      "drydocs/drydocs/review/fid_census.py"
     ],
     [
-      "drydocs/drydocs/publishing",
+      "drydocs/drydocs/review",
       "CONTAINS",
-      "drydocs/drydocs/publishing/publisher.py"
+      "drydocs/drydocs/review/gate_pages.py"
     ],
     [
-      "drydocs/drydocs/publishing",
+      "drydocs/drydocs/review",
       "CONTAINS",
-      "drydocs/drydocs/publishing/validator.py"
+      "drydocs/drydocs/review/graph_review.py"
+    ],
+    [
+      "drydocs/drydocs/review",
+      "CONTAINS",
+      "drydocs/drydocs/review/graph_verify.py"
+    ],
+    [
+      "drydocs/drydocs/review",
+      "CONTAINS",
+      "drydocs/drydocs/review/publishing"
+    ],
+    [
+      "drydocs/drydocs/review",
+      "CONTAINS",
+      "drydocs/drydocs/review/review_labels.py"
+    ],
+    [
+      "drydocs/drydocs/review",
+      "CONTAINS",
+      "drydocs/drydocs/review/run_as_detect.py"
+    ],
+    [
+      "drydocs/drydocs/review",
+      "CONTAINS",
+      "drydocs/drydocs/review/sme_notes.py"
+    ],
+    [
+      "drydocs/drydocs/review",
+      "CONTAINS",
+      "drydocs/drydocs/review/source_mappings.py"
+    ],
+    [
+      "drydocs/drydocs/review/publishing",
+      "CONTAINS",
+      "drydocs/drydocs/review/publishing/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/review/publishing",
+      "CONTAINS",
+      "drydocs/drydocs/review/publishing/assembler.py"
+    ],
+    [
+      "drydocs/drydocs/review/publishing",
+      "CONTAINS",
+      "drydocs/drydocs/review/publishing/preview.py"
+    ],
+    [
+      "drydocs/drydocs/review/publishing",
+      "CONTAINS",
+      "drydocs/drydocs/review/publishing/publisher.py"
+    ],
+    [
+      "drydocs/drydocs/review/publishing",
+      "CONTAINS",
+      "drydocs/drydocs/review/publishing/validator.py"
     ],
     [
       "drydocs/drydocs/snapshots",
@@ -42883,6 +43516,11 @@
       "drydocs/drydocs_core",
       "CONTAINS",
       "drydocs/drydocs_core/backlog_store.py"
+    ],
+    [
+      "drydocs/drydocs_core",
+      "CONTAINS",
+      "drydocs/drydocs_core/component_map.py"
     ],
     [
       "drydocs/drydocs_core",
@@ -44492,7 +45130,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260902-1353.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260902.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -45008,6 +45646,11 @@
       "drydocs/scripts",
       "CONTAINS",
       "drydocs/scripts/render_load_map.py"
+    ],
+    [
+      "drydocs/scripts",
+      "CONTAINS",
+      "drydocs/scripts/render_module_map.py"
     ],
     [
       "drydocs/scripts",
@@ -45878,6 +46521,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_module_boundary.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_module_map_render.py"
     ],
     [
       "drydocs/tests/unit",
@@ -47399,13 +48047,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2675,
-    "edges": 1427,
+    "files": 2705,
+    "edges": 1470,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2974,
-    "directories": 300
+    "rels": 3008,
+    "directories": 304
   }
 }
