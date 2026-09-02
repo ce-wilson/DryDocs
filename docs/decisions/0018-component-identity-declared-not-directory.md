@@ -18,7 +18,7 @@ relates_to:
   - PORT-MANIFEST.yaml                           # already classifies every path; ownership is what it lacks
   - docs/reviews/tech-debt-pre-restructure-2026-09-02.md   # findings A1, A2, A3, Doc1, Doc2
   - docs/reviews/restructure-design-review-2026-09-02.md   # F5 (the layer note), the two-axis rule
-executed_by: TBD — grooms of Idea-244 (the map, the guard, the five directories) and Idea-247 (the routing-doc guard and renders); the DOC1 amendment to 0015 D2
+executed_by: CORE1 (the map + join guards + PORT/LIBS), LOAD1 (the subpackage move, shims, MODULE_MAP render, RELAY-23), DOC3 (owners, genesis move, routing-doc guard, git-readme sweep, plan cut) — all 2026-09-02, merged --no-ff from feat/component-subpackages; the DOC1 amendment to 0015 D2/D4 remains
 ```
 
 > **Nothing in this record moves a file by itself.** It decides what a component IS, where
