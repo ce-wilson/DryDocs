@@ -150,7 +150,7 @@ export default function LoadMapRoute() {
       {banner}
       <StatTiles tiles={tiles} />
       <div className="min-h-0 flex-1 overflow-auto rounded-md border border-edge bg-panel-2 p-2">
-        <p className="mb-1.5 text-[12px] font-semibold text-muted">Canonical load sequence</p>
+        <p className="mb-1.5 text-xs/[1.5] font-semibold text-muted">Canonical load sequence</p>
         <ol className="flex flex-wrap items-center gap-1.5">
           {SEQUENCE.map((step, i) => (
             <li key={`${step.command}-${i}`} className="flex items-center gap-1.5">

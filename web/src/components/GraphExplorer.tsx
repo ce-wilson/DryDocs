@@ -40,7 +40,7 @@ const JOB_COLOR = '#9B6BD4' // ControlMJob's label-family color (towers.ts idiom
 const NOTE = 'mt-2 text-[13px] leading-[1.55] text-muted'
 const PANEL = 'overflow-hidden rounded-md border border-edge bg-panel'
 const P_HEAD =
-  'flex items-center justify-between gap-2.5 border-b border-edge bg-panel-2 px-3.5 py-2.5 text-[14px] font-semibold'
+  'flex items-center justify-between gap-2.5 border-b border-edge bg-panel-2 px-3.5 py-2.5 text-sm/[1.5] font-semibold'
 const P_HEAD_M = 'font-mono text-[11px] font-normal text-muted'
 
 // Middle truncation: batch job names share long prefixes (PARAD00xx_PEX_…), so

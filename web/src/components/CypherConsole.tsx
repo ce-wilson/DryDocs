@@ -47,7 +47,7 @@ function ResultTable({ result }: { result: GraphResult }) {
           {result.rows.map((row, i) => (
             <tr key={i}>
               {result.keys.map((k) => (
-                <td key={k} className="border-b border-edge-soft px-3 py-2 font-mono text-[12px] text-[#b9c4d2]">
+                <td key={k} className="border-b border-edge-soft px-3 py-2 font-mono text-xs/[1.5] text-[#b9c4d2]">
                   {JSON.stringify(row[k])}
                 </td>
               ))}
