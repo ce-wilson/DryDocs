@@ -74,20 +74,20 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 .capture-status{font-size:.78rem;color:#166534;margin:.3rem 0 0;min-height:1.1em}</style>
 </head><body>
 <h1>DryDocs — project board</h1>
-<p class="subtitle">Rendered from <code>docs/restructure/backlog/</code> 608 items &middot; 121 todo / 6 in progress / 2 blocked / 479 done. The repo is the system of record; this page is a working aid.</p>
+<p class="subtitle">Rendered from <code>docs/restructure/backlog/</code> 611 items &middot; 120 todo / 7 in progress / 3 blocked / 481 done. The repo is the system of record; this page is a working aid.</p>
 <p class="subtitle">Location: <code id="board-url"></code> <button type="button" id="board-url-copy">copy</button></p>
 <script>document.getElementById('board-url').textContent=window.location.href;document.getElementById('board-url-copy').onclick=function(){navigator.clipboard.writeText(window.location.href);};</script>
 <p class="subtitle"><a class="capture-link" href="roadmap.html">Module roadmap &rarr;</a> <a class="capture-link" href="ideas.html">Idea inbox &rarr;</a></p>
 <div class="roadmap">
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P0</span><span class="status-badge status-done">done</span></div><h3>Restructure scaffolding</h3><p class="goal">Four-layer model, external/internal split, config layer, publish boundary, sub-agents.</p><div class="progress"><div class="progress-bar" style="width:100%"></div></div><p class="progress-text">4 / 4</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P1</span><span class="status-badge status-done">done</span></div><h3>Taxonomy capture</h3><p class="goal">Live sources captured in config/taxonomy/ as pure classification (Epic B).</p><div class="progress"><div class="progress-bar" style="width:100%"></div></div><p class="progress-text">6 / 6</p></div>
-<div class="phase-card"><div class="phase-head"><span class="phase-id">P2</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Ontology mapping + HITL</h3><p class="goal">Every graph edge traces to an SME-confirmed taxonomy→ontology mapping (Epic C).</p><div class="progress"><div class="progress-bar" style="width:89%"></div></div><p class="progress-text">42 / 47</p></div>
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P2</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Ontology mapping + HITL</h3><p class="goal">Every graph edge traces to an SME-confirmed taxonomy→ontology mapping (Epic C).</p><div class="progress"><div class="progress-bar" style="width:88%"></div></div><p class="progress-text">42 / 48</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P3</span><span class="status-badge status-done">done</span></div><h3>Config-driven loaders</h3><p class="goal">Precedence + source gating read config/, not hardcoded logic (Epic D).</p><div class="progress"><div class="progress-bar" style="width:82%"></div></div><p class="progress-text">9 / 11</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P4</span><span class="status-badge status-todo">todo</span></div><h3>Context graph pilot</h3><p class="goal">SOSA/SSN observation modeling answers one live support question (Epic E).</p><div class="progress"><div class="progress-bar" style="width:0%"></div></div><p class="progress-text">0 / 2</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P5</span><span class="status-badge status-todo">todo</span></div><h3>Orchestrator expansion</h3><p class="goal">AutoSys + Airflow land as BMC-baseline concepts via confirmed crosswalks (Epic F).</p><div class="progress"><div class="progress-bar" style="width:50%"></div></div><p class="progress-text">2 / 4</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P6</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Modular architecture / component topology</h3><p class="goal">ADR 0002 — core extraction, multi-DB topology, component packages (Epic G).</p><div class="progress"><div class="progress-bar" style="width:84%"></div></div><p class="progress-text">118 / 141</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P7</span><span class="status-badge status-done">done</span></div><h3>Review toolkit back-flow</h3><p class="goal">Company SME-review/HITL toolkit reproduced generically, offline (Epic H).</p><div class="progress"><div class="progress-bar" style="width:88%"></div></div><p class="progress-text">7 / 8</p></div>
-<div class="phase-card"><div class="phase-head"><span class="phase-id">P8</span><span class="status-badge status-in_progress">in_progress</span><span class="release">v0.3.0</span></div><h3>Planning &amp; release infrastructure</h3><p class="goal">Repo-native project board + capture loop; groundwork for versioned releases (Epic I).</p><div class="progress"><div class="progress-bar" style="width:80%"></div></div><p class="progress-text">66 / 82</p></div>
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P8</span><span class="status-badge status-in_progress">in_progress</span><span class="release">v0.3.0</span></div><h3>Planning &amp; release infrastructure</h3><p class="goal">Repo-native project board + capture loop; groundwork for versioned releases (Epic I).</p><div class="progress"><div class="progress-bar" style="width:81%"></div></div><p class="progress-text">68 / 84</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P9</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Application attribution</h3><p class="goal">Jobs attributed to SEAL applications (seal_app_ref) end-to-end — gate-confirmed match policy, loader, verify coverage (Epic K).</p><div class="progress"><div class="progress-bar" style="width:87%"></div></div><p class="progress-text">33 / 38</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P10</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Documentation infrastructure</h3><p class="goal">Every design doc (TDD/Runbook/BRD) conforms to a canonical outline; deterministic md→HTML/PDF render; HITL markup loop (digital + pen/paper) re-attaches to a requirement-traceability backbone (Epic L).</p><div class="progress"><div class="progress-bar" style="width:73%"></div></div><p class="progress-text">30 / 41</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P11</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Source governance ledgers</h3><p class="goal">Per-source governance as test-enforced config: audit envelope + edge diet (doc 06, Epic M) and column-mapping ledgers (doc 08, Epic N); property-term bindings via the gate.</p><div class="progress"><div class="progress-bar" style="width:61%"></div></div><p class="progress-text">19 / 31</p></div>
@@ -98,7 +98,7 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P16</span><span class="status-badge status-todo">todo</span></div><h3>Self-documentation — DryDocs&#x27; own code in the graph</h3><p class="goal">DryDocs documents ITSELF the way it documents Control-M: the project&#x27;s code-dependency snapshot enters the knowledge graph under the software ontology (SWO), under an explicit :Project root, so &#x27;which module loads this job&#x27; is a query rather than a JSON file a human reads (Epic U).</p><div class="progress"><div class="progress-bar" style="width:83%"></div></div><p class="progress-text">24 / 29</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P17</span><span class="status-badge status-todo">todo</span></div><h3>Mind-map — deepdoc leaves the placeholder</h3><p class="goal">The per-data-flow overview record and its first producer: a graph-seeded, mind-map-driven investigator over the SDLC/ops corpora (Jira, Bitbucket, Confluence, email, Control-M Output logs) whose every finding is :Uncertain, weighted, and carries a provenance breadcrumb to its source; promotion is an SME gate write (Epic MM; docs/design/deepdoc-data-flow-overview.md).</p><div class="progress"><div class="progress-bar" style="width:17%"></div></div><p class="progress-text">2 / 12</p></div>
 </div>
-<div class="ready-strip"><strong>Ready to pull</strong> (105; <code>todo</code> with every <code>depends_on</code> done &mdash; derived, never stored): <a class="ready-id" href="#C35"><code>C35</code></a> <a class="ready-id" href="#C36"><code>C36</code></a> <a class="ready-id" href="#C37"><code>C37</code></a> <a class="ready-id" href="#C39"><code>C39</code></a> <a class="ready-id" href="#G100"><code>G100</code></a> <a class="ready-id" href="#D9"><code>D9</code></a> <a class="ready-id" href="#D11"><code>D11</code></a> <a class="ready-id" href="#G63"><code>G63</code></a> <a class="ready-id" href="#G64"><code>G64</code></a> <a class="ready-id" href="#G65"><code>G65</code></a> <a class="ready-id" href="#G106"><code>G106</code></a> <a class="ready-id" href="#G116"><code>G116</code></a> <a class="ready-id" href="#G117"><code>G117</code></a> <a class="ready-id" href="#G118"><code>G118</code></a> <a class="ready-id" href="#G119"><code>G119</code></a> <a class="ready-id" href="#G120"><code>G120</code></a> <a class="ready-id" href="#G127"><code>G127</code></a> <a class="ready-id" href="#G131"><code>G131</code></a> <a class="ready-id" href="#G132"><code>G132</code></a> <a class="ready-id" href="#G133"><code>G133</code></a> <a class="ready-id" href="#G134"><code>G134</code></a> <a class="ready-id" href="#G136"><code>G136</code></a> <a class="ready-id" href="#H8"><code>H8</code></a> <a class="ready-id" href="#I5"><code>I5</code></a> <a class="ready-id" href="#I7"><code>I7</code></a> <a class="ready-id" href="#J54"><code>J54</code></a> <a class="ready-id" href="#J56"><code>J56</code></a> <a class="ready-id" href="#J57"><code>J57</code></a> <a class="ready-id" href="#J58"><code>J58</code></a> <a class="ready-id" href="#J60"><code>J60</code></a> <a class="ready-id" href="#J61"><code>J61</code></a> <a class="ready-id" href="#J62"><code>J62</code></a> <a class="ready-id" href="#J64"><code>J64</code></a> <a class="ready-id" href="#J65"><code>J65</code></a> <a class="ready-id" href="#J67"><code>J67</code></a> <a class="ready-id" href="#J70"><code>J70</code></a> <a class="ready-id" href="#K23"><code>K23</code></a> <a class="ready-id" href="#K29"><code>K29</code></a> <a class="ready-id" href="#L23"><code>L23</code></a> <a class="ready-id" href="#L29"><code>L29</code></a> <a class="ready-id" href="#N17"><code>N17</code></a> <a class="ready-id" href="#N18"><code>N18</code></a> <a class="ready-id" href="#N19"><code>N19</code></a> <a class="ready-id" href="#N22"><code>N22</code></a> <a class="ready-id" href="#N23"><code>N23</code></a> <a class="ready-id" href="#N24"><code>N24</code></a> <a class="ready-id" href="#N25"><code>N25</code></a> <a class="ready-id" href="#N26"><code>N26</code></a> <a class="ready-id" href="#G85"><code>G85</code></a> <a class="ready-id" href="#G86"><code>G86</code></a> <a class="ready-id" href="#O23"><code>O23</code></a> <a class="ready-id" href="#O26"><code>O26</code></a> <a class="ready-id" href="#O43"><code>O43</code></a> <a class="ready-id" href="#O44"><code>O44</code></a> <a class="ready-id" href="#O48"><code>O48</code></a> <a class="ready-id" href="#O50"><code>O50</code></a> <a class="ready-id" href="#O54"><code>O54</code></a> <a class="ready-id" href="#O63"><code>O63</code></a> <a class="ready-id" href="#O68"><code>O68</code></a> <a class="ready-id" href="#O70"><code>O70</code></a> <a class="ready-id" href="#O72"><code>O72</code></a> <a class="ready-id" href="#O82"><code>O82</code></a> <a class="ready-id" href="#O87"><code>O87</code></a> <a class="ready-id" href="#O88"><code>O88</code></a> <a class="ready-id" href="#P6"><code>P6</code></a> <a class="ready-id" href="#Q22"><code>Q22</code></a> <a class="ready-id" href="#Q24"><code>Q24</code></a> <a class="ready-id" href="#Q28"><code>Q28</code></a> <a class="ready-id" href="#R7"><code>R7</code></a> <a class="ready-id" href="#R8"><code>R8</code></a> <a class="ready-id" href="#R9"><code>R9</code></a> <a class="ready-id" href="#R11"><code>R11</code></a> <a class="ready-id" href="#R12"><code>R12</code></a> <a class="ready-id" href="#R13"><code>R13</code></a> <a class="ready-id" href="#R15"><code>R15</code></a> <a class="ready-id" href="#R16"><code>R16</code></a> <a class="ready-id" href="#R17"><code>R17</code></a> <a class="ready-id" href="#R18"><code>R18</code></a> <a class="ready-id" href="#R19"><code>R19</code></a> <a class="ready-id" href="#G90"><code>G90</code></a> <a class="ready-id" href="#S11"><code>S11</code></a> <a class="ready-id" href="#U10"><code>U10</code></a> <a class="ready-id" href="#U11"><code>U11</code></a> <a class="ready-id" href="#U16"><code>U16</code></a> <a class="ready-id" href="#U23"><code>U23</code></a> <a class="ready-id" href="#U27"><code>U27</code></a> <a class="ready-id" href="#V4"><code>V4</code></a> <a class="ready-id" href="#V5"><code>V5</code></a> <a class="ready-id" href="#V6"><code>V6</code></a> <a class="ready-id" href="#V7"><code>V7</code></a> <a class="ready-id" href="#V9"><code>V9</code></a> <a class="ready-id" href="#V10"><code>V10</code></a> <a class="ready-id" href="#V11"><code>V11</code></a> <a class="ready-id" href="#Y3"><code>Y3</code></a> <a class="ready-id" href="#Y6"><code>Y6</code></a> <a class="ready-id" href="#Z4"><code>Z4</code></a> <a class="ready-id" href="#Z6"><code>Z6</code></a> <a class="ready-id" href="#Z7"><code>Z7</code></a> <a class="ready-id" href="#Z8"><code>Z8</code></a> <a class="ready-id" href="#GN2"><code>GN2</code></a> <a class="ready-id" href="#MM3"><code>MM3</code></a> <a class="ready-id" href="#MM5"><code>MM5</code></a> <a class="ready-id" href="#MM6"><code>MM6</code></a> <a class="ready-id" href="#MM9"><code>MM9</code></a> <a class="ready-id" href="#MM11"><code>MM11</code></a></div>
+<div class="ready-strip"><strong>Ready to pull</strong> (104; <code>todo</code> with every <code>depends_on</code> done &mdash; derived, never stored): <a class="ready-id" href="#C35"><code>C35</code></a> <a class="ready-id" href="#C36"><code>C36</code></a> <a class="ready-id" href="#C37"><code>C37</code></a> <a class="ready-id" href="#C39"><code>C39</code></a> <a class="ready-id" href="#G100"><code>G100</code></a> <a class="ready-id" href="#D9"><code>D9</code></a> <a class="ready-id" href="#D11"><code>D11</code></a> <a class="ready-id" href="#G63"><code>G63</code></a> <a class="ready-id" href="#G64"><code>G64</code></a> <a class="ready-id" href="#G65"><code>G65</code></a> <a class="ready-id" href="#G106"><code>G106</code></a> <a class="ready-id" href="#G116"><code>G116</code></a> <a class="ready-id" href="#G117"><code>G117</code></a> <a class="ready-id" href="#G118"><code>G118</code></a> <a class="ready-id" href="#G119"><code>G119</code></a> <a class="ready-id" href="#G120"><code>G120</code></a> <a class="ready-id" href="#G127"><code>G127</code></a> <a class="ready-id" href="#G131"><code>G131</code></a> <a class="ready-id" href="#G132"><code>G132</code></a> <a class="ready-id" href="#G133"><code>G133</code></a> <a class="ready-id" href="#G134"><code>G134</code></a> <a class="ready-id" href="#G136"><code>G136</code></a> <a class="ready-id" href="#H8"><code>H8</code></a> <a class="ready-id" href="#I5"><code>I5</code></a> <a class="ready-id" href="#I7"><code>I7</code></a> <a class="ready-id" href="#J54"><code>J54</code></a> <a class="ready-id" href="#J56"><code>J56</code></a> <a class="ready-id" href="#J57"><code>J57</code></a> <a class="ready-id" href="#J58"><code>J58</code></a> <a class="ready-id" href="#J60"><code>J60</code></a> <a class="ready-id" href="#J61"><code>J61</code></a> <a class="ready-id" href="#J62"><code>J62</code></a> <a class="ready-id" href="#J64"><code>J64</code></a> <a class="ready-id" href="#J65"><code>J65</code></a> <a class="ready-id" href="#J67"><code>J67</code></a> <a class="ready-id" href="#J70"><code>J70</code></a> <a class="ready-id" href="#K23"><code>K23</code></a> <a class="ready-id" href="#K29"><code>K29</code></a> <a class="ready-id" href="#L23"><code>L23</code></a> <a class="ready-id" href="#L29"><code>L29</code></a> <a class="ready-id" href="#N17"><code>N17</code></a> <a class="ready-id" href="#N18"><code>N18</code></a> <a class="ready-id" href="#N19"><code>N19</code></a> <a class="ready-id" href="#N22"><code>N22</code></a> <a class="ready-id" href="#N23"><code>N23</code></a> <a class="ready-id" href="#N24"><code>N24</code></a> <a class="ready-id" href="#N25"><code>N25</code></a> <a class="ready-id" href="#N26"><code>N26</code></a> <a class="ready-id" href="#G85"><code>G85</code></a> <a class="ready-id" href="#G86"><code>G86</code></a> <a class="ready-id" href="#O23"><code>O23</code></a> <a class="ready-id" href="#O26"><code>O26</code></a> <a class="ready-id" href="#O43"><code>O43</code></a> <a class="ready-id" href="#O44"><code>O44</code></a> <a class="ready-id" href="#O48"><code>O48</code></a> <a class="ready-id" href="#O50"><code>O50</code></a> <a class="ready-id" href="#O54"><code>O54</code></a> <a class="ready-id" href="#O63"><code>O63</code></a> <a class="ready-id" href="#O68"><code>O68</code></a> <a class="ready-id" href="#O70"><code>O70</code></a> <a class="ready-id" href="#O72"><code>O72</code></a> <a class="ready-id" href="#O82"><code>O82</code></a> <a class="ready-id" href="#O87"><code>O87</code></a> <a class="ready-id" href="#O88"><code>O88</code></a> <a class="ready-id" href="#P6"><code>P6</code></a> <a class="ready-id" href="#Q22"><code>Q22</code></a> <a class="ready-id" href="#Q24"><code>Q24</code></a> <a class="ready-id" href="#Q28"><code>Q28</code></a> <a class="ready-id" href="#R7"><code>R7</code></a> <a class="ready-id" href="#R8"><code>R8</code></a> <a class="ready-id" href="#R9"><code>R9</code></a> <a class="ready-id" href="#R11"><code>R11</code></a> <a class="ready-id" href="#R12"><code>R12</code></a> <a class="ready-id" href="#R13"><code>R13</code></a> <a class="ready-id" href="#R15"><code>R15</code></a> <a class="ready-id" href="#R16"><code>R16</code></a> <a class="ready-id" href="#R17"><code>R17</code></a> <a class="ready-id" href="#R18"><code>R18</code></a> <a class="ready-id" href="#R19"><code>R19</code></a> <a class="ready-id" href="#G90"><code>G90</code></a> <a class="ready-id" href="#S11"><code>S11</code></a> <a class="ready-id" href="#U10"><code>U10</code></a> <a class="ready-id" href="#U11"><code>U11</code></a> <a class="ready-id" href="#U16"><code>U16</code></a> <a class="ready-id" href="#U23"><code>U23</code></a> <a class="ready-id" href="#U27"><code>U27</code></a> <a class="ready-id" href="#V4"><code>V4</code></a> <a class="ready-id" href="#V5"><code>V5</code></a> <a class="ready-id" href="#V6"><code>V6</code></a> <a class="ready-id" href="#V7"><code>V7</code></a> <a class="ready-id" href="#V9"><code>V9</code></a> <a class="ready-id" href="#V10"><code>V10</code></a> <a class="ready-id" href="#V11"><code>V11</code></a> <a class="ready-id" href="#Y3"><code>Y3</code></a> <a class="ready-id" href="#Y6"><code>Y6</code></a> <a class="ready-id" href="#Z4"><code>Z4</code></a> <a class="ready-id" href="#Z6"><code>Z6</code></a> <a class="ready-id" href="#Z7"><code>Z7</code></a> <a class="ready-id" href="#Z8"><code>Z8</code></a> <a class="ready-id" href="#GN2"><code>GN2</code></a> <a class="ready-id" href="#MM5"><code>MM5</code></a> <a class="ready-id" href="#MM6"><code>MM6</code></a> <a class="ready-id" href="#MM9"><code>MM9</code></a> <a class="ready-id" href="#MM11"><code>MM11</code></a></div>
 <div class="filters">
   <label>Module<select id="f-module"><option value="">All</option>
 <option value="config">config</option>
@@ -179,7 +179,7 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
   <button type="button" id="f-clear">Clear filters</button>
 </div>
 <div class="board">
-<div class="column" data-status="todo"><div class="column-head"><h2>To do</h2><span class="count" data-count-for="todo">121</span></div><div class="column-body"><div class="card ready" id="card-C35" data-id="C35" data-module="ontology" data-phase="2" data-epic="ontology-mapping" data-type="task" data-status="todo" data-search="c35 run the business-layer org-structure gate: segment org class, reorg reification, one dating idiom" tabindex="0"><div class="card-head"><span class="card-id">C35</span><span class="card-title">Run the business-layer org-structure gate: segment ORG class, reorg reification, one dating idiom</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">ontology-mapping</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C28" data-target="card-C28">C28</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> A sign-off session for gate `business-layer-org-structure` is HELD and its outcome recorded in
+<div class="column" data-status="todo"><div class="column-head"><h2>To do</h2><span class="count" data-count-for="todo">120</span></div><div class="column-body"><div class="card ready" id="card-C35" data-id="C35" data-module="ontology" data-phase="2" data-epic="ontology-mapping" data-type="task" data-status="todo" data-search="c35 run the business-layer org-structure gate: segment org class, reorg reification, one dating idiom" tabindex="0"><div class="card-head"><span class="card-id">C35</span><span class="card-title">Run the business-layer org-structure gate: segment ORG class, reorg reification, one dating idiom</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">ontology-mapping</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C28" data-target="card-C28">C28</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> A sign-off session for gate `business-layer-org-structure` is HELD and its outcome recorded in
 config/gate-log.md as SIGNED, SME-DEFERRED with a named re-arm trigger, or
 BLOCKED with a named blocker -- silence is the one non-outcome. BEFORE the
 session: a stale-premise sweep of the drafted page against current facts (the
@@ -2429,7 +2429,6 @@ Module drydocs-load rather than drydocs-web: every change is to fixture and taxo
 <div class="card ready" id="card-GN2" data-id="GN2" data-module="drydocs-load" data-phase="6" data-epic="generic-naming" data-type="task" data-status="todo" data-search="gn2 execute the rename as one frozen unit and port it as one unit — data-named commands, loaders and source ids" tabindex="0"><div class="card-head"><span class="card-id">GN2</span><span class="card-title">Execute the rename as ONE frozen unit and port it as one unit — data-named commands, loaders and source ids</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-load</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">generic-naming</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-GN1" data-target="card-GN1">GN1</a> <a class="dep-link" href="#card-G79" data-target="card-G79">G79</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The mechanical rename ADR 0012 authorises, executed as a SINGLE frozen change and ported as a SINGLE unit -- the SME&#x27;s condition, and the right one: a wide rename landing in pieces leaves the two repos disagreeing about verb names for as long as the pieces take. Scope, in the layer order the ADR rules: CLI verbs (with deprecated aliases per the policy), LOADER_REGISTRY keys and loader class names, milestone-id verify commands, and -- only if the ADR rules them in the same unit -- source registry ids via the cross-repo path. Every derived surface regenerates and is proven current: load-map.json, load-map.html, ingest.sh, the startup runbook Appendix B (held by test_load_sequence_surfaces), the load runbook, and the skills that name verbs. MUST NOT overlap an in-flight port. The change freezes other producer work, lands, is ported, and only then does normal work resume.
 </p><p class="notes"><strong>Notes:</strong> Raised 2026-08-11 with GN1. depends_on G79 as well as GN1 so the split lands under the OLD names first: splitting and renaming together makes the port diff unreviewable, and the split is the part that carries behavioural risk while the rename is mechanical.
 </p></div></div>
-<div class="card ready" id="card-MM3" data-id="MM3" data-module="drydocs-deepdoc" data-phase="17" data-epic="mind-map" data-type="task" data-status="todo" data-search="mm3 mind-map state file + the shared entity/id extractor + novelty and theme columns on the search log — the mind map becomes the driver, not documentation" tabindex="0"><div class="card-head"><span class="card-id">MM3</span><span class="card-title">Mind-map state file + the shared entity/ID extractor + novelty and theme columns on the search log — the mind map becomes the driver, not documentation</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-deepdoc</span><span class="chip" data-kind="phase">P17</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">mind-map</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-MM1" data-target="card-MM1">MM1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (1) A mind-map state file schema (YAML, `drydocs.deepdoc.mindmap.v1`) with a root question, named branches, and slots that are `open` (the trailing-? of the session) or `filled` with an evidence ref and a date; a pure reader/writer in drydocs_deepdoc; a test that a slot cannot move to `filled` without an evidence ref. (2) A pure entity/ID extractor in drydocs_core (mechanism only: application-id tokens, issue keys `&lt;PROJECT&gt;-&lt;n&gt;`, folder-name positional tokens via the existing PRAOCG decode, table names, distribution-list names, GUIDs) returning typed matches with spans; table-driven tests on synthetic strings; its MODULE_MAP row and CORE_PREFIXES entry land in the same commit. (3) The search log gains `novelty` (new ids vs the graph + the record) and `theme` (= the mind-map slot targeted) columns beside tool/search/results/date, written through the existing run-log contract under DRYDOCS_LOGDIR, with a test that a row without a theme is refused. No connector calls any network in this item.</p><p class="notes"><strong>Notes:</strong> The 3-tool plan&#x27;s section D, the &#x27;real leverage&#x27;. Extractor goes to core (pure parse, ADR 0002-A §2); the state file and the log columns stay in the component. Opus: the slot/novelty semantics are the part that has to be right; the code is small.</p></div></div>
 <div class="card" id="card-MM4" data-id="MM4" data-module="drydocs-deepdoc" data-phase="17" data-epic="mind-map" data-type="task" data-status="todo" data-search="mm4 per-tool connector upgrades as mechanism-only specs: jira matchconfidence/novelty split + signpost flag, bitbucket commit-inspect by issue key or folder name, confluence firm-wide default with space distribution and app_id-from-title" tabindex="0"><div class="card-head"><span class="card-id">MM4</span><span class="card-title">Per-tool connector upgrades as mechanism-only specs: Jira MatchConfidence/Novelty split + signpost flag, Bitbucket commit-inspect by issue key OR folder name, Confluence firm-wide default with space distribution and APP_ID-from-title</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-deepdoc</span><span class="chip" data-kind="phase">P17</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">mind-map</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-MM3" data-target="card-MM3">MM3</a> <a class="dep-link" href="#card-MM5" data-target="card-MM5">MM5</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Each of the three connectors has an interface + fake pair in drydocs_deepdoc (the jira.py precedent: wire impl company-side, producer ships interface and fakes) and a test over recorded fixtures proving the upgrade: Jira — a hit scores separately on match_confidence and novelty and a high-match/templated-description hit is flagged `signpost`, with description and comments in the scored text; Bitbucket — given an issue key OR a folder name the connector&#x27;s primary path is commit inspect/analyze returning author, date, message key and changed paths, and a code search of an issue key returning 0 is reported as `expected_zero` not as a miss; Confluence — the default scope is firm-wide, the result carries the per-space hit distribution, and application-id tokens are extracted from page titles through the MM3 extractor. Every search writes an MM3 log row. No real host, space, project or credential appears in the tracked tree.</p><p class="notes"><strong>Notes:</strong> Sections A–C of the 3-tool plan. Depends on MM5 (the scripts re-homed first) and MM3 (the extractor and log columns they emit).</p></div></div>
 <div class="card ready" id="card-MM5" data-id="MM5" data-module="drydocs-deepdoc" data-phase="17" data-epic="mind-map" data-type="chore" data-status="todo" data-search="mm5 re-home the three session search scripts (jira / bitbucket / confluence, shared csv log) as mechanism-only deepdoc connectors; real hosts and config stay in internal-local" tabindex="0"><div class="card-head"><span class="card-id">MM5</span><span class="card-title">Re-home the three session search scripts (Jira / Bitbucket / Confluence, shared CSV log) as mechanism-only deepdoc connectors; real hosts and config stay in internal-local</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-deepdoc</span><span class="chip" data-kind="phase">P17</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">mind-map</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-MM1" data-target="card-MM1">MM1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The three scripts exist under drydocs_deepdoc/connectors/ with every host, cluster, project, space, vendor binary path and credential read from a config file whose committed copy is a sample with placeholders and whose real copy is gitignored under internal-local/; a git grep for company host suffixes, cluster ids and restricted-domain addresses over drydocs_deepdoc returns nothing; a smoke test runs each script in dry-run mode with no network and asserts the log row shape (tool, search, theme, results, date) and the `IDs in → references out` contract (stdin ids in, a references list out). The transcript file is cited in the module docstring as the provenance of the design, by file name.</p><p class="notes"><strong>Notes:</strong> The scripts were written on the company side during the session (PowerShell, &#x27;KISS, one per tool&#x27;); this is the back-flow of the mechanism, not the instances — the standing sanitization rule.</p></div></div>
 <div class="card ready" id="card-MM6" data-id="MM6" data-module="ontology" data-phase="17" data-epic="mind-map" data-type="task" data-status="todo" data-search="mm6 ontology proposals for what the investigation surfaces: :sdlcproject with a binding type, :jiraissue as a signpost, :codecommit, evidence edges to proxies — planned only, through the gate" tabindex="0"><div class="card-head"><span class="card-id">MM6</span><span class="card-title">Ontology proposals for what the investigation surfaces: :SdlcProject with a binding type, :JiraIssue as a signpost, :CodeCommit, evidence edges to proxies — planned only, through the gate</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P17</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / ontology-mapper</span></div><div class="epic">mind-map</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-MM2" data-target="card-MM2">MM2</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> A gate prompt (or a rider on data-flow-overview) proposes, each `status: planned` with a PROV-O/ORG/DCAT term and a SOURCE/DERIVED badge: `:SdlcProject {system: jira|bitbucket|confluence, key, binding: collaboration|seal-bound|none}` keyed one APP_ID → many projects/spaces, with the binding read from the DevX project page and dated; `:JiraIssue` carrying match_confidence, novelty and signpost and NEVER an ownership edge; `:CodeCommit {sha, author_ref, message_key}` as the code anchor; and the evidence edge family from a finding to the existing proxies only (:Application, :ControlMJob, :DataAsset, :Document/:Chunk). Every proposed node class states its reliability and trust defaults and that it is written only through drydocs_deepdoc/writer.py under :Uncertain (test_uncertain_boundary.py allowlist unchanged). The PAT-evidence Jira-board-per-team join is named as the first seed for :SdlcProject. Nothing flips past planned.</p><p class="notes"><strong>Notes:</strong> The user ruling that widened the epic: integrate discovered facts into the unstructured knowledge graph with proper ontology, weighting and SME input, plus a breadcrumb back to the source. Fable because four node classes and their PROV mappings are an ontology decision.</p></div></div>
@@ -2473,7 +2472,7 @@ THE PROVENANCE FORK IS THE SAME FORK O68 CLAUSE (d) ALREADY FORCES, reached from
 
 Mechanism only; no real acronym values from any company corpus land in a tracked file.
 </p></div></div></div></div>
-<div class="column" data-status="in_progress"><div class="column-head"><h2>In progress</h2><span class="count" data-count-for="in_progress">6</span></div><div class="column-body"><div class="card" id="card-E1" data-id="E1" data-module="ontology" data-phase="4" data-epic="context-graph" data-type="task" data-status="in_progress" data-search="e1 register sosa/ssn observation terms via the gate" tabindex="0"><div class="card-head"><span class="card-id">E1</span><span class="card-title">Register SOSA/SSN observation terms via the gate</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P4</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / ontology-mapper</span></div><div class="epic">context-graph</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C1" data-target="card-C1">C1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> sosa:* terms present with IRIs; status planned-&gt;confirmed via gate</p><p class="notes"><strong>Notes:</strong> Registration step DONE (main, 2026-06-22): sosa/ssn prefixes in namespaces.py; terms seeded in drydocs_core/schema/sosa_experimental_supplement.cypher (opt-in `drydocs apply-sosa-supplement`, NOT in bootstrap; every term adoption:&quot;experimental&quot;); 4 context relationships in relationship_vocabulary.yaml (sosa_observes/has_result/ made_by_sensor/observed_property, status planned, domain context); README split into Declared-Adopted vs Experimental/Early-Adoption. REMAINING for ontology-mapper: take the `jobrun-observation` map entry through the HITL gate (resolve ControlMJobRun-as-Observation vs separate-Observation-node; run-history source), then planned-&gt;confirmed. GATE SESSION DEFERRED 2026-07-14 (SME: not ready yet) — page stays rendered/pending; nothing flips; re-present at a future session (see gate-log 2026-07-14 deferral note).
+<div class="column" data-status="in_progress"><div class="column-head"><h2>In progress</h2><span class="count" data-count-for="in_progress">7</span></div><div class="column-body"><div class="card" id="card-E1" data-id="E1" data-module="ontology" data-phase="4" data-epic="context-graph" data-type="task" data-status="in_progress" data-search="e1 register sosa/ssn observation terms via the gate" tabindex="0"><div class="card-head"><span class="card-id">E1</span><span class="card-title">Register SOSA/SSN observation terms via the gate</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P4</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / ontology-mapper</span></div><div class="epic">context-graph</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C1" data-target="card-C1">C1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> sosa:* terms present with IRIs; status planned-&gt;confirmed via gate</p><p class="notes"><strong>Notes:</strong> Registration step DONE (main, 2026-06-22): sosa/ssn prefixes in namespaces.py; terms seeded in drydocs_core/schema/sosa_experimental_supplement.cypher (opt-in `drydocs apply-sosa-supplement`, NOT in bootstrap; every term adoption:&quot;experimental&quot;); 4 context relationships in relationship_vocabulary.yaml (sosa_observes/has_result/ made_by_sensor/observed_property, status planned, domain context); README split into Declared-Adopted vs Experimental/Early-Adoption. REMAINING for ontology-mapper: take the `jobrun-observation` map entry through the HITL gate (resolve ControlMJobRun-as-Observation vs separate-Observation-node; run-history source), then planned-&gt;confirmed. GATE SESSION DEFERRED 2026-07-14 (SME: not ready yet) — page stays rendered/pending; nothing flips; re-present at a future session (see gate-log 2026-07-14 deferral note).
 </p></div></div>
 <div class="card" id="card-G62" data-id="G62" data-module="drydocs-lineage" data-phase="6" data-epic="component-topology" data-type="task" data-status="in_progress" data-search="g62 run the rua-bundle data-profile gate: the sme names the load population, the agent profiles it, and only the walked population enters the curated load" tabindex="0"><div class="card-head"><span class="card-id">G62</span><span class="card-title">Run the rua-bundle data-profile gate: the SME names the load population, the agent profiles it, and only the walked population enters the curated load</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-lineage</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">component-topology</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-G22" data-target="card-G22">G22</a> <a class="dep-link" href="#card-G23" data-target="card-G23">G23</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> USER-GATED START — the SME convenes the session; the pull loop SKIPS this item until then (the C12/J13 idiom). The drafted rua-bundle-data-profile page is walked in its ruled two-step order: section A the SME identifies the source data (which hosts&#x27; bundles, where they sit, which collector produced each — Internal, recorded company-side, never on the page), section B the agent profiles that population through the G20 extractor in STAGING with zero graph writes, and section C consumes the profile to admit or trim the population, dispose of the hash-absent and collision cases it counts, and clear the F1 sweep. Sign-off transcribed to config/gate-log.md; gates.json + the enforcement matrix regenerate. No population the page has not walked enters the G23 curated load.
 </p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-09 from Idea-85, which asked only for ids and scheduling — the four post-G22 data-profile prompts were drafted 2026-08-07 and unsigned, and an unsigned prompt with no backlog id is invisible to the pull loop. Sessions run COMPANY-SIDE because the identify-the-source-data step names real hosts and paths (Internal); what lands producer-side is the transcription and the regenerated gate surfaces. Model fable: the ruling decides what may be written to the graph.
@@ -2507,6 +2506,7 @@ run_named; a graph-unavailable answer degrades to the named read path, never an 
 or a silent zero. 7 tests in test_mapping_api.py; full suite 2590 passed / ruff check +
 format clean (venue: worktree of origin/main on MSI desktop). Console pane = follow-on.
 </p></div></div>
+<div class="card" id="card-MM3" data-id="MM3" data-module="drydocs-deepdoc" data-phase="17" data-epic="mind-map" data-type="task" data-status="in_progress" data-search="mm3 mind-map state file + the shared entity/id extractor + novelty and theme columns on the search log — the mind map becomes the driver, not documentation" tabindex="0"><div class="card-head"><span class="card-id">MM3</span><span class="card-title">Mind-map state file + the shared entity/ID extractor + novelty and theme columns on the search log — the mind map becomes the driver, not documentation</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-deepdoc</span><span class="chip" data-kind="phase">P17</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">mind-map</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-MM1" data-target="card-MM1">MM1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (1) A mind-map state file schema (YAML, `drydocs.deepdoc.mindmap.v1`) with a root question, named branches, and slots that are `open` (the trailing-? of the session) or `filled` with an evidence ref and a date; a pure reader/writer in drydocs_deepdoc; a test that a slot cannot move to `filled` without an evidence ref. (2) A pure entity/ID extractor in drydocs_core (mechanism only: application-id tokens, issue keys `&lt;PROJECT&gt;-&lt;n&gt;`, folder-name positional tokens via the existing PRAOCG decode, table names, distribution-list names, GUIDs) returning typed matches with spans; table-driven tests on synthetic strings; its MODULE_MAP row and CORE_PREFIXES entry land in the same commit. (3) The search log gains `novelty` (new ids vs the graph + the record) and `theme` (= the mind-map slot targeted) columns beside tool/search/results/date, written through the existing run-log contract under DRYDOCS_LOGDIR, with a test that a row without a theme is refused. No connector calls any network in this item.</p><p class="notes"><strong>Notes:</strong> The 3-tool plan&#x27;s section D, the &#x27;real leverage&#x27;. Extractor goes to core (pure parse, ADR 0002-A §2); the state file and the log columns stay in the component. Opus: the slot/novelty semantics are the part that has to be right; the code is small.</p></div></div>
 <div class="card" id="card-MM7" data-id="MM7" data-module="drydocs-lineage" data-phase="17" data-epic="mind-map" data-type="task" data-status="in_progress" data-search="mm7 control-m output-tab log extractor — launcher job kind, resolved arguments, placement handoff pair, landing prefix, compute target — joined onto :etlprocess by pipeline guid, dpl_mac-shaped, every skip counted" tabindex="0"><div class="card-head"><span class="card-id">MM7</span><span class="card-title">Control-M Output-tab log extractor — launcher job KIND, resolved arguments, placement handoff pair, landing prefix, compute target — joined onto :ETLProcess by pipeline GUID, dpl_mac-shaped, every skip counted</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-lineage</span><span class="chip" data-kind="phase">P17</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">mind-map</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-G17" data-target="card-G17">G17</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> drydocs_lineage/extractors/controlm_output.py takes (source, into: LineageGraph) like every extractor, reads Output text per &lt;job, order-id, run&gt; from a NAMED sysout file — the modern wrapper writes no identity into the body, so job name / order id / run stamp are parsed from the FILE NAME (tolerant scan, site-pinnable pattern override, name-derived date kept as run_date and never merged into the launcher&#x27;s -od) and a detached text blob is rejected with a counted reason — and joins onto already-staged DPL processes on the pipeline GUID (falling back to &lt;job, run&gt; when the command line carried a variable), returning an OutputCoverage dataclass with a counted reason for every skip (no_launcher_banner, kind_unknown, guid_mismatch_vs_cmdline, truncated_json, token_redacted, identity_not_in_filename, no_order_id_in_filename). It sets PROPERTIES only — launcher_kind (from the `Identified &#x27;&lt;KIND&gt;&#x27; Job` line), compute_target, provenance_guid (placement response) and the -proId of the ingestion consuming that placement, recorded as a run-scoped PAIR whose scope is those two jobs and which never keys an edge, landing_prefix, submission_cluster, image_digest, compute_profile_ref — and creates no edge (m3_* stay as they are). A synthetic mechanism-only fixture under tests/fixtures/ reproduces the four kinds seen (PLACEMENT, INGESTION, TRANSFORM, PROVISION), a placement handoff across exactly two jobs, a transform that logs no provenance id (expected-absent, counted, never reported as a break), and a line that carries a bearer token — which the extractor REDACTS before any field and counts. The source row is registered in config/source-registry.yaml with classification and an acquisition path per Idea-133 (mode, via). A chained run (inventory → mac → output) exists as one CLI invocation and curation.py&#x27;s stub docstring names it as the cadence hook; the Output read is described in the design doc §3 as an INPUT to deepdoc, not a deepdoc feature.</p><p class="notes"><strong>Notes:</strong> Iteration 2 of the launcher contract. Genuine greenfield: no code, item or idea in the repo ingests Control-M sysout today. The log is authoritative where CMDLINE carries a %%variable and it asserts the job kind G12 wanted. Iteration 3 (run-history join via the P4 tables) is named in the doc and not minted until this lands.
 
 POC 2026-08-21 (user direction: a proof of concept frames the implementation before the
@@ -2520,7 +2520,7 @@ shapes including the cut task-service JSON, the transform with no provenance id,
 printed bearer token (redacted and counted). Real logs live under
 internal-local/controlm-output-logs/ (git-ignored). The Python extractor is still this
 item&#x27;s deliverable; the PoC fixed its field list and skip-reason set.</p></div></div></div></div>
-<div class="column" data-status="blocked"><div class="column-head"><h2>Blocked</h2><span class="count" data-count-for="blocked">2</span></div><div class="column-body"><div class="card" id="card-C33" data-id="C33" data-module="drydocs-load" data-phase="2" data-epic="ontology-mapping" data-type="task" data-status="blocked" data-search="c33 build the adhoc software-version loader the software-version-context gate authorized and deliberately did not build" tabindex="0"><div class="card-head"><span class="card-id">C33</span><span class="card-title">Build the adhoc software-version loader the software-version-context gate authorized and deliberately did not build</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-load</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">ontology-mapping</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The gate signed the SHAPE and nothing else: reg_appuser_uses_software is registered status: planned, no loader exists, and the adhoc-sme-email corpus stays confirmed: false for that reason alone. This item builds exactly what sections A-E signed -- the loader itself (MERGE key per section Q3 below, edge properties per B3, as_of from the email&#x27;s sent date), the :Document minted from the hand-recorded citation, the evidence: block&#x27;s as_of filled in on the abinitio product row, registration in config/manual-loads/manifest.yaml per E4, and the C1 install-path pattern rows in the invocation_patterns shape. SECTION Q3 IS SETTLED BEFORE THE MERGE KEY IS WRITTEN, not after. The gate deferred it with the consequence stated: if the estate re-points installs by symlink, install_path is a poor key and identity moves to (fid, version), which is a RE-KEY rather than an edit. If Q3 cannot be answered, the item STOPS at that question and says so -- a guessed identity key is the failure the identity gate&#x27;s D2/C3 exist to prevent. Two things this build must NOT do: write the section F application-level rollup (blocked on K17, and not behind a flag), and auto-append observed versions to the curated versions: list (C2). The vocabulary entry flips planned -&gt; active only if its gate says so; nothing here signs anything.
+<div class="column" data-status="blocked"><div class="column-head"><h2>Blocked</h2><span class="count" data-count-for="blocked">3</span></div><div class="column-body"><div class="card" id="card-C33" data-id="C33" data-module="drydocs-load" data-phase="2" data-epic="ontology-mapping" data-type="task" data-status="blocked" data-search="c33 build the adhoc software-version loader the software-version-context gate authorized and deliberately did not build" tabindex="0"><div class="card-head"><span class="card-id">C33</span><span class="card-title">Build the adhoc software-version loader the software-version-context gate authorized and deliberately did not build</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-load</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">ontology-mapping</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The gate signed the SHAPE and nothing else: reg_appuser_uses_software is registered status: planned, no loader exists, and the adhoc-sme-email corpus stays confirmed: false for that reason alone. This item builds exactly what sections A-E signed -- the loader itself (MERGE key per section Q3 below, edge properties per B3, as_of from the email&#x27;s sent date), the :Document minted from the hand-recorded citation, the evidence: block&#x27;s as_of filled in on the abinitio product row, registration in config/manual-loads/manifest.yaml per E4, and the C1 install-path pattern rows in the invocation_patterns shape. SECTION Q3 IS SETTLED BEFORE THE MERGE KEY IS WRITTEN, not after. The gate deferred it with the consequence stated: if the estate re-points installs by symlink, install_path is a poor key and identity moves to (fid, version), which is a RE-KEY rather than an edit. If Q3 cannot be answered, the item STOPS at that question and says so -- a guessed identity key is the failure the identity gate&#x27;s D2/C3 exist to prevent. Two things this build must NOT do: write the section F application-level rollup (blocked on K17, and not behind a flag), and auto-append observed versions to the curated versions: list (C2). The vocabulary entry flips planned -&gt; active only if its gate says so; nothing here signs anything.
 </p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-11 from Idea-98, the first of the follow-ups C25&#x27;s close note carries. model fable because the deliverable lands a MERGE KEY -- the identity decision the gate deferred -- while the code around it is ordinary loader work. The observable close signal is the corpus flipping confirmed: false -&gt; true on adhoc-sme-email, which is exactly why it must not flip on a guessed key.
 STOPPED AT Q3, 2026-08-21 -- as the acceptance requires. The repo holds no answer to
 Q3 (install_path stable, or re-pointed by symlink?): the only mentions are the gate&#x27;s own
@@ -2535,6 +2535,84 @@ loader (key {source, install_path} if paths are stable; (fid, version) if symlin
 evidence.as_of on the abinitio row, and the manifest.yaml registration. UNBLOCK = one SME
 sentence answering Q3, logged as a RECORD in config/gate-log.md under the
 software-version-context gate.
+</p></div></div>
+<div class="card" id="card-C41" data-id="C41" data-module="config" data-phase="2" data-epic="ontology-mapping" data-type="requirement" data-status="blocked" data-search="c41 the backlog series letter is an epoch tag, not a topic - mint domains as first-class registered objects and carry the topic axis in a field, gated on the teams edition adr" tabindex="0"><div class="card-head"><span class="card-id">C41</span><span class="card-title">The backlog series letter is an epoch tag, not a topic - mint domains as first-class registered objects and carry the topic axis in a field, gated on the Teams Edition ADR</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">requirement</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">ontology-mapping</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> BLOCKED ON THE TEAMS EDITION ADR. Nothing here is built until that ADR rules the domain registry
+and its minting authority. The item exists so the design is not carried only in a machine-local
+plan file.
+
+(a) A DOMAIN IS A MINTED OBJECT, registered and tracked, allocated the way an id is allocated:
+ask the allocator, push the registration, then use it. New `config/taxonomy/domains.yaml` with one
+row per domain carrying id, series prefix, title, a NULLABLE vocabulary_fragment, minted_by,
+registered_at, the gate or ADR that ruled it, and status. Seeded with the 13 that already exist,
+each citing its real ruling - eleven from vocabulary-domains-and-id-policy (2026-08-12),
+`infrastructure` from server-location-ontology (Z2, 2026-08-19), `human` from A3.
+
+(b) THE SERIES PREFIX COMES FROM THE REGISTRY. Existing series are 1-2 letters (A..Z, GN, MM);
+minted domain series are &gt;=3 (REG, SCHED, BAPP, ARCH, DOCS, QUAL, CTX, HUM, CORP, ITSM, INFRA).
+Zero regex change - `GN` and `MM` already prove multi-letter series parse. `all` gets NO series:
+it exists for edges spanning domains, and a catch-all series is precisely what G became.
+
+(c) DUAL-KEY: ids freeze, an optional `domain:` field carries the axis, following the `gates:`
+precedent (J50). No existing id moves, so every citation in config/gate-log.md,
+docs/port/port-prompt.md and IDEAS.md still resolves. Backfill is mechanical from the 27 epic
+files; items whose domain differs from their epic&#x27;s are overridden individually.
+
+(d) THE EDITION IS A DECLARED CATEGORY SEGMENT, not a numeric band: `[&lt;EDITION&gt;-]&lt;DOMAIN&gt;&lt;n&gt;`,
+edition first, base edition unprefixed. New `config/taxonomy/editions.yaml` on the
+lob-product-team.yaml pattern - Internal, synthetic sample producer-side, per-entry manifest row -
+each row declaring the edition code against an `area_product_id`, the Product Catalog key
+:AreaProduct already carries (K5 B, constraints.cypher:79).
+
+(e) THE ADR MUST RULE, and this item may not pre-empt any of it: minting authority (a base mints,
+an instance requests - ADR 0015 D4 already rules this for the ontology); what qualifies as a
+domain, so the registry does not become another G; whether a domain may exist with no vocabulary
+fragment; the architecture-vs-code split; and the edition grain.
+
+tests/unit green; no id moves; the port-prompt carries a relay, because a cross-repo convention
+change is inert until it reaches the other side.
+</p><p class="notes"><strong>Notes:</strong> WHY THIS EXISTS AS AN ITEM: the design was approved by the SME on 2026-09-01 and lived only in a
+machine-local plan file outside the repo. Its first workstream shipped the same day as J68, J69,
+J71 and J72; this is the second, and it had no record anywhere in the tree. An approved design
+with no backlog row is a design that dies with the session that made it.
+
+THE DEFECT, MEASURED. `docs/restructure/backlog/plan.yaml` maps phases 1:1 to epics and to letters
+- phase 1 = Taxonomy capture = Epic B, phase 2 = Ontology mapping = Epic C, phase 6 = Component
+topology = Epic G. The letter records WHEN a phase was opened, not what an item is about. G now
+holds 135 of 599 items (23%) across six epics, so &quot;search the G series&quot; means nothing. Company-side
+every item lands in DD - one undifferentiated series, no topic axis at all.
+
+AND THE COMPANY HAS NO WORKING ALLOCATOR TODAY, which is the sharpest single fact here:
+`--next-id DD` is refused by RESERVED_SERIES and `--next-id G` at their max of G10003 is refused by
+the ceiling. Both doors shut, so they mint by hand - the exact failure I6 was built to remove,
+still live on the far side of the port.
+
+TWO PARTITION RULES, NEITHER RETIRED, which is what produced the DD10-vs-DD10001 ambiguity
+Idea-162 records: git-readme.md:196-201 (2026-07-20) reserves DD; the allocator band (2026-08-18)
+says producer 1-9999 / company 10000+ in every series. Rule 2 generalizes Rule 1 and Rule 1 was
+never withdrawn, so a session following either is obeying a written rule.
+
+WHY THE 13 SIGNED DOMAINS RATHER THAN A NEW LIST: they are already ruled, already sharded into
+fragments 40-52 (S5), and cover ~90% of the taxonomy areas the SME named. A second topic vocabulary
+would drift against the first. And two of the 13 were REGISTERED AFTER the original ruling, so
+domain registration is already an act that happens through a gate - what is missing is a registry
+that records it and an allocator that guards it.
+
+ONE SEED ROW ARRIVES CONTESTED and the registry should say so rather than inherit it quietly:
+`architecture` absorbs code, which puts code and requirements in different domains with no declared
+join - the join the product exists to make. The 2018 genesis document (SDLC-Docs/extracted/
+FCD-Requirements.md:27) states the thesis as &quot;a subset of data from the code, requirements, and
+test cases is used to link the documentation database to the corresponding development component&quot;,
+with usage case 34 &quot;Query for requirements, code, released items&quot;. Three distinct things.
+
+AND SPLITTING THE DOMAINS IS ONLY HALF: separate domains with no typed edge between :Requirement
+and :Code reproduces spec-kit&#x27;s own gap - GitHub&#x27;s spec-kit runs Specify/Plan/Tasks/Implement/
+Converge and has NO formal traceability matrix, only implicit parent-child through phase order.
+That is C38&#x27;s finding one layer up: a relationship that exists only as an implicit ordering is not
+traversable. The reconciliation edge goes through RELATIONSHIP_GUIDE.md as status: planned, exactly
+as C38 did.
+
+RELATED: J71 made the per-entry merge rules total, which is the same disease (a rule with a hole)
+one layer down. Idea-162 records the DD-band collision this closes.
 </p></div></div>
 <div class="card" id="card-K30" data-id="K30" data-module="drydocs-load" data-phase="9" data-epic="seal-attribution" data-type="bug" data-status="blocked" data-search="k30 the pat projection&#x27;s header map is pinned to believed spellings and its test fixture repeats the same beliefs, so a real export with a case-different seal-id column writes zero application edges and still reports success" tabindex="0"><div class="card-head"><span class="card-id">K30</span><span class="card-title">The PAT projection&#x27;s header map is pinned to believed spellings and its test fixture repeats the same beliefs, so a real export with a case-different SEAL-id column writes zero application edges and still reports success</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-load</span><span class="chip" data-kind="phase">P9</span><span class="chip" data-kind="type">bug</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">seal-attribution</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) EVERY MAPPED FIELD&#x27;S ABSENCE IS LOUD, NOT ONLY THE REQUIRED ONES. Today `_project` raises `ProjectionError` for the three `REQUIRED_FIELDS` (`team_id`, `product_id`, `relationship_type`) and merely RECORDS the rest on `ProjectionReport.missing_optional`, which `scripts/project_pat_team_report.py` never turns into a non-zero exit or a warning stream. Verified producer-side: `seal_ids` is mapped to the header `&quot;SEAL IDs&quot;` and marked PINNED, and it is NOT in `REQUIRED_FIELDS` — so a real export spelling that column differently degrades to an empty value for every row, the `PatProductMapping` rows carry no SEAL ids, and a run that prints a success summary writes zero dev-team-to-application edges. After this item, a mapped header that the raw report does not carry produces a loud, non-zero-exit failure or an explicit acknowledged-absence flag; there is no third path where it is quietly empty. Cover it with a test that drives `_project` with `seal_ids` absent and asserts the loud behaviour.
 
@@ -2573,7 +2651,7 @@ relay -- guessing spellings is the defect this item exists to prevent. The (d) s
 guard (fixture headers drawn from the recorded list, not the module constant) also waits
 on that list; a guard against nothing would be decoration.
 </p></div></div></div></div>
-<div class="column" data-status="done"><div class="column-head"><h2>Done</h2><span class="count" data-count-for="done">479</span></div><div class="column-body"><div class="card" id="card-A1" data-id="A1" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a1 audit reference registry paths for staleness" tabindex="0"><div class="card-head"><span class="card-id">A1</span><span class="card-title">Audit reference registry paths for staleness</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every entry marked ok/stale; stale paths fixed or flagged</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All local mirrors + platform/standard doc paths resolve; no stale entries. verified: 2026-06-21 in REGISTRY.yaml.</p></div></div>
+<div class="column" data-status="done"><div class="column-head"><h2>Done</h2><span class="count" data-count-for="done">481</span></div><div class="column-body"><div class="card" id="card-A1" data-id="A1" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a1 audit reference registry paths for staleness" tabindex="0"><div class="card-head"><span class="card-id">A1</span><span class="card-title">Audit reference registry paths for staleness</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every entry marked ok/stale; stale paths fixed or flagged</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All local mirrors + platform/standard doc paths resolve; no stale entries. verified: 2026-06-21 in REGISTRY.yaml.</p></div></div>
 <div class="card" id="card-A2" data-id="A2" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a2 account for every bmc doc in the source manifest" tabindex="0"><div class="card-head"><span class="card-id">A2</span><span class="card-title">Account for every BMC doc in the source manifest</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every .md in bmc-controlm/ accounted for in the manifest</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All 26 bmc-controlm .md files are referenced in SOURCE-MANIFEST.md (0 uncovered).</p></div></div>
 <div class="card" id="card-A3" data-id="A3" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a3 seed the research index with linked rationale" tabindex="0"><div class="card-head"><span class="card-id">A3</span><span class="card-title">Seed the research index with linked rationale</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> &gt;=5 rows, each with a working link and a &#x27;why it matters&#x27;</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. 7 rows with working links (3 Neo4j blogs + PROV-O/SOSA/ORG/agent-memory) + why-it-matters.</p></div></div>
 <div class="card" id="card-A4" data-id="A4" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a4 registry.yaml points the dcat row at a per-standard readme that was never written" tabindex="0"><div class="card-head"><span class="card-id">A4</span><span class="card-title">REGISTRY.yaml points the dcat row at a per-standard README that was never written</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> reference/REGISTRY.yaml&#x27;s dcat row no longer cites a path that does not exist. Exactly one of two resolutions, and the choice is recorded in the close note: (a) write reference/standards/dcat/README.md following the dcmi-terms pattern from M4 — namespace, what we use it for, the specific terms we reference, source_url — or (b) re-point the row&#x27;s `docs:` at reference/standards/README.md the way the skos row already does. Nothing else in the registry changes.
@@ -6147,6 +6225,406 @@ both sides and differ - because two numbers on the same subject invite a discrep
 DISPOSITIONS OF THE NEW FILES, checked rather than assumed: the script is default_ok (it ports, so
 they can run it), the rendered .md is never-port under docs/port/** (they generate their own from
 their own base), the guard is default_ok. Suite 2938 passed / 9 skipped.
+</p></div></div>
+<div class="card" id="card-J71" data-id="J71" data-module="docs" data-phase="8" data-epic="release-infrastructure" data-type="bug" data-status="done" data-search="j71 a per-entry merge rule that enumerates fields goes silently incomplete the next time a field is added - make every rule total and guard the totality" tabindex="0"><div class="card-head"><span class="card-id">J71</span><span class="card-title">A per-entry merge rule that enumerates fields goes silently incomplete the next time a field is added - make every rule total and guard the totality</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">bug</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">release-infrastructure</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-J68" data-target="card-J68">J68</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) EVERY PER-ENTRY RULE BECOMES TOTAL. A rule that enumerates fields is a rule with a hole in
+it the moment a field is added, and enumerating harder does not fix that - the NEXT field
+reopens it. Each per-entry `entry_rule` whose file carries fields the rule does not name gains
+an explicit default: a clause naming which side owns everything not listed above. Convention
+is a literal `UNNAMED FIELDS:` marker so it is greppable and cannot be satisfied by prose that
+merely sounds like a default.
+
+(b) THE FOUR KNOWN HOLES ARE CLOSED, and `twin` is classified on the row&#x27;s own stated
+principle rather than by preference. config/source-bindings.yaml (`twin`, `reason`),
+config/doc-source-registry.yaml (`classification`, `describes_product`, `landing_zone`,
+`replaces`, `source_url`), config/audit-fields.yaml (`decided_by`, `notes`, `objects`,
+`status`), and config/source-registry.yaml - whose rule this session wrote hours earlier and
+which names 6 of its 29 fields, so it is the same defect in a brand-new row.
+
+(c) THE GUARD. tests/unit/test_port_manifest.py: for each per-entry row governing a YAML file
+of list entries, every field present is either NAMED in the entry_rule or covered by the
+row&#x27;s `UNNAMED FIELDS:` default. Written RED FIRST against the current manifest and shown
+failing on the four rows above. A companion test proves the detector catches an injected hole,
+per the J26 idiom.
+
+(d) THE RELAY, because the producer cannot repair the consumer&#x27;s tree. The port-prompt carries
+a relay naming each dropped field, which way it goes, and - for the WHERE-shaped ones - that
+the KEY crosses while the VALUE does not, so neither &quot;take it&quot; nor &quot;skip it&quot; is the whole
+instruction.
+
+tests/unit green. No file content moves; this changes merge RULES and the guard over them.
+</p><p class="notes"><strong>Notes:</strong> FOUND BY THE SME, 2026-09-01, from a real drop: the company port did not carry
+config/source-bindings.yaml from `1bd29b42` (G129), which added `twin:` to every profile.
+
+THE ROOT CAUSE IS NOT THE MISSED FILE. The row&#x27;s field split enumerates - producer-owned
+`id, carrier, platform, classification, serves, note` plus the env-map keys; company-owned the
+variable names and `status`. `twin` and `reason` are in NEITHER list. The rule was written at
+`683d85fe` (G125) and `twin` arrived the next day at `1bd29b42` (G129); nobody went back. A
+per-entry merge with no instruction for a field has no defensible move, so it drops. That is
+the rule failing, not the session.
+
+AND &quot;TAKE IT&quot; WOULD ALSO HAVE BEEN WRONG, which is why this needed a ruling rather than a
+sweep. `twin` holds a machine-local path (`internal-local/oracle-connection-consolidated.md`).
+By the row&#x27;s own principle - &quot;the WHAT crosses and the WHERE never does&quot; - the KEY is producer
+mechanism and the VALUE is company-owned. Taking it wholesale points their profiles at paths
+that do not exist on their machine; skipping the file loses the mechanism. Neither half alone
+is right, and the manifest said neither.
+
+MEASURED SCOPE (2026-09-01, producer desktop, entries parsed rather than grepped - a regex over
+raw YAML matched prose inside `notes:` blocks and reported false positives across the backlog
+items before it was replaced): source-bindings 2 of 10 fields unclassified,
+doc-source-registry 5 of 19, audit-fields 4 of 5, source-registry 23 of 29. Commits in the
+ported range touching them: source-bindings 2 (`683d85fe`, `1bd29b42`), doc-source-registry 5
+(`87fca339`, `63de2acc`, `ff87227f`, `3afa8307`, `3c2bfcdd`), audit-fields 2 (`07d9caab`,
+`3c2bfcdd`).
+
+WHY TOTALITY RATHER THAN A LONGER LIST. The obvious fix is to add the missing names, and it is
+the wrong one: it repairs today&#x27;s four holes and leaves the mechanism that produced them
+intact, so the next field added lands in exactly the same gap. A default clause gives every
+future field an answer on the day it lands, and the guard then has something it can actually
+check - &quot;is this rule total&quot; is decidable, &quot;is this rule complete enough&quot; is not.
+
+RELATION TO J68, which is the same disease one level up. J68 was a DECLARATION and its GUARD
+disagreeing about disposition; this is a FILE and its MERGE RULE drifting apart. Both are two
+descriptions of one fact that nothing forced to agree. J68&#x27;s fix was to remove the second
+description; here the second description is load-bearing, so the fix is to make it total.
+
+SELF-IMPLICATING, and recorded rather than quietly repaired: config/source-registry.yaml&#x27;s
+per-entry rule was written THIS SESSION, hours before this item, as part of J68 - and it names
+6 of 29 fields. The defect it fixes reappeared in the row that fixed it, which is the strongest
+available argument that enumeration is the wrong instrument.
+
+DONE 2026-09-01. All four clauses met.
+
+(a)+(b) Four rules are now TOTAL, each carrying a literal `UNNAMED FIELDS:` clause, and each
+ruled on its own file&#x27;s principle rather than on a blanket preference. source-bindings: the KEY
+crosses and the VALUE does not, with `twin` as the worked example and a tie-break that fails
+toward the consumer - when a new field is ambiguous, KEEP YOURS, because an unfamiliar producer
+value can point a consumer at something that does not exist while keeping their own only leaves
+them a version behind, and the second failure is visible where the first is silent.
+doc-source-registry: producer-owned by default except fields naming a location, so
+classification/describes_product/replaces/source_url cross and landing_zone does not.
+audit-fields: producer-owned, except `status` is per-repo (each side records what IT confirmed)
+and `decided_by` travels with the status it justifies. source-registry: producer-owned except
+LOCATION fields and SIDE-RULED fields (`confirmed` and its stamps, the F4 per-repo rule).
+
+(c) test_every_per_entry_rule_is_total, red first, failing on all four rows before any was
+edited - source-bindings 2, doc-source-registry 5, source-registry 23, audit-fields 4. The
+companion test injects a hole and asserts `twin` specifically is reported, so the detector is
+pinned to the field the real drop turned on. ENTRY_FILES is hand-declared because which
+top-level sequences hold entries is not derivable - a `counts:` block is a mapping, not entries.
+
+A METHOD NOTE THAT CHANGED THE ANSWER: the first scan regexed `^\s+([a-z_]+):` over raw YAML and
+reported `session`, `prose` and `anyway` as fields across the backlog items - prose inside
+`notes:` blocks. That is J66 (a guard reads code, not the prose around it) arriving in a config
+file rather than a Python one. Parsing the document instead cut the finding from noise to four
+real rows, and the guard parses.
+
+(d) RELAY-19, naming each owed field and which way it goes, and stating plainly that the company
+did not miss this - the rule did, and taking the file wholesale would have been wrong too.
+
+Suite 2941 passed / 9 skipped. No file content moved; this changed merge RULES and the guard
+over them.
+</p></div></div>
+<div class="card" id="card-J72" data-id="J72" data-module="docs" data-phase="8" data-epic="release-infrastructure" data-type="bug" data-status="done" data-search="j72 a rename reads as a clean-add on the receiving side - compare a proposed add&#x27;s content against existing consumer files with a different name, before it is applied" tabindex="0"><div class="card-head"><span class="card-id">J72</span><span class="card-title">A rename reads as a clean-add on the receiving side - compare a proposed add&#x27;s content against existing consumer files with a different name, before it is applied</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">bug</span><span class="chip" data-kind="priority">p0</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">release-infrastructure</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE CHECK EXISTS AND IS RUNNABLE FROM THE CONSUMER. For each producer path absent
+consumer-side - the paths a port classifies as clean-adds - compare CONTENT against consumer files
+with a DIFFERENT name and report the pairs that look like one document.
+
+(b) TWO MEASURES, STRONGER WINS, because the two known traps have opposite shapes. ID-SET for a
+fragment split (entries move; the ids survive, the prose does not). NORMALIZED TEXT for a renamed
+prose document (the header is rewritten; the body survives). Neither alone catches both.
+
+(c) IT REPORTS, IT NEVER DECIDES. Every flagged pair is adopt / decline / false positive, and the
+output says so. The port&#x27;s failures came from acting without looking, not from looking and
+choosing wrong.
+
+(d) PROVEN ON THE REAL RENAMES, not only on fixtures.
+
+(e) PORTS. Pure functions take TEXT and PATH MAPS, never a repository, so the guards run
+producer-side where no consumer tree exists.
+</p><p class="notes"><strong>Notes:</strong> REQUESTED BY THE COMPANY SESSION after the trap fired twice in one apply: &quot;Before I take another
+clean-add, I&#x27;d like to build the content-similarity check you offered. Cheap, and it&#x27;s now failed
+twice for want of it.&quot; ~430 files remained unexamined at that point.
+
+THE DEFECT. A port classifies a path against PORT-MANIFEST.yaml; a path absent consumer-side is a
+clean-add - apply untouched, no merge, no decision. That is correct about the PATH and blind to the
+CONTENT, so a renamed file arrives as new. The manifest cannot help: it answers &quot;how do I merge
+this path&quot;, and the question here is &quot;is this path new at all&quot;.
+
+BOTH INSTANCES, and they are shaped differently, which is why one measure is not enough:
+41-local-seal.yaml -&gt; 41-local-business-application.yaml + 52-local-human.yaml at gate
+vocabulary-domains-and-id-policy A1/A2 - a SPLIT, where prose diverges and ids survive; 16
+duplicated ids, 62 failures, one revert. And the crosswalk gate prompt, whose retired-acronym
+name became cdo-crosswalk.yaml - a rename where the ids diverge (the id is the filename stem)
+and the body survives. The second is the worse
+one: the producer copy reads SIGNED OFF, 13 confirmations, by name, where the company copy reads
+DRAFT, unsigned, session pending - and config/gate-prompts/** is canonical-company. Applying it
+would have fabricated a company ratification that never happened, in a file class whose contents
+config/gate-log.md cites as authority. A dropped field is absent; a fabricated sign-off is present
+and confident.
+
+PROVEN ON REAL HISTORY (2026-09-01, producer desktop). Run against 496aa268~1 -&gt; 496aa268 - the
+actual commit that applied the gate rename - the detector reports both real pairs at id-set
+similarity 1.00: 40-local-scheduler.yaml &lt;- 40-local-controlm.yaml, and
+41-local-business-application.yaml &lt;- 41-local-seal.yaml. That second pair is the one that cost the
+company 62 failures. Fixtures reconstruct a defect; this reproduces it.
+
+A SELF-INFLICTED FINDING WORTH KEEPING. The first run of scripts/port_rename_check.py raised
+UnicodeDecodeError: &#x27;charmap&#x27; codec can&#x27;t decode byte 0x9d - subprocess text=True decodes with the
+platform locale, cp1252 on Windows. That is the SAME trap the company session reported an hour
+earlier, where a comparison script mojibaked every em-dash and fabricated 18 of 25 &quot;differences&quot;.
+The tool built to catch their first trap fell into their second one on its first run. Worse than
+cosmetic here: a similarity check that mis-decodes one side compares a corrupted document against a
+clean one and reports the corruption as a difference - the failure it exists to prevent, wearing
+the opposite sign. Fixed with an explicit encoding=&quot;utf-8&quot; and the reason in the docstring, because
+both machines are Windows and this will be reached for again.
+
+WHY THE FLOOR IS LOW (0.35). The cost of a false positive is one diff; the cost of a false negative
+is a duplicated vocabulary or an imported signature. Both known traps score far above it.
+
+WHY THE ID MEASURE ABSTAINS BELOW THREE IDS. A gate prompt carries one id and a rename renames it,
+so the id measure would score that pair 0.00 and silence the text measure that scores it 0.88 - the
+signal meant to help would be the one that hid the gate-state regression. Guarded both directions:
+a split the text measure ranks lower, and a rename the id measure would miss.
+
+DONE 2026-09-01. drydocs/port_rename_detect.py + scripts/port_rename_check.py +
+tests/unit/test_port_rename_detect.py (11 tests). MODULE_MAP row and the test_module_boundary
+&quot;port&quot; group updated in the same commit, per the default-deny rule. RELAY-20 hands it over.
+
+REOPENED AND EXTENDED 2026-09-01, same day, because the company MEASURED it instead of trusting
+it. Against the eight real pairs from their apply the content measures caught THREE and missed
+five - including 41-local-business-application &lt;-&gt; 41-local-seal at 0.29 against a 0.35 floor,
+which is the pair that cost 62 failures. The tool missed the incident it was built for.
+
+WHY THE PROOF LOOKED GOOD AND WAS NOT. The dossier proof ran across 496aa268~1..496aa268, the
+commit that applied the FRAGMENT rename - ids unchanged, so id-set scored 1.00. The real trap is a
+later state where the G101 migration ALSO renamed the ids. Reproduced here: 0.29 on the 41 pair,
+0.30 and 0.21 on the two 52-local-human splits. Their measurement is exact.
+
+THE ASSUMPTION THAT BROKE, stated because it is the transferable part: max-of-two supposes the two
+measures fail INDEPENDENTLY. In a split-plus-rename they do not - the entries were redistributed
+(text falls) by the same migration that renamed their ids (overlap falls). Two measures, one common
+cause, and a max over correlated signals is one signal.
+
+TWO SIGNALS ADDED, both sharing no cause with the content measures:
+- SAME-SLOT-PREFIX (contributed by the company session): in a numbered directory the number is the
+  SLOT and the stem is its current name, so same number + different stem is rename evidence that
+  reads no content at all. Recovers three of the five misses - 41/41, 49/49, 50/50. Their note said
+  four; it is three, because 40/40 was already caught at 0.59 and is not among the misses.
+- VANISHED-TWIN: a consumer file the producer no longer has was renamed, split or deleted, and all
+  three are decisions. Searches the whole proposed set at a lower floor (0.15), because the question
+  has narrowed from &quot;are these related&quot; to &quot;where did this file&#x27;s content go&quot;. This is the only
+  signal that reaches a SPLIT INTO A NEW SLOT, which is the last two misses. Verified live: it
+  reports 52-local-human &lt;- 41-local-seal at 0.30, the pair both other signals miss.
+
+AND THE FRAMING IS NOW IN THE TOOL. Their ruling - necessary, not sufficient - is printed on every
+clean run, naming the 3-of-8 measurement, because exit 0 previously read as a guarantee while the
+62-failure pair sat at 0.29. A tool that reports its own measured coverage is harder to over-trust
+than one that reports a verdict.
+
+THIRD ROUND, 2026-09-01, and the company found the ROOT CAUSE I had twice papered over.
+
+MY SECOND FIX WAS RIGHT FOR A WRONG REASON, and they measured it. I claimed the true twin &quot;also
+cleared the floor and was silently dropped&quot; by the best-match rule, so raising the cap would
+surface it. On their tree that twin scored 0.08 and ranked 13 of 29 - it never came near the
+floor, and no cap change could have reached it. Worse, the cap change made the report say three
+unrelated files at an identical 0.38 with no true pair, which is a stronger invitation to dismiss
+the flag than one wrong answer was.
+
+THE ACTUAL CAUSE IS JACCARD SIZE ASYMMETRY, which is arithmetic. Their pair: an 11-token producer
+stub against the 97-token company epic it was reduced from, 8 tokens shared. Union in the
+denominator gives 8/100 = 0.08; containment divides by the smaller set, 8/11 = 0.73, rank 1 of 29.
+A producer file is regularly a reduction or expansion of its consumer twin, so Jaccard reads the
+NORMAL SHAPE of a rename as dissimilarity. Adopted as max(jaccard, containment).
+
+THEIR CAVEAT SHIPPED WITH THE CONTRIBUTION AND I VERIFIED IT INDEPENDENTLY: containment over-fires
+alone - component-topology.yaml at 428 tokens reaches 0.64 against an 11-token stub on jaccard
+0.02, purely by being large enough to contain it. Their framing is the finding: containment finds
+the twin, the cap bounds its noise, NEITHER IS SUFFICIENT ALONE.
+
+THREE DEFECTS THE ADOPTION EXPOSED, each caught by an existing guard or a real-data re-run:
+- containment turned a 4-token document into a boilerplate detector (tokens `-`, `id:`,
+  `local_relationships:` scoring 0.75 on structure alone). MIN_TOKENS_FOR_CONTAINMENT = 8 makes it
+  abstain, mirroring MIN_IDS_FOR_ID_MEASURE, and pure punctuation is stripped in normalization.
+  Caught by test_unrelated_files_are_not_flagged the moment containment landed.
+- the cap was per SIGNAL, so three signals capped at three produced twenty rows for six files on
+  the real sweep. Now per proposed file across all signals.
+- dedup preferred the FIRST claim over the STRONGEST: 41-local-business-application &lt;-
+  41-local-seal reported as normalized-text 0.57 while its same-slot-prefix 1.00 was dropped as
+  already-seen. Order of discovery is not evidence of strength.
+
+COVERAGE NOW 8/8 on their pair list, verified on real data: every true twin ranks FIRST in its
+group, and 52-local-human - the cross-slot split both earlier rounds called structurally
+unreachable - fires at 0.71 against 41-local-seal and 0.57 against 42-local-catalog. The shape
+they told me to flag rather than tune away turned out to be reachable after all, by fixing the
+measure rather than the threshold.
+
+THE METHOD FAILURE WORTH KEEPING, because it is mine and it repeated: BOTH my fixes were validated
+against fixtures I authored to match my hypothesis. Round two proved &quot;the twin cleared the floor&quot;
+using a fixture built to put a second file above the floor - a fixture written to match a theory
+proves the theory, not the tree. The company measured the real pair each time and was right each
+time. The rule this earns: when a guard is written for a specific incident, its fixture must be
+RECONSTRUCTED FROM THE INCIDENT at the real values, and a synthetic one only supplements it.
+
+FOURTH ROUND - GIT ALREADY KNEW, AND THE PORT WAS THROWING IT AWAY.
+
+THE SME ASKED whether the commit ritual should become per-module to prevent this class of guard
+being needed. It would not have helped, and the evidence is in the commit: 496aa268, which did the
+vocabulary rename, touched SIX FILES and only the ontology. It was already module-scoped. Nothing
+was missing from the commit. What was missing was in the PORT PROCESS, which classifies each
+producer path against the manifest, asks &quot;does the consumer hold this path&quot;, and in asking that
+question discards the rename metadata git recorded when the rename was made.
+
+MEASURED: `git diff -M --diff-filter=R --name-status port-base-20260826..HEAD` reports 18 RENAMES
+in the consumer range, with similarity scores, and every 2026-09-01 trap is among them -
+40-local-controlm -&gt; 40-local-scheduler at R097, 41-local-seal -&gt; 41-local-business-application at
+R095, the crosswalk gate prompt twin at R075, its test at R088. It also names two the similarity
+detector could not: drydocs/docs_verify.py -&gt; drydocs_core/docs_verify.py at R090, which is the
+shadow-definition trap the company hit, and the docs/Product -&gt; knowledge/org relocation - both
+CROSS-DIRECTORY moves that same_directory_only skips by design.
+
+So the exact list now leads the report and the heuristic follows. Git is authoritative where the
+measures are inference, and it costs one command.
+
+IT DOES NOT REPLACE THE MEASURES, for a reason that is the same shape as everything else in this
+item: git&#x27;s rename detection is 1:1. A SPLIT gets one match and the remaining targets come back as
+plain adds - 41-local-seal matched 41-local-business-application, and 52-local-human arrived as an
+add. That is exactly the pair containment recovers at 0.71. Exact for 1:1, heuristic for splits,
+and the report says so rather than letting a reader trust the exact list as complete.
+
+THE UNCOMFORTABLE PART, recorded because it is the lesson: three rounds of similarity work went
+into recovering information that was sitting in the commit metadata the whole time. The tool was
+not wrong, and the split case genuinely needs it - but the FIRST question should have been &quot;does
+anything already record this&quot;, and it was not asked until the SME asked whether the ritual was the
+problem. Reaching for a new measurement before checking what the system already knows is the
+expensive mistake here, and it was mine three times over.
+
+FIFTH ROUND - RECALL 8/8 CONFIRMED, AND THE COST OF IT PAID. The company re-ran the full sweep on
+the containment pin and reported recall 3/8 -&gt; 8/8, including the cross-slot split both of us had
+written off as structurally unreachable: 52-local-human &lt;-&gt; 41-local-seal at 0.70 (was 0.30
+missed), &lt;-&gt; 42-local-catalog at 0.60 (was 0.28 missed), and cdo-alignment &lt;-&gt; its twin at 0.80
+ranked FIRST (was 0.08, rank 13).
+
+THEY ALSO PRICED IT, WHICH I HAD NOT: 344 pairs over 230 proposed adds, of which docs/ alone was
+252 pairs for roughly TWO real ones. Backlog items share a schema, so nearly every proposed item
+matched several others at 0.40-0.60 on id:/epic:/status:/acceptance: alone. Their framing is the
+argument: &quot;a reviewer handed 252 pairs will skim, and skimming is how the twin got taken in the
+first place.&quot; A report nobody reads is the same outcome as no report, so precision is not a
+refinement here - it is the same failure at the other end.
+
+THEIR FIX, ADOPTED: the idf half of tf-idf. Discount tokens appearing in more than half a
+DIRECTORY&#x27;s files - structure survives a rename and so does content, but only content IDENTIFIES.
+Cheap, local, no dependency. It is the principled version of MIN_TOKENS_FOR_CONTAINMENT, which was
+a blunt size threshold reaching for the same thing.
+
+MEASURED ON REAL DATA: the backlog items directory has 85 proposed clean-adds and now reports 23
+pairs. Recall is unchanged - every real vocabulary pair still fires, 52-local-human at 0.66 and
+0.51, the two slot renames at 1.00. The unfiltered comparison over that directory did not finish
+inside two minutes, so idf buys speed as well as precision; smaller token sets, fewer comparisons
+that matter.
+
+AND IT SUBSUMED PART OF AN EARLIER FIX, which is worth recording rather than hiding: two cap tests
+went red on adoption because they used corpora of identical files, where idf now correctly strips
+every token and reports nothing. The cap and idf cover DIFFERENT REGIMES - idf needs at least five
+files to mean anything, and below that the cap is the only protection. Both tests were rescoped to
+say so rather than being deleted or the threshold bent to keep them green.
+
+ONE CAUTION THE COMPANY RAISED AND THE REPORT SHOULD CARRY: a perfect score is not proof.
+docs/design/feedback/--rev1.yaml scores 1.00 against its own earlier revision and is not a rename;
+it is a later revision of the same document. Recorded here; the report already says it identifies
+nothing and decides nothing, which covers it.
+
+TWO REAL FINDINGS IT SURFACED FOR THEM, both corroborating work already planned:
+folder_attribution.cypher &lt;-&gt; seal_attribution.cypher at 0.52 (a real rename, confirming the
+loader field they took in the B+C split), and cli_shared.py &lt;-&gt; cli.py at 0.49 (not a decline -
+cli_shared is the extraction FROM cli.py, so the detector found both halves of the D merge).
+
+SIXTH ROUND - THE IDF FIX CAUSED A FALSE ALL-CLEAR, WHICH IS THE WORST OUTPUT THIS TOOL HAS.
+The company re-ran docs/F on the idf pin and found the epics directory reporting exit=0, &quot;no
+proposed clean-add resembles an existing file under another name&quot; - on a directory that CONTAINS a
+real rename. Precision had won convincingly (344 -&gt; 50 pairs, docs 252 -&gt; 27) and the headline
+number hid it. Their instinct to re-run rather than carry the earlier sweep forward is what caught
+it.
+
+THE PAIR LOST IS THE ONE THE PREVIOUS PIN EXISTED TO RECOVER: cdo-alignment &lt;-&gt; its twin went
+0.08 below floor (3rd pin) -&gt; 0.80 rank 1 (4th pin, containment) -&gt; SUPPRESSED (5th pin, idf).
+
+THEIR DIAGNOSIS, AND IT IS THE GENERAL FORM: the two fixes are in DIRECT TENSION on a stub, not
+merely coincident. The file is a ten-token stub whose tokens ARE the shared epic scaffolding.
+Containment recovered it PRECISELY BECAUSE those few tokens are contained in the twin; the idf
+discount removes EXACTLY THOSE TOKENS as boilerplate. For a stub, the signal and the noise are the
+same tokens - so whichever fix runs last wins.
+
+THE MECHANISM IS THREE-WAY, and tracing it is what sited the fix correctly. The discount leaves
+the stub FIVE tokens; MIN_TOKENS_FOR_CONTAINMENT is 8; so the discount pushes the stub below the
+threshold at which containment votes. Containment abstains, Jaccard alone scores 0.09 against a
+0.35 floor, and the pair drops. IDF DOES NOT OUT-SCORE CONTAINMENT HERE - IT SWITCHES IT OFF.
+
+THE COMPANY PROPOSED EXACTLY THE RIGHT RULE and my first attempt mis-sited it. They said &quot;do not
+apply the idf discount when either side is short - the same shape and rationale as
+MIN_TOKENS_FOR_CONTAINMENT = 8&quot;. I applied it to the RAW length, where ten is above eight and the
+test never fires; measured, it changed nothing. The rule belongs on the POST-DISCOUNT length. Same
+rule, correct site - and the correction only surfaced by instrumenting the comparison instead of
+reasoning about it, which is the third time this session that measuring beat inferring.
+
+DECIDED PER PAIR, NOT PER FILE. Discounting one side and not the other is worse than either: the
+stub tokens survive on the stub and are stripped from the twin, so the overlap goes to zero and the
+pair is lost just as surely. If the discount would gut EITHER side, both compare raw.
+
+ALL THREE AXES HOLD, measured on real data: the regression pair returns at 1.00; the backlog items
+directory stays at 26 pairs over 85 clean-adds (precision kept); every vocabulary rename still
+fires including the two slot renames at 1.00. And the veto yields a GUARANTEE worth stating: idf
+can never strip a pair to nothing, because a document the discount would empty is compared raw
+instead. An empty report on a directory containing a rename is now unreachable by this path.
+
+TWO FIXTURES BROKE ON ADOPTION AND BOTH WERE WRONG, not the code: they used documents short enough
+that the veto correctly disables idf, so they had been testing the veto while claiming to test idf.
+Lengthened past the threshold. One assertion was inverted outright - it claimed idf reduces
+identical files to zero matches, which is exactly the false all-clear this round exists to prevent;
+it now asserts the cap bounds the report instead.
+
+THE META-PATTERN THE COMPANY NAMED, worth keeping: six pins, and each fix has traded against the
+previous one - recall -&gt; masking -&gt; recall+noise -&gt; precision-recall -&gt; tension-on-stubs. The tool
+is converging, but every result is only valid against the pin it ran on, which is why the full
+sweep is re-run each time rather than carried forward.
+
+CLOSED 2026-09-01 AT THE SIXTH PIN. The company re-ran the full sweep and the known-pair check on
+the conditional-discount pin and reported convergence:
+
+  measure              4th pin   5th pin   6th pin
+  recall (known)        12/12     11/12     12/12
+  total pairs            344        50        53
+  docs pairs             252        27        30
+
+The conditional guard cost +3 pairs across the WHOLE sweep to buy the lost pair back. Their words:
+the first pin where the two goals do not trade against each other. cdo-alignment &lt;-&gt; its twin is
+back at 0.80. 12/12 recall at full precision.
+
+THE OBSERVATION WORTH KEEPING IS NOT THE NUMBERS. Theirs, and it is about method rather than this
+tool: &quot;My suggestion at the fifth pin was do not discount when either side is short - directionally
+right, and I would have implemented it against the raw token count, which does not work. The stub
+is ten tokens; the discount leaves five; a raw-length test never fires. The gap between right idea
+and right mechanism is where the bug lived, and I would not have found it without the re-measure.&quot;
+That is exactly what happened here: the rule they proposed was correct and my first implementation
+of it changed nothing, and only instrumenting the comparison located the difference.
+
+THE SEQUENCE, because it is the argument for re-measuring rather than carrying results forward:
+3/8 recall -&gt; same-slot signal (6/8) -&gt; cap-at-3 (masking; never reached the stub) -&gt; containment
+(8/8 but 344 pairs) -&gt; idf discount (50 pairs, lost the stub) -&gt; conditional discount (12/12, 53
+pairs). EVERY intermediate pin traded one property for another. The one time a sweep was NOT
+re-measured carefully - the Select-Object exit-code artifact - it produced a false &quot;D is clean&quot;
+that was nearly acted on.
+
+CARRIED INTO D+E, all confirmed on the final pin rather than inherited from an earlier one:
+folder_attribution.cypher &lt;-&gt; seal_attribution.cypher (0.43, a real rename corroborating the
+loader: field already taken in B+C); cli_shared.py &lt;-&gt; cli.py (0.47, adopt both - cli_shared is
+the extraction and cli.py re-exports from it); test_cdo_crosswalk.py (0.97, declined with the
+acronym-rename deferral); and four same-slot ontology pairs at 1.00 plus the cross-slot split, all
+belonging to the deferred vocabulary workstream.
+
+ONE PREDICTION LEFT OPEN, and it is theirs and falsifiable: the cli_shared re-export should clear
+test_load_map_declarations (19) and test_chain_inputs (7). If D+E lands and it does not, their +24
+failure attribution was wrong. Recorded here so the answer is checkable either way rather than
+quietly dropped.
 </p></div></div>
 <div class="card" id="card-G35" data-id="G35" data-module="ontology" data-phase="9" data-epic="seal-attribution" data-type="requirement" data-status="done" data-search="g35 open the tom-roles gate: the live registry shows 9 distinct accountable role classes against the signed 7, and cardinality is a per-role-class attribute rather than a global rule" tabindex="0"><div class="card-head"><span class="card-id">G35</span><span class="card-title">Open the TOM-roles gate: the live registry shows 9 distinct accountable role classes against the signed 7, and cardinality is a per-role-class attribute rather than a global rule</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P9</span><span class="chip" data-kind="type">requirement</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">seal-attribution</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> A gate-prompt spec is authored and walked with the SME. It must rule: (a) the ROLE ENUMERATION — the signed 2026-07-10 §B list of 7 is contradicted by the live registry, which shows 9 distinct accountable role classes including L1 Operate manager, L2 Operate manager and Operate Manager as THREE separate concepts rather than one with a level attribute; (b) CARDINALITY as a PER-ROLE-CLASS attribute, not a global singleton rule — the same application legitimately carries four different people in one role class (Backup Information Owner) while other classes are effectively singleton; (c) that the singleton constraint, where it applies, is expressed as a GRAPH-TEST and not a database constraint, because Neo4j cannot express &quot;at most one per (app, role)&quot; declaratively; (d) the ROSTER-DISAGREEMENT question — SEAL&#x27;s own Application Contacts view and the ServiceNow TOM Accountable view return different counts for the same application, and nothing in the model records which surface an attribution came from; (e) whether INHERITANCE is modelled at all — the ServiceNow view carries Inherited / Overridden / (empty) plus an &quot;Inherited from CI&quot; parent, and DryDocs today models attribution as a flat assertion with no way to say an assignment was inherited rather than directly asserted. config/taxonomy/business-application.yaml&#x27;s `roles:` list is reconciled to whatever is ruled. Nothing loads until sign-off.
 </p><p class="notes"><strong>Notes:</strong> Carried over from the business-application-identity gate (SIGNED OFF 2026-07-27) and deliberately NOT folded into S3: that gate&#x27;s §A1 declares the signed seal-tom-attribution-reshape ruling (2026-07-10) UNCHANGED, so an item that re-opens its §B role enumeration cannot live inside it. Evidence is SME screenshots of the live registry, reviewed 2026-07-27 — Internal-Confidential, so no values are recorded here or in any committed file; only the SHAPE of the finding. Note the taxonomy file&#x27;s current `roles:` list is itself divergent (it carries Chief Business Technologist and Risk Manager, which the live surfaces do not show under those names). Adjacent, already ruled and NOT reopened by this: §D2 of the identity gate pinned attribution_id&#x27;s 4-part shape precisely BECAUSE of (b) — one person across three accountable roles collides if the role segment is dropped, and four people in one role class collide if the sid is dropped. Whatever this gate rules about role classes must keep that key shape valid. DRAFTING HALF DELIVERED 2026-08-10 (LAPTOP). STATUS STAYS in_progress ON PURPOSE — under the awaiting-HITL convention it was released from, because the acceptance says the spec is &quot;authored AND WALKED with the SME&quot; and only the authoring is done. Nothing is signed, nothing loads, and business-application.yaml&#x27;s roles: list is deliberately NOT reconciled, since §H4 reconciles it to whatever §A rules and §A is still open. WHAT THE PASS DID: brought the K21 ServiceNow evidence onto the page, which is the reason this item was routed to the laptop. Clauses (d) and (e) were the two the release note named, and both were written from DESCRIPTION rather than evidence — (e) turned out to be wrong. §E4 reasoned the inherited-from parent is estate data DryDocs does not have and treated the modelled-node option as blocked on acquiring it; the parent is the AREA PRODUCT and :AreaProduct is a K6-signed node class we already hold, so the option was never blocked. The false premise is kept above its correction per the §A4 precedent, and §E5b states the K6 boundary explicitly so an inheritance edge to :AreaProduct is not later misread as merging the two role families K6 declared independent. Also landed: §D5/§D5b (the ServiceNow side specified end to end — and the two rosters differ in KIND of holder, not only in count), §B6b/§B6c (the TOM row names a GROUP, so §B6&#x27;s always-a-person invariant needs its scope ruled before a loader relies on it; the PROV shape survives either way since prov:agent admits an Organization), §G0d-§G0f (G13/G14/G15 gain a named subject — the Deployment Module — which §G15 explicitly asked for, plus what that does NOT authorize and a correction to a reading that would have ruled §G15 by dissolving its subject), §F6/§F6b (the vocabulary-as-data target already running on the ServiceNow side, carrying a role RETIREMENT flag DryDocs has no equivalent for, which bears on §A2/§G5/§G12), §E1c (the TOM tables are a company scoped app with NO vendor baseline, so every TOM fact is an SME or instance fact), mapping rows 5-6, one new open question and one new risk. THE NEW OPEN QUESTION SHOULD BE SETTLED BEFORE THE WALK, not during it: is the TOM row&#x27;s subject a Business Application CI or a Deployment Module CI? One GROUP BY cmdb_ci.sys_class_name answers it, and §G0e&#x27;s fork turns on it. THE NEW RISK is filed rather than hidden: all of this evidence comes through a replica whose completeness is unconfirmed (K21 open question 9). Every ruling here is about SHAPE, which survives a partial copy; counts do not — including §C4&#x27;s completeness report, which is a count by construction. Suite green at 1811 passed.

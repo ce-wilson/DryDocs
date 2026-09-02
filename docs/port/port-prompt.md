@@ -1723,6 +1723,177 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   PORT-REPORT-40c35724 measured 55 your side, and a count in a producer file rots
   between ports. Read it from your own run.
 
+- **RELAY-19 — FOUR MERGE RULES HAD NO ANSWER FOR FIELDS THAT EXIST, WHICH IS WHY
+  `source-bindings.yaml` DROPPED; THE RULES ARE NOW TOTAL AND FOUR FIELDS ARE OWED
+  BACK** (new 2026-09-01; J71, from the SME's own catch).
+  `[SME-REPORTED]` for the drop, `[VERIFIED-PRODUCER]` for everything measured below.
+  **YOU DID NOT MISS THIS — THE RULE DID.** `config/source-bindings.yaml` was not
+  carried from `1bd29b42` (G129), which added `twin:` to every profile. The row's
+  field split ENUMERATES: producer-owned `id, carrier, platform, classification,
+  serves, note` plus the env-map keys; company-owned the variable names and `status`.
+  **`twin` and `reason` are in neither list.** The rule was written at `683d85fe`
+  (G125) and `twin` landed the next day at `1bd29b42`; nobody went back to classify
+  it. A per-entry merge with no instruction for a field has no defensible move.
+  **AND TAKING IT WOULD ALSO HAVE BEEN WRONG,** which is the part worth reading:
+  `twin` holds a path under internal-local/ — machine-local and gitignored, so it
+  exists on exactly one machine. By the row's own principle — *the WHAT crosses and the WHERE never does* —
+  **the KEY is producer mechanism and the VALUE is yours.** Take the field and its
+  header comment; point it at YOUR twin. Neither "take the file" nor "skip the file"
+  was ever the right instruction, and the manifest said neither.
+  **WHAT IS OWED BACK, by file. Each is a FIELD to adopt, not a value to copy:**
+  1. `config/source-bindings.yaml` — add `twin:` to each profile (yours, or `~` with
+     the reason in its note) and `reason:` on `unbound[]` rows. Both stay yours.
+  2. `config/doc-source-registry.yaml` — five fields the rule never named:
+     `classification`, `describes_product`, `replaces`, `source_url` are WHAT and
+     **cross on take**; `landing_zone` is a WHERE and **stays yours**. Five commits in
+     the applied range touched this file (`87fca339`, `63de2acc`, `ff87227f`,
+     `3afa8307`, `3c2bfcdd`) — worth a diff against `port-base-20260901` rather than
+     an assumption about which way each went.
+  3. `config/audit-fields.yaml` — `notes` and `objects` cross; **`status` is per-repo
+     and `decided_by` travels with it**, so yours stand. Two commits (`07d9caab`,
+     `3c2bfcdd`).
+  4. `config/source-registry.yaml` — see RELAY-18: it was `canonical-producer` during
+     your apply, so its failure was the opposite one (overwritten, not dropped, which
+     is your `test_source_registry` 1 -> 7). It is `per-entry` now.
+  **THE STRUCTURAL FIX, so this stops recurring:** every per-entry `entry_rule` is now
+  **TOTAL** — it names the fields it wants to name and then declares, under a literal
+  `UNNAMED FIELDS:` marker, which side owns everything else. A field added tomorrow has
+  an answer the day it lands. `test_every_per_entry_rule_is_total` enforces it, written
+  red first against all four rows. **One default is worth knowing before you merge
+  anything:** on `source-bindings.yaml`, when a new field is genuinely ambiguous,
+  **KEEP YOURS.** An unfamiliar producer value can point you at something that does not
+  exist on your machine; keeping your own only leaves you a version behind — and the
+  second failure is visible where the first is silent.
+  **AND ONE ADMISSION, because it is the best argument for the change:** the
+  `source-registry.yaml` rule that RELAY-18 announces was written the same morning and
+  named 6 of that file's 29 fields. The defect reappeared in the row that fixed it.
+
+- **RELAY-20 — THE CONTENT-SIMILARITY CHECK YOU ASKED FOR IS BUILT AND PROVEN ON
+  THE REAL RENAMES; RUN IT BEFORE THE NEXT CLEAN-ADD SLICE** (new 2026-09-01; J72,
+  from your own request after the trap fired twice).
+  `[VERIFIED-PRODUCER]` — proven against real history, not fixtures.
+  **THE COMMAND**, from your checkout with the producer remote fetched:
+  ```
+  poetry run python scripts/port_rename_check.py --producer-ref port-base-20260901 --path-prefix config/
+  ```
+  Exit 0 = no proposed clean-add resembles a file you already hold. Exit 1 = at
+  least one does, and it names the pair. Drop `--path-prefix` for the whole tree;
+  add `--any-directory` only for a deliberate sweep (both known traps were
+  in-directory, and the wide compare is quadratic).
+  **PROVEN ON YOUR TWO TRAPS, on real commits.** Run across `496aa268~1..496aa268`
+  — the commit that actually applied the gate rename — it reports both pairs at
+  **id-set similarity 1.00**: `40-local-scheduler.yaml` ← `40-local-controlm.yaml`,
+  and `41-local-business-application.yaml` ← `41-local-seal.yaml`. That second pair
+  is the one that cost you 62 failures.
+  **TWO MEASURES, AND YOU NEED BOTH — your two traps have opposite shapes.** A
+  SPLIT (41-local-seal → business-application + human) diverges in prose and keeps
+  its ids, so the id-set measure catches it. A RENAME (the crosswalk prompt's
+  retired-acronym name → `cdo-crosswalk`) renames the id — the id IS the filename stem — and keeps its body,
+  so only the text measure catches it. The id measure ABSTAINS below three ids on
+  either side, precisely so a one-id-each miss cannot score the gate pair 0.00 and
+  silence the measure that scores it 0.88.
+  **IT REPORTS, IT DOES NOT DECIDE.** Every flagged pair is adopt / decline / false
+  positive, and the output says so. Your two failures came from acting without
+  looking, not from looking and choosing wrong — this restores the looking step and
+  nothing else.
+  **ONE FINDING FROM BUILDING IT THAT IS YOURS TOO.** Its first run raised
+  `UnicodeDecodeError: 'charmap' codec can't decode byte 0x9d` — `subprocess(...,
+  text=True)` decodes with the platform locale, cp1252 on Windows. **That is the
+  same trap you reported an hour earlier**, where a comparison script mojibaked
+  every em-dash and fabricated 18 of 25 "differences". Fixed here with an explicit
+  `encoding="utf-8"`, and worth applying to any comparison tooling you keep: a
+  similarity check that mis-decodes one side compares a corrupted document against
+  a clean one and reports the corruption as a difference. Both machines are Windows;
+  neither of us gets this for free.
+  **ACTION AT THE PORT THAT CARRIES THIS:** it lands after `port-base-20260901`, so
+  it is not in the range you are applying — take the three files by name if you want
+  it now (`drydocs/port_rename_detect.py`, `scripts/port_rename_check.py`,
+  `tests/unit/test_port_rename_detect.py`), or run it from the producer checkout
+  against your tree. Either way, run it before D/E/F, where ~430 files remain
+  unexamined and 217 of them classify as clean-adds.
+
+- **RELAY-21 — THE ACRONYM RENAME IS ACCEPTED (SME, re-stated 2026-09-01). APPLY IT
+  AS A RENAME OF PATHS, NEVER AS A TAKE OF CONTENT — that distinction dissolves the
+  gate-state objection entirely** (supersedes the defer recommendation in the
+  producer's own earlier advice).
+  `[SME-REPORTED]` for the ruling; `[VERIFIED-PRODUCER]` for the file list.
+  **THE RULING IS ACCEPT.** The SME gave it once before the scope was known and
+  again after. The producer previously recommended deferring it beside the
+  vocabulary migration; **that recommendation is withdrawn** — it was reasoning
+  about a content take when the ruling is about names.
+  **WHY THE GATE-STATE OBJECTION DOES NOT SURVIVE THE DISTINCTION.** The objection
+  was that the producer's `cdo-crosswalk.yaml` reads SIGNED OFF, 13 confirmations,
+  where yours reads DRAFT with a session pending, and `config/gate-prompts/**` is
+  canonical-company. That is entirely correct **about CONTENT**. It says nothing
+  about the NAME. The manifest's `canonical-company` disposition protects what is
+  IN your file; it does not freeze what the file is CALLED. So:
+  **RENAME YOUR OWN FILE AND KEEP YOUR OWN CONTENT.** `git mv` the path; do not
+  `git checkout` the producer's version. Your prompt stays DRAFT, unsigned, session
+  pending — under its new name. No signature crosses, and the acronym is retired
+  from the surface as ruled.
+  **THE INSTRUCTION SET IS GIT'S, NOT A GREP.** `git diff -M --diff-filter=R
+  --name-status port-base-20260826..HEAD` reports the rename set exactly, with
+  similarity scores. The eleven in this family:
+  `config/crosswalks/*-vocabulary.yaml` (R082), `config/gate-prompts/*-crosswalk.yaml`
+  (R075), `docs/company-prompts/*-frameworks-load-company-prompt.md` (R093),
+  `tests/unit/test_*_crosswalk.py` (R088), and the six under
+  `internal/*-reference/` (R083–R100). Use that list rather than a token sweep —
+  it is the same 72-file change measured exactly, and it will not touch a prose
+  mention that happens to contain the string.
+  **THE ORDER THAT MATTERS:** rename the TEST with its subject in the same commit.
+  `test_*_crosswalk.py` reads `config/crosswalks/*-vocabulary.yaml`, so renaming one
+  without the other is the paired-declaration failure J68 exists for, and it will
+  fail on arrival.
+  **AND THE ONE THING THAT IS NOT A RENAME:** `internal/**` is company-side
+  Internal content and never crosses. Rename your own directory if you hold one;
+  do not take the producer's six transcripts.
+
+- **RELAY-22 — YOUR +83 ON SLICE E IS NOT A PORT PROBLEM, IT IS A RENDER STEP; AND THE
+  MANIFEST WAS TELLING YOU TO TAKE ARTIFACTS YOU SHOULD REGENERATE** (new 2026-09-02;
+  from your own D+E attribution, which was right).
+  `[VERIFIED-PRODUCER]` for the manifest defect and the renderer list; `[SME-REPORTED]`
+  for the failure counts.
+  **YOUR ATTRIBUTION IS RIGHT.** The +83 concentrates in E's newly-added tests asserting
+  that generated artifacts exist — `web/src/generated/world-*.json` and the vendored
+  `external/geo/world-atlas/countries-110m.json`. The failures are missing ARTIFACTS,
+  not broken code. Your recommendation — **commit D alone, hold E for F+G** — is the
+  right call, and the producer agrees with it and with your reason (J31: D's
+  `cli.py` surgical merge and `validate_fact_rows` are the hard-won parts; protect them).
+  **BUT THE MANIFEST HAD A DEFECT THAT WOULD HAVE MADE F+G WRONG TOO.**
+  `web/src/generated/**` had **no row** and fell through to `web/**`
+  canonical-producer — so the manifest told you to `git checkout` producer's generated
+  JSON. Fixed 2026-09-02: it is now **`derived`**, the same row shape `docs/plan/*.html`
+  already has. **Regenerate, never carry (J43).** Every file there is written by a
+  `scripts/render_*.py` renderer from committed sources and has a drift guard asserting
+  the committed copy matches a fresh render. A carried copy would make those tests pass
+  while reflecting PRODUCER's gates, load-map and software registry rather than yours —
+  a passing suite describing the wrong estate, which is the worst outcome available.
+  **SO F+G IS TWO DIFFERENT KINDS OF STEP, and the order matters:**
+  1. **F — take the SOURCES.** `external/geo/world-atlas/countries-110m.json` is a
+     vendored asset (default_ok, clean-add). The config, taxonomy and registry rows
+     your E tests read are per-entry or canonical-producer per the manifest.
+  2. **G — RUN the renderers, do not port their outputs.** You already pulled
+     `render_world_map.py`, `render_remediation_profile.py` and
+     `set_console_credential.py` forward as subjects. Add `render_board.py` (it writes
+     `gates.json`, `enforcement-matrix.json` and `load-map.json` in one run) and run
+     `python scripts/render_board.py` plus the others. The drift guards then pass on
+     YOUR sources, which is what they are for.
+  **YOUR TWO UNTRACED CLUSTERS, traced here:** `test_env_doctor` (13) reads
+  `render_env_example.py` and `.env.example`, and `.env.example` is itself a RENDER of
+  `DECLARED_VARIABLES` (G129) — so it clears by running `render_env_example.py` after
+  `env_refs.py` merges, not by porting the file. `test_query_specs` (6) reads
+  `drydocs_api/query_specs.py` (default_ok), which you pulled forward in the sibling
+  sweep; if it still fails after that, it is a QuerySpec registry content difference
+  and yours to reconcile, not an artifact gap. **Both are render-or-merge shaped, not
+  port-shaped — consistent with your "+83 clears at G" hypothesis, and still a
+  hypothesis until you run it, as you said.**
+  **ONE THING TO CARRY INTO D'S COMMIT MESSAGE:** your slicing has now failed to be
+  closed under dependency three times (config→core, tests→scripts, tests→renders), each
+  caught before a commit. That is the argument for the disposition-led apply in J69
+  rather than directory-led slices — a `derived` class is worked LAST by construction
+  because it is regenerated from everything before it. Worth saying in the record so the
+  next apply starts from classes, not directories.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
@@ -1997,6 +2168,7 @@ OWED COMPANY-SIDE:
 | T20 | **Catalog-loader review (8 findings on the company's `pat_*`/`product_lines`/`products`/`snow_support_crosswalk` cypher) — DISCHARGED at PORT-REPORT-40c35724** (2026-08-03): item 1, the `products.cypher` orphan fix, is APPLIED company-side; items 2–8 live in the company's own backlog/inbox; count-orphans-before-applying rides T23. The full 8-finding text was retired from this row at the 2026-08-05 condensation — it lives in this file's git history and PORT-REPORT-40c35724. Producer-side the same shape closed as C22 (step 70) + C24 (step 94). | **DISCHARGED 2026-08-03** (status cell corrected 2026-08-04 — producer-side staleness, the T11 class) |
 | T22 | **`_client(database)` follow-up — company backlog row DD6** (created 2026-08-03, the port's own finding): company `cli.py` `_client()` takes no `database` param, which (a) is already a LATENT crash in `patch_window_cmd` (calls `_client(database=...)` today), and (b) blocked the two new verbs — `docs-verify` (Q7) and `bootstrap-schema-graph` (targets `ddschema`). DD6 = add the param, wire both DEFERRED verbs, add the `ddschema` provisioning DDL (the G51 twin). Modules are already ported; only the thin CLI wrappers wait | pending (producer belief, as of 2026-08-03; company row DD6) |
 | T23 | **S3/C17 GRAPH writes on the company graph** — config/code landed at PORT-REPORT-40c35724, loads did NOT (guardrail 6: always yours). S3 re-key: **DROP `port_unique` FIRST**, then create `port_app_key` — a same-name re-declare succeeds and does nothing (verified live producer-side); all 8 key-bearing sites cut over in ONE apply or the constraint's null-tolerance silently doubles canonical nodes. C17: count existing orphans BEFORE the every-run `orphan` flag goes live (report's own note). **RIDER 2026-08-05, from a company-side T23 lookup the producer was shown:** that session first read T23 broadly (as C23 `IN_DIMENSION` bootstrap + G51 `ddschema` populate + all S3/C17 re-keys + the folder-attribution migration) from downstream references, then corrected itself against this row and converged on it — so the row is right as written, and G51 `ddschema` populate is **T22/DD6 territory, not T23**. **DIRECT EVIDENCE 2026-08-04 — this row's own prediction FIRED, so it is no longer only a producer belief.** The company ran `drydocs load seal_applications` against a graph that took the S3 CODE but never the S3 re-key and got `Neo.ClientError.Schema.ConstraintValidationFailed: Node(97) already exists with label 'BusinessApplication'`. Mechanism confirmed against producer source: pre-S3 nodes carry `seal_id` and NO `app_id`; `MERGE (a:BusinessApplication {app_id: row.app_id})` cannot match them because a uniqueness constraint IGNORES NULLS, so it mints a second node, and the next line `SET a.seal_id = row.app_id` then collides with the original's `seal_id` (both properties are separately unique-constrained, `constraints.cypher:43-44`). That is this row's "all 8 key-bearing sites cut over in ONE apply or the constraint's null-tolerance silently doubles canonical nodes", happening. **Remedy relayed:** backfill `app_id = seal_id` on the pre-cutover nodes BEFORE re-running, after checking whether the partial run already doubled any — batches commit per flush, so a mid-load crash leaves a partially-doubled graph, not a clean rollback. **Producer payload now exists (S10, built 2026-08-05, lands with this port):** all four `:BusinessApplication` MERGE loaders refuse up front when the target database holds a node with a null `app_id`, before any write and before the :JobRun. The refusal does NOT substitute for this row — it prevents the crash, it does not repair live state. Two things to keep straight, though. (1) **A CLOSED LOADER IS NOT A PERFORMED MIGRATION.** The company closed the folder-attribution *loader* (`folder_attribution.py` / `.cypher`) on 2026-08-04; the T23 leg is the SF1/F1 edge migration on LIVE state, which is exactly what step 55's `F1/G4-RIDER` note says wipe-and-rebuild does not cover. Do not let "the folder-attribution slice closed" on a board read as the migration being done. (2) That session could not fetch the producer and answered from a cached `cewilson/main @ 5f79d145` — see the fetch-access warning at the top of this file; a T-row read under those conditions is dated by construction. **RIDER 2026-08-06 (PORT-REPORT-a14a8028):** the company extended `PreCutoverApplicationGuard` (S10) to their own 5th `:BusinessApplication` MERGE site, `PatAppLinksLoader` — crash-prevention now covers all five company sites. Prevention only: the S3 graph re-key and C17 orphan-count legs remain owed on the live company graph | pending (producer belief, as of 2026-08-06 — the S3 re-key and C17 orphan-count legs were still open company-side at PORT-REPORT-a14a8028; the SF1 folder-attribution *loader* is closed, its edge migration is not; S10 guard now covers all 5 company MERGE sites) |
+| T24 | **TWO REPO-WIDE RENAMES ARE DEFERRED OUT OF THE 20260901 APPLY, AND BOTH RUN BEFORE THE WIPE-RELOAD, NOT AFTER** (new 2026-09-01; the SME ruled B-for-the-slice on both). **(1) THE VOCABULARY MIGRATION** — 44 id renames + 5 fragment renames + folding `41-local-seal` / `42-local-catalog` into `52-local-human`. Producer carries 175 vocabulary ids to the company's 111, and 44 of the 45 rename targets do not exist company-side, so no single rename can be applied in isolation — `u1_has_module` -> `arch_has_module` was attempted and reverted for exactly that reason. The 7 activations flagged as blocked are a SUBSET of this one migration, not separate items. **(2) THE cdo-* RENAME** — 72 producer files at `3c2bfcdd`, deferred beside it after a partial application imported a gate signature; see the gate-state note below. **THE SEQUENCING IS THE RULING AND IT IS COUNTER-INTUITIVE:** deferring reads as "do it at the wipe", and the wipe is precisely when the new vocabulary must ALREADY be in place. Reload under the old vocabulary and you freshly write ~22,956 `seal_has_port` edges and then migrate them; adopt the rename first and the reload writes `business_application_has_port` natively — **`migrate_vocab_ids_g101.cypher` becomes a no-op you never run.** Two producer-side corrections to the company's own measurement, both verified here: **44 of the 45 carry `deprecated_at: 2026-08-21`, not all 45** — the odd one is `seal_requires_scheduler` -> `reg_uses_software`, `deprecated_at: 2026-07-21` at gate C12 (platforms-taxonomy, signed 2026-07-21), and it needs **no data migration at all** because its target `:SchedulerKind` is a retired label whose constraint was removed at C13 on 2026-07-23; folding it into the G101 family sends you looking for nodes that cannot exist. And `migrate_vocab_ids_g101.cypher` landed at `8dc9a804`, an **ancestor of `port-base-20260826`** — the base already applied — so it is out of the CURRENT range but probably already in the company tree; check before pricing it as unsourced. **THE GATE-STATE NOTE, which is why (2) is not merely large:** the producer's `cdo-crosswalk.yaml` reads SIGNED OFF 2026-08-05, 13 confirmations, by name, while the company's twin reads DRAFT with a session pending, and `config/gate-prompts/**` is canonical-company. Taking it would fabricate a company ratification that never happened, in a file class `config/gate-log.md` cites as authority — a dropped field is absent, a fabricated sign-off is present and confident. Any complete workstream still carves that file out by hand. **THE VOCABULARY MIGRATION HAS A CODE DEPENDENCY, NOT ONLY A CONFIG ONE — found by your D+E apply, 2026-09-02, and it changes what item A blocks.** `drydocs_lineage/writer.py` and `drydocs_lineage/extractors/controlm_inventory.py` reference `scheduler_*` / `business_application_*` vocabulary ids EXCLUSIVELY (verified producer-side: 5 and 3 referencing lines, zero old-vocabulary refs in either). None of those ids exist on your side until the migration lands, so taking either file creates dangling vocabulary references. **Those two files structurally cannot port until item A does** — they belong to the deferred workstream, not to any slice. When A was scoped as "44 id renames + 5 fragment renames" that read as a config change; it is also the gate on two lineage modules, and any port that classifies them as fast-forwards before A lands will break. **AND "WIPE" IS TWO DIFFERENT OPERATIONS — SME clarification 2026-09-01, and the difference is how the constraint gap was FOUND.** `MATCH (n) DETACH DELETE n` removes nodes and relationships; it does NOT remove CONSTRAINTS OR INDEXES, which are schema. `DROP DATABASE` removes both. The SME has done both at different times, and it was the run that did NOT drop the database that surfaced the residue — recorded in `internal/research/triage-bootstrap-2026-08-28.md`: *"the constraints already existed at the zero baseline"*, 120 nodes / 18 rels against 60 constraints. G130 then measured it deliberately (producer desktop, `bolt://localhost:7687`, database `drydocs`): 56 live, 56 declared, and **one live-but-undeclared — `membership_id` on `:Membership`, dropped at G99 but still enforcing** — present on this desktop AND on the company instance. **What that means for both renames:** a data-only wipe leaves every constraint standing, so a residue constraint enforces a retired identity rule against the next load and is invisible until it refuses a write; and the T23 S3 re-key survives a data wipe untouched, so wiping does not discharge it. **Run `drydocs bootstrap` and read the live-but-undeclared report BEFORE the reload, whichever wipe you use.** Note also that a wipe is PER-DATABASE: `drydocs` and `ddschema` are separate, and clearing one leaves the other exactly as it was. | **DEFERRED 2026-09-01 by SME ruling; both owed company-side, sequenced BEFORE the wipe-reload.** Producer side is complete and needs nothing |
 | T21 | **What are `drydocs/docmeta/connectors/` and `drydocs/scrapers/`?** — ANSWERED 2026-08-02: a company acquisition framework whose agnostic members (web/filedrop connectors + the base protocol) seeded producer Q6; the rest (confluence connector, `scrapers/`) is purely internal. **DISCHARGED 2026-08-04:** Q6 landed `drydocs_docmeta/` producer-AUTHORED against the described shape, never a copy (step 75). Full analysis retired to this file's git history at the 2026-08-05 condensation. | ANSWERED 2026-08-02; back-flow DISCHARGED 2026-08-04 (Q6) |
 
   Done-means for T1–T10 are unchanged — they live verbatim in the archive's tracker

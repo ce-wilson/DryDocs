@@ -1,0 +1,320 @@
+id: J72
+epic: release-infrastructure
+title: A rename reads as a clean-add on the receiving side - compare a proposed add's content against
+  existing consumer files with a different name, before it is applied
+type: bug
+module: docs
+phase: 8
+agent: main
+model: sonnet
+priority: p0
+status: done
+depends_on: []
+inputs:
+- drydocs/port_preflight.py
+- drydocs/port_backlog_union.py
+- scripts/port_preflight.py
+- PORT-MANIFEST.yaml
+- tests/unit/test_port_reconcile_guards.py
+acceptance: |
+  (a) THE CHECK EXISTS AND IS RUNNABLE FROM THE CONSUMER. For each producer path absent
+  consumer-side - the paths a port classifies as clean-adds - compare CONTENT against consumer files
+  with a DIFFERENT name and report the pairs that look like one document.
+
+  (b) TWO MEASURES, STRONGER WINS, because the two known traps have opposite shapes. ID-SET for a
+  fragment split (entries move; the ids survive, the prose does not). NORMALIZED TEXT for a renamed
+  prose document (the header is rewritten; the body survives). Neither alone catches both.
+
+  (c) IT REPORTS, IT NEVER DECIDES. Every flagged pair is adopt / decline / false positive, and the
+  output says so. The port's failures came from acting without looking, not from looking and
+  choosing wrong.
+
+  (d) PROVEN ON THE REAL RENAMES, not only on fixtures.
+
+  (e) PORTS. Pure functions take TEXT and PATH MAPS, never a repository, so the guards run
+  producer-side where no consumer tree exists.
+notes: |
+  REQUESTED BY THE COMPANY SESSION after the trap fired twice in one apply: "Before I take another
+  clean-add, I'd like to build the content-similarity check you offered. Cheap, and it's now failed
+  twice for want of it." ~430 files remained unexamined at that point.
+
+  THE DEFECT. A port classifies a path against PORT-MANIFEST.yaml; a path absent consumer-side is a
+  clean-add - apply untouched, no merge, no decision. That is correct about the PATH and blind to the
+  CONTENT, so a renamed file arrives as new. The manifest cannot help: it answers "how do I merge
+  this path", and the question here is "is this path new at all".
+
+  BOTH INSTANCES, and they are shaped differently, which is why one measure is not enough:
+  41-local-seal.yaml -> 41-local-business-application.yaml + 52-local-human.yaml at gate
+  vocabulary-domains-and-id-policy A1/A2 - a SPLIT, where prose diverges and ids survive; 16
+  duplicated ids, 62 failures, one revert. And the crosswalk gate prompt, whose retired-acronym
+  name became cdo-crosswalk.yaml - a rename where the ids diverge (the id is the filename stem)
+  and the body survives. The second is the worse
+  one: the producer copy reads SIGNED OFF, 13 confirmations, by name, where the company copy reads
+  DRAFT, unsigned, session pending - and config/gate-prompts/** is canonical-company. Applying it
+  would have fabricated a company ratification that never happened, in a file class whose contents
+  config/gate-log.md cites as authority. A dropped field is absent; a fabricated sign-off is present
+  and confident.
+
+  PROVEN ON REAL HISTORY (2026-09-01, producer desktop). Run against 496aa268~1 -> 496aa268 - the
+  actual commit that applied the gate rename - the detector reports both real pairs at id-set
+  similarity 1.00: 40-local-scheduler.yaml <- 40-local-controlm.yaml, and
+  41-local-business-application.yaml <- 41-local-seal.yaml. That second pair is the one that cost the
+  company 62 failures. Fixtures reconstruct a defect; this reproduces it.
+
+  A SELF-INFLICTED FINDING WORTH KEEPING. The first run of scripts/port_rename_check.py raised
+  UnicodeDecodeError: 'charmap' codec can't decode byte 0x9d - subprocess text=True decodes with the
+  platform locale, cp1252 on Windows. That is the SAME trap the company session reported an hour
+  earlier, where a comparison script mojibaked every em-dash and fabricated 18 of 25 "differences".
+  The tool built to catch their first trap fell into their second one on its first run. Worse than
+  cosmetic here: a similarity check that mis-decodes one side compares a corrupted document against a
+  clean one and reports the corruption as a difference - the failure it exists to prevent, wearing
+  the opposite sign. Fixed with an explicit encoding="utf-8" and the reason in the docstring, because
+  both machines are Windows and this will be reached for again.
+
+  WHY THE FLOOR IS LOW (0.35). The cost of a false positive is one diff; the cost of a false negative
+  is a duplicated vocabulary or an imported signature. Both known traps score far above it.
+
+  WHY THE ID MEASURE ABSTAINS BELOW THREE IDS. A gate prompt carries one id and a rename renames it,
+  so the id measure would score that pair 0.00 and silence the text measure that scores it 0.88 - the
+  signal meant to help would be the one that hid the gate-state regression. Guarded both directions:
+  a split the text measure ranks lower, and a rename the id measure would miss.
+
+  DONE 2026-09-01. drydocs/port_rename_detect.py + scripts/port_rename_check.py +
+  tests/unit/test_port_rename_detect.py (11 tests). MODULE_MAP row and the test_module_boundary
+  "port" group updated in the same commit, per the default-deny rule. RELAY-20 hands it over.
+
+  REOPENED AND EXTENDED 2026-09-01, same day, because the company MEASURED it instead of trusting
+  it. Against the eight real pairs from their apply the content measures caught THREE and missed
+  five - including 41-local-business-application <-> 41-local-seal at 0.29 against a 0.35 floor,
+  which is the pair that cost 62 failures. The tool missed the incident it was built for.
+
+  WHY THE PROOF LOOKED GOOD AND WAS NOT. The dossier proof ran across 496aa268~1..496aa268, the
+  commit that applied the FRAGMENT rename - ids unchanged, so id-set scored 1.00. The real trap is a
+  later state where the G101 migration ALSO renamed the ids. Reproduced here: 0.29 on the 41 pair,
+  0.30 and 0.21 on the two 52-local-human splits. Their measurement is exact.
+
+  THE ASSUMPTION THAT BROKE, stated because it is the transferable part: max-of-two supposes the two
+  measures fail INDEPENDENTLY. In a split-plus-rename they do not - the entries were redistributed
+  (text falls) by the same migration that renamed their ids (overlap falls). Two measures, one common
+  cause, and a max over correlated signals is one signal.
+
+  TWO SIGNALS ADDED, both sharing no cause with the content measures:
+  - SAME-SLOT-PREFIX (contributed by the company session): in a numbered directory the number is the
+    SLOT and the stem is its current name, so same number + different stem is rename evidence that
+    reads no content at all. Recovers three of the five misses - 41/41, 49/49, 50/50. Their note said
+    four; it is three, because 40/40 was already caught at 0.59 and is not among the misses.
+  - VANISHED-TWIN: a consumer file the producer no longer has was renamed, split or deleted, and all
+    three are decisions. Searches the whole proposed set at a lower floor (0.15), because the question
+    has narrowed from "are these related" to "where did this file's content go". This is the only
+    signal that reaches a SPLIT INTO A NEW SLOT, which is the last two misses. Verified live: it
+    reports 52-local-human <- 41-local-seal at 0.30, the pair both other signals miss.
+
+  AND THE FRAMING IS NOW IN THE TOOL. Their ruling - necessary, not sufficient - is printed on every
+  clean run, naming the 3-of-8 measurement, because exit 0 previously read as a guarantee while the
+  62-failure pair sat at 0.29. A tool that reports its own measured coverage is harder to over-trust
+  than one that reports a verdict.
+
+  THIRD ROUND, 2026-09-01, and the company found the ROOT CAUSE I had twice papered over.
+
+  MY SECOND FIX WAS RIGHT FOR A WRONG REASON, and they measured it. I claimed the true twin "also
+  cleared the floor and was silently dropped" by the best-match rule, so raising the cap would
+  surface it. On their tree that twin scored 0.08 and ranked 13 of 29 - it never came near the
+  floor, and no cap change could have reached it. Worse, the cap change made the report say three
+  unrelated files at an identical 0.38 with no true pair, which is a stronger invitation to dismiss
+  the flag than one wrong answer was.
+
+  THE ACTUAL CAUSE IS JACCARD SIZE ASYMMETRY, which is arithmetic. Their pair: an 11-token producer
+  stub against the 97-token company epic it was reduced from, 8 tokens shared. Union in the
+  denominator gives 8/100 = 0.08; containment divides by the smaller set, 8/11 = 0.73, rank 1 of 29.
+  A producer file is regularly a reduction or expansion of its consumer twin, so Jaccard reads the
+  NORMAL SHAPE of a rename as dissimilarity. Adopted as max(jaccard, containment).
+
+  THEIR CAVEAT SHIPPED WITH THE CONTRIBUTION AND I VERIFIED IT INDEPENDENTLY: containment over-fires
+  alone - component-topology.yaml at 428 tokens reaches 0.64 against an 11-token stub on jaccard
+  0.02, purely by being large enough to contain it. Their framing is the finding: containment finds
+  the twin, the cap bounds its noise, NEITHER IS SUFFICIENT ALONE.
+
+  THREE DEFECTS THE ADOPTION EXPOSED, each caught by an existing guard or a real-data re-run:
+  - containment turned a 4-token document into a boilerplate detector (tokens `-`, `id:`,
+    `local_relationships:` scoring 0.75 on structure alone). MIN_TOKENS_FOR_CONTAINMENT = 8 makes it
+    abstain, mirroring MIN_IDS_FOR_ID_MEASURE, and pure punctuation is stripped in normalization.
+    Caught by test_unrelated_files_are_not_flagged the moment containment landed.
+  - the cap was per SIGNAL, so three signals capped at three produced twenty rows for six files on
+    the real sweep. Now per proposed file across all signals.
+  - dedup preferred the FIRST claim over the STRONGEST: 41-local-business-application <-
+    41-local-seal reported as normalized-text 0.57 while its same-slot-prefix 1.00 was dropped as
+    already-seen. Order of discovery is not evidence of strength.
+
+  COVERAGE NOW 8/8 on their pair list, verified on real data: every true twin ranks FIRST in its
+  group, and 52-local-human - the cross-slot split both earlier rounds called structurally
+  unreachable - fires at 0.71 against 41-local-seal and 0.57 against 42-local-catalog. The shape
+  they told me to flag rather than tune away turned out to be reachable after all, by fixing the
+  measure rather than the threshold.
+
+  THE METHOD FAILURE WORTH KEEPING, because it is mine and it repeated: BOTH my fixes were validated
+  against fixtures I authored to match my hypothesis. Round two proved "the twin cleared the floor"
+  using a fixture built to put a second file above the floor - a fixture written to match a theory
+  proves the theory, not the tree. The company measured the real pair each time and was right each
+  time. The rule this earns: when a guard is written for a specific incident, its fixture must be
+  RECONSTRUCTED FROM THE INCIDENT at the real values, and a synthetic one only supplements it.
+
+  FOURTH ROUND - GIT ALREADY KNEW, AND THE PORT WAS THROWING IT AWAY.
+
+  THE SME ASKED whether the commit ritual should become per-module to prevent this class of guard
+  being needed. It would not have helped, and the evidence is in the commit: 496aa268, which did the
+  vocabulary rename, touched SIX FILES and only the ontology. It was already module-scoped. Nothing
+  was missing from the commit. What was missing was in the PORT PROCESS, which classifies each
+  producer path against the manifest, asks "does the consumer hold this path", and in asking that
+  question discards the rename metadata git recorded when the rename was made.
+
+  MEASURED: `git diff -M --diff-filter=R --name-status port-base-20260826..HEAD` reports 18 RENAMES
+  in the consumer range, with similarity scores, and every 2026-09-01 trap is among them -
+  40-local-controlm -> 40-local-scheduler at R097, 41-local-seal -> 41-local-business-application at
+  R095, the crosswalk gate prompt twin at R075, its test at R088. It also names two the similarity
+  detector could not: drydocs/docs_verify.py -> drydocs_core/docs_verify.py at R090, which is the
+  shadow-definition trap the company hit, and the docs/Product -> knowledge/org relocation - both
+  CROSS-DIRECTORY moves that same_directory_only skips by design.
+
+  So the exact list now leads the report and the heuristic follows. Git is authoritative where the
+  measures are inference, and it costs one command.
+
+  IT DOES NOT REPLACE THE MEASURES, for a reason that is the same shape as everything else in this
+  item: git's rename detection is 1:1. A SPLIT gets one match and the remaining targets come back as
+  plain adds - 41-local-seal matched 41-local-business-application, and 52-local-human arrived as an
+  add. That is exactly the pair containment recovers at 0.71. Exact for 1:1, heuristic for splits,
+  and the report says so rather than letting a reader trust the exact list as complete.
+
+  THE UNCOMFORTABLE PART, recorded because it is the lesson: three rounds of similarity work went
+  into recovering information that was sitting in the commit metadata the whole time. The tool was
+  not wrong, and the split case genuinely needs it - but the FIRST question should have been "does
+  anything already record this", and it was not asked until the SME asked whether the ritual was the
+  problem. Reaching for a new measurement before checking what the system already knows is the
+  expensive mistake here, and it was mine three times over.
+
+  FIFTH ROUND - RECALL 8/8 CONFIRMED, AND THE COST OF IT PAID. The company re-ran the full sweep on
+  the containment pin and reported recall 3/8 -> 8/8, including the cross-slot split both of us had
+  written off as structurally unreachable: 52-local-human <-> 41-local-seal at 0.70 (was 0.30
+  missed), <-> 42-local-catalog at 0.60 (was 0.28 missed), and cdo-alignment <-> its twin at 0.80
+  ranked FIRST (was 0.08, rank 13).
+
+  THEY ALSO PRICED IT, WHICH I HAD NOT: 344 pairs over 230 proposed adds, of which docs/ alone was
+  252 pairs for roughly TWO real ones. Backlog items share a schema, so nearly every proposed item
+  matched several others at 0.40-0.60 on id:/epic:/status:/acceptance: alone. Their framing is the
+  argument: "a reviewer handed 252 pairs will skim, and skimming is how the twin got taken in the
+  first place." A report nobody reads is the same outcome as no report, so precision is not a
+  refinement here - it is the same failure at the other end.
+
+  THEIR FIX, ADOPTED: the idf half of tf-idf. Discount tokens appearing in more than half a
+  DIRECTORY's files - structure survives a rename and so does content, but only content IDENTIFIES.
+  Cheap, local, no dependency. It is the principled version of MIN_TOKENS_FOR_CONTAINMENT, which was
+  a blunt size threshold reaching for the same thing.
+
+  MEASURED ON REAL DATA: the backlog items directory has 85 proposed clean-adds and now reports 23
+  pairs. Recall is unchanged - every real vocabulary pair still fires, 52-local-human at 0.66 and
+  0.51, the two slot renames at 1.00. The unfiltered comparison over that directory did not finish
+  inside two minutes, so idf buys speed as well as precision; smaller token sets, fewer comparisons
+  that matter.
+
+  AND IT SUBSUMED PART OF AN EARLIER FIX, which is worth recording rather than hiding: two cap tests
+  went red on adoption because they used corpora of identical files, where idf now correctly strips
+  every token and reports nothing. The cap and idf cover DIFFERENT REGIMES - idf needs at least five
+  files to mean anything, and below that the cap is the only protection. Both tests were rescoped to
+  say so rather than being deleted or the threshold bent to keep them green.
+
+  ONE CAUTION THE COMPANY RAISED AND THE REPORT SHOULD CARRY: a perfect score is not proof.
+  docs/design/feedback/--rev1.yaml scores 1.00 against its own earlier revision and is not a rename;
+  it is a later revision of the same document. Recorded here; the report already says it identifies
+  nothing and decides nothing, which covers it.
+
+  TWO REAL FINDINGS IT SURFACED FOR THEM, both corroborating work already planned:
+  folder_attribution.cypher <-> seal_attribution.cypher at 0.52 (a real rename, confirming the
+  loader field they took in the B+C split), and cli_shared.py <-> cli.py at 0.49 (not a decline -
+  cli_shared is the extraction FROM cli.py, so the detector found both halves of the D merge).
+
+  SIXTH ROUND - THE IDF FIX CAUSED A FALSE ALL-CLEAR, WHICH IS THE WORST OUTPUT THIS TOOL HAS.
+  The company re-ran docs/F on the idf pin and found the epics directory reporting exit=0, "no
+  proposed clean-add resembles an existing file under another name" - on a directory that CONTAINS a
+  real rename. Precision had won convincingly (344 -> 50 pairs, docs 252 -> 27) and the headline
+  number hid it. Their instinct to re-run rather than carry the earlier sweep forward is what caught
+  it.
+
+  THE PAIR LOST IS THE ONE THE PREVIOUS PIN EXISTED TO RECOVER: cdo-alignment <-> its twin went
+  0.08 below floor (3rd pin) -> 0.80 rank 1 (4th pin, containment) -> SUPPRESSED (5th pin, idf).
+
+  THEIR DIAGNOSIS, AND IT IS THE GENERAL FORM: the two fixes are in DIRECT TENSION on a stub, not
+  merely coincident. The file is a ten-token stub whose tokens ARE the shared epic scaffolding.
+  Containment recovered it PRECISELY BECAUSE those few tokens are contained in the twin; the idf
+  discount removes EXACTLY THOSE TOKENS as boilerplate. For a stub, the signal and the noise are the
+  same tokens - so whichever fix runs last wins.
+
+  THE MECHANISM IS THREE-WAY, and tracing it is what sited the fix correctly. The discount leaves
+  the stub FIVE tokens; MIN_TOKENS_FOR_CONTAINMENT is 8; so the discount pushes the stub below the
+  threshold at which containment votes. Containment abstains, Jaccard alone scores 0.09 against a
+  0.35 floor, and the pair drops. IDF DOES NOT OUT-SCORE CONTAINMENT HERE - IT SWITCHES IT OFF.
+
+  THE COMPANY PROPOSED EXACTLY THE RIGHT RULE and my first attempt mis-sited it. They said "do not
+  apply the idf discount when either side is short - the same shape and rationale as
+  MIN_TOKENS_FOR_CONTAINMENT = 8". I applied it to the RAW length, where ten is above eight and the
+  test never fires; measured, it changed nothing. The rule belongs on the POST-DISCOUNT length. Same
+  rule, correct site - and the correction only surfaced by instrumenting the comparison instead of
+  reasoning about it, which is the third time this session that measuring beat inferring.
+
+  DECIDED PER PAIR, NOT PER FILE. Discounting one side and not the other is worse than either: the
+  stub tokens survive on the stub and are stripped from the twin, so the overlap goes to zero and the
+  pair is lost just as surely. If the discount would gut EITHER side, both compare raw.
+
+  ALL THREE AXES HOLD, measured on real data: the regression pair returns at 1.00; the backlog items
+  directory stays at 26 pairs over 85 clean-adds (precision kept); every vocabulary rename still
+  fires including the two slot renames at 1.00. And the veto yields a GUARANTEE worth stating: idf
+  can never strip a pair to nothing, because a document the discount would empty is compared raw
+  instead. An empty report on a directory containing a rename is now unreachable by this path.
+
+  TWO FIXTURES BROKE ON ADOPTION AND BOTH WERE WRONG, not the code: they used documents short enough
+  that the veto correctly disables idf, so they had been testing the veto while claiming to test idf.
+  Lengthened past the threshold. One assertion was inverted outright - it claimed idf reduces
+  identical files to zero matches, which is exactly the false all-clear this round exists to prevent;
+  it now asserts the cap bounds the report instead.
+
+  THE META-PATTERN THE COMPANY NAMED, worth keeping: six pins, and each fix has traded against the
+  previous one - recall -> masking -> recall+noise -> precision-recall -> tension-on-stubs. The tool
+  is converging, but every result is only valid against the pin it ran on, which is why the full
+  sweep is re-run each time rather than carried forward.
+
+  CLOSED 2026-09-01 AT THE SIXTH PIN. The company re-ran the full sweep and the known-pair check on
+  the conditional-discount pin and reported convergence:
+
+    measure              4th pin   5th pin   6th pin
+    recall (known)        12/12     11/12     12/12
+    total pairs            344        50        53
+    docs pairs             252        27        30
+
+  The conditional guard cost +3 pairs across the WHOLE sweep to buy the lost pair back. Their words:
+  the first pin where the two goals do not trade against each other. cdo-alignment <-> its twin is
+  back at 0.80. 12/12 recall at full precision.
+
+  THE OBSERVATION WORTH KEEPING IS NOT THE NUMBERS. Theirs, and it is about method rather than this
+  tool: "My suggestion at the fifth pin was do not discount when either side is short - directionally
+  right, and I would have implemented it against the raw token count, which does not work. The stub
+  is ten tokens; the discount leaves five; a raw-length test never fires. The gap between right idea
+  and right mechanism is where the bug lived, and I would not have found it without the re-measure."
+  That is exactly what happened here: the rule they proposed was correct and my first implementation
+  of it changed nothing, and only instrumenting the comparison located the difference.
+
+  THE SEQUENCE, because it is the argument for re-measuring rather than carrying results forward:
+  3/8 recall -> same-slot signal (6/8) -> cap-at-3 (masking; never reached the stub) -> containment
+  (8/8 but 344 pairs) -> idf discount (50 pairs, lost the stub) -> conditional discount (12/12, 53
+  pairs). EVERY intermediate pin traded one property for another. The one time a sweep was NOT
+  re-measured carefully - the Select-Object exit-code artifact - it produced a false "D is clean"
+  that was nearly acted on.
+
+  CARRIED INTO D+E, all confirmed on the final pin rather than inherited from an earlier one:
+  folder_attribution.cypher <-> seal_attribution.cypher (0.43, a real rename corroborating the
+  loader: field already taken in B+C); cli_shared.py <-> cli.py (0.47, adopt both - cli_shared is
+  the extraction and cli.py re-exports from it); test_cdo_crosswalk.py (0.97, declined with the
+  acronym-rename deferral); and four same-slot ontology pairs at 1.00 plus the cross-slot split, all
+  belonging to the deferred vocabulary workstream.
+
+  ONE PREDICTION LEFT OPEN, and it is theirs and falsifiable: the cli_shared re-export should clear
+  test_load_map_declarations (19) and test_chain_inputs (7). If D+E lands and it does not, their +24
+  failure attribution was wrong. Recorded here so the answer is checkable either way rather than
+  quietly dropped.

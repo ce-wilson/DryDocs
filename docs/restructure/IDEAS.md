@@ -91,6 +91,164 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
+- **`Idea-236`** · 2026-09-02 · `[idea]` · **open** · prio? **High** —
+  **The JOB→MFTS research landed (120 hops, 19 open questions) and it answers Idea-104's
+  evidence half — five gaps against the backlog, one of which blocks the file-transfer
+  lineage strategy outright.** Source: `internal/research/JOB-MFTS-MM-research.md` (the
+  company-side mind-map research log, transcribed producer-side 2026-09-02 at its stated venue
+  `feat/dd_lineage @ b6ca9422`; 2,183 lines, 6 self-corrections, 21 gotchas). The strategy under
+  test: MFTS/SFTP/API transfer metadata as an inventory matched to jobs, confirmed, then written
+  into the Control-M FileWatcher description so the Control-M database becomes the source of
+  record for the job→route binding — completing source→target lineage for file transfers and
+  feeding the runbook.
+  **WHAT THE RESEARCH SETTLES.** Idea-104's evidence half: 89 of 89 real MFTS routes carry a
+  6-digit NUMERIC route id (production capture `372399` inside the sampled range); the
+  `MFTS_RT_IN_*`/`MFTS_RT_OUT_*` string pair appears in **zero** real routes and reads as a
+  documentation placeholder; the UUID key belongs to OneMFT, a **different product**; and
+  `NEP4824` — the runbook's "Inbound MFTS Route ID" column — is the partner/account stem, not a
+  route id at all. Four namespaces, at least two homonyms. **MFTS is Axway SecureTransport 6.0.3,
+  SEAL 89830, distinct from FileMover/OneMFT** (CORRECTIONS H93 + "three platforms"). The
+  ruling stays the SME's; the log's own words: *a confirmation rather than a coin-flip*.
+  **THE PREMISE CORRECTION.** "We don't have loaders planned for MFTS routes" is true of producer
+  `main` and false of the company's `feat/dd_lineage`: `:MftsRoute {route_id}`,
+  `USES_INBOUND_ROUTE`/`USES_OUTBOUND_ROUTE`, `DELIVERED_VIA`→`:DeliveryMechanism` and
+  `controlm_filewatcher_metadata.cypher` are **built and active there**, with `route_id`
+  UNIQUE-constrained. Producer holds only the parser (`description_tokens.py`). The research's
+  G-1 names the consequence: *the key was committed before the shape was ruled*. So the loader is
+  not missing — it is a back-flow candidate that must WAIT for the ruling, or it imports the
+  question.
+  **THE FIVE GAPS, each with where it lands:**
+  1. **[BLOCKER — item, p1] No conformant way to record a route id on a watcher today (G-8).**
+     C30 (`done`) retired `INBOUND_ROUTE`/`OUTBOUND_ROUTE` on watchers — a watcher is inherently
+     inbound — and pointed them at `FTS_ID` + `REC_ID`. Both retired tokens were also
+     `MFTS_AGENT only; literal NULL otherwise`, and **every one of the 89 sampled routes is
+     SFTP**. So the strategy's write-back step has no token to write into, and under the prior
+     standard it would have been NULL for 100% of the real population. The research calls this
+     *a defect, not a convention*. Amending a `done` standard that carries a ruling routes through
+     **C40** (revisit a signed ruling); the item is the amendment, not the sweep.
+  2. **[item, registry] The transfer platforms are not registered (OQ-4).** No `systems[]` row, no
+     classification, no owner for MFTS, FileMover or OneMFT — producer `source-registry.yaml`
+     confirms it. MFTS has a SEAL (89830) and a named support group (`IP_CFP_ISUP_MFTS`), so it
+     is at minimum a `:BusinessApplication`. Control-M cannot be the source of record for a
+     relationship whose other end is unregistered. Same class as the registration gaps this
+     session already named; the row is the smallest change.
+  3. **[item, small] `software-registry.yaml` does not know `mfts` or `axway` (OQ-15, U-1).**
+     The vendor was **erased by internal branding** — absent from the UI, portal, API-store entry
+     and docs; it surfaced only in a mandatory `User-Agent: Axway/EndPoint` header. Recording
+     `mfts` with `vendor: axway`, the way `controlm` carries `vendor: bmc`, is the change that
+     stops the vendor being lost again. Whether Axway becomes a **vendor baseline** (a new
+     `external/file-transfer/` category and a second baseline rank in `precedence.yaml`) is a
+     separate, larger call — a gate question, not this item.
+  4. **[rider on G64, or its own item] `:MftsRoute` identity needs the environment (OQ-18).** A
+     prod route can be disabled while its CAT twin stays enabled, so `route_id` alone cannot
+     express identity; `(route_id, fts_id)` can, and `MFT System Environment` is already a column
+     in the search export. **Same shape as G64's `(guid, connectorName)` finding** — the research
+     says *worth ruling together*. And OQ-11 adds that a re-provisioned route may not keep its
+     id, in which case `route_id` fails ADR 0001's business-key test outright.
+  5. **[groom Idea-104 → item] Convene the ruling.** Idea-104 was left ungroomed for three weeks
+     because *a groom cannot pick between the readings*. The groom no longer has to pick — the
+     evidence is assembled and the gate page exists (`email-dl-contact-point` §G5 stages MFTS
+     routes as DPROD ports; OPEN/UNSIGNED). The item is to convene it with this research as the
+     evidence base. Two inputs the gate needs that the idea never had: OQ-8's **third reading**
+     (the two shapes belong to two platforms), and OQ-5's **H68** (a route is two SFTP legs
+     through FTS2 under one request id, which favours the `dprod:inputPort`/`outputPort` pair
+     over a single node — *C29 was not inventing a pair, it was reading one*).
+  **ONE SME RULING ALREADY MADE THAT SHARPENS THE STRATEGY (OQ-12):** *no daily capture.* DryDocs
+  documents **the routes** — the durable framework — and nothing more; transfer history is pulled
+  manually and periodically as research needs it. So the inventory is a ROUTE inventory, and the
+  loader question collapses to routes only. What survives for the gate is whether a transfer ever
+  becomes a graph node at all or stays research evidence (P8).
+  **THE ASSESSMENT, stated plainly.** The direction is right and the research is what makes it
+  buildable: the operational walk is *watched file → landing directory → MFTS route → sender →
+  sender's owner → owning application*, MFTS holds the last four links (H17–H22), and Control-M
+  can hand over only the second (G-9) — so an inventory that grounds the description field in
+  MFTS's truth before anything is written is the correct sequencing, not a nicety. **Where the
+  framing needs one refinement:** Control-M becomes the source of record for the **job→route
+  binding**; MFTS stays the source of record for the **route itself**. Two records, one join key
+  in the description field — never the route's facts. The description field is typed prose, and
+  the "standard" placeholder value appeared in 0 of 89 real routes; a record is only as good as
+  what got typed, so the write-back needs a validation guard against the MFTS inventory, not just
+  a confirm step.
+  **RESEARCH METHOD FINDINGS WORTH KEEPING PRODUCER-SIDE (U-1..U-6):** an internally branded
+  platform hides its vendor on every documentation surface and leaks it through implementation
+  surfaces — user-agent, cookie names, default ports, path conventions, id shapes — so check
+  those FIRST, ahead of asking a team; naming the vendor is what moves a subject from
+  entitlement-bound Internal to a publishable External reference; "there is an API" is not
+  "there is a source" until the operation list says it DESCRIBES rather than MOVES; and a
+  contract observed on one export is not the platform's contract — the log over-generalised that
+  way three times in one day and corrected itself each time. These belong in
+  `internal/research/_templates/source-probe.md` when that template is back-flowed (it is
+  company-side today and the research owes it a correction).
+  **TWO HOUSEKEEPING NOTES FROM THE COMPANY'S OWN PASS:** `G64.yaml` is `status: todo` on both
+  sides while its research log describes the gate as convened and §B run — worth checking which is
+  stale. And the log's hop ids (`H1–H7`, `P1–P6`, `S3`, `G5`) collide with real backlog ids; a
+  future grep will conflate them. Cosmetic, but it will bite a reader.
+  Not groomed here: items 1–3 are buildable now and should be; 4 is a rider unless G64 has moved;
+  5 is the SME's convening. F-1 (a Control-M QR for jobs using MFTS 6) is company-band
+  `Idea-10021` and stays theirs. Related: [[Idea-104]], C16, C29, C30, G83, G64, MM7, MM8, MM9.
+
+- **`Idea-235`** · 2026-09-01 · `[idea]` · **open** · prio? **Med** —
+  **The measurement apparatus corrupts the measurement, and it fails toward a REASSURING answer
+  rather than an alarming one.** Three instances in one session (2026-09-01), across two machines
+  and two people, all during the same port:
+  1. **cp1252 decoding.** A comparison script read `git show` with `subprocess(text=True)`, which
+     decodes with the platform locale on Windows. It mojibaked every em-dash and **fabricated 18 of
+     25 reported "differences"**. The file on disk was clean the whole time.
+  2. **A truncated pipeline's exit code.** A sweep captured results as
+     `... | Select-Object -First N; $LASTEXITCODE`. `-First` terminates a native-command pipeline
+     early, so `$LASTEXITCODE` reflected something other than the command — **reporting exit 0 where
+     the raw code was 1**. Five prefixes had been declared clean on that basis, and a slice was about
+     to be started on it.
+  3. **A fixture written to match a hypothesis.** A guard was validated against test data authored to
+     make its author's theory true, so it passed and the theory was wrong. The real pair, measured on
+     the other tree, scored 0.08 where the fixture said it cleared the floor.
+  **THE COMMON SHAPE, and it is what makes this worth a rule rather than three fixes:** in every case
+  the instrument was the thing that was broken, the artifact under test was fine, and **the corrupted
+  measurement said everything was OK**. A tool that fails loudly gets fixed in minutes. A tool that
+  fails into "clean", "18 differences found", or "the test passes" gets ACTED ON. Both of this
+  session's failures that reached a commit came from tooling that quietly reported success.
+  **WHY IT IS NOT AN ACCIDENT that they all fail reassuringly.** Each is a default that optimises for
+  not-interrupting: a locale decoder that substitutes rather than raises, a pipeline that stops
+  reading when it has enough, a fixture that the author wrote and therefore believes. Defaults are
+  chosen to keep going, and "keep going" reads as "fine".
+  **DISPOSITION — the candidate rule, not yet ruled:** when a measurement contradicts an expectation,
+  **check the instrument before the subject**, and prefer the check that can fail loudly — read the
+  raw exit code before parsing, decode explicitly, reconstruct a fixture from the incident at its
+  real values rather than authoring one. Cheap in every case. The counter-argument is that it is a
+  discipline rather than a mechanism, and this repo's own history says a discipline nobody is forced
+  to follow rots — so the real question is whether any of the three admits a guard. Related:
+  [[feedback-verify-before-asserting]], and J72's own notes carry all three as worked examples.
+
+- **`Idea-234`** · 2026-09-01 · `[idea]` · **open** · prio? **Low** —
+  **A branch tip can be green while commits inside it are red, and nothing records which — so a
+  bisect through the range fails on the guard rather than the defect.** Observed on
+  `feat/ui-web`, 2026-09-01, and reported by the session that made it rather than found by
+  anything: `e7e95f07` and `f44fb40d` shipped two console components without their
+  `config/taxonomy/ui-components.yaml` ledger rows and were RED on `test_ui_components` when
+  pushed; `e0c12d10` added the rows and the tip went green. The tip is the state anyone looks
+  at, so the range reads as healthy.
+  WHY IT IS WORTH A LINE RATHER THAN A SHRUG. The session ritual's CI check matches on HEAD's
+  sha precisely so that "green" means green at what you pushed — `snapshot.ps1` performs it
+  immediately before writing, warn-only. That check is per-push, and it does exactly what it
+  claims; nothing aggregates the answers, so a branch accumulates red commits and reports the
+  colour of its last one. The cost is not correctness — the tip is genuinely green — it is that
+  `git bisect` over such a range returns the commit where a LEDGER row was missing, not the
+  commit where behaviour changed, and the bisector cannot tell those apart without re-running
+  the suite by hand at each step.
+  WHAT MOSTLY NEUTRALIZES IT, and why this is Low rather than Med: CLAUDE.md already mandates
+  `--no-ff` for branch merges, so once `feat/ui-web` lands on `main` the red commits leave
+  main's FIRST-PARENT line entirely and `git bisect --first-parent` never visits them. The
+  hazard is real only while bisecting the branch itself, or a range that crosses the merge
+  boundary — which a port range does, since a port reads the full range and not the
+  first-parent walk.
+  DISPOSITION, if it is ever worth acting on: not a guard. A pre-push hook running the full
+  suite would cost minutes on every push to buy a property nobody has needed yet, and a red
+  intermediate commit is a normal, legitimate way to work (J68's own guard was written red
+  first on purpose — the difference is that it went green in the SAME commit). The cheap
+  version is a note: when a ledger roll describes a range, say which commits inside it were
+  red at push, the way step 272 says which ids were re-minted. That is one sentence per roll
+  and it is written by the session that already knows.
+
 - **`Idea-233`** · 2026-08-31 · `[idea]` · **open** · prio? **Med** —
   **Record HOW a source was captured, not only how much its content is trusted: a capture-rung
   alongside the VERBATIM/GROUNDED/SYNTHESIZED axis.** Every `SOURCE-MANIFEST` today carries a
@@ -2308,6 +2466,18 @@ question a 1,000-line file with the trail at the bottom could not answer.
   2026-08-12 re-check: G83 still carries the protection clause, and nothing in the interim touched which
   route-id shape is real. Not groomed, deliberately — the two readings lead to different C16 prefix
   governance and a different `dprod:DataProductPort` key, and a groom cannot pick between them.
+  **RE-CHECKED 2026-09-02 — THE EVIDENCE HALF HAS ARRIVED, and the blocker changed shape.** The
+  company-side research log `internal/research/JOB-MFTS-MM-research.md` (transcribed producer-side
+  the same day) measured it: **89 of 89 real MFTS routes carry a 6-digit numeric id**, the string
+  pair appears in **zero**, the UUID belongs to a different product (OneMFT), and the runbook's
+  `NEP4824` is a partner stem, not a route id. It also adds a THIRD reading this entry never had:
+  the two shapes may belong to two different PLATFORMS (MFTS is Axway, SEAL 89830, distinct from
+  FileMover/OneMFT). The ruling is still the SME's — but "a groom cannot pick" is no longer the
+  reason to hold: the groom does not need to pick, it needs to CONVENE, and the gate page exists
+  (`email-dl-contact-point` §G5, OPEN/UNSIGNED). Two things the ruling must now also cover, both
+  from the research: whether identity needs the environment — `(route_id, fts_id)`, the G64
+  composite-key shape (OQ-18) — and whether a re-provisioned route keeps its id, because if not
+  `route_id` fails ADR 0001's business-key test (OQ-11). See [[Idea-236]] for the full gap list.
 
 - **`Idea-93`** · 2026-08-08 · `[chore]` · **groomed → executed IN PLACE at the 2026-08-09 groom (14 stale `inputs:` fixed in backlog.yaml) + merged → L19 (the design-doc half); the E1 status question STAYS OPEN — user call** · prio? **High** —
   **next_ready needs a re-groom: 9 of 62 items carry stale `inputs:`** (persona Run 2,

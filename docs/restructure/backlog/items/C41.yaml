@@ -1,0 +1,100 @@
+id: C41
+epic: ontology-mapping
+title: The backlog series letter is an epoch tag, not a topic - mint domains as first-class registered
+  objects and carry the topic axis in a field, gated on the Teams Edition ADR
+type: requirement
+module: config
+phase: 2
+agent: main
+model: fable
+priority: p2
+status: blocked
+depends_on: []
+gates:
+- schema-identifier-publish-ceiling-teams-edition
+inputs:
+- docs/decisions/0015-team-edition-template.md
+- drydocs_core/ontology/relationship_vocabulary/00-header.yaml
+- .claude/skills/groom-backlog/validate.py
+- tests/unit/test_backlog.py
+- docs/restructure/backlog/epics/
+- git-readme.md
+acceptance: |
+  BLOCKED ON THE TEAMS EDITION ADR. Nothing here is built until that ADR rules the domain registry
+  and its minting authority. The item exists so the design is not carried only in a machine-local
+  plan file.
+
+  (a) A DOMAIN IS A MINTED OBJECT, registered and tracked, allocated the way an id is allocated:
+  ask the allocator, push the registration, then use it. New `config/taxonomy/domains.yaml` with one
+  row per domain carrying id, series prefix, title, a NULLABLE vocabulary_fragment, minted_by,
+  registered_at, the gate or ADR that ruled it, and status. Seeded with the 13 that already exist,
+  each citing its real ruling - eleven from vocabulary-domains-and-id-policy (2026-08-12),
+  `infrastructure` from server-location-ontology (Z2, 2026-08-19), `human` from A3.
+
+  (b) THE SERIES PREFIX COMES FROM THE REGISTRY. Existing series are 1-2 letters (A..Z, GN, MM);
+  minted domain series are >=3 (REG, SCHED, BAPP, ARCH, DOCS, QUAL, CTX, HUM, CORP, ITSM, INFRA).
+  Zero regex change - `GN` and `MM` already prove multi-letter series parse. `all` gets NO series:
+  it exists for edges spanning domains, and a catch-all series is precisely what G became.
+
+  (c) DUAL-KEY: ids freeze, an optional `domain:` field carries the axis, following the `gates:`
+  precedent (J50). No existing id moves, so every citation in config/gate-log.md,
+  docs/port/port-prompt.md and IDEAS.md still resolves. Backfill is mechanical from the 27 epic
+  files; items whose domain differs from their epic's are overridden individually.
+
+  (d) THE EDITION IS A DECLARED CATEGORY SEGMENT, not a numeric band: `[<EDITION>-]<DOMAIN><n>`,
+  edition first, base edition unprefixed. New `config/taxonomy/editions.yaml` on the
+  lob-product-team.yaml pattern - Internal, synthetic sample producer-side, per-entry manifest row -
+  each row declaring the edition code against an `area_product_id`, the Product Catalog key
+  :AreaProduct already carries (K5 B, constraints.cypher:79).
+
+  (e) THE ADR MUST RULE, and this item may not pre-empt any of it: minting authority (a base mints,
+  an instance requests - ADR 0015 D4 already rules this for the ontology); what qualifies as a
+  domain, so the registry does not become another G; whether a domain may exist with no vocabulary
+  fragment; the architecture-vs-code split; and the edition grain.
+
+  tests/unit green; no id moves; the port-prompt carries a relay, because a cross-repo convention
+  change is inert until it reaches the other side.
+notes: |
+  WHY THIS EXISTS AS AN ITEM: the design was approved by the SME on 2026-09-01 and lived only in a
+  machine-local plan file outside the repo. Its first workstream shipped the same day as J68, J69,
+  J71 and J72; this is the second, and it had no record anywhere in the tree. An approved design
+  with no backlog row is a design that dies with the session that made it.
+
+  THE DEFECT, MEASURED. `docs/restructure/backlog/plan.yaml` maps phases 1:1 to epics and to letters
+  - phase 1 = Taxonomy capture = Epic B, phase 2 = Ontology mapping = Epic C, phase 6 = Component
+  topology = Epic G. The letter records WHEN a phase was opened, not what an item is about. G now
+  holds 135 of 599 items (23%) across six epics, so "search the G series" means nothing. Company-side
+  every item lands in DD - one undifferentiated series, no topic axis at all.
+
+  AND THE COMPANY HAS NO WORKING ALLOCATOR TODAY, which is the sharpest single fact here:
+  `--next-id DD` is refused by RESERVED_SERIES and `--next-id G` at their max of G10003 is refused by
+  the ceiling. Both doors shut, so they mint by hand - the exact failure I6 was built to remove,
+  still live on the far side of the port.
+
+  TWO PARTITION RULES, NEITHER RETIRED, which is what produced the DD10-vs-DD10001 ambiguity
+  Idea-162 records: git-readme.md:196-201 (2026-07-20) reserves DD; the allocator band (2026-08-18)
+  says producer 1-9999 / company 10000+ in every series. Rule 2 generalizes Rule 1 and Rule 1 was
+  never withdrawn, so a session following either is obeying a written rule.
+
+  WHY THE 13 SIGNED DOMAINS RATHER THAN A NEW LIST: they are already ruled, already sharded into
+  fragments 40-52 (S5), and cover ~90% of the taxonomy areas the SME named. A second topic vocabulary
+  would drift against the first. And two of the 13 were REGISTERED AFTER the original ruling, so
+  domain registration is already an act that happens through a gate - what is missing is a registry
+  that records it and an allocator that guards it.
+
+  ONE SEED ROW ARRIVES CONTESTED and the registry should say so rather than inherit it quietly:
+  `architecture` absorbs code, which puts code and requirements in different domains with no declared
+  join - the join the product exists to make. The 2018 genesis document (SDLC-Docs/extracted/
+  FCD-Requirements.md:27) states the thesis as "a subset of data from the code, requirements, and
+  test cases is used to link the documentation database to the corresponding development component",
+  with usage case 34 "Query for requirements, code, released items". Three distinct things.
+
+  AND SPLITTING THE DOMAINS IS ONLY HALF: separate domains with no typed edge between :Requirement
+  and :Code reproduces spec-kit's own gap - GitHub's spec-kit runs Specify/Plan/Tasks/Implement/
+  Converge and has NO formal traceability matrix, only implicit parent-child through phase order.
+  That is C38's finding one layer up: a relationship that exists only as an implicit ordering is not
+  traversable. The reconciliation edge goes through RELATIONSHIP_GUIDE.md as status: planned, exactly
+  as C38 did.
+
+  RELATED: J71 made the per-entry merge rules total, which is the same disease (a rule with a hole)
+  one layer down. Idea-162 records the DD-band collision this closes.
