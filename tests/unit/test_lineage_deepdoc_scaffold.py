@@ -29,8 +29,15 @@ def test_package_surfaces() -> None:
         "review",
         "writer",
     }
-    # MM3 added `mindmap` — the state file the loop reads; it is real, not a stub.
-    assert set(drydocs_deepdoc.__all__) == {"DATABASE", "investigate", "mindmap", "writer"}
+    # MM3 added `mindmap` (the state file the loop reads) and `search_log` (the
+    # per-search ledger); both are real, not stubs.
+    assert set(drydocs_deepdoc.__all__) == {
+        "DATABASE",
+        "investigate",
+        "mindmap",
+        "search_log",
+        "writer",
+    }
 
 
 def test_write_targets_share_the_database_and_the_boundary_is_the_label() -> None:
