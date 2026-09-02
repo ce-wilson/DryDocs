@@ -1,7 +1,17 @@
 # Adoption dossier 4 — the port machinery corrections that postdate your base but govern the slices you have not applied yet
 
-**Hand-carried; NOT port payload. Pin the producer tree at `6a8bd23f`.**
+**Hand-carried; NOT port payload. Pin the producer tree at `c6a3c6bc`.**
 Documents intent; asks for nothing back.
+
+> **PIN HISTORY — the detector took six revisions and only the last is safe to adopt.**
+> `6a8bd23f` (as first written) missed the very trap it was built for; `978e7750`
+> added the same-slot and vanished-twin signals; `4f1a30d9` stopped a best-match
+> report hiding the true twin; `ed4ab6f7` added containment; `8915ea3d` added the idf
+> discount **and silently lost a known pair**; `c6a3c6bc` makes the discount
+> conditional and is the first pin where recall and precision do not trade against
+> each other. **Do not adopt any earlier sha.** Each intermediate pin traded one
+> property for another, which is only visible if the full sweep is re-run per pin
+> rather than carried forward.
 
 ## Why this is hand-carried rather than ported
 
@@ -12,8 +22,8 @@ That is the property that makes an apply reproducible, and nothing here asks you
 to give it up.
 
 The consequence: **everything below was pushed AFTER the `port-base-20260901`
-tag** (17 commits at the time of writing) and is therefore outside your range by
-construction. It rides the *next* base.
+tag** and is therefore outside your range by construction. It rides the *next*
+base. (The count grows as work lands; the pin above is what fixes what you get.)
 
 Which is exactly the problem. Every correction here governs a slice you have not
 applied yet — D, E, F and G. Waiting for the next port delivers them **after** the
@@ -38,10 +48,10 @@ would have imported a sign-off you deliberately withhold.
 
 ```
 git fetch cewilson
-git checkout 6a8bd23f -- drydocs/port_rename_detect.py \
+git checkout c6a3c6bc -- drydocs/port_rename_detect.py \
                          scripts/port_rename_check.py \
                          tests/unit/test_port_rename_detect.py
-poetry run pytest tests/unit/test_port_rename_detect.py -q      # expect 11 passed
+poetry run pytest tests/unit/test_port_rename_detect.py -q      # expect 28 passed
 ```
 
 **Then, before each remaining slice:**

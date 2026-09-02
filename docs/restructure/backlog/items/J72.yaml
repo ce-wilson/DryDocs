@@ -279,3 +279,42 @@ notes: |
   previous one - recall -> masking -> recall+noise -> precision-recall -> tension-on-stubs. The tool
   is converging, but every result is only valid against the pin it ran on, which is why the full
   sweep is re-run each time rather than carried forward.
+
+  CLOSED 2026-09-01 AT THE SIXTH PIN. The company re-ran the full sweep and the known-pair check on
+  the conditional-discount pin and reported convergence:
+
+    measure              4th pin   5th pin   6th pin
+    recall (known)        12/12     11/12     12/12
+    total pairs            344        50        53
+    docs pairs             252        27        30
+
+  The conditional guard cost +3 pairs across the WHOLE sweep to buy the lost pair back. Their words:
+  the first pin where the two goals do not trade against each other. cdo-alignment <-> its twin is
+  back at 0.80. 12/12 recall at full precision.
+
+  THE OBSERVATION WORTH KEEPING IS NOT THE NUMBERS. Theirs, and it is about method rather than this
+  tool: "My suggestion at the fifth pin was do not discount when either side is short - directionally
+  right, and I would have implemented it against the raw token count, which does not work. The stub
+  is ten tokens; the discount leaves five; a raw-length test never fires. The gap between right idea
+  and right mechanism is where the bug lived, and I would not have found it without the re-measure."
+  That is exactly what happened here: the rule they proposed was correct and my first implementation
+  of it changed nothing, and only instrumenting the comparison located the difference.
+
+  THE SEQUENCE, because it is the argument for re-measuring rather than carrying results forward:
+  3/8 recall -> same-slot signal (6/8) -> cap-at-3 (masking; never reached the stub) -> containment
+  (8/8 but 344 pairs) -> idf discount (50 pairs, lost the stub) -> conditional discount (12/12, 53
+  pairs). EVERY intermediate pin traded one property for another. The one time a sweep was NOT
+  re-measured carefully - the Select-Object exit-code artifact - it produced a false "D is clean"
+  that was nearly acted on.
+
+  CARRIED INTO D+E, all confirmed on the final pin rather than inherited from an earlier one:
+  folder_attribution.cypher <-> seal_attribution.cypher (0.43, a real rename corroborating the
+  loader: field already taken in B+C); cli_shared.py <-> cli.py (0.47, adopt both - cli_shared is
+  the extraction and cli.py re-exports from it); test_cdo_crosswalk.py (0.97, declined with the
+  acronym-rename deferral); and four same-slot ontology pairs at 1.00 plus the cross-slot split, all
+  belonging to the deferred vocabulary workstream.
+
+  ONE PREDICTION LEFT OPEN, and it is theirs and falsifiable: the cli_shared re-export should clear
+  test_load_map_declarations (19) and test_chain_inputs (7). If D+E lands and it does not, their +24
+  failure attribution was wrong. Recorded here so the answer is checkable either way rather than
+  quietly dropped.
