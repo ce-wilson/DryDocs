@@ -1,18 +1,18 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-02T03:14:47",
+    "captured_at": "2026-09-02T11:22:51",
     "date": "20260902",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "3123eb1e",
-      "full": "3123eb1eda50d7357e2c02da68d00b2bfc1e19b9",
+      "commit": "ab97ce23",
+      "full": "ab97ce2348c4f27e98b035c80e91ac25fb4030fb",
       "branch": "main",
-      "describe": "port-base-20260901-42-g3123eb1e",
-      "subject": "fix(Idea-239): header priority is Med, not Medium - test_plan_ideas vocabulary",
+      "describe": "port-base-20260901-62-gab97ce23",
+      "subject": "Merge branch 'feat/research-skills' - the four research skills and the shared ledgers, rebuilt from the AAR transcription",
       "dirty": true,
-      "untracked_present": true,
+      "untracked_present": false,
       "pr": null
     },
     "depgraph": {
@@ -20,7 +20,7 @@
       "full": "6ee0af635812bb908b2a0cb4eb25e958a8a7af57",
       "branch": "main",
       "dirty": false,
-      "untracked_present": false,
+      "untracked_present": true,
       "version": "0.1.0",
       "capabilities": {
         "multi_root": true,
@@ -4485,6 +4485,123 @@
       "name": "SKILL.md",
       "extension": ".md",
       "rel_path": ".claude/skills/reconcile-port/SKILL.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/research-general",
+      "name": "research-general",
+      "extension": "",
+      "rel_path": ".claude/skills/research-general",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/research-general/SKILL.md",
+      "name": "SKILL.md",
+      "extension": ".md",
+      "rel_path": ".claude/skills/research-general/SKILL.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/research-job-failure",
+      "name": "research-job-failure",
+      "extension": "",
+      "rel_path": ".claude/skills/research-job-failure",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/research-job-failure/SKILL.md",
+      "name": "SKILL.md",
+      "extension": ".md",
+      "rel_path": ".claude/skills/research-job-failure/SKILL.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/research-job-lineage",
+      "name": "research-job-lineage",
+      "extension": "",
+      "rel_path": ".claude/skills/research-job-lineage",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/research-job-lineage/SKILL.md",
+      "name": "SKILL.md",
+      "extension": ".md",
+      "rel_path": ".claude/skills/research-job-lineage/SKILL.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/research-probe-discipline",
+      "name": "research-probe-discipline",
+      "extension": "",
+      "rel_path": ".claude/skills/research-probe-discipline",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/research-probe-discipline/SKILL.md",
+      "name": "SKILL.md",
+      "extension": ".md",
+      "rel_path": ".claude/skills/research-probe-discipline/SKILL.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/research-probe-discipline/references",
+      "name": "references",
+      "extension": "",
+      "rel_path": ".claude/skills/research-probe-discipline/references",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/research-probe-discipline/references/id-shapes.template.yaml",
+      "name": "id-shapes.template.yaml",
+      "extension": ".yaml",
+      "rel_path": ".claude/skills/research-probe-discipline/references/id-shapes.template.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/research-probe-discipline/references/platforms.template.yaml",
+      "name": "platforms.template.yaml",
+      "extension": ".yaml",
+      "rel_path": ".claude/skills/research-probe-discipline/references/platforms.template.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/research-probe-discipline/references/source-whitelist.template.yaml",
+      "name": "source-whitelist.template.yaml",
+      "extension": ".yaml",
+      "rel_path": ".claude/skills/research-probe-discipline/references/source-whitelist.template.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/research-probe-discipline/references/terms.template.yaml",
+      "name": "terms.template.yaml",
+      "extension": ".yaml",
+      "rel_path": ".claude/skills/research-probe-discipline/references/terms.template.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -16406,15 +16523,6 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/drydocs/adapters",
-      "name": "adapters",
-      "extension": "",
-      "rel_path": "drydocs/adapters",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
-    },
-    {
       "file_id": "drydocs/drydocs/chain_inputs.py",
       "name": "chain_inputs.py",
       "extension": ".py",
@@ -16512,15 +16620,6 @@
       "project": "drydocs",
       "circular": false,
       "kind": "file"
-    },
-    {
-      "file_id": "drydocs/drydocs/controlm",
-      "name": "controlm",
-      "extension": "",
-      "rel_path": "drydocs/controlm",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
     },
     {
       "file_id": "drydocs/drydocs/data",
@@ -17612,24 +17711,6 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/drydocs/models",
-      "name": "models",
-      "extension": "",
-      "rel_path": "drydocs/models",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
-    },
-    {
-      "file_id": "drydocs/drydocs/ontology",
-      "name": "ontology",
-      "extension": "",
-      "rel_path": "drydocs/ontology",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "dir"
-    },
-    {
       "file_id": "drydocs/drydocs/pat_projection.py",
       "name": "pat_projection.py",
       "extension": ".py",
@@ -18228,6 +18309,15 @@
       "name": "docs_verify.py",
       "extension": ".py",
       "rel_path": "drydocs_core/docs_verify.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs_core/entity_extract.py",
+      "name": "entity_extract.py",
+      "extension": ".py",
+      "rel_path": "drydocs_core/entity_extract.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -19038,6 +19128,24 @@
       "name": "investigate.py",
       "extension": ".py",
       "rel_path": "drydocs_deepdoc/investigate.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs_deepdoc/mindmap.py",
+      "name": "mindmap.py",
+      "extension": ".py",
+      "rel_path": "drydocs_deepdoc/mindmap.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs_deepdoc/search_log.py",
+      "name": "search_log.py",
+      "extension": ".py",
+      "rel_path": "drydocs_deepdoc/search_log.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -20933,10 +21041,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260902.json",
-      "name": "drydocs-20260902.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260902-0314.json",
+      "name": "drydocs-20260902-0314.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260902.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260902-0314.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -22904,6 +23012,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_deepdoc_mindmap.py",
+      "name": "test_deepdoc_mindmap.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_deepdoc_mindmap.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_deepdoc_search_log.py",
+      "name": "test_deepdoc_search_log.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_deepdoc_search_log.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_depgraph_snapshots.py",
       "name": "test_depgraph_snapshots.py",
       "extension": ".py",
@@ -23061,6 +23187,15 @@
       "name": "test_enforcement_matrix.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_enforcement_matrix.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_entity_extract.py",
+      "name": "test_entity_extract.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_entity_extract.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -27705,6 +27840,10 @@
       "drydocs/drydocs_core/repo_paths.py"
     ],
     [
+      "drydocs/drydocs_core/entity_extract.py",
+      "drydocs/drydocs_core/orchestration/controlm/folder_name.py"
+    ],
+    [
       "drydocs/drydocs_core/env_doctor.py",
       "drydocs/drydocs_core/env_refs.py"
     ],
@@ -27959,6 +28098,18 @@
     [
       "drydocs/drydocs_deepdoc/investigate.py",
       "drydocs/drydocs_core/orchestration/controlm/__init__.py"
+    ],
+    [
+      "drydocs/drydocs_deepdoc/search_log.py",
+      "drydocs/drydocs_core/log_kinds.py"
+    ],
+    [
+      "drydocs/drydocs_deepdoc/search_log.py",
+      "drydocs/drydocs_core/run_log.py"
+    ],
+    [
+      "drydocs/drydocs_deepdoc/search_log.py",
+      "drydocs/drydocs_deepdoc/mindmap.py"
     ],
     [
       "drydocs/drydocs_deepdoc/writer.py",
@@ -29033,6 +29184,34 @@
       "drydocs/drydocs_lineage/writer.py"
     ],
     [
+      "drydocs/tests/unit/test_deepdoc_mindmap.py",
+      "drydocs/drydocs_deepdoc/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_deepdoc_mindmap.py",
+      "drydocs/drydocs_deepdoc/mindmap.py"
+    ],
+    [
+      "drydocs/tests/unit/test_deepdoc_search_log.py",
+      "drydocs/drydocs_core/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_deepdoc_search_log.py",
+      "drydocs/drydocs_core/log_kinds.py"
+    ],
+    [
+      "drydocs/tests/unit/test_deepdoc_search_log.py",
+      "drydocs/drydocs_deepdoc/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_deepdoc_search_log.py",
+      "drydocs/drydocs_deepdoc/mindmap.py"
+    ],
+    [
+      "drydocs/tests/unit/test_deepdoc_search_log.py",
+      "drydocs/drydocs_deepdoc/search_log.py"
+    ],
+    [
       "drydocs/tests/unit/test_description_tokens.py",
       "drydocs/drydocs_core/orchestration/controlm/description_tokens.py"
     ],
@@ -29171,6 +29350,14 @@
     [
       "drydocs/tests/unit/test_email_extracts.py",
       "drydocs/drydocs_core/models/docs.py"
+    ],
+    [
+      "drydocs/tests/unit/test_entity_extract.py",
+      "drydocs/drydocs_core/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_entity_extract.py",
+      "drydocs/drydocs_core/entity_extract.py"
     ],
     [
       "drydocs/tests/unit/test_env_doctor.py",
@@ -32261,6 +32448,26 @@
     [
       "drydocs/.claude/skills",
       "CONTAINS",
+      "drydocs/.claude/skills/research-general"
+    ],
+    [
+      "drydocs/.claude/skills",
+      "CONTAINS",
+      "drydocs/.claude/skills/research-job-failure"
+    ],
+    [
+      "drydocs/.claude/skills",
+      "CONTAINS",
+      "drydocs/.claude/skills/research-job-lineage"
+    ],
+    [
+      "drydocs/.claude/skills",
+      "CONTAINS",
+      "drydocs/.claude/skills/research-probe-discipline"
+    ],
+    [
+      "drydocs/.claude/skills",
+      "CONTAINS",
       "drydocs/.claude/skills/run-drydocs"
     ],
     [
@@ -34632,6 +34839,51 @@
       "drydocs/.claude/skills/reconcile-port",
       "CONTAINS",
       "drydocs/.claude/skills/reconcile-port/SKILL.md"
+    ],
+    [
+      "drydocs/.claude/skills/research-general",
+      "CONTAINS",
+      "drydocs/.claude/skills/research-general/SKILL.md"
+    ],
+    [
+      "drydocs/.claude/skills/research-job-failure",
+      "CONTAINS",
+      "drydocs/.claude/skills/research-job-failure/SKILL.md"
+    ],
+    [
+      "drydocs/.claude/skills/research-job-lineage",
+      "CONTAINS",
+      "drydocs/.claude/skills/research-job-lineage/SKILL.md"
+    ],
+    [
+      "drydocs/.claude/skills/research-probe-discipline",
+      "CONTAINS",
+      "drydocs/.claude/skills/research-probe-discipline/SKILL.md"
+    ],
+    [
+      "drydocs/.claude/skills/research-probe-discipline",
+      "CONTAINS",
+      "drydocs/.claude/skills/research-probe-discipline/references"
+    ],
+    [
+      "drydocs/.claude/skills/research-probe-discipline/references",
+      "CONTAINS",
+      "drydocs/.claude/skills/research-probe-discipline/references/id-shapes.template.yaml"
+    ],
+    [
+      "drydocs/.claude/skills/research-probe-discipline/references",
+      "CONTAINS",
+      "drydocs/.claude/skills/research-probe-discipline/references/platforms.template.yaml"
+    ],
+    [
+      "drydocs/.claude/skills/research-probe-discipline/references",
+      "CONTAINS",
+      "drydocs/.claude/skills/research-probe-discipline/references/source-whitelist.template.yaml"
+    ],
+    [
+      "drydocs/.claude/skills/research-probe-discipline/references",
+      "CONTAINS",
+      "drydocs/.claude/skills/research-probe-discipline/references/terms.template.yaml"
     ],
     [
       "drydocs/.claude/skills/run-drydocs",
@@ -40676,11 +40928,6 @@
     [
       "drydocs/drydocs",
       "CONTAINS",
-      "drydocs/drydocs/adapters"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
       "drydocs/drydocs/chain_inputs.py"
     ],
     [
@@ -40736,11 +40983,6 @@
     [
       "drydocs/drydocs",
       "CONTAINS",
-      "drydocs/drydocs/controlm"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
       "drydocs/drydocs/data"
     ],
     [
@@ -40792,16 +41034,6 @@
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/migrations"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
-      "drydocs/drydocs/models"
-    ],
-    [
-      "drydocs/drydocs",
-      "CONTAINS",
-      "drydocs/drydocs/ontology"
     ],
     [
       "drydocs/drydocs",
@@ -42021,6 +42253,11 @@
     [
       "drydocs/drydocs_core",
       "CONTAINS",
+      "drydocs/drydocs_core/entity_extract.py"
+    ],
+    [
+      "drydocs/drydocs_core",
+      "CONTAINS",
       "drydocs/drydocs_core/env_doctor.py"
     ],
     [
@@ -42527,6 +42764,16 @@
       "drydocs/drydocs_deepdoc",
       "CONTAINS",
       "drydocs/drydocs_deepdoc/investigate.py"
+    ],
+    [
+      "drydocs/drydocs_deepdoc",
+      "CONTAINS",
+      "drydocs/drydocs_deepdoc/mindmap.py"
+    ],
+    [
+      "drydocs/drydocs_deepdoc",
+      "CONTAINS",
+      "drydocs/drydocs_deepdoc/search_log.py"
     ],
     [
       "drydocs/drydocs_deepdoc",
@@ -43576,7 +43823,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260902.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260902-0314.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -44601,6 +44848,16 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_deepdoc_mindmap.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_deepdoc_search_log.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_depgraph_snapshots.py"
     ],
     [
@@ -44687,6 +44944,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_enforcement_matrix.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_entity_extract.py"
     ],
     [
       "drydocs/tests/unit",
@@ -46453,13 +46715,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2618,
-    "edges": 1411,
+    "files": 2632,
+    "edges": 1424,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2911,
-    "directories": 294
+    "rels": 2926,
+    "directories": 295
   }
 }
