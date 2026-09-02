@@ -22,7 +22,7 @@ export default function ThinkingLogicPanel() {
         <ul className="mt-2.5 flex flex-col gap-2.5">
           {GRAPH_ONLY.map((g) => (
             <li key={g.id} className="border-b border-edge-soft pb-2 last:border-0 last:pb-0">
-              <span className="font-mono text-[10.5px] text-teal">{g.id}</span>{' '}
+              <span className="font-mono text-[11px] text-teal">{g.id}</span>{' '}
               <span className="text-xs font-semibold text-text">{g.label}</span>
               <p className="mt-0.5 text-[11px] leading-relaxed text-muted">{g.detail}</p>
             </li>

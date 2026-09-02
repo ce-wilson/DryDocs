@@ -53,7 +53,7 @@ function SpotlightCard({
         <span className="text-[11px] font-semibold text-text">{label}</span>
         <ResultChip kind={kind} compact />
       </div>
-      <p className="mt-1 font-mono text-[10.5px] text-muted">{text}</p>
+      <p className="mt-1 font-mono text-[11px] text-muted">{text}</p>
     </div>
   )
 }

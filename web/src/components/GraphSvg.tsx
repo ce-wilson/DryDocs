@@ -6,6 +6,8 @@ const R = 27
 // .gnode/.gsub/.gedge — O30 moved them inline; the grays are the mockup's
 // dark-language values, kept verbatim for parity until the O32 light pass).
 export const GNODE = 'fill-[#e8edf3] text-[11px] font-semibold'
+// 9px holds the O91(d) SVG exception: these are graph labels a reader scans
+// against a node, not prose. 9px is the floor for that - never lower.
 export const GSUB = 'fill-[#8a97a8] font-mono text-[9px]'
 export const GEDGE = 'fill-[#8a97a8] font-mono text-[9px] font-medium'
 

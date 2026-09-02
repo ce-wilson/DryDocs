@@ -1,0 +1,61 @@
+id: O89
+epic: web-console
+title: Console feedback has no stable anchors — give each console section a content-derived
+  anchor id and export the same feedback YAML the design-doc L5 loop produces
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- O88
+inputs:
+- drydocs/design_doc.py
+- drydocs/doc_outline.py
+- docs/design/feedback/README.md
+- web/src/components/SignIn.tsx
+acceptance: |
+  (a) ONE FORMAT, NOT A SECOND ONE. Console feedback exports the EXISTING shape —
+  `doc:` / `notes:` / per-note `anchor:` + `note:`, the `drydocs.design_doc.feedback_yaml`
+  contract — so one parser, one graph loader (`load-doc-traceability`, gate
+  doc-traceability-feedback) and one `transcribe-doc-markup` skill serve both surfaces. A
+  console-shaped variant would fork the HITL loop at its narrowest point.
+
+  (b) ANCHORS ARE CONTENT-DERIVED, NEVER POSITIONAL. This is L11's rule and it is load-
+  bearing here for a stronger reason than in a doc: console sections move under a router
+  and a component tree. An anchor keyed to a route plus the section's own text survives an
+  inserted panel; one keyed to an index does not. Namespace it so a console anchor cannot
+  collide with a design-doc anchor — the two share a YAML format and must not share an id
+  space.
+
+  (c) VALIDITY IS CHECKABLE, AS IT IS FOR DOCS. `doc_outline.feedback_anchor_valid`
+  decides whether a doc note re-attaches; console notes need the equivalent, so a note
+  whose anchor no longer exists is REPORTED rather than silently dropped. A feedback loop
+  that loses notes quietly is worse than none, because the reviewer believes it worked.
+
+  (d) THE SCREEN CONTROL MIRRORS THE DOC ONE. An annotate affordance per anchored section,
+  the note kept in `localStorage` (unsent drafts are per-viewer and must not need a
+  backend), and a Copy-feedback control that puts the paste-ready block on the clipboard.
+  Match the design-doc idiom rather than inventing a console interaction: reviewers move
+  between the two surfaces.
+
+  (e) SCOPED TO THE SAME ROUTES O88 CAPTURES. The screen loop and the paper loop must agree
+  on which sections are anchorable, or a printout's gutter names ids the screen cannot
+  offer and the two halves stop being the same loop.
+notes: |
+  Minted 2026-08-31 (desktop, ui-workstream worktree). Depends on O88 because the anchor
+  SET is what O88's gutter prints — building the screen half first would fix an id space
+  the paper half then has to accept sight-unseen.
+
+  WHAT ALREADY EXISTS AND SHOULD NOT BE REBUILT: the export format and its README, the
+  `<!-- anchor: id -->` id namespace and its validator, the derived-subsection rule (L11),
+  the optional L7 review-outcome fields (`author:`, per-note `status:` open/applied/
+  rejected/superseded), and the paper transcription skill. This item supplies exactly one
+  missing thing — stable ids on console sections — and reuses the rest verbatim.
+
+  THE OPEN QUESTION, deliberately NOT decided here: whether console feedback files live
+  beside the doc ones in `docs/design/feedback/` or in their own directory. It depends on
+  whether `doc:` can name a console route without confusing the graph loader, which is a
+  question for whoever builds (a) with the loader in front of them.

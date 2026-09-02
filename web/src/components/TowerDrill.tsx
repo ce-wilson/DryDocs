@@ -14,12 +14,12 @@ import GraphSvg from './GraphSvg'
 
 const PANEL = 'overflow-hidden rounded-md border border-edge bg-panel'
 const P_HEAD =
-  'flex items-center justify-between gap-2.5 border-b border-edge bg-panel-2 px-3.5 py-2.5 text-[13.5px] font-semibold'
-const P_HEAD_M = 'font-mono text-[10.5px] font-normal text-muted'
-const TABLE = 'w-full border-collapse text-[12.5px]'
+  'flex items-center justify-between gap-2.5 border-b border-edge bg-panel-2 px-3.5 py-2.5 text-sm/[1.5] font-semibold'
+const P_HEAD_M = 'font-mono text-[11px] font-normal text-muted'
+const TABLE = 'w-full border-collapse text-[13px]'
 const TH = 'border-b border-edge bg-panel-2 px-3 py-2 text-left font-semibold text-[#c8d2de]'
-const TD = 'border-b border-edge-soft px-3 py-2 font-mono text-[11.5px] text-[#b9c4d2]'
-const TD_FIRST = 'border-b border-edge-soft px-3 py-2 text-[12.5px] font-medium text-text'
+const TD = 'border-b border-edge-soft px-3 py-2 font-mono text-xs/[1.5] text-[#b9c4d2]'
+const TD_FIRST = 'border-b border-edge-soft px-3 py-2 text-[13px] font-medium text-text'
 const TD_MATRIX = 'border-b border-edge-soft px-3 py-2 text-xs text-[#b9c4d2]'
 const TD_MATRIX_FIRST = 'border-b border-edge-soft px-3 py-2 text-xs font-semibold text-text'
 
@@ -35,7 +35,7 @@ export default function TowerDrill({ towerKey }: { towerKey: TowerKey }) {
           ◀ Back to Explorer
         </Link>
         <h2 tabIndex={-1} data-view-heading className="text-[21px] font-bold outline-none">{t.title} — Example Data &amp; Dependencies</h2>
-        <span className="whitespace-nowrap rounded-xs border border-yellow/50 bg-yellow/8 px-[9px] py-1 font-mono text-[10.5px] font-medium text-yellow">
+        <span className="whitespace-nowrap rounded-xs border border-yellow/50 bg-yellow/8 px-[9px] py-1 font-mono text-[11px] font-medium text-yellow">
           EXAMPLE DATA · ILLUSTRATIVE / ANONYMIZED
         </span>
         {towerKey === 'home' && (
@@ -53,7 +53,7 @@ export default function TowerDrill({ towerKey }: { towerKey: TowerKey }) {
           <div className={P_HEAD}>Cypher — lineage query <span className={P_HEAD_M}>neo4j browser</span></div>
           {/* static in-repo literal (data/towers.ts), not user input */}
           <pre
-            className="min-h-[240px] overflow-x-auto bg-[#0a111b] px-[18px] py-4 font-mono text-[12.5px] leading-[1.7] text-[#d7e3f0] [&_.kw]:font-semibold [&_.kw]:text-[#7cc4ff] [&_.lbl]:text-[#8ce99a] [&_.rel]:text-[#ffb86b] [&_.str]:text-[#f1fa8c]"
+            className="min-h-[240px] overflow-x-auto bg-[#0a111b] px-[18px] py-4 font-mono text-[13px] leading-[1.7] text-[#d7e3f0] [&_.kw]:font-semibold [&_.kw]:text-[#7cc4ff] [&_.lbl]:text-[#8ce99a] [&_.rel]:text-[#ffb86b] [&_.str]:text-[#f1fa8c]"
             dangerouslySetInnerHTML={{ __html: t.cypherHtml }}
           />
         </div>

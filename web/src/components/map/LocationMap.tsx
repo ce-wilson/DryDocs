@@ -141,7 +141,7 @@ export default function LocationMap({
         {countryId && (
           <button
             type="button"
-            className="rounded-md border px-2 py-1 text-[12px]"
+            className="rounded-md border px-2 py-1 text-xs/[1.5]"
             style={{ borderColor: 'var(--edge)', color: 'var(--text)', background: 'var(--panel)' }}
             onClick={() => {
               setCountryId(null)
@@ -152,21 +152,21 @@ export default function LocationMap({
           </button>
         )}
         {countryId && (
-          <span className="font-mono text-[12px]" style={{ color: 'var(--text)' }}>
+          <span className="font-mono text-xs/[1.5]" style={{ color: 'var(--text)' }}>
             {COUNTRY_NAMES.get(countryId) ?? COUNTRY_BY_ID.get(countryId)?.name ?? countryId}
           </span>
         )}
       </div>
 
       {dimension.note && (
-        <p className="mb-2 text-[12px]" style={{ color: 'var(--faint)' }}>
+        <p className="mb-2 text-xs/[1.5]" style={{ color: 'var(--faint)' }}>
           {dimension.note}
         </p>
       )}
 
       {load.state === 'error' && (
         <p
-          className="mb-2 rounded-md border px-3 py-2 font-mono text-[12px]"
+          className="mb-2 rounded-md border px-3 py-2 font-mono text-xs/[1.5]"
           style={{ borderColor: 'var(--status-fail-soft)', color: 'var(--status-fail-soft)' }}
           role="alert"
         >
@@ -259,7 +259,7 @@ export default function LocationMap({
 
       {resolved.unplaceable.length > 0 && (
         <details className="mt-2">
-          <summary className="cursor-pointer text-[12px]" style={{ color: 'var(--yellow)' }}>
+          <summary className="cursor-pointer text-xs/[1.5]" style={{ color: 'var(--yellow)' }}>
             {resolved.unplaceable.length} row(s) could not be placed — see why
           </summary>
           <ul className="mt-1 space-y-0.5 font-mono text-[11px]" style={{ color: 'var(--muted)' }}>
@@ -296,7 +296,7 @@ function Coverage({
   loading: boolean
 }) {
   return (
-    <p className="mt-2 font-mono text-[12px]" style={{ color: 'var(--muted)' }}>
+    <p className="mt-2 font-mono text-xs/[1.5]" style={{ color: 'var(--muted)' }}>
       {loading ? (
         'loading…'
       ) : (
@@ -345,7 +345,7 @@ function SiteDetail({ site, placeNoun }: { site: PlacedSite; placeNoun: string }
       </div>
 
       {site.dataCenters.length > 0 && (
-        <p className="mt-1.5 font-mono text-[12px]" style={{ color: 'var(--muted)' }}>
+        <p className="mt-1.5 font-mono text-xs/[1.5]" style={{ color: 'var(--muted)' }}>
           {placeNoun}: {site.dataCenters.join(' · ')}
         </p>
       )}
@@ -354,7 +354,7 @@ function SiteDetail({ site, placeNoun }: { site: PlacedSite; placeNoun: string }
         {site.origins.slice(0, 60).map((o) => (
           <li
             key={`${o.kind}-${o.name}`}
-            className="inline-flex items-center gap-1 font-mono text-[12px]"
+            className="inline-flex items-center gap-1 font-mono text-xs/[1.5]"
             style={{ color: 'var(--text)' }}
           >
             <MapGlyph kind={o.kind} size={13} />
@@ -362,7 +362,7 @@ function SiteDetail({ site, placeNoun }: { site: PlacedSite; placeNoun: string }
           </li>
         ))}
         {site.origins.length > 60 && (
-          <li className="text-[12px]" style={{ color: 'var(--muted)' }}>
+          <li className="text-xs/[1.5]" style={{ color: 'var(--muted)' }}>
             …and {site.origins.length - 60} more
           </li>
         )}

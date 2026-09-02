@@ -62,7 +62,7 @@ export default function Aside({
           <span className="flex h-5 w-5 shrink-0 items-center justify-center" aria-hidden="true">⇄</span>
           {!collapsed && <span className="truncate">Mappings</span>}
           {!collapsed && persona.role === 'steward' && (
-            <span className="ml-auto rounded border border-edge px-1 font-mono text-[9px] text-faint">stew</span>
+            <span className="ml-auto rounded border border-edge px-1 font-mono text-[10px] text-faint">stew</span>
           )}
         </NavLink>
       )}

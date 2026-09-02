@@ -1,0 +1,117 @@
+id: O91
+epic: web-console
+title: The console has 22 type sizes and no scale — collapse the half-pixels, retire the
+  arbitrary values that duplicate a named one, and set a floor
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on: []
+inputs:
+- web/src
+- web/src/index.css
+- web/src/styles
+acceptance: |
+  (a) THE CENSUS IS THE STARTING POINT AND MUST BE RE-RUN, NOT TRUSTED. Measured
+  2026-09-01 (desktop, this worktree): 698 size declarations across 22 distinct sizes —
+  488 arbitrary `text-[Npx]` over 17 sizes, 210 named Tailwind over 5. Roughly seven in
+  ten sizing decisions bypass the scale. These numbers move with every commit; re-measure
+  at build and quote what you find in the close.
+
+  (b) COLLAPSE THE HALF-PIXELS FIRST — it is the safe half. 43 uses across 15 files over
+  7 sizes: 9.5, 10.5, 11.5, 12.5, 13.5, 14.5, 15.5. At the DPI this console is read on,
+  each is indistinguishable from its whole-pixel neighbour, so the change is invisible and
+  removes 7 of the 22 sizes on its own. Round to the nearest whole; where a rounding is
+  genuinely load-bearing, keep it and say why on the line.
+
+  (c) RETIRE ARBITRARY VALUES THAT DUPLICATE A NAMED ONE. `text-[12px]` (10 uses) renders
+  identically to `text-xs`, which already has 158. Two spellings of one size is how a
+  vocabulary stops being one. Same for any `text-[14px]` against `text-sm`. This is a
+  rename, not a design change: nothing may look different afterwards.
+
+  (d) SET A FLOOR AND MAKE THE EXCEPTIONS EXPLICIT. 9px appears in 10 files including
+  OverviewRoute and DomainGridTable; TaskGraphPane goes to 8px and 7px. Decide the smallest
+  size allowed for anything a reader must READ — as opposed to a graph label they scan —
+  and turn every use below it into either a fix or a stated exception. 7px is not readable
+  on a standard display and should not survive without an argument.
+
+  (e) WHAT THIS ITEM MUST NOT DO: decide which size a given element ought to be. That is
+  design, and mixing it into a mechanical cleanup means no reviewer can tell a rounding
+  from a redesign in the same diff. Anything that changes how the page LOOKS belongs to a
+  separate item with a before/after.
+
+  (f) NO GLOBAL SWEEP. 698 sites, and a mechanical replace over all of them would flatten
+  deliberate choices alongside accidental ones. Work clause by clause, each its own commit,
+  each verifiable by reading the diff. `npm run build`, `npm run lint` and vitest stay green
+  throughout, and the close names the surfaces actually eyeballed in a browser — a type
+  change that only passed a typecheck has not been verified.
+notes: |
+  Minted 2026-09-01 (desktop, ui-workstream worktree) from a font-size review the user asked
+  for after two ad-hoc bumps on /load-map — the page heading (ModuleTemplate, shared by all
+  twelve module routes) and the "Declared, not observed" banner.
+
+  THE FINDING IS THE SPREAD, NOT ANY ONE SIZE. Twenty-two distinct sizes is not a scale; it
+  is the absence of one. Seven of them differ from a neighbour by half a pixel, which is a
+  decision that costs maintenance and buys nothing a reader can see. The console is not
+  visibly broken today, which is exactly why this is p3 and not higher — the cost is paid by
+  whoever next tries to answer "what size should this be?" and finds no answer in the code.
+
+  ONE OBSERVATION HELD BACK ON PURPOSE, because it is clause (e) territory and not cleanup:
+  on /load-map the data rows carry identifiers at 10px while the prose explaining them sits
+  at 12px, so the smallest text on the page is the part the page exists to show. That is a
+  design judgement with a real answer, and it deserves its own item rather than riding in on
+  a rounding pass.
+
+  CORRECTION CARRIED FORWARD: the review that prompted this quoted 43 half-pixel uses as 63
+  in conversation. 43 is the measured figure and is what (b) is scoped against.
+
+  CLOSED 2026-09-02 (desktop, ui-workstream worktree, branch feat/ui-web).
+  Clauses (b), (c) and (d) built, one commit each; (e) and (f) are constraints and
+  were held to.
+
+  CENSUS RE-MEASURED AT BUILD, not trusted from clause (a): 697 declarations over
+  23 distinct sizes at the start, against the 698 over 22 the item recorded a day
+  earlier. The count moved because three landing-page commits landed between the
+  measurement and the work. After all three clauses: 697 declarations over 13
+  distinct rendered sizes. Ten sizes retired, no declaration count change, which
+  is the shape a vocabulary cleanup should have.
+
+  (b) 42 half-pixel uses in 14 files rounded to whole pixels, retiring 7 sizes.
+  Tie-break stated in the commit: round UP uniformly, since nearest-whole does not
+  decide a .5 and shrinking text to settle arithmetic works against clause (d).
+
+  (c) 17 arbitrary duplicates retired. The naive rename would have broken its own
+  clause: a named Tailwind step carries a line-height, a bare text-[Npx] does not,
+  and :root sets 1.5 here, so text-[12px] to text-xs would have pulled line boxes
+  from 18px to 16px - visible in a table cell. The 16 inheriting sites therefore
+  carry the leading explicitly as text-xs/[1.5] and text-sm/[1.5]; the one site
+  already carrying leading-relaxed took the plain text-base. Verified in the built
+  CSS.
+
+  (d) Floor set at 10px for text a reader READS, 9px for SVG labels a reader SCANS
+  in place, nothing below. 16 DOM sites raised from 9px; TaskGraphPane's 8px and
+  7px raised to 9px. Four sites hold the SVG exception and each is marked at its
+  declaration. The rule is written into web/src/index.css beside the type tokens,
+  because the cost this item names is whoever next asks what size something should
+  be and finds no answer in the code.
+
+  BROWSER VERIFICATION, per clause (f) - surfaces actually eyeballed on
+  localhost:5173 against a live API and the drydocs graph: the landing page, /loads
+  including the run timeline, /lineage with both the trust legend and the Swimlanes
+  tab, /under-the-hood with the scoreboard and strategy cards, /explorer, and
+  /load-map with the wiring key. Layout intact everywhere, nothing reflowed.
+
+  NOT VISUALLY VERIFIED, and named rather than glossed: TaskGraphPane's two SVG
+  labels - the pane renders only after a question is answered, and /ask returned
+  "Failed to fetch" with no request reaching the API. That is the graph_qa agent
+  path and unrelated to type sizes, but it means the 8px-to-9px raise was verified
+  by build and code reading only. Also unverified in a browser: SignIn, MyApps,
+  CypherConsole, TowerDrill and AssetPathRoute, all of which took clause (b)
+  roundings.
+
+  CLAUSE (e) HELD, and the item's held-back observation still stands untouched: on
+  /load-map the identifiers are still smaller than the prose explaining them. It
+  remains a design question and wants its own item.

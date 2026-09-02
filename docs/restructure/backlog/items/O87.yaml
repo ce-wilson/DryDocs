@@ -1,0 +1,68 @@
+id: O87
+epic: web-console
+title: The persona picker does not say which seat is the SME — mark it from SME_PERSONA_ID
+  so the green chip follows the constant instead of naming Neo
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- web/src/components/SignIn.tsx
+- web/src/lib/auth.ts
+- web/src/components/ui/StatusChip.tsx
+- tests/unit/test_console_auth.py
+acceptance: |
+  (a) DERIVED, NEVER NAMED. The picker row for `SME_PERSONA_ID` carries an SME marker in
+  the `--green` token. It reads the constant already exported from `web/src/lib/auth.ts`;
+  the string "neo" appears nowhere in `SignIn.tsx`. Neo is green because the constant
+  currently points at Neo — move the constant and the chip moves with it, with no second
+  edit. A hardcoded id would be the whole defect this item exists to avoid.
+
+  (b) THE ROW ALREADY HAS AN IDIOM — REUSE IT, DO NOT REACH FOR StatusChip. Each picker
+  row is a 2-column grid whose top-right cell is a role badge (`ROLE_BADGE[p.role]`, a
+  bordered uppercase mono span). The SME marker is a sibling of that badge in the same
+  visual family. `components/ui/StatusChip.tsx` is the WRONG component here despite the
+  name: its required `count` prop makes it a count+label pill ("15 completed"), and a seat
+  marker counts nothing. Its token vocabulary is what to borrow — `--green`, theme token
+  only, no hex, glyph not emoji (DL-3/DL-5).
+
+  (c) IT MARKS A SEAT, NOT A STATE. Green here means "this is the SME seat", not "the SME
+  seat is healthy" — no credential check, no reachability probe, no API call. The picker
+  renders before sign-in and must not gain a network dependency. If a readiness indicator
+  is wanted later it is a different item against a different surface.
+
+  (d) ROLE STAYS TRUTHFUL ALONGSIDE IT. Neo's role is `user` and the badge keeps saying
+  so. O47 ruled SME is WHO a persona is and not a fourth role tier — the marker sits
+  beside the role badge and never replaces or overrides it, or `canAccessModule` starts
+  disagreeing with what the screen shows.
+
+  (e) ACCESSIBLE, NOT COLOUR-ONLY. The marker carries text (or a `title`/`aria-label`)
+  naming the seat, so it survives a monochrome render and a screen reader. A bare green
+  dot fails both.
+
+  (f) GUARDED. A test asserts the marker attaches to whichever persona `SME_PERSONA_ID`
+  names — parameterized on the constant, not on the literal "neo", so it still passes if
+  the SME seat moves and FAILS if someone hardcodes the id back in. The vitest suite,
+  `npm run build` and `npm run lint` are green, and `tests/unit/test_console_auth.py`
+  still passes.
+notes: |
+  Minted 2026-08-31 (desktop, ui-workstream worktree) from a console startup session — the
+  gap surfaced while documenting the picker for the run-drydocs-console skill.
+
+  WHAT IS TRUE TODAY. `SME_PERSONA_ID = 'neo'` is exported from `web/src/lib/auth.ts` and
+  `canAccessIntake` gates `/intake` on it, so the SME seat is fully encoded in behaviour
+  and invisible in the UI. The picker shows displayName, id, role badge and the `chip`
+  free-text line; Neo's chip happens to read "app-support SME · context intake", which is
+  prose a reader must notice and parse rather than a marker they can scan for. Six seats
+  are listed and three of them are user-tier and near-identical by design (mouse, tank,
+  dozer differ only in identity, per O64's per-persona isolation testing), which is
+  exactly the situation a scannable marker helps.
+
+  WHY p3. Nothing is broken and no one is blocked — this is legibility on a dev-facing
+  sign-in screen. It is worth doing because the alternative is every new reader learning
+  the SME seat from `auth.ts` source, and because the derived-vs-hardcoded distinction in
+  (a) is cheap now and annoying to retrofit after someone types the string.

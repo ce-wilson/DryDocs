@@ -58,7 +58,7 @@ function PathNodeView({ data }: NodeProps<PathRFNode>) {
       <Handle id="tl" type="target" position={Position.Left} className="!h-1.5 !w-1.5 !border-0 !bg-transparent" />
       <Handle id="tr" type="target" position={Position.Right} className="!h-1.5 !w-1.5 !border-0 !bg-transparent" />
       <div className="max-w-44 truncate font-mono text-[11px] font-semibold text-text">{data.label}</div>
-      <div className="text-[9.5px]" style={{ color: `var(${data.token})` }}>
+      <div className="text-[10px]" style={{ color: `var(${data.token})` }}>
         {data.sub}
         {data.expandableCount > 0 && <span className="ml-1 text-faint">(+{data.expandableCount})</span>}
       </div>
@@ -156,13 +156,13 @@ export default function AssetPathRoute() {
         {/* the two support answers, up front */}
         <div className="mt-2 grid grid-cols-1 gap-3 lg:grid-cols-3">
           <div className="rounded-lg border border-edge bg-panel p-3 text-xs">
-            <h3 className="mb-1 text-[10.5px] font-semibold uppercase tracking-wide text-faint">Who supports this</h3>
+            <h3 className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-faint">Who supports this</h3>
             <p className="text-text">{asset.support.team}</p>
             <p className="font-mono text-[11px] text-muted">queue {asset.support.queue} · {asset.support.hours}</p>
             <p className="mt-1 text-faint">{app?.label}</p>
           </div>
           <div className="rounded-lg border border-edge bg-panel p-3 text-xs">
-            <h3 className="mb-1 text-[10.5px] font-semibold uppercase tracking-wide text-faint">Load status</h3>
+            <h3 className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-faint">Load status</h3>
             <p className={'font-mono text-[11px] ' + (asset.load.state === 'LATE' ? 'text-brand-soft' : 'text-green')}>
               {asset.load.state} · expected by {asset.load.expectedBy}
             </p>
@@ -170,7 +170,7 @@ export default function AssetPathRoute() {
             <p className="text-text">{asset.load.blocking}</p>
           </div>
           <div className="rounded-lg border border-edge bg-panel p-3 text-xs">
-            <h3 className="mb-1 text-[10.5px] font-semibold uppercase tracking-wide text-faint">Selected node</h3>
+            <h3 className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-faint">Selected node</h3>
             {selected ? (
               <>
                 <p className="font-mono text-[11px] text-text">{selected.label}</p>
@@ -244,7 +244,7 @@ export default function AssetPathRoute() {
         {/* the honest cypher + the runbook projection */}
         <div className="mt-3 grid grid-cols-1 gap-3 lg:grid-cols-2">
           <div className="rounded-lg border border-edge bg-panel p-3">
-            <h3 className="mb-1.5 text-[10.5px] font-semibold uppercase tracking-wide text-faint">
+            <h3 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-faint">
               Path query (the assumed contract — shown even though you never have to write it)
             </h3>
             <pre className="overflow-x-auto rounded-md border border-edge-soft bg-bg p-2.5 font-mono text-[11px] leading-relaxed text-muted">
@@ -252,7 +252,7 @@ export default function AssetPathRoute() {
             </pre>
           </div>
           <div className="rounded-lg border border-edge bg-panel p-3">
-            <h3 className="mb-1.5 text-[10.5px] font-semibold uppercase tracking-wide text-faint">
+            <h3 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-faint">
               Proposed runbook — a projection of the visible path
             </h3>
             <table className="w-full border-collapse text-xs">
@@ -278,7 +278,7 @@ export default function AssetPathRoute() {
                     </td>
                     <td className="border-b border-edge-soft py-1.5 pr-2 font-mono text-[11px] text-text">{n.label}</td>
                     <td className="border-b border-edge-soft py-1.5 pr-2 text-text">{n.runbook!.action}</td>
-                    <td className="border-b border-edge-soft py-1.5 font-mono text-[10.5px] text-muted">{n.runbook!.verify}</td>
+                    <td className="border-b border-edge-soft py-1.5 font-mono text-[11px] text-muted">{n.runbook!.verify}</td>
                   </tr>
                 ))}
                 {runbookRows.length === 0 && (

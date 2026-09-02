@@ -220,3 +220,85 @@ export function sequenceLoaderCount(): number {
   for (const step of SEQUENCE) for (const l of step.loaders) names.add(l.cli_name ?? l.name)
   return names.size
 }
+
+// ---- O90: the wiring key ---------------------------------------------------
+//
+// TWO AXES THE REGISTRY ALREADY RECORDS SEPARATELY, CROSSED. `confirmed` says a
+// gate has ruled the source's MEANING; a non-empty `loaders` says something is
+// BUILT that writes it. They are independent, and the census proves it rather
+// than assuming it: every one of the four cells is occupied, and the lone
+// built-but-unconfirmed row is the subject of its own backlog item (Q24).
+//
+// THIS REPORTS; IT DOES NOT RULE. A registry FIELD asserting pipeline-wiring
+// readiness as a first-class disposition is gate territory, and that gate is
+// drafted and unsigned (N10, config/gate-prompts/registry-wiring-readiness.yaml)
+// — its census found `confirmed: false` splits three ways with the distinction
+// living only in YAML comments. Nothing here adds, derives or persists such a
+// field: it crosses two booleans that are already in the committed artifact. If
+// the gate later signs a real wiring field, this reads that instead — a better
+// input, not a rewrite.
+//
+// FOUR CELLS, NOT TWO. "Wired or planned" is two words for four states, and
+// flattening them is the exact conflation N10 exists to end, so each cell says
+// what is true of it.
+
+export type WiringStateId = 'wired' | 'planned' | 'awaiting-gate' | 'registered'
+
+export interface WiringState {
+  id: WiringStateId
+  /** The cell's own claim — never a grade. */
+  label: string
+  /** Theme token; the chip paints text and border with it (DL-3). */
+  token: '--green' | '--yellow' | '--blue-br' | '--muted'
+  /** What is true of a source in this cell, in one sentence. */
+  meaning: string
+}
+
+export const WIRING_STATES: readonly WiringState[] = [
+  {
+    id: 'wired',
+    label: 'wired',
+    token: '--green',
+    meaning: 'a gate ruled its meaning and a loader is built',
+  },
+  {
+    id: 'planned',
+    label: 'planned',
+    token: '--yellow',
+    meaning: 'a gate ruled its meaning; nothing is built yet',
+  },
+  {
+    id: 'awaiting-gate',
+    label: 'built, awaiting gate',
+    token: '--blue-br',
+    meaning: 'a loader is built; no gate has ruled its meaning',
+  },
+  {
+    id: 'registered',
+    label: 'registered',
+    token: '--muted',
+    meaning: 'declared in the registry; neither ruled nor built',
+  },
+]
+
+const BY_ID = new Map(WIRING_STATES.map((s) => [s.id, s]))
+
+/** Cross `confirmed` with loader presence. Pure function of the committed row. */
+export function wiringState(s: LoadMapSource): WiringState {
+  const built = s.loaders.length > 0
+  const id: WiringStateId = s.confirmed
+    ? built
+      ? 'wired'
+      : 'planned'
+    : built
+      ? 'awaiting-gate'
+      : 'registered'
+  return BY_ID.get(id)!
+}
+
+/** The live census, counted from the data — never a number typed into a component. */
+export function wiringCensus(sources: readonly LoadMapSource[] = ALL_SOURCES): Record<WiringStateId, number> {
+  const out: Record<WiringStateId, number> = { wired: 0, planned: 0, 'awaiting-gate': 0, registered: 0 }
+  for (const s of sources) out[wiringState(s).id] += 1
+  return out
+}

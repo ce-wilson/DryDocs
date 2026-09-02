@@ -62,7 +62,7 @@ export default function OverviewRoute({ persona }: { persona: Persona }) {
               <h1 data-wf="WF-LND-02" className="text-[clamp(1.9rem,4vw,2.6rem)] font-extrabold leading-tight tracking-tight text-text">
                 A Don&rsquo;t-Repeat-Yourself Knowledge Graph
               </h1>
-              <p data-wf="WF-LND-03" className="mt-3 max-w-lg text-[15.5px] leading-relaxed text-muted">
+              <p data-wf="WF-LND-03" className="mt-3 max-w-lg text-base leading-relaxed text-muted">
                 What runs, what it depends on, who owns it, which application it belongs to. Pick an
                 area below to start &mdash; every view is backed by the graph.
               </p>
@@ -89,7 +89,7 @@ export default function OverviewRoute({ persona }: { persona: Persona }) {
           {/* category pick-lists (WF-LND-05/06) */}
           <div className="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-[1.1fr_1fr]">
             <section data-wf="WF-LND-05" className="rounded-lg border border-edge bg-panel p-4">
-              <h3 className="text-sm font-semibold text-text">What do you want to look at?</h3>
+              <h3 className="text-base font-semibold text-text">What do you want to look at?</h3>
               <ul className="mt-3 grid grid-cols-1 gap-1.5 sm:grid-cols-2">
                 {/* FB-03, matching Aside.tsx exactly: a module a persona cannot
                     open does not appear. VANISHING, not disabled-with-a-reason —
@@ -109,16 +109,16 @@ export default function OverviewRoute({ persona }: { persona: Persona }) {
                         <ModuleIcon id={m.id} className="h-4 w-4" />
                       </span>
                       <span className="min-w-0">
-                        <span className="flex items-center gap-1.5 text-[13px] font-semibold text-text">
+                        <span className="flex items-center gap-1.5 text-sm font-semibold text-text">
                           <HealthGlyph
                             items={m.id === 'loads' ? (loadHealth ?? []) : []}
                             unknown={m.id !== 'loads' || loadHealth === null}
                           />
                           {m.label}
                         </span>
-                        <span className="block truncate text-[11px] text-faint">{m.tagline}</span>
+                        <span className="block truncate text-xs text-faint">{m.tagline}</span>
                       </span>
-                      <span className="ml-auto rounded border border-edge-soft px-1 py-0.5 font-mono text-[9px] text-faint">
+                      <span className="ml-auto rounded border border-edge-soft px-1 py-0.5 font-mono text-[10px] text-faint">
                         P{m.phase}
                       </span>
                     </Link>
@@ -128,16 +128,16 @@ export default function OverviewRoute({ persona }: { persona: Persona }) {
             </section>
 
             <section data-wf="WF-LND-06" className="rounded-lg border border-edge bg-panel p-4">
-              <h3 className="text-sm font-semibold text-text">Business area / tower</h3>
-              <p className="mt-0.5 text-[11px] text-faint">Pick a target &mdash; it scopes the Explorer drill-down.</p>
+              <h3 className="text-base font-semibold text-text">Business area / tower</h3>
+              <p className="mt-0.5 text-xs text-faint">Pick a target &mdash; it scopes the Explorer drill-down.</p>
               <ul className="mt-3 flex flex-col gap-1.5">
                 {Object.values(TOWERS).map((tw) => {
                   const drillable = canDrill(tw.key, persona)
                   const inner = (
                     <>
                       <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: tw.color }} aria-hidden="true" />
-                      <span className="text-[13px] font-semibold text-text">{tw.title}</span>
-                      <span className="ml-auto font-mono text-[10px] text-faint">
+                      <span className="text-sm font-semibold text-text">{tw.title}</span>
+                      <span className="ml-auto font-mono text-[11px] text-faint">
                         {tw.stats.map(([v, l]) => `${v} ${l}`).join(' \u00b7 ')}
                       </span>
                     </>
@@ -175,7 +175,7 @@ export default function OverviewRoute({ persona }: { persona: Persona }) {
 
           <OnboardingChecklist />
 
-          <p className="mt-8 text-center font-mono text-[11px] text-faint">
+          <p className="mt-8 text-center font-mono text-xs text-faint">
             Signed in as {persona.displayName} ({persona.role}) · demo/synthetic content is tagged EXAMPLE
             DATA · ILLUSTRATIVE
           </p>
@@ -188,8 +188,8 @@ export default function OverviewRoute({ persona }: { persona: Persona }) {
 function BenefitCard({ title, text }: { title: string; text: string }) {
   return (
     <div className="hover-lift rounded-lg border border-edge bg-panel p-4">
-      <h3 className="text-sm font-semibold text-text">{title}</h3>
-      <p className="mt-1 text-xs text-muted">{text}</p>
+      <h3 className="text-base font-semibold text-text">{title}</h3>
+      <p className="mt-1.5 text-sm text-muted">{text}</p>
     </div>
   )
 }
@@ -231,14 +231,14 @@ function OnboardingChecklist() {
   return (
     <div className="mt-6 rounded-lg border border-edge bg-panel p-4">
       <div className="flex items-baseline justify-between">
-        <h3 className="text-sm font-semibold text-text">Getting started</h3>
-        <span className="font-mono text-[11px] text-faint">
+        <h3 className="text-base font-semibold text-text">Getting started</h3>
+        <span className="font-mono text-xs text-faint">
           {done.length}/{ONBOARDING_STEPS.length}
         </span>
       </div>
       <ul className="mt-2 flex flex-col gap-1.5">
         {ONBOARDING_STEPS.map((s) => (
-          <li key={s.id} className="flex items-center gap-2 text-xs">
+          <li key={s.id} className="flex items-center gap-2 text-sm">
             <input
               id={`onboard-${s.id}`}
               type="checkbox"

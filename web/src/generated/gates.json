@@ -1091,7 +1091,8 @@
       ],
       "log_ref": "config/gate-log.md:4263",
       "unblocks": [
-        "C41"
+        "C41",
+        "J70"
       ]
     },
     {

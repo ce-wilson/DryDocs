@@ -67,7 +67,7 @@ export default function TaskGraphPane({ snapshots }: { snapshots: TaskGraphSnaps
         <h4 className="text-[11px] font-semibold uppercase tracking-wide text-faint">
           Tier-2 task graph
         </h4>
-        <span className="font-mono text-[9px] text-faint">
+        <span className="font-mono text-[10px] text-faint">
           in-process working memory · not the knowledge graph
         </span>
         <div className="ml-auto flex gap-1" role="group" aria-label="Task graph iteration">
@@ -77,7 +77,7 @@ export default function TaskGraphPane({ snapshots }: { snapshots: TaskGraphSnaps
               type="button"
               onClick={() => setFrame(i)}
               aria-pressed={i === frame}
-              className={`rounded border px-1.5 py-0.5 font-mono text-[9px] ${
+              className={`rounded border px-1.5 py-0.5 font-mono text-[10px] ${
                 i === frame
                   ? 'border-blue-bright text-blue-bright'
                   : 'border-edge-soft text-muted hover:border-faint'
@@ -153,11 +153,13 @@ export default function TaskGraphPane({ snapshots }: { snapshots: TaskGraphSnaps
                 stroke={color}
                 strokeWidth="1.6"
               />
+              {/* 9px holds the O91(d) SVG exception - a label scanned against
+                  a node, not prose. Was 8px and 7px, below any readable floor. */}
               <text
                 x={p.x}
                 y={p.y + 1}
                 textAnchor="middle"
-                className="fill-current text-[8px] text-text"
+                className="fill-current text-[9px] text-text"
               >
                 {short(node.kind === 'answer' ? 'answer' : node.label, 14)}
               </text>
@@ -165,7 +167,7 @@ export default function TaskGraphPane({ snapshots }: { snapshots: TaskGraphSnaps
                 x={p.x}
                 y={p.y + 12}
                 textAnchor="middle"
-                className="fill-current font-mono text-[7px] text-faint"
+                className="fill-current font-mono text-[9px] text-faint"
               >
                 {node.rows == null ? node.kind : `${node.rows} rows`}
               </text>

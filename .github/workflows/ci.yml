@@ -32,13 +32,13 @@ jobs:
   gates:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # Single version by decision (2026-08-21, Actions-minutes cost): 3.12 is
       # what both dev machines run. pyproject's ^3.11 floor is deliberately
       # untested here — tightening it to ^3.12 would churn poetry.lock instead.
       - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -46,7 +46,7 @@ jobs:
         run: pipx install poetry
 
       - name: Cache Poetry virtualenv
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.cache/pypoetry
           key: poetry-${{ runner.os }}-py3.12-${{ hashFiles('poetry.lock') }}
@@ -117,12 +117,12 @@ jobs:
       DRYDOCS_DATA_ROOT: ${{ github.workspace }}/.ci-data
       DRYDOCS_LOGDIR: ${{ github.workspace }}/.ci-logs
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: "22"
+          node-version: "24"
           cache: npm
           cache-dependency-path: web/package-lock.json
 
@@ -130,7 +130,7 @@ jobs:
       # needs the Python side installed too — the browser is only one of the
       # three processes the path crosses.
       - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -163,7 +163,7 @@ jobs:
       # failure is most of the work.
       - name: Upload Playwright report
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: playwright-report
           path: web/playwright-report/
@@ -184,7 +184,7 @@ jobs:
     env:
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Skip note (SNYK_TOKEN not set)
         if: env.SNYK_TOKEN == ''

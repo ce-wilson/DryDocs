@@ -33,7 +33,7 @@ function ResultTable({ result }: { result: GraphResult }) {
   if (result.rows.length === 0) return <p>0 rows.</p>
   return (
     <div className="max-h-[420px] overflow-x-auto overflow-y-auto">
-      <table className="w-full border-collapse text-[12.5px]">
+      <table className="w-full border-collapse text-[13px]">
         <thead>
           <tr>
             {result.keys.map((k) => (
@@ -47,7 +47,7 @@ function ResultTable({ result }: { result: GraphResult }) {
           {result.rows.map((row, i) => (
             <tr key={i}>
               {result.keys.map((k) => (
-                <td key={k} className="border-b border-edge-soft px-3 py-2 font-mono text-[11.5px] text-[#b9c4d2]">
+                <td key={k} className="border-b border-edge-soft px-3 py-2 font-mono text-xs/[1.5] text-[#b9c4d2]">
                   {JSON.stringify(row[k])}
                 </td>
               ))}

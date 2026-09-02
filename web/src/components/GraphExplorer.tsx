@@ -40,8 +40,8 @@ const JOB_COLOR = '#9B6BD4' // ControlMJob's label-family color (towers.ts idiom
 const NOTE = 'mt-2 text-[13px] leading-[1.55] text-muted'
 const PANEL = 'overflow-hidden rounded-md border border-edge bg-panel'
 const P_HEAD =
-  'flex items-center justify-between gap-2.5 border-b border-edge bg-panel-2 px-3.5 py-2.5 text-[13.5px] font-semibold'
-const P_HEAD_M = 'font-mono text-[10.5px] font-normal text-muted'
+  'flex items-center justify-between gap-2.5 border-b border-edge bg-panel-2 px-3.5 py-2.5 text-sm/[1.5] font-semibold'
+const P_HEAD_M = 'font-mono text-[11px] font-normal text-muted'
 
 // Middle truncation: batch job names share long prefixes (PARAD00xx_PEX_…), so
 // head truncation would render every node identically — keep head AND tail.
@@ -96,7 +96,7 @@ export default function GraphExplorer({ personaId }: { personaId: string }) {
     <main className="mx-auto max-w-[1180px] px-[30px]">
       <div className="flex flex-wrap items-center gap-3 pb-1 pt-6">
         <h1 tabIndex={-1} data-view-heading className="text-[21px] font-bold outline-none">Graph — live dependency view</h1>
-        <span className="whitespace-nowrap rounded-xs border border-green/50 bg-green/8 px-[9px] py-1 font-mono text-[10.5px] font-medium text-green">
+        <span className="whitespace-nowrap rounded-xs border border-green/50 bg-green/8 px-[9px] py-1 font-mono text-[11px] font-medium text-green">
           LIVE · knowledge graph · db {database || '—'} · api adapter (ADR 0005)
         </span>
       </div>
@@ -232,7 +232,7 @@ export default function GraphExplorer({ personaId }: { personaId: string }) {
                   {upstream.map((e, i) => (
                     <li key={i} className="border-b border-edge-soft py-[3px] last:border-b-0">
                       <code className="text-xs text-text">{e.target}</code>
-                      {e.via && <span className="font-mono text-[10.5px] text-muted"> via {e.via}</span>}
+                      {e.via && <span className="font-mono text-[11px] text-muted"> via {e.via}</span>}
                     </li>
                   ))}
                 </ul>
@@ -244,7 +244,7 @@ export default function GraphExplorer({ personaId }: { personaId: string }) {
                   {downstream.map((e, i) => (
                     <li key={i} className="border-b border-edge-soft py-[3px] last:border-b-0">
                       <code className="text-xs text-text">{e.source}</code>
-                      {e.via && <span className="font-mono text-[10.5px] text-muted"> via {e.via}</span>}
+                      {e.via && <span className="font-mono text-[11px] text-muted"> via {e.via}</span>}
                     </li>
                   ))}
                 </ul>

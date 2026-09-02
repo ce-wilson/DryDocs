@@ -1,0 +1,67 @@
+id: O88
+epic: web-console
+title: A console route has no paper form — capture the executed DOM to a self-contained
+  printable HTML carrying the L6 margin gutter and a route/commit provenance footer
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- drydocs/design_doc.py
+- .claude/skills/verify/SKILL.md
+- .claude/skills/run-drydocs-console/SKILL.md
+- web/src/index.css
+acceptance: |
+  (a) CAPTURE, DO NOT RE-IMPLEMENT. The console is a React SPA over a live API, so its
+  paper form is the EXECUTED DOM, not a server-side re-render of the same data. Drive the
+  running console through headless Edge — the mechanism the `verify` skill already uses
+  for the design-doc renderer — and write one self-contained `.html` per captured route,
+  styles inlined, no external requests. A second renderer that reproduces console markup
+  from JSON is the wrong shape: it would drift from the screen silently, which is the
+  whole failure the capture avoids.
+
+  (b) A CAPTURE IS A MOMENT AND THE FOOTER MUST SAY SO. `doc_rev_footer` stamps a design
+  doc with `Rev N · commit <hash>` because a doc's rev is AUTHORED. A console page has no
+  rev — it has a route, a commit, a wall-clock time, and an API it read. All four go in the
+  footer on every printed page. Without them a marked-up printout cannot be re-attached to
+  anything: the reviewer's note is about a screen that existed once.
+
+  (c) THE GUTTER IS THE EXISTING ONE. Reuse `_inject_margin_anchors`'s contract — a
+  `.dd-margin-tag` span, `display:none` on screen, positioned in the left margin under
+  `@media print`. The console today has NO print CSS AT ALL (verified 2026-08-31: no
+  `@media print` anywhere in `web/src`), so the print sheet is new work; the gutter
+  convention it carries is not, and must not be reinvented in a second idiom.
+
+  (d) WHICH ROUTES, DECIDED BY WHO REVIEWS THEM. Ship the capture for a NAMED starting
+  set rather than all fourteen routes, and say in the item close which ones and why. A
+  route behind sign-in needs a session, which is a real cost the capture must handle
+  honestly (headless sign-in) or exclude and say so — never a blank page presented as a
+  captured one.
+
+  (e) THE PAYLOAD IS NOT COMMITTED BY DEFAULT. A capture of a live console can contain
+  real graph values. It lands under the data root or `internal-local/`, the same landing
+  rule the vendor scrape follows, and the committed artifacts are the capture script and
+  its print sheet. If a specific sanitized capture is worth tracking, that is a decision
+  with a classification on it, not a default.
+notes: |
+  Minted 2026-08-31 (desktop, ui-workstream worktree) from a session that asked whether the
+  Epic L feedback loop could reach the web console. It can, but only the PAPER half (L6)
+  transfers cleanly, and this item is that half.
+
+  WHY NOT ARTIFACT COMMENTS. Anthropic ships anchored comment threads on published
+  artifacts, which is exactly this loop hosted for you — but it needs a Team or Enterprise
+  plan and an org-shared artifact (public sharing disables comments outright), and the user
+  is on personal Pro. Independently, an artifact is ONE self-contained static page with no
+  backend and no routes, so a multi-route console over drydocs-api could not be published
+  as one even on Enterprise. Both blocks are structural; neither is worth re-checking
+  without a plan change.
+
+  WHAT MAKES THIS DIFFERENT FROM A DESIGN DOC, and it is the only hard part: a design doc
+  is a `.md` whose render is deterministic, so its paper form and its screen form are the
+  same artifact under two style sheets (L13). A console page is a function of the graph at
+  a moment. The provenance footer in (b) is what keeps the loop honest — everything else
+  here is mechanical.

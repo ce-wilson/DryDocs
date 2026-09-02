@@ -12,7 +12,7 @@ export default function QuestionDetail({ question }: { question: BenchmarkQuesti
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <span
-            className="rounded border px-1.5 py-0.5 font-mono text-[9.5px]"
+            className="rounded border px-1.5 py-0.5 font-mono text-[10px]"
             style={{ borderColor: `var(${CLASS_TOKEN[question.cls]})`, color: `var(${CLASS_TOKEN[question.cls]})` }}
           >
             {question.id} · {question.cls}
@@ -27,10 +27,10 @@ export default function QuestionDetail({ question }: { question: BenchmarkQuesti
           return (
             <div key={s.id} className="rounded-md border border-edge-soft bg-bg-2 p-2.5">
               <div className="flex items-center justify-between gap-1.5">
-                <span className="text-[10.5px] font-semibold text-text">{s.label}</span>
+                <span className="text-[11px] font-semibold text-text">{s.label}</span>
                 <ResultChip kind={r.kind} compact />
               </div>
-              <p className="mt-1 font-mono text-[10.5px] text-faint">
+              <p className="mt-1 font-mono text-[11px] text-faint">
                 {r.chars.toLocaleString()} ch{r.ms != null ? ` · ${r.ms} ms` : ''}
                 {r.qualifier ? ` · ${r.qualifier}` : ''}
               </p>

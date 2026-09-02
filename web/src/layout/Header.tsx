@@ -26,16 +26,6 @@ export default function Header({ persona, env, onEnvChange, onSignOut }: HeaderP
         <span className="hidden sm:inline">DryDocs</span>
       </Link>
 
-      <div className="mx-auto flex w-full max-w-md items-center">
-        <label className="sr-only" htmlFor="global-search">Search nodes, servers, jobs</label>
-        <input
-          id="global-search"
-          type="search"
-          placeholder="Search nodes, servers, jobs…"
-          className="w-full rounded-md border border-edge bg-bg-2 px-3 py-1.5 text-sm text-text placeholder:text-faint"
-        />
-      </div>
-
       <div className="ml-auto flex shrink-0 items-center gap-3">
         {persona.role === 'admin' && (
           <div
