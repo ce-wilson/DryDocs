@@ -548,7 +548,7 @@ def test_no_id_carries_two_different_titles_across_the_remote_trunk() -> None:
         + "\n  ".join(disagreements)
         + "\n\nTWO CAUSES, and they need opposite fixes. (1) Two machines minted the "
         "same number -- renumber the LOCAL one with: python .claude/skills/"
-        "groom-backlog/validate.py --next-id <SERIES>. (2) You pushed a mint stub "
+        "groom-backlog/validate.py --next-id --module <module>. (2) You pushed a mint stub "
         "and then refined its title before pushing the body -- this guard compares "
         "TITLES, not bodies, so it cannot tell that apart from a collision. Push the "
         "body. The mint rule says the stub carries the FINAL title for exactly this "
