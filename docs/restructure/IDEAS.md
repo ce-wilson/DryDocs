@@ -91,6 +91,11 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
+- **`Idea-236`** · 2026-09-02 · `[idea]` · **open** · prio? **High** —
+  **The JOB→MFTS research landed (120 hops, 19 open questions) and it answers Idea-104's
+  evidence half — five gaps against the backlog, one of which blocks the file-transfer
+  lineage strategy outright.** STUB - body follows.
+
 - **`Idea-235`** · 2026-09-01 · `[idea]` · **open** · prio? **Med** —
   **The measurement apparatus corrupts the measurement, and it fails toward a REASSURING answer
   rather than an alarming one.** Three instances in one session (2026-09-01), across two machines
