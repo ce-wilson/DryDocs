@@ -1,0 +1,20 @@
+id: LOAD1
+epic: structure-remediation
+title: The four flat components become subpackages - drydocs/review, plan, port, docgen - with one-line re-export shims for one port cycle, MODULE_MAP tables rendered from the map, and the carved-slice relay in the port-prompt
+type: task
+module: drydocs-load
+phase: 6
+agent: main
+model: fable
+priority: p0
+status: todo
+depends_on:
+- CORE1
+inputs:
+- docs/decisions/0018-component-identity-declared-not-directory.md
+- drydocs_core/component_map.py
+- MODULE_MAP.md
+- docs/port/port-prompt.md
+- PORT-MANIFEST.yaml
+acceptance: |
+  STUB - minted 2026-09-02 under ADR 0018 D4 as amended at acceptance (Option B now, one carved slice of the port in flight); body follows.

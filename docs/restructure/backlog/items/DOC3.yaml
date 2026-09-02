@@ -1,0 +1,21 @@
+id: DOC3
+epic: doc-infrastructure
+title: Routing docs stop lagging the code - every top-level directory names its owning module, SDLC-Docs moves to docs/history/genesis, the four routing docs carry a resolving-path guard with the git-readme sweep, and 01-project-plan is cut and linked to the roadmap
+type: task
+module: docs
+phase: 6
+agent: main
+model: fable
+priority: p1
+status: todo
+depends_on:
+- CORE1
+inputs:
+- docs/decisions/0018-component-identity-declared-not-directory.md
+- git-readme.md
+- MODULE_MAP.md
+- docs/restructure/01-project-plan.md
+- docs/restructure/backlog/plan.yaml
+- SDLC-Docs/extracted
+acceptance: |
+  STUB - minted 2026-09-02 under ADR 0018 D3/D5 and the Q2/Q3 rulings; body follows.

@@ -1,0 +1,18 @@
+id: CORE1
+epic: structure-remediation
+title: The component map is an importable object in core - drydocs_core/component_map.py, read by the boundary test, joined to modules.yaml by name under a guard, with drydocs-port/PORT and drydocs-libs/LIBS registered
+type: task
+module: drydocs-core
+phase: 6
+agent: main
+model: fable
+priority: p0
+status: in_progress
+depends_on: []
+inputs:
+- docs/decisions/0018-component-identity-declared-not-directory.md
+- tests/unit/test_module_boundary.py
+- docs/restructure/backlog/modules.yaml
+- MODULE_MAP.md
+acceptance: |
+  STUB - minted 2026-09-02 under ADR 0018 D1/D2 (accepted the same day); body follows.
