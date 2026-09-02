@@ -94,7 +94,48 @@ question a 1,000-line file with the trail at the bottom could not answer.
 - **`Idea-239`** · 2026-09-02 · `[idea]` · **open** · prio? **Medium** —
   **A config surface, its renderer's SURFACES row and the derived artifact it feeds are ONE
   coupling — a port slice carries all three or none, and the manifest should name the triple
-  the way J68 names declaration/guard pairs.** STUB - body follows.
+  the way J68 names declaration/guard pairs.** Source: the company's D-slice apply of
+  `port-base-20260826..20260901` (2026-09-02; relayed session record, `port-updat-d-10..13`
+  transcribed in the relay's reading, not cited as images). What happened, in order:
+  `config/source-bindings.yaml` (G125) had reached the company in an earlier slice WITHOUT the
+  matching row in `scripts/render_enforcement_matrix.py` `SURFACES`; producer's guard
+  `tests/unit/test_enforcement_matrix.py` asserts every top-level `config/` entry is in
+  `SURFACES` or `CONFIG_EXEMPT`, so on OUR tree the pair can never separate — but a port slice
+  is not a tree, and the guard only fires after the take. `render_board.py` then exited 1, so
+  `enforcement-matrix.json` and `load-map.json` could not be regenerated; the freshly applied
+  `web/src/generated/**` → `derived` manifest row (febdf3ba) says *regenerate, never carry*;
+  and the J55 acronym guard failed on the stale carried copies. **A row we wrote to stop a
+  file being carried made the file unproducible instead**, because its inputs had crossed in
+  different slices. Clearing it exposed a SECOND stacked failure (`render_software_registry.py`
+  on `datetime.date`, fixed producer-side at O68 `6b43c850`, inside this range, not yet
+  applied) that the first had hidden. The company's own words: *the same dependency-closure
+  failure a fourth time, in a new place: renders → renderers → config surfaces.*
+  **WHY THE EXISTING MACHINERY DOES NOT COVER IT.** J68's `DECLARATION_GUARD_PAIRS` names
+  two-way couplings whose members must share a DISPOSITION. This is a three-way coupling
+  whose members legitimately hold DIFFERENT dispositions — the config file is `per-entry`
+  (company rows stay), the renderer is `canonical-producer`, the artifact is `derived` — and
+  the invariant is not "same disposition" but "same SLICE": if any one crosses, the other two
+  must be applied (or regenerated) in the same apply, and the `derived` member must be
+  regenerated LAST, after both inputs. The APPLY BY DISPOSITION section already orders
+  `derived` last; what it lacks is the statement that `derived`'s inputs are a closure, and
+  which files are in it.
+  **THE PROPOSAL, smallest form.** (1) A `closure:` field on each `derived` manifest row
+  naming its renderer(s) and the config surfaces they read — for `web/src/generated/**` that
+  is `scripts/render_board.py`, `render_enforcement_matrix.py`, `render_software_registry.py`,
+  `render_load_map.py` and every `config/*.yaml` in `SURFACES`; (2) a guard in
+  `test_port_manifest.py` that the closure is TOTAL against the importable object (J37: read
+  `SURFACES`, never the render) — a config file registered in `SURFACES` but absent from the
+  closure fails; (3) `scripts/render_port_dispositions.py` prints the closure under each
+  `derived` row so the apply sees "regenerate this — which needs THESE applied first" instead
+  of a bare "regenerate." Nothing in the port-prompt's ledger changes; this is manifest
+  structure and a guard, the J68 pattern. **What it is NOT:** a reason to allowlist a carried
+  artifact — the company considered that and rejected it, correctly: it would have shipped a
+  `derived` row for files that could not be produced.
+  **A NOTE ON COUNT.** "Fourth time" is the company's tally and it is the right one to keep:
+  `dev-environment.yaml` by omission (2026-07-28), `source-registry.yaml` (J68),
+  `source-bindings.yaml` missing from the 08-30 slice (found 2026-09-01), and now the
+  closure behind it. Each was fixed at the file; this is the first framing at the shape.
+  Related: J68, J71, J72, G125, O68, N4/N5 (the load-map surfaces), [[Idea-235]].
 
 - **`Idea-236`** · 2026-09-02 · `[idea]` · **open** · prio? **High** —
   **The JOB→MFTS research landed (120 hops, 19 open questions) and it answers Idea-104's
