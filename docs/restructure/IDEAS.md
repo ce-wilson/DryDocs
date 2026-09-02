@@ -91,7 +91,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
-- **`Idea-239`** · 2026-09-02 · `[idea]` · **open** · prio? **Medium** —
+- **`Idea-239`** · 2026-09-02 · `[idea]` · **open** · prio? **Med** —
   **A config surface, its renderer's SURFACES row and the derived artifact it feeds are ONE
   coupling — a port slice carries all three or none, and the manifest should name the triple
   the way J68 names declaration/guard pairs.** Source: the company's D-slice apply of
