@@ -29,7 +29,8 @@ def test_package_surfaces() -> None:
         "review",
         "writer",
     }
-    assert set(drydocs_deepdoc.__all__) == {"DATABASE", "investigate", "writer"}
+    # MM3 added `mindmap` — the state file the loop reads; it is real, not a stub.
+    assert set(drydocs_deepdoc.__all__) == {"DATABASE", "investigate", "mindmap", "writer"}
 
 
 def test_write_targets_share_the_database_and_the_boundary_is_the_label() -> None:

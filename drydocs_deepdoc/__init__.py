@@ -37,13 +37,14 @@ Invariants:
   corpus through the graph, never in-process.
 - **The parser is core's** — parse gaps become core changes, never local forks.
 
-Scaffold status: interfaces + contracts (G4, 2026-07-10); bodies raise
-``NotImplementedError`` until MM10.
+Scaffold status: interfaces + contracts (G4, 2026-07-10); the ``investigate``
+and ``writer`` bodies raise ``NotImplementedError`` until MM10. ``mindmap`` (MM3)
+is real: the state file the loop reads, where a slot fills only with evidence.
 """
 
 import logging
 
-from . import investigate, writer
+from . import investigate, mindmap, writer
 
 #: G105/ADR 0014 clause 2 — a module logger per component. These components
 #: had NONE, so anything they wanted to say had nowhere to go. A component
@@ -61,4 +62,4 @@ LOGGER = logging.getLogger(__name__)
 #: ``tests/unit/test_database_names.py`` pins this to what provisioning creates.
 DATABASE = "drydocs"  # G102 (2026-08-18): the fold — uncertain writes land in ground truth CARRYING :Uncertain (writer contract); the pre-fold separate database is retired
 
-__all__ = ["DATABASE", "investigate", "writer"]
+__all__ = ["DATABASE", "investigate", "mindmap", "writer"]
