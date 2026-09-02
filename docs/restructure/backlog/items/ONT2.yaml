@@ -14,6 +14,7 @@ depends_on:
 gates:
 - ontology-domain-registry-and-edition-grain
 inputs:
+- docs/reviews/restructure-design-review-2026-09-02.md
 - config/taxonomy/domains.yaml
 - config/taxonomy/software-registry.yaml
 - scripts/render_software_registry.py
@@ -59,9 +60,17 @@ acceptance: |
   `technical` - base-common: platform and vendor terms (Control-M, Oracle, Neo4j, DPL, MFTS).
   `sdlc`      - base-common: process and delivery terms (PR, ADR, HITL, SME, CI).
   `company`   - base-common: the estate's own vocabulary (LOB, SEAL, PAT, Area Product).
-  Resolution: an edition's expansion wins for its readers; absent one, the three common tiers
-  are searched in the order technical -> sdlc -> company, and a term present in two common
-  tiers is a guard failure, not a precedence question - the SME places it once.
+  Resolution: an edition's expansion wins for its readers; absent one, the common tiers are
+  searched in a fixed order. HOMONYMS ARE THE REAL CASE (review F6, docs/reviews/restructure-design-review-2026-09-02.md):
+  acronym pages exist because the same letters carry a technical meaning and a company
+  meaning, so the entry KEY is (acronym, tier), uniqueness is one expansion per (acronym,
+  tier), and one acronym MAY appear in two common tiers with two expansions. That makes the
+  order among the three common tiers a real rule, and it was never ruled: the SME listed
+  "company, SDLC, technical, then the edition specific"; the first draft of this item wrote
+  technical -> sdlc -> company. Both are defensible (the estate's own meaning first, or the
+  vendor's) and the difference decides what a reader sees, so the ORDER IS A QUESTION ON THE
+  SEEDING GATE in (d), beside the per-row tier placements - not a default the implementer
+  picks.
 
   (c) THE BASE-COMMON RULE (§B5 i) APPLIES: the three common tiers are base-owned and an
   edition may not override a common expansion, only ADD an edition-tier one; the aggregate
@@ -76,7 +85,8 @@ acceptance: |
   (e) PORT: the fragment is per-entry on the tom-role-vocabulary pattern - common-tier rows
   cross whole, edition-tier rows are the edition's own and stay.
 
-  (f) GUARDS: every row names a tier from the four; no acronym appears in two common tiers;
+  (f) GUARDS: every row names a tier from the four; one expansion per (acronym, tier), and
+  the same acronym in two tiers is allowed (a homonym, not a duplicate);
   an edition-tier row carries an edition code that exists in editions.yaml (CFG2, when built;
   skip until then); the renderer reads the fragment (J37) and AcronymsPane groups by tier;
   the migrated shape test asserts expansion/source/added/tier on every row; the emptied

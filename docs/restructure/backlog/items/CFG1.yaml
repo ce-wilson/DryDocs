@@ -12,6 +12,7 @@ depends_on: []
 gates:
 - ontology-domain-registry-and-edition-grain
 inputs:
+- docs/reviews/restructure-design-review-2026-09-02.md
 - drydocs_core/ontology/relationship_vocabulary/00-header.yaml
 - drydocs_core/ontology/relationship_vocabulary/
 - tests/unit/test_classification.py
@@ -49,7 +50,14 @@ acceptance: |
   at the base of everything so aggregate roll-up and cross-edition query work against ONE
   vocabulary; an edition may EXTEND it (its own rows, minted_by = the edition, authority = its
   gate) and never override a base row. The registry carries that as a guard: an edition row
-  may not reuse a base id, and a base row is never deprecated by an edition.
+  may not reuse a base id, and a base row is never deprecated by an edition. THE GUARD
+  SHIPS WITH A FIXTURE THAT PROVES IT FIRES (review F7, docs/reviews/restructure-design-review-2026-09-02.md): no
+  edition row exists in this repo and none will (the producer never names the company's
+  code, CFG2 c), so a guard with no positive case is vacuous here and first runs
+  unobserved at the company. A test-only fixture injects a synthetic edition row - the
+  code from CFG2's synthetic sample - and asserts both refusals, on the pattern every
+  detector in test_port_manifest.py follows (test_the_coupling_detector_catches_an_uncoupled_pair,
+  :264: a detector and the companion that proves it catches).
 
   (f) What this item does NOT do: mint any domain (ONT1 and ONT2 do the first three), define
   a mint command (a domain is minted by a gate record plus a row; the allocator question is

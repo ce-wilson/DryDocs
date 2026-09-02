@@ -13,6 +13,7 @@ depends_on:
 gates:
 - ontology-domain-registry-and-edition-grain
 inputs:
+- docs/reviews/restructure-design-review-2026-09-02.md
 - .claude/skills/groom-backlog/validate.py
 - tests/unit/test_backlog.py
 - drydocs_core/backlog_store.py
@@ -26,15 +27,37 @@ acceptance: |
   OPTIONAL edition segment in front of it and retires the two numeric partition rules.
 
   (a) GRAMMAR: `[<EDITION>-]<MODULE><n>`, edition first, base edition unprefixed. `LOAD12` is
-  producer main; `<code>-LOAD12` is that edition's twelfth load item. Three regexes gain one
-  optional group: validate.py :67 and :68 (id and filename), backlog_store.py `_ID_RE`. Every
-  existing id parses unchanged - the round-trip guard over all 630+ ids is the first test
-  written.
+  producer main; `<code>-LOAD12` is that edition's twelfth load item. SEVEN id-shape sites
+  change, not three (review F1, docs/reviews/restructure-design-review-2026-09-02.md): validate.py :67 `_ID_RE` and :68
+  `_FILE_RE` (the filename regex today matches `LOAD1` inside `AUTO-LOAD1.yaml` and silently
+  DROPS the segment); backlog_store.py `_ID_RE` (natural_id_key sorts an unparsed id after
+  every conforming one); the three bare-character extractions in test_backlog.py (:232
+  digits, :395-396 and :417 `isalpha()` joins - these do not fail on a segment, they turn
+  `AUTO-LOAD1` into series `AUTOLOAD` and STOP GUARDING, which is worse than failing); and
+  drydocs/port_preflight.py :88, whose claim-commit pattern `[A-Za-z]+[0-9]+` stops
+  recognizing an edition claim and lets the port coverage guard count it as substantive.
+  The three test_backlog.py extractions are replaced by ONE parse helper that uses the
+  allocator's regex (the test already imports the allocator for the agreement guards at
+  :267 and :352), so there is one grammar the test cannot drift from. Every existing id
+  parses unchanged - the round-trip guard over all 630+ ids is the first test written.
 
   (b) BOTH HALVES DECLARED: an edition segment must be a `code` in editions.yaml (CFG2) and a
   module code must be in modules.yaml `series`; an undeclared edition is a typo, not a tenant,
-  and fails; an undeclared module code fails as it does today. `--next-id --module <m>
-  --edition <code>` mints in that edition; without `--edition` the base.
+  and fails; an undeclared module code fails as it does today.
+
+  THE VENUE IS DECLARED, NOT INFERRED (review F2 - the most important finding): `.claude/**`
+  is canonical-producer, so the company runs THIS allocator, and once the band retires
+  nothing tells it which venue it is in - a company session that forgets `--edition` mints
+  `LOAD13`, the producer's next id, and nothing refuses it. So the allocator reads the
+  venue's edition from config/dev-environment.yaml, key `edition:` - `base` on the producer,
+  the company's own code on the company - the file that is already canonical-company
+  (PORT-MANIFEST.yaml:322) and already carries a per-side flag for exactly this reason
+  (`capability_assert`, and its note: "the divergence lives in the one file already ruled
+  per-side"). `--next-id --module <m>` mints in the venue's edition; `--edition <code>`
+  overrides DOWNWARD only (a base may mint for an instance it hosts; an instance may not
+  mint for its base or for a sibling); a venue whose file declares no `edition:` mints
+  nothing and the refusal names the key to set. ADR 0015 D3's "declared, not inferred",
+  applied to the allocator's own venue.
 
   (c) RETIRE BOTH PARTITION RULES, FORWARD-ONLY: the DD reserve (git-readme.md:197,
   2026-07-20) and the 10000 band (PRODUCER_BAND_CEILING, 2026-08-18). Neither governs a new
@@ -44,6 +67,25 @@ acceptance: |
   refused (it is frozen, like the letters). CLAUDE.md's mint rule and the skill gain the
   `--edition` case.
 
+  THE FROZEN TABLE IS PRODUCER-MEASURED AND THE COMPANY'S LEGACY IDS FAIL IT (review F3):
+  FROZEN_SERIES["G"] = 136 was measured across this repo's tree, refs and history; the
+  company holds G10001-G10003 and DD10001-DD10003, minted under a rule in force when they
+  were minted, and test_frozen_series_take_no_new_ids fails every one of them the day
+  PLAN1 ports. "Stay in the frozen table" therefore needs a second table: FROZEN_BAND =
+  {"G": 10003, "DD": 10003} - a legacy band id (number > 9999, minted before FROZEN_ON) is
+  frozen at the band's own max - consulted by the guard for band-shaped numbers only, with
+  the same allocator/test agreement guard the first table has. This is small enough to
+  ride with PLAN1's port (DOC2's freeze half), and it must: without it the freeze relay
+  hands the company a red suite (review F9).
+
+  THE FETCH FAILURE IS SILENT WHEN REMOTE REFS EXIST (review F12): `_git` returns "" on any
+  failure, and the two warnings after the fetch (validate.py :360, :368) fire only when
+  there are NO remote refs or NONE could be read. A failed fetch on a checkout that has
+  refs is neither - the stale refs read fine and the union is silently a day old, which is
+  the case the fetch exists to cover. The fetch call alone reports success or failure, and
+  a failed fetch prints a third warning: fetch failed, remote refs may be stale, treat the
+  number as provisional.
+
   (d) UNTIL THE COMPANY MINTS ITS EDITION CODE IT MINTS NOTHING NEW - and the allocator's
   refusal message for a band-shaped or DD id says exactly that, naming CFG2's file. Acceptable
   only because the code is one row and one push away (§C4).
@@ -51,6 +93,12 @@ acceptance: |
   (e) GUARDS in test_backlog.py: round-trip over every current id; edition present =>
   declared; module code present => declared; a base item never carries a segment; the
   allocator refuses an undeclared edition, a DD id, and a band-shaped number, each naming the
-  replacement.
+  replacement; a venue with no declared `edition:` is refused naming the key; the three
+  FROZEN_BAND ids parse and pass. TWO PARSERS, ONE GRAMMAR (review F4): validate.py :67
+  accepts uppercase only and no suffix, backlog_store.py :84 accepts any case and an
+  optional `[a-z]` suffix, and nothing asserts they agree - the FROZEN_SERIES and ceiling
+  constants have agreement guards because the duplication is deliberate; the regex is the
+  one duplicated thing without one. Add it: a fixed list of ids, one with a segment, that
+  must parse identically in both, and rule the suffix (no item id carries one today).
 
   Depends on CFG2 (the edition registry the segment validates against).

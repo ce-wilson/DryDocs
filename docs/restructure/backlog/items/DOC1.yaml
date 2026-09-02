@@ -12,6 +12,7 @@ depends_on: []
 gates:
 - ontology-domain-registry-and-edition-grain
 inputs:
+- docs/reviews/restructure-design-review-2026-09-02.md
 - docs/decisions/0015-team-edition-template.md
 - docs/decisions/README.md
 - config/gate-prompts/ontology-domain-registry-and-edition-grain.yaml
@@ -46,6 +47,13 @@ acceptance: |
   text - the ADR is PROPOSED, and the record of what changed and why (this gate, §D1) is the
   point. docs/decisions/README.md index line updated. Related rulings recorded in the same
   section: §C1-§C3 (the edition is a declared segment keyed to area_product_id) so the ADR's
-  D3 tenancy paragraph and the id grammar say the same thing.
+  D3 tenancy paragraph and the id grammar say the same thing. AND ONE OPEN QUESTION, written
+  as open (review F8, docs/reviews/restructure-design-review-2026-09-02.md): (b) says the aggregate board is
+  something only a base renders, but instances are copier-generated repositories and the
+  base has no declared way to read N instance backlogs - the graph side has its answer (the
+  ddestate composite, D3) and a backlog roll-up would most naturally ride the same rail
+  (items loaded as nodes, rendered from the composite) rather than a multi-repo file read.
+  That is a Team Edition design question for the ADR's follow-up list; the dated section
+  records it so the amendment does not read as though the roll-up exists.
 
   No code; the ADR still awaits its own Phase 0 gate (the URN shared-vs-owned question).

@@ -569,7 +569,14 @@ crosses whole. UNNAMED FIELDS clause per J71.
 at the base of everything so aggregate roll-up and cross-edition query work against ONE
 vocabulary; an edition may EXTEND it (its own rows, minted_by = the edition, authority = its
 gate) and never override a base row. The registry carries that as a guard: an edition row
-may not reuse a base id, and a base row is never deprecated by an edition.
+may not reuse a base id, and a base row is never deprecated by an edition. THE GUARD
+SHIPS WITH A FIXTURE THAT PROVES IT FIRES (review F7, docs/reviews/restructure-design-review-2026-09-02.md): no
+edition row exists in this repo and none will (the producer never names the company&#x27;s
+code, CFG2 c), so a guard with no positive case is vacuous here and first runs
+unobserved at the company. A test-only fixture injects a synthetic edition row - the
+code from CFG2&#x27;s synthetic sample - and asserts both refusals, on the pattern every
+detector in test_port_manifest.py follows (test_the_coupling_detector_catches_an_uncoupled_pair,
+:264: a detector and the companion that proves it catches).
 
 (f) What this item does NOT do: mint any domain (ONT1 and ONT2 do the first three), define
 a mint command (a domain is minted by a gate record plus a row; the allocator question is
@@ -685,9 +692,17 @@ meaning.
 `technical` - base-common: platform and vendor terms (Control-M, Oracle, Neo4j, DPL, MFTS).
 `sdlc`      - base-common: process and delivery terms (PR, ADR, HITL, SME, CI).
 `company`   - base-common: the estate&#x27;s own vocabulary (LOB, SEAL, PAT, Area Product).
-Resolution: an edition&#x27;s expansion wins for its readers; absent one, the three common tiers
-are searched in the order technical -&gt; sdlc -&gt; company, and a term present in two common
-tiers is a guard failure, not a precedence question - the SME places it once.
+Resolution: an edition&#x27;s expansion wins for its readers; absent one, the common tiers are
+searched in a fixed order. HOMONYMS ARE THE REAL CASE (review F6, docs/reviews/restructure-design-review-2026-09-02.md):
+acronym pages exist because the same letters carry a technical meaning and a company
+meaning, so the entry KEY is (acronym, tier), uniqueness is one expansion per (acronym,
+tier), and one acronym MAY appear in two common tiers with two expansions. That makes the
+order among the three common tiers a real rule, and it was never ruled: the SME listed
+&quot;company, SDLC, technical, then the edition specific&quot;; the first draft of this item wrote
+technical -&gt; sdlc -&gt; company. Both are defensible (the estate&#x27;s own meaning first, or the
+vendor&#x27;s) and the difference decides what a reader sees, so the ORDER IS A QUESTION ON THE
+SEEDING GATE in (d), beside the per-row tier placements - not a default the implementer
+picks.
 
 (c) THE BASE-COMMON RULE (§B5 i) APPLIES: the three common tiers are base-owned and an
 edition may not override a common expansion, only ADD an edition-tier one; the aggregate
@@ -702,7 +717,8 @@ org acronym is NOT a row anywhere (J55).
 (e) PORT: the fragment is per-entry on the tom-role-vocabulary pattern - common-tier rows
 cross whole, edition-tier rows are the edition&#x27;s own and stay.
 
-(f) GUARDS: every row names a tier from the four; no acronym appears in two common tiers;
+(f) GUARDS: every row names a tier from the four; one expansion per (acronym, tier), and
+the same acronym in two tiers is allowed (a homonym, not a duplicate);
 an edition-tier row carries an edition code that exists in editions.yaml (CFG2, when built;
 skip until then); the renderer reads the fragment (J37) and AcronymsPane groups by tier;
 the migrated shape test asserts expansion/source/added/tier on every row; the emptied
@@ -1407,15 +1423,37 @@ O59, Idea-140.
 OPTIONAL edition segment in front of it and retires the two numeric partition rules.
 
 (a) GRAMMAR: `[&lt;EDITION&gt;-]&lt;MODULE&gt;&lt;n&gt;`, edition first, base edition unprefixed. `LOAD12` is
-producer main; `&lt;code&gt;-LOAD12` is that edition&#x27;s twelfth load item. Three regexes gain one
-optional group: validate.py :67 and :68 (id and filename), backlog_store.py `_ID_RE`. Every
-existing id parses unchanged - the round-trip guard over all 630+ ids is the first test
-written.
+producer main; `&lt;code&gt;-LOAD12` is that edition&#x27;s twelfth load item. SEVEN id-shape sites
+change, not three (review F1, docs/reviews/restructure-design-review-2026-09-02.md): validate.py :67 `_ID_RE` and :68
+`_FILE_RE` (the filename regex today matches `LOAD1` inside `AUTO-LOAD1.yaml` and silently
+DROPS the segment); backlog_store.py `_ID_RE` (natural_id_key sorts an unparsed id after
+every conforming one); the three bare-character extractions in test_backlog.py (:232
+digits, :395-396 and :417 `isalpha()` joins - these do not fail on a segment, they turn
+`AUTO-LOAD1` into series `AUTOLOAD` and STOP GUARDING, which is worse than failing); and
+drydocs/port_preflight.py :88, whose claim-commit pattern `[A-Za-z]+[0-9]+` stops
+recognizing an edition claim and lets the port coverage guard count it as substantive.
+The three test_backlog.py extractions are replaced by ONE parse helper that uses the
+allocator&#x27;s regex (the test already imports the allocator for the agreement guards at
+:267 and :352), so there is one grammar the test cannot drift from. Every existing id
+parses unchanged - the round-trip guard over all 630+ ids is the first test written.
 
 (b) BOTH HALVES DECLARED: an edition segment must be a `code` in editions.yaml (CFG2) and a
 module code must be in modules.yaml `series`; an undeclared edition is a typo, not a tenant,
-and fails; an undeclared module code fails as it does today. `--next-id --module &lt;m&gt;
---edition &lt;code&gt;` mints in that edition; without `--edition` the base.
+and fails; an undeclared module code fails as it does today.
+
+THE VENUE IS DECLARED, NOT INFERRED (review F2 - the most important finding): `.claude/**`
+is canonical-producer, so the company runs THIS allocator, and once the band retires
+nothing tells it which venue it is in - a company session that forgets `--edition` mints
+`LOAD13`, the producer&#x27;s next id, and nothing refuses it. So the allocator reads the
+venue&#x27;s edition from config/dev-environment.yaml, key `edition:` - `base` on the producer,
+the company&#x27;s own code on the company - the file that is already canonical-company
+(PORT-MANIFEST.yaml:322) and already carries a per-side flag for exactly this reason
+(`capability_assert`, and its note: &quot;the divergence lives in the one file already ruled
+per-side&quot;). `--next-id --module &lt;m&gt;` mints in the venue&#x27;s edition; `--edition &lt;code&gt;`
+overrides DOWNWARD only (a base may mint for an instance it hosts; an instance may not
+mint for its base or for a sibling); a venue whose file declares no `edition:` mints
+nothing and the refusal names the key to set. ADR 0015 D3&#x27;s &quot;declared, not inferred&quot;,
+applied to the allocator&#x27;s own venue.
 
 (c) RETIRE BOTH PARTITION RULES, FORWARD-ONLY: the DD reserve (git-readme.md:197,
 2026-07-20) and the 10000 band (PRODUCER_BAND_CEILING, 2026-08-18). Neither governs a new
@@ -1425,6 +1463,25 @@ git-readme sentence is retired with a pointer to the gate record; RESERVED_SERIE
 refused (it is frozen, like the letters). CLAUDE.md&#x27;s mint rule and the skill gain the
 `--edition` case.
 
+THE FROZEN TABLE IS PRODUCER-MEASURED AND THE COMPANY&#x27;S LEGACY IDS FAIL IT (review F3):
+FROZEN_SERIES[&quot;G&quot;] = 136 was measured across this repo&#x27;s tree, refs and history; the
+company holds G10001-G10003 and DD10001-DD10003, minted under a rule in force when they
+were minted, and test_frozen_series_take_no_new_ids fails every one of them the day
+PLAN1 ports. &quot;Stay in the frozen table&quot; therefore needs a second table: FROZEN_BAND =
+{&quot;G&quot;: 10003, &quot;DD&quot;: 10003} - a legacy band id (number &gt; 9999, minted before FROZEN_ON) is
+frozen at the band&#x27;s own max - consulted by the guard for band-shaped numbers only, with
+the same allocator/test agreement guard the first table has. This is small enough to
+ride with PLAN1&#x27;s port (DOC2&#x27;s freeze half), and it must: without it the freeze relay
+hands the company a red suite (review F9).
+
+THE FETCH FAILURE IS SILENT WHEN REMOTE REFS EXIST (review F12): `_git` returns &quot;&quot; on any
+failure, and the two warnings after the fetch (validate.py :360, :368) fire only when
+there are NO remote refs or NONE could be read. A failed fetch on a checkout that has
+refs is neither - the stale refs read fine and the union is silently a day old, which is
+the case the fetch exists to cover. The fetch call alone reports success or failure, and
+a failed fetch prints a third warning: fetch failed, remote refs may be stale, treat the
+number as provisional.
+
 (d) UNTIL THE COMPANY MINTS ITS EDITION CODE IT MINTS NOTHING NEW - and the allocator&#x27;s
 refusal message for a band-shaped or DD id says exactly that, naming CFG2&#x27;s file. Acceptable
 only because the code is one row and one push away (§C4).
@@ -1432,7 +1489,13 @@ only because the code is one row and one push away (§C4).
 (e) GUARDS in test_backlog.py: round-trip over every current id; edition present =&gt;
 declared; module code present =&gt; declared; a base item never carries a segment; the
 allocator refuses an undeclared edition, a DD id, and a band-shaped number, each naming the
-replacement.
+replacement; a venue with no declared `edition:` is refused naming the key; the three
+FROZEN_BAND ids parse and pass. TWO PARSERS, ONE GRAMMAR (review F4): validate.py :67
+accepts uppercase only and no suffix, backlog_store.py :84 accepts any case and an
+optional `[a-z]` suffix, and nothing asserts they agree - the FROZEN_SERIES and ceiling
+constants have agreement guards because the duplication is deliberate; the regex is the
+one duplicated thing without one. Add it: a fixed list of ids, one with a segment, that
+must parse identically in both, and rule the suffix (no item id carries one today).
 
 Depends on CFG2 (the edition registry the segment validates against).
 </p></div></div>
@@ -1497,7 +1560,14 @@ never reuses a base id.
 text - the ADR is PROPOSED, and the record of what changed and why (this gate, §D1) is the
 point. docs/decisions/README.md index line updated. Related rulings recorded in the same
 section: §C1-§C3 (the edition is a declared segment keyed to area_product_id) so the ADR&#x27;s
-D3 tenancy paragraph and the id grammar say the same thing.
+D3 tenancy paragraph and the id grammar say the same thing. AND ONE OPEN QUESTION, written
+as open (review F8, docs/reviews/restructure-design-review-2026-09-02.md): (b) says the aggregate board is
+something only a base renders, but instances are copier-generated repositories and the
+base has no declared way to read N instance backlogs - the graph side has its answer (the
+ddestate composite, D3) and a backlog roll-up would most naturally ride the same rail
+(items loaded as nodes, rendered from the composite) rather than a multi-repo file read.
+That is a Team Edition design question for the ADR&#x27;s follow-up list; the dated section
+records it so the amendment does not read as though the roll-up exists.
 
 No code; the ADR still awaits its own Phase 0 gate (the URN shared-vs-owned question).
 </p></div></div>
@@ -1511,14 +1581,26 @@ roll that carries commit 375dd962 (PLAN1 mechanism) and 39b90843 (this gate).
 and `--next-id DD` are refused, each message naming the replacement; the series is the
 module - modules.yaml `series:` arrives canonical-producer, so they inherit the 18 codes;
 `--next-id --module &lt;m&gt;` is the command; codes are three-plus letters precisely so a
-company mint can never be confused with a frozen letter, and none is DD.
+company mint can never be confused with a frozen letter, and none is DD. THE FREEZE HALF
+CARRIES FROZEN_BAND (review F3/F9, docs/reviews/restructure-design-review-2026-09-02.md): the frozen table
+was measured on the producer&#x27;s tree and admits nothing above G136, so their G10001-G10003
+and DD10001-DD10003 fail test_frozen_series_take_no_new_ids the day this half lands.
+FROZEN_BAND = {G: 10003, DD: 10003} (a legacy band id is frozen at the band&#x27;s own max) is
+a producer-side change to validate.py and test_backlog.py that ships BEFORE this relay
+rolls, not with PLAN2 - a freeze relay that hands the company a red suite is worse than
+no relay. The relay says so, and says their three band ids are read and listed, not
+re-minted.
 
 (b) THE PREFIX HALF, which waits on PLAN2 landing: `[&lt;EDITION&gt;-]&lt;MODULE&gt;&lt;n&gt;`; the company
 base is an edition and MINTS ITS OWN CODE at its own gate (CFG2 §C3) - the relay names the
 file and the columns, not the code; both partition rules are retired forward-only (§C4):
 their DD1-DD10 / DD10001-DD10003 / G10001-G10003 stay readable; the band mirror assertion
 the port-prompt asked them to write (steps 160, 273 region) is WITHDRAWN and replaced by
-the edition-segment check; between the roll and their code mint they mint nothing new.
+the edition-segment check; between the roll and their code mint they mint nothing new -
+and that is a MECHANISM, not a request (review F2): the allocator reads the venue&#x27;s
+edition from config/dev-environment.yaml `edition:` (their own canonical-company file),
+refuses to mint while the key is absent, and names the key. The relay tells them the
+one line to write once their code is minted, and nothing else about the code itself.
 
 (c) THE TWO-AXES WORDING, verbatim from the 2026-09-02 review, so their agent stops
 conflating repos and checkouts: Axis 1 - repos (producer / company: disjoint histories,
