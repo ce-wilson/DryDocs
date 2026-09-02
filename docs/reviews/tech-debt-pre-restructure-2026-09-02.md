@@ -36,8 +36,8 @@ module names inside one package, the `port` group has no backlog module, and fiv
 directories are named in no routing document, which matters the moment ADR 0015 assigns every
 path a file class; **(3) the routing docs lag the code** — `git-readme.md` names 31 paths that
 moved at the 0002-A extraction, and the narrative project plan stops at phase 5 of 18; **(4)
-process state has drifted** — five `in_progress` claims from one 08-20/21 burst with no work
-behind them, 14 unsigned gate prompts, a Ready strip that lists 85% of the backlog. None of it
+process state has drifted** — a gate-blocked item filed as `in_progress` since June (the
+"five-claim burst" reading was a shard-date artifact, corrected in P2), 14 unsigned gate prompts, a Ready strip that lists 85% of the backlog. None of it
 blocks the restructure. Items P1, T1, D3, Doc1 and A1's cheap slice should land before it,
 because the restructure will rely on exactly the instruments and declarations they repair.
 
@@ -287,12 +287,22 @@ ritual just wrote (the skill's own offline fallback already says how; the snapsh
 tree by construction) and keep the live-graph column as the drift comparison it was meant to
 be; add `a2_circular` from `stats.circular_files`. Then a row can never be stale about itself.
 
-**P2 — Five `in_progress` claims from one burst, twelve days old, with no work behind them.**
-E1, G62, K16, L19, MM7 — claimed 2026-08-20/21, none closed, and `git branch -r --list "*wip/*"`
-returns nothing (J31's test). Per the pull rule they hold the pen on five items and keep them
-off the Ready strip. I 3 · R 2 · E 1 → **25**. *Fix:* confirm the laptop holds no unpushed
-work on them (the K9 case is the one J31 cannot see), then release each to `todo` with a note
-naming this review; N14 (5 d) stays.
+**P2 — Five `in_progress` items that are not a burst (CORRECTED 2026-09-02, same day).**
+The first reading — "five claims from one 08-20/21 burst" — was wrong, and wrong for the
+reason §P6 warns about: `git log -1` dates every item file to the Y2 shard commit
+(`8a6b592d`, 2026-08-20), which re-created all 600+ files at once, so five items that went
+`in_progress` on five different days all read as claimed on 08-20. Read from their own notes:
+E1 has been `in_progress` since June (SOSA registration DONE, the gate not held — a `blocked`
+in the schema's own vocabulary, filed as `in_progress`); G62 opened its SME session on 08-13
+and §B runs company-side; K16 was unblocked by SME evidence on 08-19 and is part-built; L19 is
+a doc-drift sweep on its second filing; MM7 is a PoC in progress since 08-21. No `wip/*`
+branch behind any of them, which for E1/G62 is expected (nothing to push) and for K16/L19/MM7
+means the in-flight work, if any, is local to the machine that holds it. I 2 · R 2 · E 1 →
+**16**. *Fix:* E1 → `blocked` with the gate as its reason (the status exists; use it); the
+other four stay claimed by whoever holds them, each with a one-line annotation naming the
+machine and the next step, on J31's rule. The debt item that survives is the one the
+misreading exposed: `in_progress` is being used for "open with a session pending", which is
+what `blocked`-with-reason is for, and a Ready strip cannot tell the two apart.
 
 **P3 — Fourteen gate prompts await sign-off and ~40 prompt files have no schema test.**
 `config/gate-prompts/` holds 58; `config/gate-log.md` has 96 records; 14 prompt stems have
@@ -337,7 +347,7 @@ metric is capped at 44 days and proves nothing; staleness has to be measured fro
 | 1 | D3 | Python version matrix 3.11 / 3.12 / 3.14 in CI | 3 | 3 | 1 | 30 | Idea-245 |
 | 2 | T1 | `.coverage*` in `.gitignore` | 3 | 2 | 1 | 25 | **EXECUTED** |
 | 2 | A1a | Guard: every boundary component group maps to a `modules.yaml` module; add `drydocs-port` / `PORT` | 2 | 3 | 1 | 25 | Idea-244 |
-| 2 | P2 | Release the five dead 08-20/21 claims after the laptop check | 3 | 2 | 1 | 25 | user ruling |
+| 16 | P2 | E1 → `blocked`; annotate the other four (CORRECTED: not a burst — shard-dated) | 2 | 2 | 1 | 16 | user ruling |
 | 5 | P1 | Metrics ledger measures the snapshot it just wrote; add A2 | 3 | 3 | 2 | 24 | Idea-243 |
 | 5 | Doc1 | `git-readme.md` path sweep + routing-doc path guard | 3 | 3 | 2 | 24 | Idea-247 |
 | 5 | P3 | Gate-prompt shape test + the unsigned-14 on the queue page | 3 | 3 | 2 | 24 | Idea-248 |
@@ -367,8 +377,7 @@ metric is capped at 44 days and proves nothing; staleness has to be measured fro
 **Business justification, one line each, for the top of the list.** D3: the daily interpreter
 and the declared floor are both untested, so a bad upgrade is found by the company, not by CI.
 T1: nobody can measure coverage without turning the suite red. A1a: the restructure mints ids
-by module, and one component has no module. P2: five items are invisible to every puller for
-no reason. P1: every debt number the ritual has recorded since 08-21 was measured on a graph
+by module, and one component has no module. P2: one gate-blocked item has read as in-flight since June. P1: every debt number the ritual has recorded since 08-21 was measured on a graph
 the ritual had not loaded. Doc1: the port's own routing doc sends the company to files that
 moved in July. P3: a gate prompt that fails at the SME session costs the one hour the SME had.
 
