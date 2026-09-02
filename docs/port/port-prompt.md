@@ -1848,6 +1848,52 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   Internal content and never crosses. Rename your own directory if you hold one;
   do not take the producer's six transcripts.
 
+- **RELAY-22 — YOUR +83 ON SLICE E IS NOT A PORT PROBLEM, IT IS A RENDER STEP; AND THE
+  MANIFEST WAS TELLING YOU TO TAKE ARTIFACTS YOU SHOULD REGENERATE** (new 2026-09-02;
+  from your own D+E attribution, which was right).
+  `[VERIFIED-PRODUCER]` for the manifest defect and the renderer list; `[SME-REPORTED]`
+  for the failure counts.
+  **YOUR ATTRIBUTION IS RIGHT.** The +83 concentrates in E's newly-added tests asserting
+  that generated artifacts exist — `web/src/generated/world-*.json` and the vendored
+  `external/geo/world-atlas/countries-110m.json`. The failures are missing ARTIFACTS,
+  not broken code. Your recommendation — **commit D alone, hold E for F+G** — is the
+  right call, and the producer agrees with it and with your reason (J31: D's
+  `cli.py` surgical merge and `validate_fact_rows` are the hard-won parts; protect them).
+  **BUT THE MANIFEST HAD A DEFECT THAT WOULD HAVE MADE F+G WRONG TOO.**
+  `web/src/generated/**` had **no row** and fell through to `web/**`
+  canonical-producer — so the manifest told you to `git checkout` producer's generated
+  JSON. Fixed 2026-09-02: it is now **`derived`**, the same row shape `docs/plan/*.html`
+  already has. **Regenerate, never carry (J43).** Every file there is written by a
+  `scripts/render_*.py` renderer from committed sources and has a drift guard asserting
+  the committed copy matches a fresh render. A carried copy would make those tests pass
+  while reflecting PRODUCER's gates, load-map and software registry rather than yours —
+  a passing suite describing the wrong estate, which is the worst outcome available.
+  **SO F+G IS TWO DIFFERENT KINDS OF STEP, and the order matters:**
+  1. **F — take the SOURCES.** `external/geo/world-atlas/countries-110m.json` is a
+     vendored asset (default_ok, clean-add). The config, taxonomy and registry rows
+     your E tests read are per-entry or canonical-producer per the manifest.
+  2. **G — RUN the renderers, do not port their outputs.** You already pulled
+     `render_world_map.py`, `render_remediation_profile.py` and
+     `set_console_credential.py` forward as subjects. Add `render_board.py` (it writes
+     `gates.json`, `enforcement-matrix.json` and `load-map.json` in one run) and run
+     `python scripts/render_board.py` plus the others. The drift guards then pass on
+     YOUR sources, which is what they are for.
+  **YOUR TWO UNTRACED CLUSTERS, traced here:** `test_env_doctor` (13) reads
+  `render_env_example.py` and `.env.example`, and `.env.example` is itself a RENDER of
+  `DECLARED_VARIABLES` (G129) — so it clears by running `render_env_example.py` after
+  `env_refs.py` merges, not by porting the file. `test_query_specs` (6) reads
+  `drydocs_api/query_specs.py` (default_ok), which you pulled forward in the sibling
+  sweep; if it still fails after that, it is a QuerySpec registry content difference
+  and yours to reconcile, not an artifact gap. **Both are render-or-merge shaped, not
+  port-shaped — consistent with your "+83 clears at G" hypothesis, and still a
+  hypothesis until you run it, as you said.**
+  **ONE THING TO CARRY INTO D'S COMMIT MESSAGE:** your slicing has now failed to be
+  closed under dependency three times (config→core, tests→scripts, tests→renders), each
+  caught before a commit. That is the argument for the disposition-led apply in J69
+  rather than directory-led slices — a `derived` class is worked LAST by construction
+  because it is regenerated from everything before it. Worth saying in the record so the
+  next apply starts from classes, not directories.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has

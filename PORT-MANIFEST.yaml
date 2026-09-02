@@ -683,6 +683,25 @@ rows:
   - path: ".claude/**"
     disposition: canonical-producer
     note: "agents + skills are producer-maintained tooling; consumer-local skills live under other names"
+  - path: "web/src/generated/**"
+    disposition: derived
+    note: >
+      Every file here is written by a scripts/render_*.py renderer from committed
+      sources (render_board.py refreshes gates.json, enforcement-matrix.json and
+      load-map.json in one run; render_world_map.py, render_gazetteer.py,
+      render_context_types.py, render_software_registry.py, render_remediation_*.py
+      the rest), and each has a drift guard asserting the committed copy matches a
+      fresh render. REGENERATE, NEVER CARRY — the J43 rule, and the same row shape
+      docs/plan/*.html already has. J68-family omission, found 2026-09-02 when the
+      company's slice-E apply hit +83 failures on tests asserting these artifacts
+      exist: the directory had NO row and fell through to web/** canonical-producer,
+      which told the consumer to TAKE producer's generated JSON. That is wrong twice
+      over — the tests want the artifact to exist, not to match producer's, and a
+      carried copy reflects PRODUCER's gates/load-map/registry rather than the
+      consumer's own sources. Run the renderers after their sources land; the guards
+      then pass on the consumer's own truth. Third instance of a file class sitting
+      under a default it does not belong to (dev-environment.yaml 2026-07-28,
+      source-registry.yaml 2026-09-01, this).
   - path: "web/**"
     disposition: canonical-producer
     note: "drydocs-web module (JS/TS, Epic O; step 31) — node_modules/dist gitignored; .env.example only, VITE_* values NEVER committed (Vite inlines them into the bundle)"
