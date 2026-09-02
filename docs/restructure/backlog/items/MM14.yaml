@@ -1,0 +1,24 @@
+id: MM14
+epic: mind-map
+title: Load the mind-map research logs and their probe ledger into a throwaway Neo4j database, apply the
+  registered ontology, and run the knowledge-graph-of-thoughts retry loop over it to see where a traversal
+  stalls
+type: task
+module: drydocs-deepdoc
+phase: 17
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on:
+- MM3
+inputs:
+- internal/research/JOB-MFTS-MM-research.md
+- internal/research/mm-aar-research.md
+- reference/research/knowledge-graph-of-thoughts.md
+- drydocs_core/ontology/relationship_vocabulary/
+- docs/design/deepdoc-data-flow-overview.md
+acceptance: |
+  STUB - body lands in the follow-up commit of this same groom (I6: the stub carries the final title, the body follows).
+notes: |
+  Minted 2026-09-02 (desktop, backlog-groomer fork). Stub per I6; body in the next commit.

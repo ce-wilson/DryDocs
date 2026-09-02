@@ -1,0 +1,21 @@
+id: J75
+epic: release-infrastructure
+title: A config surface, its renderer SURFACES row and the derived artifact it feeds are one coupling
+  - a port slice that carries only part of the triple makes the derived file unproducible
+type: chore
+module: docs
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- PORT-MANIFEST.yaml
+- docs/port/port-prompt.md
+- scripts/render_enforcement_matrix.py
+- tests/unit/test_enforcement_matrix.py
+acceptance: |
+  STUB - body lands in the follow-up commit of this same groom (I6: the stub carries the final title, the body follows).
+notes: |
+  Minted 2026-09-02 (desktop, backlog-groomer fork). Stub per I6; body in the next commit.

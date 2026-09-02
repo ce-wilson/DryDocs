@@ -1,0 +1,24 @@
+id: S16
+epic: structure-remediation
+title: The company never adopted the S8 CLI split because a manifest row can say how to merge content
+  and not how to take a new shape - make the composition root DISCOVER an optional consumer command module
+  so the two sides stop editing one file
+type: task
+module: drydocs-load
+phase: 6
+agent: main
+model: fable
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- drydocs/cli.py
+- MODULE_MAP.md
+- PORT-MANIFEST.yaml
+- tests/unit/test_cli_import_order.py
+- tests/unit/test_cli_registry.py
+- tests/unit/test_module_boundary.py
+acceptance: |
+  STUB - body lands in the follow-up commit of this same groom (I6: the stub carries the final title, the body follows).
+notes: |
+  Minted 2026-09-02 (desktop, backlog-groomer fork). Stub per I6; body in the next commit.

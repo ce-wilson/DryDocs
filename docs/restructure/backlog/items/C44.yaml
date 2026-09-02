@@ -1,0 +1,23 @@
+id: C44
+epic: ontology-mapping
+title: The MFTS route ruling now has an evidence base instead of a coin-flip - convene it at the email-dl-contact-point
+  gate, with route identity and the two-leg reading as its own clauses
+type: task
+module: ontology
+phase: 2
+agent: ontology-mapper
+model: fable
+priority: p1
+status: todo
+depends_on:
+- N27
+gates:
+- email-dl-contact-point
+inputs:
+- config/gate-prompts/email-dl-contact-point.yaml
+- internal/research/JOB-MFTS-MM-research.md
+- docs/restructure/03-hitl-sme-flow.md
+acceptance: |
+  STUB - body lands in the follow-up commit of this same groom (I6: the stub carries the final title, the body follows).
+notes: |
+  Minted 2026-09-02 (desktop, backlog-groomer fork). Stub per I6; body in the next commit.

@@ -1,0 +1,20 @@
+id: J74
+epic: release-infrastructure
+title: The publish boundary is defined on the tracked tree and is silent about git history - 34 commit
+  messages carry the retired org acronym and no guard can see them
+type: task
+module: config
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- PUBLISH-BOUNDARY.md
+- tests/unit/test_publish_boundary_retired_org_acronym.py
+- internal/cdo-reference/README.md
+acceptance: |
+  STUB - body lands in the follow-up commit of this same groom (I6: the stub carries the final title, the body follows).
+notes: |
+  Minted 2026-09-02 (desktop, backlog-groomer fork). Stub per I6; body in the next commit.

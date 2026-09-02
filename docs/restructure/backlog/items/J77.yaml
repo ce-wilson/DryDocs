@@ -1,0 +1,19 @@
+id: J77
+epic: release-infrastructure
+title: A branch tip can be green while commits inside it were red at push, so a bisect through the range
+  fails on a ledger guard rather than the defect - have the roll say which commits were red
+type: chore
+module: docs
+phase: 8
+agent: main
+model: haiku
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- docs/port/port-prompt.md
+- CLAUDE.md
+acceptance: |
+  STUB - body lands in the follow-up commit of this same groom (I6: the stub carries the final title, the body follows).
+notes: |
+  Minted 2026-09-02 (desktop, backlog-groomer fork). Stub per I6; body in the next commit.

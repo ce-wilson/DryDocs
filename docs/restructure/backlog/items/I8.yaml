@@ -1,0 +1,19 @@
+id: I8
+epic: project-board
+title: An item acceptance can be overtaken by its own dependency growing, and nothing notices - report
+  dependency currency as a warning at groom time, never as a gate
+type: chore
+module: drydocs-plan
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- .claude/skills/groom-backlog/validate.py
+- tests/unit/test_backlog.py
+acceptance: |
+  STUB - body lands in the follow-up commit of this same groom (I6: the stub carries the final title, the body follows).
+notes: |
+  Minted 2026-09-02 (desktop, backlog-groomer fork). Stub per I6; body in the next commit.

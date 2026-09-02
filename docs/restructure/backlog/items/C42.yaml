@@ -1,0 +1,23 @@
+id: C42
+epic: ontology-mapping
+title: C30 retired the watcher route tokens and pointed them at FTS_ID plus REC_ID, so the file-transfer
+  strategy has no conformant place to record a route id - amend the signed standard through the revisit
+  axis
+type: task
+module: config
+phase: 5
+agent: main
+model: fable
+priority: p1
+status: todo
+depends_on:
+- C40
+inputs:
+- config/gate-log.md
+- config/gate-prompts/
+- internal/research/JOB-MFTS-MM-research.md
+- drydocs_core/description_tokens.py
+acceptance: |
+  STUB - body lands in the follow-up commit of this same groom (I6: the stub carries the final title, the body follows).
+notes: |
+  Minted 2026-09-02 (desktop, backlog-groomer fork). Stub per I6; body in the next commit.

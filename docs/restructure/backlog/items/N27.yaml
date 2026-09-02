@@ -1,0 +1,19 @@
+id: N27
+epic: source-column-mappings
+title: Control-M cannot be the source of record for a relationship whose other end is unregistered - register
+  the three file-transfer platforms as systems with a classification and an owner
+type: task
+module: config
+phase: 11
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- config/source-registry.yaml
+- internal/research/JOB-MFTS-MM-research.md
+acceptance: |
+  STUB - body lands in the follow-up commit of this same groom (I6: the stub carries the final title, the body follows).
+notes: |
+  Minted 2026-09-02 (desktop, backlog-groomer fork). Stub per I6; body in the next commit.

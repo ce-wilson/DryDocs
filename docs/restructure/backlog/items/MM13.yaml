@@ -1,0 +1,21 @@
+id: MM13
+epic: mind-map
+title: The data-flow-overview gate prompt names MM3 nine times for work that is MM7 - the item numbers
+  moved at a groom after the prompt was drafted and nothing re-pointed it
+type: chore
+module: config
+phase: 17
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+gates:
+- data-flow-overview
+inputs:
+- config/gate-prompts/data-flow-overview.yaml
+- PORT-MANIFEST.yaml
+acceptance: |
+  STUB - body lands in the follow-up commit of this same groom (I6: the stub carries the final title, the body follows).
+notes: |
+  Minted 2026-09-02 (desktop, backlog-groomer fork). Stub per I6; body in the next commit.

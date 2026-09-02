@@ -1,0 +1,20 @@
+id: N28
+epic: source-column-mappings
+title: A manifest records how much a source is trusted and never how the bytes were obtained - add a declared
+  capture rung beside the trust axis, with no unlabeled default
+type: task
+module: config
+phase: 11
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- config/source-registry.yaml
+- config/classification.yaml
+- PUBLISH-BOUNDARY.md
+acceptance: |
+  STUB - body lands in the follow-up commit of this same groom (I6: the stub carries the final title, the body follows).
+notes: |
+  Minted 2026-09-02 (desktop, backlog-groomer fork). Stub per I6; body in the next commit.

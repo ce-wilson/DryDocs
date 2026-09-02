@@ -1,0 +1,19 @@
+id: C43
+epic: ontology-mapping
+title: The software registry does not know mfts or axway because internal branding erased the vendor from
+  every documentation surface - record the platform with its vendor the way controlm carries bmc
+type: task
+module: taxonomy
+phase: 2
+agent: taxonomy-importer
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- config/taxonomy/software-registry.yaml
+- internal/research/JOB-MFTS-MM-research.md
+acceptance: |
+  STUB - body lands in the follow-up commit of this same groom (I6: the stub carries the final title, the body follows).
+notes: |
+  Minted 2026-09-02 (desktop, backlog-groomer fork). Stub per I6; body in the next commit.

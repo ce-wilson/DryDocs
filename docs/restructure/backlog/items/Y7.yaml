@@ -1,0 +1,22 @@
+id: Y7
+epic: backlog-sharding
+title: An item can be held by an annotation while the ready list still calls it ready, because next_ready
+  is computed from depends_on alone - bless a hold field and render it as HELD
+type: bug
+module: drydocs-plan
+phase: 8
+agent: main
+model: fable
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- docs/restructure/backlog/items/O26.yaml
+- .claude/skills/groom-backlog/validate.py
+- scripts/render_board.py
+- tests/unit/test_backlog.py
+- docs/adr/0013-backlog-sharding.md
+acceptance: |
+  STUB - body lands in the follow-up commit of this same groom (I6: the stub carries the final title, the body follows).
+notes: |
+  Minted 2026-09-02 (desktop, backlog-groomer fork). Stub per I6; body in the next commit.
