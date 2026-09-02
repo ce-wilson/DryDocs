@@ -13,7 +13,44 @@ depends_on:
 gates:
 - ontology-domain-registry-and-edition-grain
 inputs:
+- .claude/skills/groom-backlog/validate.py
+- tests/unit/test_backlog.py
+- drydocs_core/backlog_store.py
+- git-readme.md
+- CLAUDE.md
+- .claude/skills/groom-backlog/SKILL.md
 - config/gate-prompts/ontology-domain-registry-and-edition-grain.yaml
 - config/gate-log.md
 acceptance: |
-  STUB - minted 2026-09-02 under PLAN1 from gate ontology-domain-registry-and-edition-grain SIGNED OFF 14/14 (E1); body follows.
+  Gate ontology-domain-registry-and-edition-grain §C1 + §C4 (SIGNED OFF 2026-09-02). PLAN1 made the series the module; this adds the
+  OPTIONAL edition segment in front of it and retires the two numeric partition rules.
+
+  (a) GRAMMAR: `[<EDITION>-]<MODULE><n>`, edition first, base edition unprefixed. `LOAD12` is
+  producer main; `<code>-LOAD12` is that edition's twelfth load item. Three regexes gain one
+  optional group: validate.py :67 and :68 (id and filename), backlog_store.py `_ID_RE`. Every
+  existing id parses unchanged - the round-trip guard over all 630+ ids is the first test
+  written.
+
+  (b) BOTH HALVES DECLARED: an edition segment must be a `code` in editions.yaml (CFG2) and a
+  module code must be in modules.yaml `series`; an undeclared edition is a typo, not a tenant,
+  and fails; an undeclared module code fails as it does today. `--next-id --module <m>
+  --edition <code>` mints in that edition; without `--edition` the base.
+
+  (c) RETIRE BOTH PARTITION RULES, FORWARD-ONLY: the DD reserve (git-readme.md:197,
+  2026-07-20) and the 10000 band (PRODUCER_BAND_CEILING, 2026-08-18). Neither governs a new
+  mint. DD1-DD10, DD10001-DD10003 and G10001-G10003 stay readable and stay in the frozen
+  table; the band check in the allocator becomes the edition-segment check of (b); the
+  git-readme sentence is retired with a pointer to the gate record; RESERVED_SERIES keeps DD
+  refused (it is frozen, like the letters). CLAUDE.md's mint rule and the skill gain the
+  `--edition` case.
+
+  (d) UNTIL THE COMPANY MINTS ITS EDITION CODE IT MINTS NOTHING NEW - and the allocator's
+  refusal message for a band-shaped or DD id says exactly that, naming CFG2's file. Acceptable
+  only because the code is one row and one push away (§C4).
+
+  (e) GUARDS in test_backlog.py: round-trip over every current id; edition present =>
+  declared; module code present => declared; a base item never carries a segment; the
+  allocator refuses an undeclared edition, a DD id, and a band-shaped number, each naming the
+  replacement.
+
+  Depends on CFG2 (the edition registry the segment validates against).

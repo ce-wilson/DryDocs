@@ -8,7 +8,7 @@ phase: 2
 agent: main
 model: fable
 priority: p2
-status: blocked
+status: done
 depends_on: []
 gates:
 - ontology-domain-registry-and-edition-grain
@@ -120,3 +120,9 @@ notes: |
 
   RELATED: J71 made the per-entry merge rules total, which is the same disease (a rule with a hole)
   one layer down. Idea-162 records the DD-band collision this closes.
+  DONE 2026-09-02 (desktop) per gate ontology-domain-registry-and-edition-grain E1: the item
+  closes on the MINT, not the build. Gate SIGNED OFF 14/14 the same day (config/gate-log.md,
+  last entry); the seven E1 items plus ONT2 from the B5 rider are minted by module code -
+  CFG1 CFG2 PLAN2 DOC1 DOC2 REF1 ONT1 ONT2 - each carrying this gate in `gates:`. The
+  item-series half was closed earlier the same day by PLAN1. What C41 still names that no
+  item builds: nothing - clause (a) is CFG1, (d) is CFG2+PLAN2, (e) is the gate record.

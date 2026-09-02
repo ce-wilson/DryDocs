@@ -74,20 +74,20 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 .capture-status{font-size:.78rem;color:#166534;margin:.3rem 0 0;min-height:1.1em}</style>
 </head><body>
 <h1>DryDocs — project board</h1>
-<p class="subtitle">Rendered from <code>docs/restructure/backlog/</code> 637 items &middot; 145 todo / 7 in progress / 3 blocked / 482 done. The repo is the system of record; this page is a working aid.</p>
+<p class="subtitle">Rendered from <code>docs/restructure/backlog/</code> 638 items &middot; 146 todo / 6 in progress / 2 blocked / 484 done. The repo is the system of record; this page is a working aid.</p>
 <p class="subtitle">Location: <code id="board-url"></code> <button type="button" id="board-url-copy">copy</button></p>
 <script>document.getElementById('board-url').textContent=window.location.href;document.getElementById('board-url-copy').onclick=function(){navigator.clipboard.writeText(window.location.href);};</script>
 <p class="subtitle"><a class="capture-link" href="roadmap.html">Module roadmap &rarr;</a> <a class="capture-link" href="ideas.html">Idea inbox &rarr;</a></p>
 <div class="roadmap">
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P0</span><span class="status-badge status-done">done</span></div><h3>Restructure scaffolding</h3><p class="goal">Four-layer model, external/internal split, config layer, publish boundary, sub-agents.</p><div class="progress"><div class="progress-bar" style="width:100%"></div></div><p class="progress-text">4 / 4</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P1</span><span class="status-badge status-done">done</span></div><h3>Taxonomy capture</h3><p class="goal">Live sources captured in config/taxonomy/ as pure classification (Epic B).</p><div class="progress"><div class="progress-bar" style="width:100%"></div></div><p class="progress-text">6 / 6</p></div>
-<div class="phase-card"><div class="phase-head"><span class="phase-id">P2</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Ontology mapping + HITL</h3><p class="goal">Every graph edge traces to an SME-confirmed taxonomy→ontology mapping (Epic C).</p><div class="progress"><div class="progress-bar" style="width:79%"></div></div><p class="progress-text">42 / 53</p></div>
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P2</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Ontology mapping + HITL</h3><p class="goal">Every graph edge traces to an SME-confirmed taxonomy→ontology mapping (Epic C).</p><div class="progress"><div class="progress-bar" style="width:80%"></div></div><p class="progress-text">43 / 54</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P3</span><span class="status-badge status-done">done</span></div><h3>Config-driven loaders</h3><p class="goal">Precedence + source gating read config/, not hardcoded logic (Epic D).</p><div class="progress"><div class="progress-bar" style="width:82%"></div></div><p class="progress-text">9 / 11</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P4</span><span class="status-badge status-todo">todo</span></div><h3>Context graph pilot</h3><p class="goal">SOSA/SSN observation modeling answers one live support question (Epic E).</p><div class="progress"><div class="progress-bar" style="width:0%"></div></div><p class="progress-text">0 / 2</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P5</span><span class="status-badge status-todo">todo</span></div><h3>Orchestrator expansion</h3><p class="goal">AutoSys + Airflow land as BMC-baseline concepts via confirmed crosswalks (Epic F).</p><div class="progress"><div class="progress-bar" style="width:40%"></div></div><p class="progress-text">2 / 5</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P6</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Modular architecture / component topology</h3><p class="goal">ADR 0002 — core extraction, multi-DB topology, component packages (Epic G).</p><div class="progress"><div class="progress-bar" style="width:83%"></div></div><p class="progress-text">118 / 142</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P7</span><span class="status-badge status-done">done</span></div><h3>Review toolkit back-flow</h3><p class="goal">Company SME-review/HITL toolkit reproduced generically, offline (Epic H).</p><div class="progress"><div class="progress-bar" style="width:88%"></div></div><p class="progress-text">7 / 8</p></div>
-<div class="phase-card"><div class="phase-head"><span class="phase-id">P8</span><span class="status-badge status-in_progress">in_progress</span><span class="release">v0.3.0</span></div><h3>Planning &amp; release infrastructure</h3><p class="goal">Repo-native project board + capture loop; groundwork for versioned releases (Epic I).</p><div class="progress"><div class="progress-bar" style="width:70%"></div></div><p class="progress-text">68 / 97</p></div>
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P8</span><span class="status-badge status-in_progress">in_progress</span><span class="release">v0.3.0</span></div><h3>Planning &amp; release infrastructure</h3><p class="goal">Repo-native project board + capture loop; groundwork for versioned releases (Epic I).</p><div class="progress"><div class="progress-bar" style="width:71%"></div></div><p class="progress-text">69 / 97</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P9</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Application attribution</h3><p class="goal">Jobs attributed to SEAL applications (seal_app_ref) end-to-end — gate-confirmed match policy, loader, verify coverage (Epic K).</p><div class="progress"><div class="progress-bar" style="width:87%"></div></div><p class="progress-text">33 / 38</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P10</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Documentation infrastructure</h3><p class="goal">Every design doc (TDD/Runbook/BRD) conforms to a canonical outline; deterministic md→HTML/PDF render; HITL markup loop (digital + pen/paper) re-attaches to a requirement-traceability backbone (Epic L).</p><div class="progress"><div class="progress-bar" style="width:73%"></div></div><p class="progress-text">30 / 41</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P11</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Source governance ledgers</h3><p class="goal">Per-source governance as test-enforced config: audit envelope + edge diet (doc 06, Epic M) and column-mapping ledgers (doc 08, Epic N); property-term bindings via the gate.</p><div class="progress"><div class="progress-bar" style="width:58%"></div></div><p class="progress-text">19 / 33</p></div>
@@ -179,7 +179,33 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
   <button type="button" id="f-clear">Clear filters</button>
 </div>
 <div class="board">
-<div class="column" data-status="todo"><div class="column-head"><h2>To do</h2><span class="count" data-count-for="todo">145</span></div><div class="column-body"><div class="card ready" id="card-REF1" data-id="REF1" data-module="reference" data-phase="2" data-epic="reference-hygiene" data-type="task" data-status="todo" data-search="ref1 register spec-kit and the spec-driven-development write-up as external reference - the precedent the code/requirements split cites" tabindex="0"><div class="card-head"><span class="card-id">REF1</span><span class="card-title">Register spec-kit and the spec-driven-development write-up as External reference - the precedent the code/requirements split cites</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> STUB - minted 2026-09-02 under PLAN1 from gate ontology-domain-registry-and-edition-grain SIGNED OFF 14/14 (E1); body follows.
+<div class="column" data-status="todo"><div class="column-head"><h2>To do</h2><span class="count" data-count-for="todo">146</span></div><div class="column-body"><div class="card ready" id="card-REF1" data-id="REF1" data-module="reference" data-phase="2" data-epic="reference-hygiene" data-type="task" data-status="todo" data-search="ref1 register spec-kit and the spec-driven-development write-up as external reference - the precedent the code/requirements split cites" tabindex="0"><div class="card-head"><span class="card-id">REF1</span><span class="card-title">Register spec-kit and the spec-driven-development write-up as External reference - the precedent the code/requirements split cites</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Gate ontology-domain-registry-and-edition-grain §B4 (SIGNED OFF 2026-09-02, &quot;split now&quot;): the split proceeds on the 2018 FCD
+evidence and the reference is registered BEHIND it, not before it. This tree has never heard
+of spec-driven development - a case-insensitive grep for spec-kit or spec-driven is empty
+across every .md, .yaml and .py - and ONT1&#x27;s proposal cites it, so it must exist as a
+citable source.
+
+(a) reference-librarian task. Two entries in reference/REGISTRY.yaml, classification
+External, each with source_url, captured_at and trust tier:
+https://github.com/github/spec-kit - the toolkit: phases Constitution / Specify / Plan /
+Tasks / Implement / CONVERGE; commands /speckit.specify, /speckit.plan, /speckit.tasks,
+/speckit.converge.
+https://www.thebcms.com/blog/spec-driven-development/ - the methodology: spec as primary
+artifact, code as regenerable output, EARS-notation acceptance criteria, per-task
+verification against those criteria.
+
+(b) A write-up at reference/research/spec-driven-development.md, GROUNDED tier: what the
+method is, and THE FINDING ONT1 rests on - spec-kit has NO formal traceability matrix; its
+requirement-to-code linkage is implicit parent-child through sequential phases, which is
+precisely the gap a graph closes and the argument for a typed edge rather than two labels
+side by side. Two DryDocs surfaces that are already converge-shaped are named:
+drydocs_core/docs_verify.py / drydocs/docs_coverage.py, and ADR 0015 D1&#x27;s completeness
+ledger.
+
+(c) reference/research/README.md index line; config/classification.yaml entry; the
+publish-boundary guards green (External, publishable).
+
+No code. ONT1 depends on this.
 </p></div></div>
 <div class="card ready" id="card-C35" data-id="C35" data-module="ontology" data-phase="2" data-epic="ontology-mapping" data-type="task" data-status="todo" data-search="c35 run the business-layer org-structure gate: segment org class, reorg reification, one dating idiom" tabindex="0"><div class="card-head"><span class="card-id">C35</span><span class="card-title">Run the business-layer org-structure gate: segment ORG class, reorg reification, one dating idiom</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">ontology-mapping</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C28" data-target="card-C28">C28</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> A sign-off session for gate `business-layer-org-structure` is HELD and its outcome recorded in
 config/gate-log.md as SIGNED, SME-DEFERRED with a named re-arm trigger, or
@@ -505,7 +531,46 @@ field in MFTS&#x27;s truth BEFORE anything is written is correct sequencing, not
 NOT IN THIS ITEM: F-1 (a Control-M QR for jobs using MFTS 6) is company-band Idea-10021 and
 stays theirs. Related: C29, C30, C42, N27, G64, MM7, Idea-104, Idea-236.
 </p></div></div>
-<div class="card ready" id="card-CFG1" data-id="CFG1" data-module="config" data-phase="2" data-epic="ontology-mapping" data-type="task" data-status="todo" data-search="cfg1 the domain registry as data - config/taxonomy/domains.yaml, one row per domain with its authority, vocabulary_fragment required, the header comment becomes a pointer" tabindex="0"><div class="card-head"><span class="card-id">CFG1</span><span class="card-title">The domain registry as data - config/taxonomy/domains.yaml, one row per domain with its authority, vocabulary_fragment REQUIRED, the header comment becomes a pointer</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">ontology-mapping</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> STUB - minted 2026-09-02 under PLAN1 from gate ontology-domain-registry-and-edition-grain SIGNED OFF 14/14 (E1); body follows.
+<div class="card ready" id="card-CFG1" data-id="CFG1" data-module="config" data-phase="2" data-epic="ontology-mapping" data-type="task" data-status="todo" data-search="cfg1 the domain registry as data - config/taxonomy/domains.yaml, one row per domain with its authority, vocabulary_fragment required, the header comment becomes a pointer" tabindex="0"><div class="card-head"><span class="card-id">CFG1</span><span class="card-title">The domain registry as data - config/taxonomy/domains.yaml, one row per domain with its authority, vocabulary_fragment REQUIRED, the header comment becomes a pointer</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">ontology-mapping</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Gate ontology-domain-registry-and-edition-grain §B1-§B3 (SIGNED OFF 2026-09-02). Today the 13 domains exist as a comment block in
+00-header.yaml lines 74-79 and a guard that pins the list; &quot;registered&quot; means someone edited
+the comment. This item makes the registry DATA.
+
+(a) NEW config/taxonomy/domains.yaml, schema drydocs.domains.v1, one row per domain: `id`
+(the join key, never renamed), `title`, `vocabulary_fragment` (REQUIRED per §B3 - the
+4x-local-*.yaml file; a row without one fails), `minted_by` (producer | company | &lt;edition&gt;),
+`registered_at`, `authority` (the gate or ADR that ruled it; every row cites one), `status`
+active | deprecated with `superseded_by` (the G87 shape). NO `series` column - PLAN1 gave the
+series to the module.
+
+(b) SEEDED WITH THE 13 AS THEY ARE, each citing its real ruling: eleven from
+vocabulary-domains-and-id-policy (2026-08-12), `infrastructure` from server-location-ontology
+(Z2, 2026-08-19), `human` from §A3 of the 08-12 gate. Nothing invented; the file writes down
+rulings that exist. Fragment entry counts at mint: scheduler 53, business_application 10,
+catalog 16, architecture 24, registry 4, docs 20, all 2, context 8, quality 8, corporate 5,
+itsm 2, infrastructure 3, human 20.
+
+(c) THE HEADER BECOMES A POINTER: 00-header.yaml&#x27;s domain block says &quot;see
+config/taxonomy/domains.yaml&quot; and the guard that pinned the closed list reads the file
+instead (J37: the importable object, never the comment). A domain named in any fragment
+entry must exist in the registry, active; a registry row&#x27;s fragment must exist on disk.
+
+(d) PORT: a per-entry manifest row on the tom-role-vocabulary pattern (PORT-MANIFEST.yaml:685
+precedent) - rows union by id, each base&#x27;s own mints stay, the header/schema/field list
+crosses whole. UNNAMED FIELDS clause per J71.
+
+(e) THE ONTOLOGY IS COMMON AND BASE-OWNED (SME rider, 2026-09-02): the declared ontology sits
+at the base of everything so aggregate roll-up and cross-edition query work against ONE
+vocabulary; an edition may EXTEND it (its own rows, minted_by = the edition, authority = its
+gate) and never override a base row. The registry carries that as a guard: an edition row
+may not reuse a base id, and a base row is never deprecated by an edition.
+
+(f) What this item does NOT do: mint any domain (ONT1 and ONT2 do the first three), define
+a mint command (a domain is minted by a gate record plus a row; the allocator question is
+name collision across remote refs and history, which `validate.py` already answers for ids
+and can answer for a name - add `--check-domain &lt;id&gt;` only if ONT1 needs it).
+
+tests/unit green; classification of the new file = Internal-Public (mechanism, no values);
+render clean.
 </p></div></div>
 <div class="card ready" id="card-G100" data-id="G100" data-module="ontology" data-phase="6" data-epic="ontology-mapping" data-type="task" data-status="todo" data-search="g100 itsm technician-group gate: ratify the snowrole register (seng / asup) and the servicenow staffing attribution, then build the ootb lookup" tabindex="0"><div class="card-head"><span class="card-id">G100</span><span class="card-title">ITSM technician-group gate: ratify the SnowRole register (SENG / ASUP) and the ServiceNow staffing attribution, then build the OOTB lookup</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">opus / ontology-mapper</span></div><div class="epic">ontology-mapping</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The vocabulary half LANDED 2026-08-18 on SME direction (G100 registration commit): :ServiceNowGroup + :SnowRole node classes, itsm_group_qualified_attribution and itsm_attribution_had_role, all status: planned, in a new `itsm` domain. This item is the GATE that ratifies them plus the build behind it. (a) RATIFY THE REGISTER as a closed set on the K5 fixed-scheme precedent: SME direction is developers -&gt; SENG, production support -&gt; ASUP. Rule whether those two are the whole set or a seed, and whether the tier numbering that pairs with them in the estate&#x27;s group naming is modelled at all producer-side (it is deliberately NOT asserted today). (b) CONFIRM THE ONE-BACKBONE RULING: technicians resolve to :Employee on the SID, NOT to a second person class. The company model reaches people through :Worker {sid}; the producer does not mint that. This is what makes &quot;which roles does this person hold across PAT, SEAL and ITSM&quot; one traversal instead of three. (c) THE HAS_AGENT HOP IS REUSED, never twinned (C8 refuses duplicate (from,label,to); schema_graph.py raises). Confirm rather than re-derive. (d) FENCE HOLDS: the group -&gt; application link (SUPPORTED_BY / HAS_SUPPORT_QUEUE / RESOLVED_BY) belongs to the company&#x27;s SIGNED snow-hpsm-queue-to-group gate. This family models WHO STAFFS A GROUP only. Do not re-mint a competing group-&gt;app shape — the trap G98 named when it warned G35 off the same thing. (e) THE BUILD, after sign-off: an OOTB lookup over sys_user_group / sys_user_grmember / sys_user (no custom table), resolving members to :Employee by SID and emitting the attribution triple. Entries flip planned -&gt; active WITH their supplement in the same change (flips-are-follow-ups). Nothing loads before sign-off; SnowRole concepts stay proposed.
 </p><p class="notes"><strong>Notes:</strong> EVIDENCE FOR THE GATE, CAPTURED 2026-08-31/09-01 (venue named per J18: ServiceNow via the
@@ -543,7 +608,41 @@ by a backlog item has a prompt; wiring this one means drafting that prompt, whic
 unit of work and is NOT done here.
 SOURCE NOTE 2026-08-18 (SME), and it changes what clause (e) builds against: the ServiceNow extracts are being re-sourced INTERNALLY from hand-pulled CSV/YAML onto SQL over the Snowflake replica views. So the lookup here targets the SOURCED feed — snow@[db].[schema].&lt;servicenow_table&gt; per the grammar the `snow` system row already rules — not a CSV shape that is being retired underneath it. Name the dataset for the ServiceNow TABLE, never the V_-prefixed view wrapper (same row). Row models do not move; the SQL aliases columns onto existing field names. Full note: Idea-132, which also carries the two NET-NEW areas (per-CI TOM responsibilities, incidents) that are NOT part of this gate and need their own. Raised 2026-08-18 alongside the registration, at the G91 close. FOURTH family on the qualified-attribution pattern (SEAL K4, PAT products K5, PAT dev teams G91, ITSM here) — the shape is settled, so this gate rules the REGISTER and the identity join, not the modelling pattern. The SME&#x27;s stated use case is a support team reaching applications through PEOPLE (members holding an operate-manager role) rather than through a develops edge, which is why the single :Employee backbone is the load-bearing part.
 </p></div></div>
-<div class="card" id="card-ONT1" data-id="ONT1" data-module="ontology" data-phase="2" data-epic="ontology-mapping" data-type="requirement" data-status="todo" data-search="ont1 mint code and requirements as domains through the g87 shape and register the requirement-to-code reconciliation edge as planned - the 2018 join, traversable" tabindex="0"><div class="card-head"><span class="card-id">ONT1</span><span class="card-title">Mint code and requirements as domains through the G87 shape and register the Requirement-to-Code reconciliation edge as planned - the 2018 join, traversable</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">requirement</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">ontology-mapping</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-CFG1" data-target="card-CFG1">CFG1</a> <a class="dep-link" href="#card-REF1" data-target="card-REF1">REF1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> STUB - minted 2026-09-02 under PLAN1 from gate ontology-domain-registry-and-edition-grain SIGNED OFF 14/14 (E1); body follows.
+<div class="card" id="card-ONT1" data-id="ONT1" data-module="ontology" data-phase="2" data-epic="ontology-mapping" data-type="requirement" data-status="todo" data-search="ont1 mint code and requirements as domains through the g87 shape and register the requirement-to-code reconciliation edge as planned - the 2018 join, traversable" tabindex="0"><div class="card-head"><span class="card-id">ONT1</span><span class="card-title">Mint code and requirements as domains through the G87 shape and register the Requirement-to-Code reconciliation edge as planned - the 2018 join, traversable</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">requirement</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">ontology-mapping</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-CFG1" data-target="card-CFG1">CFG1</a> <a class="dep-link" href="#card-REF1" data-target="card-REF1">REF1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Gate ontology-domain-registry-and-edition-grain §B4 (SIGNED OFF 2026-09-02: SPLIT NOW). The 2018 thesis (FCD-Requirements.md:27,
+:106) is requirements, code and test cases as SEPARATE things joined by a query. Today code
+is a facet of `architecture` (24 entries; :Code is dd:Code / prov:Collection, :Bitbucket is
+dd:CodeRepository) and requirements have no label and sit in `docs` (20 entries) - the join
+the product exists to make spans two domains that declare nothing to each other. This item
+is the first exercise of the §B2 mint protocol.
+
+(a) MINT TWO DOMAINS - `code` and `requirements` - as rows in domains.yaml (CFG1), each with
+its fragment file (53-local-code.yaml, 54-local-requirements.yaml), authority = this gate&#x27;s
+record, minted_by = producer. Whether `test` is a third domain is PROPOSED here with the
+evidence for and against and ruled at the gate in (d); it is not minted by default.
+
+(b) THE G87 SHAPE, NO ENTRY MOVES: every `architecture` entry that is about code, and every
+`docs` entry that is about a requirement, is ADDED to the new fragment under a domain-derived
+id with `replaces:` naming the old id, and the old entry is DEPRECATED (status, deprecated_at,
+superseded_by) - never deleted, never renamed, because ids are join keys cited inside signed
+records. The proposal lists every candidate entry with its reason; the SME rules the
+membership. `architecture` and `docs` keep everything that is not code or a requirement.
+
+(c) THE RECONCILIATION EDGE, registered in the same change or the split reproduces spec-kit&#x27;s
+own gap (REF1): a typed relationship between :Requirement and :Code, entered through
+docs/RELATIONSHIP_GUIDE.md and the vocabulary registry as `status: planned` (the C38 replica
+edge precedent). NOT ruled here: its direction, its grain, and whether the converge VERDICT
+is a property on the edge or a separate observation - those are the questions of ITS gate.
+:Requirement is a new label and needs its ADR 0001 business-key answer before any loader.
+
+(d) A GATE PROMPT for the membership ruling and the `test` question, drafted from (a)-(c),
+with the FCD lines quoted verbatim at provenance; nothing loads until it signs. This item
+is DONE when the two domains are minted, the planned entries and the planned edge are
+registered, and the prompt is drafted - not when anything is loaded.
+
+Depends on CFG1 (the registry the rows go in) and REF1 (the precedent the proposal cites).
+Not in scope: any loader, any graph write, the semantics of the edge.
+</p></div></div>
+<div class="card" id="card-ONT2" data-id="ONT2" data-module="ontology" data-phase="2" data-epic="ontology-mapping" data-type="requirement" data-status="todo" data-search="ont2 mint acronyms as a domain with a four-tier axis - company, sdlc, technical are base-common, edition-specific resolves first - through the b2 protocol" tabindex="0"><div class="card-head"><span class="card-id">ONT2</span><span class="card-title">Mint acronyms as a domain with a four-tier axis - company, SDLC, technical are base-common, edition-specific resolves first - through the B2 protocol</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">requirement</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">ontology-mapping</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-CFG1" data-target="card-CFG1">CFG1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> STUB - minted 2026-09-02 under PLAN1 from the gate&#x27;s §B5 rider (SME, in-chat); body follows.
 </p></div></div>
 <div class="card ready" id="card-D9" data-id="D9" data-module="config" data-phase="3" data-epic="config-loaders" data-type="task" data-status="todo" data-search="d9 precedence: express the internal refines chain (vendor &lt;- platform team &lt;- support group) instead of one flat internal tier" tabindex="0"><div class="card-head"><span class="card-id">D9</span><span class="card-title">Precedence: express the internal refines chain (vendor &lt;- platform team &lt;- support group) instead of one flat internal tier</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P3</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">config-loaders</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> A proposal lands for how config/precedence.yaml expresses two internal levels (the DAT SRE platform standard refining the BMC baseline, the HLT support-group standard refining DAT) so that where the two internal standards disagree — folder grammar, position-6 meaning, whether the app code carries the SEAL — the file records which wins; the ordering decision itself routes through the HITL gate (docs/restructure/03-hitl-sme-flow.md) and precedence.yaml changes only when confirmed; the position-6 &quot;frequency = legacy&quot; claim in the publishable folder-naming standard is verified against both source standards and corrected or annotated per-standard if still wrong.
 </p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-07 from Idea-64 (SME framing: Vendor -&gt; Company/Platform team -&gt; Lower support group; both internal levels sit at precedence tier 2 today). Fable: conflict-resolution semantics. The refines: frontmatter chain in knowledge/standards is the input evidence.
@@ -1235,13 +1334,136 @@ Filed in epic project-board (module drydocs-plan, phase 8) beside I6&#x27;s allo
 Y: this is groom-time TOOLING, where Y7 is the schema and the derivation. Related: Y7, I6, G68,
 O59, Idea-140.
 </p></div></div>
-<div class="card" id="card-PLAN2" data-id="PLAN2" data-module="drydocs-plan" data-phase="8" data-epic="project-board" data-type="task" data-status="todo" data-search="plan2 the edition segment in the id grammar - [&lt;edition&gt;-]&lt;module&gt;&lt;n&gt; in three regexes, both halves declared, the band check replaced, the dd reserve and the 10000 band retired forward-only" tabindex="0"><div class="card-head"><span class="card-id">PLAN2</span><span class="card-title">The edition segment in the id grammar - [&lt;EDITION&gt;-]&lt;MODULE&gt;&lt;n&gt; in three regexes, both halves declared, the band check replaced, the DD reserve and the 10000 band retired forward-only</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-plan</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">project-board</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-CFG2" data-target="card-CFG2">CFG2</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> STUB - minted 2026-09-02 under PLAN1 from gate ontology-domain-registry-and-edition-grain SIGNED OFF 14/14 (E1); body follows.
+<div class="card" id="card-PLAN2" data-id="PLAN2" data-module="drydocs-plan" data-phase="8" data-epic="project-board" data-type="task" data-status="todo" data-search="plan2 the edition segment in the id grammar - [&lt;edition&gt;-]&lt;module&gt;&lt;n&gt; in three regexes, both halves declared, the band check replaced, the dd reserve and the 10000 band retired forward-only" tabindex="0"><div class="card-head"><span class="card-id">PLAN2</span><span class="card-title">The edition segment in the id grammar - [&lt;EDITION&gt;-]&lt;MODULE&gt;&lt;n&gt; in three regexes, both halves declared, the band check replaced, the DD reserve and the 10000 band retired forward-only</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-plan</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">project-board</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-CFG2" data-target="card-CFG2">CFG2</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Gate ontology-domain-registry-and-edition-grain §C1 + §C4 (SIGNED OFF 2026-09-02). PLAN1 made the series the module; this adds the
+OPTIONAL edition segment in front of it and retires the two numeric partition rules.
+
+(a) GRAMMAR: `[&lt;EDITION&gt;-]&lt;MODULE&gt;&lt;n&gt;`, edition first, base edition unprefixed. `LOAD12` is
+producer main; `&lt;code&gt;-LOAD12` is that edition&#x27;s twelfth load item. Three regexes gain one
+optional group: validate.py :67 and :68 (id and filename), backlog_store.py `_ID_RE`. Every
+existing id parses unchanged - the round-trip guard over all 630+ ids is the first test
+written.
+
+(b) BOTH HALVES DECLARED: an edition segment must be a `code` in editions.yaml (CFG2) and a
+module code must be in modules.yaml `series`; an undeclared edition is a typo, not a tenant,
+and fails; an undeclared module code fails as it does today. `--next-id --module &lt;m&gt;
+--edition &lt;code&gt;` mints in that edition; without `--edition` the base.
+
+(c) RETIRE BOTH PARTITION RULES, FORWARD-ONLY: the DD reserve (git-readme.md:197,
+2026-07-20) and the 10000 band (PRODUCER_BAND_CEILING, 2026-08-18). Neither governs a new
+mint. DD1-DD10, DD10001-DD10003 and G10001-G10003 stay readable and stay in the frozen
+table; the band check in the allocator becomes the edition-segment check of (b); the
+git-readme sentence is retired with a pointer to the gate record; RESERVED_SERIES keeps DD
+refused (it is frozen, like the letters). CLAUDE.md&#x27;s mint rule and the skill gain the
+`--edition` case.
+
+(d) UNTIL THE COMPANY MINTS ITS EDITION CODE IT MINTS NOTHING NEW - and the allocator&#x27;s
+refusal message for a band-shaped or DD id says exactly that, naming CFG2&#x27;s file. Acceptable
+only because the code is one row and one push away (§C4).
+
+(e) GUARDS in test_backlog.py: round-trip over every current id; edition present =&gt;
+declared; module code present =&gt; declared; a base item never carries a segment; the
+allocator refuses an undeclared edition, a DD id, and a band-shaped number, each naming the
+replacement.
+
+Depends on CFG2 (the edition registry the segment validates against).
 </p></div></div>
-<div class="card" id="card-CFG2" data-id="CFG2" data-module="config" data-phase="8" data-epic="release-infrastructure" data-type="task" data-status="todo" data-search="cfg2 the edition registry - config/taxonomy/editions.yaml keyed to area_product_id, internal with a synthetic sample, per-entry manifest row; the company base mints its own code" tabindex="0"><div class="card-head"><span class="card-id">CFG2</span><span class="card-title">The edition registry - config/taxonomy/editions.yaml keyed to area_product_id, Internal with a synthetic sample, per-entry manifest row; the company base mints its own code</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">release-infrastructure</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-CFG1" data-target="card-CFG1">CFG1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> STUB - minted 2026-09-02 under PLAN1 from gate ontology-domain-registry-and-edition-grain SIGNED OFF 14/14 (E1); body follows.
+<div class="card" id="card-CFG2" data-id="CFG2" data-module="config" data-phase="8" data-epic="release-infrastructure" data-type="task" data-status="todo" data-search="cfg2 the edition registry - config/taxonomy/editions.yaml keyed to area_product_id, internal with a synthetic sample, per-entry manifest row; the company base mints its own code" tabindex="0"><div class="card-head"><span class="card-id">CFG2</span><span class="card-title">The edition registry - config/taxonomy/editions.yaml keyed to area_product_id, Internal with a synthetic sample, per-entry manifest row; the company base mints its own code</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">release-infrastructure</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-CFG1" data-target="card-CFG1">CFG1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Gate ontology-domain-registry-and-edition-grain §C2-§C3 (SIGNED OFF 2026-09-02). The grain is the AREA PRODUCT, with the SME&#x27;s
+definition as the ruling of record: an Area Product is where two or three applications are
+delivering on the same business topic. That definition - not the Product Catalog tier name -
+is what qualifies a row.
+
+(a) NEW config/taxonomy/editions.yaml, schema drydocs.editions.v1, on the lob-product-team.yaml
+pattern exactly: classification Internal; a SYNTHETIC publishable sample producer-side (two or
+three invented editions with invented area_product_ids, clearly marked); real rows
+company-side; a per-entry manifest row so a port cannot flatten them (PORT-MANIFEST.yaml:668
+precedent), with the J71 UNNAMED FIELDS clause.
+
+(b) COLUMNS: `code` (the id segment - 2-5 uppercase letters, unique, never a module code and
+never a frozen letter), `title`, `area_product_id` (the K5 §B key; constraints.cypher:79 makes
+it UNIQUE on :AreaProduct, area_products.cypher loads it - an edition joins to a node the
+graph already holds), `minted_by`, `registered_at`, `authority`, `legacy_band` (nullable; the
+company base records 10000+ here for reading history, nothing else).
+
+(c) THE COMPANY BASE IS AN EDITION AND MINTS ITS OWN CODE at its own gate, by the §B2
+protocol. The producer does not name it; the synthetic sample must not guess it either.
+
+(d) BEFORE REAL ROWS: the Area Product list exists today only in a screenshot. Transcribe it
+to a named file under internal-local/ (machine-local, never tracked) and cite THAT file in
+the company-side rows&#x27; provenance - the image-provenance rule. Producer-side this item ships
+the sample only.
+
+(e) GUARD: every `code` is unique across editions.yaml AND absent from modules.yaml `series`
+AND absent from FROZEN_SERIES; every `area_product_id` in a real row resolves against the
+loaded :AreaProduct set when a graph is present (skip, not fail, when it is not - J18).
+
+Depends on CFG1 only for the shared file conventions; the two registries never share
+(§A2).
 </p></div></div>
-<div class="card ready" id="card-DOC1" data-id="DOC1" data-module="docs" data-phase="8" data-epic="release-infrastructure" data-type="task" data-status="todo" data-search="doc1 amend adr 0015 d2/d6 - team edition ships a thin instance-owned backlog, inbox and board; the base backlog stays canonical-template; groom-backlog ships with a mandatory --scope" tabindex="0"><div class="card-head"><span class="card-id">DOC1</span><span class="card-title">Amend ADR 0015 D2/D6 - Team Edition ships a thin instance-owned backlog, inbox and board; the base backlog stays canonical-template; groom-backlog ships with a mandatory --scope</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">release-infrastructure</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> STUB - minted 2026-09-02 under PLAN1 from gate ontology-domain-registry-and-edition-grain SIGNED OFF 14/14 (E1); body follows.
+<div class="card ready" id="card-DOC1" data-id="DOC1" data-module="docs" data-phase="8" data-epic="release-infrastructure" data-type="task" data-status="todo" data-search="doc1 amend adr 0015 d2/d6 - team edition ships a thin instance-owned backlog, inbox and board; the base backlog stays canonical-template; groom-backlog ships with a mandatory --scope" tabindex="0"><div class="card-head"><span class="card-id">DOC1</span><span class="card-title">Amend ADR 0015 D2/D6 - Team Edition ships a thin instance-owned backlog, inbox and board; the base backlog stays canonical-template; groom-backlog ships with a mandatory --scope</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">release-infrastructure</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Gate ontology-domain-registry-and-edition-grain §D1 (SIGNED OFF 2026-09-02). ADR 0015 D2 (line 119, Cut row) removes
+plan_board/plan_ideas/plan_roadmap and backlog_store from Team Edition - &quot;Plan/port/backlog
+are the producer&#x27;s own project management&quot; - and D6 follows it (groom-backlog
+producer-only). D1 of the same ADR makes the completeness ledger GENERATE per-team work,
+and generated work needs a place to land. The SME ruled: amend.
+
+(a) AMEND D2: Team Edition ships a THIN, INSTANCE-OWNED backlog - items + inbox + a
+per-instance board - under the copier `instance-owned` file class D4 already defines. The
+BASE backlog stays `canonical-template`, frozen; an instance never writes under base
+`items/`. backlog_store leaves the Cut row and joins the kept set, with a scope filter.
+
+(b) AMEND D6: `groom-backlog` ships in the template, with a MANDATORY `--scope
+&lt;edition&gt;`; the aggregate (all-editions) board is something only a base renders.
+
+(c) STRENGTHEN D4 with the SME&#x27;s 2026-09-02 rider: the declared ontology is COMMON and
+base-owned - &quot;at the base of everything&quot; - so that aggregate roll-up and cross-edition
+query run against one vocabulary; an edition extends, never overrides (CFG1 e). D4 already
+says vocabulary change happens in the base; the amendment says WHY, and names the
+aggregate query as the thing the rule protects.
+
+(d) GUARDS named in the amendment, built by their own items when TE builds: an instance
+item carries its edition segment (PLAN2); `depends_on` may point instance -&gt; base, never
+base -&gt; instance; an instance never commits an aggregate render; an edition vocabulary row
+never reuses a base id.
+
+(e) THE AMENDMENT IS A DATED SECTION under the ADR&#x27;s decisions, not an edit of D2&#x27;s original
+text - the ADR is PROPOSED, and the record of what changed and why (this gate, §D1) is the
+point. docs/decisions/README.md index line updated. Related rulings recorded in the same
+section: §C1-§C3 (the edition is a declared segment keyed to area_product_id) so the ADR&#x27;s
+D3 tenancy paragraph and the id grammar say the same thing.
+
+No code; the ADR still awaits its own Phase 0 gate (the URN shared-vs-owned question).
 </p></div></div>
-<div class="card" id="card-DOC2" data-id="DOC2" data-module="docs" data-phase="8" data-epic="release-infrastructure" data-type="task" data-status="todo" data-search="doc2 relay-23 - the frozen letters, mint by module code, the edition segment and the retired partition rules reach the company through the port-prompt" tabindex="0"><div class="card-head"><span class="card-id">DOC2</span><span class="card-title">RELAY-23 - the frozen letters, mint by module code, the edition segment and the retired partition rules reach the company through the port-prompt</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">release-infrastructure</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-PLAN2" data-target="card-PLAN2">PLAN2</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> STUB - minted 2026-09-02 under PLAN1 from gate ontology-domain-registry-and-edition-grain SIGNED OFF 14/14 (E1); body follows.
+<div class="card" id="card-DOC2" data-id="DOC2" data-module="docs" data-phase="8" data-epic="release-infrastructure" data-type="task" data-status="todo" data-search="doc2 relay-23 - the frozen letters, mint by module code, the edition segment and the retired partition rules reach the company through the port-prompt" tabindex="0"><div class="card-head"><span class="card-id">DOC2</span><span class="card-title">RELAY-23 - the frozen letters, mint by module code, the edition segment and the retired partition rules reach the company through the port-prompt</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">release-infrastructure</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-PLAN2" data-target="card-PLAN2">PLAN2</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Gate ontology-domain-registry-and-edition-grain §E1 (SIGNED OFF 2026-09-02): a cross-repo convention change is inert until it
+reaches the other side, and the company&#x27;s allocator only WORKS once it holds an edition
+code. RELAY-23 carries PLAN1 + this gate to the company through the port-prompt, in the
+roll that carries commit 375dd962 (PLAN1 mechanism) and 39b90843 (this gate).
+
+(a) THE FREEZE HALF, which can go now: the 27 letters frozen at their all-time max
+(FROZEN_SERIES, FROZEN_ON 2026-09-02; the table is the constant, quoted); `--next-id G`
+and `--next-id DD` are refused, each message naming the replacement; the series is the
+module - modules.yaml `series:` arrives canonical-producer, so they inherit the 18 codes;
+`--next-id --module &lt;m&gt;` is the command; codes are three-plus letters precisely so a
+company mint can never be confused with a frozen letter, and none is DD.
+
+(b) THE PREFIX HALF, which waits on PLAN2 landing: `[&lt;EDITION&gt;-]&lt;MODULE&gt;&lt;n&gt;`; the company
+base is an edition and MINTS ITS OWN CODE at its own gate (CFG2 §C3) - the relay names the
+file and the columns, not the code; both partition rules are retired forward-only (§C4):
+their DD1-DD10 / DD10001-DD10003 / G10001-G10003 stay readable; the band mirror assertion
+the port-prompt asked them to write (steps 160, 273 region) is WITHDRAWN and replaced by
+the edition-segment check; between the roll and their code mint they mint nothing new.
+
+(c) THE TWO-AXES WORDING, verbatim from the 2026-09-02 review, so their agent stops
+conflating repos and checkouts: Axis 1 - repos (producer / company: disjoint histories,
+one-way port; the edition prefix separates THESE). Axis 2 - checkouts (every machine,
+worktree or session is a checkout; the push-before-work claim and the wip/ branch rule
+separate THESE). &quot;Both machines and both repos&quot; meant axis 2 on our side and axis 1
+between us.
+
+(d) J63 provenance block, the RELAY numbered, the APPLY BY DISPOSITION section updated for
+the new per-entry rows (domains.yaml, editions.yaml) and the CLAUDE.md mint-rule change.
+Idea-237&#x27;s gate-prompt correction (MM13) rides the same relay.
+
+Depends on PLAN2 for (b); (a) may ship first if a roll happens before PLAN2 lands, in which
+case the item stays in_progress and (b) is a second relay entry.
 </p></div></div>
 <div class="card ready" id="card-J54" data-id="J54" data-module="docs" data-phase="8" data-epic="release-infrastructure" data-type="chore" data-status="todo" data-search="j54 versioning.md describes a backlog schema and a backlog file that no longer exist, so the release ritual instructs a reader to cite a tombstone" tabindex="0"><div class="card-head"><span class="card-id">J54</span><span class="card-title">VERSIONING.md describes a backlog schema and a backlog file that no longer exist, so the release ritual instructs a reader to cite a tombstone</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / main</span></div><div class="epic">release-infrastructure</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE TWO STALE FACTS. `VERSIONING.md` names the backlog config schema at its PREVIOUS version, and its release-notes section tells the author to cite epic and item ids from `docs/restructure/backlog.yaml`. The schema is now v3 (ADR 0013) and that file is a tombstone — the backlog is one item per file under `docs/restructure/backlog/items/`. Both are corrected, and the ids-to-cite instruction points at the sharded tree.
 
@@ -3306,54 +3528,10 @@ transcribed from seven company artifacts on an UNMERGED research branch and cite
 
 Related: MM2, MM3, MM6, MM10, MM12, R16, L28, G102, ADR 0007, ADR 0011, Idea-236.
 </p></div></div></div></div>
-<div class="column" data-status="in_progress"><div class="column-head"><h2>In progress</h2><span class="count" data-count-for="in_progress">7</span></div><div class="column-body"><div class="card" id="card-E1" data-id="E1" data-module="ontology" data-phase="4" data-epic="context-graph" data-type="task" data-status="in_progress" data-search="e1 register sosa/ssn observation terms via the gate" tabindex="0"><div class="card-head"><span class="card-id">E1</span><span class="card-title">Register SOSA/SSN observation terms via the gate</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P4</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / ontology-mapper</span></div><div class="epic">context-graph</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C1" data-target="card-C1">C1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> sosa:* terms present with IRIs; status planned-&gt;confirmed via gate</p><p class="notes"><strong>Notes:</strong> Registration step DONE (main, 2026-06-22): sosa/ssn prefixes in namespaces.py; terms seeded in drydocs_core/schema/sosa_experimental_supplement.cypher (opt-in `drydocs apply-sosa-supplement`, NOT in bootstrap; every term adoption:&quot;experimental&quot;); 4 context relationships in relationship_vocabulary.yaml (sosa_observes/has_result/ made_by_sensor/observed_property, status planned, domain context); README split into Declared-Adopted vs Experimental/Early-Adoption. REMAINING for ontology-mapper: take the `jobrun-observation` map entry through the HITL gate (resolve ControlMJobRun-as-Observation vs separate-Observation-node; run-history source), then planned-&gt;confirmed. GATE SESSION DEFERRED 2026-07-14 (SME: not ready yet) — page stays rendered/pending; nothing flips; re-present at a future session (see gate-log 2026-07-14 deferral note).
+<div class="column" data-status="in_progress"><div class="column-head"><h2>In progress</h2><span class="count" data-count-for="in_progress">6</span></div><div class="column-body"><div class="card" id="card-E1" data-id="E1" data-module="ontology" data-phase="4" data-epic="context-graph" data-type="task" data-status="in_progress" data-search="e1 register sosa/ssn observation terms via the gate" tabindex="0"><div class="card-head"><span class="card-id">E1</span><span class="card-title">Register SOSA/SSN observation terms via the gate</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P4</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / ontology-mapper</span></div><div class="epic">context-graph</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C1" data-target="card-C1">C1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> sosa:* terms present with IRIs; status planned-&gt;confirmed via gate</p><p class="notes"><strong>Notes:</strong> Registration step DONE (main, 2026-06-22): sosa/ssn prefixes in namespaces.py; terms seeded in drydocs_core/schema/sosa_experimental_supplement.cypher (opt-in `drydocs apply-sosa-supplement`, NOT in bootstrap; every term adoption:&quot;experimental&quot;); 4 context relationships in relationship_vocabulary.yaml (sosa_observes/has_result/ made_by_sensor/observed_property, status planned, domain context); README split into Declared-Adopted vs Experimental/Early-Adoption. REMAINING for ontology-mapper: take the `jobrun-observation` map entry through the HITL gate (resolve ControlMJobRun-as-Observation vs separate-Observation-node; run-history source), then planned-&gt;confirmed. GATE SESSION DEFERRED 2026-07-14 (SME: not ready yet) — page stays rendered/pending; nothing flips; re-present at a future session (see gate-log 2026-07-14 deferral note).
 </p></div></div>
 <div class="card" id="card-G62" data-id="G62" data-module="drydocs-lineage" data-phase="6" data-epic="component-topology" data-type="task" data-status="in_progress" data-search="g62 run the rua-bundle data-profile gate: the sme names the load population, the agent profiles it, and only the walked population enters the curated load" tabindex="0"><div class="card-head"><span class="card-id">G62</span><span class="card-title">Run the rua-bundle data-profile gate: the SME names the load population, the agent profiles it, and only the walked population enters the curated load</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-lineage</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">component-topology</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-G22" data-target="card-G22">G22</a> <a class="dep-link" href="#card-G23" data-target="card-G23">G23</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> USER-GATED START — the SME convenes the session; the pull loop SKIPS this item until then (the C12/J13 idiom). The drafted rua-bundle-data-profile page is walked in its ruled two-step order: section A the SME identifies the source data (which hosts&#x27; bundles, where they sit, which collector produced each — Internal, recorded company-side, never on the page), section B the agent profiles that population through the G20 extractor in STAGING with zero graph writes, and section C consumes the profile to admit or trim the population, dispose of the hash-absent and collision cases it counts, and clear the F1 sweep. Sign-off transcribed to config/gate-log.md; gates.json + the enforcement matrix regenerate. No population the page has not walked enters the G23 curated load.
 </p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-09 from Idea-85, which asked only for ids and scheduling — the four post-G22 data-profile prompts were drafted 2026-08-07 and unsigned, and an unsigned prompt with no backlog id is invisible to the pull loop. Sessions run COMPANY-SIDE because the identify-the-source-data step names real hosts and paths (Internal); what lands producer-side is the transcription and the regenerated gate surfaces. Model fable: the ruling decides what may be written to the graph.
-</p></div></div>
-<div class="card" id="card-PLAN1" data-id="PLAN1" data-module="drydocs-plan" data-phase="8" data-epic="project-board" data-type="task" data-status="in_progress" data-search="plan1 freeze the 27 legacy id series and mint every new item id by module code - the series is the module" tabindex="0"><div class="card-head"><span class="card-id">PLAN1</span><span class="card-title">Freeze the 27 legacy id series and mint every new item id by module code - the series is the module</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-plan</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">project-board</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE LETTERS ARE FROZEN, at the highest number each had ever taken across local, every
-remote ref and history, measured through the allocator on 2026-09-02: A4 B5 C44 D11 E2 F2
-G136 GN2 H8 I8 J78 K30 L29 M4 MM14 N28 O92 P6 Q28 R23 S16 U27 V11 W3 X4 Y7 Z9. The snapshot
-is a COMMITTED CONSTANT in validate.py and again in test_backlog.py, with a guard that the
-two agree - never the current max, which rises with the file it guards. No id moves.
-
-(b) THE SERIES IS THE MODULE. modules.yaml gains a `series:` map, one code per module, and
-`validate.py --next-id --module &lt;module&gt;` derives the series from it. Codes are three or
-more uppercase letters so none can be read as a frozen letter; none is DD. The allocator
-refuses a frozen series, an unregistered series, DD, and the company band, each with the
-reason and the command that replaces it.
-
-(c) GUARDS, in test_backlog.py: every module has a code and no code can collide; no item
-in a frozen series exceeds its frozen max; an item whose id carries a module code names
-that module in `module:`; the allocator and the guard agree on the snapshot; the allocator
-refuses a frozen and an unregistered series.
-
-(d) THE RULING IS RECORDED where rulings live - config/gate-log.md, as a RECORD, since the
-SME ruled it in-chat - and the mint rule in CLAUDE.md and the groom-backlog skill say
-`--module` and say why. C41 is re-pointed: its item-series half is superseded by this, its
-domain-registry half stays an ontology concern and stops citing the schema-identifier gate,
-which never asked its questions.
-
-(e) WHAT THIS IS NOT. It is not the edition prefix (`[&lt;ED&gt;-]&lt;MODULE&gt;&lt;n&gt;`), which retires
-the DD reserve and the numeric band and needs the port relay - that is the next item. It is
-not the inbox shard. And it renumbers nothing: config/gate-log.md, the port-prompt and
-IDEAS.md cite every legacy id and every one still resolves.
-
-tests/unit green, ruff clean, the board and roadmap re-rendered; this item&#x27;s own id is the
-first mint under the rule, taken from the allocator it describes.
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-02 (desktop, ui-workstream worktree, branch feat/backlog-series-by-module) as
-the first id under the rule it establishes, from `--next-id --module drydocs-plan`.
-
-WHY NOW AND NOT AT THE TEAMS EDITION GATE. C41 designed a domain registry and was blocked on
-an ADR ruling; meanwhile every mint went into an epoch letter - 18 more in the groom that
-landed this morning. The SME&#x27;s direction on 2026-09-02: retire the old series and start by
-module BEFORE Teams Edition, because the problem compounds daily. The module axis already
-existed on 611 of 611 items as a required field; only the prefix was missing, which is why
-this is a day&#x27;s mechanism and not a design.
-
-MODULE, NOT DOMAIN, for item series - the one place this departs from C41. Domain is the
-ontology topic; module is the MODULE_MAP component an agent pulls against and the field
-every item already carries. The domain registry remains an ontology concern.
 </p></div></div>
 <div class="card" id="card-K16" data-id="K16" data-module="config" data-phase="9" data-epic="seal-attribution" data-type="task" data-status="in_progress" data-search="k16 fid directory census: measure the demand-set pull scope on one application, and the registration-vs-attribution disagreement rate" tabindex="0"><div class="card-head"><span class="card-id">K16</span><span class="card-title">FID directory census: measure the demand-set pull scope on ONE application, and the registration-vs-attribution disagreement rate</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P9</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">seal-attribution</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> For ONE application, three counts are reported (counts ONLY — never a row dump; the output is Internal and lands company-side): (a) total directory rows for that application; (b) |demand set ∩ that application|, where the demand set is the union of run-as owners in the Control-M extract, distinct STG_APP_FACT fact_value rows with fact_type=&#x27;FID&#x27; the K2 resolver currently counts unresolved, and account names in registered adhoc evidence; (c) the breakdown of (a) minus (b) by the directory&#x27;s own type/status columns. PLUS the §Q0 measurement the gate cannot sign without: of the accounts in the demand set, how many have a directory application assignment that DISAGREES with the Control-M-derived folder attribution, and the by-case split of those disagreements into &quot;different subjects, both correct&quot; vs &quot;stale directory&quot; vs &quot;wrong folder attribution&quot; (§G5). Doc 09&#x27;s phase table is updated with the real numbers. No pull beyond the demand set; no rows loaded.
 </p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-05 (desktop) from the 2026-08-05 IDEAS entries. THIS RUNS BEFORE THE GATE, not after: &quot;about two hundred accounts per application&quot; is the estimate the gate cannot rule on, and the census turns it into &quot;N of ~200, and here is what the other rows are&quot;. The §Q0 disagreement breakdown is the part that decides whether the directory is a trustworthy ownership source with expected consumer divergence, or a lagging record needing remediation — a question raised only after the gate was drafted, which is why it sits in a separate item rather than inside the gate page. module: config (a source-scoping measurement, not a loader). Producer-side this repo carries the METHOD; the counts themselves are Internal. PRODUCER HALF DELIVERED 2026-08-07 (laptop), and the item is BLOCKED rather than done because its acceptance asks for real counts this repo structurally cannot produce — it holds no directory extract, which is the whole point of the demand-set pull. Shipped: drydocs/fid_census.py (pure — opens no file, contacts no database, writes nothing; every input injected), tests/unit/test_fid_census.py (14 tests, all synthetic), and docs/company-prompts/k16-fid-census-company-prompt.md following the 2026-08-07 company-pack convention. Doc 09 gains a &quot;The numbers&quot; table with every cell marked pending, and an explicit note that an empty cell means NOT MEASURED, never zero. TWO DESIGN DECISIONS WORTH KNOWING BEFORE THE COUNTS ARRIVE. (1) COUNTS-ONLY IS ENFORCED BY THE RETURN TYPE, not by discipline: FidCensus holds int and dict[str,int] fields only, so a row dump is UNEXPRESSIBLE, and a test pins that structurally. That is what lets the result travel back into this repo at all — a later field carrying account names would leak Internal values into a producer-side artifact. (2) THE §G5 READING IS NEVER COMPUTED. The gate says the three readings are distinguished per case and never globally, with a human ruling each — so the census counts disagreements mechanically and parks every one in `unruled` until an SME ruling is injected. The number still sitting in `unruled` is itself reportable: the never-silent rule applied to the report rather than to a load. THE BLOCKER&#x27;S REASON CHANGED 2026-08-12 (SME evidence) — still blocked, much smaller ask. The FID directory is not an external system needing an export or an onboarding: it is `psgmgr.HR_PHONE_EXP`, functional rows `EMP_TYP_CD = &#x27;FCT&#x27;`, in the replica ALREADY IN SCOPE and already the Control-M source. So the census is a SINGLE-SCHEMA JOIN — demand set (i) from CM_DEF_VJOB.OWNER against the directory in the same schema — and no new source crosses the boundary. Status stays blocked because the counts are Internal and this repo has no psgmgr access, which is unchanged; what changed is that satisfying it no longer waits on a source onboarding, only on someone running the query company-side. RUN Q6 FIRST (gate fid-identity-and-scope): whether CM_DEF_VJOB.OWNER holds the NAME or the ID decides the join key, and the two keys give different demand sets. Measuring with the wrong one produces a confident wrong number. module: config is kept as the WORK AREA; the code module classifies as drydocs-review in test_module_boundary.py (it loads nothing and configures nothing — it produces the counts an SME rules from, the same reasoning that puts source_mappings there).
@@ -3397,7 +3575,7 @@ shapes including the cut task-service JSON, the transform with no provenance id,
 printed bearer token (redacted and counted). Real logs live under
 internal-local/controlm-output-logs/ (git-ignored). The Python extractor is still this
 item&#x27;s deliverable; the PoC fixed its field list and skip-reason set.</p></div></div></div></div>
-<div class="column" data-status="blocked"><div class="column-head"><h2>Blocked</h2><span class="count" data-count-for="blocked">3</span></div><div class="column-body"><div class="card" id="card-C33" data-id="C33" data-module="drydocs-load" data-phase="2" data-epic="ontology-mapping" data-type="task" data-status="blocked" data-search="c33 build the adhoc software-version loader the software-version-context gate authorized and deliberately did not build" tabindex="0"><div class="card-head"><span class="card-id">C33</span><span class="card-title">Build the adhoc software-version loader the software-version-context gate authorized and deliberately did not build</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-load</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">ontology-mapping</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The gate signed the SHAPE and nothing else: reg_appuser_uses_software is registered status: planned, no loader exists, and the adhoc-sme-email corpus stays confirmed: false for that reason alone. This item builds exactly what sections A-E signed -- the loader itself (MERGE key per section Q3 below, edge properties per B3, as_of from the email&#x27;s sent date), the :Document minted from the hand-recorded citation, the evidence: block&#x27;s as_of filled in on the abinitio product row, registration in config/manual-loads/manifest.yaml per E4, and the C1 install-path pattern rows in the invocation_patterns shape. SECTION Q3 IS SETTLED BEFORE THE MERGE KEY IS WRITTEN, not after. The gate deferred it with the consequence stated: if the estate re-points installs by symlink, install_path is a poor key and identity moves to (fid, version), which is a RE-KEY rather than an edit. If Q3 cannot be answered, the item STOPS at that question and says so -- a guessed identity key is the failure the identity gate&#x27;s D2/C3 exist to prevent. Two things this build must NOT do: write the section F application-level rollup (blocked on K17, and not behind a flag), and auto-append observed versions to the curated versions: list (C2). The vocabulary entry flips planned -&gt; active only if its gate says so; nothing here signs anything.
+<div class="column" data-status="blocked"><div class="column-head"><h2>Blocked</h2><span class="count" data-count-for="blocked">2</span></div><div class="column-body"><div class="card" id="card-C33" data-id="C33" data-module="drydocs-load" data-phase="2" data-epic="ontology-mapping" data-type="task" data-status="blocked" data-search="c33 build the adhoc software-version loader the software-version-context gate authorized and deliberately did not build" tabindex="0"><div class="card-head"><span class="card-id">C33</span><span class="card-title">Build the adhoc software-version loader the software-version-context gate authorized and deliberately did not build</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-load</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">ontology-mapping</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The gate signed the SHAPE and nothing else: reg_appuser_uses_software is registered status: planned, no loader exists, and the adhoc-sme-email corpus stays confirmed: false for that reason alone. This item builds exactly what sections A-E signed -- the loader itself (MERGE key per section Q3 below, edge properties per B3, as_of from the email&#x27;s sent date), the :Document minted from the hand-recorded citation, the evidence: block&#x27;s as_of filled in on the abinitio product row, registration in config/manual-loads/manifest.yaml per E4, and the C1 install-path pattern rows in the invocation_patterns shape. SECTION Q3 IS SETTLED BEFORE THE MERGE KEY IS WRITTEN, not after. The gate deferred it with the consequence stated: if the estate re-points installs by symlink, install_path is a poor key and identity moves to (fid, version), which is a RE-KEY rather than an edit. If Q3 cannot be answered, the item STOPS at that question and says so -- a guessed identity key is the failure the identity gate&#x27;s D2/C3 exist to prevent. Two things this build must NOT do: write the section F application-level rollup (blocked on K17, and not behind a flag), and auto-append observed versions to the curated versions: list (C2). The vocabulary entry flips planned -&gt; active only if its gate says so; nothing here signs anything.
 </p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-11 from Idea-98, the first of the follow-ups C25&#x27;s close note carries. model fable because the deliverable lands a MERGE KEY -- the identity decision the gate deferred -- while the code around it is ordinary loader work. The observable close signal is the corpus flipping confirmed: false -&gt; true on adhoc-sme-email, which is exactly why it must not flip on a guessed key.
 STOPPED AT Q3, 2026-08-21 -- as the acceptance requires. The repo holds no answer to
 Q3 (install_path stable, or re-pointed by symlink?): the only mentions are the gate&#x27;s own
@@ -3412,106 +3590,6 @@ loader (key {source, install_path} if paths are stable; (fid, version) if symlin
 evidence.as_of on the abinitio row, and the manifest.yaml registration. UNBLOCK = one SME
 sentence answering Q3, logged as a RECORD in config/gate-log.md under the
 software-version-context gate.
-</p></div></div>
-<div class="card" id="card-C41" data-id="C41" data-module="config" data-phase="2" data-epic="ontology-mapping" data-type="requirement" data-status="blocked" data-search="c41 the backlog series letter is an epoch tag, not a topic - mint domains as first-class registered objects and carry the topic axis in a field, gated on the teams edition adr" tabindex="0"><div class="card-head"><span class="card-id">C41</span><span class="card-title">The backlog series letter is an epoch tag, not a topic - mint domains as first-class registered objects and carry the topic axis in a field, gated on the Teams Edition ADR</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">requirement</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">ontology-mapping</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> RE-SCOPED 2026-09-02 (RECORD in config/gate-log.md, &quot;the backlog series is the MODULE&quot;). The
-title is kept verbatim - a title is part of an id&#x27;s identity to the trunk guard, and the
-series-letter finding it states is true; PLAN1 is what answered it for items. The
-item-series half of this design - clauses (b) and (c) as originally written, where a DOMAIN
-registry supplied the series prefix - is SUPERSEDED by PLAN1: item ids take the MODULE code
-from modules.yaml `series:`, the 27 letters are frozen, and no id moves. What remains here is
-the ontology half (a) and the edition grain (d), and (e) is narrowed to the questions those
-two still need ruled.
-
-The former `gates:` entry, `schema-identifier-publish-ceiling-teams-edition`, is removed: that
-prompt asks whether `psgmgr` is public vocabulary and how a registered id is renamed. It never
-asked this item&#x27;s questions, so it could never have unblocked it. This item needs its own
-prompt, drafted from (e) below, and takes that slug when it exists.
-
-BLOCKED until that prompt is drafted and ruled. The item exists so the design is not carried
-only in a machine-local plan file.
-
-(a) A DOMAIN IS A MINTED OBJECT, registered and tracked, allocated the way an id is allocated:
-ask the allocator, push the registration, then use it. New `config/taxonomy/domains.yaml` with one
-row per domain carrying id, series prefix, title, a NULLABLE vocabulary_fragment, minted_by,
-registered_at, the gate or ADR that ruled it, and status. Seeded with the 13 that already exist,
-each citing its real ruling - eleven from vocabulary-domains-and-id-policy (2026-08-12),
-`infrastructure` from server-location-ontology (Z2, 2026-08-19), `human` from A3.
-
-(b) SUPERSEDED BY PLAN1 - kept for the record. As written: THE SERIES PREFIX COMES FROM THE REGISTRY. Existing series are 1-2 letters (A..Z, GN, MM);
-minted domain series are &gt;=3 (REG, SCHED, BAPP, ARCH, DOCS, QUAL, CTX, HUM, CORP, ITSM, INFRA).
-Zero regex change - `GN` and `MM` already prove multi-letter series parse. `all` gets NO series:
-it exists for edges spanning domains, and a catch-all series is precisely what G became.
-
-(c) SUPERSEDED BY PLAN1 for items (module IS the axis, and it was already a required field);
-still open for ONTOLOGY objects, where a `domain:` field remains the design. As written:
-DUAL-KEY: ids freeze, an optional `domain:` field carries the axis, following the `gates:`
-precedent (J50). No existing id moves, so every citation in config/gate-log.md,
-docs/port/port-prompt.md and IDEAS.md still resolves. Backfill is mechanical from the 27 epic
-files; items whose domain differs from their epic&#x27;s are overridden individually.
-
-(d) THE EDITION IS A DECLARED CATEGORY SEGMENT, not a numeric band: `[&lt;EDITION&gt;-]&lt;DOMAIN&gt;&lt;n&gt;`,
-edition first, base edition unprefixed. New `config/taxonomy/editions.yaml` on the
-lob-product-team.yaml pattern - Internal, synthetic sample producer-side, per-entry manifest row -
-each row declaring the edition code against an `area_product_id`, the Product Catalog key
-:AreaProduct already carries (K5 B, constraints.cypher:79).
-
-(e) THE ADR MUST RULE, and this item may not pre-empt any of it: minting authority (a base mints,
-an instance requests - ADR 0015 D4 already rules this for the ontology); what qualifies as a
-domain, so the registry does not become another G; whether a domain may exist with no vocabulary
-fragment; the architecture-vs-code split; and the edition grain.
-
-tests/unit green; no id moves; the port-prompt carries a relay, because a cross-repo convention
-change is inert until it reaches the other side.
-</p><p class="notes"><strong>Notes:</strong> RE-SCOPED 2026-09-02 (desktop, ui-workstream worktree, branch feat/backlog-series-by-module).
-The SME ruled item series BY MODULE, not by domain, and ruled it now rather than at the Teams
-Edition gate - see the RECORD and PLAN1. The correction to this item&#x27;s own `gates:` line came
-from the 2026-09-02 groom-backlog review: the slug was set on 09-01 as a placeholder for &quot;the
-Teams Edition ruling&quot; and pointed at a prompt that asks a different question. An item blocked
-on a gate that cannot unblock it is blocked forever and looks merely patient.
-
-WHY THIS EXISTS AS AN ITEM: the design was approved by the SME on 2026-09-01 and lived only in a
-machine-local plan file outside the repo. Its first workstream shipped the same day as J68, J69,
-J71 and J72; this is the second, and it had no record anywhere in the tree. An approved design
-with no backlog row is a design that dies with the session that made it.
-
-THE DEFECT, MEASURED. `docs/restructure/backlog/plan.yaml` maps phases 1:1 to epics and to letters
-- phase 1 = Taxonomy capture = Epic B, phase 2 = Ontology mapping = Epic C, phase 6 = Component
-topology = Epic G. The letter records WHEN a phase was opened, not what an item is about. G now
-holds 135 of 599 items (23%) across six epics, so &quot;search the G series&quot; means nothing. Company-side
-every item lands in DD - one undifferentiated series, no topic axis at all.
-
-AND THE COMPANY HAS NO WORKING ALLOCATOR TODAY, which is the sharpest single fact here:
-`--next-id DD` is refused by RESERVED_SERIES and `--next-id G` at their max of G10003 is refused by
-the ceiling. Both doors shut, so they mint by hand - the exact failure I6 was built to remove,
-still live on the far side of the port.
-
-TWO PARTITION RULES, NEITHER RETIRED, which is what produced the DD10-vs-DD10001 ambiguity
-Idea-162 records: git-readme.md:196-201 (2026-07-20) reserves DD; the allocator band (2026-08-18)
-says producer 1-9999 / company 10000+ in every series. Rule 2 generalizes Rule 1 and Rule 1 was
-never withdrawn, so a session following either is obeying a written rule.
-
-WHY THE 13 SIGNED DOMAINS RATHER THAN A NEW LIST: they are already ruled, already sharded into
-fragments 40-52 (S5), and cover ~90% of the taxonomy areas the SME named. A second topic vocabulary
-would drift against the first. And two of the 13 were REGISTERED AFTER the original ruling, so
-domain registration is already an act that happens through a gate - what is missing is a registry
-that records it and an allocator that guards it.
-
-ONE SEED ROW ARRIVES CONTESTED and the registry should say so rather than inherit it quietly:
-`architecture` absorbs code, which puts code and requirements in different domains with no declared
-join - the join the product exists to make. The 2018 genesis document (SDLC-Docs/extracted/
-FCD-Requirements.md:27) states the thesis as &quot;a subset of data from the code, requirements, and
-test cases is used to link the documentation database to the corresponding development component&quot;,
-with usage case 34 &quot;Query for requirements, code, released items&quot;. Three distinct things.
-
-AND SPLITTING THE DOMAINS IS ONLY HALF: separate domains with no typed edge between :Requirement
-and :Code reproduces spec-kit&#x27;s own gap - GitHub&#x27;s spec-kit runs Specify/Plan/Tasks/Implement/
-Converge and has NO formal traceability matrix, only implicit parent-child through phase order.
-That is C38&#x27;s finding one layer up: a relationship that exists only as an implicit ordering is not
-traversable. The reconciliation edge goes through RELATIONSHIP_GUIDE.md as status: planned, exactly
-as C38 did.
-
-RELATED: J71 made the per-entry merge rules total, which is the same disease (a rule with a hole)
-one layer down. Idea-162 records the DD-band collision this closes.
 </p></div></div>
 <div class="card" id="card-K30" data-id="K30" data-module="drydocs-load" data-phase="9" data-epic="seal-attribution" data-type="bug" data-status="blocked" data-search="k30 the pat projection&#x27;s header map is pinned to believed spellings and its test fixture repeats the same beliefs, so a real export with a case-different seal-id column writes zero application edges and still reports success" tabindex="0"><div class="card-head"><span class="card-id">K30</span><span class="card-title">The PAT projection&#x27;s header map is pinned to believed spellings and its test fixture repeats the same beliefs, so a real export with a case-different SEAL-id column writes zero application edges and still reports success</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-load</span><span class="chip" data-kind="phase">P9</span><span class="chip" data-kind="type">bug</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">seal-attribution</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) EVERY MAPPED FIELD&#x27;S ABSENCE IS LOUD, NOT ONLY THE REQUIRED ONES. Today `_project` raises `ProjectionError` for the three `REQUIRED_FIELDS` (`team_id`, `product_id`, `relationship_type`) and merely RECORDS the rest on `ProjectionReport.missing_optional`, which `scripts/project_pat_team_report.py` never turns into a non-zero exit or a warning stream. Verified producer-side: `seal_ids` is mapped to the header `&quot;SEAL IDs&quot;` and marked PINNED, and it is NOT in `REQUIRED_FIELDS` — so a real export spelling that column differently degrades to an empty value for every row, the `PatProductMapping` rows carry no SEAL ids, and a run that prints a success summary writes zero dev-team-to-application edges. After this item, a mapped header that the raw report does not carry produces a loud, non-zero-exit failure or an explicit acknowledged-absence flag; there is no third path where it is quietly empty. Cover it with a test that drives `_project` with `seal_ids` absent and asserts the loud behaviour.
 
@@ -3550,7 +3628,7 @@ relay -- guessing spellings is the defect this item exists to prevent. The (d) s
 guard (fixture headers drawn from the recorded list, not the module constant) also waits
 on that list; a guard against nothing would be decoration.
 </p></div></div></div></div>
-<div class="column" data-status="done"><div class="column-head"><h2>Done</h2><span class="count" data-count-for="done">482</span></div><div class="column-body"><div class="card" id="card-A1" data-id="A1" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a1 audit reference registry paths for staleness" tabindex="0"><div class="card-head"><span class="card-id">A1</span><span class="card-title">Audit reference registry paths for staleness</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every entry marked ok/stale; stale paths fixed or flagged</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All local mirrors + platform/standard doc paths resolve; no stale entries. verified: 2026-06-21 in REGISTRY.yaml.</p></div></div>
+<div class="column" data-status="done"><div class="column-head"><h2>Done</h2><span class="count" data-count-for="done">484</span></div><div class="column-body"><div class="card" id="card-A1" data-id="A1" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a1 audit reference registry paths for staleness" tabindex="0"><div class="card-head"><span class="card-id">A1</span><span class="card-title">Audit reference registry paths for staleness</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every entry marked ok/stale; stale paths fixed or flagged</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All local mirrors + platform/standard doc paths resolve; no stale entries. verified: 2026-06-21 in REGISTRY.yaml.</p></div></div>
 <div class="card" id="card-A2" data-id="A2" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a2 account for every bmc doc in the source manifest" tabindex="0"><div class="card-head"><span class="card-id">A2</span><span class="card-title">Account for every BMC doc in the source manifest</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every .md in bmc-controlm/ accounted for in the manifest</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All 26 bmc-controlm .md files are referenced in SOURCE-MANIFEST.md (0 uncovered).</p></div></div>
 <div class="card" id="card-A3" data-id="A3" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a3 seed the research index with linked rationale" tabindex="0"><div class="card-head"><span class="card-id">A3</span><span class="card-title">Seed the research index with linked rationale</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> &gt;=5 rows, each with a working link and a &#x27;why it matters&#x27;</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. 7 rows with working links (3 Neo4j blogs + PROV-O/SOSA/ORG/agent-memory) + why-it-matters.</p></div></div>
 <div class="card" id="card-A4" data-id="A4" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a4 registry.yaml points the dcat row at a per-standard readme that was never written" tabindex="0"><div class="card-head"><span class="card-id">A4</span><span class="card-title">REGISTRY.yaml points the dcat row at a per-standard README that was never written</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> reference/REGISTRY.yaml&#x27;s dcat row no longer cites a path that does not exist. Exactly one of two resolutions, and the choice is recorded in the close note: (a) write reference/standards/dcat/README.md following the dcmi-terms pattern from M4 — namespace, what we use it for, the specific terms we reference, source_url — or (b) re-point the row&#x27;s `docs:` at reference/standards/README.md the way the skos row already does. Nothing else in the registry changes.
@@ -3842,6 +3920,112 @@ the path CLAUDE.md prescribes for a new relationship type.
 
 Agent ontology-mapper and module ontology per the layer table; model fable because edge meaning
 is the category the matrix reserves it for.
+</p></div></div>
+<div class="card" id="card-C41" data-id="C41" data-module="config" data-phase="2" data-epic="ontology-mapping" data-type="requirement" data-status="done" data-search="c41 the backlog series letter is an epoch tag, not a topic - mint domains as first-class registered objects and carry the topic axis in a field, gated on the teams edition adr" tabindex="0"><div class="card-head"><span class="card-id">C41</span><span class="card-title">The backlog series letter is an epoch tag, not a topic - mint domains as first-class registered objects and carry the topic axis in a field, gated on the Teams Edition ADR</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">requirement</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">ontology-mapping</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> RE-SCOPED 2026-09-02 (RECORD in config/gate-log.md, &quot;the backlog series is the MODULE&quot;). The
+title is kept verbatim - a title is part of an id&#x27;s identity to the trunk guard, and the
+series-letter finding it states is true; PLAN1 is what answered it for items. The
+item-series half of this design - clauses (b) and (c) as originally written, where a DOMAIN
+registry supplied the series prefix - is SUPERSEDED by PLAN1: item ids take the MODULE code
+from modules.yaml `series:`, the 27 letters are frozen, and no id moves. What remains here is
+the ontology half (a) and the edition grain (d), and (e) is narrowed to the questions those
+two still need ruled.
+
+The former `gates:` entry, `schema-identifier-publish-ceiling-teams-edition`, is removed: that
+prompt asks whether `psgmgr` is public vocabulary and how a registered id is renamed. It never
+asked this item&#x27;s questions, so it could never have unblocked it. This item needs its own
+prompt, drafted from (e) below, and takes that slug when it exists.
+
+BLOCKED until that prompt is drafted and ruled. The item exists so the design is not carried
+only in a machine-local plan file.
+
+(a) A DOMAIN IS A MINTED OBJECT, registered and tracked, allocated the way an id is allocated:
+ask the allocator, push the registration, then use it. New `config/taxonomy/domains.yaml` with one
+row per domain carrying id, series prefix, title, a NULLABLE vocabulary_fragment, minted_by,
+registered_at, the gate or ADR that ruled it, and status. Seeded with the 13 that already exist,
+each citing its real ruling - eleven from vocabulary-domains-and-id-policy (2026-08-12),
+`infrastructure` from server-location-ontology (Z2, 2026-08-19), `human` from A3.
+
+(b) SUPERSEDED BY PLAN1 - kept for the record. As written: THE SERIES PREFIX COMES FROM THE REGISTRY. Existing series are 1-2 letters (A..Z, GN, MM);
+minted domain series are &gt;=3 (REG, SCHED, BAPP, ARCH, DOCS, QUAL, CTX, HUM, CORP, ITSM, INFRA).
+Zero regex change - `GN` and `MM` already prove multi-letter series parse. `all` gets NO series:
+it exists for edges spanning domains, and a catch-all series is precisely what G became.
+
+(c) SUPERSEDED BY PLAN1 for items (module IS the axis, and it was already a required field);
+still open for ONTOLOGY objects, where a `domain:` field remains the design. As written:
+DUAL-KEY: ids freeze, an optional `domain:` field carries the axis, following the `gates:`
+precedent (J50). No existing id moves, so every citation in config/gate-log.md,
+docs/port/port-prompt.md and IDEAS.md still resolves. Backfill is mechanical from the 27 epic
+files; items whose domain differs from their epic&#x27;s are overridden individually.
+
+(d) THE EDITION IS A DECLARED CATEGORY SEGMENT, not a numeric band: `[&lt;EDITION&gt;-]&lt;DOMAIN&gt;&lt;n&gt;`,
+edition first, base edition unprefixed. New `config/taxonomy/editions.yaml` on the
+lob-product-team.yaml pattern - Internal, synthetic sample producer-side, per-entry manifest row -
+each row declaring the edition code against an `area_product_id`, the Product Catalog key
+:AreaProduct already carries (K5 B, constraints.cypher:79).
+
+(e) THE ADR MUST RULE, and this item may not pre-empt any of it: minting authority (a base mints,
+an instance requests - ADR 0015 D4 already rules this for the ontology); what qualifies as a
+domain, so the registry does not become another G; whether a domain may exist with no vocabulary
+fragment; the architecture-vs-code split; and the edition grain.
+
+tests/unit green; no id moves; the port-prompt carries a relay, because a cross-repo convention
+change is inert until it reaches the other side.
+</p><p class="notes"><strong>Notes:</strong> RE-SCOPED 2026-09-02 (desktop, ui-workstream worktree, branch feat/backlog-series-by-module).
+The SME ruled item series BY MODULE, not by domain, and ruled it now rather than at the Teams
+Edition gate - see the RECORD and PLAN1. The correction to this item&#x27;s own `gates:` line came
+from the 2026-09-02 groom-backlog review: the slug was set on 09-01 as a placeholder for &quot;the
+Teams Edition ruling&quot; and pointed at a prompt that asks a different question. An item blocked
+on a gate that cannot unblock it is blocked forever and looks merely patient.
+
+WHY THIS EXISTS AS AN ITEM: the design was approved by the SME on 2026-09-01 and lived only in a
+machine-local plan file outside the repo. Its first workstream shipped the same day as J68, J69,
+J71 and J72; this is the second, and it had no record anywhere in the tree. An approved design
+with no backlog row is a design that dies with the session that made it.
+
+THE DEFECT, MEASURED. `docs/restructure/backlog/plan.yaml` maps phases 1:1 to epics and to letters
+- phase 1 = Taxonomy capture = Epic B, phase 2 = Ontology mapping = Epic C, phase 6 = Component
+topology = Epic G. The letter records WHEN a phase was opened, not what an item is about. G now
+holds 135 of 599 items (23%) across six epics, so &quot;search the G series&quot; means nothing. Company-side
+every item lands in DD - one undifferentiated series, no topic axis at all.
+
+AND THE COMPANY HAS NO WORKING ALLOCATOR TODAY, which is the sharpest single fact here:
+`--next-id DD` is refused by RESERVED_SERIES and `--next-id G` at their max of G10003 is refused by
+the ceiling. Both doors shut, so they mint by hand - the exact failure I6 was built to remove,
+still live on the far side of the port.
+
+TWO PARTITION RULES, NEITHER RETIRED, which is what produced the DD10-vs-DD10001 ambiguity
+Idea-162 records: git-readme.md:196-201 (2026-07-20) reserves DD; the allocator band (2026-08-18)
+says producer 1-9999 / company 10000+ in every series. Rule 2 generalizes Rule 1 and Rule 1 was
+never withdrawn, so a session following either is obeying a written rule.
+
+WHY THE 13 SIGNED DOMAINS RATHER THAN A NEW LIST: they are already ruled, already sharded into
+fragments 40-52 (S5), and cover ~90% of the taxonomy areas the SME named. A second topic vocabulary
+would drift against the first. And two of the 13 were REGISTERED AFTER the original ruling, so
+domain registration is already an act that happens through a gate - what is missing is a registry
+that records it and an allocator that guards it.
+
+ONE SEED ROW ARRIVES CONTESTED and the registry should say so rather than inherit it quietly:
+`architecture` absorbs code, which puts code and requirements in different domains with no declared
+join - the join the product exists to make. The 2018 genesis document (SDLC-Docs/extracted/
+FCD-Requirements.md:27) states the thesis as &quot;a subset of data from the code, requirements, and
+test cases is used to link the documentation database to the corresponding development component&quot;,
+with usage case 34 &quot;Query for requirements, code, released items&quot;. Three distinct things.
+
+AND SPLITTING THE DOMAINS IS ONLY HALF: separate domains with no typed edge between :Requirement
+and :Code reproduces spec-kit&#x27;s own gap - GitHub&#x27;s spec-kit runs Specify/Plan/Tasks/Implement/
+Converge and has NO formal traceability matrix, only implicit parent-child through phase order.
+That is C38&#x27;s finding one layer up: a relationship that exists only as an implicit ordering is not
+traversable. The reconciliation edge goes through RELATIONSHIP_GUIDE.md as status: planned, exactly
+as C38 did.
+
+RELATED: J71 made the per-entry merge rules total, which is the same disease (a rule with a hole)
+one layer down. Idea-162 records the DD-band collision this closes.
+DONE 2026-09-02 (desktop) per gate ontology-domain-registry-and-edition-grain E1: the item
+closes on the MINT, not the build. Gate SIGNED OFF 14/14 the same day (config/gate-log.md,
+last entry); the seven E1 items plus ONT2 from the B5 rider are minted by module code -
+CFG1 CFG2 PLAN2 DOC1 DOC2 REF1 ONT1 ONT2 - each carrying this gate in `gates:`. The
+item-series half was closed earlier the same day by PLAN1. What C41 still names that no
+item builds: nothing - clause (a) is CFG1, (d) is CFG2+PLAN2, (e) is the gate record.
 </p></div></div>
 <div class="card" id="card-G34" data-id="G34" data-module="ontology" data-phase="9" data-epic="ontology-mapping" data-type="task" data-status="done" data-search="g34 scaffold the business glossary now so the internal port cannot collide on a name or a backlog slot: reserve catalogbusinessterm + its edges as status: planned, schema public / definitions internal" tabindex="0"><div class="card-head"><span class="card-id">G34</span><span class="card-title">Scaffold the business glossary NOW so the internal port cannot collide on a name or a backlog slot: reserve CatalogBusinessTerm + its edges as status: planned, schema public / definitions internal</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P9</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / ontology-mapper</span></div><div class="epic">ontology-mapping</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> RESERVATION ONLY — this item deliberately does NOT define terms or build a glossary. It claims the names and the slot so a later internal port cannot collide, then stops. Specifically: (a) `CatalogBusinessTerm` keyed by `term_id` is registered as a `proposed` taxonomy-ontology-map entry, taking the shape the data-catalog pattern already defines rather than inventing one; (b) its three edges — CatalogElement IS_REPRESENTED_AS, CatalogValidValue HAS_ALLOWED_VALUES, CatalogBusinessTerm DEFINED_FOR — are registered in drydocs_core/ontology/relationship_vocabulary.yaml at `status: planned`, the documented pre-gate step (SOSA/SSN precedent, the only other planned entry); (c) the classification split is written down: the glossary SCHEMA (label, key, edge terms, YAML shape) is Internal-Public and ports to the company repo, the term DEFINITIONS are Internal and live in internal/, and industry-standard terms bind to SKOS, already a declared reference standard in reference/standards/; (d) the file locations for both halves exist with a README stating the split. NO term is defined, no loader writes anything, and the HITL gate that would confirm the edges is NOT run here. Suite green.
 </p><p class="notes"><strong>Notes:</strong> Raised at the business-application-identity gate §F2 (SIGNED OFF 2026-07-27). SME reason, verbatim in substance: the glossary will for the most part be internal unless there are industry-standard acronyms or names, and doing the scaffolding producer-side now means the internal ports do not collide later with either a name or a backlog item. That is a PORT-SEQUENCING argument, not an ontology one — which is why reservation is the whole deliverable. WHY IT IS AN ITEM RATHER THAN AN ACT OF THAT GATE: the identity gate&#x27;s §A1 states it &quot;creates no relationship-vocabulary term&quot;. Registering the edges inside it would have falsified A1 and re-opened a ruled scope item, so the registration was pushed here, where `status: planned` needs no gate of its own. Substance this feeds: F2&#x27;s finding that the durable home for what an acronym MEANS is a CatalogBusinessTerm-shaped glossary, the same conclusion the reopened gate-log Q6 acronym question circles, plus the Unity Catalog takeaway that a controlled vocabulary needs an enforcement point or it rots. The identity gate is itself the evidence: &quot;SEAL&quot; was found carrying THREE distinct meanings across three homes (the issuing authority, the source id, and an ecosystem referencing convention used in Control-M CMDLINEs), and nothing in the repo recorded that they were different things. MERGED IN 2026-08-05 (desktop, Idea-35 — the acronym-catalog line): that entry is CONTENT for this scaffold, not a second home, and it names the shape the scaffold should be able to hold — which is worth knowing while building the empty version. Its requirement: key by acronym, carry MANY senses per key, and tag each sense with its scope (`area`, `business-domain`, `technical-domain`, `industry` — what an outsider would assume). Plus, wherever a misreading has actually happened, an explicit **does-NOT-mean** note; that note, not the expansion, is the protective sentence. AIS is the worked example and the reason: &quot;as-is&quot; (a standard modeling idiom) vs &quot;Application Integration Streaming&quot; (an org platform family), with our own `:AisTool` label having meant NEITHER. Today `software-registry.yaml#acronyms` is a one-key section with no scope dimension, so it can record expansions but not COLLISIONS — and collisions are the failure mode that bites. This is a SKOS job (prefLabel / altLabel / definition / scopeNote, senses as concepts in a scheme); SKOS is declared in reference/standards/README.md but has NO fetched local copy yet, unlike prov-o / w3c-org / dprod-ekgf / sosa-ssn — fetching it belongs with the content pass. SCAFFOLD-ONLY STILL HOLDS: this item defines no terms, so nothing above changes its acceptance. The content pass stays parked on its own trigger, the gate-log Q6 ruling (which decides whether `#acronyms` survives at all), and lands INSIDE this scaffold.
@@ -6330,6 +6514,55 @@ the fix, and widening it to tolerate stub-shaped items would trade a real stalen
 convenience. Recorded rather than silently patched for the reason the first amendment gives -
 this class of gap only surfaces from the mechanism being used, and twice now it has surfaced on
 the very next use.
+</p></div></div>
+<div class="card" id="card-PLAN1" data-id="PLAN1" data-module="drydocs-plan" data-phase="8" data-epic="project-board" data-type="task" data-status="done" data-search="plan1 freeze the 27 legacy id series and mint every new item id by module code - the series is the module" tabindex="0"><div class="card-head"><span class="card-id">PLAN1</span><span class="card-title">Freeze the 27 legacy id series and mint every new item id by module code - the series is the module</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-plan</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">project-board</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE LETTERS ARE FROZEN, at the highest number each had ever taken across local, every
+remote ref and history, measured through the allocator on 2026-09-02: A4 B5 C44 D11 E2 F2
+G136 GN2 H8 I8 J78 K30 L29 M4 MM14 N28 O92 P6 Q28 R23 S16 U27 V11 W3 X4 Y7 Z9. The snapshot
+is a COMMITTED CONSTANT in validate.py and again in test_backlog.py, with a guard that the
+two agree - never the current max, which rises with the file it guards. No id moves.
+
+(b) THE SERIES IS THE MODULE. modules.yaml gains a `series:` map, one code per module, and
+`validate.py --next-id --module &lt;module&gt;` derives the series from it. Codes are three or
+more uppercase letters so none can be read as a frozen letter; none is DD. The allocator
+refuses a frozen series, an unregistered series, DD, and the company band, each with the
+reason and the command that replaces it.
+
+(c) GUARDS, in test_backlog.py: every module has a code and no code can collide; no item
+in a frozen series exceeds its frozen max; an item whose id carries a module code names
+that module in `module:`; the allocator and the guard agree on the snapshot; the allocator
+refuses a frozen and an unregistered series.
+
+(d) THE RULING IS RECORDED where rulings live - config/gate-log.md, as a RECORD, since the
+SME ruled it in-chat - and the mint rule in CLAUDE.md and the groom-backlog skill say
+`--module` and say why. C41 is re-pointed: its item-series half is superseded by this, its
+domain-registry half stays an ontology concern and stops citing the schema-identifier gate,
+which never asked its questions.
+
+(e) WHAT THIS IS NOT. It is not the edition prefix (`[&lt;ED&gt;-]&lt;MODULE&gt;&lt;n&gt;`), which retires
+the DD reserve and the numeric band and needs the port relay - that is the next item. It is
+not the inbox shard. And it renumbers nothing: config/gate-log.md, the port-prompt and
+IDEAS.md cite every legacy id and every one still resolves.
+
+tests/unit green, ruff clean, the board and roadmap re-rendered; this item&#x27;s own id is the
+first mint under the rule, taken from the allocator it describes.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-02 (desktop, ui-workstream worktree, branch feat/backlog-series-by-module) as
+the first id under the rule it establishes, from `--next-id --module drydocs-plan`.
+
+WHY NOW AND NOT AT THE TEAMS EDITION GATE. C41 designed a domain registry and was blocked on
+an ADR ruling; meanwhile every mint went into an epoch letter - 18 more in the groom that
+landed this morning. The SME&#x27;s direction on 2026-09-02: retire the old series and start by
+module BEFORE Teams Edition, because the problem compounds daily. The module axis already
+existed on 611 of 611 items as a required field; only the prefix was missing, which is why
+this is a day&#x27;s mechanism and not a design.
+
+MODULE, NOT DOMAIN, for item series - the one place this departs from C41. Domain is the
+ontology topic; module is the MODULE_MAP component an agent pulls against and the field
+every item already carries. The domain registry remains an ontology concern.
+DONE 2026-09-02: merged to main at c24ce720 (--no-ff, from feat/backlog-series-by-module,
+tip 664bca4a). Built on the laptop-vantage UI session, closed by the desktop session after
+the merge under the one-pen rule (CLAUDE.md §0). The first ids minted under it the same day:
+CFG1 CFG2 PLAN2 DOC1 DOC2 REF1 ONT1 ONT2 (gate ontology-domain-registry-and-edition-grain).
+The edition segment that follows this is PLAN2.
 </p></div></div>
 <div class="card" id="card-J1" data-id="J1" data-module="docs" data-phase="8" data-epic="release-infrastructure" data-type="chore" data-status="done" data-search="j1 sweep the iteration fragments (naming drift, superseded banners)" tabindex="0"><div class="card-head"><span class="card-id">J1</span><span class="card-title">Sweep the iteration fragments (naming drift, superseded banners)</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">haiku / main</span></div><div class="epic">release-infrastructure</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> DryDocs1 -&gt; DryDocs in CLAUDE.md:1 and 01-project-plan.md (title, repo URL; merged-branch line removed); drydocs1 -&gt; drydocs in knowledge/depgraph-snapshots/snapshot.ps1 + its README (existing drydocs1-*.json snapshot files left untouched as history); the stray &quot;@claude - &lt;Aura console URL&gt;&quot; line removed from README.md:1; a &quot;Superseded by the Phase 0-5 restructure plan&quot; banner on docs/reviews/drydocs-consolidated-plan.md and the persona/SDLC review docs; a README in SDLC-Docs/ marking it a frozen reference corpus that fed the ADRs. Tests stay green.
 </p><p class="notes"><strong>Notes:</strong> Done 2026-07-01 (haiku agent per the model matrix; opus review pass). 19 files: renames (CLAUDE.md, 01-project-plan.md incl. URL + merged-branch line, snapshot.ps1 + README + viewer.html, reference/REGISTRY.yaml — a residual the sweep caught beyond the checklist), README.md stray console-URL line removed, 11 docs/reviews/ superseded banners, SDLC-Docs/README.md created (frozen corpus). Residuals justified: historical drydocs1-*.json snapshots, the drydocs1-live-neo4j memory name, docs/history/. m1/m3-verify renames stay parked for the v1.0 window.

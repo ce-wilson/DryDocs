@@ -14,7 +14,44 @@ depends_on:
 gates:
 - ontology-domain-registry-and-edition-grain
 inputs:
+- drydocs_core/ontology/relationship_vocabulary/43-local-architecture.yaml
+- drydocs_core/ontology/relationship_vocabulary/45-local-docs.yaml
+- docs/RELATIONSHIP_GUIDE.md
+- SDLC-Docs/extracted/FCD-Requirements.md
+- config/taxonomy/domains.yaml
 - config/gate-prompts/ontology-domain-registry-and-edition-grain.yaml
 - config/gate-log.md
 acceptance: |
-  STUB - minted 2026-09-02 under PLAN1 from gate ontology-domain-registry-and-edition-grain SIGNED OFF 14/14 (E1); body follows.
+  Gate ontology-domain-registry-and-edition-grain §B4 (SIGNED OFF 2026-09-02: SPLIT NOW). The 2018 thesis (FCD-Requirements.md:27,
+  :106) is requirements, code and test cases as SEPARATE things joined by a query. Today code
+  is a facet of `architecture` (24 entries; :Code is dd:Code / prov:Collection, :Bitbucket is
+  dd:CodeRepository) and requirements have no label and sit in `docs` (20 entries) - the join
+  the product exists to make spans two domains that declare nothing to each other. This item
+  is the first exercise of the §B2 mint protocol.
+
+  (a) MINT TWO DOMAINS - `code` and `requirements` - as rows in domains.yaml (CFG1), each with
+  its fragment file (53-local-code.yaml, 54-local-requirements.yaml), authority = this gate's
+  record, minted_by = producer. Whether `test` is a third domain is PROPOSED here with the
+  evidence for and against and ruled at the gate in (d); it is not minted by default.
+
+  (b) THE G87 SHAPE, NO ENTRY MOVES: every `architecture` entry that is about code, and every
+  `docs` entry that is about a requirement, is ADDED to the new fragment under a domain-derived
+  id with `replaces:` naming the old id, and the old entry is DEPRECATED (status, deprecated_at,
+  superseded_by) - never deleted, never renamed, because ids are join keys cited inside signed
+  records. The proposal lists every candidate entry with its reason; the SME rules the
+  membership. `architecture` and `docs` keep everything that is not code or a requirement.
+
+  (c) THE RECONCILIATION EDGE, registered in the same change or the split reproduces spec-kit's
+  own gap (REF1): a typed relationship between :Requirement and :Code, entered through
+  docs/RELATIONSHIP_GUIDE.md and the vocabulary registry as `status: planned` (the C38 replica
+  edge precedent). NOT ruled here: its direction, its grain, and whether the converge VERDICT
+  is a property on the edge or a separate observation - those are the questions of ITS gate.
+  :Requirement is a new label and needs its ADR 0001 business-key answer before any loader.
+
+  (d) A GATE PROMPT for the membership ruling and the `test` question, drafted from (a)-(c),
+  with the FCD lines quoted verbatim at provenance; nothing loads until it signs. This item
+  is DONE when the two domains are minted, the planned entries and the planned edge are
+  registered, and the prompt is drafted - not when anything is loaded.
+
+  Depends on CFG1 (the registry the rows go in) and REF1 (the precedent the proposal cites).
+  Not in scope: any loader, any graph write, the semantics of the edge.

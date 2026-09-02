@@ -12,7 +12,36 @@ depends_on: []
 gates:
 - ontology-domain-registry-and-edition-grain
 inputs:
+- reference/REGISTRY.yaml
+- reference/research/README.md
+- config/classification.yaml
 - config/gate-prompts/ontology-domain-registry-and-edition-grain.yaml
 - config/gate-log.md
 acceptance: |
-  STUB - minted 2026-09-02 under PLAN1 from gate ontology-domain-registry-and-edition-grain SIGNED OFF 14/14 (E1); body follows.
+  Gate ontology-domain-registry-and-edition-grain §B4 (SIGNED OFF 2026-09-02, "split now"): the split proceeds on the 2018 FCD
+  evidence and the reference is registered BEHIND it, not before it. This tree has never heard
+  of spec-driven development - a case-insensitive grep for spec-kit or spec-driven is empty
+  across every .md, .yaml and .py - and ONT1's proposal cites it, so it must exist as a
+  citable source.
+
+  (a) reference-librarian task. Two entries in reference/REGISTRY.yaml, classification
+  External, each with source_url, captured_at and trust tier:
+  https://github.com/github/spec-kit - the toolkit: phases Constitution / Specify / Plan /
+  Tasks / Implement / CONVERGE; commands /speckit.specify, /speckit.plan, /speckit.tasks,
+  /speckit.converge.
+  https://www.thebcms.com/blog/spec-driven-development/ - the methodology: spec as primary
+  artifact, code as regenerable output, EARS-notation acceptance criteria, per-task
+  verification against those criteria.
+
+  (b) A write-up at reference/research/spec-driven-development.md, GROUNDED tier: what the
+  method is, and THE FINDING ONT1 rests on - spec-kit has NO formal traceability matrix; its
+  requirement-to-code linkage is implicit parent-child through sequential phases, which is
+  precisely the gap a graph closes and the argument for a typed edge rather than two labels
+  side by side. Two DryDocs surfaces that are already converge-shaped are named:
+  drydocs_core/docs_verify.py / drydocs/docs_coverage.py, and ADR 0015 D1's completeness
+  ledger.
+
+  (c) reference/research/README.md index line; config/classification.yaml entry; the
+  publish-boundary guards green (External, publishable).
+
+  No code. ONT1 depends on this.

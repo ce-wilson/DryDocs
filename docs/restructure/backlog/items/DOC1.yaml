@@ -12,7 +12,40 @@ depends_on: []
 gates:
 - ontology-domain-registry-and-edition-grain
 inputs:
+- docs/decisions/0015-team-edition-template.md
+- docs/decisions/README.md
 - config/gate-prompts/ontology-domain-registry-and-edition-grain.yaml
 - config/gate-log.md
 acceptance: |
-  STUB - minted 2026-09-02 under PLAN1 from gate ontology-domain-registry-and-edition-grain SIGNED OFF 14/14 (E1); body follows.
+  Gate ontology-domain-registry-and-edition-grain §D1 (SIGNED OFF 2026-09-02). ADR 0015 D2 (line 119, Cut row) removes
+  plan_board/plan_ideas/plan_roadmap and backlog_store from Team Edition - "Plan/port/backlog
+  are the producer's own project management" - and D6 follows it (groom-backlog
+  producer-only). D1 of the same ADR makes the completeness ledger GENERATE per-team work,
+  and generated work needs a place to land. The SME ruled: amend.
+
+  (a) AMEND D2: Team Edition ships a THIN, INSTANCE-OWNED backlog - items + inbox + a
+  per-instance board - under the copier `instance-owned` file class D4 already defines. The
+  BASE backlog stays `canonical-template`, frozen; an instance never writes under base
+  `items/`. backlog_store leaves the Cut row and joins the kept set, with a scope filter.
+
+  (b) AMEND D6: `groom-backlog` ships in the template, with a MANDATORY `--scope
+  <edition>`; the aggregate (all-editions) board is something only a base renders.
+
+  (c) STRENGTHEN D4 with the SME's 2026-09-02 rider: the declared ontology is COMMON and
+  base-owned - "at the base of everything" - so that aggregate roll-up and cross-edition
+  query run against one vocabulary; an edition extends, never overrides (CFG1 e). D4 already
+  says vocabulary change happens in the base; the amendment says WHY, and names the
+  aggregate query as the thing the rule protects.
+
+  (d) GUARDS named in the amendment, built by their own items when TE builds: an instance
+  item carries its edition segment (PLAN2); `depends_on` may point instance -> base, never
+  base -> instance; an instance never commits an aggregate render; an edition vocabulary row
+  never reuses a base id.
+
+  (e) THE AMENDMENT IS A DATED SECTION under the ADR's decisions, not an edit of D2's original
+  text - the ADR is PROPOSED, and the record of what changed and why (this gate, §D1) is the
+  point. docs/decisions/README.md index line updated. Related rulings recorded in the same
+  section: §C1-§C3 (the edition is a declared segment keyed to area_product_id) so the ADR's
+  D3 tenancy paragraph and the id grammar say the same thing.
+
+  No code; the ADR still awaits its own Phase 0 gate (the URN shared-vs-owned question).

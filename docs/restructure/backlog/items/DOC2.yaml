@@ -13,7 +13,41 @@ depends_on:
 gates:
 - ontology-domain-registry-and-edition-grain
 inputs:
+- docs/port/port-prompt.md
+- PORT-MANIFEST.yaml
+- docs/restructure/backlog/modules.yaml
 - config/gate-prompts/ontology-domain-registry-and-edition-grain.yaml
 - config/gate-log.md
 acceptance: |
-  STUB - minted 2026-09-02 under PLAN1 from gate ontology-domain-registry-and-edition-grain SIGNED OFF 14/14 (E1); body follows.
+  Gate ontology-domain-registry-and-edition-grain §E1 (SIGNED OFF 2026-09-02): a cross-repo convention change is inert until it
+  reaches the other side, and the company's allocator only WORKS once it holds an edition
+  code. RELAY-23 carries PLAN1 + this gate to the company through the port-prompt, in the
+  roll that carries commit 375dd962 (PLAN1 mechanism) and 39b90843 (this gate).
+
+  (a) THE FREEZE HALF, which can go now: the 27 letters frozen at their all-time max
+  (FROZEN_SERIES, FROZEN_ON 2026-09-02; the table is the constant, quoted); `--next-id G`
+  and `--next-id DD` are refused, each message naming the replacement; the series is the
+  module - modules.yaml `series:` arrives canonical-producer, so they inherit the 18 codes;
+  `--next-id --module <m>` is the command; codes are three-plus letters precisely so a
+  company mint can never be confused with a frozen letter, and none is DD.
+
+  (b) THE PREFIX HALF, which waits on PLAN2 landing: `[<EDITION>-]<MODULE><n>`; the company
+  base is an edition and MINTS ITS OWN CODE at its own gate (CFG2 §C3) - the relay names the
+  file and the columns, not the code; both partition rules are retired forward-only (§C4):
+  their DD1-DD10 / DD10001-DD10003 / G10001-G10003 stay readable; the band mirror assertion
+  the port-prompt asked them to write (steps 160, 273 region) is WITHDRAWN and replaced by
+  the edition-segment check; between the roll and their code mint they mint nothing new.
+
+  (c) THE TWO-AXES WORDING, verbatim from the 2026-09-02 review, so their agent stops
+  conflating repos and checkouts: Axis 1 - repos (producer / company: disjoint histories,
+  one-way port; the edition prefix separates THESE). Axis 2 - checkouts (every machine,
+  worktree or session is a checkout; the push-before-work claim and the wip/ branch rule
+  separate THESE). "Both machines and both repos" meant axis 2 on our side and axis 1
+  between us.
+
+  (d) J63 provenance block, the RELAY numbered, the APPLY BY DISPOSITION section updated for
+  the new per-entry rows (domains.yaml, editions.yaml) and the CLAUDE.md mint-rule change.
+  Idea-237's gate-prompt correction (MM13) rides the same relay.
+
+  Depends on PLAN2 for (b); (a) may ship first if a roll happens before PLAN2 lands, in which
+  case the item stays in_progress and (b) is a second relay entry.

@@ -13,7 +13,41 @@ depends_on:
 gates:
 - ontology-domain-registry-and-edition-grain
 inputs:
+- config/taxonomy/lob-product-team.yaml
+- PORT-MANIFEST.yaml
+- drydocs_core/schema/constraints.cypher
+- drydocs/loaders/cypher/area_products.cypher
 - config/gate-prompts/ontology-domain-registry-and-edition-grain.yaml
 - config/gate-log.md
 acceptance: |
-  STUB - minted 2026-09-02 under PLAN1 from gate ontology-domain-registry-and-edition-grain SIGNED OFF 14/14 (E1); body follows.
+  Gate ontology-domain-registry-and-edition-grain §C2-§C3 (SIGNED OFF 2026-09-02). The grain is the AREA PRODUCT, with the SME's
+  definition as the ruling of record: an Area Product is where two or three applications are
+  delivering on the same business topic. That definition - not the Product Catalog tier name -
+  is what qualifies a row.
+
+  (a) NEW config/taxonomy/editions.yaml, schema drydocs.editions.v1, on the lob-product-team.yaml
+  pattern exactly: classification Internal; a SYNTHETIC publishable sample producer-side (two or
+  three invented editions with invented area_product_ids, clearly marked); real rows
+  company-side; a per-entry manifest row so a port cannot flatten them (PORT-MANIFEST.yaml:668
+  precedent), with the J71 UNNAMED FIELDS clause.
+
+  (b) COLUMNS: `code` (the id segment - 2-5 uppercase letters, unique, never a module code and
+  never a frozen letter), `title`, `area_product_id` (the K5 §B key; constraints.cypher:79 makes
+  it UNIQUE on :AreaProduct, area_products.cypher loads it - an edition joins to a node the
+  graph already holds), `minted_by`, `registered_at`, `authority`, `legacy_band` (nullable; the
+  company base records 10000+ here for reading history, nothing else).
+
+  (c) THE COMPANY BASE IS AN EDITION AND MINTS ITS OWN CODE at its own gate, by the §B2
+  protocol. The producer does not name it; the synthetic sample must not guess it either.
+
+  (d) BEFORE REAL ROWS: the Area Product list exists today only in a screenshot. Transcribe it
+  to a named file under internal-local/ (machine-local, never tracked) and cite THAT file in
+  the company-side rows' provenance - the image-provenance rule. Producer-side this item ships
+  the sample only.
+
+  (e) GUARD: every `code` is unique across editions.yaml AND absent from modules.yaml `series`
+  AND absent from FROZEN_SERIES; every `area_product_id` in a real row resolves against the
+  loaded :AreaProduct set when a graph is present (skip, not fail, when it is not - J18).
+
+  Depends on CFG1 only for the shared file conventions; the two registries never share
+  (§A2).

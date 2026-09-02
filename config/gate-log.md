@@ -4374,8 +4374,18 @@ answered and stays open as a rider. Nothing renumbers; no id moves.
   spec-kit / spec-driven-development sources are registered by the reference-librarian
   BEHIND the split (REF1), not before it. Whether `test` is a third domain is NOT ruled
   and rides with ONT1's proposal.
-- **§B5 — CONFIRMED as drafted; rider OPEN.** `acronyms` and `ontology` are not minted
-  here and go through §B2 if ever wanted; whether either is wanted was not answered.
+- **§B5 — CONFIRMED as drafted; RIDER RULED the same session (SME, in-chat, after the
+  five).** Neither is minted by this gate; both go through §B2. But both ARE wanted, and the
+  SME said how: (i) *ontology* — "declared/standardized ontology needs to be at the base of
+  everything, a common ontology in order to have the aggregate rollup and query across using
+  declared ontology." Recorded as a rule, not a domain: the declared ontology is COMMON and
+  BASE-OWNED; an edition extends it (own rows, own authority) and never overrides a base row;
+  that is what makes cross-edition aggregate query possible. Carried by CFG1 (e) as a registry
+  guard and by DOC1 (c) into ADR 0015 D4. (ii) *acronyms* — "a little trickier: it needs
+  common for company, SDLC, technical, then the edition specific." Recorded as a domain TO BE
+  MINTED with a TIER axis of four values — `company`, `sdlc`, `technical`, `edition` — where
+  the first three are base-common and the fourth is edition-owned, resolved edition-first
+  then common. Minted by ONT2 through the §B2 protocol; this record is its authority.
 - **§C1 — CONFIRMED.** `[<EDITION>-]<MODULE><n>`, edition first, base unprefixed; the
   segment is optional so every existing id parses; both halves must be declared.
 - **§C2 — RULED: THE GRAIN IS THE AREA PRODUCT**, with the SME's definition as the
@@ -4407,7 +4417,7 @@ answered and stays open as a rider. Nothing renumbers; no id moves.
   series: CFG1 (domains.yaml), CFG2 (editions.yaml), PLAN2 (the edition segment in the
   id grammar + band-check replacement + git-readme retirement), DOC1 (the ADR 0015
   amendment text), DOC2 (RELAY-23, the port relay), REF1 (spec-kit / SDD registered),
-  ONT1 (the code/requirements split + the planned reconciliation edge). C41 closes on
-  the mint, per E1.
+  ONT1 (the code/requirements split + the planned reconciliation edge), ONT2 (the
+  acronyms domain, four tiers — from the §B5 rider). C41 closes on the mint, per E1.
 - **§F1 — CONFIRMED.** Not reopened: PLAN1, the psgmgr publish ceiling, the 13 domains'
   membership, G102, the reconciliation edge's semantics.

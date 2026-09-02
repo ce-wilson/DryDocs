@@ -12,7 +12,49 @@ depends_on: []
 gates:
 - ontology-domain-registry-and-edition-grain
 inputs:
+- drydocs_core/ontology/relationship_vocabulary/00-header.yaml
+- drydocs_core/ontology/relationship_vocabulary/
+- tests/unit/test_classification.py
 - config/gate-prompts/ontology-domain-registry-and-edition-grain.yaml
 - config/gate-log.md
 acceptance: |
-  STUB - minted 2026-09-02 under PLAN1 from gate ontology-domain-registry-and-edition-grain SIGNED OFF 14/14 (E1); body follows.
+  Gate ontology-domain-registry-and-edition-grain §B1-§B3 (SIGNED OFF 2026-09-02). Today the 13 domains exist as a comment block in
+  00-header.yaml lines 74-79 and a guard that pins the list; "registered" means someone edited
+  the comment. This item makes the registry DATA.
+
+  (a) NEW config/taxonomy/domains.yaml, schema drydocs.domains.v1, one row per domain: `id`
+  (the join key, never renamed), `title`, `vocabulary_fragment` (REQUIRED per §B3 - the
+  4x-local-*.yaml file; a row without one fails), `minted_by` (producer | company | <edition>),
+  `registered_at`, `authority` (the gate or ADR that ruled it; every row cites one), `status`
+  active | deprecated with `superseded_by` (the G87 shape). NO `series` column - PLAN1 gave the
+  series to the module.
+
+  (b) SEEDED WITH THE 13 AS THEY ARE, each citing its real ruling: eleven from
+  vocabulary-domains-and-id-policy (2026-08-12), `infrastructure` from server-location-ontology
+  (Z2, 2026-08-19), `human` from §A3 of the 08-12 gate. Nothing invented; the file writes down
+  rulings that exist. Fragment entry counts at mint: scheduler 53, business_application 10,
+  catalog 16, architecture 24, registry 4, docs 20, all 2, context 8, quality 8, corporate 5,
+  itsm 2, infrastructure 3, human 20.
+
+  (c) THE HEADER BECOMES A POINTER: 00-header.yaml's domain block says "see
+  config/taxonomy/domains.yaml" and the guard that pinned the closed list reads the file
+  instead (J37: the importable object, never the comment). A domain named in any fragment
+  entry must exist in the registry, active; a registry row's fragment must exist on disk.
+
+  (d) PORT: a per-entry manifest row on the tom-role-vocabulary pattern (PORT-MANIFEST.yaml:685
+  precedent) - rows union by id, each base's own mints stay, the header/schema/field list
+  crosses whole. UNNAMED FIELDS clause per J71.
+
+  (e) THE ONTOLOGY IS COMMON AND BASE-OWNED (SME rider, 2026-09-02): the declared ontology sits
+  at the base of everything so aggregate roll-up and cross-edition query work against ONE
+  vocabulary; an edition may EXTEND it (its own rows, minted_by = the edition, authority = its
+  gate) and never override a base row. The registry carries that as a guard: an edition row
+  may not reuse a base id, and a base row is never deprecated by an edition.
+
+  (f) What this item does NOT do: mint any domain (ONT1 and ONT2 do the first three), define
+  a mint command (a domain is minted by a gate record plus a row; the allocator question is
+  name collision across remote refs and history, which `validate.py` already answers for ids
+  and can answer for a name - add `--check-domain <id>` only if ONT1 needs it).
+
+  tests/unit green; classification of the new file = Internal-Public (mechanism, no values);
+  render clean.

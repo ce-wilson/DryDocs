@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: opus
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - docs/restructure/backlog/modules.yaml
@@ -63,3 +63,8 @@ notes: |
   MODULE, NOT DOMAIN, for item series - the one place this departs from C41. Domain is the
   ontology topic; module is the MODULE_MAP component an agent pulls against and the field
   every item already carries. The domain registry remains an ontology concern.
+  DONE 2026-09-02: merged to main at c24ce720 (--no-ff, from feat/backlog-series-by-module,
+  tip 664bca4a). Built on the laptop-vantage UI session, closed by the desktop session after
+  the merge under the one-pen rule (CLAUDE.md §0). The first ids minted under it the same day:
+  CFG1 CFG2 PLAN2 DOC1 DOC2 REF1 ONT1 ONT2 (gate ontology-domain-registry-and-edition-grain).
+  The edition segment that follows this is PLAN2.
