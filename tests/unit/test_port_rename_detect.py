@@ -19,7 +19,9 @@ from drydocs.port_rename_detect import (
     jaccard,
     normalized_text,
     overlap,
+    parse_git_renames,
     rename_candidates,
+    render_git_renames,
     report,
     structural_candidates,
     text_similarity,
@@ -471,3 +473,41 @@ def test_the_cap_is_per_file_across_signals_not_per_signal() -> None:
     found = rename_candidates(proposed, existing, producer_paths={"vocab/41-local-new.yaml"})
     assert len(found) == MAX_MATCHES_PER_ADD
     assert all(c.proposed == "vocab/41-local-new.yaml" for c in found)
+
+
+# ---- git already knew (2026-09-01) -------------------------------------------
+# The SME asked whether the commit ritual should go per-module to prevent this.
+# It would not have: the vocabulary rename was ALREADY a 6-file, ontology-scoped
+# commit. Nothing was missing from the commit — the rename metadata was missing
+# from the PORT, which classifies by path and never reads history.
+
+
+def test_git_rename_output_is_parsed_exactly() -> None:
+    """`git diff -M --diff-filter=R --name-status` is authoritative where the
+    similarity measures are heuristic. Measured on the real consumer range: 18
+    renames, every 2026-09-01 trap among them."""
+    sample = "\n".join(
+        [
+            "R097\tvocab/40-local-controlm.yaml\tvocab/40-local-scheduler.yaml",
+            "R075\tconfig/gate-prompts/legacy-crosswalk.yaml\tconfig/gate-prompts/cdo-crosswalk.yaml",
+            "R090\tdrydocs/docs_verify.py\tdrydocs_core/docs_verify.py",
+            "M\tsome/edited/file.py",  # not a rename; must be ignored
+            "A\tsome/added/file.py",
+        ]
+    )
+    parsed = parse_git_renames(sample)
+    assert len(parsed) == 3
+    assert parsed[0] == ("vocab/40-local-controlm.yaml", "vocab/40-local-scheduler.yaml", 97)
+    # the cross-DIRECTORY move is in the list — the same-directory heuristic skips it
+    assert ("drydocs/docs_verify.py", "drydocs_core/docs_verify.py", 90) in parsed
+
+
+def test_the_git_report_states_its_one_to_one_limit() -> None:
+    """Git matches one old path to one new path, so a SPLIT reports one rename and
+    the other targets as plain adds — which is exactly the pair containment
+    recovers. A reader who does not know that will trust the exact list as complete."""
+    text = render_git_renames([("a/old.yaml", "a/new.yaml", 97)])
+    assert "exact, not inferred" in text
+    assert "1:1" in text and "SPLIT" in text
+    assert "R097" in text
+    assert "git detected no renames" in render_git_renames([])

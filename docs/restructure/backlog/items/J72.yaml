@@ -157,3 +157,36 @@ notes: |
   proves the theory, not the tree. The company measured the real pair each time and was right each
   time. The rule this earns: when a guard is written for a specific incident, its fixture must be
   RECONSTRUCTED FROM THE INCIDENT at the real values, and a synthetic one only supplements it.
+
+  FOURTH ROUND - GIT ALREADY KNEW, AND THE PORT WAS THROWING IT AWAY.
+
+  THE SME ASKED whether the commit ritual should become per-module to prevent this class of guard
+  being needed. It would not have helped, and the evidence is in the commit: 496aa268, which did the
+  vocabulary rename, touched SIX FILES and only the ontology. It was already module-scoped. Nothing
+  was missing from the commit. What was missing was in the PORT PROCESS, which classifies each
+  producer path against the manifest, asks "does the consumer hold this path", and in asking that
+  question discards the rename metadata git recorded when the rename was made.
+
+  MEASURED: `git diff -M --diff-filter=R --name-status port-base-20260826..HEAD` reports 18 RENAMES
+  in the consumer range, with similarity scores, and every 2026-09-01 trap is among them -
+  40-local-controlm -> 40-local-scheduler at R097, 41-local-seal -> 41-local-business-application at
+  R095, the crosswalk gate prompt twin at R075, its test at R088. It also names two the similarity
+  detector could not: drydocs/docs_verify.py -> drydocs_core/docs_verify.py at R090, which is the
+  shadow-definition trap the company hit, and the docs/Product -> knowledge/org relocation - both
+  CROSS-DIRECTORY moves that same_directory_only skips by design.
+
+  So the exact list now leads the report and the heuristic follows. Git is authoritative where the
+  measures are inference, and it costs one command.
+
+  IT DOES NOT REPLACE THE MEASURES, for a reason that is the same shape as everything else in this
+  item: git's rename detection is 1:1. A SPLIT gets one match and the remaining targets come back as
+  plain adds - 41-local-seal matched 41-local-business-application, and 52-local-human arrived as an
+  add. That is exactly the pair containment recovers at 0.71. Exact for 1:1, heuristic for splits,
+  and the report says so rather than letting a reader trust the exact list as complete.
+
+  THE UNCOMFORTABLE PART, recorded because it is the lesson: three rounds of similarity work went
+  into recovering information that was sitting in the commit metadata the whole time. The tool was
+  not wrong, and the split case genuinely needs it - but the FIRST question should have been "does
+  anything already record this", and it was not asked until the SME asked whether the ritual was the
+  problem. Reaching for a new measurement before checking what the system already knows is the
+  expensive mistake here, and it was mine three times over.

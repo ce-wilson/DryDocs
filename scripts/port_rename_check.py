@@ -17,7 +17,8 @@ Usage, from the company checkout with the producer remote fetched:
     # both known traps were in-directory; widen only for a deliberate sweep
     poetry run python scripts/port_rename_check.py --producer-ref cewilson/main --any-directory
 
-Exit 0 = no proposed clean-add resembles a file you already hold. Exit 1 = at
+Exit 0 = git detected no renames in the range AND no proposed clean-add
+resembles a file you already hold. Exit 1 = at
 least one does; READ BOTH before applying either. **Exit 0 is NOT a guarantee the
 slice is safe** — see the residual limitation in the report and in
 ``port_rename_detect``. Necessary, not sufficient. Exit 2 = a side could not be
@@ -39,7 +40,12 @@ import subprocess
 import sys
 from pathlib import Path
 
-from drydocs.port_rename_detect import rename_candidates, report
+from drydocs.port_rename_detect import (
+    parse_git_renames,
+    rename_candidates,
+    render_git_renames,
+    report,
+)
 from drydocs_core.repo_paths import repo_root
 
 REPO = repo_root(Path(__file__).resolve().parents[1])
@@ -128,6 +134,20 @@ def main(argv: list[str] | None = None) -> int:
             "An empty consumer side cannot be compared against."
         )
 
+    # EXACT FIRST, HEURISTIC SECOND. Git recorded these renames when they were made;
+    # the port was discarding that and re-deriving it by similarity. Anything git
+    # names here is a fact, not a candidate.
+    git_renames = [
+        r
+        for r in parse_git_renames(
+            _git("diff", "-M", "--diff-filter=R", "--name-status", args.producer_ref, "HEAD")
+        )
+        if r[0].startswith(args.path_prefix) or r[1].startswith(args.path_prefix)
+    ]
+    print()
+    print(render_git_renames(git_renames))
+    print()
+
     proposed = {path: text for path, text in producer.items() if path not in consumer}
     print(
         f"producer {args.producer_ref}: {len(producer)} readable file(s); "
@@ -136,7 +156,7 @@ def main(argv: list[str] | None = None) -> int:
     candidates = rename_candidates(proposed, consumer, same_directory_only=not args.any_directory)
     print()
     print(report(candidates))
-    return 1 if candidates else 0
+    return 1 if (candidates or git_renames) else 0
 
 
 if __name__ == "__main__":

@@ -420,6 +420,60 @@ NOT_A_GUARANTEE = (
 )
 
 
+def parse_git_renames(name_status: str) -> list[tuple[str, str, int]]:
+    """``(old, new, similarity%)`` from ``git diff -M --diff-filter=R --name-status``.
+
+    GIT ALREADY KNOWS, and the port was throwing it away. A port classifies each
+    producer path against the manifest and asks "does the consumer have this path" —
+    a question that discards the rename metadata sitting in the commit that made it.
+    Measured on ``port-base-20260826..HEAD``: **18 renames**, every one of the
+    2026-09-01 traps among them, with similarity scores attached —
+    ``40-local-controlm -> 40-local-scheduler`` at R097,
+    ``41-local-seal -> 41-local-business-application`` at R095, the crosswalk prompt
+    twin at R075, its test at R088, and ``drydocs/docs_verify.py ->
+    drydocs_core/docs_verify.py`` at R090, which is the shadow-definition trap.
+
+    This is EXACT where the similarity measures are heuristic, so it is reported
+    first and separately. It does not replace them, for two reasons:
+
+    * **Git's rename detection is 1:1.** A SPLIT gets one match and the rest are
+      plain adds — ``41-local-seal`` matched ``41-local-business-application`` and
+      ``52-local-human`` came back as an add, which is precisely the pair
+      :func:`containment` recovers at 0.71.
+    * It has a similarity threshold and a rename limit, so a heavily-edited rename
+      can fall out of the list entirely.
+
+    Parsing is separated from running git so the guards need no repository.
+    """
+    out: list[tuple[str, str, int]] = []
+    for line in name_status.splitlines():
+        parts = line.split("	")
+        if len(parts) != 3 or not parts[0].startswith("R"):
+            continue
+        score = parts[0][1:]
+        out.append((parts[1], parts[2], int(score) if score.isdigit() else 0))
+    return out
+
+
+def render_git_renames(renames: list[tuple[str, str, int]]) -> str:
+    if not renames:
+        return "git detected no renames in this range."
+    lines = [
+        f"{len(renames)} RENAME(S) GIT DETECTED IN THIS RANGE — exact, not inferred.",
+        "",
+        "A path on the right may look like a clean-add here while the path on the",
+        "left is a file you already hold. Resolve each as a rename before applying:",
+        "",
+    ]
+    lines += [f"  R{score:03d}  {old}\n        -> {new}" for old, new, score in renames]
+    lines += [
+        "",
+        "Git's detection is 1:1, so a SPLIT shows one rename and the other targets as",
+        "plain adds. The similarity candidates below cover that case.",
+    ]
+    return "\n".join(lines)
+
+
 def report(candidates: list[RenameCandidate]) -> str:
     if not candidates:
         clean = "no proposed clean-add resembles an existing file under another name."
