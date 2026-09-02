@@ -18,6 +18,56 @@
   import the graph-write or run-cadence layer.
 - **Components import only core, never each other.**
 
+## The component map (ADR 0018 D1 — the declaration, rendered)
+
+What a module BELONGS to is declared once, in `drydocs_core/component_map.py`, and read three
+ways: `tests/unit/test_module_boundary.py` enforces it, this section renders it, and the Team
+Edition copier (ADR 0015 D2/D4) derives its file classes from it. Since ADR 0018 D4
+(2026-09-02) the four components that were flat name-lists under `drydocs/` are subpackages —
+`drydocs/review/`, `drydocs/plan/`, `drydocs/port/`, `drydocs/docgen/` — and each old flat path
+is a one-cycle `sys.modules` re-export shim (both prefixes are listed until the shims retire at
+the roll after next).
+
+<!-- component-map:begin -->
+_Rendered from `drydocs_core/component_map.py` by `scripts/render_module_map.py`; do not edit by hand (ADR 0018 D1). The tables further down carry each row's history._
+
+| Component | Backlog module | Series | Dotted prefixes (the boundary test classifies by these) |
+|---|---|---|---|
+| core | `drydocs-core` | `CORE` | `drydocs_core` |
+| load | `drydocs-load` | `LOAD` | `drydocs.loaders`, `drydocs.cli`, `drydocs.cli_schema`, `drydocs.cli_ingest`, `drydocs.cli_verify`, `drydocs.cli_variables`, `drydocs.cli_docs`, `drydocs.cli_plan`, `drydocs.cli_shared`, `drydocs.snapshots`, `drydocs.staging`, `drydocs.cmdline_staging`, `drydocs.seal_samples`, `drydocs.pat_projection`, `drydocs.chain_inputs`, `drydocs.code_graph_freshness`, `drydocs.docs_coverage` |
+| review | `drydocs-review` | `REV` | `drydocs.review`, `drydocs.graph_verify`, `drydocs.review_labels`, `drydocs.source_mappings`, `drydocs.graph_review`, `drydocs.sme_notes`, `drydocs.gate_pages`, `drydocs.publishing`, `drydocs.fid_census`, `drydocs.run_as_detect` |
+| plan | `drydocs-plan` | `PLAN` | `drydocs.plan`, `drydocs.plan_board`, `drydocs.plan_roadmap` |
+| port | `drydocs-port` | `PORT` | `drydocs.port`, `drydocs.port_preflight`, `drydocs.port_backlog_union`, `drydocs.port_rename_detect` |
+| docgen | `drydocs-docgen` | `DOCGEN` | `drydocs.docgen`, `drydocs.doc_outline`, `drydocs.design_doc`, `drydocs.doc_pdf`, `drydocs.plan_ideas` |
+| remediation | `drydocs-remediation` | `REM` | `drydocs_remediation` |
+| lineage | `drydocs-lineage` | `LIN` | `drydocs_lineage` |
+| deepdoc | `drydocs-deepdoc` | `DEEP` | `drydocs_deepdoc` |
+| docmeta | `drydocs-docmeta` | `META` | `drydocs_docmeta` |
+| api | `drydocs-api` | `API` | `drydocs_api` |
+| agents | `drydocs-agents` | `AGENT` | `agents` |
+| libs | `drydocs-libs` | `LIBS` | `libs` |
+
+| Owned surface (no Python package root) | Owning module |
+|---|---|
+| `SDLC-Docs/` | `docs` |
+| `agents/` | `drydocs-agents` |
+| `config/` | `config` |
+| `docs/` | `docs` |
+| `drydocs-icons/` | `drydocs-web` |
+| `external/` | `reference` |
+| `graph-tests/` | `drydocs-review` |
+| `internal/` | `docs` |
+| `knowledge/` | `docs` |
+| `knowledge/depgraph-snapshots/` | `drydocs-load` |
+| `knowledge/upgrade-plans/` | `docs` |
+| `libs/` | `drydocs-libs` |
+| `reference/` | `reference` |
+| `scripts/` | `drydocs-load` |
+| `web/` | `drydocs-web` |
+
+Work-area and non-Python modules (own no package): `config`, `docs`, `drydocs-web`, `graph-infra`, `ontology`, `reference`, `taxonomy`.
+<!-- component-map:end -->
+
 ## Naming: folder name vs module name (S7, raised at ADR 0008)
 
 A **module name** (`drydocs-<x>`, the backlog's `modules:` registry) names a *component* —
@@ -77,7 +127,7 @@ The backlog `modules:` comments cite this section rather than re-explaining it.
 |---|---|---|
 | `drydocs/loaders/**` | `drydocs-load` (main) | `drydocs` ground truth |
 | `drydocs/cli.py` | `drydocs-load` (entrypoint) | — (orchestrates loaders) |
-| `drydocs/cli_schema.py`, `cli_ingest.py`, `cli_verify.py`, `cli_variables.py`, `cli_docs.py`, `cli_plan.py` | `drydocs-load` (per-domain command modules, S8 2026-08-21) — each holds one domain's Typer verbs and is merged FLAT onto the root, so `drydocs --help` is unchanged. Since S13 (2026-08-27) they import shared state from `cli_shared.py` (never the root at module scope — that was the S13 cycle) and are NOT entrypoints: a verb that wires another component (resolve-cmdline-staging, lineage-review → `drydocs_lineage`; fid-census → `drydocs.fid_census`) stays in `cli.py`, the only `ENTRYPOINT_MODULES` exemption. `m1-verify`/`m3-verify` survive as deprecated aliases of `verify-reference`/`verify-controlm` | — (orchestrate loaders) |
+| `drydocs/cli_schema.py`, `cli_ingest.py`, `cli_verify.py`, `cli_variables.py`, `cli_docs.py`, `cli_plan.py` | `drydocs-load` (per-domain command modules, S8 2026-08-21) — each holds one domain's Typer verbs and is merged FLAT onto the root, so `drydocs --help` is unchanged. Since S13 (2026-08-27) they import shared state from `cli_shared.py` (never the root at module scope — that was the S13 cycle) and are NOT entrypoints: a verb that wires another component (resolve-cmdline-staging, lineage-review → `drydocs_lineage`; fid-census → `drydocs.review.fid_census`) stays in `cli.py`, the only `ENTRYPOINT_MODULES` exemption. `m1-verify`/`m3-verify` survive as deprecated aliases of `verify-reference`/`verify-controlm` | — (orchestrate loaders) |
 | `drydocs/cli_shared.py` | `drydocs-load` (hoisted shared CLI state, S13 2026-08-27, the ADR 0002-A shape) — the constants and stateless helpers the command modules and the root both import (loader registry, chains, gate/adapters/opt helpers, `console`). Makes the CLI import graph a DAG so every `cli_*` module works as the FIRST import of a fresh interpreter (guard: `tests/unit/test_cli_import_order.py`, subprocess-per-import). Mutable state stays on the root (`_registry`, `_client` — the tested patch surfaces), reached only at call time | — (pure state; no graph write) |
 | `drydocs/snapshots/` | `drydocs-load` (tooling) | depgraph snapshot |
 | `drydocs/staging.py` | `drydocs-load` (staging bundle builder; ex `controlm/staging.py`) | — (builds loader input) |
@@ -88,25 +138,25 @@ The backlog `modules:` comments cite this section rather than re-explaining it.
 | `drydocs/chain_inputs.py` | `drydocs-load` (chain input resolver, G78) — resolves every step of a sequenced chain (`refresh-reference`, the `ingest-controlm` fixture pass) BEFORE the first write: explicit `--samples-dir` (fixtures) or `--source <id>` (the registry's declared landing zone), no default; a missing required file fails the chain by name; the closing table says which path each step read | — (pure path resolution, **no graph write**) |
 | `drydocs/pat_projection.py` | `drydocs-load` (input projection, G82) — projects the raw PAT team report into the two files the team chain reads (`cli.CHAINS['refresh-teams']`) (`dev_teams__sample.csv`, `pat_product_mapping__sample.csv`); refuses to guess a key header (`--header-map` pins spellings on the first real run); ledger = `config/source-mappings/pat-team-report.yaml`. CLI: `scripts/project_pat_team_report.py` | two CSVs under the caller's `--out-dir` (Internal, under `DRYDOCS_DATA_ROOT`; **no graph write**) |
 | `drydocs/seal_samples.py` | `drydocs-load` (fixture generator) — derives the two SEAL sample CSVs the business-application chain declares (`cli.CHAINS['refresh-applications']`) from `config/taxonomy/business-application.yaml`. They are GENERATED per machine, never committed: `drydocs/data/` is gitignored as possibly-sensitive, and this file family leaked real SEALIDs twice. Refuses to emit an app id outside the reserved 70001-70099 block | sample CSVs under `drydocs/data/samples/` (**no graph write**) |
-| `drydocs/graph_verify.py` | `drydocs-review` — data-driven Cypher acceptance runner (Epic H) | — (reads graph; asserts) |
-| `drydocs/review_labels.py` | `drydocs-review` — the review backbone (source→DATA-label map); consumed by review | — (pure config) |
-| `drydocs/source_mappings.py` | `drydocs-review` — per-source column ledger accessor (doc 08); projected/filter-only/excluded/deferred disposition per profiled column | — (pure config) |
-| `drydocs/graph_review.py` | `drydocs-review` — renders live-graph rows → SME review HTML (H2) | — (reads graph; writes HTML) |
-| `drydocs/sme_notes.py` | `drydocs-review` — SME-notes harvester: owner-attributed inline `SME[sid] $FR/$UC/$OQ/$NOTES` comments → requirement buckets (Epic H) | — (scans repo; reports) |
-| `drydocs/gate_pages.py` | `drydocs-review` — HITL SME-gate prompt-page generator (load-step spec → self-contained interactive review page; repo stays the system of record) | gate pages (offline HTML) |
-| `drydocs/publishing/**` | `drydocs-review` — docs publish pipeline (Confluence push abstracted, H5) | external (docs target) |
+| `drydocs/review/graph_verify.py` | `drydocs-review` — data-driven Cypher acceptance runner (Epic H) | — (reads graph; asserts) |
+| `drydocs/review/review_labels.py` | `drydocs-review` — the review backbone (source→DATA-label map); consumed by review | — (pure config) |
+| `drydocs/review/source_mappings.py` | `drydocs-review` — per-source column ledger accessor (doc 08); projected/filter-only/excluded/deferred disposition per profiled column | — (pure config) |
+| `drydocs/review/graph_review.py` | `drydocs-review` — renders live-graph rows → SME review HTML (H2) | — (reads graph; writes HTML) |
+| `drydocs/review/sme_notes.py` | `drydocs-review` — SME-notes harvester: owner-attributed inline `SME[sid] $FR/$UC/$OQ/$NOTES` comments → requirement buckets (Epic H) | — (scans repo; reports) |
+| `drydocs/review/gate_pages.py` | `drydocs-review` — HITL SME-gate prompt-page generator (load-step spec → self-contained interactive review page; repo stays the system of record) | gate pages (offline HTML) |
+| `drydocs/review/publishing/**` | `drydocs-review` — docs publish pipeline (Confluence push abstracted, H5) | external (docs target) |
 | `drydocs/docs_coverage.py` | `drydocs-load` — the Q16 software→documentation coverage report (`drydocs docs-coverage`): per product, what docs are declared, where they live, whether they are loaded, and every blocker. Two layers — a PURE declaration join that decides the cross-DB question with the database off, plus an optional injected graph probe whose fields are `None` (`not-probed`) rather than `0` when it does not run. Reuses `drydocs_core.docs_verify.count_query` so the two verbs cannot disagree | — (returns counts + states) |
-| `drydocs/fid_census.py` | `drydocs-review` — the doc-09 phase-0 FID directory census (K16): demand-set scope + the registration-vs-attribution disagreement rate the `fid-identity-and-scope` gate cannot sign without. Pure (no file, no DB, no writes; every input injected) and **counts-only by return type** — the method is producer-side, the measured values are Internal and company-side | — (returns counts) |
-| `drydocs/run_as_detect.py` | K25 — cross-application run_as detection over the census join: per-JOB class (platform_user / application_fid / unresolvable), class x job type, the same/different/unresolvable comparison for application-class jobs, and the §G5 split parked until ruled. Pure and stdlib-only like `fid_census.py`, for the same porting reason; counts only, no graph write | drydocs-review |
-| `drydocs/plan_board.py` | `drydocs-plan` — backlog/ (sharded, ADR 0013) → HTML project board renderer (Epic I) | `docs/plan/board.html` |
-| `drydocs/plan_ideas.py` | `drydocs-plan` — IDEAS.md → HTML idea-inbox read view; reuses `design_doc.render_body` rather than adding a second markdown renderer | `docs/plan/ideas.html` |
-| `drydocs/plan_roadmap.py` | `drydocs-plan` — roadmap.yaml (authored stage/estimates) + backlog/ (live counts) → per-module build-out roadmap; the third planning surface | `docs/plan/roadmap.html` |
-| `drydocs/port_preflight.py` | `drydocs-port` — J41 the port OPENING sequence: certifies a producer base before a company session starts (tree/renders/suite/ledger-coverage/relay-basis/cited-path-resolution/tag). Pure functions take TEXT, COMMIT LISTS and DOCUMENT MAPS, never a repo, so the guards run without one; only `run_checks` shells out | `port-base-<date>` tag + a pass/fail report |
-| `drydocs/port_backlog_union.py` | `drydocs-port` — J42 the port UNION half: diffs the producer base's backlog item-id set (a git ref, materialized with `git archive`) against the APPLIED consumer tree and fails the port report naming every dropped id. Both sides read through `backlog_store.load_items`, so an absent/empty items directory and a filename-vs-inner-id mismatch FAIL LOUD instead of reading as agreement (the tombstone vacuous-green trap). Owns never-drop-an-entry only; the status-regression half is the J16 guard's | a pass/fail union block for the port report |
-| `drydocs/port_rename_detect.py` | `drydocs-port` — J72 the port RENAME half: a producer path absent consumer-side classifies as a clean-add, which is true of the PATH and blind to the CONTENT — so a renamed file arrives as new. Compares each proposed add against consumer files with a DIFFERENT name, by id-set (a split moves entries; ids survive it) and by normalized text (a rename rewrites the header; the body survives), taking the stronger. Reports, never decides. Pure text/path-map functions, no repo | a stop-and-look list for the apply session |
-| `drydocs/doc_outline.py` | `drydocs-docgen` — canonical doc-outline completeness + traceability validator (Epic L) | — (pure; validates docs) |
-| `drydocs/design_doc.py` | `drydocs-docgen` — deterministic Markdown→HTML renderer, one surface: screen + @media print (Epic L; L13) | `docs/design/*.html` |
-| `drydocs/doc_pdf.py` | `drydocs-docgen` — headless-Chromium html→PDF via the @media print sheet (Brave-first), date-normalized (Epic L) | `docs/design/*.pdf` (build-on-demand) |
+| `drydocs/review/fid_census.py` | `drydocs-review` — the doc-09 phase-0 FID directory census (K16): demand-set scope + the registration-vs-attribution disagreement rate the `fid-identity-and-scope` gate cannot sign without. Pure (no file, no DB, no writes; every input injected) and **counts-only by return type** — the method is producer-side, the measured values are Internal and company-side | — (returns counts) |
+| `drydocs/review/run_as_detect.py` | K25 — cross-application run_as detection over the census join: per-JOB class (platform_user / application_fid / unresolvable), class x job type, the same/different/unresolvable comparison for application-class jobs, and the §G5 split parked until ruled. Pure and stdlib-only like `fid_census.py`, for the same porting reason; counts only, no graph write | drydocs-review |
+| `drydocs/plan/plan_board.py` | `drydocs-plan` — backlog/ (sharded, ADR 0013) → HTML project board renderer (Epic I) | `docs/plan/board.html` |
+| `drydocs/docgen/plan_ideas.py` | `drydocs-plan` — IDEAS.md → HTML idea-inbox read view; reuses `design_doc.render_body` rather than adding a second markdown renderer | `docs/plan/ideas.html` |
+| `drydocs/plan/plan_roadmap.py` | `drydocs-plan` — roadmap.yaml (authored stage/estimates) + backlog/ (live counts) → per-module build-out roadmap; the third planning surface | `docs/plan/roadmap.html` |
+| `drydocs/port/port_preflight.py` | `drydocs-port` — J41 the port OPENING sequence: certifies a producer base before a company session starts (tree/renders/suite/ledger-coverage/relay-basis/cited-path-resolution/tag). Pure functions take TEXT, COMMIT LISTS and DOCUMENT MAPS, never a repo, so the guards run without one; only `run_checks` shells out | `port-base-<date>` tag + a pass/fail report |
+| `drydocs/port/port_backlog_union.py` | `drydocs-port` — J42 the port UNION half: diffs the producer base's backlog item-id set (a git ref, materialized with `git archive`) against the APPLIED consumer tree and fails the port report naming every dropped id. Both sides read through `backlog_store.load_items`, so an absent/empty items directory and a filename-vs-inner-id mismatch FAIL LOUD instead of reading as agreement (the tombstone vacuous-green trap). Owns never-drop-an-entry only; the status-regression half is the J16 guard's | a pass/fail union block for the port report |
+| `drydocs/port/port_rename_detect.py` | `drydocs-port` — J72 the port RENAME half: a producer path absent consumer-side classifies as a clean-add, which is true of the PATH and blind to the CONTENT — so a renamed file arrives as new. Compares each proposed add against consumer files with a DIFFERENT name, by id-set (a split moves entries; ids survive it) and by normalized text (a rename rewrites the header; the body survives), taking the stronger. Reports, never decides. Pure text/path-map functions, no repo | a stop-and-look list for the apply session |
+| `drydocs/docgen/doc_outline.py` | `drydocs-docgen` — canonical doc-outline completeness + traceability validator (Epic L) | — (pure; validates docs) |
+| `drydocs/docgen/design_doc.py` | `drydocs-docgen` — deterministic Markdown→HTML renderer, one surface: screen + @media print (Epic L; L13) | `docs/design/*.html` |
+| `drydocs/docgen/doc_pdf.py` | `drydocs-docgen` — headless-Chromium html→PDF via the @media print sheet (Brave-first), date-normalized (Epic L) | `docs/design/*.pdf` (build-on-demand) |
 | `drydocs_lineage/**` | `drydocs-lineage` (C2) — proactive/curated cmd-line lineage on the shared core parser (G4 scaffold; POPULATED by the depgraph re-home G9/0002-C, DONE 2026-07-11: model/extractor/review/collect/writer) | `drydocs` (curated/CONFIRMED only; `writer.py` is the sole write boundary, gate-bound until the vocab flips active) |
 | `drydocs_deepdoc/**` | `drydocs-deepdoc` (C3; charter ruled at gate document-content-topology G32, restated MM1 2026-08-21) — the corpus-driven investigator seeded from the grounded graph: starts from a subject already in `drydocs`, searches the document corpus + SDLC surfaces, creates no relationship whose subject is not already in the graph; the core command-line parser is an INPUT, not a rival. Method + synthesis: `docs/design/deepdoc-data-flow-overview.md` (epic MM) | `drydocs`, every write carrying `:Uncertain` + reliability/trust stamps (the label is the boundary since the G102 fold; proxy-node keys; `writer.py` sole boundary; promotion = HITL gate through the loader path, never a label strip). Real since MM3: `mindmap.py` (the `drydocs.deepdoc.mindmap.v1` state file — branches, slots, and the rule that a slot fills only with an evidence ref, enforced on the transition and on load) and `search_log.py` (the per-search ledger, declared kind `search` in `config/log-kinds.yaml`: `theme` = the slot targeted, required; `novelty` = new ids vs graph + record, with the ids) |
 | `drydocs_remediation/**` | `drydocs-remediation` (C1) — detect → transform → prove → Jira (ADR 0002-B; scaffolded 2026-07-10, in-monorepo per 0002-A-1) | — (**no graph write**; Jira = SoR; the `jira.py` module is the only side-effect boundary) |
@@ -123,12 +173,12 @@ The backlog `modules:` comments cite this section rather than re-explaining it.
 > bucket, so a new review module (graph_review / publishing) that isn't classified here will
 > **fail the boundary test** rather than being silently unguarded.
 >
-> **`drydocs-plan` note.** Same default-deny discipline: `drydocs/plan_board.py` is a pure,
+> **`drydocs-plan` note.** Same default-deny discipline: `drydocs/plan/plan_board.py` is a pure,
 > offline renderer (backlog/ → `docs/plan/board.html`, no Neo4j, no imports from other
 > components) classified into its own `plan` COMPONENT_GROUP, mirroring how `review` is declared —
 > it exists precisely so a future `drydocs-plan` module that isn't added here fails the same guard.
 >
-> **`drydocs-docgen` note.** Same discipline: `drydocs/doc_outline.py` validates a design doc
+> **`drydocs-docgen` note.** Same discipline: `drydocs/docgen/doc_outline.py` validates a design doc
 > against its canonical `*.outline.yaml` (completeness + requirement traceability, Epic L). Pure,
 > offline (stdlib + PyYAML), imports no component; classified into its own `docgen` COMPONENT_GROUP.
 > The L3 renderer + L5 save-button widget land in this same group.

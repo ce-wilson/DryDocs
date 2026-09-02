@@ -67,7 +67,7 @@ the accumulated lessons from prior ports. Read both.
    `poetry run python scripts/port_backlog_union.py --producer-ref port-base-YYYYMMDD`
    Exit 0 = the union holds (any ruled omissions print WITH their reasons). Exit 1 =
    the port dropped items and the run names every id — restore each file from the
-   base, or record it in `drydocs.port_backlog_union.UNION_EXCLUSIONS` with the
+   base, or record it in `drydocs.port.port_backlog_union.UNION_EXCLUSIONS` with the
    reason it stays behind. Exit 2 = a side could not be read, which is a FAILURE and
    never "no difference": the tombstone `docs/restructure/backlog.yaml` has no
    `items` key, so a check aimed there would compare two empty sets and pass for
@@ -172,7 +172,7 @@ stay skipped — confirm with the operator if a new one appears.
   slice began 2026-08-26 company-side (register reconciled, wiring built);
   until an adoption report closes a cluster, its files stay at the
   company-divergent state and are NOT re-taken by a later port.
-- **`drydocs/run_as_detect.py` per-line reconcile — ENDED 2026-08-27:** the
+- **`drydocs/review/run_as_detect.py` per-line reconcile — ENDED 2026-08-27:** the
   producer adopted ASCII `x` (`64ec0e7e`), so the RUF002/RUF003 divergence
   e33f8d02 recorded dies at the next port; no per-line handling needed.
 
@@ -205,13 +205,13 @@ stay skipped — confirm with the operator if a new one appears.
   and must never be deleted or "reconciled" — they simply do not exist producer
   side, so an inbound port leaves them untouched:
   - *Architectural / low-sanitization-risk* — `graph_review.py`, `graph_verify.py`,
-    `sme_notes.py`, `drydocs/publishing/`, `site/`. These are back-flow candidates
+    `sme_notes.py`, `drydocs/review/publishing/`, `site/`. These are back-flow candidates
     (reproduce generically in the public producer via the screenshot/describe
     channel; set `classification` on each). If/when the producer grows a generic
     same-named file, it becomes a **collision** — add a ledger row then.
 - **`drydocs-review` collisions are LIVE (ledger row, 2026-07-07).** The producer's
   generic twins landed 2026-07-01 (Epic H: `graph_review.py`, `graph_verify.py`,
-  `review_labels.py`, `sme_notes.py`, `gate_pages.py`, `drydocs/publishing/**`,
+  `review_labels.py`, `sme_notes.py`, `gate_pages.py`, `drydocs/review/publishing/**`,
   `config/review-labels.yaml`, `config/gate-prompts/**`, `graph-tests/**`) — resolve
   **Canonical-COMPANY** per port-prompt step 10 / git-readme "`drydocs-review` —
   back-flow stream". Three 2026-07-07 refinements (port-prompt steps 17–18):

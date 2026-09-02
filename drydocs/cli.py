@@ -647,7 +647,7 @@ def profile_folder_set(
 # this root imports both — so any CLI module works as the first import of a
 # fresh interpreter (guarded by tests/unit/test_cli_import_order.py). The three
 # verbs above (resolve-cmdline-staging, lineage-review, fid-census) stay here
-# because they wire another component (drydocs_lineage, drydocs.fid_census) —
+# because they wire another component (drydocs_lineage, drydocs.review.fid_census) —
 # the composition root is the only module exempt from the component-import
 # invariant (ENTRYPOINT_MODULES); S8 added no new exemption and S13 removes
 # none.

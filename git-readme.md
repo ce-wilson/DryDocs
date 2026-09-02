@@ -73,7 +73,7 @@ What diverges, by stream:
 - **`drydocs-review` back-flow (NEW — REVERSE direction)** — the company-authored SME/HITL toolkit,
   reproduced here generically. **Canonical-COMPANY on collision** — keep your version. See the dedicated
   "`drydocs-review` — back-flow stream" section below.
-- **`drydocs-plan` project board (NEW — Epic I)** — `drydocs/plan_board.py` + `scripts/render_board.py`
+- **`drydocs-plan` project board (NEW — Epic I)** — `drydocs/plan/plan_board.py` + `scripts/render_board.py`
   render `backlog.yaml` (now **schema v2**) into `docs/plan/board.html`; plus the `groom-backlog` skill and
   a new `tests/unit/test_backlog.py` schema guard. All **clean-adds** — take FROM this repo. `plan_board`
   is its own `plan` component group in the boundary guard (imports core only).
@@ -144,7 +144,7 @@ What diverges, by stream:
       (M1: `WAS_GENERATED_BY` **delta-only**, `row_checksum`) SHIPPED; Control-M loaders/cyphers +
       `base.py` are Canonical-here; `graph-tests/provenance-diet.yaml` is a back-flow seed; confidential
       source→column maps authored company-side only (one-way). **Steps 15 + 22.**
-    - **Source-governance column ledger (doc 08 / N1)** — `drydocs/source_mappings.py` (pure config
+    - **Source-governance column ledger (doc 08 / N1)** — `drydocs/review/source_mappings.py` (pure config
       accessor, parked in the review boundary group) + `config/source-mappings/controlm-psgmgr.yaml`;
       clean-adds, but the `MODULE_MAP.md` row + boundary-guard membership must travel. **Step 23.**
     - **bmc-docs lexical corpus — docmeta P0, SHIPPED & gate-accepted** — converted BMC docs →
@@ -271,10 +271,10 @@ them the **opposite** way to everything else in this guide:
 > the real Confluence wiring (`toby_publish_confluence`), the real `review-labels.yaml`,
 > the real space coordinates, and real `SME[SID]` data. Take **company wholesale** for:
 >
-> - `drydocs/graph_review.py`, `drydocs/graph_verify.py`, `drydocs/review_labels.py`,
->   `drydocs/sme_notes.py`
-> - `drydocs/gate_pages.py` (the HITL prompt-page generator) + any generated `pages/`
-> - `drydocs/publishing/**`
+> - `drydocs/review/graph_review.py`, `drydocs/review/graph_verify.py`, `drydocs/review/review_labels.py`,
+>   `drydocs/review/sme_notes.py`
+> - `drydocs/review/gate_pages.py` (the HITL prompt-page generator) + any generated `pages/`
+> - `drydocs/review/publishing/**`
 > - `config/review-labels.yaml`, `config/gate-prompts/**`, `graph-tests/**` (seed backbone,
 >   gate-prompt specs, acceptance suites — company's real ones win)
 

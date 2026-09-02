@@ -120,7 +120,7 @@ Field semantics:
 
 ## Enforcement (what makes it a ledger, not another doc)
 
-1. **Typed accessor** `drydocs/source_mappings.py` (pattern:
+1. **Typed accessor** `drydocs/review/source_mappings.py` (pattern:
    `review_labels.py`) — load/validate; `projected(object)`,
    `unaccounted(profile_columns)`, `to_records()` for the DataFrame view.
 2. **Coverage test** — per object: rows + default sweep must account for

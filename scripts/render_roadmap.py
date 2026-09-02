@@ -1,7 +1,7 @@
 """render_roadmap.py — render roadmap.yaml + backlog.yaml to docs/plan/roadmap.html.
 
 Sibling of ``render_board.py``; a default-paths ``render_board.py`` run calls this
-too, so the ritual stays one command. Stdlib + ``drydocs.plan_roadmap`` only.
+too, so the ritual stays one command. Stdlib + ``drydocs.plan.plan_roadmap`` only.
 
 Usage:
     python scripts/render_roadmap.py
@@ -13,7 +13,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from drydocs.plan_roadmap import (
+from drydocs.plan.plan_roadmap import (
     DEFAULT_ROADMAP_BACKLOG_PATH,
     DEFAULT_ROADMAP_OUT_PATH,
     DEFAULT_ROADMAP_PATH,

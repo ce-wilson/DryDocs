@@ -40,7 +40,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from drydocs.port_rename_detect import (
+from drydocs.port.port_rename_detect import (
     parse_git_renames,
     rename_candidates,
     render_git_renames,

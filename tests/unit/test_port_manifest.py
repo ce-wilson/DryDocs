@@ -3,7 +3,7 @@
 
 The manifest is the authority the consumer-side reconcile-port run reads
 mechanically; these checks keep it well-formed and pin the rows whose loss
-would be catastrophic (a blind checkout of drydocs/publishing/** destroys the
+would be catastrophic (a blind checkout of drydocs/review/publishing/** destroys the
 consumer's wired Confluence originals). Pure YAML — no git, no Neo4j.
 """
 
@@ -89,7 +89,7 @@ def test_critical_rows_are_pinned(manifest: dict) -> None:
     ontology files, and the port-frozen adapter."""
     by_path = {r["path"]: r["disposition"] for r in manifest["rows"]}
     expected = {
-        "drydocs/publishing/**": "canonical-company",
+        "drydocs/review/publishing/**": "canonical-company",
         "config/gate-prompts/**": "canonical-company",
         "drydocs_core/adapters/oracle_adapter.py": "canonical-company",
         "config/gate-log.md": "union-append",

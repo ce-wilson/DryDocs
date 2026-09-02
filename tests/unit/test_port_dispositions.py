@@ -105,7 +105,7 @@ def test_every_disposition_the_manifest_uses_has_an_apply_rule() -> None:
 def test_the_apply_section_sits_above_the_ledger_the_coverage_guard_reads() -> None:
     """J69 (c), and it is a real trap rather than a formality.
 
-    ``drydocs/port_preflight.py`` reads ONLY between the ``STEP LEDGER`` and
+    ``drydocs/port/port_preflight.py`` reads ONLY between the ``STEP LEDGER`` and
     ``ACCEPTANCE GATE`` markers, and ``cited_shas`` harvests every backticked sha in
     that span. Put the apply section INSIDE those markers and its citations start
     counting as ledger coverage — commits would read as cited because a disposition
@@ -118,5 +118,5 @@ def test_the_apply_section_sits_above_the_ledger_the_coverage_guard_reads() -> N
     assert apply_at < ledger_at, (
         "the APPLY BY DISPOSITION section must sit ABOVE the STEP LEDGER marker — "
         "inside it, its backticked shas would be counted as ledger citations by "
-        "drydocs/port_preflight.py:cited_shas"
+        "drydocs/port/port_preflight.py:cited_shas"
     )

@@ -131,14 +131,14 @@ code). Full plan: [`05-drydocs-review-backflow.md`](05-drydocs-review-backflow.m
 - **H1** ✅ P2 *done 2026-07-01* — Reproduced `graph_verify` + `review_labels` (the offline backbone):
   pure load/evaluate, duck-typed graph runner (no Neo4j import), vendor-BMC seeds at Internal-Public,
   27 unit tests; not wired into `cli.py` (entrypoint-boundary TODO). Full suite 214 passed.
-- **H2** ✅ P2 *done 2026-07-01* — `drydocs/graph_review.py`: pure `render_review` (self-contained HTML,
+- **H2** ✅ P2 *done 2026-07-01* — `drydocs/review/graph_review.py`: pure `render_review` (self-contained HTML,
   one section per label, `hidden_props`/`_`-keys stripped, backbone provenance on headers). 6 tests.
-- **H3** ✅ P3 *done 2026-07-01* — `drydocs/sme_notes.py`: `SME[sid] $FR/$UC/$OQ/$NOTES` harvester
+- **H3** ✅ P3 *done 2026-07-01* — `drydocs/review/sme_notes.py`: `SME[sid] $FR/$UC/$OQ/$NOTES` harvester
   (read-only `harvest_tree` + `route`; excludes `data/`). 5 tests, synthetic SIDs.
-- **H4** ✅ P3 *done 2026-07-01* — `drydocs/gate_pages.py`: `render_gate_page(spec)` → interactive HTML
+- **H4** ✅ P3 *done 2026-07-01* — `drydocs/review/gate_pages.py`: `render_gate_page(spec)` → interactive HTML
   (checkbox per confirmation, localStorage, progress bar, classification badge, "no write until confirmed").
   Example `config/gate-prompts/bmc-docs-example.yaml` (renamed per ADR 0004). 6 tests. *Gated:* real PAT/SEAL gate pages deferred.
-- **H5** ✅ P3 *done 2026-07-01* — `drydocs/publishing/`: `assemble` + validator (well-formed XML + macro
+- **H5** ✅ P3 *done 2026-07-01* — `drydocs/review/publishing/`: `assemble` + validator (well-formed XML + macro
   allow-list) + `write_preview` + `Publisher` Protocol (Noop/Local; Confluence push abstracted). 10 tests.
   *Gated:* a real `ConfluencePublisher` (space coords/auth) deferred to the company twin.
 - **H6** ✅ P2 *done 2026-07-01* — Closed the boundary-guard blind spot: `review` `COMPONENT_GROUP`
@@ -158,7 +158,7 @@ with a written acceptance test; haiku for renames/ritual wiring.
   `modules:` registry, and `title`/`type`/`module`/`phase` on every item, so a future to-do lands
   as `type: requirement` aligned to a module + phase. `tests/unit/test_backlog.py` enforces the
   schema and keeps `summary:`/`next_ready:` computed-consistent.
-- **I2** ☐ P1 (sonnet) — `drydocs/plan_board.py` renders `backlog.yaml` → `docs/plan/board.html`:
+- **I2** ☐ P1 (sonnet) — `drydocs/plan/plan_board.py` renders `backlog.yaml` → `docs/plan/board.html`:
   self-contained roadmap strip + kanban + module/phase/epic/type filters + quick-capture box.
   *Accept:* offline tests; classified in MODULE_MAP + boundary test; board committed. (depends: I1)
 - **I3** ☐ P2 (opus authors; sonnet runs) — `groom-backlog` skill: raw notes / paper-note photos →

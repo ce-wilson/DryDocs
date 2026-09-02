@@ -66,6 +66,13 @@ EXTRA_DOCS: dict[str, str] = {
 #: Paths a document names that are NOT claims about the current tree. Each needs a
 #: reason — the exemption IS the reason, same idiom as MODULE_EXEMPT.
 HISTORICAL_PATHS: dict[str, str] = {
+    "drydocs/publishing/validator.py": (
+        "the port-prompt ledger names the file where it WAS when the step was written. "
+        "ADR 0018 D4 (2026-09-02) moved the publishing package to drydocs/review/publishing/; "
+        "the old package path is a sys.modules shim (drydocs/publishing/__init__.py), so the "
+        "MODULE still resolves but the submodule FILE does not. A ledger step is a statement "
+        "about the past; the relay for the move (RELAY-23) names the new path"
+    ),
     "docs/runbook-mapping-demo.md": (
         "front-matter history — the demo runbook records where it was RELOCATED FROM "
         "at the L14 refit. A former path is a fact about the past, not a claim that it exists"

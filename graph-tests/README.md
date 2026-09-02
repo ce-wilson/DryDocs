@@ -4,7 +4,7 @@ Each `*.yaml` file here is a **suite** of `TC-*` cases the `drydocs-review`
 component's `graph-verify` runner executes against a live graph. A case is a Cypher
 query plus an assertion on the result shape (`empty` / `nonempty` / `equals`).
 
-- Loader + evaluator live in [`drydocs/graph_verify.py`](../drydocs/graph_verify.py)
+- Loader + evaluator live in [`drydocs/review/graph_verify.py`](../drydocs/review/graph_verify.py)
   and are **pure/offline** (unit-tested with no Neo4j). Only running a suite touches
   the graph.
 - **classification: Internal-Public.** The committed example

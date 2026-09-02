@@ -66,7 +66,9 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
         "drydocs.snapshots",
         "drydocs.staging",
         "drydocs.cmdline_staging",
-        "drydocs.docs_verify",
+        # drydocs.docs_verify left this list at ADR 0018 D1 (2026-09-02): the module moved to
+        # core at O58 and the stale entry sat here unnoticed until the MODULE_MAP completeness
+        # guard (test_module_map_render.py) asked where it was told.
         "drydocs.seal_samples",
         # drydocs.pat_projection = projects the raw PAT team report into the two
         # files the team chain reads (G82). Load, same bucket and same
@@ -99,6 +101,8 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
     # source_mappings here. Imports NO first-party module (stdlib only) by design: the
     # method is ported to the company side, which is where the measured values live.
     "review": (
+        "drydocs.review",  # the subpackage (ADR 0018 D4, 2026-09-02) - the component IS the directory
+        # the flat names below are the one-cycle re-export SHIMS at the old paths; drop at the roll after next
         "drydocs.graph_verify",
         "drydocs.review_labels",
         "drydocs.source_mappings",
@@ -116,7 +120,12 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
     # plan_roadmap belongs HERE (unlike plan_ideas, below): it renders no
     # markdown — it consumes plan_board's published backlog shape, and a
     # within-group import is exactly what this classification permits.
-    "plan": ("drydocs.plan_board", "drydocs.plan_roadmap"),
+    "plan": (
+        "drydocs.plan",  # the subpackage (ADR 0018 D4, 2026-09-02) - the component IS the directory
+        # the flat names below are the one-cycle re-export SHIMS at the old paths; drop at the roll after next
+        "drydocs.plan_board",
+        "drydocs.plan_roadmap",
+    ),
     # drydocs-port — J41 port machinery. Its own group rather than a lodger in
     # "plan", and the reason is the same one that moved plan_ideas to docgen:
     # classify by WHAT IT DOES, not by which documents it happens to read. It
@@ -128,6 +137,8 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
     # repository, and now the checks run against the CALLER's checkout rather than
     # certifying the main tree from inside a worktree.
     "port": (
+        "drydocs.port",  # the subpackage (ADR 0018 D4, 2026-09-02) - the component IS the directory
+        # the flat names below are the one-cycle re-export SHIMS at the old paths; drop at the roll after next
         "drydocs.port_preflight",
         "drydocs.port_backlog_union",
         "drydocs.port_rename_detect",
@@ -145,6 +156,8 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
     # import (a borrowed stylesheet from plan_board) and was right twice — the
     # page now carries its own CSS, so docgen imports nothing but stdlib.
     "docgen": (
+        "drydocs.docgen",  # the subpackage (ADR 0018 D4, 2026-09-02) - the component IS the directory
+        # the flat names below are the one-cycle re-export SHIMS at the old paths; drop at the roll after next
         "drydocs.doc_outline",
         "drydocs.design_doc",
         "drydocs.doc_pdf",

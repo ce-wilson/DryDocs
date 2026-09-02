@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import pytest
 
-from drydocs.port_preflight import (
+from drydocs.port.port_preflight import (
     BASIS_TAGS,
     RECORD_PREFIXES,
     Commit,

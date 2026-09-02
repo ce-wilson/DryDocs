@@ -21,7 +21,7 @@
 # If a runbook ever needs requirement-level tracking, add the `traceability:` block
 # here (the validator already supports it) rather than inventing a per-doc format.
 #
-# VALIDATION: drydocs/doc_outline.py; tests/unit/test_doc_outline.py sweeps every
+# VALIDATION: drydocs/docgen/doc_outline.py; tests/unit/test_doc_outline.py sweeps every
 # docs/design/*-runbook.md against this outline (the *-tdd.md auto-sweep idiom).
 # A required section may be satisfied by an explicit "N/A — <reason>"; the anchor
 # must still be present.

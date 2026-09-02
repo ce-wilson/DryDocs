@@ -46,24 +46,24 @@ REPO = Path(__file__).resolve().parents[2]
 #: are deliberately absent: those travel with the package and keep the ``__file__``
 #: anchor.
 CONTENT_PATH_CONSTANTS: tuple[tuple[str, str], ...] = (
-    ("drydocs.plan_board", "DEFAULT_BACKLOG_PATH"),
-    ("drydocs.plan_board", "DEFAULT_BOARD_PATH"),
-    ("drydocs.plan_ideas", "DEFAULT_IDEAS_PATH"),
-    ("drydocs.plan_ideas", "DEFAULT_IDEAS_OUT_PATH"),
-    ("drydocs.plan_roadmap", "DEFAULT_ROADMAP_PATH"),
-    ("drydocs.plan_roadmap", "DEFAULT_ROADMAP_BACKLOG_PATH"),
-    ("drydocs.plan_roadmap", "DEFAULT_ROADMAP_OUT_PATH"),
+    ("drydocs.plan.plan_board", "DEFAULT_BACKLOG_PATH"),
+    ("drydocs.plan.plan_board", "DEFAULT_BOARD_PATH"),
+    ("drydocs.docgen.plan_ideas", "DEFAULT_IDEAS_PATH"),
+    ("drydocs.docgen.plan_ideas", "DEFAULT_IDEAS_OUT_PATH"),
+    ("drydocs.plan.plan_roadmap", "DEFAULT_ROADMAP_PATH"),
+    ("drydocs.plan.plan_roadmap", "DEFAULT_ROADMAP_BACKLOG_PATH"),
+    ("drydocs.plan.plan_roadmap", "DEFAULT_ROADMAP_OUT_PATH"),
     # ---- the 2026-08-12 residue sweep (Idea-109's own follow-up list) ----
-    ("drydocs.gate_pages", "DEFAULT_GATE_PROMPTS_DIR"),
-    ("drydocs.graph_verify", "DEFAULT_GRAPH_TESTS_DIR"),
-    ("drydocs.review_labels", "DEFAULT_REVIEW_LABELS_PATH"),
-    ("drydocs.source_mappings", "DEFAULT_SOURCE_MAPPINGS_DIR"),
+    ("drydocs.review.gate_pages", "DEFAULT_GATE_PROMPTS_DIR"),
+    ("drydocs.review.graph_verify", "DEFAULT_GRAPH_TESTS_DIR"),
+    ("drydocs.review.review_labels", "DEFAULT_REVIEW_LABELS_PATH"),
+    ("drydocs.review.source_mappings", "DEFAULT_SOURCE_MAPPINGS_DIR"),
     ("drydocs.seal_samples", "DEFAULT_CAPTURE_PATH"),
     # A build script's WRITE target, so it follows the caller — unlike
     # drydocs.cli.DEFAULT_SAMPLES_DIR, which names the same directory as a
     # runtime READ default and stays package-internal. Same path, opposite call.
     ("drydocs.seal_samples", "DEFAULT_SAMPLES_DIR"),
-    ("drydocs.port_preflight", "PORT_PROMPT_PATH"),
+    ("drydocs.port.port_preflight", "PORT_PROMPT_PATH"),
     # S8 (2026-08-21): the docs verbs and their content defaults moved out of the root
     ("drydocs.cli_docs", "DOC_REGISTRY_PATH"),
     ("drydocs.cli_docs", "SOFTWARE_REGISTRY_PATH"),
@@ -334,12 +334,12 @@ def test_every_root_anchor_exemption_names_a_real_file_and_a_reason() -> None:
 #: Printed by the probe below, one per line, as ``<label>\t<resolved path>``. Spans all
 #: four installed packages the sweep touched, plus the one constant that must NOT move.
 _PROBE = """\
-import drydocs.gate_pages, drydocs.port_preflight, drydocs.seal_samples
+import drydocs.review.gate_pages, drydocs.port.port_preflight, drydocs.seal_samples
 import drydocs.cli, drydocs_core.precedence, drydocs_core.mapping_store
 import drydocs.loaders.code_snapshot, drydocs_docmeta.registry, drydocs_api.intake
 for label, value in [
-    ("content:gate_pages", drydocs.gate_pages.DEFAULT_GATE_PROMPTS_DIR),
-    ("content:port_preflight", drydocs.port_preflight.PORT_PROMPT_PATH),
+    ("content:gate_pages", drydocs.review.gate_pages.DEFAULT_GATE_PROMPTS_DIR),
+    ("content:port_preflight", drydocs.port.port_preflight.PORT_PROMPT_PATH),
     ("content:seal_samples", drydocs.seal_samples.DEFAULT_SAMPLES_DIR),
     ("content:precedence", drydocs_core.precedence.DEFAULT_PRECEDENCE_PATH),
     ("content:mapping_store_db", drydocs_core.mapping_store.DEFAULT_DB_PATH),

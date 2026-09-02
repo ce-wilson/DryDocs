@@ -1,4 +1,4 @@
-"""Unit tests for plan_board (drydocs/plan_board.py) — pure, no Neo4j."""
+"""Unit tests for plan_board (drydocs/plan/plan_board.py) — pure, no Neo4j."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ try:
 except ImportError:
     _YAML_AVAILABLE = False
 
-from drydocs.plan_board import (
+from drydocs.plan.plan_board import (
     Backlog,
     BoardError,
     Phase,

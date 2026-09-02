@@ -71,7 +71,7 @@ doc-drift sweep corrects citations this way on every signed page it touches.
 
 ## Gate-page format (STANDARD — all gate reviews follow this)
 
-Every gate review page is rendered by `drydocs/gate_pages.py` from a spec in
+Every gate review page is rendered by `drydocs/review/gate_pages.py` from a spec in
 `config/gate-prompts/` and follows the same four-part structure (established by
 `controlm-q1q3-phase1`, SME-accepted 2026-07-07; enforced by `tests/unit/test_gate_pages.py`):
 

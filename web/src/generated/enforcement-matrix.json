@@ -122,7 +122,7 @@
       "file": "config/classification.yaml",
       "code_resident": false,
       "consumers": [
-        "drydocs/publishing/"
+        "drydocs/review/publishing/"
       ],
       "guard_tests": [
         "test_classification.py",
@@ -295,7 +295,7 @@
       "file": "config/review-labels.yaml",
       "code_resident": false,
       "consumers": [
-        "drydocs/publishing/"
+        "drydocs/review/publishing/"
       ],
       "guard_tests": [
         "test_review_labels.py"
@@ -307,7 +307,7 @@
       "files": [
         "config/review-labels.yaml"
       ],
-      "content": "# =============================================================================\n# config/review-labels.yaml — the \"review backbone\" (drydocs-review component).\n#\n# Maps each ingestion SOURCE to the DATA node labels it populates, in CHAIN ORDER,\n# with SME provenance. This is the shared backbone consumed by the drydocs-review\n# component: graph-review renders one section per label; graph-verify validates a\n# suite's declared targets against it.\n#\n# Pure config — no Neo4j, no graph writes. Typed accessor: drydocs/review_labels.py.\n#\n# classification: Internal-Public. This committed backbone is seeded from the\n# bmc-docs baseline (generic Control-M object labels — publishable; corpus id\n# per ADR 0004). Real\n# internal source->label chains (SEAL/PAT) live in a gitignored twin and are\n# confirmed through the HITL gate before they drive any load — see\n# docs/restructure/03-hitl-sme-flow.md. Never commit real sources here.\n# =============================================================================\nclassification: Internal-Public\nschema: drydocs.review-labels.v1\nupdated: 2026-07-01\n\nsources:\n  - id: bmc-controlm-structure\n    provenance: \"BMC Control-M folder/job export (bmc-docs baseline; VERBATIM)\"\n    labels: [ControlMFolder, ControlMJob, Condition]        # chain order: folder -> job -> condition\n\n  - id: bmc-controlm-variables\n    provenance: \"Control-M variable normalization, Phases A/B/C (GROUNDED)\"\n    labels: [ControlMJob, JobRun]                       # variables resolve onto the run\n\n  - id: bmc-controlm-lineage\n    provenance: \"curated command-line lineage (C2; GROUNDED)\"\n    labels: [ControlMJob, JobRun, Condition]\n\n  - id: bmc-docs\n    provenance: \"converted BMC documentation corpus (VERBATIM/GROUNDED/SYNTHESIZED per chunk)\"\n    labels: [Document, Chunk]\n",
+      "content": "# =============================================================================\n# config/review-labels.yaml — the \"review backbone\" (drydocs-review component).\n#\n# Maps each ingestion SOURCE to the DATA node labels it populates, in CHAIN ORDER,\n# with SME provenance. This is the shared backbone consumed by the drydocs-review\n# component: graph-review renders one section per label; graph-verify validates a\n# suite's declared targets against it.\n#\n# Pure config — no Neo4j, no graph writes. Typed accessor: drydocs/review/review_labels.py.\n#\n# classification: Internal-Public. This committed backbone is seeded from the\n# bmc-docs baseline (generic Control-M object labels — publishable; corpus id\n# per ADR 0004). Real\n# internal source->label chains (SEAL/PAT) live in a gitignored twin and are\n# confirmed through the HITL gate before they drive any load — see\n# docs/restructure/03-hitl-sme-flow.md. Never commit real sources here.\n# =============================================================================\nclassification: Internal-Public\nschema: drydocs.review-labels.v1\nupdated: 2026-07-01\n\nsources:\n  - id: bmc-controlm-structure\n    provenance: \"BMC Control-M folder/job export (bmc-docs baseline; VERBATIM)\"\n    labels: [ControlMFolder, ControlMJob, Condition]        # chain order: folder -> job -> condition\n\n  - id: bmc-controlm-variables\n    provenance: \"Control-M variable normalization, Phases A/B/C (GROUNDED)\"\n    labels: [ControlMJob, JobRun]                       # variables resolve onto the run\n\n  - id: bmc-controlm-lineage\n    provenance: \"curated command-line lineage (C2; GROUNDED)\"\n    labels: [ControlMJob, JobRun, Condition]\n\n  - id: bmc-docs\n    provenance: \"converted BMC documentation corpus (VERBATIM/GROUNDED/SYNTHESIZED per chunk)\"\n    labels: [Document, Chunk]\n",
       "extra_contents": {}
     },
     {
@@ -356,7 +356,7 @@
       "file": "config/gate-prompts/",
       "code_resident": false,
       "consumers": [
-        "drydocs/publishing/"
+        "drydocs/review/publishing/"
       ],
       "guard_tests": [
         "test_gate_pages.py"

@@ -1,8 +1,8 @@
-"""Unit tests for sme_notes (drydocs/sme_notes.py) — pure, no Neo4j. Synthetic SIDs only."""
+"""Unit tests for sme_notes (drydocs/review/sme_notes.py) — pure, no Neo4j. Synthetic SIDs only."""
 
 from __future__ import annotations
 
-from drydocs.sme_notes import ROUTE_TAGS, harvest_text, harvest_tree, route
+from drydocs.review.sme_notes import ROUTE_TAGS, harvest_text, harvest_tree, route
 
 
 def test_harvest_python_and_cypher_comments() -> None:

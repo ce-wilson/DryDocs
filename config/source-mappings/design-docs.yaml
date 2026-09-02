@@ -64,7 +64,7 @@ objects:
     kind: yaml
     profile:
       profiled_on: ~
-      via: "docs/design/feedback/<doc-id>-rev<N>.yaml (drydocs.design_doc.feedback_yaml + the optional review-outcome fields, README §L7)"
+      via: "docs/design/feedback/<doc-id>-rev<N>.yaml (drydocs.docgen.design_doc.feedback_yaml + the optional review-outcome fields, README §L7)"
       column_count: ~
       census: pending
     note: >

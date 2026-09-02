@@ -79,7 +79,7 @@ folder XML (the 9.0.21.300 source of record) alongside — it is both the "befor
 artifact and the thing the dev team will diff.
 
 ### P5 — HITL review + target metadata (uses the review toolkit)
-Load the series into the SME review flow (`drydocs/graph_review.py` + gate
+Load the series into the SME review flow (`drydocs/review/graph_review.py` + gate
 pages; every change is a *proposal*, never auto-applied). Standard findings to
 generate per series:
 - **FileWatcher description enrichment** — insert file-transfer facts into the

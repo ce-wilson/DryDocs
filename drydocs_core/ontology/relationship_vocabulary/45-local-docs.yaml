@@ -212,7 +212,7 @@
     note: >
       ACTIVE (gate doc-traceability-feedback signed off 2026-07-20, C4 — mixed-direction correlation path confirmed, no ABOUT_REQUIREMENT shortcut). FeedbackNote's anchor-keyed target (docs/design/feedback/README.md format
       — `anchor` must match a `<!-- anchor: id -->` or an L11 derived subsection anchor,
-      drydocs/doc_outline.py feedback_anchor_valid). Entity → Entity "aboutness", not
+      drydocs/docgen/doc_outline.py feedback_anchor_valid). Entity → Entity "aboutness", not
       derivation — same reasoning as docs_describes (Document → SoftwareProduct,
       deliberately NOT wasDerivedFrom). The W3C Web Annotation model (oa:hasTarget) is the
       standards-precise analog but is NOT a declared company standard (absent from

@@ -37,7 +37,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from drydocs.source_mappings import SourceMapping
+from drydocs.review.source_mappings import SourceMapping
 from drydocs_lineage.extractors.controlm_inventory import CSV_CONTRACT
 
 REPO_ROOT = Path(__file__).resolve().parents[2]

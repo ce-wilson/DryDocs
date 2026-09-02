@@ -40,7 +40,7 @@
 # new column is dispositioned BY NAME, which is the point of the count.
 #
 # Column names are mechanism (Internal-Public); the report's rows are Internal
-# and never land in the tree. Typed accessor: drydocs/source_mappings.py.
+# and never land in the tree. Typed accessor: drydocs/review/source_mappings.py.
 # Guarded by tests/unit/test_source_mapping_drift.py (registry pointer + census
 # reconciliation) and tests/unit/test_pat_projection.py (the projection's
 # header map and this ledger's projected rows agree).

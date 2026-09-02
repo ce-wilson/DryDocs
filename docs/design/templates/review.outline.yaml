@@ -22,7 +22,7 @@
 # trace — it narrates; the TDDs carry the backbone. If that ever changes, add the
 # `traceability:` block here (the validator already supports it).
 #
-# VALIDATION: drydocs/doc_outline.py; tests/unit/test_doc_outline.py pins the
+# VALIDATION: drydocs/docgen/doc_outline.py; tests/unit/test_doc_outline.py pins the
 # real doc against this outline (the exemplar-can-never-drift idiom).
 # =============================================================================
 

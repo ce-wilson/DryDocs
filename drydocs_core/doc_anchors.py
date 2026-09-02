@@ -1,7 +1,7 @@
 """Anchor-id contract shared across components (Epic L).
 
 The ``<!-- anchor: id -->`` convention is used by the docgen component
-(drydocs.doc_outline validation, drydocs.design_doc rendering) AND the load
+(drydocs.docgen.doc_outline validation, drydocs.docgen.design_doc rendering) AND the load
 component (drydocs.loaders.doc_traceability, L7 connector #1) — shared code
 routes through core per ADR 0002-a, so the regex and the L11 derived-anchor
 separator live here and both components import them.

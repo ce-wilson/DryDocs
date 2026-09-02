@@ -41,7 +41,7 @@
 # inventories and procedures, not requirements. The per-workflow blocks and the
 # recovery/escalation sections ARE its proof surface.
 #
-# VALIDATION: drydocs/doc_outline.py; tests/unit/test_doc_outline.py validates
+# VALIDATION: drydocs/docgen/doc_outline.py; tests/unit/test_doc_outline.py validates
 # the committed example (sdlc-app-runbook.example.md) against this outline.
 # A required section may be satisfied by an explicit "N/A — <reason>"; the
 # anchor must still be present (the source example itself marks eight sections

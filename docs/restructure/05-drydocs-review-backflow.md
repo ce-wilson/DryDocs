@@ -34,7 +34,7 @@ goal (any DryDocs adopter needs an SME review loop).
 | `graph_verify.py` | Data-driven Cypher acceptance runner: loads YAML `TC-*` suites, runs each against the live graph, asserts `equals`/`empty`/`nonempty`, non-zero exit on failure. Loader + evaluate are pure/offline. | reads graph via CLI |
 | `review_labels.py` | Typed accessor over `review-labels.yaml` — the shared backbone mapping each ingestion *source* → the DATA labels it populates, in chain order + SME provenance. Consumed by both above. Pure config, no graph. | reads config |
 | `sme_notes.py` | Harvester for owner-attributed `SME[SID]` inline notes across the repo (Python/YAML `#`, Cypher `//`), typed sub-tags routing to `$FR/$UC/$OQ/$NOTES`. Read-only; structured SME feedback back to the agent. | reads repo files |
-| `drydocs/publishing/` | Confluence publish pipeline: authors XHTML fragments under `pages/`, assembles via template (`assembler`), validates XML + macro allow-list (`validator`), previews locally (`preview`), pushes via a Confluence-client wrapper. | reads docs/site → writes Confluence |
+| `drydocs/review/publishing/` | Confluence publish pipeline: authors XHTML fragments under `pages/`, assembles via template (`assembler`), validates XML + macro allow-list (`validator`), previews locally (`preview`), pushes via a Confluence-client wrapper. | reads docs/site → writes Confluence |
 
 ## HITL gate architecture (the target the generator produces)
 
@@ -101,7 +101,7 @@ unguarded. Today the only unclassified `.py` under the scanned roots is
 2. `graph_review` — pure HTML renderer, offline-testable.
 3. `sme_notes` — generic harvester, strip real SIDs.
 4. HITL prompt-page **generator** — renderer over the three inputs above; own thread.
-5. `drydocs/publishing/` — last; needs the Confluence adapter abstracted.
+5. `drydocs/review/publishing/` — last; needs the Confluence adapter abstracted.
 
 Then land the `review` group in `MODULE_MAP.md` + the guard, plus the default-deny backstop.
 
@@ -112,7 +112,7 @@ producer → company port — and the resolution is the **reverse** of most rows
 
 > **Canonical-COMPANY.** For every `drydocs-review` path
 > (`graph_review.py`, `graph_verify.py`, `review_labels.py`, `sme_notes.py`,
-> `drydocs/publishing/**`, `review-labels.yaml`, the HITL page generator), **keep the
+> `drydocs/review/publishing/**`, `review-labels.yaml`, the HITL page generator), **keep the
 > company version.** The producer's copy is the sanitized *public template*; it must
 > **not** overwrite the company's originals, which carry the real Confluence wiring,
 > the real publisher, and the real `review-labels.yaml`. Do not hand-merge — take
@@ -126,24 +126,24 @@ company reads) and [`docs/port/port-prompt.md`](../port-prompt.md), and in the
 
 Tracked as **Epic H** in [`backlog.yaml`](backlog.yaml).
 
-- **H1 — done (2026-07-01).** The offline backbone: [`drydocs/review_labels.py`](../../drydocs/review_labels.py)
+- **H1 — done (2026-07-01).** The offline backbone: [`drydocs/review/review_labels.py`](../../drydocs/review/review_labels.py)
   (typed accessor over [`config/review-labels.yaml`](../../config/review-labels.yaml)) +
-  [`drydocs/graph_verify.py`](../../drydocs/graph_verify.py) (pure `load`/`evaluate`; `run_*`
+  [`drydocs/review/graph_verify.py`](../../drydocs/review/graph_verify.py) (pure `load`/`evaluate`; `run_*`
   takes a duck-typed `GraphRunner`, so the module never imports Neo4j and is fully offline).
   Example suite [`graph-tests/bmc-docs-smoke.yaml`](../../graph-tests/bmc-docs-smoke.yaml)
   (named `vendor-bmc-smoke.yaml` until the ADR 0004 rename).
   27 unit tests; both YAML seeds `classification: Internal-Public`.
-- **H2 — done (2026-07-01).** [`drydocs/graph_review.py`](../../drydocs/graph_review.py): pure
+- **H2 — done (2026-07-01).** [`drydocs/review/graph_review.py`](../../drydocs/review/graph_review.py): pure
   `render_review({label: [props]})` → self-contained HTML, `hidden_props` + `_`-keys stripped, review-backbone
   provenance on each section header. 6 unit tests.
-- **H3 — done (2026-07-01).** [`drydocs/sme_notes.py`](../../drydocs/sme_notes.py): `SME[sid] $FR/$UC/$OQ/$NOTES`
+- **H3 — done (2026-07-01).** [`drydocs/review/sme_notes.py`](../../drydocs/review/sme_notes.py): `SME[sid] $FR/$UC/$OQ/$NOTES`
   harvester (read-only `harvest_tree`/`route`, excludes `data/`). 5 unit tests, synthetic SIDs.
-- **H4 — done (2026-07-01).** [`drydocs/gate_pages.py`](../../drydocs/gate_pages.py): `render_gate_page(spec)`
+- **H4 — done (2026-07-01).** [`drydocs/review/gate_pages.py`](../../drydocs/review/gate_pages.py): `render_gate_page(spec)`
   → self-contained interactive HTML (checkbox per confirmation, localStorage persistence, progress bar,
   classification badge, mapping table, "no graph write until confirmed" banner). Example
   [`config/gate-prompts/bmc-docs-example.yaml`](../../config/gate-prompts/bmc-docs-example.yaml)
   (named `vendor-bmc-example.yaml` until the ADR 0004 rename). 6 unit tests.
-- **H5 — done (2026-07-01).** [`drydocs/publishing/`](../../drydocs/publishing/__init__.py): `assemble` +
+- **H5 — done (2026-07-01).** [`drydocs/review/publishing/`](../../drydocs/review/publishing/__init__.py): `assemble` +
   validator (well-formed XML + macro allow-list) + `write_preview` + `Publisher` Protocol
   (Noop/Local; Confluence push abstracted — no `toby_publish_confluence`, no space coords). 10 unit tests.
 - **H6 — done (2026-07-01).** Boundary guard closed: `review` component group +

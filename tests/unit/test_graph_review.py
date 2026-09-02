@@ -1,9 +1,9 @@
-"""Unit tests for graph_review (drydocs/graph_review.py) — pure, no Neo4j."""
+"""Unit tests for graph_review (drydocs/review/graph_review.py) — pure, no Neo4j."""
 
 from __future__ import annotations
 
-from drydocs.graph_review import DEFAULT_HIDDEN_PROPS, group_rows, render_review
-from drydocs.review_labels import ReviewLabels
+from drydocs.review.graph_review import DEFAULT_HIDDEN_PROPS, group_rows, render_review
+from drydocs.review.review_labels import ReviewLabels
 
 _ROWS = {
     "ControlMFolder": [

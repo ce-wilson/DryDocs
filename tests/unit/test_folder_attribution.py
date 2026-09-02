@@ -17,7 +17,6 @@ import pytest
 
 yaml = pytest.importorskip("yaml")
 
-from drydocs.graph_verify import Assertion, load_suite
 from drydocs.loaders.folder_attribution import (
     AUTHORED_SOURCE,
     FALLBACK_SOURCE,
@@ -27,6 +26,7 @@ from drydocs.loaders.folder_attribution import (
     resolve_folder_attributions,
 )
 from drydocs.loaders.seal_attribution import TierReconcilers
+from drydocs.review.graph_verify import Assertion, load_suite
 from drydocs_core import yaml_fragments
 from drydocs_core.adapters import CsvAdapter
 from drydocs_core.models import FolderAttributionRow, SealAttributionRow

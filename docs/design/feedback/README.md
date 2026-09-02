@@ -13,13 +13,13 @@ produce the same anchor-keyed YAML:
 - **Paper (L6):** print the same `.html` — its `@media print` sheet is the paper layout, L13 — (or its build-on-demand `.pdf`,
   `scripts/doc_to_pdf.py`) — each section's stable anchor id is visible in the page's left
   margin gutter, plus a `Rev N · commit <hash>` footer on every page
-  (`drydocs/design_doc.py:_inject_margin_anchors` / `doc_rev_footer`). Annotate by hand,
+  (`drydocs/docgen/design_doc.py:_inject_margin_anchors` / `doc_rev_footer`). Annotate by hand,
   scan into `scans/` (Internal by default — never published, see `scans/README.md`), and
   the `.claude/skills/transcribe-doc-markup` skill turns the pen markup into the same
   anchor-keyed YAML — transcribing faithfully first, then keying each note to the margin
   anchor nearest it.
 
-## Format (`drydocs.design_doc.feedback_yaml`)
+## Format (`drydocs.docgen.design_doc.feedback_yaml`)
 
 ```yaml
 # design-doc feedback — paste into docs/design/feedback/<doc-id>-rev<N>.yaml

@@ -276,27 +276,88 @@ rows:
     note: "inbox + audit trail; both sides append — merge is the union (proven conflict site, 3x on 2026-07-09)"
 
   # ---- consumer-canonical (drydocs-review back-flow stream + wiring) --------
-  - path: "drydocs/graph_review.py"
+  - path: "drydocs/review/graph_review.py"
     disposition: canonical-company
     note: "producer copy = sanitized public template; consumer's carries real wiring"
-  - path: "drydocs/graph_verify.py"
+  - path: "drydocs/review/graph_verify.py"
     disposition: canonical-company
     note: "same back-flow rule"
-  - path: "drydocs/review_labels.py"
+  - path: "drydocs/review/review_labels.py"
     disposition: canonical-company
     note: "same back-flow rule"
-  - path: "drydocs/sme_notes.py"
+  - path: "drydocs/review/sme_notes.py"
     disposition: canonical-company
     note: "same back-flow rule"
-  - path: "drydocs/gate_pages.py"
+  - path: "drydocs/review/gate_pages.py"
     disposition: canonical-company
     note: "back-flow rule; generic mechanism deltas (meta-card/provenance standard) fold in WITH their tests, or decline both together — logged"
-  - path: "drydocs/publishing/**"
+  - path: "drydocs/review/publishing/**"
     disposition: canonical-company
     note: "consumer's carries the real Confluence connector; producer's is the abstracted template"
   - path: "config/review-labels.yaml"
     disposition: canonical-company
     note: "real labels consumer-side"
+  # ---- ADR 0018 D4 (2026-09-02): the one-cycle re-export SHIMS at the old flat paths ----
+  # The four flat components became subpackages (drydocs/review, plan, port, docgen). Each old
+  # path is now a sys.modules alias to the moved module - producer mechanism, identical on both
+  # sides, so canonical-producer. APPLY ORDER MATTERS on the consumer (RELAY-23): first `git mv`
+  # YOUR file to the new path (your content moves; the canonical-company rows above now name
+  # the NEW paths), THEN take the shim at the old path. A shim taken before the move overwrites
+  # your wiring. All shims are removed at the roll after next; these rows go with them.
+  - path: "drydocs/graph_verify.py"
+    disposition: canonical-producer
+    note: "ADR 0018 shim; your module lives at its subpackage path now (RELAY-23 step 1 moves it, step 2 takes this)"
+  - path: "drydocs/review_labels.py"
+    disposition: canonical-producer
+    note: "ADR 0018 shim; your module lives at its subpackage path now (RELAY-23 step 1 moves it, step 2 takes this)"
+  - path: "drydocs/source_mappings.py"
+    disposition: canonical-producer
+    note: "ADR 0018 shim; your module lives at its subpackage path now (RELAY-23 step 1 moves it, step 2 takes this)"
+  - path: "drydocs/graph_review.py"
+    disposition: canonical-producer
+    note: "ADR 0018 shim; your module lives at its subpackage path now (RELAY-23 step 1 moves it, step 2 takes this)"
+  - path: "drydocs/sme_notes.py"
+    disposition: canonical-producer
+    note: "ADR 0018 shim; your module lives at its subpackage path now (RELAY-23 step 1 moves it, step 2 takes this)"
+  - path: "drydocs/gate_pages.py"
+    disposition: canonical-producer
+    note: "ADR 0018 shim; your module lives at its subpackage path now (RELAY-23 step 1 moves it, step 2 takes this)"
+  - path: "drydocs/fid_census.py"
+    disposition: canonical-producer
+    note: "ADR 0018 shim; your module lives at its subpackage path now (RELAY-23 step 1 moves it, step 2 takes this)"
+  - path: "drydocs/run_as_detect.py"
+    disposition: canonical-producer
+    note: "ADR 0018 shim; your module lives at its subpackage path now (RELAY-23 step 1 moves it, step 2 takes this)"
+  - path: "drydocs/plan_board.py"
+    disposition: canonical-producer
+    note: "ADR 0018 shim; your module lives at its subpackage path now (RELAY-23 step 1 moves it, step 2 takes this)"
+  - path: "drydocs/plan_roadmap.py"
+    disposition: canonical-producer
+    note: "ADR 0018 shim; your module lives at its subpackage path now (RELAY-23 step 1 moves it, step 2 takes this)"
+  - path: "drydocs/port_preflight.py"
+    disposition: canonical-producer
+    note: "ADR 0018 shim; your module lives at its subpackage path now (RELAY-23 step 1 moves it, step 2 takes this)"
+  - path: "drydocs/port_backlog_union.py"
+    disposition: canonical-producer
+    note: "ADR 0018 shim; your module lives at its subpackage path now (RELAY-23 step 1 moves it, step 2 takes this)"
+  - path: "drydocs/port_rename_detect.py"
+    disposition: canonical-producer
+    note: "ADR 0018 shim; your module lives at its subpackage path now (RELAY-23 step 1 moves it, step 2 takes this)"
+  - path: "drydocs/doc_outline.py"
+    disposition: canonical-producer
+    note: "ADR 0018 shim; your module lives at its subpackage path now (RELAY-23 step 1 moves it, step 2 takes this)"
+  - path: "drydocs/design_doc.py"
+    disposition: canonical-producer
+    note: "ADR 0018 shim; your module lives at its subpackage path now (RELAY-23 step 1 moves it, step 2 takes this)"
+  - path: "drydocs/doc_pdf.py"
+    disposition: canonical-producer
+    note: "ADR 0018 shim; your module lives at its subpackage path now (RELAY-23 step 1 moves it, step 2 takes this)"
+  - path: "drydocs/plan_ideas.py"
+    disposition: canonical-producer
+    note: "ADR 0018 shim; your module lives at its subpackage path now (RELAY-23 step 1 moves it, step 2 takes this)"
+  - path: "drydocs/publishing/**"
+    disposition: canonical-producer
+    note: "ADR 0018 shim package (aliases the four submodules too); your connector lives at drydocs/review/publishing/ now (RELAY-23)"
   # ---- J51 (2026-08-20): canonical-producer paths the company legitimately EXTENDS ----
   # Idea-142's class, found live at the 135-170 port (constraints.cypher lost two company
   # constraints to a wholesale take) and named five more times in PORT-REPORT-caa0406 +

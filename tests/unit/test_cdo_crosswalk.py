@@ -21,7 +21,7 @@ from pathlib import Path
 
 import yaml
 
-from drydocs.gate_pages import load_gate_spec
+from drydocs.review.gate_pages import load_gate_spec
 from drydocs_core.orchestration.crosswalk import (
     SIBLING_SCHEMA_IDS,
     load_crosswalks,

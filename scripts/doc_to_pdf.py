@@ -1,6 +1,6 @@
 """doc_to_pdf.py — render a design doc's .html to .pdf (Epic L / L4).
 
-Thin CLI over ``drydocs.doc_pdf``. The doc's single ``.html`` carries its print layout as
+Thin CLI over ``drydocs.docgen.doc_pdf``. The doc's single ``.html`` carries its print layout as
 an ``@media print`` sheet (L13), which headless Chromium applies during print-to-pdf.
 Uses a headless Chromium-family browser (Brave first, then Chrome / Edge) with fixed
 flags, and normalizes the PDF dates so re-runs are structurally identical. The blank PDF
@@ -16,7 +16,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from drydocs.doc_pdf import find_browser, html_to_pdf
+from drydocs.docgen.doc_pdf import find_browser, html_to_pdf
 
 
 def main() -> int:

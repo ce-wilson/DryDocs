@@ -24,7 +24,7 @@
   ruling it protects is already stated one sentence earlier. The feedback's fourth note —
   commands running together — was NOT a prose defect: `render_body` folded a fenced block
   inside a list item into the item's text, so every operator runbook rendered its commands
-  on one line. Fixed in `drydocs/design_doc.py`, which is why this Rev changes more `.html`
+  on one line. Fixed in `drydocs/docgen/design_doc.py`, which is why this Rev changes more `.html`
   than `.md`); on top of
   Rev 11, 2026-08-24 (CATCH-UP TO THE G102 FOLD, 2026-08-18 — this doc had been Rev 10 / 2026-08-04, so it
   spent two weeks telling readers to provision a four-database topology two of whose

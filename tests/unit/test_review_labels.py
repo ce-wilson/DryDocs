@@ -1,10 +1,10 @@
-"""Unit tests for the review backbone (drydocs/review_labels.py) — pure, no Neo4j."""
+"""Unit tests for the review backbone (drydocs/review/review_labels.py) — pure, no Neo4j."""
 
 from __future__ import annotations
 
 import pytest
 
-from drydocs.review_labels import (
+from drydocs.review.review_labels import (
     ReviewLabels,
     ReviewLabelsError,
     UnknownReviewSourceError,

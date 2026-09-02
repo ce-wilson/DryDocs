@@ -2,7 +2,7 @@
 
 Thin CLI beside ``scripts/render_board.py`` (and wired into the session-end ritual next to
 ``snapshot.ps1``) until the ``drydocs/cli.py`` entrypoint-boundary TODO is resolved. Stdlib
-+ ``drydocs.design_doc`` only — the doc .md is the single source of truth; the one HTML
++ ``drydocs.docgen.design_doc`` only — the doc .md is the single source of truth; the one HTML
 surface (screen + @media print, L13) is a deterministic render of it.
 
 Usage:
@@ -16,7 +16,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from drydocs.design_doc import write_doc
+from drydocs.docgen.design_doc import write_doc
 
 
 def main() -> None:

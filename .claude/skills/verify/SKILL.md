@@ -1,11 +1,11 @@
 ---
 name: verify
-description: Runtime-verify DryDocs changes at their real surface. Use after changing the design-doc renderer (drydocs/design_doc.py), the board/gate-page renderers, or the CLI — drives the emitted HTML through headless Edge and captures the executed DOM/screenshot as evidence, instead of re-running tests.
+description: Runtime-verify DryDocs changes at their real surface. Use after changing the design-doc renderer (drydocs/docgen/design_doc.py), the board/gate-page renderers, or the CLI — drives the emitted HTML through headless Edge and captures the executed DOM/screenshot as evidence, instead of re-running tests.
 ---
 
 # verify — DryDocs runtime verification recipes
 
-## Design-doc renderer (drydocs/design_doc.py)
+## Design-doc renderer (drydocs/docgen/design_doc.py)
 
 Surface = the emitted HTML executed in a browser (the annotate JS builds the HITL layer
 at runtime — file inspection alone misses it).
@@ -18,7 +18,7 @@ at runtime — file inspection alone misses it).
 
 2. **Determinism**: `Get-FileHash` each output, re-render, hash again — must be identical.
 
-3. **Execute the JS and dump the live DOM** — reuse the `drydocs.doc_pdf` recipe
+3. **Execute the JS and dump the live DOM** — reuse the `drydocs.docgen.doc_pdf` recipe
    (`find_browser()` + its flag set) with `--dump-dom` (or `--screenshot=<path>`):
    ```python
    base = [str(find_browser()), "--headless=new", "--disable-gpu", "--no-sandbox",
