@@ -49,3 +49,10 @@ notes: |
   FILED IN EPIC ONTOLOGY-MAPPING WITH module taxonomy AND phase 2, matching C11/C12/C13, the
   existing software-registry items. Phase 1 (taxonomy capture) is done and closed; the registry's
   live items sit in phase 2. Recorded because it was a judgement call, not an obvious one.
+  RIDER 2026-09-02 (SME, gate ontology-domain-registry-and-edition-grain §B5 second rider):
+  the row is the WHITE-LABEL case and the row shape must say so - `vendor: axway`, product
+  Axway SecureTransport, and a `white_label:` marker carrying the internal name (MFTS) so a
+  reader learns the vendor from the registry rather than from a User-Agent header. The
+  company already added the white-label reference in their registry; this row is the
+  producer's mechanism-only twin. The TERM "MFTS" (its expansion, its tier) is NOT this row -
+  it is an acronyms-domain entry (ONT2); the two link by name only.

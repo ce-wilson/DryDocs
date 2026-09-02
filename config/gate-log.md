@@ -4386,6 +4386,17 @@ answered and stays open as a rider. Nothing renumbers; no id moves.
   MINTED with a TIER axis of four values — `company`, `sdlc`, `technical`, `edition` — where
   the first three are base-common and the fourth is edition-owned, resolved edition-first
   then common. Minted by ONT2 through the §B2 protocol; this record is its authority.
+  **Second rider, same session — the store.** The `acronyms:` block in
+  `config/taxonomy/software-registry.yaml` was ruled THE AUTHORITATIVE HOME on 2026-07-21;
+  the SME re-ruled it here (C40, a signed ruling looked at again): *"they were not meant to
+  live in the software-registry.yaml, that was meant to HOLD them."* Acronyms get their own
+  store (the domain's fragment) and the block migrates out in the G87 shape — nothing lost,
+  nothing duplicated. The example that decides it: **MFTS** is a TERM with an expansion (the
+  acronyms domain) and separately a PRODUCT — Axway SecureTransport, white-labeled
+  internally, found by the research agent after years of being assumed in-house — which is a
+  software-registry row with `vendor: axway` and a white-label marker (C43). The term and the
+  product link by name; they are never one row, because an acronym is not a product and most
+  acronyms have no product at all.
 - **§C1 — CONFIRMED.** `[<EDITION>-]<MODULE><n>`, edition first, base unprefixed; the
   segment is optional so every existing id parses; both halves must be declared.
 - **§C2 — RULED: THE GRAIN IS THE AREA PRODUCT**, with the SME's definition as the

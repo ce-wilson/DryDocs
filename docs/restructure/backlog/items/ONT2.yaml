@@ -30,18 +30,28 @@ acceptance: |
   a TIER axis, and the tiers are what make it trickier than the other 13.
 
   (a) MINT `acronyms` as a row in domains.yaml (CFG1) through the §B2 protocol: authority =
-  the §B5 rider in the gate record; minted_by = producer; fragment 55-local-acronyms.yaml.
-  The fragment's entries are expansions, not edges: id, acronym, expansion, tier, scope note,
-  source. The relationship-vocabulary schema gains nothing; an expansion row is a different
-  kind of entry and the fragment says so in its header (the 46-local-all precedent for a
-  fragment whose entries are not the usual shape). THE EXISTING HOME IS NOT MOVED: the
-  `acronyms:` block in config/taxonomy/software-registry.yaml is THE AUTHORITATIVE HOME by
-  SME ruling (2026-07-21), rendered by scripts/render_software_registry.py and shown by
-  AcronymsPane.tsx (O68), with expansion/source/added required per row
-  (test_software_registry.py). The domain row and fragment DECLARE that block as the
-  domain's store - `vocabulary_fragment` points at the registry block, not a new file - so
-  the ruling stands and nothing is duplicated. If CFG1's guard requires a 4x-/5x- file, the
-  fragment is a one-line pointer file and the guard follows the pointer.
+  the §B5 rider in the gate record; minted_by = producer; fragment 55-local-acronyms.yaml -
+  ITS OWN STORE. The fragment's entries are expansions, not edges: id, acronym, expansion,
+  tier, scope note, source, added. The relationship-vocabulary schema gains nothing; an
+  expansion row is a different kind of entry and the fragment says so in its header (the
+  46-local-all precedent for a fragment whose entries are not the usual shape).
+
+  THE SOFTWARE-REGISTRY BLOCK WAS A HOLDING PLACE, NOT A HOME (SME, 2026-09-02, superseding
+  the 2026-07-21 "authoritative home" ruling - recorded as a rider on the gate). The
+  `acronyms:` block in config/taxonomy/software-registry.yaml MIGRATES to the fragment in
+  the G87 shape: every row is added to 55-local-acronyms.yaml with its expansion, source and
+  added-date intact and a `tier`; the block is then emptied with a comment pointing at the
+  fragment and the rider; scripts/render_software_registry.py stops reading it and a
+  render step reads the fragment instead; test_software_registry.py's acronym shape test
+  moves with the data. Nothing is lost and nothing is duplicated.
+
+  WHY SEPARATE - the MFTS case, which is the SME's example: "MFTS" is TWO facts. As a TERM
+  it has an expansion and a tier (this domain). As a PRODUCT it is Axway SecureTransport
+  white-labeled internally - a software-registry row with vendor: axway and a white-label
+  marker (C43). The term links to the product by name; the two are never stored together,
+  because an acronym is not a product and most acronyms (LOB, SEAL, PDN, HITL) have no
+  product row at all. The registry holds product identity; the acronyms domain holds
+  meaning.
 
   (b) FOUR TIERS, in resolution order, edition-first:
   `edition`   - owned by an edition (minted_by = its code, authority = its gate); the only tier
@@ -58,20 +68,21 @@ acceptance: |
   view resolves every edition's terms against the same three common tiers, which is what
   keeps cross-edition text readable.
 
-  (d) SEED from what exists: the `acronyms:` block already carries every row with
-  expansion, source and added-date; this item adds `tier` to each, placed by the SME at a
-  short gate (a table, one row per acronym, tier proposed with reason) rather than by the
-  implementer. Nothing is invented; the seed is the block's current rows. The retired org
-  acronym is NOT a row anywhere (J55).
+  (d) SEED = the migrated block: every row keeps expansion, source and added-date and
+  gains `tier`, placed by the SME at a short gate (a table, one row per acronym, tier
+  proposed with reason) rather than by the implementer. Nothing is invented. The retired
+  org acronym is NOT a row anywhere (J55).
 
   (e) PORT: the fragment is per-entry on the tom-role-vocabulary pattern - common-tier rows
   cross whole, edition-tier rows are the edition's own and stay.
 
   (f) GUARDS: every row names a tier from the four; no acronym appears in two common tiers;
   an edition-tier row carries an edition code that exists in editions.yaml (CFG2, when built;
-  skip until then); render_software_registry.py carries `tier` through to the JSON and
-  AcronymsPane groups by it; test_software_registry.py's shape test gains the field. The
-  surface stays deterministic.
+  skip until then); the renderer reads the fragment (J37) and AcronymsPane groups by tier;
+  the migrated shape test asserts expansion/source/added/tier on every row; the emptied
+  registry block stays empty (a guard, so the holding place does not refill). The surface
+  stays deterministic.
 
   Depends on CFG1 (the registry). Not in scope: any change to the relationship-vocabulary
-  entry schema, any loader, the O68 pane's design beyond grouping by tier.
+  entry schema, any loader, the O68 pane's design beyond grouping by tier, and the
+  software-registry row shape (C43 carries the white-label marker).
