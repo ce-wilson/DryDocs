@@ -62,6 +62,7 @@ BACKLOG = REPO_ROOT / "docs" / "restructure" / "backlog"  # the sharded tree (AD
 AGENTS_DIR = REPO_ROOT / ".claude" / "agents"
 ITEMS_REL = "docs/restructure/backlog/items"
 IDEAS_REL = "docs/restructure/IDEAS.md"
+MODULES_REL = "docs/restructure/backlog/modules.yaml"
 
 #: An item id is an uppercase series prefix and a number: G129, MM4, DD7.
 _ID_RE = re.compile(r"^(?P<series>[A-Z]+)(?P<number>\d+)$")
@@ -85,6 +86,48 @@ IDEA_SERIES = "IDEA"
 #: Reserved for company-side-only items (cross-repo convention 2026-07-20,
 #: git-readme.md). The allocator refuses it rather than leaving it to a reader.
 RESERVED_SERIES = frozenset({"DD"})
+
+#: THE LEGACY SERIES ARE FROZEN (ruling 2026-09-02, config/gate-log.md). The letter
+#: was an epoch tag - it recorded WHEN a phase opened, not what an item is about -
+#: and G alone had absorbed 136 items across six epics. Each series is frozen at
+#: the highest number it had ever taken across local, every remote ref and history,
+#: measured the day of the ruling; that number is a COMMITTED CONSTANT, never the
+#: current max, because a computed floor rises with every new id and silently
+#: re-legalizes the series (the band guard's own rule). No id moves: ids are join
+#: keys and config/gate-log.md cites them inside signed records. New ids take the
+#: MODULE code from modules.yaml `series:` - ``--next-id --module <module>``.
+#: Duplicated in tests/unit/test_backlog.py DELIBERATELY, with a guard that the two
+#: agree; the test wins if they ever differ.
+FROZEN_ON = "2026-09-02"
+FROZEN_SERIES: dict[str, int] = {
+    "A": 4,
+    "B": 5,
+    "C": 44,
+    "D": 11,
+    "E": 2,
+    "F": 2,
+    "G": 136,
+    "GN": 2,
+    "H": 8,
+    "I": 8,
+    "J": 78,
+    "K": 30,
+    "L": 29,
+    "M": 4,
+    "MM": 14,
+    "N": 28,
+    "O": 92,
+    "P": 6,
+    "Q": 28,
+    "R": 23,
+    "S": 16,
+    "U": 27,
+    "V": 11,
+    "W": 3,
+    "X": 4,
+    "Y": 7,
+    "Z": 9,
+}
 
 #: Producer allocates at or below this in EVERY series; company is above it.
 #: Duplicated from tests/unit/test_backlog.py DELIBERATELY -- this script runs
@@ -239,6 +282,18 @@ def known_ids() -> tuple[set[str], dict[str, int], list[str]]:
     return local | remote | history, counts, refs
 
 
+def module_series() -> dict[str, str]:
+    """``module -> SERIES`` from modules.yaml ``series:`` - the ONLY source of a new series.
+
+    Read from the file rather than embedded here so that registering a module and
+    registering its series is one edit in one place, and the guard in
+    tests/unit/test_backlog.py holds both to the same shape.
+    """
+    doc = yaml.safe_load((REPO_ROOT / MODULES_REL).read_text(encoding="utf-8")) or {}
+    series = doc.get("series") or {}
+    return {str(k): str(v).strip().upper() for k, v in series.items()}
+
+
 def next_id(series: str, taken: set[str] | None = None) -> tuple[str, int]:
     """``(next_id, highest_taken)`` for ``series``. MAX+1, never the lowest gap."""
     series = series.strip().upper()
@@ -248,6 +303,21 @@ def next_id(series: str, taken: set[str] | None = None) -> tuple[str, int]:
         raise SystemExit(
             f"refused: the {series}-series is reserved for company-side-only items "
             "(cross-repo convention 2026-07-20, git-readme.md)"
+        )
+    if series in FROZEN_SERIES:
+        raise SystemExit(
+            f"refused: the {series}-series was FROZEN on {FROZEN_ON} at "
+            f"{series}{FROZEN_SERIES[series]} (config/gate-log.md). The letter was an epoch "
+            "tag, not a topic. New ids take the module code: "
+            "validate.py --next-id --module <module>"
+        )
+    codes = module_series()
+    if series != IDEA_SERIES and series not in set(codes.values()):
+        registered = ", ".join(f"{m}={c}" for m, c in sorted(codes.items()))
+        raise SystemExit(
+            f"refused: {series!r} is not a registered module series. A series comes from "
+            f"docs/restructure/backlog/modules.yaml `series:`, never from a letter somebody "
+            f"picks. Registered: {registered}"
         )
     pool = taken if taken is not None else known_ids()[0]
     numbers = [
@@ -436,9 +506,26 @@ def main() -> int:
 
 def _cli(argv: list[str]) -> int:
     if argv and argv[0] in ("--next-id", "--show-ids"):
-        if len(argv) < 2:
-            raise SystemExit(f"usage: validate.py {argv[0]} <SERIES>   e.g. {argv[0]} G")
-        return _report_allocation(argv[1], show_all=argv[0] == "--show-ids")
+        show = argv[0] == "--show-ids"
+        rest = argv[1:]
+        if rest and rest[0] == "--module":
+            # The series is DERIVED from the module (ruling 2026-09-02): the groomer
+            # names the module the item belongs to - a field every item already
+            # carries - and never picks a letter.
+            codes = module_series()
+            if len(rest) < 2 or rest[1] not in codes:
+                known = ", ".join(sorted(codes))
+                raise SystemExit(
+                    f"usage: validate.py {argv[0]} --module <module>   modules: {known}"
+                )
+            return _report_allocation(codes[rest[1]], show_all=show)
+        if not rest:
+            raise SystemExit(
+                f"usage: validate.py {argv[0]} --module <module>   (a backlog item)"
+                + chr(10)
+                + f"       validate.py {argv[0]} Idea                (the idea inbox)"
+            )
+        return _report_allocation(rest[0], show_all=show)
     return main()
 
 

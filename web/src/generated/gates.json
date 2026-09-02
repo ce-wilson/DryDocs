@@ -1092,9 +1092,19 @@
       ],
       "log_ref": "config/gate-log.md:4263",
       "unblocks": [
-        "C41",
         "J70"
       ]
+    },
+    {
+      "kind": "log-entry",
+      "date": "2026-09-02",
+      "title": "RECORD: the backlog series is the MODULE; the 27 letter series are FROZEN (PLAN1; SME ruling in-chat, 2026-09-02)",
+      "status": "recorded",
+      "prompt_files": [
+        "config/gate-prompts/schema-identifier-publish-ceiling-teams-edition.yaml"
+      ],
+      "log_ref": "config/gate-log.md:4305",
+      "unblocks": []
     },
     {
       "kind": "prompt-only",

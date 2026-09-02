@@ -10,8 +10,7 @@ model: fable
 priority: p2
 status: blocked
 depends_on: []
-gates:
-- schema-identifier-publish-ceiling-teams-edition
+gates: []
 inputs:
 - docs/decisions/0015-team-edition-template.md
 - drydocs_core/ontology/relationship_vocabulary/00-header.yaml
@@ -20,9 +19,22 @@ inputs:
 - docs/restructure/backlog/epics/
 - git-readme.md
 acceptance: |
-  BLOCKED ON THE TEAMS EDITION ADR. Nothing here is built until that ADR rules the domain registry
-  and its minting authority. The item exists so the design is not carried only in a machine-local
-  plan file.
+  RE-SCOPED 2026-09-02 (RECORD in config/gate-log.md, "the backlog series is the MODULE"). The
+  title is kept verbatim - a title is part of an id's identity to the trunk guard, and the
+  series-letter finding it states is true; PLAN1 is what answered it for items. The
+  item-series half of this design - clauses (b) and (c) as originally written, where a DOMAIN
+  registry supplied the series prefix - is SUPERSEDED by PLAN1: item ids take the MODULE code
+  from modules.yaml `series:`, the 27 letters are frozen, and no id moves. What remains here is
+  the ontology half (a) and the edition grain (d), and (e) is narrowed to the questions those
+  two still need ruled.
+
+  The former `gates:` entry, `schema-identifier-publish-ceiling-teams-edition`, is removed: that
+  prompt asks whether `psgmgr` is public vocabulary and how a registered id is renamed. It never
+  asked this item's questions, so it could never have unblocked it. This item needs its own
+  prompt, drafted from (e) below, and takes that slug when it exists.
+
+  BLOCKED until that prompt is drafted and ruled. The item exists so the design is not carried
+  only in a machine-local plan file.
 
   (a) A DOMAIN IS A MINTED OBJECT, registered and tracked, allocated the way an id is allocated:
   ask the allocator, push the registration, then use it. New `config/taxonomy/domains.yaml` with one
@@ -31,12 +43,14 @@ acceptance: |
   each citing its real ruling - eleven from vocabulary-domains-and-id-policy (2026-08-12),
   `infrastructure` from server-location-ontology (Z2, 2026-08-19), `human` from A3.
 
-  (b) THE SERIES PREFIX COMES FROM THE REGISTRY. Existing series are 1-2 letters (A..Z, GN, MM);
+  (b) SUPERSEDED BY PLAN1 - kept for the record. As written: THE SERIES PREFIX COMES FROM THE REGISTRY. Existing series are 1-2 letters (A..Z, GN, MM);
   minted domain series are >=3 (REG, SCHED, BAPP, ARCH, DOCS, QUAL, CTX, HUM, CORP, ITSM, INFRA).
   Zero regex change - `GN` and `MM` already prove multi-letter series parse. `all` gets NO series:
   it exists for edges spanning domains, and a catch-all series is precisely what G became.
 
-  (c) DUAL-KEY: ids freeze, an optional `domain:` field carries the axis, following the `gates:`
+  (c) SUPERSEDED BY PLAN1 for items (module IS the axis, and it was already a required field);
+  still open for ONTOLOGY objects, where a `domain:` field remains the design. As written:
+  DUAL-KEY: ids freeze, an optional `domain:` field carries the axis, following the `gates:`
   precedent (J50). No existing id moves, so every citation in config/gate-log.md,
   docs/port/port-prompt.md and IDEAS.md still resolves. Backfill is mechanical from the 27 epic
   files; items whose domain differs from their epic's are overridden individually.
@@ -55,6 +69,13 @@ acceptance: |
   tests/unit green; no id moves; the port-prompt carries a relay, because a cross-repo convention
   change is inert until it reaches the other side.
 notes: |
+  RE-SCOPED 2026-09-02 (desktop, ui-workstream worktree, branch feat/backlog-series-by-module).
+  The SME ruled item series BY MODULE, not by domain, and ruled it now rather than at the Teams
+  Edition gate - see the RECORD and PLAN1. The correction to this item's own `gates:` line came
+  from the 2026-09-02 groom-backlog review: the slug was set on 09-01 as a placeholder for "the
+  Teams Edition ruling" and pointed at a prompt that asks a different question. An item blocked
+  on a gate that cannot unblock it is blocked forever and looks merely patient.
+
   WHY THIS EXISTS AS AN ITEM: the design was approved by the SME on 2026-09-01 and lived only in a
   machine-local plan file outside the repo. Its first workstream shipped the same day as J68, J69,
   J71 and J72; this is the second, and it had no record anywhere in the tree. An approved design

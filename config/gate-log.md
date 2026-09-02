@@ -4301,3 +4301,43 @@ activation is a groomed follow-up (Q24/Q25, minted at this sign-off).
 - **Authority note.** This stub is a RECORD, not a ruling — J43's reconcile check treats
   DRAFTED stubs as non-authority; no registry field, envelope property or term may cite this
   heading. Sign-off item: J70 (`feat/ui-web`), whose `gates:` field takes this slug.
+
+## 2026-09-02 — RECORD: the backlog series is the MODULE; the 27 letter series are FROZEN (PLAN1; SME ruling in-chat, 2026-09-02)
+
+**What was ruled.** New backlog item ids take the code of the module they belong to
+(`LOAD12`, `WEB3`, `PLAN1`), derived by the allocator from `docs/restructure/backlog/modules.yaml`
+`series:`; nobody picks a letter. The 27 legacy series — A..Z, GN, MM — are frozen at the
+highest number each had ever taken across local, every remote ref and history, measured through
+the allocator on the day: A4 B5 C44 D11 E2 F2 G136 GN2 H8 I8 J78 K30 L29 M4 MM14 N28 O92 P6 Q28
+R23 S16 U27 V11 W3 X4 Y7 Z9. The snapshot is a committed constant (validate.py and
+test_backlog.py, asserted equal), never the current max. **No id moves** — ids are join keys
+and this file cites them inside signed records.
+
+**Why.** The letter was an epoch tag: `plan.yaml` mapped phases 1:1 to epics and to letters,
+so a series recorded WHEN a phase opened, not what an item is about. G held 136 of ~630 items
+across six epics. Every item already carried the topic as a REQUIRED field (`module:`, 611 of
+611 on the day), so the prefix was the only thing missing. The SME's direction was to retire the
+letters and start by module BEFORE Teams Edition, because the problem compounded with every
+groom — 18 more letter ids landed the same morning.
+
+**Module, not domain — the departure from C41.** C41 (2026-09-01) designed a DOMAIN registry
+as the item-series source, blocked on a Teams Edition ruling. Domain is the ontology topic;
+module is the MODULE_MAP component an agent pulls against and the field every item already
+carries. Item series take the module. The domain registry remains an ontology concern and is
+decoupled from item numbering by this record; C41 is re-scoped accordingly and its `gates:`
+no longer cites `schema-identifier-publish-ceiling-teams-edition`, a prompt that asks about
+`psgmgr` and never asked C41's questions.
+
+**Code rules.** Three or more uppercase letters, so no code can be read as a frozen letter;
+never DD, which the company side occupied in a series this repo cannot see (Idea-162); one
+code per module, because two modules sharing a series is the G problem under a new name. A
+new module is one `modules.yaml` edit — name and code together.
+
+**What this does NOT rule, deliberately.** The edition prefix (`[<ED>-]<MODULE><n>`, base
+unprefixed) that retires the DD reserve (`git-readme.md`, 2026-07-20) and the numeric band
+(2026-08-18) — that needs the port relay and is the next item. The inbox shard. The Teams
+Edition D2 amendment. Each is recorded when it is ruled, not here.
+
+**Built.** PLAN1 (`feat/backlog-series-by-module`): `modules.yaml` `series:`, the allocator's
+`FROZEN_SERIES` + `--next-id --module`, five guards in `test_backlog.py`, the mint rule in
+CLAUDE.md and the groom-backlog skill.

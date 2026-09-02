@@ -66,13 +66,25 @@ things share the word *port* — never conflate them:
   the desktop read claim commit `3608ae5` as a dead tip and rebuilt it (`17d9e08` on main,
   `bfb2f0b` stranded on a branch); and the C19 double-build above. What this does NOT fix: a session
   that dies before its first push stays invisible, and no convention changes that.
+  **One pen per surface (2026-09-02).** Concurrent sessions are normal — two machines, N
+  worktrees, a review session. Collisions come from two sessions WRITING THE SAME SURFACE, not
+  from two sessions existing. So: at the start of any session that will write, name the
+  surfaces it holds the pen for — `backlog` (`items/`, `IDEAS.md`/`ideas/`, `epics/`, the plan
+  renders), `port` (`port-prompt.md`, `PORT-MANIFEST.yaml`, `docs/company-prompts/`), `adr`,
+  `code:<module>` — in its first commit message or a `wip/` branch name. Any other live session
+  stays off those surfaces until the pen moves, and asks rather than assumes. The item-file
+  claim (`status: in_progress`, pushed) is the pen for ONE ITEM; this is the pen for a SURFACE.
+  The board's Ready strip and `git branch -r --list "wip/*"` are where you look before picking
+  one up. What this does NOT cover: a session that never says what it holds — that was the
+  coordination failure of 2026-09-02 (two sessions grooming and merging the same renders in one
+  afternoon), and it is not a tooling gap.
 
 **Mint rule (the claim protocol's other half; I6).** A pull is claimed by pushing `status: in_progress`. An id is claimed the same way, and for the same reason: an id that exists only in your tree is an id the other machine will mint too. **Never read the next free number off your own tree** — ask the allocator, which unions the local items, every remote ref's tree listing, and every id ever added in history, and returns max+1 (a gap is usually a BURNED id — `config/gate-log.md` cites ids inside SIGNED records, so re-issuing one silently re-points a signed gate):
 ```
-python .claude/skills/groom-backlog/validate.py --next-id G      # a backlog series
-python .claude/skills/groom-backlog/validate.py --next-id Idea   # the idea inbox
+python .claude/skills/groom-backlog/validate.py --next-id --module drydocs-load   # a backlog item: the series IS the module (LOAD12)
+python .claude/skills/groom-backlog/validate.py --next-id Idea                    # the idea inbox
 ```
-Then **mint, push the stub, and only then write the body** — the mechanism that already works for ADR numbering, where a committed, pushed index line reserves a number for a draft that does not exist yet. **The stub carries the FINAL title**, because the collision guard compares titles and not bodies: refine a title between the stub push and the body push and the guard reads local-vs-trunk as two machines minting one number, and goes red until the body lands (observed on J66, 2026-08-30). Settle the title before the stub; everything else can follow. **And the stub commit carries the refreshed board and roadmap** (`poetry run python scripts/render_board.py`), because the Y5 tolerance that lets a CLAIM ship no render is for STATUS-ONLY drift and a new item is beyond it: without the render, `test_committed_roadmap_page_matches_its_sources` fails and the trunk is red for the whole window between the two pushes (observed on G132/G133, 2026-08-30). Rendering in the stub commit costs nothing and keeps the guard doing its job. This has failed six times without the protocol, most recently O69 on 2026-08-29: one machine's id was already pushed on a feature branch and the other never looked past its own working tree. The allocator BANDS (producer 1–9999, company 10000+) are a different rule and unchanged — they separate the two repos, never the two machines.
+The 27 legacy letters (A..Z, GN, MM) were FROZEN on 2026-09-02 — a letter recorded when a phase opened, not what an item is about — and the allocator refuses them; a new id always carries its module code. Then **mint, push the stub, and only then write the body** — the mechanism that already works for ADR numbering, where a committed, pushed index line reserves a number for a draft that does not exist yet. **The stub carries the FINAL title**, because the collision guard compares titles and not bodies: refine a title between the stub push and the body push and the guard reads local-vs-trunk as two machines minting one number, and goes red until the body lands (observed on J66, 2026-08-30). Settle the title before the stub; everything else can follow. **And the stub commit carries the refreshed board and roadmap** (`poetry run python scripts/render_board.py`), because the Y5 tolerance that lets a CLAIM ship no render is for STATUS-ONLY drift and a new item is beyond it: without the render, `test_committed_roadmap_page_matches_its_sources` fails and the trunk is red for the whole window between the two pushes (observed on G132/G133, 2026-08-30). Rendering in the stub commit costs nothing and keeps the guard doing its job. This has failed six times without the protocol, most recently O69 on 2026-08-29: one machine's id was already pushed on a feature branch and the other never looked past its own working tree. The allocator BANDS (producer 1–9999, company 10000+) are a different rule and unchanged — they separate the two repos, never the two machines.
 
 **Session ritual (keeps every platform aligned):**
 1. **Start:** `git pull` → read this file → open the board's Ready-to-pull strip (or run
