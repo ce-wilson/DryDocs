@@ -94,7 +94,35 @@ question a 1,000-line file with the trail at the bottom could not answer.
 - **`Idea-240`** · 2026-09-02 · `[idea]` · **open** · prio? **Med** —
   **The publish boundary is defined on the tracked tree and says nothing about git HISTORY —
   34 commit messages on main carry the retired org acronym, and whether the public push is
-  tip-only or carries history is undocumented.** STUB - body follows.
+  tip-only or carries history is undocumented.** Source: the company's own flag during the
+  D/F apply (2026-09-02, relayed session record) — a commit TITLE on their `main` carries the
+  retired token, and their `git rm --cached` of the deepdoc scrape removed the blob from the
+  tip while it stays reachable in history; they named it *a history-rewrite decision, not a
+  tip-level one*, and left it to the SME. The same decision exists here and has never been
+  written down. **Measured producer-side:** `git log main --grep` for the retired token (read
+  from `internal/cdo-reference/README.md`, the guard's own mapping file, never spelled here)
+  matches **34 of 1,816** commits on `main`. `tests/unit/
+  test_publish_boundary_retired_org_acronym.py` (J55) scopes history OUT deliberately — its
+  docstring cites commit `3c2bfcdd` naming history as an *expected transient survivor* — and
+  that is the right scope for a tree guard. But `PUBLISH-BOUNDARY.md` defines the boundary
+  as *the git-tracked working tree outside `internal/`* and does not contain the word
+  "history," so the document that governs the public push is silent on the one thing a
+  public push carries that a tree guard cannot see. This repo has a public twin
+  ([[project-public-side-publish-boundary]]), so the question is live, not hypothetical.
+  **THE RULING NEEDED, one of three:** (a) the public push is TIP-ONLY (squash or orphan
+  commit) — history never leaves, and `PUBLISH-BOUNDARY.md` says so in one sentence; (b) the
+  public push carries history and the 34 messages are ACCEPTED (the acronym in a commit
+  subject identifies an org unit, not a person, host or credential — arguably below the
+  §3 line) — recorded as an allowlisted class with the count and the reason; (c) history is
+  rewritten (`filter-repo` on messages only) — the option the company named, and the one
+  that breaks every `reviewed_commit` stamp, gate-log sha, port-base tag and PORT-REPORT
+  pin in the repo, so it is listed to be REJECTED with the reason, not to be chosen.
+  Recommendation is (a) if the publish mechanism already is tip-only (verify against the
+  public twin's `git rev-list --count`), otherwise (b). **Either way the mechanism gains one
+  test:** a guard that reads `git log --format=%s%b` for the retired token and asserts the
+  count against the recorded ceiling (34 today) — a NEW occurrence in a commit message is
+  the leak J55 cannot see, and it is the failure the company just had. Not a sweep; a
+  ceiling. Related: J55, J23, [[Idea-239]] (same day, same port).
 
 - **`Idea-239`** · 2026-09-02 · `[idea]` · **open** · prio? **Med** —
   **A config surface, its renderer's SURFACES row and the derived artifact it feeds are ONE
