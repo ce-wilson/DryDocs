@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - web/src
@@ -67,3 +67,51 @@ notes: |
 
   CORRECTION CARRIED FORWARD: the review that prompted this quoted 43 half-pixel uses as 63
   in conversation. 43 is the measured figure and is what (b) is scoped against.
+
+  CLOSED 2026-09-02 (desktop, ui-workstream worktree, branch feat/ui-web).
+  Clauses (b), (c) and (d) built, one commit each; (e) and (f) are constraints and
+  were held to.
+
+  CENSUS RE-MEASURED AT BUILD, not trusted from clause (a): 697 declarations over
+  23 distinct sizes at the start, against the 698 over 22 the item recorded a day
+  earlier. The count moved because three landing-page commits landed between the
+  measurement and the work. After all three clauses: 697 declarations over 13
+  distinct rendered sizes. Ten sizes retired, no declaration count change, which
+  is the shape a vocabulary cleanup should have.
+
+  (b) 42 half-pixel uses in 14 files rounded to whole pixels, retiring 7 sizes.
+  Tie-break stated in the commit: round UP uniformly, since nearest-whole does not
+  decide a .5 and shrinking text to settle arithmetic works against clause (d).
+
+  (c) 17 arbitrary duplicates retired. The naive rename would have broken its own
+  clause: a named Tailwind step carries a line-height, a bare text-[Npx] does not,
+  and :root sets 1.5 here, so text-[12px] to text-xs would have pulled line boxes
+  from 18px to 16px - visible in a table cell. The 16 inheriting sites therefore
+  carry the leading explicitly as text-xs/[1.5] and text-sm/[1.5]; the one site
+  already carrying leading-relaxed took the plain text-base. Verified in the built
+  CSS.
+
+  (d) Floor set at 10px for text a reader READS, 9px for SVG labels a reader SCANS
+  in place, nothing below. 16 DOM sites raised from 9px; TaskGraphPane's 8px and
+  7px raised to 9px. Four sites hold the SVG exception and each is marked at its
+  declaration. The rule is written into web/src/index.css beside the type tokens,
+  because the cost this item names is whoever next asks what size something should
+  be and finds no answer in the code.
+
+  BROWSER VERIFICATION, per clause (f) - surfaces actually eyeballed on
+  localhost:5173 against a live API and the drydocs graph: the landing page, /loads
+  including the run timeline, /lineage with both the trust legend and the Swimlanes
+  tab, /under-the-hood with the scoreboard and strategy cards, /explorer, and
+  /load-map with the wiring key. Layout intact everywhere, nothing reflowed.
+
+  NOT VISUALLY VERIFIED, and named rather than glossed: TaskGraphPane's two SVG
+  labels - the pane renders only after a question is answered, and /ask returned
+  "Failed to fetch" with no request reaching the API. That is the graph_qa agent
+  path and unrelated to type sizes, but it means the 8px-to-9px raise was verified
+  by build and code reading only. Also unverified in a browser: SignIn, MyApps,
+  CypherConsole, TowerDrill and AssetPathRoute, all of which took clause (b)
+  roundings.
+
+  CLAUSE (e) HELD, and the item's held-back observation still stands untouched: on
+  /load-map the identifiers are still smaller than the prose explaining them. It
+  remains a design question and wants its own item.
