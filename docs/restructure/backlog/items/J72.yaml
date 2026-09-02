@@ -113,3 +113,47 @@ notes: |
   clean run, naming the 3-of-8 measurement, because exit 0 previously read as a guarantee while the
   62-failure pair sat at 0.29. A tool that reports its own measured coverage is harder to over-trust
   than one that reports a verdict.
+
+  THIRD ROUND, 2026-09-01, and the company found the ROOT CAUSE I had twice papered over.
+
+  MY SECOND FIX WAS RIGHT FOR A WRONG REASON, and they measured it. I claimed the true twin "also
+  cleared the floor and was silently dropped" by the best-match rule, so raising the cap would
+  surface it. On their tree that twin scored 0.08 and ranked 13 of 29 - it never came near the
+  floor, and no cap change could have reached it. Worse, the cap change made the report say three
+  unrelated files at an identical 0.38 with no true pair, which is a stronger invitation to dismiss
+  the flag than one wrong answer was.
+
+  THE ACTUAL CAUSE IS JACCARD SIZE ASYMMETRY, which is arithmetic. Their pair: an 11-token producer
+  stub against the 97-token company epic it was reduced from, 8 tokens shared. Union in the
+  denominator gives 8/100 = 0.08; containment divides by the smaller set, 8/11 = 0.73, rank 1 of 29.
+  A producer file is regularly a reduction or expansion of its consumer twin, so Jaccard reads the
+  NORMAL SHAPE of a rename as dissimilarity. Adopted as max(jaccard, containment).
+
+  THEIR CAVEAT SHIPPED WITH THE CONTRIBUTION AND I VERIFIED IT INDEPENDENTLY: containment over-fires
+  alone - component-topology.yaml at 428 tokens reaches 0.64 against an 11-token stub on jaccard
+  0.02, purely by being large enough to contain it. Their framing is the finding: containment finds
+  the twin, the cap bounds its noise, NEITHER IS SUFFICIENT ALONE.
+
+  THREE DEFECTS THE ADOPTION EXPOSED, each caught by an existing guard or a real-data re-run:
+  - containment turned a 4-token document into a boilerplate detector (tokens `-`, `id:`,
+    `local_relationships:` scoring 0.75 on structure alone). MIN_TOKENS_FOR_CONTAINMENT = 8 makes it
+    abstain, mirroring MIN_IDS_FOR_ID_MEASURE, and pure punctuation is stripped in normalization.
+    Caught by test_unrelated_files_are_not_flagged the moment containment landed.
+  - the cap was per SIGNAL, so three signals capped at three produced twenty rows for six files on
+    the real sweep. Now per proposed file across all signals.
+  - dedup preferred the FIRST claim over the STRONGEST: 41-local-business-application <-
+    41-local-seal reported as normalized-text 0.57 while its same-slot-prefix 1.00 was dropped as
+    already-seen. Order of discovery is not evidence of strength.
+
+  COVERAGE NOW 8/8 on their pair list, verified on real data: every true twin ranks FIRST in its
+  group, and 52-local-human - the cross-slot split both earlier rounds called structurally
+  unreachable - fires at 0.71 against 41-local-seal and 0.57 against 42-local-catalog. The shape
+  they told me to flag rather than tune away turned out to be reachable after all, by fixing the
+  measure rather than the threshold.
+
+  THE METHOD FAILURE WORTH KEEPING, because it is mine and it repeated: BOTH my fixes were validated
+  against fixtures I authored to match my hypothesis. Round two proved "the twin cleared the floor"
+  using a fixture built to put a second file above the floor - a fixture written to match a theory
+  proves the theory, not the tree. The company measured the real pair each time and was right each
+  time. The rule this earns: when a guard is written for a specific incident, its fixture must be
+  RECONSTRUCTED FROM THE INCIDENT at the real values, and a synthetic one only supplements it.

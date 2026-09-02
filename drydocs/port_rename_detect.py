@@ -84,8 +84,20 @@ MIN_IDS_FOR_ID_MEASURE = 3
 #: is noise, not evidence, and burying the signal is the failure at the other end.
 MAX_MATCHES_PER_ADD = 3
 
+#: Below this many distinct tokens on either side, CONTAINMENT abstains and only
+#: Jaccard votes. Same shape as MIN_IDS_FOR_ID_MEASURE and the same reason: a
+#: measure that divides by the smaller set becomes a boilerplate detector when the
+#: smaller set IS boilerplate. Caught by an existing guard the moment containment
+#: landed — a 4-token document whose tokens were `-`, `id:` and
+#: `local_relationships:` scored 0.75 containment against an unrelated file, on
+#: structure alone. The company said it first about Jaccard ("equal tiny sets make
+#: it measure boilerplate, not content"); it is truer of containment. Set below the
+#: 11 tokens of the real pair this measure exists for.
+MIN_TOKENS_FOR_CONTAINMENT = 8
+
 _COMMENT = re.compile(r"#.*$", re.M)
 _WS = re.compile(r"\s+")
+_PUNCT_ONLY = re.compile(r"[^\w]+")
 
 
 @dataclass(frozen=True)
@@ -111,7 +123,10 @@ def normalized_text(text: str) -> str:
     body — the crosswalk prompt and its retired-acronym twin differ most in their
     header, which is precisely the part that must not dominate the comparison.
     """
-    return _WS.sub(" ", _COMMENT.sub("", text)).strip().lower()
+    collapsed = _WS.sub(" ", _COMMENT.sub("", text)).strip().lower()
+    # A bare `-` is a YAML list marker, not evidence. Dropping pure punctuation
+    # costs nothing and stops the smallest documents scoring on structure alone.
+    return " ".join(t for t in collapsed.split() if not _PUNCT_ONLY.fullmatch(t))
 
 
 def id_set(text: str) -> set[str]:
@@ -134,10 +149,44 @@ def jaccard(a: set[str], b: set[str]) -> float:
     return len(a & b) / len(a | b)
 
 
+def containment(a: set[str], b: set[str]) -> float:
+    """``|A n B| / min(|A|, |B|)`` — overlap as a fraction of the SMALLER set.
+
+    CONTRIBUTED BY THE COMPANY SESSION (2026-09-01) after measuring that Jaccard
+    collapses under SIZE ASYMMETRY, which is arithmetic rather than opinion. Their
+    real pair: an 11-token producer stub against the 97-token company epic it was
+    reduced from, sharing 8 tokens. Jaccard puts the union on the bottom and scores
+    it 0.08 — rank 13 of 29, never near the floor. Containment divides by the
+    smaller set and scores 0.73, rank 1 of 29.
+
+    That asymmetry is the normal shape of a rename here, not an edge case: a
+    producer file is regularly a reduction or an expansion of its consumer twin,
+    and Jaccard reads the size difference as dissimilarity.
+
+    IT OVER-FIRES ALONE, and the caveat came with the contribution — verified
+    independently on the producer tree: `component-topology.yaml` at 428 tokens
+    reaches containment 0.64 against an 11-token stub on Jaccard 0.02, purely by
+    being large enough to contain it. So this is taken as ``max(jaccard,
+    containment)`` and bounded by :data:`MAX_MATCHES_PER_ADD`. **Neither is
+    sufficient alone** — containment finds the twin, the cap bounds its noise —
+    and that composition is the finding, more than either half.
+    """
+    if not a or not b:
+        return 0.0
+    if min(len(a), len(b)) < MIN_TOKENS_FOR_CONTAINMENT:
+        return 0.0  # too small to carry content; see MIN_TOKENS_FOR_CONTAINMENT
+    return len(a & b) / min(len(a), len(b))
+
+
+def overlap(a: set[str], b: set[str]) -> float:
+    """The stronger of Jaccard and containment. See :func:`containment`."""
+    return max(jaccard(a, b), containment(a, b))
+
+
 def text_similarity(a: str, b: str) -> float:
-    """Token-level Jaccard over normalized text. Cheap and order-insensitive,
+    """Token-level overlap over normalized text. Cheap and order-insensitive,
     which is right here: a rename that also reorders sections is still a rename."""
-    return jaccard(set(a.split()), set(b.split()))
+    return overlap(set(a.split()), set(b.split()))
 
 
 def compare(proposed_text: str, existing_text: str) -> tuple[float, str]:
@@ -158,7 +207,7 @@ def compare(proposed_text: str, existing_text: str) -> tuple[float, str]:
     """
     proposed_ids, existing_ids = id_set(proposed_text), id_set(existing_text)
     id_score = (
-        jaccard(proposed_ids, existing_ids)
+        overlap(proposed_ids, existing_ids)
         if min(len(proposed_ids), len(existing_ids)) >= MIN_IDS_FOR_ID_MEASURE
         else 0.0
     )
@@ -291,13 +340,19 @@ def rename_candidates(
                 matches.append(RenameCandidate(new_path, old_path, score, basis))
         # EVERY match above the floor, not just the best one — capped, not filtered.
         #
-        # Reporting only the winner HIDES THE TRUE TWIN behind a higher-scoring
-        # coincidence, which is not hypothetical: the company sweep on 2026-09-01
-        # found `cdo-alignment.yaml` reported against `ddlineage-retirement.yaml`
-        # while its real twin, the retired-acronym `*-alignment.yaml` sitting in the
-        # same directory, also cleared the floor and was silently dropped. A
-        # best-match report is a RANKING presented as an identification, and the one
-        # answer it suppresses is the one the reader needed.
+        # CORRECTION, 2026-09-01: an earlier version of this comment said the true
+        # twin "also cleared the floor and was silently dropped" by the best-match
+        # rule. THAT WAS WRONG, and measured wrong by the company session: on their
+        # tree the twin scored 0.08 and ranked 13 of 29 — it never came near the
+        # floor, so no change to the cap could have surfaced it. The cap is still
+        # right (a best-match report is a RANKING presented as an IDENTIFICATION),
+        # but it was not the fix for that pair; :func:`containment` is. Left here as
+        # a correction rather than an edit, because the wrong reason was load-bearing
+        # for a whole round of work.
+        #
+        # The two compose and neither is sufficient: containment surfaces a twin the
+        # union-denominator buried, and the cap keeps containment's size-driven
+        # false positives from burying it again.
         out.extend(sorted(matches, key=lambda c: -c.score)[:MAX_MATCHES_PER_ADD])
 
     # The structural signal is added rather than compared against: it reads no
@@ -311,12 +366,45 @@ def rename_candidates(
         if producer_paths is not None
         else []
     )
+    by_key = {(c.proposed, c.existing): c for c in out}
     for candidate in [*structural, *vanished]:
         key = (candidate.proposed, candidate.existing)
-        if key not in seen:
-            out.append(candidate)
-            seen.add(key)
-    return sorted(out, key=lambda c: (c.proposed, -c.score))
+        existing_claim = by_key.get(key)
+        if existing_claim is None:
+            by_key[key] = candidate
+        elif candidate.basis == "same-slot-prefix":
+            # THE STRONGEST CLAIM WINS A DUPLICATE, and the naive dedup had this
+            # backwards. `41-local-business-application` <- `41-local-seal` reported
+            # as normalized-text 0.57 because the content pass reached it first and
+            # the structural pass was then skipped as "already seen" — losing the
+            # 1.00 same-slot claim, which is the one a reader should act on. Order of
+            # discovery is not evidence of strength.
+            by_key[key] = candidate
+    out = list(by_key.values())
+    del seen
+
+    # THE CAP IS PER PROPOSED FILE, ACROSS ALL SIGNALS — not per signal.
+    #
+    # Containment is deliberately permissive (it has to be, to surface a twin the
+    # union-denominator buried), so three signals each capped at three produced
+    # TWENTY rows for six files on the real vocabulary sweep. That is the failure
+    # the company named about a different symptom, and it applies here exactly:
+    # three unrelated files at a similar score are "a strong invitation to dismiss
+    # the whole flag as noise, which is the failure the detector exists to prevent."
+    #
+    # Structural first, because "same slot" is the strongest claim available, then
+    # by score — so whatever survives the cap leads with the likeliest twin.
+    ranked: dict[str, list[RenameCandidate]] = {}
+    for candidate in out:
+        ranked.setdefault(candidate.proposed, []).append(candidate)
+    capped: list[RenameCandidate] = []
+    for proposed_path in sorted(ranked):
+        best_first = sorted(
+            ranked[proposed_path],
+            key=lambda c: (c.basis != "same-slot-prefix", -c.score),
+        )
+        capped.extend(best_first[:MAX_MATCHES_PER_ADD])
+    return capped
 
 
 #: Printed on a clean run, because the company session's measurement showed the

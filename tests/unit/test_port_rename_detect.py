@@ -14,8 +14,11 @@ from drydocs.port_rename_detect import (
     MAX_MATCHES_PER_ADD,
     SIMILARITY_FLOOR,
     compare,
+    containment,
     id_set,
+    jaccard,
     normalized_text,
+    overlap,
     rename_candidates,
     report,
     structural_candidates,
@@ -347,14 +350,20 @@ def test_a_clean_run_says_it_is_not_a_guarantee() -> None:
 
 
 def test_the_true_twin_is_not_hidden_behind_a_higher_scoring_coincidence() -> None:
-    """Found by the company sweep, 2026-09-01, and it is a reporting defect rather
-    than a scoring one.
+    """A best-match report is a RANKING presented as an IDENTIFICATION.
 
-    `cdo-alignment.yaml` was reported against `ddlineage-retirement.yaml` while its
-    real twin — the retired-acronym `*-alignment.yaml` in the same directory — also
-    cleared the floor and was silently dropped, because only the best match per
-    proposed add was emitted. A best-match report is a RANKING presented as an
-    IDENTIFICATION, and the answer it suppresses is the one the reader wanted.
+    THIS TEST'S ORIGINAL FIXTURE WAS BUILT TO CONFIRM A WRONG HYPOTHESIS, and that
+    is worth more than the property it checks. It was written believing the real
+    `cdo-alignment.yaml` twin cleared the floor and was dropped by the best-match
+    rule — so the fixture was authored to put a second file above the floor, and it
+    passed. The company then MEASURED the real pair: 0.08, rank 13 of 29, never
+    near the floor. A fixture written to match a hypothesis proves the hypothesis,
+    not the tree; the real pair needed :func:`containment`, not a bigger cap.
+
+    The property below is still real and still worth guarding — two files above the
+    floor must both be reported — so the test stays. Its claim is now scoped to
+    what it actually demonstrates, and the case it was WRITTEN for is covered by
+    `test_containment_finds_a_twin_that_jaccard_buries`.
     """
     proposed = {"epics/cdo-alignment.yaml": "alignment crosswalk rows framework bindings shared"}
     existing = {
@@ -383,3 +392,82 @@ def test_the_match_list_is_capped_so_a_common_file_cannot_bury_the_signal() -> N
     existing = {f"epics/other-{n}.yaml": shared for n in range(10)}
     found = rename_candidates({"epics/new.yaml": shared}, existing)
     assert len(found) == MAX_MATCHES_PER_ADD
+
+
+def test_containment_finds_a_twin_that_jaccard_buries() -> None:
+    """The real pair, at the real sizes, contributed by the company session.
+
+    An 11-token producer stub against the 97-token company epic it was reduced
+    from, sharing 8 tokens. Jaccard puts the UNION on the bottom — 8/100 — and
+    scores 0.08, rank 13 of 29, nowhere near the floor. Containment divides by the
+    SMALLER set — 8/11 — and scores 0.73, rank 1.
+
+    This is arithmetic, not tuning: a producer file is regularly a reduction or an
+    expansion of its consumer twin, so Jaccard reads the normal shape of a rename
+    as dissimilarity.
+    """
+    shared = [f"tok{n}" for n in range(8)]
+    stub = " ".join([*shared, "stubonly1", "stubonly2", "stubonly3"])  # 11
+    epic = " ".join([*shared, *(f"epiconly{n}" for n in range(89))])  # 97
+    a, b = set(stub.split()), set(epic.split())
+    assert len(a) == 11 and len(b) == 97 and len(a & b) == 8
+
+    assert jaccard(a, b) < SIMILARITY_FLOOR, "Jaccard buries it below the floor"
+    assert containment(a, b) >= SIMILARITY_FLOOR, "containment clears it"
+    assert overlap(a, b) == containment(a, b), "the stronger measure wins"
+
+    found = rename_candidates(
+        {"epics/cdo-alignment.yaml": stub}, {"epics/legacy-alignment.yaml": epic}
+    )
+    assert [c.existing for c in found] == ["epics/legacy-alignment.yaml"]
+
+
+def test_containment_over_fires_alone_which_is_why_the_cap_is_load_bearing() -> None:
+    """The caveat shipped WITH the contribution, and verified independently on the
+    producer tree: `component-topology.yaml` at 428 tokens reaches containment 0.64
+    against an 11-token stub on Jaccard 0.02 — purely by being large enough to
+    contain it.
+
+    So containment is not adopted alone. It surfaces the twin the union-denominator
+    buried; the cap keeps its size-driven false positives from burying it again.
+    Neither half is sufficient, which is the finding.
+    """
+    stub = set("a b c d e f g h i j k".split())
+    big = stub | {f"unrelated{n}" for n in range(400)}
+    assert containment(stub, big) == 1.0, "a big file trivially contains a small one"
+    assert jaccard(stub, big) < 0.05, "and Jaccard correctly calls it dissimilar"
+    # the cap is what keeps a directory full of large files from drowning the report
+    existing = {f"epics/big-{n}.yaml": " ".join(big) for n in range(10)}
+    assert (
+        len(rename_candidates({"epics/stub.yaml": " ".join(stub)}, existing)) == MAX_MATCHES_PER_ADD
+    )
+
+
+def test_the_strongest_claim_wins_a_duplicate_not_the_first_one_found() -> None:
+    """Order of discovery is not evidence of strength.
+
+    The content pass runs before the structural pass, so a pair both find was
+    reported on the WEAKER basis: `41-local-business-application` <- `41-local-seal`
+    came back as normalized-text 0.57 while the same-slot claim of 1.00 was dropped
+    as "already seen". A reader acts on the basis, so reporting the weaker one is a
+    downgrade disguised as deduplication.
+    """
+    proposed = {"vocab/41-local-business-application.yaml": "alpha beta gamma delta epsilon zeta"}
+    existing = {"vocab/41-local-seal.yaml": "alpha beta gamma delta epsilon eta"}
+    found = rename_candidates(proposed, existing)
+    pair = [c for c in found if c.existing == "vocab/41-local-seal.yaml"]
+    assert len(pair) == 1, "one row per pair, not one per signal"
+    assert pair[0].basis == "same-slot-prefix"
+    assert pair[0].score == 1.0
+
+
+def test_the_cap_is_per_file_across_signals_not_per_signal() -> None:
+    """Three signals each capped at three is a cap of nine, which on the real
+    vocabulary sweep produced twenty rows for six files — the noise that invites a
+    reader to dismiss the whole report."""
+    shared = " ".join(f"tok{n}" for n in range(20))
+    proposed = {"vocab/41-local-new.yaml": shared}
+    existing = {f"vocab/41-local-old{n}.yaml": shared for n in range(8)}
+    found = rename_candidates(proposed, existing, producer_paths={"vocab/41-local-new.yaml"})
+    assert len(found) == MAX_MATCHES_PER_ADD
+    assert all(c.proposed == "vocab/41-local-new.yaml" for c in found)
