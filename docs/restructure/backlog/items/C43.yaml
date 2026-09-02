@@ -14,6 +14,38 @@ inputs:
 - config/taxonomy/software-registry.yaml
 - internal/research/JOB-MFTS-MM-research.md
 acceptance: |
-  STUB - body lands in the follow-up commit of this same groom (I6: the stub carries the final title, the body follows).
+  (a) ADD mfts TO config/taxonomy/software-registry.yaml WITH vendor: axway, the way controlm
+  carries vendor: bmc, with the fields that registry already requires of a product row - no new
+  field shapes.
+
+  (b) RECORD THE VERSION FACT the research established, at whatever precision the registry
+  supports: Axway SecureTransport 6.0.3. Where the registry has no version slot, put it in the
+  row's note rather than inventing one.
+
+  (c) WHAT THIS ITEM MUST NOT DECIDE: whether Axway becomes a VENDOR BASELINE - a new
+  external/file-transfer/ category and a second baseline rank in config/precedence.yaml. That is
+  a larger call and a gate question. Say so on the row so the next reader does not take the
+  registration as the precedent.
+
+  (d) SIBLING PRODUCTS: register FileMover and OneMFT only to the extent their vendor and
+  identity are actually established by evidence. Where they are not, leave them out and say why
+  in the close - an unevidenced vendor row is worse than an absent one. The SYSTEM-level
+  registration of all three lives in N27, not here.
+
+  (e) PASS/FAIL: the registry render (scripts/render_board.py default paths, which refreshes
+  web/src/generated/software-registry.json) picks the new vendor and product up, the committed
+  render matches, and the vendor count in the render output moves by the number of vendors added.
 notes: |
-  Minted 2026-09-02 (desktop, backlog-groomer fork). Stub per I6; body in the next commit.
+  Groomed 2026-09-02 from Idea-236 gap 3 (OQ-15, U-1), desktop, backlog-groomer fork.
+
+  WHY IT IS WORTH A ROW: the vendor was ERASED BY INTERNAL BRANDING - absent from the UI, the
+  portal, the API-store entry and the docs - and surfaced only in a mandatory
+  User-Agent: Axway/EndPoint header. Recording it is what stops it being lost again, and the
+  generalisable finding (an internally branded platform hides its vendor on every documentation
+  surface and leaks it through implementation surfaces: user-agent, cookie names, default ports,
+  path conventions, id shapes) has already landed producer-side in the research-general skill,
+  section 2.1.
+
+  FILED IN EPIC ONTOLOGY-MAPPING WITH module taxonomy AND phase 2, matching C11/C12/C13, the
+  existing software-registry items. Phase 1 (taxonomy capture) is done and closed; the registry's
+  live items sit in phase 2. Recorded because it was a judgement call, not an obvious one.

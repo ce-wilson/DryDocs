@@ -14,6 +14,41 @@ inputs:
 - docs/port/port-prompt.md
 - PORT-MANIFEST.yaml
 acceptance: |
-  STUB - body lands in the follow-up commit of this same groom (I6: the stub carries the final title, the body follows).
+  (a) THE RULE, written into docs/port/port-prompt.md: a commit whose subject begins
+  refactor( and touches a path whose manifest disposition is evaluate is a MANDATORY RELAY
+  at the roll that carries it. The relay names three things and no more - the file, the new
+  shape, and where consumer content goes in that shape. It is one paragraph, authored by
+  the session that made the refactor, because that session is the only one that knows the
+  shape it intended.
+
+  (b) SAY WHAT AN EVALUATE NOTE CANNOT SAY, in the prompt, in one sentence, because that is
+  the whole reason the rule exists: an evaluate note tells the consumer how to merge
+  CONTENT, and no wording of it can say the producer changed the SHAPE of this file, take
+  the shape and re-home your content. A consumer following the S8 row literally merged
+  producer verbs INTO its monolith - which is what the row told it to do.
+
+  (c) THE WORKED EXAMPLE ships with the rule: S8 (2026-08-21, f5e7229d) split cli.py from
+  3,184 lines into a thin root plus six per-domain modules, under a manifest row that reads
+  composition root; both sides add commands - merge per collision ledger. It shipped without
+  a relay and TWO ports walked past it.
+
+  (d) SCOPE, stated so this does not become a tripwire nobody can satisfy: the trigger is
+  the conjunction (refactor subject AND evaluate path), not either alone. A refactor inside
+  a canonical-producer path needs no relay - the consumer takes it wholesale. A feature
+  commit on an evaluate path is exactly what the evaluate note is for.
+
+  (e) PASS/FAIL: the port-prompt carries the rule with its example, and the relay's required
+  three fields are named. Whether this is ever mechanised is out of scope - a subject-line
+  convention is not a guard and this item does not pretend otherwise.
 notes: |
-  Minted 2026-09-02 (desktop, backlog-groomer fork). Stub per I6; body in the next commit.
+  Groomed 2026-09-02 from Idea-241's closing section (desktop, backlog-groomer fork), filed
+  separately from S16 because it is a process rule in a doc, not a code change, and the two
+  have nothing in common at build time.
+
+  WHY p1 on a docs chore: the failure it prevents is silent and compounding. The next
+  structural refactor of an evaluate path will repeat the S8 outcome exactly, and the
+  evidence that it does is two ports, not one.
+
+  DELIBERATELY NOT PROPOSED HERE: automating the trigger (a CI check over commit subjects
+  against the manifest's evaluate paths). It is a real option and it is a different item -
+  this one is the rule and its example, which is what a port session actually reads.

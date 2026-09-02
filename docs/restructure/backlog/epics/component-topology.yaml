@@ -93,6 +93,12 @@ groom_log:
     the new P6 identity probe.
   attached_at: G111
 - date: '2026-08-30'
-  note: >-
-    2026-08-30 weekly groom: G127-G131 minted. G128 and G129 are both G125 follow-ups the build recorded rather than hid - the resolver migration it declined, and the environment doctor its declared list finally makes possible.
+  note: '2026-08-30 weekly groom: G127-G131 minted. G128 and G129 are both G125 follow-ups the build recorded
+    rather than hid - the resolver migration it declined, and the environment doctor its declared list
+    finally makes possible.'
   attached_at: G127
+- date: '2026-09-02'
+  note: 'Groom 2026-09-02: Idea-236 gap 4 MERGED into G64 as a rider - the MFTS (route_id, fts_id) identity
+    finding is the same shape as this gate''s (guid, connectorName) question and the two are ruled together,
+    with the MFTS ruling itself belonging to C44. Housekeeping flagged, not acted on: the company''s research
+    log describes this gate as convened while G64 reads todo on both sides.'

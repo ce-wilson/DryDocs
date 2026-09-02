@@ -16,6 +16,40 @@ inputs:
 - config/gate-prompts/data-flow-overview.yaml
 - PORT-MANIFEST.yaml
 acceptance: |
-  STUB - body lands in the follow-up commit of this same groom (I6: the stub carries the final title, the body follows).
+  (a) THE CORRECTION: config/gate-prompts/data-flow-overview.yaml names MM3 at nine sites
+  (lines 10, 40, 65, 112, 134, 137, 260, 269, 390 as read on 2026-09-02) for the item that
+  reads the Output-tab log verbatim, enriches the members and fills the SOURCE-badged log
+  fields (launcher_kinds, compute_target, placement_handoff, landing_prefix). That is MM7.
+  Re-read the line numbers at build - they move - and correct by CONTENT, not by offset.
+
+  (b) LINE 65 ALSO CARRIES THE WRONG MODULE: it files the consumer as drydocs-lineage (MM3)
+  while MM3 is drydocs-deepdoc. The module is right and the id is wrong; fix the id and leave
+  the module.
+
+  (c) WHAT MUST NOT CHANGE: the gates: [data-flow-overview] edge on MM3 itself stays. The
+  evidence-ref grammar MM3 built IS gate territory (section E), so MM3 belongs to this gate -
+  it is simply not the item that closes the Output-tab fields.
+
+  (d) THE CROSS-REPO STEP, and it is required for this item to be complete:
+  config/gate-prompts/** is canonical-company (PORT-MANIFEST, J51 rows), so the producer edit
+  is a draft correction that the company's copy will not inherit automatically. Record the
+  correction as a RELAY line in the port ledger naming the nine sites and the substitution, so
+  the company's signed-or-drafting copy can take it section by section rather than wholesale.
+
+  (e) PASS/FAIL: no occurrence of MM3 in the prompt describes Output-tab/log-substrate work;
+  MM7 does; MM3 appears only where the evidence-ref grammar is meant; the relay line exists.
 notes: |
-  Minted 2026-09-02 (desktop, backlog-groomer fork). Stub per I6; body in the next commit.
+  Groomed 2026-09-02 from Idea-237 (desktop, backlog-groomer fork). Found while closing MM3
+  (laptop, same day).
+
+  WHY IT IS WORTH AN ITEM AT ALL: a reader who takes the prompt at its word will look for MM3
+  to close the Output-tab fields and find a mind-map state file. The prompt says absent until
+  MM3 lands and the field says so, which is now a false statement about which item to wait for.
+
+  HOW IT HAPPENED, recorded because the class recurs: the prompt was drafted 2026-08-21 and the
+  item numbers shifted at a groom afterwards. Nothing re-points a prompt when a groom renumbers
+  around it - the same currency gap I8 reports for depends_on, seen on a different surface.
+
+  The idea filed this as an inbox line rather than a fix precisely because of the
+  canonical-company disposition; clause (d) is that concern turned into a step rather than a
+  reason not to act.

@@ -90,6 +90,11 @@ groom_log:
     occlusion on all five at once.
   attached_at: O77
 - date: '2026-08-30'
-  note: >-
-    2026-08-30 weekly groom: O83-O85 minted from three console defects that all present as the wrong symptom - zero rows instead of a wrong database, success instead of an unknown label, unreachable instead of a blocked origin.
+  note: '2026-08-30 weekly groom: O83-O85 minted from three console defects that all present as the wrong
+    symptom - zero rows instead of a wrong database, success instead of an unknown label, unreachable
+    instead of a blocked origin.'
   attached_at: O83
+- date: '2026-09-02'
+  note: 'Groomed 2026-09-02 from Idea-231. O92: canAccessModule has three call sites and no test, and
+    no guard pins which modules are designated sme. Not an authorization defect - the API is the enforcement
+    point - it is about the console''s audience decisions staying deliberate.'

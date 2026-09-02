@@ -14,6 +14,53 @@ inputs:
 - .claude/skills/groom-backlog/validate.py
 - tests/unit/test_backlog.py
 acceptance: |
-  STUB - body lands in the follow-up commit of this same groom (I6: the stub carries the final title, the body follows).
+  (a) THE CHECK, and it is mechanical with no judgement in it: for each item still todo or
+  in_progress, ask git whether any file in its depends_on set was modified more recently than the
+  item's own file, and report it. One git log -1 per file. No prose diffing - no validator could
+  ever tell a stale acceptance from a fine one by comparing text, and this item does not try.
+
+  (b) WARN-ONLY, AND THE REASON IS PART OF THE OUTPUT. Most dependency edits are irrelevant to the
+  dependent, so a FAILING check would be noise within a week and would train people to ignore it.
+  The value is a list somebody scans at groom time, not a gate. Print it under a heading that says
+  so.
+
+  (c) done ITEMS ARE EXCLUDED, deliberately, and the exclusion is commented: a closed item's
+  acceptance describing an older dependency is a HISTORICAL RECORD and correct as written.
+  Re-opening those would make verified records retrospectively false - the same argument the
+  2026-08-28 groom used when it filed O77 fresh rather than reopening O66.
+
+  (d) WHERE IT RUNS: .claude/skills/groom-backlog/validate.py, beside the derived counts, so a
+  groom sees it without an extra command. If test_backlog.py grows a mirror, it asserts the
+  mechanism (a known-stale pair is reported) and never the CONTENT of the list, which changes with
+  every commit.
+
+  (e) PERFORMANCE IS A REAL CONSTRAINT AT 600-PLUS ITEMS: batch the git queries (one log call over
+  the item directory, then a lookup) rather than shelling out per dependency edge. Say the measured
+  runtime in the close.
+
+  (f) PASS/FAIL: the warning lists O59/G68 - the incident pair - if it still qualifies at build
+  time, or the close names why it no longer does; validate.py still exits 0 with warnings present;
+  the derived counts are unchanged by this addition.
 notes: |
-  Minted 2026-09-02 (desktop, backlog-groomer fork). Stub per I6; body in the next commit.
+  Groomed 2026-09-02 from Idea-230 (desktop, backlog-groomer fork). Found while building O59,
+  whose acceptance says PROFILE frames render G68's four censuses. G68 has FIVE: census (e)
+  INVOCATIONS was merged into it from Idea-140 on 2026-08-19, eight days after O59 was raised on
+  2026-08-11. Nothing connected the two.
+
+  WHY IT IS WORTH A MECHANISM RATHER THAN CARE: the builder is left with two bad options and no
+  third - follow the LETTER and ship four censuses when five exist, or follow the PURPOSE and
+  silently deviate from a written acceptance. O59 took the second and recorded the deviation in
+  the code and the close note, which is the best available answer and still relies on somebody
+  reading the dependency's notes closely enough to spot it. The information was not missing; G68's
+  notes say MERGED 2026-08-19 (groom) in plain words. It had no route to the item that depends on
+  it.
+
+  WHERE THE HOLE IS, precisely: depends_on is a SCHEDULING edge. It decides what enters next_ready
+  and nothing else, and carries no currency claim, so an amended dependency and an untouched
+  dependent are indistinguishable from a dependency that never changed. A groom is triggered by
+  inbox entries, not by another item's amendment. Y5 and the render guards catch STALE RENDERS;
+  nothing catches stale cross-item PROSE.
+
+  Filed in epic project-board (module drydocs-plan, phase 8) beside I6's allocator rather than in
+  Y: this is groom-time TOOLING, where Y7 is the schema and the derivation. Related: Y7, I6, G68,
+  O59, Idea-140.

@@ -91,7 +91,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
-- **`Idea-241`** · 2026-09-02 · `[idea]` · **open** · prio? **High** —
+- **`Idea-241`** · 2026-09-02 · `[idea]` · **groomed → S16 (the build half: discovery in the composition root) + J73 (the port-prompt relay rule) (2026-09-02)** — the COMPANY-side adoption of the S8 split is their port action and is not a producer item · prio? **High** —
   **The S8 composition root should DISCOVER a consumer command module by convention, so
   `drydocs/cli.py` stops being an `evaluate` collision — the company never adopted the split
   and its monolith carries stale inline copies of every verb S8 moved.** Source: the
@@ -148,7 +148,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   `evaluate` path is a mandatory relay. Related: S8, S13, ADR 0002-A, J68, J69, [[Idea-239]]
   (same report, same day), [[Idea-240]].
 
-- **`Idea-240`** · 2026-09-02 · `[idea]` · **open** · prio? **Med** —
+- **`Idea-240`** · 2026-09-02 · `[idea]` · **groomed → J74 (2026-09-02), the MECHANISM half only — the tip-only-vs-history RULING (a/b/c) stays OPEN and is the user's; J74 carries the three options so it can be made from the item file** · prio? **Med** —
   **The publish boundary is defined on the tracked tree and says nothing about git HISTORY —
   34 commit messages on main carry the retired org acronym, and whether the public push is
   tip-only or carries history is undocumented.** Source: the company's own flag during the
@@ -181,7 +181,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   the leak J55 cannot see, and it is the failure the company just had. Not a sweep; a
   ceiling. Related: J55, J23, [[Idea-239]] (same day, same port).
 
-- **`Idea-239`** · 2026-09-02 · `[idea]` · **open** · prio? **Med** —
+- **`Idea-239`** · 2026-09-02 · `[idea]` · **groomed → J75 (2026-09-02)** · prio? **Med** —
   **A config surface, its renderer's SURFACES row and the derived artifact it feeds are ONE
   coupling — a port slice carries all three or none, and the manifest should name the triple
   the way J68 names declaration/guard pairs.** Source: the company's D-slice apply of
@@ -227,7 +227,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   closure behind it. Each was fixed at the file; this is the first framing at the shape.
   Related: J68, J71, J72, G125, O68, N4/N5 (the load-map surfaces), [[Idea-235]].
 
-- **`Idea-238`** · 2026-09-02 · `[idea]` · **open** · prio? **Med** —
+- **`Idea-238`** · 2026-09-02 · `[idea]` · **groomed → MM14 (2026-09-02)** · prio? **Med** —
   **Load the mind-map research logs into a throwaway Neo4j database (`mindmap`), apply the
   current ontology, and run the Knowledge-Graph-of-Thoughts retry loop over it — to see how a
   mind map traverses.** User ask, 2026-09-02 (laptop session, branch
@@ -313,7 +313,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
     X" is a finding (3.2); the artifact and the reading are cited separately — the image is
     VERBATIM, a model's reading of it is GROUNDED (3.6).
 
-- **`Idea-237`** · 2026-09-02 · `[doc]` · **open** · prio? **Med** —
+- **`Idea-237`** · 2026-09-02 · `[doc]` · **groomed → MM13 (2026-09-02)** · prio? **Med** —
   **The data-flow-overview gate prompt calls "MM3" the Output-tab / log-substrate extractor —
   that is MM7's work, and MM3 is something else.** Found while closing MM3 (2026-09-02, laptop).
   `config/gate-prompts/data-flow-overview.yaml` names MM3 nine times (lines 10, 40, 65, 112, 134,
@@ -332,7 +332,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   `gates: [data-flow-overview]` edge on MM3 itself stays, because the evidence-ref grammar MM3
   built IS gate territory (§E).
 
-- **`Idea-236`** · 2026-09-02 · `[idea]` · **open** · prio? **High** —
+- **`Idea-236`** · 2026-09-02 · `[idea]` · **groomed → C42 (gap 1, via C40 + the gate), N27 (gap 2), C43 (gap 3), C44 (gap 5, the convening) (2026-09-02); gap 4 merged → G64 as a rider — the route-identity ruling itself stays the SME's** · prio? **High** —
   **The JOB→MFTS research landed (120 hops, 19 open questions) and it answers Idea-104's
   evidence half — five gaps against the backlog, one of which blocks the file-transfer
   lineage strategy outright.** Source: `internal/research/JOB-MFTS-MM-research.md` (the
@@ -440,7 +440,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   5 is the SME's convening. F-1 (a Control-M QR for jobs using MFTS 6) is company-band
   `Idea-10021` and stays theirs. Related: [[Idea-104]], C16, C29, C30, G83, G64, MM7, MM8, MM9.
 
-- **`Idea-235`** · 2026-09-01 · `[idea]` · **open** · prio? **Med** —
+- **`Idea-235`** · 2026-09-01 · `[idea]` · **groomed → J76 (2026-09-02), the ONE instance that admits a guard (explicit decoding); the general check-the-instrument-first discipline stays OPEN and is the user's** · prio? **Med** —
   **The measurement apparatus corrupts the measurement, and it fails toward a REASSURING answer
   rather than an alarming one.** Three instances in one session (2026-09-01), across two machines
   and two people, all during the same port:
@@ -472,7 +472,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   to follow rots — so the real question is whether any of the three admits a guard. Related:
   [[feedback-verify-before-asserting]], and J72's own notes carry all three as worked examples.
 
-- **`Idea-234`** · 2026-09-01 · `[idea]` · **open** · prio? **Low** —
+- **`Idea-234`** · 2026-09-01 · `[idea]` · **groomed → J77 (2026-09-02)** · prio? **Low** —
   **A branch tip can be green while commits inside it are red, and nothing records which — so a
   bisect through the range fails on the guard rather than the defect.** Observed on
   `feat/ui-web`, 2026-09-01, and reported by the session that made it rather than found by
@@ -502,7 +502,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   red at push, the way step 272 says which ids were re-minted. That is one sentence per roll
   and it is written by the session that already knows.
 
-- **`Idea-233`** · 2026-08-31 · `[idea]` · **open** · prio? **Med** —
+- **`Idea-233`** · 2026-08-31 · `[idea]` · **groomed → N28 (2026-09-02)** · prio? **Med** —
   **Record HOW a source was captured, not only how much its content is trusted: a capture-rung
   alongside the VERBATIM/GROUNDED/SYNTHESIZED axis.** Every `SOURCE-MANIFEST` today carries a
   trust axis, which says how much interpretation sits between the source and the claim. It does
@@ -544,7 +544,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   is machine-local and Internal. The ladder itself is mechanism and carries nothing company-specific.
 
 
-- **`Idea-232`** · 2026-08-31 · `[bug]` · **open** · prio? **High** —
+- **`Idea-232`** · 2026-08-31 · `[bug]` · **groomed → Y7 (2026-09-02)** · prio? **High** —
   **A backlog item can be HELD by an annotation while the ready list still calls it ready,
   because `next_ready` is computed from `depends_on` alone.** Found the expensive way: O26
   was pulled and claimed during a p2 task run because both its dependencies were `done`.
@@ -578,7 +578,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   against a ruling. Both are "the backlog knows something the derived view does not".
 
 
-- **`Idea-231`** · 2026-08-31 · `[bug]` · **open** · prio? **Med** —
+- **`Idea-231`** · 2026-08-31 · `[bug]` · **groomed → O92 (2026-09-02)** · prio? **Med** —
   **`canAccessModule` decides who sees which console module and has no test, and no guard
   pins which modules are designated `sme`.** Noticed at O59, which set `access: 'sme'` on
   `/remediation` — a one-word edit that changed the module from visible-to-every-role to
@@ -604,7 +604,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   quietly" pattern `ui-tests.yaml`'s coverage pins already use. A pin is right here precisely
   because the list SHOULD change rarely and always on purpose.
 
-- **`Idea-230`** · 2026-08-31 · `[chore]` · **open** · prio? **Med** —
+- **`Idea-230`** · 2026-08-31 · `[chore]` · **groomed → I8 (2026-09-02)** · prio? **Med** —
   **An item's acceptance can be overtaken by its own dependency's growth, and nothing
   notices.** Found while building O59, whose acceptance says "PROFILE frames render G68's
   four censuses". G68 has five: census (e) INVOCATIONS was merged into it from `Idea-140` on
@@ -634,7 +634,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   written — re-opening those would make verified records retrospectively false, which is the
   same argument the 2026-08-28 groom used when it filed O77 fresh rather than reopening O66.
 
-- **`Idea-229`** · 2026-08-31 · `[chore]` · **open** · prio? **High** —
+- **`Idea-229`** · 2026-08-31 · `[chore]` · **groomed → J78 (2026-09-02)** · prio? **High** —
   **A cancelled CI run is neither green nor red, and nothing reads it as unverified — so a
   commit can reach main having never been checked, and its failure surfaces on somebody
   else's next push.** Both of this session's first two pushes were cancelled by the newer
@@ -925,7 +925,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 <!-- add new ideas at the top -->
 
-- **`Idea-228`** · 2026-08-31 · `[bug]` · **open — found while verifying O78, desktop** · prio? **Low** —
+- **`Idea-228`** · 2026-08-31 · `[bug]` · **open — re-read at the 2026-09-02 groom and NOT groomed: the entry's own amendment says the real fork is whether these surfaces move onto a layout engine at all versus another rung of dodging, and that is a direction the user rules, not a build** · prio? **Low** —
   **Relationship chips dodge NODES but not each other, so two names whose edges pass near the same
   point still overlap — now visible on /docs, where DESCRIBES lands on top of NEXT_CHUNK.** O66
   moved the label out of the SVG edge layer into an HTML chip; O77 taught the chip to walk along
@@ -968,7 +968,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   force layout) at all, which retires the whole class, versus another rung of dodging, which does
   not.
 
-- **`Idea-227`** · 2026-08-31 · `[bug]` · **open — found by O80's new unit runner, desktop** · prio? **Med** —
+- **`Idea-227`** · 2026-08-31 · `[bug]` · **groomed → Z9 (2026-09-02)** · prio? **Med** —
   **A synthetic city's country reports that it HAS a drawable outline when it does not, because
   `resolve.ts` reads `country_id` and ignores `country_alias` — the same family as the Z5 index bug
   the file was written to catch.** `PlacedSite.countryHasNoShape` is computed as
@@ -984,7 +984,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   red and tells whoever fixed it to flip `it.fails` back to `it`. Worth noting as evidence rather
   than coincidence: the runner found this on its FIRST run, in the one module the item named.
 
-- **`Idea-225`** · 2026-08-30 · `[idea]` · **open — found by G129's doctor, desktop** · prio? **Med** —
+- **`Idea-225`** · 2026-08-30 · `[idea]` · **open — re-read at the 2026-09-02 groom and NOT groomed: the entry states three options and calls it a ruling, not a build; G129's doctor already REPORTS the divergence, so nothing is silent meanwhile** · prio? **Med** —
   **A variable set in `.env` alone is visible to every loader and invisible to every binding check,
   and the two surfaces will disagree out loud the first time an Oracle account lands here.** The
   settings classes declare `env_file=.env` (`drydocs_core/config.py`), so pydantic reads the
@@ -2698,7 +2698,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   a branch first? Sibling of `Idea-17` (post-squash relic cleanup), which this groom
   narrowed the same day.
 
-- **`Idea-104`** · 2026-08-11 · `[question]` · **open** · prio? **Med** —
+- **`Idea-104`** · 2026-08-11 · `[question]` · **open — the CONVENING is groomed → C44 (2026-09-02) with the JOB-MFTS research as its evidence base; the ruling itself stays the SME's** · prio? **Med** —
   **The MFT route id changed shape between the field observation and the standard, and
   nobody has said which is real.** The 2026-06-11 production capture
   (`internal/standards/technology/description-field-metadata-plan.md`) records one

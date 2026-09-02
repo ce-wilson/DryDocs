@@ -16,6 +16,41 @@ inputs:
 - scripts/render_enforcement_matrix.py
 - tests/unit/test_enforcement_matrix.py
 acceptance: |
-  STUB - body lands in the follow-up commit of this same groom (I6: the stub carries the final title, the body follows).
+  (a) NAME THE TRIPLE IN PORT-MANIFEST.yaml the way J68 names declaration/guard pairs: a
+  config surface, its renderer's SURFACES row, and the derived artifact it feeds are ONE
+  coupling, and a port slice carries all three or none. The first instance to declare is
+  config/source-bindings.yaml + scripts/render_enforcement_matrix.py SURFACES +
+  web/src/generated/enforcement-matrix.json; enumerate the others that exist today rather
+  than declaring the pattern in the abstract.
+
+  (b) SAY WHY THE EXISTING GUARD CANNOT COVER IT. tests/unit/test_enforcement_matrix.py
+  asserts every top-level config/ entry is in SURFACES or CONFIG_EXEMPT, so ON A TREE the
+  pair can never separate. A port slice is not a tree: the guard only fires AFTER the take,
+  and by then the derived artifact is unproducible because render_board.py exits 1. The
+  manifest is the only surface that can express a constraint about a SLICE.
+
+  (c) THE FAILURE THIS PREVENTS, stated in the note so nobody prices it as bookkeeping: a
+  derived row that says regenerate, never carry made the file UNPRODUCIBLE rather than
+  merely stale, and the J55 acronym guard then failed on the stale carried copies. One
+  missing SURFACES row cost a cleared slice, an exposed second failure and a red trunk.
+
+  (d) THE PORT-PROMPT GAINS THE READING RULE: when a slice touches a config/ path, check
+  its renderer row and its derived artifact in the same breath. One sentence.
+
+  (e) PASS/FAIL: the manifest carries the triple rows with the coupling named; the
+  port-prompt carries the reading rule; the enumeration in (a) is complete against today's
+  SURFACES list, and the close names how it was enumerated (read the SURFACES constant, not
+  a render - J37).
 notes: |
-  Minted 2026-09-02 (desktop, backlog-groomer fork). Stub per I6; body in the next commit.
+  Groomed 2026-09-02 from Idea-239 (desktop, backlog-groomer fork). Source: the company's
+  D-slice apply of port-base-20260826..20260901, relayed session record, where G125's
+  config/source-bindings.yaml had arrived in an earlier slice WITHOUT its SURFACES row.
+
+  WHY IT IS A MANIFEST CHANGE AND NOT A TEST CHANGE: the producer tree cannot reproduce the
+  failure - the guard makes it impossible here. That is precisely why it has to be written
+  down where a port session reads, rather than trusted to a green suite.
+
+  THE SECOND, STACKED FAILURE from the same episode is already fixed producer-side and is
+  recorded here only so the story reads correctly: render_software_registry.py failed on
+  datetime.date, fixed at O68 (6b43c850), inside the same range. Related: J68, J69, G125,
+  N4, N5, Idea-240, Idea-241.

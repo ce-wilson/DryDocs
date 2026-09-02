@@ -18,6 +18,60 @@ inputs:
 - internal/research/JOB-MFTS-MM-research.md
 - docs/restructure/03-hitl-sme-flow.md
 acceptance: |
-  STUB - body lands in the follow-up commit of this same groom (I6: the stub carries the final title, the body follows).
+  (a) CONVENE, DO NOT DECIDE. This item drafts the gate section and assembles the evidence; the
+  ruling is the SME's, through the HITL gate (docs/restructure/03-hitl-sme-flow.md), and every
+  mapping it touches stays planned until confirmed. The gate page already exists -
+  email-dl-contact-point section G5 stages MFTS routes as DPROD ports, OPEN and UNSIGNED - so
+  this is a re-pose of an existing section with an evidence base, not a new gate.
+
+  (b) THE EVIDENCE BASE IS THE RESEARCH LOG and is cited as such: 89 of 89 real routes carry a
+  6-digit numeric route id; the MFTS_RT_IN_*/MFTS_RT_OUT_* string pair appears in zero real
+  routes; the UUID key belongs to OneMFT, a different product; NEP4824 is a partner/account stem.
+  Idea-104 sat ungroomed for three weeks because a groom cannot pick between the readings - the
+  groom no longer has to pick, and that is exactly why this is convening rather than promoting.
+
+  (c) TWO INPUTS THE GATE NEEDS THAT THE ORIGINAL QUESTION NEVER HAD. First, OQ-8's THIRD
+  READING: the two shapes belong to two different platforms, which is a third answer neither of
+  the original two contained. Second, OQ-5's H68: a route is two SFTP legs through FTS2 under one
+  request id, which favours the dprod:inputPort/outputPort PAIR over a single node - C29 was not
+  inventing a pair, it was reading one.
+
+  (d) ROUTE IDENTITY IS A CLAUSE OF THIS GATE, not a separate ruling: a prod route can be
+  disabled while its CAT twin stays enabled, so route_id alone cannot express identity;
+  (route_id, fts_id) can, and MFT System Environment is already a column in the search export.
+  Pose it beside G64's (guid, connectorName) finding, which the research says is worth ruling
+  together, and carry OQ-11 with it - if a re-provisioned route does not keep its id, route_id
+  fails ADR 0001's business-key test outright.
+
+  (e) CARRY THE SME RULING ALREADY MADE, so the gate does not re-litigate it: NO DAILY CAPTURE
+  (OQ-12). DryDocs documents the ROUTES - the durable framework - and nothing more; transfer
+  history is pulled manually and periodically. The inventory is a ROUTE inventory. What survives
+  for the gate is whether a transfer ever becomes a graph node at all or stays research evidence
+  (P8).
+
+  (f) THE LOADER IS NOT IN SCOPE AND MUST BE NAMED AS OUT OF SCOPE. :MftsRoute {route_id},
+  USES_INBOUND_ROUTE/USES_OUTBOUND_ROUTE, DELIVERED_VIA -> :DeliveryMechanism and
+  controlm_filewatcher_metadata.cypher are built and active on the company's feat/dd_lineage with
+  route_id UNIQUE-constrained; producer holds only the parser (drydocs_core/description_tokens.py).
+  So the loader is a back-flow candidate that must WAIT for this ruling or it imports the
+  question - the research's G-1 names the consequence: the key was committed before the shape was
+  ruled.
+
+  (g) PASS/FAIL: the gate section is re-posed with clauses (c), (d) and (e) as explicit questions
+  and the evidence cited to the log; the item closes when the prompt is drafted and queued, and
+  the SIGNING is a separate event recorded in config/gate-log.md.
 notes: |
-  Minted 2026-09-02 (desktop, backlog-groomer fork). Stub per I6; body in the next commit.
+  Groomed 2026-09-02 from Idea-236 gap 5 (desktop, backlog-groomer fork), which is itself the
+  convening half of Idea-104.
+
+  DEPENDS ON N27 because Control-M cannot be the source of record for a relationship whose other
+  end is unregistered - the gate would be ruling on an edge to an unregistered system.
+
+  THE FRAMING REFINEMENT THIS ITEM CARRIES INTO THE GATE, stated plainly because it is the part
+  most easily lost: the operational walk is watched file -> landing directory -> MFTS route ->
+  sender -> sender's owner -> owning application; MFTS holds the last four links (H17-H22) and
+  Control-M can hand over only the second (G-9). So an inventory that grounds the description
+  field in MFTS's truth BEFORE anything is written is correct sequencing, not a nicety.
+
+  NOT IN THIS ITEM: F-1 (a Control-M QR for jobs using MFTS 6) is company-band Idea-10021 and
+  stays theirs. Related: C29, C30, C42, N27, G64, MM7, Idea-104, Idea-236.

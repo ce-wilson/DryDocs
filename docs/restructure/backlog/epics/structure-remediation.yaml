@@ -49,3 +49,9 @@ groom_log:
     4 failed, 45 passed. Pre-existing, not introduced by G79; filed under S because the S8
     CLI split produced the shape.
   attached_at: S15
+- date: '2026-09-02'
+  note: 'Groomed 2026-09-02 from Idea-241. S16 minted: the composition root discovers an optional consumer
+    command module, so drydocs/cli.py stops being an evaluate collision and its manifest row can become
+    canonical-producer. The COMPANY-side half of that idea (adopting the S8 split, re-homing 26 company-only
+    verbs, dropping stale inline copies) is their port action and is deliberately not in the item; the
+    process lesson is J73.'

@@ -17,6 +17,62 @@ inputs:
 - tests/unit/test_backlog.py
 - docs/adr/0013-backlog-sharding.md
 acceptance: |
-  STUB - body lands in the follow-up commit of this same groom (I6: the stub carries the final title, the body follows).
+  (a) THE SCHEMA DECISION COMES FIRST AND IS THE ITEM'S REAL CONTENT: drydocs.backlog.v3 gains a
+  BLESSED HOLD FIELD - a declared field, or a declared vocabulary on an existing annotation - that
+  the derivation reads. Whatever shape is chosen, it is DECLARED: the guard must be able to tell a
+  hold from a note without reading English.
+
+  (b) DO NOT LET THIS BECOME BLOCK ON ANY ANNOTATION. Most annotations are notes, not holds. A
+  general rule would start refusing items nobody meant to hold, and a false hold is invisible in
+  the other direction - which is worse than today. State this constraint in the schema comment,
+  not only in this item.
+
+  (c) THE DERIVATION: next_ready excludes a held item. Same rule everywhere it is computed -
+  scripts/render_board.py and .claude/skills/groom-backlog/validate.py both, since the board's
+  Ready-to-pull strip and the validator's derived list must not disagree.
+
+  (d) HELD IS RENDERED, NEVER DROPPED. The board shows the item as HELD with the hold text
+  visible. An item that vanishes from the ready list with no reason is its own defect, and the
+  whole point of the hold is that a human wrote down why.
+
+  (e) THE PULL RULE IN CLAUDE.md is amended in the same commit, because it currently tells an
+  agent to take the next ready item and says nothing about holds - after this item it does not
+  need to, and the sentence should say that the ready list already excludes held items.
+
+  (f) O26 IS THE FIXTURE AND THE PROOF: it carries annotations.status = SME HOLD 2026-07-22:
+  runbook template shape goes through a HITL template session BEFORE this view is built - deps are
+  done but do NOT pull this item until that session rules. It must leave next_ready and appear as
+  HELD on the board. Convert its existing annotation to the blessed field in the same commit;
+  leave the text intact.
+
+  (g) PASS/FAIL: tests/unit/test_backlog.py covers held-excluded-from-next_ready, held-still-
+  rendered, and unblessed-annotation-does-NOT-hold; validate.py and the board agree on the derived
+  counts; ADR 0013 records the schema addition.
 notes: |
-  Minted 2026-09-02 (desktop, backlog-groomer fork). Stub per I6; body in the next commit.
+  Groomed 2026-09-02 from Idea-232 (desktop, backlog-groomer fork). Found the expensive way: O26
+  was PULLED and claimed during a p2 task run because both its dependencies were done. The claim
+  was released the same session with nothing built, but the pull commit and its release are both
+  on the trunk, and a session with less slack would have built it.
+
+  WHY THE READY LIST CANNOT SEE IT: next_ready is derived as status todo plus every depends_on
+  done. That is the right rule for DEPENDENCIES and it is the whole rule today, so a hold expressed
+  anywhere else is invisible. The board strip, validate.py's derived list and the CLAUDE.md pull
+  rule all inherit the same blindness.
+
+  THE PART THAT MAKES IT p1 RATHER THAN A ONE-OFF: the hold is on the item precisely BECAUSE the
+  deps are done. An item blocked by dependencies needs no annotation - the annotation exists for
+  exactly the case the ready list gets wrong. The two mechanisms are most likely to disagree in the
+  situation the annotation was written for.
+
+  MODEL fable: this is a drydocs.backlog.v3 change, not a validator tweak, and ADR 0013 clause 3
+  (roll-ups are derived, never stored) constrains the shape.
+
+  Related: Idea-230 -> I8 is the same family from the other side - there an item's ACCEPTANCE goes
+  stale against its dependency, here an item's PULLABILITY goes stale against a ruling. Both are
+  the backlog knowing something the derived view does not.
+
+  A SECOND LIVE INSTANCE, found during this groom and worth using as the second fixture: G64's
+  acceptance OPENS with USER-GATED START - the SME convenes the session; the pull loop SKIPS this
+  item until then. That hold lives in free prose inside acceptance, where no derivation can read
+  it, and G64 stays out of next_ready today only because G22 and G25 are not done. When they
+  close, it becomes O26 again. Any blessed-field design must be able to express this one too.

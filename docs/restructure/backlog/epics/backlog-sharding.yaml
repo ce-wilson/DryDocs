@@ -39,3 +39,8 @@ groom_log:
     — the guard is right, the instruction is incomplete. Evidence: the O75 claim
     commit 49356d9a, run 33214406376.
   attached_at: Y6
+- date: '2026-09-02'
+  note: 'Groomed 2026-09-02 from Idea-232. Y7: an item held by an annotation is still called ready, because
+    next_ready reads depends_on alone. O26 was pulled on that basis. The fix is a BLESSED hold field in
+    drydocs.backlog.v3 plus a HELD render - not a general block-on-any-annotation rule, which would refuse
+    items nobody meant to hold.'

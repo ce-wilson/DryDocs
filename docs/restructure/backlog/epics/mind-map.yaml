@@ -27,3 +27,9 @@ groom_log:
     unruled fork with different modules and different gate exposure, and it stays
     parked in IDEAS.md as a question for the user.
   attached_at: MM11
+- date: '2026-09-02'
+  note: 'Groomed 2026-09-02. MM13 corrects the data-flow-overview gate prompt, which names MM3 nine times
+    for work that is MM7 - the numbers moved at a groom after the prompt was drafted. MM14 is the user''s
+    KGoT experiment: load the research logs and the probe ledger into a throwaway mindmap database, apply
+    the REGISTERED ontology (report gaps, never mint), and record where the retry loop stalls. The scratch
+    database is task-scoped and dropped; it does not reopen G102''s one-content-database fold.'

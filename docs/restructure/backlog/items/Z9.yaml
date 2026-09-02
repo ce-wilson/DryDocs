@@ -14,6 +14,35 @@ inputs:
 - web/src/components/map/resolve.ts
 - web/src/components/map/resolve.test.ts
 acceptance: |
-  STUB - body lands in the follow-up commit of this same groom (I6: the stub carries the final title, the body follows).
+  (a) THE FIX IS ONE MISSING FALLBACK: PlacedSite.countryHasNoShape is computed as
+  COUNTRY_NO_SHAPE.has(city.country_id ?? ''), but a synthetic city carries no numeric country_id -
+  only country_alias: 'SYN' - so the lookup asks for the empty string and misses SYN, which the
+  gazetteer declares no_shape: true. Add the country_alias fallback.
+
+  (b) THE SECOND SYMPTOM FOLLOWS FROM THE SAME LINE and must be fixed with it: countryId is null
+  for the same reason, so synthetic countries never reach countryIds and never appear in the
+  drill-down list either.
+
+  (c) FLIP THE it.fails CASE BACK TO it. The correct expectation is already written down as a
+  deliberately failing case in web/src/components/map/resolve.test.ts, so fixing the code turns
+  that test red until the marker is flipped - which is the signal, working as designed.
+
+  (d) VERIFY IN THE UI, not only in the runner: the synthetic country must no longer offer an
+  outline to tint or drill into, and must appear in the drill-down list. Name the surface eyeballed
+  in the close.
+
+  (e) PASS/FAIL: vitest green with the case as a plain it; no other resolve.ts behaviour changes;
+  npm run lint and npm run build green.
 notes: |
-  Minted 2026-09-02 (desktop, backlog-groomer fork). Stub per I6; body in the next commit.
+  Groomed 2026-09-02 from Idea-227 (desktop, backlog-groomer fork). Found by O80's new unit runner
+  on its FIRST run, in the one module that item named - worth recording as evidence for the runner
+  rather than as coincidence.
+
+  SAME FAMILY as the Z5 index bug the test file was written to catch: an identifier read on one
+  axis while the data carries it on another. NOT FIXED AT O80 by that item's scope guard - O80 buys
+  the test capability and proves it; changing what the map DRAWS is Z-series work with its own
+  review, which is this item.
+
+  Filed in epic server-location with module drydocs-web and phase 12: the epic owns the map's
+  geography, the code is console code, and phase 12 is where console work is tracked. Recorded
+  because the epic's other items sit in phase 6.

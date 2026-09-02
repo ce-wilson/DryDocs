@@ -14,6 +14,35 @@ inputs:
 - docs/port/port-prompt.md
 - CLAUDE.md
 acceptance: |
-  STUB - body lands in the follow-up commit of this same groom (I6: the stub carries the final title, the body follows).
+  (a) ONE SENTENCE, in the ledger/roll convention wherever a roll describes a COMMIT RANGE:
+  name the commits inside the range that were RED at push, or state that none were. Written
+  by the session that made them, which already knows - the same way a roll step names which
+  ids were re-minted.
+
+  (b) NOT A GUARD, and say so on the line. A pre-push hook running the full suite would cost
+  minutes on every push to buy a property nobody has needed yet, and a red intermediate
+  commit is a legitimate way to work - J68's own guard was written red first on purpose. The
+  difference that matters is whether it goes green in the SAME commit.
+
+  (c) SAY WHAT MOSTLY NEUTRALIZES IT, so the note is not read as bigger than it is: CLAUDE.md
+  mandates --no-ff for branch merges, so once a branch lands, its red commits leave main's
+  FIRST-PARENT line and git bisect --first-parent never visits them. The exposure is
+  bisecting the branch itself, or a range that crosses the merge boundary - which a PORT
+  range does, since a port reads the full range and not the first-parent walk.
+
+  (d) PASS/FAIL: the convention is written where a roll is authored, with the bisect
+  consequence as its one-line reason.
 notes: |
-  Minted 2026-09-02 (desktop, backlog-groomer fork). Stub per I6; body in the next commit.
+  Groomed 2026-09-02 from Idea-234 (desktop, backlog-groomer fork). p3 and haiku on purpose:
+  this is one sentence in a doc, and the idea itself argues against anything larger.
+
+  THE OBSERVATION: on feat/ui-web (2026-09-01), e7e95f07 and f44fb40d shipped two console
+  components without their config/taxonomy/ui-components.yaml ledger rows and were RED on
+  test_ui_components when pushed; e0c12d10 added the rows and the tip went green. The tip is
+  the state anyone looks at, so the range reads as healthy. Reported by the session that made
+  it, not found by anything - which is the gap.
+
+  WHAT ALREADY WORKS AND IS NOT BEING CHANGED: the session ritual's CI check matches on HEAD's
+  sha, warn-only, immediately before snapshot.ps1 writes. It does exactly what it claims,
+  per push. Nothing aggregates the answers, and this item does not build an aggregator.
+  Related: Idea-111, Idea-229 (the same verification channel, seen where a run has NO verdict).

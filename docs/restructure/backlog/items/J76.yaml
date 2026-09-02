@@ -15,6 +15,52 @@ inputs:
 - scripts/
 - docs/style/review-provenance.md
 acceptance: |
-  STUB - body lands in the follow-up commit of this same groom (I6: the stub carries the final title, the body follows).
+  (a) BUILD THE ONE GUARD THE THREE INCIDENTS ADMIT, and only that one: a source-scan check
+  that a subprocess call capturing text does so with an EXPLICIT encoding. text=True decodes
+  with the platform locale, which is cp1252 on this desktop, and every backlog item file
+  holds em dashes. Read the CODE, not the prose around it (J66) - go through
+  tests/source_scan.py (code_only, called_names), never a bare substring test, because this
+  repo's comments explain the very pattern the guard forbids.
+
+  (b) SCOPE THE GUARD, and state the scope in its docstring: repo scripts and tests, the
+  places a measurement is authored. The allocator in .claude/skills/groom-backlog/
+  validate.py already does this correctly and carries the comment explaining why - use it as
+  the reference implementation, and let the guard prove that file passes.
+
+  (c) THE OTHER TWO GET PROSE, NOT GUARDS, and the item says why for each. The truncated
+  PowerShell pipeline (... | Select-Object -First N then reading $LASTEXITCODE, which
+  reports 0 where the raw code was 1) is a shell idiom no Python-side scan can see; the
+  fixture authored to make its author's theory true is a review property, not a mechanical
+  one. Both go into the verification guidance as named failure modes with their incidents.
+
+  (d) THE RULE LINE, wherever verification discipline already lives: when a measurement
+  contradicts an expectation, CHECK THE INSTRUMENT BEFORE THE SUBJECT, and prefer the check
+  that can fail loudly - read the raw exit code before parsing, decode explicitly,
+  reconstruct a fixture from the incident at its real values rather than authoring one.
+
+  (e) PASS/FAIL: the guard is green on the tree as it stands (fix anything it finds in the
+  same commit, or record the exemption on the line), red on a synthetic text=True capture,
+  and the three incidents are recorded with the shape they share - the instrument was
+  broken, the artifact was fine, and the corrupted measurement said everything was OK.
 notes: |
-  Minted 2026-09-02 (desktop, backlog-groomer fork). Stub per I6; body in the next commit.
+  Groomed 2026-09-02 from Idea-235 (desktop, backlog-groomer fork). The idea's own
+  disposition is a candidate rule, not yet ruled, and asks whether any of the three
+  instances admits a guard. One does, cleanly, and that half is what is promoted; the
+  broader discipline question stays in the IDEAS inbox for the user.
+
+  THE THREE INCIDENTS, all 2026-09-01, two machines, two people, one port: (1) a comparison
+  script read git show with subprocess(text=True) and mojibaked every em dash, fabricating
+  18 of 25 reported differences while the file on disk was clean; (2) a sweep captured
+  results as ... | Select-Object -First N, which terminates a native-command pipeline early,
+  so $LASTEXITCODE reported 0 where the raw code was 1 - five prefixes were declared clean
+  on that basis and a slice was about to start on it; (3) a guard was validated against
+  fixture data authored to make its author's theory true, and the real pair measured on the
+  other tree scored 0.08 where the fixture cleared the floor.
+
+  WHY THEY ALL FAIL REASSURINGLY, which is the part worth keeping: each is a default that
+  optimises for not interrupting - a locale decoder that substitutes rather than raises, a
+  pipeline that stops reading when it has enough, a fixture its author believes. A tool that
+  fails loudly gets fixed in minutes; a tool that fails into clean gets ACTED ON.
+
+  Related: the verify-before-asserting working agreement, J66 (a guard reads code, not the
+  prose around it), and J72's notes, which carry all three as worked examples.

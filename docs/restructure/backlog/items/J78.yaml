@@ -14,6 +14,39 @@ inputs:
 - knowledge/depgraph-snapshots/snapshot.ps1
 - CLAUDE.md
 acceptance: |
-  STUB - body lands in the follow-up commit of this same groom (I6: the stub carries the final title, the body follows).
+  (a) THE PRODUCER-SIDE HALF IS ONE SENTENCE OF LOGIC in snapshot.ps1's CI check: a run whose
+  conclusion is cancelled is UNVERIFIED - not green, not red - and the check says so by name.
+  It stays WARN-ONLY and never blocks the snapshot, for the reason already recorded: recording
+  repo structure and passing a lint gate are unrelated jobs.
+
+  (b) THE MESSAGE NAMES THE CONSEQUENCE, because the operator's next action differs from the
+  green and red cases: this commit has not been checked; the next push that runs will attribute
+  its failure to whoever made it. Also treat a MISSING run for HEAD's sha the same way - no
+  verdict is no verdict, whatever the reason.
+
+  (c) WHY THE EXISTING CHECK CANNOT SEE IT, stated in the code comment: the sha-matching added
+  after Idea-111 catches STALE GREEN - green at somebody else's older commit. A cancelled run
+  has a MATCHING sha and no result, so the check has nothing to disagree with. Different
+  failure, same channel.
+
+  (d) CLAUDE.md's session-ritual CI step gains the third outcome in the same commit, so the
+  ritual and the script agree: green at HEAD, red at HEAD, or no verdict at HEAD.
+
+  (e) PASS/FAIL: run the check against a sha whose run was cancelled (both of this session's
+  first two pushes on 2026-08-31 qualify) and it reports UNVERIFIED; against a green sha it is
+  unchanged; the snapshot still writes in every case.
 notes: |
-  Minted 2026-09-02 (desktop, backlog-groomer fork). Stub per I6; body in the next commit.
+  Groomed 2026-09-02 from Idea-229 (desktop, backlog-groomer fork). p1 because the failure
+  lands on the WRONG COMMIT: both of the 2026-08-31 session's first two pushes were cancelled
+  by the newer push, and the guard failure they carried surfaced on the other machine's
+  commit, where it read as that commit's fault until the log was opened.
+
+  WHY IT MATTERS MORE THAN IT LOOKS: two machines pushing minutes apart is the normal case
+  here, not the edge case - the same concurrency the I6 mint rule and the J31 wip-branch rule
+  exist for. Every one of those rules makes work VISIBLE across machines; this is the same gap
+  in the verification channel.
+
+  SEPARATE AND ALREADY CLOSED, recorded so the run ids in the idea still read correctly: on
+  2026-08-31 run 33401557831 failed all three jobs in 2-3 seconds on a GitHub billing block,
+  executing nothing. The user raised the spending limit the same day and the re-run started
+  normally. Account-side, no repo change, and NOT part of this item.

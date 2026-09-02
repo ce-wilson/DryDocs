@@ -145,14 +145,22 @@ groom_log:
     since every reading trades governance cleanliness against unblocking or visibility.
   attached_at: J61
 - date: '2026-08-30'
-  note: >-
-    2026-08-30 weekly groom: J63-J65 minted. J63 is the cross-repo one - a review that does not name its tree manufactures defects, three times now. J64 and J65 are two DIFFERENT defects in the snapshot script and each says it does not re-solve the other.
+  note: '2026-08-30 weekly groom: J63-J65 minted. J63 is the cross-repo one - a review that does not name
+    its tree manufactures defects, three times now. J64 and J65 are two DIFFERENT defects in the snapshot
+    script and each says it does not re-solve the other.'
   attached_at: J63
 - date: '2026-08-30'
-  note: >-
-    Targeted groom of Idea-226 alone: J66 minted. Three guards built on 2026-08-30 each
-    hand-rolled the same workaround for the same trap - a source-reading guard matching the
-    comment that explains what it forbids - so the item gives them one helper and puts the rule
-    beside J37 in the working agreements. Its sharp clause is the fence: a fourth function of the
-    same name strips CYPHER, not Python, and must not be folded in on a name match.
+  note: 'Targeted groom of Idea-226 alone: J66 minted. Three guards built on 2026-08-30 each hand-rolled
+    the same workaround for the same trap - a source-reading guard matching the comment that explains
+    what it forbids - so the item gives them one helper and puts the rule beside J37 in the working agreements.
+    Its sharp clause is the fence: a fourth function of the same name strips CYPHER, not Python, and must
+    not be folded in on a name match.'
   attached_at: J66
+- date: '2026-09-02'
+  note: Groomed 2026-09-02, six items from one port's findings and one session's tooling failures. J73
+    (a refactor of an evaluate path is a mandatory relay - two ports walked past the S8 split), J74 (the
+    publish boundary is silent about git history; the mechanism half only, the tip-only-vs-history ruling
+    stays the user's), J75 (config surface + renderer SURFACES row + derived artifact are one coupling
+    a slice must carry whole), J76 (the instrument corrupts the measurement and fails toward reassuring;
+    one of the three instances admits a guard), J77 (a roll naming a range says which commits were red
+    at push), J78 (a cancelled CI run is UNVERIFIED, not green).

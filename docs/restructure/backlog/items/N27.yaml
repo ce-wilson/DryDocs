@@ -14,6 +14,35 @@ inputs:
 - config/source-registry.yaml
 - internal/research/JOB-MFTS-MM-research.md
 acceptance: |
-  STUB - body lands in the follow-up commit of this same groom (I6: the stub carries the final title, the body follows).
+  (a) ADD THE SYSTEMS ROWS to config/source-registry.yaml for the three file-transfer platforms
+  the research separates: MFTS, FileMover and OneMFT. Each carries the fields the registry already
+  requires - no new field shapes - including a classification (there is no unlabeled default) and
+  an owner.
+
+  (b) MFTS IS AT MINIMUM A :BusinessApplication: it has a SEAL (89830) and a named support group
+  (IP_CFP_ISUP_MFTS). Register the identifiers, never connection coordinates - a SEAL id and a
+  support-group name are identifiers, and the internal-twin rule covers host/port/service/creds
+  only. Test: could someone connect with this string alone.
+
+  (c) THEY ARE THREE SYSTEMS, NOT ONE UNDER THREE NAMES, and the rows must say so: MFTS is Axway
+  SecureTransport 6.0.3 and is DISTINCT from FileMover and OneMFT (research CORRECTION H93). A
+  single row with aliases would re-create the homonym the research spent six corrections
+  separating.
+
+  (d) DATASETS ARE OUT OF SCOPE. This registers the SYSTEMS. No dataset row, no URN for a route,
+  no loader - the route's shape is C44's gate question and registering a dataset here would
+  pre-empt it.
+
+  (e) PASS/FAIL: the registry validators pass; the derived load-map render regenerates and the
+  committed copy matches (a default-paths render_board.py run refreshes load-map.json and
+  load-map.html); the source count in the render moves by three.
 notes: |
-  Minted 2026-09-02 (desktop, backlog-groomer fork). Stub per I6; body in the next commit.
+  Groomed 2026-09-02 from Idea-236 gap 2 (OQ-4), desktop, backlog-groomer fork.
+
+  THE ARGUMENT FOR p1 IS STRUCTURAL, not urgency: Control-M cannot be the source of record for a
+  relationship whose other end is unregistered. C44's gate is blocked behind this for the same
+  reason, which is why it depends on it. Producer source-registry.yaml confirms there is no
+  systems row, no classification and no owner for any of the three today.
+
+  Same class as the registration gaps this session already named; the row is the smallest change
+  that unblocks the rest. Related: C42, C43, C44, N26, Idea-236.

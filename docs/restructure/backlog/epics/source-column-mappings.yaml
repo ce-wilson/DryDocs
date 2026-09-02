@@ -34,6 +34,14 @@ groom_log:
     a new document.
   attached_at: N17
 - date: '2026-08-30'
-  note: >-
-    2026-08-30 weekly groom: N22-N26 minted from the 08-29/08-30 registry findings. Four of the five are GATE DRAFTS and apply nothing - N23 carries the whole id grammar as ONE question (un-redaction, the URN carrier slot, the subset qualifier) because those parts cannot be ruled apart, N24 the access-path and reader axis, N25 the layer axis. N26 is the only build and needs no new field.
+  note: '2026-08-30 weekly groom: N22-N26 minted from the 08-29/08-30 registry findings. Four of the five
+    are GATE DRAFTS and apply nothing - N23 carries the whole id grammar as ONE question (un-redaction,
+    the URN carrier slot, the subset qualifier) because those parts cannot be ruled apart, N24 the access-path
+    and reader axis, N25 the layer axis. N26 is the only build and needs no new field.'
   attached_at: N22
+- date: '2026-09-02'
+  note: 'Groomed 2026-09-02. N27 registers MFTS, FileMover and OneMFT as systems - Control-M cannot be
+    the source of record for a relationship whose other end is unregistered, and C44''s gate is blocked
+    behind it. N28 adds a declared capture rung beside the trust axis: how the bytes were obtained is
+    a different question from how much interpretation sits between source and claim, with no unlabeled
+    default.'

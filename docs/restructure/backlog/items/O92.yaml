@@ -17,6 +17,37 @@ inputs:
 - web/src/layout/Aside.tsx
 - config/taxonomy/ui-tests.yaml
 acceptance: |
-  STUB - body lands in the follow-up commit of this same groom (I6: the stub carries the final title, the body follows).
+  (a) THE UNIT TEST: a vitest file over canAccessModule in web/src/modules/registry.ts - the three
+  roles against the three designations, including the undefined / 'all' default. It is a pure
+  three-line function with three call sites (layout/Aside.tsx, lib/auth.ts,
+  routes/OverviewRoute.tsx) and no test at all, which is exactly the shape the O80 runner exists
+  for and cheaper to guard than to argue about.
+
+  (b) THE PIN, and it is the larger half: a test that pins WHICH module ids carry a non-default
+  access value. The list should change rarely and always on purpose, which is precisely when a pin
+  is the right instrument - the same state the number so it cannot drift up quietly pattern
+  ui-tests.yaml's coverage pins already use.
+
+  (c) THE PIN CARRIES THE REASON PER ENTRY, not just the id: FB-03 for /software and /gates, the
+  delta argument for /remediation. A designation whose reason is unrecorded is the thing the pin is
+  supposed to prevent.
+
+  (d) SAY IN THE TEST DOCSTRING WHAT THIS IS NOT, because it will otherwise be priced as a
+  security fix: it is NOT an authorization defect. The server re-resolves the real role from the
+  token on every call and the API is the enforcement point, so nothing here is a data exposure.
+  This is about the console's own audience decisions staying deliberate.
+
+  (e) THE FAILURE IS SILENT IN BOTH DIRECTIONS and the tests must cover both: a module wrongly
+  OPENED shows an end user numbers they will misread; a module wrongly CLOSED simply disappears for
+  them with no error.
+
+  (f) PASS/FAIL: npm run lint, npm run build and the vitest suite green; flipping any module's
+  access in the registry turns the pin red; removing the pin's reason for an entry is caught at
+  review, not by the test, and the item says so rather than pretending otherwise.
 notes: |
-  Minted 2026-09-02 (desktop, backlog-groomer fork). Stub per I6; body in the next commit.
+  Groomed 2026-09-02 from Idea-231 (desktop, backlog-groomer fork). Noticed at O59, which set
+  access: 'sme' on /remediation - a one-word edit that changed the module from
+  visible-to-every-role to steward-plus-admin. The change was intended and the reason is recorded
+  inline, but nothing outside the diff would have caught it either way.
+
+  DEPENDS ON O80 (done), which bought the vitest runner and proved it. Related: O59, O80, FB-03.

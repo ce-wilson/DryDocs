@@ -19,6 +19,83 @@ inputs:
 - drydocs_core/ontology/relationship_vocabulary/
 - docs/design/deepdoc-data-flow-overview.md
 acceptance: |
-  STUB - body lands in the follow-up commit of this same groom (I6: the stub carries the final title, the body follows).
+  (a) SCOPE: an EXPERIMENT, not a feature. It answers one question - can a knowledge-graph-of-
+  thoughts loop walk a mind map, and where does it stall - and its deliverable is a written run
+  report, not a shipped capability. Nothing in it may become a default.
+
+  (b) THE SCRATCH DATABASE IS TASK-SCOPED AND IS DROPPED AFTER. G102 folded the content topology
+  to ONE database (drydocs) with :Uncertain as the boundary, ADR 0011 is the contingency, and
+  test_database_names.py pins the deployed names - a fourth CONTENT database would reopen that
+  ruling and this item does not. What it does instead is KGoT's own pattern: a throwaway graph
+  per question, created for the run, dropped at the end, named mindmap, never added to the pin.
+  If the experiment shows the graph is worth KEEPING, that is a gate question (which labels,
+  which database) and is out of scope here.
+
+  (c) THE CORPUS IS TWO FILES PLUS THE PROBE LEDGER, all Internal:
+  internal/research/JOB-MFTS-MM-research.md (the JOB->MFTS log: YAML front matter, Brain-map,
+  a Trace ledger of about 120 hops, CORRECTION blocks, Gotchas, Predictions, Open questions,
+  Acronyms, Notes log), internal/research/mm-aar-research.md, and the probe log plus source
+  whitelist the AAR describes (internal/research/_probes/*.jsonl,
+  internal/research/_registry/source-whitelist.yaml). The loaded graph carries real values, so
+  it lives only on a machine that has internal/, is never published, and every claim about it
+  NAMES ITS VENUE (J18).
+
+  (d) APPLY THE REGISTERED ONTOLOGY, nothing new. The relationship-vocabulary registry plus what
+  MM has already registered planned - MM2's :DataFlow edges (arch_has_data_flow,
+  arch_orchestrates, arch_fed_by, arch_lands_in, docs_evidenced_by). The mapping the experiment
+  uses: hops -> ContextFinding-shaped rows (subject/predicate/object/evidence breadcrumb/phase);
+  CORRECTION blocks -> retractions with an as_of; Open questions -> open slots in the MM3 state
+  file (drydocs.deepdoc.mindmap.v1); Brain-map -> its branches; Acronyms -> MM12's candidate
+  class. If the run wants an edge the registry does not have, that is a FINDING to report, not
+  an edge to mint - relationship meaning goes through the HITL gate, always.
+
+  (e) EVERY WRITE CARRIES :Uncertain plus reliability/trust (ADR 0011 clause 1) even in the
+  scratch database, BY CHOICE and said out loud: test_uncertain_boundary.py only watches
+  drydocs_deepdoc, so a writer under scripts/ is unguarded and must carry the discipline itself.
+
+  (f) THE PROBE LEDGER IS THE NEGATIVE SPACE and is the reason this is worth running: loaded, it
+  is the set of edges the analyst tried and RULED OUT, each with its control query - exactly
+  what a loop needs so it does not re-walk a dead end - and the whitelist is the known half of
+  MM3's novelty score. Three AAR section 3 rules go into the retry logic as written: a negative
+  probe without a passing positive control is INVALID, not negative (3.1); a census over an
+  artifact needs a schema control before the platform does not hold X is a finding (3.2); the
+  artifact and the reading are cited separately (3.6).
+
+  (g) THE LOOP, per ADR 0007 as the reference file maps it: bounded escalation into the
+  iterative loop, the fix-Cypher repair loop capped at two retries, the forced-solve fallback so
+  a stalled loop still returns something inspectable, and per-iteration snapshots. Seed it with
+  the log's own central_question.
+
+  (h) THE REPORT RECORDS, at minimum: hops taken versus the roughly 120 the analyst took by
+  hand; which retries fired and why; whether forced-solve was reached; what each iteration's
+  snapshot shows; whether the traversal reaches the same understanding the log states plainly;
+  and - stated as a prediction BEFORE the run, then answered - whether the loop notices the
+  CORRECTION blocks or happily walks a retracted hop.
+
+  (i) PLACEMENT: parse and state-file writing in drydocs-deepdoc; the scratch loader and the
+  loop harness under scripts/ (or agents/, if it rides the Tier-2 ADK loop) so no component
+  learns a database name the pin does not allow.
+
+  (j) OPEN QUESTION THE RUN ANSWERS WITH DATA, not by ruling: whether the probe row
+  (tool/query/scope/result_count/outcome) and MM3's search-log row (tool/search/theme/novelty)
+  converge into one shape.
 notes: |
-  Minted 2026-09-02 (desktop, backlog-groomer fork). Stub per I6; body in the next commit.
+  Groomed 2026-09-02 from Idea-238 (desktop, backlog-groomer fork). User ask, same day, laptop
+  session on branch feat/mm-deepdoc-investigate: ingest the research-mindmap files, load them
+  into a new Neo4j db mindmap, apply the current ontology and the KGoT retry logic, just to see
+  how it can be traversed.
+
+  WHERE IT SITS: downstream of MM3 (done - the state file and the extractor are the parse target
+  and the parser); a live rehearsal for MM6 (ontology proposals - the run surfaces which labels
+  the log needs) and MM10 (investigate() v1 is this loop made procedural); adjacent to R16 (named
+  agent verbs over reviewed QuerySpecs, which are the loop's tools) and L28 (the KGoT citation).
+
+  MODEL fable BECAUSE THE JUDGEMENT IS THE DELIVERABLE: the run has to tell an ontology GAP from
+  a traversal failure and must not resolve either by minting. The clause that keeps it honest is
+  (d) - report, never mint.
+
+  THE SECOND SOURCE FILE landed the same day as the idea: internal/research/mm-aar-research.md
+  (fd3aa92b, provenance corrected at 2c184a79), the after-action review of the JOB->MFTS search,
+  transcribed from seven company artifacts on an UNMERGED research branch and cited by path only.
+
+  Related: MM2, MM3, MM6, MM10, MM12, R16, L28, G102, ADR 0007, ADR 0011, Idea-236.

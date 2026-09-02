@@ -24,3 +24,7 @@ groom_log:
     fixture and taxonomy data — the signed T1/T2 host tiers and the MATCH-only
     technology-port ruling are explicitly not touched.
   attached_at: Z8
+- date: '2026-09-02'
+  note: 'Groomed 2026-09-02 from Idea-227. Z9: a synthetic city''s country reports a drawable outline
+    it does not have, because the resolver reads country_id and ignores country_alias. Found by O80''s
+    runner on its first run; the correct expectation is already in the repo as an it.fails case.'

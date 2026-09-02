@@ -19,6 +19,62 @@ inputs:
 - tests/unit/test_cli_registry.py
 - tests/unit/test_module_boundary.py
 acceptance: |
-  STUB - body lands in the follow-up commit of this same groom (I6: the stub carries the final title, the body follows).
+  (a) THE PRECONDITION, and it is not producer work: this item removes the RESIDUAL
+  collision, it does not perform the company's adoption of the S8 split. Producer-side
+  nothing is broken today - cli.py is 669 lines and registers 51 commands, measured on
+  main at port-base-20260901 (read app.registered_commands, never --help; J37). Build
+  this whether or not the company has adopted yet: after adoption the only company edit
+  to cli.py would be one tuple element, and this deletes even that.
+
+  (b) DISCOVERY, not a hard import. The composition root imports one optional consumer
+  module - ONE name, settled in this item and written into MODULE_MAP.md in the same
+  commit - if and only if importlib.util.find_spec finds it, and registers its verbs
+  after every entry in COMMAND_MODULES so a consumer verb can override nothing by
+  accident. Producer ships no such module. A missing module is SILENT, never a warning:
+  that is the normal producer state.
+
+  (c) THE GUARDS, three, and each names why it exists. test_cli_import_order.py gains the
+  optional module, subprocess-per-import - an in-process import proves nothing about
+  import order, which is exactly the gap that shipped the S13 cycle. test_cli_registry.py
+  asserts both directions with a fixture module: present, its verbs register; absent,
+  import succeeds and nothing is logged. test_module_boundary.py classifies the new name
+  (default-deny: an unclassified module fails as UNCLASSIFIED), so the MODULE_MAP.md row
+  and the CORE_PREFIXES/COMPONENT_GROUP entry land in the same commit as the code.
+
+  (d) THE MANIFEST ROW IS THE POINT. drydocs/cli.py moves from evaluate to
+  canonical-producer in PORT-MANIFEST.yaml, with the reason on the row: both sides can no
+  longer edit the same file, because the consumer's verbs live in a file producer does not
+  ship. Do not make this edit until (b) and (c) are green - the row is a claim about the
+  code, and a disposition that describes an intention rather than the tree is the J68
+  defect.
+
+  (e) WHAT THIS ITEM MUST NOT DO: it does not move any producer verb, does not change
+  drydocs --help, and does not author the company's module. The shape is ADR 0002-A's -
+  core imports nothing from a component, and a consumer module is the outermost layer and
+  may import anything - so nothing here relaxes the invariant.
+
+  (f) CLOSE NOTE STATES THE MEASUREMENT AGAIN at build time: cli.py line count, the
+  registered-command count from the importable object, and which of the six S8 modules
+  were touched (expected: none).
 notes: |
-  Minted 2026-09-02 (desktop, backlog-groomer fork). Stub per I6; body in the next commit.
+  Groomed 2026-09-02 from Idea-241 (desktop, backlog-groomer fork). The idea carries TWO
+  changes and this item is deliberately only the second one. The FIRST - the company
+  adopting the 669-line root, re-homing its 26 company-only verbs into a company-owned
+  command module, and DROPPING rather than moving every inline verb whose name is already
+  in producer's registered_commands - is the company's port action and is raised in their
+  PORT-REPORT for port-base-20260826..20260901 as owed, for a ruling. It cannot be done
+  here and is not in this item's acceptance.
+
+  WHY IT IS p1 rather than p2: the company's monolith has grown 3,184 -> 4,079 -> 4,112
+  lines across ports while the split never arrived, and every verb S8 moved that has
+  CHANGED since (G79's refresh-reference split into three subject commands,
+  verify-reference/verify-controlm with the m1/m3 deprecated aliases) exists company-side
+  only as a stale inline copy from before the split. env-doctor is the first one a guard
+  caught, not the only one that is wrong. The cost compounds per port.
+
+  MODULE CHOICE RECORDED, since it was a judgement: drydocs-load. MODULE_MAP.md rows 79-81
+  place cli.py, the six cli_*.py command modules and cli_shared.py all in drydocs-load, and
+  the optional consumer module is a peer of those - not core, since it orchestrates loaders.
+
+  THE GENERAL LESSON in Idea-241 is NOT in this item; it is J73, because it is a port-prompt
+  rule and not a code change. Related: S8, S13, ADR 0002-A, J68, J69, Idea-239, Idea-240.

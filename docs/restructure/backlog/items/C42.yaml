@@ -18,6 +18,49 @@ inputs:
 - internal/research/JOB-MFTS-MM-research.md
 - drydocs_core/description_tokens.py
 acceptance: |
-  STUB - body lands in the follow-up commit of this same groom (I6: the stub carries the final title, the body follows).
+  (a) THE DEFECT, precisely: C30 (done, SME-ruled) retired INBOUND_ROUTE/OUTBOUND_ROUTE on
+  FileWatcher jobs - a watcher is inherently inbound - and pointed them at FTS_ID plus REC_ID.
+  Both retired tokens were additionally scoped MFTS_AGENT only; literal NULL otherwise. Every
+  one of the 89 sampled real routes is SFTP. So the file-transfer strategy's write-back step has
+  no conformant token to write a route id into, and under the prior standard the field would
+  have been NULL for 100% of the real population. The research calls this a defect, not a
+  convention, and this item agrees or refutes it with evidence - it does not assume it.
+
+  (b) IT ROUTES THROUGH THE GATE, AND THROUGH C40. C30 carries a SIGNED ruling, so amending it
+  is a revisit, not an edit - that is what C40 builds the axis for, including the STANDS outcome
+  that today has nowhere to be recorded. The amendment is proposed via the gate; the ruling is
+  the SME's; nothing in the greenfield standard changes until it is signed. This item is the
+  AMENDMENT PROPOSAL, not the sweep of any existing definitions.
+
+  (c) WHAT THE PROPOSAL MUST CONTAIN: the population evidence (89 of 89 SFTP; the numeric
+  6-digit route id, production capture 372399 inside the sampled range; the MFTS_RT_IN_*/
+  MFTS_RT_OUT_* string pair in ZERO real routes, reading as a documentation placeholder), the
+  question of WHICH token carries the route id under the corrected standard, and the explicit
+  statement that Control-M becomes the source of record for the JOB-TO-ROUTE BINDING while MFTS
+  stays the source of record for the ROUTE ITSELF - one join key in the description field, never
+  the route's facts.
+
+  (d) A VALIDATION GUARD IS PART OF THE PROPOSAL, not an afterthought: the description field is
+  typed prose and the standard placeholder appeared in 0 of 89 real routes, so a written binding
+  is only as good as what got typed. Whatever token the ruling picks, the proposal names how a
+  value is validated against the MFTS inventory rather than merely confirmed by a human.
+
+  (e) PASS/FAIL: the gate prompt exists with clauses (c) and (d) posed as questions, C40's
+  revisit axis records the outcome including STANDS, and no producer definition or extractor
+  changes until the ruling is signed.
 notes: |
-  Minted 2026-09-02 (desktop, backlog-groomer fork). Stub per I6; body in the next commit.
+  Groomed 2026-09-02 from Idea-236 gap 1 (desktop, backlog-groomer fork). Evidence base:
+  internal/research/JOB-MFTS-MM-research.md, the company-side mind-map research log transcribed
+  producer-side 2026-09-02 at its stated venue feat/dd_lineage @ b6ca9422 (2,183 lines, 6
+  self-corrections, 21 gotchas); this finding is its G-8.
+
+  DEPENDS ON C40 DELIBERATELY, and that keeps it out of next_ready until the revisit axis exists.
+  Amending a done item that carries a signed ruling with no axis to record the amendment is how a
+  signed record silently becomes wrong - the exact failure C40 was raised for.
+
+  THE NAMESPACE CAUTION, carried from the research so this item is not built on a homonym: four
+  namespaces, at least two homonyms. MFTS is Axway SecureTransport 6.0.3, SEAL 89830, DISTINCT
+  from FileMover and OneMFT; the UUID key belongs to OneMFT, a different product; and NEP4824 -
+  the runbook's Inbound MFTS Route ID column - is the partner/account stem, not a route id at all.
+
+  Related: C30, C40, C44, N27, G83, MM7, Idea-104, Idea-236.
