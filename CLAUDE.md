@@ -66,6 +66,18 @@ things share the word *port* — never conflate them:
   the desktop read claim commit `3608ae5` as a dead tip and rebuilt it (`17d9e08` on main,
   `bfb2f0b` stranded on a branch); and the C19 double-build above. What this does NOT fix: a session
   that dies before its first push stays invisible, and no convention changes that.
+  **One pen per surface (2026-09-02).** Concurrent sessions are normal — two machines, N
+  worktrees, a review session. Collisions come from two sessions WRITING THE SAME SURFACE, not
+  from two sessions existing. So: at the start of any session that will write, name the
+  surfaces it holds the pen for — `backlog` (`items/`, `IDEAS.md`/`ideas/`, `epics/`, the plan
+  renders), `port` (`port-prompt.md`, `PORT-MANIFEST.yaml`, `docs/company-prompts/`), `adr`,
+  `code:<module>` — in its first commit message or a `wip/` branch name. Any other live session
+  stays off those surfaces until the pen moves, and asks rather than assumes. The item-file
+  claim (`status: in_progress`, pushed) is the pen for ONE ITEM; this is the pen for a SURFACE.
+  The board's Ready strip and `git branch -r --list "wip/*"` are where you look before picking
+  one up. What this does NOT cover: a session that never says what it holds — that was the
+  coordination failure of 2026-09-02 (two sessions grooming and merging the same renders in one
+  afternoon), and it is not a tooling gap.
 
 **Mint rule (the claim protocol's other half; I6).** A pull is claimed by pushing `status: in_progress`. An id is claimed the same way, and for the same reason: an id that exists only in your tree is an id the other machine will mint too. **Never read the next free number off your own tree** — ask the allocator, which unions the local items, every remote ref's tree listing, and every id ever added in history, and returns max+1 (a gap is usually a BURNED id — `config/gate-log.md` cites ids inside SIGNED records, so re-issuing one silently re-points a signed gate):
 ```
