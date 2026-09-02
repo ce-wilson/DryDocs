@@ -15,6 +15,7 @@ from drydocs.port_rename_detect import (
     SIMILARITY_FLOOR,
     compare,
     containment,
+    discriminating,
     id_set,
     jaccard,
     normalized_text,
@@ -389,11 +390,21 @@ def test_the_true_twin_is_not_hidden_behind_a_higher_scoring_coincidence() -> No
 
 def test_the_match_list_is_capped_so_a_common_file_cannot_bury_the_signal() -> None:
     """The failure at the other end: reporting everything makes a boilerplate-heavy
-    file match a dozen others and drowns the pair that matters."""
+    file match a dozen others and drowns the pair that matters.
+
+    FOUR files, deliberately below MIN_CORPUS_FOR_IDF. Above it, idf strips the
+    shared tokens and NOTHING matches — which is idf doing the same job better. The
+    cap is what protects a directory too small for document frequency to mean
+    anything, and the two cover different regimes rather than overlapping.
+    """
     shared = "alignment crosswalk rows framework bindings"
-    existing = {f"epics/other-{n}.yaml": shared for n in range(10)}
+    existing = {f"epics/other-{n}.yaml": shared for n in range(4)}
     found = rename_candidates({"epics/new.yaml": shared}, existing)
     assert len(found) == MAX_MATCHES_PER_ADD
+
+    # and above the threshold, idf removes the reason to report anything at all
+    big = {f"epics/other-{n}.yaml": shared for n in range(6)}
+    assert rename_candidates({"epics/new.yaml": shared}, big) == []
 
 
 def test_containment_finds_a_twin_that_jaccard_buries() -> None:
@@ -439,7 +450,10 @@ def test_containment_over_fires_alone_which_is_why_the_cap_is_load_bearing() -> 
     assert containment(stub, big) == 1.0, "a big file trivially contains a small one"
     assert jaccard(stub, big) < 0.05, "and Jaccard correctly calls it dissimilar"
     # the cap is what keeps a directory full of large files from drowning the report
-    existing = {f"epics/big-{n}.yaml": " ".join(big) for n in range(10)}
+    # FOUR files, below MIN_CORPUS_FOR_IDF: idf abstains, so the cap is the only
+    # thing standing between the reader and a page of matches. That is the regime
+    # this test is about — in a larger directory idf removes the shared tokens first.
+    existing = {f"epics/big-{n}.yaml": " ".join(big) for n in range(4)}
     assert (
         len(rename_candidates({"epics/stub.yaml": " ".join(stub)}, existing)) == MAX_MATCHES_PER_ADD
     )
@@ -469,7 +483,9 @@ def test_the_cap_is_per_file_across_signals_not_per_signal() -> None:
     reader to dismiss the whole report."""
     shared = " ".join(f"tok{n}" for n in range(20))
     proposed = {"vocab/41-local-new.yaml": shared}
-    existing = {f"vocab/41-local-old{n}.yaml": shared for n in range(8)}
+    # Four, not eight: above MIN_CORPUS_FOR_IDF the shared tokens are stripped as
+    # directory boilerplate and nothing matches at all — which is idf working.
+    existing = {f"vocab/41-local-old{n}.yaml": shared for n in range(4)}
     found = rename_candidates(proposed, existing, producer_paths={"vocab/41-local-new.yaml"})
     assert len(found) == MAX_MATCHES_PER_ADD
     assert all(c.proposed == "vocab/41-local-new.yaml" for c in found)
@@ -511,3 +527,47 @@ def test_the_git_report_states_its_one_to_one_limit() -> None:
     assert "1:1" in text and "SPLIT" in text
     assert "R097" in text
     assert "git detected no renames" in render_git_renames([])
+
+
+def test_idf_drops_a_directory_schema_that_every_file_shares() -> None:
+    """Contributed by the company session after measuring the cost of recall.
+
+    Backlog items share a schema, so nearly every proposed item matched several
+    others at 0.40-0.60 on `id:` / `epic:` / `status:` alone — 252 pairs in one
+    directory for roughly two real ones. Structure survives a rename and so does
+    content; only CONTENT identifies.
+
+    This matters as much as recall for a reason measured twice this session: a
+    reviewer handed 252 pairs will skim, and skimming is how the twin got taken in
+    the first place. A report nobody reads is the same outcome as no report.
+    """
+    schema = "id: epic: status: acceptance: notes: type: module: phase:"
+    existing = {
+        f"items/{name}.yaml": f"{schema} {body}"
+        for name, body in [
+            ("A1", "alpha unique one"),
+            ("B2", "beta unique two"),
+            ("C3", "gamma unique three"),
+            ("D4", "delta unique four"),
+            ("E5", "epsilon unique five"),
+            ("OLD", "zeta distinctive marker phrase"),
+        ]
+    }
+    # shares the schema with all six, and the DISTINCTIVE content of exactly one
+    proposed = {"items/NEW.yaml": f"{schema} zeta distinctive marker phrase"}
+
+    found = rename_candidates(proposed, existing)
+    assert [c.existing for c in found] == ["items/OLD.yaml"], (
+        "only the file sharing distinctive content is a candidate; the five sharing "
+        "only the directory's schema are not"
+    )
+
+
+def test_idf_abstains_in_a_directory_too_small_to_measure() -> None:
+    """In a three-file directory every shared token trivially exceeds any ceiling,
+    so document frequency is noise. Small directories keep the unfiltered
+    comparison — where the pair count is small enough to read anyway."""
+    freq = {"shared": 3}
+    assert discriminating("shared unique", freq, 3) == "shared unique"
+    # above the threshold the same token is dropped as boilerplate
+    assert discriminating("shared unique", {"shared": 5}, 5) == "unique"

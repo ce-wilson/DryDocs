@@ -190,3 +190,43 @@ notes: |
   anything already record this", and it was not asked until the SME asked whether the ritual was the
   problem. Reaching for a new measurement before checking what the system already knows is the
   expensive mistake here, and it was mine three times over.
+
+  FIFTH ROUND - RECALL 8/8 CONFIRMED, AND THE COST OF IT PAID. The company re-ran the full sweep on
+  the containment pin and reported recall 3/8 -> 8/8, including the cross-slot split both of us had
+  written off as structurally unreachable: 52-local-human <-> 41-local-seal at 0.70 (was 0.30
+  missed), <-> 42-local-catalog at 0.60 (was 0.28 missed), and cdo-alignment <-> its twin at 0.80
+  ranked FIRST (was 0.08, rank 13).
+
+  THEY ALSO PRICED IT, WHICH I HAD NOT: 344 pairs over 230 proposed adds, of which docs/ alone was
+  252 pairs for roughly TWO real ones. Backlog items share a schema, so nearly every proposed item
+  matched several others at 0.40-0.60 on id:/epic:/status:/acceptance: alone. Their framing is the
+  argument: "a reviewer handed 252 pairs will skim, and skimming is how the twin got taken in the
+  first place." A report nobody reads is the same outcome as no report, so precision is not a
+  refinement here - it is the same failure at the other end.
+
+  THEIR FIX, ADOPTED: the idf half of tf-idf. Discount tokens appearing in more than half a
+  DIRECTORY's files - structure survives a rename and so does content, but only content IDENTIFIES.
+  Cheap, local, no dependency. It is the principled version of MIN_TOKENS_FOR_CONTAINMENT, which was
+  a blunt size threshold reaching for the same thing.
+
+  MEASURED ON REAL DATA: the backlog items directory has 85 proposed clean-adds and now reports 23
+  pairs. Recall is unchanged - every real vocabulary pair still fires, 52-local-human at 0.66 and
+  0.51, the two slot renames at 1.00. The unfiltered comparison over that directory did not finish
+  inside two minutes, so idf buys speed as well as precision; smaller token sets, fewer comparisons
+  that matter.
+
+  AND IT SUBSUMED PART OF AN EARLIER FIX, which is worth recording rather than hiding: two cap tests
+  went red on adoption because they used corpora of identical files, where idf now correctly strips
+  every token and reports nothing. The cap and idf cover DIFFERENT REGIMES - idf needs at least five
+  files to mean anything, and below that the cap is the only protection. Both tests were rescoped to
+  say so rather than being deleted or the threshold bent to keep them green.
+
+  ONE CAUTION THE COMPANY RAISED AND THE REPORT SHOULD CARRY: a perfect score is not proof.
+  docs/design/feedback/--rev1.yaml scores 1.00 against its own earlier revision and is not a rename;
+  it is a later revision of the same document. Recorded here; the report already says it identifies
+  nothing and decides nothing, which covers it.
+
+  TWO REAL FINDINGS IT SURFACED FOR THEM, both corroborating work already planned:
+  folder_attribution.cypher <-> seal_attribution.cypher at 0.52 (a real rename, confirming the
+  loader field they took in the B+C split), and cli_shared.py <-> cli.py at 0.49 (not a decline -
+  cli_shared is the extraction FROM cli.py, so the detector found both halves of the D merge).

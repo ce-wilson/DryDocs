@@ -306,6 +306,50 @@ def vanished_twin_candidates(
     return out
 
 
+#: A token appearing in more than this fraction of a directory's files carries no
+#: identifying information — it is the directory's SCHEMA, not the document's
+#: content. Contributed by the company session (2026-09-01) as "the idf half of
+#: tf-idf", after measuring the cost of recall bought without it: 344 pairs over 230
+#: proposed adds, of which `docs/` alone was 252 pairs for roughly two real ones.
+#: Backlog items share a schema, so nearly every proposed item matched several
+#: others at 0.40-0.60 on `id:`/`epic:`/`status:`/`acceptance:` alone.
+#:
+#: THE PRECISION FAILURE MATTERS AS MUCH AS RECALL, and for a reason measured twice
+#: this session: "a reviewer handed 252 pairs will skim, and skimming is how the
+#: twin got taken in the first place." A report nobody reads is the same outcome as
+#: no report.
+DIRECTORY_TOKEN_CEILING = 0.5
+
+#: Below this many files, document frequency is noise — in a three-file directory
+#: every shared token trivially exceeds any ceiling. Small directories keep the
+#: unfiltered comparison, where the pair count is small enough to read anyway.
+MIN_CORPUS_FOR_IDF = 5
+
+
+def document_frequency(texts: list[str]) -> dict[str, int]:
+    """How many of ``texts`` each token appears in (presence, not count)."""
+    frequency: dict[str, int] = {}
+    for text in texts:
+        for token in set(normalized_text(text).split()):
+            frequency[token] = frequency.get(token, 0) + 1
+    return frequency
+
+
+def discriminating(
+    text: str, frequency: dict[str, int], corpus_size: int, *, ceiling: float = DIRECTORY_TOKEN_CEILING
+) -> str:
+    """``text`` with its directory's boilerplate removed.
+
+    Structure survives a rename and so does content; only content IDENTIFIES. This
+    keeps the tokens that distinguish a document from its neighbours and drops the
+    ones every neighbour also has.
+    """
+    if corpus_size < MIN_CORPUS_FOR_IDF:
+        return normalized_text(text)
+    cutoff = corpus_size * ceiling
+    return " ".join(t for t in normalized_text(text).split() if frequency.get(t, 0) <= cutoff)
+
+
 def rename_candidates(
     proposed: dict[str, str],
     existing: dict[str, str],
@@ -324,18 +368,30 @@ def rename_candidates(
     a whole-tree comparison is quadratic over thousands of files for a signal that
     would mostly be noise. Set it False for a deliberate wide sweep.
     """
+    # Per-directory document frequency, built once from the consumer side. The
+    # corpus is the DIRECTORY because that is where a schema is shared — backlog
+    # items look alike, gate prompts look alike, and neither resembles the other.
+    by_directory: dict[str, list[str]] = {}
+    for path, text in existing.items():
+        by_directory.setdefault(str(Path(path).parent), []).append(text)
+    frequency = {d: document_frequency(texts) for d, texts in by_directory.items()}
+
     out: list[RenameCandidate] = []
     for new_path, new_text in sorted(proposed.items()):
         if new_path in existing:
             continue  # a collision, not a rename — the manifest routes it
         new_dir = str(Path(new_path).parent)
+        corpus = by_directory.get(new_dir, [])
+        freq, size = frequency.get(new_dir, {}), len(corpus)
         matches: list[RenameCandidate] = []
         for old_path, old_text in existing.items():
             if old_path == new_path:
                 continue
             if same_directory_only and str(Path(old_path).parent) != new_dir:
                 continue
-            score, basis = compare(new_text, old_text)
+            score, basis = compare(
+                discriminating(new_text, freq, size), discriminating(old_text, freq, size)
+            )
             if score >= floor:
                 matches.append(RenameCandidate(new_path, old_path, score, basis))
         # EVERY match above the floor, not just the best one — capped, not filtered.
