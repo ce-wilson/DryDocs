@@ -154,6 +154,28 @@ question a 1,000-line file with the trail at the bottom could not answer.
   - **What to expect, stated before the run:** the CORRECTION blocks are the interesting
     part — a hop the log later retracted is exactly the edge a naive traversal will happily
     walk, and whether the loop notices the retraction is the first thing to look at.
+  - **KEPT-UPDATED 2026-09-02 (same day) — the family is two files, not one, and the second
+    brings the traversal's negative space.** `internal/research/mm-aar-research.md` landed on
+    `main` (fd3aa92b; provenance corrected 2c184a79): the after-action review of the JOB→MFTS
+    search, transcribed from seven company artifacts that live on an UNMERGED research branch
+    — not company main, not port candidates, cited by path only. Two of those artifacts are
+    graph-loadable beside the log and belong in this experiment: the **probe log**
+    (`internal/research/_probes/<subject>-probes.jsonl`, one object per probe — `source / tool /
+    query / scope / result_count / outcome`, `outcome ∈ empty | irrelevant | blocked | stale |
+    exhausted | exhausted_in_scope`, with a positive `control_query` that must pass before
+    `exhausted` is admissible) and the **source whitelist**
+    (`internal/research/_registry/source-whitelist.yaml`: confirmed-good sources AND
+    controlled dead ends, `decay` mandatory, graduates to the ingestion registries only through
+    the gate). Loaded, the probe log is the set of edges the analyst tried and ruled out, each
+    with its control — exactly what a KGoT loop needs so it does not re-walk a dead end — and
+    the whitelist is the `known` half of MM3's novelty score. The probe log's row is the MM3
+    search log's sibling (`tool / query / outcome` beside `tool / search / theme / novelty`);
+    whether the two converge into one row shape is a groom question this experiment answers
+    with data rather than by ruling. Three AAR §3 rules go into the loop's retry logic as
+    written: a negative probe without a passing positive control is INVALID, not negative
+    (3.1); a census over an artifact needs a schema control before "the platform does not hold
+    X" is a finding (3.2); the artifact and the reading are cited separately — the image is
+    VERBATIM, a model's reading of it is GROUNDED (3.6).
 
 - **`Idea-237`** · 2026-09-02 · `[doc]` · **open** · prio? **Med** —
   **The data-flow-overview gate prompt calls "MM3" the Output-tab / log-substrate extractor —
