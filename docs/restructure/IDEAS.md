@@ -227,6 +227,111 @@ question a 1,000-line file with the trail at the bottom could not answer.
   closure behind it. Each was fixed at the file; this is the first framing at the shape.
   Related: J68, J71, J72, G125, O68, N4/N5 (the load-map surfaces), [[Idea-235]].
 
+- **`Idea-238`** · 2026-09-02 · `[idea]` · **open** · prio? **Med** —
+  **Load the mind-map research logs into a throwaway Neo4j database (`mindmap`), apply the
+  current ontology, and run the Knowledge-Graph-of-Thoughts retry loop over it — to see how a
+  mind map traverses.** User ask, 2026-09-02 (laptop session, branch
+  `feat/mm-deepdoc-investigate`): "ingest all of the research-mindmap files, test loading into
+  a new Neo4j db `mindmap`, applying the current ontology, and the retry logic of knowledge
+  graphs of thoughts, just to see how it can be traversed." An experiment, not a feature.
+  - **THE SOURCE FAMILY.** `internal/research/<SUBJECT>-MM-research.md` — one so far, the
+    JOB→MFTS log (`internal/research/JOB-MFTS-MM-research.md`, 2,183 lines, transcribed
+    producer-side 2026-09-02 from its company venue; Idea-236 files its five gaps). It is
+    already graph-shaped prose: YAML front matter (`central_question`, `subject`, `venue`),
+    a **Brain-map** section (the tree), a **Trace ledger** of ~120 hops (H-n), **CORRECTION**
+    blocks that retract earlier hops, **Gotchas** (G-n), **Predictions** resolved against
+    evidence, **Open questions** (OQ-n, the SME's to rule), **Acronyms & terms**, and a dated
+    **Notes log**. The sibling family is the deepdoc session's eight `*-capture.md`
+    transcripts (machine-local, never tracked). Both are `classification: Internal` — the
+    loaded graph carries real values, so the database lives only on a machine that has
+    `internal/`, is never published, and every claim about it names its venue (J18).
+  - **"NEW DB" — read it the KGoT way or it fights the fold.** G102 (2026-08-18) folded the
+    content topology to ONE database, `drydocs`, with `:Uncertain` as the boundary; ADR 0011
+    is the contingency; `test_database_names.py` pins the deployed names. A fourth content
+    database reopens that ruling. What does NOT: KGoT's own pattern — a **task-scoped,
+    throwaway graph per question** (`reference/research/knowledge-graph-of-thoughts.md`,
+    the iterative controller). So `mindmap` is a scratch database created for the run and
+    dropped after, the way KGoT builds one per task — a test bench, never a home. If the
+    experiment shows the graph is worth KEEPING, that is a gate question (which labels,
+    which database), not a default.
+  - **"APPLY THE CURRENT ONTOLOGY."** The relationship-vocabulary registry
+    (`drydocs_core/ontology/relationship_vocabulary/`, per-domain fragments) plus what MM
+    has already registered `planned` — MM2's `:DataFlow` edges (`arch_has_data_flow`,
+    `arch_orchestrates`, `arch_fed_by`, `arch_lands_in`, `docs_evidenced_by`). The log's
+    sections map onto things the epic already has names for: hops → `ContextFinding`-shaped
+    rows (subject / predicate / object / evidence breadcrumb / `phase: build|run`);
+    CORRECTION blocks → retractions with an `as_of` (a KGoT graph edit, and the temporal
+    axis C40 wants); Open questions → **open slots** in the MM3 state file
+    (`drydocs.deepdoc.mindmap.v1`); the Brain-map → its branches; Acronyms & terms → MM12's
+    candidate class; the MM3 entity extractor pulls the ids out of every hop. Every write
+    is corpus-derived, so it carries `:Uncertain` + reliability/trust (ADR 0011 clause 1)
+    even in a scratch database — the discipline is cheap and the guards
+    (`test_uncertain_boundary.py`) only watch `drydocs_deepdoc`, so a scratch writer under
+    `scripts/` or `internal-local/` must carry it by choice, and say so.
+  - **"THE RETRY LOGIC OF KNOWLEDGE GRAPHS OF THOUGHTS."** As the reference file maps it onto
+    ADR 0007: bounded escalation INTO an iterative loop (Tier 2, reached only when Tier-1
+    context is insufficient), the **fix-Cypher repair loop capped at ≤2 retries**, the
+    **forced-solve fallback** so a stalled loop still returns something inspectable, and
+    **per-iteration snapshots** (rendered by the console's `TaskGraphPane`). The experiment:
+    seed the loop with the log's own `central_question`, let it traverse the `mindmap`
+    graph, and record — hops taken vs the ~120 the analyst took by hand, which retries
+    fired and why, whether forced-solve was reached, what each iteration's snapshot shows,
+    and whether the traversal arrives at the same "understanding" section the log states
+    plainly. That is the whole question: **can the loop walk a mind map, and where does it
+    stall.**
+  - **WHERE IT SITS.** Downstream of MM3 (done: the state file and the extractor are the
+    parse target and the parser); a live rehearsal for MM6 (ontology proposals — the
+    experiment will surface which labels the log needs) and MM10 (`investigate()` v1 is
+    this loop made procedural, graph-seeded); adjacent to R16 (named agent verbs over the
+    reviewed QuerySpecs — the loop's tools) and L28 (the KGoT citation). Module for a groom:
+    `drydocs-deepdoc` for the parse and the state-file writer; the scratch-database loader
+    and the loop harness under `scripts/` (or `agents/`, if it rides the Tier-2 ADK loop)
+    so nothing in a component learns a database name the pin does not allow.
+  - **What to expect, stated before the run:** the CORRECTION blocks are the interesting
+    part — a hop the log later retracted is exactly the edge a naive traversal will happily
+    walk, and whether the loop notices the retraction is the first thing to look at.
+  - **KEPT-UPDATED 2026-09-02 (same day) — the family is two files, not one, and the second
+    brings the traversal's negative space.** `internal/research/mm-aar-research.md` landed on
+    `main` (fd3aa92b; provenance corrected 2c184a79): the after-action review of the JOB→MFTS
+    search, transcribed from seven company artifacts that live on an UNMERGED research branch
+    — not company main, not port candidates, cited by path only. Two of those artifacts are
+    graph-loadable beside the log and belong in this experiment: the **probe log**
+    (`internal/research/_probes/<subject>-probes.jsonl`, one object per probe — `source / tool /
+    query / scope / result_count / outcome`, `outcome ∈ empty | irrelevant | blocked | stale |
+    exhausted | exhausted_in_scope`, with a positive `control_query` that must pass before
+    `exhausted` is admissible) and the **source whitelist**
+    (`internal/research/_registry/source-whitelist.yaml`: confirmed-good sources AND
+    controlled dead ends, `decay` mandatory, graduates to the ingestion registries only through
+    the gate). Loaded, the probe log is the set of edges the analyst tried and ruled out, each
+    with its control — exactly what a KGoT loop needs so it does not re-walk a dead end — and
+    the whitelist is the `known` half of MM3's novelty score. The probe log's row is the MM3
+    search log's sibling (`tool / query / outcome` beside `tool / search / theme / novelty`);
+    whether the two converge into one row shape is a groom question this experiment answers
+    with data rather than by ruling. Three AAR §3 rules go into the loop's retry logic as
+    written: a negative probe without a passing positive control is INVALID, not negative
+    (3.1); a census over an artifact needs a schema control before "the platform does not hold
+    X" is a finding (3.2); the artifact and the reading are cited separately — the image is
+    VERBATIM, a model's reading of it is GROUNDED (3.6).
+
+- **`Idea-237`** · 2026-09-02 · `[doc]` · **open** · prio? **Med** —
+  **The data-flow-overview gate prompt calls "MM3" the Output-tab / log-substrate extractor —
+  that is MM7's work, and MM3 is something else.** Found while closing MM3 (2026-09-02, laptop).
+  `config/gate-prompts/data-flow-overview.yaml` names MM3 nine times (lines 10, 40, 65, 112, 134,
+  137, 260, 269, 390) as the item that reads the Output-tab log verbatim, enriches the members and
+  fills the SOURCE-badged log fields (`launcher_kinds`, `compute_target`, `placement_handoff`,
+  `landing_prefix`) — "absent until MM3 lands and the field says so". In the backlog as it stands,
+  that is **MM7** (`Control-M Output-tab log extractor … joined onto :ETLProcess`, drydocs-lineage,
+  in_progress); **MM3** is the mind-map state file + the shared entity/ID extractor + the search
+  log's theme/novelty columns (drydocs-deepdoc, done). Line 65 even files the consumer as
+  "drydocs-lineage (MM3)", which is MM7's module. The numbers shifted at a groom after the prompt
+  was drafted (2026-08-21), and nothing re-pointed the prompt. Why it is an inbox line and not a
+  fix: `config/gate-prompts/**` is canonical-company (J72 notes), so a producer-side edit to a
+  drafted, unsigned prompt is a cross-repo reconciliation, not an edit — and a reader who takes
+  the prompt at its word will look for MM3 to close the Output-tab fields and find a state file.
+  Smallest fix: s/MM3/MM7/ at the nine sites, with the consumer line's module corrected; the
+  `gates: [data-flow-overview]` edge on MM3 itself stays, because the evidence-ref grammar MM3
+  built IS gate territory (§E).
+
 - **`Idea-236`** · 2026-09-02 · `[idea]` · **open** · prio? **High** —
   **The JOB→MFTS research landed (120 hops, 19 open questions) and it answers Idea-104's
   evidence half — five gaps against the backlog, one of which blocks the file-transfer

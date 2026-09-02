@@ -132,3 +132,19 @@ kinds:
       would let an untrusted caller enable verbose capture of their own traffic.
       HELD FOR SME REVIEW: whether this text is ever DISPLAYED in the console.
       Capturing it is ruled; surfacing it is not.
+
+  - id: search
+    writer: drydocs_deepdoc.search_log.SearchLog
+    rotation: per-day
+    format: jsonl
+    note: >
+      MM3 — the deepdoc search log: one line per connector search (tool, search,
+      theme = the mind-map slot targeted, novelty + the new ids, results, date,
+      seed). The three session search scripts kept this as a shared CSV under
+      DRYDOCS_LOGDIR; it joins the family here as a declared kind. Append-only
+      per-day ledger like `qa`, and for the same reason: novelty is "new ids vs
+      the graph + the record", and the record IS this file — a per-run file
+      would shard the one history the score reads. A row with no theme is
+      refused before any I/O (drydocs_deepdoc.search_log). Retention is the
+      shared 90 days; the map the rows target is the durable record, the log is
+      how it got filled.
