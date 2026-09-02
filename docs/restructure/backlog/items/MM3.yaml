@@ -8,7 +8,7 @@ phase: 17
 agent: main
 model: opus
 priority: p2
-status: in_progress
+status: done
 depends_on:
 - MM1
 gates:
@@ -21,3 +21,37 @@ acceptance: |-
   (1) A mind-map state file schema (YAML, `drydocs.deepdoc.mindmap.v1`) with a root question, named branches, and slots that are `open` (the trailing-? of the session) or `filled` with an evidence ref and a date; a pure reader/writer in drydocs_deepdoc; a test that a slot cannot move to `filled` without an evidence ref. (2) A pure entity/ID extractor in drydocs_core (mechanism only: application-id tokens, issue keys `<PROJECT>-<n>`, folder-name positional tokens via the existing PRAOCG decode, table names, distribution-list names, GUIDs) returning typed matches with spans; table-driven tests on synthetic strings; its MODULE_MAP row and CORE_PREFIXES entry land in the same commit. (3) The search log gains `novelty` (new ids vs the graph + the record) and `theme` (= the mind-map slot targeted) columns beside tool/search/results/date, written through the existing run-log contract under DRYDOCS_LOGDIR, with a test that a row without a theme is refused. No connector calls any network in this item.
 notes: |-
   The 3-tool plan's section D, the 'real leverage'. Extractor goes to core (pure parse, ADR 0002-A §2); the state file and the log columns stay in the component. Opus: the slot/novelty semantics are the part that has to be right; the code is small.
+  DONE 2026-09-02 (laptop), on branch feat/mm-deepdoc-investigate, three commits (b5e84980,
+  27dcb5bd, dffc5d96) + this close; merge to main is the branch's business when the MM stream
+  lands (G79 precedent). (1) drydocs_deepdoc/mindmap.py -- schema drydocs.deepdoc.mindmap.v1: a
+  root question, named branches, slots open (the session's trailing ?) or filled with an evidence
+  ref and a date. Frozen value objects; fill() returns a new map. THE RULE IS ENFORCED TWICE, on
+  the transition and on load, because the other machine may have written the file and a map that
+  reads as more complete than its evidence is worse than no map. The evidence ref is
+  <kind>:<rest> with the six kinds of design doc section 2's evidence[] row -- the shape common to
+  E1/E2/E3, which the data-flow-overview gate has not ruled between; resolution is MM10's.
+  new_mindmap() builds the default layout from the section-2 record fields under the section-6
+  branches so MM10 can "load or create the state for the record fields still unknown" without
+  hand-listing them. (2) drydocs_core/entity_extract.py -- pure parse, six classes with spans
+  (guid, folder_name via parse_folder_name gated by the publish-boundary guard's own token shape,
+  issue_key, table_name, distribution_list, application_id). PASS ORDER IS PRECEDENCE:
+  PRARAG-HLDM-70002-PEX-RFND-DLY contains an issue-key shape and an application-id shape, so the
+  folder pass runs first and claims the span. Application ids are always reported and marked
+  `cued` when -seal / app_id / application / a landing-prefix /raw/ says so; the caller ranks.
+  MODULE_MAP row added. THE CORE_PREFIXES CLAUSE IS SATISFIED BY THE EXISTING ENTRY, not a new
+  one: CORE_PREFIXES is ("drydocs_core",) -- the physical package is the whole of core since ADR
+  0002-a-1 (test_module_boundary.py:46-48) -- so a new core module is classified by the package
+  prefix and the acceptance's "entry" was written against a per-module world that no longer
+  exists. (3) drydocs_deepdoc/search_log.py -- theme (= <branch>/<slot>) REQUIRED, refused before
+  any I/O; novelty = len(new_ids), and the row carries the ids beside the count because a bare
+  number is the problem the column exists to fix; score_novelty() is the pure found-minus-known,
+  with "known" = graph + map + logged_ids() supplied by the caller (no graph, no network here).
+  Written as a DECLARED kind `search` in config/log-kinds.yaml, per-day jsonl -- the qa-ledger
+  idiom, because the record the score reads IS this file and claim_log_path's per-run files
+  would shard it. 90 tests across the three (32 + 34 + 24); suite green, ruff clean.
+  TWO THINGS FOUND AND NOT FIXED, deliberately. (a) config/gate-prompts/data-flow-overview.yaml
+  calls "MM3" the Output-tab / log-substrate extractor (lines 10, 40, 65, 112, 134, 137, 260,
+  269, 390) -- that is MM7's work today; MM3 is this item. The gate prompt is canonical-company,
+  so the correction is not a producer edit -- captured as Idea-237. (b) MM5's design-provenance
+  input (the sdlc-tools-build-capture transcript) is machine-local and absent on the laptop, which
+  is why MM3 went first on this branch; MM5 waits for that file to be copied over.

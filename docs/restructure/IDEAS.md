@@ -91,6 +91,25 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
+- **`Idea-237`** · 2026-09-02 · `[doc]` · **open** · prio? **Med** —
+  **The data-flow-overview gate prompt calls "MM3" the Output-tab / log-substrate extractor —
+  that is MM7's work, and MM3 is something else.** Found while closing MM3 (2026-09-02, laptop).
+  `config/gate-prompts/data-flow-overview.yaml` names MM3 nine times (lines 10, 40, 65, 112, 134,
+  137, 260, 269, 390) as the item that reads the Output-tab log verbatim, enriches the members and
+  fills the SOURCE-badged log fields (`launcher_kinds`, `compute_target`, `placement_handoff`,
+  `landing_prefix`) — "absent until MM3 lands and the field says so". In the backlog as it stands,
+  that is **MM7** (`Control-M Output-tab log extractor … joined onto :ETLProcess`, drydocs-lineage,
+  in_progress); **MM3** is the mind-map state file + the shared entity/ID extractor + the search
+  log's theme/novelty columns (drydocs-deepdoc, done). Line 65 even files the consumer as
+  "drydocs-lineage (MM3)", which is MM7's module. The numbers shifted at a groom after the prompt
+  was drafted (2026-08-21), and nothing re-pointed the prompt. Why it is an inbox line and not a
+  fix: `config/gate-prompts/**` is canonical-company (J72 notes), so a producer-side edit to a
+  drafted, unsigned prompt is a cross-repo reconciliation, not an edit — and a reader who takes
+  the prompt at its word will look for MM3 to close the Output-tab fields and find a state file.
+  Smallest fix: s/MM3/MM7/ at the nine sites, with the consumer line's module corrected; the
+  `gates: [data-flow-overview]` edge on MM3 itself stays, because the evidence-ref grammar MM3
+  built IS gate territory (§E).
+
 - **`Idea-235`** · 2026-09-01 · `[idea]` · **open** · prio? **Med** —
   **The measurement apparatus corrupts the measurement, and it fails toward a REASSURING answer
   rather than an alarming one.** Three instances in one session (2026-09-01), across two machines

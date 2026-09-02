@@ -348,5 +348,5 @@ def save_mindmap(mm: MindMap, path: Path) -> Path:
     """Write the map; the parent directory is created. Returns the path."""
     target = Path(path)
     target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_text(dumps(mm), encoding="utf-8")
+    target.write_text(dumps(mm), encoding="utf-8", newline="\n")
     return target
