@@ -83,6 +83,32 @@ modules:
       into a query surface.
     ideas: []
 
+  - module: drydocs-port
+    stage: active
+    built: >
+      The producer→company port machinery: the J41 preflight (ritual detection, ledger
+      coverage, relay basis, cited-path resolution), the J42 backlog union, the J69
+      disposition renderer and the J72 rename detector, with 127 unit tests and the
+      PORT-MANIFEST shape/coupling/totality guards. Registered as its own module at
+      ADR 0018 (2026-09-02); it had been a boundary group with no backlog series.
+    remaining: >
+      An apply rehearsal (the missing integration tier), the git/subprocess layer and the
+      four scripts' exit codes under test, the seven consumer-only reconcile tests runnable
+      producer-side from a committed snapshot fixture (docs/reviews/port-test-review-and-
+      workplan-2026-09-02.md, P1-P7); shim removal after the ADR 0018 subpackage move.
+    ideas: []
+
+  - module: drydocs-libs
+    stage: steady
+    built: >
+      libs/oracle_kerberos — the thin-JDBC Kerberos login helper (MSLSA + MIT), port-frozen
+      by its own manifest row, 27 tests. A library beside the product: a server deployment
+      is configured differently and never calls it (ADR 0018 Q1, 2026-09-02).
+    remaining: >
+      Nothing scheduled. Grows only if a second standalone helper appears; a helper that
+      starts importing a component fails the boundary guard instead of sliding in.
+    ideas: []
+
   - module: drydocs-docgen
     stage: mature
     built: >

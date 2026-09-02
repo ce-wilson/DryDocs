@@ -7,7 +7,7 @@ phase: 6
 agent: main
 model: fable
 priority: p0
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - docs/decisions/0018-component-identity-declared-not-directory.md
@@ -15,4 +15,21 @@ inputs:
 - docs/restructure/backlog/modules.yaml
 - MODULE_MAP.md
 acceptance: |
-  STUB - minted 2026-09-02 under ADR 0018 D1/D2 (accepted the same day); body follows.
+  ADR 0018 D1/D2, accepted 2026-09-02.
+
+  (a) drydocs_core/component_map.py holds the declaration that lived in
+  tests/unit/test_module_boundary.py - CORE_PREFIXES, COMPONENT_GROUPS, ENTRYPOINT_MODULES,
+  DECLARED_COMPONENT_IMPORTS, every ruling comment moved with its line - plus the join:
+  COMPONENT_MODULE (group -> modules.yaml name), CORE_MODULE, NON_PYTHON_MODULES,
+  SURFACE_OWNERS (top-level directory -> owning module), component_of(), module_of().
+  Pure data; imports nothing.
+  (b) The boundary test imports the map and ENFORCES it (J37); it no longer defines it.
+  (c) Four join guards: every group names a registered module; modules.yaml is exactly
+  core + the groups' modules + the declared non-Python set; SURFACE_OWNERS names
+  registered modules and real directories; every tracked top-level directory has an owner.
+  (d) modules.yaml registers drydocs-port (PORT) and drydocs-libs (LIBS); runbook coverage
+  carries both as EXEMPT with reasons; roadmap.yaml carries a judgment for each.
+  (e) MODULE_MAP.md names the map; its component tables are rendered from it at LOAD1.
+notes: |
+  DONE 2026-09-02 (desktop, feat/component-subpackages). 98 guards green across the
+  boundary, runbook, roadmap, backlog and manifest suites.
