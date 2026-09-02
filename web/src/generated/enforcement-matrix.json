@@ -363,7 +363,7 @@
       ],
       "gate_ref": "(is the gate record)",
       "status": "gate-pending",
-      "pending_entries": 128,
+      "pending_entries": 129,
       "env_refs": [
         "SECRET_NAME"
       ],
@@ -397,6 +397,7 @@
         "config/gate-prompts/etlprocess-kind-enum.yaml",
         "config/gate-prompts/fid-identity-and-scope.yaml",
         "config/gate-prompts/medallion-stage-vocabulary.yaml",
+        "config/gate-prompts/ontology-domain-registry-and-edition-grain.yaml",
         "config/gate-prompts/pending-source-correction.yaml",
         "config/gate-prompts/platforms-taxonomy.yaml",
         "config/gate-prompts/product-cabinet-attribution.yaml",

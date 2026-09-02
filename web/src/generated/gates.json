@@ -1268,6 +1268,19 @@
     {
       "kind": "prompt-only",
       "date": null,
+      "title": "ontology-domain-registry-and-edition-grain (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/ontology-domain-registry-and-edition-grain.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": [
+        "C41"
+      ]
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
       "title": "registry-wiring-readiness (gate page rendered — session not yet run)",
       "status": "open",
       "prompt_files": [

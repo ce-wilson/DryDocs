@@ -1,0 +1,190 @@
+# GATE ontology-domain-registry-and-edition-grain — DRAFTED 2026-09-02 (C41 clause e).
+# UNSIGNED. Nothing is minted, registered or renamed until this signs.
+#
+# The item-series half of C41 was ruled on 2026-09-02 (RECORD "the backlog series is the
+# MODULE", PLAN1): item ids take the module code, the 27 letters are frozen, no id moves.
+# That is NOT reopened here. What this gate rules is what PLAN1 left standing: the two
+# other axes — ONTOLOGY DOMAINS as minted, registered objects, and the EDITION as a
+# declared segment on an id — and the ADR 0015 amendment the second one depends on.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: ontology-domain-registry-and-edition-grain
+title: >-
+  SME Gate — the two remaining axes: an ontology domain is a MINTED object with a registry
+  and a minting authority, and an edition is a DECLARED segment on an id keyed to a real
+  Area Product — plus the ADR 0015 D2 amendment that gives an instance a backlog to mint into
+step: >-
+  C41 clause (e), drafted 2026-09-02, after PLAN1 settled the item-series axis and removed
+  C41's former gate (schema-identifier-publish-ceiling-teams-edition, which asked whether
+  psgmgr is public vocabulary and never asked these questions). Read with the RECORD at
+  config/gate-log.md "2026-09-02 — the backlog series is the MODULE". Everything here is
+  a ruling C41 may not pre-empt; the SME gave two of the answers in-chat on 2026-09-01
+  ("the company base needs to mint the domain — registered, tracked, part of the ADR";
+  "requirements and code need to be separate labels in a graph") and this prompt puts
+  them where a build can cite them.
+summary: >-
+  (a) TWO AXES REMAIN, and they are different kinds of thing. A DOMAIN is a partition of
+  the relationship vocabulary — 13 exist, each registered by a signed gate, sharded into
+  fragments 40-52 (S5); today they are declared in a comment block in 00-header.yaml and
+  nowhere else, so "registered" means "someone edited the comment." An EDITION is a tenant
+  — a generated Team Edition instance (ADR 0015, PROPOSED 2026-08-27) or the company base
+  — and today tenancy in the id space is a NUMERIC BAND (producer 1-9999, company 10000+)
+  that encodes identity in digits nothing can read, with a second, older rule (the DD
+  reserve, git-readme.md:197) still live beside it. (b) WHAT PLAN1 CHANGED FOR THIS GATE.
+  The domain registry was going to supply the backlog series prefix; the module does that
+  now. So a domain no longer needs a `series` column, and the only reason a domain could
+  exist WITHOUT a vocabulary fragment — to be a backlog topic — is gone. The prompt says so
+  and recommends the narrower registry. (c) THE ONE SPLIT THE PRODUCT TURNS ON. The 2018
+  genesis document separates code, requirements and test cases; today code is a facet of
+  `architecture` (24 entries) and requirements sit in `docs` (20 entries), so the join the
+  product exists to make spans two domains that declare nothing to each other. The
+  external precedent (spec-kit, spec-driven development) is NOT yet registered in
+  reference/REGISTRY.yaml; B4 says what can be ruled without it and what waits. (d) THE
+  EDITION GRAIN IS A RULING, NOT A DEFAULT: Area Product (about twenty, SME-reported, no
+  transcription file yet), DevTeam (46), or application (84) — change it later and every
+  code re-mints. (e) NOTHING RENUMBERS. Ids freeze under PLAN1; the edition segment is
+  optional and the base edition has none, so every existing id parses unchanged.
+
+meta:
+  Module: >-
+    config — the artifacts are config/taxonomy/domains.yaml (NEW) and config/taxonomy/
+    editions.yaml (NEW), the allocator (.claude/skills/groom-backlog/validate.py) and its
+    mirror in tests/unit/test_backlog.py, drydocs_core/backlog_store.py's id regex, and
+    the ADR 0015 amendment text. No loader and no graph write is in scope.
+  Source: >-
+    drydocs_core/ontology/relationship_vocabulary/00-header.yaml (the 13 domains and the
+    gates that registered them, quoted at provenance rather than summarized);
+    config/gate-log.md 2026-08-12 vocabulary-domains-and-id-policy 19/19 (§A1-A3 the
+    domains, §B1 the domain-derived id prefix, §B3 the G87 add-new + deprecate-old
+    migration); 2026-08-19 server-location-ontology 12/12 (Z2, `infrastructure`);
+    docs/decisions/0015-team-edition-template.md D2 (Cut row), D3 (tenancy), D4
+    (vocabulary change happens in the base); SDLC-Docs/extracted/FCD-Requirements.md
+    :27 and :106 (the 2018 thesis).
+  Precedent: >-
+    PLAN1 (2026-09-02) for the mint-by-registered-code shape this gate extends; I6 for the
+    mint-stub-then-body protocol a domain registration copies; G87 for add-new + deprecate-old
+    as the only way an id-bearing thing is split; K5 §B for :AreaProduct keyed
+    area_product_id (constraints.cypher:79, loaders/cypher/area_products.cypher); C40 for
+    reopening a signed ruling, which B5's candidate mints would do.
+  Registry ref: >-
+    Domains today: scheduler(53) business_application(10) catalog(16) architecture(24)
+    registry(4) docs(20) all(2) context(8) quality(8) corporate(5) itsm(2) infrastructure(3)
+    human(20) — entry counts per fragment, measured 2026-09-02. Modules: 18, each with a
+    series code since PLAN1. Editions: none declared anywhere yet; the company base is the
+    first.
+  Classification: >-
+    Internal-Public — mechanism only. editions.yaml itself will be Internal (it names Area
+    Products) and ships a synthetic sample producer-side on the lob-product-team.yaml
+    pattern; this prompt names no real Area Product.
+  Counts: >-
+    Measured 2026-09-02 (producer desktop, main c24ce720): items 630; frozen letters 27,
+    G at 136; module values 18; domains 13; vocabulary entries 175 across 13 fragments.
+    Area Product count is NOT measured — it is SME-reported (about twenty) from a Product
+    Catalog view that has no transcription file; C2 asks for the file before the grain is
+    ruled on a number.
+
+provenance:
+  - label: The 13 domains and how each one got there
+    source_object: drydocs_core/ontology/relationship_vocabulary/00-header.yaml
+    key: "domain field, lines 74-79"
+    loader: NONE — a declaration in a comment block; nothing reads it as data.
+    properties:
+      - name: the_closed_list
+        origin: source
+        from: >-
+          "scheduler | business_application | catalog | architecture | registry | docs |
+          quality | context | all | human | corporate | itsm | infrastructure"
+      - name: registration_is_already_a_gate_act
+        origin: source
+        from: "(`infrastructure` registered at gate server-location-ontology"
+      - name: id_prefix_is_domain_derived
+        origin: source
+        from: >-
+          "domain-derived prefix (scheduler_*, business_application_*, human_*, catalog_*,
+          arch_*, reg_*, docs_*/doc_*) — gate"
+      - name: not_a_data_object
+        origin: derived
+        from: >-
+          the list lives in a comment; adding a domain means editing prose and a guard
+          that pins the list. Derived — and it is what B1 asks the SME to change.
+  - label: What tenancy already means in the ADR
+    source_object: docs/decisions/0015-team-edition-template.md
+    key: "D3 (line 126), D4 (line 154), D2 Cut row (line 119)"
+    loader: NONE — an ADR, PROPOSED, not accepted.
+    properties:
+      - name: tenancy_is_a_declared_segment
+        origin: source
+        from: "tenancy is an alias plus a URN segment ... is declared, not inferred"
+      - name: vocabulary_changes_in_the_base
+        origin: source
+        from: "vocabulary change happens in the base, through the base's gate"
+      - name: backlog_is_cut
+        origin: source
+        from: >-
+          Cut: plan_board/plan_ideas/plan_roadmap, backlog_store — "Plan/port/backlog are
+          the producer's own project management"
+  - label: The 2018 thesis the architecture-vs-code question rests on
+    source_object: SDLC-Docs/extracted/FCD-Requirements.md
+    key: "lines 27 and 106"
+    loader: NONE — a recovered requirements document (Full Circle Docs, 2018).
+    properties:
+      - name: three_things_not_one
+        origin: source
+        from: >-
+          "A subset of data from the code, requirements, and test cases is used to link the
+          documentation database to the corresponding development component"
+      - name: the_query_the_product_promised
+        origin: source
+        from: "34. Query for requirements, code, released items."
+  - label: The two live partition rules
+    source_object: git-readme.md and .claude/skills/groom-backlog/validate.py
+    key: "git-readme.md:197; validate.py RESERVED_SERIES (:88), PRODUCER_BAND_CEILING (:136)"
+    loader: NONE — allocator constants and a README rule.
+    properties:
+      - name: rule_one_2026_07_20
+        origin: source
+        from: >-
+          "The producer NEVER allocates DD ids; the company side NEVER allocates
+          producer-style epic-letter ids"
+      - name: rule_two_2026_08_18
+        origin: source
+        from: "PRODUCER_BAND_CEILING = 9999"
+      - name: neither_retired
+        origin: derived
+        from: >-
+          both are enforced today; a company session obeying rule one mints DD11, one
+          obeying rule two mints DD10001 — Idea-162's ambiguity, and the reason the
+          2026-09-01 port plan could not count its own company-only set.
+
+sections:
+  - title: A. What is settled, and what this gate may not touch
+    confirmations:
+      - "A1. PLAN1 IS NOT REOPENED. Item ids take the module code (`LOAD12`, `WEB3`, `PLAN1`), the 27 letters are frozen at their all-time max, and no id moves. This gate adds an OPTIONAL edition segment in front of that shape and nothing else to it. Confirm that the item-series axis is closed and that C41's clauses (b) and (c)-for-items stay superseded."
+      - "A2. THE TWO AXES ARE DIFFERENT KINDS OF THING AND GET DIFFERENT REGISTRIES. A domain partitions the VOCABULARY (which fragment file an entry lives in); an edition partitions the ID SPACE and the graph (which tenant minted a thing). Confirm they are ruled separately below — B for domains, C for editions — and that neither is allowed to reuse the other's registry. The 2026-09-01 design conflated them by making the domain supply the series; PLAN1 undid that and this gate keeps it undone."
+
+  - title: B. The domain registry — a domain is a MINTED object
+    confirmations:
+      - "B1. THE REGISTRY EXISTS AS DATA, NOT AS A COMMENT. NEW config/taxonomy/domains.yaml, one row per domain: `id` (the join key, never renamed), `title`, `vocabulary_fragment` (the 4x-local-*.yaml file), `minted_by` (the base that registered it), `registered_at`, `authority` (the gate or ADR that ruled it — every row cites one), `status` active|deprecated with `superseded_by` (the G87 shape). NO `series` column: PLAN1 gave the series to the module. Seeded with the 13 as they are, each citing its real ruling — eleven from vocabulary-domains-and-id-policy (2026-08-12), `infrastructure` from server-location-ontology (Z2), `human` from §A3 — and 00-header.yaml's comment block becomes a pointer to the file. Nothing is invented; the registry writes down rulings that exist. Confirm the file and its columns."
+      - "B2. MINTING AUTHORITY: A BASE MINTS, AN INSTANCE REQUESTS — and the company base mints ITS OWN through ITS OWN gate. ADR 0015 D4 already rules this for vocabulary entries (\"vocabulary change happens in the base, through the base's gate\"); a domain is the container those entries live in and inherits the rule unchanged. Producer sign-off has never been company sign-off, so a domain the company needs is minted at the company base by the company SME and rides the port as a per-entry row (the tom-role-vocabulary precedent: 16 producer classes against 19 company, each side's own mints stay). The protocol is I6's: ask the allocator whether the name is taken on ANY remote ref or in history, push the registration stub, then write the fragment. Confirm the authority and the protocol."
+      - "B3. WHAT QUALIFIES AS A DOMAIN — the bar the 13 met, stated so the registry does not become another G. A domain is a FILE/LOADER PARTITION of the vocabulary: a set of entries that one loader family reads and one fragment holds. It is explicitly NOT an rdfs:domain, NOT a BDAT layer, and NOT a backlog topic (PLAN1). Corollary, and this is a CHANGE from the 2026-09-01 design: a domain may NOT exist without a vocabulary fragment. The only consumer of a fragment-less domain was the backlog series, and that consumer is gone; `vocabulary_fragment` is therefore REQUIRED, not nullable. Confirm the bar and the corollary, or rule that a fragment-less domain has a use this gate has not named."
+      - "B4. ARCHITECTURE-VS-CODE — the split the product turns on, and the first real exercise of B2. The 2018 thesis is requirements, code and test cases as SEPARATE things (FCD-Requirements.md:27) joined by a query (:106). Today code is a facet of `architecture` (24 entries; `:Code` is `dd:Code`/`prov:Collection`, `:Bitbucket` is `dd:CodeRepository`) and requirements have no label and sit in `docs` (20 entries) — the join spans two domains that declare nothing to each other. THREE constraints on the ruling, and the SME picks the timing: (i) the split follows G87 — mint `code` (and `requirements`, and if ruled `test`) as new domains, deprecate nothing, MOVE no entry: an entry that belongs to the new domain is added there with `replaces:` and the old one is deprecated, because ids are join keys cited in signed records; (ii) separate domains WITHOUT a typed edge between :Requirement and :Code reproduce spec-kit's own gap (implicit parent-child, nothing traversable), so the reconciliation edge is registered `status: planned` through docs/RELATIONSHIP_GUIDE.md in the same change, and its direction, grain and whether the converge verdict is an edge property or an observation are ruled at ITS gate, not here; (iii) the external precedent — github/spec-kit and the spec-driven-development write-up — is NOT registered in reference/REGISTRY.yaml today. RULE ONE OF: (a) split now on the FCD evidence alone and register the reference behind it; (b) HOLD B4 until the reference-librarian registers both sources (classification External, source_url), then rule at a rider. The drafter recommends (b): the split is too load-bearing to rule on a remembered precedent, and registration is a day's work."
+      - "B5. THE OTHER CANDIDATE MINTS, named so they go through B2 and not around it: `acronyms` (a vocabulary of expansions, no edges of its own), and `ontology` itself (entries that change the vocabulary have no domain, because the vocabulary is where domains are declared). Each would amend a signed gate, which is what C40 exists for. Confirm that neither is minted by this gate — this gate creates the registry and the protocol; a mint is a separate act with its own record — and say whether either is wanted at all."
+
+  - title: C. The edition — a DECLARED segment, keyed to something real
+    confirmations:
+      - "C1. GRAMMAR: `[<EDITION>-]<MODULE><n>`, edition first, base edition unprefixed. `LOAD12` is producer main; `<code>-LOAD12` is that edition's twelfth load item. Edition-first because an item lives in exactly one edition's backlog and that is the filesystem grouping; the cross-estate view (\"all load work everywhere\") is a query over the module field, not a sort over filenames. Every existing id still parses because the segment is optional and the base has none; the three regexes (validate.py :67/:68, backlog_store.py _ID_RE) gain one optional group, and a guard asserts BOTH halves are declared — an undeclared edition segment is a typo, not a tenant; an undeclared module code is a typo, not a module. Confirm the grammar."
+      - "C2. THE GRAIN, and it is a ruling because changing it re-mints every code. The candidates, from the Product Catalog: Area Product (the Team-of-Teams tier, ~20 [SME-REPORTED — a screenshot, no transcription file]), DevTeam (46), application (84). The 2026-09-01 design chose Area Product because :AreaProduct is already a keyed node (K5 §B, `area_product_id` UNIQUE at constraints.cypher:79, loaded by area_products.cypher) and because twenty is a number a human can hold. TWO things before this confirms: transcribe the Area Product list to a named file under internal-local/ and cite the FILE (the image-provenance rule), and say whether a per-DevTeam or per-application instance is ever expected — if yes, the grain is the finer one from day one. Rule the grain."
+      - "C3. THE REGISTRY: NEW config/taxonomy/editions.yaml on the lob-product-team.yaml pattern — classification Internal, a SYNTHETIC publishable sample producer-side, real rows company-side, a per-entry manifest row so a port cannot flatten them. One row per edition: `code` (the id segment, 2-5 upper-case letters, unique), `title`, `area_product_id` (the K5 key — an edition joins to a node the graph already holds), `minted_by`, `registered_at`, `authority`, `legacy_band` where one exists. THE COMPANY BASE IS AN EDITION AND MINTS ITS OWN CODE, at its own gate, by the same B2 protocol — the producer does not name it here. Confirm the file, the columns, and that the company mints its code."
+      - "C4. BOTH LEGACY PARTITION RULES RETIRE, FORWARD-ONLY. The DD reserve (git-readme.md:197, 2026-07-20) and the 10000 band (PRODUCER_BAND_CEILING, 2026-08-18) governed the same question with different answers and produced Idea-162's DD10-vs-DD10001. On sign-off: neither governs a NEW mint; both are kept for READING history (DD1-DD10, DD10001-DD10003, G10001-G10003 stay resolvable and are listed in the frozen table as they are); the git-readme sentence is retired with a pointer here; the allocator's band check becomes an edition-segment check. Until the company mints its edition code, it mints NOTHING new — and the drafter says this is acceptable only because the code is one row and one push away, not because a hold is a good rule. Confirm."
+
+  - title: D. ADR 0015 D2 — the amendment that gives an edition something to mint INTO
+    confirmations:
+      - "D1. AS WRITTEN, D2 CUTS THE BACKLOG FROM TEAM EDITION (\"Plan/port/backlog are the producer's own project management\") and D6 follows it (`groom-backlog` producer-only). That was right for a template whose product is the completeness ledger — but D1 makes the ledger GENERATE per-team work (\"per-app completeness is a number with a named residual\"), and generated work needs a place to land. AMEND D2: Team Edition ships a THIN, INSTANCE-OWNED backlog (items + inbox + a per-instance board) under the copier `instance-owned` file class D4 already defines; the BASE backlog stays `canonical-template`, frozen, and an instance never writes under it. AMEND D6: `groom-backlog` ships, with a mandatory `--scope`. Guards: an instance item carries its edition segment; `depends_on` may point instance→base, never base→instance. Confirm the amendment — or rule the per-team ask out of scope, in which case C1-C4 still stand for the company base alone."
+
+  - title: E. What moves on sign-off, and in what order
+    confirmations:
+      - "E1. NOTHING RENUMBERS AND NO ID MOVES — restated because every prior attempt at this problem failed on exactly that. The build items, each minted under PLAN1 in its module series: domains.yaml + the header pointer + its guard (module config); editions.yaml + the synthetic sample + its manifest row (config); the optional edition group in three regexes + the both-halves-declared guard + the band check's replacement (config, the allocator is skill code); the ADR 0015 D2/D6 amendment text (docs); the port relay (RELAY-23, port) — because a cross-repo convention change is inert until it reaches the other side, and the company's allocator only WORKS once it holds an edition code. B4's split, if ruled (a), is its own item under the ontology module and goes through the vocabulary registry as planned entries first. Confirm the item list and that C41 closes when they are minted, not when they are built."
+
+  - title: F. Fence
+    confirmations:
+      - "F1. NOT REOPENED HERE: PLAN1 (A1); J13 class 3 and the psgmgr publish ceiling (its own gate, unsigned, unrelated); the 13 domains' membership — no entry moves between fragments on this signature; G102's one-database ruling (an edition is a URN segment per D3, not a database); and the reconciliation edge's semantics (B4 ii — registered planned, ruled at its own gate). A ruling here authorizes items; the items do the work in scoped commits, each carrying its render and its guard."

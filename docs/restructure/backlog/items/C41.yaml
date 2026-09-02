@@ -10,7 +10,8 @@ model: fable
 priority: p2
 status: blocked
 depends_on: []
-gates: []
+gates:
+- ontology-domain-registry-and-edition-grain
 inputs:
 - docs/decisions/0015-team-edition-template.md
 - drydocs_core/ontology/relationship_vocabulary/00-header.yaml
