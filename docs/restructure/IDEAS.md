@@ -94,7 +94,59 @@ question a 1,000-line file with the trail at the bottom could not answer.
 - **`Idea-241`** · 2026-09-02 · `[idea]` · **open** · prio? **High** —
   **The S8 composition root should DISCOVER a consumer command module by convention, so
   `drydocs/cli.py` stops being an `evaluate` collision — the company never adopted the split
-  and its monolith carries stale inline copies of every verb S8 moved.** STUB - body follows.
+  and its monolith carries stale inline copies of every verb S8 moved.** Source: the
+  company's PORT-REPORT for `port-base-20260826..20260901`, defect 6 (2026-09-02, relayed
+  session record): `test_env_doctor::test_the_command_is_registered` failed at their G slice
+  because `env-doctor` is defined in `drydocs/cli_schema.py` — byte-identical to producer,
+  taken in D — and **nothing imports it**. Their `drydocs/cli.py` is a **4,079-line pre-S8
+  monolith with zero references to any `cli_*` module** (4,112 after D's one hunk); the six
+  per-domain modules sit beside it unwired. Attribution checked, not assumed: the orphaning
+  predates the port — it was already so at their base `294b9cec`.
+  **MEASURED HERE (J63: `main`, `port-base-20260901`).** Producer `cli.py` is 669 lines and
+  registers 51 commands (`app.registered_commands`, J37); the six `cli_*.py` modules total
+  4,017 lines. The S8 split landed **2026-08-21** (`f5e7229d`, 3,184 lines → thin root + six
+  modules) and S13 hoisted shared state on 08-27 (`5ab0c1d2`) — so `cli.py` was 1,356 lines at
+  `port-base-20260826` and 669 at `20260901`. **S8 was in the PREVIOUS port's range.** A
+  prior port already faced the split and did not adopt it.
+  **WHY — a manifest row that cannot express a refactor.** `drydocs/cli.py` is `evaluate`
+  with the note *"composition root; both sides add commands — merge per collision ledger
+  (keep consumer verbs, add producer verbs)"* (`PORT-MANIFEST.yaml:870`). That rule is
+  correct for VERB ADDITIONS and wrong for a STRUCTURAL change: followed literally it merges
+  producer verbs INTO the monolith, so the monolith grows every port (3,184 → 4,079 → 4,112)
+  and the split never arrives. Worse than one missing verb: every verb S8 moved into a
+  module and that has CHANGED since — G79's `refresh-reference` split into three subject
+  commands, `verify-reference`/`verify-controlm` with the m1/m3 deprecated aliases — exists
+  company-side only as a **stale inline copy from before the split**. Their 67 registered
+  commands include those copies. `env-doctor` is the first one a guard caught, not the only
+  one that is wrong.
+  **TWO CHANGES, one theirs and one ours.**
+  THEIRS (the port action, raised in their report as "owed, for a ruling") — adopt the split:
+  take the 669-line root wholesale; move the company-only verbs (their count: 26) into a
+  company-owned `drydocs/cli_company.py` (or per-domain) with its `MODULE_MAP.md` row in the
+  same commit (`load` group; the S13 subprocess-per-import guard covers it for free); DROP,
+  not move, every inline verb whose name is in producer's `registered_commands` — the module
+  version is current, the inline one is stale (name-set diff, read the importable object on
+  both sides); add `cli_company` to `COMMAND_MODULES` at `cli.py:663`.
+  OURS (this idea) — remove the residual collision permanently. After adoption the only
+  company edit to `cli.py` is one tuple element. Replace it with DISCOVERY: the composition
+  root imports `drydocs.cli_local` (name to be settled; one name, documented in
+  `MODULE_MAP.md`) **if and only if `importlib.util.find_spec` finds it**, and registers its
+  verbs after `COMMAND_MODULES`. Producer ships no such module; the company owns one; the
+  manifest row for `drydocs/cli.py` can then move from `evaluate` to `canonical-producer`,
+  because both sides never again edit the same file. Guards: `test_cli_import_order.py` gains
+  the optional module (subprocess-per-import — an in-process import proves nothing about
+  order, S13); `test_cli_registry.py` asserts a fixture `cli_local` registers and a missing
+  one is silent; `test_module_boundary.py` classifies the name (default-deny). The
+  composition-root-plus-discovered-extension shape is ADR 0002-A's — core imports nothing
+  from a component; a consumer module is the outermost layer and may import anything.
+  **THE GENERAL LESSON, for the J68/J69 machinery:** `evaluate` notes say how to merge
+  CONTENT. None of them can say "the producer changed the SHAPE of this file — take the
+  shape, re-home your content." A structural refactor of an `evaluate` path needs its own
+  RELAY at the roll that carries it, naming the new shape and where consumer content goes;
+  S8 shipped without one, and two ports walked past it. Candidate rule for
+  `docs/port/port-prompt.md`: a commit whose subject starts `refactor(` and touches an
+  `evaluate` path is a mandatory relay. Related: S8, S13, ADR 0002-A, J68, J69, [[Idea-239]]
+  (same report, same day), [[Idea-240]].
 
 - **`Idea-240`** · 2026-09-02 · `[idea]` · **open** · prio? **Med** —
   **The publish boundary is defined on the tracked tree and says nothing about git HISTORY —
