@@ -336,7 +336,11 @@ def document_frequency(texts: list[str]) -> dict[str, int]:
 
 
 def discriminating(
-    text: str, frequency: dict[str, int], corpus_size: int, *, ceiling: float = DIRECTORY_TOKEN_CEILING
+    text: str,
+    frequency: dict[str, int],
+    corpus_size: int,
+    *,
+    ceiling: float = DIRECTORY_TOKEN_CEILING,
 ) -> str:
     """``text`` with its directory's boilerplate removed.
 
