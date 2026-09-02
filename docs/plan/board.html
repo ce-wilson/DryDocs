@@ -642,7 +642,58 @@ registered, and the prompt is drafted - not when anything is loaded.
 Depends on CFG1 (the registry the rows go in) and REF1 (the precedent the proposal cites).
 Not in scope: any loader, any graph write, the semantics of the edge.
 </p></div></div>
-<div class="card" id="card-ONT2" data-id="ONT2" data-module="ontology" data-phase="2" data-epic="ontology-mapping" data-type="requirement" data-status="todo" data-search="ont2 mint acronyms as a domain with a four-tier axis - company, sdlc, technical are base-common, edition-specific resolves first - through the b2 protocol" tabindex="0"><div class="card-head"><span class="card-id">ONT2</span><span class="card-title">Mint acronyms as a domain with a four-tier axis - company, SDLC, technical are base-common, edition-specific resolves first - through the B2 protocol</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">requirement</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">ontology-mapping</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-CFG1" data-target="card-CFG1">CFG1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> STUB - minted 2026-09-02 under PLAN1 from the gate&#x27;s §B5 rider (SME, in-chat); body follows.
+<div class="card" id="card-ONT2" data-id="ONT2" data-module="ontology" data-phase="2" data-epic="ontology-mapping" data-type="requirement" data-status="todo" data-search="ont2 mint acronyms as a domain with a four-tier axis - company, sdlc, technical are base-common, edition-specific resolves first - through the b2 protocol" tabindex="0"><div class="card-head"><span class="card-id">ONT2</span><span class="card-title">Mint acronyms as a domain with a four-tier axis - company, SDLC, technical are base-common, edition-specific resolves first - through the B2 protocol</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">requirement</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">ontology-mapping</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-CFG1" data-target="card-CFG1">CFG1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Gate ontology-domain-registry-and-edition-grain, §B5 rider (SME, in-chat, 2026-09-02):
+&quot;acronyms is a little trickier. it needs common for company, SDLC, technical, then the
+edition specific.&quot; That sentence is the design. Acronyms is a DOMAIN (a vocabulary of
+expansions - the O68 acronym surface already renders one, without a domain to live in) with
+a TIER axis, and the tiers are what make it trickier than the other 13.
+
+(a) MINT `acronyms` as a row in domains.yaml (CFG1) through the §B2 protocol: authority =
+the §B5 rider in the gate record; minted_by = producer; fragment 55-local-acronyms.yaml.
+The fragment&#x27;s entries are expansions, not edges: id, acronym, expansion, tier, scope note,
+source. The relationship-vocabulary schema gains nothing; an expansion row is a different
+kind of entry and the fragment says so in its header (the 46-local-all precedent for a
+fragment whose entries are not the usual shape). THE EXISTING HOME IS NOT MOVED: the
+`acronyms:` block in config/taxonomy/software-registry.yaml is THE AUTHORITATIVE HOME by
+SME ruling (2026-07-21), rendered by scripts/render_software_registry.py and shown by
+AcronymsPane.tsx (O68), with expansion/source/added required per row
+(test_software_registry.py). The domain row and fragment DECLARE that block as the
+domain&#x27;s store - `vocabulary_fragment` points at the registry block, not a new file - so
+the ruling stands and nothing is duplicated. If CFG1&#x27;s guard requires a 4x-/5x- file, the
+fragment is a one-line pointer file and the guard follows the pointer.
+
+(b) FOUR TIERS, in resolution order, edition-first:
+`edition`   - owned by an edition (minted_by = its code, authority = its gate); the only tier
+              an instance may write.
+`technical` - base-common: platform and vendor terms (Control-M, Oracle, Neo4j, DPL, MFTS).
+`sdlc`      - base-common: process and delivery terms (PR, ADR, HITL, SME, CI).
+`company`   - base-common: the estate&#x27;s own vocabulary (LOB, SEAL, PAT, Area Product).
+Resolution: an edition&#x27;s expansion wins for its readers; absent one, the three common tiers
+are searched in the order technical -&gt; sdlc -&gt; company, and a term present in two common
+tiers is a guard failure, not a precedence question - the SME places it once.
+
+(c) THE BASE-COMMON RULE (§B5 i) APPLIES: the three common tiers are base-owned and an
+edition may not override a common expansion, only ADD an edition-tier one; the aggregate
+view resolves every edition&#x27;s terms against the same three common tiers, which is what
+keeps cross-edition text readable.
+
+(d) SEED from what exists: the `acronyms:` block already carries every row with
+expansion, source and added-date; this item adds `tier` to each, placed by the SME at a
+short gate (a table, one row per acronym, tier proposed with reason) rather than by the
+implementer. Nothing is invented; the seed is the block&#x27;s current rows. The retired org
+acronym is NOT a row anywhere (J55).
+
+(e) PORT: the fragment is per-entry on the tom-role-vocabulary pattern - common-tier rows
+cross whole, edition-tier rows are the edition&#x27;s own and stay.
+
+(f) GUARDS: every row names a tier from the four; no acronym appears in two common tiers;
+an edition-tier row carries an edition code that exists in editions.yaml (CFG2, when built;
+skip until then); render_software_registry.py carries `tier` through to the JSON and
+AcronymsPane groups by it; test_software_registry.py&#x27;s shape test gains the field. The
+surface stays deterministic.
+
+Depends on CFG1 (the registry). Not in scope: any change to the relationship-vocabulary
+entry schema, any loader, the O68 pane&#x27;s design beyond grouping by tier.
 </p></div></div>
 <div class="card ready" id="card-D9" data-id="D9" data-module="config" data-phase="3" data-epic="config-loaders" data-type="task" data-status="todo" data-search="d9 precedence: express the internal refines chain (vendor &lt;- platform team &lt;- support group) instead of one flat internal tier" tabindex="0"><div class="card-head"><span class="card-id">D9</span><span class="card-title">Precedence: express the internal refines chain (vendor &lt;- platform team &lt;- support group) instead of one flat internal tier</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P3</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">config-loaders</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> A proposal lands for how config/precedence.yaml expresses two internal levels (the DAT SRE platform standard refining the BMC baseline, the HLT support-group standard refining DAT) so that where the two internal standards disagree — folder grammar, position-6 meaning, whether the app code carries the SEAL — the file records which wins; the ordering decision itself routes through the HITL gate (docs/restructure/03-hitl-sme-flow.md) and precedence.yaml changes only when confirmed; the position-6 &quot;frequency = legacy&quot; claim in the publishable folder-naming standard is verified against both source standards and corrected or annotated per-standard if still wrong.
 </p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-07 from Idea-64 (SME framing: Vendor -&gt; Company/Platform team -&gt; Lower support group; both internal levels sit at precedence tier 2 today). Fable: conflict-resolution semantics. The refines: frontmatter chain in knowledge/standards is the input evidence.
