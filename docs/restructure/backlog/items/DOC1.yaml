@@ -1,0 +1,18 @@
+id: DOC1
+epic: release-infrastructure
+title: Amend ADR 0015 D2/D6 - Team Edition ships a thin instance-owned backlog, inbox and board; the base backlog stays canonical-template; groom-backlog ships with a mandatory --scope
+type: task
+module: docs
+phase: 8
+agent: main
+model: fable
+priority: p1
+status: todo
+depends_on: []
+gates:
+- ontology-domain-registry-and-edition-grain
+inputs:
+- config/gate-prompts/ontology-domain-registry-and-edition-grain.yaml
+- config/gate-log.md
+acceptance: |
+  STUB - minted 2026-09-02 under PLAN1 from gate ontology-domain-registry-and-edition-grain SIGNED OFF 14/14 (E1); body follows.

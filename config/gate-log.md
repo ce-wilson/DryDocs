@@ -4341,3 +4341,73 @@ Edition D2 amendment. Each is recorded when it is ruled, not here.
 **Built.** PLAN1 (`feat/backlog-series-by-module`): `modules.yaml` `series:`, the allocator's
 `FROZEN_SERIES` + `--next-id --module`, five guards in `test_backlog.py`, the mint rule in
 CLAUDE.md and the groom-backlog skill.
+
+## 2026-09-02 — GATE: ontology-domain-registry-and-edition-grain — SIGNED OFF 14/14 (C41)
+
+**Prompt:** `config/gate-prompts/ontology-domain-registry-and-edition-grain.yaml` ·
+**Backlog:** C41 (clause e; the item-series half was ruled the same day as PLAN1) ·
+**Session:** producer desktop, in-chat walkthrough of the six sections, SME answered
+the five rulings in one message; the other nine confirmations were presented as
+restating prior rulings (PLAN1, the 2026-09-01 in-chat directions, I6, G87, K5) and
+are recorded as confirmed-as-drafted — any of them can be reopened under C40. One
+ruling (C2) carries an SME-supplied DEFINITION the prompt did not have; that
+definition is the ruling of record. B5's second question ("wanted at all?") was not
+answered and stays open as a rider. Nothing renumbers; no id moves.
+
+- **§A1/§A2 — CONFIRMED.** PLAN1 is closed and not reopened; a domain partitions the
+  vocabulary, an edition partitions the id space, and the two registries never share.
+- **§B1 — CONFIRMED.** `config/taxonomy/domains.yaml` as data: id, title,
+  vocabulary_fragment, minted_by, registered_at, authority, status/superseded_by. No
+  `series` column. Seeded with the 13, each citing its real ruling; the header comment
+  becomes a pointer.
+- **§B2 — CONFIRMED.** A base mints, an instance requests; the company base mints its own
+  domains at its own gate (per-entry row on the tom-role-vocabulary pattern); the mint
+  protocol is I6's.
+- **§B3 — RULED: `vocabulary_fragment` is REQUIRED.** SME: "the vocabulary should be
+  required." A domain is a file/loader partition of the vocabulary and nothing else;
+  the fragment-less domain the 2026-09-01 design allowed has no consumer after PLAN1
+  and is not permitted.
+- **§B4 — RULED: SPLIT NOW (option a).** SME: "split now." `code` and `requirements`
+  become minted domains through the G87 shape (add-new + deprecate-old; no entry moves;
+  `replaces:` on every re-homed entry); the `:Requirement`→`:Code` reconciliation edge
+  is registered `status: planned` in the same change and ruled at its own gate; the
+  spec-kit / spec-driven-development sources are registered by the reference-librarian
+  BEHIND the split (REF1), not before it. Whether `test` is a third domain is NOT ruled
+  and rides with ONT1's proposal.
+- **§B5 — CONFIRMED as drafted; rider OPEN.** `acronyms` and `ontology` are not minted
+  here and go through §B2 if ever wanted; whether either is wanted was not answered.
+- **§C1 — CONFIRMED.** `[<EDITION>-]<MODULE><n>`, edition first, base unprefixed; the
+  segment is optional so every existing id parses; both halves must be declared.
+- **§C2 — RULED: THE GRAIN IS THE AREA PRODUCT**, with the SME's definition as the
+  ruling of record: *an Area Product is where two or three applications are delivering
+  on the same business topic.* That definition is what qualifies a row in
+  editions.yaml — not the Product Catalog tier name by itself. Finer instances
+  (per-DevTeam, per-application) were not asked for and are not provided for; if one
+  is ever wanted it is a re-mint of every code and a new ruling. The Area Product list
+  is still to be transcribed to a named file under `internal-local/` before CFG2
+  writes real rows (the image-provenance rule); the count (~20) stays SME-REPORTED
+  until then.
+- **§C3 — CONFIRMED.** `config/taxonomy/editions.yaml`, Internal, synthetic sample
+  producer-side, per-entry manifest row; code / title / area_product_id / minted_by /
+  registered_at / authority / legacy_band. The company base is an edition and mints
+  its own code at its own gate.
+- **§C4 — RULED: BOTH PARTITION RULES RETIRE, forward-only.** SME: "retire both." The
+  DD reserve (git-readme.md:197) and the 10000 band (PRODUCER_BAND_CEILING) govern no
+  new mint; DD1–DD10, DD10001–DD10003 and G10001–G10003 stay readable and listed;
+  the allocator's band check becomes an edition-segment check; the git-readme sentence
+  is retired with a pointer here. The company mints nothing new until it has minted
+  its edition code.
+- **§D1 — RULED: AMEND ADR 0015 D2/D6.** SME: "amend for an instance-owned backlog."
+  Team Edition ships a thin instance-owned backlog (items + inbox + per-instance board)
+  under the copier `instance-owned` class; the base backlog stays `canonical-template`
+  and frozen; `groom-backlog` ships with a mandatory `--scope`; an instance item
+  carries its edition segment; `depends_on` may point instance→base, never
+  base→instance.
+- **§E1 — CONFIRMED.** Build items minted the same day under PLAN1, in their module
+  series: CFG1 (domains.yaml), CFG2 (editions.yaml), PLAN2 (the edition segment in the
+  id grammar + band-check replacement + git-readme retirement), DOC1 (the ADR 0015
+  amendment text), DOC2 (RELAY-23, the port relay), REF1 (spec-kit / SDD registered),
+  ONT1 (the code/requirements split + the planned reconciliation edge). C41 closes on
+  the mint, per E1.
+- **§F1 — CONFIRMED.** Not reopened: PLAN1, the psgmgr publish ceiling, the 13 domains'
+  membership, G102, the reconciliation edge's semantics.

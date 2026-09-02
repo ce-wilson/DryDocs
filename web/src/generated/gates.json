@@ -1107,6 +1107,26 @@
       "unblocks": []
     },
     {
+      "kind": "log-entry",
+      "date": "2026-09-02",
+      "title": "GATE: ontology-domain-registry-and-edition-grain — SIGNED OFF 14/14 (C41)",
+      "status": "signed-off",
+      "prompt_files": [
+        "config/gate-prompts/ontology-domain-registry-and-edition-grain.yaml"
+      ],
+      "log_ref": "config/gate-log.md:4345",
+      "unblocks": [
+        "REF1",
+        "C41",
+        "CFG1",
+        "ONT1",
+        "PLAN2",
+        "CFG2",
+        "DOC1",
+        "DOC2"
+      ]
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",
@@ -1263,19 +1283,6 @@
       "log_ref": null,
       "unblocks": [
         "G118"
-      ]
-    },
-    {
-      "kind": "prompt-only",
-      "date": null,
-      "title": "ontology-domain-registry-and-edition-grain (gate page rendered — session not yet run)",
-      "status": "open",
-      "prompt_files": [
-        "config/gate-prompts/ontology-domain-registry-and-edition-grain.yaml"
-      ],
-      "log_ref": null,
-      "unblocks": [
-        "C41"
       ]
     },
     {

@@ -1,0 +1,19 @@
+id: DOC2
+epic: release-infrastructure
+title: RELAY-23 - the frozen letters, mint by module code, the edition segment and the retired partition rules reach the company through the port-prompt
+type: task
+module: docs
+phase: 8
+agent: main
+model: fable
+priority: p1
+status: todo
+depends_on:
+- PLAN2
+gates:
+- ontology-domain-registry-and-edition-grain
+inputs:
+- config/gate-prompts/ontology-domain-registry-and-edition-grain.yaml
+- config/gate-log.md
+acceptance: |
+  STUB - minted 2026-09-02 under PLAN1 from gate ontology-domain-registry-and-edition-grain SIGNED OFF 14/14 (E1); body follows.

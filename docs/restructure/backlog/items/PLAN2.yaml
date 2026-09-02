@@ -1,0 +1,19 @@
+id: PLAN2
+epic: project-board
+title: The edition segment in the id grammar - [<EDITION>-]<MODULE><n> in three regexes, both halves declared, the band check replaced, the DD reserve and the 10000 band retired forward-only
+type: task
+module: drydocs-plan
+phase: 8
+agent: main
+model: fable
+priority: p1
+status: todo
+depends_on:
+- CFG2
+gates:
+- ontology-domain-registry-and-edition-grain
+inputs:
+- config/gate-prompts/ontology-domain-registry-and-edition-grain.yaml
+- config/gate-log.md
+acceptance: |
+  STUB - minted 2026-09-02 under PLAN1 from gate ontology-domain-registry-and-edition-grain SIGNED OFF 14/14 (E1); body follows.

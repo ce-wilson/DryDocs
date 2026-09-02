@@ -1,0 +1,20 @@
+id: ONT1
+epic: ontology-mapping
+title: Mint code and requirements as domains through the G87 shape and register the Requirement-to-Code reconciliation edge as planned - the 2018 join, traversable
+type: requirement
+module: ontology
+phase: 2
+agent: main
+model: fable
+priority: p1
+status: todo
+depends_on:
+- CFG1
+- REF1
+gates:
+- ontology-domain-registry-and-edition-grain
+inputs:
+- config/gate-prompts/ontology-domain-registry-and-edition-grain.yaml
+- config/gate-log.md
+acceptance: |
+  STUB - minted 2026-09-02 under PLAN1 from gate ontology-domain-registry-and-edition-grain SIGNED OFF 14/14 (E1); body follows.

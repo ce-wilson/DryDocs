@@ -1,0 +1,18 @@
+id: REF1
+epic: reference-hygiene
+title: Register spec-kit and the spec-driven-development write-up as External reference - the precedent the code/requirements split cites
+type: task
+module: reference
+phase: 2
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on: []
+gates:
+- ontology-domain-registry-and-edition-grain
+inputs:
+- config/gate-prompts/ontology-domain-registry-and-edition-grain.yaml
+- config/gate-log.md
+acceptance: |
+  STUB - minted 2026-09-02 under PLAN1 from gate ontology-domain-registry-and-edition-grain SIGNED OFF 14/14 (E1); body follows.

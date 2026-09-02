@@ -363,7 +363,7 @@
       ],
       "gate_ref": "(is the gate record)",
       "status": "gate-pending",
-      "pending_entries": 129,
+      "pending_entries": 130,
       "env_refs": [
         "SECRET_NAME"
       ],

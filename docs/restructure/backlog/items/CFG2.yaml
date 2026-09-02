@@ -1,0 +1,19 @@
+id: CFG2
+epic: release-infrastructure
+title: The edition registry - config/taxonomy/editions.yaml keyed to area_product_id, Internal with a synthetic sample, per-entry manifest row; the company base mints its own code
+type: task
+module: config
+phase: 8
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on:
+- CFG1
+gates:
+- ontology-domain-registry-and-edition-grain
+inputs:
+- config/gate-prompts/ontology-domain-registry-and-edition-grain.yaml
+- config/gate-log.md
+acceptance: |
+  STUB - minted 2026-09-02 under PLAN1 from gate ontology-domain-registry-and-edition-grain SIGNED OFF 14/14 (E1); body follows.

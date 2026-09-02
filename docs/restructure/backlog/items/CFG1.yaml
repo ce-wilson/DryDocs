@@ -1,0 +1,18 @@
+id: CFG1
+epic: ontology-mapping
+title: The domain registry as data - config/taxonomy/domains.yaml, one row per domain with its authority, vocabulary_fragment REQUIRED, the header comment becomes a pointer
+type: task
+module: config
+phase: 2
+agent: main
+model: fable
+priority: p1
+status: todo
+depends_on: []
+gates:
+- ontology-domain-registry-and-edition-grain
+inputs:
+- config/gate-prompts/ontology-domain-registry-and-edition-grain.yaml
+- config/gate-log.md
+acceptance: |
+  STUB - minted 2026-09-02 under PLAN1 from gate ontology-domain-registry-and-edition-grain SIGNED OFF 14/14 (E1); body follows.
