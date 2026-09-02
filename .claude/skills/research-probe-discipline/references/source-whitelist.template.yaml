@@ -1,0 +1,105 @@
+# =============================================================================
+# source-whitelist.template.yaml — the shape of internal/research/_registry/
+# source-whitelist.yaml (schema drydocs.source-whitelist.v1)
+# =============================================================================
+# WHAT THIS IS: the "where do I look, and what did it actually answer" ledger for
+# research sessions. It records BOTH confirmed-good sources and proven dead ends,
+# because a dead end without a recorded control is not admissible evidence of
+# absence (research-probe-discipline §3).
+#
+# WHAT THIS IS NOT: an ingestion registry. Three files, three jobs —
+#   internal/research/_registry/source-whitelist.yaml  <- research starting points (this shape)
+#   config/doc-source-registry.yaml                    <- documents a loader may read (GATE-BOUND)
+#   config/source-registry.yaml                        <- data sources (GATE-BOUND)
+# An entry GRADUATES to a config registry through the HITL gate (the add-source-object
+# skill is the walk for a data source); it never short-circuits one.
+#
+# CLASSIFICATION: the real file is Internal. It carries hosts, account shapes and
+# application ids, and it lives under internal/research/ — tracked in the private
+# repo, never published. THIS TEMPLATE is mechanism-only: every value below is a
+# placeholder shape (<account>, <space-key>, ftsi#####), never an instance. The
+# skills that read the real file must never inline its values.
+#
+# OPEN — the user's to rule, carried from the company's after-action review
+# (internal/research/mm-aar-research.md, Part 2 §8). The working defaults below
+# are the company build's ASSUMPTIONS, recorded so a reader can see what was
+# decided by default, not rulings:
+#   OQ-a  one whitelist for all subjects, or one per subject area?
+#         working default: ONE file (searches better; per-subject avoids
+#         cross-branch merge conflicts)
+#   OQ-b  does an entry need SME sign-off, or is verified_by: agent acceptable
+#         with a recorded control?
+#         working default: verified_by is RECORDED, not enforced; every
+#         agent-verified entry carries its control instead
+#   OQ-c  default decay?
+#         working default: varies by volatility rather than a flat 90d — 7d for
+#         a seven-day event history, 60d for a page already seen stale, 180d for
+#         a spec
+#   OQ-d  commit the probe log, or keep it session-scratch?
+#         working default: COMMIT it — committing is what makes reuse measurable
+#   OQ-e  three skills, or one with a mode: parameter?
+#         RULED by the build: three thin skills over one backbone
+#
+# SCHEMA (drydocs.source-whitelist.v1)
+#   id                required, kebab-case, stable
+#   name              required, human label
+#   subject_context   required, SME-supplied one-liner: what family this source belongs to
+#   host              optional, Internal
+#   access:
+#     tool            how it is reached (CLI + version, API, browser, file)
+#     auth            the auth surface — name it even when it works
+#     rung            1 spec/bulk · 2 authenticated API · 3 saved HTML · 4 print/PDF · 5 copy-paste
+#   verified_on       required, ISO date the claim below was last true
+#   verified_by       required, sme | agent
+#   outcome           required, good | empty | irrelevant | blocked | stale | exhausted | exhausted_in_scope
+#   control           required when outcome is `exhausted*` — what proved the probe was valid
+#   answers           required, list — the questions this source DOES settle
+#   does_not_answer   required, list — scope limits, so the next session does not re-derive them
+#   replayable_query  required, the exact query/steps to reproduce
+#   decay             required, e.g. 90d — after this, re-verify before citing
+#   classification    required, External | Internal-Public | Internal
+#   graduates_to      optional, the config-registry id if it has been gate-approved
+#   notes             optional
+schema: drydocs.source-whitelist.v1
+
+entries:
+  # A confirmed-good source, at the rung it was actually reached.
+  - id: <platform>-transfer-definitions-export
+    name: "<platform> transfer definitions (UI export)"
+    subject_context: "<one line from the SME: what this platform is and what family it belongs to>"
+    host: "<host>"
+    access:
+      tool: browser
+      auth: "<sso surface name>"
+      rung: 5
+    verified_on: 2026-09-02
+    verified_by: agent
+    outcome: good
+    answers:
+      - "which <account> owns which <directory> route"
+      - "the definition-record grain: (<account> -> <directory>), no file identity"
+    does_not_answer:
+      - "which file moved on which day — that is the event record, seven-day window"
+    replayable_query: "<UI path> > Export > <object>; save as <file>.csv"
+    decay: 60d
+    classification: Internal
+    notes: "the 21-column export; a second, wider export of the same object exists — see the next row"
+
+  # A controlled dead end. `exhausted` is admissible ONLY because the control passed.
+  - id: <wiki>-<space-key>-route-term
+    name: "<wiki> space <space-key>, searched for the route term"
+    subject_context: "<one line from the SME>"
+    access:
+      tool: "<wiki cli> <version>"
+      auth: "<token surface>"
+      rung: 2
+    verified_on: 2026-09-02
+    verified_by: agent
+    outcome: exhausted
+    control: "same space, broader term -> 25 results; same term unscoped -> 12 results in <other-space>"
+    answers: []
+    does_not_answer:
+      - "anything about <term> — the term lives in <other-space>, not here"
+    replayable_query: "space = <space-key> AND text ~ \"<term>\""
+    decay: 90d
+    classification: Internal
