@@ -15,6 +15,7 @@ from drydocs.port_rename_detect import (
     SIMILARITY_FLOOR,
     compare,
     containment,
+    discounted_pair,
     discriminating,
     id_set,
     jaccard,
@@ -402,9 +403,16 @@ def test_the_match_list_is_capped_so_a_common_file_cannot_bury_the_signal() -> N
     found = rename_candidates({"epics/new.yaml": shared}, existing)
     assert len(found) == MAX_MATCHES_PER_ADD
 
-    # and above the threshold, idf removes the reason to report anything at all
-    big = {f"epics/other-{n}.yaml": shared for n in range(6)}
-    assert rename_candidates({"epics/new.yaml": shared}, big) == []
+    # AND THE GUARANTEE THE REGRESSION DEMANDED: idf can never strip a pair to
+    # nothing. Six identical files means EVERY token is boilerplate, so the discount
+    # would leave zero — at which point the stub veto fires and the comparison runs
+    # raw. The report stays bounded by the cap rather than going silently empty,
+    # because an empty report on a directory that contains a rename is the one
+    # output a reviewer acts on without looking.
+    long_shared = " ".join(f"boiler{i}" for i in range(30))
+    big = {f"epics/other-{n}.yaml": long_shared for n in range(6)}
+    still_found = rename_candidates({"epics/new.yaml": long_shared}, big)
+    assert len(still_found) == MAX_MATCHES_PER_ADD, "bounded by the cap, never silenced"
 
 
 def test_containment_finds_a_twin_that_jaccard_buries() -> None:
@@ -541,20 +549,16 @@ def test_idf_drops_a_directory_schema_that_every_file_shares() -> None:
     reviewer handed 252 pairs will skim, and skimming is how the twin got taken in
     the first place. A report nobody reads is the same outcome as no report.
     """
-    schema = "id: epic: status: acceptance: notes: type: module: phase:"
-    existing = {
-        f"items/{name}.yaml": f"{schema} {body}"
-        for name, body in [
-            ("A1", "alpha unique one"),
-            ("B2", "beta unique two"),
-            ("C3", "gamma unique three"),
-            ("D4", "delta unique four"),
-            ("E5", "epsilon unique five"),
-            ("OLD", "zeta distinctive marker phrase"),
-        ]
-    }
-    # shares the schema with all six, and the DISTINCTIVE content of exactly one
-    proposed = {"items/NEW.yaml": f"{schema} zeta distinctive marker phrase"}
+    schema = "id: epic: status: acceptance: notes: type: module: phase: agent: model:"
+
+    def item(tag: str) -> str:
+        # long enough that the discount leaves more than MIN_TOKENS_FOR_CONTAINMENT,
+        # or the stub veto fires and this would be testing the veto, not idf
+        return schema + " " + " ".join(f"{tag}{i}" for i in range(12))
+
+    existing = {f"items/{n}.yaml": item(n) for n in ("A1", "B2", "C3", "D4", "E5")}
+    existing["items/OLD.yaml"] = item("zeta")
+    proposed = {"items/NEW.yaml": item("zeta")}  # schema shared with all; content with one
 
     found = rename_candidates(proposed, existing)
     assert [c.existing for c in found] == ["items/OLD.yaml"], (
@@ -571,3 +575,46 @@ def test_idf_abstains_in_a_directory_too_small_to_measure() -> None:
     assert discriminating("shared unique", freq, 3) == "shared unique"
     # above the threshold the same token is dropped as boilerplate
     assert discriminating("shared unique", {"shared": 5}, 5) == "unique"
+
+
+def test_the_idf_discount_never_switches_containment_off() -> None:
+    """THE STUB VETO — the regression that produced a FALSE ALL-CLEAR.
+
+    Reconstructed from the real incident. A ten-token stub whose tokens ARE the
+    directory's shared scaffolding, against the larger twin it was reduced from. The
+    discount leaves the stub FIVE tokens — below MIN_TOKENS_FOR_CONTAINMENT — so
+    containment abstains, Jaccard alone scores 0.09 against a 0.35 floor, and the
+    pair vanishes. idf does not out-score containment here; it switches it off.
+
+    That is the worst output this tool can produce: a directory containing a real
+    rename reporting "no proposed clean-add resembles an existing file", which is
+    the one result a reviewer acts on without looking.
+    """
+    scaffold = "id: title: order: letter: groom_log: epic alignment status"
+    stub = f"{scaffold} distinctive_marker"
+    twin = stub + " " + " ".join(f"detail{i} expanded prose retained" for i in range(20))
+    # a directory whose files all share the scaffold — so the discount targets it
+    corpus = {f"epics/other-{n}.yaml": f"{scaffold} filler{n}" for n in range(8)}
+    corpus["epics/legacy-alignment.yaml"] = twin
+
+    found = rename_candidates({"epics/cdo-alignment.yaml": stub}, corpus)
+    assert any(c.existing == "epics/legacy-alignment.yaml" for c in found), (
+        "the known-real pair must survive the idf discount — losing it is a false "
+        "all-clear on a directory that contains a rename"
+    )
+
+
+def test_the_veto_is_decided_per_pair_not_per_file() -> None:
+    """Discounting one side and not the other is worse than either.
+
+    The stub's tokens would survive on the stub and be stripped from the twin, so the
+    overlap goes to zero and the pair is lost just as surely. If the discount would
+    gut EITHER side, both are compared raw.
+    """
+    freq = {"shared": 20, "rare": 1}
+    corpus_size = 20
+    short = "shared shared rare"
+    long = " ".join(["shared"] + [f"uniq{i}" for i in range(20)])
+    a, b = discounted_pair(short, long, freq, corpus_size)
+    assert set(a.split()) == set(normalized_text(short).split()), "short side kept raw"
+    assert set(b.split()) == set(normalized_text(long).split()), "so is its partner"

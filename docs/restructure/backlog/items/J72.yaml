@@ -230,3 +230,52 @@ notes: |
   folder_attribution.cypher <-> seal_attribution.cypher at 0.52 (a real rename, confirming the
   loader field they took in the B+C split), and cli_shared.py <-> cli.py at 0.49 (not a decline -
   cli_shared is the extraction FROM cli.py, so the detector found both halves of the D merge).
+
+  SIXTH ROUND - THE IDF FIX CAUSED A FALSE ALL-CLEAR, WHICH IS THE WORST OUTPUT THIS TOOL HAS.
+  The company re-ran docs/F on the idf pin and found the epics directory reporting exit=0, "no
+  proposed clean-add resembles an existing file under another name" - on a directory that CONTAINS a
+  real rename. Precision had won convincingly (344 -> 50 pairs, docs 252 -> 27) and the headline
+  number hid it. Their instinct to re-run rather than carry the earlier sweep forward is what caught
+  it.
+
+  THE PAIR LOST IS THE ONE THE PREVIOUS PIN EXISTED TO RECOVER: cdo-alignment <-> its twin went
+  0.08 below floor (3rd pin) -> 0.80 rank 1 (4th pin, containment) -> SUPPRESSED (5th pin, idf).
+
+  THEIR DIAGNOSIS, AND IT IS THE GENERAL FORM: the two fixes are in DIRECT TENSION on a stub, not
+  merely coincident. The file is a ten-token stub whose tokens ARE the shared epic scaffolding.
+  Containment recovered it PRECISELY BECAUSE those few tokens are contained in the twin; the idf
+  discount removes EXACTLY THOSE TOKENS as boilerplate. For a stub, the signal and the noise are the
+  same tokens - so whichever fix runs last wins.
+
+  THE MECHANISM IS THREE-WAY, and tracing it is what sited the fix correctly. The discount leaves
+  the stub FIVE tokens; MIN_TOKENS_FOR_CONTAINMENT is 8; so the discount pushes the stub below the
+  threshold at which containment votes. Containment abstains, Jaccard alone scores 0.09 against a
+  0.35 floor, and the pair drops. IDF DOES NOT OUT-SCORE CONTAINMENT HERE - IT SWITCHES IT OFF.
+
+  THE COMPANY PROPOSED EXACTLY THE RIGHT RULE and my first attempt mis-sited it. They said "do not
+  apply the idf discount when either side is short - the same shape and rationale as
+  MIN_TOKENS_FOR_CONTAINMENT = 8". I applied it to the RAW length, where ten is above eight and the
+  test never fires; measured, it changed nothing. The rule belongs on the POST-DISCOUNT length. Same
+  rule, correct site - and the correction only surfaced by instrumenting the comparison instead of
+  reasoning about it, which is the third time this session that measuring beat inferring.
+
+  DECIDED PER PAIR, NOT PER FILE. Discounting one side and not the other is worse than either: the
+  stub tokens survive on the stub and are stripped from the twin, so the overlap goes to zero and the
+  pair is lost just as surely. If the discount would gut EITHER side, both compare raw.
+
+  ALL THREE AXES HOLD, measured on real data: the regression pair returns at 1.00; the backlog items
+  directory stays at 26 pairs over 85 clean-adds (precision kept); every vocabulary rename still
+  fires including the two slot renames at 1.00. And the veto yields a GUARANTEE worth stating: idf
+  can never strip a pair to nothing, because a document the discount would empty is compared raw
+  instead. An empty report on a directory containing a rename is now unreachable by this path.
+
+  TWO FIXTURES BROKE ON ADOPTION AND BOTH WERE WRONG, not the code: they used documents short enough
+  that the veto correctly disables idf, so they had been testing the veto while claiming to test idf.
+  Lengthened past the threshold. One assertion was inverted outright - it claimed idf reduces
+  identical files to zero matches, which is exactly the false all-clear this round exists to prevent;
+  it now asserts the cap bounds the report instead.
+
+  THE META-PATTERN THE COMPANY NAMED, worth keeping: six pins, and each fix has traded against the
+  previous one - recall -> masking -> recall+noise -> precision-recall -> tension-on-stubs. The tool
+  is converging, but every result is only valid against the pin it ran on, which is why the full
+  sweep is re-run each time rather than carried forward.

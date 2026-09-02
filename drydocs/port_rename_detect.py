@@ -348,10 +348,48 @@ def discriminating(
     keeps the tokens that distinguish a document from its neighbours and drops the
     ones every neighbour also has.
     """
+    mine = normalized_text(text)
     if corpus_size < MIN_CORPUS_FOR_IDF:
-        return normalized_text(text)
+        return mine
     cutoff = corpus_size * ceiling
-    return " ".join(t for t in normalized_text(text).split() if frequency.get(t, 0) <= cutoff)
+    return " ".join(t for t in mine.split() if frequency.get(t, 0) <= cutoff)
+
+
+def discounted_pair(a: str, b: str, frequency: dict[str, int], corpus_size: int) -> tuple[str, str]:
+    """The two texts to compare — discounted, unless the discount would gut either.
+
+    THE STUB VETO. Contributed by the company session after the idf discount caused a
+    FALSE ALL-CLEAR on a directory containing a real rename — the single worst output
+    this tool can produce, because it is the one a reviewer acts on without looking.
+
+    THE TWO FIXES ARE IN DIRECT TENSION ON A STUB, not merely coincident.
+    ``cdo-alignment.yaml`` is a ten-token stub whose tokens ARE the shared epic
+    scaffolding. Containment recovered it (0.80, rank 1) PRECISELY BECAUSE those few
+    tokens are contained in the twin; the discount removes EXACTLY THOSE TOKENS as
+    boilerplate. For a stub the signal and the noise are the same tokens, so whichever
+    fix runs last wins — and idf ran last.
+
+    THE MECHANISM IS THREE-WAY, and tracing it is what located the veto correctly.
+    The stub is ten tokens; the discount leaves FIVE; ``MIN_TOKENS_FOR_CONTAINMENT``
+    is 8 — so the discount pushes the stub below the threshold at which containment
+    votes, containment abstains, Jaccard alone scores the pair 0.09 against a 0.35
+    floor, and it drops. idf does not out-score containment here; it switches it off.
+
+    So the veto keys on the POST-DISCOUNT length against that same constant. The
+    company proposed exactly this rule ("the same shape and rationale as
+    MIN_TOKENS_FOR_CONTAINMENT"); the first attempt applied it to the RAW length,
+    where ten is above eight and the test never fires. Same rule, correct site.
+
+    THE DECISION IS PER PAIR, not per file. Discounting one side and not the other is
+    worse than either: the stub's tokens survive on the stub and are stripped from the
+    twin, so the overlap goes to zero and the pair is lost just as surely. If the
+    discount guts EITHER side, both are compared raw.
+    """
+    da, db = discriminating(a, frequency, corpus_size), discriminating(b, frequency, corpus_size)
+    for discounted in (da, db):
+        if len(set(discounted.split())) < MIN_TOKENS_FOR_CONTAINMENT:
+            return normalized_text(a), normalized_text(b)
+    return da, db
 
 
 def rename_candidates(
@@ -393,9 +431,7 @@ def rename_candidates(
                 continue
             if same_directory_only and str(Path(old_path).parent) != new_dir:
                 continue
-            score, basis = compare(
-                discriminating(new_text, freq, size), discriminating(old_text, freq, size)
-            )
+            score, basis = compare(*discounted_pair(new_text, old_text, freq, size))
             if score >= floor:
                 matches.append(RenameCandidate(new_path, old_path, score, basis))
         # EVERY match above the floor, not just the best one — capped, not filtered.
