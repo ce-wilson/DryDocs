@@ -91,6 +91,22 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
+- **`Idea-242`** · 2026-09-02 · `[chore]` · **open** · prio? **High** —
+  **FROZEN_BAND is owed by two items and neither can ship it in time: mint it as its own
+  PLAN-series chore if a port roll is scheduled before PLAN2 is pulled.** Source: the
+  2026-09-02 design review (`docs/reviews/restructure-design-review-2026-09-02.md`, F3 and
+  F9). `FROZEN_SERIES["G"] = 136` was measured on the producer's tree; the company holds
+  `G10001-G10003` and `DD10001-DD10003`, and `test_frozen_series_take_no_new_ids` fails all
+  six the day PLAN1 ports. The fix is one table — `FROZEN_BAND = {G: 10003, DD: 10003}`, a
+  legacy band id (number > 9999, minted before FROZEN_ON) is frozen at the band's own max —
+  in `validate.py` and `test_backlog.py` with the same agreement guard the first table has.
+  PLAN2 (c) carries it, and DOC2's freeze half says it must land BEFORE the relay rolls; but
+  DOC2 depends on PLAN2, and PLAN2 depends on CFG2 → CFG1. So the ORDER matters and no item
+  encodes it: if the next roll comes after PLAN2 closes, nothing to do — PLAN2 carries it. If
+  a roll is scheduled first, groom this into `PLAN3` (module drydocs-plan, no deps, ~20 lines
+  + two tests), make DOC2's freeze half depend on it, and drop the table from PLAN2 (c). The
+  trigger is the roll date, which is why this is an inbox entry and not a speculative mint.
+
 - **`Idea-241`** · 2026-09-02 · `[idea]` · **groomed → S16 (the build half: discovery in the composition root) + J73 (the port-prompt relay rule) (2026-09-02)** · prio? **High** — the COMPANY-side adoption of the S8 split is their port action and is not a producer item · prio? **High** —
   **The S8 composition root should DISCOVER a consumer command module by convention, so
   `drydocs/cli.py` stops being an `evaluate` collision — the company never adopted the split
