@@ -62,7 +62,7 @@ export default function OverviewRoute({ persona }: { persona: Persona }) {
               <h1 data-wf="WF-LND-02" className="text-[clamp(1.9rem,4vw,2.6rem)] font-extrabold leading-tight tracking-tight text-text">
                 A Don&rsquo;t-Repeat-Yourself Knowledge Graph
               </h1>
-              <p data-wf="WF-LND-03" className="mt-3 max-w-lg text-[15.5px] leading-relaxed text-muted">
+              <p data-wf="WF-LND-03" className="mt-3 max-w-lg text-[16px] leading-relaxed text-muted">
                 What runs, what it depends on, who owns it, which application it belongs to. Pick an
                 area below to start &mdash; every view is backed by the graph.
               </p>

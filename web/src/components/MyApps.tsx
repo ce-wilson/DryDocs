@@ -11,9 +11,9 @@ import GraphSvg from './GraphSvg'
 
 const PANEL = 'overflow-hidden rounded-md border border-edge bg-panel'
 const P_HEAD =
-  'flex items-center justify-between gap-2.5 border-b border-edge bg-panel-2 px-3.5 py-2.5 text-[13.5px] font-semibold'
-const P_HEAD_M = 'font-mono text-[10.5px] font-normal text-muted'
-const BADGE = 'whitespace-nowrap rounded-xs border px-2 py-[3px] font-mono text-[9.5px] font-medium'
+  'flex items-center justify-between gap-2.5 border-b border-edge bg-panel-2 px-3.5 py-2.5 text-[14px] font-semibold'
+const P_HEAD_M = 'font-mono text-[11px] font-normal text-muted'
+const BADGE = 'whitespace-nowrap rounded-xs border px-2 py-[3px] font-mono text-[10px] font-medium'
 const SNOW_BADGE: Record<string, string> = {
   read: 'border-blue-bright bg-blue-bright/10 text-blue-bright',
   contribute: 'border-green bg-green/10 text-green',
@@ -28,7 +28,7 @@ export default function MyApps({ persona }: { persona: Persona }) {
     <main className="mx-auto max-w-[1180px] px-[30px]">
       <div className="flex flex-wrap items-center gap-3.5 pb-4 pt-6">
         <h2 tabIndex={-1} data-view-heading className="text-[21px] font-bold outline-none">My Apps — Home Lending</h2>
-        <span className="whitespace-nowrap rounded-xs border border-yellow/50 bg-yellow/8 px-[9px] py-1 font-mono text-[10.5px] font-medium text-yellow">
+        <span className="whitespace-nowrap rounded-xs border border-yellow/50 bg-yellow/8 px-[9px] py-1 font-mono text-[11px] font-medium text-yellow">
           USER VIEW · SYNTHESIZED
         </span>
         <span className="max-w-[300px] overflow-hidden text-ellipsis whitespace-nowrap rounded-full border border-edge px-3 py-[5px] font-mono text-[11px] font-medium text-muted">
@@ -74,8 +74,8 @@ function AppCard({ app }: { app: MyApp }) {
           SNOW · {app.snowPermission}
         </span>
       </div>
-      <div className="mt-2.5 text-[14.5px] font-semibold">{app.name}</div>
-      <div className="mb-3 mt-[3px] text-[11.5px] text-muted">{app.description}</div>
+      <div className="mt-2.5 text-[15px] font-semibold">{app.name}</div>
+      <div className="mb-3 mt-[3px] text-[12px] text-muted">{app.description}</div>
       <div className="flex items-center justify-between gap-2.5 border-t border-edge-soft pt-2.5 text-[13px]">
         <span>{app.team.name} · {app.team.engineers} engineers</span>
         <span className={`${BADGE} border-yellow bg-yellow/8 text-yellow`}>PAT</span>

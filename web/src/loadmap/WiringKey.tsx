@@ -20,7 +20,7 @@ export default function WiringKey({ sources }: { sources: readonly LoadMapSource
       </p>
       <ul className="flex flex-wrap gap-x-4 gap-y-1.5">
         {WIRING_STATES.map((s) => (
-          <li key={s.id} className="flex items-baseline gap-1.5 text-[10.5px]">
+          <li key={s.id} className="flex items-baseline gap-1.5 text-[11px]">
             <span
               className="inline-flex items-center rounded-full border px-1.5 py-px font-mono font-semibold"
               style={{

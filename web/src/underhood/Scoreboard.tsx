@@ -47,7 +47,7 @@ export default function Scoreboard({
               <td className="border-b border-edge-soft px-2.5 py-2 font-mono text-[11px] text-muted">{q.id}</td>
               <td className="border-b border-edge-soft px-2.5 py-2">
                 <span
-                  className="rounded border px-1.5 py-0.5 font-mono text-[9.5px] whitespace-nowrap"
+                  className="rounded border px-1.5 py-0.5 font-mono text-[10px] whitespace-nowrap"
                   style={{ borderColor: `var(${CLASS_TOKEN[q.cls]})`, color: `var(${CLASS_TOKEN[q.cls]})` }}
                 >
                   {q.cls}

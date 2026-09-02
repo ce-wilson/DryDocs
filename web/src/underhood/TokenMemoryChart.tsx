@@ -72,7 +72,7 @@ export default function TokenMemoryChart() {
         <h3 className="text-sm font-semibold text-text">Token-memory tracker</h3>
         <span className="ml-auto flex flex-wrap gap-3">
           {series.map((s) => (
-            <span key={s.id} className="flex items-center gap-1.5 font-mono text-[10.5px] text-muted">
+            <span key={s.id} className="flex items-center gap-1.5 font-mono text-[11px] text-muted">
               <span className="h-2 w-2 rounded-full" style={{ background: `var(${COLOR[s.id]})` }} aria-hidden="true" />
               {LABEL[s.id]} · {TOTALS[s.id].chars.toLocaleString()}ch ({TOTALS[s.id].tokens} tok)
             </span>

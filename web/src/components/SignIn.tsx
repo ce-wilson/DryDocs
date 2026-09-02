@@ -49,7 +49,7 @@ export default function SignIn({ onSignIn }: { onSignIn: (s: Session) => void })
       <div className="rounded-md border border-edge bg-panel p-[18px]">
         <div className="flex items-center gap-3">
           <h2 className="text-lg font-semibold">Sign in</h2>
-          <span className="whitespace-nowrap rounded-xs border border-edge bg-bg-2 px-[9px] py-1 font-mono text-[10.5px] font-medium text-muted">
+          <span className="whitespace-nowrap rounded-xs border border-edge bg-bg-2 px-[9px] py-1 font-mono text-[11px] font-medium text-muted">
             SYNTHETIC ACCOUNTS
           </span>
         </div>
@@ -74,7 +74,7 @@ export default function SignIn({ onSignIn }: { onSignIn: (s: Session) => void })
               <span className="font-semibold">{p.displayName}</span>
               <span className="col-start-1 row-start-2 font-mono text-xs text-blue-bright">{p.id}</span>
               <span
-                className={`col-start-2 row-start-1 self-start rounded-xs border px-2 py-[3px] font-mono text-[10.5px] font-semibold uppercase ${ROLE_BADGE[p.role] ?? ''}`}
+                className={`col-start-2 row-start-1 self-start rounded-xs border px-2 py-[3px] font-mono text-[11px] font-semibold uppercase ${ROLE_BADGE[p.role] ?? ''}`}
               >
                 {p.role}
               </span>

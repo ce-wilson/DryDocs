@@ -15,19 +15,19 @@ export default function StrategyCards() {
         >
           <div className="p-3.5">
             <h3 className="text-sm font-semibold text-text">{s.label}</h3>
-            <p className="mt-0.5 font-mono text-[10.5px] text-faint">{s.kicker}</p>
+            <p className="mt-0.5 font-mono text-[11px] text-faint">{s.kicker}</p>
             <p className="mt-2.5 text-xs leading-relaxed text-muted">{s.how}</p>
             <dl className="mt-3 grid grid-cols-3 gap-2 border-t border-edge-soft pt-2.5 text-center">
               <div>
-                <dt className="text-[9.5px] uppercase tracking-wide text-faint">Recall</dt>
+                <dt className="text-[10px] uppercase tracking-wide text-faint">Recall</dt>
                 <dd className="font-mono text-xs font-semibold text-text">{s.recall}</dd>
               </div>
               <div>
-                <dt className="text-[9.5px] uppercase tracking-wide text-faint">Tokens</dt>
+                <dt className="text-[10px] uppercase tracking-wide text-faint">Tokens</dt>
                 <dd className="font-mono text-xs font-semibold text-text">{s.tokens}</dd>
               </div>
               <div>
-                <dt className="text-[9.5px] uppercase tracking-wide text-faint">Latency</dt>
+                <dt className="text-[10px] uppercase tracking-wide text-faint">Latency</dt>
                 <dd className="font-mono text-xs font-semibold text-text">{s.latency}</dd>
               </div>
             </dl>
