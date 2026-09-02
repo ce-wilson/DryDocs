@@ -1,0 +1,22 @@
+id: PLAN3
+epic: project-board
+title: FROZEN_BAND - the legacy band ids (G10001-G10003, DD10001-DD10003) are frozen at the band's own max, so the letter freeze can port without handing the company a red suite
+type: chore
+module: drydocs-plan
+phase: 8
+agent: main
+model: fable
+priority: p0
+status: in_progress
+depends_on: []
+gates:
+- ontology-domain-registry-and-edition-grain
+inputs:
+- docs/restructure/IDEAS.md
+- docs/reviews/restructure-design-review-2026-09-02.md
+- docs/reviews/port-test-review-and-workplan-2026-09-02.md
+- .claude/skills/groom-backlog/validate.py
+- tests/unit/test_backlog.py
+acceptance: |
+  STUB - minted 2026-09-02 from Idea-242 (trigger fired: PLAN1 is already 113 commits past
+  port-base-20260901, so the next roll carries the freeze before PLAN2 lands); body follows.
