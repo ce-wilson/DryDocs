@@ -91,6 +91,10 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
+- **`Idea-235`** · 2026-09-01 · `[idea]` · **open** · prio? **Med** —
+  **The measurement apparatus corrupts the measurement, and it fails toward a REASSURING answer
+  rather than an alarming one.** STUB - body follows.
+
 - **`Idea-234`** · 2026-09-01 · `[idea]` · **open** · prio? **Low** —
   **A branch tip can be green while commits inside it are red, and nothing records which — so a
   bisect through the range fails on the guard rather than the defect.** Observed on

@@ -1812,6 +1812,42 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   against your tree. Either way, run it before D/E/F, where ~430 files remain
   unexamined and 217 of them classify as clean-adds.
 
+- **RELAY-21 — THE ACRONYM RENAME IS ACCEPTED (SME, re-stated 2026-09-01). APPLY IT
+  AS A RENAME OF PATHS, NEVER AS A TAKE OF CONTENT — that distinction dissolves the
+  gate-state objection entirely** (supersedes the defer recommendation in the
+  producer's own earlier advice).
+  `[SME-REPORTED]` for the ruling; `[VERIFIED-PRODUCER]` for the file list.
+  **THE RULING IS ACCEPT.** The SME gave it once before the scope was known and
+  again after. The producer previously recommended deferring it beside the
+  vocabulary migration; **that recommendation is withdrawn** — it was reasoning
+  about a content take when the ruling is about names.
+  **WHY THE GATE-STATE OBJECTION DOES NOT SURVIVE THE DISTINCTION.** The objection
+  was that the producer's `cdo-crosswalk.yaml` reads SIGNED OFF, 13 confirmations,
+  where yours reads DRAFT with a session pending, and `config/gate-prompts/**` is
+  canonical-company. That is entirely correct **about CONTENT**. It says nothing
+  about the NAME. The manifest's `canonical-company` disposition protects what is
+  IN your file; it does not freeze what the file is CALLED. So:
+  **RENAME YOUR OWN FILE AND KEEP YOUR OWN CONTENT.** `git mv` the path; do not
+  `git checkout` the producer's version. Your prompt stays DRAFT, unsigned, session
+  pending — under its new name. No signature crosses, and the acronym is retired
+  from the surface as ruled.
+  **THE INSTRUCTION SET IS GIT'S, NOT A GREP.** `git diff -M --diff-filter=R
+  --name-status port-base-20260826..HEAD` reports the rename set exactly, with
+  similarity scores. The eleven in this family:
+  `config/crosswalks/*-vocabulary.yaml` (R082), `config/gate-prompts/*-crosswalk.yaml`
+  (R075), `docs/company-prompts/*-frameworks-load-company-prompt.md` (R093),
+  `tests/unit/test_*_crosswalk.py` (R088), and the six under
+  `internal/*-reference/` (R083–R100). Use that list rather than a token sweep —
+  it is the same 72-file change measured exactly, and it will not touch a prose
+  mention that happens to contain the string.
+  **THE ORDER THAT MATTERS:** rename the TEST with its subject in the same commit.
+  `test_*_crosswalk.py` reads `config/crosswalks/*-vocabulary.yaml`, so renaming one
+  without the other is the paired-declaration failure J68 exists for, and it will
+  fail on arrival.
+  **AND THE ONE THING THAT IS NOT A RENAME:** `internal/**` is company-side
+  Internal content and never crosses. Rename your own directory if you hold one;
+  do not take the producer's six transcripts.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
