@@ -1233,10 +1233,6 @@ default_ok:
     reason: "outward-facing non-governed doc (CLAUDE.md §6) — editorial treatment applies, and each side's audience differs"
   - path: "docs/overview/**"
     reason: "outward-facing executive overview; same audience-differs reasoning as the whitepaper"
-  - path: "SDLC-Docs/**"
-    reason: "extracted SDLC method docs (BDD/SDD howto, FCD requirements) — external method material, not DryDocs content"
-
-  # ---- assets + knowledge ---------------------------------------------------
   - path: "drydocs-icons/**"
     reason: "vendor/product icon assets (svg/png/webp). External marks reproduced for UI use; binary, no merge semantics — clean-add is the only sensible resolution"
   - path: "knowledge/org/**"

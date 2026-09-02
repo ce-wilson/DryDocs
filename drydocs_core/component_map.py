@@ -280,7 +280,6 @@ SURFACE_OWNERS: dict[str, str] = {
     "external": "reference",
     "config": "config",
     "docs": "docs",
-    "SDLC-Docs": "docs",  # moves to docs/history/genesis/ (DOC3, ADR 0018 Q3)
     "scripts": "drydocs-load",  # renderers and rituals; each script's SUBJECT owns its logic
     "internal": "docs",  # the publish-boundary twin; never crosses
 }

@@ -323,4 +323,4 @@ units from `docs/restructure/backlog/items/`. Each backlog item names its agent 
   import proves nothing about import order (S13: exactly that gap shipped a cycle).
 - **Secrets discipline:** architecture-level only. No real data values in commits.
 
-See `internal/repo-README.md` for the runnable pipeline and `docs/restructure/01-project-plan.md` for the plan.
+See `internal/repo-README.md` for the runnable pipeline and `docs/restructure/01-project-plan.md` for the founding narrative (the phase list itself is `docs/restructure/backlog/plan.yaml`, rendered on `docs/plan/roadmap.html`).

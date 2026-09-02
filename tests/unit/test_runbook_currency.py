@@ -61,6 +61,25 @@ EXTRA_DOCS: dict[str, str] = {
         "Added after a manual audit found the S5 fragment split had reached the code "
         "and not this document"
     ),
+    # ADR 0018 D5 (2026-09-02): the four ROUTING documents. A routing doc that names a
+    # moved path actively misdirects - git-readme.md carried 31 paths from before the
+    # 0002-A extraction for seven weeks, MODULE_MAP.md seven, and nothing looked.
+    "CLAUDE.md": (
+        "the agent operating guide - every session reads it first, and a stale path in it "
+        "is repeated by every agent that reads it until somebody notices"
+    ),
+    "MODULE_MAP.md": (
+        "the physical routing doc - where new code goes; a stale path here misplaces the "
+        "next module and the default-deny guard then names the wrong fix"
+    ),
+    "git-readme.md": (
+        "the cross-repo WHY guide the company session reads at a port; it carried 31 "
+        "pre-extraction paths for seven weeks before ADR 0018 D5 put it under this guard"
+    ),
+    "internal/repo-README.md": (
+        "the runnable-pipeline README - the first document a new machine follows, so a "
+        "moved path here costs a session before anyone suspects the doc"
+    ),
 }
 
 #: Paths a document names that are NOT claims about the current tree. Each needs a

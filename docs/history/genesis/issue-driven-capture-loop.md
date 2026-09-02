@@ -178,4 +178,3 @@ continuously test context sufficiency, and the ledger records whether the system
 - **(c) Run one issue end-to-end:** take one synthetic value-discrepancy on one DataAsset through
   §2's loop → produce `§DOC + §OQ(method-tagged) + §LEDGER`, as the first graceful-degradation row.
 - **Recommended order:** (a) → (b) → (c).
-```
