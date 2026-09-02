@@ -1,7 +1,8 @@
 # ADR 0018 — Component identity is a declared, exported module map; directories follow only when a trigger fires
 
 ```yaml
-status: PROPOSED          # awaiting the user's ruling on D1-D5 and the three open questions
+status: ACCEPTED-WITH-AMENDMENTS   # user, 2026-09-02 - D1-D3, D5 as proposed; D4 AMENDED to NOW; Q1-Q3 ruled (see Acceptance)
+accepted: 2026-09-02
 date: 2026-09-02
 authored_by: the 2026-09-02 tech-debt review, second-reviewed under /architecture (desktop)
 deciders: [chad.wilson]
@@ -20,9 +21,32 @@ relates_to:
 executed_by: TBD — grooms of Idea-244 (the map, the guard, the five directories) and Idea-247 (the routing-doc guard and renders); the DOC1 amendment to 0015 D2
 ```
 
-> **Nothing in this record moves a file.** It decides what a component IS, where that is
-> written down, and what has to be true before any file moves. The move itself (D4) is
-> triggered, not scheduled.
+> **Nothing in this record moves a file by itself.** It decides what a component IS, where
+> that is written down, and - as amended at acceptance - that the directories follow NOW, as
+> one carved slice of the port in flight, so the rest of the restructure lands on a tree
+> whose physical and logical layout already agree.
+
+## Acceptance (user, 2026-09-02)
+
+- **D1, D2, D3, D5 - accepted as proposed.**
+- **D4 - AMENDED: take Option B now, not on a trigger.** The user's words: *"I have been
+  wanting B for a long time, let's take the hit now, carve that into the sole port, so the
+  rest of the restructure goes smoothly."* So the subpackage move is scheduled, not
+  triggered; it lands producer-side as one branch merged `--no-ff`, and it crosses to the
+  company as ONE carved slice of the current port with its own relay - the consumer applies
+  it as git renames (the J72 detector and `git diff -M` both see them), with the re-export
+  shims making every old import path valid for one port cycle. The "never mid-apply" clause
+  is replaced by "as its own slice, applied after the range's classes and before the
+  vocabulary migration" - the move touches no vocabulary and no config, so it sits cleanly
+  between workplan chunks 4 and 5.
+- **Q1 - `libs/` becomes its own module, `drydocs-libs`, series `LIBS`.** Reason given: a
+  server deployment of this project is configured differently and would never call it;
+  it is a library beside the product, not a part of core. Runbook state: EXEMPT (standalone
+  drop-ins; `libs/oracle_kerberos/` carries its own guide).
+- **Q2 - cut and link.** `01-project-plan.md` keeps what YAML cannot hold and links the
+  roadmap render; the roadmap is not re-rendered on its account.
+- **Q3 - `docs/history/genesis/`.** The six `SDLC-Docs/extracted/` files move there as
+  they are, lowercase path, module `docs`.
 
 - **Reviewed at:** commit `0e3d2945` on `main`, port base `port-base-20260901`; venue MSI.
   *Absent here reads as not-yet-ported, not as broken (docs/style/review-provenance.md).*
@@ -119,15 +143,17 @@ and `web` (non-Python, no group) → `drydocs-web` follow S7's non-Python clause
 | `libs/` | open question Q1 | see below |
 | `SDLC-Docs/` | `docs`, relocated | the 2018 genesis material (Full Circle Docs) is the project's own history, not external reference: move to `docs/history/genesis/` in lowercase, the six files as they are, and the design review's citation of `FCD-Requirements.md` follows it. Not `reference/` — nothing there has a `source_url` |
 
-**D4 — Directories follow the map only when a trigger fires, and the triggers are
-ADR 0002-A's.** A flat component becomes a subpackage (`drydocs/review/`, `drydocs/plan/`,
-`drydocs/port/`, `drydocs/docgen/`; `load` stays the package root) when ONE of:
-(a) it gains a second consumer outside `drydocs.cli` (the rule that moved `docs_verify` to
-core at O58); (b) it needs its own run cadence or release (0002 rejected polyrepo on
-exactly this trigger); (c) the copier is being built and D1's list-driven `_exclude`
-proves insufficient in practice — not in anticipation. The move is add-new + re-export-old
-for one port cycle, never a rename. **And never during an in-flight company apply**: the
-earliest date is after workplan chunk 9 closes the `port-base-20260901` range.
+**D4 — Directories follow the map NOW (as amended at acceptance; the proposed text said
+"only when a trigger fires").** The four flat components become subpackages —
+`drydocs/review/`, `drydocs/plan/`, `drydocs/port/`, `drydocs/docgen/`; `load` stays the
+package root — as add-new + re-export-old: every old module path (`drydocs.gate_pages`,
+`drydocs.plan_board`, …) stays importable as a one-line shim for one port cycle, so no
+citation breaks and no consumer import fails on arrival; the shims are removed at the roll
+after next. The move lands producer-side on one branch, merged `--no-ff`, and crosses as
+ONE carved slice of the port in flight with its own relay (renames, not clean-adds; the
+consumer's `git diff -M` reproduces the list). The proposed clause's triggers — a second
+consumer, an own cadence, the copier build — remain the reasons; the user ruled the cost
+is better paid once, now, before the restructure items land on the tree.
 
 **D5 — Routing docs are rendered or guarded, never hand-copied.** `MODULE_MAP.md`'s two
 tables render from D1's map. `docs/restructure/01-project-plan.md`'s phase narrative
@@ -213,10 +239,10 @@ layer down: extract when a consumer exists, never to share early.
 - **Harder:** adding a component now touches `component_map.py` AND `modules.yaml` (the
   guard says so, with the row to add); `MODULE_MAP.md`'s tables are no longer hand-edited
   (the prose around them still is — the S7 section, the placement test, the history).
-- **Revisit:** D4's triggers, at the copier build (0015 Phase 0 gate) and at any second
-  consumer. And Q1–Q3 below.
+- **Revisit:** the shim removal at the roll after next; the copier's use of the map at
+  the 0015 Phase 0 gate.
 
-## Open questions for the ruling
+## Open questions — RULED at acceptance (kept for the reasoning)
 
 - **Q1 — `libs/` ownership.** It is Python (`libs/oracle_kerberos/`, port-frozen, its own
   `evaluate` manifest row) and it is in `COMPONENT_GROUPS` as `libs`, but it is not a
@@ -233,13 +259,14 @@ layer down: extract when a consumer exists, never to share early.
 
 ## Action items
 
-1. [ ] Ruling on D1–D5 and Q1–Q3 (user).
-2. [ ] Groom Idea-244 into two items: CFG/CORE — `drydocs_core/component_map.py` + the
-   boundary test importing it + the join guard + `drydocs-port`/`PORT` in `modules.yaml`;
-   DOC — the five ownership rows and the `SDLC-Docs/` relocation.
-3. [ ] Groom Idea-247: the routing-doc path guard, the `git-readme.md` sweep in the same
-   commit, `MODULE_MAP.md` tables rendered from the map, `01-project-plan.md` per Q2.
-4. [ ] DOC1 (already minted): amend ADR 0015 D2 to cite this ADR's map as the object the
+1. [x] Ruling on D1–D5 and Q1–Q3 (user, 2026-09-02 — see Acceptance).
+2. [ ] CORE item: `drydocs_core/component_map.py` + the boundary test importing it + the
+   join guard + `drydocs-port`/`PORT` and `drydocs-libs`/`LIBS` in `modules.yaml`.
+3. [ ] LOAD item: the four subpackages with re-export shims; the port relay for the carved
+   slice; `MODULE_MAP.md` tables rendered from the map.
+4. [ ] DOC item: the five ownership rows; `SDLC-Docs/` → `docs/history/genesis/`; the
+   routing-doc path guard with the `git-readme.md` sweep; `01-project-plan.md` cut and
+   linked.
+5. [ ] DOC1 (already minted): amend ADR 0015 D2 to cite this ADR's map as the object the
    cut reads, and D4 to say the `drydocs/**` file classes derive from it.
-5. [ ] Record D4's triggers on the copier's Phase 0 gate so the move is decided there,
-   with the company apply closed.
+6. [ ] Shim removal at the roll after next (an item minted when the relay rolls).
