@@ -1,0 +1,96 @@
+# =============================================================================
+# id-shapes.template.yaml — the shape of internal/research/_registry/id-shapes.yaml
+# (schema drydocs.research-id-shapes.v1): identifier shapes, which system mints
+# them, and whether they join — established ONCE
+# =============================================================================
+# WHY THIS FILE EXISTS: in the reviewed trace "four different identifier shapes
+# had each been called the route id", and which one actually joined a job to
+# its transfer was the whole question. A trace that meets an identifier with no
+# ledger to consult will call it a key, a name, or noise by feel. This is the
+# shared ledger of shapes — read before treating any token as a key, written
+# at session close.
+#
+# WHAT VALIDATES A ROW (no probe, so no `control`): `join_key` is `confirmed`
+# ONLY when an authoritative record was retrieved BY that key — name the record.
+# A shape that "looks like" a key, or that an SME supplied with a caveat, is
+# `unverified` and may not be used as a join key, a filename, a front-matter
+# field or a graph property until resolved (research-probe-discipline §1).
+#
+# WHERE IT FEEDS: no config home. A shape ruled a join key is a candidate CLASS
+# for the shared entity extractor (drydocs_core.entity_extract, MM3 — today:
+# guid, folder_name, issue_key, table_name, distribution_list, application_id).
+# Adding a class is a code change
+# with tests; the KEY itself — what it identifies in the graph — is the gate's.
+#
+# CLASSIFICATION: the real file is Internal — real shapes are near-instances,
+# and an example value is an instance. THIS TEMPLATE is mechanism-only: the
+# shapes below are placeholders (`ftsi#####`, `<PREFIX>-<n>`), never observed
+# values, and every 5-digit example must sit in the reserved synthetic block
+# (tests/unit/test_publish_boundary_values.py).
+#
+# SCHEMA (drydocs.research-id-shapes.v1)
+#   id              required, kebab-case, stable — what people CALL it
+#   also_called     optional, list — the other names the same shape goes by
+#   shape           required, a regex-ish pattern with placeholders, never a value
+#   example         required, a placeholder instance (`ftsi#####`), never observed
+#   minted_by       required, the platform/system that assigns it (a platforms.yaml id
+#                   where one exists)
+#   identifies      required, one line — what a value of this shape names
+#   lifetime        required, durable | ephemeral — a durable handle reaches a
+#                   definition record; an ephemeral one only an event record, and
+#                   expires (the lineage skill's link 4a / 4b)
+#   join_key        required, confirmed | unverified | not-a-key
+#   confirmed_by    required when confirmed — the authoritative record retrieved by
+#                   this key, and on which platform
+#   collides_with   optional, list — other shapes it can be mistaken for: homonyms,
+#                   era collisions (a legacy numbering overlapping a current one)
+#   extractor_class optional, the entity_extract class that reads it, or `candidate`
+#   evidence        required, list of breadcrumbs, <kind>:<rest>
+#   first_seen      required, { subject, on }
+#   verified_on     required, ISO date
+#   verified_by     required, sme | agent
+#   decay           required, e.g. 365d — shapes change on platform generations, rarely otherwise
+#   classification  required, External | Internal-Public | Internal
+#   notes           optional
+schema: drydocs.research-id-shapes.v1
+
+entries:
+  # A durable handle, confirmed as a join key by the record it retrieved.
+  - id: <platform>-route-id
+    also_called: ["route id", "<the token name in job descriptions>"]
+    shape: "<prefix>[0-9]{5}"
+    example: "ftsi#####"
+    minted_by: <internal-brand>
+    identifies: "one transfer definition — (<account> -> <directory>), no file identity"
+    lifetime: durable
+    join_key: confirmed
+    confirmed_by: "the definition export row retrieved by this value, <platform>, 2026-09-01"
+    collides_with:
+      - "<other-shape> — the same digits under an older numbering scheme (era collision)"
+    extractor_class: candidate
+    evidence:
+      - "transcript:<subject>-MM-research.md"
+    first_seen: { subject: <subject>, on: 2026-09-01 }
+    verified_on: 2026-09-02
+    verified_by: agent
+    decay: 365d
+    classification: Internal
+
+  # An ephemeral handle: it retrieves an event record this week and nothing next week.
+  - id: <platform>-transfer-file-name
+    shape: "<feed>_<yyyymmdd>.<ext>"
+    example: "<feed>_20260901.csv"
+    minted_by: <upstream-producer>
+    identifies: "one delivered file — the event record, seven-day window"
+    lifetime: ephemeral
+    join_key: confirmed
+    confirmed_by: "the transfer-history row retrieved by file name, <platform>, 2026-09-01 — and absent after 7 days"
+    extractor_class: ~
+    evidence:
+      - "log:<job>/<run>/<line-range>"
+    first_seen: { subject: <subject>, on: 2026-09-01 }
+    verified_on: 2026-09-02
+    verified_by: agent
+    decay: 365d
+    classification: Internal
+    notes: "a candidate that passes only on this handle is traceable this week and not next — report 4a and 4b separately"

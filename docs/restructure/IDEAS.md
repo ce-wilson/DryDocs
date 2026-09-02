@@ -420,6 +420,18 @@ question a 1,000-line file with the trail at the bottom could not answer.
   way three times in one day and corrected itself each time. These belong in
   `internal/research/_templates/source-probe.md` when that template is back-flowed (it is
   company-side today and the research owes it a correction).
+  **KEPT-UPDATED 2026-09-02 (laptop, `feat/research-skills`):** the U-1..U-6 method landed
+  producer-side as SKILLS, not as the `source-probe.md` template — `research-general` §2.1 /
+  §2.3 / §2.4 carries U-1..U-6 in mechanism, on the `research-probe-discipline` backbone,
+  with `research-job-failure` and `research-job-lineage` beside it; all four rebuilt from the
+  transcription `internal/research/mm-aar-research.md` (Parts 4–7, reviewed at `2c184a79`).
+  The company originals sit on an unmerged research branch, so this is a rebuild from the
+  transcription, not a port. The template correction the research owed is moot producer-side:
+  the skills supersede the template, and the whitelist schema ships as
+  `.claude/skills/research-probe-discipline/references/source-whitelist.template.yaml` with
+  the AAR's OQ-a..OQ-e flagged OPEN for the user. One substantive correction at the review:
+  the lineage skill's "compare max ids and renumber" step is rewritten to the allocator mint
+  rule.
   **TWO HOUSEKEEPING NOTES FROM THE COMPANY'S OWN PASS:** `G64.yaml` is `status: todo` on both
   sides while its research log describes the gate as convened and §B run — worth checking which is
   stale. And the log's hop ids (`H1–H7`, `P1–P6`, `S3`, `G5`) collide with real backlog ids; a

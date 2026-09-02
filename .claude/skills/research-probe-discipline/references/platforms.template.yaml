@@ -1,0 +1,104 @@
+# =============================================================================
+# platforms.template.yaml — the shape of internal/research/_registry/platforms.yaml
+# (schema drydocs.research-platforms.v1): internal brand -> vendor, product,
+# version and era, established ONCE
+# =============================================================================
+# WHY THIS FILE EXISTS: the reviewed trace spent two days on documentation that
+# never named the vendor; a mandatory User-Agent header did, then a cookie name,
+# then a version label. The next trace on the same platform must not repeat
+# that — and Idea-236 recorded that the software registry did not know the
+# platform at all. This is the shared ledger of what a platform actually IS,
+# read before any probe on it, written at session close.
+#
+# WHAT VALIDATES A ROW (the whitelist's `control` does not transfer): the
+# IMPLEMENTATION SURFACE that revealed the vendor — a header, a cookie name, a
+# default port, a path convention, a version label, an error-code vocabulary.
+# A vendor named only in a supported-client compatibility table is NOT the
+# vendor of the system (research-probe-discipline §4.4); record that as
+# `revealed_by: none` and confidence `To verify`.
+#
+# GRADUATION, two targets:
+#   reference/REGISTRY.yaml                  the vendor's PUBLIC docs, once named —
+#                                            External, no entitlement, the
+#                                            reference-librarian agent's file
+#   config/taxonomy/software-registry.yaml   a product row (Vendor / SoftwareProduct,
+#                                            SME-gated field set 2026-07-07)
+# Both through the gate; research edits neither.
+#
+# OWNERSHIP SURFACE lives here as a field, not a fourth ledger: which surface
+# asserts who owns a thing on this platform (a deployment CI's correlation_id,
+# an escalation row, a notification's registered contact). It is per platform,
+# and it is the fact a failure or lineage trace re-derives every time.
+#
+# CLASSIFICATION: the real file is Internal — internal brand names, hosts, the
+# generation history of a platform. THIS TEMPLATE is mechanism-only.
+#
+# SCHEMA (drydocs.research-platforms.v1)
+#   id                required, kebab-case, stable — the INTERNAL brand, since
+#                     that is what a job token or a description names
+#   internal_names    required, list — every spelling seen in tokens, descriptions,
+#                     tickets (a name may denote a mechanism, an era, or a product)
+#   vendor            required, or `unknown` — the company, never the product
+#   product           required, or `unknown` — what the vendor ships
+#   version           optional, the string as observed and where
+#   era               optional, list of { name, from, to } — generational renames,
+#                     so an identifier from one era is not matched to another
+#   revealed_by       required, list of { surface, observation } — the implementation
+#                     surfaces that named the vendor; `none` when only prose did
+#   confidence        required, Confirmed | Partial | Likely | To verify | Corrected
+#   ownership_surface required, list of { asserts, surface } — which record says who
+#                     owns what on this platform (e.g. application id <- CI correlation_id)
+#   record_grains     optional, list of { record, identity, grain, retention, artifact_named }
+#                     — the definition-vs-event table the lineage skill fills in §2.4
+#   exports           optional, list of { name, columns, joins_on } — every export of
+#                     the same object seen, so "one export is not the platform" is
+#                     checkable
+#   error_taxonomy    optional, list — the platform's OWN failure vocabulary (Issue Type
+#                     values, error codes) as captured; a failure trace reads it here
+#                     instead of re-harvesting it, and registering it as graph
+#                     vocabulary stays the gate's
+#   evidence          required, list of breadcrumbs, <kind>:<rest>
+#   first_seen        required, { subject, on }
+#   verified_on       required, ISO date
+#   verified_by       required, sme | agent
+#   decay             required, e.g. 180d
+#   classification    required, External | Internal-Public | Internal
+#   graduates_to      optional, list — `reference-registry` and/or `software-registry`
+#                     once signed
+#   notes             optional
+schema: drydocs.research-platforms.v1
+
+entries:
+  - id: <internal-brand>
+    internal_names: ["<BRAND>", "<brand-token-in-job-names>", "<older-brand>"]
+    vendor: "<vendor>"
+    product: "<product>"
+    version: "<x.y.z>, from the version label in <field>"
+    era:
+      - { name: "<older-brand>", from: "<year>", to: "<year>" }
+      - { name: "<BRAND>", from: "<year>", to: ~ }
+    revealed_by:
+      - { surface: user-agent, observation: "mandatory header names the vendor product" }
+      - { surface: cookie, observation: "session cookie name matches the vendor product" }
+      - { surface: version-label, observation: "a field value carries the product version" }
+    confidence: Confirmed
+    ownership_surface:
+      - { asserts: application id, surface: "deployment CI correlation_id" }
+      - { asserts: support contact, surface: "the failure notification's registered contact" }
+    record_grains:
+      - { record: definition, identity: "<account> -> <directory>", grain: route, retention: durable, artifact_named: false }
+      - { record: event, identity: "<transfer-id>", grain: file, retention: 7d, artifact_named: true }
+    exports:
+      - { name: "<object> (narrow)", columns: 21, joins_on: "<key>" }
+      - { name: "<object> (wide)", columns: 139, joins_on: "<key>" }
+    error_taxonomy: [authentication, connection, network, permission, transfer-operation]
+    evidence:
+      - "transcript:<subject>-MM-research.md"
+      - "confluence:<page-id>"
+    first_seen: { subject: <subject>, on: 2026-09-01 }
+    verified_on: 2026-09-02
+    verified_by: agent
+    decay: 180d
+    classification: Internal
+    graduates_to: ~
+    notes: "the vendor's public docs are External once named — register them, they cost no entitlement"
