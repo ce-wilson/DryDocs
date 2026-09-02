@@ -91,6 +91,247 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
+- **`Idea-241`** · 2026-09-02 · `[idea]` · **open** · prio? **High** —
+  **The S8 composition root should DISCOVER a consumer command module by convention, so
+  `drydocs/cli.py` stops being an `evaluate` collision — the company never adopted the split
+  and its monolith carries stale inline copies of every verb S8 moved.** Source: the
+  company's PORT-REPORT for `port-base-20260826..20260901`, defect 6 (2026-09-02, relayed
+  session record): `test_env_doctor::test_the_command_is_registered` failed at their G slice
+  because `env-doctor` is defined in `drydocs/cli_schema.py` — byte-identical to producer,
+  taken in D — and **nothing imports it**. Their `drydocs/cli.py` is a **4,079-line pre-S8
+  monolith with zero references to any `cli_*` module** (4,112 after D's one hunk); the six
+  per-domain modules sit beside it unwired. Attribution checked, not assumed: the orphaning
+  predates the port — it was already so at their base `294b9cec`.
+  **MEASURED HERE (J63: `main`, `port-base-20260901`).** Producer `cli.py` is 669 lines and
+  registers 51 commands (`app.registered_commands`, J37); the six `cli_*.py` modules total
+  4,017 lines. The S8 split landed **2026-08-21** (`f5e7229d`, 3,184 lines → thin root + six
+  modules) and S13 hoisted shared state on 08-27 (`5ab0c1d2`) — so `cli.py` was 1,356 lines at
+  `port-base-20260826` and 669 at `20260901`. **S8 was in the PREVIOUS port's range.** A
+  prior port already faced the split and did not adopt it.
+  **WHY — a manifest row that cannot express a refactor.** `drydocs/cli.py` is `evaluate`
+  with the note *"composition root; both sides add commands — merge per collision ledger
+  (keep consumer verbs, add producer verbs)"* (`PORT-MANIFEST.yaml:870`). That rule is
+  correct for VERB ADDITIONS and wrong for a STRUCTURAL change: followed literally it merges
+  producer verbs INTO the monolith, so the monolith grows every port (3,184 → 4,079 → 4,112)
+  and the split never arrives. Worse than one missing verb: every verb S8 moved into a
+  module and that has CHANGED since — G79's `refresh-reference` split into three subject
+  commands, `verify-reference`/`verify-controlm` with the m1/m3 deprecated aliases — exists
+  company-side only as a **stale inline copy from before the split**. Their 67 registered
+  commands include those copies. `env-doctor` is the first one a guard caught, not the only
+  one that is wrong.
+  **TWO CHANGES, one theirs and one ours.**
+  THEIRS (the port action, raised in their report as "owed, for a ruling") — adopt the split:
+  take the 669-line root wholesale; move the company-only verbs (their count: 26) into a
+  company-owned `drydocs/cli_company.py` (or per-domain) with its `MODULE_MAP.md` row in the
+  same commit (`load` group; the S13 subprocess-per-import guard covers it for free); DROP,
+  not move, every inline verb whose name is in producer's `registered_commands` — the module
+  version is current, the inline one is stale (name-set diff, read the importable object on
+  both sides); add `cli_company` to `COMMAND_MODULES` at `cli.py:663`.
+  OURS (this idea) — remove the residual collision permanently. After adoption the only
+  company edit to `cli.py` is one tuple element. Replace it with DISCOVERY: the composition
+  root imports `drydocs.cli_local` (name to be settled; one name, documented in
+  `MODULE_MAP.md`) **if and only if `importlib.util.find_spec` finds it**, and registers its
+  verbs after `COMMAND_MODULES`. Producer ships no such module; the company owns one; the
+  manifest row for `drydocs/cli.py` can then move from `evaluate` to `canonical-producer`,
+  because both sides never again edit the same file. Guards: `test_cli_import_order.py` gains
+  the optional module (subprocess-per-import — an in-process import proves nothing about
+  order, S13); `test_cli_registry.py` asserts a fixture `cli_local` registers and a missing
+  one is silent; `test_module_boundary.py` classifies the name (default-deny). The
+  composition-root-plus-discovered-extension shape is ADR 0002-A's — core imports nothing
+  from a component; a consumer module is the outermost layer and may import anything.
+  **THE GENERAL LESSON, for the J68/J69 machinery:** `evaluate` notes say how to merge
+  CONTENT. None of them can say "the producer changed the SHAPE of this file — take the
+  shape, re-home your content." A structural refactor of an `evaluate` path needs its own
+  RELAY at the roll that carries it, naming the new shape and where consumer content goes;
+  S8 shipped without one, and two ports walked past it. Candidate rule for
+  `docs/port/port-prompt.md`: a commit whose subject starts `refactor(` and touches an
+  `evaluate` path is a mandatory relay. Related: S8, S13, ADR 0002-A, J68, J69, [[Idea-239]]
+  (same report, same day), [[Idea-240]].
+
+- **`Idea-240`** · 2026-09-02 · `[idea]` · **open** · prio? **Med** —
+  **The publish boundary is defined on the tracked tree and says nothing about git HISTORY —
+  34 commit messages on main carry the retired org acronym, and whether the public push is
+  tip-only or carries history is undocumented.** Source: the company's own flag during the
+  D/F apply (2026-09-02, relayed session record) — a commit TITLE on their `main` carries the
+  retired token, and their `git rm --cached` of the deepdoc scrape removed the blob from the
+  tip while it stays reachable in history; they named it *a history-rewrite decision, not a
+  tip-level one*, and left it to the SME. The same decision exists here and has never been
+  written down. **Measured producer-side:** `git log main --grep` for the retired token (read
+  from `internal/cdo-reference/README.md`, the guard's own mapping file, never spelled here)
+  matches **34 of 1,816** commits on `main`. `tests/unit/
+  test_publish_boundary_retired_org_acronym.py` (J55) scopes history OUT deliberately — its
+  docstring cites commit `3c2bfcdd` naming history as an *expected transient survivor* — and
+  that is the right scope for a tree guard. But `PUBLISH-BOUNDARY.md` defines the boundary
+  as *the git-tracked working tree outside `internal/`* and does not contain the word
+  "history," so the document that governs the public push is silent on the one thing a
+  public push carries that a tree guard cannot see. This repo has a public twin
+  ([[project-public-side-publish-boundary]]), so the question is live, not hypothetical.
+  **THE RULING NEEDED, one of three:** (a) the public push is TIP-ONLY (squash or orphan
+  commit) — history never leaves, and `PUBLISH-BOUNDARY.md` says so in one sentence; (b) the
+  public push carries history and the 34 messages are ACCEPTED (the acronym in a commit
+  subject identifies an org unit, not a person, host or credential — arguably below the
+  §3 line) — recorded as an allowlisted class with the count and the reason; (c) history is
+  rewritten (`filter-repo` on messages only) — the option the company named, and the one
+  that breaks every `reviewed_commit` stamp, gate-log sha, port-base tag and PORT-REPORT
+  pin in the repo, so it is listed to be REJECTED with the reason, not to be chosen.
+  Recommendation is (a) if the publish mechanism already is tip-only (verify against the
+  public twin's `git rev-list --count`), otherwise (b). **Either way the mechanism gains one
+  test:** a guard that reads `git log --format=%s%b` for the retired token and asserts the
+  count against the recorded ceiling (34 today) — a NEW occurrence in a commit message is
+  the leak J55 cannot see, and it is the failure the company just had. Not a sweep; a
+  ceiling. Related: J55, J23, [[Idea-239]] (same day, same port).
+
+- **`Idea-239`** · 2026-09-02 · `[idea]` · **open** · prio? **Med** —
+  **A config surface, its renderer's SURFACES row and the derived artifact it feeds are ONE
+  coupling — a port slice carries all three or none, and the manifest should name the triple
+  the way J68 names declaration/guard pairs.** Source: the company's D-slice apply of
+  `port-base-20260826..20260901` (2026-09-02; relayed session record, `port-updat-d-10..13`
+  transcribed in the relay's reading, not cited as images). What happened, in order:
+  `config/source-bindings.yaml` (G125) had reached the company in an earlier slice WITHOUT the
+  matching row in `scripts/render_enforcement_matrix.py` `SURFACES`; producer's guard
+  `tests/unit/test_enforcement_matrix.py` asserts every top-level `config/` entry is in
+  `SURFACES` or `CONFIG_EXEMPT`, so on OUR tree the pair can never separate — but a port slice
+  is not a tree, and the guard only fires after the take. `render_board.py` then exited 1, so
+  `enforcement-matrix.json` and `load-map.json` could not be regenerated; the freshly applied
+  `web/src/generated/**` → `derived` manifest row (febdf3ba) says *regenerate, never carry*;
+  and the J55 acronym guard failed on the stale carried copies. **A row we wrote to stop a
+  file being carried made the file unproducible instead**, because its inputs had crossed in
+  different slices. Clearing it exposed a SECOND stacked failure (`render_software_registry.py`
+  on `datetime.date`, fixed producer-side at O68 `6b43c850`, inside this range, not yet
+  applied) that the first had hidden. The company's own words: *the same dependency-closure
+  failure a fourth time, in a new place: renders → renderers → config surfaces.*
+  **WHY THE EXISTING MACHINERY DOES NOT COVER IT.** J68's `DECLARATION_GUARD_PAIRS` names
+  two-way couplings whose members must share a DISPOSITION. This is a three-way coupling
+  whose members legitimately hold DIFFERENT dispositions — the config file is `per-entry`
+  (company rows stay), the renderer is `canonical-producer`, the artifact is `derived` — and
+  the invariant is not "same disposition" but "same SLICE": if any one crosses, the other two
+  must be applied (or regenerated) in the same apply, and the `derived` member must be
+  regenerated LAST, after both inputs. The APPLY BY DISPOSITION section already orders
+  `derived` last; what it lacks is the statement that `derived`'s inputs are a closure, and
+  which files are in it.
+  **THE PROPOSAL, smallest form.** (1) A `closure:` field on each `derived` manifest row
+  naming its renderer(s) and the config surfaces they read — for `web/src/generated/**` that
+  is `scripts/render_board.py`, `render_enforcement_matrix.py`, `render_software_registry.py`,
+  `render_load_map.py` and every `config/*.yaml` in `SURFACES`; (2) a guard in
+  `test_port_manifest.py` that the closure is TOTAL against the importable object (J37: read
+  `SURFACES`, never the render) — a config file registered in `SURFACES` but absent from the
+  closure fails; (3) `scripts/render_port_dispositions.py` prints the closure under each
+  `derived` row so the apply sees "regenerate this — which needs THESE applied first" instead
+  of a bare "regenerate." Nothing in the port-prompt's ledger changes; this is manifest
+  structure and a guard, the J68 pattern. **What it is NOT:** a reason to allowlist a carried
+  artifact — the company considered that and rejected it, correctly: it would have shipped a
+  `derived` row for files that could not be produced.
+  **A NOTE ON COUNT.** "Fourth time" is the company's tally and it is the right one to keep:
+  `dev-environment.yaml` by omission (2026-07-28), `source-registry.yaml` (J68),
+  `source-bindings.yaml` missing from the 08-30 slice (found 2026-09-01), and now the
+  closure behind it. Each was fixed at the file; this is the first framing at the shape.
+  Related: J68, J71, J72, G125, O68, N4/N5 (the load-map surfaces), [[Idea-235]].
+
+- **`Idea-238`** · 2026-09-02 · `[idea]` · **open** · prio? **Med** —
+  **Load the mind-map research logs into a throwaway Neo4j database (`mindmap`), apply the
+  current ontology, and run the Knowledge-Graph-of-Thoughts retry loop over it — to see how a
+  mind map traverses.** User ask, 2026-09-02 (laptop session, branch
+  `feat/mm-deepdoc-investigate`): "ingest all of the research-mindmap files, test loading into
+  a new Neo4j db `mindmap`, applying the current ontology, and the retry logic of knowledge
+  graphs of thoughts, just to see how it can be traversed." An experiment, not a feature.
+  - **THE SOURCE FAMILY.** `internal/research/<SUBJECT>-MM-research.md` — one so far, the
+    JOB→MFTS log (`internal/research/JOB-MFTS-MM-research.md`, 2,183 lines, transcribed
+    producer-side 2026-09-02 from its company venue; Idea-236 files its five gaps). It is
+    already graph-shaped prose: YAML front matter (`central_question`, `subject`, `venue`),
+    a **Brain-map** section (the tree), a **Trace ledger** of ~120 hops (H-n), **CORRECTION**
+    blocks that retract earlier hops, **Gotchas** (G-n), **Predictions** resolved against
+    evidence, **Open questions** (OQ-n, the SME's to rule), **Acronyms & terms**, and a dated
+    **Notes log**. The sibling family is the deepdoc session's eight `*-capture.md`
+    transcripts (machine-local, never tracked). Both are `classification: Internal` — the
+    loaded graph carries real values, so the database lives only on a machine that has
+    `internal/`, is never published, and every claim about it names its venue (J18).
+  - **"NEW DB" — read it the KGoT way or it fights the fold.** G102 (2026-08-18) folded the
+    content topology to ONE database, `drydocs`, with `:Uncertain` as the boundary; ADR 0011
+    is the contingency; `test_database_names.py` pins the deployed names. A fourth content
+    database reopens that ruling. What does NOT: KGoT's own pattern — a **task-scoped,
+    throwaway graph per question** (`reference/research/knowledge-graph-of-thoughts.md`,
+    the iterative controller). So `mindmap` is a scratch database created for the run and
+    dropped after, the way KGoT builds one per task — a test bench, never a home. If the
+    experiment shows the graph is worth KEEPING, that is a gate question (which labels,
+    which database), not a default.
+  - **"APPLY THE CURRENT ONTOLOGY."** The relationship-vocabulary registry
+    (`drydocs_core/ontology/relationship_vocabulary/`, per-domain fragments) plus what MM
+    has already registered `planned` — MM2's `:DataFlow` edges (`arch_has_data_flow`,
+    `arch_orchestrates`, `arch_fed_by`, `arch_lands_in`, `docs_evidenced_by`). The log's
+    sections map onto things the epic already has names for: hops → `ContextFinding`-shaped
+    rows (subject / predicate / object / evidence breadcrumb / `phase: build|run`);
+    CORRECTION blocks → retractions with an `as_of` (a KGoT graph edit, and the temporal
+    axis C40 wants); Open questions → **open slots** in the MM3 state file
+    (`drydocs.deepdoc.mindmap.v1`); the Brain-map → its branches; Acronyms & terms → MM12's
+    candidate class; the MM3 entity extractor pulls the ids out of every hop. Every write
+    is corpus-derived, so it carries `:Uncertain` + reliability/trust (ADR 0011 clause 1)
+    even in a scratch database — the discipline is cheap and the guards
+    (`test_uncertain_boundary.py`) only watch `drydocs_deepdoc`, so a scratch writer under
+    `scripts/` or `internal-local/` must carry it by choice, and say so.
+  - **"THE RETRY LOGIC OF KNOWLEDGE GRAPHS OF THOUGHTS."** As the reference file maps it onto
+    ADR 0007: bounded escalation INTO an iterative loop (Tier 2, reached only when Tier-1
+    context is insufficient), the **fix-Cypher repair loop capped at ≤2 retries**, the
+    **forced-solve fallback** so a stalled loop still returns something inspectable, and
+    **per-iteration snapshots** (rendered by the console's `TaskGraphPane`). The experiment:
+    seed the loop with the log's own `central_question`, let it traverse the `mindmap`
+    graph, and record — hops taken vs the ~120 the analyst took by hand, which retries
+    fired and why, whether forced-solve was reached, what each iteration's snapshot shows,
+    and whether the traversal arrives at the same "understanding" section the log states
+    plainly. That is the whole question: **can the loop walk a mind map, and where does it
+    stall.**
+  - **WHERE IT SITS.** Downstream of MM3 (done: the state file and the extractor are the
+    parse target and the parser); a live rehearsal for MM6 (ontology proposals — the
+    experiment will surface which labels the log needs) and MM10 (`investigate()` v1 is
+    this loop made procedural, graph-seeded); adjacent to R16 (named agent verbs over the
+    reviewed QuerySpecs — the loop's tools) and L28 (the KGoT citation). Module for a groom:
+    `drydocs-deepdoc` for the parse and the state-file writer; the scratch-database loader
+    and the loop harness under `scripts/` (or `agents/`, if it rides the Tier-2 ADK loop)
+    so nothing in a component learns a database name the pin does not allow.
+  - **What to expect, stated before the run:** the CORRECTION blocks are the interesting
+    part — a hop the log later retracted is exactly the edge a naive traversal will happily
+    walk, and whether the loop notices the retraction is the first thing to look at.
+  - **KEPT-UPDATED 2026-09-02 (same day) — the family is two files, not one, and the second
+    brings the traversal's negative space.** `internal/research/mm-aar-research.md` landed on
+    `main` (fd3aa92b; provenance corrected 2c184a79): the after-action review of the JOB→MFTS
+    search, transcribed from seven company artifacts that live on an UNMERGED research branch
+    — not company main, not port candidates, cited by path only. Two of those artifacts are
+    graph-loadable beside the log and belong in this experiment: the **probe log**
+    (`internal/research/_probes/<subject>-probes.jsonl`, one object per probe — `source / tool /
+    query / scope / result_count / outcome`, `outcome ∈ empty | irrelevant | blocked | stale |
+    exhausted | exhausted_in_scope`, with a positive `control_query` that must pass before
+    `exhausted` is admissible) and the **source whitelist**
+    (`internal/research/_registry/source-whitelist.yaml`: confirmed-good sources AND
+    controlled dead ends, `decay` mandatory, graduates to the ingestion registries only through
+    the gate). Loaded, the probe log is the set of edges the analyst tried and ruled out, each
+    with its control — exactly what a KGoT loop needs so it does not re-walk a dead end — and
+    the whitelist is the `known` half of MM3's novelty score. The probe log's row is the MM3
+    search log's sibling (`tool / query / outcome` beside `tool / search / theme / novelty`);
+    whether the two converge into one row shape is a groom question this experiment answers
+    with data rather than by ruling. Three AAR §3 rules go into the loop's retry logic as
+    written: a negative probe without a passing positive control is INVALID, not negative
+    (3.1); a census over an artifact needs a schema control before "the platform does not hold
+    X" is a finding (3.2); the artifact and the reading are cited separately — the image is
+    VERBATIM, a model's reading of it is GROUNDED (3.6).
+
+- **`Idea-237`** · 2026-09-02 · `[doc]` · **open** · prio? **Med** —
+  **The data-flow-overview gate prompt calls "MM3" the Output-tab / log-substrate extractor —
+  that is MM7's work, and MM3 is something else.** Found while closing MM3 (2026-09-02, laptop).
+  `config/gate-prompts/data-flow-overview.yaml` names MM3 nine times (lines 10, 40, 65, 112, 134,
+  137, 260, 269, 390) as the item that reads the Output-tab log verbatim, enriches the members and
+  fills the SOURCE-badged log fields (`launcher_kinds`, `compute_target`, `placement_handoff`,
+  `landing_prefix`) — "absent until MM3 lands and the field says so". In the backlog as it stands,
+  that is **MM7** (`Control-M Output-tab log extractor … joined onto :ETLProcess`, drydocs-lineage,
+  in_progress); **MM3** is the mind-map state file + the shared entity/ID extractor + the search
+  log's theme/novelty columns (drydocs-deepdoc, done). Line 65 even files the consumer as
+  "drydocs-lineage (MM3)", which is MM7's module. The numbers shifted at a groom after the prompt
+  was drafted (2026-08-21), and nothing re-pointed the prompt. Why it is an inbox line and not a
+  fix: `config/gate-prompts/**` is canonical-company (J72 notes), so a producer-side edit to a
+  drafted, unsigned prompt is a cross-repo reconciliation, not an edit — and a reader who takes
+  the prompt at its word will look for MM3 to close the Output-tab fields and find a state file.
+  Smallest fix: s/MM3/MM7/ at the nine sites, with the consumer line's module corrected; the
+  `gates: [data-flow-overview]` edge on MM3 itself stays, because the evidence-ref grammar MM3
+  built IS gate territory (§E).
+
 - **`Idea-236`** · 2026-09-02 · `[idea]` · **open** · prio? **High** —
   **The JOB→MFTS research landed (120 hops, 19 open questions) and it answers Idea-104's
   evidence half — five gaps against the backlog, one of which blocks the file-transfer
@@ -179,6 +420,18 @@ question a 1,000-line file with the trail at the bottom could not answer.
   way three times in one day and corrected itself each time. These belong in
   `internal/research/_templates/source-probe.md` when that template is back-flowed (it is
   company-side today and the research owes it a correction).
+  **KEPT-UPDATED 2026-09-02 (laptop, `feat/research-skills`):** the U-1..U-6 method landed
+  producer-side as SKILLS, not as the `source-probe.md` template — `research-general` §2.1 /
+  §2.3 / §2.4 carries U-1..U-6 in mechanism, on the `research-probe-discipline` backbone,
+  with `research-job-failure` and `research-job-lineage` beside it; all four rebuilt from the
+  transcription `internal/research/mm-aar-research.md` (Parts 4–7, reviewed at `2c184a79`).
+  The company originals sit on an unmerged research branch, so this is a rebuild from the
+  transcription, not a port. The template correction the research owed is moot producer-side:
+  the skills supersede the template, and the whitelist schema ships as
+  `.claude/skills/research-probe-discipline/references/source-whitelist.template.yaml` with
+  the AAR's OQ-a..OQ-e flagged OPEN for the user. One substantive correction at the review:
+  the lineage skill's "compare max ids and renumber" step is rewritten to the allocator mint
+  rule.
   **TWO HOUSEKEEPING NOTES FROM THE COMPANY'S OWN PASS:** `G64.yaml` is `status: todo` on both
   sides while its research log describes the gate as convened and §B run — worth checking which is
   stale. And the log's hop ids (`H1–H7`, `P1–P6`, `S3`, `G5`) collide with real backlog ids; a

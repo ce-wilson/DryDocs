@@ -1,18 +1,18 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-01T14:12:45",
-    "date": "20260901",
+    "captured_at": "2026-09-02T03:14:47",
+    "date": "20260902",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "5d14003c",
-      "full": "5d14003c34dc2b8d7e9c0d40825358bfa9646912",
+      "commit": "3123eb1e",
+      "full": "3123eb1eda50d7357e2c02da68d00b2bfc1e19b9",
       "branch": "main",
-      "describe": "port-base-20260901-10-g5d14003c",
-      "subject": "docs(Idea-234): a green tip says nothing about the commits inside the range",
-      "dirty": false,
-      "untracked_present": false,
+      "describe": "port-base-20260901-42-g3123eb1e",
+      "subject": "fix(Idea-239): header priority is Med, not Medium - test_plan_ideas vocabulary",
+      "dirty": true,
+      "untracked_present": true,
       "pr": null
     },
     "depgraph": {
@@ -7271,6 +7271,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/company-prompts/adoption-4-port-machinery-dossier.md",
+      "name": "adoption-4-port-machinery-dossier.md",
+      "extension": ".md",
+      "rel_path": "docs/company-prompts/adoption-4-port-machinery-dossier.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/company-prompts/cdo-frameworks-load-company-prompt.md",
       "name": "cdo-frameworks-load-company-prompt.md",
       "extension": ".md",
@@ -9764,6 +9773,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/C41.yaml",
+      "name": "C41.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/C41.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/C5.yaml",
       "name": "C5.yaml",
       "extension": ".yaml",
@@ -11901,6 +11919,24 @@
       "name": "J7.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/J7.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/J71.yaml",
+      "name": "J71.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/J71.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/J72.yaml",
+      "name": "J72.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/J72.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -17648,6 +17684,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs/port_rename_detect.py",
+      "name": "port_rename_detect.py",
+      "extension": ".py",
+      "rel_path": "drydocs/port_rename_detect.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs/publishing",
       "name": "publishing",
       "extension": "",
@@ -20717,6 +20762,24 @@
       "kind": "dir"
     },
     {
+      "file_id": "drydocs/internal/research/JOB-MFTS-MM-research.md",
+      "name": "JOB-MFTS-MM-research.md",
+      "extension": ".md",
+      "rel_path": "internal/research/JOB-MFTS-MM-research.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/internal/research/mm-aar-research.md",
+      "name": "mm-aar-research.md",
+      "extension": ".md",
+      "rel_path": "internal/research/mm-aar-research.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/internal/research/triage-bootstrap-2026-08-28.md",
       "name": "triage-bootstrap-2026-08-28.md",
       "extension": ".md",
@@ -20870,10 +20933,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260831.json",
-      "name": "drydocs-20260831.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260902.json",
+      "name": "drydocs-20260902.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260831.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260902.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -21990,6 +22053,15 @@
       "name": "port_preflight.py",
       "extension": ".py",
       "rel_path": "scripts/port_preflight.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/scripts/port_rename_check.py",
+      "name": "port_rename_check.py",
+      "extension": ".py",
+      "rel_path": "scripts/port_rename_check.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -23610,6 +23682,15 @@
       "name": "test_port_reconcile_guards.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_port_reconcile_guards.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_port_rename_detect.py",
+      "name": "test_port_rename_detect.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_port_rename_detect.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -28304,6 +28385,14 @@
       "drydocs/drydocs/port_preflight.py"
     ],
     [
+      "drydocs/scripts/port_rename_check.py",
+      "drydocs/drydocs/port_rename_detect.py"
+    ],
+    [
+      "drydocs/scripts/port_rename_check.py",
+      "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
       "drydocs/scripts/project_pat_team_report.py",
       "drydocs/drydocs/pat_projection.py"
     ],
@@ -29778,6 +29867,10 @@
     [
       "drydocs/tests/unit/test_port_reconcile_guards.py",
       "drydocs/drydocs_remediation/detect.py"
+    ],
+    [
+      "drydocs/tests/unit/test_port_rename_detect.py",
+      "drydocs/drydocs/port_rename_detect.py"
     ],
     [
       "drydocs/tests/unit/test_precedence.py",
@@ -36003,6 +36096,11 @@
     [
       "drydocs/docs/company-prompts",
       "CONTAINS",
+      "drydocs/docs/company-prompts/adoption-4-port-machinery-dossier.md"
+    ],
+    [
+      "drydocs/docs/company-prompts",
+      "CONTAINS",
       "drydocs/docs/company-prompts/cdo-frameworks-load-company-prompt.md"
     ],
     [
@@ -37348,6 +37446,11 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/C41.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/C5.yaml"
     ],
     [
@@ -38534,6 +38637,16 @@
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
       "drydocs/docs/restructure/backlog/items/J7.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/J71.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/J72.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -40719,6 +40832,11 @@
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/port_preflight.py"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
+      "drydocs/drydocs/port_rename_detect.py"
     ],
     [
       "drydocs/drydocs",
@@ -43343,6 +43461,16 @@
     [
       "drydocs/internal/research",
       "CONTAINS",
+      "drydocs/internal/research/JOB-MFTS-MM-research.md"
+    ],
+    [
+      "drydocs/internal/research",
+      "CONTAINS",
+      "drydocs/internal/research/mm-aar-research.md"
+    ],
+    [
+      "drydocs/internal/research",
+      "CONTAINS",
       "drydocs/internal/research/triage-bootstrap-2026-08-28.md"
     ],
     [
@@ -43448,7 +43576,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260831.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260902.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -43904,6 +44032,11 @@
       "drydocs/scripts",
       "CONTAINS",
       "drydocs/scripts/port_preflight.py"
+    ],
+    [
+      "drydocs/scripts",
+      "CONTAINS",
+      "drydocs/scripts/port_rename_check.py"
     ],
     [
       "drydocs/scripts",
@@ -44899,6 +45032,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_port_reconcile_guards.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_port_rename_detect.py"
     ],
     [
       "drydocs/tests/unit",
@@ -46315,13 +46453,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2609,
-    "edges": 1408,
+    "files": 2618,
+    "edges": 1411,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 2902,
+    "rels": 2911,
     "directories": 294
   }
 }

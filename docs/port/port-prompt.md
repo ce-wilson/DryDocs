@@ -1847,6 +1847,24 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   **AND THE ONE THING THAT IS NOT A RENAME:** `internal/**` is company-side
   Internal content and never crosses. Rename your own directory if you hold one;
   do not take the producer's six transcripts.
+  **CORRECTION (2026-09-02, from your own apply) — THE SWEEP IS REQUIRED, AND THE
+  RELAY ABOVE SAID THE OPPOSITE.** "Use that list rather than a token sweep" was
+  wrong, and the guard caught it on your side: `tests/unit/
+  test_publish_boundary_retired_org_acronym.py` (J55, in this range) fails on ANY
+  occurrence of the retired token outside `internal/`, prose included, allowlist
+  EMPTY. The producer's own change was 13 path renames PLUS a prose sweep of every
+  publishable file (`gate-log.md`, `IDEAS.md`, `doc-source-registry.yaml` — the
+  four-letter form became the three-letter form even inside quoted committee
+  names); the only text that keeps the old token is the VERBATIM
+  capture under `internal/`, because `internal/` never publishes. So the rule is
+  scoped by FILE, not by case and not by path-vs-prose: **outside `internal/`, the
+  token goes everywhere; inside `internal/`, captured text stays as captured and
+  only the directory moves.** What "never a take of content" MEANT — and still
+  means — is narrower than the sentence read: the gate prompt's STATUS and
+  SIGNATURE do not cross. Rename it, sweep its prose, keep it DRAFT and unsigned.
+  You derived this from the tree and applied it correctly (13 renames, 50 files,
+  201 mentions, residual outside `internal/` zero, J55 green); this note exists so
+  the next reader does not have to.
 
 - **RELAY-22 — YOUR +83 ON SLICE E IS NOT A PORT PROBLEM, IT IS A RENDER STEP; AND THE
   MANIFEST WAS TELLING YOU TO TAKE ARTIFACTS YOU SHOULD REGENERATE** (new 2026-09-02;
