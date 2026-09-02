@@ -91,6 +91,11 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
+- **`Idea-239`** · 2026-09-02 · `[idea]` · **open** · prio? **Medium** —
+  **A config surface, its renderer's SURFACES row and the derived artifact it feeds are ONE
+  coupling — a port slice carries all three or none, and the manifest should name the triple
+  the way J68 names declaration/guard pairs.** STUB - body follows.
+
 - **`Idea-236`** · 2026-09-02 · `[idea]` · **open** · prio? **High** —
   **The JOB→MFTS research landed (120 hops, 19 open questions) and it answers Idea-104's
   evidence half — five gaps against the backlog, one of which blocks the file-transfer
