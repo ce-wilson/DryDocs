@@ -1,6 +1,6 @@
 ---
 name: research-probe-discipline
-description: "The shared backbone for DryDocs research sessions — the SME context interview, the probe-outcome vocabulary, the positive-control rule, the probe log, and the source whitelist. Use whenever a research session searches ANY source and might record an absence, a dead end, or a 'not found'. Loaded by research-general, research-job-failure and research-job-lineage; use it directly for one-off lookups that still need their negatives to be trustworthy."
+description: "The shared backbone for DryDocs research sessions — the SME context interview, the probe-outcome vocabulary, the positive-control rule, the probe log, and the shared ledgers (source whitelist, terms, platforms, id shapes) that stop a session re-discovering what the last one settled. Use whenever a research session searches ANY source and might record an absence, a dead end, or a 'not found'. Loaded by research-general, research-job-failure and research-job-lineage; use it directly for one-off lookups that still need their negatives to be trustworthy."
 ---
 
 # research-probe-discipline
@@ -57,6 +57,12 @@ sme_context:
 
 **An `unverified` fact may not become a join key, a filename, a front-matter field or a graph
 property until it is resolved.** Resolving it is action #1, not an item somewhere in the list.
+
+**Then read the shared ledgers (§6) for the subject family before the first query** — the
+whitelist for where to look, `terms` for what the tokens mean, `platforms` for what the
+platform actually is, `id-shapes` for which identifiers join. What is already there is cited,
+not re-derived; a session that re-discovers a term the last session decoded has spent its
+budget on nothing.
 
 ---
 
@@ -179,12 +185,37 @@ search record.*
 
 ---
 
-## 6. The source whitelist
+## 6. The shared ledgers — the whitelist, and three more shaped like it
+
+Four files under `internal/research/_registry/`, one discipline. Each exists because a
+reviewed session re-discovered something the session before it had already established, and
+each is read before the first query and written at close. The shapes ship as templates in
+[`references/`](references/); copy one to start the file.
+
+| Ledger | Schema | Stops re-discovering | Graduates to (through the gate) |
+|---|---|---|---|
+| `source-whitelist.yaml` | `drydocs.source-whitelist.v1` | where to look, and what a source does NOT answer | `config/doc-source-registry.yaml`, `config/source-registry.yaml` |
+| `terms.yaml` | `drydocs.research-terms.v1` | what an acronym or token means — and what it does NOT mean | `config/taxonomy/software-registry.yaml` `acronyms:` (the SME-ruled home; the four registry fields are carried verbatim so promotion is a copy) |
+| `platforms.yaml` | `drydocs.research-platforms.v1` | what an internally branded platform actually is — vendor, product, version, era — and which surface asserts ownership on it | `reference/REGISTRY.yaml` (the vendor's public docs, External) and a `software-registry.yaml` product row |
+| `id-shapes.yaml` | `drydocs.research-id-shapes.v1` | which identifier shapes exist, who mints them, and whether they join | no config home — a confirmed join key is a candidate class for the shared entity extractor; the key's meaning is the gate's |
+
+**What validates a row differs by ledger, and the field says so.** A source row carries its
+`control` (§3); a term carries its `evidence` and a `confidence` in the analyst's own
+vocabulary (`Confirmed / Partial / Likely / To verify / Corrected`); a platform carries the
+implementation surface that `revealed_by` the vendor; an id shape carries `join_key:
+confirmed` only with the authoritative record `confirmed_by`. Every row carries
+`verified_on`, `verified_by: sme | agent`, `decay`, `classification` and its evidence
+breadcrumbs in the state-file grammar (`<kind>:<rest>`).
+
+**Agent-verified is never SME-verified.** `verified_by: agent` marks a corpus-derived
+(SYNTHESIZED) row; it stays marked through graduation, where the registry's own `source`
+prose must agree with it. A ledger that lets the two blur is worse than no ledger.
+
+### 6.1 The source whitelist
 
 `internal/research/_registry/source-whitelist.yaml` — schema `drydocs.source-whitelist.v1`.
 The field list, with the working defaults and the questions still open for the user to rule,
-is [`references/source-whitelist.template.yaml`](references/source-whitelist.template.yaml);
-copy it to start the file.
+is [`references/source-whitelist.template.yaml`](references/source-whitelist.template.yaml).
 
 **Read it first.** Before probing anything, check whether the source is already recorded: what
 rung it reached, what it answers, and — just as important — what it **does not** answer.
@@ -197,23 +228,39 @@ rung it reached, what it answers, and — just as important — what it **does n
 Every entry carries `verified_on` and `decay`. **Past decay, re-verify before citing.** One
 page the reviewed session leaned on had gone stale in under four months.
 
-### Not an ingestion registry
+### 6.2 Terms, platforms, id shapes
+
+Read them the same way, in the same step. A token already in `terms.yaml` is cited by its
+row, not decoded again — and its `not:` list is the homonym check for free. A platform already
+in `platforms.yaml` answers "which platform is it, actually?" and "which surface asserts
+ownership?" before a probe is spent on either. A shape already in `id-shapes.yaml` says
+whether the token in hand is a durable handle, an ephemeral one, or not a key at all. Write
+to them at close (§8): new rows, corrected rows, and rows whose confidence moved — with the
+evidence that moved it.
+
+### 6.3 Not ingestion registries
 
 | File | Purpose | Gate-bound? |
 |---|---|---|
-| `internal/research/_registry/source-whitelist.yaml` | research starting points | no |
+| `internal/research/_registry/*.yaml` | research ledgers — starting points, terms, platforms, id shapes | no |
 | `config/doc-source-registry.yaml` | documents a loader may read | **yes** |
 | `config/source-registry.yaml` | data sources | **yes** |
+| `config/taxonomy/software-registry.yaml` | vendors, products, and the ruled acronym expansions | **yes** |
+| `reference/REGISTRY.yaml` | external references (a named vendor's public docs) | **yes** |
 
-A whitelist entry **graduates** to a config registry through the HITL gate — the
-`add-source-object` skill is the walk for a data source. It never short-circuits one. Set
-`graduates_to:` only after sign-off.
+A ledger row **graduates** to a config registry through the HITL gate — the
+`add-source-object` skill is the walk for a data source, the O68 change-artifact path for an
+acronym, the `reference-librarian` agent for a vendor reference. It never short-circuits one.
+Set `graduates_to:` only after sign-off.
 
-### A wrong row is worse than no row
+### 6.4 A wrong row is worse than no row
 
-The prose table this file replaced carried an incorrect lead for two months and sent a session
-to a homonym. **Ledger entries need the same outcome class, control and decay as the probes
-that produced them** — otherwise reuse propagates errors faster than it saves time.
+The prose table the whitelist replaced carried an incorrect lead for two months and sent a
+session to a homonym. **Ledger rows need the same evidence, the same validation
+(control, confidence, revealing surface, confirming record) and the same decay as the probes
+that produced them** — otherwise reuse propagates errors faster than it saves time. A row
+past its `decay` is re-verified before it is cited, and a row found wrong is corrected in
+place with the reason in `notes`, never deleted.
 
 ---
 
@@ -236,12 +283,20 @@ If a worked example needs a value to make sense, write it as a shape — `<accou
 1. Every probe is in the JSONL, with an outcome class.
 2. Every `exhausted*` row has a control.
 3. New or corrected sources are written to the whitelist with `verified_on`.
-4. Every `unverified` SME fact is either resolved or still flagged `unverified` — never
+4. **The session's decodes are promoted to the shared ledgers**, with their evidence: every
+   term the log's acronyms table settled or corrected → `terms.yaml`; every platform whose
+   vendor, version, era or ownership surface was established → `platforms.yaml`; every
+   identifier shape whose `join_key` status was settled → `id-shapes.yaml`. Confidence is
+   carried as it stands — a `Likely` stays `Likely`, `verified_by: agent` stays `agent` — never
+   rounded up at the door.
+5. Every `unverified` SME fact is either resolved or still flagged `unverified` — never
    silently promoted.
-5. Two metrics in the notes entry:
+6. Three metrics in the notes entry:
    - **coverage** — of the candidate sources for the question, how many were probed;
-   - **reuse** — how many probes were skipped because the whitelist already answered them.
-     If reuse stays near zero across sessions, the ledger is not paying for itself.
+   - **reuse** — how many probes were skipped because the whitelist already answered them;
+   - **re-discovery** — how many terms, platforms or shapes the session decoded that a ledger
+     already held. Reuse near zero means the ledgers are not paying for themselves;
+     re-discovery above zero means they were not read.
 
 ---
 

@@ -27,7 +27,9 @@ Question 7 is the highest-yield of the four. **The channel a failure arrives on 
 evidence** — it names the registered contact, often names the artifact, and tells you which
 surface the platform considers authoritative for failures.
 
-Read the whitelist for the subject family before probing.
+Read the shared ledgers for the subject family before probing (`research-probe-discipline`
+§6): the whitelist for where to look, `platforms` for the platform's ownership surface and
+error taxonomy already on record, `terms` for the tokens in the notification.
 
 ---
 

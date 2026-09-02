@@ -27,8 +27,9 @@ Run the five-question SME interview from `research-probe-discipline` §1, plus o
 Write it into the log's `central_question`. If it cannot be phrased as a question, stop and say
 so — there is no trace to open yet.
 
-Then **read the whitelist** (`internal/research/_registry/source-whitelist.yaml`) for the
-subject family before probing anything.
+Then **read the shared ledgers** (`internal/research/_registry/` — the whitelist, `terms`,
+`platforms`, `id-shapes`; `research-probe-discipline` §6) for the subject family before
+probing anything. A term, a platform or an id shape already there is cited, not re-derived.
 
 ---
 
@@ -64,9 +65,16 @@ vendor's processes.
 compatibility table* is not the vendor of the system. Ask whether the name appears as the
 **subject** or in a list of things the subject talks to.
 
+**Check `platforms.yaml` before any of this.** If the platform is already there, the vendor,
+version, era and ownership surface are settled and cited — the two days above were spent once
+and need not be spent again. If it is not, the row you write at close is the trace's most
+reusable output: `internal_names`, `vendor`, `product`, `revealed_by` (the surfaces above,
+each with what was observed), `era`, `ownership_surface`.
+
 Once the vendor is named, register the public reference the way this repo registers every
 external source: `reference/REGISTRY.yaml` with a `source_url`, classification External
-(`CLAUDE.md` §2-§3; the `reference-librarian` agent owns that file).
+(`CLAUDE.md` §2-§3; the `reference-librarian` agent owns that file) — that is the platform
+row's `graduates_to`.
 
 ### 2.2 Internal documentation
 
@@ -112,11 +120,18 @@ an id obtained by name** (`research-probe-discipline` §1).
 
 ## 3. Decode as you go
 
-Keep an acronyms and terms table in the log from the first hop, with a confidence column
+**Read `terms.yaml` first** (`research-probe-discipline` §6). A token already in the ledger is
+cited by its row — expansion, confidence and its `not:` list — and is not decoded again; the
+ledger exists because every log used to rebuild this table from nothing.
+
+Then keep an acronyms and terms table in the log from the first hop, as the **session's
+working copy**: the tokens the ledger did not know, with a confidence column
 (`Confirmed / Partial / Likely / To verify / Corrected`). Never silently upgrade a confidence.
-An acronym that survives the session is a candidate for the software registry
-(`config/taxonomy/software-registry.yaml`) by the change-artifact path — never a direct edit
-from a trace.
+At close, every row the session settled or corrected goes to `terms.yaml` with its evidence
+(§8 of the backbone). A term that reaches `Confirmed` with an SME behind it is a candidate for
+the software registry's `acronyms:` section (`config/taxonomy/software-registry.yaml`, the
+SME-ruled home) by the change-artifact path — never a direct edit from a trace, and never
+without `verified_by` agreeing with the registry's `source`.
 
 **Two decode traps, both observed:**
 

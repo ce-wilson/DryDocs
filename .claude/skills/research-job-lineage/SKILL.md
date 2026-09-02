@@ -27,7 +27,9 @@ Five-question interview from `research-probe-discipline` §1, plus four:
 > **9. Is there a known-good sibling** that already traces end to end? A worked example is
 >   worth more than any amount of schema reading.
 
-Read the whitelist for the platform family before probing.
+Read the shared ledgers for the platform family before probing (`research-probe-discipline`
+§6): the whitelist for where to look, `platforms` for what the transfer platform actually is,
+`id-shapes` for which of the anchor's tokens is a handle at all.
 
 ---
 
@@ -66,7 +68,9 @@ Now go to the transfer/movement platform. Two things to establish before profili
 
 - **Which platform is it, actually?** Internal branding, generational renames and generic use
   of a family name make this genuinely ambiguous. A name in a job token may denote a
-  *mechanism*, an *era*, or a *product*.
+  *mechanism*, an *era*, or a *product*. **`platforms.yaml` answers this first** — its
+  `internal_names` and `era` list are exactly this ambiguity, settled once; if the platform
+  is there, cite the row and move on. If it is not, this trace writes it at close.
 - **How many exports does it have?** Two exports of the same object with near-disjoint columns
   are common. If they share one key they **join** — and the union is often the full picture
   neither alone provides.
@@ -87,6 +91,13 @@ different keys and different lifetimes**. Establish for each:
 **The grain is the finding.** A definition scoped to *(account → directory)* carries no file
 identity; a definition scoped to *(feed, extension)* does. Two platforms doing the same job may
 differ here, and a model ported across them will be wrong.
+
+**This table is a ledger row, not a log section.** Its answers go to `platforms.yaml`
+(`record_grains`, `exports`) and each identifier it names goes to `id-shapes.yaml` with its
+`lifetime` (durable → link 4a, ephemeral → link 4b) and its `join_key` status — `confirmed`
+only by naming the record the key retrieved. Read both ledgers before filling the table; the
+reviewed trace called four different shapes "the route id" before one of them retrieved a
+record, and the next trace on the same platform should start from that answer.
 
 ### 2.5 Ownership
 

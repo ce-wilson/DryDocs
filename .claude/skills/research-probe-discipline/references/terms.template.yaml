@@ -1,0 +1,105 @@
+# =============================================================================
+# terms.template.yaml — the shape of internal/research/_registry/terms.yaml
+# (schema drydocs.research-terms.v1): acronyms and terms decoded ONCE, across
+# every research subject
+# =============================================================================
+# WHY THIS FILE EXISTS: every research log rebuilt its own Term / Meaning /
+# Confidence table, so the same acronym was decoded on every trace and the
+# decode died with the session. This is the shared ledger — like the source
+# whitelist, and for the same reason: reuse. Read it before decoding anything;
+# a term already here is CITED, not re-derived. Write to it at session close.
+#
+# WHERE IT SITS IN THE PIPELINE (three stages, three trust levels):
+#   1. per-subject candidates   the mind-map state file (drydocs.deepdoc.mindmap.v1;
+#                                MM12 adds acronym candidates there, :Uncertain,
+#                                the sentence traveling with the token)
+#   2. cross-subject ledger      THIS FILE — the analyst's promotion target at
+#                                session close, Internal, every row evidenced
+#   3. the durable home          config/taxonomy/software-registry.yaml `acronyms:`
+#                                (SME-ruled home 2026-07-21; O68 clause (d) shape:
+#                                expansion / source / added / note, guarded by
+#                                tests/unit/test_software_registry.py) — reached
+#                                ONLY through the change-artifact path, never by a
+#                                research edit to config/
+# The four registry fields are carried here verbatim so graduation is a COPY.
+#
+# OPEN — the user's to rule (carried beside the whitelist's OQ-a..OQ-e):
+#   OQ-f  MM12 clause (c) says the extractor's acronym candidates land in the
+#         state file "and nowhere else". That governs the EXTRACTOR's automated
+#         output (stage 1); this ledger is the ANALYST's target (stage 2). They
+#         are consistent as a pipeline, but MM12's wording reads as forbidding
+#         the middle step — if these ledgers are adopted, MM12 (c) needs a
+#         one-line amendment at groom. Not edited here.
+#   OQ-g  no validator reads this file producer-side (the whitelist has none
+#         either); a validator is a later item if the ledgers fill.
+#
+# TRUST IS NOT OPTIONAL. verified_by: agent means the decode is corpus-derived
+# (SYNTHESIZED) and must never be indistinguishable from an SME-supplied entry.
+# At graduation the registry's `source` prose ("SME ruling…" / "SME-supplied…")
+# must agree with verified_by here.
+#
+# CLASSIFICATION: the real file is Internal (it will name internal platforms
+# and programs). THIS TEMPLATE is mechanism-only — <ACRONYM> shapes, never an
+# instance. For a worked example of a graduated row, read the registry's own
+# SNOW entry (tracked, Internal-Public).
+#
+# SCHEMA (drydocs.research-terms.v1)
+#   term              required, the token as written in the source, exact case
+#   expansion         required, one line  ─┐
+#   source            required, prose      │  the four registry fields,
+#   added             required, ISO date   │  carried verbatim
+#   note              optional             ─┘
+#   confidence        required, Confirmed | Partial | Likely | To verify | Corrected
+#                     (the analyst's exact column; never silently upgraded)
+#   not               optional, list — what the term explicitly does NOT mean
+#                     (the structured form of "ServiceNow. NOT Snowflake.")
+#   evidence          required, list of breadcrumbs in the state-file grammar,
+#                     <kind>:<rest> with kind in email | log | jira | commit |
+#                     confluence | transcript — the sentence it was found in,
+#                     cited, not pasted
+#   first_seen        required, { subject: <research subject>, on: ISO date }
+#   verified_on       required, ISO date the expansion was last confirmed
+#   verified_by       required, sme | agent
+#   decay             required, e.g. 180d — a term's meaning drifts slower than
+#                     a page, and faster than you think when a program renames
+#   classification    required, External | Internal-Public | Internal
+#   graduates_to      optional, `software-registry` once the change artifact is
+#                     signed; absent until then
+#   notes             optional
+schema: drydocs.research-terms.v1
+
+entries:
+  # A confirmed term, ready to graduate: every registry field present and the
+  # expansion SME-verified.
+  - term: <ACRONYM>
+    expansion: "<one line, the program or product name the token stands for>"
+    source: "SME-supplied 2026-09-02, from <the surface that stated it>"
+    added: 2026-09-02
+    note: "<the caveat the expansion alone would lose — a misnomer, a rename, an era>"
+    confidence: Confirmed
+    not:
+      - "<the homonym it is NOT, when one exists>"
+    evidence:
+      - "confluence:<page-id>"
+      - "transcript:<subject>-MM-research.md"
+    first_seen: { subject: <subject>, on: 2026-09-01 }
+    verified_on: 2026-09-02
+    verified_by: sme
+    decay: 180d
+    classification: Internal
+    graduates_to: ~
+
+  # A term decoded by the agent from the corpus alone — kept, cited, and marked
+  # so it can never pass for an SME entry.
+  - term: <TOKEN>
+    expansion: "<the reading the surrounding sentence supports>"
+    source: "agent reading of <artifact> 2026-09-02; not SME-confirmed"
+    added: 2026-09-02
+    confidence: Likely
+    evidence:
+      - "log:<job>/<run>/<line-range>"
+    first_seen: { subject: <subject>, on: 2026-09-02 }
+    verified_on: 2026-09-02
+    verified_by: agent
+    decay: 90d
+    classification: Internal
