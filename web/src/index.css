@@ -6,6 +6,9 @@
 
 @import 'tailwindcss';
 @import './styles/tokens.css';
+/* O88: the paper form — @media print only, plus the screen-side hide for the L6 gutter
+   tags and the capture footer. Nothing in it applies on screen. */
+@import './styles/print.css';
 
 /* O91(d) TYPE FLOOR. The smallest size allowed for text a reader must READ is
    10px. Below that is reserved for labels a reader SCANS in place - the text

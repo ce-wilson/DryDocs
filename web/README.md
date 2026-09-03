@@ -98,6 +98,52 @@ Changing the web port means changing that variable with it.
 The case ledger is `config/taxonomy/ui-tests.yaml`: cases carrying `automated_by`
 are run by these files, and the rest are still checklists a person works through.
 
+## Paper form (O88) — capture a route for pen-and-paper review
+
+The console's paper form is the **executed DOM**, captured from the running console
+through headless Edge and written as one self-contained `.html` per route — the L6
+half of the Epic L feedback loop, for a React SPA over a live API. It is a capture,
+never a re-render: a second renderer that reproduced console markup from JSON would
+drift from the screen silently.
+
+```powershell
+npm run paper -- --persona mouse                                   # /gates, /software, /load-map
+npm run paper -- --persona trinity --routes /gates,/remediation --verify-print
+Get-Content .\secret.txt | npm run paper -- --persona mouse --secret-stdin   # non-interactive
+```
+
+- **What it needs**: the console and `drydocs-api` running (`--web`, default
+  `http://localhost:5173`), a persona and its secret (prompted without echo, or
+  `--secret-stdin` — never a flag, never the environment), `DRYDOCS_DATA_ROOT` set
+  (captures land under `<data root>/console-captures/<utc-stamp>/`, or `--out`), and
+  headless Edge (`--browser chromium` falls back to the O80 harness's build).
+- **What each capture carries**: every stylesheet inlined (fonts fall back to system
+  faces; `@font-face` is dropped rather than shipping font files), images and canvases
+  as data URIs, no scripts, the `.dd-margin-tag` gutter tag on every heading, table and
+  tab panel (`<route-slug>.<n>` in DOM order, also in `data-dd-anchor`), and a
+  `.dd-print-footer` on every printed page: `route · commit (dirty?) · captured UTC ·
+  api <origin the page itself read> · persona · browser`. A `capture-manifest.json`
+  beside the files records the same plus each file's sha256 and whether it is
+  self-contained (the script exits 1 if any capture still references an external
+  resource).
+- **The print sheet is `src/styles/print.css`** (imported by `index.css`, `@media
+  print` only): the shell chrome goes, `main` gets the left gutter, and the
+  `.dd-margin-tag` / `.dd-print-footer` rules are the design-doc renderer's, verbatim —
+  `tests/unit/test_console_print_gutter.py` pins them equal. Printing a live route from
+  the browser uses the same sheet, with no tags and no footer, because only the capture
+  knows the commit and the moment.
+- **The default set is the three SME surfaces** that render from committed generated
+  artifacts (`/gates`, `/software`, `/load-map`): they need no graph, so a capture is
+  reproducible anywhere, and they are exactly the pages FB-03 designates for review.
+  Graph-backed routes are opt-in and only as good as the graph behind the API at that
+  moment — which is what the footer is for.
+- **Captures are not committed.** They can carry real graph values; they follow the
+  vendor-scrape landing rule. Tracking a sanitized one is a decision with a
+  classification on it, not a default.
+- The transformation is pure (`src/lib/paperForm.ts`, tested under jsdom in
+  `paperForm.test.ts`); `scripts/captureRoutes.mjs` is the driver around it. The `verify`
+  skill's design-doc recipe (`drydocs.docgen.doc_pdf`) prints a capture to PDF unchanged.
+
 ## Graph access (ADR 0005) — the GraphAccess seam
 
 Console code reads the graph ONLY through the `GraphAccess` interface

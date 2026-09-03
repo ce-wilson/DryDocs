@@ -61,6 +61,19 @@ at runtime — file inspection alone misses it).
   here — the rule stands on the venue argument alone: if you did not launch the
   browser, you do not know what it is pointed at.
 
+## Console routes — the paper form (O88)
+
+A console page is a function of the graph at a moment, so its paper form is a CAPTURE
+of the executed DOM, not a render: `npm run paper -- --persona <id>` in `web/` drives
+the running console through headless Edge (Playwright-driven, because `--dump-dom`
+cannot sign in and a sign-in screen is not a captured page), and writes one
+self-contained `.html` per route under `<DRYDOCS_DATA_ROOT>/console-captures/<stamp>/`
+with the L6 gutter tags and a `route · commit · captured · api · persona` footer.
+`--verify-print` re-opens each file under `emulateMedia({ media: 'print' })` and records
+the tag's computed `display`. The capture is a valid input to the design-doc recipe
+above: `html_to_pdf(<capture>)` prints it with the same gutter. Details and the default
+route set: `web/README.md`, "Paper form (O88)".
+
 ## CLI / pipeline changes
 
 Use the `run-drydocs` skill (ingest chain, m3-verify, model-layer checks without Neo4j).

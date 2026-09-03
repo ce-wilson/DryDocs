@@ -1,0 +1,66 @@
+/* The console's print sheet (O88) — the paper form for the L6 pen-and-paper
+   feedback loop (Epic L). Everything below is @media print, apart from the one
+   screen-side line that hides the gutter tags and the capture footer and the
+   @page box, so nothing here can reflow the console on screen: TC-SHELL-01's
+   lesson is that an unlayered broad selector beats Tailwind's layered utilities,
+   which is what we want on paper and never on a screen.
+
+   THE GUTTER IS THE EXISTING ONE. The `.dd-margin-tag` and `.dd-print-footer`
+   rules are copied VERBATIM from drydocs/docgen/design_doc.py (_PRINT_MEDIA_CSS)
+   and tests/unit/test_console_print_gutter.py pins the two equal — the console
+   had no print CSS at all before this file, so the sheet is new work, but the
+   convention it carries is not and is not reinvented in a second idiom. The
+   tags themselves are injected by src/lib/paperForm.ts at capture time
+   (scripts/captureRoutes.mjs); a live print from the browser gets this sheet
+   without tags or footer, because only the capture knows the commit and the
+   moment. */
+
+.dd-margin-tag, .dd-print-footer { display: none; }
+
+@page { size: Letter; margin: 0.6in 0.62in 0.55in 0.62in; }
+
+@media print {
+  /* the light print palette beats both the OS dark scheme and the theme toggle */
+  :root, :root[data-theme="dark"], :root[data-theme="light"], html.dark {
+    color-scheme: light;
+    --ink: #1a1a1a; --mid: #555; --line: #bdbdbd; --fill: #eee; --faint: #f6f6f6; --bg: #fff; --link: #0a58ca;
+  }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #fff; }
+  body { background: #fff; color: var(--ink); font: 10.5px/1.45 "Segoe UI", system-ui, Arial, sans-serif; min-height: 0; }
+
+  /* The shell is a grid of banner / header / aside / sidebar / main. On paper only
+     main exists: its siblings go, and the grid container becomes a plain block so
+     main is not left in a grid cell of the old geometry. */
+  div:has(> main) { display: block; height: auto; }
+  div:has(> main) > :not(main) { display: none; }
+  nav[aria-label="Modules"], [role="tablist"], button, input, select, textarea,
+  .dd-fb-bar, .dd-toast { display: none; }
+
+  main {
+    max-width: 7.2in; margin: 0 auto; padding: 0 0 0 0.62in; position: relative;
+    overflow: visible; height: auto; min-height: 0;
+  }
+  a { color: inherit; text-decoration: underline; }
+  table { display: table; width: 100%; font-size: 9.1px; border-collapse: collapse; }
+  th, td { padding: 3px 5px; border: 1px solid var(--line); }
+  th { background: var(--fill); }
+  h1, h2, h3, h4, table, [role="tabpanel"] { break-inside: avoid; }
+
+  /* L6 paper HITL: each anchored block sits in the left gutter (main's own padding-left,
+     reserved above) so a printed page carries the anchor id beside its section — no @page
+     margin-box support required, so headless Chromium print-to-pdf renders it reliably. */
+  h1, h2, h3, h4, table, caption, tbody > tr > td:first-child, [role="tabpanel"] { position: relative; }
+  .dd-margin-tag {
+    display: block; position: absolute; left: -0.6in; top: 0.1em; width: 0.54in;
+    font: 6.2px/1.15 "Cascadia Mono","Consolas",monospace; text-align: right;
+    color: var(--mid); letter-spacing: 0.1px; word-break: break-word;
+  }
+  /* Rev/commit footer: `position: fixed` repeats on every printed page in Chromium's
+     headless print-to-pdf (the standard running-footer technique) without needing CSS
+     Paged-Media margin-box content(), which Chromium supports only partially. */
+  .dd-print-footer {
+    display: block; position: fixed; left: 0.62in; right: 0.62in; bottom: 0.12in;
+    font-size: 8px; color: var(--mid); text-align: center;
+    border-top: 1px solid var(--line); padding-top: 3px;
+  }
+}
