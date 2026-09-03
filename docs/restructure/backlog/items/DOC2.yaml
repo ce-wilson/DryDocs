@@ -33,13 +33,13 @@ acceptance: |
   `--next-id --module <m>` is the command; codes are three-plus letters precisely so a
   company mint can never be confused with a frozen letter, and none is DD. THE FREEZE HALF
   CARRIES FROZEN_BAND (review F3/F9, docs/reviews/restructure-design-review-2026-09-02.md): the frozen table
-  was measured on the producer's tree and admits nothing above G136, so their G10001-G10003
+  was measured on the producer's tree and admits nothing above G136, so the company's G10001-G10003
   and DD10001-DD10003 fail test_frozen_series_take_no_new_ids the day this half lands.
   FROZEN_BAND = {G: 10003, DD: 10003} (a legacy band id is frozen at the band's own max) is
   PLAN3 - a producer-side change to validate.py and test_backlog.py that ships BEFORE this
   relay rolls, not with PLAN2 (re-pointed 2026-09-02; this item now depends on PLAN3 for
   its freeze half) - a freeze relay that hands the company a red suite is worse than no
-  relay. The relay says so, and says their six band ids are read and listed, not
+  relay. The relay says so, and says the company's six band ids are read and listed, not
   re-minted.
 
   (b) THE PREFIX HALF, which waits on PLAN2 landing: `[<EDITION>-]<MODULE><n>`; the company
@@ -47,11 +47,11 @@ acceptance: |
   file and the columns, not the code; both partition rules are retired forward-only (§C4):
   their DD1-DD10 / DD10001-DD10003 / G10001-G10003 stay readable; the band mirror assertion
   the port-prompt asked them to write (steps 160, 273 region) is WITHDRAWN and replaced by
-  the edition-segment check; between the roll and their code mint they mint nothing new -
+  the edition-segment check; between the roll and the company's code mint the company mints nothing new -
   and that is a MECHANISM, not a request (review F2): the allocator reads the venue's
-  edition from config/dev-environment.yaml `edition:` (their own canonical-company file),
-  refuses to mint while the key is absent, and names the key. The relay tells them the
-  one line to write once their code is minted, and nothing else about the code itself.
+  edition from config/dev-environment.yaml `edition:` (the company's own canonical-company file),
+  refuses to mint while the key is absent, and names the key. The relay tells the company the
+  one line to write once its code is minted, and nothing else about the code itself.
 
   (c) THE TWO-AXES WORDING, verbatim from the 2026-09-02 review, so their agent stops
   conflating repos and checkouts: Axis 1 - repos (producer / company: disjoint histories,
