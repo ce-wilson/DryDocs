@@ -31,10 +31,21 @@ def _registry() -> dict:
     return yaml.safe_load(SOFTWARE_REGISTRY.read_text(encoding="utf-8"))
 
 
+#: Vitest's own file pattern (web/vitest.config.ts: `src/**/*.{test,spec}.{ts,tsx}`).
+#: A `.test.tsx` beside a component is a TEST of it, not a component: it renders
+#: nothing on any route and needs no ledger row. O87 (2026-09-03) added the first
+#: one (SignIn.test.tsx) and this scan counted it as an unregistered component.
+_TEST_FILE_SUFFIXES = (".test", ".spec")
+
+
 def _on_disk(ledger: dict) -> set[str]:
     root = REPO / ledger["root"]
     ext = ledger["extension"]
-    return {f.relative_to(root).as_posix() for f in root.rglob(f"*{ext}")}
+    return {
+        f.relative_to(root).as_posix()
+        for f in root.rglob(f"*{ext}")
+        if not f.name[: -len(ext)].endswith(_TEST_FILE_SUFFIXES)
+    }
 
 
 # --------------------------------------------------------------------------- #

@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - web/src/components/SignIn.tsx
@@ -66,3 +66,52 @@ notes: |
   sign-in screen. It is worth doing because the alternative is every new reader learning
   the SME seat from `auth.ts` source, and because the derived-vs-hardcoded distinction in
   (a) is cheap now and annoying to retrofit after someone types the string.
+
+  BUILT 2026-09-03 (laptop, Lane B of the 0aeba6fc handoff; wip/O87-laptop).
+
+  (a) DERIVED. SignIn.tsx imports SME_PERSONA_ID and renders the marker for the row whose
+  id equals it; the id is written nowhere in the component, and a test reads the
+  component's source to prove that a quoted literal equal to the constant is absent.
+
+  (b) THE ROW'S IDIOM. The top-right grid cell became a flex pair: the marker - the same
+  bordered uppercase mono shape as the role badge, painted with the --green token
+  through StatusChip's vocabulary (border, text and a 10% color-mix fill; token, never
+  hex; a glyph, never an emoji) - and then the role badge. StatusChip itself is not used,
+  for the reason the acceptance gives.
+
+  (c) A SEAT, NOT A STATE: nothing is checked, probed or fetched; the picker still
+  renders before sign-in with no network dependency, which is also what made the UI
+  check below need no API.
+
+  (d) The role badge is untouched beside it: Neo's row still says USER.
+
+  (e) The marker's text is "SME seat" (the diamond glyph is aria-hidden decoration) and
+  its title names the seat and the constant, so a monochrome print and a screen reader
+  both get it.
+
+  (f) GUARDED by web/src/components/SignIn.test.tsx - the first component test in this
+  tree, React Testing Library under jsdom (O80 provisioned both for exactly the moment a
+  pure-module test was not enough): the marker attaches to whichever persona
+  SME_PERSONA_ID names and to no other, parameterized on the constant; it names the seat
+  in text and title and paints with --green; the SME persona's badge still says its real
+  role; and the source carries no quoted literal equal to the constant, so hardcoding the
+  id back in fails the test. vitest 13 files / 146 tests, tsc -b, oxlint and vite build
+  green; tests/unit/test_console_auth.py 63 passed (it reads the credential store and the
+  Python personas, not the picker).
+
+  SEEN ON THE PICKER, venue named: laptop, headless Edge 152 against Vite on :5299 with no
+  API (the picker renders before sign-in): exactly one marker on the page, on Neo's row,
+  reading "◆ SME seat" with the title present, computed colour the --green token, the
+  role badge USER intact beside it, six persona buttons, no page errors.
+
+  ONE GUARD ADJUSTED, because the first component test met it: tests/unit/
+  test_ui_components.py counted components/SignIn.test.tsx as an unregistered component
+  (its scan was every .tsx under the ledger root). The scan now skips vitest's own file
+  pattern, {test,spec}.tsx, with the reason beside the rule - a test renders nothing on
+  any route and needs no ledger row. Both directions of the drift guard are unchanged for
+  real components. Full suite 3139 passed with that in place, plus the roadmap render red
+  every Lane B close carries.
+
+  NOT DONE, on purpose: no ui-tests.yaml case. The claim is a component property the
+  runner holds entirely, and adding a ledger row would move the automated-share pin for
+  a p3 legibility marker; the desktop can groom one in if the ledger should carry it.
