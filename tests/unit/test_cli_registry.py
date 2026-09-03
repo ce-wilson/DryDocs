@@ -29,6 +29,24 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 FIXTURE_MODULE = '''"""A consumer command module, on the S8 shape - fixture only."""
 import typer
 
+from drydocs.cli_shared import register_loaders
+from drydocs.loaders.base import BaseLoader
+
+
+class ConsumerProbeLoader(BaseLoader):
+    """A loader the producer does not ship."""
+
+    source_id = "controlm-xml-export"
+
+    def load(self, *a, **k):  # pragma: no cover - never run
+        raise NotImplementedError
+
+
+register_loaders(
+    {"consumer_probe": ConsumerProbeLoader},
+    chains={"consumer-probe": (ConsumerProbeLoader,)},
+)
+
 app = typer.Typer()
 
 
@@ -104,6 +122,38 @@ def test_importing_the_consumer_module_first_does_not_execute_the_root(
     )
     result = _probe(code)
     assert result.returncode == 0, result.stderr
+
+
+def test_present_module_registers_its_loaders_and_the_views_follow(consumer_dir: Path) -> None:
+    """The DECLARATION half: a consumer loader registered at import is in the composed
+    root's LOADER_REGISTRY, LOADER_SOURCE is re-derived (the D3 gate reads it), and
+    the chain it declares is visible - the seventeen-loaders case, in miniature."""
+    code = (
+        "import drydocs; "
+        f"drydocs.__path__.append({str(consumer_dir)!r}); "
+        "import drydocs.cli as c; "
+        "assert 'consumer_probe' in c.LOADER_REGISTRY; "
+        "assert c.LOADER_SOURCE['consumer_probe'] == 'controlm-xml-export'; "
+        "assert 'consumer-probe' in c.COMMAND_LOADERS; "
+        "assert 'consumer_probe' not in c.unchained_loaders(); "
+        "print('ok')"
+    )
+    result = _probe(code)
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.strip() == "ok"
+
+
+def test_a_consumer_cannot_shadow_a_producer_loader() -> None:
+    from drydocs.cli_shared import LOADER_REGISTRY, register_loaders
+
+    name, cls = next(iter(LOADER_REGISTRY.items()))
+
+    class Other(cls):  # type: ignore[misc,valid-type]
+        pass
+
+    with pytest.raises(ValueError, match="never shadows"):
+        register_loaders({name: Other})
+    assert LOADER_REGISTRY[name] is cls, "a refused registration must change nothing"
 
 
 def test_the_root_names_the_seam_once() -> None:

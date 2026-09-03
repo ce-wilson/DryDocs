@@ -2172,6 +2172,30 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   dataset's `system` field says, an origin that reaches the graph through a replica is
   not a carrier, and a system with no automated dataset needs no profile - the flag you
   left on the one real unbound carrier is the honest state, not a gap.
+  **SIXTH POSTSCRIPT - your two chunk-4 questions, answered producer-side:**
+  (1) *The seventeen dropped loader registrations.* Your option D was right - S16 gave
+  `cli_consumer` a VERB seam and no DECLARATION seam, and `LOADER_REGISTRY.update()` from
+  your side would have left `LOADER_SOURCE` and the unchained set stale exactly as you said.
+  The seam now exists: `drydocs.cli_shared.register_loaders(registry, chains=..., unchained_exclusions=...)`,
+  re-exported from the root, re-derives the views IN PLACE (the root re-exports the dict
+  objects, so a rebind would strand every earlier import), refuses a name that would shadow
+  a producer loader, and is proven by `test_cli_registry.py` in a subprocess with a fixture
+  consumer. Call it ONCE at the top of `cli_consumer.py`, before your `app`, with your
+  seventeen loaders and your own chains; `test_load_map_declarations` reads the composed
+  root, so it holds over the union. Take `cli_shared.py`, `cli.py` and the test by name past
+  the tag (or carry your option B until the next roll - it is a one-call swap either way).
+  (2) *`:data_center` -> `:data_center_filter`.* Confirmed, behavior-preserving. And the
+  contradiction you left standing is resolved in your favor: P6 is right, the G115 docstring
+  was wrong - CM_DEF_VTAB carries the SHORT server code, CM_HOSTS / CM_AVG_RUN the LONG form,
+  and the producer's own `controlm_folders.sql` comment agreed with you all along; the
+  2026-07-22 probe profiled CM_AVG_RUN alone. Docstring and option help are corrected
+  producer-side; the mechanism (a second bind carrying the short code from the DECLARED
+  inventory, never derived from the string) is LOAD2. Until it lands, one `--data-center`
+  value serves one family per run: short code for folders/jobs/variables, long form for
+  hosts/avg-run - a long-form value against the VTAB family returns zero rows and reads as
+  an empty data center, which is the failure to warn your operators about. Your per-DC
+  shards were not silently empty by luck: P6 (the collision probe) still blocks the first
+  multi-data-center load on both sides.
 
 OWED COMPANY-SIDE:
 

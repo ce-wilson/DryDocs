@@ -1,0 +1,58 @@
+id: LOAD2
+epic: component-topology
+title: The data-center scope bind assumes one value domain and the extract family has two - a second bind carries the short server code from the declared inventory, never derived
+type: task
+module: drydocs-load
+phase: 6
+agent: main
+model: opus
+priority: p1
+status: todo
+depends_on:
+- G115
+inputs:
+- drydocs/cli_shared.py
+- drydocs/loaders/sql/controlm_folders.sql
+- drydocs/loaders/sql/controlm_jobs.sql
+- drydocs/loaders/sql/controlm_variables.sql
+- drydocs/loaders/sql/controlm_hosts.sql
+- drydocs/loaders/sql/controlm_avg_run.sql
+acceptance: |
+  (a) THE FACT, AND WHERE IT CAME FROM. CM_DEF_VTAB.DATA_CENTER carries the SHORT Control-M
+  server code; CM_HOSTS.DATA_CENTER and CM_AVG_RUN.DATA_CENTER carry the LONG-form name.
+  The producer's own SQL comments already said so (controlm_folders.sql beside
+  controlm_hosts.sql), and the company's P6 work on the live replica confirmed it on
+  2026-09-03. G115 wired ONE bind, data_center_filter, across the whole family and its
+  docstring claimed one value domain "everywhere" - generalized from a probe that profiled
+  CM_AVG_RUN alone. The docstring and the option help were corrected the same day; this
+  item closes the mechanism.
+
+  (b) TWO BINDS, ONE OPTION. The scope-bind helper emits data_center_filter (long form,
+  hosts / avg-run) AND data_center_code (short code, the VTAB-joined folders / jobs /
+  variables statements). Each statement binds the one its column carries; python-oracledb
+  drops the unused named bind, so the full dict stays safe everywhere. The operator still
+  passes ONE --data-center value.
+
+  (c) THE MAPPING IS DECLARED, NEVER DERIVED. Short-to-long is a declared fact in the
+  internal data-center inventory (the J13 twin of the publishable spellings), read through
+  the source-registry binding, not computed from the string (the P032 -> P32 shape LOOKS
+  derivable and this item does not assert it). An operator value that matches neither
+  domain is refused with the message naming both spellings; a value matching one is
+  translated to the other for the statements that need it. No real value enters the repo.
+
+  (d) GUARDS. The SQL-parse drift guard passes with the second bind; the bundled samples
+  exercise both families with one option value; a test proves that a long-form value
+  against a VTAB-joined statement no longer returns zero rows silently (the failure this
+  item exists to remove).
+
+  (e) NOT IN SCOPE. The collision probe (P6) and any folder/job identity change stay
+  gate-bound in P6; this item only makes one --data-center value reach every table in the
+  domain that table speaks.
+notes: |
+  Minted 2026-09-03 (desktop, allocator) from the company's chunk-4 question on
+  port-base-20260902: they renamed their SQL bind :data_center to :data_center_filter to
+  match the shared helper and found the docstring asserting one value domain while their
+  P6 finding and their SQL comment both said SHORT for CM_DEF_VTAB. Answered in RELAY-25:
+  P6 is right, the docstring was wrong, corrected producer-side; the mechanism is this item.
+  p1 because it sits in front of the first per-data-center load G115 was built for, and a
+  wrong-domain value fails as an EMPTY data center rather than as an error.

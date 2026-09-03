@@ -378,6 +378,62 @@ UNCHAINED_LOADER_EXCLUSIONS: dict[str, str] = {
 }
 
 
+def _rederive_loader_views() -> None:
+    """Recompute every view DERIVED from LOADER_REGISTRY, in place.
+
+    In place, because the composition root re-exports these dicts by object and a
+    consumer's `load` verb reads them at call time - rebinding the name here would
+    leave every earlier import holding the stale one.
+    """
+    LOADER_SOURCE.clear()
+    LOADER_SOURCE.update(
+        {
+            cli_name: cls.source_id
+            for cli_name, cls in LOADER_REGISTRY.items()
+            if cls.source_id is not None
+        }
+    )
+
+
+def register_loaders(
+    registry: dict[str, type],
+    *,
+    chains: dict[str, tuple[type, ...]] | None = None,
+    unchained_exclusions: dict[str, str] | None = None,
+) -> None:
+    """The DECLARATION half of the consumer seam (S16 gave the verb half).
+
+    A consumer's command module (``drydocs.cli_consumer``, imported LAST by the
+    root) registers its loaders ONCE, at import, through this function - never by
+    mutating ``LOADER_REGISTRY`` directly, because ``LOADER_SOURCE`` and the
+    unchained set are DERIVED from it and would go stale; the eleven ties
+    ``tests/unit/test_load_map_declarations.py`` guards read the composed root, so
+    they hold over the union. Found at the company's chunk-4 S8 take (2026-09-03):
+    seventeen company loaders vanished from the ad-hoc ``load`` path because the
+    monolith's registry was replaced and nothing declared them back.
+
+    ``registry``: cli name -> loader class, each declaring ``source_id`` (the
+    ``load`` verb gates on it). ``chains``: the consumer's own command -> loaders,
+    for its verbs. ``unchained_exclusions``: cli name -> written reason for any
+    consumer loader outside every chain (G80 - the omission is a decision on record).
+    A name that already binds a DIFFERENT producer class is refused: a consumer
+    extends the registry, it never shadows it.
+    """
+    for name, cls in registry.items():
+        bound = LOADER_REGISTRY.get(name)
+        if bound is not None and bound is not cls:
+            raise ValueError(
+                f"register_loaders: {name!r} already binds {bound.__name__}; a consumer "
+                "extends LOADER_REGISTRY and never shadows a producer loader"
+            )
+    LOADER_REGISTRY.update(registry)
+    if chains:
+        COMMAND_LOADERS.update(chains)
+    if unchained_exclusions:
+        UNCHAINED_LOADER_EXCLUSIONS.update(unchained_exclusions)
+    _rederive_loader_views()
+
+
 def unchained_registry_loaders() -> tuple[tuple[str, type], ...]:
     """Every LOADER_REGISTRY ``(name, class)`` no COMMAND_LOADERS command runs.
 
@@ -805,13 +861,25 @@ def _scope_binds(
                           start with a lowercase letter; a SID ending in lowercase
                           'p' is the automation release process, not a person.
       row_cap             unordered ROWNUM sample cap
-      data_center_filter  data-center name LIKE pattern (G115). One value domain
-                          across the family: the DC value-domain probe
-                          (drydocs/loaders/sql/adhoc/profile_cm_avg_run.sql,
-                          answered 2026-07-22) confirmed the long-form name is
-                          the key everywhere, so the full long-form spelling is
-                          an exact match and a prefix pattern also works. The
-                          pattern passes through untouched, like folder_filter.
+      data_center_filter  data-center LIKE pattern (G115). TWO value domains,
+                          not one - corrected 2026-09-03 from the company's P6
+                          finding, which the producer's own SQL comments already
+                          agreed with: CM_DEF_VTAB.DATA_CENTER (folders, and the
+                          folder-joined jobs and variables extracts) carries the
+                          SHORT Control-M server code, while CM_HOSTS and
+                          CM_AVG_RUN carry the LONG-form name. The 2026-07-22
+                          probe (drydocs/loaders/sql/adhoc/profile_cm_avg_run.sql)
+                          profiled CM_AVG_RUN alone, so its "long-form" answer
+                          was true of that table and over-generalized here. One
+                          bind value therefore serves one family at a time: pass
+                          the short code to a folders/jobs/variables run and the
+                          long form to a hosts/avg-run run; a long-form value
+                          against the VTAB family returns zero rows and looks
+                          like an empty data center. The short-to-long mapping is
+                          a declared fact (the internal data-center inventory),
+                          never derived in code - a second bind carrying it is
+                          the LOAD item that closes this. The pattern still
+                          passes through untouched, like folder_filter.
 
     Operational employee identity (who *ran* actions, vs who authored the
     definition) is separate and not here — it lives in psgmgr.CM_AUD_ACTS;
@@ -873,7 +941,9 @@ def _data_center_opt():
         None,
         "--data-center",
         help=(
-            "Data-center name LIKE pattern (long-form, e.g. 'T032-E0700-DMA' or 'T032%'). "
+            "Data-center LIKE pattern. SHORT server code for folders/jobs/variables "
+            "(CM_DEF_VTAB, e.g. 'T32'); LONG-form name for hosts/avg-run (e.g. "
+            "'T032-E0700-DMA' or 'T032%') - two value domains, one bind, one family per run. "
             f"{_SCOPE_HELP}"
         ),
     )
