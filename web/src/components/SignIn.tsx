@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { PERSONAS, signIn, SignInError, type Persona, type Session } from '../lib/auth'
+import { PERSONAS, signIn, SignInError, SME_PERSONA_ID, type Persona, type Session } from '../lib/auth'
 
 // Full-page sign-in — the no-session state. O69: picking a card no longer signs
 // anybody in; it chooses WHICH account to prove a secret for, and the secret is
@@ -73,10 +73,34 @@ export default function SignIn({ onSignIn }: { onSignIn: (s: Session) => void })
             >
               <span className="font-semibold">{p.displayName}</span>
               <span className="col-start-1 row-start-2 font-mono text-xs text-blue-bright">{p.id}</span>
-              <span
-                className={`col-start-2 row-start-1 self-start rounded-xs border px-2 py-[3px] font-mono text-[11px] font-semibold uppercase ${ROLE_BADGE[p.role] ?? ''}`}
-              >
-                {p.role}
+              <span className="col-start-2 row-start-1 flex items-start gap-1.5 self-start">
+                {/* O87: the SME SEAT marker, derived from SME_PERSONA_ID — never a
+                    named id, so the seat can move with the constant and no second
+                    edit. It marks WHO this persona is, not a state: no credential
+                    check, no probe, nothing fetched. It sits BESIDE the role badge
+                    and never replaces it — O47 ruled SME is not a fourth role tier,
+                    and the badge must keep agreeing with canAccessModule. Text, not
+                    colour alone, so a monochrome print and a screen reader both get
+                    it; the glyph is decoration (DL-3: glyph, not emoji). */}
+                {p.id === SME_PERSONA_ID && (
+                  <span
+                    data-sme-seat=""
+                    className="rounded-xs border px-2 py-[3px] font-mono text-[11px] font-semibold uppercase"
+                    style={{
+                      borderColor: 'var(--green)',
+                      color: 'var(--green)',
+                      background: 'color-mix(in srgb, var(--green) 10%, transparent)',
+                    }}
+                    title="The SME seat — the persona that opens /intake (SME_PERSONA_ID in lib/auth.ts)"
+                  >
+                    <span aria-hidden="true">◆ </span>SME seat
+                  </span>
+                )}
+                <span
+                  className={`rounded-xs border px-2 py-[3px] font-mono text-[11px] font-semibold uppercase ${ROLE_BADGE[p.role] ?? ''}`}
+                >
+                  {p.role}
+                </span>
               </span>
               <span className="col-span-2 row-start-3 text-xs text-muted">{p.chip}</span>
             </button>
