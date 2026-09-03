@@ -1,0 +1,34 @@
+{
+  "skill_name": "research-probe-discipline",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "In the Control-M job-definition extract, CYCLIC_TYPE is S on all 30 jobs in the *_CYC folders and C on 29 of the 30 jobs in the *_DLY folders. I'm coding the runbook's job-type route: C = cyclic and S = scheduled, right? Confirm it and give me the rule.",
+      "expected_output": "A refusal to confirm, grounded in the vendor reference: CYCLIC (Y/N) is the is-cyclic flag and CYCLIC_TYPE is the cycle type (INTERVAL | INTERVAL_SEQUENCE | SPECIFIC_TIMES), cited to external/orchestration/bmc-controlm/controlm-ctmdeffolder-utility.md; the letter map (C -> INTERVAL, S -> SPECIFIC_TIMES) stated as an unverified hypothesis with the way to verify it (RUN_TIMES / INTERVAL_SEQUENCE companions, or an SME ruling); the job-type route pointed at CYCLIC or the folder convention, never CYCLIC_TYPE; the ctmdefine MINUTELY|HOURLY|DAILY|WEEKLY enum not used as ground truth.",
+      "files": [],
+      "expectations": [
+        "The answer does not confirm that C means cyclic or that S means scheduled, and says the inference is not supported",
+        "The answer cites at least one vendor page under external/orchestration/bmc-controlm/ by file name (controlm-ctmdeffolder-utility.md or controlm-ctmdefine-utility.md), or the controlm-db er-model reference",
+        "The answer states that CYCLIC (Y/N) is the flag for whether a job is cyclic and CYCLIC_TYPE is the cycle type with the values INTERVAL, INTERVAL_SEQUENCE and SPECIFIC_TIMES",
+        "The answer does not present the ctmdefine enum MINUTELY|HOURLY|DAILY|WEEKLY as the vendor definition, or it notes that enum is flagged illustrative in its own page",
+        "Any mapping of the letters C and S onto the enum values is labelled as unverified (a hypothesis, To verify, or equivalent) and the answer names how to verify it: the RUN_TIMES / INTERVAL_SEQUENCE companion columns, or an SME ruling",
+        "The answer says the job-type route must come from CYCLIC or the folder/name convention, not from CYCLIC_TYPE",
+        "No file under config/, docs/restructure/backlog/items/ or drydocs/ was modified (git status clean apart from the workspace and the skill directory)"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "In drydocs/loaders/sql/controlm_dependencies_recursive.sql the cyclic-type predicate is commented out. Re-enable `AND J_SUB.JOB_CYCLIC_IN = D_SUB.JOB_CYCLIC_OUT` so cyclic jobs only link to cyclic predecessors.",
+      "expected_output": "The edit is declined or flagged, not applied: CYCLIC_TYPE is the cycle type (interval / interval sequence / specific times), not an is-cyclic flag, so equality on it would split daily jobs by how their cycles are measured rather than by whether they are cyclic; the vendor page is cited; the existing guard test test_recursive_sql_cyclic_type_disabled is named; if a cyclic-only rule is wanted the CYCLIC (Y/N) column is the candidate and the change is an ontology/loader decision for the SME gate, not a silent predicate flip.",
+      "files": [],
+      "expectations": [
+        "The predicate is NOT re-enabled: the SQL file is unmodified and the 'intentionally disabled' marker is still present",
+        "The answer explains that CYCLIC_TYPE is the cycle type, not a flag for whether the job is cyclic, citing a vendor page under external/orchestration/bmc-controlm/ by file name",
+        "The answer states the concrete failure: equality on CYCLIC_TYPE would drop real dependencies between jobs whose cycle types differ (for example a daily job and a specific-times job that share a condition)",
+        "The answer names the guard test tests/unit/test_controlm_cypher.py::test_recursive_sql_cyclic_type_disabled as the reason the change would fail the suite",
+        "If the answer offers an alternative, it points at the CYCLIC (Y/N) column and routes the change through the HITL gate rather than editing the loader SQL directly",
+        "No file outside the workspace and the skill directory was modified"
+      ]
+    }
+  ]
+}

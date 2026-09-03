@@ -22,6 +22,13 @@
 -- Design notes preserved from the canonical version:
 --   1. Cyclic-type matching (CYCLIC_IN = CYCLIC_OUT) is intentionally
 --      DISABLED — kept commented to preserve the canonical intent.
+--      WHY IT STAYS DISABLED (2026-09-02): CYCLIC_TYPE is the vendor's CYCLE TYPE
+--      (INTERVAL / INTERVAL_SEQUENCE / SPECIFIC_TIMES — ctmdeffolder Parameter
+--      Reference, GROUNDED), not an is-cyclic flag; that flag is CYCLIC (Y/N). A
+--      company-side census found the letter C concentrated on the *_DLY folders
+--      and S on the *_CYC folders, so equality here would split DAILY jobs by how
+--      their cycles are measured and drop real dependencies. Test case:
+--      .claude/skills/research-probe-discipline/evals/files/cyclic-type-trap.md
 --   2. Self-references (a job feeding itself across DLY/CYC twins with the
 --      same JOB_NAME) are excluded, as in the canonical anchor member.
 --
