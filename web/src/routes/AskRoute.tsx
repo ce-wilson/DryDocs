@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import ModuleToolbar from '../layout/ModuleToolbar'
 import EmptyState from '../components/ui/EmptyState'
 import SpecGrid from '../explorer/SpecGrid'
+import { createPublicApi } from '../lib/apiClient'
 import { createApiAccess, createApiClient } from '../lib/graphApi'
 import { ask, controlPart, type AskEnvelope, type AskSource, type AskStep } from '../ask/askApi'
 import TaskGraphPane from '../ask/TaskGraphPane'
@@ -76,10 +77,12 @@ export default function AskRoute({ persona }: { persona: Persona }) {
   const [specClass, setSpecClass] = useState<Record<string, string>>({})
   useEffect(() => {
     let cancelled = false
-    fetch(`${apiUrl}/specs`)
-      .then((r) => (r.ok ? r.json() : []))
-      .then((specs: { id: string; classification: string }[]) => {
-        if (!cancelled) setSpecClass(Object.fromEntries(specs.map((s) => [s.id, s.classification])))
+    // O70: the public typed client — the list is unauthenticated and its rows
+    // are SpecOut, the server's declaration, so `classification` is not assumed.
+    createPublicApi(apiUrl)
+      .GET('/specs')
+      .then(({ data }) => {
+        if (!cancelled && data) setSpecClass(Object.fromEntries(data.map((s) => [s.id, s.classification])))
       })
       .catch(() => undefined)
     return () => {

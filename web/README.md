@@ -180,3 +180,40 @@ If you are developing a production application, we recommend enabling type-aware
 ```
 
 See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+
+## Generated API client (O70)
+
+The console's HTTP layer is generated from `drydocs-api`'s own OpenAPI schema,
+not written by hand. Two committed artifacts, one chain, guarded at every link:
+
+| Artifact | Written by | Guarded by |
+|---|---|---|
+| `src/generated/openapi.json` | `poetry run python scripts/dump_openapi.py` (repo root; reads `create_app().openapi()`, the importable object) | `tests/unit/test_openapi_client.py`, and `scripts/dump_openapi.py --check` in the CI `web` job |
+| `src/generated/api.d.ts` | `npm run api:types` (`scripts/writeApiTypes.mjs` → `scripts/genApiTypes.ts`) | `src/generated/api.test.ts` regenerates in memory and compares |
+| every call site | `src/lib/apiClient.ts` — `openapi-fetch` over the generated `paths` | `npm run build` (`tsc -b`), a CI step since O70 |
+
+**After any `drydocs_api` change, regenerate in that order and commit both files**:
+
+```sh
+poetry run python scripts/dump_openapi.py && (cd web && npm run api:types)
+```
+
+What the generation buys: a path, path/query parameter or JSON body the schema
+does not declare does not compile, and a response is typed wherever the server
+declares one (`drydocs_api/schemas.py` — the routes `GraphAccess` and sign-in
+read: `/login`, `/query/{id}`, `/raw-cypher`, `/specs`, `/specs/{id}/run`, and
+the small ones). The `GraphAccess` seam in `src/lib/graph.ts` is unchanged —
+components consume exactly what they did — and `src/lib/graphApi.ts` pins its
+hand-owned result types to the generated ones at compile time.
+
+What it does not buy yet: `/docs-verify`, `/mappings/*`, `/intake/*` and
+`/specs/ephemeral` are still free objects server-side, so their wrappers go
+through `unwrapAs<T>()` — a type the console CLAIMS, named as such at each call.
+Declaring a model for one of them (a `drydocs_api.schemas` change plus the
+regeneration above) turns that claim into a guard; the Python test lists them
+so the promotion is a move between two lists, not a discovery.
+
+`openapi-typescript` declares a `typescript@^5` peer while this package is on
+TypeScript 6; the `overrides` block in `package.json` resolves the peer to the
+project's own compiler rather than relaxing peer checks globally (`npm ci` honors
+it). Regenerate and re-run `npm test` after bumping either.

@@ -11,7 +11,7 @@
 // the request carries NO parameters, because the server chooses every query.
 
 import { sessionRejected, sessionToken } from './auth'
-import { diagnoseNetworkFailure } from './reachability'
+import { createAuthedApi, unwrapAs } from './apiClient'
 
 export interface CorpusRow {
   corpus_id: string
@@ -36,31 +36,18 @@ export interface CorpusStatusPayload {
 }
 
 export async function fetchCorpusStatus(baseUrl: string): Promise<CorpusStatusPayload> {
-  const token = sessionToken()
-  if (!token) {
-    sessionRejected()
-    throw new Error('not signed in — the console session has ended')
-  }
+  // O70: the typed client owns the token, the 401 → session-ended rule and the
+  // O85 network diagnosis; the path is checked against the schema. The
+  // response type is still hand-declared — /docs-verify is a free object
+  // server-side until drydocs_api.schemas models it.
+  const api = createAuthedApi(baseUrl, { token: sessionToken, rejected: sessionRejected })
+  const result = await api.GET('/docs-verify')
 
-  let res: Response
-  try {
-    res = await fetch(`${baseUrl}/docs-verify`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-  } catch {
-    throw new Error((await diagnoseNetworkFailure(baseUrl)).message)
-  }
-
-  if (res.status === 401) {
-    sessionRejected()
-    throw new Error('the server refused this session')
-  }
-  if (res.status === 403) {
+  if (result.response.status === 401) throw new Error('the server refused this session')
+  if (result.response.status === 403) {
     // Steward+admin, matching /gates and /software. Said plainly rather than as
     // a generic failure: this is a designation, not a fault.
     throw new Error('this reconciliation is an SME surface — steward or admin only')
   }
-  if (!res.ok) throw new Error(`docs-verify failed (${res.status})`)
-
-  return (await res.json()) as CorpusStatusPayload
+  return unwrapAs<CorpusStatusPayload>(result, 'docs-verify')
 }

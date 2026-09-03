@@ -19,7 +19,7 @@
 // behind them are machine-local — see drydocs_api/credentials.py and
 // scripts/set_console_credential.py.
 
-import { diagnoseNetworkFailure } from './reachability'
+import { createPublicApi, detailOf } from './apiClient'
 
 export type Role = 'user' | 'steward' | 'admin'
 
@@ -118,44 +118,30 @@ export class SignInError extends Error {}
 /** Sign in against drydocs-api. The secret leaves this function in one request
  *  and is never stored. */
 export async function signIn(personaId: string, secret: string): Promise<Session> {
-  let res: Response
-  try {
-    res = await fetch(`${apiBaseUrl()}/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ persona_id: personaId, secret }),
+  // O70: the public typed client — no session yet, so no bearer middleware. The
+  // path, the body (LoginBody) and the response (LoginOut) are the server's own
+  // declaration; a login response this console cannot read is now a compile
+  // error here rather than a runtime check.
+  const { data, error, response } = await createPublicApi(apiBaseUrl())
+    .POST('/login', { body: { persona_id: personaId, secret } })
+    .catch((err: unknown) => {
+      // O85: a dead server and a blocked origin are the same TypeError to fetch;
+      // the client's probe has already said which, and this keeps its message.
+      throw new SignInError(err instanceof Error ? err.message : String(err))
     })
-  } catch {
-    // O85: a dead server and a blocked origin are the same TypeError here, and
-    // this line used to assert the first. One probe tells them apart.
-    throw new SignInError((await diagnoseNetworkFailure(apiBaseUrl())).message)
+  if (error !== undefined || !response.ok || !data) {
+    // A non-JSON refusal body is still a refusal; the server's one message for
+    // both a wrong secret and an unknown id is deliberate (account enumeration).
+    throw new SignInError(detailOf(error, response) || 'invalid credentials')
   }
-  if (!res.ok) {
-    let detail = 'invalid credentials'
-    try {
-      const body = (await res.json()) as { detail?: unknown }
-      if (typeof body.detail === 'string') detail = body.detail
-    } catch {
-      /* a non-JSON error body is still a refusal */
-    }
-    throw new SignInError(detail)
-  }
-  const body = (await res.json()) as {
-    token?: unknown
-    persona_id?: unknown
-    expires_at?: unknown
-  }
-  if (typeof body.token !== 'string' || typeof body.persona_id !== 'string') {
-    throw new SignInError('drydocs-api returned a login response this console cannot read')
-  }
-  const persona = PERSONAS.find((p) => p.id === body.persona_id)
-  if (!persona) throw new SignInError(`server issued a session for unknown persona: ${body.persona_id}`)
+  const persona = PERSONAS.find((p) => p.id === data.persona_id)
+  if (!persona) throw new SignInError(`server issued a session for unknown persona: ${data.persona_id}`)
   const session: Session = {
     personaId: persona.id,
     role: persona.role,
     signedInAt: new Date().toISOString(),
-    token: body.token,
-    expiresAt: typeof body.expires_at === 'string' ? body.expires_at : '',
+    token: data.token,
+    expiresAt: data.expires_at,
   }
   store(session)
   return session
@@ -181,10 +167,15 @@ export function signOut(): void {
     /* nothing to clear */
   }
   if (!session) return
-  void fetch(`${apiBaseUrl()}/logout`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${session.token}` },
-  }).catch(() => undefined)
+  // The token is passed explicitly: the local session is already gone, so the
+  // authed client (which reads it) is the wrong tool here. Plain fetch, not the
+  // diagnosing one — a best-effort revoke must not spend a reachability probe.
+  void createPublicApi(apiBaseUrl())
+    .POST('/logout', {
+      headers: { Authorization: `Bearer ${session.token}` },
+      fetch: (request) => globalThis.fetch(request),
+    })
+    .catch(() => undefined)
 }
 
 /** The stored session, or null. Any garbage, any missing token, and any
