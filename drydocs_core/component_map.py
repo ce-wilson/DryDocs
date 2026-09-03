@@ -210,7 +210,19 @@ ALL_COMPONENT_PREFIXES: tuple[str, ...] = tuple(
 # classification (it lives in the `load` group) and to the core-imports-nothing rule.
 # This resolves the ADR 0002-a entrypoint TODO (see MODULE_MAP.md): a port whose cli.py
 # owns review/plan commands and imports those components passes the guard unchanged.
-ENTRYPOINT_MODULES: frozenset[str] = frozenset({"drydocs.cli", "drydocs_core.cli"})
+#
+# drydocs.cli_consumer joined the set on 2026-09-03 (S16 follow-up): the consumer's
+# command module is the consumer's COMPOSITION SURFACE - its verbs wire the consumer's own
+# components (docmeta, publishing, sme_notes on the company side) exactly as the root's
+# verbs wire lineage and fid_census - so it carries the same exemption. S16 (e) said "a
+# consumer module is the outermost layer and may import anything" and then did not put
+# it here; the first consumer module built against the seam failed
+# test_components_do_not_import_each_other on eleven imports, which is how the gap was
+# found. It is still default-deny classified (load) and still bound by
+# core-imports-nothing; absent producer-side, which the entrypoint test tolerates.
+ENTRYPOINT_MODULES: frozenset[str] = frozenset(
+    {"drydocs.cli", "drydocs_core.cli", "drydocs.cli_consumer"}
+)
 
 # Declared cross-component allowances — module -> component prefixes it may import.
 # DISTINCT from ENTRYPOINT_MODULES: these are NOT composition roots, they are the places
