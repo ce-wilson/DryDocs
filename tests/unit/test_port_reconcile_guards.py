@@ -749,7 +749,7 @@ def _git_files(*extra_args: str) -> list[str]:
             ["git", "ls-files", *extra_args],
             cwd=REPO,
             capture_output=True,
-            text=True,
+            encoding="utf-8",
             check=True,
         ).stdout
     except (OSError, subprocess.CalledProcessError):  # pragma: no cover

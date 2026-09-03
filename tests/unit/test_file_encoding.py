@@ -43,14 +43,14 @@ def _walked_files() -> list[str]:
             ["git", "ls-files"],
             cwd=REPO,
             capture_output=True,
-            text=True,
+            encoding="utf-8",
             check=True,
         ).stdout
         untracked = subprocess.run(
             ["git", "ls-files", "--others", "--exclude-standard"],
             cwd=REPO,
             capture_output=True,
-            text=True,
+            encoding="utf-8",
             check=True,
         ).stdout
     except (OSError, subprocess.CalledProcessError):  # pragma: no cover

@@ -32,7 +32,7 @@ def _main_worktree() -> Path:
             ["git", "rev-parse", "--path-format=absolute", "--git-common-dir"],
             cwd=REPO_ROOT,
             capture_output=True,
-            text=True,
+            encoding="utf-8",
             timeout=20,
             check=True,
         ).stdout.strip()

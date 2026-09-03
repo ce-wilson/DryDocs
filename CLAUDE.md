@@ -273,7 +273,11 @@ units from `docs/restructure/backlog/items/`. Each backlog item names its agent 
   same commit. A backlog item's `module:` field names the target component; the map says which
   directory that is.
 - **Verify before asserting.** A recalled fact or stale doc that names a file/flag/column may
-  be wrong — confirm it exists before relying on it.
+  be wrong — confirm it exists before relying on it. And when a measurement contradicts an
+  expectation, **check the instrument before the subject** (J76): read the raw exit code before
+  parsing, decode explicitly, reconstruct a fixture from the incident at its real values — three
+  instruments failed *into* "clean" on 2026-09-01 and were acted on
+  ([`docs/style/review-provenance.md`](docs/style/review-provenance.md), "Check the instrument").
 - **Live-verification claims name their venue (J18).** A "verified live" claim names the
   machine/container/database it ran on (e.g. "desktop, `neo4jtest`, `drydocs` DB") — the two
   machines hold independent graphs, so an untagged claim reads as a defect from the other

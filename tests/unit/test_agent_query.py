@@ -239,6 +239,6 @@ def test_import_pulls_neither_the_framework_nor_the_wiring_module():
         "print(sorted(m for m in ('fastapi', 'uvicorn', 'drydocs_api.app') if m in sys.modules))"
     )
     out = subprocess.run(
-        [sys.executable, "-c", code], capture_output=True, text=True, check=True
+        [sys.executable, "-c", code], capture_output=True, encoding="utf-8", check=True
     ).stdout.strip()
     assert out == "[]", f"agent_query import dragged in: {out}"
