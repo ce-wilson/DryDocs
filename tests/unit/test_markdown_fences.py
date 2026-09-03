@@ -68,7 +68,12 @@ def test_the_scan_actually_reaches_the_documents() -> None:
     """Guard the guard: an empty sweep passes everything and proves nothing."""
     found = _docs()
     assert len(found) > 20, f"expected the docs tree, found {len(found)} files"
-    assert (DOCS_ROOT / "port" / "port-prompt.md") in found
+    # The canary is a document that exists on BOTH sides of the port. It used to be
+    # docs/port/port-prompt.md - the file the defect was found in - but docs/port/** is
+    # never-port, so every consumer's copy of this canonical-producer test failed on a
+    # file that cannot exist there (company chunk 2, 2026-09-03). docs/style/** crosses
+    # whole, so the style guide is present wherever this test is.
+    assert (DOCS_ROOT / "style" / "us-business-english.md") in found
 
 
 def test_every_fence_under_docs_closes() -> None:

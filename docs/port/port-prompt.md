@@ -2117,6 +2117,14 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   verdicts already given, nothing crosses), and a fall-through guard red for a known
   reason cannot report a new fall-through a later carve-out introduces. A guard is
   allowed to be red only when the NEXT carve-out is its fix.
+  **SECOND POSTSCRIPT (after the moves):** the `test_markdown_fences.py` canary you
+  re-pointed was a producer defect, not a divergence to carry. It pinned
+  `docs/port/port-prompt.md` - the file the defect was found in - and `docs/port/**` is
+  never-port, so a canonical-producer test asserted a file that cannot exist on your
+  side. It now pins `docs/style/us-business-english.md` (`docs/style/**` crosses whole).
+  Take the producer's test by name past the tag and drop your divergence; the
+  `test_plan_ideas.py` revert was right - its subject `drydocs/docgen/plan_ideas.py`
+  arrives with carve-out 2 (RELAY-23 content first), so the test goes with that.
 
 OWED COMPANY-SIDE:
 
