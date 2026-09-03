@@ -928,9 +928,25 @@ rows:
     note: "configuration layer default — the per-entry/canonical-company/union rows ABOVE override for the map, gate-prompts, review-labels, gate-log, dev-environment (first match wins). A file of LOCAL infrastructure facts does not belong under this default; dev-environment.yaml sat here by omission until the 2026-07-28 port"
 
   # ---- integration points (hand-merge per the reconcile-port ledger) --------
+  - path: "drydocs/cli_consumer.py"
+    disposition: canonical-company
+    note: >
+      S16 (2026-09-02): the CONSUMER's command module - the company's own verbs, on the S8
+      module shape, discovered by the root and registered last. The producer ships NONE,
+      so this row matches nothing producer-side by construction (row_may_match_nothing);
+      it exists so a verbatim take of drydocs/ can never remove the consumer's verbs.
   - path: "drydocs/cli.py"
-    disposition: evaluate
-    note: "composition root; both sides add commands — merge per collision ledger (keep consumer verbs, add producer verbs)"
+    disposition: canonical-producer
+    note: >
+      S16 (2026-09-02): MOVED from evaluate. The row read "both sides add commands - merge
+      per collision ledger" for two ports, and a consumer following it merged producer
+      verbs INTO its monolith while the producer had split the file (S8) - an evaluate
+      note can say how to merge CONTENT, never "take the SHAPE and re-home your verbs".
+      Now the root discovers drydocs/cli_consumer.py (the row above) and registers it
+      last, so the consumer's verbs live in a file the producer never ships and this
+      file is taken wholesale. RELAY-24 says how to adopt: take cli.py, cli_shared.py
+      and the six cli_*.py at the base, move your verbs to cli_consumer.py on the same
+      shape, and never edit this file again.
   - path: ".github/**"
     disposition: evaluate
     note: "J5 CI (step 31): the publish-boundary guard is producer-remote-specific and GHE Actions runners/policies are consumer-side — keep consumer workflows, adapt rather than adopt"
@@ -1326,6 +1342,11 @@ row_may_match_nothing:
     reason: "gitignored local zone — never tracked on either side, so it can never appear in the guard's population by construction"
 
   # ---- company-only modules the producer will never hold --------------------
+  - path: "drydocs/cli_consumer.py"
+    reason: >
+      S16: the consumer's command module. The producer never ships one - the discovery
+      seam in drydocs/cli.py is the point - so the canonical-company row matches nothing
+      here by construction, and the guard would otherwise report it as a dead row.
   - path: "drydocs/locations.py"
     reason: "never-port company-only module (real site/data-center values); producer-side absence is the intended state, not rot"
   - path: "drydocs/seal_deployments.py"

@@ -64,6 +64,8 @@ Ingest commands:
 
 from __future__ import annotations
 
+import importlib
+import importlib.util
 import uuid
 from pathlib import Path
 
@@ -663,6 +665,23 @@ from . import (  # noqa: E402
 COMMAND_MODULES = (cli_schema, cli_ingest, cli_verify, cli_variables, cli_docs, cli_plan)
 for _sub in COMMAND_MODULES:
     app.registered_commands.extend(_sub.app.registered_commands)
+
+# --- the optional CONSUMER command module (S16) -------------------------------
+# The producer ships no ``drydocs/cli_consumer.py``. A consumer (the company port, a
+# Team Edition instance) may add one, on the exact shape of the six modules above: its
+# own Typer, verbs registered FLAT, ``_client`` resolved through this root at call time,
+# never a module-scope import of this root (test_cli_import_order.py guards it by name).
+# This root DISCOVERS it — importlib.util.find_spec, never a hard import — and registers
+# its verbs LAST, so a consumer verb can shadow nothing by accident. A missing module is
+# the normal producer state and is SILENT: no warning, no log line. This is what lets
+# PORT-MANIFEST.yaml carry this file as canonical-producer: both sides stop editing one
+# file, because the consumer's verbs live in a file the producer never ships. Two ports
+# walked past the S8 split because an evaluate row can say how to merge CONTENT and not
+# "take the shape and re-home your verbs" (Idea-241 / S16 / J73).
+CONSUMER_COMMAND_MODULE = "drydocs.cli_consumer"
+if importlib.util.find_spec(CONSUMER_COMMAND_MODULE) is not None:
+    _consumer = importlib.import_module(CONSUMER_COMMAND_MODULE)
+    app.registered_commands.extend(_consumer.app.registered_commands)
 
 
 if __name__ == "__main__":

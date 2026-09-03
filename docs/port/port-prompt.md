@@ -1966,6 +1966,62 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   command modules stay at the root (they ARE the load component's root, and your `cli.py`
   is a surgical merge — Idea-241). Nothing in this relay touches them.
 
+- **RELAY-24 — ADOPT THE S8 CLI SPLIT BEFORE YOU RETRY THE APPLY: TAKE THE SHAPE, RE-HOME
+  YOUR VERBS INTO `drydocs/cli_consumer.py`, AND STOP EDITING `cli.py` FOR GOOD** (new
+  2026-09-02; S16 built the seam, the SME ruled "don't merge this port, try again with S8").
+  `[VERIFIED-PRODUCER]` for the seam and its guards; `[SME-REPORTED]` for the ruling.
+  **WHY TWO PORTS WALKED PAST IT.** `drydocs/cli.py` carried an `evaluate` row that read
+  "both sides add commands - merge per collision ledger", and you followed it literally:
+  producer verbs merged INTO your monolith, twice, while the producer had already split
+  the file (S8, 2026-08-21: a thin composition root plus six per-domain `cli_*.py`; S13:
+  `cli_shared.py`). An evaluate note can say how to merge CONTENT; no wording of it can
+  say "the shape of this file changed, take the shape and re-home your content". That
+  is why your Defect 6 exists: you hold the six modules (canonical-producer by default)
+  and a root that does not import them, so they sit orphaned and `test_env_doctor`
+  fails three. The row is now `canonical-producer`, and this relay is the sentence the
+  row could not say.
+  **THE SEAM (S16, producer-side, past your base - take it by name or wait for the
+  roll).** `drydocs/cli.py` now discovers ONE optional consumer module -
+  `drydocs.cli_consumer`, `importlib.util.find_spec`, never a hard import - and registers
+  its verbs LAST, after `COMMAND_MODULES`, so a consumer verb shadows nothing by
+  accident. The producer ships no such file; absent is the normal state and it is
+  silent. Guards: `tests/unit/test_cli_registry.py` proves both directions with a fixture
+  module (present registers last; absent is silent; importing it first never executes
+  the root), `tests/unit/test_cli_import_order.py` adds it to the subprocess-per-import
+  list wherever it exists, and the boundary map classifies it `load`.
+  **THE ADOPTION, six steps, one commit, on YOUR main before the retry:**
+  1. Take `drydocs/cli.py`, `drydocs/cli_shared.py` and the six `drydocs/cli_*.py`
+     WHOLESALE at the producer tree that carries S16 (the row is canonical-producer now;
+     the `cli.py` line is not a merge any more).
+  2. Diff your old `cli.py` against the producer's six modules: every verb of yours that
+     is NOT a producer verb goes into `drydocs/cli_consumer.py`. Module shape = any of the
+     six: its own `typer.Typer()`, verbs registered on it, shared state imported from
+     `drydocs.cli_shared`, and `_client` resolved THROUGH the root inside the function
+     (a function-local import of the root module, then `return _root._client(database)` - the six modules show the exact lines) - never a
+     module-scope import of `drydocs.cli`, which is the S13 cycle and the guard fails
+     you by name. Your `patch_window_cmd` and the scrapers / docmeta / seal_projection
+     verbs are the ones you know about; the diff is the list.
+  3. DD6 (T22) closes in the same move: the producer's root `_client(database)` already
+     takes the database, so `docs-verify` and `bootstrap-schema-graph` register from the
+     producer's `cli_docs.py` / `cli_schema.py` without a wrapper of yours; the `ddschema`
+     provisioning DDL is still yours to run (chunk 6 of the workplan).
+  4. `drydocs/cli_consumer.py` is canonical-company (its row is already in the manifest,
+     and it matches nothing producer-side by construction). Add it to YOUR overlay if you
+     keep one; never send it.
+  5. Guards green, in this order: `python -c "import drydocs.cli"`;
+     `pytest tests/unit/test_cli_import_order.py tests/unit/test_cli_registry.py` (the
+     consumer module joins the first list automatically once it exists); then
+     `drydocs --help` lists your verbs after the producer's. `test_env_doctor`'s three
+     clear with the orphans gone.
+  6. Then and only then: park `port/20260901b` as the reference branch it is (the
+     dispositions record, the `validate_fact_rows` merge and the suite trajectory are
+     worth keeping; nothing on it merges), branch fresh from your main, re-take the
+     before-snapshot (chunk 1), and re-apply by class. With `cli.py` wholesale, slice D's
+     surgical merge does not happen again.
+  **WHAT THIS RELAY DOES NOT DO:** it does not move any producer verb, does not change
+  `drydocs --help` producer-side, and does not author your module - the diff in step 2
+  is the only place your verbs are known.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has

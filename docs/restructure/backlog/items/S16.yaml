@@ -9,7 +9,7 @@ phase: 6
 agent: main
 model: fable
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs/cli.py
@@ -78,3 +78,14 @@ notes: |
 
   THE GENERAL LESSON in Idea-241 is NOT in this item; it is J73, because it is a port-prompt
   rule and not a code change. Related: S8, S13, ADR 0002-A, J68, J69, Idea-239, Idea-240.
+  DONE 2026-09-02 (desktop, feat/s16-consumer-cli-discovery, merged --no-ff). THE MEASUREMENT
+  AT BUILD, per (f): cli.py 688 lines (669 + the seam block); registered commands read from
+  app.registered_commands = 51 producer-side, unchanged; of the six S8 modules touched:
+  none. The seam: CONSUMER_COMMAND_MODULE = "drydocs.cli_consumer", find_spec, registered
+  after COMMAND_MODULES, silent when absent. Guards: test_cli_registry.py (fixture module on
+  drydocs.__path__ in a subprocess - present registers last, absent is silent, importing it
+  first never executes the root, the producer ships none), test_cli_import_order.py joins
+  it where it exists, the component map classifies it load, MODULE_MAP row, manifest:
+  cli.py evaluate -> canonical-producer, cli_consumer.py canonical-company +
+  row_may_match_nothing. RELAY-24 carries the six adoption steps; the workplan gains
+  chunk 0. Built the same evening the SME ruled the first apply parked and retried with S8.

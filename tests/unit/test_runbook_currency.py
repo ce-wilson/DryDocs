@@ -121,6 +121,13 @@ HISTORICAL_PATHS: dict[str, str] = {
 #: cross-repo excuse. Every entry here must be a path the document asserts is
 #: absent producer-side or names in a sibling — never one we simply deleted.
 FOREIGN_PATHS: dict[str, str] = {
+    "drydocs/cli_consumer.py": (
+        "the CONSUMER's command module (S16, 2026-09-02): the producer ships none by design - "
+        "drydocs/cli.py discovers it with find_spec and the manifest carries it canonical-company. "
+        "MODULE_MAP.md and RELAY-24 name it to say where the consumer's verbs go; naming the "
+        "file that must NOT exist here is the seam, not a stale claim (test_cli_registry.py "
+        "asserts its absence)"
+    ),
     "internal/research/G64-SME-MM-research.md": (
         "COMPANY-side research log (the G64 dpl pipeline-registry contract session, "
         "2026-08-31). T13's row cites it as the venue where the validation actually ran, "

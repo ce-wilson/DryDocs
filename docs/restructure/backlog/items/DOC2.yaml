@@ -68,6 +68,6 @@ acceptance: |
   case the item stays in_progress and (b) is a second relay entry.
 notes: |
   2026-09-02: RELAY-23 was taken by the ADR 0018 subpackage move, which rolls first; this
-  relay rolls as RELAY-24. The title keeps its original number - a retitle after the stub
+  relay takes the next free relay number when it rolls (RELAY-23 and RELAY-24 were taken the same day by the ADR 0018 move and the S8 adoption). The title keeps its original number - a retitle after the stub
   push reads as a mint collision to the guard (I6); the number in the port-prompt is what
   counts.

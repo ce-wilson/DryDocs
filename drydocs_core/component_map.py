@@ -63,6 +63,11 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
         # both). Load like its consumers; NOT an entrypoint — it imports only
         # this component and core, and the root keeps the only wiring exemption.
         "drydocs.cli_shared",
+        # S16 (2026-09-02): the optional CONSUMER command module the root discovers
+        # (importlib.util.find_spec, registered last). The producer ships none; a consumer
+        # writes one on the S8 module shape and PORT-MANIFEST carries it canonical-company.
+        # Classified load so default-deny does not fail the consumer's tree by name.
+        "drydocs.cli_consumer",
         "drydocs.snapshots",
         "drydocs.staging",
         "drydocs.cmdline_staging",
