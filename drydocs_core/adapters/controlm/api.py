@@ -30,7 +30,12 @@ the README beside the sample config carries the same rules):
   reference: per operation, the corpus-grounded tool, its provenance, and
   its availability at the target version. An operation with no verified
   template and no grounded default is a REPORTED capability gap (exit code
-  3), never a silent fallback — the G96 clause-(d) guardrail.
+  3), never a silent fallback — the G96 clause-(d) guardrail. A template
+  whose tool the host cannot START (not on PATH, not executable) is a
+  fourth outcome, exit code 4, reported through the same JSON channel
+  (G133): the operation is supported and configured, so it is neither a
+  config error nor a capability gap, and the tool never ran, so it is not
+  a run failure either.
 
 Target environment: Control-M **9.0.21.300, XML-first** — the JSON/SaaS
 Automation API corpus files are conceptual reference only, and XML
@@ -71,6 +76,11 @@ EXIT_OK = 0
 EXIT_RUN_FAILED = 1
 EXIT_CONFIG = 2
 EXIT_CAPABILITY_GAP = 3
+# G133: the tool the template names could not be started — not on PATH, or not
+# executable. Its own code because the other three each say something false
+# about it: 1 claims the tool ran, 2 claims the config is wrong, 3 claims the
+# capability is missing. The wrapper's `*) fail` arm already covers it.
+EXIT_NOT_RUNNABLE = 4
 
 
 @dataclass(frozen=True)
@@ -298,6 +308,9 @@ class CallResult:
     capability_gap: bool
     message: str
     returncode: int | None = None
+    #: the call never started (G133) — ``returncode`` is None and ``message``
+    #: carries the OS error; distinct from a call that ran and failed
+    not_runnable: bool = False
 
     def to_json(self) -> str:
         payload = dict(self.__dict__)
@@ -309,6 +322,8 @@ class CallResult:
     def exit_code(self) -> int:
         if self.capability_gap:
             return EXIT_CAPABILITY_GAP
+        if self.not_runnable:
+            return EXIT_NOT_RUNNABLE
         return EXIT_OK if self.ok else EXIT_RUN_FAILED
 
 
@@ -376,7 +391,20 @@ def execute(planned: PlannedCall, runner: Runner | None = None) -> CallResult:
     )
     if planned.capability_gap:
         return CallResult(ok=False, capability_gap=True, message=planned.gap_reason, **common)
-    proc = (runner or _default_runner)(planned.argv)
+    try:
+        proc = (runner or _default_runner)(planned.argv)
+    except OSError as exc:
+        # G133: subprocess.run raises OSError (FileNotFoundError, PermissionError)
+        # only when the child cannot be STARTED — once it runs, its outcome is a
+        # returncode. Before this, the exception escaped main() as a traceback
+        # with no JSON on stdout, which the wrapper .sh cannot parse.
+        return CallResult(
+            ok=False,
+            capability_gap=False,
+            not_runnable=True,
+            message=f"cannot start {planned.argv[0]!r}: {exc}",
+            **common,
+        )
     ok = proc.returncode == 0
     tail = (proc.stdout if ok else (proc.stderr or proc.stdout) or "").strip()
     return CallResult(
@@ -388,9 +416,16 @@ def execute(planned: PlannedCall, runner: Runner | None = None) -> CallResult:
     )
 
 
-def main(argv: list[str] | None = None) -> int:
+def main(argv: list[str] | None = None, *, runner: Runner | None = None) -> int:
     """CLI entry for the wrapper .sh: JSON on stdout, exit code per contract
-    (0 ok · 1 run failed · 2 config/usage · 3 reported capability gap)."""
+    (0 ok · 1 run failed · 2 config/usage · 3 reported capability gap ·
+    4 tool not runnable).
+
+    ``runner`` is the same seam :func:`execute` exposes, threaded through so a
+    test can drive the RUN path of the entry point and not only ``--plan-only``
+    (G133 clause e — every CLI test used the planning path, which is how the
+    missing-binary traceback went unnoticed). The .sh never passes it.
+    """
     ap = argparse.ArgumentParser(
         prog="drydocs-controlm-api",
         description=f"Control-M API-call framework (target {TARGET_VERSION})",
@@ -434,7 +469,7 @@ def main(argv: list[str] | None = None) -> int:
             message=planned.gap_reason if planned.capability_gap else "plan only",
         )
     else:
-        result = execute(planned)
+        result = execute(planned, runner=runner)
     print(result.to_json())
     return result.exit_code
 
