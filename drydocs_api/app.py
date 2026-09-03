@@ -85,6 +85,15 @@ from drydocs_api.mappings import (
 from drydocs_api.personas import UnknownPersonaError
 from drydocs_api.queries import NAMED_QUERIES, ParamValidationError, UnknownQueryError
 from drydocs_api.query_specs import UnknownSpecError
+from drydocs_api.schemas import (
+    HealthOut,
+    LoginOut,
+    NamedQueryOut,
+    NamedRunOut,
+    SpecOut,
+    SpecRunOut,
+    StatusOut,
+)
 from drydocs_api.sessions import InMemorySessionStore, InvalidTokenError, Session
 from drydocs_core.config import Neo4jSettings
 from drydocs_core.env_refs import resolve_optional
@@ -324,9 +333,14 @@ def create_app(
 
     AdminUser = Annotated[Session, Depends(_current_admin)]  # noqa: N806
 
+    # O70: the return annotation IS the response_model — FastAPI publishes it in
+    # the OpenAPI schema the console's TypeScript client is generated from, and
+    # validates the handler's dict against it (extra keys forbidden; see
+    # drydocs_api.schemas). Every route the console reads through GraphAccess
+    # or the sign-in flow is declared this way.
     @app.get("/health")
-    def health() -> dict[str, str]:
-        return {"status": "ok"}
+    def health() -> HealthOut:
+        return HealthOut(status="ok")
 
     # O58 — the doc-corpus reconciliation, as a NAMED SERVER-SIDE READ.
     #
@@ -365,7 +379,7 @@ def create_app(
         return corpus_status(registry.get("sources", []), graph)
 
     @app.get("/queries")
-    def queries() -> list[dict[str, object]]:
+    def queries() -> list[NamedQueryOut]:
         return [
             {
                 "id": q.id,
@@ -379,7 +393,7 @@ def create_app(
         ]
 
     @app.post("/login")
-    def post_login(body: LoginBody) -> dict[str, str]:
+    def post_login(body: LoginBody) -> LoginOut:
         try:
             return login(body.persona_id, body.secret, sessions, creds)
         except CredentialsNotConfiguredError as exc:
@@ -393,9 +407,9 @@ def create_app(
             raise HTTPException(401, "invalid credentials") from None
 
     @app.post("/logout")
-    def post_logout(user: CurrentUser) -> dict[str, str]:
+    def post_logout(user: CurrentUser) -> StatusOut:
         logout(user.token, sessions)
-        return {"status": "ok"}
+        return StatusOut(status="ok")
 
     @app.post("/query/{query_id}")
     def post_query(
@@ -403,7 +417,7 @@ def create_app(
         body: QueryBody,
         user: CurrentUser,
         x_drydocs_run_id: str | None = Header(default=None),
-    ) -> dict[str, object]:
+    ) -> NamedRunOut:
         try:
             with audit.observe(
                 "/query/{query_id}", token=user.token, run_id=x_drydocs_run_id
@@ -430,7 +444,7 @@ def create_app(
         body: RawBody,
         user: AdminUser,
         x_drydocs_run_id: str | None = Header(default=None),
-    ) -> dict[str, object]:
+    ) -> NamedRunOut:
         try:
             with audit.observe("/raw-cypher", token=user.token, run_id=x_drydocs_run_id) as rec:
                 rec.cypher = body.cypher  # debug tier only; the api line cannot carry it
@@ -453,7 +467,7 @@ def create_app(
     ephemerals = EphemeralSpecStore()
 
     @app.get("/specs")
-    def get_specs() -> list[dict[str, object]]:
+    def get_specs() -> list[SpecOut]:
         return list_specs()
 
     @app.post("/specs/ephemeral")
@@ -501,7 +515,7 @@ def create_app(
         body: QueryBody,
         user: CurrentUser,
         x_drydocs_run_id: str | None = Header(default=None),
-    ) -> dict[str, object]:
+    ) -> SpecRunOut:
         try:
             with audit.observe(
                 "/specs/{spec_id}/run", token=user.token, run_id=x_drydocs_run_id

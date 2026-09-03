@@ -146,8 +146,27 @@ jobs:
         working-directory: .
         run: poetry install --with api --no-interaction
 
+      # O70: the committed schema the console's TypeScript client is generated
+      # from must match the importable app. This job is the one venue with
+      # fastapi installed (--with api), so the guard runs here and not in
+      # `gates`; tests/unit/test_openapi_client.py makes the same assertion
+      # wherever the group is installed locally.
+      - name: Generated API schema is current
+        working-directory: .
+        run: poetry run python scripts/dump_openapi.py --check
+
       - name: Install web dependencies
         run: npm ci
+
+      - name: Lint (oxlint)
+        run: npm run lint
+
+      # O70: the generated client's whole promise is that an API change the
+      # console has not caught up with is a COMPILE error. Vitest does not
+      # typecheck and the Playwright run serves the app through esbuild, which
+      # strips types, so until this step nothing in CI could see one.
+      - name: Typecheck and build (tsc -b, vite build)
+        run: npm run build
 
       - name: Unit tests (vitest)
         run: npm test

@@ -1,4 +1,5 @@
-import { createApiClient, readDetail, type ApiClient } from './graphApi'
+import { unwrapAs } from './apiClient'
+import { createApiClient } from './graphApi'
 
 // The O13 mappings client — the /mappings/* surface of drydocs-api
 // (steward/admin only, enforced SERVER-side; the UI gate is convenience).
@@ -6,6 +7,12 @@ import { createApiClient, readDetail, type ApiClient } from './graphApi'
 // "write" is draftChangeset, which returns a config/manual-loads/ change
 // ARTIFACT (CSV text + manifest snippet) — the server writes nothing, the
 // loader stays the only graph writer (wf-mapping-01's one rule).
+//
+// O70: the paths, path/query parameters and request bodies below are checked
+// against the generated schema (lib/apiClient.ts). The RESPONSE types on this
+// page are still the hand-declared interfaces, because the server declares
+// these routes as free objects — the day drydocs_api.schemas models them, the
+// casts at each `unwrap` go and the interfaces become aliases of the schema.
 
 export interface MappingDomain {
   id: string
@@ -129,65 +136,61 @@ export interface MappingsApi {
   correctionsReport(): Promise<CorrectionsReport>
 }
 
-async function json<T>(res: Response, what: string): Promise<T> {
-  if (!res.ok) throw new Error(`${what} failed (${res.status}): ${await readDetail(res)}`)
-  return (await res.json()) as T
-}
-
 export function createMappingsApi(baseUrl: string, personaId: string): MappingsApi {
-  const client: ApiClient = createApiClient(baseUrl, personaId)
+  const { api } = createApiClient(baseUrl, personaId)
   return {
     async domains() {
-      const body = await json<{ domains: MappingDomain[] }>(
-        await client.authedGet('/mappings/domains'),
+      const body = unwrapAs<{ domains: MappingDomain[] }>(
+        await api.GET('/mappings/domains'),
         'mappings/domains',
       )
       return body.domains
     },
     async grid(domainId) {
-      return json<MappingGrid>(
-        await client.authedGet(`/mappings/grid/${domainId}`),
+      return unwrapAs<MappingGrid>(
+        await api.GET('/mappings/grid/{domain_id}', { params: { path: { domain_id: domainId } } }),
         `mappings/grid/${domainId}`,
       )
     },
     async options() {
-      return json<MappingOptions>(await client.authedGet('/mappings/options'), 'mappings/options')
+      return unwrapAs<MappingOptions>(await api.GET('/mappings/options'), 'mappings/options')
     },
     async draftChangeset(entries) {
-      return json<ChangesetArtifact>(
-        await client.authedPost('/mappings/changeset', { entries }),
+      return unwrapAs<ChangesetArtifact>(
+        await api.POST('/mappings/changeset', { body: { entries } }),
         'mappings/changeset',
       )
     },
     async draftOverride(entries, draftId) {
-      return json<DraftReceipt>(
-        await client.authedPost('/mappings/overrides/draft', { entries, draft_id: draftId }),
+      return unwrapAs<DraftReceipt>(
+        await api.POST('/mappings/overrides/draft', { body: { entries, draft_id: draftId } }),
         'mappings/overrides/draft',
       )
     },
     async draftAppCode(entries, draftId) {
-      return json<DraftReceipt>(
-        await client.authedPost('/mappings/app-code/draft', { entries, draft_id: draftId }),
+      return unwrapAs<DraftReceipt>(
+        await api.POST('/mappings/app-code/draft', { body: { entries, draft_id: draftId } }),
         'mappings/app-code/draft',
       )
     },
     async drafts(domain) {
-      const q = domain ? `?domain=${encodeURIComponent(domain)}` : ''
-      const body = await json<{ drafts: OpenDraft[] }>(
-        await client.authedGet(`/mappings/drafts${q}`),
+      const body = unwrapAs<{ drafts: OpenDraft[] }>(
+        await api.GET('/mappings/drafts', { params: { query: domain ? { domain } : {} } }),
         'mappings/drafts',
       )
       return body.drafts
     },
     async promoteDraft(draftId) {
-      return json<PromotedDiff>(
-        await client.authedPost(`/mappings/drafts/${encodeURIComponent(draftId)}/promote`, {}),
+      return unwrapAs<PromotedDiff>(
+        await api.POST('/mappings/drafts/{draft_id}/promote', {
+          params: { path: { draft_id: draftId } },
+        }),
         'mappings/drafts/promote',
       )
     },
     async correctionsReport() {
-      return json<CorrectionsReport>(
-        await client.authedGet('/mappings/overrides/report'),
+      return unwrapAs<CorrectionsReport>(
+        await api.GET('/mappings/overrides/report'),
         'mappings/overrides/report',
       )
     },
