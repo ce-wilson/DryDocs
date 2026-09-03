@@ -3,9 +3,9 @@ handoff: drydocs.lane-handoff.v1
 lane: B
 machine: laptop
 generated: 2026-09-03
-generated_at: 30d2e870 (main)
-queue: [G133, O92, J62, J58, O87]
-pens: [code:drydocs-core, code:drydocs-web, code:config]
+generated_at: 0f765355 (main)
+queue: [O92, G133, O70, R9, O88, J62]
+pens: [code:drydocs-web, code:drydocs-core, code:drydocs-api, code:config]
 ---
 
 # Lane B handoff — laptop, 2026-09-03
@@ -21,7 +21,7 @@ Collisions come from two sessions writing the same surface, not from two session
 existing. Your first commit message (or your `wip/` branch name) names what you hold:
 
 ```text
-pen: code:drydocs-core · code:drydocs-web · code:config
+pen: code:drydocs-web · code:drydocs-core · code:drydocs-api · code:config
 ```
 
 Lane A holds: `backlog · port · adr · gates · snapshot`. Anything not declared by either lane
@@ -40,7 +40,7 @@ is the pen for a SURFACE.
 4. Per-machine facts are yours to verify: `DRYDOCS_DATA_ROOT`, `DRYDOCS_LOGDIR`, the
    `.env`, and whether Neo4j is reachable here. Venue-stamp any live claim (J18).
 
-## Your queue, in order (5 items) — claim one at a time
+## Your queue, in order (6 items) — claim one at a time
 
 Every item below is `todo` with every dependency `done` at the generating commit — the
 same rule the board's Ready strip uses (`derive_summary`). Re-check on pull: the other
@@ -49,11 +49,12 @@ since PLAN1), so two lanes minting in disjoint series cannot collide on a number
 
 | # | Id | Title | Type / prio | Module | Model | Notes from the check |
 |---|---|---|---|---|---|---|
-| 1 | **G133** | api.py calls execute() outside the try that catches FileNotFoundError, so a missing binary breaks the documented exit-code contract - and API-CALLS.md records one folder-export path where two exist | task / p2 | `drydocs-core` | sonnet | clean |
-| 2 | **O92** | canAccessModule decides who sees which console module and has no test, and no guard pins which modules are designated sme (after O80) | task / p2 | `drydocs-web` | sonnet | clean |
-| 3 | **J62** | pre-commit hooks running the two commands CI blocks on, so the lint failure that ran red for a hundred consecutive runs cannot be committed again | chore / p2 | `config` | sonnet | clean |
-| 4 | **J58** | Governed config YAML has no required identity header — one JSON Schema for the four-key block, scoped BY FILE CLASS so template-class files are exempt, with schema coverage sequenced first | chore / p2 | `config` | sonnet | clean |
-| 5 | **O87** | The persona picker does not say which seat is the SME — mark it from SME_PERSONA_ID so the green chip follows the constant instead of naming Neo | task / p3 | `drydocs-web` | sonnet | clean |
+| 1 | **O92** | canAccessModule decides who sees which console module and has no test, and no guard pins which modules are designated sme (after O80) | task / p2 | `drydocs-web` | sonnet | clean |
+| 2 | **G133** | api.py calls execute() outside the try that catches FileNotFoundError, so a missing binary breaks the documented exit-code contract - and API-CALLS.md records one folder-export path where two exist | task / p2 | `drydocs-core` | sonnet | clean |
+| 3 | **O70** | Generate the TypeScript API client from the OpenAPI schema instead of hand-keeping fetch wrappers and their response types | task / p2 | `drydocs-web` | sonnet | clean |
+| 4 | **R9** | Read-only agent query command over the O33-guarded QuerySpecs: one deterministic, testable graph-navigation surface for agents (MCP recorded as the later option) | task / p2 | `drydocs-api` | sonnet | clean |
+| 5 | **O88** | A console route has no paper form — capture the executed DOM to a self-contained printable HTML carrying the L6 margin gutter and a route/commit provenance footer | task / p2 | `drydocs-web` | sonnet | clean |
+| 6 | **J62** | pre-commit hooks running the two commands CI blocks on, so the lint failure that ran red for a hundred consecutive runs cannot be committed again | chore / p2 | `config` | sonnet | clean |
 
 ## Surfaces — who holds which pen this burst
 
@@ -77,8 +78,21 @@ the change back through the sender.
 | `gates` (this skill's addition to §0) | `config/gate-log.md` | Lane A — the signed gate record |
 | `gates` (this skill's addition to §0) | `config/crosswalks/` | Lane A — orchestrator crosswalks — gate-bound config |
 | `snapshot` (this skill's addition to §0) | `knowledge/depgraph-snapshots/` | Lane A — the session snapshot — one writer per burst |
+| Lane A's queue | the items CFG1, CFG2, PLAN2, DOC2, REF1, ONT1, ONT2, DOC1 and their inputs | do not claim or edit |
 | `code:<module>` | everything an item in YOUR queue names in `inputs` | this lane, claimed per item |
 | — | `docs/plan/*.html`, `web/src/generated/**`, `docs/design/*.html` | derived renders — Lane A regenerates once at close; nobody merges them by hand (J43) |
+
+**About Lane A's queue, from the same check** (for the sender to rule — this lane
+does nothing with these):
+
+- CFG2: not ready — depends on ['CFG1'] (not all done)
+- PLAN2: not ready — depends on ['CFG2'] (not all done)
+- DOC2: not ready — depends on ['PLAN2'] (not all done)
+- ONT1: not ready — depends on ['CFG1', 'REF1'] (not all done)
+- ONT2: not ready — depends on ['CFG1'] (not all done)
+- CFG1: gate-bound: ontology-domain-registry-and-edition-grain (an SME session, not a build)
+- REF1: gate-bound: ontology-domain-registry-and-edition-grain (an SME session, not a build)
+- DOC1: gate-bound: ontology-domain-registry-and-edition-grain (an SME session, not a build)
 
 **Lane B claims status-only and never renders.** A claim is one item file, pushed;
 Y5 tolerates it un-rendered, and Lane A renders once at close. **Lane B does not
