@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - web/src/components/map/resolve.ts
@@ -46,3 +46,41 @@ notes: |
   Filed in epic server-location with module drydocs-web and phase 12: the epic owns the map's
   geography, the code is console code, and phase 12 is where console work is tracked. Recorded
   because the epic's other items sit in phase 6.
+
+  BUILT 2026-09-03 (laptop, Lane B of the 0aeba6fc handoff; wip/Z9-laptop).
+
+  (a)(b) ONE FALLBACK, THREE READS. The city index three lines above already keyed on
+  `country_id ?? country_alias`; the site construction now derives the same countryKey once
+  and uses it for countryId, countryName and countryHasNoShape. Synthetica reports
+  countryHasNoShape true, countryId 'SYN', countryName 'Synthetica', and reaches countryIds.
+  No other resolve.ts behaviour changed.
+
+  (c) The it.fails case went red the moment the code was fixed - the marker working exactly as
+  designed - and is flipped to it, its comment rewritten as history. One new case pins
+  countryId, countryName and countryIds for a synthetic site. resolve.test.ts: 17 passed.
+
+  (d) VERIFIED IN THE UI - the venue named because it is not the laptop's graph: this laptop's
+  graph has no Server label at all (the R9 agent query command, run live against neo4jtest,
+  returns 0 rows for map.server-locations.v1), so the Locations map would render nothing. The
+  real console (Vite :5299) was served by the real API (:8021) built through its documented
+  injection seam, create_app(runner=...), with a runner returning five declared location rows
+  - three Synthetica, one London, one Singapore - and driven in headless Edge 152 through the
+  real sign-in form. On the Explorer route's Locations tab: Otherton and Sampleville place as
+  synthetic markers; clicking Otherton opens its card reading "Otherton, OT · Synthetica" with
+  the synthetic-fixture chip and WITHOUT the "no outline at this map resolution" chip (that
+  chip is deliberately suppressed for synthetic sites - the fixture chip already says what it
+  is); no path titled Synthetica exists, so nothing is tinted and nothing drills (no "← World"
+  button after the click). Contrast on the same page: United Kingdom tints, is clickable, and
+  drills - "← World" appears. Singapore's city is not in the gazetteer and lands in the
+  unplaceable list, correctly. Zero page errors. Screenshot kept in the session scratchpad,
+  not the repo.
+
+  ON "THE DRILL-DOWN LIST": the map has no rendered list of countries - `countryIds` IS the
+  list the item means, and the map reads it as the set of touched outlines. Before the fix
+  Synthetica was absent from it; now it is present, and because it has no outline the map
+  correctly offers nothing for it. So the visible change on the page is nil by construction:
+  the outline the item says the UI "offered" was the resolver's claim, never something the map
+  could draw. The fix makes the data true; the page was already honest.
+
+  (e) npm run lint and npm run build green; vitest 12 files / 143 tests; the Python suite
+  untouched by this change but run before the close.
