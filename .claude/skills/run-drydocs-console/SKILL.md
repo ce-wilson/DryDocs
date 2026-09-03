@@ -77,6 +77,15 @@ so a fresh clone has no personas and `/login` returns 401 for every attempt. `/l
 returns ONE message for bad-secret and unknown-persona on purpose (enumeration), so a 401
 does not tell you which it was — check the store exists before debugging the request.
 
+## Paper form — capture a route for pen-and-paper review (O88)
+
+With tiers 2 and 3 answering, `npm run paper -- --persona <id>` (in `web/`) signs in
+through headless Edge and writes self-contained printable captures of `/gates`,
+`/software` and `/load-map` (artifact-backed, no graph needed; `--routes` for others)
+under `<DRYDOCS_DATA_ROOT>/console-captures/<stamp>/`, each with the L6 gutter tags and
+a route/commit/time/API/persona footer. The secret is prompted, never a flag. See
+`web/README.md`, "Paper form (O88)".
+
 ## Step 4 — test persona credentials (only if sign-in refuses)
 
 The console signs in against a MACHINE-LOCAL store, so this step is per-desktop and is
