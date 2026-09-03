@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - config/doc-source-registry.yaml
@@ -91,3 +91,55 @@ notes: |
   and it needs its research written up properly first - the findings currently
   live in a session rather than in a log, which is the same gap J63 names for
   reviews. This item touches no DPL row.
+
+  BUILT 2026-09-03 (laptop, Lane B of the 0aeba6fc handoff; wip/G134-laptop).
+
+  (a) THE LADDER, once, twice-shaped on purpose: explained in the header's REQUIRED
+  block and declared as DATA under `capture_ladder:` - rungs 1-5 best-to-worst with
+  what each can yield, plus `unprobed` - because the guard reads the object, not the
+  prose (J37). One refinement the rows forced, written into the header: a PDF or
+  file the publisher SERVED as its artifact is rung 1 (an export), while rung 4 is a
+  PDF you MADE by printing a rendering. The two published-PDF corpora would
+  otherwise have sat on a rung describing a route nobody took.
+
+  (b) TEN ROWS (the body's thirteen counts the three retired ids), each with the
+  rung REACHED, from the row's own capture prose: rung 1 x4 - the two served-PDF
+  corpora (neo4j-docs-essential-graphrag, jpmc-reports) and the two mail corpora
+  whose .msg files are the mail system's export (adhoc-sme-email, ops-email-
+  extracts); rung 2 x1 - cdo-frameworks; rung 3 x3 - bmc-docs, bmc-docs-controlm-
+  utilities, chase-leadership-scrape; unprobed x2 - seal-pat-scrape (VERBATIM as
+  declared intent, no capture) and mwaa-implementation-docs, GROUNDED at unprobed,
+  the exact row the item exists to make visible; its comment says the ladder is a
+  task there and names Confluence's REST route as rung 2 to try.
+
+  (c) GUARDED, four tests in tests/unit/test_doc_registry.py: the ladder's shape
+  and order; the field required with vocabulary = the ladder's keys; VERBATIM may
+  not sit at rung 4 or 5 while GROUNDED anywhere is fine (one-directional, as
+  ruled); and the unprobed set PINNED so a row joins or leaves it deliberately -
+  the pin is what makes "which corpora were never probed" a count instead of a
+  reading.
+
+  (d) cdo-frameworks carries capture_rung 2 with its rung 5 -> 2 history beside
+  it; the trust_default comment stays as the WHY. The body's `confluence-*` is
+  that row under its pre-sanitization name.
+
+  (e) Both rules ride in the header verbatim in intent: a blocked agent fetch says
+  nothing about the host, and rung 1 existing is not rung 1 working.
+
+  (f) Nothing re-classified, no trust_default moved, no confirmed flag touched.
+  TWO FINDINGS recorded in their rows and raised here, not corrected:
+  bmc-docs-controlm-utilities and chase-leadership-scrape both claim VERBATIM at
+  rung 3, which the ladder's rule of thumb marks GROUNDED. The utilities scrape
+  STORES the served bytes - a real case for VERBATIM the rule of thumb undersells,
+  and the guard deliberately does not fail rung 3. The leadership scrape RETAINS a
+  transcription of pages it fetched (a rung-5 shape on top of a rung-3 fetch; the
+  raw HTML was not kept) - the weaker claim of the two. Both are the SME's call;
+  trust_default is what the loaders read. Nothing in scope touches a DPL row.
+
+  VERIFIED: the 99 tests across the registry, classification, corpus-status,
+  docs-coverage and source-registry suites pass with the new key (every reader
+  goes through dict access); ruff clean; full suite 3143 passed with ONE failure
+  that is a render, not a defect - test_enforcement_matrix's regeneration guard,
+  because web/src/generated/enforcement-matrix.json embeds this ledger's row and
+  render_board.py (which runs render_enforcement_matrix) is Lane A's pen. It clears
+  with the same render the roadmap guard needs at merge.
