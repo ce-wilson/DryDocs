@@ -25,7 +25,7 @@ the two in step.
 | Operation | Tool (transport) | Corpus grounding | Availability at 9.0.21.300 |
 |---|---|---|---|
 | `api_probe` | `ctm config servers::get` (automation-api) | `controlm-api-installation.md` — Monthly on-prem API, CLI env setup, this exact verify command | Compatible "9.0.20 and higher" **on paper**; emrestsrv install, endpoint, and token policy unverified company-side (remediation OQ-1). Grounded default template ships. |
-| `folder_export` | `exportdeffolder` (em-xml-utility) | `controlm-planning-utils.md` (name + purpose only); `controlm-xml-definition-format.md` | Available — XML supported-but-deprecated window. **Syntax = corpus gap**; config template required. |
+| `folder_export` | `exportdeffolder` (em-xml-utility) — **and a second transport in working use**, the Automation API `GET /deploy/jobs?ctm=&folder=&format=XML` (automation-api); see "Two folder-export transports" below | `controlm-planning-utils.md` (name + purpose only); `controlm-xml-definition-format.md`; the API path grounded by a measured pull, not by the corpus | Available — XML supported-but-deprecated window. **Syntax = corpus gap** for the utility; config template required. The two transports return **different shapes**: the API copy omits six EM-instance attributes and carries `REAL_FOLDER_ID=0` (deployable-shaped, not a defect). |
 | `folder_deploy` | `deffolder` (em-xml-utility) | same as `folder_export` | Available; syntax = corpus gap; config template required. |
 | `folder_define` | `ctmdeffolder` (server-utility) | `controlm-ctmdeffolder-utility.md` — parameter grain: `-FOLDER`, `-APPLICATION`/`-SUBAPPLICATION`, cyclic, `-RBC`/`-DAYSCAL`/`-WEEKCAL`, `-INCOND`/`-OUTCOND`, `-VARIABLE` (apostrophes for `$`), `-input_file` | Available (SMART folders only). SaaS-doc caveat: verify divergence on the EM before templating. |
 | `job_export` | `exportdefjob` (em-xml-utility) | `controlm-xml-definition-format.md` — "exports … from the Control-M/EM database to an output file"; `controlm-planning-utils.md` | Available; argument-file XML shape = corpus gap; config template required. |
@@ -38,6 +38,40 @@ the two in step.
 | `calendar_copy` | `copydefcal` (em-xml-utility) | `controlm-planning-utils.md` (name only) | Available in principle; syntax = corpus gap; config template required. |
 | `condition_add` | — (no grounded tool) | **no corpus ground truth** for runtime condition add | **Reported capability gap, always** (exit 3). Definition-grain in/out conditions ride `-INCOND`/`-OUTCOND` on `job_define`/`folder_define` (`controlm-ctmdefine-utility.md`, `controlm-ctmdeffolder-utility.md`). |
 | `condition_remove` | — (no grounded tool) | **no corpus ground truth** for runtime condition remove | Reported capability gap, always (exit 3). |
+
+## Two folder-export transports, and what the shape difference costs (G133)
+
+The table above used to imply one path. There are two, and they do not return
+the same document:
+
+| | `exportdeffolder` (em-xml-utility) | `GET /deploy/jobs?ctm=&folder=&format=XML` (automation-api) |
+|---|---|---|
+| grounding | corpus names the tool; syntax unverified | not in the corpus; measured 2026-08-30 on one folder present in both exports |
+| content | 30 JOB, 21 VARIABLE, 1 INCOND, 1 OUTCOND, 1 RULE_BASED_CALENDAR | identical content |
+| EM-instance attributes | carries `IS_CURRENT_VERSION`, `VERSION_SERIAL`, `VERSION_HOST`, `VERSION_OPCODE`, `MODIFIED`, `JOBS_IN_GROUP` | omits all six |
+| folder identity | `REAL_FOLDER_ID` as the EM holds it | `REAL_FOLDER_ID=0` |
+| shape | an EM-instance record | **deployable** — the id is assigned by Control-M on upload, so the zero is correct for this artifact, not a defect in the pull |
+
+**What that costs, in this repo's terms.** The graph keys folders on
+`folder_id` (`drydocs/loaders/cypher/controlm_folders.cypher` MERGEs
+`ControlMFolder {folder_id}`, sourced from `CM_DEF_VTAB.TABLE_ID` in
+`drydocs/loaders/sql/controlm_folders.sql`), so an API-pulled folder cannot
+be reconciled to a loaded folder by identity — only by name.
+`IS_CURRENT_VERSION` is a live filter across the loader SQL
+(`controlm_folders.sql`, `controlm_jobs.sql`, both conditions loaders), so
+without it "these are the current definitions" is an assumption about API
+behaviour rather than a field that can be tested.
+
+**What is NOT lost.** The XML lineage extractor keys its rows on
+`(data_center, folder_name, subfolder_path, job_name)`
+(`drydocs_lineage/extractors/controlm_xml.py`) — names, not ids — so the API
+export is usable for the command-line lineage weld unchanged.
+
+**For the D11 gate** (`controlm-definition-precedence`): its clauses A1/A2
+assume one XML feed against one replica. The scriptable transport is the one
+that loses folder identity and the version columns, so the question is
+"which XML, and can it still be joined", not "does XML beat the replica" —
+recorded here so the gate session finds it; this reference rules nothing.
 
 ## Gaps the next corpus fetch should close
 
