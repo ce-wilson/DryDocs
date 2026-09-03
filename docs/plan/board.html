@@ -12388,6 +12388,14 @@ NOT DONE HERE, BY DESIGN: no graph write (LIN2); no Ab Initio pset -&gt; dataset
 extractor (Phase 3); no key ranking or grading (Phase 4). The XML export is not a hop-1
 input yet - controlm_inventory reads the CSV projection; the XML route goes through
 resolve-cmdline-staging today, and joining the two is a later item.
+
+CI CORRECTION (5c429f05 red on the gates job, fixed the same hour): the bundled
+variables sample (controlm_variables__sample.csv) is MACHINE-LOCAL - drydocs/data/ is
+gitignored and only the named samples are force-tracked; this one never was - so the
+test asserting it present failed on a fresh checkout. The variables sample is now
+optional in the default run (acquisition records bundled-samples-absent), and both
+states are proven locally by running the two test files with the file present and
+moved away. Nothing about hop 1 changes: the variables CSV only adds PRECMD/POSTCMD.
 </p></div></div></div></div>
 </div>
 <div class="capture">

@@ -515,8 +515,13 @@ def lineage_extract(
         jobs = DEFAULT_SAMPLES_DIR / "controlm_jobs__sample.csv"
         acquisition["jobs"] = "bundled-samples"
         if variables is None:
+            # The variables sample is MACHINE-LOCAL (drydocs/data/ is ignored; only the
+            # named samples are force-tracked, and this one is not), so a fresh checkout
+            # runs hop 1 without PRECMD/POSTCMD text. The staging records it absent.
             variables = DEFAULT_SAMPLES_DIR / "controlm_variables__sample.csv"
-            acquisition["variables"] = "bundled-samples"
+            acquisition["variables"] = (
+                "bundled-samples" if variables.exists() else "bundled-samples-absent"
+            )
     else:
         jobs = _zoned_or_refuse(jobs, what="jobs")
         acquisition["jobs"] = "declared-zone"

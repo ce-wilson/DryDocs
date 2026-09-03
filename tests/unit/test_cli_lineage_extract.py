@@ -45,7 +45,8 @@ def test_default_run_stages_the_bundled_samples_into_the_write_zone(tmp_path: Pa
     assert len(files) == 1, "one artifact per run, in the declared lineage/staged/ zone"
     data = json.loads(files[0].read_text(encoding="utf-8"))
     assert data["schema"] == "drydocs.lineage-staged.v1"
-    assert data["acquisition"] == {"jobs": "bundled-samples", "variables": "bundled-samples"}
+    assert data["acquisition"]["jobs"] == "bundled-samples"
+    assert data["acquisition"]["variables"] in ("bundled-samples", "bundled-samples-absent")
     assert files[0].name == f"lineage-{data['run_id']}.json"
     by_hop = {s["hop"]: s for s in data["sources"]}
     assert by_hop["controlm"]["path"] == str(DEFAULT_SAMPLES_DIR / "controlm_jobs__sample.csv")

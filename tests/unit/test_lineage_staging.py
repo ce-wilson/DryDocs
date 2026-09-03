@@ -128,7 +128,9 @@ def test_hop_order_is_declared_and_only_the_first_hop_is_required() -> None:
 def test_the_bundled_samples_stage_abinitio_etl_processes() -> None:
     """Hop 1 on the package samples: every job seeds a process node, the Ab Initio
     wrappers classify as :ETLProcess kind abinitio, and INVOKES is the edge."""
-    staged = stage_chain(jobs=SAMPLE_JOBS, variables=SAMPLE_VARS)
+    # the variables sample is machine-local (untracked): pass it only where it exists,
+    # and the assertions below hold either way - hop 1 is the jobs CSV
+    staged = stage_chain(jobs=SAMPLE_JOBS, variables=SAMPLE_VARS if SAMPLE_VARS.exists() else None)
     kinds = {n.kind for n in staged.graph.processes.values()}
     assert {"controlm_job", "abinitio"} <= kinds
     assert {t for _, t, _ in staged.graph.rels} == {"INVOKES"}
@@ -137,7 +139,8 @@ def test_the_bundled_samples_stage_abinitio_etl_processes() -> None:
     assert cov["invocations_etl_process"] > 0
     # the optional hops were asked and had nothing - said so, not silent
     by_hop = {s.hop: s for s in staged.sources}
-    assert by_hop["controlm"].present and by_hop["controlm_variables"].present
+    assert by_hop["controlm"].present
+    assert by_hop["controlm_variables"].present is SAMPLE_VARS.exists()
     for hop in ("dpl_mac", "dpl_registry", "glue"):
         assert by_hop[hop].present is False
         assert by_hop[hop].note == "no path given"
