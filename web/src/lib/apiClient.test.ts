@@ -92,6 +92,28 @@ describe('the authed client', () => {
     expect(calls[0]?.url).toBe(`${BASE}/mappings/drafts?domain=a%20b`)
     expect(calls[1]?.url).toBe(`${BASE}/mappings/grid/x%2Fy`)
   })
+
+  // The one call O70 changed in KIND: evidence upload went from a raw
+  // fetch(FormData) to a body serializer. The client must drop its default
+  // application/json header when the serialized body is a FormData, or the
+  // browser cannot set the multipart boundary and the server reads no files.
+  it('lets a body serializer hand fetch a FormData, so the request is multipart', async () => {
+    const calls = fakeFetch(200, { intake_id: 'i1' })
+    const file = new File(['x'], 'note.txt', { type: 'text/plain' })
+    await createAuthedApi(BASE, hooks('tok')).POST('/intake/{intake_id}/evidence', {
+      params: { path: { intake_id: 'i1' } },
+      body: { files: [] },
+      bodySerializer: () => {
+        const form = new FormData()
+        form.append('files', file, file.name)
+        return form
+      },
+    })
+    const type = calls[0]?.headers.get('content-type') ?? ''
+    expect(type.startsWith('multipart/form-data; boundary=')).toBe(true)
+    expect(type).not.toContain('application/json')
+    expect(calls[0]?.headers.get('authorization')).toBe('Bearer tok')
+  })
 })
 
 describe('the public client', () => {
