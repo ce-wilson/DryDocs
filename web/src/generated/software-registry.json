@@ -197,6 +197,12 @@
       "name": "In-house",
       "publisher_url": "",
       "icon": null
+    },
+    {
+      "id": "axway",
+      "name": "Axway",
+      "publisher_url": "https://www.axway.com/",
+      "icon": null
     }
   ],
   "vendors_without_icons": [
@@ -206,7 +212,8 @@
     "reui",
     "xyflow",
     "tailwind-labs",
-    "in-house"
+    "in-house",
+    "axway"
   ],
   "products": [
     {
@@ -221,6 +228,7 @@
       ],
       "used_by_drydocs": true,
       "seal_id": null,
+      "white_label": null,
       "documentation": null,
       "stack": [
         "backend",
@@ -239,6 +247,7 @@
       ],
       "used_by_drydocs": true,
       "seal_id": null,
+      "white_label": null,
       "documentation": null,
       "stack": [
         "web-console"
@@ -256,6 +265,7 @@
       ],
       "used_by_drydocs": false,
       "seal_id": null,
+      "white_label": null,
       "documentation": null,
       "stack": []
     },
@@ -271,6 +281,7 @@
       ],
       "used_by_drydocs": true,
       "seal_id": "[seal-id]",
+      "white_label": null,
       "documentation": {
         "corpus": "bmc-docs-controlm-utilities",
         "docs_version": "9.0.20",
@@ -342,6 +353,7 @@
       ],
       "used_by_drydocs": true,
       "seal_id": null,
+      "white_label": null,
       "documentation": null,
       "stack": [
         "backend"
@@ -359,6 +371,7 @@
       ],
       "used_by_drydocs": true,
       "seal_id": null,
+      "white_label": null,
       "documentation": null,
       "stack": [
         "web-console"
@@ -376,6 +389,7 @@
       ],
       "used_by_drydocs": true,
       "seal_id": null,
+      "white_label": null,
       "documentation": null,
       "stack": [
         "web-console"
@@ -393,6 +407,7 @@
       ],
       "used_by_drydocs": true,
       "seal_id": null,
+      "white_label": null,
       "documentation": null,
       "stack": [
         "web-console"
@@ -410,6 +425,7 @@
       ],
       "used_by_drydocs": true,
       "seal_id": null,
+      "white_label": null,
       "documentation": null,
       "stack": [
         "web-console"
@@ -427,6 +443,7 @@
       ],
       "used_by_drydocs": true,
       "seal_id": null,
+      "white_label": null,
       "documentation": null,
       "stack": [
         "backend"
@@ -442,6 +459,7 @@
       "versions": [],
       "used_by_drydocs": false,
       "seal_id": null,
+      "white_label": null,
       "documentation": null,
       "stack": []
     },
@@ -455,6 +473,7 @@
       "versions": [],
       "used_by_drydocs": false,
       "seal_id": null,
+      "white_label": null,
       "documentation": null,
       "stack": []
     },
@@ -470,11 +489,28 @@
       ],
       "used_by_drydocs": false,
       "seal_id": null,
+      "white_label": null,
       "documentation": {
         "corpus": "mwaa-implementation-docs",
         "docs_version": "2026-08-07 locator",
         "current_for": []
       },
+      "stack": []
+    },
+    {
+      "id": "mfts",
+      "vendor": "axway",
+      "name": "Axway SecureTransport",
+      "category": "Managed File Transfer",
+      "role": "tool",
+      "type": "commercial",
+      "versions": [
+        "6.0.3"
+      ],
+      "used_by_drydocs": false,
+      "seal_id": "[seal-id]",
+      "white_label": "MFTS",
+      "documentation": null,
       "stack": []
     },
     {
@@ -487,6 +523,7 @@
       "versions": [],
       "used_by_drydocs": false,
       "seal_id": null,
+      "white_label": null,
       "documentation": null,
       "stack": []
     },
@@ -500,6 +537,7 @@
       "versions": [],
       "used_by_drydocs": false,
       "seal_id": null,
+      "white_label": null,
       "documentation": null,
       "stack": []
     },
@@ -513,6 +551,7 @@
       "versions": [],
       "used_by_drydocs": false,
       "seal_id": null,
+      "white_label": null,
       "documentation": null,
       "stack": []
     }

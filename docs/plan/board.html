@@ -74,24 +74,24 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 .capture-status{font-size:.78rem;color:#166534;margin:.3rem 0 0;min-height:1.1em}</style>
 </head><body>
 <h1>DryDocs — project board</h1>
-<p class="subtitle">Rendered from <code>docs/restructure/backlog/</code> 642 items &middot; 133 todo / 12 in progress / 2 blocked / 495 done. The repo is the system of record; this page is a working aid.</p>
+<p class="subtitle">Rendered from <code>docs/restructure/backlog/</code> 642 items &middot; 133 todo / 6 in progress / 2 blocked / 501 done. The repo is the system of record; this page is a working aid.</p>
 <p class="subtitle">Location: <code id="board-url"></code> <button type="button" id="board-url-copy">copy</button></p>
 <script>document.getElementById('board-url').textContent=window.location.href;document.getElementById('board-url-copy').onclick=function(){navigator.clipboard.writeText(window.location.href);};</script>
 <p class="subtitle"><a class="capture-link" href="roadmap.html">Module roadmap &rarr;</a> <a class="capture-link" href="ideas.html">Idea inbox &rarr;</a></p>
 <div class="roadmap">
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P0</span><span class="status-badge status-done">done</span></div><h3>Restructure scaffolding</h3><p class="goal">Four-layer model, external/internal split, config layer, publish boundary, sub-agents.</p><div class="progress"><div class="progress-bar" style="width:100%"></div></div><p class="progress-text">4 / 4</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P1</span><span class="status-badge status-done">done</span></div><h3>Taxonomy capture</h3><p class="goal">Live sources captured in config/taxonomy/ as pure classification (Epic B).</p><div class="progress"><div class="progress-bar" style="width:100%"></div></div><p class="progress-text">6 / 6</p></div>
-<div class="phase-card"><div class="phase-head"><span class="phase-id">P2</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Ontology mapping + HITL</h3><p class="goal">Every graph edge traces to an SME-confirmed taxonomy→ontology mapping (Epic C).</p><div class="progress"><div class="progress-bar" style="width:80%"></div></div><p class="progress-text">43 / 54</p></div>
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P2</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Ontology mapping + HITL</h3><p class="goal">Every graph edge traces to an SME-confirmed taxonomy→ontology mapping (Epic C).</p><div class="progress"><div class="progress-bar" style="width:81%"></div></div><p class="progress-text">44 / 54</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P3</span><span class="status-badge status-done">done</span></div><h3>Config-driven loaders</h3><p class="goal">Precedence + source gating read config/, not hardcoded logic (Epic D).</p><div class="progress"><div class="progress-bar" style="width:82%"></div></div><p class="progress-text">9 / 11</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P4</span><span class="status-badge status-todo">todo</span></div><h3>Context graph pilot</h3><p class="goal">SOSA/SSN observation modeling answers one live support question (Epic E).</p><div class="progress"><div class="progress-bar" style="width:0%"></div></div><p class="progress-text">0 / 2</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P5</span><span class="status-badge status-todo">todo</span></div><h3>Orchestrator expansion</h3><p class="goal">AutoSys + Airflow land as BMC-baseline concepts via confirmed crosswalks (Epic F).</p><div class="progress"><div class="progress-bar" style="width:40%"></div></div><p class="progress-text">2 / 5</p></div>
-<div class="phase-card"><div class="phase-head"><span class="phase-id">P6</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Modular architecture / component topology</h3><p class="goal">ADR 0002 — core extraction, multi-DB topology, component packages (Epic G).</p><div class="progress"><div class="progress-bar" style="width:85%"></div></div><p class="progress-text">123 / 145</p></div>
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P6</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Modular architecture / component topology</h3><p class="goal">ADR 0002 — core extraction, multi-DB topology, component packages (Epic G).</p><div class="progress"><div class="progress-bar" style="width:86%"></div></div><p class="progress-text">124 / 145</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P7</span><span class="status-badge status-done">done</span></div><h3>Review toolkit back-flow</h3><p class="goal">Company SME-review/HITL toolkit reproduced generically, offline (Epic H).</p><div class="progress"><div class="progress-bar" style="width:88%"></div></div><p class="progress-text">7 / 8</p></div>
-<div class="phase-card"><div class="phase-head"><span class="phase-id">P8</span><span class="status-badge status-in_progress">in_progress</span><span class="release">v0.3.0</span></div><h3>Planning &amp; release infrastructure</h3><p class="goal">Repo-native project board + capture loop; groundwork for versioned releases (Epic I).</p><div class="progress"><div class="progress-bar" style="width:71%"></div></div><p class="progress-text">70 / 98</p></div>
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P8</span><span class="status-badge status-in_progress">in_progress</span><span class="release">v0.3.0</span></div><h3>Planning &amp; release infrastructure</h3><p class="goal">Repo-native project board + capture loop; groundwork for versioned releases (Epic I).</p><div class="progress"><div class="progress-bar" style="width:72%"></div></div><p class="progress-text">71 / 98</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P9</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Application attribution</h3><p class="goal">Jobs attributed to SEAL applications (seal_app_ref) end-to-end — gate-confirmed match policy, loader, verify coverage (Epic K).</p><div class="progress"><div class="progress-bar" style="width:87%"></div></div><p class="progress-text">33 / 38</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P10</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Documentation infrastructure</h3><p class="goal">Every design doc (TDD/Runbook/BRD) conforms to a canonical outline; deterministic md→HTML/PDF render; HITL markup loop (digital + pen/paper) re-attaches to a requirement-traceability backbone (Epic L).</p><div class="progress"><div class="progress-bar" style="width:73%"></div></div><p class="progress-text">30 / 41</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P11</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Source governance ledgers</h3><p class="goal">Per-source governance as test-enforced config: audit envelope + edge diet (doc 06, Epic M) and column-mapping ledgers (doc 08, Epic N); property-term bindings via the gate.</p><div class="progress"><div class="progress-bar" style="width:61%"></div></div><p class="progress-text">20 / 33</p></div>
-<div class="phase-card"><div class="phase-head"><span class="phase-id">P12</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Web console / graph visualization</h3><p class="goal">Browser front-end over the knowledge graph: navigable C4/graph views, with a decided browser↔Neo4j access path (bolt-from-browser vs a thin API).</p><div class="progress"><div class="progress-bar" style="width:81%"></div></div><p class="progress-text">79 / 98</p></div>
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P12</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Web console / graph visualization</h3><p class="goal">Browser front-end over the knowledge graph: navigable C4/graph views, with a decided browser↔Neo4j access path (bolt-from-browser vs a thin API).</p><div class="progress"><div class="progress-bar" style="width:84%"></div></div><p class="progress-text">82 / 98</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P13</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Runtime topology &amp; maintenance windows</h3><p class="goal">Control-M host topology (CM_HOSTS) + runtime-stats supplement (CM_AVG_RUN) loaded per their gates; the maintenance-window question (best patch window for a host/group) answerable from the graph (Epic P).</p><div class="progress"><div class="progress-bar" style="width:83%"></div></div><p class="progress-text">5 / 6</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P14</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Document ingestion &amp; doc-graph benchmarks</h3><p class="goal">Unstructured documents as graph corpora (docmeta): the P0 benchmark verdict (traversal vs manifest-routed md vs vector RAG) with its evidence experiments, and the landing zone for the docmeta component&#x27;s P1+ phases once the verdict + docmeta ADR gate them (Epic Q).</p><div class="progress"><div class="progress-bar" style="width:89%"></div></div><p class="progress-text">24 / 27</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P15</span><span class="status-badge status-todo">todo</span></div><h3>Agentic Q&amp;A console</h3><p class="goal">Free-text questions answered by a tiered read-only agent (QuerySpec router → schema-grounded text2cypher → bounded graph-of-thoughts loop) with every executed Cypher exposed via ephemeral specs, per-run question/context/memory/token telemetry, and stale-source rescrape (Epic R; ADR 0007).</p><div class="progress"><div class="progress-bar" style="width:57%"></div></div><p class="progress-text">13 / 23</p></div>
@@ -3180,177 +3180,10 @@ transcribed from seven company artifacts on an UNMERGED research branch and cite
 
 Related: MM2, MM3, MM6, MM10, MM12, R16, L28, G102, ADR 0007, ADR 0011, Idea-236.
 </p></div></div></div></div>
-<div class="column" data-status="in_progress"><div class="column-head"><h2>In progress</h2><span class="count" data-count-for="in_progress">12</span></div><div class="column-body"><div class="card" id="card-C43" data-id="C43" data-module="taxonomy" data-phase="2" data-epic="ontology-mapping" data-type="task" data-status="in_progress" data-search="c43 the software registry does not know mfts or axway because internal branding erased the vendor from every documentation surface - record the platform with its vendor the way controlm carries bmc" tabindex="0"><div class="card-head"><span class="card-id">C43</span><span class="card-title">The software registry does not know mfts or axway because internal branding erased the vendor from every documentation surface - record the platform with its vendor the way controlm carries bmc</span></div><div class="chips"><span class="chip" data-kind="module">taxonomy</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / taxonomy-importer</span></div><div class="epic">ontology-mapping</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) ADD mfts TO config/taxonomy/software-registry.yaml WITH vendor: axway, the way controlm
-carries vendor: bmc, with the fields that registry already requires of a product row - no new
-field shapes.
-
-(b) RECORD THE VERSION FACT the research established, at whatever precision the registry
-supports: Axway SecureTransport 6.0.3. Where the registry has no version slot, put it in the
-row&#x27;s note rather than inventing one.
-
-(c) WHAT THIS ITEM MUST NOT DECIDE: whether Axway becomes a VENDOR BASELINE - a new
-external/file-transfer/ category and a second baseline rank in config/precedence.yaml. That is
-a larger call and a gate question. Say so on the row so the next reader does not take the
-registration as the precedent.
-
-(d) SIBLING PRODUCTS: register FileMover and OneMFT only to the extent their vendor and
-identity are actually established by evidence. Where they are not, leave them out and say why
-in the close - an unevidenced vendor row is worse than an absent one. The SYSTEM-level
-registration of all three lives in N27, not here.
-
-(e) PASS/FAIL: the registry render (scripts/render_board.py default paths, which refreshes
-web/src/generated/software-registry.json) picks the new vendor and product up, the committed
-render matches, and the vendor count in the render output moves by the number of vendors added.
-</p><p class="notes"><strong>Notes:</strong> Groomed 2026-09-02 from Idea-236 gap 3 (OQ-15, U-1), desktop, backlog-groomer fork.
-
-WHY IT IS WORTH A ROW: the vendor was ERASED BY INTERNAL BRANDING - absent from the UI, the
-portal, the API-store entry and the docs - and surfaced only in a mandatory
-User-Agent: Axway/EndPoint header. Recording it is what stops it being lost again, and the
-generalisable finding (an internally branded platform hides its vendor on every documentation
-surface and leaks it through implementation surfaces: user-agent, cookie names, default ports,
-path conventions, id shapes) has already landed producer-side in the research-general skill,
-section 2.1.
-
-FILED IN EPIC ONTOLOGY-MAPPING WITH module taxonomy AND phase 2, matching C11/C12/C13, the
-existing software-registry items. Phase 1 (taxonomy capture) is done and closed; the registry&#x27;s
-live items sit in phase 2. Recorded because it was a judgement call, not an obvious one.
-RIDER 2026-09-02 (SME, gate ontology-domain-registry-and-edition-grain §B5 second rider):
-the row is the WHITE-LABEL case and the row shape must say so - `vendor: axway`, product
-Axway SecureTransport, and a `white_label:` marker carrying the internal name (MFTS) so a
-reader learns the vendor from the registry rather than from a User-Agent header. The
-company already added the white-label reference in their registry; this row is the
-producer&#x27;s mechanism-only twin. The TERM &quot;MFTS&quot; (its expansion, its tier) is NOT this row -
-it is an acronyms-domain entry (ONT2); the two link by name only.
-</p></div></div>
-<div class="card" id="card-E1" data-id="E1" data-module="ontology" data-phase="4" data-epic="context-graph" data-type="task" data-status="in_progress" data-search="e1 register sosa/ssn observation terms via the gate" tabindex="0"><div class="card-head"><span class="card-id">E1</span><span class="card-title">Register SOSA/SSN observation terms via the gate</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P4</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / ontology-mapper</span></div><div class="epic">context-graph</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C1" data-target="card-C1">C1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> sosa:* terms present with IRIs; status planned-&gt;confirmed via gate</p><p class="notes"><strong>Notes:</strong> Registration step DONE (main, 2026-06-22): sosa/ssn prefixes in namespaces.py; terms seeded in drydocs_core/schema/sosa_experimental_supplement.cypher (opt-in `drydocs apply-sosa-supplement`, NOT in bootstrap; every term adoption:&quot;experimental&quot;); 4 context relationships in relationship_vocabulary.yaml (sosa_observes/has_result/ made_by_sensor/observed_property, status planned, domain context); README split into Declared-Adopted vs Experimental/Early-Adoption. REMAINING for ontology-mapper: take the `jobrun-observation` map entry through the HITL gate (resolve ControlMJobRun-as-Observation vs separate-Observation-node; run-history source), then planned-&gt;confirmed. GATE SESSION DEFERRED 2026-07-14 (SME: not ready yet) — page stays rendered/pending; nothing flips; re-present at a future session (see gate-log 2026-07-14 deferral note).
+<div class="column" data-status="in_progress"><div class="column-head"><h2>In progress</h2><span class="count" data-count-for="in_progress">6</span></div><div class="column-body"><div class="card" id="card-E1" data-id="E1" data-module="ontology" data-phase="4" data-epic="context-graph" data-type="task" data-status="in_progress" data-search="e1 register sosa/ssn observation terms via the gate" tabindex="0"><div class="card-head"><span class="card-id">E1</span><span class="card-title">Register SOSA/SSN observation terms via the gate</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P4</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / ontology-mapper</span></div><div class="epic">context-graph</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C1" data-target="card-C1">C1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> sosa:* terms present with IRIs; status planned-&gt;confirmed via gate</p><p class="notes"><strong>Notes:</strong> Registration step DONE (main, 2026-06-22): sosa/ssn prefixes in namespaces.py; terms seeded in drydocs_core/schema/sosa_experimental_supplement.cypher (opt-in `drydocs apply-sosa-supplement`, NOT in bootstrap; every term adoption:&quot;experimental&quot;); 4 context relationships in relationship_vocabulary.yaml (sosa_observes/has_result/ made_by_sensor/observed_property, status planned, domain context); README split into Declared-Adopted vs Experimental/Early-Adoption. REMAINING for ontology-mapper: take the `jobrun-observation` map entry through the HITL gate (resolve ControlMJobRun-as-Observation vs separate-Observation-node; run-history source), then planned-&gt;confirmed. GATE SESSION DEFERRED 2026-07-14 (SME: not ready yet) — page stays rendered/pending; nothing flips; re-present at a future session (see gate-log 2026-07-14 deferral note).
 </p></div></div>
 <div class="card" id="card-G62" data-id="G62" data-module="drydocs-lineage" data-phase="6" data-epic="component-topology" data-type="task" data-status="in_progress" data-search="g62 run the rua-bundle data-profile gate: the sme names the load population, the agent profiles it, and only the walked population enters the curated load" tabindex="0"><div class="card-head"><span class="card-id">G62</span><span class="card-title">Run the rua-bundle data-profile gate: the SME names the load population, the agent profiles it, and only the walked population enters the curated load</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-lineage</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">component-topology</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-G22" data-target="card-G22">G22</a> <a class="dep-link" href="#card-G23" data-target="card-G23">G23</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> USER-GATED START — the SME convenes the session; the pull loop SKIPS this item until then (the C12/J13 idiom). The drafted rua-bundle-data-profile page is walked in its ruled two-step order: section A the SME identifies the source data (which hosts&#x27; bundles, where they sit, which collector produced each — Internal, recorded company-side, never on the page), section B the agent profiles that population through the G20 extractor in STAGING with zero graph writes, and section C consumes the profile to admit or trim the population, dispose of the hash-absent and collision cases it counts, and clear the F1 sweep. Sign-off transcribed to config/gate-log.md; gates.json + the enforcement matrix regenerate. No population the page has not walked enters the G23 curated load.
 </p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-09 from Idea-85, which asked only for ids and scheduling — the four post-G22 data-profile prompts were drafted 2026-08-07 and unsigned, and an unsigned prompt with no backlog id is invisible to the pull loop. Sessions run COMPANY-SIDE because the identify-the-source-data step names real hosts and paths (Internal); what lands producer-side is the transcription and the regenerated gate surfaces. Model fable: the ruling decides what may be written to the graph.
-</p></div></div>
-<div class="card" id="card-G134" data-id="G134" data-module="config" data-phase="6" data-epic="component-topology" data-type="task" data-status="in_progress" data-search="g134 the document registry records a corpus&#x27;s trust level but not the rung that produced it, so a grounded row cannot say whether anything higher was ever tried" tabindex="0"><div class="card-head"><span class="card-id">G134</span><span class="card-title">The document registry records a corpus&#x27;s trust level but not the rung that produced it, so a GROUNDED row cannot say whether anything higher was ever tried</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">component-topology</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE LADDER IS DECLARED ONCE, IN THE FILE&#x27;S HEADER, and it is ordered
-best-to-worst because the rule that matters is &quot;work down only until something
-answers&quot;: 1 machine-readable spec or bulk export (OpenAPI, GraphQL
-introspection, a DB catalog) - 2 an authenticated API call you make yourself -
-3 saved HTML or a rendered DOM - 4 print-to-PDF plus layout extraction -
-5 copy/paste text. Rungs 1-2 can yield VERBATIM; 3-4 yield GROUNDED; 5 yields
-GROUNDED and lossy. The ladder does not replace trust_default - it explains it.
-
-(b) EVERY ROW GAINS A RUNG, AND `unprobed` IS A VALUE. The field records the
-highest rung REACHED, never the highest that exists, so `unprobed` means the
-ladder was never walked and reads as a TASK rather than a limit. A row whose
-trust_default is GROUNDED and whose rung is unprobed is the finding this item
-exists to make visible: today that row is indistinguishable from one where
-rungs 1 and 2 were checked and refused.
-
-(c) THE FIELD IS REQUIRED AND GUARDED, like every other field on this ledger.
-tests/unit/test_doc_registry.py enforces the existing REQUIRED set; the rung
-joins it, with the vocabulary closed and the trust pairing checked - a row
-claiming VERBATIM at rung 4 or 5 fails, because a layout extraction is not the
-served bytes. A row may be GROUNDED at rung 1 or 2 (a spec can be transcribed
-badly); the constraint is one-directional on purpose.
-
-(d) THE PROSE THAT ALREADY DOES THIS JOB CONVERTS TO DATA. Two rows carry rung
-history in comments today. `confluence-*` reads &quot;upgraded 2026-08-19 per this
-row&#x27;s own rule: the direct Confluence fetch ran (company-side; ~50 pages, 0
-failed). Was GROUNDED while the capture was screenshot transcription&quot; - that is
-a rung 5 to rung 2 upgrade written as narrative. Convert those to the field and
-keep the prose as the WHY; the field carries what a guard can read, the comment
-carries what a person needs.
-
-(e) TWO RULES SHIP WITH THE FIELD OR IT WILL BE FILLED IN WRONG.
-ONE: a blocked agent fetch says nothing about the host. Chat-tool network policy
-is not the machine&#x27;s network access, and a source recorded `unreachable` on that
-basis is mis-recorded - both DPL hosts were &quot;blocked&quot; for an agent and answered
-immediately from a terminal on the same machine. TWO: rung 1 EXISTING is not
-rung 1 WORKING. The counterexample is already in hand and belongs in the header
-as the reason the field records reached-not-available: a service whose
-documented REST interface is gated for an account while a lower, undocumented
-route still answers. The ladder is walked, not inferred.
-
-(f) NOTHING IN THIS ITEM RE-CLASSIFIES A CORPUS OR CHANGES A `confirmed:` FLAG.
-Rung is a property of HOW a corpus was captured. Classification is sensitivity
-and stays where config/classification.yaml puts it; trust_default keeps its
-meaning; confirmed stays the gate&#x27;s. If filling in the field reveals that a
-row&#x27;s trust_default is wrong for its rung, that is a FINDING recorded in the
-row&#x27;s notes and raised - never a silent correction, because trust_default is
-what loaders read.
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-08-31. The ladder comes from a company-side research pass that
-captured two DPL service specs and wrote up the capture route as a reusable
-framework rather than a one-off. Producer-side the applicable surface is
-config/doc-source-registry.yaml - 13 rows, each already carrying
-trust_default: VERBATIM | GROUNDED | SYNTHESIZED, which is the SAME vocabulary
-the ladder assigns. So this is not a new axis: it is the missing HALF of an axis
-the ledger already has. The registry records the verdict and not the method,
-and the method is what tells a later reader whether the verdict can be improved.
-
-WHY IT IS WORTH A FIELD RATHER THAN A CONVENTION. The evidence that the
-convention alone does not hold is in the file: the one row that DID improve its
-capture route recorded the improvement in a comment, which no guard reads and no
-census can count. Ask &quot;which corpora could be VERBATIM but are not&quot; today and
-the answer requires reading thirteen comment blocks and inferring.
-
-THE LESSON THE LADDER ENCODES, which is the part worth keeping even if the field
-shape changes: look for the machine-readable source before building a scraper
-for the human-readable rendering of it. A Swagger UI page always has a spec
-behind it. That was proven the expensive way - a PDF-derived capture of those
-two services needed three captures and four parser-bug fixes to agree with the
-spec, and even then could not recover required-field arrays, enum values or
-$ref links, because the UI inlines references and renders enums as collapsed
-stubs. The spec route was one request.
-
-DELIBERATELY NOT HERE: the DPL registry field-contract correction. That is G64&#x27;s
-and it needs its research written up properly first - the findings currently
-live in a session rather than in a log, which is the same gap J63 names for
-reviews. This item touches no DPL row.
-</p></div></div>
-<div class="card" id="card-J76" data-id="J76" data-module="config" data-phase="8" data-epic="release-infrastructure" data-type="task" data-status="in_progress" data-search="j76 the measurement instrument fails toward a reassuring answer - locale decoding and truncated pipelines reported clean where the raw result was not, and one of the three admits a guard" tabindex="0"><div class="card-head"><span class="card-id">J76</span><span class="card-title">The measurement instrument fails toward a reassuring answer - locale decoding and truncated pipelines reported clean where the raw result was not, and one of the three admits a guard</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">release-infrastructure</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) BUILD THE ONE GUARD THE THREE INCIDENTS ADMIT, and only that one: a source-scan check
-that a subprocess call capturing text does so with an EXPLICIT encoding. text=True decodes
-with the platform locale, which is cp1252 on this desktop, and every backlog item file
-holds em dashes. Read the CODE, not the prose around it (J66) - go through
-tests/source_scan.py (code_only, called_names), never a bare substring test, because this
-repo&#x27;s comments explain the very pattern the guard forbids.
-
-(b) SCOPE THE GUARD, and state the scope in its docstring: repo scripts and tests, the
-places a measurement is authored. The allocator in .claude/skills/groom-backlog/
-validate.py already does this correctly and carries the comment explaining why - use it as
-the reference implementation, and let the guard prove that file passes.
-
-(c) THE OTHER TWO GET PROSE, NOT GUARDS, and the item says why for each. The truncated
-PowerShell pipeline (... | Select-Object -First N then reading $LASTEXITCODE, which
-reports 0 where the raw code was 1) is a shell idiom no Python-side scan can see; the
-fixture authored to make its author&#x27;s theory true is a review property, not a mechanical
-one. Both go into the verification guidance as named failure modes with their incidents.
-
-(d) THE RULE LINE, wherever verification discipline already lives: when a measurement
-contradicts an expectation, CHECK THE INSTRUMENT BEFORE THE SUBJECT, and prefer the check
-that can fail loudly - read the raw exit code before parsing, decode explicitly,
-reconstruct a fixture from the incident at its real values rather than authoring one.
-
-(e) PASS/FAIL: the guard is green on the tree as it stands (fix anything it finds in the
-same commit, or record the exemption on the line), red on a synthetic text=True capture,
-and the three incidents are recorded with the shape they share - the instrument was
-broken, the artifact was fine, and the corrupted measurement said everything was OK.
-</p><p class="notes"><strong>Notes:</strong> Groomed 2026-09-02 from Idea-235 (desktop, backlog-groomer fork). The idea&#x27;s own
-disposition is a candidate rule, not yet ruled, and asks whether any of the three
-instances admits a guard. One does, cleanly, and that half is what is promoted; the
-broader discipline question stays in the IDEAS inbox for the user.
-
-THE THREE INCIDENTS, all 2026-09-01, two machines, two people, one port: (1) a comparison
-script read git show with subprocess(text=True) and mojibaked every em dash, fabricating
-18 of 25 reported differences while the file on disk was clean; (2) a sweep captured
-results as ... | Select-Object -First N, which terminates a native-command pipeline early,
-so $LASTEXITCODE reported 0 where the raw code was 1 - five prefixes were declared clean
-on that basis and a slice was about to start on it; (3) a guard was validated against
-fixture data authored to make its author&#x27;s theory true, and the real pair measured on the
-other tree scored 0.08 where the fixture cleared the floor.
-
-WHY THEY ALL FAIL REASSURINGLY, which is the part worth keeping: each is a default that
-optimises for not interrupting - a locale decoder that substitutes rather than raises, a
-pipeline that stops reading when it has enough, a fixture its author believes. A tool that
-fails loudly gets fixed in minutes; a tool that fails into clean gets ACTED ON.
-
-Related: the verify-before-asserting working agreement, J66 (a guard reads code, not the
-prose around it), and J72&#x27;s notes, which carry all three as worked examples.
 </p></div></div>
 <div class="card" id="card-K16" data-id="K16" data-module="config" data-phase="9" data-epic="seal-attribution" data-type="task" data-status="in_progress" data-search="k16 fid directory census: measure the demand-set pull scope on one application, and the registration-vs-attribution disagreement rate" tabindex="0"><div class="card-head"><span class="card-id">K16</span><span class="card-title">FID directory census: measure the demand-set pull scope on ONE application, and the registration-vs-attribution disagreement rate</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P9</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">seal-attribution</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> For ONE application, three counts are reported (counts ONLY — never a row dump; the output is Internal and lands company-side): (a) total directory rows for that application; (b) |demand set ∩ that application|, where the demand set is the union of run-as owners in the Control-M extract, distinct STG_APP_FACT fact_value rows with fact_type=&#x27;FID&#x27; the K2 resolver currently counts unresolved, and account names in registered adhoc evidence; (c) the breakdown of (a) minus (b) by the directory&#x27;s own type/status columns. PLUS the §Q0 measurement the gate cannot sign without: of the accounts in the demand set, how many have a directory application assignment that DISAGREES with the Control-M-derived folder attribution, and the by-case split of those disagreements into &quot;different subjects, both correct&quot; vs &quot;stale directory&quot; vs &quot;wrong folder attribution&quot; (§G5). Doc 09&#x27;s phase table is updated with the real numbers. No pull beyond the demand set; no rows loaded.
 </p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-05 (desktop) from the 2026-08-05 IDEAS entries. THIS RUNS BEFORE THE GATE, not after: &quot;about two hundred accounts per application&quot; is the estimate the gate cannot rule on, and the census turns it into &quot;N of ~200, and here is what the other rows are&quot;. The §Q0 disagreement breakdown is the part that decides whether the directory is a trustworthy ownership source with expected consumer divergence, or a lagging record needing remediation — a question raised only after the gate was drafted, which is why it sits in a separate item rather than inside the gate page. module: config (a source-scoping measurement, not a loader). Producer-side this repo carries the METHOD; the counts themselves are Internal. PRODUCER HALF DELIVERED 2026-08-07 (laptop), and the item is BLOCKED rather than done because its acceptance asks for real counts this repo structurally cannot produce — it holds no directory extract, which is the whole point of the demand-set pull. Shipped: drydocs/fid_census.py (pure — opens no file, contacts no database, writes nothing; every input injected), tests/unit/test_fid_census.py (14 tests, all synthetic), and docs/company-prompts/k16-fid-census-company-prompt.md following the 2026-08-07 company-pack convention. Doc 09 gains a &quot;The numbers&quot; table with every cell marked pending, and an explicit note that an empty cell means NOT MEASURED, never zero. TWO DESIGN DECISIONS WORTH KNOWING BEFORE THE COUNTS ARRIVE. (1) COUNTS-ONLY IS ENFORCED BY THE RETURN TYPE, not by discipline: FidCensus holds int and dict[str,int] fields only, so a row dump is UNEXPRESSIBLE, and a test pins that structurally. That is what lets the result travel back into this repo at all — a later field carrying account names would leak Internal values into a producer-side artifact. (2) THE §G5 READING IS NEVER COMPUTED. The gate says the three readings are distinguished per case and never globally, with a human ruling each — so the census counts disagreements mechanically and parks every one in `unruled` until an SME ruling is injected. The number still sitting in `unruled` is itself reportable: the never-silent rule applied to the report rather than to a load. THE BLOCKER&#x27;S REASON CHANGED 2026-08-12 (SME evidence) — still blocked, much smaller ask. The FID directory is not an external system needing an export or an onboarding: it is `psgmgr.HR_PHONE_EXP`, functional rows `EMP_TYP_CD = &#x27;FCT&#x27;`, in the replica ALREADY IN SCOPE and already the Control-M source. So the census is a SINGLE-SCHEMA JOIN — demand set (i) from CM_DEF_VJOB.OWNER against the directory in the same schema — and no new source crosses the boundary. Status stays blocked because the counts are Internal and this repo has no psgmgr access, which is unchanged; what changed is that satisfying it no longer waits on a source onboarding, only on someone running the query company-side. RUN Q6 FIRST (gate fid-identity-and-scope): whether CM_DEF_VJOB.OWNER holds the NAME or the ID decides the join key, and the two keys give different demand sets. Measuring with the wrong one produces a confident wrong number. module: config is kept as the WORK AREA; the code module classifies as drydocs-review in test_module_boundary.py (it loads nothing and configures nothing — it produces the counts an SME rules from, the same reasoning that puts source_mappings there).
@@ -3380,91 +3213,6 @@ first, so the email domain rides -- the route reads docs.email-unassigned.v1 via
 run_named; a graph-unavailable answer degrades to the named read path, never an error
 or a silent zero. 7 tests in test_mapping_api.py; full suite 2590 passed / ruff check +
 format clean (venue: worktree of origin/main on MSI desktop). Console pane = follow-on.
-</p></div></div>
-<div class="card" id="card-O54" data-id="O54" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="in_progress" data-search="o54 the enforcement matrix cannot show a guarded code-resident surface as enforced — and the canonical load sequence is exactly that surface" tabindex="0"><div class="card-head"><span class="card-id">O54</span><span class="card-title">The enforcement matrix cannot show a guarded code-resident surface as enforced — and the canonical load sequence is exactly that surface</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> A surface row for the canonical load sequence (cli.CANONICAL_LOAD_SEQUENCE with LOAD_PROFILES and SCHEDULED_INGEST_EXCLUSIONS) is in the generated matrix, and it renders `enforced` rather than `unguarded`: today the renderer forces status=&quot;unguarded&quot; for ANY row flagged code_resident regardless of its guards, which is now simply wrong — N3/N6 gave that surface real guard tests. The status logic separates &quot;config living in code&quot; (a fact about WHERE it lives) from &quot;nothing guards it&quot; (a fact about whether it is tested), the page&#x27;s KPI wording is updated to match, and the render stays deterministic with its drift test green.
-</p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-07 (pm) from Idea-55. The blocker the entry named — &quot;the registry needs to accept a module path&quot; — was checked at the groom and is NOT the blocker: the renderer only requires the declared path to exist, and drydocs/cli.py does. The real blocker is the unconditional code_resident -&gt; unguarded branch in render_enforcement_matrix.py. Module drydocs-web and epic O because the matrix is the O12 admin surface&#x27;s generated artifact; the row&#x27;s SUBJECT living in drydocs/cli.py is the whole point of the row.
-</p></div></div>
-<div class="card" id="card-O87" data-id="O87" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="in_progress" data-search="o87 the persona picker does not say which seat is the sme — mark it from sme_persona_id so the green chip follows the constant instead of naming neo" tabindex="0"><div class="card-head"><span class="card-id">O87</span><span class="card-title">The persona picker does not say which seat is the SME — mark it from SME_PERSONA_ID so the green chip follows the constant instead of naming Neo</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) DERIVED, NEVER NAMED. The picker row for `SME_PERSONA_ID` carries an SME marker in
-the `--green` token. It reads the constant already exported from `web/src/lib/auth.ts`;
-the string &quot;neo&quot; appears nowhere in `SignIn.tsx`. Neo is green because the constant
-currently points at Neo — move the constant and the chip moves with it, with no second
-edit. A hardcoded id would be the whole defect this item exists to avoid.
-
-(b) THE ROW ALREADY HAS AN IDIOM — REUSE IT, DO NOT REACH FOR StatusChip. Each picker
-row is a 2-column grid whose top-right cell is a role badge (`ROLE_BADGE[p.role]`, a
-bordered uppercase mono span). The SME marker is a sibling of that badge in the same
-visual family. `components/ui/StatusChip.tsx` is the WRONG component here despite the
-name: its required `count` prop makes it a count+label pill (&quot;15 completed&quot;), and a seat
-marker counts nothing. Its token vocabulary is what to borrow — `--green`, theme token
-only, no hex, glyph not emoji (DL-3/DL-5).
-
-(c) IT MARKS A SEAT, NOT A STATE. Green here means &quot;this is the SME seat&quot;, not &quot;the SME
-seat is healthy&quot; — no credential check, no reachability probe, no API call. The picker
-renders before sign-in and must not gain a network dependency. If a readiness indicator
-is wanted later it is a different item against a different surface.
-
-(d) ROLE STAYS TRUTHFUL ALONGSIDE IT. Neo&#x27;s role is `user` and the badge keeps saying
-so. O47 ruled SME is WHO a persona is and not a fourth role tier — the marker sits
-beside the role badge and never replaces or overrides it, or `canAccessModule` starts
-disagreeing with what the screen shows.
-
-(e) ACCESSIBLE, NOT COLOUR-ONLY. The marker carries text (or a `title`/`aria-label`)
-naming the seat, so it survives a monochrome render and a screen reader. A bare green
-dot fails both.
-
-(f) GUARDED. A test asserts the marker attaches to whichever persona `SME_PERSONA_ID`
-names — parameterized on the constant, not on the literal &quot;neo&quot;, so it still passes if
-the SME seat moves and FAILS if someone hardcodes the id back in. The vitest suite,
-`npm run build` and `npm run lint` are green, and `tests/unit/test_console_auth.py`
-still passes.
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-08-31 (desktop, ui-workstream worktree) from a console startup session — the
-gap surfaced while documenting the picker for the run-drydocs-console skill.
-
-WHAT IS TRUE TODAY. `SME_PERSONA_ID = &#x27;neo&#x27;` is exported from `web/src/lib/auth.ts` and
-`canAccessIntake` gates `/intake` on it, so the SME seat is fully encoded in behaviour
-and invisible in the UI. The picker shows displayName, id, role badge and the `chip`
-free-text line; Neo&#x27;s chip happens to read &quot;app-support SME · context intake&quot;, which is
-prose a reader must notice and parse rather than a marker they can scan for. Six seats
-are listed and three of them are user-tier and near-identical by design (mouse, tank,
-dozer differ only in identity, per O64&#x27;s per-persona isolation testing), which is
-exactly the situation a scannable marker helps.
-
-WHY p3. Nothing is broken and no one is blocked — this is legibility on a dev-facing
-sign-in screen. It is worth doing because the alternative is every new reader learning
-the SME seat from `auth.ts` source, and because the derived-vs-hardcoded distinction in
-(a) is cheap now and annoying to retrofit after someone types the string.
-</p></div></div>
-<div class="card" id="card-Z9" data-id="Z9" data-module="drydocs-web" data-phase="12" data-epic="server-location" data-type="bug" data-status="in_progress" data-search="z9 a synthetic city reports that its country has a drawable outline when it has none, because the resolver reads country_id and ignores country_alias" tabindex="0"><div class="card-head"><span class="card-id">Z9</span><span class="card-title">A synthetic city reports that its country has a drawable outline when it has none, because the resolver reads country_id and ignores country_alias</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">bug</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">server-location</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE FIX IS ONE MISSING FALLBACK: PlacedSite.countryHasNoShape is computed as
-COUNTRY_NO_SHAPE.has(city.country_id ?? &#x27;&#x27;), but a synthetic city carries no numeric country_id -
-only country_alias: &#x27;SYN&#x27; - so the lookup asks for the empty string and misses SYN, which the
-gazetteer declares no_shape: true. Add the country_alias fallback.
-
-(b) THE SECOND SYMPTOM FOLLOWS FROM THE SAME LINE and must be fixed with it: countryId is null
-for the same reason, so synthetic countries never reach countryIds and never appear in the
-drill-down list either.
-
-(c) FLIP THE it.fails CASE BACK TO it. The correct expectation is already written down as a
-deliberately failing case in web/src/components/map/resolve.test.ts, so fixing the code turns
-that test red until the marker is flipped - which is the signal, working as designed.
-
-(d) VERIFY IN THE UI, not only in the runner: the synthetic country must no longer offer an
-outline to tint or drill into, and must appear in the drill-down list. Name the surface eyeballed
-in the close.
-
-(e) PASS/FAIL: vitest green with the case as a plain it; no other resolve.ts behaviour changes;
-npm run lint and npm run build green.
-</p><p class="notes"><strong>Notes:</strong> Groomed 2026-09-02 from Idea-227 (desktop, backlog-groomer fork). Found by O80&#x27;s new unit runner
-on its FIRST run, in the one module that item named - worth recording as evidence for the runner
-rather than as coincidence.
-
-SAME FAMILY as the Z5 index bug the test file was written to catch: an identifier read on one
-axis while the data carries it on another. NOT FIXED AT O80 by that item&#x27;s scope guard - O80 buys
-the test capability and proves it; changing what the map DRAWS is Z-series work with its own
-review, which is this item.
-
-Filed in epic server-location with module drydocs-web and phase 12: the epic owns the map&#x27;s
-geography, the code is console code, and phase 12 is where console work is tracked. Recorded
-because the epic&#x27;s other items sit in phase 6.
 </p></div></div>
 <div class="card" id="card-MM7" data-id="MM7" data-module="drydocs-lineage" data-phase="17" data-epic="mind-map" data-type="task" data-status="in_progress" data-search="mm7 control-m output-tab log extractor — launcher job kind, resolved arguments, placement handoff pair, landing prefix, compute target — joined onto :etlprocess by pipeline guid, dpl_mac-shaped, every skip counted" tabindex="0"><div class="card-head"><span class="card-id">MM7</span><span class="card-title">Control-M Output-tab log extractor — launcher job KIND, resolved arguments, placement handoff pair, landing prefix, compute target — joined onto :ETLProcess by pipeline GUID, dpl_mac-shaped, every skip counted</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-lineage</span><span class="chip" data-kind="phase">P17</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">mind-map</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-G17" data-target="card-G17">G17</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> drydocs_lineage/extractors/controlm_output.py takes (source, into: LineageGraph) like every extractor, reads Output text per &lt;job, order-id, run&gt; from a NAMED sysout file — the modern wrapper writes no identity into the body, so job name / order id / run stamp are parsed from the FILE NAME (tolerant scan, site-pinnable pattern override, name-derived date kept as run_date and never merged into the launcher&#x27;s -od) and a detached text blob is rejected with a counted reason — and joins onto already-staged DPL processes on the pipeline GUID (falling back to &lt;job, run&gt; when the command line carried a variable), returning an OutputCoverage dataclass with a counted reason for every skip (no_launcher_banner, kind_unknown, guid_mismatch_vs_cmdline, truncated_json, token_redacted, identity_not_in_filename, no_order_id_in_filename). It sets PROPERTIES only — launcher_kind (from the `Identified &#x27;&lt;KIND&gt;&#x27; Job` line), compute_target, provenance_guid (placement response) and the -proId of the ingestion consuming that placement, recorded as a run-scoped PAIR whose scope is those two jobs and which never keys an edge, landing_prefix, submission_cluster, image_digest, compute_profile_ref — and creates no edge (m3_* stay as they are). A synthetic mechanism-only fixture under tests/fixtures/ reproduces the four kinds seen (PLACEMENT, INGESTION, TRANSFORM, PROVISION), a placement handoff across exactly two jobs, a transform that logs no provenance id (expected-absent, counted, never reported as a break), and a line that carries a bearer token — which the extractor REDACTS before any field and counts. The source row is registered in config/source-registry.yaml with classification and an acquisition path per Idea-133 (mode, via). A chained run (inventory → mac → output) exists as one CLI invocation and curation.py&#x27;s stub docstring names it as the cadence hook; the Output read is described in the design doc §3 as an INPUT to deepdoc, not a deepdoc feature.</p><p class="notes"><strong>Notes:</strong> Iteration 2 of the launcher contract. Genuine greenfield: no code, item or idea in the repo ingests Control-M sysout today. The log is authoritative where CMDLINE carries a %%variable and it asserts the job kind G12 wanted. Iteration 3 (run-history join via the P4 tables) is named in the doc and not minted until this lands.
 
@@ -3532,7 +3280,7 @@ relay -- guessing spellings is the defect this item exists to prevent. The (d) s
 guard (fixture headers drawn from the recorded list, not the module constant) also waits
 on that list; a guard against nothing would be decoration.
 </p></div></div></div></div>
-<div class="column" data-status="done"><div class="column-head"><h2>Done</h2><span class="count" data-count-for="done">495</span></div><div class="column-body"><div class="card" id="card-A1" data-id="A1" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a1 audit reference registry paths for staleness" tabindex="0"><div class="card-head"><span class="card-id">A1</span><span class="card-title">Audit reference registry paths for staleness</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every entry marked ok/stale; stale paths fixed or flagged</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All local mirrors + platform/standard doc paths resolve; no stale entries. verified: 2026-06-21 in REGISTRY.yaml.</p></div></div>
+<div class="column" data-status="done"><div class="column-head"><h2>Done</h2><span class="count" data-count-for="done">501</span></div><div class="column-body"><div class="card" id="card-A1" data-id="A1" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a1 audit reference registry paths for staleness" tabindex="0"><div class="card-head"><span class="card-id">A1</span><span class="card-title">Audit reference registry paths for staleness</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every entry marked ok/stale; stale paths fixed or flagged</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All local mirrors + platform/standard doc paths resolve; no stale entries. verified: 2026-06-21 in REGISTRY.yaml.</p></div></div>
 <div class="card" id="card-A2" data-id="A2" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a2 account for every bmc doc in the source manifest" tabindex="0"><div class="card-head"><span class="card-id">A2</span><span class="card-title">Account for every BMC doc in the source manifest</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every .md in bmc-controlm/ accounted for in the manifest</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All 26 bmc-controlm .md files are referenced in SOURCE-MANIFEST.md (0 uncovered).</p></div></div>
 <div class="card" id="card-A3" data-id="A3" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a3 seed the research index with linked rationale" tabindex="0"><div class="card-head"><span class="card-id">A3</span><span class="card-title">Seed the research index with linked rationale</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> &gt;=5 rows, each with a working link and a &#x27;why it matters&#x27;</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. 7 rows with working links (3 Neo4j blogs + PROV-O/SOSA/ORG/agent-memory) + why-it-matters.</p></div></div>
 <div class="card" id="card-A4" data-id="A4" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a4 registry.yaml points the dcat row at a per-standard readme that was never written" tabindex="0"><div class="card-head"><span class="card-id">A4</span><span class="card-title">REGISTRY.yaml points the dcat row at a per-standard README that was never written</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> reference/REGISTRY.yaml&#x27;s dcat row no longer cites a path that does not exist. Exactly one of two resolutions, and the choice is recorded in the close note: (a) write reference/standards/dcat/README.md following the dcmi-terms pattern from M4 — namespace, what we use it for, the specific terms we reference, source_url — or (b) re-point the row&#x27;s `docs:` at reference/standards/README.md the way the skos row already does. Nothing else in the registry changes.
@@ -3930,6 +3678,92 @@ last entry); the seven E1 items plus ONT2 from the B5 rider are minted by module
 CFG1 CFG2 PLAN2 DOC1 DOC2 REF1 ONT1 ONT2 - each carrying this gate in `gates:`. The
 item-series half was closed earlier the same day by PLAN1. What C41 still names that no
 item builds: nothing - clause (a) is CFG1, (d) is CFG2+PLAN2, (e) is the gate record.
+</p></div></div>
+<div class="card" id="card-C43" data-id="C43" data-module="taxonomy" data-phase="2" data-epic="ontology-mapping" data-type="task" data-status="done" data-search="c43 the software registry does not know mfts or axway because internal branding erased the vendor from every documentation surface - record the platform with its vendor the way controlm carries bmc" tabindex="0"><div class="card-head"><span class="card-id">C43</span><span class="card-title">The software registry does not know mfts or axway because internal branding erased the vendor from every documentation surface - record the platform with its vendor the way controlm carries bmc</span></div><div class="chips"><span class="chip" data-kind="module">taxonomy</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / taxonomy-importer</span></div><div class="epic">ontology-mapping</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) ADD mfts TO config/taxonomy/software-registry.yaml WITH vendor: axway, the way controlm
+carries vendor: bmc, with the fields that registry already requires of a product row - no new
+field shapes.
+
+(b) RECORD THE VERSION FACT the research established, at whatever precision the registry
+supports: Axway SecureTransport 6.0.3. Where the registry has no version slot, put it in the
+row&#x27;s note rather than inventing one.
+
+(c) WHAT THIS ITEM MUST NOT DECIDE: whether Axway becomes a VENDOR BASELINE - a new
+external/file-transfer/ category and a second baseline rank in config/precedence.yaml. That is
+a larger call and a gate question. Say so on the row so the next reader does not take the
+registration as the precedent.
+
+(d) SIBLING PRODUCTS: register FileMover and OneMFT only to the extent their vendor and
+identity are actually established by evidence. Where they are not, leave them out and say why
+in the close - an unevidenced vendor row is worse than an absent one. The SYSTEM-level
+registration of all three lives in N27, not here.
+
+(e) PASS/FAIL: the registry render (scripts/render_board.py default paths, which refreshes
+web/src/generated/software-registry.json) picks the new vendor and product up, the committed
+render matches, and the vendor count in the render output moves by the number of vendors added.
+</p><p class="notes"><strong>Notes:</strong> Groomed 2026-09-02 from Idea-236 gap 3 (OQ-15, U-1), desktop, backlog-groomer fork.
+
+WHY IT IS WORTH A ROW: the vendor was ERASED BY INTERNAL BRANDING - absent from the UI, the
+portal, the API-store entry and the docs - and surfaced only in a mandatory
+User-Agent: Axway/EndPoint header. Recording it is what stops it being lost again, and the
+generalisable finding (an internally branded platform hides its vendor on every documentation
+surface and leaks it through implementation surfaces: user-agent, cookie names, default ports,
+path conventions, id shapes) has already landed producer-side in the research-general skill,
+section 2.1.
+
+FILED IN EPIC ONTOLOGY-MAPPING WITH module taxonomy AND phase 2, matching C11/C12/C13, the
+existing software-registry items. Phase 1 (taxonomy capture) is done and closed; the registry&#x27;s
+live items sit in phase 2. Recorded because it was a judgement call, not an obvious one.
+RIDER 2026-09-02 (SME, gate ontology-domain-registry-and-edition-grain §B5 second rider):
+the row is the WHITE-LABEL case and the row shape must say so - `vendor: axway`, product
+Axway SecureTransport, and a `white_label:` marker carrying the internal name (MFTS) so a
+reader learns the vendor from the registry rather than from a User-Agent header. The
+company already added the white-label reference in their registry; this row is the
+producer&#x27;s mechanism-only twin. The TERM &quot;MFTS&quot; (its expansion, its tier) is NOT this row -
+it is an acronyms-domain entry (ONT2); the two link by name only.
+
+BUILT 2026-09-03 (laptop, Lane B of the 0aeba6fc handoff; wip/C43-laptop).
+
+(a) Vendor `axway` (name, publisher_url - third-party, so the URL is required by the guard)
+and product `mfts`: vendor axway, name Axway SecureTransport, category Managed File
+Transfer, role tool, type commercial, used_by_drydocs false (a platform DryDocs traces
+THROUGH in G14 lineage, not one it is built on or ingests from - yet), seal_id the
+`[seal-id]` placeholder exactly as controlm carries it. The research file holds the real
+registration id and an internal hostname; neither crosses into this Internal-Public file,
+and the publish-boundary sweep over config/taxonomy would refuse them anyway.
+
+(b) versions: [&quot;6.0.3&quot;] - the registry&#x27;s own slot, so no note was needed. Established by
+the research&#x27;s internal change record (H93); the change id itself stays in internal/.
+
+THE RIDER: `white_label: MFTS` on the row, the one optional key added, and the renderer
+passes it through to the generated JSON so /software can show the internal name beside
+the vendor&#x27;s product name. The TERM stays ONT2&#x27;s; the row says so.
+
+(c) Written on the row: the baseline question - an external/file-transfer/ category and
+a second rank in config/precedence.yaml - is a gate&#x27;s, and the row ranks nothing.
+
+(d) SIBLINGS LEFT OUT, and why: the research establishes that FileMover (legacy) was
+replaced by OneMFT (current) and that both are DISTINCT platforms from MFTS - but it
+establishes neither one&#x27;s VENDOR, so a row for either would carry a vendor nobody has
+evidenced. Absent, with the reason on the row, and the guard pins their absence so a
+later session adds them on evidence rather than by analogy. Their system-level
+registration is N27&#x27;s.
+
+(e) THE RENDER, run locally and not committed: scripts/render_software_registry.py
+reports 15 vendors (was 14) and 17 products (was 16), with axway listed in
+vendors_without_icons - no drydocs-icons manifest entry yet, reported by the soft link,
+never dropped. The committed web/src/generated/software-registry.json is Lane A&#x27;s render
+(the handoff fences web/src/generated/**), refreshed by the same render_board.py run every
+Lane B close needs at merge, so test_software_registry_json is red on this branch on the
+drift test and the icon-or-reported contract, both read from the committed file, and
+green on main after the merge. The vendor count moves by exactly the one vendor added.
+
+GUARDS: tests/unit/test_software_registry.py pins the row&#x27;s shape, the white_label rule
+(a non-empty string wherever present) and the absent siblings; tests/unit/
+test_docs_coverage.py&#x27;s census pin moves 16 -&gt; 17 products and 14 -&gt; 15 without a
+documentation pointer, with the reason on the line - Axway&#x27;s public SecureTransport docs
+are the research&#x27;s own next rung (an External corpus to register and capture, the way
+BMC&#x27;s are for Control-M), so the gap is a task and not a miss. ruff clean; full suite
+3139 passed with the two render-bound failures above and nothing else.
 </p></div></div>
 <div class="card" id="card-G34" data-id="G34" data-module="ontology" data-phase="9" data-epic="ontology-mapping" data-type="task" data-status="done" data-search="g34 scaffold the business glossary now so the internal port cannot collide on a name or a backlog slot: reserve catalogbusinessterm + its edges as status: planned, schema public / definitions internal" tabindex="0"><div class="card-head"><span class="card-id">G34</span><span class="card-title">Scaffold the business glossary NOW so the internal port cannot collide on a name or a backlog slot: reserve CatalogBusinessTerm + its edges as status: planned, schema public / definitions internal</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P9</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / ontology-mapper</span></div><div class="epic">ontology-mapping</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> RESERVATION ONLY — this item deliberately does NOT define terms or build a glossary. It claims the names and the slot so a later internal port cannot collide, then stops. Specifically: (a) `CatalogBusinessTerm` keyed by `term_id` is registered as a `proposed` taxonomy-ontology-map entry, taking the shape the data-catalog pattern already defines rather than inventing one; (b) its three edges — CatalogElement IS_REPRESENTED_AS, CatalogValidValue HAS_ALLOWED_VALUES, CatalogBusinessTerm DEFINED_FOR — are registered in drydocs_core/ontology/relationship_vocabulary.yaml at `status: planned`, the documented pre-gate step (SOSA/SSN precedent, the only other planned entry); (c) the classification split is written down: the glossary SCHEMA (label, key, edge terms, YAML shape) is Internal-Public and ports to the company repo, the term DEFINITIONS are Internal and live in internal/, and industry-standard terms bind to SKOS, already a declared reference standard in reference/standards/; (d) the file locations for both halves exist with a README stating the split. NO term is defined, no loader writes anything, and the HITL gate that would confirm the edges is NOT run here. Suite green.
 </p><p class="notes"><strong>Notes:</strong> Raised at the business-application-identity gate §F2 (SIGNED OFF 2026-07-27). SME reason, verbatim in substance: the glossary will for the most part be internal unless there are industry-standard acronyms or names, and doing the scaffolding producer-side now means the internal ports do not collide later with either a name or a backlog item. That is a PORT-SEQUENCING argument, not an ontology one — which is why reservation is the whole deliverable. WHY IT IS AN ITEM RATHER THAN AN ACT OF THAT GATE: the identity gate&#x27;s §A1 states it &quot;creates no relationship-vocabulary term&quot;. Registering the edges inside it would have falsified A1 and re-opened a ruled scope item, so the registration was pushed here, where `status: planned` needs no gate of its own. Substance this feeds: F2&#x27;s finding that the durable home for what an acronym MEANS is a CatalogBusinessTerm-shaped glossary, the same conclusion the reopened gate-log Q6 acronym question circles, plus the Unity Catalog takeaway that a controlled vocabulary needs an enforcement point or it rots. The identity gate is itself the evidence: &quot;SEAL&quot; was found carrying THREE distinct meanings across three homes (the issuing authority, the source id, and an ecosystem referencing convention used in Control-M CMDLINEs), and nothing in the repo recorded that they were different things. MERGED IN 2026-08-05 (desktop, Idea-35 — the acronym-catalog line): that entry is CONTENT for this scaffold, not a second home, and it names the shape the scaffold should be able to hold — which is worth knowing while building the empty version. Its requirement: key by acronym, carry MANY senses per key, and tag each sense with its scope (`area`, `business-domain`, `technical-domain`, `industry` — what an outsider would assume). Plus, wherever a misreading has actually happened, an explicit **does-NOT-mean** note; that note, not the expansion, is the protective sentence. AIS is the worked example and the reason: &quot;as-is&quot; (a standard modeling idiom) vs &quot;Application Integration Streaming&quot; (an org platform family), with our own `:AisTool` label having meant NEITHER. Today `software-registry.yaml#acronyms` is a one-key section with no scope dimension, so it can record expansions but not COLLISIONS — and collisions are the failure mode that bites. This is a SKOS job (prefLabel / altLabel / definition / scopeNote, senses as concepts in a scheme); SKOS is declared in reference/standards/README.md but has NO fetched local copy yet, unlike prov-o / w3c-org / dprod-ekgf / sosa-ssn — fetching it belongs with the content pass. SCAFFOLD-ONLY STILL HOLDS: this item defines no terms, so nothing above changes its acceptance. The content pass stays parked on its own trigger, the gate-log Q6 ruling (which decides whether `#acronyms` survives at all), and lands INSIDE this scaffold.
@@ -6285,6 +6119,134 @@ green (70), ruff check and ruff format --check clean, full suite 3100 passed
 before the close. No new file, so no MODULE_MAP row; drydocs_core is already a
 core prefix. Not verified, as the body says: any call against a live Control-M.
 </p></div></div>
+<div class="card" id="card-G134" data-id="G134" data-module="config" data-phase="6" data-epic="component-topology" data-type="task" data-status="done" data-search="g134 the document registry records a corpus&#x27;s trust level but not the rung that produced it, so a grounded row cannot say whether anything higher was ever tried" tabindex="0"><div class="card-head"><span class="card-id">G134</span><span class="card-title">The document registry records a corpus&#x27;s trust level but not the rung that produced it, so a GROUNDED row cannot say whether anything higher was ever tried</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">component-topology</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE LADDER IS DECLARED ONCE, IN THE FILE&#x27;S HEADER, and it is ordered
+best-to-worst because the rule that matters is &quot;work down only until something
+answers&quot;: 1 machine-readable spec or bulk export (OpenAPI, GraphQL
+introspection, a DB catalog) - 2 an authenticated API call you make yourself -
+3 saved HTML or a rendered DOM - 4 print-to-PDF plus layout extraction -
+5 copy/paste text. Rungs 1-2 can yield VERBATIM; 3-4 yield GROUNDED; 5 yields
+GROUNDED and lossy. The ladder does not replace trust_default - it explains it.
+
+(b) EVERY ROW GAINS A RUNG, AND `unprobed` IS A VALUE. The field records the
+highest rung REACHED, never the highest that exists, so `unprobed` means the
+ladder was never walked and reads as a TASK rather than a limit. A row whose
+trust_default is GROUNDED and whose rung is unprobed is the finding this item
+exists to make visible: today that row is indistinguishable from one where
+rungs 1 and 2 were checked and refused.
+
+(c) THE FIELD IS REQUIRED AND GUARDED, like every other field on this ledger.
+tests/unit/test_doc_registry.py enforces the existing REQUIRED set; the rung
+joins it, with the vocabulary closed and the trust pairing checked - a row
+claiming VERBATIM at rung 4 or 5 fails, because a layout extraction is not the
+served bytes. A row may be GROUNDED at rung 1 or 2 (a spec can be transcribed
+badly); the constraint is one-directional on purpose.
+
+(d) THE PROSE THAT ALREADY DOES THIS JOB CONVERTS TO DATA. Two rows carry rung
+history in comments today. `confluence-*` reads &quot;upgraded 2026-08-19 per this
+row&#x27;s own rule: the direct Confluence fetch ran (company-side; ~50 pages, 0
+failed). Was GROUNDED while the capture was screenshot transcription&quot; - that is
+a rung 5 to rung 2 upgrade written as narrative. Convert those to the field and
+keep the prose as the WHY; the field carries what a guard can read, the comment
+carries what a person needs.
+
+(e) TWO RULES SHIP WITH THE FIELD OR IT WILL BE FILLED IN WRONG.
+ONE: a blocked agent fetch says nothing about the host. Chat-tool network policy
+is not the machine&#x27;s network access, and a source recorded `unreachable` on that
+basis is mis-recorded - both DPL hosts were &quot;blocked&quot; for an agent and answered
+immediately from a terminal on the same machine. TWO: rung 1 EXISTING is not
+rung 1 WORKING. The counterexample is already in hand and belongs in the header
+as the reason the field records reached-not-available: a service whose
+documented REST interface is gated for an account while a lower, undocumented
+route still answers. The ladder is walked, not inferred.
+
+(f) NOTHING IN THIS ITEM RE-CLASSIFIES A CORPUS OR CHANGES A `confirmed:` FLAG.
+Rung is a property of HOW a corpus was captured. Classification is sensitivity
+and stays where config/classification.yaml puts it; trust_default keeps its
+meaning; confirmed stays the gate&#x27;s. If filling in the field reveals that a
+row&#x27;s trust_default is wrong for its rung, that is a FINDING recorded in the
+row&#x27;s notes and raised - never a silent correction, because trust_default is
+what loaders read.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-08-31. The ladder comes from a company-side research pass that
+captured two DPL service specs and wrote up the capture route as a reusable
+framework rather than a one-off. Producer-side the applicable surface is
+config/doc-source-registry.yaml - 13 rows, each already carrying
+trust_default: VERBATIM | GROUNDED | SYNTHESIZED, which is the SAME vocabulary
+the ladder assigns. So this is not a new axis: it is the missing HALF of an axis
+the ledger already has. The registry records the verdict and not the method,
+and the method is what tells a later reader whether the verdict can be improved.
+
+WHY IT IS WORTH A FIELD RATHER THAN A CONVENTION. The evidence that the
+convention alone does not hold is in the file: the one row that DID improve its
+capture route recorded the improvement in a comment, which no guard reads and no
+census can count. Ask &quot;which corpora could be VERBATIM but are not&quot; today and
+the answer requires reading thirteen comment blocks and inferring.
+
+THE LESSON THE LADDER ENCODES, which is the part worth keeping even if the field
+shape changes: look for the machine-readable source before building a scraper
+for the human-readable rendering of it. A Swagger UI page always has a spec
+behind it. That was proven the expensive way - a PDF-derived capture of those
+two services needed three captures and four parser-bug fixes to agree with the
+spec, and even then could not recover required-field arrays, enum values or
+$ref links, because the UI inlines references and renders enums as collapsed
+stubs. The spec route was one request.
+
+DELIBERATELY NOT HERE: the DPL registry field-contract correction. That is G64&#x27;s
+and it needs its research written up properly first - the findings currently
+live in a session rather than in a log, which is the same gap J63 names for
+reviews. This item touches no DPL row.
+
+BUILT 2026-09-03 (laptop, Lane B of the 0aeba6fc handoff; wip/G134-laptop).
+
+(a) THE LADDER, once, twice-shaped on purpose: explained in the header&#x27;s REQUIRED
+block and declared as DATA under `capture_ladder:` - rungs 1-5 best-to-worst with
+what each can yield, plus `unprobed` - because the guard reads the object, not the
+prose (J37). One refinement the rows forced, written into the header: a PDF or
+file the publisher SERVED as its artifact is rung 1 (an export), while rung 4 is a
+PDF you MADE by printing a rendering. The two published-PDF corpora would
+otherwise have sat on a rung describing a route nobody took.
+
+(b) TEN ROWS (the body&#x27;s thirteen counts the three retired ids), each with the
+rung REACHED, from the row&#x27;s own capture prose: rung 1 x4 - the two served-PDF
+corpora (neo4j-docs-essential-graphrag, jpmc-reports) and the two mail corpora
+whose .msg files are the mail system&#x27;s export (adhoc-sme-email, ops-email-
+extracts); rung 2 x1 - cdo-frameworks; rung 3 x3 - bmc-docs, bmc-docs-controlm-
+utilities, chase-leadership-scrape; unprobed x2 - seal-pat-scrape (VERBATIM as
+declared intent, no capture) and mwaa-implementation-docs, GROUNDED at unprobed,
+the exact row the item exists to make visible; its comment says the ladder is a
+task there and names Confluence&#x27;s REST route as rung 2 to try.
+
+(c) GUARDED, four tests in tests/unit/test_doc_registry.py: the ladder&#x27;s shape
+and order; the field required with vocabulary = the ladder&#x27;s keys; VERBATIM may
+not sit at rung 4 or 5 while GROUNDED anywhere is fine (one-directional, as
+ruled); and the unprobed set PINNED so a row joins or leaves it deliberately -
+the pin is what makes &quot;which corpora were never probed&quot; a count instead of a
+reading.
+
+(d) cdo-frameworks carries capture_rung 2 with its rung 5 -&gt; 2 history beside
+it; the trust_default comment stays as the WHY. The body&#x27;s `confluence-*` is
+that row under its pre-sanitization name.
+
+(e) Both rules ride in the header verbatim in intent: a blocked agent fetch says
+nothing about the host, and rung 1 existing is not rung 1 working.
+
+(f) Nothing re-classified, no trust_default moved, no confirmed flag touched.
+TWO FINDINGS recorded in their rows and raised here, not corrected:
+bmc-docs-controlm-utilities and chase-leadership-scrape both claim VERBATIM at
+rung 3, which the ladder&#x27;s rule of thumb marks GROUNDED. The utilities scrape
+STORES the served bytes - a real case for VERBATIM the rule of thumb undersells,
+and the guard deliberately does not fail rung 3. The leadership scrape RETAINS a
+transcription of pages it fetched (a rung-5 shape on top of a rung-3 fetch; the
+raw HTML was not kept) - the weaker claim of the two. Both are the SME&#x27;s call;
+trust_default is what the loaders read. Nothing in scope touches a DPL row.
+
+VERIFIED: the 99 tests across the registry, classification, corpus-status,
+docs-coverage and source-registry suites pass with the new key (every reader
+goes through dict access); ruff clean; full suite 3143 passed with ONE failure
+that is a render, not a defect - test_enforcement_matrix&#x27;s regeneration guard,
+because web/src/generated/enforcement-matrix.json embeds this ledger&#x27;s row and
+render_board.py (which runs render_enforcement_matrix) is Lane A&#x27;s pen. It clears
+with the same render the roadmap guard needs at merge.
+</p></div></div>
 <div class="card" id="card-G135" data-id="G135" data-module="drydocs-lineage" data-phase="6" data-epic="component-topology" data-type="task" data-status="done" data-search="g135 the dpl registry extractor stages a wrong contract as a clean run, because every counter it keeps is a skip counter and a record with no seal field takes the enclosing folder&#x27;s name" tabindex="0"><div class="card-head"><span class="card-id">G135</span><span class="card-title">The dpl registry extractor stages a wrong contract as a clean run, because every counter it keeps is a skip counter and a record with no seal field takes the enclosing folder&#x27;s name</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-lineage</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">component-topology</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The extractor gains the ability to REPORT that its field contract is wrong. It does not
 gain an opinion about what the right one is - that is clause C1 of the
 dpl-pipeline-registry-contract gate and it belongs to the SME.
@@ -7889,6 +7851,96 @@ test_load_map_declarations (19) and test_chain_inputs (7). If D+E lands and it d
 failure attribution was wrong. Recorded here so the answer is checkable either way rather than
 quietly dropped.
 </p></div></div>
+<div class="card" id="card-J76" data-id="J76" data-module="config" data-phase="8" data-epic="release-infrastructure" data-type="task" data-status="done" data-search="j76 the measurement instrument fails toward a reassuring answer - locale decoding and truncated pipelines reported clean where the raw result was not, and one of the three admits a guard" tabindex="0"><div class="card-head"><span class="card-id">J76</span><span class="card-title">The measurement instrument fails toward a reassuring answer - locale decoding and truncated pipelines reported clean where the raw result was not, and one of the three admits a guard</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">release-infrastructure</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) BUILD THE ONE GUARD THE THREE INCIDENTS ADMIT, and only that one: a source-scan check
+that a subprocess call capturing text does so with an EXPLICIT encoding. text=True decodes
+with the platform locale, which is cp1252 on this desktop, and every backlog item file
+holds em dashes. Read the CODE, not the prose around it (J66) - go through
+tests/source_scan.py (code_only, called_names), never a bare substring test, because this
+repo&#x27;s comments explain the very pattern the guard forbids.
+
+(b) SCOPE THE GUARD, and state the scope in its docstring: repo scripts and tests, the
+places a measurement is authored. The allocator in .claude/skills/groom-backlog/
+validate.py already does this correctly and carries the comment explaining why - use it as
+the reference implementation, and let the guard prove that file passes.
+
+(c) THE OTHER TWO GET PROSE, NOT GUARDS, and the item says why for each. The truncated
+PowerShell pipeline (... | Select-Object -First N then reading $LASTEXITCODE, which
+reports 0 where the raw code was 1) is a shell idiom no Python-side scan can see; the
+fixture authored to make its author&#x27;s theory true is a review property, not a mechanical
+one. Both go into the verification guidance as named failure modes with their incidents.
+
+(d) THE RULE LINE, wherever verification discipline already lives: when a measurement
+contradicts an expectation, CHECK THE INSTRUMENT BEFORE THE SUBJECT, and prefer the check
+that can fail loudly - read the raw exit code before parsing, decode explicitly,
+reconstruct a fixture from the incident at its real values rather than authoring one.
+
+(e) PASS/FAIL: the guard is green on the tree as it stands (fix anything it finds in the
+same commit, or record the exemption on the line), red on a synthetic text=True capture,
+and the three incidents are recorded with the shape they share - the instrument was
+broken, the artifact was fine, and the corrupted measurement said everything was OK.
+</p><p class="notes"><strong>Notes:</strong> Groomed 2026-09-02 from Idea-235 (desktop, backlog-groomer fork). The idea&#x27;s own
+disposition is a candidate rule, not yet ruled, and asks whether any of the three
+instances admits a guard. One does, cleanly, and that half is what is promoted; the
+broader discipline question stays in the IDEAS inbox for the user.
+
+THE THREE INCIDENTS, all 2026-09-01, two machines, two people, one port: (1) a comparison
+script read git show with subprocess(text=True) and mojibaked every em dash, fabricating
+18 of 25 reported differences while the file on disk was clean; (2) a sweep captured
+results as ... | Select-Object -First N, which terminates a native-command pipeline early,
+so $LASTEXITCODE reported 0 where the raw code was 1 - five prefixes were declared clean
+on that basis and a slice was about to start on it; (3) a guard was validated against
+fixture data authored to make its author&#x27;s theory true, and the real pair measured on the
+other tree scored 0.08 where the fixture cleared the floor.
+
+WHY THEY ALL FAIL REASSURINGLY, which is the part worth keeping: each is a default that
+optimises for not interrupting - a locale decoder that substitutes rather than raises, a
+pipeline that stops reading when it has enough, a fixture its author believes. A tool that
+fails loudly gets fixed in minutes; a tool that fails into clean gets ACTED ON.
+
+Related: the verify-before-asserting working agreement, J66 (a guard reads code, not the
+prose around it), and J72&#x27;s notes, which carry all three as worked examples.
+
+BUILT 2026-09-03 (laptop, Lane B of the 0aeba6fc handoff; wip/J76-laptop).
+
+(a) THE GUARD: tests/unit/test_subprocess_encoding.py. A call of run, check_output, Popen,
+call or check_call that passes text=True or universal_newlines=True must pass encoding=
+too; getoutput and getstatusoutput are refused outright (locale-only by construction).
+Read from the syntax tree, never the text - and the item&#x27;s named verbs were not enough:
+called_names() can say a thing is called, and this guard is about HOW it is called, so
+tests/source_scan.py gained its fourth verb, call_sites() - every call of a watched name
+with its keyword arguments, constants resolved and everything else marked NOT_CONSTANT -
+and comment_lines(), the one legitimate reason a guard reads a comment: an exemption
+marker the author placed on purpose (`# J76: locale` on any line of the call, with the
+reason on that line). The helper&#x27;s __all__ pin moved with it and four tests cover the
+verbs. J66 held: a comment describing the forbidden pattern does not trip the rule, and a
+test says so.
+
+(b) SCOPE, in the docstring: scripts/, tests/, web/e2e/ and the groom-backlog skill&#x27;s
+scripts - the places a measurement is authored. The allocator is the reference shape and
+a test proves it passes. OUT OF SCOPE, and named so nobody assumes: four production
+sites carry text=True (drydocs/port/port_backlog_union.py, drydocs/port/port_preflight.py,
+drydocs_core/adapters/controlm/api.py, drydocs_core/landing_zones.py). The Control-M
+utility runner in api.py may even WANT the console code page - that is a ruling about a
+tool&#x27;s output, not a measurement, and widening the scope is a separate item.
+
+(c)(d) PROSE: docs/style/review-provenance.md, &quot;Check the instrument before the subject
+(J76)&quot; - the rule line first, then the three incidents as a table with what happened,
+what it cost and whether a guard exists: locale decoding (guarded), the truncated
+PowerShell pipeline (a shell idiom no Python scan can see; the fix is to read
+$LASTEXITCODE from the bare command and truncate only what is displayed), and the fixture
+authored to fit its author&#x27;s theory (a review property; reconstruct from the incident at
+its real values). CLAUDE.md section 6&#x27;s &quot;Verify before asserting&quot; bullet carries the rule
+line and points there - the one touch on a surface neither lane declared, required by
+&quot;wherever verification discipline already lives&quot;.
+
+(e) GREEN ON THE TREE IN THE SAME COMMIT: the guard found nineteen sites in three
+scripts and fourteen test files - every one an ordinary git or Python capture - and each
+had text=True replaced with encoding=&quot;utf-8&quot;; nothing was exempted. Every touched suite
+re-run (376 passed), the guard&#x27;s own fifteen cases (five synthetic reds, six greens, the
+multi-line marker, the J66 comment case, the reference file), ruff clean, full suite 3159
+passed before the close. One of the nineteen was this lane&#x27;s own R9 test from two days
+ago, which is the point of a guard over a rule people already know.
+</p></div></div>
 <div class="card" id="card-G35" data-id="G35" data-module="ontology" data-phase="9" data-epic="seal-attribution" data-type="requirement" data-status="done" data-search="g35 open the tom-roles gate: the live registry shows 9 distinct accountable role classes against the signed 7, and cardinality is a per-role-class attribute rather than a global rule" tabindex="0"><div class="card-head"><span class="card-id">G35</span><span class="card-title">Open the TOM-roles gate: the live registry shows 9 distinct accountable role classes against the signed 7, and cardinality is a per-role-class attribute rather than a global rule</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P9</span><span class="chip" data-kind="type">requirement</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">seal-attribution</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> A gate-prompt spec is authored and walked with the SME. It must rule: (a) the ROLE ENUMERATION — the signed 2026-07-10 §B list of 7 is contradicted by the live registry, which shows 9 distinct accountable role classes including L1 Operate manager, L2 Operate manager and Operate Manager as THREE separate concepts rather than one with a level attribute; (b) CARDINALITY as a PER-ROLE-CLASS attribute, not a global singleton rule — the same application legitimately carries four different people in one role class (Backup Information Owner) while other classes are effectively singleton; (c) that the singleton constraint, where it applies, is expressed as a GRAPH-TEST and not a database constraint, because Neo4j cannot express &quot;at most one per (app, role)&quot; declaratively; (d) the ROSTER-DISAGREEMENT question — SEAL&#x27;s own Application Contacts view and the ServiceNow TOM Accountable view return different counts for the same application, and nothing in the model records which surface an attribution came from; (e) whether INHERITANCE is modelled at all — the ServiceNow view carries Inherited / Overridden / (empty) plus an &quot;Inherited from CI&quot; parent, and DryDocs today models attribution as a flat assertion with no way to say an assignment was inherited rather than directly asserted. config/taxonomy/business-application.yaml&#x27;s `roles:` list is reconciled to whatever is ruled. Nothing loads until sign-off.
 </p><p class="notes"><strong>Notes:</strong> Carried over from the business-application-identity gate (SIGNED OFF 2026-07-27) and deliberately NOT folded into S3: that gate&#x27;s §A1 declares the signed seal-tom-attribution-reshape ruling (2026-07-10) UNCHANGED, so an item that re-opens its §B role enumeration cannot live inside it. Evidence is SME screenshots of the live registry, reviewed 2026-07-27 — Internal-Confidential, so no values are recorded here or in any committed file; only the SHAPE of the finding. Note the taxonomy file&#x27;s current `roles:` list is itself divergent (it carries Chief Business Technologist and Risk Manager, which the live surfaces do not show under those names). Adjacent, already ruled and NOT reopened by this: §D2 of the identity gate pinned attribution_id&#x27;s 4-part shape precisely BECAUSE of (b) — one person across three accountable roles collides if the role segment is dropped, and four people in one role class collide if the sid is dropped. Whatever this gate rules about role classes must keep that key shape valid. DRAFTING HALF DELIVERED 2026-08-10 (LAPTOP). STATUS STAYS in_progress ON PURPOSE — under the awaiting-HITL convention it was released from, because the acceptance says the spec is &quot;authored AND WALKED with the SME&quot; and only the authoring is done. Nothing is signed, nothing loads, and business-application.yaml&#x27;s roles: list is deliberately NOT reconciled, since §H4 reconciles it to whatever §A rules and §A is still open. WHAT THE PASS DID: brought the K21 ServiceNow evidence onto the page, which is the reason this item was routed to the laptop. Clauses (d) and (e) were the two the release note named, and both were written from DESCRIPTION rather than evidence — (e) turned out to be wrong. §E4 reasoned the inherited-from parent is estate data DryDocs does not have and treated the modelled-node option as blocked on acquiring it; the parent is the AREA PRODUCT and :AreaProduct is a K6-signed node class we already hold, so the option was never blocked. The false premise is kept above its correction per the §A4 precedent, and §E5b states the K6 boundary explicitly so an inheritance edge to :AreaProduct is not later misread as merging the two role families K6 declared independent. Also landed: §D5/§D5b (the ServiceNow side specified end to end — and the two rosters differ in KIND of holder, not only in count), §B6b/§B6c (the TOM row names a GROUP, so §B6&#x27;s always-a-person invariant needs its scope ruled before a loader relies on it; the PROV shape survives either way since prov:agent admits an Organization), §G0d-§G0f (G13/G14/G15 gain a named subject — the Deployment Module — which §G15 explicitly asked for, plus what that does NOT authorize and a correction to a reading that would have ruled §G15 by dissolving its subject), §F6/§F6b (the vocabulary-as-data target already running on the ServiceNow side, carrying a role RETIREMENT flag DryDocs has no equivalent for, which bears on §A2/§G5/§G12), §E1c (the TOM tables are a company scoped app with NO vendor baseline, so every TOM fact is an SME or instance fact), mapping rows 5-6, one new open question and one new risk. THE NEW OPEN QUESTION SHOULD BE SETTLED BEFORE THE WALK, not during it: is the TOM row&#x27;s subject a Business Application CI or a Deployment Module CI? One GROUP BY cmdb_ci.sys_class_name answers it, and §G0e&#x27;s fork turns on it. THE NEW RISK is filed rather than hidden: all of this evidence comes through a replica whose completeness is unconfirmed (K21 open question 9). Every ruling here is about SHAPE, which survives a partial copy; counts do not — including §C4&#x27;s completeness report, which is a count by construction. Suite green at 1811 passed.
 </p></div></div>
@@ -8667,6 +8719,56 @@ So all three plausible homes decline it, each for a defensible reason, and the r
 </p></div></div>
 <div class="card" id="card-O53" data-id="O53" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="chore" data-status="done" data-search="o53 heroart is the code graph&#x27;s first front-end orphan: remove it or wire it in (default remove)" tabindex="0"><div class="card-head"><span class="card-id">O53</span><span class="card-title">HeroArt is the code graph&#x27;s first front-end orphan: remove it or wire it in (default remove)</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> web/src/components/HeroArt.tsx is either imported by a live route again or DELETED together with its index.css hero-net rule and its ui-components.yaml row (coverage pin moved with the history-line convention); the orphan query over the TS import edges then returns only vite.config.ts; build + lint green.
 </p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-07 from Idea-77. Default is delete — OverviewRoute&#x27;s own comment demoted the radial hub, only a css comment still cites the file, and O30&#x27;s App.css retirement already recorded its remaining rules as dead.
+</p></div></div>
+<div class="card" id="card-O54" data-id="O54" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="done" data-search="o54 the enforcement matrix cannot show a guarded code-resident surface as enforced — and the canonical load sequence is exactly that surface" tabindex="0"><div class="card-head"><span class="card-id">O54</span><span class="card-title">The enforcement matrix cannot show a guarded code-resident surface as enforced — and the canonical load sequence is exactly that surface</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> A surface row for the canonical load sequence (cli.CANONICAL_LOAD_SEQUENCE with LOAD_PROFILES and SCHEDULED_INGEST_EXCLUSIONS) is in the generated matrix, and it renders `enforced` rather than `unguarded`: today the renderer forces status=&quot;unguarded&quot; for ANY row flagged code_resident regardless of its guards, which is now simply wrong — N3/N6 gave that surface real guard tests. The status logic separates &quot;config living in code&quot; (a fact about WHERE it lives) from &quot;nothing guards it&quot; (a fact about whether it is tested), the page&#x27;s KPI wording is updated to match, and the render stays deterministic with its drift test green.
+</p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-07 (pm) from Idea-55. The blocker the entry named — &quot;the registry needs to accept a module path&quot; — was checked at the groom and is NOT the blocker: the renderer only requires the declared path to exist, and drydocs/cli.py does. The real blocker is the unconditional code_resident -&gt; unguarded branch in render_enforcement_matrix.py. Module drydocs-web and epic O because the matrix is the O12 admin surface&#x27;s generated artifact; the row&#x27;s SUBJECT living in drydocs/cli.py is the whole point of the row.
+
+BUILT 2026-09-03 (laptop, Lane B of the 0aeba6fc handoff; wip/O54-laptop).
+
+THE STATUS LOGIC SEPARATED. surface_status() in scripts/render_enforcement_matrix.py
+decides from the guards and the pending count only; code_resident rides on the row as a
+fact about WHERE, and the docstring&#x27;s status vocabulary records that until this item
+the unguarded branch also fired for any code-resident row — right for the launcher
+registry the flag was invented for, wrong once N3/N6 guarded the load sequence.
+
+THE ROW, AND WHERE IT POINTS. The declarations moved to drydocs/cli_shared.py at S8 and
+drydocs/cli.py re-exports them, so the row&#x27;s file is cli_shared.py (where the config
+LIVES) and the item&#x27;s input path was right for the tree it was groomed on. A code-
+resident row names its `symbols` — CANONICAL_LOAD_SEQUENCE, LOAD_PROFILES,
+SCHEDULED_INGEST_EXCLUSIONS — and _symbol_source() renders and scans ONLY those module-
+level declarations, read from the syntax tree with each one&#x27;s leading comment block:
+the whole module would have reported every env read in the CLI as if the load sequence
+referenced it. Consumers: drydocs/cli.py, scripts/ingest.sh (calls load_profile at run
+time), scripts/render_load_map.py. Guards: test_load_sequence_surfaces.py (N6),
+test_load_map_declarations.py and test_load_map_json.py (N3/N4). A fresh build renders
+the row `enforced`, 0 pending, no env refs, 7.4 kB of declarations; the generator
+fails closed on a code-resident row with no symbols or a symbol the module does not
+define.
+
+THE PAGE&#x27;S WORDING. AdminConfigRoute&#x27;s file node reads &quot;code-resident: &lt;symbols&gt;&quot; in
+the yellow token rather than &quot;the migration argument&quot; in red — red is the &quot;NO GUARD
+TEST&quot; node&#x27;s alone — and the File cell names the symbols. The route tolerates a
+committed artifact that predates the field.
+
+GUARDED: four tests in tests/unit/test_enforcement_matrix.py — the row exists in a
+fresh build and renders enforced; its content is the declarations and not the module
+(no `def`, under 12 kB); surface_status ignores residency in both directions; every
+row carries code_resident and symbols. ruff clean; tsc, oxlint, vite build and vitest
+(142) green; full suite 3143 passed with ONE failure that is the render, not the
+renderer: the drift test against the committed JSON.
+
+THE RENDER IS LANE A&#x27;S, NAMED HERE AS THE WRITER: web/src/generated/enforcement-
+matrix.json is a derived render the handoff fences off for Lane A, and it is
+regenerated by the same render_board.py run (which calls render_enforcement_matrix)
+that every Lane B close already needs at merge. So &quot;the drift test green&quot; is true on
+main after the merge and deliberately not on this branch; the committed artifact is
+not touched here, per J43 (nobody merges a render by hand). The G134 branch changed the
+same artifact&#x27;s input (the doc registry gained a field), so one render at merge covers
+both.
+
+DETERMINISM: the new content slice is read from the syntax tree in file order and the
+scan regexes are the existing ones; test_render_determinism&#x27;s write_text rule is met
+by the unchanged writer. No new dependency, no new file.
 </p></div></div>
 <div class="card" id="card-O55" data-id="O55" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="chore" data-status="done" data-search="o55 the react-router high advisory needs a v7-to-v8 migration or a recorded waiver — npm audit stays red until one of them happens" tabindex="0"><div class="card-head"><span class="card-id">O55</span><span class="card-title">The react-router high advisory needs a v7-to-v8 migration or a recorded waiver — npm audit stays red until one of them happens</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> `npm audit` in web/ reports ZERO high-severity advisories, reached one of two ways with the choice named in the commit body: (a) the migration — router imports rewritten against react-router@8 (v8 absorbs react-router-dom, whose latest 7.18.1 sits inside the vulnerable 7.12.0-8.2.0 range, which is why `npm audit fix` is a no-op), `npm run build` passing and every route still reachable; or (b) an explicit recorded waiver naming why GHSA-qwww-vcr4-c8h2 cannot apply to this console (the RSC-mode CSRF path — the console is a Vite SPA with no RSC actions). A red audit is never the resting state.
 </p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-07 (pm) from Idea-40, escalated out of O34 by that item&#x27;s own stop clause (the postcss/nanoid patches landed there; this one needs a major bump). Both branches are legitimate — the entry&#x27;s own reading is &quot;likely moot in practice&quot; — so the acceptance refuses to force the migration and forbids only leaving the audit red AND undecided. Pairs with the bundle code-splitting design call O34 also parked.
@@ -10171,6 +10273,105 @@ tests over canAccessModule.
 LEDGERS: GraphCanvasRoute registered UNBOUND (35/82) — it renders surfaces from DIFFERENT
 modules, so binding it to one would encode the first caller as owner, the same rule its
 own GraphCanvas and SpecGraphPane follow. TC-RUNBOOKS-02 seeded, automated (10/31).
+</p></div></div>
+<div class="card" id="card-O87" data-id="O87" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="done" data-search="o87 the persona picker does not say which seat is the sme — mark it from sme_persona_id so the green chip follows the constant instead of naming neo" tabindex="0"><div class="card-head"><span class="card-id">O87</span><span class="card-title">The persona picker does not say which seat is the SME — mark it from SME_PERSONA_ID so the green chip follows the constant instead of naming Neo</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) DERIVED, NEVER NAMED. The picker row for `SME_PERSONA_ID` carries an SME marker in
+the `--green` token. It reads the constant already exported from `web/src/lib/auth.ts`;
+the string &quot;neo&quot; appears nowhere in `SignIn.tsx`. Neo is green because the constant
+currently points at Neo — move the constant and the chip moves with it, with no second
+edit. A hardcoded id would be the whole defect this item exists to avoid.
+
+(b) THE ROW ALREADY HAS AN IDIOM — REUSE IT, DO NOT REACH FOR StatusChip. Each picker
+row is a 2-column grid whose top-right cell is a role badge (`ROLE_BADGE[p.role]`, a
+bordered uppercase mono span). The SME marker is a sibling of that badge in the same
+visual family. `components/ui/StatusChip.tsx` is the WRONG component here despite the
+name: its required `count` prop makes it a count+label pill (&quot;15 completed&quot;), and a seat
+marker counts nothing. Its token vocabulary is what to borrow — `--green`, theme token
+only, no hex, glyph not emoji (DL-3/DL-5).
+
+(c) IT MARKS A SEAT, NOT A STATE. Green here means &quot;this is the SME seat&quot;, not &quot;the SME
+seat is healthy&quot; — no credential check, no reachability probe, no API call. The picker
+renders before sign-in and must not gain a network dependency. If a readiness indicator
+is wanted later it is a different item against a different surface.
+
+(d) ROLE STAYS TRUTHFUL ALONGSIDE IT. Neo&#x27;s role is `user` and the badge keeps saying
+so. O47 ruled SME is WHO a persona is and not a fourth role tier — the marker sits
+beside the role badge and never replaces or overrides it, or `canAccessModule` starts
+disagreeing with what the screen shows.
+
+(e) ACCESSIBLE, NOT COLOUR-ONLY. The marker carries text (or a `title`/`aria-label`)
+naming the seat, so it survives a monochrome render and a screen reader. A bare green
+dot fails both.
+
+(f) GUARDED. A test asserts the marker attaches to whichever persona `SME_PERSONA_ID`
+names — parameterized on the constant, not on the literal &quot;neo&quot;, so it still passes if
+the SME seat moves and FAILS if someone hardcodes the id back in. The vitest suite,
+`npm run build` and `npm run lint` are green, and `tests/unit/test_console_auth.py`
+still passes.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-08-31 (desktop, ui-workstream worktree) from a console startup session — the
+gap surfaced while documenting the picker for the run-drydocs-console skill.
+
+WHAT IS TRUE TODAY. `SME_PERSONA_ID = &#x27;neo&#x27;` is exported from `web/src/lib/auth.ts` and
+`canAccessIntake` gates `/intake` on it, so the SME seat is fully encoded in behaviour
+and invisible in the UI. The picker shows displayName, id, role badge and the `chip`
+free-text line; Neo&#x27;s chip happens to read &quot;app-support SME · context intake&quot;, which is
+prose a reader must notice and parse rather than a marker they can scan for. Six seats
+are listed and three of them are user-tier and near-identical by design (mouse, tank,
+dozer differ only in identity, per O64&#x27;s per-persona isolation testing), which is
+exactly the situation a scannable marker helps.
+
+WHY p3. Nothing is broken and no one is blocked — this is legibility on a dev-facing
+sign-in screen. It is worth doing because the alternative is every new reader learning
+the SME seat from `auth.ts` source, and because the derived-vs-hardcoded distinction in
+(a) is cheap now and annoying to retrofit after someone types the string.
+
+BUILT 2026-09-03 (laptop, Lane B of the 0aeba6fc handoff; wip/O87-laptop).
+
+(a) DERIVED. SignIn.tsx imports SME_PERSONA_ID and renders the marker for the row whose
+id equals it; the id is written nowhere in the component, and a test reads the
+component&#x27;s source to prove that a quoted literal equal to the constant is absent.
+
+(b) THE ROW&#x27;S IDIOM. The top-right grid cell became a flex pair: the marker - the same
+bordered uppercase mono shape as the role badge, painted with the --green token
+through StatusChip&#x27;s vocabulary (border, text and a 10% color-mix fill; token, never
+hex; a glyph, never an emoji) - and then the role badge. StatusChip itself is not used,
+for the reason the acceptance gives.
+
+(c) A SEAT, NOT A STATE: nothing is checked, probed or fetched; the picker still
+renders before sign-in with no network dependency, which is also what made the UI
+check below need no API.
+
+(d) The role badge is untouched beside it: Neo&#x27;s row still says USER.
+
+(e) The marker&#x27;s text is &quot;SME seat&quot; (the diamond glyph is aria-hidden decoration) and
+its title names the seat and the constant, so a monochrome print and a screen reader
+both get it.
+
+(f) GUARDED by web/src/components/SignIn.test.tsx - the first component test in this
+tree, React Testing Library under jsdom (O80 provisioned both for exactly the moment a
+pure-module test was not enough): the marker attaches to whichever persona
+SME_PERSONA_ID names and to no other, parameterized on the constant; it names the seat
+in text and title and paints with --green; the SME persona&#x27;s badge still says its real
+role; and the source carries no quoted literal equal to the constant, so hardcoding the
+id back in fails the test. vitest 13 files / 146 tests, tsc -b, oxlint and vite build
+green; tests/unit/test_console_auth.py 63 passed (it reads the credential store and the
+Python personas, not the picker).
+
+SEEN ON THE PICKER, venue named: laptop, headless Edge 152 against Vite on :5299 with no
+API (the picker renders before sign-in): exactly one marker on the page, on Neo&#x27;s row,
+reading &quot;◆ SME seat&quot; with the title present, computed colour the --green token, the
+role badge USER intact beside it, six persona buttons, no page errors.
+
+ONE GUARD ADJUSTED, because the first component test met it: tests/unit/
+test_ui_components.py counted components/SignIn.test.tsx as an unregistered component
+(its scan was every .tsx under the ledger root). The scan now skips vitest&#x27;s own file
+pattern, {test,spec}.tsx, with the reason beside the rule - a test renders nothing on
+any route and needs no ledger row. Both directions of the drift guard are unchanged for
+real components. Full suite 3139 passed with that in place, plus the roadmap render red
+every Lane B close carries.
+
+NOT DONE, on purpose: no ui-tests.yaml case. The claim is a component property the
+runner holds entirely, and adding a ledger row would move the automated-share pin for
+a p3 legibility marker; the desktop can groom one in if the ledger should carry it.
 </p></div></div>
 <div class="card" id="card-O88" data-id="O88" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="done" data-search="o88 a console route has no paper form — capture the executed dom to a self-contained printable html carrying the l6 margin gutter and a route/commit provenance footer" tabindex="0"><div class="card-head"><span class="card-id">O88</span><span class="card-title">A console route has no paper form — capture the executed DOM to a self-contained printable HTML carrying the L6 margin gutter and a route/commit provenance footer</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) CAPTURE, DO NOT RE-IMPLEMENT. The console is a React SPA over a live API, so its
 paper form is the EXECUTED DOM, not a server-side re-render of the same data. Drive the
@@ -11881,6 +12082,76 @@ synthetic fixture cities sit in open ocean that is nobody&#x27;s territory, and 
 drill-down frames the contiguous states with Plano/Dallas adjacent and
 Westerville/Columbus in Ohio. Neo4j NOT required for any of it -- no live-graph claim
 is made here; the specs are registered and guarded, not yet run against a loaded DB.
+</p></div></div>
+<div class="card" id="card-Z9" data-id="Z9" data-module="drydocs-web" data-phase="12" data-epic="server-location" data-type="bug" data-status="done" data-search="z9 a synthetic city reports that its country has a drawable outline when it has none, because the resolver reads country_id and ignores country_alias" tabindex="0"><div class="card-head"><span class="card-id">Z9</span><span class="card-title">A synthetic city reports that its country has a drawable outline when it has none, because the resolver reads country_id and ignores country_alias</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">bug</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">server-location</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE FIX IS ONE MISSING FALLBACK: PlacedSite.countryHasNoShape is computed as
+COUNTRY_NO_SHAPE.has(city.country_id ?? &#x27;&#x27;), but a synthetic city carries no numeric country_id -
+only country_alias: &#x27;SYN&#x27; - so the lookup asks for the empty string and misses SYN, which the
+gazetteer declares no_shape: true. Add the country_alias fallback.
+
+(b) THE SECOND SYMPTOM FOLLOWS FROM THE SAME LINE and must be fixed with it: countryId is null
+for the same reason, so synthetic countries never reach countryIds and never appear in the
+drill-down list either.
+
+(c) FLIP THE it.fails CASE BACK TO it. The correct expectation is already written down as a
+deliberately failing case in web/src/components/map/resolve.test.ts, so fixing the code turns
+that test red until the marker is flipped - which is the signal, working as designed.
+
+(d) VERIFY IN THE UI, not only in the runner: the synthetic country must no longer offer an
+outline to tint or drill into, and must appear in the drill-down list. Name the surface eyeballed
+in the close.
+
+(e) PASS/FAIL: vitest green with the case as a plain it; no other resolve.ts behaviour changes;
+npm run lint and npm run build green.
+</p><p class="notes"><strong>Notes:</strong> Groomed 2026-09-02 from Idea-227 (desktop, backlog-groomer fork). Found by O80&#x27;s new unit runner
+on its FIRST run, in the one module that item named - worth recording as evidence for the runner
+rather than as coincidence.
+
+SAME FAMILY as the Z5 index bug the test file was written to catch: an identifier read on one
+axis while the data carries it on another. NOT FIXED AT O80 by that item&#x27;s scope guard - O80 buys
+the test capability and proves it; changing what the map DRAWS is Z-series work with its own
+review, which is this item.
+
+Filed in epic server-location with module drydocs-web and phase 12: the epic owns the map&#x27;s
+geography, the code is console code, and phase 12 is where console work is tracked. Recorded
+because the epic&#x27;s other items sit in phase 6.
+
+BUILT 2026-09-03 (laptop, Lane B of the 0aeba6fc handoff; wip/Z9-laptop).
+
+(a)(b) ONE FALLBACK, THREE READS. The city index three lines above already keyed on
+`country_id ?? country_alias`; the site construction now derives the same countryKey once
+and uses it for countryId, countryName and countryHasNoShape. Synthetica reports
+countryHasNoShape true, countryId &#x27;SYN&#x27;, countryName &#x27;Synthetica&#x27;, and reaches countryIds.
+No other resolve.ts behaviour changed.
+
+(c) The it.fails case went red the moment the code was fixed - the marker working exactly as
+designed - and is flipped to it, its comment rewritten as history. One new case pins
+countryId, countryName and countryIds for a synthetic site. resolve.test.ts: 17 passed.
+
+(d) VERIFIED IN THE UI - the venue named because it is not the laptop&#x27;s graph: this laptop&#x27;s
+graph has no Server label at all (the R9 agent query command, run live against neo4jtest,
+returns 0 rows for map.server-locations.v1), so the Locations map would render nothing. The
+real console (Vite :5299) was served by the real API (:8021) built through its documented
+injection seam, create_app(runner=...), with a runner returning five declared location rows
+- three Synthetica, one London, one Singapore - and driven in headless Edge 152 through the
+real sign-in form. On the Explorer route&#x27;s Locations tab: Otherton and Sampleville place as
+synthetic markers; clicking Otherton opens its card reading &quot;Otherton, OT · Synthetica&quot; with
+the synthetic-fixture chip and WITHOUT the &quot;no outline at this map resolution&quot; chip (that
+chip is deliberately suppressed for synthetic sites - the fixture chip already says what it
+is); no path titled Synthetica exists, so nothing is tinted and nothing drills (no &quot;← World&quot;
+button after the click). Contrast on the same page: United Kingdom tints, is clickable, and
+drills - &quot;← World&quot; appears. Singapore&#x27;s city is not in the gazetteer and lands in the
+unplaceable list, correctly. Zero page errors. Screenshot kept in the session scratchpad,
+not the repo.
+
+ON &quot;THE DRILL-DOWN LIST&quot;: the map has no rendered list of countries - `countryIds` IS the
+list the item means, and the map reads it as the set of touched outlines. Before the fix
+Synthetica was absent from it; now it is present, and because it has no outline the map
+correctly offers nothing for it. So the visible change on the page is nil by construction:
+the outline the item says the UI &quot;offered&quot; was the resolver&#x27;s claim, never something the map
+could draw. The fix makes the data true; the page was already honest.
+
+(e) npm run lint and npm run build green; vitest 12 files / 143 tests; the Python suite
+untouched by this change but run before the close.
 </p></div></div>
 <div class="card" id="card-GN1" data-id="GN1" data-module="docs" data-phase="6" data-epic="generic-naming" data-type="task" data-status="done" data-search="gn1 adr 0012 — name loaders, commands and sources by the data, not the tool: the three-axis model and the deprecation policy" tabindex="0"><div class="card-head"><span class="card-id">GN1</span><span class="card-title">ADR 0012 — name loaders, commands and sources by the DATA, not the tool: the three-axis model and the deprecation policy</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">generic-naming</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> An ADR settling the naming BEFORE any rename moves, because the alternative is renaming twice. It must carry: (a) THE MOTIVATION IN THE SME&#x27;S OWN TERMS -- company jargon entered a repo that was meant to be generic from the start (seal, pat, m1/m3 milestone ids). This is the standalone- generalization goal, not cosmetics, which is why it earns an ADR and an epic rather than a rename commit. (b) THE THREE-AXIS MODEL: the command names the SUBJECT (the data), the source registry entry carries CADENCE and ACQUISITION, and the profile is DERIVED by filtering on cadence. Today all three are collapsed into one LoadStep with hand-assigned profile tuples. (c) THE THREE BANDS: prepare / load / verify. Only the load band is source-keyed; forcing check or bootstrap into a source scheme is the same category error inverted. m1-verify and m3-verify carry the same defect as seal and pat -- milestone ids meaning nothing to a reader -- and are renamed with everything else. (d) THE SAAS QUESTION, ruled not dodged. The SME flagged ServiceNow and Jira as possible exceptions because they are widely known. The ADR should record the counter-argument and the ruling: the subject names the data (cmdb, work-items), the source id names the tool, because the SME&#x27;s own CSV-to-database argument applies one level up -- if CMDB data later arrives from a different ITSM, load-servicenow is wrong and load-cmdb is still right. (e) DEPRECATION POLICY. CLI verb names are a PUBLIC CONTRACT -- company crons, scripts and the run-drydocs skill call them by name. New names ship with old ones as deprecated aliases for one port cycle, then drop. Precedent exists: cli.py already carries legacy-verb aliasing for supplements. (f) THE SOURCE-ID LAYER IS NOT A UNILATERAL PRODUCER CHANGE, and the ADR must say so or GN2 will discover it the hard way. Registry v2 is a COMPANY-CANONICAL SURFACE per the standing divergence ledger, and retired ids are governed by the D4 refusal list. Renaming pat:* source ids is a cross-repo reconciliation with new retired-id entries, not an edit. The ADR rules which of the three layers move together and which move separately. (g) The alternatives considered and rejected, with reasons -- an ADR that records only the chosen option is a design note wearing a decision&#x27;s clothes.
 </p><p class="notes"><strong>Notes:</strong> Claimed at raise, 2026-08-11 (desktop), SME direction: &quot;I agree with the ADR approach and everything ... the rename may require its own standalone epic, with a frozen change and port.&quot; NEW EPIC generic-naming, prefix GN. NOTE ON THE PREFIX: the free single letter was T, and it was NOT taken -- T1-T22 is the cross-repo TRACKER id space cited throughout docs/port/port-prompt.md, so T-series backlog items would collide semantically with T15/T18/T22. That is the same class of collision that produced the G70 duplicate this morning; declining it cost one letter.
