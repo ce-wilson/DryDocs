@@ -153,10 +153,11 @@ for itself twice.
    entry on the same gap. Extend it rather than duplicating.
 2. **Take the id from the allocator, never from the tree** (the mint rule, `CLAUDE.md` §0 and
    the `groom-backlog` skill):
-   `python .claude/skills/groom-backlog/validate.py --next-id <SERIES>` (`Idea` for the inbox,
-   the epic letter for an item). It unions the local items, every remote ref's tree and every
-   id ever added in history, so an id minted on a parallel branch or the other machine is
-   already taken. **Mint, push the stub with its final title, then write the body.** Ids are
+   `python .claude/skills/groom-backlog/validate.py --next-id --module <module>` for an item
+   (since PLAN1 the id series IS the module — the 27 legacy letters are frozen and the
+   allocator refuses them) and `--next-id Idea` for the inbox. It unions the local items,
+   every remote ref's tree and every id ever added in history, so an id minted on a parallel
+   branch or the other machine is already taken. **Mint, push the stub with its final title, then write the body.** Ids are
    stable references — cited by signed gate records — so an id is never renumbered and a gap
    in the sequence is never reused. *(The company build of this skill said "compare the max
    id against `origin/main` and prefer renumbering the ungroomed side"; that is the failure the

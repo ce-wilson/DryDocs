@@ -758,6 +758,27 @@ rows:
   - path: "docs/restructure/0*.md"
     disposition: canonical-producer
     note: "conceptual model / plan / HITL flow docs"
+  # 2026-09-02: the lane-handoff skill, its eval workspace and the file it generates are
+  # never-port — the SPECIFIC rows must sit above the `.claude/**` glob (first match wins),
+  # the shape docs/next-session-handoff.md already uses under the docs default.
+  - path: ".claude/skills/lane-handoff/**"
+    disposition: never-port
+    note: "PRODUCER-ONLY TOOLING (user ruling 2026-09-02). Lanes split a burst across two
+      producer machines for throughput; the company port is the opposite need — one pen,
+      methodical, accuracy over speed — and a two-lane split tool is the wrong instrument
+      there: it would re-create the two-machine confusion the company's own agent already
+      fell into. Carved out of the `.claude/**` canonical-producer default, not gated at
+      runtime: a manifest row is the layer that decides what crosses, and a skill that is
+      never carried has nothing to guard."
+  - path: ".claude/skills/lane-handoff-workspace/**"
+    disposition: never-port
+    note: "The skill's eval workspace (review page + benchmark, the rest gitignored) — producer
+      session material, same reason as the skill."
+  - path: "docs/lane-*-handoff.md"
+    disposition: never-port
+    note: "The generated per-burst handoff. It DIRECTS producer work between two producer
+      machines and deletes itself when its queue empties — the docs/next-session-handoff.md
+      shape, one file per lane."
   - path: ".claude/**"
     disposition: canonical-producer
     note: "agents + skills are producer-maintained tooling; consumer-local skills live under other names"
@@ -1331,6 +1352,14 @@ default_ok:
 #   test_no_manifest_row_matches_nothing (and its well-formedness twin).
 # =============================================================================
 row_may_match_nothing:
+  # ---- ephemeral by design --------------------------------------------------
+  - path: "docs/lane-*-handoff.md"
+    reason: >
+      2026-09-02: the lane-handoff skill's generated file exists only DURING a two-machine
+      burst and deletes itself when its queue empties, so the row matches nothing between
+      bursts by design. It is kept because the file must never port when it does exist —
+      producer session state directing producer work, the docs/next-session-handoff.md
+      class — and a row added only while a burst is live would be the one nobody remembers.
   # ---- side-local by construction ------------------------------------------
   - path: "drydocs/docmeta/**"
     reason: >

@@ -4,44 +4,45 @@
     {
       "id": 1,
       "prompt": "I'm on the desktop doing the port reconcile all afternoon and the laptop session is idle. Hand the laptop a build queue of four code-only items it can do without Neo4j — pick them from what's actually ready — and write the handoff so it can just pull and start. Put the file under the workspace outputs dir, not in docs/.",
-      "expected_output": "A markdown handoff for Lane B (laptop) with a front-matter queue of exactly four ids that are all `todo` with dependencies done, none gate-bound and none venue-bound to the desktop; a surface-ownership table that fences the Lane A surfaces (gate prompts, gate-log, PORT-MANIFEST, docs/port, IDEAS.md, depgraph snapshots); a self-deleting lifecycle clause; and the start ritual cited from CLAUDE.md §0 rather than retyped.",
+      "expected_output": "A markdown handoff for Lane B (laptop) with a front-matter queue of exactly four ids that are all `todo` with dependencies done, none gate-bound and none venue-bound to the desktop; a pens line for the receiving session's first commit (code:<module> per queued module); a surface table keyed by pen that fences the Lane A pens (backlog, port, adr, gates, snapshot); a self-deleting lifecycle clause; and the start ritual cited from CLAUDE.md §0 rather than retyped.",
       "files": [],
       "expectations": [
         "A handoff markdown file exists in the run's outputs directory and nothing was written under docs/",
         "The handoff names exactly four backlog item ids as the laptop's queue",
         "Every queued id is status todo in the live backlog with every depends_on done (the board's Ready-to-pull rule)",
         "No queued item is gate-bound (has a gates: field) and none has an input under internal-local/ or the data root",
-        "The handoff fences the Lane A surfaces by name: at least config/gate-prompts, docs/restructure/IDEAS.md and PORT-MANIFEST.yaml are marked as not this lane's",
+        "The handoff fences the Lane A surfaces by pen: at least the backlog pen (IDEAS.md), the port pen (PORT-MANIFEST.yaml) and the gates pen (config/gate-prompts) are marked as Lane A's",
+        "The handoff gives the receiving session a pens line to declare in its first commit (code:<module> for each queued module)",
         "The handoff states that the file is deleted when its queue is empty (self-retiring lifecycle)",
         "The handoff tells the receiving session to push status: in_progress in the item file before work and to use a wip/ branch for unfinished work (the CLAUDE.md section 0 claim rules), by citation or restatement",
-        "The repo tree was left untouched: git status shows no new or modified files outside the workspace, the skill directory, and the pre-existing 00-header.yaml edit"
+        "The repo tree was left untouched: git status shows no new or modified tracked files outside the eval workspace and the skill directory"
       ]
     },
     {
       "id": 2,
       "prompt": "The laptop says it finished its lane. Here's the handoff it was working from: .claude/skills/lane-handoff/evals/files/lane-b-handoff-sample.md. Tell me whether it can be retired, and if not, what's still open.",
-      "expected_output": "A status per queued id read from the live backlog (done / in_progress / todo), a clear verdict — retire the file (delete it in the closing commit) only if every id is done, otherwise the list of ids still open and the instruction to keep the file — and no edits to any item file.",
+      "expected_output": "A status per queued id read from the live backlog (done / in_progress / todo / MISSING), a clear verdict — retire the file (delete it in the closing commit) only if every id is done, otherwise the list of ids still open and the instruction to keep the file — and no edits to any item file.",
       "files": ["evals/files/lane-b-handoff-sample.md"],
       "expectations": [
         "The answer reports a status for each of the three queued ids MM3, G79 and G106",
         "The reported statuses agree with the live backlog: MM3 done, G79 done, G106 todo",
         "The verdict is to KEEP the handoff (not retire it) and it names G106 as the item still open",
         "The answer explains the retire condition — the file is deleted in the closing commit only once every queued item is done",
-        "The sample handoff file still exists and no backlog item file was modified (git status clean apart from the workspace, the skill directory, and the pre-existing 00-header.yaml edit)"
+        "The sample handoff file still exists and no backlog item file was modified (git status shows no new or modified tracked files outside the eval workspace and the skill directory)"
       ]
     },
     {
       "id": 3,
       "prompt": "Flip the lanes this week: the laptop owns the MM stream (MM5, MM12, MM4) and the desktop takes the gate sessions G116, G117, G118, G119. Write the desktop's handoff. Save it to the workspace outputs dir.",
-      "expected_output": "Either a Lane A (desktop) handoff whose queue is the four gate items with each flagged as gate-bound (SME sessions), fencing MM5/MM12/MM4 as the other lane's queue — or an explicit refusal/flag report explaining that MM4 is not ready (MM5 not done) and MM5 is venue-bound (machine-local input), so the requested split cannot be written as stated until those are ruled. What must not happen: a file that silently lists blocked or venue-bound items as ready.",
+      "expected_output": "A Lane A (desktop) handoff whose queue is the four gate items in that order, each noted as gate-bound (an SME session), with the pens line 'pen: backlog · port · adr · gates · snapshot', fencing MM5/MM12/MM4 as the laptop lane's queue — and carrying the other-lane notes that MM4 is not ready (MM5 not done) and MM5's input is machine-local. What must not happen: a file that silently lists blocked or venue-bound items as ready, or a refusal that could have been a file with notes.",
       "files": [],
       "expectations": [
-        "MM4 is not presented as ready anywhere in the output: it is identified as blocked because MM5 is not done",
-        "MM5 is identified as venue-bound (its input under internal-local/ is machine-local) or otherwise as needing the user's ruling before it can be assigned",
-        "If a Lane A handoff is written, its queue is G116, G117, G118, G119 in that order and each is marked as a gate session (SME-bound), not a build",
-        "The desktop's handoff (or the answer, if no file was written) fences MM5, MM12 and MM4 as the laptop lane's items — not to be claimed or edited by the desktop",
+        "A Lane A handoff file is written whose queue is G116, G117, G118, G119 in that order, each marked gate-bound / an SME session",
+        "The file's pens line for the desktop is the surface pens (backlog, port, adr, gates, snapshot), not code:<module>",
+        "MM4 is noted as not ready (blocked on MM5) in the other-lane notes, and MM5 as machine-local — neither presented as plainly ready",
+        "The file fences MM5, MM12 and MM4 as the laptop lane's items — not to be claimed or edited by the desktop",
         "The output does not silently list any blocked or venue-bound item as a plain ready item",
-        "The repo tree was left untouched: git status shows no new or modified files outside the workspace, the skill directory, and the pre-existing 00-header.yaml edit"
+        "The repo tree was left untouched: git status shows no new or modified tracked files outside the eval workspace and the skill directory"
       ]
     }
   ]

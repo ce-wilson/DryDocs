@@ -181,3 +181,12 @@ docs/port/port-dispositions.md
 .coverage
 .coverage.*
 htmlcov/
+
+# Skill-creator eval workspaces (.claude/skills/<skill>-workspace/): run outputs, agent
+# transcripts and grading are session scratch and never tracked; the review page and the
+# benchmark summary are the record a reader on the other machine can open.
+.claude/skills/*-workspace/**
+!.claude/skills/*-workspace/
+!.claude/skills/*-workspace/iteration-*/
+!.claude/skills/*-workspace/iteration-*/review.html
+!.claude/skills/*-workspace/iteration-*/benchmark.md

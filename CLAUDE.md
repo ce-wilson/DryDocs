@@ -77,7 +77,10 @@ things share the word *port* — never conflate them:
   The board's Ready strip and `git branch -r --list "wip/*"` are where you look before picking
   one up. What this does NOT cover: a session that never says what it holds — that was the
   coordination failure of 2026-09-02 (two sessions grooming and merging the same renders in one
-  afternoon), and it is not a tooling gap.
+  afternoon), and it is not a tooling gap. **For a planned two-machine burst, the
+  [`lane-handoff` skill](.claude/skills/lane-handoff/SKILL.md) generates the queue, the pens
+  line and the surface fence as one self-retiring file** (`docs/lane-<x>-handoff.md`); its
+  `PENS` table is keyed by the names above, plus `gates` and `snapshot`, which it adds.
 
 **Mint rule (the claim protocol's other half; I6).** A pull is claimed by pushing `status: in_progress`. An id is claimed the same way, and for the same reason: an id that exists only in your tree is an id the other machine will mint too. **Never read the next free number off your own tree** — ask the allocator, which unions the local items, every remote ref's tree listing, and every id ever added in history, and returns max+1 (a gap is usually a BURNED id — `config/gate-log.md` cites ids inside SIGNED records, so re-issuing one silently re-points a signed gate):
 ```
