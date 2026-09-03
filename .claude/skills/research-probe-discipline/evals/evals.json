@@ -29,6 +29,35 @@
         "If the answer offers an alternative, it points at the CYCLIC (Y/N) column and routes the change through the HITL gate rather than editing the loader SQL directly",
         "No file outside the workspace and the skill directory was modified"
       ]
+    },
+    {
+      "id": 3,
+      "prompt": "I'm profiling Control-M variables. One team has a variable FILE_NM_SUFFIX whose whole value is a single period. Another team writes file names like PREFIX_%%DAT_FILE_DT_FMT..txt with two dots, and their date variable's value ends in a dot (%%$OYEAR.%%OMONTH.). Is the period a typo? What is this called, and is it a defect I should raise?",
+      "expected_output": "An answer that names the vendor concept (a single period after a variable name is Control-M's concatenation delimiter and is consumed) and this repo's term for the bare-dot value (dot-smuggling, remediation rule R1), citing the greenfield job standard, the metadata plan's hazard 1, the rules registry or the resolver docstring; that separates the two teams (team 1 smuggles a dot as a value - R1; team 2 uses the vendor's .. escape and a trailing dot, which the standard permits and R1 does not flag); that says detection is pattern-based, never by variable name; that notes the vendor file in the tree does not state the period rule so the citation is to internal standards; and that marks the %%var.text half of the rule as open (R10, pending B1) rather than asserting it.",
+      "files": [],
+      "expectations": [
+        "The answer says the period after a variable name is the Control-M concatenation delimiter (consumed, not emitted) and does not call the .. spelling a typo",
+        "The answer uses the term dot-smuggling (or dot smuggling) for the bare-dot value and connects it to remediation rule R1",
+        "The answer cites at least one in-repo source by path: knowledge/standards/technology/controlm-greenfield-job-standard.md, knowledge/standards/technology/description-field-metadata-plan.md, internal/remediation/standards-rules-registry.md, or drydocs_core/orchestration/controlm/resolver.py",
+        "The answer distinguishes the two teams: the bare-dot value is the smuggle (R1 applies); the .. escape and trailing dot are the vendor's literal-period spelling that the standard permits (R1 does not apply)",
+        "The answer says detection must be pattern-based (a value that is wholly punctuation), not by variable name, because teams use different names for the same trick",
+        "The answer notes that external/orchestration/bmc-controlm/controlm-variables.md does not state the period rule (its concatenation section is synthesized), so the grounded citation is to the internal standards, not the vendor file",
+        "If the answer discusses whether a period before literal text is consumed (%%VAR.txt), it marks that half as open (R10 / pending B1) instead of asserting one behavior",
+        "No file under config/, docs/restructure/backlog/items/, knowledge/ or drydocs_core/ was modified"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "My SQL splits CMD_LINE on '.' to pull the file extension out of Control-M command lines, and about a third of the file names come out wrong. Fix the split expression.",
+      "expected_output": "A decline to fix the split, with the reason: in a Control-M variable expression the same '.' is an operator (the concatenation delimiter, consumed) when it follows a variable name and a literal everywhere else, and a literal dot may arrive from a variable's value at resolution time, so no text-level split can be correct; the answer points at drydocs_core/orchestration/controlm/resolver.py (resolve_command_line, the one place substitution happens, which no caller may re-implement) and at the R1 detector reading the resolved variable rather than the command text; it names dot-smuggling as the practice that defeats text parsing.",
+      "files": [],
+      "expectations": [
+        "The answer does not offer a corrected split-on-'.' expression as the fix; it explains why a text-level split cannot be made correct",
+        "The answer states that the period after a variable name is Control-M's concatenation delimiter and is consumed, while a period elsewhere is literal, and that a literal dot can come from a variable's value (dot-smuggling)",
+        "The answer points to drydocs_core/orchestration/controlm/resolver.py (resolve_command_line) as the place substitution is implemented and cites its rule that no caller may re-implement substitution",
+        "The answer names dot-smuggling or remediation rule R1 as the practice that makes command-text parsing wrong",
+        "No file was modified outside the workspace and the skill directory"
+      ]
     }
   ]
 }
