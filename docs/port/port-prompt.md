@@ -2166,6 +2166,12 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   `test_cli_registry.py`, and `drydocs --help` listing your `cli_consumer` verbs last.
   Your monolithic `cli.py` is replaced by the take; every verb of yours must already be
   in `cli_consumer.py` before that commit, or it is gone.
+  **FIFTH POSTSCRIPT:** the row you flagged as owed is added - `tests/unit/test_source_bindings.py`
+  is `evaluate` on the `test_schema.py` shape (keep your automated-dataset count, take
+  the drift-guard logic). Your binding outcome is the right one: a carrier is what the
+  dataset's `system` field says, an origin that reaches the graph through a replica is
+  not a carrier, and a system with no automated dataset needs no profile - the flag you
+  left on the one real unbound carrier is the honest state, not a gap.
 
 OWED COMPANY-SIDE:
 

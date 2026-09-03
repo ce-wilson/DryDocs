@@ -1022,6 +1022,16 @@ rows:
   - path: "drydocs_core/models/controlm.py"
     disposition: evaluate
     note: "keep consumer-only rows (e.g. ControlMQuantitativeRow), add producer rows (path moved in Phase B)"
+  - path: "tests/unit/test_source_bindings.py"
+    disposition: evaluate
+    note: >
+      test_reports_cover_every_automated_dataset pins the automated-dataset COUNT
+      (producer 15; consumer 17 at the 2026-09-03 chunk-2 apply, the two extra
+      being company-only rows in the per-entry source-registry). Same shape as
+      test_schema.py: keep the consumer count, take the producer's drift-guard
+      logic. Without this row the tests/** default would revert 17 -> 15 at
+      every port - the company flagged it and did not add the row itself,
+      correctly: the manifest is producer-owned.
   - path: "tests/unit/test_schema.py"
     disposition: evaluate
     note: "consumer EXPECTED_CONSTRAINTS is ahead (superset: base + snow-support supplements). Producer was 47 at the step-45 head and is 49 at 78ba7fd (+2 from the P3 hosts loader, step 46e). Counts drift EVERY port — trust the live test files over this note (66acea8 lesson); keep consumer count, take producer drift-guard logic, and raise the consumer number only for genuinely new active edges that ship their own supplement block"
