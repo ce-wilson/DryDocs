@@ -182,6 +182,15 @@ rows:
     entry_rule: >
       union of dependencies; KEEP the consumer's version string (per-repo
       release cadence); producer v* release tags never cherry-pick.
+  - path: ".pre-commit-config.yaml"
+    disposition: canonical-producer
+    note: >
+      J62 (2026-09-03). The two commands CI blocks on, as commit-time hooks. Its rev
+      IS pyproject's exact ruff pin (0.5.7, J10 stage 0) and your pin is the same by
+      J10, so the hooks belong on both sides at the same standard. Take it whole; the
+      only thing that ever changes here is the rev, which moves WITH the pin
+      (tests/unit/test_precommit_config.py fails when they differ). Nothing installs
+      it for you - `pre-commit install` once per clone, as the file's header says.
   # ---- the backlog: sharded 2026-08-20 (Y2, ADR 0013) ---------------------------
   # One item per file. Rows are ordered most-specific first; backlog.yaml itself is
   # now a TOMBSTONE and the ONE-TIME split sequence rides its row.

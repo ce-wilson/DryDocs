@@ -74,7 +74,7 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 .capture-status{font-size:.78rem;color:#166534;margin:.3rem 0 0;min-height:1.1em}</style>
 </head><body>
 <h1>DryDocs — project board</h1>
-<p class="subtitle">Rendered from <code>docs/restructure/backlog/</code> 642 items &middot; 140 todo / 11 in progress / 2 blocked / 489 done. The repo is the system of record; this page is a working aid.</p>
+<p class="subtitle">Rendered from <code>docs/restructure/backlog/</code> 642 items &middot; 139 todo / 6 in progress / 2 blocked / 495 done. The repo is the system of record; this page is a working aid.</p>
 <p class="subtitle">Location: <code id="board-url"></code> <button type="button" id="board-url-copy">copy</button></p>
 <script>document.getElementById('board-url').textContent=window.location.href;document.getElementById('board-url-copy').onclick=function(){navigator.clipboard.writeText(window.location.href);};</script>
 <p class="subtitle"><a class="capture-link" href="roadmap.html">Module roadmap &rarr;</a> <a class="capture-link" href="ideas.html">Idea inbox &rarr;</a></p>
@@ -85,20 +85,20 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P3</span><span class="status-badge status-done">done</span></div><h3>Config-driven loaders</h3><p class="goal">Precedence + source gating read config/, not hardcoded logic (Epic D).</p><div class="progress"><div class="progress-bar" style="width:82%"></div></div><p class="progress-text">9 / 11</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P4</span><span class="status-badge status-todo">todo</span></div><h3>Context graph pilot</h3><p class="goal">SOSA/SSN observation modeling answers one live support question (Epic E).</p><div class="progress"><div class="progress-bar" style="width:0%"></div></div><p class="progress-text">0 / 2</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P5</span><span class="status-badge status-todo">todo</span></div><h3>Orchestrator expansion</h3><p class="goal">AutoSys + Airflow land as BMC-baseline concepts via confirmed crosswalks (Epic F).</p><div class="progress"><div class="progress-bar" style="width:40%"></div></div><p class="progress-text">2 / 5</p></div>
-<div class="phase-card"><div class="phase-head"><span class="phase-id">P6</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Modular architecture / component topology</h3><p class="goal">ADR 0002 — core extraction, multi-DB topology, component packages (Epic G).</p><div class="progress"><div class="progress-bar" style="width:84%"></div></div><p class="progress-text">122 / 145</p></div>
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P6</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Modular architecture / component topology</h3><p class="goal">ADR 0002 — core extraction, multi-DB topology, component packages (Epic G).</p><div class="progress"><div class="progress-bar" style="width:85%"></div></div><p class="progress-text">123 / 145</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P7</span><span class="status-badge status-done">done</span></div><h3>Review toolkit back-flow</h3><p class="goal">Company SME-review/HITL toolkit reproduced generically, offline (Epic H).</p><div class="progress"><div class="progress-bar" style="width:88%"></div></div><p class="progress-text">7 / 8</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P8</span><span class="status-badge status-in_progress">in_progress</span><span class="release">v0.3.0</span></div><h3>Planning &amp; release infrastructure</h3><p class="goal">Repo-native project board + capture loop; groundwork for versioned releases (Epic I).</p><div class="progress"><div class="progress-bar" style="width:71%"></div></div><p class="progress-text">70 / 98</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P9</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Application attribution</h3><p class="goal">Jobs attributed to SEAL applications (seal_app_ref) end-to-end — gate-confirmed match policy, loader, verify coverage (Epic K).</p><div class="progress"><div class="progress-bar" style="width:87%"></div></div><p class="progress-text">33 / 38</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P10</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Documentation infrastructure</h3><p class="goal">Every design doc (TDD/Runbook/BRD) conforms to a canonical outline; deterministic md→HTML/PDF render; HITL markup loop (digital + pen/paper) re-attaches to a requirement-traceability backbone (Epic L).</p><div class="progress"><div class="progress-bar" style="width:73%"></div></div><p class="progress-text">30 / 41</p></div>
-<div class="phase-card"><div class="phase-head"><span class="phase-id">P11</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Source governance ledgers</h3><p class="goal">Per-source governance as test-enforced config: audit envelope + edge diet (doc 06, Epic M) and column-mapping ledgers (doc 08, Epic N); property-term bindings via the gate.</p><div class="progress"><div class="progress-bar" style="width:58%"></div></div><p class="progress-text">19 / 33</p></div>
-<div class="phase-card"><div class="phase-head"><span class="phase-id">P12</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Web console / graph visualization</h3><p class="goal">Browser front-end over the knowledge graph: navigable C4/graph views, with a decided browser↔Neo4j access path (bolt-from-browser vs a thin API).</p><div class="progress"><div class="progress-bar" style="width:78%"></div></div><p class="progress-text">76 / 98</p></div>
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P11</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Source governance ledgers</h3><p class="goal">Per-source governance as test-enforced config: audit envelope + edge diet (doc 06, Epic M) and column-mapping ledgers (doc 08, Epic N); property-term bindings via the gate.</p><div class="progress"><div class="progress-bar" style="width:61%"></div></div><p class="progress-text">20 / 33</p></div>
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P12</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Web console / graph visualization</h3><p class="goal">Browser front-end over the knowledge graph: navigable C4/graph views, with a decided browser↔Neo4j access path (bolt-from-browser vs a thin API).</p><div class="progress"><div class="progress-bar" style="width:81%"></div></div><p class="progress-text">79 / 98</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P13</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Runtime topology &amp; maintenance windows</h3><p class="goal">Control-M host topology (CM_HOSTS) + runtime-stats supplement (CM_AVG_RUN) loaded per their gates; the maintenance-window question (best patch window for a host/group) answerable from the graph (Epic P).</p><div class="progress"><div class="progress-bar" style="width:83%"></div></div><p class="progress-text">5 / 6</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P14</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Document ingestion &amp; doc-graph benchmarks</h3><p class="goal">Unstructured documents as graph corpora (docmeta): the P0 benchmark verdict (traversal vs manifest-routed md vs vector RAG) with its evidence experiments, and the landing zone for the docmeta component&#x27;s P1+ phases once the verdict + docmeta ADR gate them (Epic Q).</p><div class="progress"><div class="progress-bar" style="width:89%"></div></div><p class="progress-text">24 / 27</p></div>
-<div class="phase-card"><div class="phase-head"><span class="phase-id">P15</span><span class="status-badge status-todo">todo</span></div><h3>Agentic Q&amp;A console</h3><p class="goal">Free-text questions answered by a tiered read-only agent (QuerySpec router → schema-grounded text2cypher → bounded graph-of-thoughts loop) with every executed Cypher exposed via ephemeral specs, per-run question/context/memory/token telemetry, and stale-source rescrape (Epic R; ADR 0007).</p><div class="progress"><div class="progress-bar" style="width:52%"></div></div><p class="progress-text">12 / 23</p></div>
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P15</span><span class="status-badge status-todo">todo</span></div><h3>Agentic Q&amp;A console</h3><p class="goal">Free-text questions answered by a tiered read-only agent (QuerySpec router → schema-grounded text2cypher → bounded graph-of-thoughts loop) with every executed Cypher exposed via ephemeral specs, per-run question/context/memory/token telemetry, and stale-source rescrape (Epic R; ADR 0007).</p><div class="progress"><div class="progress-bar" style="width:57%"></div></div><p class="progress-text">13 / 23</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P16</span><span class="status-badge status-todo">todo</span></div><h3>Self-documentation — DryDocs&#x27; own code in the graph</h3><p class="goal">DryDocs documents ITSELF the way it documents Control-M: the project&#x27;s code-dependency snapshot enters the knowledge graph under the software ontology (SWO), under an explicit :Project root, so &#x27;which module loads this job&#x27; is a query rather than a JSON file a human reads (Epic U).</p><div class="progress"><div class="progress-bar" style="width:83%"></div></div><p class="progress-text">24 / 29</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P17</span><span class="status-badge status-todo">todo</span></div><h3>Mind-map — deepdoc leaves the placeholder</h3><p class="goal">The per-data-flow overview record and its first producer: a graph-seeded, mind-map-driven investigator over the SDLC/ops corpora (Jira, Bitbucket, Confluence, email, Control-M Output logs) whose every finding is :Uncertain, weighted, and carries a provenance breadcrumb to its source; promotion is an SME gate write (Epic MM; docs/design/deepdoc-data-flow-overview.md).</p><div class="progress"><div class="progress-bar" style="width:21%"></div></div><p class="progress-text">3 / 14</p></div>
 </div>
-<div class="ready-strip"><strong>Ready to pull</strong> (118; <code>todo</code> with every <code>depends_on</code> done &mdash; derived, never stored): <a class="ready-id" href="#REF1"><code>REF1</code></a> <a class="ready-id" href="#C35"><code>C35</code></a> <a class="ready-id" href="#C36"><code>C36</code></a> <a class="ready-id" href="#C37"><code>C37</code></a> <a class="ready-id" href="#C39"><code>C39</code></a> <a class="ready-id" href="#C43"><code>C43</code></a> <a class="ready-id" href="#CFG1"><code>CFG1</code></a> <a class="ready-id" href="#G100"><code>G100</code></a> <a class="ready-id" href="#D9"><code>D9</code></a> <a class="ready-id" href="#D11"><code>D11</code></a> <a class="ready-id" href="#G63"><code>G63</code></a> <a class="ready-id" href="#G64"><code>G64</code></a> <a class="ready-id" href="#G65"><code>G65</code></a> <a class="ready-id" href="#G106"><code>G106</code></a> <a class="ready-id" href="#G116"><code>G116</code></a> <a class="ready-id" href="#G117"><code>G117</code></a> <a class="ready-id" href="#G118"><code>G118</code></a> <a class="ready-id" href="#G119"><code>G119</code></a> <a class="ready-id" href="#G120"><code>G120</code></a> <a class="ready-id" href="#G127"><code>G127</code></a> <a class="ready-id" href="#G131"><code>G131</code></a> <a class="ready-id" href="#G132"><code>G132</code></a> <a class="ready-id" href="#G134"><code>G134</code></a> <a class="ready-id" href="#G136"><code>G136</code></a> <a class="ready-id" href="#H8"><code>H8</code></a> <a class="ready-id" href="#I5"><code>I5</code></a> <a class="ready-id" href="#I7"><code>I7</code></a> <a class="ready-id" href="#I8"><code>I8</code></a> <a class="ready-id" href="#DOC1"><code>DOC1</code></a> <a class="ready-id" href="#J54"><code>J54</code></a> <a class="ready-id" href="#J56"><code>J56</code></a> <a class="ready-id" href="#J57"><code>J57</code></a> <a class="ready-id" href="#J58"><code>J58</code></a> <a class="ready-id" href="#J60"><code>J60</code></a> <a class="ready-id" href="#J61"><code>J61</code></a> <a class="ready-id" href="#J62"><code>J62</code></a> <a class="ready-id" href="#J64"><code>J64</code></a> <a class="ready-id" href="#J65"><code>J65</code></a> <a class="ready-id" href="#J67"><code>J67</code></a> <a class="ready-id" href="#J70"><code>J70</code></a> <a class="ready-id" href="#J73"><code>J73</code></a> <a class="ready-id" href="#J74"><code>J74</code></a> <a class="ready-id" href="#J75"><code>J75</code></a> <a class="ready-id" href="#J76"><code>J76</code></a> <a class="ready-id" href="#J77"><code>J77</code></a> <a class="ready-id" href="#J78"><code>J78</code></a> <a class="ready-id" href="#K23"><code>K23</code></a> <a class="ready-id" href="#K29"><code>K29</code></a> <a class="ready-id" href="#L23"><code>L23</code></a> <a class="ready-id" href="#L29"><code>L29</code></a> <a class="ready-id" href="#N17"><code>N17</code></a> <a class="ready-id" href="#N18"><code>N18</code></a> <a class="ready-id" href="#N19"><code>N19</code></a> <a class="ready-id" href="#N22"><code>N22</code></a> <a class="ready-id" href="#N23"><code>N23</code></a> <a class="ready-id" href="#N24"><code>N24</code></a> <a class="ready-id" href="#N25"><code>N25</code></a> <a class="ready-id" href="#N26"><code>N26</code></a> <a class="ready-id" href="#N27"><code>N27</code></a> <a class="ready-id" href="#N28"><code>N28</code></a> <a class="ready-id" href="#G85"><code>G85</code></a> <a class="ready-id" href="#G86"><code>G86</code></a> <a class="ready-id" href="#O23"><code>O23</code></a> <a class="ready-id" href="#O26"><code>O26</code></a> <a class="ready-id" href="#O43"><code>O43</code></a> <a class="ready-id" href="#O44"><code>O44</code></a> <a class="ready-id" href="#O48"><code>O48</code></a> <a class="ready-id" href="#O50"><code>O50</code></a> <a class="ready-id" href="#O54"><code>O54</code></a> <a class="ready-id" href="#O63"><code>O63</code></a> <a class="ready-id" href="#O68"><code>O68</code></a> <a class="ready-id" href="#O72"><code>O72</code></a> <a class="ready-id" href="#O82"><code>O82</code></a> <a class="ready-id" href="#O87"><code>O87</code></a> <a class="ready-id" href="#P6"><code>P6</code></a> <a class="ready-id" href="#Q22"><code>Q22</code></a> <a class="ready-id" href="#Q24"><code>Q24</code></a> <a class="ready-id" href="#Q28"><code>Q28</code></a> <a class="ready-id" href="#R7"><code>R7</code></a> <a class="ready-id" href="#R8"><code>R8</code></a> <a class="ready-id" href="#R11"><code>R11</code></a> <a class="ready-id" href="#R12"><code>R12</code></a> <a class="ready-id" href="#R13"><code>R13</code></a> <a class="ready-id" href="#R15"><code>R15</code></a> <a class="ready-id" href="#R16"><code>R16</code></a> <a class="ready-id" href="#R17"><code>R17</code></a> <a class="ready-id" href="#R18"><code>R18</code></a> <a class="ready-id" href="#R19"><code>R19</code></a> <a class="ready-id" href="#G90"><code>G90</code></a> <a class="ready-id" href="#S11"><code>S11</code></a> <a class="ready-id" href="#U10"><code>U10</code></a> <a class="ready-id" href="#U11"><code>U11</code></a> <a class="ready-id" href="#U16"><code>U16</code></a> <a class="ready-id" href="#U23"><code>U23</code></a> <a class="ready-id" href="#U27"><code>U27</code></a> <a class="ready-id" href="#V4"><code>V4</code></a> <a class="ready-id" href="#V5"><code>V5</code></a> <a class="ready-id" href="#V6"><code>V6</code></a> <a class="ready-id" href="#V7"><code>V7</code></a> <a class="ready-id" href="#V9"><code>V9</code></a> <a class="ready-id" href="#V10"><code>V10</code></a> <a class="ready-id" href="#V11"><code>V11</code></a> <a class="ready-id" href="#Y3"><code>Y3</code></a> <a class="ready-id" href="#Y6"><code>Y6</code></a> <a class="ready-id" href="#Y7"><code>Y7</code></a> <a class="ready-id" href="#Z4"><code>Z4</code></a> <a class="ready-id" href="#Z6"><code>Z6</code></a> <a class="ready-id" href="#Z7"><code>Z7</code></a> <a class="ready-id" href="#Z8"><code>Z8</code></a> <a class="ready-id" href="#Z9"><code>Z9</code></a> <a class="ready-id" href="#GN2"><code>GN2</code></a> <a class="ready-id" href="#MM5"><code>MM5</code></a> <a class="ready-id" href="#MM6"><code>MM6</code></a> <a class="ready-id" href="#MM9"><code>MM9</code></a> <a class="ready-id" href="#MM11"><code>MM11</code></a> <a class="ready-id" href="#MM12"><code>MM12</code></a> <a class="ready-id" href="#MM13"><code>MM13</code></a> <a class="ready-id" href="#MM14"><code>MM14</code></a></div>
+<div class="ready-strip"><strong>Ready to pull</strong> (118; <code>todo</code> with every <code>depends_on</code> done &mdash; derived, never stored): <a class="ready-id" href="#REF1"><code>REF1</code></a> <a class="ready-id" href="#C35"><code>C35</code></a> <a class="ready-id" href="#C36"><code>C36</code></a> <a class="ready-id" href="#C37"><code>C37</code></a> <a class="ready-id" href="#C39"><code>C39</code></a> <a class="ready-id" href="#C43"><code>C43</code></a> <a class="ready-id" href="#CFG1"><code>CFG1</code></a> <a class="ready-id" href="#G100"><code>G100</code></a> <a class="ready-id" href="#D9"><code>D9</code></a> <a class="ready-id" href="#D11"><code>D11</code></a> <a class="ready-id" href="#G63"><code>G63</code></a> <a class="ready-id" href="#G64"><code>G64</code></a> <a class="ready-id" href="#G65"><code>G65</code></a> <a class="ready-id" href="#G106"><code>G106</code></a> <a class="ready-id" href="#G116"><code>G116</code></a> <a class="ready-id" href="#G117"><code>G117</code></a> <a class="ready-id" href="#G118"><code>G118</code></a> <a class="ready-id" href="#G119"><code>G119</code></a> <a class="ready-id" href="#G120"><code>G120</code></a> <a class="ready-id" href="#G127"><code>G127</code></a> <a class="ready-id" href="#G131"><code>G131</code></a> <a class="ready-id" href="#G132"><code>G132</code></a> <a class="ready-id" href="#G134"><code>G134</code></a> <a class="ready-id" href="#G136"><code>G136</code></a> <a class="ready-id" href="#H8"><code>H8</code></a> <a class="ready-id" href="#I5"><code>I5</code></a> <a class="ready-id" href="#I7"><code>I7</code></a> <a class="ready-id" href="#I8"><code>I8</code></a> <a class="ready-id" href="#DOC1"><code>DOC1</code></a> <a class="ready-id" href="#J54"><code>J54</code></a> <a class="ready-id" href="#J56"><code>J56</code></a> <a class="ready-id" href="#J57"><code>J57</code></a> <a class="ready-id" href="#J58"><code>J58</code></a> <a class="ready-id" href="#J60"><code>J60</code></a> <a class="ready-id" href="#J61"><code>J61</code></a> <a class="ready-id" href="#J64"><code>J64</code></a> <a class="ready-id" href="#J65"><code>J65</code></a> <a class="ready-id" href="#J67"><code>J67</code></a> <a class="ready-id" href="#J70"><code>J70</code></a> <a class="ready-id" href="#J73"><code>J73</code></a> <a class="ready-id" href="#J74"><code>J74</code></a> <a class="ready-id" href="#J75"><code>J75</code></a> <a class="ready-id" href="#J76"><code>J76</code></a> <a class="ready-id" href="#J77"><code>J77</code></a> <a class="ready-id" href="#J78"><code>J78</code></a> <a class="ready-id" href="#K23"><code>K23</code></a> <a class="ready-id" href="#K29"><code>K29</code></a> <a class="ready-id" href="#L23"><code>L23</code></a> <a class="ready-id" href="#L29"><code>L29</code></a> <a class="ready-id" href="#N17"><code>N17</code></a> <a class="ready-id" href="#N18"><code>N18</code></a> <a class="ready-id" href="#N19"><code>N19</code></a> <a class="ready-id" href="#N22"><code>N22</code></a> <a class="ready-id" href="#N23"><code>N23</code></a> <a class="ready-id" href="#N24"><code>N24</code></a> <a class="ready-id" href="#N25"><code>N25</code></a> <a class="ready-id" href="#N26"><code>N26</code></a> <a class="ready-id" href="#N27"><code>N27</code></a> <a class="ready-id" href="#N28"><code>N28</code></a> <a class="ready-id" href="#G85"><code>G85</code></a> <a class="ready-id" href="#G86"><code>G86</code></a> <a class="ready-id" href="#O23"><code>O23</code></a> <a class="ready-id" href="#O26"><code>O26</code></a> <a class="ready-id" href="#O43"><code>O43</code></a> <a class="ready-id" href="#O44"><code>O44</code></a> <a class="ready-id" href="#O48"><code>O48</code></a> <a class="ready-id" href="#O50"><code>O50</code></a> <a class="ready-id" href="#O54"><code>O54</code></a> <a class="ready-id" href="#O63"><code>O63</code></a> <a class="ready-id" href="#O68"><code>O68</code></a> <a class="ready-id" href="#O72"><code>O72</code></a> <a class="ready-id" href="#O82"><code>O82</code></a> <a class="ready-id" href="#O87"><code>O87</code></a> <a class="ready-id" href="#O89"><code>O89</code></a> <a class="ready-id" href="#P6"><code>P6</code></a> <a class="ready-id" href="#Q22"><code>Q22</code></a> <a class="ready-id" href="#Q24"><code>Q24</code></a> <a class="ready-id" href="#Q28"><code>Q28</code></a> <a class="ready-id" href="#R7"><code>R7</code></a> <a class="ready-id" href="#R8"><code>R8</code></a> <a class="ready-id" href="#R11"><code>R11</code></a> <a class="ready-id" href="#R12"><code>R12</code></a> <a class="ready-id" href="#R13"><code>R13</code></a> <a class="ready-id" href="#R15"><code>R15</code></a> <a class="ready-id" href="#R16"><code>R16</code></a> <a class="ready-id" href="#R17"><code>R17</code></a> <a class="ready-id" href="#R18"><code>R18</code></a> <a class="ready-id" href="#R19"><code>R19</code></a> <a class="ready-id" href="#G90"><code>G90</code></a> <a class="ready-id" href="#S11"><code>S11</code></a> <a class="ready-id" href="#U10"><code>U10</code></a> <a class="ready-id" href="#U11"><code>U11</code></a> <a class="ready-id" href="#U16"><code>U16</code></a> <a class="ready-id" href="#U23"><code>U23</code></a> <a class="ready-id" href="#U27"><code>U27</code></a> <a class="ready-id" href="#V4"><code>V4</code></a> <a class="ready-id" href="#V5"><code>V5</code></a> <a class="ready-id" href="#V6"><code>V6</code></a> <a class="ready-id" href="#V7"><code>V7</code></a> <a class="ready-id" href="#V9"><code>V9</code></a> <a class="ready-id" href="#V10"><code>V10</code></a> <a class="ready-id" href="#V11"><code>V11</code></a> <a class="ready-id" href="#Y3"><code>Y3</code></a> <a class="ready-id" href="#Y6"><code>Y6</code></a> <a class="ready-id" href="#Y7"><code>Y7</code></a> <a class="ready-id" href="#Z4"><code>Z4</code></a> <a class="ready-id" href="#Z6"><code>Z6</code></a> <a class="ready-id" href="#Z7"><code>Z7</code></a> <a class="ready-id" href="#Z8"><code>Z8</code></a> <a class="ready-id" href="#Z9"><code>Z9</code></a> <a class="ready-id" href="#GN2"><code>GN2</code></a> <a class="ready-id" href="#MM5"><code>MM5</code></a> <a class="ready-id" href="#MM6"><code>MM6</code></a> <a class="ready-id" href="#MM9"><code>MM9</code></a> <a class="ready-id" href="#MM11"><code>MM11</code></a> <a class="ready-id" href="#MM12"><code>MM12</code></a> <a class="ready-id" href="#MM13"><code>MM13</code></a> <a class="ready-id" href="#MM14"><code>MM14</code></a></div>
 <div class="filters">
   <label>Module<select id="f-module"><option value="">All</option>
 <option value="config">config</option>
@@ -179,7 +179,7 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
   <button type="button" id="f-clear">Clear filters</button>
 </div>
 <div class="board">
-<div class="column" data-status="todo"><div class="column-head"><h2>To do</h2><span class="count" data-count-for="todo">140</span></div><div class="column-body"><div class="card ready" id="card-REF1" data-id="REF1" data-module="reference" data-phase="2" data-epic="reference-hygiene" data-type="task" data-status="todo" data-search="ref1 register spec-kit and the spec-driven-development write-up as external reference - the precedent the code/requirements split cites" tabindex="0"><div class="card-head"><span class="card-id">REF1</span><span class="card-title">Register spec-kit and the spec-driven-development write-up as External reference - the precedent the code/requirements split cites</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Gate ontology-domain-registry-and-edition-grain §B4 (SIGNED OFF 2026-09-02, &quot;split now&quot;): the split proceeds on the 2018 FCD
+<div class="column" data-status="todo"><div class="column-head"><h2>To do</h2><span class="count" data-count-for="todo">139</span></div><div class="column-body"><div class="card ready" id="card-REF1" data-id="REF1" data-module="reference" data-phase="2" data-epic="reference-hygiene" data-type="task" data-status="todo" data-search="ref1 register spec-kit and the spec-driven-development write-up as external reference - the precedent the code/requirements split cites" tabindex="0"><div class="card-head"><span class="card-id">REF1</span><span class="card-title">Register spec-kit and the spec-driven-development write-up as External reference - the precedent the code/requirements split cites</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Gate ontology-domain-registry-and-edition-grain §B4 (SIGNED OFF 2026-09-02, &quot;split now&quot;): the split proceeds on the 2018 FCD
 evidence and the reference is registered BEHIND it, not before it. This tree has never heard
 of spec-driven development - a case-insensitive grep for spec-kit or spec-driven is empty
 across every .md, .yaml and .py - and ONT1&#x27;s proposal cites it, so it must exist as a
@@ -1657,24 +1657,6 @@ Clause (b) is the half worth the item on its own. The ff-block has a workaround 
 
 This item was itself written and committed through the recipe it describes, from a detached worktree at origin slash main, which is the closest thing to a pre-verification the shape allows.
 </p></div></div>
-<div class="card ready" id="card-J62" data-id="J62" data-module="config" data-phase="11" data-epic="release-infrastructure" data-type="chore" data-status="todo" data-search="j62 pre-commit hooks running the two commands ci blocks on, so the lint failure that ran red for a hundred consecutive runs cannot be committed again" tabindex="0"><div class="card-head"><span class="card-id">J62</span><span class="card-title">pre-commit hooks running the two commands CI blocks on, so the lint failure that ran red for a hundred consecutive runs cannot be committed again</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P11</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">release-infrastructure</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> A committed .pre-commit-config.yaml runs, at minimum, the two commands CI blocks on - ruff check and ruff format - on staged files, so the failure mode this repo actually had cannot reach a commit. Installation is one documented command and the session ritual says where it goes; the hooks are not silently mandatory, because a repo that fails an unexplained hook on a fresh clone teaches people to pass --no-verify. The hook versions are pinned and match the ruff the project already depends on, so local and CI cannot disagree about what a violation is - a hook that lints to a different standard than CI is worse than no hook. CI keeps its own ruff steps unchanged: the hook is a faster first line, never a replacement for the gate.
-</p><p class="notes"><strong>Notes:</strong> Raised 2026-08-27 from the web-scaffolding review of serious-scaffold/ss-python, which
-ships pre-commit as standard. Of that scaffold&#x27;s tooling this is the single piece that
-answers a failure this project actually had.
-THE EVIDENCE: between 2026-08-05 and 2026-08-12 CI ran red for more than a hundred
-consecutive runs on ruff check and ruff format, while sessions kept pushing past it. It
-stayed invisible because the unit suite passed the whole time, so nothing local ever
-looked wrong. The response then was detection - the session ritual now checks CI, and
-snapshot.ps1 performs that check itself against HEAD&#x27;s own sha. Both are after the fact.
-A hook makes the commit itself fail, which is the only intervention that does not depend
-on somebody remembering to look.
-DELIBERATELY NOT ADOPTED from the same scaffold, with reasons in the review: Sphinx and
-Read the Docs (we have a deterministic renderer whose output the HITL loop keys feedback
-anchors on, and a second documentation system would compete with a governed surface);
-semantic-release and commitlint (this repo&#x27;s commit conventions carry reasons a linter
-cannot check, and automated version bumps buy nothing on a proof of concept); mypy (a
-type-checking sweep over an existing codebase is its own project, not scaffolding).
-</p></div></div>
 <div class="card ready" id="card-J64" data-id="J64" data-module="graph-infra" data-phase="8" data-epic="release-infrastructure" data-type="bug" data-status="todo" data-search="j64 a depgraph snapshot scanned before the commit it stamps is a claim about a tree that was never scanned - scan after, not before" tabindex="0"><div class="card-head"><span class="card-id">J64</span><span class="card-title">A depgraph snapshot scanned before the commit it stamps is a claim about a tree that was never scanned - scan after, not before</span></div><div class="chips"><span class="chip" data-kind="module">graph-infra</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">bug</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">release-infrastructure</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE ORDERING IS ENFORCED IN THE SCRIPT, NOT LEFT TO THE RITUAL&#x27;S PROSE. The snapshot stamps
 a git metadata header - commit, full sha, branch, describe, subject and dirty flag - so the scan
 must run against the tree of the commit it stamps. A scan taken before that commit exists makes
@@ -2857,7 +2839,7 @@ sign-in screen. It is worth doing because the alternative is every new reader le
 the SME seat from `auth.ts` source, and because the derived-vs-hardcoded distinction in
 (a) is cheap now and annoying to retrofit after someone types the string.
 </p></div></div>
-<div class="card" id="card-O89" data-id="O89" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="o89 console feedback has no stable anchors — give each console section a content-derived anchor id and export the same feedback yaml the design-doc l5 loop produces" tabindex="0"><div class="card-head"><span class="card-id">O89</span><span class="card-title">Console feedback has no stable anchors — give each console section a content-derived anchor id and export the same feedback YAML the design-doc L5 loop produces</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-O88" data-target="card-O88">O88</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) ONE FORMAT, NOT A SECOND ONE. Console feedback exports the EXISTING shape —
+<div class="card ready" id="card-O89" data-id="O89" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="o89 console feedback has no stable anchors — give each console section a content-derived anchor id and export the same feedback yaml the design-doc l5 loop produces" tabindex="0"><div class="card-head"><span class="card-id">O89</span><span class="card-title">Console feedback has no stable anchors — give each console section a content-derived anchor id and export the same feedback YAML the design-doc L5 loop produces</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-O88" data-target="card-O88">O88</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) ONE FORMAT, NOT A SECOND ONE. Console feedback exports the EXISTING shape —
 `doc:` / `notes:` / per-note `anchor:` + `note:`, the `drydocs.design_doc.feedback_yaml`
 contract — so one parser, one graph loader (`load-doc-traceability`, gate
 doc-traceability-feedback) and one `transcribe-doc-markup` skill serve both surfaces. A
@@ -3450,97 +3432,10 @@ transcribed from seven company artifacts on an UNMERGED research branch and cite
 
 Related: MM2, MM3, MM6, MM10, MM12, R16, L28, G102, ADR 0007, ADR 0011, Idea-236.
 </p></div></div></div></div>
-<div class="column" data-status="in_progress"><div class="column-head"><h2>In progress</h2><span class="count" data-count-for="in_progress">11</span></div><div class="column-body"><div class="card" id="card-E1" data-id="E1" data-module="ontology" data-phase="4" data-epic="context-graph" data-type="task" data-status="in_progress" data-search="e1 register sosa/ssn observation terms via the gate" tabindex="0"><div class="card-head"><span class="card-id">E1</span><span class="card-title">Register SOSA/SSN observation terms via the gate</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P4</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / ontology-mapper</span></div><div class="epic">context-graph</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C1" data-target="card-C1">C1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> sosa:* terms present with IRIs; status planned-&gt;confirmed via gate</p><p class="notes"><strong>Notes:</strong> Registration step DONE (main, 2026-06-22): sosa/ssn prefixes in namespaces.py; terms seeded in drydocs_core/schema/sosa_experimental_supplement.cypher (opt-in `drydocs apply-sosa-supplement`, NOT in bootstrap; every term adoption:&quot;experimental&quot;); 4 context relationships in relationship_vocabulary.yaml (sosa_observes/has_result/ made_by_sensor/observed_property, status planned, domain context); README split into Declared-Adopted vs Experimental/Early-Adoption. REMAINING for ontology-mapper: take the `jobrun-observation` map entry through the HITL gate (resolve ControlMJobRun-as-Observation vs separate-Observation-node; run-history source), then planned-&gt;confirmed. GATE SESSION DEFERRED 2026-07-14 (SME: not ready yet) — page stays rendered/pending; nothing flips; re-present at a future session (see gate-log 2026-07-14 deferral note).
+<div class="column" data-status="in_progress"><div class="column-head"><h2>In progress</h2><span class="count" data-count-for="in_progress">6</span></div><div class="column-body"><div class="card" id="card-E1" data-id="E1" data-module="ontology" data-phase="4" data-epic="context-graph" data-type="task" data-status="in_progress" data-search="e1 register sosa/ssn observation terms via the gate" tabindex="0"><div class="card-head"><span class="card-id">E1</span><span class="card-title">Register SOSA/SSN observation terms via the gate</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P4</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / ontology-mapper</span></div><div class="epic">context-graph</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C1" data-target="card-C1">C1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> sosa:* terms present with IRIs; status planned-&gt;confirmed via gate</p><p class="notes"><strong>Notes:</strong> Registration step DONE (main, 2026-06-22): sosa/ssn prefixes in namespaces.py; terms seeded in drydocs_core/schema/sosa_experimental_supplement.cypher (opt-in `drydocs apply-sosa-supplement`, NOT in bootstrap; every term adoption:&quot;experimental&quot;); 4 context relationships in relationship_vocabulary.yaml (sosa_observes/has_result/ made_by_sensor/observed_property, status planned, domain context); README split into Declared-Adopted vs Experimental/Early-Adoption. REMAINING for ontology-mapper: take the `jobrun-observation` map entry through the HITL gate (resolve ControlMJobRun-as-Observation vs separate-Observation-node; run-history source), then planned-&gt;confirmed. GATE SESSION DEFERRED 2026-07-14 (SME: not ready yet) — page stays rendered/pending; nothing flips; re-present at a future session (see gate-log 2026-07-14 deferral note).
 </p></div></div>
 <div class="card" id="card-G62" data-id="G62" data-module="drydocs-lineage" data-phase="6" data-epic="component-topology" data-type="task" data-status="in_progress" data-search="g62 run the rua-bundle data-profile gate: the sme names the load population, the agent profiles it, and only the walked population enters the curated load" tabindex="0"><div class="card-head"><span class="card-id">G62</span><span class="card-title">Run the rua-bundle data-profile gate: the SME names the load population, the agent profiles it, and only the walked population enters the curated load</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-lineage</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">component-topology</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-G22" data-target="card-G22">G22</a> <a class="dep-link" href="#card-G23" data-target="card-G23">G23</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> USER-GATED START — the SME convenes the session; the pull loop SKIPS this item until then (the C12/J13 idiom). The drafted rua-bundle-data-profile page is walked in its ruled two-step order: section A the SME identifies the source data (which hosts&#x27; bundles, where they sit, which collector produced each — Internal, recorded company-side, never on the page), section B the agent profiles that population through the G20 extractor in STAGING with zero graph writes, and section C consumes the profile to admit or trim the population, dispose of the hash-absent and collision cases it counts, and clear the F1 sweep. Sign-off transcribed to config/gate-log.md; gates.json + the enforcement matrix regenerate. No population the page has not walked enters the G23 curated load.
 </p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-09 from Idea-85, which asked only for ids and scheduling — the four post-G22 data-profile prompts were drafted 2026-08-07 and unsigned, and an unsigned prompt with no backlog id is invisible to the pull loop. Sessions run COMPANY-SIDE because the identify-the-source-data step names real hosts and paths (Internal); what lands producer-side is the transcription and the regenerated gate surfaces. Model fable: the ruling decides what may be written to the graph.
-</p></div></div>
-<div class="card" id="card-G133" data-id="G133" data-module="drydocs-core" data-phase="6" data-epic="component-topology" data-type="task" data-status="in_progress" data-search="g133 api.py calls execute() outside the try that catches filenotfounderror, so a missing binary breaks the documented exit-code contract - and api-calls.md records one folder-export path where two exist" tabindex="0"><div class="card-head"><span class="card-id">G133</span><span class="card-title">api.py calls execute() outside the try that catches FileNotFoundError, so a missing binary breaks the documented exit-code contract - and API-CALLS.md records one folder-export path where two exist</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-core</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">component-topology</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE EXIT-CODE HOLE, FIXED AND GUARDED. In api.py the try at line 418 covers
-load_config and plan, and its handler at 421 catches FileNotFoundError - but
-that handler only ever fires for the missing-CONFIG raise at line 253.
-`result = execute(planned)` sits at line 437, OUTSIDE the try, and execute
-reaches subprocess.run through _default_runner (line 361), which raises
-FileNotFoundError when the named binary is not on PATH. So a missing `ctm` or
-`exportdeffolder` produces a traceback and NO JSON on stdout, breaking the
-exit-code contract README.md documents. Fix: execution failure reports through
-the same CallResult/JSON channel as every other outcome, with an exit code the
-README table names. A test drives the CLI entry point with a runner or PATH
-that raises FileNotFoundError and asserts BOTH halves - parseable JSON on
-stdout AND the contracted exit code - because asserting only the exit code
-passes on a traceback that happens to exit non-zero.
-
-(b) WHICH CODE, DECIDED RATHER THAN DEFAULTED. README.md&#x27;s contract already
-spends 0-3, with 2 as &quot;config/usage error (bad path, unknown operation,
-missing template parameter)&quot; and 3 as the reported capability gap. A missing
-BINARY is neither a config error nor a capability gap - the operation is
-supported and configured, the host just cannot run it. Say which code it takes
-and record why in the README table in the same change; do not quietly widen
-the meaning of 2.
-
-(c) API-CALLS.md STOPS IMPLYING ONE FOLDER-EXPORT PATH. The folder_export row
-maps to exportdeffolder (em-xml-utility) with status &quot;Available - XML
-supported-but-deprecated window. Syntax = corpus gap; config template
-required.&quot; That is accurate and incomplete: a second transport is in working
-use - the Automation API GET /deploy/jobs?ctm=&amp;folder=&amp;format=XML - and the two
-return DIFFERENT SHAPES. Measured 2026-08-30 on one folder present in both
-exports: the payloads are identical in content (30 JOB, 21 VARIABLE, 1 INCOND,
-1 OUTCOND, 1 RULE_BASED_CALENDAR) and the API copy omits six EM-instance
-attributes (IS_CURRENT_VERSION, VERSION_SERIAL, VERSION_HOST, VERSION_OPCODE,
-MODIFIED, JOBS_IN_GROUP) while carrying REAL_FOLDER_ID=0. The row records that
-both transports exist, which attributes each carries, and that the deploy path
-is DEPLOYABLE-shaped - the zeroed id is correct for an artifact whose id is
-assigned by Control-M on upload, not a defect in the pull.
-
-(d) NAME WHAT THE SHAPE DIFFERENCE COSTS, IN THIS REPO&#x27;S TERMS, so the row is
-useful to the next reader rather than a curiosity. The graph keys folders on
-folder_id (drydocs/loaders/cypher/controlm_folders.cypher MERGE, sourced from
-CM_DEF_VTAB.TABLE_ID), so an API-pulled folder cannot be reconciled to a loaded
-folder by identity - only by name. IS_CURRENT_VERSION is a live filter across
-the loader SQL, so without it &quot;these are the current definitions&quot; is an
-assumption about API behaviour rather than a field that can be tested. What is
-NOT lost: resolve-cmdline-staging joins on (data_center, folder_name, job_name)
-- names, not ids - so the API export is usable for the lineage weld unchanged.
-
-(e) THE RUNNER SEAM REACHES THE ENTRY POINT. execute() already accepts an
-injectable Runner, but main() calls `execute(planned)` bare, so no test can
-drive the CLI&#x27;s RUN path - every existing CLI test uses --plan-only, which is
-why (a) went unnoticed. Thread the runner through main (or make the default
-runner the single patch point and say so), so the entry point is testable for
-execution outcomes and not only for planning ones.
-
-NOT IN SCOPE, AND NAMED SO IT IS NOT SILENTLY ASSUMED: verifying a real call
-against a live Control-M. Nothing producer-side is configured to make one -
-no endpoint, no token, no ctm CLI - so a clause demanding a verified template
-would make this item unclosable here (J18: a live-verification claim names its
-venue). That work is G132 clause (g), on the server where the collector runs.
-Everything above is closable on a machine with no Control-M access at all,
-because (a) tests the binary being ABSENT.
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-08-30. Both defects were found alongside a real folder pull, and
-both are verified against this tree at cae680e7: the try/execute line numbers
-are exact, and the API-CALLS.md folder_export row reads as quoted.
-
-DO NOT TEMPLATE A CALL FROM MEMORY. README.md section 4 and the corpus headers
-say why: every controlm-api-*.md page in external/orchestration/bmc-controlm/
-is flagged SaaS-conceptual and, in two cases, confirmed structurally inaccurate
-and partly SYNTHESIZED. They ground WHICH properties and behaviours exist, not
-syntax. The one grounded default template that ships is api_probe
-(`ctm config servers::get`); start from that probe against the live gateway and
-enumerate the deploy/config services, rather than reconstructing an endpoint
-from a doc page.
-
-WHY THIS IS NOT G132. That item moves a collector into the repo and is a
-drydocs-lineage change; this one is a drydocs-core adapter defect plus a
-reference correction. They were drafted as one item and split because the api.py
-fix is small, verified and independent of any gate, while the transport question
-needs a live probe. Neither blocks the other.
-
-WHAT THIS DOES TO THE D11 GATE. Clauses A1/A2 of controlm-definition-precedence
-assume ONE XML feed against ONE replica. There are two XML export paths with
-different attribute sets, and the scriptable one is the one that loses folder
-identity and the version columns. The question stops being &quot;does XML beat the
-replica&quot; and becomes &quot;which XML, and can it still be joined&quot; - which strengthens
-the complementarity reading in that gate&#x27;s OQ-9 rather than the winner/loser
-framing. Recorded here so the gate session finds it; this item rules nothing.
 </p></div></div>
 <div class="card" id="card-K16" data-id="K16" data-module="config" data-phase="9" data-epic="seal-attribution" data-type="task" data-status="in_progress" data-search="k16 fid directory census: measure the demand-set pull scope on one application, and the registration-vs-attribution disagreement rate" tabindex="0"><div class="card-head"><span class="card-id">K16</span><span class="card-title">FID directory census: measure the demand-set pull scope on ONE application, and the registration-vs-attribution disagreement rate</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P9</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">seal-attribution</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> For ONE application, three counts are reported (counts ONLY — never a row dump; the output is Internal and lands company-side): (a) total directory rows for that application; (b) |demand set ∩ that application|, where the demand set is the union of run-as owners in the Control-M extract, distinct STG_APP_FACT fact_value rows with fact_type=&#x27;FID&#x27; the K2 resolver currently counts unresolved, and account names in registered adhoc evidence; (c) the breakdown of (a) minus (b) by the directory&#x27;s own type/status columns. PLUS the §Q0 measurement the gate cannot sign without: of the accounts in the demand set, how many have a directory application assignment that DISAGREES with the Control-M-derived folder attribution, and the by-case split of those disagreements into &quot;different subjects, both correct&quot; vs &quot;stale directory&quot; vs &quot;wrong folder attribution&quot; (§G5). Doc 09&#x27;s phase table is updated with the real numbers. No pull beyond the demand set; no rows loaded.
 </p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-05 (desktop) from the 2026-08-05 IDEAS entries. THIS RUNS BEFORE THE GATE, not after: &quot;about two hundred accounts per application&quot; is the estimate the gate cannot rule on, and the census turns it into &quot;N of ~200, and here is what the other rows are&quot;. The §Q0 disagreement breakdown is the part that decides whether the directory is a trustworthy ownership source with expected consumer divergence, or a lagging record needing remediation — a question raised only after the gate was drafted, which is why it sits in a separate item rather than inside the gate page. module: config (a source-scoping measurement, not a loader). Producer-side this repo carries the METHOD; the counts themselves are Internal. PRODUCER HALF DELIVERED 2026-08-07 (laptop), and the item is BLOCKED rather than done because its acceptance asks for real counts this repo structurally cannot produce — it holds no directory extract, which is the whole point of the demand-set pull. Shipped: drydocs/fid_census.py (pure — opens no file, contacts no database, writes nothing; every input injected), tests/unit/test_fid_census.py (14 tests, all synthetic), and docs/company-prompts/k16-fid-census-company-prompt.md following the 2026-08-07 company-pack convention. Doc 09 gains a &quot;The numbers&quot; table with every cell marked pending, and an explicit note that an empty cell means NOT MEASURED, never zero. TWO DESIGN DECISIONS WORTH KNOWING BEFORE THE COUNTS ARRIVE. (1) COUNTS-ONLY IS ENFORCED BY THE RETURN TYPE, not by discipline: FidCensus holds int and dict[str,int] fields only, so a row dump is UNEXPRESSIBLE, and a test pins that structurally. That is what lets the result travel back into this repo at all — a later field carrying account names would leak Internal values into a producer-side artifact. (2) THE §G5 READING IS NEVER COMPUTED. The gate says the three readings are distinguished per case and never globally, with a human ruling each — so the census counts disagreements mechanically and parks every one in `unruled` until an SME ruling is injected. The number still sitting in `unruled` is itself reportable: the never-silent rule applied to the report rather than to a load. THE BLOCKER&#x27;S REASON CHANGED 2026-08-12 (SME evidence) — still blocked, much smaller ask. The FID directory is not an external system needing an export or an onboarding: it is `psgmgr.HR_PHONE_EXP`, functional rows `EMP_TYP_CD = &#x27;FCT&#x27;`, in the replica ALREADY IN SCOPE and already the Control-M source. So the census is a SINGLE-SCHEMA JOIN — demand set (i) from CM_DEF_VJOB.OWNER against the directory in the same schema — and no new source crosses the boundary. Status stays blocked because the counts are Internal and this repo has no psgmgr access, which is unchanged; what changed is that satisfying it no longer waits on a source onboarding, only on someone running the query company-side. RUN Q6 FIRST (gate fid-identity-and-scope): whether CM_DEF_VJOB.OWNER holds the NAME or the ID decides the join key, and the two keys give different demand sets. Measuring with the wrong one produces a confident wrong number. module: config is kept as the WORK AREA; the code module classifies as drydocs-review in test_module_boundary.py (it loads nothing and configures nothing — it produces the counts an SME rules from, the same reasoning that puts source_mappings there).
@@ -3570,101 +3465,6 @@ first, so the email domain rides -- the route reads docs.email-unassigned.v1 via
 run_named; a graph-unavailable answer degrades to the named read path, never an error
 or a silent zero. 7 tests in test_mapping_api.py; full suite 2590 passed / ruff check +
 format clean (venue: worktree of origin/main on MSI desktop). Console pane = follow-on.
-</p></div></div>
-<div class="card" id="card-O70" data-id="O70" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="in_progress" data-search="o70 generate the typescript api client from the openapi schema instead of hand-keeping fetch wrappers and their response types" tabindex="0"><div class="card-head"><span class="card-id">O70</span><span class="card-title">Generate the TypeScript API client from the OpenAPI schema instead of hand-keeping fetch wrappers and their response types</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The console&#x27;s HTTP layer is generated from the drydocs_api OpenAPI schema rather than written by hand: request paths, parameter shapes and response types all derive from the server&#x27;s own declaration, so an API change the browser code has not caught up with is a TypeScript compile error instead of a runtime surprise. The generated output is committed and a drift guard fails when it no longer matches a freshly generated one - the same generated-artifact discipline the board, the gates page and the load map already follow. The GraphAccess seam (ADR 0005) survives unchanged: generation replaces the hand-written transport underneath it, never the interface the components consume, and the bolt dev adapter is untouched. npm run build and oxlint stay clean.
-</p><p class="notes"><strong>Notes:</strong> Raised 2026-08-27 from the web-scaffolding review. The reviewed FastAPI template generates
-its frontend client from the backend schema; we hand-write web/src/lib/graphApi.ts and
-hand-maintain its response types against drydocs_api. That is a restatement of a declaration
-with no guard behind it, which is the defect class this repo has already written a rule
-about twice - never parse a render, never hand-copy a declaration. The QuerySpec registry is
-the natural first beneficiary: 35 specs whose column shapes the console currently trusts by
-convention alone.
-</p></div></div>
-<div class="card" id="card-O88" data-id="O88" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="in_progress" data-search="o88 a console route has no paper form — capture the executed dom to a self-contained printable html carrying the l6 margin gutter and a route/commit provenance footer" tabindex="0"><div class="card-head"><span class="card-id">O88</span><span class="card-title">A console route has no paper form — capture the executed DOM to a self-contained printable HTML carrying the L6 margin gutter and a route/commit provenance footer</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) CAPTURE, DO NOT RE-IMPLEMENT. The console is a React SPA over a live API, so its
-paper form is the EXECUTED DOM, not a server-side re-render of the same data. Drive the
-running console through headless Edge — the mechanism the `verify` skill already uses
-for the design-doc renderer — and write one self-contained `.html` per captured route,
-styles inlined, no external requests. A second renderer that reproduces console markup
-from JSON is the wrong shape: it would drift from the screen silently, which is the
-whole failure the capture avoids.
-
-(b) A CAPTURE IS A MOMENT AND THE FOOTER MUST SAY SO. `doc_rev_footer` stamps a design
-doc with `Rev N · commit &lt;hash&gt;` because a doc&#x27;s rev is AUTHORED. A console page has no
-rev — it has a route, a commit, a wall-clock time, and an API it read. All four go in the
-footer on every printed page. Without them a marked-up printout cannot be re-attached to
-anything: the reviewer&#x27;s note is about a screen that existed once.
-
-(c) THE GUTTER IS THE EXISTING ONE. Reuse `_inject_margin_anchors`&#x27;s contract — a
-`.dd-margin-tag` span, `display:none` on screen, positioned in the left margin under
-`@media print`. The console today has NO print CSS AT ALL (verified 2026-08-31: no
-`@media print` anywhere in `web/src`), so the print sheet is new work; the gutter
-convention it carries is not, and must not be reinvented in a second idiom.
-
-(d) WHICH ROUTES, DECIDED BY WHO REVIEWS THEM. Ship the capture for a NAMED starting
-set rather than all fourteen routes, and say in the item close which ones and why. A
-route behind sign-in needs a session, which is a real cost the capture must handle
-honestly (headless sign-in) or exclude and say so — never a blank page presented as a
-captured one.
-
-(e) THE PAYLOAD IS NOT COMMITTED BY DEFAULT. A capture of a live console can contain
-real graph values. It lands under the data root or `internal-local/`, the same landing
-rule the vendor scrape follows, and the committed artifacts are the capture script and
-its print sheet. If a specific sanitized capture is worth tracking, that is a decision
-with a classification on it, not a default.
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-08-31 (desktop, ui-workstream worktree) from a session that asked whether the
-Epic L feedback loop could reach the web console. It can, but only the PAPER half (L6)
-transfers cleanly, and this item is that half.
-
-WHY NOT ARTIFACT COMMENTS. Anthropic ships anchored comment threads on published
-artifacts, which is exactly this loop hosted for you — but it needs a Team or Enterprise
-plan and an org-shared artifact (public sharing disables comments outright), and the user
-is on personal Pro. Independently, an artifact is ONE self-contained static page with no
-backend and no routes, so a multi-route console over drydocs-api could not be published
-as one even on Enterprise. Both blocks are structural; neither is worth re-checking
-without a plan change.
-
-WHAT MAKES THIS DIFFERENT FROM A DESIGN DOC, and it is the only hard part: a design doc
-is a `.md` whose render is deterministic, so its paper form and its screen form are the
-same artifact under two style sheets (L13). A console page is a function of the graph at
-a moment. The provenance footer in (b) is what keeps the loop honest — everything else
-here is mechanical.
-</p></div></div>
-<div class="card" id="card-O92" data-id="O92" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="in_progress" data-search="o92 canaccessmodule decides who sees which console module and has no test, and no guard pins which modules are designated sme" tabindex="0"><div class="card-head"><span class="card-id">O92</span><span class="card-title">canAccessModule decides who sees which console module and has no test, and no guard pins which modules are designated sme</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-O80" data-target="card-O80">O80</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE UNIT TEST: a vitest file over canAccessModule in web/src/modules/registry.ts - the three
-roles against the three designations, including the undefined / &#x27;all&#x27; default. It is a pure
-three-line function with three call sites (layout/Aside.tsx, lib/auth.ts,
-routes/OverviewRoute.tsx) and no test at all, which is exactly the shape the O80 runner exists
-for and cheaper to guard than to argue about.
-
-(b) THE PIN, and it is the larger half: a test that pins WHICH module ids carry a non-default
-access value. The list should change rarely and always on purpose, which is precisely when a pin
-is the right instrument - the same state the number so it cannot drift up quietly pattern
-ui-tests.yaml&#x27;s coverage pins already use.
-
-(c) THE PIN CARRIES THE REASON PER ENTRY, not just the id: FB-03 for /software and /gates, the
-delta argument for /remediation. A designation whose reason is unrecorded is the thing the pin is
-supposed to prevent.
-
-(d) SAY IN THE TEST DOCSTRING WHAT THIS IS NOT, because it will otherwise be priced as a
-security fix: it is NOT an authorization defect. The server re-resolves the real role from the
-token on every call and the API is the enforcement point, so nothing here is a data exposure.
-This is about the console&#x27;s own audience decisions staying deliberate.
-
-(e) THE FAILURE IS SILENT IN BOTH DIRECTIONS and the tests must cover both: a module wrongly
-OPENED shows an end user numbers they will misread; a module wrongly CLOSED simply disappears for
-them with no error.
-
-(f) PASS/FAIL: npm run lint, npm run build and the vitest suite green; flipping any module&#x27;s
-access in the registry turns the pin red; removing the pin&#x27;s reason for an entry is caught at
-review, not by the test, and the item says so rather than pretending otherwise.
-</p><p class="notes"><strong>Notes:</strong> Groomed 2026-09-02 from Idea-231 (desktop, backlog-groomer fork). Noticed at O59, which set
-access: &#x27;sme&#x27; on /remediation - a one-word edit that changed the module from
-visible-to-every-role to steward-plus-admin. The change was intended and the reason is recorded
-inline, but nothing outside the diff would have caught it either way.
-
-DEPENDS ON O80 (done), which bought the vitest runner and proved it. Related: O59, O80, FB-03.
-</p></div></div>
-<div class="card" id="card-R9" data-id="R9" data-module="drydocs-api" data-phase="15" data-epic="agentic-qa" data-type="task" data-status="in_progress" data-search="r9 read-only agent query command over the o33-guarded queryspecs: one deterministic, testable graph-navigation surface for agents (mcp recorded as the later option)" tabindex="0"><div class="card-head"><span class="card-id">R9</span><span class="card-title">Read-only agent query command over the O33-guarded QuerySpecs: one deterministic, testable graph-navigation surface for agents (MCP recorded as the later option)</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-api</span><span class="chip" data-kind="phase">P15</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">agentic-qa</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> A read-only, deterministic query command over the O33-guarded QuerySpecs, placed so the module boundary holds (drydocs_api owns the specs; test_module_boundary stays green): each spec addressable by name with typed params, stable JSON output, refuses unknown specs/params, zero write paths; unit tests drive it against a fake client; a short agent-facing usage note documents it as the graph-navigation surface. MCP (mcp-neo4j-cypher) explicitly out of scope, recorded as the richer later option.
-</p><p class="notes"><strong>Notes:</strong> Groomed 2026-07-28 pm from the live-benchmarked [idea] line (5 questions ~410ms/~1.2k chars vs grep&#x27;s noisy equivalents; safe now that U6 fixed the cross-root blind spot). CLI-vs-MCP resolved toward CLI by the line&#x27;s own analysis: MCP adds config + write-risk surface.
 </p></div></div>
 <div class="card" id="card-MM7" data-id="MM7" data-module="drydocs-lineage" data-phase="17" data-epic="mind-map" data-type="task" data-status="in_progress" data-search="mm7 control-m output-tab log extractor — launcher job kind, resolved arguments, placement handoff pair, landing prefix, compute target — joined onto :etlprocess by pipeline guid, dpl_mac-shaped, every skip counted" tabindex="0"><div class="card-head"><span class="card-id">MM7</span><span class="card-title">Control-M Output-tab log extractor — launcher job KIND, resolved arguments, placement handoff pair, landing prefix, compute target — joined onto :ETLProcess by pipeline GUID, dpl_mac-shaped, every skip counted</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-lineage</span><span class="chip" data-kind="phase">P17</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">mind-map</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-G17" data-target="card-G17">G17</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> drydocs_lineage/extractors/controlm_output.py takes (source, into: LineageGraph) like every extractor, reads Output text per &lt;job, order-id, run&gt; from a NAMED sysout file — the modern wrapper writes no identity into the body, so job name / order id / run stamp are parsed from the FILE NAME (tolerant scan, site-pinnable pattern override, name-derived date kept as run_date and never merged into the launcher&#x27;s -od) and a detached text blob is rejected with a counted reason — and joins onto already-staged DPL processes on the pipeline GUID (falling back to &lt;job, run&gt; when the command line carried a variable), returning an OutputCoverage dataclass with a counted reason for every skip (no_launcher_banner, kind_unknown, guid_mismatch_vs_cmdline, truncated_json, token_redacted, identity_not_in_filename, no_order_id_in_filename). It sets PROPERTIES only — launcher_kind (from the `Identified &#x27;&lt;KIND&gt;&#x27; Job` line), compute_target, provenance_guid (placement response) and the -proId of the ingestion consuming that placement, recorded as a run-scoped PAIR whose scope is those two jobs and which never keys an edge, landing_prefix, submission_cluster, image_digest, compute_profile_ref — and creates no edge (m3_* stay as they are). A synthetic mechanism-only fixture under tests/fixtures/ reproduces the four kinds seen (PLACEMENT, INGESTION, TRANSFORM, PROVISION), a placement handoff across exactly two jobs, a transform that logs no provenance id (expected-absent, counted, never reported as a break), and a line that carries a bearer token — which the extractor REDACTS before any field and counts. The source row is registered in config/source-registry.yaml with classification and an acquisition path per Idea-133 (mode, via). A chained run (inventory → mac → output) exists as one CLI invocation and curation.py&#x27;s stub docstring names it as the cadence hook; the Output read is described in the design doc §3 as an INPUT to deepdoc, not a deepdoc feature.</p><p class="notes"><strong>Notes:</strong> Iteration 2 of the launcher contract. Genuine greenfield: no code, item or idea in the repo ingests Control-M sysout today. The log is authoritative where CMDLINE carries a %%variable and it asserts the job kind G12 wanted. Iteration 3 (run-history join via the P4 tables) is named in the doc and not minted until this lands.
 
@@ -3732,7 +3532,7 @@ relay -- guessing spellings is the defect this item exists to prevent. The (d) s
 guard (fixture headers drawn from the recorded list, not the module constant) also waits
 on that list; a guard against nothing would be decoration.
 </p></div></div></div></div>
-<div class="column" data-status="done"><div class="column-head"><h2>Done</h2><span class="count" data-count-for="done">489</span></div><div class="column-body"><div class="card" id="card-A1" data-id="A1" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a1 audit reference registry paths for staleness" tabindex="0"><div class="card-head"><span class="card-id">A1</span><span class="card-title">Audit reference registry paths for staleness</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every entry marked ok/stale; stale paths fixed or flagged</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All local mirrors + platform/standard doc paths resolve; no stale entries. verified: 2026-06-21 in REGISTRY.yaml.</p></div></div>
+<div class="column" data-status="done"><div class="column-head"><h2>Done</h2><span class="count" data-count-for="done">495</span></div><div class="column-body"><div class="card" id="card-A1" data-id="A1" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a1 audit reference registry paths for staleness" tabindex="0"><div class="card-head"><span class="card-id">A1</span><span class="card-title">Audit reference registry paths for staleness</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every entry marked ok/stale; stale paths fixed or flagged</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All local mirrors + platform/standard doc paths resolve; no stale entries. verified: 2026-06-21 in REGISTRY.yaml.</p></div></div>
 <div class="card" id="card-A2" data-id="A2" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a2 account for every bmc doc in the source manifest" tabindex="0"><div class="card-head"><span class="card-id">A2</span><span class="card-title">Account for every BMC doc in the source manifest</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every .md in bmc-controlm/ accounted for in the manifest</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All 26 bmc-controlm .md files are referenced in SOURCE-MANIFEST.md (0 uncovered).</p></div></div>
 <div class="card" id="card-A3" data-id="A3" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a3 seed the research index with linked rationale" tabindex="0"><div class="card-head"><span class="card-id">A3</span><span class="card-title">Seed the research index with linked rationale</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> &gt;=5 rows, each with a working link and a &#x27;why it matters&#x27;</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. 7 rows with working links (3 Neo4j blogs + PROV-O/SOSA/ORG/agent-memory) + why-it-matters.</p></div></div>
 <div class="card" id="card-A4" data-id="A4" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a4 registry.yaml points the dcat row at a per-standard readme that was never written" tabindex="0"><div class="card-head"><span class="card-id">A4</span><span class="card-title">REGISTRY.yaml points the dcat row at a per-standard README that was never written</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> reference/REGISTRY.yaml&#x27;s dcat row no longer cites a path that does not exist. Exactly one of two resolutions, and the choice is recorded in the close note: (a) write reference/standards/dcat/README.md following the dcmi-terms pattern from M4 — namespace, what we use it for, the specific terms we reference, source_url — or (b) re-point the row&#x27;s `docs:` at reference/standards/README.md the way the skos row already does. Nothing else in the registry changes.
@@ -6346,6 +6146,145 @@ company-side 2026-08-28 triage where three undeclared constraints were actually 
 Module graph-infra and epic component-topology follow the schema and provisioning work; the
 deliverable is a check in the bootstrap path, not a loader change.
 </p></div></div>
+<div class="card" id="card-G133" data-id="G133" data-module="drydocs-core" data-phase="6" data-epic="component-topology" data-type="task" data-status="done" data-search="g133 api.py calls execute() outside the try that catches filenotfounderror, so a missing binary breaks the documented exit-code contract - and api-calls.md records one folder-export path where two exist" tabindex="0"><div class="card-head"><span class="card-id">G133</span><span class="card-title">api.py calls execute() outside the try that catches FileNotFoundError, so a missing binary breaks the documented exit-code contract - and API-CALLS.md records one folder-export path where two exist</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-core</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">component-topology</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE EXIT-CODE HOLE, FIXED AND GUARDED. In api.py the try at line 418 covers
+load_config and plan, and its handler at 421 catches FileNotFoundError - but
+that handler only ever fires for the missing-CONFIG raise at line 253.
+`result = execute(planned)` sits at line 437, OUTSIDE the try, and execute
+reaches subprocess.run through _default_runner (line 361), which raises
+FileNotFoundError when the named binary is not on PATH. So a missing `ctm` or
+`exportdeffolder` produces a traceback and NO JSON on stdout, breaking the
+exit-code contract README.md documents. Fix: execution failure reports through
+the same CallResult/JSON channel as every other outcome, with an exit code the
+README table names. A test drives the CLI entry point with a runner or PATH
+that raises FileNotFoundError and asserts BOTH halves - parseable JSON on
+stdout AND the contracted exit code - because asserting only the exit code
+passes on a traceback that happens to exit non-zero.
+
+(b) WHICH CODE, DECIDED RATHER THAN DEFAULTED. README.md&#x27;s contract already
+spends 0-3, with 2 as &quot;config/usage error (bad path, unknown operation,
+missing template parameter)&quot; and 3 as the reported capability gap. A missing
+BINARY is neither a config error nor a capability gap - the operation is
+supported and configured, the host just cannot run it. Say which code it takes
+and record why in the README table in the same change; do not quietly widen
+the meaning of 2.
+
+(c) API-CALLS.md STOPS IMPLYING ONE FOLDER-EXPORT PATH. The folder_export row
+maps to exportdeffolder (em-xml-utility) with status &quot;Available - XML
+supported-but-deprecated window. Syntax = corpus gap; config template
+required.&quot; That is accurate and incomplete: a second transport is in working
+use - the Automation API GET /deploy/jobs?ctm=&amp;folder=&amp;format=XML - and the two
+return DIFFERENT SHAPES. Measured 2026-08-30 on one folder present in both
+exports: the payloads are identical in content (30 JOB, 21 VARIABLE, 1 INCOND,
+1 OUTCOND, 1 RULE_BASED_CALENDAR) and the API copy omits six EM-instance
+attributes (IS_CURRENT_VERSION, VERSION_SERIAL, VERSION_HOST, VERSION_OPCODE,
+MODIFIED, JOBS_IN_GROUP) while carrying REAL_FOLDER_ID=0. The row records that
+both transports exist, which attributes each carries, and that the deploy path
+is DEPLOYABLE-shaped - the zeroed id is correct for an artifact whose id is
+assigned by Control-M on upload, not a defect in the pull.
+
+(d) NAME WHAT THE SHAPE DIFFERENCE COSTS, IN THIS REPO&#x27;S TERMS, so the row is
+useful to the next reader rather than a curiosity. The graph keys folders on
+folder_id (drydocs/loaders/cypher/controlm_folders.cypher MERGE, sourced from
+CM_DEF_VTAB.TABLE_ID), so an API-pulled folder cannot be reconciled to a loaded
+folder by identity - only by name. IS_CURRENT_VERSION is a live filter across
+the loader SQL, so without it &quot;these are the current definitions&quot; is an
+assumption about API behaviour rather than a field that can be tested. What is
+NOT lost: resolve-cmdline-staging joins on (data_center, folder_name, job_name)
+- names, not ids - so the API export is usable for the lineage weld unchanged.
+
+(e) THE RUNNER SEAM REACHES THE ENTRY POINT. execute() already accepts an
+injectable Runner, but main() calls `execute(planned)` bare, so no test can
+drive the CLI&#x27;s RUN path - every existing CLI test uses --plan-only, which is
+why (a) went unnoticed. Thread the runner through main (or make the default
+runner the single patch point and say so), so the entry point is testable for
+execution outcomes and not only for planning ones.
+
+NOT IN SCOPE, AND NAMED SO IT IS NOT SILENTLY ASSUMED: verifying a real call
+against a live Control-M. Nothing producer-side is configured to make one -
+no endpoint, no token, no ctm CLI - so a clause demanding a verified template
+would make this item unclosable here (J18: a live-verification claim names its
+venue). That work is G132 clause (g), on the server where the collector runs.
+Everything above is closable on a machine with no Control-M access at all,
+because (a) tests the binary being ABSENT.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-08-30. Both defects were found alongside a real folder pull, and
+both are verified against this tree at cae680e7: the try/execute line numbers
+are exact, and the API-CALLS.md folder_export row reads as quoted.
+
+DO NOT TEMPLATE A CALL FROM MEMORY. README.md section 4 and the corpus headers
+say why: every controlm-api-*.md page in external/orchestration/bmc-controlm/
+is flagged SaaS-conceptual and, in two cases, confirmed structurally inaccurate
+and partly SYNTHESIZED. They ground WHICH properties and behaviours exist, not
+syntax. The one grounded default template that ships is api_probe
+(`ctm config servers::get`); start from that probe against the live gateway and
+enumerate the deploy/config services, rather than reconstructing an endpoint
+from a doc page.
+
+WHY THIS IS NOT G132. That item moves a collector into the repo and is a
+drydocs-lineage change; this one is a drydocs-core adapter defect plus a
+reference correction. They were drafted as one item and split because the api.py
+fix is small, verified and independent of any gate, while the transport question
+needs a live probe. Neither blocks the other.
+
+WHAT THIS DOES TO THE D11 GATE. Clauses A1/A2 of controlm-definition-precedence
+assume ONE XML feed against ONE replica. There are two XML export paths with
+different attribute sets, and the scriptable one is the one that loses folder
+identity and the version columns. The question stops being &quot;does XML beat the
+replica&quot; and becomes &quot;which XML, and can it still be joined&quot; - which strengthens
+the complementarity reading in that gate&#x27;s OQ-9 rather than the winner/loser
+framing. Recorded here so the gate session finds it; this item rules nothing.
+
+BUILT 2026-09-03 (laptop, Lane B of the f109280f handoff; wip/G133-laptop). The
+line numbers in (a) still matched the tree exactly at the claim.
+
+(a) execute() now wraps the runner call in an OSError catch. subprocess.run raises
+OSError - FileNotFoundError, PermissionError - only when the child cannot be
+STARTED; once it runs, its outcome is a returncode, so the catch cannot mask a
+failed call. The outcome is a CallResult with not_runnable=True, returncode None
+and the OS error in message, printed through the same JSON channel as every other
+result. The guard drives the REAL default runner against a template naming a
+binary no host has, and asserts both halves: json.loads on stdout first (a
+traceback fails there, not at the code), then the exit code.
+
+(b) EXIT_NOT_RUNNABLE = 4, decided and recorded in the README table with the
+reason: 1 says the tool ran (it never did), 2 says the config is wrong (the
+template is valid and the operation supported), 3 says the capability is missing
+at this version (it is not). Widening 2 would make &quot;fix your config&quot; the advice
+for a host-provisioning problem. The wrapper&#x27;s `*) fail` arm already covers 4;
+a wrapper that wants to say &quot;install the utility&quot; tests for it. The JSON contract
+gains `not_runnable`, listed in the README key list; a test pins that every code
+the module defines has a README row (reads prose on purpose - the table IS the
+contract, J66&#x27;s stated exception).
+
+(c) The folder_export row names both transports and the shape difference, and a
+new &quot;Two folder-export transports&quot; section beside the table carries the measured
+comparison as a two-column table: identical content, the six EM-instance
+attributes present only in the utility export, REAL_FOLDER_ID as the EM holds it
+versus 0, and the reading that the API copy is DEPLOYABLE-shaped - the zero is
+correct for an artifact whose id Control-M assigns on upload. No operation was
+added and nothing was templated from memory: the API path is recorded as grounded
+by a measured pull, not by the corpus, and OPERATIONS is unchanged.
+
+(d) The cost is named in this repo&#x27;s terms, every path verified in the tree
+before it was cited: the cypher MERGE on ControlMFolder {folder_id}, sourced from
+TABLE_ID in the folders SQL; IS_CURRENT_VERSION as a live filter in the folders,
+jobs and both conditions loaders; and what is NOT lost - the XML lineage
+extractor keys on (data_center, folder_name, subfolder_path, job_name). One
+precision on the body: the extractor&#x27;s key carries subfolder_path as well as the
+three names the body lists; still names, not ids, so the conclusion holds. The
+D11 note travels into the reference so the gate session finds it there too.
+
+(e) main(argv, *, runner=None) threads the runner into execute(). The .sh never
+passes it; a test does, and the entry point&#x27;s RUN path is now driven both with a
+recording runner (exit 0, argv seen) and a raising one (exit 4). A third test
+keeps ran-and-failed (exit 1, returncode 1), never-started (exit 4, returncode
+None) and not-executable (PermissionError, also 4) distinct from one another.
+
+VERIFIED: five new tests in test_controlm_api.py, the adapter suite plus the
+source-scan, render-parsing, fence, publish-boundary and module-boundary guards
+green (70), ruff check and ruff format --check clean, full suite 3100 passed
+before the close. No new file, so no MODULE_MAP row; drydocs_core is already a
+core prefix. Not verified, as the body says: any call against a live Control-M.
+</p></div></div>
 <div class="card" id="card-G135" data-id="G135" data-module="drydocs-lineage" data-phase="6" data-epic="component-topology" data-type="task" data-status="done" data-search="g135 the dpl registry extractor stages a wrong contract as a clean run, because every counter it keeps is a skip counter and a record with no seal field takes the enclosing folder&#x27;s name" tabindex="0"><div class="card-head"><span class="card-id">G135</span><span class="card-title">The dpl registry extractor stages a wrong contract as a clean run, because every counter it keeps is a skip counter and a record with no seal field takes the enclosing folder&#x27;s name</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-lineage</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">component-topology</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The extractor gains the ability to REPORT that its field contract is wrong. It does not
 gain an opinion about what the right one is - that is clause C1 of the
 dpl-pipeline-registry-contract gate and it belongs to the SME.
@@ -7124,6 +7063,65 @@ the word-boundary test; the depgraph-snapshot survivor 3c2bfcdd named had alread
 rolled at d3f648ee. ALLOWLIST ships empty with the enumeration recorded inline.
 Clause (e) boundary in the module docstring: the cross-repo half (company registry
 row / loaded doc ids) is a port-session question under the F-table, not this guard&#x27;s.
+</p></div></div>
+<div class="card" id="card-J62" data-id="J62" data-module="config" data-phase="11" data-epic="release-infrastructure" data-type="chore" data-status="done" data-search="j62 pre-commit hooks running the two commands ci blocks on, so the lint failure that ran red for a hundred consecutive runs cannot be committed again" tabindex="0"><div class="card-head"><span class="card-id">J62</span><span class="card-title">pre-commit hooks running the two commands CI blocks on, so the lint failure that ran red for a hundred consecutive runs cannot be committed again</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P11</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">release-infrastructure</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> A committed .pre-commit-config.yaml runs, at minimum, the two commands CI blocks on - ruff check and ruff format - on staged files, so the failure mode this repo actually had cannot reach a commit. Installation is one documented command and the session ritual says where it goes; the hooks are not silently mandatory, because a repo that fails an unexplained hook on a fresh clone teaches people to pass --no-verify. The hook versions are pinned and match the ruff the project already depends on, so local and CI cannot disagree about what a violation is - a hook that lints to a different standard than CI is worse than no hook. CI keeps its own ruff steps unchanged: the hook is a faster first line, never a replacement for the gate.
+</p><p class="notes"><strong>Notes:</strong> Raised 2026-08-27 from the web-scaffolding review of serious-scaffold/ss-python, which
+ships pre-commit as standard. Of that scaffold&#x27;s tooling this is the single piece that
+answers a failure this project actually had.
+THE EVIDENCE: between 2026-08-05 and 2026-08-12 CI ran red for more than a hundred
+consecutive runs on ruff check and ruff format, while sessions kept pushing past it. It
+stayed invisible because the unit suite passed the whole time, so nothing local ever
+looked wrong. The response then was detection - the session ritual now checks CI, and
+snapshot.ps1 performs that check itself against HEAD&#x27;s own sha. Both are after the fact.
+A hook makes the commit itself fail, which is the only intervention that does not depend
+on somebody remembering to look.
+DELIBERATELY NOT ADOPTED from the same scaffold, with reasons in the review: Sphinx and
+Read the Docs (we have a deterministic renderer whose output the HITL loop keys feedback
+anchors on, and a second documentation system would compete with a governed surface);
+semantic-release and commitlint (this repo&#x27;s commit conventions carry reasons a linter
+cannot check, and automated version bumps buy nothing on a proof of concept); mypy (a
+type-checking sweep over an existing codebase is its own project, not scaffolding).
+
+BUILT 2026-09-03 (laptop, Lane B of the f109280f handoff; wip/J62-laptop).
+
+THE CONFIG. .pre-commit-config.yaml: one repo (astral-sh/ruff-pre-commit) at rev v0.5.7,
+which IS pyproject&#x27;s exact ruff pin (J10 stage 0: no caret, byte-identical formatting
+across the two repos), and two hooks with no arguments - `ruff` reports exactly what
+CI&#x27;s `ruff check .` would (no --fix: the hook shows the finding rather than editing
+under you), `ruff-format` rewrites the staged files the way `ruff format --check .`
+demands and fails the commit so you re-stage and commit again. The file&#x27;s header
+carries the reason it exists, the install, and why the rev is the pin, so the first
+person it stops on a fresh clone reads why instead of reaching for --no-verify.
+
+ONE DOCUMENTED COMMAND, AND WHERE. `pre-commit install`, once per clone, with
+`pipx install pre-commit` once per machine the way poetry is installed here (no
+poetry dev dependency, so poetry.lock is untouched). CLAUDE.md section 0, the Start
+step of the session ritual, says so in four lines and says CI stays the gate - the one
+touch on a surface neither lane declared this burst, required by the acceptance.
+Nothing installs the hooks for you: not silently mandatory, by the item&#x27;s own reasoning.
+
+THE GUARD. tests/unit/test_precommit_config.py: the hooks are exactly those two with no
+extra keys; the rev equals pyproject&#x27;s EXACT ruff pin and poetry.lock&#x27;s version (parsed
+TOML and YAML - the objects, not the prose); the CI workflow, parsed, still runs both
+ruff steps; the session ritual names the install (reads CLAUDE.md prose on purpose -
+the prose is the artifact under test, J66&#x27;s stated exception); the config explains
+itself. Move the pin and the rev together or this goes red.
+
+VERIFIED on the laptop: pre-commit 4.6.2 via pipx; `pre-commit install` wrote the hook
+into this clone; `pre-commit run --all-files` passed both hooks over the whole tree
+(clean at 0.5.7, as CI says); a probe commit carrying an unused import and unformatted
+code was REFUSED - ruff reported 3 findings, ruff-format rewrote the file, HEAD
+unchanged, the probe removed; and the J62 commit itself went through the hooks. Full
+suite: 3099 passed and ONE failure that is not this item&#x27;s to fix - see below.
+
+FOR LANE A AT MERGE, THE PORT PEN: test_port_reconcile_guards&#x27;
+test_no_tracked_path_falls_through_silently is red on this branch because the new root
+file matches no PORT-MANIFEST row, and the manifest is Lane A&#x27;s pen. The row to add,
+handed back rather than written here: path &quot;.pre-commit-config.yaml&quot;, disposition
+canonical-producer, with a note that its rev tracks pyproject&#x27;s exact ruff pin (the
+J62 guard) and that the company&#x27;s pin is the same by J10 - the hooks belong on both
+sides at the same standard. Until that row lands, this branch is red on two tests: the
+roadmap render (every Lane B close is) and this fallthrough.
 </p></div></div>
 <div class="card" id="card-J63" data-id="J63" data-module="docs" data-phase="8" data-epic="release-infrastructure" data-type="chore" data-status="done" data-search="j63 a review run against an un-ported checkout manufactures defects, three times now - make every review surface name the tree it ran against" tabindex="0"><div class="card-head"><span class="card-id">J63</span><span class="card-title">A review run against an un-ported checkout manufactures defects, three times now - make every review surface name the tree it ran against</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">release-infrastructure</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) A REVIEW OR TRIAGE ARTIFACT STATES THE TREE IT RAN AGAINST - its commit, its branch, and its
 port base - so that absent here reads as not yet ported rather than broken. That is the whole
@@ -9185,6 +9183,89 @@ expiry itself is unit-tested with an injected clock rather than by waiting eight
 green, ruff clean, npm run build and oxlint clean. The runbook is at Rev 3 with the credential
 prerequisite and four new troubleshooting rows.
 </p></div></div>
+<div class="card" id="card-O70" data-id="O70" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="done" data-search="o70 generate the typescript api client from the openapi schema instead of hand-keeping fetch wrappers and their response types" tabindex="0"><div class="card-head"><span class="card-id">O70</span><span class="card-title">Generate the TypeScript API client from the OpenAPI schema instead of hand-keeping fetch wrappers and their response types</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The console&#x27;s HTTP layer is generated from the drydocs_api OpenAPI schema rather than written by hand: request paths, parameter shapes and response types all derive from the server&#x27;s own declaration, so an API change the browser code has not caught up with is a TypeScript compile error instead of a runtime surprise. The generated output is committed and a drift guard fails when it no longer matches a freshly generated one - the same generated-artifact discipline the board, the gates page and the load map already follow. The GraphAccess seam (ADR 0005) survives unchanged: generation replaces the hand-written transport underneath it, never the interface the components consume, and the bolt dev adapter is untouched. npm run build and oxlint stay clean.
+</p><p class="notes"><strong>Notes:</strong> Raised 2026-08-27 from the web-scaffolding review. The reviewed FastAPI template generates
+its frontend client from the backend schema; we hand-write web/src/lib/graphApi.ts and
+hand-maintain its response types against drydocs_api. That is a restatement of a declaration
+with no guard behind it, which is the defect class this repo has already written a rule
+about twice - never parse a render, never hand-copy a declaration. The QuerySpec registry is
+the natural first beneficiary: 35 specs whose column shapes the console currently trusts by
+convention alone.
+
+BUILT 2026-09-03 (laptop, Lane B of the f109280f handoff; wip/O70-laptop).
+
+THE SERVER HAD TO DECLARE FIRST, and that was the finding. Every handler returned
+dict[str, object], so the schema described each response as a free object: generating a
+client from it would have typed Record&lt;string, unknown&gt; and merely moved the hand-written
+cast. drydocs_api/schemas.py now carries pydantic response models - extra=&#x27;forbid&#x27;, so a
+handler key the schema does not name fails response validation in the API tests rather
+than dropping off the wire silently - as the return annotations of the routes GraphAccess
+and sign-in read: /health, /login, /logout, /queries, /query/{id}, /raw-cypher, /specs,
+/specs/{id}/run. The export manifest stays a free object on purpose (an open ledger record
+the console already types Record&lt;string, unknown&gt;).
+
+TWO COMMITTED ARTIFACTS, ONE CHAIN, A GUARD AT EACH LINK. scripts/dump_openapi.py writes
+web/src/generated/openapi.json from create_app().openapi() - the importable object, never
+/openapi.json over HTTP (J37) - sorted and newline-pinned, with --check. One generator,
+web/scripts/genApiTypes.ts, writes api.d.ts through `npm run api:types` and is imported by
+the vitest guard to regenerate in memory (the openapi-typescript CLI prepends a banner the
+API does not, so writer and checker share the function). Guards: tests/unit/
+test_openapi_client.py (committed schema == fresh dump; each seam route declares its model;
+every model forbids extras; the still-free routes are a recorded list that fails when one
+of them gains a model, so promotion is a move between two lists and not a discovery) and
+web/src/generated/api.test.ts (api.d.ts == regenerate(openapi.json), line endings
+normalised). Regenerate order after any drydocs_api change: dump, then api:types; the web
+README section says so.
+
+THE CLIENT. web/src/lib/apiClient.ts is openapi-fetch over the generated paths: a path,
+path/query parameter or JSON body the schema does not declare does not compile. Two
+flavours - public (no session: /login, /health, the /specs list the Ask page reads) and
+authed (bearer from the session on every request; a 401 ends the session, O69&#x27;s rule,
+unchanged) - both routing a network failure through the O85 probe. Session hooks are
+injected so auth.ts can use the public client for /login without a module cycle (vite
+build shows no circular warning). unwrap() is the one source of the &quot;&lt;what&gt; failed
+(&lt;status&gt;): &lt;detail&gt;&quot; messages; unwrapAs&lt;T&gt;() is the same check for a route the server
+still declares as a free object, named separately so every call site of it IS the
+follow-up list.
+
+THE SEAM SURVIVED BYTE-IDENTICAL. web/src/lib/graph.ts is untouched; graphApi.ts is
+rebuilt on the typed client and pins NamedResult and SpecResult to NamedRunOut and
+SpecRunOut with compile-time assignability assertions, so a server that drops a field the
+seam promises stops the build there. The bolt adapter is untouched. mappingsApi, intakeApi
+(multipart evidence through a bodySerializer, path still checked), corpusStatus, auth
+(signIn/signOut) and AskRoute&#x27;s spec list all moved to typed paths and bodies; authedPost,
+authedGet and readDetail are gone. ApiClient keeps getToken() - R5&#x27;s agent handoff needs it.
+
+WHAT IT DOES NOT BUY YET, recorded rather than implied: /docs-verify, /mappings/*,
+/intake/* and /specs/ephemeral are still free objects server-side, so their wrappers go
+through unwrapAs - a type the console CLAIMS. Each is a drydocs_api.schemas declaration
+away from becoming a guard; listed in the Python test and the README for grooming.
+
+CI COULD NOT SEE A COMPILE ERROR, which undercut the item&#x27;s whole promise: the web job ran
+vitest (no typecheck) and Playwright (Vite serves through esbuild, which strips types).
+The job now runs `npm run lint`, `npm run build` (tsc -b) and `dump_openapi.py --check`
+(the one job with fastapi installed - `gates` deliberately installs without the api
+group, which is why the Python guard importorskips there).
+
+TOOLING. openapi-fetch 0.17.0 (runtime, ~6 kB) and openapi-typescript 7.13.0 (dev). The
+latter declares a typescript@^5 peer against this package&#x27;s TypeScript 6; resolved through
+a package.json `overrides` entry pointing the peer at the project&#x27;s own compiler rather
+than legacy-peer-deps, so `npm ci` stays strict. Generation verified under TS 6.0.3.
+
+VERIFIED: tsc -b exit 0; oxlint exit 0; vite build clean; vitest 10 files / 107 tests, of
+which 12 drive the transport policies against a fake fetch (bearer set, no-token refusal,
+401 ends the session without retry, network failure diagnosed, path and query
+serialisation) and 2 guard the generated types; Python: the API suite (18) with response
+validation on, the new guard, full suite 3109 passed, ruff check and format clean.
+END-TO-END, real bytes through the new client: the O80 Playwright suite - laptop,
+Chromium (installed for it here) against Vite plus drydocs-api on :8011, no graph - signs
+in through the typed public client and renders /gates through the authed one, and the
+wrong-secret refusal still comes from the server; 2/2 passed.
+
+FOR LANE A AT MERGE: web/src/generated/openapi.json and api.d.ts are derived from
+drydocs_api, not from render_board.py. If drydocs_api moved on main since this branch,
+regenerate both at the merge (dump, then api:types) or the schema guard is red post-merge.
+</p></div></div>
 <div class="card" id="card-O71" data-id="O71" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="done" data-search="o71 the adr 0015 watched-source trigger for the fastapi template has fired â€” draft the console auth-boundary gate question and the register-row amendment, and decide nothing outside the gate" tabindex="0"><div class="card-head"><span class="card-id">O71</span><span class="card-title">The ADR 0015 watched-source trigger for the FastAPI template has fired â€” draft the console auth-boundary gate question and the register-row amendment, and decide nothing outside the gate</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) A GATE PROMPT SPEC EXISTS AND PROPOSES, IT DOES NOT ADOPT. A new spec under `config/gate-prompts/` puts the console&#x27;s authentication boundary to the SME, in the shape `config/gate-prompts/ui-write-surface.yaml` already uses (the O20 precedent: a page that PROPOSES a boundary and changes nothing by being rendered), and it satisfies whatever `tests/unit/test_gate_pages.py` requires of every spec â€” Module / Source / Registry ref / Classification. AUTH IS A TRUST BOUNDARY: nothing in this item adopts, installs, or wires an auth mechanism. Until the gate signs off, the console&#x27;s sign-in stays the stub it is today.
 
 (b) THE QUESTION IS ABOUT PRACTICES, NOT A SCAFFOLD, AND SAYS SO. The ADR&#x27;s survey already REJECTED the `fastapi/full-stack-fastapi-template` scaffold â€” clone-and-diverge, no update lifecycle, Stripe and multi-org baggage â€” and that rejection stands; the spec must restate it so a reader cannot mistake the gate for a reversal. What is on the table is the template&#x27;s auth PRACTICES, cited to the register row: OAuth2 password flow, JWT, hashed credentials, a user model, a recovery flow â€” the survey&#x27;s characterisation was &quot;users-in-a-workspace rows behind JWT&quot;. Each practice is a separately tickable confirmation, so declining any subset is a valid sign-off.
@@ -10091,6 +10172,128 @@ LEDGERS: GraphCanvasRoute registered UNBOUND (35/82) — it renders surfaces fro
 modules, so binding it to one would encode the first caller as owner, the same rule its
 own GraphCanvas and SpecGraphPane follow. TC-RUNBOOKS-02 seeded, automated (10/31).
 </p></div></div>
+<div class="card" id="card-O88" data-id="O88" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="done" data-search="o88 a console route has no paper form — capture the executed dom to a self-contained printable html carrying the l6 margin gutter and a route/commit provenance footer" tabindex="0"><div class="card-head"><span class="card-id">O88</span><span class="card-title">A console route has no paper form — capture the executed DOM to a self-contained printable HTML carrying the L6 margin gutter and a route/commit provenance footer</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) CAPTURE, DO NOT RE-IMPLEMENT. The console is a React SPA over a live API, so its
+paper form is the EXECUTED DOM, not a server-side re-render of the same data. Drive the
+running console through headless Edge — the mechanism the `verify` skill already uses
+for the design-doc renderer — and write one self-contained `.html` per captured route,
+styles inlined, no external requests. A second renderer that reproduces console markup
+from JSON is the wrong shape: it would drift from the screen silently, which is the
+whole failure the capture avoids.
+
+(b) A CAPTURE IS A MOMENT AND THE FOOTER MUST SAY SO. `doc_rev_footer` stamps a design
+doc with `Rev N · commit &lt;hash&gt;` because a doc&#x27;s rev is AUTHORED. A console page has no
+rev — it has a route, a commit, a wall-clock time, and an API it read. All four go in the
+footer on every printed page. Without them a marked-up printout cannot be re-attached to
+anything: the reviewer&#x27;s note is about a screen that existed once.
+
+(c) THE GUTTER IS THE EXISTING ONE. Reuse `_inject_margin_anchors`&#x27;s contract — a
+`.dd-margin-tag` span, `display:none` on screen, positioned in the left margin under
+`@media print`. The console today has NO print CSS AT ALL (verified 2026-08-31: no
+`@media print` anywhere in `web/src`), so the print sheet is new work; the gutter
+convention it carries is not, and must not be reinvented in a second idiom.
+
+(d) WHICH ROUTES, DECIDED BY WHO REVIEWS THEM. Ship the capture for a NAMED starting
+set rather than all fourteen routes, and say in the item close which ones and why. A
+route behind sign-in needs a session, which is a real cost the capture must handle
+honestly (headless sign-in) or exclude and say so — never a blank page presented as a
+captured one.
+
+(e) THE PAYLOAD IS NOT COMMITTED BY DEFAULT. A capture of a live console can contain
+real graph values. It lands under the data root or `internal-local/`, the same landing
+rule the vendor scrape follows, and the committed artifacts are the capture script and
+its print sheet. If a specific sanitized capture is worth tracking, that is a decision
+with a classification on it, not a default.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-08-31 (desktop, ui-workstream worktree) from a session that asked whether the
+Epic L feedback loop could reach the web console. It can, but only the PAPER half (L6)
+transfers cleanly, and this item is that half.
+
+WHY NOT ARTIFACT COMMENTS. Anthropic ships anchored comment threads on published
+artifacts, which is exactly this loop hosted for you — but it needs a Team or Enterprise
+plan and an org-shared artifact (public sharing disables comments outright), and the user
+is on personal Pro. Independently, an artifact is ONE self-contained static page with no
+backend and no routes, so a multi-route console over drydocs-api could not be published
+as one even on Enterprise. Both blocks are structural; neither is worth re-checking
+without a plan change.
+
+WHAT MAKES THIS DIFFERENT FROM A DESIGN DOC, and it is the only hard part: a design doc
+is a `.md` whose render is deterministic, so its paper form and its screen form are the
+same artifact under two style sheets (L13). A console page is a function of the graph at
+a moment. The provenance footer in (b) is what keeps the loop honest — everything else
+here is mechanical.
+
+BUILT 2026-09-03 (laptop, Lane B of the f109280f handoff; wip/O88-laptop).
+
+(a) HEADLESS EDGE, DRIVEN RATHER THAN FLAGGED - a deliberate reading of the clause, not
+a departure. The verify skill&#x27;s design-doc recipe launches Edge with --dump-dom, and a
+flag cannot sign in: pointed at a route it renders the sign-in screen, which is exactly
+the blank page (d) forbids. So web/scripts/captureRoutes.mjs (`npm run paper`) drives
+the same browser through Playwright (channel msedge; --browser chromium falls back to
+the O80 harness&#x27;s build, and the manifest records which executed the page), signs in
+through the real form the way the O80 e2e does, and writes what the browser rendered.
+Self-contained means: every stylesheet&#x27;s rules inlined as one sheet (@font-face
+dropped - the print sheet names system faces - rather than shipping font files),
+images and canvases as data URIs, scripts, links and iframes removed. The
+transformation is PURE over a Document (web/src/lib/paperForm.ts) so it runs under
+jsdom in the unit suite and inside the driver identically; paperForm.test.ts (10
+cases) pins the anchor scheme, the table-caption placement, the footer, the meta, the
+strip list, and an external-reference sweep that turns &quot;no external requests&quot; into a
+guard the driver enforces (exit 1 if any capture still references one).
+
+(b) THE FOOTER on every printed page (.dd-print-footer): route · the capture host&#x27;s
+HEAD with &quot;(dirty)&quot; when the tree differed · UTC time · the API origin the page ITSELF
+requested at sign-in (observed from its /login request, never a flag) · persona ·
+browser and version. The same provenance rides in a &lt;meta name=&quot;drydocs-capture&quot;&gt; and
+in capture-manifest.json beside the files, with each file&#x27;s sha256.
+
+(c) THE GUTTER. web/src/styles/print.css is the console&#x27;s first print CSS, imported
+by index.css, @media print only apart from the screen-side hide line and @page; the
+.dd-margin-tag and .dd-print-footer rules are copied VERBATIM from
+design_doc._PRINT_MEDIA_CSS and tests/unit/test_console_print_gutter.py pins the two
+equal, the hide line first, and nothing outside the media block (TC-SHELL-01&#x27;s lesson
+in reverse: an unlayered selector beats Tailwind&#x27;s layered utilities, wanted on paper
+and never on screen). The shell chrome goes on paper (div:has(&gt; main) siblings, the
+module nav, tablists, controls) and main gets the gutter padding. What could NOT
+transfer is the anchor SCHEME: _inject_margin_anchors tags blocks by authored id and
+the console has none, so tags are &lt;route-slug&gt;.&lt;n&gt; in DOM order over headings, tables,
+data-frame rows and tab panels, also written to data-dd-anchor - the key a scanned
+markup is re-attached by, stable for a given DOM. Rows are anchored through their
+FIRST CELL: a &lt;tr&gt; is not a reliable containing block for an absolutely positioned
+tag in Chromium, a &lt;td&gt; is, and the first cell&#x27;s left edge is the table&#x27;s. The first
+capture of /gates carried two anchors for a whole page, which is not a granularity
+anyone marks a table up at; with rows it carries twenty-four.
+
+(d) THE NAMED STARTING SET: /gates, /software, /load-map. They render from committed
+generated artifacts, so a capture needs no graph and is reproducible on any machine
+(this laptop&#x27;s graph state was unknown this session - the Neo4j MCP server failed to
+connect - and a capture of an empty graph is the blank page in another form); and
+they are exactly the pages FB-03 designates for SME review. Graph-backed routes are
+opt-in through --routes and only as good as the graph behind the API at that moment,
+which is what the footer is for. Headless sign-in is real and its cost is paid: the
+secret is prompted without echo or read from --secret-stdin, never a flag or the
+environment (O80&#x27;s provenance rule: a flag would be a third, unrecorded origin).
+
+(e) NOT COMMITTED. Captures land under DRYDOCS_DATA_ROOT/console-captures/&lt;utc-stamp&gt;/
+(the root is mandatory, G81; --out overrides). The committed artifacts are the script,
+paperForm.ts, print.css, the two tests. No dependency was added: jsdom and playwright
+are already in the tree, so package-lock.json is untouched.
+
+VERIFIED, venue-stamped: laptop, no graph - a throwaway credential minted by the O80
+bootstrap, drydocs-api on :8021 and Vite on :5299 (the harness&#x27;s three-process shape),
+headless Edge 152. Three captures: 24, 18 and 32 anchors; every one self-contained
+(the sweep found nothing); --verify-print re-opened each under print media and found
+the tag and the footer display:block; the design-doc recipe (doc_pdf.html_to_pdf)
+printed the /gates capture to a PDF unchanged - the loop closed. Two defects found by
+running it, both fixed before the push: the persona button&#x27;s accessible name carries
+the role chip, so an anchored whole-name match never clicked; and /software polls, so
+&quot;networkidle&quot; never arrived - the driver now waits for load, then a bounded quiet.
+tsc -b, oxlint, vite build, vitest 9 files / 103 tests, the gutter guard, ruff, full
+suite 3099 passed.
+
+DOCS: web/README.md &quot;Paper form (O88)&quot;; a pointer in each of the two skills the item
+names as inputs (mechanism only, no machine paths). A live print from the browser
+uses the same sheet with no tags and no footer, and the README says why: only the
+capture knows the commit and the moment.
+</p></div></div>
 <div class="card" id="card-O90" data-id="O90" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="done" data-search="o90 the console shows no wired-vs-planned key: render the cross of gate-confirmation and loader presence, which is derivable today and mints no schema field" tabindex="0"><div class="card-head"><span class="card-id">O90</span><span class="card-title">The console shows no wired-vs-planned key: render the cross of gate-confirmation and loader presence, which is derivable today and mints no schema field</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) TWO AXES THAT ALREADY EXIST, CROSSED — NO NEW FIELD. Every source row in
 `load-map.json` carries `confirmed` (a boolean: has a gate ruled its meaning) and
 `loaders` (a list: is anything built that writes it). The key renders the cross of those
@@ -10272,6 +10475,84 @@ roundings.
 CLAUSE (e) HELD, and the item&#x27;s held-back observation still stands untouched: on
 /load-map the identifiers are still smaller than the prose explaining them. It
 remains a design question and wants its own item.
+</p></div></div>
+<div class="card" id="card-O92" data-id="O92" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="done" data-search="o92 canaccessmodule decides who sees which console module and has no test, and no guard pins which modules are designated sme" tabindex="0"><div class="card-head"><span class="card-id">O92</span><span class="card-title">canAccessModule decides who sees which console module and has no test, and no guard pins which modules are designated sme</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-O80" data-target="card-O80">O80</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE UNIT TEST: a vitest file over canAccessModule in web/src/modules/registry.ts - the three
+roles against the three designations, including the undefined / &#x27;all&#x27; default. It is a pure
+three-line function with three call sites (layout/Aside.tsx, lib/auth.ts,
+routes/OverviewRoute.tsx) and no test at all, which is exactly the shape the O80 runner exists
+for and cheaper to guard than to argue about.
+
+(b) THE PIN, and it is the larger half: a test that pins WHICH module ids carry a non-default
+access value. The list should change rarely and always on purpose, which is precisely when a pin
+is the right instrument - the same state the number so it cannot drift up quietly pattern
+ui-tests.yaml&#x27;s coverage pins already use.
+
+(c) THE PIN CARRIES THE REASON PER ENTRY, not just the id: FB-03 for /software and /gates, the
+delta argument for /remediation. A designation whose reason is unrecorded is the thing the pin is
+supposed to prevent.
+
+(d) SAY IN THE TEST DOCSTRING WHAT THIS IS NOT, because it will otherwise be priced as a
+security fix: it is NOT an authorization defect. The server re-resolves the real role from the
+token on every call and the API is the enforcement point, so nothing here is a data exposure.
+This is about the console&#x27;s own audience decisions staying deliberate.
+
+(e) THE FAILURE IS SILENT IN BOTH DIRECTIONS and the tests must cover both: a module wrongly
+OPENED shows an end user numbers they will misread; a module wrongly CLOSED simply disappears for
+them with no error.
+
+(f) PASS/FAIL: npm run lint, npm run build and the vitest suite green; flipping any module&#x27;s
+access in the registry turns the pin red; removing the pin&#x27;s reason for an entry is caught at
+review, not by the test, and the item says so rather than pretending otherwise.
+</p><p class="notes"><strong>Notes:</strong> Groomed 2026-09-02 from Idea-231 (desktop, backlog-groomer fork). Noticed at O59, which set
+access: &#x27;sme&#x27; on /remediation - a one-word edit that changed the module from
+visible-to-every-role to steward-plus-admin. The change was intended and the reason is recorded
+inline, but nothing outside the diff would have caught it either way.
+
+DEPENDS ON O80 (done), which bought the vitest runner and proved it. Related: O59, O80, FB-03.
+
+BUILT 2026-09-03 (laptop, Lane B of the f109280f handoff; wip/O92-laptop). One new file,
+web/src/modules/registry.test.ts, 24 cases, beside the module it guards.
+
+(a) The full 3x4 matrix of canAccessModule - four designation values (undefined, &#x27;all&#x27;,
+&#x27;sme&#x27;, &#x27;admin&#x27;) by three roles - written out cell by cell rather than derived, with a check
+that no cell is missing, that undefined and &#x27;all&#x27; agree for every role, and that the
+function is monotone in the role. &#x27;admin&#x27; is in the matrix although no module carries it
+today; the file says so.
+
+(b) THE PIN HAS FIVE ENTRIES, NOT THREE. Acceptance (c) named remediation, software and
+gates; the registry as built also carries access: &#x27;sme&#x27; on loadmap (O57) and underhood. All
+five are pinned, as a toEqual on the exact {id: access} map of every module with a
+non-default designation - a subset check would miss a REMOVED designation, which is the
+wrongly-opened direction. (c) Each entry carries the reason recorded where the designation
+was made: O59&#x27;s delta argument for remediation, FB-03 for the other four. The test checks a
+reason is present; whether it is still true is review&#x27;s question, as (f) says.
+
+(d) The file header says what this is not - an authorization test - and why: the server
+re-resolves the role from the token on every call (ADR 0005 decision 3; lib/auth.ts).
+
+(e) Both silent directions, computed over the real registry through the same filter
+expression the call sites use: the user role sees no designated module (wrongly OPENED)
+and every default module (wrongly CLOSED); steward and admin see every sme module; admin
+sees the whole registry; filtering never reorders, which the Overview spokes depend on.
+
+(f) VERIFIED: npm run lint exit 0 (three pre-existing fast-refresh warnings, none in the new
+file), npm run build exit 0, vitest 9 files / 117 tests green. The pin verified RED by
+flipping remediation&#x27;s access to &#x27;all&#x27; in the registry - exactly one test fails, the pin,
+23 pass - then the registry restored (git diff --quiet). Full Python suite, ruff check and
+ruff format --check green before the push.
+
+TWO STALE PREMISES IN THE BODY, recorded and not corrected (inputs are grooming, Lane A&#x27;s
+pen): the function now has FOUR call sites, not three - routes/GraphCanvasRoute.tsx joined
+at O86, and lib/auth.ts only mentions it in a comment; and &quot;no test at all&quot; was true at
+groom but O86&#x27;s web/src/lib/canvasRoutes.test.ts has since covered six of the twelve cells
+as its own dependency statement. That test is left alone; the matrix and the pin here are
+the complete guard.
+
+THE LEDGER: TC-SHELL-08 added to TS-SHELL (the only legal home - overview is not a registry
+id and the nav is shell chrome), automated_by the new file, sourced to this build. The
+automated share moves 16/39 to 17/40 in tests/unit/test_ui_tests_ledger.py, with the dated
+line saying why the share moved: the claim is about a pure function and a registry constant,
+not a backfill. The header count in ui-tests.yaml moved with it.
 </p></div></div>
 <div class="card" id="card-P1" data-id="P1" data-module="config" data-phase="13" data-epic="runtime-topology" data-type="task" data-status="done" data-search="p1 run the cm_hosts + cm_avg_run profiling probes internally; record conclusions + the dc scope call" tabindex="0"><div class="card-head"><span class="card-id">P1</span><span class="card-title">Run the CM_HOSTS + CM_AVG_RUN profiling probes internally; record conclusions + the DC scope call</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P13</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">haiku / main</span></div><div class="epic">runtime-topology</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Conclusions (counts/domains/match rates only — never result rows) recorded for cm_hosts P1–P5 and cm_avg_run P0–P8 (P4s scoped smoke test BEFORE the estate-wide join, per the user&#x27;s performance flag) in the two gate specs&#x27; provenance blocks + the ledger via fields; the 22-DC-vs-production scope call appended to config/gate-log.md as the controlm-hosts-topology residual resolution.
 </p><p class="notes"><strong>Notes:</strong> User-run on the internal network (no producer-side psgmgr access); agent transcribes.</p></div></div>
@@ -10566,6 +10847,69 @@ in-commit. Suite 2596 passed / 11 skipped; ruff clean.
 </p></div></div>
 <div class="card" id="card-R6" data-id="R6" data-module="drydocs-agents" data-phase="15" data-epic="agentic-qa" data-type="requirement" data-status="done" data-search="r6 tier-2 bounded graph-of-thoughts loop: enhance/solve controller with hard caps and the task-scoped context graph per the r1 residency ruling" tabindex="0"><div class="card-head"><span class="card-id">R6</span><span class="card-title">Tier-2 bounded graph-of-thoughts loop: enhance/solve controller with hard caps and the task-scoped context graph per the R1 residency ruling</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-agents</span><span class="chip" data-kind="phase">P15</span><span class="chip" data-kind="type">requirement</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">agentic-qa</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-R2" data-target="card-R2">R2</a> <a class="dep-link" href="#card-R3" data-target="card-R3">R3</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The loop engages only when Tier-1 context is insufficient; hard caps enforced (iterations &lt;=2, next-step vote x3, fix loop &lt;=2, per-question token budget) with a forced-solve fallback so every run terminates with an answer or an explicit &quot;cannot answer&quot;; the enhance branch writes ONLY the task-scoped context graph named by the R1 ruling (never drydocs / ddlineage — a test proves it); per-iteration snapshots are captured and renderable in the existing d3 graph pane; the R3 ledger records per-iteration cost so caps are tunable from data.
 </p><p class="notes"><strong>Notes:</strong> CLOSED 2026-08-01. tier2.py is a PURE controller taking llm/retrieve callables rather than the pipeline, so the whole loop is testable with fakes and the private coupling stays in pipeline.py; retrieval REUSES Tier 1, which is why the &lt;=2 fix loop and the read-only pre-flight are inherited rather than reimplemented — there is exactly one path that runs Cypher, and a test pins the executed sequence. Two bounding decisions the acceptance did not settle, both stated in the module docstring: (1) a tie or unparseable vote counts as SOLVE — the failure mode of voting is not a wrong answer, it is a loop that will not stop, so ambiguity resolves toward terminating; (2) the token budget bounds EXPLORATION, not the whole run — once spent the loop stops enhancing, but evidence already bought still gets one final answer call, deliberately over budget and recorded as budget.exhausted. Refusing that last call would spend the budget gathering evidence and then discard it unanswered. With NO evidence and no budget the run makes zero calls. The R1 residency proof is STRUCTURAL, not behavioural: task_graph.py has no driver, session, database name or Cypher in it, and the test reads the source and fails if any appears. A comment saying &quot;do not persist this&quot; is not a control; a module with nothing to persist with is. Also fixed a real gap the acceptance named only in passing — the ledger recorded iteration=1 for EVERY call, so per-iteration cost was unavailable and the caps were untunable from data. The loop now drives the iteration counter and a test pins round 2&#x27;s calls to round 2. Every cap reports whether it BIT (forced_solve, budget.exhausted), and the budget is reported on runs it never touched — a limit you can only see once it has bitten is one nobody can tune before it does. Web: rather than a second d3 copy, the deterministic placement engine moved to lib/forceLayout.ts and GraphExplorer now consumes it; the new ask/TaskGraphPane keeps its OWN visual language on purpose, because a viewer who mistakes a synthesized sub-question for a real graph node has been actively misled. Snapshots are cumulative per phase (start / iteration N / final) so any frame renders alone. Suite 1315; tsc + build clean; O42 ledger 27/64 (TaskGraphPane bound to ask/).
+</p></div></div>
+<div class="card" id="card-R9" data-id="R9" data-module="drydocs-api" data-phase="15" data-epic="agentic-qa" data-type="task" data-status="done" data-search="r9 read-only agent query command over the o33-guarded queryspecs: one deterministic, testable graph-navigation surface for agents (mcp recorded as the later option)" tabindex="0"><div class="card-head"><span class="card-id">R9</span><span class="card-title">Read-only agent query command over the O33-guarded QuerySpecs: one deterministic, testable graph-navigation surface for agents (MCP recorded as the later option)</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-api</span><span class="chip" data-kind="phase">P15</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">agentic-qa</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> A read-only, deterministic query command over the O33-guarded QuerySpecs, placed so the module boundary holds (drydocs_api owns the specs; test_module_boundary stays green): each spec addressable by name with typed params, stable JSON output, refuses unknown specs/params, zero write paths; unit tests drive it against a fake client; a short agent-facing usage note documents it as the graph-navigation surface. MCP (mcp-neo4j-cypher) explicitly out of scope, recorded as the richer later option.
+</p><p class="notes"><strong>Notes:</strong> Groomed 2026-07-28 pm from the live-benchmarked [idea] line (5 questions ~410ms/~1.2k chars vs grep&#x27;s noisy equivalents; safe now that U6 fixed the cross-root blind spot). CLI-vs-MCP resolved toward CLI by the line&#x27;s own analysis: MCP adds config + write-risk surface.
+
+BUILT 2026-09-03 (laptop, Lane B of the f109280f handoff; wip/R9-laptop).
+
+PLACEMENT, decided by the guard rather than by taste: drydocs_api/agent_query.py, run
+as `python -m drydocs_api.agent_query`. The component owns the specs; a `drydocs`
+sub-command would have made the root CLI import this component (and credentials.py&#x27;s
+KDF into the eight-entrypoint import-order guard), and ENTRYPOINT_MODULES is only the
+three drydocs*.cli* modules. test_module_boundary stays green with no new row: the
+package is prefix-classified.
+
+ONE ENVELOPE, SHARED WITH THE API. exports.run_spec is now auth + resolution +
+execute_spec(spec, bound, runner); execute_spec is public and returns exactly the ten
+keys run_spec always did - deliberately, because O70&#x27;s SpecRunOut (on wip/O70-laptop)
+forbids extras, so any CLI-only field would break the API&#x27;s declared response. The
+command&#x27;s `run` prints that dict; `list` and `describe` print the GET /specs rows
+(list_specs verbatim). No third shape was minted.
+
+THE COMMAND. list | describe &lt;id&gt; | run &lt;id&gt; -p KEY=VALUE ... [--pretty]. A shell
+carries only strings, so -p values are converted to the DECLARED type before
+validate_params - which rightly rejects &quot;10&quot; for an int at the API, where JSON carries
+types. Refused BY NAME on stdout with exit 2, the runner never running: an unknown spec
+(with the registry size), an unknown, missing or mistyped param (with the declared
+list), a malformed or repeated -p, an ephemeral eph. id (session-scoped, R4; the
+command has no session). A runner exception is exit 1 with the class and message. No
+Cypher operand exists to refuse - the parser has no operand that could carry a query,
+and a test asserts that structurally. One JSON document on stdout for every outcome,
+keys sorted, ASCII-safe (a legacy Windows code page cannot mangle it), one trailing
+newline; a success IS the envelope, every failure carries ok:false and error.
+main(argv, *, runner=None) is the injection seam (the G133 shape); the live runner is
+imported lazily from drydocs_api.app only when nothing was injected.
+
+TESTS: tests/unit/test_agent_query.py, 17 cases over a fake runner: list equals
+list_specs(); run equals execute_spec&#x27;s dict key for key with no ok on success; the
+runner receives spec.cypher and spec.database verbatim and limit as an int; declared
+defaults apply; identical bytes for identical input; --pretty is the same document;
+every refusal by kind with the runner never called; the no-Cypher-operand structural
+check; runner failure as exit 1 with JSON; and a subprocess import that pulls neither
+fastapi/uvicorn nor drydocs_api.app (the neo4j PACKAGE rides in with
+drydocs_core.config on every first-party import, so it is deliberately not in that
+list - what matters is that no driver is built and no framework loads). The fixture
+spec is chosen from the registry by shape (optional int limit), not by name, so a
+renamed spec cannot silently retire the tests. Reads CLI stdout as JSON on purpose:
+that output IS the contract (J37&#x27;s allowed case).
+
+USAGE NOTE: drydocs_api/README.md &quot;Agent query command (R9)&quot; - what it is, the three
+sub-commands, the exit contract, the contrast with the raw-Cypher graph_query ADK
+agent, and MCP (mcp-neo4j-cypher) recorded as the richer later option and out of
+scope: it adds a config surface and a write-risk surface this command does not have.
+One pointer paragraph in agents/README.md beside specs_catalog.
+
+VERIFIED: the 17 new tests plus test_query_specs and test_api_audit (which pin the
+envelope the refactor preserved), test_module_boundary, ruff check and format clean,
+full suite 3111 passed before the close. Smoke on this laptop, no graph: `run` on an
+unknown id prints the refusal and exits 2; `list` prints the registry (43 specs). Not
+verified: a live run against Neo4j - the command&#x27;s own execution path is the API&#x27;s
+execute_spec, unchanged, and the driver is the API&#x27;s LiveRunner.
+
+NOT TOUCHED, on purpose: drydocs_api/app.py (O70&#x27;s branch edits its imports and eight
+handlers; Lane A merges both branches) and the keys of the run envelope (O70&#x27;s
+response model forbids extras).
 </p></div></div>
 <div class="card" id="card-R10" data-id="R10" data-module="drydocs-agents" data-phase="15" data-epic="agentic-qa" data-type="chore" data-status="done" data-search="r10 agent-runtime alignment chores from the passed adr 0007 revisit check: pin google-adk to &gt;=2,&lt;3 and date-stamp the revisit clause" tabindex="0"><div class="card-head"><span class="card-id">R10</span><span class="card-title">Agent-runtime alignment chores from the passed ADR 0007 revisit check: pin google-adk to &gt;=2,&lt;3 and date-stamp the revisit clause</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-agents</span><span class="chip" data-kind="phase">P15</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / main</span></div><div class="epic">agentic-qa</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> agents/requirements.txt pins google-adk&gt;=2,&lt;3 (currently unpinned while ADK 2.0 breaking changes land upstream — an unpinned install can drift under the app shape); ADR 0007&#x27;s Revisit-if section carries a dated note that the trigger fired 2026-07-28 and PASSED (convergence, not divergence), citing the internal review by path only (internal/agent-platform/smartsdk-3-adr0007-compatibility.md).
 </p><p class="notes"><strong>Notes:</strong> Groomed 2026-07-28 evening from the agent-runtime target-state [idea] line&#x27;s follow-ups; the third follow-up (R3 caller-identity slot) was MERGED into R3&#x27;s acceptance in the same groom. CLOSED 2026-07-28 evening: requirements.txt pins google-adk&gt;=2,&lt;3 with the R10 rationale comment; ADR 0007&#x27;s Revisit-if section carries the dated PASSED sub-bullet citing the internal review by path, trigger kept live for the next major. (agents/ has its own venv — the pin takes effect at that venv&#x27;s next pip install, by design.)
