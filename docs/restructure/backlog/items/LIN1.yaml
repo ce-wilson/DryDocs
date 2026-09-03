@@ -7,7 +7,7 @@ phase: 6
 agent: main
 model: opus
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs_lineage/extractors/controlm_inventory.py
@@ -68,3 +68,49 @@ notes: |
   the research findings that change the KEYS (a literal pipeline id outranks a resolved
   variable, the terminator period, join-key grades) are Phase 4, deliberately after the
   extract and the load exist.
+
+  BUILT 2026-09-03 (desktop, Lane A).
+
+  THE MODULE. drydocs_lineage/staging.py - stage_chain() runs the four extractors in hop
+  order into one LineageGraph (hop 1 required, raises StagingError by name; hops 2a/3
+  optional, each recorded present / absent-with-reason in a sources block: "no path
+  given", "not found", "directory is empty"); the registry cross-check is handed the
+  clone's pipeline GUIDs from the MAC walk; write_artifact()/read_artifact() carry the
+  graph plus a header (schema drydocs.lineage-staged.v1, run id, captured_at, the
+  acquisition, the sources, the extractor names, the per-extractor coverage) with
+  sorted keys and LF, byte-identical for the same inputs and clock.
+
+  THE VERB, AND ONE DEVIATION FROM THE ACCEPTANCE. `drydocs lineage-extract` lives in
+  drydocs/cli.py beside lineage-review, NOT in a new cli_lineage.py: MODULE_MAP's S8 rule
+  says a verb that wires another component stays in the composition root - the only
+  ENTRYPOINT_MODULES exemption - and a per-domain command module importing
+  drydocs_lineage would need a component_map change for no gain. Options: --jobs,
+  --variables, --mac-root, --registry-root, --glue, --out-dir. Defaults: the bundled
+  samples for hop 1 (acquisition=bundled-samples), the declared zones for the optional
+  hops (asked, and the artifact says where), lineage/staged/ for the artifact. An
+  explicit path outside every declared read zone is REFUSED (exit 2, the message names
+  the zones) with no override; an --out-dir inside a read zone is refused (G81).
+
+  FOUR ZONES DECLARED (config/data-zones.yaml + data_root helpers): controlm-exports/
+  (read - the hand-carried CSV projection route, the shape the company exports from SQL
+  Developer), dpl-mac/ (read), glue-inventory/ (read), lineage/staged/ (write). The DPL
+  registry already had dpl-registry/ through the source registry. The zone guards pass.
+
+  VERIFIED: desktop, DRYDOCS_DATA_ROOT=C:/coding/projects/data/DryDocs -
+  `drydocs lineage-extract` on the bundled samples stages 17 jobs -> 33 processes
+  (17 controlm_job, 10 abinitio :ETLProcess, 6 shell_script), 17 INVOKES, the three
+  optional hops absent-skipped with their zone paths recorded; artifact in
+  lineage/staged/, run log under the log root. Unit: test_lineage_staging.py (9 - both
+  DPL flag spellings key one pipeline node and the pset lands as abinitio in one run;
+  hop 2a READS_FROM/WRITES_TO on the GUID key with the registry cross-check naming the
+  unregistered pipeline; hop 3 placements as properties and no edge; the artifact
+  round-trips and is deterministic) and test_cli_lineage_extract.py (6 - the declared
+  defaults, the refusal naming controlm-exports/, the zoned run, the read zones read
+  when they hold something, the read-zone out-dir refusal). Full suite 3191 passed,
+  9 skipped; ruff clean.
+
+  NOT DONE HERE, BY DESIGN: no graph write (LIN2); no Ab Initio pset -> dataset
+  extractor (Phase 3); no key ranking or grading (Phase 4). The XML export is not a hop-1
+  input yet - controlm_inventory reads the CSV projection; the XML route goes through
+  resolve-cmdline-staging today, and joining the two is a later item.
+

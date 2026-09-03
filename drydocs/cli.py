@@ -417,6 +417,174 @@ def lineage_review(
     console.print(f"coverage: {coverage.summary()}")
 
 
+def _zoned_or_refuse(path: Path | None, *, what: str) -> Path | None:
+    """LIN1 (b): an explicit lineage input resolves inside a declared READ zone or the
+    run refuses (G81/G121) - no override flag, because a side door here is the
+    undeclared acquisition route those two items closed. ``None`` passes through:
+    the caller has already resolved the declared default for that hop."""
+    if path is None:
+        return None
+    from drydocs_core.data_zones import read_zone_containing
+
+    try:
+        zone = read_zone_containing(path)
+    except DataRootNotSetError as exc:
+        console.print(f"[red]{exc}[/]")
+        raise typer.Exit(2) from None
+    if zone is None:
+        console.print(
+            f"[red]REFUSED: --{what} {path} is outside every declared read zone.[/] "
+            "An acquisition route is declared or it does not run (G121): land the file "
+            "in its zone (`drydocs landing-zones` lists them - controlm-exports/, dpl-mac/, "
+            "dpl-registry/, glue-inventory/) or declare one in config/data-zones.yaml."
+        )
+        raise typer.Exit(2)
+    return path
+
+
+def _declared_default(helper) -> Path | None:
+    """The declared zone a hop reads when no path is given. Returned whether or not
+    the directory exists: the staging records the path and says absent, so the
+    artifact shows the hop was ASKED and had nothing (G11, one level up)."""
+    try:
+        return helper()
+    except DataRootNotSetError:
+        return None
+
+
+@app.command(name="lineage-extract")
+def lineage_extract(
+    jobs: Path | None = typer.Option(
+        None,
+        "--jobs",
+        help=(
+            "Control-M jobs CSV export (or a directory holding one). Must sit inside a "
+            "declared read zone. Default: the bundled package samples - a dev run."
+        ),
+    ),
+    variables: Path | None = typer.Option(
+        None,
+        "--variables",
+        help="Control-M variables CSV (PRECMD/POSTCMD shell text, G60). Default: beside --jobs, "
+        "or the bundled sample with the default jobs.",
+    ),
+    mac_root: Path | None = typer.Option(
+        None,
+        "--mac-root",
+        help="DPL Metadata-As-Code root (promotion-repo clone or staged sets). Default: the "
+        "declared dpl-mac/ zone; skipped and counted when empty.",
+    ),
+    registry_root: Path | None = typer.Option(
+        None,
+        "--registry-root",
+        help="DPL registry landing zone (per-SEAL Swagger JSON). Default: the declared "
+        "dpl-registry/ zone; skipped and counted when empty.",
+    ),
+    glue: Path | None = typer.Option(
+        None,
+        "--glue",
+        help="AWS Glue base-table inventory CSV. Default: the declared glue-inventory/ zone; "
+        "skipped and counted when empty.",
+    ),
+    out_dir: Path | None = typer.Option(
+        None,
+        "--out-dir",
+        help="Where the staged artifact lands. Default: the declared lineage/staged/ write "
+        "zone under DRYDOCS_DATA_ROOT.",
+    ),
+) -> None:
+    """Run the lineage chain's extractors and stage ONE artifact (LIN1).
+
+    Hop 1 (job -> ETL tool: DPL pipeline id, Ab Initio pset; INVOKES / USES_ARTIFACT
+    and the CMD_LINE file ops) is required; hop 2a (DPL MAC + registry) and hop 3
+    (Glue placements) run when their declared zone holds something and are skipped
+    AND COUNTED when it does not. Every explicit path must sit inside a declared
+    read zone (G121) - there is no override. The artifact is what `lineage-load`
+    and `lineage-review` read; nothing here touches the graph.
+    """
+    from drydocs_core.data_root import (
+        dpl_mac_dir,
+        dpl_registry_dir,
+        glue_inventory_dir,
+        lineage_staged_dir,
+    )
+    from drydocs_lineage.staging import StagingError, stage_chain, write_artifact
+
+    acquisition: dict[str, str] = {}
+    if jobs is None:
+        jobs = DEFAULT_SAMPLES_DIR / "controlm_jobs__sample.csv"
+        acquisition["jobs"] = "bundled-samples"
+        if variables is None:
+            variables = DEFAULT_SAMPLES_DIR / "controlm_variables__sample.csv"
+            acquisition["variables"] = "bundled-samples"
+    else:
+        jobs = _zoned_or_refuse(jobs, what="jobs")
+        acquisition["jobs"] = "declared-zone"
+    variables = (
+        _zoned_or_refuse(variables, what="variables")
+        if "variables" not in acquisition
+        else variables
+    )
+    mac_root = _zoned_or_refuse(mac_root, what="mac-root") or _declared_default(dpl_mac_dir)
+    registry_root = _zoned_or_refuse(registry_root, what="registry-root") or _declared_default(
+        dpl_registry_dir
+    )
+    glue = _zoned_or_refuse(glue, what="glue") or _declared_default(glue_inventory_dir)
+
+    try:
+        out = out_dir if out_dir is not None else lineage_staged_dir(create=True)
+    except DataRootNotSetError as exc:
+        console.print(f"[red]{exc}[/]")
+        raise typer.Exit(2) from None
+    except ReadZoneWriteError as exc:
+        console.print(f"[red]{exc}[/]")
+        raise typer.Exit(2) from None
+    if out_dir is not None:
+        try:
+            from drydocs_core.data_root import refuse_write_into_read_zone
+
+            refuse_write_into_read_zone(out, action="write the lineage artifact")
+        except DataRootNotSetError:
+            pass  # an explicit --out-dir with no data root: nothing declared to collide with
+        except ReadZoneWriteError as exc:
+            console.print(f"[red]{exc}[/]")
+            raise typer.Exit(2) from None
+        out.mkdir(parents=True, exist_ok=True)
+
+    run_id = str(uuid.uuid4())
+    run_log = LoaderRunLog(
+        "lineage_extract.v1",
+        run_id,
+        source=str(jobs),
+        target=str(out),
+        meta={"acquisition": ", ".join(f"{k}={v}" for k, v in acquisition.items())},
+    )
+    run_log.open()
+    run_log.attach()
+    try:
+        staged = stage_chain(
+            jobs=jobs,
+            variables=variables,
+            mac_root=mac_root,
+            registry_root=registry_root,
+            glue_inventory=glue,
+        )
+        path = write_artifact(staged, out, run_id=run_id, acquisition=acquisition)
+    except StagingError as exc:
+        run_log.close(error=exc)
+        console.print(f"[red]{exc}[/]")
+        raise typer.Exit(2) from None
+    except Exception as exc:
+        run_log.close(error=exc)
+        raise
+    run_log.close(
+        summary={"sources": [s.as_dict() for s in staged.sources], "coverage": staged.coverage}
+    )
+    for line in staged.summary_lines():
+        console.print(line)
+    console.print(f"[green]wrote {path}[/] (run {run_id})")
+
+
 def _column_map(spec: str, *, required: tuple[str, ...], what: str) -> dict[str, str]:
     """Parse `role=HEADER,role=HEADER` into {role: header}.
 

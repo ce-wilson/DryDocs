@@ -231,6 +231,31 @@ def controlm_xml_dir() -> Path:
     return source_dir("controlm-xml")
 
 
+def controlm_exports_dir() -> Path:
+    """Hand-exported CSV projections of the Control-M definition views for a
+    lineage-extract run off the Oracle adapter (LIN1). READ zone."""
+    return source_dir("controlm-exports")
+
+
+def dpl_mac_dir() -> Path:
+    """The DPL Metadata-As-Code root lineage-extract reads (LIN1): a promotion-repo
+    clone at any level, or a hand-staged directory of per-pipeline JSON sets
+    (G17). READ zone - the system never writes a clone."""
+    return source_dir("dpl-mac")
+
+
+def glue_inventory_dir() -> Path:
+    """The AWS Glue base-table inventory exports lineage-extract reads (LIN1;
+    the G41 extractor's two CSV shapes). READ zone - hand-exported."""
+    return source_dir("glue-inventory")
+
+
+def lineage_staged_dir(*, create: bool = False) -> Path:
+    """Where lineage-extract writes its staged LineageGraph artifact (LIN1).
+    WRITE zone - a run rebuilds it from the declared read zones."""
+    return source_dir("lineage", "staged", create=create)
+
+
 def remediation_incoming_dir() -> Path:
     """Landing zone for folder ``.xml`` exports awaiting a remediation pass.
 

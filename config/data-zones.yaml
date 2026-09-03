@@ -164,6 +164,58 @@ zones:
       Q10 landing zone: Copilot JSON extracts beside their original .msg files,
       hand-exported. The repo carries only synthetic samples. Read-mode.
 
+  # ---- the lineage chain (LIN1) -----------------------------------------------
+  # Three zones lineage-extract reads or writes. The two READ zones exist because
+  # G121 says an acquisition route is declared or it does not run, and the MAC
+  # clone and the Glue inventory had no declared home - so no explicit path to
+  # either could ever be accepted. The DPL registry JSON already lands in the
+  # source registry's dpl-registry/ drop (dpl:pipeline-registry, dpl:dataset-
+  # registry) and needs no row here.
+  - id: controlm-exports
+    mode: read
+    base: data_root
+    path: controlm-exports/
+    helper: controlm_exports_dir
+    note: >
+      Hand-exported CSV projections of the Control-M definition views (the
+      controlm_jobs.sql / controlm_variables.sql column contracts) for a
+      lineage-extract run that does not go through the Oracle adapter - the shape
+      the company carries out of SQL Developer. Real job names, command lines,
+      FIDs, hosts. Read-mode. The bundled package samples are the dev default and
+      need no zone; this is the declared route for a real export.
+
+  - id: dpl-mac
+    mode: read
+    base: data_root
+    path: dpl-mac/
+    helper: dpl_mac_dir
+    note: >
+      The DPL Metadata-As-Code root the G17 extractor reads: a promotion-repo
+      clone (any level) or a hand-staged directory of per-pipeline JSON sets.
+      Hand-landed: real pipeline and dataset GUIDs, dataflow names, SEAL ids.
+      Read-mode - the system never writes a clone.
+
+  - id: glue-inventory
+    mode: read
+    base: data_root
+    path: glue-inventory/
+    helper: glue_inventory_dir
+    note: >
+      The AWS Glue base-table inventory exports the G41 extractor reads (the
+      GUID-bearing inventory and the consumption inventory, CSV). Hand-exported:
+      real database and table names, S3 paths, SEAL ids. Read-mode.
+
+  - id: lineage-staged
+    mode: write
+    base: data_root
+    path: lineage/staged/
+    helper: lineage_staged_dir
+    note: >
+      Where lineage-extract writes its staged LineageGraph artifact (JSON, one
+      per run, named by run id) with the per-extractor coverage beside it.
+      lineage-load and lineage-review read it back. The system owns it outright:
+      a run rebuilds it from the declared sources above.
+
   # ---- staging + operator config (found while walking the call sites) -------
   - id: cmdline-staging
     mode: write
