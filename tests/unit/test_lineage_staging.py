@@ -19,7 +19,9 @@ from drydocs.cli_shared import DEFAULT_SAMPLES_DIR
 from drydocs_lineage.staging import (
     ARTIFACT_SCHEMA,
     HOPS,
+    REQUIRED,
     StagingError,
+    artifact_name,
     read_artifact,
     stage_chain,
     write_artifact,
@@ -120,9 +122,13 @@ def _glue_sheet(tmp_path: Path) -> Path:
 # --- hop 1 -----------------------------------------------------------------------
 
 
-def test_hop_order_is_declared_and_only_the_first_hop_is_required() -> None:
-    assert [h for h, _ in HOPS] == ["controlm", "dpl_mac", "dpl_registry", "glue"]
-    assert [req for _, req in HOPS] == [True, False, False, False]
+def test_the_sources_block_follows_the_declared_hop_order(tmp_path: Path) -> None:
+    """HOPS is the declaration the artifact's sources block is checked against - not
+    a literal asserted back at itself (the LIN1 review's nit)."""
+    staged = stage_chain(jobs=_dpl_jobs(tmp_path))
+    assert [s.hop for s in staged.sources] == [h for h, _ in HOPS]
+    assert REQUIRED == {"controlm"}
+    assert {s.hop for s in staged.sources if s.required} == REQUIRED
 
 
 def test_the_bundled_samples_stage_abinitio_etl_processes() -> None:
@@ -156,6 +162,47 @@ def test_both_dpl_spellings_and_the_pset_land_as_one_hop1_run(tmp_path: Path) ->
     assert len(into_pipe) == 2, "both flag spellings key the SAME pipeline node (G15)"
     ab = [n for n in procs.values() if n.kind == "abinitio"]
     assert len(ab) == 1 and ab[0].name.endswith(".pset")
+
+
+def test_a_variables_csv_discovered_beside_the_jobs_source_is_recorded_as_read(
+    tmp_path: Path,
+) -> None:
+    """The LIN1 review's defect 1: with no --variables the extractor discovers a
+    variables CSV beside a jobs DIRECTORY (its documented behavior) and the header used
+    to say absent while the graph carried file-op edges built from it. Now the header
+    names the file the extractor actually read."""
+    jobs = _dpl_jobs(tmp_path)
+    (jobs.parent / "variables.csv").write_text(
+        "TABLE_NAME,JOB_ID,JOB_NAME,APPL_TYPE,NAME,VALUE\n"
+        '10,1,JOB_AWS,OS,%%PRECMD,"mv /data/in/accounts.dat /work/accounts.dat"\n',
+        encoding="utf-8",
+        newline="\n",
+    )
+    staged = stage_chain(jobs=jobs.parent)  # the directory, the company route
+    vars_state = next(s for s in staged.sources if s.hop == "controlm_variables")
+    assert vars_state.present is True
+    assert vars_state.path == str(jobs.parent / "variables.csv")
+    assert "discovered" in vars_state.note
+    assert staged.coverage["controlm"]["prepost_rows_read"] == 1
+    assert {t for _, t, _ in staged.graph.rels} >= {"READS_FROM", "WRITES_TO"}
+
+
+def test_an_explicit_variables_path_that_is_absent_reads_nothing_and_says_so(
+    tmp_path: Path,
+) -> None:
+    """The same defect's second entry: an explicit path that does not exist must NOT
+    fall back to discovery. The sibling variables CSV is present and must stay unread."""
+    jobs = _dpl_jobs(tmp_path)
+    (jobs.parent / "variables.csv").write_text(
+        "TABLE_NAME,JOB_ID,JOB_NAME,APPL_TYPE,NAME,VALUE\n" '10,1,JOB_AWS,OS,%%PRECMD,"mv /a /b"\n',
+        encoding="utf-8",
+        newline="\n",
+    )
+    staged = stage_chain(jobs=jobs.parent, variables=jobs.parent / "nope.csv")
+    vars_state = next(s for s in staged.sources if s.hop == "controlm_variables")
+    assert vars_state.present is False and vars_state.note == "not found"
+    assert staged.coverage["controlm"]["prepost_rows_read"] == 0
+    assert staged.coverage["controlm"]["variables_path"] == ""
 
 
 def test_a_missing_required_source_raises_and_names_the_path(tmp_path: Path) -> None:
@@ -215,31 +262,65 @@ def test_hop3_places_the_dataset_as_properties_and_adds_no_edge(tmp_path: Path) 
 # --- the artifact ------------------------------------------------------------------------
 
 
-def test_the_artifact_round_trips_and_is_deterministic(tmp_path: Path) -> None:
-    staged = stage_chain(jobs=_dpl_jobs(tmp_path), mac_root=_mac_root(tmp_path))
+def test_the_artifact_round_trips_exactly_with_every_hop_present(tmp_path: Path) -> None:
+    """to_dict -> file -> from_dict -> to_dict is exact: kinds, properties (hop 3's whole
+    payload), rels - not just the counts (the LIN1 review's point 2b)."""
+    staged = stage_chain(
+        jobs=_dpl_jobs(tmp_path),
+        mac_root=_mac_root(tmp_path),
+        registry_root=_registry_root(tmp_path),
+        glue_inventory=_glue_sheet(tmp_path),
+    )
     out = tmp_path / "staged"
     out.mkdir()
     when = datetime(2026, 9, 3, 12, 0, tzinfo=UTC)
-    p1 = write_artifact(staged, out, run_id="run-1", acquisition={"jobs": "test"}, captured_at=when)
-    graph, header = read_artifact(p1)
-    assert graph.stats() == staged.graph.stats()
-    assert graph.rels == staged.graph.rels
+    path = write_artifact(
+        staged, out, run_id="run-1", acquisition={"jobs": "test"}, captured_at=when, commit="abc123"
+    )
+    graph, header = read_artifact(path)
+    assert graph.to_dict() == staged.graph.to_dict()
     assert header["schema"] == ARTIFACT_SCHEMA
     assert header["run_id"] == "run-1"
+    assert header["code_commit"] == "abc123"
     assert header["acquisition"] == {"jobs": "test"}
-    assert {s["hop"] for s in header["sources"]} == {
+    assert [s["hop"] for s in header["sources"]] == [h for h, _ in HOPS]
+    assert header["extractors"] == {
+        "controlm": "controlm-inventory",
+        "dpl_mac": "dpl-mac",
+        "dpl_registry": "dpl-registry",
+        "glue": "glue-tables",
+    }
+    assert set(header["coverage"]) == {
         "controlm",
-        "controlm_variables",
         "dpl_mac",
         "dpl_registry",
+        "dpl_registry_crosscheck",
         "glue",
     }
-    assert header["extractors"] == {"controlm": "controlm-inventory", "dpl_mac": "dpl-mac"}
-    # same inputs, same clock -> same bytes (the render-determinism rule)
-    again = stage_chain(jobs=_dpl_jobs(tmp_path), mac_root=_mac_root(tmp_path))
-    p2 = write_artifact(again, out, run_id="run-1", acquisition={"jobs": "test"}, captured_at=when)
-    assert p1.read_bytes() == p2.read_bytes()
+
+
+def test_two_runs_over_the_same_inputs_write_identical_bytes(tmp_path: Path) -> None:
+    """Determinism, measured for real: two DIFFERENT output directories (the review's
+    point 2a - one directory and one run id was the same file read twice)."""
+    when = datetime(2026, 9, 3, 12, 0, tzinfo=UTC)
+    out_a, out_b = tmp_path / "a", tmp_path / "b"
+    out_a.mkdir()
+    out_b.mkdir()
+    first = stage_chain(jobs=_dpl_jobs(tmp_path), mac_root=_mac_root(tmp_path))
+    p1 = write_artifact(first, out_a, run_id="run-1", captured_at=when, commit="abc123")
+    second = stage_chain(jobs=_dpl_jobs(tmp_path), mac_root=_mac_root(tmp_path))
+    p2 = write_artifact(second, out_b, run_id="run-1", captured_at=when, commit="abc123")
+    assert p1 != p2 and p1.read_bytes() == p2.read_bytes()
     assert b"\r\n" not in p1.read_bytes()
+
+
+def test_the_artifact_name_sorts_by_capture_time() -> None:
+    """A UTC stamp leads the run id, so a listing sorts chronologically and the newest
+    is derivable without opening a file (the review's point 4)."""
+    early = artifact_name("zzzz", datetime(2026, 9, 3, 12, 0, tzinfo=UTC))
+    late = artifact_name("aaaa", datetime(2026, 9, 3, 12, 0, 1, tzinfo=UTC))
+    assert early == "lineage-20260903T120000Z-zzzz.json"
+    assert sorted([late, early]) == [early, late]
 
 
 def test_reading_something_else_as_an_artifact_is_refused(tmp_path: Path) -> None:

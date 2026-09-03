@@ -165,7 +165,7 @@ zones:
       hand-exported. The repo carries only synthetic samples. Read-mode.
 
   # ---- the lineage chain (LIN1) -----------------------------------------------
-  # Three zones lineage-extract reads or writes. The two READ zones exist because
+  # Four zones lineage-extract reads or writes. The READ zones exist because
   # G121 says an acquisition route is declared or it does not run, and the MAC
   # clone and the Glue inventory had no declared home - so no explicit path to
   # either could ever be accepted. The DPL registry JSON already lands in the

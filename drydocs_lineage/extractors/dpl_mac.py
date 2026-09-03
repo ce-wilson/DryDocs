@@ -189,6 +189,7 @@ class MacCoverage:
     clone_ambiguous_folders: int = 0  # mixed-casing name#guid dirs — review, not guessed
     clone_sets_missing: int = 0  # pipeline folders with no pipeline.json yet
     clone_missing_set_guids: list[str] = field(default_factory=list)  # the fetch work list
+    clone_pipeline_guids: list[str] = field(default_factory=list)  # every pipeline folder parsed
     clone_guid_mismatch: int = 0  # folder GUID != pipeline.json pipelineId (json wins)
     clone_names_applied: int = 0  # mac_clone_name stamped from a folder name
     dataset_names_from_clone: int = 0  # dataset_name filled from a dataset folder name
@@ -254,6 +255,8 @@ class DplMacExtractor:
             if parsed.kind == "pipeline":
                 coverage.clone_pipeline_folders += 1
                 pipeline_dirs[clone_dir] = parsed
+                if parsed.guid not in coverage.clone_pipeline_guids:
+                    coverage.clone_pipeline_guids.append(parsed.guid)
             elif parsed.kind == "dataset":
                 coverage.clone_dataset_folders += 1
                 dataset_names.setdefault(parsed.guid, parsed.name)

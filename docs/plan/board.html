@@ -3222,8 +3222,11 @@ Related: MM2, MM3, MM6, MM10, MM12, R16, L28, G102, ADR 0007, ADR 0011, Idea-236
 <div class="card ready" id="card-LIN2" data-id="LIN2" data-module="drydocs-lineage" data-phase="6" data-epic="lineage-chain" data-type="task" data-status="todo" data-search="lin2 drydocs lineage-load - plan_curated over a staged lineage artifact, write_curated for the active labels, plan-only by default" tabindex="0"><div class="card-head"><span class="card-id">LIN2</span><span class="card-title">drydocs lineage-load - plan_curated over a staged lineage artifact, write_curated for the active labels, plan-only by default</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-lineage</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">lineage-chain</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-LIN1" data-target="card-LIN1">LIN1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Phase 1 of the lineage-chain workplan
 (docs/reviews/lineage-chain-extract-load-workplan-2026-09-03.md). The LOAD half.
 
-(a) THE VERB. `drydocs lineage-load &lt;artifact&gt;` in drydocs/cli_lineage.py reads a staged
-artifact LIN1 wrote, rebuilds the LineageGraph, runs drydocs_lineage.writer.plan_curated
+(a) THE VERB. `drydocs lineage-load [&lt;artifact&gt;]` in drydocs/cli.py beside
+lineage-extract (the S8 rule LIN1 recorded: component-wiring verbs stay in the root)
+reads a staged artifact LIN1 wrote - by default the NEWEST in the declared
+lineage/staged/ zone, which the sortable artifact name makes derivable without
+opening a file - rebuilds the LineageGraph, runs drydocs_lineage.writer.plan_curated
 and prints the WritePlan (nodes, edges by label, the planned-label refusals, the
 unresolved file-op candidates) - and STOPS. That is the default. `--write` runs
 write_curated against the ground-truth database for the ACTIVE labels only
@@ -3236,9 +3239,14 @@ the review surface&#x27;s confirmations (lineage-review&#x27;s JSON export), pas
 `--confirmed &lt;file&gt;`; with no confirmations the write is the empty set and says so.
 Nothing reaches `drydocs` uncurated (the package invariant).
 
-(c) THE LOAD NAMES ITS EXTRACT. The run log and the written nodes carry the artifact&#x27;s
-run id, so a graph fact can be traced to the extract, the source files and the extractor
-versions that produced it (G107; the provenance-envelope shape).
+(c) THE LOAD NAMES ITS EXTRACT, AND THE PROVENANCE IT WRITES IS WHAT THE EXTRACTOR
+READ. The run log and the written nodes carry the artifact&#x27;s run id and code_commit,
+so a graph fact traces to the extract, the source files and the code that produced it
+(G107; the provenance-envelope shape). The LIN1 lane review&#x27;s condition: the sources
+block the load stamps onto the graph is the artifact&#x27;s sources block - which since the
+review names the file the extractor actually read, discovered or given - and a test
+proves a discovered variables CSV reaches the graph as present, not absent. Retention
+of lineage/staged/ (newest-only, or N) is decided and written down in this item.
 
 (d) VENUE-TAGGED PROOF. On the desktop, `neo4jtest`, database `drydocs`: the bundled-
 sample artifact from LIN1 loads its ETLProcess / Script / DataAsset nodes and the four
@@ -12396,6 +12404,45 @@ test asserting it present failed on a fresh checkout. The variables sample is no
 optional in the default run (acquisition records bundled-samples-absent), and both
 states are proven locally by running the two test files with the file present and
 moved away. Nothing about hop 1 changes: the variables CSV only adds PRECMD/POSTCMD.
+
+LANE REVIEW (laptop, reviewed at 0f893f86, range 316cab98..0170ed2c) - the headline
+numbers reproduced on a second venue with no variables sample present (33 / 17 / 10 /
+6, 17 INVOKES), so the desktop evidence is sample-reproducible, not machine-pinned.
+Findings, and what was done with each, all landed in the follow-up commit:
+
+1. PROVENANCE DEFECT (real, fixed at the seam). With no --variables the extractor
+   discovers a variables CSV beside a jobs DIRECTORY - its documented behavior - and
+   the artifact recorded the source absent while the graph carried file-op edges
+   built from it; an explicit absent --variables fell through to the same discovery.
+   G11 inverted, on the company&#x27;s own route (--jobs &lt;dir under controlm-exports/&gt;).
+   ExtractCoverage now reports variables_path (what it actually read); staging hands
+   an explicit path over as given (absent = nothing read, no discovery) and records a
+   discovered file as present with the note &quot;discovered beside the jobs source&quot;.
+   Two tests reproduce both entry points.
+2. TWO INSTRUMENTS THAT MEASURED NOTHING (fixed). The determinism test wrote the same
+   run id to the same directory twice and compared one file with itself; it now writes
+   to two directories. The round-trip test compared counts only and staged no glue
+   hop; it now stages every hop and asserts to_dict() equality (kinds, properties,
+   rels). A sortable-name test was added.
+3. TWO DEVIATIONS FROM THE ACCEPTANCE, NOW RECORDED. (c) &quot;extractor versions&quot;: no
+   extractor carries a version and a number nobody bumps is worse than none, so the
+   header now carries code_commit (the checkout&#x27;s HEAD through repo_root, &quot;unknown&quot;
+   outside git) - that is what tells two artifacts staged across a parsing change
+   apart. (d) the tracked samples show abinitio + INVOKES only; kind dpl, both DPL
+   spellings, USES_ARTIFACT and the file ops are proven on synthetic fixtures (here
+   and in the pre-existing test_lineage_inventory.py), not on the samples. Nothing
+   is untested; the VERIFIED note above described what ran without saying so.
+4. NAMING FOR LIN2 (settled here, not after). Artifacts are now
+   lineage-&lt;UTC stamp&gt;-&lt;run id&gt;.json, so a listing sorts chronologically and &quot;the
+   newest&quot; is derivable without opening a file; LIN2&#x27;s acceptance says it loads the
+   newest by default. Retention is LIN2&#x27;s call to record.
+Nits, all taken: HOPS now includes controlm_variables and a test asserts the sources
+block against it; the MAC extractor hands back the clone pipeline GUIDs it parsed
+(MacCoverage.clone_pipeline_guids) instead of staging re-walking the tree; the
+data-zones comment says four; the zone check is PER HOP (LINEAGE_INPUT_ZONES) - a
+jobs CSV under dpl-mac/ is refused as a misfile and the message names the hop&#x27;s own
+zone - with a test. Also caught by the full suite: the commit anchor climbed to the
+repo root with a bare __file__ (Idea-109 guard) and now goes through repo_root().
 </p></div></div></div></div>
 </div>
 <div class="capture">

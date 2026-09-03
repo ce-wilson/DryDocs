@@ -122,3 +122,42 @@ notes: |
   states are proven locally by running the two test files with the file present and
   moved away. Nothing about hop 1 changes: the variables CSV only adds PRECMD/POSTCMD.
 
+  LANE REVIEW (laptop, reviewed at 0f893f86, range 316cab98..0170ed2c) - the headline
+  numbers reproduced on a second venue with no variables sample present (33 / 17 / 10 /
+  6, 17 INVOKES), so the desktop evidence is sample-reproducible, not machine-pinned.
+  Findings, and what was done with each, all landed in the follow-up commit:
+
+  1. PROVENANCE DEFECT (real, fixed at the seam). With no --variables the extractor
+     discovers a variables CSV beside a jobs DIRECTORY - its documented behavior - and
+     the artifact recorded the source absent while the graph carried file-op edges
+     built from it; an explicit absent --variables fell through to the same discovery.
+     G11 inverted, on the company's own route (--jobs <dir under controlm-exports/>).
+     ExtractCoverage now reports variables_path (what it actually read); staging hands
+     an explicit path over as given (absent = nothing read, no discovery) and records a
+     discovered file as present with the note "discovered beside the jobs source".
+     Two tests reproduce both entry points.
+  2. TWO INSTRUMENTS THAT MEASURED NOTHING (fixed). The determinism test wrote the same
+     run id to the same directory twice and compared one file with itself; it now writes
+     to two directories. The round-trip test compared counts only and staged no glue
+     hop; it now stages every hop and asserts to_dict() equality (kinds, properties,
+     rels). A sortable-name test was added.
+  3. TWO DEVIATIONS FROM THE ACCEPTANCE, NOW RECORDED. (c) "extractor versions": no
+     extractor carries a version and a number nobody bumps is worse than none, so the
+     header now carries code_commit (the checkout's HEAD through repo_root, "unknown"
+     outside git) - that is what tells two artifacts staged across a parsing change
+     apart. (d) the tracked samples show abinitio + INVOKES only; kind dpl, both DPL
+     spellings, USES_ARTIFACT and the file ops are proven on synthetic fixtures (here
+     and in the pre-existing test_lineage_inventory.py), not on the samples. Nothing
+     is untested; the VERIFIED note above described what ran without saying so.
+  4. NAMING FOR LIN2 (settled here, not after). Artifacts are now
+     lineage-<UTC stamp>-<run id>.json, so a listing sorts chronologically and "the
+     newest" is derivable without opening a file; LIN2's acceptance says it loads the
+     newest by default. Retention is LIN2's call to record.
+  Nits, all taken: HOPS now includes controlm_variables and a test asserts the sources
+  block against it; the MAC extractor hands back the clone pipeline GUIDs it parsed
+  (MacCoverage.clone_pipeline_guids) instead of staging re-walking the tree; the
+  data-zones comment says four; the zone check is PER HOP (LINEAGE_INPUT_ZONES) - a
+  jobs CSV under dpl-mac/ is refused as a misfile and the message names the hop's own
+  zone - with a test. Also caught by the full suite: the commit anchor climbed to the
+  repo root with a bare __file__ (Idea-109 guard) and now goes through repo_root().
+

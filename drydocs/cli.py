@@ -417,26 +417,45 @@ def lineage_review(
     console.print(f"coverage: {coverage.summary()}")
 
 
+#: LIN1 (b), tightened at the review: each hop's explicit input must sit inside THAT
+#: hop's declared zone, not merely inside some read zone - a jobs CSV under dpl-mac/
+#: is a misfiled file, not an acquisition route. Keyed by the option name; the
+#: values are zone ids from config/data-zones.yaml and the source registry.
+LINEAGE_INPUT_ZONES: dict[str, tuple[str, ...]] = {
+    "jobs": ("controlm-exports",),
+    "variables": ("controlm-exports",),
+    "mac-root": ("dpl-mac",),
+    "registry-root": ("dpl:pipeline-registry", "dpl:dataset-registry"),
+    "glue": ("glue-inventory",),
+}
+
+
 def _zoned_or_refuse(path: Path | None, *, what: str) -> Path | None:
-    """LIN1 (b): an explicit lineage input resolves inside a declared READ zone or the
-    run refuses (G81/G121) - no override flag, because a side door here is the
+    """LIN1 (b): an explicit lineage input resolves inside ITS hop's declared READ zone
+    or the run refuses (G81/G121) - no override flag, because a side door here is the
     undeclared acquisition route those two items closed. ``None`` passes through:
-    the caller has already resolved the declared default for that hop."""
+    the caller resolves the declared default for that hop."""
     if path is None:
         return None
     from drydocs_core.data_zones import read_zone_containing
 
+    expected = LINEAGE_INPUT_ZONES[what]
     try:
         zone = read_zone_containing(path)
     except DataRootNotSetError as exc:
         console.print(f"[red]{exc}[/]")
         raise typer.Exit(2) from None
-    if zone is None:
+    if zone is None or zone.id not in expected:
+        where = (
+            f"inside read zone {zone.id!r}, which is not this hop's"
+            if zone is not None
+            else "outside every declared read zone"
+        )
         console.print(
-            f"[red]REFUSED: --{what} {path} is outside every declared read zone.[/] "
-            "An acquisition route is declared or it does not run (G121): land the file "
-            "in its zone (`drydocs landing-zones` lists them - controlm-exports/, dpl-mac/, "
-            "dpl-registry/, glue-inventory/) or declare one in config/data-zones.yaml."
+            f"[red]REFUSED: --{what} {path} is {where}.[/] "
+            f"An acquisition route is declared or it does not run (G121): --{what} reads "
+            f"from {' or '.join(expected)} (`drydocs landing-zones` shows where that is on "
+            "this machine). Land the file there, or declare a zone in config/data-zones.yaml."
         )
         raise typer.Exit(2)
     return path

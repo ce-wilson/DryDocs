@@ -26,7 +26,9 @@ _ANSI = re.compile(r"\x1b\[[0-9;]*m")
 
 
 def _plain(text: str) -> str:
-    return _ANSI.sub("", text)
+    """ANSI stripped and whitespace collapsed: the console wraps long messages at the
+    terminal width, so a phrase can straddle a line break."""
+    return re.sub(r"\s+", " ", _ANSI.sub("", text))
 
 
 def _artifacts(root: Path) -> list[Path]:
@@ -47,7 +49,9 @@ def test_default_run_stages_the_bundled_samples_into_the_write_zone(tmp_path: Pa
     assert data["schema"] == "drydocs.lineage-staged.v1"
     assert data["acquisition"]["jobs"] == "bundled-samples"
     assert data["acquisition"]["variables"] in ("bundled-samples", "bundled-samples-absent")
-    assert files[0].name == f"lineage-{data['run_id']}.json"
+    assert files[0].name.endswith(f"-{data['run_id']}.json")
+    assert files[0].name.startswith("lineage-2")  # the UTC stamp leads - sortable
+    assert data["code_commit"] not in ("", None)
     by_hop = {s["hop"]: s for s in data["sources"]}
     assert by_hop["controlm"]["path"] == str(DEFAULT_SAMPLES_DIR / "controlm_jobs__sample.csv")
     # the declared zones were LOOKED AT, and the artifact says where
@@ -73,9 +77,26 @@ def test_an_explicit_jobs_path_outside_every_declared_zone_is_refused(tmp_path: 
     result = runner.invoke(cli_mod.app, ["lineage-extract", "--jobs", str(stray)])
     assert result.exit_code == 2
     out = _plain(result.output)
-    assert "REFUSED" in out and "declared read zone" in out
-    assert "controlm-exports/" in out, "the refusal names the zone that would declare it"
+    assert "REFUSED" in out and "outside every declared read zone" in out
+    assert "controlm-exports" in out, "the refusal names the hop's own zone"
     assert not _artifacts(tmp_path), "a refused run writes nothing"
+
+
+def test_a_jobs_path_inside_another_hops_zone_is_refused(tmp_path: Path, monkeypatch):
+    """Per-hop discipline (the review's nit): a jobs CSV under dpl-mac/ is a misfiled
+    file, not an acquisition route, even though dpl-mac/ IS a declared read zone."""
+    monkeypatch.setenv("DRYDOCS_DATA_ROOT", str(tmp_path))
+    monkeypatch.setenv("DRYDOCS_LOGDIR", str(tmp_path / "logs"))
+    misfiled = tmp_path / "dpl-mac" / "jobs.csv"
+    misfiled.parent.mkdir()
+    misfiled.write_text(
+        "job_id,folder_id,job_name,parent_table,owner,node_id,cmd_line\n", encoding="utf-8"
+    )
+    result = runner.invoke(cli_mod.app, ["lineage-extract", "--jobs", str(misfiled)])
+    assert result.exit_code == 2
+    out = _plain(result.output)
+    assert "not this hop's" in out and "controlm-exports" in out
+    assert not _artifacts(tmp_path)
 
 
 def test_an_explicit_jobs_path_inside_the_declared_export_zone_runs(tmp_path: Path, monkeypatch):

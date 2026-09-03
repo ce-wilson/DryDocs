@@ -14,14 +14,17 @@ inputs:
 - drydocs_lineage/writer.py
 - drydocs_lineage/curation.py
 - drydocs_lineage/model.py
-- drydocs/cli_lineage.py
+- drydocs/cli.py
 - drydocs_core/ontology/relationship_vocabulary/40-local-scheduler.yaml
 acceptance: |
   Phase 1 of the lineage-chain workplan
   (docs/reviews/lineage-chain-extract-load-workplan-2026-09-03.md). The LOAD half.
 
-  (a) THE VERB. `drydocs lineage-load <artifact>` in drydocs/cli_lineage.py reads a staged
-  artifact LIN1 wrote, rebuilds the LineageGraph, runs drydocs_lineage.writer.plan_curated
+  (a) THE VERB. `drydocs lineage-load [<artifact>]` in drydocs/cli.py beside
+  lineage-extract (the S8 rule LIN1 recorded: component-wiring verbs stay in the root)
+  reads a staged artifact LIN1 wrote - by default the NEWEST in the declared
+  lineage/staged/ zone, which the sortable artifact name makes derivable without
+  opening a file - rebuilds the LineageGraph, runs drydocs_lineage.writer.plan_curated
   and prints the WritePlan (nodes, edges by label, the planned-label refusals, the
   unresolved file-op candidates) - and STOPS. That is the default. `--write` runs
   write_curated against the ground-truth database for the ACTIVE labels only
@@ -34,9 +37,14 @@ acceptance: |
   `--confirmed <file>`; with no confirmations the write is the empty set and says so.
   Nothing reaches `drydocs` uncurated (the package invariant).
 
-  (c) THE LOAD NAMES ITS EXTRACT. The run log and the written nodes carry the artifact's
-  run id, so a graph fact can be traced to the extract, the source files and the extractor
-  versions that produced it (G107; the provenance-envelope shape).
+  (c) THE LOAD NAMES ITS EXTRACT, AND THE PROVENANCE IT WRITES IS WHAT THE EXTRACTOR
+  READ. The run log and the written nodes carry the artifact's run id and code_commit,
+  so a graph fact traces to the extract, the source files and the code that produced it
+  (G107; the provenance-envelope shape). The LIN1 lane review's condition: the sources
+  block the load stamps onto the graph is the artifact's sources block - which since the
+  review names the file the extractor actually read, discovered or given - and a test
+  proves a discovered variables CSV reaches the graph as present, not absent. Retention
+  of lineage/staged/ (newest-only, or N) is decided and written down in this item.
 
   (d) VENUE-TAGGED PROOF. On the desktop, `neo4jtest`, database `drydocs`: the bundled-
   sample artifact from LIN1 loads its ETLProcess / Script / DataAsset nodes and the four

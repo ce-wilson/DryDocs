@@ -40,27 +40,32 @@ Boundary: imports only ``drydocs_core`` and this package.
 from __future__ import annotations
 
 import json
+import subprocess
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from drydocs_core.repo_paths import repo_root
 from drydocs_lineage.extractors.controlm_inventory import ControlMInventoryExtractor
-from drydocs_lineage.extractors.dpl_mac import CLONE_NAME_SEP, DplMacExtractor, parse_clone_folder
+from drydocs_lineage.extractors.dpl_mac import DplMacExtractor
 from drydocs_lineage.extractors.dpl_registry import DplRegistryExtractor, cross_check
 from drydocs_lineage.extractors.glue_tables import GlueTableInventoryExtractor
 from drydocs_lineage.model import LineageGraph
 
 ARTIFACT_SCHEMA = "drydocs.lineage-staged.v1"
 
-#: The hops, in the order the chain runs them. ``required`` hops raise when the
-#: source is missing; optional hops are skipped and counted.
+#: The sources, in the order the chain resolves them - this IS the artifact's
+#: ``sources`` block order (a test asserts the two agree). ``required`` sources raise
+#: when missing; the others are skipped and counted.
 HOPS: tuple[tuple[str, bool], ...] = (
     ("controlm", True),
+    ("controlm_variables", False),
     ("dpl_mac", False),
     ("dpl_registry", False),
     ("glue", False),
 )
+REQUIRED: frozenset[str] = frozenset(hop for hop, required in HOPS if required)
 
 
 class StagingError(RuntimeError):
@@ -122,20 +127,6 @@ def _state(hop: str, required: bool, path: Path | None) -> SourceState:
     return SourceState(hop, required, str(path), True)
 
 
-def _clone_pipeline_guids(mac_root: Path) -> set[str]:
-    """The pipeline-folder GUIDs a promotion clone names (``<name>#<guid>``,
-    lowercase = pipeline) - the cross-check's third signal column. Same walk the
-    MAC extractor does; read here so the registry pass can be handed a set."""
-    candidates = [p for p in mac_root.rglob(f"*{CLONE_NAME_SEP}*") if p.is_dir()]
-    candidates.append(mac_root)
-    guids: set[str] = set()
-    for folder in candidates:
-        parsed = parse_clone_folder(folder.name)
-        if parsed is not None and parsed.kind == "pipeline":
-            guids.add(parsed.guid)
-    return guids
-
-
 def stage_chain(
     *,
     jobs: Path,
@@ -162,12 +153,21 @@ def stage_chain(
     staged.sources.append(s_vars)
     controlm = ControlMInventoryExtractor()
     staged.extractors["controlm"] = controlm.name
-    cov = controlm.extract(
-        jobs,
-        graph,
-        variables_csv=variables if s_vars.present else None,
-    )
+    # An EXPLICIT variables path is handed over as given, present or not: an absent
+    # explicit path resolves to nothing and the extractor discovers nothing. Only when
+    # no path is given does the extractor look beside the jobs source - and then the
+    # provenance below records what it found, so the header never says "absent" for a
+    # file the graph carries edges from (the LIN1 review's defect 1).
+    cov = controlm.extract(jobs, graph, variables_csv=variables)
     staged.coverage["controlm"] = cov.as_dict()
+    read_vars = cov.variables_path
+    if read_vars and read_vars != s_vars.path:
+        s_vars.path, s_vars.present = read_vars, True
+        s_vars.note = "discovered beside the jobs source (no path given)"
+    elif read_vars:
+        s_vars.present, s_vars.note = True, ""
+    elif s_vars.present:
+        s_vars.present, s_vars.note = False, "given, but not a variables CSV - nothing read"
 
     # hop 2a - optional: the MAC root, then the registry (the cross-check reads
     # the clone's GUIDs, so the MAC pass runs first)
@@ -177,8 +177,9 @@ def stage_chain(
     if s_mac.present:
         mac = DplMacExtractor()
         staged.extractors["dpl_mac"] = mac.name
-        staged.coverage["dpl_mac"] = mac.extract(mac_root, graph).as_dict()
-        clone_guids = _clone_pipeline_guids(mac_root)
+        mac_cov = mac.extract(mac_root, graph)
+        staged.coverage["dpl_mac"] = mac_cov.as_dict()
+        clone_guids = set(mac_cov.clone_pipeline_guids)  # what the extractor parsed, not a re-walk
     s_reg = _state("dpl_registry", False, registry_root)
     staged.sources.append(s_reg)
     if s_reg.present:
@@ -201,12 +202,42 @@ def stage_chain(
     return staged
 
 
+def code_commit(repo: Path | None = None) -> str:
+    """The commit the extractor code was at, or ``"unknown"`` outside a git checkout.
+
+    The extractors carry no version attribute of their own (a number nobody bumps is
+    worse than none), so the tree's commit is what tells two artifacts staged before
+    and after a parsing change apart - the LIN1 review's deviation (c)."""
+    root = repo or repo_root(Path(__file__).resolve().parents[1])  # Idea-109: the CALLER's checkout
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=root,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            timeout=10,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return "unknown"
+    sha = result.stdout.strip()
+    return sha if result.returncode == 0 and sha else "unknown"
+
+
+def artifact_name(run_id: str, captured_at: datetime) -> str:
+    """``lineage-<UTC stamp>-<run id>.json`` - the stamp leads so a directory listing
+    sorts chronologically and "the newest" is derivable (the LIN1 review's point 4)."""
+    stamp = captured_at.astimezone(UTC).strftime("%Y%m%dT%H%M%SZ")
+    return f"lineage-{stamp}-{run_id}.json"
+
+
 def artifact_dict(
     staged: StagedLineage,
     *,
     run_id: str,
     acquisition: dict[str, str] | None = None,
     captured_at: datetime | None = None,
+    commit: str | None = None,
 ) -> dict[str, Any]:
     """The artifact as a plain dict: header + the graph."""
     when = (captured_at or datetime.now(UTC)).astimezone(UTC)
@@ -214,6 +245,7 @@ def artifact_dict(
         "schema": ARTIFACT_SCHEMA,
         "run_id": run_id,
         "captured_at": when.isoformat(timespec="seconds"),
+        "code_commit": commit if commit is not None else code_commit(),
         "acquisition": dict(acquisition or {}),
         "sources": [s.as_dict() for s in staged.sources],
         "extractors": dict(staged.extractors),
@@ -229,12 +261,16 @@ def write_artifact(
     run_id: str,
     acquisition: dict[str, str] | None = None,
     captured_at: datetime | None = None,
+    commit: str | None = None,
 ) -> Path:
-    """Write ``<out_dir>/lineage-<run_id>.json``; deterministic for the same inputs
-    and the same ``captured_at``. ``out_dir`` must already exist - creating a
-    directory is a data-root decision the caller makes through a declared helper."""
-    path = Path(out_dir) / f"lineage-{run_id}.json"
-    payload = artifact_dict(staged, run_id=run_id, acquisition=acquisition, captured_at=captured_at)
+    """Write ``<out_dir>/<artifact_name>``; deterministic for the same inputs, the same
+    ``captured_at`` and the same ``commit``. ``out_dir`` must already exist - creating
+    a directory is a data-root decision the caller makes through a declared helper."""
+    when = (captured_at or datetime.now(UTC)).astimezone(UTC)
+    path = Path(out_dir) / artifact_name(run_id, when)
+    payload = artifact_dict(
+        staged, run_id=run_id, acquisition=acquisition, captured_at=when, commit=commit
+    )
     path.write_text(
         json.dumps(payload, indent=2, sort_keys=True, ensure_ascii=False) + "\n",
         encoding="utf-8",

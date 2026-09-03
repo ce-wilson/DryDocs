@@ -224,8 +224,13 @@ class ExtractCoverage:
     resolve_no_scope_chain: int = 0  # no chain for this job — parsed raw, COUNTED
     resolve_substitutions: int = 0  # total names substituted across the run
     file_op_operands_unpaired: int = 0  # raw/resolved parses disagreed — raw kept
+    # -- LIN1 review (2026-09-03): the variables CSV this run ACTUALLY read, "" when
+    #    none. A caller that passed no path gets discovery beside the jobs source
+    #    (documented above); without this slot the caller's provenance record said
+    #    "absent" while the graph carried edges built from it - G11 inverted.
+    variables_path: str = ""
 
-    def as_dict(self) -> dict[str, int]:
+    def as_dict(self) -> dict[str, int | str]:
         return asdict(self)
 
     def summary(self) -> str:
@@ -337,6 +342,7 @@ class ControlMInventoryExtractor:
         # chain. No chain available (no variables CSV) = the old behaviour
         # exactly, counted rather than silent.
         self._scope_chains = self._build_scope_chains(vars_path)
+        coverage.variables_path = str(vars_path) if vars_path is not None else ""
         with csv_path.open(newline="", encoding="utf-8-sig") as fh:
             for row in csv.DictReader(fh):
                 coverage.rows_read += 1
