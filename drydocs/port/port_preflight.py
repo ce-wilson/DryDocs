@@ -137,6 +137,21 @@ RECORD_PREFIXES: dict[str, str] = {
         "distinction FOREIGN_PATHS draws, applied to whole documents because these are "
         "foreign end to end rather than in a line or two"
     ),
+    "docs/history/": (
+        "superseded documents kept for provenance (DOC3, 2026-09-02: the July port guide, "
+        "the genesis material). Every path in them is a fact about the tree the document "
+        "described when it was live — git-readme's July half names drydocs/schema/*.cypher "
+        "because that is where the files were in July — and the manifest's own row for the "
+        "directory says the same: by definition nobody's live content"
+    ),
+    "internal/research/": (
+        "dated research logs (the research-* skills, 2026-09-02): a log records what the "
+        "session READ, on whichever tree it read it — company-side modules, templates on a "
+        "branch that had not merged — and the J63 provenance block in each says so. A path "
+        "here is a citation of the evidence, not a claim that the file is in this tree; "
+        "the two logs that forced this entry (JOB-MFTS, mm-aar) name company-only code and "
+        "the skill's own template paths, both tracked as gaps by Idea-236 / Idea-238"
+    ),
 }
 
 #: A document may also declare itself a record in its own header, which beats a

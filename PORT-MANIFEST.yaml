@@ -297,6 +297,23 @@ rows:
   - path: "config/review-labels.yaml"
     disposition: canonical-company
     note: "real labels consumer-side"
+  # ---- machine-pair and eval working files: never cross (2026-09-02) ----------
+  - path: "docs/lane-*-handoff.md"
+    disposition: never-port
+    note: >
+      lane-handoff (2026-09-02): the per-burst queue one PRODUCER machine hands another.
+      It retires itself when its queue empties and it names the producer's two machines'
+      surfaces - a working file of one machine pair, never a port artifact. Without this
+      row it fell to docs/** default: clean-add when absent, which is how the 08-27
+      handoff would have crossed had a roll caught it live.
+  - path: ".claude/skills/*-workspace/**"
+    disposition: never-port
+    note: >
+      skill EVAL workspaces (lane-handoff-workspace/iteration-N/review.html and its kin):
+      run transcripts and grader output embedded in a review page - producer working
+      state under a canonical-producer tree, which is exactly the class of file a
+      wholesale take of .claude/** would carry. The skill and its evals/ suite cross; the
+      runs do not.
   # ---- ADR 0018 D4 (2026-09-02): the one-cycle re-export SHIMS at the old flat paths ----
   # The four flat components became subpackages (drydocs/review, plan, port, docgen). Each old
   # path is now a sys.modules alias to the moved module - producer mechanism, identical on both
@@ -1324,6 +1341,11 @@ row_may_match_nothing:
     reason: >
       J40: same as drydocs/docmeta/** — company-only capability, row exists to protect,
       matches nothing producer-side by construction.
+  - path: "docs/lane-*-handoff.md"
+    reason: >
+      the per-burst handoff retires itself when its queue empties (lane-handoff, 2026-09-02),
+      so between bursts the glob matches nothing on purpose - the row is the tripwire that
+      keeps a live one from crossing at a roll that happens to catch it mid-burst.
   - path: "docs/next-internal-session.md"
     reason: >
       RETIRED 2026-08-25 — the file is deleted producer-side (audit + the Idea-174
