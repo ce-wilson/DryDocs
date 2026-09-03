@@ -91,6 +91,21 @@ data:
   log_env: DRYDOCS_LOGDIR
   log_default: "~/logs/DryDocs"
 
+shell:
+  # RUNTIME text encoding on Windows, per machine, never committed. .editorconfig
+  # settles what the FILES are (utf-8, lf) and the guards read files with an
+  # explicit encoding, so the tree is fine; what .editorconfig cannot reach is the
+  # interpreter's stdout, which on a Windows console defaults to the ANSI code page
+  # and dies on the first non-ASCII character a renderer or a test prints (the
+  # 2026-09-02 symptom: a pipeline that stopped mid-output with no error - J76's
+  # class). Set BOTH in the user environment, the same way DRYDOCS_DATA_ROOT is set:
+  #   PYTHONUTF8=1          - the interpreter runs in UTF-8 mode (files AND streams)
+  #   PYTHONIOENCODING=utf-8 - the streams alone; covers an interpreter that ignores
+  #                            the first (an embedded or older one)
+  # A Claude Code shell does not inherit them reliably, so `export PYTHONIOENCODING=
+  # utf-8` at the head of the command is the working habit there.
+  utf8_env: [PYTHONUTF8, PYTHONIOENCODING]
+
 depgraph:
   # The code-graph INSTRUMENT (U7). knowledge/depgraph-snapshots/snapshot.ps1
   # shells out to this sibling checkout, so the revision here decides what a
