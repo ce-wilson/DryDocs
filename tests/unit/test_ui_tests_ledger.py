@@ -155,7 +155,7 @@ def test_automated_cases_name_a_file_that_exists() -> None:
 
 
 def test_the_automated_share_is_pinned_so_it_cannot_drift_up_quietly() -> None:
-    """Sixteen of thirty-nine. The point is that the number is SMALL and visible.
+    """Seventeen of forty. The point is that the number is SMALL and visible.
 
     O80 bought the capability and proved it on cases that had already escaped
     into main; it did not backfill coverage, and this pin is what stops a later
@@ -176,12 +176,21 @@ def test_the_automated_share_is_pinned_so_it_cannot_drift_up_quietly() -> None:
     served or declared), which is the half that drifted. The diagnosis half was
     verified in a real browser against real servers, because a browser is the
     only thing that can produce the failure at all.
+
+    16/39 -> 17/40 at O92 (2026-09-03): TC-SHELL-08, automated by
+    web/src/modules/registry.test.ts. The claim is about the REGISTRY — which
+    module ids carry an access designation, with a recorded reason each, and what
+    each role's filter yields in both silent directions — so the unit runner holds
+    the whole case. The sign-in steps in the case are how a person confirms the
+    rendered nav agrees with the filter, and they stay manual. Same share rule as
+    O59: this moved up because the claim is about a pure function and a registry
+    constant, not because anything was backfilled.
     """
     cases = [c for s in _tests()["suites"] for c in s["cases"]]
     automated = [c for c in cases if c.get("automated_by")]
     assert (len(automated), len(cases)) == (
-        16,
-        39,
+        17,
+        40,
     ), f"automated case count changed: {len(automated)}/{len(cases)} — update the pin"
 
 
