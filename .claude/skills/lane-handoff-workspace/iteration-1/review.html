@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eval Review</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js" integrity="sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --bg: #faf9f5;
+      --surface: #ffffff;
+      --border: #e8e6dc;
+      --text: #141413;
+      --text-muted: #b0aea5;
+      --accent: #d97757;
+      --accent-hover: #c4613f;
+      --green: #788c5d;
+      --green-bg: #eef2e8;
+      --red: #c44;
+      --red-bg: #fceaea;
+      --header-bg: #141413;
+      --header-text: #faf9f5;
+      --radius: 6px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Lora', Georgia, serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---- Header ---- */
+    .header {
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .header h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .header .instructions {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin-top: 0.25rem;
+    }
+    .header .progress {
+      font-size: 0.875rem;
+      opacity: 0.8;
+      text-align: right;
+    }
+
+    /* ---- Main content ---- */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* ---- Sections ---- */
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      flex-shrink: 0;
+    }
+    .section-header {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.75rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .section-body {
+      padding: 1rem;
+    }
+
+    /* ---- Config badge ---- */
+    .config-badge {
+      display: inline-block;
+      padding: 0.2rem 0.625rem;
+      border-radius: 9999px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-left: 0.75rem;
+      vertical-align: middle;
+    }
+    .config-badge.config-primary {
+      background: rgba(33, 150, 243, 0.12);
+      color: #1976d2;
+    }
+    .config-badge.config-baseline {
+      background: rgba(255, 193, 7, 0.15);
+      color: #f57f17;
+    }
+
+    /* ---- Prompt ---- */
+    .prompt-text {
+      white-space: pre-wrap;
+      font-size: 0.9375rem;
+      line-height: 1.6;
+    }
+
+    /* ---- Outputs ---- */
+    .output-file {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .output-file + .output-file {
+      margin-top: 1rem;
+    }
+    .output-file-header {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .output-file-header .dl-btn {
+      font-size: 0.7rem;
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-weight: 500;
+      opacity: 0.8;
+    }
+    .output-file-header .dl-btn:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+    .output-file-content {
+      padding: 0.75rem;
+      overflow-x: auto;
+    }
+    .output-file-content pre {
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+    }
+    .output-file-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+    }
+    .output-file-content iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+    }
+    .output-file-content table {
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+      width: 100%;
+    }
+    .output-file-content table td,
+    .output-file-content table th {
+      border: 1px solid var(--border);
+      padding: 0.375rem 0.5rem;
+      text-align: left;
+    }
+    .output-file-content table th {
+      background: var(--bg);
+      font-weight: 600;
+    }
+    .output-file-content .download-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+    .output-file-content .download-link:hover {
+      background: var(--border);
+    }
+    .empty-state {
+      color: var(--text-muted);
+      font-style: italic;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    /* ---- Feedback ---- */
+    .prev-feedback {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.625rem 0.75rem;
+      margin-top: 0.75rem;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .prev-feedback-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.25rem;
+      color: var(--text-muted);
+    }
+    .feedback-textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.9375rem;
+      line-height: 1.5;
+      resize: vertical;
+      color: var(--text);
+    }
+    .feedback-textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    .feedback-status {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      min-height: 1.1em;
+    }
+
+    /* ---- Grades (collapsible) ---- */
+    .grades-toggle {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .grades-toggle:hover {
+      color: var(--accent);
+    }
+    .grades-toggle .arrow {
+      margin-right: 0.5rem;
+      transition: transform 0.15s;
+      font-size: 0.75rem;
+    }
+    .grades-toggle .arrow.open {
+      transform: rotate(90deg);
+    }
+    .grades-content {
+      display: none;
+      margin-top: 0.75rem;
+    }
+    .grades-content.open {
+      display: block;
+    }
+    .grades-summary {
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .grade-badge {
+      display: inline-block;
+      padding: 0.125rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .grade-pass { background: var(--green-bg); color: var(--green); }
+    .grade-fail { background: var(--red-bg); color: var(--red); }
+    .assertion-list {
+      list-style: none;
+    }
+    .assertion-item {
+      padding: 0.625rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8125rem;
+    }
+    .assertion-item:last-child { border-bottom: none; }
+    .assertion-status {
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+    .assertion-status.pass { color: var(--green); }
+    .assertion-status.fail { color: var(--red); }
+    .assertion-evidence {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+      padding-left: 1.5rem;
+    }
+
+    /* ---- View tabs ---- */
+    .view-tabs {
+      display: flex;
+      gap: 0;
+      padding: 0 2rem;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .view-tab {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.625rem 1.25rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .view-tab:hover { color: var(--text); }
+    .view-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .view-panel { display: none; }
+    .view-panel.active { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+
+    /* ---- Benchmark view ---- */
+    .benchmark-view {
+      padding: 1.5rem 2rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .benchmark-table {
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.8125rem;
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+    .benchmark-table th, .benchmark-table td {
+      padding: 0.625rem 0.75rem;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+    .benchmark-table th {
+      font-family: 'Poppins', sans-serif;
+      background: var(--header-bg);
+      color: var(--header-text);
+      font-weight: 500;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .benchmark-table tr:hover { background: var(--bg); }
+    .benchmark-table tr.benchmark-row-with { background: rgba(33, 150, 243, 0.06); }
+    .benchmark-table tr.benchmark-row-without { background: rgba(255, 193, 7, 0.06); }
+    .benchmark-table tr.benchmark-row-with:hover { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-without:hover { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-table tr.benchmark-row-avg { font-weight: 600; border-top: 2px solid var(--border); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-with { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-without { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-delta-positive { color: var(--green); font-weight: 600; }
+    .benchmark-delta-negative { color: var(--red); font-weight: 600; }
+    .benchmark-notes {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+    }
+    .benchmark-notes h3 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+    }
+    .benchmark-notes ul {
+      list-style: disc;
+      padding-left: 1.25rem;
+    }
+    .benchmark-notes li {
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      margin-bottom: 0.375rem;
+    }
+    .benchmark-empty {
+      color: var(--text-muted);
+      font-style: italic;
+      text-align: center;
+      padding: 3rem;
+    }
+
+    /* ---- Navigation ---- */
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+    .nav-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text);
+      transition: all 0.15s;
+    }
+    .nav-btn:hover:not(:disabled) {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .done-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .done-btn:hover {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .done-btn.ready {
+      border: none;
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+    }
+    .done-btn.ready:hover {
+      background: var(--accent-hover);
+    }
+    /* ---- Done overlay ---- */
+    .done-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+    .done-overlay.visible {
+      display: flex;
+    }
+    .done-card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 2rem 3rem;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+    }
+    .done-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .done-card p {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    .done-card .btn-row {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .done-card button {
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+    .done-card button:hover {
+      background: var(--bg);
+    }
+    /* ---- Toast ---- */
+    .toast {
+      position: fixed;
+      bottom: 5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 0.625rem 1.25rem;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 200;
+    }
+    .toast.visible {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" style="height:100vh; display:flex; flex-direction:column;">
+    <div class="header">
+      <div>
+        <h1>Eval Review: <span id="skill-name"></span></h1>
+        <div class="instructions">Review each output and leave feedback below. Navigate with arrow keys or buttons. When done, copy feedback and paste into Claude Code.</div>
+      </div>
+      <div class="progress" id="progress"></div>
+    </div>
+
+    <!-- View tabs (only shown when benchmark data exists) -->
+    <div class="view-tabs" id="view-tabs" style="display:none;">
+      <button class="view-tab active" onclick="switchView('outputs')">Outputs</button>
+      <button class="view-tab" onclick="switchView('benchmark')">Benchmark</button>
+    </div>
+
+    <!-- Outputs panel (qualitative review) -->
+    <div class="view-panel active" id="panel-outputs">
+    <div class="main">
+      <!-- Prompt -->
+      <div class="section">
+        <div class="section-header">Prompt <span class="config-badge" id="config-badge" style="display:none;"></span></div>
+        <div class="section-body">
+          <div class="prompt-text" id="prompt-text"></div>
+        </div>
+      </div>
+
+      <!-- Outputs -->
+      <div class="section">
+        <div class="section-header">Output</div>
+        <div class="section-body" id="outputs-body">
+          <div class="empty-state">No output files found</div>
+        </div>
+      </div>
+
+      <!-- Previous Output (collapsible) -->
+      <div class="section" id="prev-outputs-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="togglePrevOutputs()">
+            <span class="arrow" id="prev-outputs-arrow">&#9654;</span>
+            Previous Output
+          </div>
+        </div>
+        <div class="grades-content" id="prev-outputs-content"></div>
+      </div>
+
+      <!-- Grades (collapsible) -->
+      <div class="section" id="grades-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="toggleGrades()">
+            <span class="arrow" id="grades-arrow">&#9654;</span>
+            Formal Grades
+          </div>
+        </div>
+        <div class="grades-content" id="grades-content"></div>
+      </div>
+
+      <!-- Feedback -->
+      <div class="section">
+        <div class="section-header">Your Feedback</div>
+        <div class="section-body">
+          <textarea
+            class="feedback-textarea"
+            id="feedback"
+            placeholder="What do you think of this output? Any issues, suggestions, or things that look great?"
+          ></textarea>
+          <div class="feedback-status" id="feedback-status"></div>
+          <div class="prev-feedback" id="prev-feedback" style="display:none;">
+            <div class="prev-feedback-label">Previous feedback</div>
+            <div id="prev-feedback-text"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav" id="outputs-nav">
+      <button class="nav-btn" id="prev-btn" onclick="navigate(-1)">&#8592; Previous</button>
+      <button class="done-btn" id="done-btn" onclick="showDoneDialog()">Submit All Reviews</button>
+      <button class="nav-btn" id="next-btn" onclick="navigate(1)">Next &#8594;</button>
+    </div>
+    </div><!-- end panel-outputs -->
+
+    <!-- Benchmark panel (quantitative stats) -->
+    <div class="view-panel" id="panel-benchmark">
+      <div class="benchmark-view" id="benchmark-content">
+        <div class="benchmark-empty">No benchmark data available. Run a benchmark to see quantitative results here.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Done overlay -->
+  <div class="done-overlay" id="done-overlay">
+    <div class="done-card">
+      <h2>Review Complete</h2>
+      <p>Your feedback has been saved. Go back to your Claude Code session and tell Claude you're done reviewing.</p>
+      <div class="btn-row">
+        <button onclick="closeDoneDialog()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ---- Embedded data (injected by generate_review.py) ----
+    const EMBEDDED_DATA = {"skill_name": "lane-handoff", "runs": [{"id": "eval-1-laptop-build-queue-with_skill-run-1", "prompt": "I'm on the desktop doing the port reconcile all afternoon and the laptop session is idle. Hand the laptop a build queue of four code-only items it can do without Neo4j \u00e2\u20ac\u201d pick them from what's actually ready \u00e2\u20ac\u201d and write the handoff so it can just pull and start. Put the file under the workspace outputs dir, not in docs/.", "eval_id": 1, "outputs": [{"name": "answer.md", "type": "text", "content": "I followed the `lane-handoff` skill and generated the queue with its script\n(`.claude/skills/lane-handoff/scripts/handoff.py`) rather than hand-typing one, so the file is\ntool-validated: readiness came straight from `derive_summary` (the board's own rule), and the\nscript refused/flagged nothing.\n\n**File written:** `.claude/skills/lane-handoff-workspace/iteration-1/eval-1-laptop-build-queue/with_skill/outputs/lane-b-handoff.md`\n(generated with `--out`, so it never touched `docs/`).\n\n## The four items\n\n| # | Id | What it is | Why it's safe for an idle, Neo4j-less laptop |\n|---|---|---|---|\n| 1 | **G133** | `api.py` calls `execute()` outside the `try` that catches `FileNotFoundError` \u00e2\u20ac\u201d a missing binary breaks the documented exit-code contract; also fixes a doc claiming one folder-export path where two exist | Pure Python fix in `drydocs_core/adapters/controlm/api.py` + its docs + a unit test. No deps, no graph. |\n| 2 | **G106** | `drydocs prune-logs`: nothing rotates/caps/sweeps the run-log directory today \u00e2\u20ac\u201d build the retention verb (mirrors `prune-snapshots`) | Filesystem/CLI code (`drydocs/cli.py`, `drydocs_core/run_log.py`). Its one dependency, G104, is already `done`. No graph. |\n| 3 | **G134** | The document registry records a corpus's trust level but not the rung that produced it, so a GROUNDED row can't say whether anything higher was tried | Config schema + loader/test change (`config/doc-source-registry.yaml`, `tests/unit/test_doc_registry.py`). No deps, no graph. |\n| 4 | **J58** | Governed config YAML has no required identity header \u00e2\u20ac\u201d one JSON Schema for the four-key block, scoped by file class | Its own acceptance text says outright: \"runs in the default suite with no live services.\" No deps. |\n\nAll four are `task`/`chore`, `status: todo`, every dependency `done`, and none carried a venue,\nsurface, or gate flag from the script's check \u00e2\u20ac\u201d meaning none needs SME/gate involvement, none\ntouches a machine-local data root, and none needs the graph reachable.\n\n**Why these and not others:** I scanned the full `--suggest` output (105 ready items). Most\nunflagged items outside these four were prose/runbook edits (`docs`-module items like H8, I7,\nJ54, L29) rather than code, or were `drydocs-agents` \"requirement\"-type work (R18/R19) that\npulls in the ADK/agents-venv tier \u00e2\u20ac\u201d more scaffolding-dependent than a clean pull-and-build task.\nOne p1 item, P6, looked attractive by priority but is explicitly a live-`psgmgr`-only probe with\nno producer-side database access at all, so it's off the table regardless of machine. I also\ngrepped the actual source files these four touch for `neo4j`/`GraphDatabase`/`bolt://` \u00e2\u20ac\u201d the only\nhit was in `config/doc-source-registry.yaml`, and it turned out to be registry metadata about a\nNeo4j-*branded document corpus* (a vendor ebook), not a live database dependency, so I kept G134\nin.\n\n**One thing worth flagging (not written into the handoff file, to avoid hand-drifting a\ntool-generated artifact):** G134 and J58 both touch `tests/unit/test_doc_registry.py`. I queued\nthem adjacent (#3 then #4) precisely so the laptop finishes and commits G134 before starting J58,\nrather than interleaving them.\n\n**Assumption made in place of asking:** the task didn't name a specific backlog item as \"the port\nreconcile,\" so I checked for one (none of the 6 currently `in_progress` items are it \u00e2\u20ac\u201d port\nreconcile runs via the `reconcile-port` skill as a recurring session activity, not a single\nbacklog item). The script's built-in `LANE_A_SURFACES` table already fences the relevant paths\n(`PORT-MANIFEST.yaml`, `docs/port/`, `.claude/skills/reconcile-port/`), so I left `--other-queue`\nempty rather than inventing an item id to fence.\n\nNothing in the repo outside the two eval-output files (and this transcript) was touched \u00e2\u20ac\u201d no\ncommit, push, branch change, render, backlog claim, or id mint.\n"}, {"name": "lane-b-handoff.md", "type": "text", "content": "---\nhandoff: drydocs.lane-handoff.v1\nlane: B\nmachine: laptop\ngenerated: 2026-09-02\ngenerated_at: bd7151ed (main)\nqueue: [G133, G106, G134, J58]\n---\n\n# Lane B handoff \u00e2\u20ac\u201d laptop, 2026-09-02\n\n**From:** the desktop Lane A session (port reconcile in progress all afternoon). **To:** the Lane B session on the laptop.\n**Lifecycle:** a working handoff, not a durable record \u00e2\u20ac\u201d the item files are. When\nthe queue below is empty, delete this file in the closing commit\n(`python .claude/skills/lane-handoff/scripts/handoff.py --check <this file>` says when).\n\n## Start ritual \u00e2\u20ac\u201d CLAUDE.md \u00c2\u00a70, cited, not restated\n\n1. `git pull` (fast-forward), read CLAUDE.md, open the board's Ready-to-pull strip.\n2. Claim ONE item at a time: push `status: in_progress` in that item file BEFORE work,\n   no render (Y5). `git branch --show-current` before every commit (the branch\n   guardrail). In-flight work pushes to `wip/<id>-laptop` (J31).\n3. Ids come from the allocator, never from your tree (I6) \u00e2\u20ac\u201d but a lane does not mint:\n   ideas and groom requests go back to the sender (see the surfaces below).\n4. Per-machine facts are yours to verify: `DRYDOCS_DATA_ROOT`, `DRYDOCS_LOGDIR`, the\n   `.env`, and whether Neo4j is reachable here. Venue-stamp any live claim (J18).\n\n## Your queue, in order (4 items) \u00e2\u20ac\u201d claim one at a time\n\nEvery item below is `todo` with every dependency `done` at the generating commit \u00e2\u20ac\u201d the\nsame rule the board's Ready strip uses (`derive_summary`). Re-check on pull: the other\nlane may have moved something.\n\n| # | Id | Title | Type / prio | Module | Model | Notes from the check |\n|---|---|---|---|---|---|---|\n| 1 | **G133** | api.py calls execute() outside the try that catches FileNotFoundError, so a missing binary breaks the documented exit-code contract - and API-CALLS.md records one folder-export path where two exist | task / p2 | `drydocs-core` | sonnet | clean |\n| 2 | **G106** | drydocs prune-logs: nothing rotates, caps or sweeps the run-log directory today \u00e2\u20ac\u201d retention as a verb mirroring prune-snapshots, not a background sweeper thread (after G104) | task / p2 | `drydocs-load` | sonnet | clean |\n| 3 | **G134** | The document registry records a corpus's trust level but not the rung that produced it, so a GROUNDED row cannot say whether anything higher was ever tried | task / p2 | `config` | sonnet | clean |\n| 4 | **J58** | Governed config YAML has no required identity header \u00e2\u20ac\u201d one JSON Schema for the four-key block, scoped BY FILE CLASS so template-class files are exempt, with schema coverage sequenced first | chore / p2 | `config` | sonnet | clean |\n\n## Surfaces \u00e2\u20ac\u201d who owns what this burst\n\nThe partition is by SURFACE, not only by item, because the collisions a burst\nproduces land on shared files rather than on claimed items: the inbox top, the\nrendered pages, the snapshot. A lane touches the other lane's surfaces only by\nhanding the change back through the SME.\n\n| Surface | Owner | Why |\n|---|---|---|\n| `config/gate-prompts/` | Lane A | gate prompts (SME sessions run from Lane A) |\n| `config/gate-log.md` | Lane A | the signed gate record |\n| `PORT-MANIFEST.yaml` | Lane A | port dispositions |\n| `config/crosswalks/` | Lane A | orchestrator crosswalks |\n| `docs/port/` | Lane A | port prompt, relays, dossiers |\n| `.claude/skills/reconcile-port/` | Lane A | the port skill |\n| `docs/restructure/IDEAS.md` | Lane A | the idea inbox, and all grooming |\n| `knowledge/depgraph-snapshots/` | Lane A | the session snapshot \u00e2\u20ac\u201d one writer per burst |\n| everything an item in YOUR queue names in `inputs` | this lane | claimed per item, one at a time |\n| `docs/plan/*.html`, `web/src/generated/**`, `docs/design/*.html` | whoever merges | derived renders \u00e2\u20ac\u201d regenerate at merge, never merge by hand (J43) |\n\n**Lane B does not append to `IDEAS.md`.** Even an allocator-minted id conflicts at the\ninbox top when both machines insert there in one burst (observed 2026-09-02, twice).\nAnything worth capturing goes back to the sender in your close report, or waits for\nthe burst to end.\n\n## Rules that have bitten \u00e2\u20ac\u201d the durable ones live in CLAUDE.md\n\n- Full suite before every push (`poetry run pytest -q`), plus `ruff check .` and a bare\n  `ruff format --check .` \u00e2\u20ac\u201d CI blocks on both and ran red for a week once while subsets\n  passed locally (\u00c2\u00a70, Idea-111).\n- A guard reads code, not prose (J66); never parse a render (J37); a review names its\n  tree (J63). Read them in \u00c2\u00a76 \u00e2\u20ac\u201d this file will not keep up with them.\n- Item notes: no backslash escapes through a shell heredoc; write the note with the Write\n  tool and run `tests/unit/test_backlog.py` before committing it.\n\n## Close\n\n1. Every claimed item `done` and pushed; renders regenerated; `gh run list` at YOUR sha.\n2. `python .claude/skills/lane-handoff/scripts/handoff.py --check <this file>` \u00e2\u20ac\u201d when it\n   reports the queue empty, delete this file in the same closing commit.\n3. The depgraph snapshot is a Lane A surface: run it only if you are Lane A, or the\n   sender says the burst is over and you are the last one standing.\n4. Report back: what closed, what is `wip/`, what you noticed (that is how ideas reach\n   the inbox from Lane B).\n"}], "grading": {"expectations": [{"text": "A handoff markdown file exists in the run's outputs directory and nothing was written under docs/", "passed": true, "evidence": "handoff files: ['lane-b-handoff.md']; docs/lane-* present: []"}, {"text": "The handoff names exactly four backlog item ids as the laptop's queue", "passed": true, "evidence": "queue ids found: ['G133', 'G106', 'G134', 'J58']"}, {"text": "Every queued id is status todo in the live backlog with every depends_on done (the board's Ready-to-pull rule)", "passed": true, "evidence": "status/ready per id: {'G133': ('todo', True), 'G106': ('todo', True), 'G134': ('todo', True), 'J58': ('todo', True)}"}, {"text": "No queued item is gate-bound (has a gates: field) and none has an input under internal-local/ or the data root", "passed": true, "evidence": "gate/venue offenders: {}"}, {"text": "The handoff fences the Lane A surfaces by name: at least config/gate-prompts, docs/restructure/IDEAS.md and PORT-MANIFEST.yaml are marked as not this lane's", "passed": true, "evidence": "surfaces named: ['config/gate-prompts', 'docs/restructure/IDEAS.md', 'PORT-MANIFEST.yaml']"}, {"text": "The handoff states that the file is deleted when its queue is empty (self-retiring lifecycle)", "passed": true, "evidence": "lifecycle phrasing found"}, {"text": "The handoff tells the receiving session to push status: in_progress in the item file before work and to use a wip/ branch for unfinished work (the CLAUDE.md section 0 claim rules), by citation or restatement", "passed": true, "evidence": "in_progress mentioned: True; wip/ mentioned: True"}, {"text": "The repo tree was left untouched: git status shows no new or modified files outside the workspace, the skill directory, and the pre-existing 00-header.yaml edit", "passed": true, "evidence": "git status clean outside workspace/skill"}], "summary": {"passed": 8, "failed": 0, "total": 8, "pass_rate": 1.0}}}, {"id": "eval-1-laptop-build-queue-without_skill-run-1", "prompt": "I'm on the desktop doing the port reconcile all afternoon and the laptop session is idle. Hand the laptop a build queue of four code-only items it can do without Neo4j \u00e2\u20ac\u201d pick them from what's actually ready \u00e2\u20ac\u201d and write the handoff so it can just pull and start. Put the file under the workspace outputs dir, not in docs/.", "eval_id": 1, "outputs": [{"name": "answer.md", "type": "text", "content": "I built the laptop's queue and wrote the handoff to\n`.claude/skills/lane-handoff-workspace/iteration-1/eval-1-laptop-build-queue/without_skill/outputs/lane-b-handoff.md`\n(kept out of `docs/` as asked).\n\n**The four I picked, in suggested order:**\n\n1. **G133** \u00e2\u20ac\u201d `api.py` calls `execute()` outside the `try` that catches `FileNotFoundError`, so a\n   missing `ctm`/`exportdeffolder` binary breaks the documented exit-code contract; `API-CALLS.md`\n   also implies one folder-export path where two actually exist. Pure Python bug fix + doc\n   correction. I checked the current tree \u00e2\u20ac\u201d the bug is still live (`execute(planned)` at line 437,\n   outside the try that ends at 424) \u00e2\u20ac\u201d and the item itself says outright it's \"closable on a machine\n   with no Control-M access at all.\"\n2. **G106** \u00e2\u20ac\u201d a new `drydocs prune-logs` CLI verb (dry-run by default, age-bounded, mirrors the\n   existing `prune-snapshots`). Self-contained, tested against a temp directory, no live services.\n3. **J64** \u00e2\u20ac\u201d the depgraph snapshot script scans before the commit it's supposed to be stamping;\n   enforce scan-after-commit in the script itself, with a documented reproduction case. This is the\n   repo's own dependency-graph tooling (\"graph-infra\"), not Neo4j.\n4. **J60** \u00e2\u20ac\u201d turn on ruff's `D100`/`D104` (module/package docstrings) and fill the ~31 modules\n   currently missing one. Pure lint config + prose, no live services.\n\nAll four are `status: todo` with satisfied dependencies, none touch Neo4j or need a live\nControl-M/psgmgr connection, and they don't overlap each other's files.\n\n**What I deliberately left out, and why:**\n\n- Every `Run the ___ gate` item that showed up as \"ready\" (there are a lot: C35-37, G100, D11,\n  G63-65, G116-120, K29, N18, ...) \u00e2\u20ac\u201d those are SME/HITL-gated ontology or precedence rulings, not\n  something a solo session should just execute.\n- **G131** (empty Neo4j password in the agent env file) and **J65** (snapshot board-refresh\n  silently skipping) both looked tempting \u00e2\u20ac\u201d clean bugs, ready, no formal dependencies \u00e2\u20ac\u201d but both\n  items' acceptance requires verification \"on this desktop\" specifically (a live agent-tier Neo4j\n  connection test, and a shell-environment leak that's specific to this machine). Neither is\n  something the laptop could actually close, so I excluded them and flagged them in the handoff so\n  the laptop doesn't second-guess my list and go pick them up anyway.\n- I also noticed your desktop checkout currently has an uncommitted change in\n  `drydocs_core/ontology/relationship_vocabulary/00-header.yaml` (a comment-only ontology\n  clarification) \u00e2\u20ac\u201d none of my four touch that file, which is part of why the queue is safe to run\n  in parallel with your reconcile work this afternoon. I used that same fact to bump **J58**\n  (governed-YAML header schema) down to an alternate rather than the main four \u00e2\u20ac\u201d its scope reaches\n  into that exact directory.\n\n**One thing worth a decision, not a stall:** G106's acceptance leaves `--max-bytes` unresolved (the\n2026-08-25 SME ruling settled the age bound but not the size cap). I told the laptop to ship\nage-only and record the size cap as explicitly deferred, per the item's own stated fallback \u00e2\u20ac\u201d rather\nthan let it invent a number or get stuck waiting on you.\n\n**Alternates**, in case one of the four turns out blocked by the time the laptop pulls: **U27**\n(same snapshot script as J64, do it after \u00e2\u20ac\u201d a real CI-verdict branch-detection bug with its own\nmissing test fixtures), then **J58**.\n\nThe handoff also carries the pull rule, the branch guardrail, the `wip/<id>-laptop` push discipline,\nand a note that a CI check run from a `wip/` branch will misleadingly print \"no run yet\" (that's the\nexact U27 defect, not a sign anything broke) \u00e2\u20ac\u201d so the laptop session can just read it and start\nwithout re-deriving any of this.\n"}, {"name": "lane-b-handoff.md", "type": "text", "content": "# Lane B build queue \u00e2\u20ac\u201d laptop, 2026-09-02 afternoon\n\n**Lane A (desktop, this session):** port reconcile, all afternoon \u00e2\u20ac\u201d unavailable for backlog pulls.\n**Lane B (laptop, idle):** this queue. Four ready, code-only backlog items, none needing a Neo4j\nconnection. Pull `main` and start.\n\n**Provenance (J63).** This queue was computed against `main` at `bd7151ed` (merge of\n`feat/ui-web`, 2026-09-02). It is a claim about *that* tree. After you `git pull`, if\n`git rev-parse HEAD` is no longer `bd7151ed`, re-run the check before claiming anything:\n\n```\npoetry run python .claude/skills/groom-backlog/validate.py\n```\n\nand confirm the four ids below still show `status: todo` in their item files\n(`docs/restructure/backlog/items/<ID>.yaml`) with every `depends_on` still `done`. If one has\nmoved (claimed by someone else, or a dependency reopened), drop it and pull the next alternate\nlisted at the bottom instead of stalling.\n\n**Why these four and not others.** 105 items currently derive as `next_ready`. Most of them are\nSME/HITL gate sessions (`Run the ___ gate`) \u00e2\u20ac\u201d explicitly out of scope for an unattended pull, they\nbelong at the HITL gate, not to a solo session. Of what's left, these four are self-contained code\nchanges: a Python bug fix, a new CLI verb, a PowerShell script fix, and a lint-config + docstring\npass. None of the four touch Neo4j, none require a live Control-M/psgmgr connection, and none is\npinned to verification \"on this desktop\" (two strong candidates \u00e2\u20ac\u201d **G131** and **J65** \u00e2\u20ac\u201d were\nrejected for exactly that: both close only with a step verified live against *this machine's*\nenvironment leak/connection, which the laptop cannot reproduce or claim to have checked; see J18\non venue-named live-verification claims).\n\n**The desktop has its own uncommitted work right now** \u00e2\u20ac\u201d `drydocs_core/ontology/relationship_vocabulary/00-header.yaml`\ncarries a local, uncommitted comment-only clarification (governed ontology YAML). None of the four\nitems below touch that file or that directory, which is deliberate: it's part of why this queue is\nsafe to run in parallel with Lane A rather than merely convenient. It's also the second reason\n**J58** (governed-config-YAML header schema) was pushed to the alternates list below rather than\nthe main four \u00e2\u20ac\u201d its acceptance explicitly reaches every governed YAML under `config/` and\n`drydocs_core/ontology/`, which is exactly the file family Lane A is mid-edit on tonight.\n\n**Surface ownership this afternoon.** Lane B (you) owns the board render, the design-doc renders,\nand the depgraph snapshot on `main` for whatever you close. Lane A's reconcile writes to the\ncompany-side history via `reconcile-port`; it should not touch the four files/areas below. Still \u00e2\u20ac\u201d\npull immediately before every claim (the standard rule), not just once at session start, since Lane\nA may push between your pulls.\n\n---\n\n## The pull rule (verbatim from CLAUDE.md \u00c2\u00a70 \u00e2\u20ac\u201d do this before touching any item)\n\n> Take the next `status: todo` item in `docs/restructure/backlog/items/` whose every `depends_on`\n> is `done`; **commit and push** `status: in_progress` in that one item file **before starting\n> work**; do exactly that item, staying inside your layer; meet its `acceptance`; set it `done`.\n\n- **Branch guardrail:** run `git branch --show-current` immediately before every commit. Confirm\n  you're on `main` (small, verified, sequential work \u00e2\u20ac\u201d the repo's default) before committing the\n  claim or the close.\n- **Work visibility (J31):** push a `wip/<id>-laptop` branch at your first substantive edit on an\n  item, and again at end of session if you don't close it. Never leave same-day work unpushed.\n- **No id minting needed.** All four ids below already exist and are already titled \u00e2\u20ac\u201d you are\n  claiming existing items, not minting new ones, so the I6 allocator protocol doesn't apply here.\n- **All four are `agent: main`** \u00e2\u20ac\u201d no sub-agent dispatch; do them directly in the main session.\n- **Session close (each item):** `poetry run pytest -q`, `python -c \"import drydocs.cli\"`,\n  `drydocs --help`, then regenerate the board (`poetry run python scripts/render_board.py`) and any\n  design docs touched, commit, push, then `gh run list --branch main --limit 5` to confirm CI is\n  green on what you pushed, then run `knowledge/depgraph-snapshots/snapshot.ps1`.\n- **A snapshot run from a `wip/<id>-laptop` branch will print \"no run yet for HEAD\" in its CI\n  line** even when CI is green \u00e2\u20ac\u201d that's the exact defect item U27 (below, as an alternate)\n  describes; it is not a sign anything you did is broken. The check is reliable once you're back on\n  `main`.\n\n---\n\n## The queue\n\n### 1. G133 \u00e2\u20ac\u201d api.py execute() sits outside the FileNotFoundError try; API-CALLS.md implies one folder-export path where two exist\n- **Type:** task \u00c2\u00b7 **Module:** drydocs-core \u00c2\u00b7 **Priority:** p2 \u00c2\u00b7 **Depends on:** none\n- **Files:** `drydocs_core/adapters/controlm/api.py`, `drydocs_core/adapters/controlm/API-CALLS.md`,\n  `drydocs_core/adapters/controlm/README.md`, `tests/unit/test_controlm_api.py`\n- **Verified current** (2026-09-02, this tree at `bd7151ed`): `result = execute(planned)` is at\n  line 437 in `api.py`, outside the `try` that ends at line 424 and catches\n  `(FileNotFoundError, KeyError, configparser.Error)` \u00e2\u20ac\u201d exactly as the item describes. The bug is\n  live, not stale.\n- **What it asks:** (a) route execution failures (a missing `ctm`/`exportdeffolder` binary raising\n  `FileNotFoundError` from `_default_runner`) through the same `CallResult`/JSON channel as every\n  other outcome, with a test that asserts BOTH parseable JSON on stdout AND the contracted exit\n  code \u00e2\u20ac\u201d not just a non-zero exit, which a bare traceback also produces. Thread the runner through\n  `main()` so the CLI's execute path becomes testable (today only `--plan-only` is exercised). (b)\n  Pick and record which of the documented exit codes (0-3) a missing binary takes, and say why in\n  the README table \u00e2\u20ac\u201d it's neither \"config/usage error\" (2) nor a capability gap (3). (c) Correct\n  `API-CALLS.md`'s `folder_export` row: two live transports exist (the XML export and the\n  Automation API GET), with different attribute sets \u00e2\u20ac\u201d record both, not one. (d) Name what the\n  shape difference costs in this repo's terms (folder identity keys on `folder_id`, which the API\n  path can't supply \u00e2\u20ac\u201d but the lineage weld on `(data_center, folder_name, job_name)` is unaffected).\n- **Explicitly in scope with no live Control-M access at all** \u00e2\u20ac\u201d the item says so directly: \"closable\n  on a machine with no Control-M access at all, because (a) tests the binary being ABSENT.\"\n- **Out of scope, on purpose:** verifying a real Automation API call against a live gateway \u00e2\u20ac\u201d that's\n  G132 clause (g), server-side. Don't try to reach for it.\n- Full acceptance: `docs/restructure/backlog/items/G133.yaml`\n\n### 2. G106 \u00e2\u20ac\u201d `drydocs prune-logs`: a dry-run-by-default retention verb, mirroring `prune-snapshots`\n- **Type:** task \u00c2\u00b7 **Module:** drydocs-load \u00c2\u00b7 **Priority:** p2 \u00c2\u00b7 **Depends on:** G104 (done)\n- **Files:** `drydocs/cli.py`, `drydocs_core/run_log.py`, `agents/common/llm_ledger.py`,\n  `docs/decisions/0014-runtime-substrate.md`; retention windows read from `config/log-kinds.yaml`\n  (G105, also done \u00e2\u20ac\u201d confirmed present in this tree).\n- **What it asks:** a new `drydocs prune-logs` CLI verb, DRY-RUN BY DEFAULT (prints what it would\n  delete, needs an explicit apply flag to act), bounded by age (`--older-than-days`, default from\n  `RuntimeSettings.log_retention_days`) and covering every file family sharing the log\n  directory \u00e2\u20ac\u201d the per-run `<kind>.<name>.<ts>.log` files, SQL run logs, and the\n  `llm_ledger.py` JSONL ledger. The QA ledger gets the same 90-day retention as everything\n  else (ruled 2026-08-25 \u00e2\u20ac\u201d it is **not** exempt; note the tradeoff honestly in `--help` since the\n  `run` line is the only place full question text lands). NO background daemon \u00e2\u20ac\u201d a callable verb\n  only (ADR 0014 rejected a sweeper thread for a named reason).\n- **The one open call, already resolved by SME ruling \u00e2\u20ac\u201d don't leave it as a question:**\n  `--max-bytes` has no ruled number. **Ship age-only.** Record the size cap as explicitly deferred\n  in the code and in `--help`, and name its trigger (e.g., \"revisit if the log directory exceeds a\n  size the SME sets\"). Do not invent a number \u00e2\u20ac\u201d a size sweep nobody chose is exactly the failure\n  mode this item exists to prevent.\n- **Test:** drive the verb over a temp directory holding files of both naming shapes; assert (a)\n  dry-run deletes nothing, (b) the age bound selects the expected set, (c) an exempted file\n  survives.\n- Full acceptance: `docs/restructure/backlog/items/G106.yaml`\n\n### 3. J64 \u00e2\u20ac\u201d depgraph snapshot: scan the tree of the commit being stamped, not a pre-merge tree\n- **Type:** bug \u00c2\u00b7 **Module:** graph-infra (the repo's own dependency-graph tooling, **not** Neo4j)\n  \u00c2\u00b7 **Priority:** p2 \u00c2\u00b7 **Depends on:** none\n- **Files:** `knowledge/depgraph-snapshots/snapshot.ps1`, `knowledge/depgraph-snapshots/README.md`,\n  `tests/unit/test_depgraph_snapshots.py`\n- **What it asks:** the snapshot's git-metadata header (commit/sha/branch/describe/dirty) is a claim\n  that the scan ran against that commit's tree. Enforce the ordering in the script, not just in the\n  session-ritual's prose \u00e2\u20ac\u201d reproduce the 2026-08-29 incident (a pre-merge scan that recorded a\n  directory main had since renamed, tripping the J55 publish-boundary guard) as the test case, and\n  confirm the fix prevents it. A dirty tree at scan time is reported, not stamped silently.\n- **Explicitly out of scope:** the snapshot *cadence* question (deliberately left to the user), the\n  board-refresh-skipping defect (that's J65 \u00e2\u20ac\u201d desktop-pinned, not in this queue), and the CI-verdict\n  branch-blindness defect (that's U27 \u00e2\u20ac\u201d see alternates below).\n- **Suggested sequencing:** close this one **last** in your session, right before the normal\n  session-close snapshot run \u00e2\u20ac\u201d that run, taken against the commit you're about to stamp, doubles as\n  the item's own required re-verification evidence. Quote its output in the close note.\n- Full acceptance: `docs/restructure/backlog/items/J64.yaml`\n\n### 4. J60 \u00e2\u20ac\u201d enable ruff D100/D104 (module/package docstrings) and fill what's missing\n- **Type:** chore \u00c2\u00b7 **Module:** docs \u00c2\u00b7 **Priority:** p3 \u00c2\u00b7 **Depends on:** none\n- **Files:** `pyproject.toml` (confirmed today: `[tool.ruff.lint].select` is currently\n  `[\"E\", \"F\", \"W\", \"I\", \"B\", \"UP\", \"N\", \"RUF\"]` \u00e2\u20ac\u201d no `D` rules yet), `.github/workflows/ci.yml`,\n  `docs/reviews/persona-python-architect-idea-181.md`\n- **What it asks:** add `D100` + `D104` to ruff's `select` with the pydocstyle convention set\n  explicitly (so the rest of the `D` family doesn't switch on by accident). Existing ruff exclusions\n  (vendored skill scripts, captured experiment records) carry forward unchanged. The 2026-08-27\n  measurement found 31 modules with no docstring \u00e2\u20ac\u201d **re-measure at pull time** and report both\n  numbers. Fill each with 1-2 sentences of U.S. business-technical English saying what the module\n  is *for*, citing a governing ADR/gate/backlog id where one obviously exists (214 existing\n  docstrings already do this) \u00e2\u20ac\u201d never invent one, never restate the filename. `ruff check` and\n  `ruff format --check` both exit 0 on the tree you leave.\n- **Out of scope:** function/class docstrings (D101-103), any date/provenance key, the YAML header\n  standard (that's J58/J59).\n- Full acceptance: `docs/restructure/backlog/items/J60.yaml`\n\n---\n\n## Alternates, if one of the four is blocked at pull time\n\nTry in this order rather than re-deriving the ready list from scratch:\n\n1. **U27** \u00e2\u20ac\u201d `snapshot.ps1`'s CI check asks `gh run list --branch main`, so from any other branch\n   HEAD can never appear in the answer and the verdict silently degrades to \"no run yet\" forever;\n   its `Get-CiVerdict` function also has zero tests despite its own design comment claiming it's a\n   pure function. Same script as J64 \u00e2\u20ac\u201d do it **after** J64 in the same session if you pick it up,\n   not instead of it; the two items explicitly name each other as non-overlapping siblings (J64 is\n   about *when* the scan runs, U27 is about a check *inside* it misreporting). No Neo4j; verification\n   is `gh`/CI plumbing only. `docs/restructure/backlog/items/U27.yaml`\n2. **J58** \u00e2\u20ac\u201d one JSON Schema for the four-key governed-YAML identity header\n   (`schema:`/`source:`/`classification:`/`updated:`), scoped by file class. Explicitly \"runs in the\n   default suite with no live services.\" Larger surface area (measured baseline: 32 of 138 tracked\n   YAMLs missing `schema:`, 104 missing `updated:`) and \u00e2\u20ac\u201d as noted above \u00e2\u20ac\u201d it reaches into\n   `drydocs_core/ontology/` governed YAML, the same directory Lane A has an uncommitted edit in\n   right now. Pull immediately before starting this one specifically, and expect to rebase around\n   whatever Lane A has landed in that directory by the time you get to it.\n   `docs/restructure/backlog/items/J58.yaml`\n\n---\n\n## What this queue deliberately leaves alone\n\n- Every `Run the ___ gate` item in `next_ready` (C35, C36, C37, G100, D11, G63-65, G116-120,\n  K29, N18, ...) \u00e2\u20ac\u201d SME/HITL-gated ontology or precedence decisions, not solo-session work (see\n  CLAUDE.md \u00c2\u00a70 and the HITL flow doc).\n- **G131** and **J65** \u00e2\u20ac\u201d both close only against a live verification \"on this desktop\"; not\n  reproducible or claimable from the laptop. Leave them for Lane A.\n- Anything under `drydocs-web`/`drydocs-api`/`drydocs-agents` requiring the live console stack,\n  the ADK service venv, or a real graph \u00e2\u20ac\u201d out of scope by the \"no Neo4j\" constraint on this queue,\n  not because they're not ready.\n\n## When you're done\n\nRetire this file (delete it, or note in your session-close that its queue is exhausted) once all\nfour \u00e2\u20ac\u201d or their substitutes \u00e2\u20ac\u201d are `done` and pushed, so a later session doesn't treat a spent queue\nas a live one.\n"}], "grading": {"expectations": [{"text": "A handoff markdown file exists in the run's outputs directory and nothing was written under docs/", "passed": true, "evidence": "handoff files: ['lane-b-handoff.md']; docs/lane-* present: []"}, {"text": "The handoff names exactly four backlog item ids as the laptop's queue", "passed": true, "evidence": "The queue section lists exactly four (G133, G106, J64, J60); U27 and J58 appear under a separately headed 'Alternates' list, so the bold-id count of 8 was the parser, not the file."}, {"text": "Every queued id is status todo in the live backlog with every depends_on done (the board's Ready-to-pull rule)", "passed": true, "evidence": "status/ready per id: {'G133': ('todo', True), 'G106': ('todo', True), 'J64': ('todo', True), 'J60': ('todo', True), 'G131': ('todo', True), 'J65': ('todo', True), 'J58': ('todo', True), 'U27': ('todo', True)}"}, {"text": "No queued item is gate-bound (has a gates: field) and none has an input under internal-local/ or the data root", "passed": true, "evidence": "gate/venue offenders: {}"}, {"text": "The handoff fences the Lane A surfaces by name: at least config/gate-prompts, docs/restructure/IDEAS.md and PORT-MANIFEST.yaml are marked as not this lane's", "passed": false, "evidence": "surfaces named: []"}, {"text": "The handoff states that the file is deleted when its queue is empty (self-retiring lifecycle)", "passed": true, "evidence": "lifecycle phrasing found"}, {"text": "The handoff tells the receiving session to push status: in_progress in the item file before work and to use a wip/ branch for unfinished work (the CLAUDE.md section 0 claim rules), by citation or restatement", "passed": true, "evidence": "in_progress mentioned: True; wip/ mentioned: True"}, {"text": "The repo tree was left untouched: git status shows no new or modified files outside the workspace, the skill directory, and the pre-existing 00-header.yaml edit", "passed": true, "evidence": "git status clean outside workspace/skill"}], "summary": {"passed": 7, "failed": 1, "total": 8, "pass_rate": 0.88}}}, {"id": "eval-2-check-retire-with_skill-run-1", "prompt": "The laptop says it finished its lane. Here's the handoff it was working from: .claude/skills/lane-handoff/evals/files/lane-b-handoff-sample.md. Tell me whether it can be retired, and if not, what's still open.", "eval_id": 2, "outputs": [{"name": "answer.md", "type": "text", "content": "No \u00e2\u20ac\u201d the handoff file cannot be retired yet. One of the three queued items is still open.\n\n## Per-item status\n\nChecked with `python .claude/skills/lane-handoff/scripts/handoff.py --check` against\n`lane-b-handoff-sample.md`'s queue (`[MM3, G79, G106]`), and cross-checked directly against\neach backlog item file (both the local tree and `origin/main` \u00e2\u20ac\u201d see note on staleness below):\n\n| # | Id | Title | Status |\n|---|---|---|---|\n| 1 | MM3 | Mind-map state file + shared entity/ID extractor + novelty/theme columns on the search log | **done** |\n| 2 | G79 | Split refresh-reference by SOURCE \u00e2\u20ac\u201d one command per subject | **done** |\n| 3 | G106 | `drydocs prune-logs`: retention as a verb mirroring `prune-snapshots` | **todo \u00e2\u20ac\u201d still open** |\n\n## Verdict: keep the file\n\nThe script's own gate says it plainly:\n\n```\n  MM3    done\n  G79    done\n  G106   todo\n\nQueue not empty: G106 still open. Keep the file.\n```\nExit code 1. Per the skill's close step (step 6), exit 0 is what licenses deleting the handoff\nin the closing commit; exit 1 means the file stays and the close report names what's open. The\nlaptop's \"finished its lane\" claim is two-thirds right \u00e2\u20ac\u201d MM3 and G79 landed \u00e2\u20ac\u201d but G106 was\nnever started.\n\n**The sample file itself is untouched** (this run is read-only over the repo; even if it\nqualified for retirement, deletion would happen in the *closing commit* of a real session, not\nhere).\n\n## What's still open\n\n- **G106** (`drydocs prune-logs`) \u00e2\u20ac\u201d status `todo` in `docs/restructure/backlog/items/G106.yaml`,\n  not `in_progress`, so nobody has claimed it \u00e2\u20ac\u201d this is an unstarted item, not stalled or\n  abandoned work.\n- Its one dependency, **G104** (the runtime-substrate ADR / log directory settings), is already\n  `done`, so G106 is unblocked and ready to pull \u00e2\u20ac\u201d whoever picks it up next can start\n  immediately without waiting on anything else.\n- No stranded work was found for it: `git branch -r --list \"wip/G106-*\"` (and a full\n  `wip/*` listing) returned nothing on `origin`, so this isn't a case of finished-but-unpushed\n  laptop work hiding behind a stale `todo` status (the J31 failure mode) \u00e2\u20ac\u201d it genuinely wasn't\n  built.\n\n## Note on tree staleness\n\nThe local checkout is 32 commits behind `origin/main` (`git status` reports \"Your branch is\nbehind... by 32 commits, and can be fast-forwarded\" \u00e2\u20ac\u201d untouched, per the read-only constraint).\nI re-verified all three statuses directly against `origin/main` with `git show\norigin/main:docs/restructure/backlog/items/<id>.yaml`, and they match the local check exactly\n(MM3 done, G79 done, G106 todo), so the staleness does not change the verdict \u00e2\u20ac\u201d G106 is still\nopen at the current trunk tip, not just in this local snapshot.\n\n## Bottom line\n\nDo not retire `lane-b-handoff-sample.md`. Two of three items are closed; **G106 is the one\nthing left on the laptop's Lane B queue**, and it's ready to pull (dependency satisfied,\nunclaimed) whenever that session resumes.\n"}], "grading": {"expectations": [{"text": "The answer reports a status for each of the three queued ids MM3, G79 and G106", "passed": true, "evidence": "ids mentioned: {'MM3': True, 'G79': True, 'G106': True}"}, {"text": "The reported statuses agree with the live backlog: MM3 done, G79 done, G106 todo", "passed": true, "evidence": "live statuses {'MM3': 'done', 'G79': 'done', 'G106': 'todo'}; each found near its id in the answer: True"}, {"text": "The verdict is to KEEP the handoff (not retire it) and it names G106 as the item still open", "passed": true, "evidence": "keep-verdict phrasing with G106 present"}, {"text": "The answer explains the retire condition \u2014 the file is deleted in the closing commit only once every queued item is done", "passed": true, "evidence": "answer.md line 32: 'deletion would happen in the closing commit of a real session', and the verdict quotes the script's 'Queue not empty: G106 still open. Keep the file.' \u2014 the condition (every item done \u2192 delete at close) is stated, in different words than the regex."}, {"text": "The sample handoff file still exists and no backlog item file was modified (git status clean apart from the workspace, the skill directory, and the pre-existing 00-header.yaml edit)", "passed": true, "evidence": "sample exists: True; git status clean outside workspace/skill"}], "summary": {"passed": 5, "failed": 0, "total": 5, "pass_rate": 1.0}}}, {"id": "eval-2-check-retire-without_skill-run-1", "prompt": "The laptop says it finished its lane. Here's the handoff it was working from: .claude/skills/lane-handoff/evals/files/lane-b-handoff-sample.md. Tell me whether it can be retired, and if not, what's still open.", "eval_id": 2, "outputs": [{"name": "answer.md", "type": "text", "content": "# Lane B handoff check \u00e2\u20ac\u201d `.claude/skills/lane-handoff/evals/files/lane-b-handoff-sample.md`\n\n## Per-item status\n\n| # | Id | Title (short) | Backlog status | Verified on `main`? |\n|---|---|---|---|---|\n| 1 | **MM3** | Mind-map state file + entity/ID extractor + novelty/theme columns | `status: done` | Yes \u00e2\u20ac\u201d merged via `67cc583c` (\"Merge branch 'feat/mm-deepdoc-investigate' \u00e2\u20ac\u201d MM3...\"), and a follow-up commit `0a7fa3ac` explicitly drops the \"unmerged branch\" caveats on citations to it. The branch `feat/mm-deepdoc-investigate` still exists (local + `origin`) but its tip is reachable from `main` (`git branch --merged main` lists it), so the branch is stale-but-merged, not pending. |\n| 2 | **G79** | Split `refresh-reference` by source; wire the two orphan loaders | `status: done` | Yes \u00e2\u20ac\u201d merged via `de5506d3` (\"Merge branch 'feat/g79-source-split' \u00e2\u20ac\u201d G79: refresh-reference splits by source\"), with follow-through commits after it (`5857709e`, `93aa8060`, `118e2cbf`, snapshot commits). The branch `feat/g79-source-split` no longer exists locally or on `origin` \u00e2\u20ac\u201d cleaned up post-merge, per the item's own \"merged --no-ff\" note. |\n| 3 | **G106** | `drydocs prune-logs` retention verb | **`status: todo`** | **No implementation found.** `depends_on: G104`, which is itself `done` (ADR 0014 drafted, and separately I can see it was later `ACCEPTED` per commit `413b9186`), so G106 is unblocked and ready to pull \u00e2\u20ac\u201d but nothing has claimed or built it. No `wip/G106-*` branch on `origin`, no `in_progress` claim commit, no commit anywhere in history mentioning G106 except the two grooming/ruling commits (`ecf8ab17` folding SME rulings into the acceptance, `13cbd509` the original grooming pass). |\n\n## Verdict: the handoff file **cannot** be retired yet\n\nThe file's own close condition is \"when the queue is empty\" (all three claimed and done, then delete it in the closing commit). Two of three items (MM3, G79) are done and merged to `main`; the third, **G106, is still `status: todo`** \u00e2\u20ac\u201d untouched, not even claimed. The queue is not empty, so per the file's own lifecycle rule it stays.\n\n(I did not run `.claude/skills/lane-handoff/scripts/handoff.py --check` per this task's constraints \u00e2\u20ac\u201d the status above is from reading the three backlog item files directly and confirming merge state against `main`'s git history, which should agree with what that script would report.)\n\n## What's still open\n\n- **G106** \u00e2\u20ac\u201d `drydocs prune-logs`: a dry-run-by-default retention verb mirroring `prune-snapshots`, covering all three log families in the shared log directory (per-run `run_log.py` files, SQL run logs, the `llm_ledger.py` JSONL ledger). Its acceptance criteria were tightened by SME rulings folded in on 2026-08-25:\n  - (A) the QA ledger is explicitly **not** exempt \u00e2\u20ac\u201d 90-day retention like everything else, with the `--help` text noting that sweeping it destroys the only place full question text is recoverable from a hash.\n  - (B) every retention window must come from the `config/log-kinds.yaml` declaration (per G105), never a literal or flag default in G106 itself.\n  - (C) `--max-bytes` (the size cap) is explicitly **unruled** \u00e2\u20ac\u201d G106 must either get an SME number for it or ship age-only with the size bound recorded as deferred and its trigger named. Inventing a number is called out as the wrong move.\n  - Its dependency, G104, is satisfied (ADR 0014 exists and was accepted), so nothing blocks picking G106 up next.\n- No other gaps found: the \"Surfaces\" ownership table (gate-prompts, IDEAS.md, depgraph-snapshots \u00e2\u20ac\u201d all Lane A's) and the Close checklist don't reference open work beyond the queue itself.\n\n**Bottom line:** don't delete `lane-b-handoff-sample.md` yet. One item (G106) in its queue is still `todo` with unresolved acceptance details (notably the `--max-bytes` ruling) \u00e2\u20ac\u201d hand that to whichever lane picks it up next, then re-check.\n"}], "grading": {"expectations": [{"text": "The answer reports a status for each of the three queued ids MM3, G79 and G106", "passed": true, "evidence": "ids mentioned: {'MM3': True, 'G79': True, 'G106': True}"}, {"text": "The reported statuses agree with the live backlog: MM3 done, G79 done, G106 todo", "passed": true, "evidence": "live statuses {'MM3': 'done', 'G79': 'done', 'G106': 'todo'}; each found near its id in the answer: True"}, {"text": "The verdict is to KEEP the handoff (not retire it) and it names G106 as the item still open", "passed": true, "evidence": "keep-verdict phrasing with G106 present"}, {"text": "The answer explains the retire condition \u2014 the file is deleted in the closing commit only once every queued item is done", "passed": true, "evidence": "retire condition stated"}, {"text": "The sample handoff file still exists and no backlog item file was modified (git status clean apart from the workspace, the skill directory, and the pre-existing 00-header.yaml edit)", "passed": true, "evidence": "sample exists: True; git status clean outside workspace/skill"}], "summary": {"passed": 5, "failed": 0, "total": 5, "pass_rate": 1.0}}}, {"id": "eval-3-flipped-lanes-blocked-with_skill-run-1", "prompt": "Flip the lanes this week: the laptop owns the MM stream (MM5, MM12, MM4) and the desktop takes the gate sessions G116, G117, G118, G119. Write the desktop's handoff. Save it to the workspace outputs dir.", "eval_id": 3, "outputs": [{"name": "answer.md", "type": "text", "content": "# Desktop handoff \u00e2\u20ac\u201d blocked, needs your ruling\n\nI did not write `lane-a-handoff.md`. Generating \"the desktop's handoff\" for this split is\nblocked on two things only you can rule on, and one of them can't be resolved from inside\nthis session at all because fixing it means editing the skill's script, which is out of\nscope for a read-only run.\n\n## What I read\n\n- `.claude/skills/lane-handoff/SKILL.md` \u00e2\u20ac\u201d the workflow and the script's contract.\n- `.claude/skills/lane-handoff/scripts/handoff.py` \u00e2\u20ac\u201d `--lane` is documented as **the\n  receiving lane**; a handoff file is generated by the sender (Lane A) *for* the receiving\n  lane (Lane B). The rendered file's surface table (`render()`, the `LANE_A_SURFACES` loop)\n  hardcodes every gate surface as `| Lane A |`, and that ownership list is called \"policy,\n  not a guard\" \u00e2\u20ac\u201d changeable only by editing the script.\n- The backlog items G116, G117, G118, G119 (`docs/restructure/backlog/items/G*.yaml`) \u00e2\u20ac\u201d\n  all four are gate sign-off sessions (`gates: [...]`, `agent: main`, acceptance = \"a\n  sign-off session ... HELD\"), and their `inputs` are `config/gate-prompts/<name>.yaml` and\n  `config/gate-log.md` \u00e2\u20ac\u201d both listed verbatim in the script's `LANE_A_SURFACES` table as\n  \"gate prompts (SME sessions run from Lane A)\" and \"the signed gate record.\"\n- Items G116 and G117 carry dated notes confirming this repo's own convention: \"PRE-GATE\n  SWEEP 2026-08-28 (**desktop, Lane A**): premises CURRENT\" \u00e2\u20ac\u201d on this machine, historically,\n  desktop *is* Lane A and gate sessions are its standing job, not a queued build item.\n- MM4, MM5, MM12 (`docs/restructure/backlog/items/MM*.yaml`) \u00e2\u20ac\u201d the laptop's proposed MM\n  stream.\n\n## Why it's blocked\n\n**1. A real \"flip the lanes\" is a code edit, and it's forbidden here.**\nRead literally, \"the laptop owns the MM stream and the desktop takes the gate sessions\"\nmeans swapping which machine is Lane A and which is Lane B: laptop becomes Lane A (keeper\nof gate prompts, the gate log, the port prompt, the inbox, the snapshot) and desktop\nbecomes Lane B (the build/receiving lane), even though desktop is the one actually running\nthe SME gate sessions this week. Under that reading, the generated file would say the gate\nsurfaces the desktop is running its sessions against belong to the *other* machine\n(\"coordinate before editing\") \u00e2\u20ac\u201d because `render()` prints `Lane A` for every\n`LANE_A_SURFACES` row unconditionally; there's no parameter to flip it. The skill says this\nownership list can be changed \"when a burst needs a different split \u00e2\u20ac\u201d it is policy, not a\nguard,\" but changing it means editing `.claude/skills/lane-handoff/scripts/handoff.py`,\nwhich is outside the outputs directory and off-limits under the read-only constraint for\nthis run. **This blocks independent of who runs the actual gate sessions** \u00e2\u20ac\u201d it's a script\nchange, not a decision I can make by picking flags.\n\n**2. Even setting that aside, queuing gate sessions to a receiving lane is exactly what the\nskill warns against, and the tool itself refuses it.**\nSKILL.md, step 2: \"never a gate-runner item (an SME session, not a build) unless that\nmachine is where the SME sits.\" I don't know where the SME sits this week, and the task\nsays you're not available to say. Mechanically, I ran the generator both ways (neither\nwrote a file \u00e2\u20ac\u201d `--out` pointed at this outputs directory, not the repo tree):\n\n```\npoetry run python .claude/skills/lane-handoff/scripts/handoff.py --lane B --machine desktop \\\n    --queue G116,G117,G118,G119 --from \"the laptop Lane A session\" --out <scratch path>\n# FLAGGED \u00e2\u20ac\u201d G116, G117, G118, G119 carry venue or surface flags ... exit 3, no file written\n\npoetry run python .claude/skills/lane-handoff/scripts/handoff.py --lane A --machine desktop \\\n    --queue G116,G117,G118,G119 --from \"the laptop Lane A session\" --out <scratch path>\n# same FLAGGED result, exit 3 \u00e2\u20ac\u201d the flag check never reads --lane, so both letters agree\n```\n\nAll four items carry both a gate flag (SME session, not a build) and two surface flags\neach (`config/gate-prompts/\u00e2\u20ac\u00a6` and `config/gate-log.md`, both Lane\u00e2\u20ac\u2018A\u00e2\u20ac\u2018owned). The script\nrequires `--allow-flagged` to proceed past this \u00e2\u20ac\u201d an explicit override I'm not willing to\nguess my way past, since it stands in for exactly the ruling you're not here to give.\n\n## The two readings, and the ruling each needs\n\n1. **Flip = swap which machine is Lane A** (desktop becomes Lane B and runs the gate\n   sessions as its queue). Needs, before I can generate anything: (a) your confirmation the\n   SME sits at the desktop this week, and (b) your decision on how `LANE_A_SURFACES` in\n   `scripts/handoff.py` should read for this burst \u00e2\u20ac\u201d that's a script edit only you (or a\n   session not under this read-only constraint) can make. Once both are settled, the\n   command is:\n   `--lane B --machine desktop --queue G116,G117,G118,G119 --other-queue MM5,MM12,MM4 --from \"the laptop Lane A session\"`\n   \u00e2\u20ac\u201d and it should run clean, no flags, after the surfaces table is fixed.\n\n2. **Flip = only who sends, desktop still keeps the gate-session/Lane-A role** (matches\n   this repo's own historical pattern \u00e2\u20ac\u201d see the G116/G117 \"desktop, Lane A\" sweep notes).\n   Under this reading there is no \"desktop handoff\" to write at all: Lane A doesn't receive\n   a handoff file, it sends one. The artifact that *would* exist is the laptop's handoff\n   (Lane B), queuing the MM stream, generated from the desktop's own session. The skill has\n   no \"Lane B sends to Lane A\" mode (\"Lane A is the sender by default\"; the handoff file\n   itself is listed as a Lane A surface). I did not generate this instead of what was asked\n   \u00e2\u20ac\u201d the task named the desktop's handoff specifically, and substituting a different\n   deliverable would be guessing which reading you meant.\n\nI can't tell which of these is intended, and reading (1) is the plain reading of \"flip the\nlanes\" but is the one that requires an edit I'm not allowed to make in this run. Please\nrule which reading applies (and, if (1), settle the SME location and how the surfaces table\nshould change) and I can generate the file on the next pass.\n\n## One more thing worth flagging regardless of which way this is ruled\n\n`MM4` would be **refused outright**, not merely flagged, if queued anywhere right now: it\ndepends on `MM5`, which is still `status: todo` (not `done`). It only becomes ready once\n`MM5` closes. `MM5` itself carries a venue flag \u00e2\u20ac\u201d its one input,\n`internal-local/deepdoc/2026-08-20-session-1/transcripts/sdlc-tools-build-capture.md`, is\nmachine-local, so whichever machine gets it needs to confirm that file is actually present\nthere. `MM12` is clean (ready, no flags). None of this blocks the desktop handoff, but it\nmeans the laptop's \"MM stream\" queue as stated (MM5, MM12, MM4 all at once) can't be\ngenerated as one clean queue either \u00e2\u20ac\u201d MM4 would need to wait for MM5 to close first.\n"}], "grading": {"expectations": [{"text": "MM4 is not presented as ready anywhere in the output: it is identified as blocked because MM5 is not done", "passed": true, "evidence": "MM4 lines: - MM4, MM5, MM12 (`docs/restructure/backlog/items/MM*.yaml`) \u2014 the laptop's proposed MM | `--lane B --machine desktop --queue G116,G117,G118,G119 --other-queue MM5,MM12,MM4 --from \"the laptop Lane A session\"` | `MM4` would be **refused outright**, not merely flagged, if queued anywhere right now: it | means the laptop's \"MM stream\" queue as stated (MM5, MM12, MM4 all at once) can't be"}, {"text": "MM5 is identified as venue-bound (its input under internal-local/ is machine-local) or otherwise as needing the user's ruling before it can be assigned", "passed": true, "evidence": "MM5 lines: - MM4, MM5, MM12 (`docs/restructure/backlog/items/MM*.yaml`) \u2014 the laptop's proposed MM | `--lane B --machine desktop --queue G116,G117,G118,G119 --other-queue MM5,MM12,MM4 --from \"the laptop Lane A session\"` | depends on `MM5`, which is still `status: todo` (not `done`). It only becomes ready once | `MM5` closes. `MM5` itself carries a venue flag \u2014 its one input,"}, {"text": "If a Lane A handoff is written, its queue is G116, G117, G118, G119 in that order and each is marked as a gate session (SME-bound), not a build", "passed": true, "evidence": "no handoff file written (refusal/flag report path) \u2014 assertion vacuous"}, {"text": "The desktop's handoff (or the answer, if no file was written) fences MM5, MM12 and MM4 as the laptop lane's items \u2014 not to be claimed or edited by the desktop", "passed": true, "evidence": "MM ids present with other-lane/fence wording"}, {"text": "The output does not silently list any blocked or venue-bound item as a plain ready item", "passed": true, "evidence": "No handoff file was written; answer.md lists nothing as ready \u2014 it stops and explains the two blockers (surface flags for a Lane A queue, MM4 blocked on MM5)."}, {"text": "The repo tree was left untouched: git status shows no new or modified files outside the workspace, the skill directory, and the pre-existing 00-header.yaml edit", "passed": true, "evidence": "git status clean outside workspace/skill"}], "summary": {"passed": 6, "failed": 0, "total": 6, "pass_rate": 1.0}}}, {"id": "eval-3-flipped-lanes-blocked-without_skill-run-1", "prompt": "Flip the lanes this week: the laptop owns the MM stream (MM5, MM12, MM4) and the desktop takes the gate sessions G116, G117, G118, G119. Write the desktop's handoff. Save it to the workspace outputs dir.", "eval_id": 3, "outputs": [{"name": "answer.md", "type": "text", "content": "## What I did\n\nI wrote `lane-a-handoff.md` \u00e2\u20ac\u201d the desktop's handoff for this week's flip\n(laptop keeps the MM stream: MM5, MM12, MM4; desktop takes the four gate\nsign-off sessions: G116, G117, G118, G119). It's saved next to this file.\n\nBefore writing it I verified, against both this checkout's HEAD and\n`origin/main` (read-only \u00e2\u20ac\u201d I did not pull, per the run constraints):\n- All seven items (MM4, MM5, MM12, G116, G117, G118, G119) exist, are\n  `status: todo`, and every one of their `depends_on` items is `done`. No\n  claim conflicts (`git branch -r --list \"wip/*\"` is empty).\n- No `docs/lane-*-handoff.md` currently exists anywhere in the tree or on\n  `origin/main` to serve as \"the\" prior assignment this is flipping from.\n  The only precedent in git history is a retired `docs/lane-b-handoff.md`\n  (commits `7ed4eab2` / `a9a89230`), which always ran desktop = gate/SME\n  surfaces, laptop = build items \u00e2\u20ac\u201d the same shape you asked for this week,\n  not its reverse.\n- That retired file explicitly named G116\u00e2\u20ac\u201cG120 (among others) as\n  *\"SME sessions, not build items\"* and routed them to \"do not touch\" for\n  whichever session was the receiving build lane \u00e2\u20ac\u201d because each gate page\n  ends in a Confirm/Edit/Reject/Skip call that only the live SME can make\n  (`docs/restructure/03-hitl-sme-flow.md`). I wrote the desktop's queue to\n  match that shape: the four gates are listed as a live, SME-attended\n  sequence with real prep work (a stale-premise sweep is still undone for\n  G118 and G119; G119 also has a specific stale `gate-log.md` line ~1125 to\n  correct), not as a \"claim it, finish it unattended, mark it done\" queue.\n- This checkout is 32 commits behind `origin/main`. I read (never pulled)\n  the diff to check nothing there invalidated the queue, and found two\n  things worth carrying into the handoff: a brand-new CLAUDE.md clause from\n  today, \"one pen per surface\" (`664bca4a`), which is exactly the\n  coordination rule a two-lane handoff needs and isn't in this checkout's\n  tracked CLAUDE.md yet; and the `PLAN1` backlog restructure, which freezes\n  the legacy `G`/`MM` letter series \u00e2\u20ac\u201d the four gate ids and three MM ids\n  are unaffected, but any follow-up items the gate rulings authorize should\n  mint under the new `CFG`/`ONT` module codes, not a new `G` id. Both are\n  called out in the handoff with their source commit.\n\n## What needs your ruling\n\nOne thing genuinely can't be resolved from the tree: **what baseline is\n\"the lanes\" being flipped from?** No committed file records a standing\ndefault, and the one precedent that exists already has desktop owning gate\nwork \u00e2\u20ac\u201d so as written, this week's assignment isn't a reversal of anything\nvisible in git history. If there was a different arrangement in effect\n(a verbal one, or from a session that never committed a handoff file), I\ncan't see it and didn't guess at it. Everything else in the handoff \u00e2\u20ac\u201d the\nqueue, the ordering, the surface declarations, the \"do not touch\" list \u00e2\u20ac\u201d is\nbuilt from verified facts, so the file stands regardless of how you answer\nthat one question; it's flagged rather than blocking.\n\nI did not touch `eval_metadata.json` in this workspace, did not read\nanything under `.claude/skills/lane-handoff/`, made no commits, no pushes,\nno branch changes, no backlog-item edits, and did not run any render\nscript \u00e2\u20ac\u201d only reads (including read-only `git fetch`/`git show` against\n`origin/main` for the drift check above).\n"}, {"name": "lane-a-handoff.md", "type": "text", "content": "# Lane A handoff \u00e2\u20ac\u201d gate-session lane (desktop), week of 2026-09-02\n\n**From:** the laptop session (Lane B this week; sandbox checkout\n`C:\\coding\\projects\\sandbox\\DryDocs`), which keeps the MM (deepdoc) build\nstream for itself this week instead of handing it off.\n**To:** the desktop session (Lane A this week \u00e2\u20ac\u201d the flipped assignment).\n**Lifecycle:** this file is a working handoff \u00e2\u20ac\u201d when the gate-session queue\nbelow is fully dispositioned (each gate SIGNED, SME-DEFERRED, or BLOCKED and\nrecorded in `config/gate-log.md`), delete it in the closing commit; it is not\na durable record (the item files and `config/gate-log.md` are).\n\n---\n\n## Review provenance (J63)\n\n- `reviewed_commit`: `bd7151ed80b6ee237279a6f1e5f6fcef49784132` (local HEAD,\n  laptop checkout, branch `main`)\n- `reviewed_branch`: `main`\n- `reviewed_port_base`: not applicable \u00e2\u20ac\u201d no port in flight was inspected for\n  this handoff\n- **Tree is stale relative to `origin/main` by 32 commits** (verified via\n  `git log HEAD..origin/main` and `git fetch`, read-only \u00e2\u20ac\u201d this session did\n  not pull, per its run constraints). The 32 commits include two that bear\n  directly on how this handoff should be read and were folded in below:\n  - `664bca4a` \u00e2\u20ac\u201d **\"one pen per surface\" (2026-09-02)**, a new clause added\n    to CLAUDE.md's git-model section. It is not yet present in this laptop's\n    local CLAUDE.md. Quoted in full under \"Surfaces,\" below, because it is\n    the operative rule for exactly the coordination problem a lane handoff\n    exists to solve.\n  - the `feat/backlog-series-by-module` merge (`c24ce720`) / **PLAN1** \u00e2\u20ac\u201d the\n    27 legacy single/double-letter id series (`A`..`Z`, `GN`, `MM`) were\n    **frozen** at their highest-ever number that day; new items now mint\n    under a module code (`CFG`, `ONT`, `DEEP`, \u00e2\u20ac\u00a6) via\n    `validate.py --next-id --module <module>`, never a legacy letter.\n    Checked individually against `origin/main`: `G116`\u00e2\u20ac\u201c`G119` and\n    `MM4`/`MM5`/`MM12` all still exist there, unrenamed, all `status: todo`\n    \u00e2\u20ac\u201d this handoff's item ids and statuses are unaffected. What it changes\n    is **follow-up items minted off a gate ruling this week mint under\n    `CFG` or `ONT`, not a new `G` id** \u00e2\u20ac\u201d flag this to whoever runs the\n    session, since the item text (written before the freeze) still says\n    \"G-series\" in spirit.\n  - **Desktop's first action should be a real `git pull`**, then a full\n    re-read of CLAUDE.md before starting \u00e2\u20ac\u201d it changed today.\n\n## Start ritual\n\n1. `git pull` (fast-forward expected \u00e2\u20ac\u201d see above).\n2. `git branch --show-current` before any commit.\n3. Read CLAUDE.md fresh (it gained the one-pen-per-surface clause today).\n4. Check the board's Ready-to-pull strip and `git branch -r --list \"wip/*\"`\n   for anything already claimed before touching G116\u00e2\u20ac\u201cG119.\n5. Per-machine facts (ADR 0014) are yours to verify: `DRYDOCS_DATA_ROOT` /\n   `DRYDOCS_LOGDIR`, and this checkout's own `.env`.\n\n## Your queue \u00e2\u20ac\u201d four gate sign-off sessions, in this order\n\n**These are HITL SME sessions, not build items.** Per\n`docs/restructure/03-hitl-sme-flow.md`, each gate page ends with \"Your call:\n[C]onfirm [E]dit [R]eject [S]kip\" addressed to **you**, the SME, live. No\nsession \u00e2\u20ac\u201d main or delegated \u00e2\u20ac\u201d can render that call on your behalf; that\nwould be exactly the \"never auto-decided\" case CLAUDE.md warns about. The\nretired `docs/lane-b-handoff.md` (git history, commit `7ed4eab2`) made the\nsame distinction explicitly when it routed these same four gate ids to\n\"Do NOT touch (Lane A surfaces)\" for the receiving lane: *\"Gate-runner items\n(K29, G116-G120, C35-C37, MM11, N18, J56, D11, N19) are SME sessions, not\nbuild items.\"* This week they are Lane A's own work, held live by whoever\nsits at the desktop \u00e2\u20ac\u201d the mechanics below are prep and recording, not a\nqueue a session pulls and finishes unattended.\n\nEach of the four already has its dependency drafting item `done` and is\n`status: todo` (verified on both local HEAD and `origin/main`):\n\n1. **G116** \u00e2\u20ac\u201d `standard-identity-and-carrier` gate (depends_on `G95`, done).\n   Item's own 2026-08-28 sweep note says \"premises CURRENT... runnable as\n   drafted.\" That note is five days old as of today \u00e2\u20ac\u201d re-verify nothing\n   named in it has moved before relying on it (C28/K20 model: restate only\n   what actually moved, never re-ask a point that hasn't).\n2. **G117** \u00e2\u20ac\u201d `script-provenance-gaps` gate (depends_on `G61`, done). Same\n   2026-08-28 \"runnable as drafted\" note; same five-day re-check.\n3. **G118** \u00e2\u20ac\u201d `etlprocess-kind-enum` gate (depends_on `G27`, done). No\n   dated sweep note is recorded on the item at all \u00e2\u20ac\u201d do the stale-premise\n   sweep the acceptance requires before holding the session, not just the\n   five-day recheck the other two get.\n4. **G119** \u00e2\u20ac\u201d `snowflake-data-catalog` gate (depends_on `G44`, done). Also\n   has no recorded sweep. Its acceptance names a specific, already-verified\n   stale line to correct as part of the sweep: `config/gate-log.md` line\n   ~1125 still reads \"gate prompt not drafted\" while\n   `config/gate-prompts/snowflake-data-catalog.yaml` exists \u00e2\u20ac\u201d confirmed\n   still true against both local HEAD and `origin/main`. Fix it as a dated\n   correction beside the existing line, never a rewrite of it (L25 \u00e2\u20ac\u201d\n   signed/existing gate-log text gets riders, not edits).\n\nFor each: hold the session live, record the outcome in `config/gate-log.md`\nas `SIGNED`, `SME-DEFERRED` with a named re-arm trigger, or `BLOCKED` with a\nnamed blocker \u00e2\u20ac\u201d silence is the one outcome the acceptance forbids. After a\nruling, mint the follow-up build items it authorizes (or an explicit\nnone-needed note in the sign-off entry) \u00e2\u20ac\u201d under the new `CFG`/`ONT` module\nseries per PLAN1, not a legacy `G` id.\n\n## Surfaces you hold the pen for this week\n\nPer the new CLAUDE.md clause found on `origin/main` (`664bca4a`, quoted in\nfull since it is not yet in this checkout's tracked copy):\n\n> **One pen per surface (2026-09-02).** Concurrent sessions are normal \u00e2\u20ac\u201d\n> two machines, N worktrees, a review session. Collisions come from two\n> sessions WRITING THE SAME SURFACE, not from two sessions existing. So: at\n> the start of any session that will write, name the surfaces it holds the\n> pen for \u00e2\u20ac\u201d `backlog` (`items/`, `IDEAS.md`/`ideas/`, `epics/`, the plan\n> renders), `port` (`port-prompt.md`, `PORT-MANIFEST.yaml`,\n> `docs/company-prompts/`), `adr`, `code:<module>` \u00e2\u20ac\u201d in its first commit\n> message or a `wip/` branch name. Any other live session stays off those\n> surfaces until the pen moves, and asks rather than assumes.\n\nYour gate work touches `backlog` (minting follow-ups, board render) and, by\nextension, `config/gate-log.md` and `config/gate-prompts/**` \u00e2\u20ac\u201d those two\nfiles aren't named in the four listed categories above; treat them as part\nof the same pen as the gate work and say so explicitly in your first commit\nmessage, since the rule's own text only gives four worked examples, not a\nclosed list. Declare the pen before your first mint or gate-log edit.\n\n## Do NOT touch (laptop-owned this week)\n\n`drydocs_deepdoc/**`, the item files `MM4.yaml` / `MM5.yaml` / `MM12.yaml`\n(status edits included), and `docs/design/deepdoc-data-flow-overview.md` if\nthe laptop session is actively editing it. The laptop holds\n`code:drydocs-deepdoc` for its own queue (below) \u00e2\u20ac\u201d informational only, not\nyours to act on.\n\n## What the laptop is doing in parallel (informational)\n\nMM stream, in dependency order: **MM5** (depends on `MM1`, done) unblocks\n**MM4** (depends on `MM3` done + `MM5`), so MM5 goes first; **MM12** (depends\nonly on `MM3`, done) has no ordering dependency on the other two and can run\nbefore or after MM5 \u00e2\u20ac\u201d the laptop is taking it second, then MM4 last since\nMM4 cannot start until MM5 is `done`.\n\n## Coordination\n\nIf your gate work needs a `backlog` or `code:drydocs-deepdoc` touch that\nisn't yours to make (e.g., a gate ruling turns out to require a deepdoc\ncode change), say so rather than crossing the line \u00e2\u20ac\u201d hand it back through\nthe laptop session or the user. Check `git branch -r --list \"wip/*\"` before\ntouching anything that might already be `in_progress`. Push your own\nin-flight work at the first substantive edit and again at session close if\nthe queue isn't fully dispositioned (J31): branch `wip/<id>-desktop`.\n\n## Open question this handoff does NOT resolve\n\nNo tracked file \u00e2\u20ac\u201d on this local `HEAD` or on `origin/main` \u00e2\u20ac\u201d records what\n\"the lanes\" default assignment for this week actually is. The only prior\nprecedent in git history (`docs/lane-b-handoff.md`, commits `7ed4eab2` /\nretired `a9a89230`) always ran **desktop = gate/SME surfaces, laptop =\nbuild items** \u00e2\u20ac\u201d i.e., the same shape as this week's assignment, not its\nreverse. Whether \"flip the lanes\" means something changed from a *different,\nuntracked* baseline (a verbal arrangement, a prior session not reflected in\nany committed file) is not something this handoff can verify \u00e2\u20ac\u201d that is the\none thing here that needs the user's confirmation, not a guess from this\nsession.\n"}], "grading": {"expectations": [{"text": "MM4 is not presented as ready anywhere in the output: it is identified as blocked because MM5 is not done", "passed": true, "evidence": "MM4 lines: (laptop keeps the MM stream: MM5, MM12, MM4; desktop takes the four gate | - All seven items (MM4, MM5, MM12, G116, G117, G118, G119) exist, are | `MM4`/`MM5`/`MM12` all still exist there, unrenamed, all `status: todo` | `drydocs_deepdoc/**`, the item files `MM4.yaml` / `MM5.yaml` / `MM12.yaml`"}, {"text": "MM5 is identified as venue-bound (its input under internal-local/ is machine-local) or otherwise as needing the user's ruling before it can be assigned", "passed": false, "evidence": "MM5 lines: (laptop keeps the MM stream: MM5, MM12, MM4; desktop takes the four gate | - All seven items (MM4, MM5, MM12, G116, G117, G118, G119) exist, are | `MM4`/`MM5`/`MM12` all still exist there, unrenamed, all `status: todo` | `drydocs_deepdoc/**`, the item files `MM4.yaml` / `MM5.yaml` / `MM12.yaml`"}, {"text": "If a Lane A handoff is written, its queue is G116, G117, G118, G119 in that order and each is marked as a gate session (SME-bound), not a build", "passed": true, "evidence": "lane-a-handoff.md \u00a7'Your queue \u2014 four gate sign-off sessions, in this order' lists G116, G117, G118, G119 and states 'These are HITL SME sessions, not build items'."}, {"text": "The desktop's handoff (or the answer, if no file was written) fences MM5, MM12 and MM4 as the laptop lane's items \u2014 not to be claimed or edited by the desktop", "passed": true, "evidence": "MM ids present with other-lane/fence wording"}, {"text": "The output does not silently list any blocked or venue-bound item as a plain ready item", "passed": false, "evidence": "The 'What the laptop is doing in parallel' section orders MM5 \u2192 MM12 \u2192 MM4 and marks MM4 as waiting on MM5, but MM5's machine-local input is never mentioned \u2014 a venue-bound item presented as plainly startable."}, {"text": "The repo tree was left untouched: git status shows no new or modified files outside the workspace, the skill directory, and the pre-existing 00-header.yaml edit", "passed": true, "evidence": "git status clean outside workspace/skill"}], "summary": {"passed": 4, "failed": 2, "total": 6, "pass_rate": 0.67}}}], "previous_feedback": {}, "previous_outputs": {}, "benchmark": {"metadata": {"skill_name": "lane-handoff", "skill_path": "<path/to/skill>", "executor_model": "<model-name>", "analyzer_model": "<model-name>", "timestamp": "2026-09-03T00:06:54Z", "evals_run": [1, 2, 3], "runs_per_configuration": 3}, "runs": [{"eval_id": 1, "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 8, "failed": 0, "total": 8, "time_seconds": 352.2, "tokens": 116002, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "A handoff markdown file exists in the run's outputs directory and nothing was written under docs/", "passed": true, "evidence": "handoff files: ['lane-b-handoff.md']; docs/lane-* present: []"}, {"text": "The handoff names exactly four backlog item ids as the laptop's queue", "passed": true, "evidence": "queue ids found: ['G133', 'G106', 'G134', 'J58']"}, {"text": "Every queued id is status todo in the live backlog with every depends_on done (the board's Ready-to-pull rule)", "passed": true, "evidence": "status/ready per id: {'G133': ('todo', True), 'G106': ('todo', True), 'G134': ('todo', True), 'J58': ('todo', True)}"}, {"text": "No queued item is gate-bound (has a gates: field) and none has an input under internal-local/ or the data root", "passed": true, "evidence": "gate/venue offenders: {}"}, {"text": "The handoff fences the Lane A surfaces by name: at least config/gate-prompts, docs/restructure/IDEAS.md and PORT-MANIFEST.yaml are marked as not this lane's", "passed": true, "evidence": "surfaces named: ['config/gate-prompts', 'docs/restructure/IDEAS.md', 'PORT-MANIFEST.yaml']"}, {"text": "The handoff states that the file is deleted when its queue is empty (self-retiring lifecycle)", "passed": true, "evidence": "lifecycle phrasing found"}, {"text": "The handoff tells the receiving session to push status: in_progress in the item file before work and to use a wip/ branch for unfinished work (the CLAUDE.md section 0 claim rules), by citation or restatement", "passed": true, "evidence": "in_progress mentioned: True; wip/ mentioned: True"}, {"text": "The repo tree was left untouched: git status shows no new or modified files outside the workspace, the skill directory, and the pre-existing 00-header.yaml edit", "passed": true, "evidence": "git status clean outside workspace/skill"}], "notes": []}, {"eval_id": 2, "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5, "time_seconds": 134.4, "tokens": 75680, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "The answer reports a status for each of the three queued ids MM3, G79 and G106", "passed": true, "evidence": "ids mentioned: {'MM3': True, 'G79': True, 'G106': True}"}, {"text": "The reported statuses agree with the live backlog: MM3 done, G79 done, G106 todo", "passed": true, "evidence": "live statuses {'MM3': 'done', 'G79': 'done', 'G106': 'todo'}; each found near its id in the answer: True"}, {"text": "The verdict is to KEEP the handoff (not retire it) and it names G106 as the item still open", "passed": true, "evidence": "keep-verdict phrasing with G106 present"}, {"text": "The answer explains the retire condition \u2014 the file is deleted in the closing commit only once every queued item is done", "passed": true, "evidence": "answer.md line 32: 'deletion would happen in the closing commit of a real session', and the verdict quotes the script's 'Queue not empty: G106 still open. Keep the file.' \u2014 the condition (every item done \u2192 delete at close) is stated, in different words than the regex."}, {"text": "The sample handoff file still exists and no backlog item file was modified (git status clean apart from the workspace, the skill directory, and the pre-existing 00-header.yaml edit)", "passed": true, "evidence": "sample exists: True; git status clean outside workspace/skill"}], "notes": []}, {"eval_id": 3, "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 6, "failed": 0, "total": 6, "time_seconds": 412.8, "tokens": 114745, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "MM4 is not presented as ready anywhere in the output: it is identified as blocked because MM5 is not done", "passed": true, "evidence": "MM4 lines: - MM4, MM5, MM12 (`docs/restructure/backlog/items/MM*.yaml`) \u2014 the laptop's proposed MM | `--lane B --machine desktop --queue G116,G117,G118,G119 --other-queue MM5,MM12,MM4 --from \"the laptop Lane A session\"` | `MM4` would be **refused outright**, not merely flagged, if queued anywhere right now: it | means the laptop's \"MM stream\" queue as stated (MM5, MM12, MM4 all at once) can't be"}, {"text": "MM5 is identified as venue-bound (its input under internal-local/ is machine-local) or otherwise as needing the user's ruling before it can be assigned", "passed": true, "evidence": "MM5 lines: - MM4, MM5, MM12 (`docs/restructure/backlog/items/MM*.yaml`) \u2014 the laptop's proposed MM | `--lane B --machine desktop --queue G116,G117,G118,G119 --other-queue MM5,MM12,MM4 --from \"the laptop Lane A session\"` | depends on `MM5`, which is still `status: todo` (not `done`). It only becomes ready once | `MM5` closes. `MM5` itself carries a venue flag \u2014 its one input,"}, {"text": "If a Lane A handoff is written, its queue is G116, G117, G118, G119 in that order and each is marked as a gate session (SME-bound), not a build", "passed": true, "evidence": "no handoff file written (refusal/flag report path) \u2014 assertion vacuous"}, {"text": "The desktop's handoff (or the answer, if no file was written) fences MM5, MM12 and MM4 as the laptop lane's items \u2014 not to be claimed or edited by the desktop", "passed": true, "evidence": "MM ids present with other-lane/fence wording"}, {"text": "The output does not silently list any blocked or venue-bound item as a plain ready item", "passed": true, "evidence": "No handoff file was written; answer.md lists nothing as ready \u2014 it stops and explains the two blockers (surface flags for a Lane A queue, MM4 blocked on MM5)."}, {"text": "The repo tree was left untouched: git status shows no new or modified files outside the workspace, the skill directory, and the pre-existing 00-header.yaml edit", "passed": true, "evidence": "git status clean outside workspace/skill"}], "notes": []}, {"eval_id": 1, "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 0.88, "passed": 7, "failed": 1, "total": 8, "time_seconds": 600.9, "tokens": 131790, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "A handoff markdown file exists in the run's outputs directory and nothing was written under docs/", "passed": true, "evidence": "handoff files: ['lane-b-handoff.md']; docs/lane-* present: []"}, {"text": "The handoff names exactly four backlog item ids as the laptop's queue", "passed": true, "evidence": "The queue section lists exactly four (G133, G106, J64, J60); U27 and J58 appear under a separately headed 'Alternates' list, so the bold-id count of 8 was the parser, not the file."}, {"text": "Every queued id is status todo in the live backlog with every depends_on done (the board's Ready-to-pull rule)", "passed": true, "evidence": "status/ready per id: {'G133': ('todo', True), 'G106': ('todo', True), 'J64': ('todo', True), 'J60': ('todo', True), 'G131': ('todo', True), 'J65': ('todo', True), 'J58': ('todo', True), 'U27': ('todo', True)}"}, {"text": "No queued item is gate-bound (has a gates: field) and none has an input under internal-local/ or the data root", "passed": true, "evidence": "gate/venue offenders: {}"}, {"text": "The handoff fences the Lane A surfaces by name: at least config/gate-prompts, docs/restructure/IDEAS.md and PORT-MANIFEST.yaml are marked as not this lane's", "passed": false, "evidence": "surfaces named: []"}, {"text": "The handoff states that the file is deleted when its queue is empty (self-retiring lifecycle)", "passed": true, "evidence": "lifecycle phrasing found"}, {"text": "The handoff tells the receiving session to push status: in_progress in the item file before work and to use a wip/ branch for unfinished work (the CLAUDE.md section 0 claim rules), by citation or restatement", "passed": true, "evidence": "in_progress mentioned: True; wip/ mentioned: True"}, {"text": "The repo tree was left untouched: git status shows no new or modified files outside the workspace, the skill directory, and the pre-existing 00-header.yaml edit", "passed": true, "evidence": "git status clean outside workspace/skill"}], "notes": []}, {"eval_id": 2, "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5, "time_seconds": 139.0, "tokens": 82750, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "The answer reports a status for each of the three queued ids MM3, G79 and G106", "passed": true, "evidence": "ids mentioned: {'MM3': True, 'G79': True, 'G106': True}"}, {"text": "The reported statuses agree with the live backlog: MM3 done, G79 done, G106 todo", "passed": true, "evidence": "live statuses {'MM3': 'done', 'G79': 'done', 'G106': 'todo'}; each found near its id in the answer: True"}, {"text": "The verdict is to KEEP the handoff (not retire it) and it names G106 as the item still open", "passed": true, "evidence": "keep-verdict phrasing with G106 present"}, {"text": "The answer explains the retire condition \u2014 the file is deleted in the closing commit only once every queued item is done", "passed": true, "evidence": "retire condition stated"}, {"text": "The sample handoff file still exists and no backlog item file was modified (git status clean apart from the workspace, the skill directory, and the pre-existing 00-header.yaml edit)", "passed": true, "evidence": "sample exists: True; git status clean outside workspace/skill"}], "notes": []}, {"eval_id": 3, "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 0.67, "passed": 4, "failed": 2, "total": 6, "time_seconds": 663.0, "tokens": 125817, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "MM4 is not presented as ready anywhere in the output: it is identified as blocked because MM5 is not done", "passed": true, "evidence": "MM4 lines: (laptop keeps the MM stream: MM5, MM12, MM4; desktop takes the four gate | - All seven items (MM4, MM5, MM12, G116, G117, G118, G119) exist, are | `MM4`/`MM5`/`MM12` all still exist there, unrenamed, all `status: todo` | `drydocs_deepdoc/**`, the item files `MM4.yaml` / `MM5.yaml` / `MM12.yaml`"}, {"text": "MM5 is identified as venue-bound (its input under internal-local/ is machine-local) or otherwise as needing the user's ruling before it can be assigned", "passed": false, "evidence": "MM5 lines: (laptop keeps the MM stream: MM5, MM12, MM4; desktop takes the four gate | - All seven items (MM4, MM5, MM12, G116, G117, G118, G119) exist, are | `MM4`/`MM5`/`MM12` all still exist there, unrenamed, all `status: todo` | `drydocs_deepdoc/**`, the item files `MM4.yaml` / `MM5.yaml` / `MM12.yaml`"}, {"text": "If a Lane A handoff is written, its queue is G116, G117, G118, G119 in that order and each is marked as a gate session (SME-bound), not a build", "passed": true, "evidence": "lane-a-handoff.md \u00a7'Your queue \u2014 four gate sign-off sessions, in this order' lists G116, G117, G118, G119 and states 'These are HITL SME sessions, not build items'."}, {"text": "The desktop's handoff (or the answer, if no file was written) fences MM5, MM12 and MM4 as the laptop lane's items \u2014 not to be claimed or edited by the desktop", "passed": true, "evidence": "MM ids present with other-lane/fence wording"}, {"text": "The output does not silently list any blocked or venue-bound item as a plain ready item", "passed": false, "evidence": "The 'What the laptop is doing in parallel' section orders MM5 \u2192 MM12 \u2192 MM4 and marks MM4 as waiting on MM5, but MM5's machine-local input is never mentioned \u2014 a venue-bound item presented as plainly startable."}, {"text": "The repo tree was left untouched: git status shows no new or modified files outside the workspace, the skill directory, and the pre-existing 00-header.yaml edit", "passed": true, "evidence": "git status clean outside workspace/skill"}], "notes": []}], "run_summary": {"with_skill": {"pass_rate": {"mean": 1.0, "stddev": 0.0, "min": 1.0, "max": 1.0}, "time_seconds": {"mean": 299.8, "stddev": 146.4102, "min": 134.4, "max": 412.8}, "tokens": {"mean": 102142.3333, "stddev": 22925.6696, "min": 75680, "max": 116002}}, "without_skill": {"pass_rate": {"mean": 0.85, "stddev": 0.167, "min": 0.67, "max": 1.0}, "time_seconds": {"mean": 467.6333, "stddev": 286.2936, "min": 139.0, "max": 663.0}, "tokens": {"mean": 113452.3333, "stddev": 26756.1981, "min": 82750, "max": 131790}}, "delta": {"pass_rate": "+0.15", "time_seconds": "-167.8", "tokens": "-11310"}}, "notes": []}};
+
+    // ---- State ----
+    let feedbackMap = {};  // run_id -> feedback text
+    let currentIndex = 0;
+    let visitedRuns = new Set();
+
+    // ---- Init ----
+    async function init() {
+      // Load saved feedback from server — but only if this isn't a fresh
+      // iteration (indicated by previous_feedback being present). When
+      // previous feedback exists, the feedback.json on disk is stale from
+      // the prior iteration and should not pre-fill the textareas.
+      const hasPrevious = Object.keys(EMBEDDED_DATA.previous_feedback || {}).length > 0
+        || Object.keys(EMBEDDED_DATA.previous_outputs || {}).length > 0;
+      if (!hasPrevious) {
+        try {
+          const resp = await fetch("/api/feedback");
+          const data = await resp.json();
+          if (data.reviews) {
+            for (const r of data.reviews) feedbackMap[r.run_id] = r.feedback;
+          }
+        } catch { /* first run, no feedback yet */ }
+      }
+
+      document.getElementById("skill-name").textContent = EMBEDDED_DATA.skill_name;
+      showRun(0);
+
+      // Wire up feedback auto-save
+      const textarea = document.getElementById("feedback");
+      let saveTimeout = null;
+      textarea.addEventListener("input", () => {
+        clearTimeout(saveTimeout);
+        document.getElementById("feedback-status").textContent = "";
+        saveTimeout = setTimeout(() => saveCurrentFeedback(), 800);
+      });
+    }
+
+    // ---- Navigation ----
+    function navigate(delta) {
+      const newIndex = currentIndex + delta;
+      if (newIndex >= 0 && newIndex < EMBEDDED_DATA.runs.length) {
+        saveCurrentFeedback();
+        showRun(newIndex);
+      }
+    }
+
+    function updateNavButtons() {
+      document.getElementById("prev-btn").disabled = currentIndex === 0;
+      document.getElementById("next-btn").disabled =
+        currentIndex === EMBEDDED_DATA.runs.length - 1;
+    }
+
+    // ---- Show a run ----
+    function showRun(index) {
+      currentIndex = index;
+      const run = EMBEDDED_DATA.runs[index];
+
+      // Progress
+      document.getElementById("progress").textContent =
+        `${index + 1} of ${EMBEDDED_DATA.runs.length}`;
+
+      // Prompt
+      document.getElementById("prompt-text").textContent = run.prompt;
+
+      // Config badge
+      const badge = document.getElementById("config-badge");
+      const configMatch = run.id.match(/(with_skill|without_skill|new_skill|old_skill)/);
+      if (configMatch) {
+        const config = configMatch[1];
+        const isBaseline = config === "without_skill" || config === "old_skill";
+        badge.textContent = config.replace(/_/g, " ");
+        badge.className = "config-badge " + (isBaseline ? "config-baseline" : "config-primary");
+        badge.style.display = "inline-block";
+      } else {
+        badge.style.display = "none";
+      }
+
+      // Outputs
+      renderOutputs(run);
+
+      // Previous outputs
+      renderPrevOutputs(run);
+
+      // Grades
+      renderGrades(run);
+
+      // Previous feedback
+      const prevFb = (EMBEDDED_DATA.previous_feedback || {})[run.id];
+      const prevEl = document.getElementById("prev-feedback");
+      if (prevFb) {
+        document.getElementById("prev-feedback-text").textContent = prevFb;
+        prevEl.style.display = "block";
+      } else {
+        prevEl.style.display = "none";
+      }
+
+      // Feedback
+      document.getElementById("feedback").value = feedbackMap[run.id] || "";
+      document.getElementById("feedback-status").textContent = "";
+
+      updateNavButtons();
+
+      // Track visited runs and promote done button when all visited
+      visitedRuns.add(index);
+      const doneBtn = document.getElementById("done-btn");
+      if (visitedRuns.size >= EMBEDDED_DATA.runs.length) {
+        doneBtn.classList.add("ready");
+      }
+
+      // Scroll main content to top
+      document.querySelector(".main").scrollTop = 0;
+    }
+
+    // ---- Render outputs ----
+    function renderOutputs(run) {
+      const container = document.getElementById("outputs-body");
+      container.innerHTML = "";
+
+      const outputs = run.outputs || [];
+      if (outputs.length === 0) {
+        container.innerHTML = '<div class="empty-state">No output files</div>';
+        return;
+      }
+
+      for (const file of outputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        // Always show file header with download link
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const content = document.createElement("div");
+        content.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          content.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          content.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          content.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(content, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          content.appendChild(a);
+        } else if (file.type === "error") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          pre.style.color = "var(--red)";
+          content.appendChild(pre);
+        }
+
+        fileDiv.appendChild(content);
+        container.appendChild(fileDiv);
+      }
+    }
+
+    // ---- XLSX rendering via SheetJS ----
+    function renderXlsx(container, b64Data) {
+      try {
+        const raw = Uint8Array.from(atob(b64Data), c => c.charCodeAt(0));
+        const wb = XLSX.read(raw, { type: "array" });
+
+        for (let i = 0; i < wb.SheetNames.length; i++) {
+          const sheetName = wb.SheetNames[i];
+          const ws = wb.Sheets[sheetName];
+
+          if (wb.SheetNames.length > 1) {
+            const sheetLabel = document.createElement("div");
+            sheetLabel.style.cssText =
+              "font-weight:600; font-size:0.8rem; color:#b0aea5; margin-top:0.5rem; margin-bottom:0.25rem;";
+            sheetLabel.textContent = "Sheet: " + sheetName;
+            container.appendChild(sheetLabel);
+          }
+
+          const htmlStr = XLSX.utils.sheet_to_html(ws, { editable: false });
+          const wrapper = document.createElement("div");
+          wrapper.innerHTML = htmlStr;
+          container.appendChild(wrapper);
+        }
+      } catch (err) {
+        container.textContent = "Error rendering spreadsheet: " + err.message;
+      }
+    }
+
+    // ---- Grades ----
+    function renderGrades(run) {
+      const section = document.getElementById("grades-section");
+      const content = document.getElementById("grades-content");
+
+      if (!run.grading) {
+        section.style.display = "none";
+        return;
+      }
+
+      const grading = run.grading;
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("grades-arrow").classList.remove("open");
+
+      const summary = grading.summary || {};
+      const expectations = grading.expectations || [];
+
+      let html = '<div style="padding: 1rem;">';
+
+      // Summary line
+      const passRate = summary.pass_rate != null
+        ? Math.round(summary.pass_rate * 100) + "%"
+        : "?";
+      const badgeClass = summary.pass_rate >= 0.8 ? "grade-pass" : summary.pass_rate >= 0.5 ? "" : "grade-fail";
+      html += '<div class="grades-summary">';
+      html += '<span class="grade-badge ' + badgeClass + '">' + passRate + '</span>';
+      html += '<span>' + (summary.passed || 0) + ' passed, ' + (summary.failed || 0) + ' failed of ' + (summary.total || 0) + '</span>';
+      html += '</div>';
+
+      // Assertions list
+      html += '<ul class="assertion-list">';
+      for (const exp of expectations) {
+        const statusClass = exp.passed ? "pass" : "fail";
+        const statusIcon = exp.passed ? "\u2713" : "\u2717";
+        html += '<li class="assertion-item">';
+        html += '<span class="assertion-status ' + statusClass + '">' + statusIcon + '</span>';
+        html += '<span>' + escapeHtml(exp.text) + '</span>';
+        if (exp.evidence) {
+          html += '<div class="assertion-evidence">' + escapeHtml(exp.evidence) + '</div>';
+        }
+        html += '</li>';
+      }
+      html += '</ul>';
+
+      html += '</div>';
+      content.innerHTML = html;
+    }
+
+    function toggleGrades() {
+      const content = document.getElementById("grades-content");
+      const arrow = document.getElementById("grades-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Previous outputs (collapsible) ----
+    function renderPrevOutputs(run) {
+      const section = document.getElementById("prev-outputs-section");
+      const content = document.getElementById("prev-outputs-content");
+      const prevOutputs = (EMBEDDED_DATA.previous_outputs || {})[run.id];
+
+      if (!prevOutputs || prevOutputs.length === 0) {
+        section.style.display = "none";
+        return;
+      }
+
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("prev-outputs-arrow").classList.remove("open");
+
+      // Render the files into the content area
+      content.innerHTML = "";
+      const wrapper = document.createElement("div");
+      wrapper.style.padding = "1rem";
+
+      for (const file of prevOutputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const fc = document.createElement("div");
+        fc.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          fc.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          fc.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          fc.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(fc, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          fc.appendChild(a);
+        }
+
+        fileDiv.appendChild(fc);
+        wrapper.appendChild(fileDiv);
+      }
+
+      content.appendChild(wrapper);
+    }
+
+    function togglePrevOutputs() {
+      const content = document.getElementById("prev-outputs-content");
+      const arrow = document.getElementById("prev-outputs-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Feedback (saved to server -> feedback.json) ----
+    function saveCurrentFeedback() {
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // Build reviews array from map
+      const reviews = [];
+      for (const [run_id, feedback] of Object.entries(feedbackMap)) {
+        if (feedback.trim()) {
+          reviews.push({ run_id, feedback, timestamp: new Date().toISOString() });
+        }
+      }
+
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reviews, status: "in_progress" }),
+      }).then(() => {
+        document.getElementById("feedback-status").textContent = "Saved";
+      }).catch(() => {
+        // Static mode or server unavailable — no-op on auto-save,
+        // feedback will be downloaded on final submit
+        document.getElementById("feedback-status").textContent = "Will download on submit";
+      });
+    }
+
+    // ---- Done ----
+    function showDoneDialog() {
+      // Save current textarea to feedbackMap (but don't POST yet)
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // POST once with status: complete — include ALL runs so the model
+      // can distinguish "no feedback" (looks good) from "not reviewed"
+      const reviews = [];
+      const ts = new Date().toISOString();
+      for (const r of EMBEDDED_DATA.runs) {
+        reviews.push({ run_id: r.id, feedback: feedbackMap[r.id] || "", timestamp: ts });
+      }
+      const payload = JSON.stringify({ reviews, status: "complete" }, null, 2);
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: payload,
+      }).then(() => {
+        document.getElementById("done-overlay").classList.add("visible");
+      }).catch(() => {
+        // Server not available (static mode) — download as file
+        const blob = new Blob([payload], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "feedback.json";
+        a.click();
+        URL.revokeObjectURL(url);
+        document.getElementById("done-overlay").classList.add("visible");
+      });
+    }
+
+    function closeDoneDialog() {
+      // Reset status back to in_progress
+      saveCurrentFeedback();
+      document.getElementById("done-overlay").classList.remove("visible");
+    }
+
+    // ---- Toast ----
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("visible");
+      setTimeout(() => toast.classList.remove("visible"), 2000);
+    }
+
+    // ---- Keyboard nav ----
+    document.addEventListener("keydown", (e) => {
+      // Don't capture when typing in textarea
+      if (e.target.tagName === "TEXTAREA") return;
+
+      if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+        e.preventDefault();
+        navigate(-1);
+      } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        e.preventDefault();
+        navigate(1);
+      }
+    });
+
+    // ---- Util ----
+    function getDownloadUri(file) {
+      if (file.data_uri) return file.data_uri;
+      if (file.data_b64) return "data:application/octet-stream;base64," + file.data_b64;
+      if (file.type === "text") return "data:text/plain;charset=utf-8," + encodeURIComponent(file.content);
+      return "#";
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ---- View switching ----
+    function switchView(view) {
+      document.querySelectorAll(".view-tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
+      document.querySelector(`[onclick="switchView('${view}')"]`).classList.add("active");
+      document.getElementById("panel-" + view).classList.add("active");
+    }
+
+    // ---- Benchmark rendering ----
+    function renderBenchmark() {
+      const data = EMBEDDED_DATA.benchmark;
+      if (!data) return;
+
+      // Show the tabs
+      document.getElementById("view-tabs").style.display = "flex";
+
+      const container = document.getElementById("benchmark-content");
+      const summary = data.run_summary || {};
+      const metadata = data.metadata || {};
+      const notes = data.notes || [];
+
+      let html = "";
+
+      // Header
+      html += "<h2 style='font-family: Poppins, sans-serif; margin-bottom: 0.5rem;'>Benchmark Results</h2>";
+      html += "<p style='color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.25rem;'>";
+      if (metadata.skill_name) html += "<strong>" + escapeHtml(metadata.skill_name) + "</strong> &mdash; ";
+      if (metadata.timestamp) html += metadata.timestamp + " &mdash; ";
+      if (metadata.evals_run) html += "Evals: " + metadata.evals_run.join(", ") + " &mdash; ";
+      html += (metadata.runs_per_configuration || "?") + " runs per configuration";
+      html += "</p>";
+
+      // Summary table
+      html += '<table class="benchmark-table">';
+
+      function fmtStat(stat, pct) {
+        if (!stat) return "—";
+        const suffix = pct ? "%" : "";
+        const m = pct ? (stat.mean * 100).toFixed(0) : stat.mean.toFixed(1);
+        const s = pct ? (stat.stddev * 100).toFixed(0) : stat.stddev.toFixed(1);
+        return m + suffix + " ± " + s + suffix;
+      }
+
+      function deltaClass(val) {
+        if (!val) return "";
+        const n = parseFloat(val);
+        if (n > 0) return "benchmark-delta-positive";
+        if (n < 0) return "benchmark-delta-negative";
+        return "";
+      }
+
+      // Discover config names dynamically (everything except "delta")
+      const configs = Object.keys(summary).filter(k => k !== "delta");
+      const configA = configs[0] || "config_a";
+      const configB = configs[1] || "config_b";
+      const labelA = configA.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const labelB = configB.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const a = summary[configA] || {};
+      const b = summary[configB] || {};
+      const delta = summary.delta || {};
+
+      html += "<thead><tr><th>Metric</th><th>" + escapeHtml(labelA) + "</th><th>" + escapeHtml(labelB) + "</th><th>Delta</th></tr></thead>";
+      html += "<tbody>";
+
+      html += "<tr><td><strong>Pass Rate</strong></td>";
+      html += "<td>" + fmtStat(a.pass_rate, true) + "</td>";
+      html += "<td>" + fmtStat(b.pass_rate, true) + "</td>";
+      html += '<td class="' + deltaClass(delta.pass_rate) + '">' + (delta.pass_rate || "—") + "</td></tr>";
+
+      // Time (only show row if data exists)
+      if (a.time_seconds || b.time_seconds) {
+        html += "<tr><td><strong>Time (s)</strong></td>";
+        html += "<td>" + fmtStat(a.time_seconds, false) + "</td>";
+        html += "<td>" + fmtStat(b.time_seconds, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.time_seconds) + '">' + (delta.time_seconds ? delta.time_seconds + "s" : "—") + "</td></tr>";
+      }
+
+      // Tokens (only show row if data exists)
+      if (a.tokens || b.tokens) {
+        html += "<tr><td><strong>Tokens</strong></td>";
+        html += "<td>" + fmtStat(a.tokens, false) + "</td>";
+        html += "<td>" + fmtStat(b.tokens, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.tokens) + '">' + (delta.tokens || "—") + "</td></tr>";
+      }
+
+      html += "</tbody></table>";
+
+      // Per-eval breakdown (if runs data available)
+      const runs = data.runs || [];
+      if (runs.length > 0) {
+        const evalIds = [...new Set(runs.map(r => r.eval_id))].sort((a, b) => a - b);
+
+        html += "<h3 style='font-family: Poppins, sans-serif; margin-bottom: 0.75rem;'>Per-Eval Breakdown</h3>";
+
+        const hasTime = runs.some(r => r.result && r.result.time_seconds != null);
+        const hasErrors = runs.some(r => r.result && r.result.errors > 0);
+
+        for (const evalId of evalIds) {
+          const evalRuns = runs.filter(r => r.eval_id === evalId);
+          const evalName = evalRuns[0] && evalRuns[0].eval_name ? evalRuns[0].eval_name : "Eval " + evalId;
+
+          html += "<h4 style='font-family: Poppins, sans-serif; margin: 1rem 0 0.5rem; color: var(--text);'>" + escapeHtml(evalName) + "</h4>";
+          html += '<table class="benchmark-table">';
+          html += "<thead><tr><th>Config</th><th>Run</th><th>Pass Rate</th>";
+          if (hasTime) html += "<th>Time (s)</th>";
+          if (hasErrors) html += "<th>Crashes During Execution</th>";
+          html += "</tr></thead>";
+          html += "<tbody>";
+
+          // Group by config and render with average rows
+          const configGroups = [...new Set(evalRuns.map(r => r.configuration))];
+          for (let ci = 0; ci < configGroups.length; ci++) {
+            const config = configGroups[ci];
+            const configRuns = evalRuns.filter(r => r.configuration === config);
+            if (configRuns.length === 0) continue;
+
+            const rowClass = ci === 0 ? "benchmark-row-with" : "benchmark-row-without";
+            const configLabel = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+
+            for (const run of configRuns) {
+              const r = run.result || {};
+              const prClass = r.pass_rate >= 0.8 ? "benchmark-delta-positive" : r.pass_rate < 0.5 ? "benchmark-delta-negative" : "";
+              html += '<tr class="' + rowClass + '">';
+              html += "<td>" + configLabel + "</td>";
+              html += "<td>" + run.run_number + "</td>";
+              html += '<td class="' + prClass + '">' + ((r.pass_rate || 0) * 100).toFixed(0) + "% (" + (r.passed || 0) + "/" + (r.total || 0) + ")</td>";
+              if (hasTime) html += "<td>" + (r.time_seconds != null ? r.time_seconds.toFixed(1) : "—") + "</td>";
+              if (hasErrors) html += "<td>" + (r.errors || 0) + "</td>";
+              html += "</tr>";
+            }
+
+            // Average row
+            const rates = configRuns.map(r => (r.result || {}).pass_rate || 0);
+            const avgRate = rates.reduce((a, b) => a + b, 0) / rates.length;
+            const avgPrClass = avgRate >= 0.8 ? "benchmark-delta-positive" : avgRate < 0.5 ? "benchmark-delta-negative" : "";
+            html += '<tr class="benchmark-row-avg ' + rowClass + '">';
+            html += "<td>" + configLabel + "</td>";
+            html += "<td>Avg</td>";
+            html += '<td class="' + avgPrClass + '">' + (avgRate * 100).toFixed(0) + "%</td>";
+            if (hasTime) {
+              const times = configRuns.map(r => (r.result || {}).time_seconds).filter(t => t != null);
+              html += "<td>" + (times.length ? (times.reduce((a, b) => a + b, 0) / times.length).toFixed(1) : "—") + "</td>";
+            }
+            if (hasErrors) html += "<td></td>";
+            html += "</tr>";
+          }
+          html += "</tbody></table>";
+
+          // Per-assertion detail for this eval
+          const runsWithExpectations = {};
+          for (const config of configGroups) {
+            runsWithExpectations[config] = evalRuns.filter(r => r.configuration === config && r.expectations && r.expectations.length > 0);
+          }
+          const hasAnyExpectations = Object.values(runsWithExpectations).some(runs => runs.length > 0);
+          if (hasAnyExpectations) {
+            // Collect all unique assertion texts across all configs
+            const allAssertions = [];
+            const seen = new Set();
+            for (const config of configGroups) {
+              for (const run of runsWithExpectations[config]) {
+                for (const exp of (run.expectations || [])) {
+                  if (!seen.has(exp.text)) {
+                    seen.add(exp.text);
+                    allAssertions.push(exp.text);
+                  }
+                }
+              }
+            }
+
+            html += '<table class="benchmark-table" style="margin-top: 0.5rem;">';
+            html += "<thead><tr><th>Assertion</th>";
+            for (const config of configGroups) {
+              const label = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+              html += "<th>" + escapeHtml(label) + "</th>";
+            }
+            html += "</tr></thead><tbody>";
+
+            for (const assertionText of allAssertions) {
+              html += "<tr><td>" + escapeHtml(assertionText) + "</td>";
+
+              for (const config of configGroups) {
+                html += "<td>";
+                for (const run of runsWithExpectations[config]) {
+                  const exp = (run.expectations || []).find(e => e.text === assertionText);
+                  if (exp) {
+                    const cls = exp.passed ? "benchmark-delta-positive" : "benchmark-delta-negative";
+                    const icon = exp.passed ? "\u2713" : "\u2717";
+                    html += '<span class="' + cls + '" title="Run ' + run.run_number + ': ' + escapeHtml(exp.evidence || "") + '">' + icon + "</span> ";
+                  } else {
+                    html += "— ";
+                  }
+                }
+                html += "</td>";
+              }
+              html += "</tr>";
+            }
+            html += "</tbody></table>";
+          }
+        }
+      }
+
+      // Notes
+      if (notes.length > 0) {
+        html += '<div class="benchmark-notes">';
+        html += "<h3>Analysis Notes</h3>";
+        html += "<ul>";
+        for (const note of notes) {
+          html += "<li>" + escapeHtml(note) + "</li>";
+        }
+        html += "</ul></div>";
+      }
+
+      container.innerHTML = html;
+    }
+
+    // ---- Start ----
+    init();
+    renderBenchmark();
+  </script>
+</body>
+</html>
