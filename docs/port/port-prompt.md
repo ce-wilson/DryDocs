@@ -1989,10 +1989,19 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   module (present registers last; absent is silent; importing it first never executes
   the root), `tests/unit/test_cli_import_order.py` adds it to the subprocess-per-import
   list wherever it exists, and the boundary map classifies it `load`.
-  **THE ADOPTION, six steps, one commit, on YOUR main before the retry:**
+  **THE ADOPTION, six steps - and the ORDER CORRECTION that followed the first reading
+  (2026-09-02, later the same evening):** the eight S8 files import loaders and helpers
+  that arrive IN THE RANGE you are re-applying (`chain_inputs`, `manual_loads`,
+  `batch_port_orchestrator`, the G82/G128 loaders), so a wholesale take of `cli.py` on
+  your pre-port `main` does not import. Step 1 therefore happens INSIDE the retry, in the
+  canonical-producer class of chunk 4, where the import closure is the range itself;
+  chunk 0 on `main` is steps 2 and 4 only - author your module, park the branch.
   1. Take `drydocs/cli.py`, `drydocs/cli_shared.py` and the six `drydocs/cli_*.py`
-     WHOLESALE at the producer tree that carries S16 (the row is canonical-producer now;
-     the `cli.py` line is not a merge any more).
+     WHOLESALE - in chunk 4's canonical-producer pass, from a producer tree that carries
+     S16 (`9b63527a` or later; the seam is past `port-base-20260901`, so these eight are
+     a take-by-name from that sha, the dossier-4 shape). `python -c "import drydocs.cli"`
+     is the closure check: every ImportError names a loader the range has not landed
+     yet. The row is canonical-producer now; the `cli.py` line is not a merge any more.
   2. Diff your old `cli.py` against the producer's six modules: every verb of yours that
      is NOT a producer verb goes into `drydocs/cli_consumer.py`. Module shape = any of the
      six: its own `typer.Typer()`, verbs registered on it, shared state imported from
@@ -2012,7 +2021,15 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
      `pytest tests/unit/test_cli_import_order.py tests/unit/test_cli_registry.py` (the
      consumer module joins the first list automatically once it exists); then
      `drydocs --help` lists your verbs after the producer's. `test_env_doctor`'s three
-     clear with the orphans gone.
+     clear with the orphans gone. THE REFERENCE FILES THAT MOVE WITH THE EIGHT, all
+     take-by-name from the same sha: `tests/unit/test_cli_registry.py` (new) and
+     `tests/unit/test_cli_import_order.py` (gains the optional module); the two
+     `PORT-MANIFEST.yaml` rows (`drydocs/cli.py` canonical-producer,
+     `drydocs/cli_consumer.py` canonical-company + its `row_may_match_nothing` entry -
+     the manifest is canonical-producer, so they arrive with it); and ONE line in YOUR
+     `tests/unit/test_module_boundary.py` (per-entry): add `"drydocs.cli_consumer"` to
+     the `load` group, or default-deny fails your module as UNCLASSIFIED - producer-side
+     that line lives in `drydocs_core/component_map.py` (CORE1, also past your base).
   6. Then and only then: park `port/20260901b` as the reference branch it is (the
      dispositions record, the `validate_fact_rows` merge and the suite trajectory are
      worth keeping; nothing on it merges), branch fresh from your main, re-take the

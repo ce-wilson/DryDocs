@@ -228,10 +228,11 @@ rule); retries.
 
 ### Chunk 0 — Adopt S8 on `main`, park the first branch, start over
 
-- **Scope:** the S8 shape taken wholesale (`cli.py`, `cli_shared.py`, the six `cli_*.py`)
-  at a producer tree that carries S16; the company's own verbs re-homed into
-  `drydocs/cli_consumer.py` on the same module shape; DD6 closed by the producer's
-  `_client(database)`. Six steps, one commit, RELAY-24.
+- **Scope:** the company's own verbs authored into `drydocs/cli_consumer.py` on the S8
+  module shape (RELAY-24 steps 2 and 4), and the first branch parked. The wholesale take
+  of the eight S8 files (`cli.py`, `cli_shared.py`, the six `cli_*.py`) happens in
+  **chunk 4's canonical-producer pass**, not here: those files import loaders that arrive
+  in the range, so on the pre-port `main` they do not import. DD6 closes when they land.
 - **Guard:** `python -c "import drydocs.cli"`; `test_cli_import_order.py` +
   `test_cli_registry.py` (the consumer module joins the first automatically);
   `drydocs --help` lists the company's verbs after the producer's; the three
