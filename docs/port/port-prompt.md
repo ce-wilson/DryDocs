@@ -2038,6 +2038,27 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   **WHAT THIS RELAY DOES NOT DO:** it does not move any producer verb, does not change
   `drydocs --help` producer-side, and does not author your module - the diff in step 2
   is the only place your verbs are known.
+  **ADDENDUM 2026-09-03, from your chunk-0 build - four things the first consumer module
+  hit, and one producer gap among them.** (a) THE GAP, producer's: your module wires your
+  own components (docmeta, publishing, sme_notes) and
+  `test_components_do_not_import_each_other` failed it on eleven imports, because S16 said
+  a consumer module "may import anything" and then left it out of `ENTRYPOINT_MODULES`.
+  Fixed producer-side after `port-base-20260902` (the entry is in
+  `drydocs_core/component_map.py`); until that ports, add `"drydocs.cli_consumer"` to
+  `ENTRYPOINT_MODULES` in YOUR `test_module_boundary.py` beside the `load` classification -
+  same file, two lines. (b) IMPORTING THE MODULE BEFORE CHUNK 4 FAILS BY DESIGN: it imports
+  `cli_shared`, which imports loaders the range carries (`folder_attribution` ->
+  `seal_attribution.validate_fact_rows` is the first ImportError you will see, and it is
+  the D-slice merge you parked). Author and lint it in chunk 0; import it in chunk 4, or
+  test-import it in a worktree checked out at `port-base-20260902` with your module
+  dropped in. (c) THE SIX `DEFAULT_*` CONSTANTS your extractor reported missing
+  (`DEFAULT_GROUPS_CSV`, `DEFAULT_CROSSWALK`, `DEFAULT_TOM_CSV`, `DEFAULT_ROSTER_DIR`,
+  `DEFAULT_APP_GROUP_CSV`, `DEFAULT_MEMBERS_CSV`) are company-side inputs the producer
+  never had - they belong in your module, not in `cli_shared`. (d) 1,520 LINES IS A
+  MONOLITH AGAIN: the seam discovers ONE name, but that name may be a PACKAGE -
+  a `cli_consumer/` directory under `drydocs/` whose package init exposes `app`, with per-domain modules inside on
+  the S8 shape - and `find_spec` and the import-order guard treat it identically. Your
+  call; the shape is the same either way.
 
 OWED COMPANY-SIDE:
 
