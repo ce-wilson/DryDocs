@@ -2196,6 +2196,19 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   an empty data center, which is the failure to warn your operators about. Your per-DC
   shards were not silently empty by luck: P6 (the collision probe) still blocks the first
   multi-data-center load on both sides.
+  **SEVENTH POSTSCRIPT - your two named debts after the S8 carve-out, both closed
+  producer-side:** (1) `test_cli_registry.py` on a consumer tree: right, the fixture probes
+  appended a fake module to `drydocs.__path__`, and where a REAL `cli_consumer.py` exists
+  the package directory wins the import, so every probe silently exercised your module.
+  The test now branches on whether `drydocs/cli_consumer.py` exists: the two producer-only
+  facts (the producer ships none; absence is silent) and the fixture loader probe SKIP by
+  name with the reason, and the two properties that hold for any consumer are asserted
+  against the REAL module - its verbs are the last registered, and importing it first
+  does not execute the root. Proven here by simulating a consumer tree (4 passed,
+  3 skipped) and on the producer (7 passed). Take it by name. (2) The manifest row pinning
+  `test_source_bindings.py`'s count landed at `02580f2c` (evaluate, the `test_schema.py`
+  shape - keep your 17, take the drift-guard logic): the fifth postscript above. Nothing
+  else from your report is outstanding on this side.
 
 OWED COMPANY-SIDE:
 
