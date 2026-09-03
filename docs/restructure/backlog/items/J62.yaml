@@ -8,7 +8,7 @@ phase: 11
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - .github/workflows
@@ -33,3 +33,44 @@ notes: |
   semantic-release and commitlint (this repo's commit conventions carry reasons a linter
   cannot check, and automated version bumps buy nothing on a proof of concept); mypy (a
   type-checking sweep over an existing codebase is its own project, not scaffolding).
+
+  BUILT 2026-09-03 (laptop, Lane B of the f109280f handoff; wip/J62-laptop).
+
+  THE CONFIG. .pre-commit-config.yaml: one repo (astral-sh/ruff-pre-commit) at rev v0.5.7,
+  which IS pyproject's exact ruff pin (J10 stage 0: no caret, byte-identical formatting
+  across the two repos), and two hooks with no arguments - `ruff` reports exactly what
+  CI's `ruff check .` would (no --fix: the hook shows the finding rather than editing
+  under you), `ruff-format` rewrites the staged files the way `ruff format --check .`
+  demands and fails the commit so you re-stage and commit again. The file's header
+  carries the reason it exists, the install, and why the rev is the pin, so the first
+  person it stops on a fresh clone reads why instead of reaching for --no-verify.
+
+  ONE DOCUMENTED COMMAND, AND WHERE. `pre-commit install`, once per clone, with
+  `pipx install pre-commit` once per machine the way poetry is installed here (no
+  poetry dev dependency, so poetry.lock is untouched). CLAUDE.md section 0, the Start
+  step of the session ritual, says so in four lines and says CI stays the gate - the one
+  touch on a surface neither lane declared this burst, required by the acceptance.
+  Nothing installs the hooks for you: not silently mandatory, by the item's own reasoning.
+
+  THE GUARD. tests/unit/test_precommit_config.py: the hooks are exactly those two with no
+  extra keys; the rev equals pyproject's EXACT ruff pin and poetry.lock's version (parsed
+  TOML and YAML - the objects, not the prose); the CI workflow, parsed, still runs both
+  ruff steps; the session ritual names the install (reads CLAUDE.md prose on purpose -
+  the prose is the artifact under test, J66's stated exception); the config explains
+  itself. Move the pin and the rev together or this goes red.
+
+  VERIFIED on the laptop: pre-commit 4.6.2 via pipx; `pre-commit install` wrote the hook
+  into this clone; `pre-commit run --all-files` passed both hooks over the whole tree
+  (clean at 0.5.7, as CI says); a probe commit carrying an unused import and unformatted
+  code was REFUSED - ruff reported 3 findings, ruff-format rewrote the file, HEAD
+  unchanged, the probe removed; and the J62 commit itself went through the hooks. Full
+  suite: 3099 passed and ONE failure that is not this item's to fix - see below.
+
+  FOR LANE A AT MERGE, THE PORT PEN: test_port_reconcile_guards'
+  test_no_tracked_path_falls_through_silently is red on this branch because the new root
+  file matches no PORT-MANIFEST row, and the manifest is Lane A's pen. The row to add,
+  handed back rather than written here: path ".pre-commit-config.yaml", disposition
+  canonical-producer, with a note that its rev tracks pyproject's exact ruff pin (the
+  J62 guard) and that the company's pin is the same by J10 - the hooks belong on both
+  sides at the same standard. Until that row lands, this branch is red on two tests: the
+  roadmap render (every Lane B close is) and this fallthrough.
