@@ -8,7 +8,7 @@ phase: 2
 agent: taxonomy-importer
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - config/taxonomy/software-registry.yaml
@@ -56,3 +56,47 @@ notes: |
   company already added the white-label reference in their registry; this row is the
   producer's mechanism-only twin. The TERM "MFTS" (its expansion, its tier) is NOT this row -
   it is an acronyms-domain entry (ONT2); the two link by name only.
+
+  BUILT 2026-09-03 (laptop, Lane B of the 0aeba6fc handoff; wip/C43-laptop).
+
+  (a) Vendor `axway` (name, publisher_url - third-party, so the URL is required by the guard)
+  and product `mfts`: vendor axway, name Axway SecureTransport, category Managed File
+  Transfer, role tool, type commercial, used_by_drydocs false (a platform DryDocs traces
+  THROUGH in G14 lineage, not one it is built on or ingests from - yet), seal_id the
+  `[seal-id]` placeholder exactly as controlm carries it. The research file holds the real
+  registration id and an internal hostname; neither crosses into this Internal-Public file,
+  and the publish-boundary sweep over config/taxonomy would refuse them anyway.
+
+  (b) versions: ["6.0.3"] - the registry's own slot, so no note was needed. Established by
+  the research's internal change record (H93); the change id itself stays in internal/.
+
+  THE RIDER: `white_label: MFTS` on the row, the one optional key added, and the renderer
+  passes it through to the generated JSON so /software can show the internal name beside
+  the vendor's product name. The TERM stays ONT2's; the row says so.
+
+  (c) Written on the row: the baseline question - an external/file-transfer/ category and
+  a second rank in config/precedence.yaml - is a gate's, and the row ranks nothing.
+
+  (d) SIBLINGS LEFT OUT, and why: the research establishes that FileMover (legacy) was
+  replaced by OneMFT (current) and that both are DISTINCT platforms from MFTS - but it
+  establishes neither one's VENDOR, so a row for either would carry a vendor nobody has
+  evidenced. Absent, with the reason on the row, and the guard pins their absence so a
+  later session adds them on evidence rather than by analogy. Their system-level
+  registration is N27's.
+
+  (e) THE RENDER, run locally and not committed: scripts/render_software_registry.py
+  reports 15 vendors (was 14) and 17 products (was 16), with axway listed in
+  vendors_without_icons - no drydocs-icons manifest entry yet, reported by the soft link,
+  never dropped. The committed web/src/generated/software-registry.json is Lane A's render
+  (the handoff fences web/src/generated/**), refreshed by the same render_board.py run every
+  Lane B close needs at merge, so test_software_registry_json is red on this branch on the
+  drift test and the icon-or-reported contract, both read from the committed file, and
+  green on main after the merge. The vendor count moves by exactly the one vendor added.
+
+  GUARDS: tests/unit/test_software_registry.py pins the row's shape, the white_label rule
+  (a non-empty string wherever present) and the absent siblings; tests/unit/
+  test_docs_coverage.py's census pin moves 16 -> 17 products and 14 -> 15 without a
+  documentation pointer, with the reason on the line - Axway's public SecureTransport docs
+  are the research's own next rung (an External corpus to register and capture, the way
+  BMC's are for Control-M), so the gap is a task and not a miss. ruff clean; full suite
+  3139 passed with the two render-bound failures above and nothing else.
