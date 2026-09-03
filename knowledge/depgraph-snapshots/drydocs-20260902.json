@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-02T17:48:40",
+    "captured_at": "2026-09-02T22:41:48",
     "date": "20260902",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "21fa5c30",
-      "full": "21fa5c30748d8b36aa463e79bfc546ab48fbfad9",
+      "commit": "df0b0437",
+      "full": "df0b0437c5588292665608523494031fee4ae427",
       "branch": "main",
-      "describe": "port-base-20260901-125-g21fa5c30",
-      "subject": "Merge branch 'feat/component-subpackages' - ADR 0018: the component map is an importable object (CORE1), the four flat components become subpackages with one-cycle shims (LOAD1), routing docs stop lagging the code (DOC3)",
+      "describe": "port-base-20260902",
+      "subject": "chore(port): ledger roll - the cited-paths check reads never-port zones as never claims; three real citations in two skills fixed (lane-handoff, run-drydocs-console)",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -2055,6 +2055,105 @@
       "name": "SKILL.md",
       "extension": ".md",
       "rel_path": ".claude/skills/incident-response/SKILL.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/lane-handoff",
+      "name": "lane-handoff",
+      "extension": "",
+      "rel_path": ".claude/skills/lane-handoff",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/lane-handoff-workspace",
+      "name": "lane-handoff-workspace",
+      "extension": "",
+      "rel_path": ".claude/skills/lane-handoff-workspace",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/lane-handoff-workspace/iteration-1",
+      "name": "iteration-1",
+      "extension": "",
+      "rel_path": ".claude/skills/lane-handoff-workspace/iteration-1",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/lane-handoff-workspace/iteration-1/review.html",
+      "name": "review.html",
+      "extension": ".html",
+      "rel_path": ".claude/skills/lane-handoff-workspace/iteration-1/review.html",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/lane-handoff/SKILL.md",
+      "name": "SKILL.md",
+      "extension": ".md",
+      "rel_path": ".claude/skills/lane-handoff/SKILL.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/lane-handoff/evals",
+      "name": "evals",
+      "extension": "",
+      "rel_path": ".claude/skills/lane-handoff/evals",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/lane-handoff/evals/evals.json",
+      "name": "evals.json",
+      "extension": ".json",
+      "rel_path": ".claude/skills/lane-handoff/evals/evals.json",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/lane-handoff/evals/files",
+      "name": "files",
+      "extension": "",
+      "rel_path": ".claude/skills/lane-handoff/evals/files",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/lane-handoff/evals/files/lane-b-handoff-sample.md",
+      "name": "lane-b-handoff-sample.md",
+      "extension": ".md",
+      "rel_path": ".claude/skills/lane-handoff/evals/files/lane-b-handoff-sample.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/lane-handoff/scripts",
+      "name": "scripts",
+      "extension": "",
+      "rel_path": ".claude/skills/lane-handoff/scripts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/lane-handoff/scripts/handoff.py",
+      "name": "handoff.py",
+      "extension": ".py",
+      "rel_path": ".claude/skills/lane-handoff/scripts/handoff.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -21734,10 +21833,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260902.json",
-      "name": "drydocs-20260902.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260902-1748.json",
+      "name": "drydocs-20260902-1748.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260902.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260902-1748.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -23507,6 +23606,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_cli_registry.py",
+      "name": "test_cli_registry.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_cli_registry.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_cmdline_staging.py",
       "name": "test_cmdline_staging.py",
       "extension": ".py",
@@ -24618,6 +24726,15 @@
       "name": "test_query_specs.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_query_specs.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_reconcile_port_skill_snapshot.py",
+      "name": "test_reconcile_port_skill_snapshot.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_reconcile_port_skill_snapshot.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -27135,6 +27252,14 @@
     ],
     [
       "drydocs/.claude/skills/groom-backlog/validate.py",
+      "drydocs/drydocs_core/backlog_store.py"
+    ],
+    [
+      "drydocs/.claude/skills/lane-handoff/scripts/handoff.py",
+      "drydocs/drydocs_core/__init__.py"
+    ],
+    [
+      "drydocs/.claude/skills/lane-handoff/scripts/handoff.py",
       "drydocs/drydocs_core/backlog_store.py"
     ],
     [
@@ -29836,6 +29961,10 @@
     [
       "drydocs/tests/unit/test_classification.py",
       "drydocs/drydocs_api/query_specs.py"
+    ],
+    [
+      "drydocs/tests/unit/test_cli_registry.py",
+      "drydocs/drydocs/cli.py"
     ],
     [
       "drydocs/tests/unit/test_cmdline_staging.py",
@@ -33345,6 +33474,16 @@
     [
       "drydocs/.claude/skills",
       "CONTAINS",
+      "drydocs/.claude/skills/lane-handoff"
+    ],
+    [
+      "drydocs/.claude/skills",
+      "CONTAINS",
+      "drydocs/.claude/skills/lane-handoff-workspace"
+    ],
+    [
+      "drydocs/.claude/skills",
+      "CONTAINS",
       "drydocs/.claude/skills/oracle-db"
     ],
     [
@@ -34431,6 +34570,51 @@
       "drydocs/.claude/skills/incident-response",
       "CONTAINS",
       "drydocs/.claude/skills/incident-response/SKILL.md"
+    ],
+    [
+      "drydocs/.claude/skills/lane-handoff",
+      "CONTAINS",
+      "drydocs/.claude/skills/lane-handoff/SKILL.md"
+    ],
+    [
+      "drydocs/.claude/skills/lane-handoff",
+      "CONTAINS",
+      "drydocs/.claude/skills/lane-handoff/evals"
+    ],
+    [
+      "drydocs/.claude/skills/lane-handoff",
+      "CONTAINS",
+      "drydocs/.claude/skills/lane-handoff/scripts"
+    ],
+    [
+      "drydocs/.claude/skills/lane-handoff-workspace",
+      "CONTAINS",
+      "drydocs/.claude/skills/lane-handoff-workspace/iteration-1"
+    ],
+    [
+      "drydocs/.claude/skills/lane-handoff-workspace/iteration-1",
+      "CONTAINS",
+      "drydocs/.claude/skills/lane-handoff-workspace/iteration-1/review.html"
+    ],
+    [
+      "drydocs/.claude/skills/lane-handoff/evals",
+      "CONTAINS",
+      "drydocs/.claude/skills/lane-handoff/evals/evals.json"
+    ],
+    [
+      "drydocs/.claude/skills/lane-handoff/evals",
+      "CONTAINS",
+      "drydocs/.claude/skills/lane-handoff/evals/files"
+    ],
+    [
+      "drydocs/.claude/skills/lane-handoff/evals/files",
+      "CONTAINS",
+      "drydocs/.claude/skills/lane-handoff/evals/files/lane-b-handoff-sample.md"
+    ],
+    [
+      "drydocs/.claude/skills/lane-handoff/scripts",
+      "CONTAINS",
+      "drydocs/.claude/skills/lane-handoff/scripts/handoff.py"
     ],
     [
       "drydocs/.claude/skills/oracle-db",
@@ -45130,7 +45314,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260902.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260902-1748.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -46045,6 +46229,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_cli_registry.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_cmdline_staging.py"
     ],
     [
@@ -46661,6 +46850,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_query_specs.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_reconcile_port_skill_snapshot.py"
     ],
     [
       "drydocs/tests/unit",
@@ -48047,13 +48241,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2705,
-    "edges": 1470,
+    "files": 2712,
+    "edges": 1473,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 3008,
-    "directories": 304
+    "rels": 3021,
+    "directories": 310
   }
 }
