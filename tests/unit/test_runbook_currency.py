@@ -45,6 +45,7 @@ guard exists for, and it went unseen for four days for want of a glob.
 from __future__ import annotations
 
 import re
+import subprocess
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -97,9 +98,26 @@ NEVER_PORT_ZONE_OF: dict[str, str] = {
 }
 
 
+def _zone_has_tracked_content(zone: str) -> bool:
+    """TRACKED content, not a directory probe. A consumer's `docs/port/` exists and
+    holds exactly one file - the gitignored working state `render_port_dispositions.py`
+    writes - so `is_dir()` answered "present" for a zone that never crossed (found by
+    the company the same day the map landed). The question is whether the zone has
+    tracked content here, and only git can answer it."""
+    result = subprocess.run(
+        ["git", "ls-files", "--", zone],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        check=True,
+    )
+    return bool(result.stdout.strip())
+
+
 def _absent_never_port_zone(rel: str) -> bool:
     zone = NEVER_PORT_ZONE_OF.get(rel)
-    return zone is not None and not (REPO_ROOT / zone).is_dir()
+    return zone is not None and not _zone_has_tracked_content(zone)
 
 
 #: Paths a document names that are NOT claims about the current tree. Each needs a
@@ -336,7 +354,7 @@ def test_never_port_zone_map_names_extra_docs_under_real_zones() -> None:
     for rel, zone in NEVER_PORT_ZONE_OF.items():
         assert rel in EXTRA_DOCS, f"{rel!r} is in NEVER_PORT_ZONE_OF but not EXTRA_DOCS"
         assert rel.startswith(zone + "/"), f"{rel!r} does not lie under its zone {zone!r}"
-    if (REPO_ROOT / "docs" / "port").is_dir():  # the producer tree
+    if _zone_has_tracked_content("docs/port"):  # the producer tree
         for rel in NEVER_PORT_ZONE_OF:
             assert (REPO_ROOT / rel).exists(), f"producer tree, so {rel!r} must exist"
 

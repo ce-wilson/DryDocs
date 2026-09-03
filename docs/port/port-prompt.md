@@ -2135,6 +2135,9 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   the test by name past the tag and restore `EXTRA_DOCS` whole. Your observation stands
   and is recorded: one retired stub broke three separate guards, and only the full-suite
   baseline diff caught the last two - that is why the baseline diff is part of the ritual.
+  Your second finding is applied too: the zone check reads TRACKED content (`git ls-files`),
+  not `is_dir()`, so your `docs/port/` holding only the gitignored `port-dispositions.md`
+  reads as absent. Take the test by name again, at or after this commit.
 
 OWED COMPANY-SIDE:
 
