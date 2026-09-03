@@ -9,7 +9,7 @@ phase: 6
 agent: main
 model: fable
 priority: p1
-status: todo
+status: in_progress
 depends_on: []
 inputs:
 - drydocs/cli.py
