@@ -364,16 +364,21 @@ entries, gate-log append-only. Use them to PROVE the merge respected the rules
 instead of eyeballing:
 
 ```
-# 1. BEFORE applying the port — snapshot the consumer copies
+# 1. BEFORE applying the port — snapshot the consumer copies.
+# The one-liners below use chr(10), not a backslash-n literal: an escaped newline inside a -c string
+# was rendered as a real line break once (2026-09-02, the company's chunk-1 apply) and the
+# two J51 lines failed as written. tests/unit/test_reconcile_port_skill_snapshot.py runs
+# every one of them, so a mangled line fails here before it fails at the consumer.
+# $env:TEMP is fine for a same-day apply; a MULTI-DAY apply (the chunked workplan) should
+# point TEMP at a directory that survives a reboot, because the before-state cannot be
+# re-taken after a slice lands.
 mkdir "$env:TEMP/reconcile-before"
 cp config/gate-log.md "$env:TEMP/reconcile-before/"
 # ADR 0013: the backlog is a sharded TREE — snapshot the ASSEMBLED document under the old name:
 poetry run python -c "from pathlib import Path; import os; from drydocs_core.backlog_store import dump_document; (Path(os.environ['TEMP'])/'reconcile-before'/'backlog.yaml').write_text(dump_document(), encoding='utf-8')"
 # J51 (optional, arms two no-drop guards): the list-shaped per-entry files — detector ids and exemption keys
-poetry run python -c "import os; from pathlib import Path; from drydocs_remediation import detect; d=Path(os.environ['TEMP'])/'reconcile-before'; (d/'detect-rule-ids.txt').write_text('
-'.join(detect.CONFORMANCE_RULE_IDS), encoding='utf-8')"
-poetry run python -c "import os, importlib; from pathlib import Path; m=importlib.import_module('tests.unit.test_runbook_currency'); d=Path(os.environ['TEMP'])/'reconcile-before'; (d/'runbook-exemption-keys.txt').write_text('
-'.join(f'{t}:{k}' for t in ('HISTORICAL_PATHS','FOREIGN_PATHS','DEFERRED_VERBS') for k in sorted(getattr(m,t,{}) or {})), encoding='utf-8')"
+poetry run python -c "import os; from pathlib import Path; from drydocs_remediation import detect; d=Path(os.environ['TEMP'])/'reconcile-before'; (d/'detect-rule-ids.txt').write_text(chr(10).join(detect.CONFORMANCE_RULE_IDS), encoding='utf-8')"
+poetry run python -c "import os, importlib; from pathlib import Path; m=importlib.import_module('tests.unit.test_runbook_currency'); d=Path(os.environ['TEMP'])/'reconcile-before'; (d/'runbook-exemption-keys.txt').write_text(chr(10).join(f'{t}:{k}' for t in ('HISTORICAL_PATHS','FOREIGN_PATHS','DEFERRED_VERBS') for k in sorted(getattr(m,t,{}) or {})), encoding='utf-8')"
 # S5: the two registries are fragment DIRECTORIES — snapshot the MERGED documents:
 poetry run python -c "from pathlib import Path; import os; from drydocs_core import yaml_fragments as yf; d = Path(os.environ['TEMP'])/'reconcile-before'; (d/'relationship_vocabulary.yaml').write_text(yf.merged_text('drydocs_core/ontology/relationship_vocabulary'), encoding='utf-8'); (d/'taxonomy-ontology-map.yaml').write_text(yf.merged_text('config/taxonomy-ontology-map'), encoding='utf-8')"
 
