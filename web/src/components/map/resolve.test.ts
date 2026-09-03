@@ -48,28 +48,34 @@ describe('resolveRows — the synthetic-city regression (Z5)', () => {
     expect(result.sites.every((s) => s.synthetic)).toBe(true)
   })
 
-  // A DEFECT THIS RUNNER FOUND ON ITS FIRST RUN, left failing on purpose and
-  // marked so the suite is green while the gap stays visible. `it.fails` asserts
-  // the CORRECT expectation and passes only while that expectation is unmet — so
-  // the day resolve.ts is fixed, this line goes red and tells whoever fixed it to
-  // flip `it.fails` back to `it`. Pinning the wrong value instead would have
-  // enshrined the bug in a test, which is worse than having no test.
+  // A DEFECT THIS RUNNER FOUND ON ITS FIRST RUN (O80, 2026-08-31). It sat here
+  // as an `it.fails` — the CORRECT expectation, marked so the suite stayed green
+  // while the gap stayed visible, and so that fixing resolve.ts would turn the
+  // line red and tell whoever fixed it to flip the marker. Z9 (2026-09-03) fixed
+  // it and flipped it: the marker worked exactly as designed.
   //
-  // THE DEFECT: Synthetica is declared `no_shape: true`, but the site reports
-  // countryHasNoShape === false, so the UI offers an outline to tint and drill
-  // into for a country that has none. The cause is the SAME FAMILY as the
-  // original city-index bug this file was written to catch — the code reads
-  // `city.country_id` and ignores `country_alias`, and a synthetic city carries
-  // only the alias. `COUNTRY_NO_SHAPE.has(city.country_id ?? '')` asks for the
-  // empty string and misses 'SYN'. `countryId` is null for the same reason, so
-  // synthetic countries also never reach `countryIds`.
-  //
-  // NOT FIXED HERE by O80's scope guard: this item buys the test capability and
-  // proves it, and changing what the map draws is Z-series work with its own
-  // review. Inboxed to IDEAS.md at the build.
-  it.fails('marks Synthetica as having no drawable outline rather than hiding it', () => {
+  // THE DEFECT WAS: Synthetica is declared `no_shape: true`, but the site
+  // reported countryHasNoShape === false, so the UI offered an outline to tint
+  // and drill into for a country that has none. SAME FAMILY as the city-index
+  // bug this file was written to catch — the code read `city.country_id` and
+  // ignored `country_alias`, and a synthetic city carries only the alias, so
+  // `COUNTRY_NO_SHAPE.has(city.country_id ?? '')` asked for the empty string
+  // and missed 'SYN'. The fix is the fallback the index key already used.
+  it('marks Synthetica as having no drawable outline rather than hiding it', () => {
     const [site] = resolveRows([row({ city: 'Otherton', country: 'Synthetica' })]).sites
     expect(site.countryHasNoShape).toBe(true)
+  })
+
+  // The second symptom of the same line (Z9 clause b): countryId was null for a
+  // synthetic city, so synthetic countries never reached `countryIds` and never
+  // appeared in the drill-down list. Now the alias IS the id, as it is in the
+  // gazetteer's own countries table.
+  it('gives a synthetic site its alias as countryId, so Synthetica reaches countryIds', () => {
+    const result = resolveRows([row({ city: 'Otherton', country: 'Synthetica' })])
+    const [site] = result.sites
+    expect(site.countryId).toBe('SYN')
+    expect(site.countryName).toBe('Synthetica')
+    expect(result.countryIds).toEqual(['SYN'])
   })
 })
 
