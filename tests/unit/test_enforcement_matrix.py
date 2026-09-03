@@ -66,6 +66,63 @@ def test_referenced_paths_exist():
             assert (REPO / "tests" / "unit" / t).exists(), f"{s['id']}: missing guard test {t}"
 
 
+def test_the_canonical_load_sequence_is_a_code_resident_surface_that_renders_enforced():
+    """O54. The load sequence, its profiles and the scheduled exclusions live in
+    drydocs/cli_shared.py by design (every operator surface derives from them),
+    and N3/N6 gave them real guard tests. Until O54 the renderer forced
+    `unguarded` on ANY code-resident row, which conflated WHERE the config lives
+    with WHETHER it is tested. Read from a fresh build, not the committed file:
+    the committed artifact is Lane A's render and lags a renderer change until
+    the next render_board.py run."""
+    fresh = _generator().build_matrix()
+    row = next(s for s in fresh["surfaces"] if s["id"] == "canonical-load-sequence")
+    assert row["code_resident"] is True
+    assert row["file"] == "drydocs/cli_shared.py"
+    assert row["symbols"] == [
+        "CANONICAL_LOAD_SEQUENCE",
+        "LOAD_PROFILES",
+        "SCHEDULED_INGEST_EXCLUSIONS",
+    ]
+    assert "test_load_sequence_surfaces.py" in row["guard_tests"]
+    assert row["status"] == "enforced"
+
+
+def test_a_code_resident_row_renders_its_declarations_not_its_module():
+    """The content of a code-resident surface is the named symbols' source (with
+    the comment block above each), never the whole module: cli_shared.py is
+    hundreds of lines of CLI plumbing, and scanning it would report every env
+    read in the CLI as if the load sequence referenced it."""
+    fresh = _generator().build_matrix()
+    row = next(s for s in fresh["surfaces"] if s["id"] == "canonical-load-sequence")
+    content = row["content"]
+    for name in row["symbols"]:
+        assert f"{name}" in content, f"{name} not in the rendered declarations"
+    assert "def " not in content, "a function body leaked into the declaration slice"
+    assert len(content) < 12_000, "the slice is the declarations, not the module"
+    assert row["files"] == ["drydocs/cli_shared.py"]
+
+
+def test_status_is_decided_by_guards_and_pending_only():
+    """The status function, on its own: residency never decides it."""
+    mod = _generator()
+    guarded = {"guard_tests": ["x.py"], "code_resident": True}
+    unguarded = {"guard_tests": [], "code_resident": False}
+    assert mod.surface_status(guarded, pending=0) == "enforced"
+    assert mod.surface_status(guarded, pending=2) == "gate-pending"
+    assert mod.surface_status(unguarded, pending=0) == "unguarded"
+    assert mod.surface_status({**unguarded, "code_resident": True}, pending=0) == "unguarded"
+
+
+def test_every_row_carries_the_residency_fact_beside_its_status():
+    """`code_resident` and `symbols` are on every row (empty symbols for config
+    files), so the page never has to infer residency from a path."""
+    for row in _generator().build_matrix()["surfaces"]:
+        assert isinstance(row["code_resident"], bool), row["id"]
+        assert isinstance(row["symbols"], list), row["id"]
+        if row["code_resident"]:
+            assert row["symbols"], f"{row['id']}: a code-resident row must name its symbols"
+
+
 def test_launcher_registry_migrated_to_a_guarded_config_surface():
     """G26 (2026-07-27) retired the code-resident unguarded example: the
     registry now lives at config/launcher-registry.yaml behind a schema

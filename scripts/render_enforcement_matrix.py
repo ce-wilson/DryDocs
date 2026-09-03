@@ -8,12 +8,22 @@ a build-time artifact (the board-render pattern: registry = truth, render =
 artifact, ``tests/unit/test_enforcement_matrix.py`` = the drift guard).
 
 Status vocabulary (wf-admin-config-01 (6)):
-- ``unguarded``    -- no guard test, or the config is code-resident (was the
-                     launcher-registry row until its G26 migration to
-                     config/launcher-registry.yaml, 2026-07-27).
+- ``unguarded``    -- no guard test. (Until O54, 2026-09-03, this branch also
+                     fired for ANY ``code_resident`` row regardless of its
+                     guards -- right for the launcher registry the flag was
+                     invented for, which had none until its G26 migration to
+                     config/launcher-registry.yaml on 2026-07-27, and simply
+                     wrong once N3/N6 gave the canonical load sequence real
+                     guard tests while it stayed code-resident by design.)
 - ``gate-pending`` -- the surface carries entries awaiting HITL
                      (``status: proposed`` / ``planned`` / ``placeholder``).
 - ``enforced``     -- guarded and nothing pending.
+
+``code_resident`` is a SEPARATE fact -- WHERE the config lives (in a module,
+not a config file) -- and the row carries it beside the status rather than
+folding it in. A code-resident row names its ``symbols``; only those
+declarations render as its content and are scanned for pending markers and
+env references, never the whole module.
 
 CI freshness is LAST-RUN metadata only (user decision 2026-07-17): if
 ``var/ci-last-run.json`` exists (dropped by a CI artifact download), it is
@@ -43,8 +53,9 @@ _ENV_REF_RE = re.compile(
 )
 
 # -- The surface registry (verified against the repo at every generation) -----
-# file: repo-relative path; dirs end with '/'. code_resident marks the odd one
-# out -- config living in code, the page's KPI example.
+# file: repo-relative path; dirs end with '/'. code_resident marks a surface
+# whose config lives in a MODULE (see the docstring): such a row names its
+# `symbols`, and only those declarations are rendered and scanned.
 SURFACES: list[dict] = [
     {
         "id": "source-registry",
@@ -269,6 +280,29 @@ SURFACES: list[dict] = [
         "guard_tests": ["test_config_schemas.py"],
         "gate_ref": None,
     },
+    {
+        "id": "canonical-load-sequence",
+        "title": "Canonical load sequence",
+        # O54: the one code-resident surface, BY DESIGN rather than by neglect.
+        # The ordered load sequence, its operator profiles and the scheduled
+        # omissions (each with a written reason) are declarations in
+        # drydocs/cli_shared.py, re-exported by drydocs/cli.py (S8), and every
+        # operator surface DERIVES from them: scripts/ingest.sh calls
+        # load_profile at run time, the runbook's Appendix B is held to the
+        # same answer, and the load map is rendered from them (N3/N4/N5/N6).
+        # Moving them to YAML would put a load ORDER in a file nothing
+        # executes; the guards below are what makes code residency safe.
+        "file": "drydocs/cli_shared.py",
+        "code_resident": True,
+        "symbols": ["CANONICAL_LOAD_SEQUENCE", "LOAD_PROFILES", "SCHEDULED_INGEST_EXCLUSIONS"],
+        "consumers": ["drydocs/cli.py", "scripts/ingest.sh", "scripts/render_load_map.py"],
+        "guard_tests": [
+            "test_load_sequence_surfaces.py",
+            "test_load_map_declarations.py",
+            "test_load_map_json.py",
+        ],
+        "gate_ref": "N3 (declarations) / N6 (profiles) — guarded declarations, not a gate",
+    },
 ]
 
 # Top-level config/ entries that are deliberately NOT surfaces.
@@ -285,6 +319,12 @@ def _read_capped(path: Path) -> str:
     return text
 
 
+def _scan_text(text: str) -> tuple[int, list[str]]:
+    """Pending-marker count + env-var references in one text."""
+    env_refs = {m.group(1) or m.group(2) or m.group(3) for m in _ENV_REF_RE.finditer(text)}
+    return len(_PENDING_RE.findall(text)), sorted(env_refs)
+
+
 def _scan(paths: list[Path]) -> tuple[int, list[str]]:
     """Pending-marker count + env-var references across the surface's files."""
     pending = 0
@@ -292,11 +332,53 @@ def _scan(paths: list[Path]) -> tuple[int, list[str]]:
     for p in paths:
         if p.suffix not in {".yaml", ".yml", ".md", ".py"}:
             continue
-        text = p.read_text(encoding="utf-8", errors="replace")
-        pending += len(_PENDING_RE.findall(text))
-        for m in _ENV_REF_RE.finditer(text):
-            env_refs.add(m.group(1) or m.group(2) or m.group(3))
+        found, refs = _scan_text(p.read_text(encoding="utf-8", errors="replace"))
+        pending += found
+        env_refs.update(refs)
     return pending, sorted(env_refs)
+
+
+def _symbol_source(path: Path, names: list[str]) -> str:
+    """The source of the module-level declarations named in ``names``, in file
+    order, as the CONTENT of a code-resident surface (O54). Read from the
+    syntax tree so a comment that mentions a symbol is never mistaken for its
+    definition; the slice keeps the declaration's own leading comment block so
+    the rendered row carries the reasons written beside the data."""
+    import ast
+
+    text = path.read_text(encoding="utf-8", errors="replace")
+    lines = text.splitlines()
+    tree = ast.parse(text)
+    wanted = set(names)
+    spans: list[tuple[int, int]] = []
+    for node in tree.body:
+        targets: list[ast.expr] = []
+        if isinstance(node, ast.Assign):
+            targets = node.targets
+        elif isinstance(node, ast.AnnAssign):
+            targets = [node.target]
+        if any(isinstance(t, ast.Name) and t.id in wanted for t in targets):
+            start = node.lineno
+            # walk back over the contiguous comment block above the declaration
+            while start > 1 and lines[start - 2].lstrip().startswith("#"):
+                start -= 1
+            spans.append((start, node.end_lineno or node.lineno))
+    return "\n\n".join("\n".join(lines[a - 1 : b]) for a, b in spans) + ("\n" if spans else "")
+
+
+def surface_status(surface: dict, pending: int) -> str:
+    """The status vocabulary, decided from the GUARDS and the pending count only.
+
+    Whether the config lives in code (``code_resident``) is a fact about WHERE,
+    carried on the row beside this; it stopped deciding the status at O54,
+    because a guarded declaration in a module is enforced by exactly the same
+    mechanism a guarded YAML file is -- a test that fails when it drifts.
+    """
+    if not surface["guard_tests"]:
+        return "unguarded"
+    if pending:
+        return "gate-pending"
+    return "enforced"
 
 
 def build_matrix() -> dict:
@@ -343,22 +425,34 @@ def build_matrix() -> dict:
             if not (REPO / "tests" / "unit" / t).exists():
                 errors.append(f"surface {s['id']}: missing guard test {t}")
 
-        pending, env_refs = _scan(files)
-        if s.get("code_resident") or not s["guard_tests"]:
-            status = "unguarded"
-        elif pending:
-            status = "gate-pending"
+        symbols = list(s.get("symbols", []))
+        if s.get("code_resident"):
+            # O54: a code-resident surface is its DECLARATIONS, not its module.
+            # Render and scan only the named symbols; the rest of the file is
+            # code, and scanning it would report every env read in the CLI as
+            # if the load sequence referenced it.
+            if not symbols:
+                errors.append(f"surface {s['id']}: code_resident rows must name symbols")
+                continue
+            content = _symbol_source(primary, symbols)
+            missing_symbols = [n for n in symbols if f"{n}" not in content]
+            if missing_symbols:
+                errors.append(
+                    f"surface {s['id']}: symbols not defined in {s['file']}: {missing_symbols}"
+                )
+                continue
+            pending, env_refs = _scan_text(content)
         else:
-            status = "enforced"
+            pending, env_refs = _scan(files)
+            content = None if is_dir else _read_capped(primary)
+        status = surface_status(s, pending)
 
         # content: single-file surfaces render verbatim (secrets are .env-only
         # -- files carry env-var REFERENCES, never values); dir surfaces list.
         if is_dir:
             listing = [str(p.relative_to(REPO)).replace("\\", "/") for p in files]
-            content = None
         else:
             listing = [s["file"], *s.get("extra_files", [])]
-            content = _read_capped(primary)
         extra_contents = {e: _read_capped(REPO / e) for e in s.get("extra_files", [])}
 
         rows.append(
@@ -367,6 +461,7 @@ def build_matrix() -> dict:
                 "title": s["title"],
                 "file": s["file"],
                 "code_resident": bool(s.get("code_resident")),
+                "symbols": symbols,
                 "consumers": s["consumers"],
                 "guard_tests": s["guard_tests"],
                 "gate_ref": s["gate_ref"],

@@ -29,7 +29,13 @@ interface Surface {
   id: string
   title: string
   file: string
+  /** O54: WHERE the config lives (a module, not a config file) — a fact about
+   *  residency, carried beside `status` and never deciding it. A guarded
+   *  declaration in code is enforced by the same mechanism as a guarded YAML
+   *  file: a test that fails when it drifts. */
   code_resident: boolean
+  /** the module-level declarations a code-resident row IS (its content) */
+  symbols: string[]
   consumers: string[]
   guard_tests: string[]
   gate_ref: string | null
@@ -93,8 +99,10 @@ function chainGraph(s: Surface): { nodes: ChainRFNode[]; edges: Edge[] } {
     position: { x: 0, y: 40 },
     data: {
       label: s.file,
-      role: s.code_resident ? 'code-resident (the migration argument)' : 'config file',
-      token: s.code_resident ? '--red' : '--blue',
+      // O54: residency is WHERE, not WHETHER — the guard column, not this node,
+      // says if the surface is tested. Red belongs to "no guard test" only.
+      role: s.code_resident ? `code-resident: ${(s.symbols ?? []).join(', ')}` : 'config file',
+      token: s.code_resident ? '--yellow' : '--blue',
     },
   })
   s.consumers.forEach((c, i) => {
@@ -223,7 +231,7 @@ export default function AdminConfigRoute() {
                     >
                       <td className="border-b border-edge-soft px-2.5 py-1.5 font-medium text-text">{s.title}</td>
                       <td className="border-b border-edge-soft px-2.5 py-1.5 font-mono text-[10px] text-muted">
-                        {s.code_resident ? `${s.file} (code-resident)` : s.file}
+                        {s.code_resident ? `${s.file} · code-resident: ${(s.symbols ?? []).join(', ')}` : s.file}
                       </td>
                       <td className="border-b border-edge-soft px-2.5 py-1.5 font-mono text-[10px] text-muted">
                         {s.consumers.join(', ')}
