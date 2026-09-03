@@ -8,7 +8,7 @@ phase: 2
 agent: taxonomy-importer
 model: sonnet
 priority: p2
-status: todo
+status: in_progress
 depends_on: []
 inputs:
 - config/taxonomy/software-registry.yaml
