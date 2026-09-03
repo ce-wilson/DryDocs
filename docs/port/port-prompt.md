@@ -2106,6 +2106,17 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   case; it is the ENTRYPOINT case (the consumer's composition surface), and the producer's
   map says so since `30d2e870`. Your declared-imports resolution works; the entrypoint line
   is the one that ports, so switch to it when the seam arrives, or carry both until then.
+  **POSTSCRIPT (chunk 2, carve-out 1):** `test_the_totality_detector_catches_an_injected_hole`
+  crashed on your tree with `FileNotFoundError` for `config/source-bindings.yaml` - the
+  companion hard-coded that subject, and a consumer holds the manifest before it holds
+  every per-entry file. It now SKIPS, by name, when the subject is absent (the detector
+  itself still runs); fixed producer-side after the tag. And the ruling you asked for:
+  **do the two tree-diff `git mv` batches in chunk 2, right after the manifest take** -
+  the eleven `SDLC-Docs/extracted/` and `docs/Product/` files to `docs/history/genesis/`
+  and `knowledge/org/`. They are your own content moving to producer paths (ADOPT
+  verdicts already given, nothing crosses), and a fall-through guard red for a known
+  reason cannot report a new fall-through a later carve-out introduces. A guard is
+  allowed to be red only when the NEXT carve-out is its fix.
 
 OWED COMPANY-SIDE:
 

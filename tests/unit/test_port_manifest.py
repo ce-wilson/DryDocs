@@ -366,6 +366,15 @@ def test_every_per_entry_rule_is_total(manifest: dict) -> None:
 
 def test_the_totality_detector_catches_an_injected_hole() -> None:
     """The J26 idiom: a detector that silently matches nothing reads as a pass."""
+    if not (REPO / "config" / "source-bindings.yaml").is_file():
+        # A consumer mid-apply holds the manifest before it holds every per-entry
+        # subject (the company's chunk-2 take on 2026-09-03 hit FileNotFoundError
+        # here). The detector above already ran on the rows that exist; this
+        # companion only needs a subject to inject a hole into, and it names one.
+        pytest.skip(
+            "companion needs config/source-bindings.yaml to inject its hole into; the "
+            "file is absent on this tree (a consumer before its per-entry class lands)"
+        )
     rows = [
         {
             "path": "config/source-bindings.yaml",
