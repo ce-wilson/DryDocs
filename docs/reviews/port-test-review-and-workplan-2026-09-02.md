@@ -296,6 +296,13 @@ NOT do. Commands are from the company checkout with the producer remote fetched
 
 ### Chunk 4 — The remaining classes for this range: clean-adds, evaluates, union-appends
 
+> **Population correction (2026-09-03, from the company's chunk-1 report):** the range's
+> classes are not the whole population. A file that predates the range's base and never
+> reached the company (their example: `drydocs/loaders/cypher/folder_attribution.cypher`)
+> is invisible to a tag..tag diff and visible only to the rename-look's TREE diff. Chunk 4
+> works the UNION: the range's classes, plus every tree-diff clean-add dispositioned ADOPT
+> in chunk 1, each classified through the same manifest.
+
 - **Scope:** everything in the class lists not touched by A–G: the clean-add balance (after
   chunk 1's rename dispositions), `evaluate` 29 (hand-merge, an un-made decision until made),
   `union-append` 16 (append, never reorder, never drop yours — `config/gate-log.md` among

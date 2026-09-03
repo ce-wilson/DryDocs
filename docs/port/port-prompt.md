@@ -1917,8 +1917,8 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   at acceptance — the SME ruled "take the hit now, carve that into the sole port").
   `[VERIFIED-PRODUCER]` for the move and the shims (3,071 unit tests green on the moved
   tree); `[SME-REPORTED]` for the ruling.
-  **WHAT MOVED.** Eighteen modules and one package left the flat `drydocs/` root for four
-  subpackages, keeping their basenames: `drydocs/review/` (graph_verify, review_labels,
+  **WHAT MOVED.** Seventeen modules and one package (eighteen moves) left the flat
+  `drydocs/` root for four subpackages, keeping their basenames: `drydocs/review/` (graph_verify, review_labels,
   source_mappings, graph_review, sme_notes, gate_pages, fid_census, run_as_detect, and the
   `publishing/` package), `drydocs/plan/` (plan_board, plan_roadmap), `drydocs/port/`
   (port_preflight, port_backlog_union, port_rename_detect), `drydocs/docgen/` (doc_outline,
@@ -1938,11 +1938,13 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   **THE ORDER, and it is the RELAY-21 distinction again — names versus content.** Six of
   the moved paths are `canonical-company` (the five review modules and `publishing/**`):
   YOUR files carry the real wiring and the producer's are templates. The manifest rows now
-  name the NEW paths for that content. So: (1) `git mv` YOUR six files to their subpackage
-  paths — content moves, nothing crosses; (2) THEN take the producer's shims at the old
+  name the NEW paths for that content. So: (1) `git mv` YOUR files under those six rows to
+  their subpackage paths - five modules and the whole `publishing/` package, twelve paths
+  on your tree - content moves, nothing crosses; (2) THEN take the producer's shims at the old
   paths, which the manifest pins `canonical-producer` with a note saying exactly this;
   (3) take the twelve plan/port/docgen modules at their new paths as ordinary
-  `default_ok` producer code (you hold producer copies; `evaluate` resolves to "take" unless
+  `default_ok` producer code (nine, once `review`'s three non-canonical-company modules are
+  counted with them - the arithmetic is in your report; the rule is the same) (you hold producer copies; `evaluate` resolves to "take" unless
   you extended one — the D-slice `cli.py` merge is the only place you did, and `cli.py`
   did not move); (4) take the four `__init__.py` files and `drydocs_core/component_map.py`
   (canonical-producer — it is the declaration the boundary test now imports, ADR 0018 D1).
@@ -1957,7 +1959,7 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   `<!-- component-map:begin/end -->` markers (`scripts/render_module_map.py`,
   `test_module_map_render.py` fails on drift — regenerate, never carry, J43; the hand tables
   around it are per-entry as before); PORT-MANIFEST rows for the six canonical-company
-  paths now name the new paths, and nineteen shim rows pin the old ones; every guard
+  paths now name the new paths, and eighteen shim rows (twelve new plus the six flipped) pin the old ones; every guard
   declaration in `config/**` that named a moved module by path (`review_labels.py`,
   `source_mappings.py`, `fid_census.py`, `design_doc.py` in the gate prompts, source
   mappings and `review-labels.yaml`) names the new path — those are per-entry files, so
@@ -2059,6 +2061,51 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   a `cli_consumer/` directory under `drydocs/` whose package init exposes `app`, with per-domain modules inside on
   the S8 shape - and `find_spec` and the import-order guard treat it identically. Your
   call; the shape is the same either way.
+
+- **RELAY-25 — YOUR CHUNK-1 REPORT ON `port-base-20260902`: FIVE PRODUCER CORRECTIONS
+  LANDED, AND THE MECHANISM ANSWERS TO YOUR SEVEN QUESTIONS** (new 2026-09-03; the rulings
+  that are yours stay yours). `[VERIFIED-PRODUCER]` for every fix named by sha;
+  `[SME-REPORTED]` for what your report measured.
+  **WHAT YOU FOUND THAT WAS OURS, fixed after `port-base-20260902` (take by name, or wait
+  for the roll):** (1) the `drydocs/publishing/` shim aliased four submodules by name and
+  your package holds six - it now aliases every submodule `pkgutil` finds, so
+  `confluence_client` and `manifest` are one object each, not two; (2) `cli_shared.py` and
+  the six `cli_*.py` had no manifest row and fell to `default_ok` (evaluate on collision) -
+  seven canonical-producer rows now say "take wholesale with `cli.py`"; (3) RELAY-23's
+  counts - seventeen modules plus the package, eighteen shim rows, six ROWS covering
+  twelve of your paths - corrected in place; (4) the measured block reads 194 / 10, yours
+  was right, the producer measured before its own `*-workspace/**` row; (5) J55 is now
+  FAIL-CLOSED on a full clone: a tree that carries `internal/` but whose
+  `internal/cdo-reference/README.md` has no RENAMED note FAILS with the sentence to
+  author, instead of skipping - "J55 green" on your side meant nothing until this.
+  **THE FINDING THAT CHANGES THE PLAN, and it is right:** the rename-look's 357 proposed
+  clean-adds are a TREE diff (producer at the tag versus your HEAD), and the 738 are a RANGE
+  diff (tag..tag). A file that predates `port-base-20260826` and never reached you -
+  `drydocs/loaders/cypher/folder_attribution.cypher` is your example - is in the first set
+  and not the second, so a chunk-4 pass that works only the range's classes never adds it.
+  **Chunk 4's population is the union**: the range's classes, plus every tree-diff clean-add
+  dispositioned ADOPT in chunk 1, classified through the same manifest. The workplan says so
+  now. That cypher is a plain clean-add; the vocabulary's "held/absent" note is about the
+  LOAD (K8 is T23 family, grain-breaking - the file lands in chunk 4, the verb runs after
+  chunk 7's wipe).
+  **YOUR SEVEN QUESTIONS - the mechanism half:** Q1 answered above. Q2: yes, the company
+  authors its own RENAMED note (one sentence naming the former directory) - the guard's
+  regex reads `internal/<token>-reference/`, and (5) makes its absence a failure. Q3 and Q5
+  are company housekeeping - the `never-port` row on `docs/company-prompts/` protects the
+  directory from producer DELETIONS; moving your own flat stragglers into it is your call
+  and nothing here objects; the one orphan left under your `docs/Product/` after the S14 move likewise (it is a company-only file; move it beside the rest under `knowledge/org/`, delete it, or give it a row). Q4: the
+  retired `docs/port-prompt.md` stub is yours - a one-line pointer to your PORT-REPORT that
+  is never refreshed, or delete it; it stays in FOREIGN_PATHS here either way. Q6: yes,
+  deliberate - the before-state is the tree the RANGE meets, and chunk 0 authored one
+  company file the snapshot's six do not include. Q7: not a port question, and worth the
+  look - inboxed producer-side (Idea-251): a HITL feedback artifact whose rev1 and rev11
+  normalize to the same anchor set is either an unfilled template or a normalizer that
+  discards the payload.
+  **ONE THING YOUR REPORT GOT WRONG, for the record:** `cli_consumer.py` being classified
+  `load` and importing docmeta/publishing/sme_notes is not a `DECLARED_COMPONENT_IMPORTS`
+  case; it is the ENTRYPOINT case (the consumer's composition surface), and the producer's
+  map says so since `30d2e870`. Your declared-imports resolution works; the entrypoint line
+  is the one that ports, so switch to it when the seam arrives, or carry both until then.
 
 OWED COMPANY-SIDE:
 
@@ -2405,10 +2452,12 @@ is exactly that table with the seven `web/src/generated/**` rows moved to `deriv
 (130 − 7 = 123). Your census reconciles to the path; the producer's number was the one
 measured at the wrong head. The renderer's head-ref adaptation you made is the fix
 (Idea-250) — a range is tag..tag on both sides.
-**MEASURED FOR THE RETRY (fifth roll, 2026-09-02)** — the range you apply is now
-`port-base-20260826..port-base-20260902`, tag..tag, with the manifest at the new tag:
-**738 changed paths across 8 classes** — default_ok 240, per-entry 200, canonical-producer
-195, evaluate 34, canonical-company 32, union-append 17, derived 11, never-port 9. The
+**MEASURED FOR THE RETRY (fifth roll, 2026-09-02; corrected 2026-09-03 from the company's
+chunk-1 census)** — the range you apply is now `port-base-20260826..port-base-20260902`,
+tag..tag, with the manifest at the new tag: **738 changed paths across 8 classes** —
+default_ok 240, per-entry 200, canonical-producer 194, evaluate 34, canonical-company 32,
+union-append 17, derived 11, never-port 10. (The roll's own `*-workspace/**` row moves one
+path from canonical-producer to never-port; the producer measured before adding it.) The
 extension alone (`port-base-20260901..port-base-20260902`) is 286 paths: default_ok 93,
 canonical-producer 89, per-entry 56, canonical-company 18, union-append 12, evaluate 9,
 derived 6, never-port 3. Measured at the roll commit's parent with the roll's own manifest

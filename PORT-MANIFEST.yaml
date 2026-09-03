@@ -966,6 +966,27 @@ rows:
       module shape, discovered by the root and registered last. The producer ships NONE,
       so this row matches nothing producer-side by construction (row_may_match_nothing);
       it exists so a verbatim take of drydocs/ can never remove the consumer's verbs.
+  - path: "drydocs/cli_shared.py"
+    disposition: canonical-producer
+    note: "the S8/S13 CLI shape (2026-09-03, from the company's chunk-1 report): without a row this fell to drydocs/** default_ok, which is evaluate-on-collision - and the company holds a copy, so the S8 take was a hand-merge by accident. Taken wholesale with cli.py; the consumer's verbs live in cli_consumer.py."
+  - path: "drydocs/cli_schema.py"
+    disposition: canonical-producer
+    note: "the S8/S13 CLI shape (2026-09-03, from the company's chunk-1 report): without a row this fell to drydocs/** default_ok, which is evaluate-on-collision - and the company holds a copy, so the S8 take was a hand-merge by accident. Taken wholesale with cli.py; the consumer's verbs live in cli_consumer.py."
+  - path: "drydocs/cli_ingest.py"
+    disposition: canonical-producer
+    note: "the S8/S13 CLI shape (2026-09-03, from the company's chunk-1 report): without a row this fell to drydocs/** default_ok, which is evaluate-on-collision - and the company holds a copy, so the S8 take was a hand-merge by accident. Taken wholesale with cli.py; the consumer's verbs live in cli_consumer.py."
+  - path: "drydocs/cli_verify.py"
+    disposition: canonical-producer
+    note: "the S8/S13 CLI shape (2026-09-03, from the company's chunk-1 report): without a row this fell to drydocs/** default_ok, which is evaluate-on-collision - and the company holds a copy, so the S8 take was a hand-merge by accident. Taken wholesale with cli.py; the consumer's verbs live in cli_consumer.py."
+  - path: "drydocs/cli_variables.py"
+    disposition: canonical-producer
+    note: "the S8/S13 CLI shape (2026-09-03, from the company's chunk-1 report): without a row this fell to drydocs/** default_ok, which is evaluate-on-collision - and the company holds a copy, so the S8 take was a hand-merge by accident. Taken wholesale with cli.py; the consumer's verbs live in cli_consumer.py."
+  - path: "drydocs/cli_docs.py"
+    disposition: canonical-producer
+    note: "the S8/S13 CLI shape (2026-09-03, from the company's chunk-1 report): without a row this fell to drydocs/** default_ok, which is evaluate-on-collision - and the company holds a copy, so the S8 take was a hand-merge by accident. Taken wholesale with cli.py; the consumer's verbs live in cli_consumer.py."
+  - path: "drydocs/cli_plan.py"
+    disposition: canonical-producer
+    note: "the S8/S13 CLI shape (2026-09-03, from the company's chunk-1 report): without a row this fell to drydocs/** default_ok, which is evaluate-on-collision - and the company holds a copy, so the S8 take was a hand-merge by accident. Taken wholesale with cli.py; the consumer's verbs live in cli_consumer.py."
   - path: "drydocs/cli.py"
     disposition: canonical-producer
     note: >
