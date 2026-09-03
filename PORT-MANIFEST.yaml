@@ -675,7 +675,12 @@ rows:
       sequence surfaces), FOREIGN_PATHS (emptied company-side — every producer
       entry exists there), and the company's DEFERRED_VERBS (T22: sweep-removed,
       load-essential-graphrag, with its still-cited guard). Union by KEY, keep each
-      side's reasons verbatim. RETIREMENT TRIGGER, and the row's own exit: when
+      side's reasons verbatim - EXCEPT a producer entry whose only citer is a
+      document under a never-port zone (docs/port/port-prompt.md cites eleven:
+      three historical, seven foreign, one generated), which the consumer DROPS
+      by rule, because the still-cited guard would otherwise fail on an entry
+      nothing on that side can cite (found at the 2026-09-03 chunk-2 apply).
+      RETIREMENT TRIGGER, and the row's own exit: when
       T19 / T22 land company-side the exemptions go and this row reverts to the
       tests/** default. Shrink-only guard semantics stay — an entry is removed
       when its subject is gone, never to silence the test.

@@ -2150,6 +2150,22 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   `MODULE_MAP.md` is per-entry as you read it - the three `controlm/*` rows resolve
   against the merged map, and a company-only row that cites a path that no longer
   exists is stale on your side, not protected by the rule.
+  **FOURTH POSTSCRIPT (carve-out 2 closing):** two rulings on what you reported. (1) The
+  eleven producer exemptions you retired because their only citer is the never-port
+  ledger: that is now the row's own rule (`test_runbook_currency.py` entry_rule - a
+  producer entry cited only from under a never-port zone is dropped by the consumer),
+  so the next union does not bring them back. (2) Reordering the S8 take to be the next
+  carve-out is allowed by the red-only-when-next-fixes-it rule, on one condition the
+  workplan gave for deferring it in the first place: the eight S8 files import EIGHT
+  `drydocs_core` modules that are in this range - `data_root`, `data_zones`,
+  `docs_verify`, `env_doctor`, `env_refs`, `mapping_store`, `schema/supplements`,
+  `source_bindings` (you already hold the last two; `drydocs.loaders.vendor_docs` and
+  `drydocs.chain_inputs` are imported too but are NOT in this range, so they are already
+  yours). Take those WITH the eight, one commit, and the guard is
+  chunk 0's: `python -c "import drydocs.cli"`, `test_cli_import_order.py`,
+  `test_cli_registry.py`, and `drydocs --help` listing your `cli_consumer` verbs last.
+  Your monolithic `cli.py` is replaced by the take; every verb of yours must already be
+  in `cli_consumer.py` before that commit, or it is gone.
 
 OWED COMPANY-SIDE:
 
