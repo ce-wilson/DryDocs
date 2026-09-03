@@ -20,6 +20,7 @@ fails here BY NAME, not two splits later.
 
 from __future__ import annotations
 
+import importlib.util
 import subprocess
 import sys
 
@@ -38,6 +39,10 @@ CLI_MODULES: tuple[str, ...] = (
     "drydocs.cli_docs",
     "drydocs.cli_plan",
 )
+# S16: the optional CONSUMER module joins the list wherever it exists (never producer-side;
+# test_cli_registry.py proves the seam with a fixture). Subprocess-per-import, like the rest.
+if importlib.util.find_spec("drydocs.cli_consumer") is not None:
+    CLI_MODULES = (*CLI_MODULES, "drydocs.cli_consumer")
 
 #: Everything except the root itself must be importable WITHOUT executing the
 #: root's module body (the root imports THEM, never the reverse at import time).

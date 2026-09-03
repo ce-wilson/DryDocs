@@ -216,6 +216,33 @@ rule); retries.
 
 ## B2. The chunks
 
+> **Amended 2026-09-02 (evening), after the company's chunk-1 report and the SME's ruling
+> "don't merge this port, try again with S8".** Two things changed. (1) The first apply
+> (`port/20260901b`) got further than §B0 assumed — slices A–G landed with 76 attributed
+> residual failures — and its `cli.py` was a surgical merge because the `evaluate` row could
+> not say "take the shape" (Defect 6, three orphaned-module failures). (2) S16 built the
+> seam: the root discovers `drydocs/cli_consumer.py`, and `drydocs/cli.py` is now
+> canonical-producer. So the retry starts with a **chunk 0** on the company's `main`, the
+> first branch is parked as a reference, and everything below runs again from a fresh
+> branch. RELAY-24 in the port-prompt carries the six adoption steps.
+
+### Chunk 0 — Adopt S8 on `main`, park the first branch, start over
+
+- **Scope:** the S8 shape taken wholesale (`cli.py`, `cli_shared.py`, the six `cli_*.py`)
+  at a producer tree that carries S16; the company's own verbs re-homed into
+  `drydocs/cli_consumer.py` on the same module shape; DD6 closed by the producer's
+  `_client(database)`. Six steps, one commit, RELAY-24.
+- **Guard:** `python -c "import drydocs.cli"`; `test_cli_import_order.py` +
+  `test_cli_registry.py` (the consumer module joins the first automatically);
+  `drydocs --help` lists the company's verbs after the producer's; the three
+  `test_env_doctor` orphans clear.
+- **Then:** `port/20260901b` is parked, not merged — its dispositions record, the
+  `validate_fact_rows` merge and the measured suite trajectory are reference; nothing on
+  it merges. Branch fresh from `main`; chunk 1 re-takes the before-snapshot (the old one
+  describes a tree that no longer exists).
+- **Not:** no port slice on `main` — chunk 0 is the company's own refactor, on the
+  producer's shape, and the port starts after it.
+
 Each chunk: scope · order inside it · the commands · the guard that closes it · what it does
 NOT do. Commands are from the company checkout with the producer remote fetched
 (`git fetch cewilson`), `RECONCILE_BEFORE_DIR` set to the snapshot taken in chunk 1.
@@ -374,7 +401,7 @@ NOT do. Commands are from the company checkout with the producer remote fetched
 ## B3. Sequencing, in one line
 
 ```
-1 prep/snapshot/look  →  2 F sources  →  3 G renders + E  →  4 remaining classes
+0 adopt S8 on main, park the first branch  →  1 prep/snapshot/look  →  2 F sources  →  3 G renders + E  →  4 remaining classes
 →  5 vocabulary (config, then the two lineage modules)  →  6 DD6 CLI seam
 →  7 bootstrap audit + DROP DATABASE x2 + re-provision  →  8 reload + C17 count
 →  9 report + provenance  →  10 next roll (PLAN3 first, producer-side)
