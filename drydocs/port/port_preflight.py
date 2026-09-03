@@ -154,6 +154,10 @@ RECORD_PREFIXES: dict[str, str] = {
     ),
 }
 
+#: Cited paths under these prefixes are never port claims: the zone is Internal and
+#: never-port, so the consumer never receives the file whether or not it exists here.
+NEVER_PORT_ZONES: tuple[str, ...] = ("internal/",)
+
 #: A document may also declare itself a record in its own header, which beats a
 #: table entry here on both counts that matter: the caveat is visible to whoever
 #: READS the document, and it cannot rot out of sight inside a module nobody opens.
@@ -333,6 +337,16 @@ def unresolved_citations(
         if is_suite_guarded(rel_path) or is_record_document(rel_path, text):
             continue
         for path in sorted(cited_paths(text, repo_roots)):
+            if path.startswith(NEVER_PORT_ZONES):
+                # A path under `internal/` is Internal by classification and never-port
+                # by manifest: whether it exists on THIS side says nothing to the consumer,
+                # who will never receive it, and a skill that names where its Internal
+                # OUTPUT goes (the research skills' `_registry/` ledgers, written on first
+                # run) is describing a run, not the tree. `internal-local/` is deliberately
+                # NOT here — J71 (`c5ebd2ce`): a backticked machine-local path is an
+                # existence claim that holds on one machine, and a document that carries
+                # one is wrong on every other machine, ported or not.
+                continue
             if not exists(path):
                 findings.append((rel_path, path))
     return findings

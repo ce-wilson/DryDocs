@@ -81,7 +81,7 @@ does not tell you which it was — check the store exists before debugging the r
 
 The console signs in against a MACHINE-LOCAL store, so this step is per-desktop and is
 not part of a normal start. Six Matrix-named personas share one dev-only secret
-convention; the values live in `internal-local/console-credentials-README.md`, which is
+convention; the values live in a machine-local README under `internal-local/` (gitignored; the file name is in that directory's index), which is
 gitignored, alongside the persona/role table. They are deliberately NOT written here —
 this skill is tracked, and CLAUDE.md section 3 keeps credentials out of tracked surfaces.
 

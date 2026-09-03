@@ -12,7 +12,7 @@ snapshot. On 2026-09-02 three sessions ran a burst without a partition and every
 landed on exactly those: two merge conflicts at the top of `IDEAS.md`, render conflicts on
 both merges, a snapshot push that beat another push by 75 seconds.
 
-The 2026-08-27 burst ran clean, and it had one thing today's did not: `docs/lane-b-handoff.md`
+The 2026-08-27 burst ran clean, and it had one thing today's did not: a `lane-b-handoff.md` under `docs/`
 — a queue for the receiving machine, a list of surfaces the sending machine owned, and a rule
 that the file deletes itself when the queue empties. It was written by hand, which is why it
 could not be found again (it retired on schedule) and why its retyped rules had drifted from
@@ -20,7 +20,7 @@ could not be found again (it retired on schedule) and why its retyped rules had 
 
 ## What the script does, and does not
 
-`scripts/handoff.py` (run from the repo root) has three modes:
+`.claude/skills/lane-handoff/scripts/handoff.py` (run from the repo root) has three modes:
 
 | Mode | Command | Reads | Writes |
 |---|---|---|---|
@@ -94,6 +94,6 @@ it is policy, not a guard.
 
 ## Provenance
 
-Built 2026-09-02 from the retired `docs/lane-b-handoff.md` (`git show 7ed4eab2:docs/lane-b-handoff.md`)
+Built 2026-09-02 from the retired handoff file (`git show 7ed4eab2:docs/lane-b-handoff.md`)
 and the three collisions of the same day's unpartitioned burst; the I7 backlog item carries
 the in-checkout fan-out version of the same rule.
