@@ -2125,6 +2125,16 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   Take the producer's test by name past the tag and drop your divergence; the
   `test_plan_ideas.py` revert was right - its subject `drydocs/docgen/plan_ideas.py`
   arrives with carve-out 2 (RELAY-23 content first), so the test goes with that.
+  **THIRD POSTSCRIPT (carve-out 2, the retired stub's third guard):** same defect class,
+  same fix. `test_runbook_currency.py` read `docs/port/port-prompt.md` unconditionally
+  through `EXTRA_DOCS`, so all four of its tests failed on your tree, and you emptied
+  `EXTRA_DOCS` as a divergence - which drops the three routing docs (CLAUDE.md,
+  MODULE_MAP.md, git-readme.md) from the currency guard on your side. The producer's
+  test now carries `NEVER_PORT_ZONE_OF`: an entry under a never-port zone is skipped by
+  name when the zone directory is absent, and still required when it is present. Take
+  the test by name past the tag and restore `EXTRA_DOCS` whole. Your observation stands
+  and is recorded: one retired stub broke three separate guards, and only the full-suite
+  baseline diff caught the last two - that is why the baseline diff is part of the ritual.
 
 OWED COMPANY-SIDE:
 

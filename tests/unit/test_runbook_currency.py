@@ -82,6 +82,26 @@ EXTRA_DOCS: dict[str, str] = {
     ),
 }
 
+#: EXTRA_DOCS entries that live under a never-port ZONE (PORT-MANIFEST.yaml rows
+#: `docs/port/**`, `internal/`). This test is canonical-producer and runs on every
+#: consumer tree, where such a document CANNOT exist - the zone is the seam, not a
+#: stale claim. So: when the zone directory itself is absent, the entry is skipped by
+#: name; when the zone is present, the document must be (a producer that moves
+#: port-prompt.md still fails here). The company's chunk-2 apply (2026-09-03) hit this
+#: as four failures in one file and emptied EXTRA_DOCS as a divergence, which lost the
+#: three routing docs - the second canonical-producer test that pinned a never-port
+#: path, after the test_markdown_fences.py canary.
+NEVER_PORT_ZONE_OF: dict[str, str] = {
+    "docs/port/port-prompt.md": "docs/port",
+    "internal/repo-README.md": "internal",
+}
+
+
+def _absent_never_port_zone(rel: str) -> bool:
+    zone = NEVER_PORT_ZONE_OF.get(rel)
+    return zone is not None and not (REPO_ROOT / zone).is_dir()
+
+
 #: Paths a document names that are NOT claims about the current tree. Each needs a
 #: reason — the exemption IS the reason, same idiom as MODULE_EXEMPT.
 HISTORICAL_PATHS: dict[str, str] = {
@@ -213,6 +233,8 @@ def _documents() -> dict[str, str]:
     """
     docs = {p.name: p.read_text(encoding="utf-8") for p in sorted(DESIGN_DIR.glob("*-runbook.md"))}
     for rel in EXTRA_DOCS:
+        if _absent_never_port_zone(rel):
+            continue  # a consumer tree: the zone never crosses (NEVER_PORT_ZONE_OF)
         docs[rel] = (REPO_ROOT / rel).read_text(encoding="utf-8")
     return docs
 
@@ -298,13 +320,25 @@ def test_extra_docs_exist_and_carry_a_reason() -> None:
     covering nothing, silently — the failure mode the sibling coverage guard was
     written for, one level up."""
     for rel, why in EXTRA_DOCS.items():
-        assert (REPO_ROOT / rel).exists(), (
+        assert _absent_never_port_zone(rel) or (REPO_ROOT / rel).exists(), (
             f"EXTRA_DOCS names {rel!r}, which does not exist — it moved, and this "
             "guard stopped covering it the moment it did."
         )
         assert (
             isinstance(why, str) and len(why.strip()) >= 40
         ), f"EXTRA_DOCS[{rel!r}] needs a reason it is worth guarding, not {why!r}"
+
+
+def test_never_port_zone_map_names_extra_docs_under_real_zones() -> None:
+    """The zone map is a skip list, so it must not drift from the two things it
+    joins: every key is an EXTRA_DOCS entry, and every zone is a directory the
+    producer holds (here it is the producer, so both must be present)."""
+    for rel, zone in NEVER_PORT_ZONE_OF.items():
+        assert rel in EXTRA_DOCS, f"{rel!r} is in NEVER_PORT_ZONE_OF but not EXTRA_DOCS"
+        assert rel.startswith(zone + "/"), f"{rel!r} does not lie under its zone {zone!r}"
+    if (REPO_ROOT / "docs" / "port").is_dir():  # the producer tree
+        for rel in NEVER_PORT_ZONE_OF:
+            assert (REPO_ROOT / rel).exists(), f"producer tree, so {rel!r} must exist"
 
 
 def test_path_exemptions_carry_a_reason_and_are_still_cited() -> None:
