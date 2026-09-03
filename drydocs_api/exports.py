@@ -190,6 +190,22 @@ def run_spec(
     _authenticate(token, store)
     spec, fixed = _resolve_spec(spec_id, token, ephemerals)
     bound = {**fixed, **validate_params(spec, params)}
+    return execute_spec(spec, bound, runner)
+
+
+def execute_spec(
+    spec: QuerySpec, bound: Mapping[str, object], runner: GraphRunner
+) -> dict[str, object]:
+    """Run an already-resolved, already-validated spec and shape THE envelope.
+
+    R9: this is the one dict both ``POST /specs/{id}/run`` and the agent query
+    command (``drydocs_api.agent_query``) return, so an agent reading the CLI
+    and a console reading the API see the same ten keys. Exactly these keys:
+    the API's declared response model (O70, ``drydocs_api.schemas.SpecRunOut``)
+    forbids extras, so a CLI-only field belongs on the CLI's side, never here.
+    Authentication and spec RESOLUTION (registry row vs. a session's ephemeral
+    registration) stay with the callers — this takes a spec and bound params.
+    """
     ensure_read_only(spec.cypher)  # defense in depth — ephemeral specs re-validate here
     keys, rows = runner.run(spec.cypher, dict(bound), spec.database)
     keys, watermarked = _apply_watermark(spec, list(keys), rows)
