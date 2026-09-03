@@ -1368,6 +1368,16 @@ mint for its base or for a sibling); a venue whose file declares no `edition:` m
 nothing and the refusal names the key to set. ADR 0015 D3&#x27;s &quot;declared, not inferred&quot;,
 applied to the allocator&#x27;s own venue.
 
+THE IDEA SERIES HAS NO GRAMMAR IN THIS ITEM YET (found 2026-09-03: the company minted
+Idea-10012 in the band during its port retry, and the band retires forward-only). The
+allocator treats `Idea` as its own case (validate.py IDEA_SERIES), outside the module
+codes, so `[&lt;EDITION&gt;-]&lt;MODULE&gt;&lt;n&gt;` says nothing about the inbox. Rule it here, one way:
+either `&lt;EDITION&gt;-Idea-&lt;n&gt;` on the same segment rule (an instance&#x27;s inbox is its own,
+DOC1 says the inbox is instance-owned), or the Idea series stays band-numbered
+forward-only as a deliberate exception written into the band-retirement text. The
+first is consistent; the second is cheaper and leaves one grammar with two shapes.
+Recommend the first; the guard in (e) covers `Idea` ids too.
+
 (c) RETIRE BOTH PARTITION RULES, FORWARD-ONLY: the DD reserve (git-readme.md:197,
 2026-07-20) and the 10000 band (PRODUCER_BAND_CEILING, 2026-08-18). Neither governs a new
 mint. DD1-DD10, DD10001-DD10003 and G10001-G10003 stay readable and stay in the frozen
