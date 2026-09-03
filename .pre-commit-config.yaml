@@ -1,0 +1,38 @@
+# pre-commit hooks — the two commands CI blocks on, run on the staged files (J62).
+#
+# WHY THIS EXISTS. Between 2026-08-05 and 2026-08-12 CI ran red for more than a
+# hundred consecutive runs on `ruff check` and `ruff format --check` while sessions
+# kept pushing past it. It stayed invisible because the unit suite passed the whole
+# time, so nothing local ever looked wrong. The session ritual now checks CI, and
+# snapshot.ps1 checks it against HEAD's own sha — both after the fact. A hook makes
+# the COMMIT fail, which is the only intervention that does not depend on somebody
+# remembering to look.
+#
+# NOT SILENTLY MANDATORY. Nothing installs this for you: a repo that fails an
+# unexplained hook on a fresh clone teaches people to pass --no-verify. Once per
+# machine `pipx install pre-commit` (the same way poetry is installed here), then
+# once per clone, from the repo root:
+#
+#     pre-commit install
+#
+# After that every `git commit` runs the two hooks on the files being committed.
+# `ruff` reports exactly what CI's `ruff check .` would (no --fix: the hook shows
+# the finding rather than editing under you); `ruff-format` rewrites the staged
+# files the way CI's `ruff format --check .` demands and fails the commit so you
+# re-stage and commit again. `pre-commit run --all-files` runs both over the tree.
+#
+# THE REV IS THE PIN. pyproject.toml pins ruff EXACTLY (0.5.7 — J10 stage 0:
+# formatter output varies across ruff versions, and the producer and company repos
+# must agree byte for byte; authority docs/ruff-format-convergence.md). The hook
+# runs its own ruff from this rev, so the rev must equal that pin or the hook lints
+# to a different standard than CI — which is worse than no hook. Move the two
+# together; tests/unit/test_precommit_config.py fails when they differ.
+#
+# CI keeps its own ruff steps unchanged (.github/workflows/ci.yml). The hook is a
+# faster first line, never a replacement for the gate.
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.5.7
+    hooks:
+      - id: ruff
+      - id: ruff-format

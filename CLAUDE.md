@@ -92,6 +92,10 @@ The 27 legacy letters (A..Z, GN, MM) were FROZEN on 2026-09-02 — a letter reco
 **Session ritual (keeps every platform aligned):**
 1. **Start:** `git pull` → read this file → open the board's Ready-to-pull strip (or run
    `python .claude/skills/groom-backlog/validate.py` for the derived list), pick the next ready item.
+   Once per clone, `pre-commit install` (J62; `pipx install pre-commit` once per machine): the two
+   ruff commands CI blocks on then run on the staged files at every commit, at the exact ruff pin —
+   a fast first line, never the gate. Not installed for you, on purpose: `.pre-commit-config.yaml`
+   explains itself so a hook failure on a fresh clone is never an unexplained one.
 2. **During:** the in-session Task list is *ephemeral* working memory for the one item — distinct
    from the durable item file.
 3. **End:** update the item's `status`, **regenerate the board** (`poetry run python scripts/render_board.py`)
