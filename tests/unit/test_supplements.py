@@ -353,7 +353,7 @@ def _tracked_text_files() -> list[Path]:
         ["git", "ls-files", "-z", "*.md", "*.py", "*.yaml", "*.yml", "*.cypher"],
         cwd=root,
         capture_output=True,
-        text=True,
+        encoding="utf-8",
         check=True,
     )
     return [root / rel for rel in out.stdout.split("\0") if rel and rel not in _HISTORICAL]

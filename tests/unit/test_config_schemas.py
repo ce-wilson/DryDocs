@@ -208,7 +208,7 @@ def test_schemas_validate_without_importing_drydocs_core(tmp_path: Path) -> None
             str(REPO / "config" / "precedence.yaml"),
         ],
         capture_output=True,
-        text=True,
+        encoding="utf-8",
         cwd=tmp_path,  # not the repo root — no accidental package resolution
     )
     assert res.returncode == 0, res.stderr

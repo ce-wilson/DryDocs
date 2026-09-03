@@ -441,7 +441,7 @@ def test_promote_diff_applies_with_real_git(sessions, override_store, tmp_path):
 
     subprocess.run([git, "init", "-q"], cwd=work, check=True)
     done = subprocess.run(
-        [git, "apply", "--verbose", str(patch)], cwd=work, capture_output=True, text=True
+        [git, "apply", "--verbose", str(patch)], cwd=work, capture_output=True, encoding="utf-8"
     )
     assert done.returncode == 0, f"git refused the emitted diff:\n{done.stderr}"
     rows = list(csv.DictReader(io.StringIO(target.read_text(encoding="utf-8"))))

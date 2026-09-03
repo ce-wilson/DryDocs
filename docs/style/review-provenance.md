@@ -78,3 +78,25 @@ No test asserts the stamp across every surface. Asserting it repo-wide would fai
 historical document, and back-filling those is exactly the wrong move (see above). The
 convention is applied at authoring time and by review; if a guard is ever wanted, it belongs on
 *newly added* files only, which is a separate item and not this one.
+
+## Check the instrument before the subject (J76)
+
+**The rule.** When a measurement contradicts an expectation, check the instrument before the
+subject, and prefer the check that can fail loudly: read the raw exit code before parsing
+anything, decode explicitly, and reconstruct a fixture from the incident at its real values
+rather than authoring one. A tool that fails loudly gets fixed in minutes; a tool that fails into
+"clean" gets acted on.
+
+**Why — three incidents in one day, 2026-09-01, two machines, two people, one port.** Each has
+the same shape: the instrument was broken, the artifact was fine, and the corrupted measurement
+said everything was OK. Each is a default that optimises for not interrupting.
+
+| Failure mode | What happened | What it costs | Guarded? |
+|---|---|---|---|
+| **Locale decoding** | A comparison script read `git show` through `subprocess.run(..., text=True)`. `text=True` decodes with the platform locale — cp1252 on that desktop — and every backlog item file holds em dashes, so the decoder substituted its way through and the script reported 18 of 25 "differences" that did not exist. | The file on disk was clean; the report said the tree was wrong. | **Yes** — `tests/unit/test_subprocess_encoding.py`: a capture that passes `text=True` or `universal_newlines=True` must pass `encoding=` too, over `scripts/`, `tests/`, `web/e2e/` and the groom-backlog skill. The allocator in `.claude/skills/groom-backlog/validate.py` is the reference shape. An exemption is `# J76: locale` on the call, with the reason. |
+| **Truncated pipeline** | A sweep captured results as `... \| Select-Object -First N`. That terminates a native-command pipeline early, so `$LASTEXITCODE` reported 0 where the raw code was 1; five prefixes were declared clean on that basis and a slice was about to start on it. | A green verdict from an exit code that was never the command's. | **No** — a shell idiom no Python-side scan can see. Named here so it is recognised: read `$LASTEXITCODE` from the bare command, then truncate what you display. |
+| **A fixture authored to fit the theory** | A guard was validated against fixture data written to make its author's theory true; the real pair, measured on the other tree, scored 0.08 where the fixture cleared the floor. | A guard that passes its own fixture and fails the incident it was written for. | **No** — a review property, not a mechanical one. Named here: a fixture for an incident is reconstructed from that incident at its real values, never authored to a hypothesis (J72's notes carry the worked example). |
+
+The guarded case is the only one of the three that admits a guard cleanly; promoting the other two
+to guards would be the disease this rule names — an instrument that reports "clean" for reasons of
+its own.

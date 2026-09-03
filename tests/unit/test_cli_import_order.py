@@ -53,7 +53,7 @@ def _probe(code: str) -> subprocess.CompletedProcess:
     return subprocess.run(
         [sys.executable, "-c", code],
         capture_output=True,
-        text=True,
+        encoding="utf-8",
         timeout=120,
     )
 

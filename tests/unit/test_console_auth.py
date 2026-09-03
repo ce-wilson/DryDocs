@@ -184,7 +184,7 @@ def test_no_credential_file_is_tracked():
         ["git", "ls-files", "--", f"*{DEFAULT_RELATIVE_PATH.name}"],
         cwd=REPO_ROOT,
         capture_output=True,
-        text=True,
+        encoding="utf-8",
     )
     assert tracked.stdout.strip() == ""
 

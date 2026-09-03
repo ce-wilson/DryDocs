@@ -77,7 +77,7 @@ raw = subprocess.run(
         Q,
     ],
     capture_output=True,
-    text=True,
+    encoding="utf-8",
 ).stdout
 rows = list(csv.DictReader(io.StringIO(raw.replace(", ", ","))))
 if not rows:

@@ -44,13 +44,28 @@ from __future__ import annotations
 import ast
 import io
 import tokenize
+from collections.abc import Collection
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Final
 
 #: The whole surface. Pinned rather than inferred, and asserted by
 #: tests/unit/test_source_scan.py: a helper module that grows a fourth verb
-#: nobody calls is how a shared helper becomes a private one again.
-__all__ = ["code_only", "imported_modules", "called_names", "source_text"]
+#: nobody calls is how a shared helper becomes a private one again. The fourth
+#: verb, ``call_sites``, arrived with a caller (J76's subprocess-encoding guard)
+#: and ``comment_lines`` with it, for the one thing a guard may read a comment
+#: for: an exemption marker placed on purpose.
+__all__ = [
+    "code_only",
+    "imported_modules",
+    "called_names",
+    "call_sites",
+    "comment_lines",
+    "source_text",
+    "CallSite",
+    "MISSING",
+    "NOT_CONSTANT",
+]
 
 #: Which calls :func:`called_names` reports. ``"name"`` is a bare ``foo()``,
 #: ``"attribute"`` is ``obj.foo()``, ``"all"`` is both. The distinction is
@@ -138,4 +153,83 @@ def called_names(source: str, *, kind: str = ALL) -> set[str]:
             found.add(func.id)
         elif isinstance(func, ast.Attribute) and kind in (ATTRIBUTE, ALL):
             found.add(func.attr)
+    return found
+
+
+@dataclass(frozen=True)
+class CallSite:
+    """One call of a watched name: where it is and which keywords it passes.
+
+    ``keywords`` maps each keyword argument's name to its literal value when the
+    argument is a constant (``True``, ``"utf-8"``), else to :data:`NOT_CONSTANT`
+    — a guard can then say "``text=True`` with no ``encoding``" without guessing
+    at expressions it cannot evaluate. ``lineno``/``end_lineno`` bracket the whole
+    call, so a per-line exemption marker anywhere inside it can be honoured.
+    """
+
+    name: str
+    lineno: int
+    end_lineno: int
+    keywords: dict[str, object] = field(default_factory=dict)
+
+    def constant(self, keyword: str) -> object:
+        return self.keywords.get(keyword, MISSING)
+
+
+MISSING: Final = object()
+NOT_CONSTANT: Final = object()
+
+
+def call_sites(source: str, names: Collection[str]) -> list[CallSite]:
+    """Every call of one of ``names`` (bare or final-attribute, as
+    :func:`called_names` matches), with its keyword arguments — the fourth verb
+    (J76). :func:`called_names` answers "is X called at all"; a guard about HOW
+    something is called (``subprocess.run(..., text=True)`` with no encoding)
+    needs the arguments, and reading them from the tree rather than the text is
+    what keeps such a guard off the comments that explain the very pattern it
+    forbids."""
+    wanted = set(names)
+    found: list[CallSite] = []
+    for node in ast.walk(ast.parse(source)):
+        if not isinstance(node, ast.Call):
+            continue
+        func = node.func
+        if isinstance(func, ast.Name):
+            name = func.id
+        elif isinstance(func, ast.Attribute):
+            name = func.attr
+        else:
+            continue
+        if name not in wanted:
+            continue
+        keywords: dict[str, object] = {}
+        for kw in node.keywords:
+            if kw.arg is None:  # **mapping — its keys are unknowable here
+                continue
+            keywords[kw.arg] = (
+                kw.value.value if isinstance(kw.value, ast.Constant) else NOT_CONSTANT
+            )
+        found.append(
+            CallSite(
+                name=name,
+                lineno=node.lineno,
+                end_lineno=node.end_lineno or node.lineno,
+                keywords=keywords,
+            )
+        )
+    return found
+
+
+def comment_lines(source: str) -> dict[int, str]:
+    """Line number -> the comment on that line, for every line that carries one.
+
+    The one legitimate reason a guard reads a comment: an EXEMPTION MARKER the
+    author put there on purpose (the ``noqa`` idiom). A guard that honours a
+    marker reads exactly the marker's line, never the prose around the code —
+    the J66 rule with its one stated exception made explicit.
+    """
+    found: dict[int, str] = {}
+    for tok in tokenize.generate_tokens(io.StringIO(source).readline):
+        if tok.type == tokenize.COMMENT:
+            found[tok.start[0]] = tok.string
     return found

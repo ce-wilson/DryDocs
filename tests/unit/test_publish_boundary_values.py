@@ -134,7 +134,7 @@ def _tracked_files() -> list[str]:
             ["git", "ls-files"],
             cwd=REPO,
             capture_output=True,
-            text=True,
+            encoding="utf-8",
             check=True,
         ).stdout
     except (OSError, subprocess.CalledProcessError):  # pragma: no cover
