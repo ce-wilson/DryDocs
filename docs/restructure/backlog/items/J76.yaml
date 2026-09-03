@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - tests/source_scan.py
@@ -64,3 +64,44 @@ notes: |
 
   Related: the verify-before-asserting working agreement, J66 (a guard reads code, not the
   prose around it), and J72's notes, which carry all three as worked examples.
+
+  BUILT 2026-09-03 (laptop, Lane B of the 0aeba6fc handoff; wip/J76-laptop).
+
+  (a) THE GUARD: tests/unit/test_subprocess_encoding.py. A call of run, check_output, Popen,
+  call or check_call that passes text=True or universal_newlines=True must pass encoding=
+  too; getoutput and getstatusoutput are refused outright (locale-only by construction).
+  Read from the syntax tree, never the text - and the item's named verbs were not enough:
+  called_names() can say a thing is called, and this guard is about HOW it is called, so
+  tests/source_scan.py gained its fourth verb, call_sites() - every call of a watched name
+  with its keyword arguments, constants resolved and everything else marked NOT_CONSTANT -
+  and comment_lines(), the one legitimate reason a guard reads a comment: an exemption
+  marker the author placed on purpose (`# J76: locale` on any line of the call, with the
+  reason on that line). The helper's __all__ pin moved with it and four tests cover the
+  verbs. J66 held: a comment describing the forbidden pattern does not trip the rule, and a
+  test says so.
+
+  (b) SCOPE, in the docstring: scripts/, tests/, web/e2e/ and the groom-backlog skill's
+  scripts - the places a measurement is authored. The allocator is the reference shape and
+  a test proves it passes. OUT OF SCOPE, and named so nobody assumes: four production
+  sites carry text=True (drydocs/port/port_backlog_union.py, drydocs/port/port_preflight.py,
+  drydocs_core/adapters/controlm/api.py, drydocs_core/landing_zones.py). The Control-M
+  utility runner in api.py may even WANT the console code page - that is a ruling about a
+  tool's output, not a measurement, and widening the scope is a separate item.
+
+  (c)(d) PROSE: docs/style/review-provenance.md, "Check the instrument before the subject
+  (J76)" - the rule line first, then the three incidents as a table with what happened,
+  what it cost and whether a guard exists: locale decoding (guarded), the truncated
+  PowerShell pipeline (a shell idiom no Python scan can see; the fix is to read
+  $LASTEXITCODE from the bare command and truncate only what is displayed), and the fixture
+  authored to fit its author's theory (a review property; reconstruct from the incident at
+  its real values). CLAUDE.md section 6's "Verify before asserting" bullet carries the rule
+  line and points there - the one touch on a surface neither lane declared, required by
+  "wherever verification discipline already lives".
+
+  (e) GREEN ON THE TREE IN THE SAME COMMIT: the guard found nineteen sites in three
+  scripts and fourteen test files - every one an ordinary git or Python capture - and each
+  had text=True replaced with encoding="utf-8"; nothing was exempted. Every touched suite
+  re-run (376 passed), the guard's own fifteen cases (five synthetic reds, six greens, the
+  multi-line marker, the J66 comment case, the reference file), ruff clean, full suite 3159
+  passed before the close. One of the nineteen was this lane's own R9 test from two days
+  ago, which is the point of a guard over a rule people already know.
