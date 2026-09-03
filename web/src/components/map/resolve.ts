@@ -141,13 +141,22 @@ export function resolveRows(rows: readonly LocationRow[]): ResolveResult {
     const key = city.id
     let site = sites.get(key)
     if (!site) {
+      // Z9: the SAME fallback the index key uses above. A synthetic city carries
+      // no numeric country_id, only its alias, so every country-keyed read here
+      // must ask with the key the gazetteer's countries table actually carries.
+      // Reading country_id alone asked COUNTRY_NO_SHAPE for '' and missed SYN
+      // (Synthetica offered an outline it does not have), and left countryId
+      // null (Synthetica never reached countryIds or the drill-down list) — the
+      // Z5 family: an identifier read on one axis while the data carries it on
+      // another. O80's runner found it on its first run.
+      const countryKey = city.country_id ?? city.country_alias
       site = {
         key,
         cityName: city.name,
         state: city.state,
-        countryId: city.country_id,
-        countryName: COUNTRY_NAME.get(city.country_id ?? '') ?? row.country,
-        countryHasNoShape: COUNTRY_NO_SHAPE.has(city.country_id ?? ''),
+        countryId: countryKey,
+        countryName: COUNTRY_NAME.get(countryKey ?? '') ?? row.country,
+        countryHasNoShape: COUNTRY_NO_SHAPE.has(countryKey ?? ''),
         // Re-projected from lat/lon rather than trusting the artifact's cached
         // x/y, so the two can never silently disagree; the guard asserts they
         // agree, and this makes the runtime independent of that.
