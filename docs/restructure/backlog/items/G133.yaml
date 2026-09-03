@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: done
 depends_on: []
 inputs:
 - drydocs_core/adapters/controlm/api.py
@@ -103,3 +103,55 @@ notes: |
   replica" and becomes "which XML, and can it still be joined" - which strengthens
   the complementarity reading in that gate's OQ-9 rather than the winner/loser
   framing. Recorded here so the gate session finds it; this item rules nothing.
+
+  BUILT 2026-09-03 (laptop, Lane B of the f109280f handoff; wip/G133-laptop). The
+  line numbers in (a) still matched the tree exactly at the claim.
+
+  (a) execute() now wraps the runner call in an OSError catch. subprocess.run raises
+  OSError - FileNotFoundError, PermissionError - only when the child cannot be
+  STARTED; once it runs, its outcome is a returncode, so the catch cannot mask a
+  failed call. The outcome is a CallResult with not_runnable=True, returncode None
+  and the OS error in message, printed through the same JSON channel as every other
+  result. The guard drives the REAL default runner against a template naming a
+  binary no host has, and asserts both halves: json.loads on stdout first (a
+  traceback fails there, not at the code), then the exit code.
+
+  (b) EXIT_NOT_RUNNABLE = 4, decided and recorded in the README table with the
+  reason: 1 says the tool ran (it never did), 2 says the config is wrong (the
+  template is valid and the operation supported), 3 says the capability is missing
+  at this version (it is not). Widening 2 would make "fix your config" the advice
+  for a host-provisioning problem. The wrapper's `*) fail` arm already covers 4;
+  a wrapper that wants to say "install the utility" tests for it. The JSON contract
+  gains `not_runnable`, listed in the README key list; a test pins that every code
+  the module defines has a README row (reads prose on purpose - the table IS the
+  contract, J66's stated exception).
+
+  (c) The folder_export row names both transports and the shape difference, and a
+  new "Two folder-export transports" section beside the table carries the measured
+  comparison as a two-column table: identical content, the six EM-instance
+  attributes present only in the utility export, REAL_FOLDER_ID as the EM holds it
+  versus 0, and the reading that the API copy is DEPLOYABLE-shaped - the zero is
+  correct for an artifact whose id Control-M assigns on upload. No operation was
+  added and nothing was templated from memory: the API path is recorded as grounded
+  by a measured pull, not by the corpus, and OPERATIONS is unchanged.
+
+  (d) The cost is named in this repo's terms, every path verified in the tree
+  before it was cited: the cypher MERGE on ControlMFolder {folder_id}, sourced from
+  TABLE_ID in the folders SQL; IS_CURRENT_VERSION as a live filter in the folders,
+  jobs and both conditions loaders; and what is NOT lost - the XML lineage
+  extractor keys on (data_center, folder_name, subfolder_path, job_name). One
+  precision on the body: the extractor's key carries subfolder_path as well as the
+  three names the body lists; still names, not ids, so the conclusion holds. The
+  D11 note travels into the reference so the gate session finds it there too.
+
+  (e) main(argv, *, runner=None) threads the runner into execute(). The .sh never
+  passes it; a test does, and the entry point's RUN path is now driven both with a
+  recording runner (exit 0, argv seen) and a raising one (exit 4). A third test
+  keeps ran-and-failed (exit 1, returncode 1), never-started (exit 4, returncode
+  None) and not-executable (PermissionError, also 4) distinct from one another.
+
+  VERIFIED: five new tests in test_controlm_api.py, the adapter suite plus the
+  source-scan, render-parsing, fence, publish-boundary and module-boundary guards
+  green (70), ruff check and ruff format --check clean, full suite 3100 passed
+  before the close. No new file, so no MODULE_MAP row; drydocs_core is already a
+  core prefix. Not verified, as the body says: any call against a live Control-M.

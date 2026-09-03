@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: done
 depends_on: []
 inputs:
 - drydocs/design_doc.py
@@ -65,3 +65,76 @@ notes: |
   same artifact under two style sheets (L13). A console page is a function of the graph at
   a moment. The provenance footer in (b) is what keeps the loop honest — everything else
   here is mechanical.
+
+  BUILT 2026-09-03 (laptop, Lane B of the f109280f handoff; wip/O88-laptop).
+
+  (a) HEADLESS EDGE, DRIVEN RATHER THAN FLAGGED - a deliberate reading of the clause, not
+  a departure. The verify skill's design-doc recipe launches Edge with --dump-dom, and a
+  flag cannot sign in: pointed at a route it renders the sign-in screen, which is exactly
+  the blank page (d) forbids. So web/scripts/captureRoutes.mjs (`npm run paper`) drives
+  the same browser through Playwright (channel msedge; --browser chromium falls back to
+  the O80 harness's build, and the manifest records which executed the page), signs in
+  through the real form the way the O80 e2e does, and writes what the browser rendered.
+  Self-contained means: every stylesheet's rules inlined as one sheet (@font-face
+  dropped - the print sheet names system faces - rather than shipping font files),
+  images and canvases as data URIs, scripts, links and iframes removed. The
+  transformation is PURE over a Document (web/src/lib/paperForm.ts) so it runs under
+  jsdom in the unit suite and inside the driver identically; paperForm.test.ts (10
+  cases) pins the anchor scheme, the table-caption placement, the footer, the meta, the
+  strip list, and an external-reference sweep that turns "no external requests" into a
+  guard the driver enforces (exit 1 if any capture still references one).
+
+  (b) THE FOOTER on every printed page (.dd-print-footer): route · the capture host's
+  HEAD with "(dirty)" when the tree differed · UTC time · the API origin the page ITSELF
+  requested at sign-in (observed from its /login request, never a flag) · persona ·
+  browser and version. The same provenance rides in a <meta name="drydocs-capture"> and
+  in capture-manifest.json beside the files, with each file's sha256.
+
+  (c) THE GUTTER. web/src/styles/print.css is the console's first print CSS, imported
+  by index.css, @media print only apart from the screen-side hide line and @page; the
+  .dd-margin-tag and .dd-print-footer rules are copied VERBATIM from
+  design_doc._PRINT_MEDIA_CSS and tests/unit/test_console_print_gutter.py pins the two
+  equal, the hide line first, and nothing outside the media block (TC-SHELL-01's lesson
+  in reverse: an unlayered selector beats Tailwind's layered utilities, wanted on paper
+  and never on screen). The shell chrome goes on paper (div:has(> main) siblings, the
+  module nav, tablists, controls) and main gets the gutter padding. What could NOT
+  transfer is the anchor SCHEME: _inject_margin_anchors tags blocks by authored id and
+  the console has none, so tags are <route-slug>.<n> in DOM order over headings, tables,
+  data-frame rows and tab panels, also written to data-dd-anchor - the key a scanned
+  markup is re-attached by, stable for a given DOM. Rows are anchored through their
+  FIRST CELL: a <tr> is not a reliable containing block for an absolutely positioned
+  tag in Chromium, a <td> is, and the first cell's left edge is the table's. The first
+  capture of /gates carried two anchors for a whole page, which is not a granularity
+  anyone marks a table up at; with rows it carries twenty-four.
+
+  (d) THE NAMED STARTING SET: /gates, /software, /load-map. They render from committed
+  generated artifacts, so a capture needs no graph and is reproducible on any machine
+  (this laptop's graph state was unknown this session - the Neo4j MCP server failed to
+  connect - and a capture of an empty graph is the blank page in another form); and
+  they are exactly the pages FB-03 designates for SME review. Graph-backed routes are
+  opt-in through --routes and only as good as the graph behind the API at that moment,
+  which is what the footer is for. Headless sign-in is real and its cost is paid: the
+  secret is prompted without echo or read from --secret-stdin, never a flag or the
+  environment (O80's provenance rule: a flag would be a third, unrecorded origin).
+
+  (e) NOT COMMITTED. Captures land under DRYDOCS_DATA_ROOT/console-captures/<utc-stamp>/
+  (the root is mandatory, G81; --out overrides). The committed artifacts are the script,
+  paperForm.ts, print.css, the two tests. No dependency was added: jsdom and playwright
+  are already in the tree, so package-lock.json is untouched.
+
+  VERIFIED, venue-stamped: laptop, no graph - a throwaway credential minted by the O80
+  bootstrap, drydocs-api on :8021 and Vite on :5299 (the harness's three-process shape),
+  headless Edge 152. Three captures: 24, 18 and 32 anchors; every one self-contained
+  (the sweep found nothing); --verify-print re-opened each under print media and found
+  the tag and the footer display:block; the design-doc recipe (doc_pdf.html_to_pdf)
+  printed the /gates capture to a PDF unchanged - the loop closed. Two defects found by
+  running it, both fixed before the push: the persona button's accessible name carries
+  the role chip, so an anchored whole-name match never clicked; and /software polls, so
+  "networkidle" never arrived - the driver now waits for load, then a bounded quiet.
+  tsc -b, oxlint, vite build, vitest 9 files / 103 tests, the gutter guard, ruff, full
+  suite 3099 passed.
+
+  DOCS: web/README.md "Paper form (O88)"; a pointer in each of the two skills the item
+  names as inputs (mechanism only, no machine paths). A live print from the browser
+  uses the same sheet with no tags and no footer, and the README says why: only the
+  capture knows the commit and the moment.

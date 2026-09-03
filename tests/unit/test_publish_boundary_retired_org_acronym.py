@@ -121,12 +121,26 @@ def test_retired_org_acronym_is_not_published() -> None:
     appear in any git-tracked file outside internal/."""
     token = _retired_token()
     if token is None:
-        pytest.skip(
-            "internal/cdo-reference/README.md is not present in this clone (a "
-            "published clone excludes internal/ entirely), or its retired-token "
-            "mapping note could not be parsed — this guard has nothing to read "
-            "the retired acronym from, so it cannot run here. This is a SKIP, "
-            "not a pass: it proves nothing about whether the token is published."
+        if not (REPO / "internal").is_dir():
+            pytest.skip(
+                "internal/ is absent from this clone (a published clone excludes it "
+                "entirely), so there is nothing to read the retired acronym from and "
+                "nothing Internal to leak. This is a SKIP, not a pass: it proves "
+                "nothing about whether the token is published."
+            )
+        # FAIL-CLOSED (2026-09-03, from the company's chunk-1 report): a clone that
+        # CARRIES internal/ is a full clone, and on a full clone this guard must have
+        # its note. The company's retry found the guard skipping on their tree - the
+        # README under internal/cdo-reference/ existed but carried no RENAMED note -
+        # and a skip there is the guard sitting green and silent on exactly the tree
+        # that publishes. Nobody may write the token here, so the note is the only
+        # source; a missing note is the defect, and the fix is to author the sentence.
+        pytest.fail(
+            "internal/ is present but internal/cdo-reference/README.md is missing or "
+            "carries no RENAMED note of the form `internal/<token>-reference/`. This "
+            "guard derives the retired token from that note and never writes it; "
+            "author the note (one sentence naming the former directory) so the guard "
+            "can run. A skip here would be a green light on the tree that publishes."
         )
 
     pattern = re.compile(r"\b" + re.escape(token) + r"\b", re.IGNORECASE)

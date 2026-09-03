@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: done
 depends_on: []
 inputs:
 - web/src/lib/graphApi.ts
@@ -25,3 +25,77 @@ notes: |
   about twice - never parse a render, never hand-copy a declaration. The QuerySpec registry is
   the natural first beneficiary: 35 specs whose column shapes the console currently trusts by
   convention alone.
+
+  BUILT 2026-09-03 (laptop, Lane B of the f109280f handoff; wip/O70-laptop).
+
+  THE SERVER HAD TO DECLARE FIRST, and that was the finding. Every handler returned
+  dict[str, object], so the schema described each response as a free object: generating a
+  client from it would have typed Record<string, unknown> and merely moved the hand-written
+  cast. drydocs_api/schemas.py now carries pydantic response models - extra='forbid', so a
+  handler key the schema does not name fails response validation in the API tests rather
+  than dropping off the wire silently - as the return annotations of the routes GraphAccess
+  and sign-in read: /health, /login, /logout, /queries, /query/{id}, /raw-cypher, /specs,
+  /specs/{id}/run. The export manifest stays a free object on purpose (an open ledger record
+  the console already types Record<string, unknown>).
+
+  TWO COMMITTED ARTIFACTS, ONE CHAIN, A GUARD AT EACH LINK. scripts/dump_openapi.py writes
+  web/src/generated/openapi.json from create_app().openapi() - the importable object, never
+  /openapi.json over HTTP (J37) - sorted and newline-pinned, with --check. One generator,
+  web/scripts/genApiTypes.ts, writes api.d.ts through `npm run api:types` and is imported by
+  the vitest guard to regenerate in memory (the openapi-typescript CLI prepends a banner the
+  API does not, so writer and checker share the function). Guards: tests/unit/
+  test_openapi_client.py (committed schema == fresh dump; each seam route declares its model;
+  every model forbids extras; the still-free routes are a recorded list that fails when one
+  of them gains a model, so promotion is a move between two lists and not a discovery) and
+  web/src/generated/api.test.ts (api.d.ts == regenerate(openapi.json), line endings
+  normalised). Regenerate order after any drydocs_api change: dump, then api:types; the web
+  README section says so.
+
+  THE CLIENT. web/src/lib/apiClient.ts is openapi-fetch over the generated paths: a path,
+  path/query parameter or JSON body the schema does not declare does not compile. Two
+  flavours - public (no session: /login, /health, the /specs list the Ask page reads) and
+  authed (bearer from the session on every request; a 401 ends the session, O69's rule,
+  unchanged) - both routing a network failure through the O85 probe. Session hooks are
+  injected so auth.ts can use the public client for /login without a module cycle (vite
+  build shows no circular warning). unwrap() is the one source of the "<what> failed
+  (<status>): <detail>" messages; unwrapAs<T>() is the same check for a route the server
+  still declares as a free object, named separately so every call site of it IS the
+  follow-up list.
+
+  THE SEAM SURVIVED BYTE-IDENTICAL. web/src/lib/graph.ts is untouched; graphApi.ts is
+  rebuilt on the typed client and pins NamedResult and SpecResult to NamedRunOut and
+  SpecRunOut with compile-time assignability assertions, so a server that drops a field the
+  seam promises stops the build there. The bolt adapter is untouched. mappingsApi, intakeApi
+  (multipart evidence through a bodySerializer, path still checked), corpusStatus, auth
+  (signIn/signOut) and AskRoute's spec list all moved to typed paths and bodies; authedPost,
+  authedGet and readDetail are gone. ApiClient keeps getToken() - R5's agent handoff needs it.
+
+  WHAT IT DOES NOT BUY YET, recorded rather than implied: /docs-verify, /mappings/*,
+  /intake/* and /specs/ephemeral are still free objects server-side, so their wrappers go
+  through unwrapAs - a type the console CLAIMS. Each is a drydocs_api.schemas declaration
+  away from becoming a guard; listed in the Python test and the README for grooming.
+
+  CI COULD NOT SEE A COMPILE ERROR, which undercut the item's whole promise: the web job ran
+  vitest (no typecheck) and Playwright (Vite serves through esbuild, which strips types).
+  The job now runs `npm run lint`, `npm run build` (tsc -b) and `dump_openapi.py --check`
+  (the one job with fastapi installed - `gates` deliberately installs without the api
+  group, which is why the Python guard importorskips there).
+
+  TOOLING. openapi-fetch 0.17.0 (runtime, ~6 kB) and openapi-typescript 7.13.0 (dev). The
+  latter declares a typescript@^5 peer against this package's TypeScript 6; resolved through
+  a package.json `overrides` entry pointing the peer at the project's own compiler rather
+  than legacy-peer-deps, so `npm ci` stays strict. Generation verified under TS 6.0.3.
+
+  VERIFIED: tsc -b exit 0; oxlint exit 0; vite build clean; vitest 10 files / 107 tests, of
+  which 12 drive the transport policies against a fake fetch (bearer set, no-token refusal,
+  401 ends the session without retry, network failure diagnosed, path and query
+  serialisation) and 2 guard the generated types; Python: the API suite (18) with response
+  validation on, the new guard, full suite 3109 passed, ruff check and format clean.
+  END-TO-END, real bytes through the new client: the O80 Playwright suite - laptop,
+  Chromium (installed for it here) against Vite plus drydocs-api on :8011, no graph - signs
+  in through the typed public client and renders /gates through the authed one, and the
+  wrong-secret refusal still comes from the server; 2/2 passed.
+
+  FOR LANE A AT MERGE: web/src/generated/openapi.json and api.d.ts are derived from
+  drydocs_api, not from render_board.py. If drydocs_api moved on main since this branch,
+  regenerate both at the merge (dump, then api:types) or the schema guard is red post-merge.

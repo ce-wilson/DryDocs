@@ -28,7 +28,7 @@
 # `automated_by` is run by that file in CI; a case without one is still a
 # checklist a human works through, and most of them are.
 #
-# WHAT THIS DOES NOT CLAIM. Sixteen cases are automated out of thirty-nine. The
+# WHAT THIS DOES NOT CLAIM. Seventeen cases are automated out of forty. The
 # ledger's job is unchanged — it stops implying every case is unautomatable, and
 # it must not start implying the opposite. The first four were chosen because
 # each had already escaped into main and been caught by a person looking (O80's
@@ -37,7 +37,11 @@
 # functions and a generated artifact and so are exactly what a runner can hold.
 # The share moving up is not evidence that anything was backfilled; the ninth is
 # O85's and the tenth O86's, and each automates only the half a machine can
-# check — the half that needed eyes is recorded in the case's `source`.
+# check — the half that needed eyes is recorded in the case's `source`. The
+# seventeenth is O92's: a claim about the REGISTRY — which module ids carry an
+# access designation and what each role's filter yields — so the unit runner
+# holds the whole of it, and the sign-in steps in the case are how a person
+# confirms the rendered nav agrees with the filter.
 #
 # SEEDED FROM VERIFIED BEHAVIOUR, NOT INVENTED. Every case below cites a
 # backlog close note recording something that was actually observed working.
@@ -167,6 +171,26 @@ suites:
           O69 with nobody noticing.
         source: "O85 fix 2026-08-31 — desktop, Chrome vs the console on :5199 against drydocs-api :8002, DRYDOCS_CORS_ORIGINS unset; both diagnosis branches driven against real servers (a live no-CORS server on :8099 and a dead :8098)"
         automated_by: tests/unit/test_console_origins.py
+
+      - id: TC-SHELL-08
+        description: A module designated sme is absent from the nav and the Overview spokes for
+          the user role and present for steward and admin, and WHICH modules are designated is pinned
+        steps:
+          - Sign in as a user-tier persona (mouse); note the aside nav and the Overview spokes.
+          - Sign in as the steward persona (trinity); compare.
+          - Change any module's `access` in web/src/modules/registry.ts and run the unit suite.
+        expect: >
+          The user-tier persona sees no module whose registry entry carries `access: 'sme'`
+          (remediation, software, gates, loadmap, underhood today) and sees every default
+          module; steward and admin see all of them, in registry order. The unit suite pins
+          WHICH ids carry a designation and the recorded reason for each, so the one-word
+          edit O59 made (Idea-231) turns a test red instead of passing unnoticed. NOT an
+          authorization case — the API re-resolves the role from the token on every call, so
+          nothing here is a data exposure. This is the console's audience decisions staying
+          deliberate, in both silent directions: wrongly opened shows an end user deltas they
+          read as breakage (FB-03); wrongly closed simply vanishes, with no error anywhere.
+        source: "O92 build 2026-09-03 — laptop, vitest: 24 cases over the real registry through the same filter expression Aside, OverviewRoute and GraphCanvasRoute use; the pin verified red by flipping remediation to 'all' and restoring"
+        automated_by: web/src/modules/registry.test.ts
   # ---------------------------------------------------------------------------
   - id: TS-LOADS
     module: loads

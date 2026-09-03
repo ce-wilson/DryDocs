@@ -182,6 +182,15 @@ rows:
     entry_rule: >
       union of dependencies; KEEP the consumer's version string (per-repo
       release cadence); producer v* release tags never cherry-pick.
+  - path: ".pre-commit-config.yaml"
+    disposition: canonical-producer
+    note: >
+      J62 (2026-09-03). The two commands CI blocks on, as commit-time hooks. Its rev
+      IS pyproject's exact ruff pin (0.5.7, J10 stage 0) and your pin is the same by
+      J10, so the hooks belong on both sides at the same standard. Take it whole; the
+      only thing that ever changes here is the rev, which moves WITH the pin
+      (tests/unit/test_precommit_config.py fails when they differ). Nothing installs
+      it for you - `pre-commit install` once per clone, as the file's header says.
   # ---- the backlog: sharded 2026-08-20 (Y2, ADR 0013) ---------------------------
   # One item per file. Rows are ordered most-specific first; backlog.yaml itself is
   # now a TOMBSTONE and the ONE-TIME split sequence rides its row.
@@ -966,6 +975,27 @@ rows:
       module shape, discovered by the root and registered last. The producer ships NONE,
       so this row matches nothing producer-side by construction (row_may_match_nothing);
       it exists so a verbatim take of drydocs/ can never remove the consumer's verbs.
+  - path: "drydocs/cli_shared.py"
+    disposition: canonical-producer
+    note: "the S8/S13 CLI shape (2026-09-03, from the company's chunk-1 report): without a row this fell to drydocs/** default_ok, which is evaluate-on-collision - and the company holds a copy, so the S8 take was a hand-merge by accident. Taken wholesale with cli.py; the consumer's verbs live in cli_consumer.py."
+  - path: "drydocs/cli_schema.py"
+    disposition: canonical-producer
+    note: "the S8/S13 CLI shape (2026-09-03, from the company's chunk-1 report): without a row this fell to drydocs/** default_ok, which is evaluate-on-collision - and the company holds a copy, so the S8 take was a hand-merge by accident. Taken wholesale with cli.py; the consumer's verbs live in cli_consumer.py."
+  - path: "drydocs/cli_ingest.py"
+    disposition: canonical-producer
+    note: "the S8/S13 CLI shape (2026-09-03, from the company's chunk-1 report): without a row this fell to drydocs/** default_ok, which is evaluate-on-collision - and the company holds a copy, so the S8 take was a hand-merge by accident. Taken wholesale with cli.py; the consumer's verbs live in cli_consumer.py."
+  - path: "drydocs/cli_verify.py"
+    disposition: canonical-producer
+    note: "the S8/S13 CLI shape (2026-09-03, from the company's chunk-1 report): without a row this fell to drydocs/** default_ok, which is evaluate-on-collision - and the company holds a copy, so the S8 take was a hand-merge by accident. Taken wholesale with cli.py; the consumer's verbs live in cli_consumer.py."
+  - path: "drydocs/cli_variables.py"
+    disposition: canonical-producer
+    note: "the S8/S13 CLI shape (2026-09-03, from the company's chunk-1 report): without a row this fell to drydocs/** default_ok, which is evaluate-on-collision - and the company holds a copy, so the S8 take was a hand-merge by accident. Taken wholesale with cli.py; the consumer's verbs live in cli_consumer.py."
+  - path: "drydocs/cli_docs.py"
+    disposition: canonical-producer
+    note: "the S8/S13 CLI shape (2026-09-03, from the company's chunk-1 report): without a row this fell to drydocs/** default_ok, which is evaluate-on-collision - and the company holds a copy, so the S8 take was a hand-merge by accident. Taken wholesale with cli.py; the consumer's verbs live in cli_consumer.py."
+  - path: "drydocs/cli_plan.py"
+    disposition: canonical-producer
+    note: "the S8/S13 CLI shape (2026-09-03, from the company's chunk-1 report): without a row this fell to drydocs/** default_ok, which is evaluate-on-collision - and the company holds a copy, so the S8 take was a hand-merge by accident. Taken wholesale with cli.py; the consumer's verbs live in cli_consumer.py."
   - path: "drydocs/cli.py"
     disposition: canonical-producer
     note: >

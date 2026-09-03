@@ -147,6 +147,104 @@ def test_cli_bad_cfg_path_is_config_exit(data_root, capsys, tmp_path):
     assert "error" in json.loads(capsys.readouterr().out)
 
 
+# --- G133: a tool the host cannot start is an outcome, not a traceback --------
+
+
+def _raising_runner(argv):
+    raise FileNotFoundError(2, "No such file or directory", argv[0])
+
+
+def test_cli_missing_binary_emits_json_and_the_not_runnable_exit(data_root, capsys, tmp_path):
+    """Drives the REAL default runner: the template names a binary no host has,
+    so subprocess.run raises FileNotFoundError from the OS itself. Both halves
+    are asserted — parseable JSON on stdout AND the contracted code — because
+    the exit code alone passes on a traceback that happens to exit non-zero."""
+    cfg_file = tmp_path / "c.cfg"
+    cfg_file.write_text(
+        "[calls]\napi_probe = drydocs-g133-no-such-binary config servers::get\n",
+        encoding="utf-8",
+    )
+    rc = api.main(["api_probe", "--cfg", str(cfg_file)])
+    out = capsys.readouterr().out
+    payload = json.loads(out)  # a traceback would fail here, not at the exit code
+    assert rc == api.EXIT_NOT_RUNNABLE == 4
+    assert payload["ok"] is False
+    assert payload["not_runnable"] is True
+    assert payload["capability_gap"] is False
+    assert payload["returncode"] is None
+    assert "drydocs-g133-no-such-binary" in payload["message"]
+    assert payload["argv"][0] == "drydocs-g133-no-such-binary"
+
+
+def test_cli_runner_seam_reaches_the_entry_point(data_root, capsys):
+    """Clause (e): main() takes the same Runner execute() does, so the RUN path
+    of the entry point is testable and not only --plan-only."""
+    seen: list[tuple[str, ...]] = []
+
+    def recording_runner(argv):
+        seen.append(argv)
+        return subprocess.CompletedProcess(argv, 0, stdout="probe ok", stderr="")
+
+    rc = api.main(["api_probe"], runner=recording_runner)
+    payload = json.loads(capsys.readouterr().out)
+    assert rc == api.EXIT_OK and payload["ok"] is True and payload["not_runnable"] is False
+    assert seen == [("ctm", "config", "servers::get")]
+
+    rc = api.main(["api_probe"], runner=_raising_runner)
+    payload = json.loads(capsys.readouterr().out)
+    assert rc == api.EXIT_NOT_RUNNABLE and payload["not_runnable"] is True
+
+
+def test_not_runnable_is_distinct_from_ran_and_failed(data_root):
+    """The three non-gap outcomes must not collapse into one another: a tool
+    that ran and returned 1 is exit 1 with a returncode; a tool that never
+    started is exit 4 with none. A PermissionError (present but not
+    executable) is the same outcome as a missing one."""
+    planned = api.plan("api_probe", api.load_config())
+
+    failed = api.execute(planned, runner=lambda a: subprocess.CompletedProcess(a, 1, "", "boom"))
+    assert failed.exit_code == api.EXIT_RUN_FAILED
+    assert failed.returncode == 1 and failed.not_runnable is False
+
+    absent = api.execute(planned, runner=_raising_runner)
+    assert absent.exit_code == api.EXIT_NOT_RUNNABLE
+    assert absent.returncode is None and absent.not_runnable is True and absent.ok is False
+
+    def not_executable(argv):
+        raise PermissionError(13, "Permission denied", argv[0])
+
+    assert api.execute(planned, runner=not_executable).exit_code == api.EXIT_NOT_RUNNABLE
+
+
+def test_exit_codes_are_distinct_and_the_readme_table_names_each():
+    """Reads README prose on purpose: the table IS the contract the wrapper .sh
+    is written against (J66's stated exception), so a code the module defines
+    and the table does not name is a contract the operator cannot see."""
+    codes = {
+        api.EXIT_OK: 0,
+        api.EXIT_RUN_FAILED: 1,
+        api.EXIT_CONFIG: 2,
+        api.EXIT_CAPABILITY_GAP: 3,
+        api.EXIT_NOT_RUNNABLE: 4,
+    }
+    assert len(codes) == 5
+    readme = (PKG_DIR / "README.md").read_text(encoding="utf-8")
+    for code in codes.values():
+        assert f"| {code} |" in readme, f"README exit-code table has no row for {code}"
+    assert "`not_runnable`" in readme, "the JSON key list must name the new field"
+
+
+def test_discovery_reference_records_both_folder_export_transports():
+    """Clause (c): the folder_export row must stop implying one path."""
+    doc = (PKG_DIR / "API-CALLS.md").read_text(encoding="utf-8")
+    row = next(line for line in doc.splitlines() if line.startswith("| `folder_export`"))
+    assert "exportdeffolder" in row and "/deploy/jobs" in row
+    assert "REAL_FOLDER_ID=0" in row
+    # clause (d): the cost is named in this repo's terms, not left as a curiosity
+    assert "folder_id" in doc and "IS_CURRENT_VERSION" in doc
+    assert "controlm_folders.cypher" in doc
+
+
 # --- discovery reference (clause c) ----------------------------------------
 
 

@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: done
 depends_on:
 - O80
 inputs:
@@ -51,3 +51,47 @@ notes: |
   inline, but nothing outside the diff would have caught it either way.
 
   DEPENDS ON O80 (done), which bought the vitest runner and proved it. Related: O59, O80, FB-03.
+
+  BUILT 2026-09-03 (laptop, Lane B of the f109280f handoff; wip/O92-laptop). One new file,
+  web/src/modules/registry.test.ts, 24 cases, beside the module it guards.
+
+  (a) The full 3x4 matrix of canAccessModule - four designation values (undefined, 'all',
+  'sme', 'admin') by three roles - written out cell by cell rather than derived, with a check
+  that no cell is missing, that undefined and 'all' agree for every role, and that the
+  function is monotone in the role. 'admin' is in the matrix although no module carries it
+  today; the file says so.
+
+  (b) THE PIN HAS FIVE ENTRIES, NOT THREE. Acceptance (c) named remediation, software and
+  gates; the registry as built also carries access: 'sme' on loadmap (O57) and underhood. All
+  five are pinned, as a toEqual on the exact {id: access} map of every module with a
+  non-default designation - a subset check would miss a REMOVED designation, which is the
+  wrongly-opened direction. (c) Each entry carries the reason recorded where the designation
+  was made: O59's delta argument for remediation, FB-03 for the other four. The test checks a
+  reason is present; whether it is still true is review's question, as (f) says.
+
+  (d) The file header says what this is not - an authorization test - and why: the server
+  re-resolves the role from the token on every call (ADR 0005 decision 3; lib/auth.ts).
+
+  (e) Both silent directions, computed over the real registry through the same filter
+  expression the call sites use: the user role sees no designated module (wrongly OPENED)
+  and every default module (wrongly CLOSED); steward and admin see every sme module; admin
+  sees the whole registry; filtering never reorders, which the Overview spokes depend on.
+
+  (f) VERIFIED: npm run lint exit 0 (three pre-existing fast-refresh warnings, none in the new
+  file), npm run build exit 0, vitest 9 files / 117 tests green. The pin verified RED by
+  flipping remediation's access to 'all' in the registry - exactly one test fails, the pin,
+  23 pass - then the registry restored (git diff --quiet). Full Python suite, ruff check and
+  ruff format --check green before the push.
+
+  TWO STALE PREMISES IN THE BODY, recorded and not corrected (inputs are grooming, Lane A's
+  pen): the function now has FOUR call sites, not three - routes/GraphCanvasRoute.tsx joined
+  at O86, and lib/auth.ts only mentions it in a comment; and "no test at all" was true at
+  groom but O86's web/src/lib/canvasRoutes.test.ts has since covered six of the twelve cells
+  as its own dependency statement. That test is left alone; the matrix and the pin here are
+  the complete guard.
+
+  THE LEDGER: TC-SHELL-08 added to TS-SHELL (the only legal home - overview is not a registry
+  id and the nav is shell chrome), automated_by the new file, sourced to this build. The
+  automated share moves 16/39 to 17/40 in tests/unit/test_ui_tests_ledger.py, with the dated
+  line saying why the share moved: the claim is about a pure function and a registry constant,
+  not a backfill. The header count in ui-tests.yaml moved with it.

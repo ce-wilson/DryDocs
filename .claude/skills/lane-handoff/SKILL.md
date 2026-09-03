@@ -127,3 +127,9 @@ rules, and the review of `fe120bf9` (pen-keyed surfaces, the unit test, path nor
 the workspace gitignore). The I7 backlog item carries the in-checkout fan-out version of the
 same rule. Iteration-1 eval: 100% with the skill vs 85% without; iteration 2: 100% vs 70% on
 the tightened assertions.
+
+First real burst 2026-09-03 (six items, laptop = Lane B, all six closed on `wip/` and merged
+clean): the Lane B block now carries the three findings that report surfaced — a close commit
+is red on the roadmap guard by design (Y5 covers a claim, not a close), a new tracked path
+hands its manifest row back through the item notes (the `port` pen is A's), and an item that
+owns its own generated artifact names the writer at close.

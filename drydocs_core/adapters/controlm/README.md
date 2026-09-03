@@ -45,10 +45,22 @@ discovery reference.
 | 1 | call ran and failed |
 | 2 | config/usage error (bad path, unknown operation, missing template parameter) |
 | 3 | reported capability gap — no verified call shape at 9.0.21.300 |
+| 4 | tool not runnable — the template's binary is not on PATH or not executable; the call never started, so `returncode` is null and `not_runnable` is true |
+
+**Why 4 is its own code (G133, 2026-09-03).** A missing `ctm` or
+`exportdeffolder` used to escape `main()` as a Python traceback with NO JSON
+on stdout, which the wrapper cannot parse. It could not honestly take any of
+the three codes already spent: 1 says the call ran and failed (it never
+ran); 2 says the config is wrong (the template is valid and the operation is
+supported); 3 says the capability is missing at this version (it is not —
+the host simply cannot start the tool). Widening 2 to cover it would make
+"fix your config" the advice for a host-provisioning problem. The wrapper's
+`*) fail` arm already handles it; a wrapper that wants to say "install the
+utility on this host" tests for 4.
 
 One JSON object on stdout either way: `ok`, `operation`, `transport`,
-`availability`, `argv`, `in_dir`, `out_dir`, `capability_gap`, `message`,
-`returncode`, `target_version`.
+`availability`, `argv`, `in_dir`, `out_dir`, `capability_gap`,
+`not_runnable`, `message`, `returncode`, `target_version`.
 
 ## Example wrapper shape (generic — the whole point)
 

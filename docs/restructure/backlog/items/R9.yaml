@@ -8,7 +8,7 @@ phase: 15
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: done
 depends_on: []
 inputs:
 - drydocs_api/query_specs.py
@@ -18,3 +18,63 @@ acceptance: |
   A read-only, deterministic query command over the O33-guarded QuerySpecs, placed so the module boundary holds (drydocs_api owns the specs; test_module_boundary stays green): each spec addressable by name with typed params, stable JSON output, refuses unknown specs/params, zero write paths; unit tests drive it against a fake client; a short agent-facing usage note documents it as the graph-navigation surface. MCP (mcp-neo4j-cypher) explicitly out of scope, recorded as the richer later option.
 notes: |
   Groomed 2026-07-28 pm from the live-benchmarked [idea] line (5 questions ~410ms/~1.2k chars vs grep's noisy equivalents; safe now that U6 fixed the cross-root blind spot). CLI-vs-MCP resolved toward CLI by the line's own analysis: MCP adds config + write-risk surface.
+
+  BUILT 2026-09-03 (laptop, Lane B of the f109280f handoff; wip/R9-laptop).
+
+  PLACEMENT, decided by the guard rather than by taste: drydocs_api/agent_query.py, run
+  as `python -m drydocs_api.agent_query`. The component owns the specs; a `drydocs`
+  sub-command would have made the root CLI import this component (and credentials.py's
+  KDF into the eight-entrypoint import-order guard), and ENTRYPOINT_MODULES is only the
+  three drydocs*.cli* modules. test_module_boundary stays green with no new row: the
+  package is prefix-classified.
+
+  ONE ENVELOPE, SHARED WITH THE API. exports.run_spec is now auth + resolution +
+  execute_spec(spec, bound, runner); execute_spec is public and returns exactly the ten
+  keys run_spec always did - deliberately, because O70's SpecRunOut (on wip/O70-laptop)
+  forbids extras, so any CLI-only field would break the API's declared response. The
+  command's `run` prints that dict; `list` and `describe` print the GET /specs rows
+  (list_specs verbatim). No third shape was minted.
+
+  THE COMMAND. list | describe <id> | run <id> -p KEY=VALUE ... [--pretty]. A shell
+  carries only strings, so -p values are converted to the DECLARED type before
+  validate_params - which rightly rejects "10" for an int at the API, where JSON carries
+  types. Refused BY NAME on stdout with exit 2, the runner never running: an unknown spec
+  (with the registry size), an unknown, missing or mistyped param (with the declared
+  list), a malformed or repeated -p, an ephemeral eph. id (session-scoped, R4; the
+  command has no session). A runner exception is exit 1 with the class and message. No
+  Cypher operand exists to refuse - the parser has no operand that could carry a query,
+  and a test asserts that structurally. One JSON document on stdout for every outcome,
+  keys sorted, ASCII-safe (a legacy Windows code page cannot mangle it), one trailing
+  newline; a success IS the envelope, every failure carries ok:false and error.
+  main(argv, *, runner=None) is the injection seam (the G133 shape); the live runner is
+  imported lazily from drydocs_api.app only when nothing was injected.
+
+  TESTS: tests/unit/test_agent_query.py, 17 cases over a fake runner: list equals
+  list_specs(); run equals execute_spec's dict key for key with no ok on success; the
+  runner receives spec.cypher and spec.database verbatim and limit as an int; declared
+  defaults apply; identical bytes for identical input; --pretty is the same document;
+  every refusal by kind with the runner never called; the no-Cypher-operand structural
+  check; runner failure as exit 1 with JSON; and a subprocess import that pulls neither
+  fastapi/uvicorn nor drydocs_api.app (the neo4j PACKAGE rides in with
+  drydocs_core.config on every first-party import, so it is deliberately not in that
+  list - what matters is that no driver is built and no framework loads). The fixture
+  spec is chosen from the registry by shape (optional int limit), not by name, so a
+  renamed spec cannot silently retire the tests. Reads CLI stdout as JSON on purpose:
+  that output IS the contract (J37's allowed case).
+
+  USAGE NOTE: drydocs_api/README.md "Agent query command (R9)" - what it is, the three
+  sub-commands, the exit contract, the contrast with the raw-Cypher graph_query ADK
+  agent, and MCP (mcp-neo4j-cypher) recorded as the richer later option and out of
+  scope: it adds a config surface and a write-risk surface this command does not have.
+  One pointer paragraph in agents/README.md beside specs_catalog.
+
+  VERIFIED: the 17 new tests plus test_query_specs and test_api_audit (which pin the
+  envelope the refactor preserved), test_module_boundary, ruff check and format clean,
+  full suite 3111 passed before the close. Smoke on this laptop, no graph: `run` on an
+  unknown id prints the refusal and exits 2; `list` prints the registry (43 specs). Not
+  verified: a live run against Neo4j - the command's own execution path is the API's
+  execute_spec, unchanged, and the driver is the API's LiveRunner.
+
+  NOT TOUCHED, on purpose: drydocs_api/app.py (O70's branch edits its imports and eight
+  handlers; Lane A merges both branches) and the keys of the run envelope (O70's
+  response model forbids extras).

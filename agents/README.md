@@ -20,7 +20,11 @@ runtime can be profiled/leak-tested in isolation.
 executor — READ-access-mode transactions make the **server** the write boundary (row cap +
 tx timeout; proven by `tests/integration/test_graph_qa_read_mode.py`).
 `common/specs_catalog.py` imports the `drydocs_api` QuerySpec registry by path — one
-Cypher source of truth, no HTTP dependency.
+Cypher source of truth, no HTTP dependency. The same registry is a **shell command**
+for agents that navigate rather than converse: `python -m drydocs_api.agent_query
+list | describe <id> | run <id> -p k=v` (R9; `drydocs_api/README.md`, "Agent query
+command") — spec ids and declared params only, no Cypher operand, the `/specs/{id}/run`
+envelope on stdout, exit 0/1/2. `graph_query` above is the raw-Cypher counterpart.
 
 > **Install gotcha (2026-07-23):** recent `litellm` sdists need a Rust toolchain on
 > Windows; install wheels only — `pip install --only-binary :all: litellm` (1.91.4 known
