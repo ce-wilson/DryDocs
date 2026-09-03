@@ -2137,7 +2137,19 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   baseline diff caught the last two - that is why the baseline diff is part of the ritual.
   Your second finding is applied too: the zone check reads TRACKED content (`git ls-files`),
   not `is_dir()`, so your `docs/port/` holding only the gitignored `port-dispositions.md`
-  reads as absent. Take the test by name again, at or after this commit.
+  reads as absent. Take the test by name again, at or after this commit - and one
+  correction to that instruction, both times I gave it: `test_runbook_currency.py` is
+  PER-ENTRY (its manifest row, J51): the GUARD code crosses whole - `EXTRA_DOCS`,
+  `NEVER_PORT_ZONE_OF` and the checks are mechanism - while the three EXEMPTION tables
+  are per-side data, union by key, your reasons kept verbatim. So `docs/plan/load-map.html`
+  (derived, deferred on your side under T19) goes in YOUR `HISTORICAL_PATHS` beside the
+  four T19 entries you already hold, not in a producer table. Two more from your
+  currency findings: `git-readme.md` is DEFAULT (evaluate), deliberately uncovered - the
+  row says both sides may hold their own copy - so a take is a legitimate evaluate
+  outcome only after a diff shows your copy carries nothing but the 21 stale paths; and
+  `MODULE_MAP.md` is per-entry as you read it - the three `controlm/*` rows resolve
+  against the merged map, and a company-only row that cites a path that no longer
+  exists is stale on your side, not protected by the rule.
 
 OWED COMPANY-SIDE:
 
