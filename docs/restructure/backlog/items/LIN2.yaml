@@ -1,0 +1,57 @@
+id: LIN2
+epic: lineage-chain
+title: drydocs lineage-load - plan_curated over a staged lineage artifact, write_curated for the active labels, plan-only by default
+type: task
+module: drydocs-lineage
+phase: 6
+agent: main
+model: opus
+priority: p1
+status: todo
+depends_on:
+- LIN1
+inputs:
+- drydocs_lineage/writer.py
+- drydocs_lineage/curation.py
+- drydocs_lineage/model.py
+- drydocs/cli_lineage.py
+- drydocs_core/ontology/relationship_vocabulary/40-local-scheduler.yaml
+acceptance: |
+  Phase 1 of the lineage-chain workplan
+  (docs/reviews/lineage-chain-extract-load-workplan-2026-09-03.md). The LOAD half.
+
+  (a) THE VERB. `drydocs lineage-load <artifact>` in drydocs/cli_lineage.py reads a staged
+  artifact LIN1 wrote, rebuilds the LineageGraph, runs drydocs_lineage.writer.plan_curated
+  and prints the WritePlan (nodes, edges by label, the planned-label refusals, the
+  unresolved file-op candidates) - and STOPS. That is the default. `--write` runs
+  write_curated against the ground-truth database for the ACTIVE labels only
+  (scheduler_invokes, scheduler_uses_artifact, scheduler_reads_from, scheduler_writes_to,
+  as signed at G55); a planned label (scheduler_triggers) is still refused by the writer
+  and the refusal is printed, never swallowed.
+
+  (b) CURATION IS THE GATE, NOT A FLAG. The confirmed set write_curated takes comes from
+  the review surface's confirmations (lineage-review's JSON export), passed as
+  `--confirmed <file>`; with no confirmations the write is the empty set and says so.
+  Nothing reaches `drydocs` uncurated (the package invariant).
+
+  (c) THE LOAD NAMES ITS EXTRACT. The run log and the written nodes carry the artifact's
+  run id, so a graph fact can be traced to the extract, the source files and the extractor
+  versions that produced it (G107; the provenance-envelope shape).
+
+  (d) VENUE-TAGGED PROOF. On the desktop, `neo4jtest`, database `drydocs`: the bundled-
+  sample artifact from LIN1 loads its ETLProcess / Script / DataAsset nodes and the four
+  active edge labels; a second run is idempotent (MERGE, counts unchanged); the graph
+  count matches the WritePlan. Recorded in the notes with the venue named (J18).
+
+  (e) GUARDS. plan-only is proven with no database (the unit conftest's non-terminal
+  console); the write path is proven behind the testcontainers e2e marker (J9), not in
+  the unit suite; the writer's gate-bound refusal has a test that asserts the message.
+
+  (f) NOT IN SCOPE. Activating a planned label (gate-bound). Reload / removed-from-source
+  marking for lineage (a later item, on the D7 tombstone pattern).
+notes: |
+  Minted 2026-09-03 (desktop, allocator) with LIN1 as the Phase 1 pair. write_curated
+  and plan_curated have existed since G55 (2026-08-07) and have never had a command;
+  lineage-review renders the SME page and writes nothing. Depends on LIN1 for the
+  artifact shape. Built on the desktop (Lane A): the live container and the samples are
+  here.

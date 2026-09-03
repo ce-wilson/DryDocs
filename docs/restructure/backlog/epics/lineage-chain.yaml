@@ -1,0 +1,20 @@
+id: lineage-chain
+letter: LIN
+title: The lineage chain, extracted and loaded - job to ETL tool to pipeline to dataset to landing-zone table
+order: 27
+groom_log:
+- date: '2026-09-03'
+  note: |-
+    Opened 2026-09-03 (desktop) from the user's direction after the PEX research deep-dive
+    capture: the plan's first focus is mapping the Control-M job to its ETL tool (a DPL
+    pipeline id or an Ab Initio pset), the pipeline to its datasets, and the dataset to
+    its landing-zone table - with the first goal of creating the EXTRACTS and the LOADS.
+    The extractors for hops 1, 2a and 3 already exist in drydocs_lineage (G12/G15/G97,
+    G17/G25, G41/G43) and the curated writer exists (G55/G23); what does not exist is a
+    verb that runs them against declared sources and a verb that loads the curated result
+    - the only lineage verbs today are lineage-review (HTML, no graph) and
+    resolve-cmdline-staging. Ab Initio pset -> dataset (hop 2b) has no extractor at all.
+    Workplan: docs/reviews/lineage-chain-extract-load-workplan-2026-09-03.md. Own epic
+    rather than component-topology because the five phases sequence as one unit and the
+    board should show them that way; items carry plan phase 6 like the G lineage items.
+  attached_at: LIN1

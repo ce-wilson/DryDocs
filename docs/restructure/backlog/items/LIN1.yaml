@@ -1,0 +1,70 @@
+id: LIN1
+epic: lineage-chain
+title: drydocs lineage-extract - one verb runs the lineage extractors against DECLARED sources and stages one LineageGraph artifact with coverage and a run log
+type: task
+module: drydocs-lineage
+phase: 6
+agent: main
+model: opus
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- drydocs_lineage/extractors/controlm_inventory.py
+- drydocs_lineage/extractors/dpl_mac.py
+- drydocs_lineage/extractors/dpl_registry.py
+- drydocs_lineage/extractors/glue_tables.py
+- drydocs_lineage/model.py
+- drydocs/cli.py
+- drydocs/cli_shared.py
+- config/source-registry.yaml
+- config/data-zones.yaml
+- drydocs/data/samples/controlm_jobs__sample.csv
+- drydocs/data/samples/controlm_variables__sample.csv
+acceptance: |
+  Phase 1 of the lineage-chain workplan
+  (docs/reviews/lineage-chain-extract-load-workplan-2026-09-03.md). The EXTRACT half.
+
+  (a) THE VERB. `drydocs lineage-extract` lives in a new S8 command module
+  `drydocs/cli_lineage.py` (registered by the root like the other six; the import-order
+  and registry guards extend to it). It runs the extractors that already exist, in hop
+  order, into ONE drydocs_lineage.model.LineageGraph: hop 1 controlm_inventory (jobs CSV
+  or the XML export, plus the variables CSV when present - PRECMD/POSTCMD, G60); hop 2a
+  dpl_mac (the MAC clone) and dpl_registry (the registry JSON); hop 3 glue_tables (the
+  Glue inventory). Every source after hop 1 is OPTIONAL and absent-means-skipped-and-
+  COUNTED, never silently absent (G11's house rule); hop 1 is required.
+
+  (b) DECLARED INPUTS ONLY. Every input resolves through the source registry's declared
+  acquisition path or a declared read zone (G81, G121): an undeclared path is refused
+  with the message naming the row that would declare it. No --csv side door.
+
+  (c) THE ARTIFACT. The staged graph is written ONCE as JSON into a declared WRITE zone
+  (a new data-zones row, `lineage/staged/`, mode write) with the per-extractor coverage
+  objects beside it and a LoaderRunLog per run (G107). The artifact is what
+  lineage-load (LIN2) and lineage-review read; it carries the source paths, the extractor
+  versions and the run id, so a load names the extract it came from.
+
+  (d) VENUE-TAGGED PROOF ON THE BUNDLED SAMPLES. Run against drydocs/data/samples: the
+  job -> :ETLProcess candidates (kind dpl AND kind abinitio, both spellings of the DPL
+  pipeline flag, the wrapper-unwrapped pset) appear in the artifact with INVOKES and
+  USES_ARTIFACT candidates and the file-op READS_FROM / WRITES_TO from CMD_LINE and
+  PRECMD/POSTCMD. Hops 2a and 3 are proven on the SYNTHETIC fixtures the existing tests
+  already use (shape-faithful, value-fake) by pointing the optional sources at them.
+
+  (e) GUARDS. The verb reads the importable objects, never a render (J37); a test runs it
+  end to end on the samples in a tmp data root and asserts the coverage counts; the
+  module-boundary test still holds (lineage imports only core; the CLI module imports
+  lineage, which is the load group's job).
+
+  (f) NOT IN SCOPE. No graph write (LIN2). No new extractor (Ab Initio pset is LIN3, a
+  later phase). No key-strength grading (Phase 4).
+notes: |
+  Minted 2026-09-03 (desktop, allocator; first id in the LIN series - PLAN1: the series
+  IS the module). The extractors and the writer have existed for weeks; this is the verb
+  that was never built - the only lineage verbs are lineage-review and
+  resolve-cmdline-staging, and write_curated is called from no command. Built on the
+  desktop because the bundled samples and the cmdline-staging store live here (Lane A).
+  Source of the plan: the user's direction of 2026-09-03 after the PEX research capture;
+  the research findings that change the KEYS (a literal pipeline id outranks a resolved
+  variable, the terminator period, join-key grades) are Phase 4, deliberately after the
+  extract and the load exist.
