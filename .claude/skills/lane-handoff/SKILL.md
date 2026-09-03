@@ -121,14 +121,9 @@ render once, snapshot once.
 
 ## Provenance
 
-<<<<<<< HEAD
-Built 2026-09-02 from the retired handoff file (`git show 7ed4eab2:docs/lane-b-handoff.md`)
-and the three collisions of the same day's unpartitioned burst; the I7 backlog item carries
-the in-checkout fan-out version of the same rule.
-=======
 Built 2026-09-02 from the retired handoff file (`git show 7ed4eab2:docs/lane-b-handoff.md`),
 the same day's three unpartitioned-burst collisions, the desktop session's five dual-session
 rules, and the review of `fe120bf9` (pen-keyed surfaces, the unit test, path normalization,
 the workspace gitignore). The I7 backlog item carries the in-checkout fan-out version of the
-same rule. Iteration-1 eval: 100% with the skill vs 85% without, on three prompts.
->>>>>>> 7caaa917 (feat(skills): lane-handoff iteration 2 - producer-only by manifest, pen-keyed surfaces, a unit test, the desktop's five rules)
+same rule. Iteration-1 eval: 100% with the skill vs 85% without; iteration 2: 100% vs 70% on
+the tightened assertions.

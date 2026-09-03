@@ -312,8 +312,9 @@ rows:
       skill EVAL workspaces (lane-handoff-workspace/iteration-N/review.html and its kin):
       run transcripts and grader output embedded in a review page - producer working
       state under a canonical-producer tree, which is exactly the class of file a
-      wholesale take of .claude/** would carry. The skill and its evals/ suite cross; the
-      runs do not.
+      wholesale take of .claude/** would carry. The runs never cross; nor, since the user's
+      ruling later the same day, does the lane-handoff skill itself (its own never-port row
+      sits above the .claude/** glob) - lanes are producer-only tooling.
   # ---- ADR 0018 D4 (2026-09-02): the one-cycle re-export SHIMS at the old flat paths ----
   # The four flat components became subpackages (drydocs/review, plan, port, docgen). Each old
   # path is now a sys.modules alias to the moved module - producer mechanism, identical on both
@@ -758,9 +759,10 @@ rows:
   - path: "docs/restructure/0*.md"
     disposition: canonical-producer
     note: "conceptual model / plan / HITL flow docs"
-  # 2026-09-02: the lane-handoff skill, its eval workspace and the file it generates are
-  # never-port — the SPECIFIC rows must sit above the `.claude/**` glob (first match wins),
-  # the shape docs/next-session-handoff.md already uses under the docs default.
+  # 2026-09-02: the lane-handoff SKILL is never-port — a SPECIFIC row above the `.claude/**`
+  # glob (first match wins). Its generated file and the eval workspaces have their own
+  # never-port rows in the machine-pair block above; this row is the one the user's ruling
+  # added after them: the skill itself must not cross.
   - path: ".claude/skills/lane-handoff/**"
     disposition: never-port
     note: "PRODUCER-ONLY TOOLING (user ruling 2026-09-02). Lanes split a burst across two
@@ -770,15 +772,6 @@ rows:
       fell into. Carved out of the `.claude/**` canonical-producer default, not gated at
       runtime: a manifest row is the layer that decides what crosses, and a skill that is
       never carried has nothing to guard."
-  - path: ".claude/skills/lane-handoff-workspace/**"
-    disposition: never-port
-    note: "The skill's eval workspace (review page + benchmark, the rest gitignored) — producer
-      session material, same reason as the skill."
-  - path: "docs/lane-*-handoff.md"
-    disposition: never-port
-    note: "The generated per-burst handoff. It DIRECTS producer work between two producer
-      machines and deletes itself when its queue empties — the docs/next-session-handoff.md
-      shape, one file per lane."
   - path: ".claude/**"
     disposition: canonical-producer
     note: "agents + skills are producer-maintained tooling; consumer-local skills live under other names"
@@ -1352,14 +1345,6 @@ default_ok:
 #   test_no_manifest_row_matches_nothing (and its well-formedness twin).
 # =============================================================================
 row_may_match_nothing:
-  # ---- ephemeral by design --------------------------------------------------
-  - path: "docs/lane-*-handoff.md"
-    reason: >
-      2026-09-02: the lane-handoff skill's generated file exists only DURING a two-machine
-      burst and deletes itself when its queue empties, so the row matches nothing between
-      bursts by design. It is kept because the file must never port when it does exist —
-      producer session state directing producer work, the docs/next-session-handoff.md
-      class — and a row added only while a burst is live would be the one nobody remembers.
   # ---- side-local by construction ------------------------------------------
   - path: "drydocs/docmeta/**"
     reason: >
