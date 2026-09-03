@@ -2302,6 +2302,15 @@ never-port 8, derived 4. **Do not compare that 519 against your own diverged-pat
 count and call the gap a discrepancy:** they measure different things by construction.
 This counts every path the range TOUCHED; your census counts paths that exist on both
 sides and DIFFER. Your 88 and this 519 are both right.
+**CORRECTION (2026-09-02, from your chunk-1 census):** 519 was measured `..HEAD` at roll
+time, three commits past the tag, against the manifest at that HEAD. Measured **tag..tag**
+(`port-base-20260826..port-base-20260901`) with the manifest AT THE TAG the range is
+**516 paths** — canonical-producer 130, per-entry 150, default_ok 165, evaluate 29,
+union-append 16, canonical-company 14, never-port 8, derived 4 — and your 123 / 150 / 11
+is exactly that table with the seven `web/src/generated/**` rows moved to `derived`
+(130 − 7 = 123). Your census reconciles to the path; the producer's number was the one
+measured at the wrong head. The renderer's head-ref adaptation you made is the fix
+(Idea-250) — a range is tag..tag on both sides.
 
 **THE STEP LEDGER IS NOT REPLACED BY THIS AND IS NOT SUMMARIZED BY IT.** It stays
 below, entire, and it is where the reasoning lives — why a change was made, what it
