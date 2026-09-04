@@ -7,7 +7,7 @@ phase: 2
 agent: main
 model: fable
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 gates:
 - ontology-domain-registry-and-edition-grain
@@ -66,3 +66,40 @@ acceptance: |
 
   tests/unit green; classification of the new file = Internal-Public (mechanism, no values);
   render clean.
+notes: |
+  BUILT 2026-09-04 (desktop, Lane A; claimed 8deee035, step 1 of the intake review's
+  sequence). config/taxonomy/domains.yaml (schema drydocs.domains.v1, Internal-Public,
+  13 rows) + config/schemas/domains.schema.json (S6 family, malformed fixture = a row
+  with no vocabulary_fragment) + drydocs_core/ontology/domain_registry.py (the reader,
+  on the tom_role_vocabulary shape) + tests/unit/test_domain_registry.py (15 guards) +
+  the 00-header.yaml pointer + the per-entry PORT-MANIFEST row with its UNNAMED FIELDS
+  clause (added to test_port_manifest's ENTRY_FILES so J71 totality covers it) + the
+  MODULE_MAP row. 3211 unit tests green on the desktop.
+
+  ONE CORRECTION TO THIS ITEM'S OWN ACCEPTANCE, made because (b) says "nothing invented;
+  the file writes down rulings that exist": (b) attributed ELEVEN domains to the
+  2026-08-12 gate. The tree says nine plus `human` (§A3) = ten. `corporate` was
+  registered at gate corporate-backbone-vocabulary §B3 (G98, SIGNED 2026-08-17; the
+  schema enum gained it at 1099d68d the same day) and `itsm` on SME DIRECTION at the
+  G100 build (2026-08-18, b17f24e5) ahead of its gate, which is still a todo item with
+  no prompt. The rows cite the real rulings; `itsm` carries `authority_status: pending`
+  - a field the acceptance did not name, added so a row can be honest about a gate that
+  has not run instead of naming a record that does not exist - and a guard fails the
+  day the log signs `itsm-technician-group` with the row still saying pending.
+
+  WHAT "THE GUARD THAT PINNED THE LIST" TURNED OUT TO BE: not a test - the closed enum in
+  config/schemas/relationship-vocabulary.schema.json (S6, 08-12 §D2). Kept, because the
+  S6 split gives the schema editor-time checking, but demoted to a RENDER of the
+  registry: test_the_schema_enum_is_a_render_of_the_registry holds them equal, so a
+  domain minted in one place only is a red test. Two guards the acceptance did not ask
+  for and the measurement justified: every entry sits in ITS OWN domain's fragment (true
+  for all 175 at mint - the partition IS the file, §B3), and registered fragments <->
+  fragments on disk is a bijection (an unregistered fragment cannot appear).
+
+  (e) fixture: the synthetic edition code is `XMPL` (tests/unit/test_domain_registry.py
+  SYNTHETIC_EDITION) - CFG2's synthetic sample adopts it so the two fixtures agree.
+  Both refusals fire (reuse of a base id; a base row superseded by an edition row) and
+  the positive case (an edition row with its own id) passes.
+
+  (f) held: no domain minted, no mint command. ONT1/ONT2 add to SEEDED in the test when
+  they mint - the pin is deliberate so a dropped row is red, not a diff.

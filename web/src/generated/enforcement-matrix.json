@@ -235,6 +235,7 @@
         "config/taxonomy/business-application.yaml",
         "config/taxonomy/context-types.yaml",
         "config/taxonomy/controlm.yaml",
+        "config/taxonomy/domains.yaml",
         "config/taxonomy/lob-product-team.yaml",
         "config/taxonomy/location-gazetteer.yaml",
         "config/taxonomy/medallion-stages.yaml",
@@ -669,6 +670,7 @@
       "env_refs": [],
       "files": [
         "config/schemas/classification.schema.json",
+        "config/schemas/domains.schema.json",
         "config/schemas/precedence.schema.json",
         "config/schemas/relationship-vocabulary.schema.json",
         "config/schemas/source-mapping.schema.json",

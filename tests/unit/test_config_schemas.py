@@ -57,6 +57,10 @@ FAMILIES: dict[str, tuple[str, list[Path]]] = {
         "relationship-vocabulary.schema.json",
         sorted((REPO / "drydocs_core" / "ontology" / "relationship_vocabulary").glob("*.yaml")),
     ),
+    "domains": (
+        "domains.schema.json",
+        [REPO / "config" / "taxonomy" / "domains.yaml"],
+    ),
 }
 
 
@@ -159,6 +163,25 @@ _MALFORMED: dict[str, tuple[dict | list, str]] = {
     "relationship-vocabulary": (
         [{"id": "x_edge", "neo4j_label": "X_EDGE", "from_node": "A", "to_node": "B"}],
         "$[0]",
+    ),
+    # domain registry: a row with no vocabulary_fragment (REQUIRED, gate sB3)
+    "domains": (
+        {
+            "schema": "drydocs.domains.v1",
+            "classification": "Internal-Public",
+            "updated": "2026-09-04",
+            "domains": [
+                {
+                    "id": "topic",
+                    "title": "T",
+                    "minted_by": "producer",
+                    "registered_at": "2026-09-04",
+                    "authority": "x",
+                    "status": "active",
+                }
+            ],
+        },
+        "$.domains[0]",
     ),
 }
 

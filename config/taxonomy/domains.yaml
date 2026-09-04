@@ -1,0 +1,203 @@
+# =============================================================================
+# config/taxonomy/domains.yaml — the DOMAIN REGISTRY: an ontology domain is a
+# MINTED, REGISTERED object (gate ontology-domain-registry-and-edition-grain,
+# SIGNED OFF 2026-09-02 14/14, §B1-§B3; built at CFG1).
+#
+# WHAT A DOMAIN IS (§B3, ruled): a FILE/LOADER PARTITION of the relationship
+# vocabulary — the set of entries one 4x-local-*.yaml fragment holds. Not
+# rdfs:domain (from_node/to_node carry that), not the BDAT layer on source-
+# registry SYSTEM rows, and not a backlog topic: PLAN1 gave the backlog series to
+# the MODULE, so a domain has no `series` column and `vocabulary_fragment` is
+# REQUIRED — a row without one fails to load.
+#
+# WHY THIS FILE EXISTS. Until 2026-09-04 the 13 domains were a comment block in
+# drydocs_core/ontology/relationship_vocabulary/00-header.yaml and a closed enum in
+# config/schemas/relationship-vocabulary.schema.json; "registered" meant somebody
+# edited the comment. Three of the 13 were registered AFTER the original ruling
+# (corporate 08-17, itsm 08-18, infrastructure 08-19), each an act with nowhere to
+# record itself but a comment and an enum. This file records it. Reader: drydocs_core/ontology/domain_registry.py.
+# Guards: tests/unit/test_domain_registry.py — every fragment entry's `domain`
+# must be a registered ACTIVE row; every row's fragment must exist on disk; the
+# schema's enum must equal this file's ids (the enum is a RENDER of this file,
+# kept for editor-time checking, never the other way round).
+#
+# WHO MINTS (§B2): a BASE mints, an instance requests; the company base mints ITS
+# OWN domains at ITS OWN gate. `minted_by` is `producer` or `company` for a base
+# row, or an edition code (config/taxonomy/editions.yaml, CFG2) for a row an
+# edition added. The protocol is I6's: the row is pushed before it is used, because
+# a domain that exists only in one tree is a domain the other base mints too.
+#
+# THE ONTOLOGY IS COMMON AND BASE-OWNED (§B5 rider, SME 2026-09-02: "declared /
+# standardized ontology needs to be at the base of everything ... in order to have
+# the aggregate rollup and query across"). An edition EXTENDS the registry — its
+# own rows, its own authority — and never overrides a base row. The reader enforces
+# both halves: an edition row may not reuse a base id, and a base row is never
+# superseded by an edition row.
+#
+# RETIREMENT IS A STATE, NOT A DELETION (the G87 shape): a domain that stops being
+# used goes `status: deprecated` with `superseded_by` naming its successor. Ids are
+# join keys — every vocabulary entry carries one, and signed gate records cite
+# them — so an id is never renamed and never reused. The B4 split (`code` and
+# `requirements` out of `architecture`, `acronyms` new) is ONT1/ONT2's to mint
+# through §B2; nothing here anticipates it.
+#
+# PORT: per-entry (PORT-MANIFEST.yaml) — rows union by id, each base's own mints
+# stay, the header and the field list cross whole.
+#
+# Entry counts per fragment at mint (2026-09-04, derived — never stored as data):
+# scheduler 53, business_application 10, catalog 16, architecture 24, registry 4,
+# docs 20, all 2, context 8, quality 8, corporate 5, itsm 2, infrastructure 3,
+# human 20.
+# =============================================================================
+
+schema: drydocs.domains.v1
+classification: Internal-Public   # mechanism only — no firm data; the fragment names are code
+classification_only: true
+updated: 2026-09-04
+
+# Fields (all required unless marked):
+#   id                   the domain name — the join key every vocabulary entry's
+#                        `domain:` carries; NEVER renamed
+#   title                display name
+#   vocabulary_fragment  the fragment file under drydocs_core/ontology/
+#                        relationship_vocabulary/ that holds this domain's entries
+#                        (REQUIRED, §B3)
+#   minted_by            producer | company | <edition code>
+#   registered_at        the date the ruling that registered it was signed
+#   authority            the gate id (config/gate-log.md heading) or ADR that ruled it
+#   authority_status     (optional) signed (default) | pending — pending names a gate
+#                        that has a backlog item and no record yet; the guard
+#                        fails a pending authority the log HAS signed (flip it)
+#   status               active | deprecated
+#   superseded_by        (deprecated rows only) the successor domain's id
+#   note                 (optional) what the partition holds, in one line
+
+domains:
+  - id: scheduler
+    title: Scheduler
+    vocabulary_fragment: 40-local-scheduler.yaml
+    minted_by: producer
+    registered_at: 2026-08-12
+    authority: vocabulary-domains-and-id-policy
+    status: active
+    note: >-
+      Tool-agnostic scheduling semantics (renamed from `controlm` at §A1; AutoSys /
+      Airflow edges file here via the BMC-baseline crosswalk).
+  - id: business_application
+    title: Business application
+    vocabulary_fragment: 41-local-business-application.yaml
+    minted_by: producer
+    registered_at: 2026-08-12
+    authority: vocabulary-domains-and-id-policy
+    status: active
+    note: >-
+      The application record and its ownership edges (renamed from `seal` at §A2).
+  - id: catalog
+    title: Catalog
+    vocabulary_fragment: 42-local-catalog.yaml
+    minted_by: producer
+    registered_at: 2026-08-12
+    authority: vocabulary-domains-and-id-policy
+    status: active
+    note: Product / data-catalog structure and its classifiers.
+  - id: architecture
+    title: Architecture
+    vocabulary_fragment: 43-local-architecture.yaml
+    minted_by: producer
+    registered_at: 2026-08-12
+    authority: vocabulary-domains-and-id-policy
+    status: active
+    note: >-
+      App / code / team ownership flow. Holds code today; §B4 ruled `code` and
+      `requirements` SPLIT OUT through the G87 shape (ONT1) — this row stays until
+      that mint deprecates what it takes.
+  - id: registry
+    title: Registry
+    vocabulary_fragment: 44-local-registry.yaml
+    minted_by: producer
+    registered_at: 2026-08-12
+    authority: vocabulary-domains-and-id-policy
+    status: active
+    note: The source registry's own edges (systems, datasets, carriers).
+  - id: docs
+    title: Documents
+    vocabulary_fragment: 45-local-docs.yaml
+    minted_by: producer
+    registered_at: 2026-08-12
+    authority: vocabulary-domains-and-id-policy
+    status: active
+    note: >-
+      The document corpus and its describes / supersedes edges. Holds
+      requirements today; see `architecture` for the §B4 split.
+  - id: all
+    title: Cross-domain
+    vocabulary_fragment: 46-local-all.yaml
+    minted_by: producer
+    registered_at: 2026-08-12
+    authority: vocabulary-domains-and-id-policy
+    status: active
+    note: >-
+      Edges that span domains (the provenance envelope's own). A registered
+      partition like any other; it is not a catch-all for new entries.
+  - id: context
+    title: Context
+    vocabulary_fragment: 47-local-context.yaml
+    minted_by: producer
+    registered_at: 2026-08-12
+    authority: vocabulary-domains-and-id-policy
+    status: active
+    note: SOSA/SSN context-graph terms — experimental, opt-in supplement, planned until ruled.
+  - id: quality
+    title: Quality
+    vocabulary_fragment: 48-local-quality.yaml
+    minted_by: producer
+    registered_at: 2026-08-12
+    authority: vocabulary-domains-and-id-policy
+    status: active
+    note: DQV quality edges over the bootstrap-seeded metric / dimension catalog (C23).
+  - id: corporate
+    title: Corporate
+    vocabulary_fragment: 49-local-corporate.yaml
+    minted_by: producer
+    registered_at: 2026-08-17
+    authority: corporate-backbone-vocabulary
+    status: active
+    note: >-
+      The corporate backbone (company / segment / LOB hierarchy). Registered at
+      G98's gate §B3 (SIGNED 2026-08-17, 19/19) — NOT at the 08-12 gate, whatever
+      CFG1's acceptance said; the schema enum gained it at 1099d68d, the same day.
+  - id: itsm
+    title: ITSM
+    vocabulary_fragment: 50-local-itsm.yaml
+    minted_by: producer
+    registered_at: 2026-08-18
+    authority: itsm-technician-group
+    authority_status: pending
+    status: active
+    note: >-
+      ServiceNow support-group staffing and its attributions (G100). Registered
+      2026-08-18 ON SME DIRECTION, on the shape G91 had just ruled; the gate that
+      ratifies the register (backlog G100, `itsm-technician-group`) has not been
+      run, so the authority is PENDING and this row says so rather than naming a
+      record that does not exist. Flip to signed when the record lands.
+  - id: infrastructure
+    title: Infrastructure
+    vocabulary_fragment: 51-local-infrastructure.yaml
+    minted_by: producer
+    registered_at: 2026-08-19
+    authority: server-location-ontology
+    status: active
+    note: >-
+      Physical placement / geography (Z2): neither scheduler nor architecture.
+      The first domain registered AFTER the original ruling — the act this file
+      now records.
+  - id: human
+    title: Human
+    vocabulary_fragment: 52-local-human.yaml
+    minted_by: producer
+    registered_at: 2026-08-12
+    authority: vocabulary-domains-and-id-policy
+    status: active
+    note: >-
+      People / org edges (§A3 of the same gate; no entries moved at registration,
+      the G74 relocation followed).

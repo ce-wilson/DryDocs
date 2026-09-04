@@ -325,6 +325,7 @@ ENTRY_FILES: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("config/doc-source-registry.yaml", ("sources",)),
     ("config/source-registry.yaml", ("systems", "datasets")),
     ("config/audit-fields.yaml", ("envelope", "sources")),
+    ("config/taxonomy/domains.yaml", ("domains",)),
 )
 
 
