@@ -240,3 +240,151 @@ free number at roll time.
 
 Then chunk 7's bootstrap audit and `DROP DATABASE` for both databases, the reload, and the
 report, as the workplan has them.
+
+---
+
+## 6. VERIFY - carve-out 6 as executed (2026-09-04, laptop, re-read at `d62ac0e8`)
+
+The company ran carve-out 6 and reported before its full suite landed: `test_backlog.py` 16
+passed including all five ported freeze tests, both refusals firing by name, `validate.py`
+ALL CHECKS PASS at items=540 phases=18 modules=20, 38 reconcile guards green with
+`RECONCILE_BEFORE_DIR` armed, ruff clean, and a baseline regeneration of 519 to 642 ids. Three
+findings came back. **All three hold. Two of them correct this review.**
+
+### F1 - the ALLOCATOR-BAND block does not have the shape R1 described. Their fix is the right one
+
+R1 told them to keep "your `PRODUCER_BAND_CEILING` line, your `PORTED_COMPANY_IDS`". They hold
+neither: a 2026-08-24 company-polarity rework replaced both with `COMPANY_BAND_FLOOR = 10000`
+and `PRE_PARTITION_COMPANY_IDS`. R1 was written from the producer's file and the manifest row's
+wording, and the row describes the split rather than their names. **The review was wrong about
+the shape; the split it named was right.**
+
+Their resolution is better than the one R1 implied. `_frozen_strays` reads
+`PRODUCER_BAND_CEILING` (`test_backlog.py:378`) to separate a legacy band id from a letter id,
+so the ported mechanism needs the name. They defined `PRODUCER_BAND_CEILING = COMPANY_BAND_FLOOR
+- 1` rather than editing the producer's function: the same boundary from their polarity, the
+mechanism crosses verbatim, and the next roll diffs clean. That is the per-entry rule applied
+exactly - mechanism whole, per-side data local - and it satisfies
+`test_the_allocator_and_the_band_guard_agree_on_the_ceiling` (`:274`), which compares their
+constant to the allocator's literal 9999.
+
+**One forward note that rides with it.** `COMPANY_BAND_FLOOR` is a RETIRING constant: gate §C4
+retires both partition rules forward-only, and the edition segment replaces the band when PLAN2
+ports. `_frozen_strays` is not retiring - it judges legacy band ids for as long as the six exist.
+So when the band rule goes, `PRODUCER_BAND_CEILING` must survive its source: pin it to a literal
+9999 with the reason, or the derived alias disappears with the constant it derives from and takes
+the freeze guard's band arm with it.
+
+### F2 - no series code was needed. The measurement retires R1's addendum
+
+R1's addendum said every company-only module needs a `series:` code and named `docmeta-acquire`
+as the likely one. They measured: `docmeta-acquire` is a component GROUP in `component_map.py`
+that maps to the already-registered `drydocs-docmeta` module, and their `modules.yaml` is
+identical to the producer's at 20 modules and 20 codes, because carve-out 5 already unioned it.
+
+Verified here. `component_map.py:243` states the join as group to module, `:256` carries the
+producer's own `"docmeta": "drydocs-docmeta"`, and the guard at `:267` asserts modules.yaml
+equals core plus the `COMPONENT_MODULE` values plus the work-area set - an equality on VALUES, so
+two groups mapping to one module is legal and adds no row. `modules.yaml` carries 20 series
+entries at `port-base-20260902` and 20 at HEAD, so the count is stable across the range.
+**The addendum was a caution, and measurement is what retires a caution.** The rule it stated
+stands for any FUTURE company-only module; it had no subject today.
+
+### F3 - the slice was not closed under dependency, and this is the workplan's G5 firing
+
+Taking the four named items turned `test_dependencies_resolve_and_are_acyclic` and
+`test_derived_summary_is_consistent` red with `KeyError: CFG2`, both green before. They computed
+the transitive closure instead of patching the symptom and took CFG1 and CFG2 as clean-adds.
+Correct, and correctly diagnosed: the workplan's G5 is "slice closure is nobody's test", P2 is
+the proposed test, and P2 is one of the three Part A items §4 row 3 records as not built, not
+inboxed and not minted. **This is the second time G5 has cost a session real work.** It raises
+P2 from a proposal to the item the evidence now names.
+
+**What their closure rule is missing, and it is the reason to write it down rather than repeat
+it.** An item file's closure is not `depends_on` alone. Three edges must resolve for the backlog
+guards to pass, and the third is the one that bites next:
+
+1. `depends_on` - `test_dependencies_resolve_and_are_acyclic` (`:633`). The one they hit.
+2. `epic` - `test_path_is_the_identity` (`:110-119`) asserts every item's epic has a file under
+   `epics/`. The three they took need `ontology-mapping`, `release-infrastructure` and
+   `project-board`; all three are producer files added in range, so their tree had them.
+3. `gates` - `test_declared_gates_are_lists_of_known_prompt_slugs` (`:610`) requires
+   `config/gate-prompts/<slug>.yaml` to EXIST. `config/gate-prompts/**` is canonical-company and
+   ledger 306 says the producer's signed prompt never overwrites their draft or absent file, so
+   this edge crosses a class boundary: the item ports, the prompt it names does not.
+
+Edge 3 has a live tripwire. `PLAN2.yaml` declares ONE gate at `port-base-20260902` and TWO at
+producer HEAD - `idea-series-grammar` was added at `bf1a6f86`, past the tag, and its prompt file
+is past the tag too. A PLAN2 taken from HEAD names a gate prompt that cannot exist company-side
+and turns that guard red; a PLAN2 taken at the tag does not. Which leads to the one thing worth
+confirming before carve-out 7.
+
+### V1 - which ref did the item files come from? "or later" was wrong for item files
+
+The hand-carried work order said "at `e7dc4153` or later" for the take-whole set. **That phrase
+is safe for mechanism and unsafe for item files, and the defect is the work order's.** Measured
+across the files it covered:
+
+| File | Changed after `e7dc4153`? | Does "or later" matter? |
+|---|---|---|
+| `validate.py`, `test_backlog.py` | no commits | no |
+| `modules.yaml` | one, `62c19a8e` (CORE1), IN range; 20 codes at the tag and at HEAD | no |
+| `CLAUDE.md` | three, ALL PAST THE TAG - J76 the instrument rule, J62 pre-commit, lane-handoff iteration 2 | **yes** |
+| `CFG1.yaml`, `CFG2.yaml` | `todo` at the tag, `done` at HEAD | **yes** |
+| `PLAN2.yaml` | one gate slug at the tag, two at HEAD | **yes** |
+
+Two consequences to check rather than assume:
+
+- **CFG1 and CFG2 taken from HEAD arrive `done`,** while every artifact their acceptance names
+  (`config/taxonomy/domains.yaml`, `editions.yaml`, the two registry modules, their two test
+  files, the two JSON schemas) landed 2026-09-04, past the tag, outside the range. A `done` item
+  whose subject is absent is a board that lies, and it self-corrects at no future roll because
+  the file already matches. Taken at the tag they arrive `todo`, which is true on their tree and
+  is exactly what the interim mint rule waits on. Their baseline regeneration measured 642, which
+  is the producer's item count at `port-base-20260902` to the id (645 at HEAD), so their range
+  discipline reads as tag-pinned; this is a confirmation to state, not an accusation.
+- **`CLAUDE.md` taken from HEAD** carries three mechanisms outside their range, two of which cite
+  paths they do not hold: `.pre-commit-config.yaml` (J62) and
+  `.claude/skills/lane-handoff/SKILL.md` (never-port, and the row that makes it match nothing
+  company-side is the `fe4df356` manifest R3 sends with carve-out 7). Their own carve-out 5
+  finding was a stale path citation caught by the currency guard, so this is the same class.
+  Take `CLAUDE.md` at the tag, or take it at HEAD deliberately and expect the currency guard to
+  name those two.
+
+**Producer-side fix (port pen), beyond R1's two:** the ledger's take instructions should say
+`at port-base-20260902` for item files, and name a sha only where a postscript rules a
+take-by-name. "Or later" is a mechanism idiom and it does not survive contact with a file whose
+`status` is data.
+
+### V2 - reconcile 16 against 26
+
+The producer's `test_backlog.py` holds 26 test functions; their run reports 16 passed. The
+per-entry split moves ONE block of three (`test_producer_allocates_below_the_company_band`,
+`test_the_allocator_and_the_band_guard_agree_on_the_ceiling`,
+`test_the_allocator_refuses_to_cross_into_the_company_band`) to their inverted equivalents, which
+keeps the count at about 26. A ten-test gap is either a filtered run, a set of producer-only
+guards absent by construction (`test_no_id_carries_two_different_titles_across_the_remote_trunk`
+needs the producer trunk; `test_monolith_is_a_tombstone` needs their `backlog.yaml` tombstone),
+or guards a wholesale take dropped earlier. **Name the delta in the report** - which producer
+guards their file does not carry, and the reason for each. Shrink-only applies to exemption
+tables; it applies to guards with more force.
+
+### V3 - what the report already settles, and what is still owed
+
+Settled and verified here: the baseline regeneration to **642** is the producer's item count at
+the tag exactly; **C35, G116 and G117** are producer ids added at `aed7229b`, so their
+reclassification as producer-origin is right, and retiring the known-red band guard on that basis
+is sound. R5 is discharged by that bump, and nothing was extended to make it green.
+
+Still owed from §2 and §3, both deferred by the company to the post-suite report, both fine:
+**R7** (which file held the module-local-cache fix - `cli_shared.py` or `cli.py` means it
+back-flows, `cli_consumer.py` means nothing is owed) and **R2** (where T24 (1) sits, plus the
+chunk-4 union check's exit code). One correction to §2 on that check: their backlog holds 540
+items against the tag's 642 producer ids, so the union cannot exit 0 until the remaining classes
+land. That is expected mid-port, and it makes the check the END gate of the range rather than a
+carve-out 6 precondition - which is how B3 reads it, and §2 should have said so.
+
+One process note. The full-suite run excluded `test_port_reconcile_guards.py` by `--ignore` and
+ran it separately with the env var armed. That is the correct way to run a guard that needs a
+fixture the bare suite cannot give it, and it is the carve-out 2 failure mode only when the
+separate armed run is missing from the same report. Theirs is not.
