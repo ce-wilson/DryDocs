@@ -8,6 +8,7 @@ registered rel spellings.
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import pytest
@@ -67,6 +68,26 @@ def test_comment_box_per_folder_and_export(page: str) -> None:
     assert 'class="note"' in page
     assert "exportNotes()" in page
     assert "drydocs-lineage-review-" in page  # localStorage namespace is ours
+
+
+def test_every_dependency_row_carries_a_decision_control_keyed_by_its_rel(page: str) -> None:
+    """LIN2 (b): the per-rel decision. Each dep row's control names the rel triple the
+    graph carries (from / type / to are the node ids and the registered label), so an
+    exported decision joins to a candidate by equality. The export writes the
+    drydocs.lineage-decisions.v1 shape the load reads."""
+    g = LineageGraph()
+    ControlMInventoryExtractor().extract(FIXTURE, g)
+    controls = re.findall(
+        r'<select class="decide" data-from="([^"]*)" data-type="([^"]*)" data-to="([^"]*)"', page
+    )
+    assert controls, "a decision control per dependency row"
+    from html import unescape
+
+    rendered = {(unescape(a), unescape(b), unescape(c)) for a, b, c in controls}
+    assert rendered <= g.rels and len(rendered) == len(controls)
+    assert "drydocs.lineage-decisions.v1" in page
+    assert "decision:s.value" in page and "drydocs-lineage-decisions-" in page
+    assert "Export decisions + notes" in page
 
 
 def test_html_escaped() -> None:

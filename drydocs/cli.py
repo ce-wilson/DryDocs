@@ -511,6 +511,12 @@ def lineage_extract(
         help="Where the staged artifact lands. Default: the declared lineage/staged/ write "
         "zone under DRYDOCS_DATA_ROOT.",
     ),
+    keep: int = typer.Option(
+        10,
+        "--keep",
+        help="Retention of the staged zone (LIN2): after a successful write keep the newest "
+        "N artifacts and prune the rest; 0 keeps everything. The load never deletes.",
+    ),
 ) -> None:
     """Run the lineage chain's extractors and stage ONE artifact (LIN1).
 
@@ -527,7 +533,12 @@ def lineage_extract(
         glue_inventory_dir,
         lineage_staged_dir,
     )
-    from drydocs_lineage.staging import StagingError, stage_chain, write_artifact
+    from drydocs_lineage.staging import (
+        StagingError,
+        prune_staged,
+        stage_chain,
+        write_artifact,
+    )
 
     acquisition: dict[str, str] = {}
     if jobs is None:
@@ -607,6 +618,199 @@ def lineage_extract(
     for line in staged.summary_lines():
         console.print(line)
     console.print(f"[green]wrote {path}[/] (run {run_id})")
+    pruned = prune_staged(out, keep=keep)
+    if pruned:
+        console.print(f"pruned {len(pruned)} older artifact(s) (--keep {keep})")
+
+
+@app.command(name="lineage-load")
+def lineage_load(
+    artifact: Path | None = typer.Argument(
+        None,
+        help="A staged lineage artifact (lineage-extract's output). Default: the NEWEST in "
+        "the declared lineage/staged/ zone.",
+    ),
+    confirmed: Path | None = typer.Option(
+        None,
+        "--confirmed",
+        help="The decisions file the lineage-review page exported "
+        "(drydocs.lineage-decisions.v1). Without it nothing is confirmed and nothing is "
+        "written: curation is the gate.",
+    ),
+    write: bool = typer.Option(
+        False,
+        "--write",
+        help="Run the plan against the ground-truth database (drydocs). Default: print the "
+        "plan and stop.",
+    ),
+) -> None:
+    """Plan - and with --write, load - the curated lineage into ground truth (LIN2).
+
+    Reads ONE staged artifact (the newest by default: the UTC stamp leads the file
+    name, so no file is opened to find it), rebuilds the LineageGraph, takes the
+    CONFIRMED rels from the review page's decisions file, runs the writer's
+    plan_curated and prints the plan: nodes by class, rels by label, the labels a
+    live load would refuse because the vocabulary is still planned, and the file-op
+    candidates that would drop. That is the default; it needs no database.
+
+    --write runs write_curated for the ACTIVE labels (scheduler_invokes,
+    scheduler_uses_artifact, scheduler_reads_from, scheduler_writes_to - gate
+    rua-load-shapes, G55). A planned label (scheduler_triggers) is refused by the
+    writer and the refusal is printed. The load names its extract: every node and
+    rel written carries the artifact's run id and code commit, and the :JobRun
+    carries the artifact's sources block (what the extractor actually read).
+    """
+    from drydocs_core.data_root import lineage_staged_dir
+    from drydocs_lineage.curation import DecisionsError, load_decisions
+    from drydocs_lineage.staging import is_dirty_commit, newest_artifact, read_artifact
+    from drydocs_lineage.writer import (
+        ExtractProvenance,
+        GateBoundVocabularyError,
+        TrustBoundaryError,
+        gate_bound_labels,
+        plan_curated,
+        unresolved_file_op_candidates,
+        write_curated,
+    )
+
+    if artifact is None:
+        try:
+            staged_dir = lineage_staged_dir()
+        except DataRootNotSetError as exc:
+            console.print(f"[red]{exc}[/]")
+            raise typer.Exit(2) from None
+        artifact = newest_artifact(staged_dir)
+        if artifact is None:
+            console.print(
+                f"[red]no staged lineage artifact in {staged_dir}[/] - run "
+                "`drydocs lineage-extract` first, or name an artifact."
+            )
+            raise typer.Exit(2)
+    if not artifact.is_file():
+        console.print(f"[red]artifact not found: {artifact}[/]")
+        raise typer.Exit(2)
+    try:
+        graph, header = read_artifact(artifact)
+    except (ValueError, KeyError, OSError) as exc:
+        console.print(f"[red]cannot read {artifact}: {exc}[/]")
+        raise typer.Exit(2) from None
+    provenance = ExtractProvenance.from_header(header, artifact=str(artifact))
+
+    # -- the extract this load names ---------------------------------------------
+    console.print(f"artifact  {artifact}")
+    console.print(f"extract   run {provenance.run_id}  captured {provenance.captured_at}")
+    dirty = (
+        "  [yellow]DIRTY TREE - staged from uncommitted code[/]"
+        if is_dirty_commit(provenance.code_commit)
+        else ""
+    )
+    console.print(f"code      {provenance.code_commit}{dirty}")
+    for src in header.get("sources") or []:
+        state = "present" if src.get("present") else "absent"
+        note = f"  ({src['note']})" if src.get("note") else ""
+        console.print(f"  {src.get('hop', '?'):<18} {state:<8} {src.get('path', '')}{note}")
+    st = graph.stats()
+    console.print(
+        f"graph     {st['processes']} processes, {st['data_assets']} data assets, "
+        f"{st['rels']} candidate rels"
+    )
+
+    # -- curation: the gate, not a flag -------------------------------------------
+    if confirmed is None:
+        confirmed_rels: set[tuple[str, str, str]] = set()
+        console.print(
+            "[yellow]no --confirmed decisions file: the confirmed set is EMPTY[/] - nothing "
+            "reaches ground truth uncurated. Export decisions from the lineage-review page."
+        )
+    else:
+        try:
+            decisions = load_decisions(confirmed)
+        except DecisionsError as exc:
+            console.print(f"[red]{exc}[/]")
+            raise typer.Exit(2) from None
+        stale = decisions.missing_from(graph.rels)
+        if stale:
+            console.print(
+                f"[red]{len(stale)} decision(s) name a rel this artifact does not carry[/] - "
+                "the page was rendered from another extract; re-render lineage-review from "
+                f"this artifact's sources and decide again. First: {stale[0]}"
+            )
+            raise typer.Exit(2)
+        confirmed_rels = set(decisions.confirmed)
+        console.print(
+            f"decisions {confirmed}: {len(decisions.confirmed)} confirmed, "
+            f"{len(decisions.rejected)} rejected, {len(decisions.proposed)} undecided; "
+            f"{len(graph.rels) - decisions.total} candidate(s) never decided"
+        )
+
+    # -- the plan ------------------------------------------------------------------
+    load_run_id = str(uuid.uuid4())
+    try:
+        plan = plan_curated(graph, confirmed_rels, provenance=provenance, load_run_id=load_run_id)
+    except ValueError as exc:
+        console.print(f"[red]cannot plan: {exc}[/]")
+        raise typer.Exit(2) from None
+    by_label: dict[str, int] = {}
+    for _src, rel_type, _dst in confirmed_rels:
+        by_label[rel_type] = by_label.get(rel_type, 0) + 1
+    console.print(
+        f"plan      nodes: {plan.scripts} Script, {plan.etl_processes} ETLProcess, "
+        f"{plan.assets} DataAsset; rels: {plan.rels} confirmed"
+        + ("".join(f", {n} {label}" for label, n in sorted(by_label.items())) or " (none)")
+    )
+    if plan.launchers or plan.payloads:
+        console.print(
+            f"          script roles: {plan.launchers} launcher, {plan.payloads} payload, "
+            f"{plan.scripts_unroled} unroled; {plan.uses_artifact_rels} USES_ARTIFACT"
+        )
+    refusals = gate_bound_labels(plan.rel_types)
+    for label, vid, status in refusals:
+        console.print(
+            f"[red]GATE-BOUND: {label} ({vid}) is {status}, not active[/] - a live load "
+            "refuses this label until the HITL gate flips it"
+        )
+    would_drop = unresolved_file_op_candidates(graph)
+    if plan.unresolved_file_ops or would_drop:
+        console.print(
+            f"[yellow]unresolved file-op candidates: {plan.unresolved_file_ops} in this plan, "
+            f"{len(would_drop)} in the artifact[/] (script-sourced READS_FROM/WRITES_TO with "
+            "no owning job - dropped and counted, never written)"
+        )
+    console.print(f"          {len(plan.statements)} statement(s) (load run {load_run_id})")
+
+    if not write:
+        console.print("[green]plan only[/] - pass --write to load against drydocs.")
+        return
+
+    # -- the load ------------------------------------------------------------------
+    if not confirmed_rels:
+        console.print("[yellow]nothing confirmed - nothing to write.[/]")
+        return
+    try:
+        with _client("drydocs") as client:
+            written = write_curated(
+                graph,
+                confirmed_rels,
+                client,
+                provenance=provenance,
+                run_id=load_run_id,
+            )
+    except GateBoundVocabularyError as exc:
+        console.print(f"[red]REFUSED: {exc}[/]")
+        raise typer.Exit(2) from None
+    except TrustBoundaryError as exc:
+        console.print(f"[red]REFUSED: {exc}[/]")
+        raise typer.Exit(2) from None
+    console.print(
+        f"[green]wrote {written} rel(s) to drydocs[/] (load run {load_run_id}; extract run "
+        f"{provenance.run_id})"
+    )
+    if written < len(confirmed_rels):
+        console.print(
+            f"[yellow]{len(confirmed_rels) - written} confirmed rel(s) not written[/] - a "
+            "ControlMJob endpoint is not in the graph (the M3 load owns those; run it first) "
+            "or a file-op candidate had no owning job (see the plan's unresolved count)."
+        )
 
 
 def _column_map(spec: str, *, required: tuple[str, ...], what: str) -> dict[str, str]:
@@ -842,7 +1046,8 @@ def profile_folder_set(
 # modules import drydocs.cli_shared (never this module at module scope), and
 # this root imports both — so any CLI module works as the first import of a
 # fresh interpreter (guarded by tests/unit/test_cli_import_order.py). The three
-# verbs above (resolve-cmdline-staging, lineage-review, fid-census) stay here
+# verbs above (resolve-cmdline-staging, lineage-review, lineage-extract, lineage-load,
+# fid-census) stay here
 # because they wire another component (drydocs_lineage, drydocs.review.fid_census) —
 # the composition root is the only module exempt from the component-import
 # invariant (ENTRYPOINT_MODULES); S8 added no new exemption and S13 removes

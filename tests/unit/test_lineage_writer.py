@@ -25,6 +25,7 @@ Pins, in order of importance:
 from __future__ import annotations
 
 import ast
+import json
 from pathlib import Path
 
 import pytest
@@ -40,9 +41,11 @@ from drydocs_lineage.model import (
 )
 from drydocs_lineage.writer import (
     DATABASE,
+    ExtractProvenance,
     GateBoundVocabularyError,
     TrustBoundaryError,
     asset_urn,
+    gate_bound_labels,
     plan_curated,
     vocabulary_status,
     write_curated,
@@ -609,3 +612,129 @@ def test_asset_urn_is_the_d1_proxy_shape() -> None:
         "urn:drydocs:dataasset:hdfs:/data/landing:loans"
     )
     assert asset_urn("hive_table", "edw.loans") == ("urn:drydocs:dataasset:hive_table:-:edw.loans")
+
+
+# --- LIN2 (c): the load names its extract -----------------------------------------------
+
+_HEADER = {
+    "schema": "drydocs.lineage-staged.v1",
+    "run_id": "extract-run-1",
+    "captured_at": "2026-09-04T12:00:00+00:00",
+    "code_commit": "abc123-dirty",
+    "acquisition": {"jobs": "bundled-samples"},
+    "sources": [
+        {"hop": "controlm", "required": True, "path": "/z/jobs.csv", "present": True, "note": ""},
+        {
+            "hop": "controlm_variables",
+            "required": False,
+            "path": "/z/controlm_variables.csv",
+            "present": True,
+            "note": "discovered beside the jobs source (no path given)",
+        },
+        {
+            "hop": "dpl_mac",
+            "required": False,
+            "path": "/z/dpl-mac",
+            "present": False,
+            "note": "not found",
+        },
+    ],
+}
+
+
+def test_a_plan_without_provenance_is_what_it_was_before_lin2() -> None:
+    g = _fixture_graph()
+    plan = plan_curated(g, set(g.rels))
+    joined = "\n".join(c for c, _ in plan.statements)
+    assert "extract_run_id" not in joined and "JobRun" not in joined
+    assert all("extract_run_id" not in p for _, p in plan.statements)
+
+
+def test_a_provenance_stamped_plan_marks_every_node_and_rel_and_brackets_a_jobrun() -> None:
+    """Every MERGEd node and rel carries the artifact's run id and code commit; the plan
+    opens a :JobRun (the existing label, O28's property shape - no new label or edge)
+    carrying the artifact's sources block VERBATIM and closes it last. The discovered
+    variables CSV reaches the graph as present, with the note that says how it was
+    found - the LIN1 lane review's condition."""
+    g = _fixture_graph()
+    prov = ExtractProvenance.from_header(_HEADER, artifact="/z/lineage/staged/x.json")
+    assert prov.dirty
+    plan = plan_curated(g, set(g.rels), provenance=prov, load_run_id="load-run-1")
+
+    first_cypher, first_params = plan.statements[0]
+    assert "MERGE (run:JobRun {run_id: $run_id})" in first_cypher
+    assert "run.loader     = 'lineage-load'" in first_cypher
+    assert first_params["run_id"] == "load-run-1"
+    assert first_params["extract_run_id"] == "extract-run-1"
+    assert first_params["extract_code_commit"] == "abc123-dirty"
+    assert first_params["extract_artifact"] == "/z/lineage/staged/x.json"
+    assert first_params["confirmed_rels"] == len(g.rels)
+    sources = [json.loads(s) for s in first_params["sources"]]
+    assert sources == _HEADER["sources"], "the sources block, verbatim and in hop order"
+    assert sources[1]["present"] is True and "discovered" in sources[1]["note"]
+
+    last_cypher, last_params = plan.statements[-1]
+    assert "MATCH (run:JobRun {run_id: $run_id})" in last_cypher and "COMPLETED" in last_cypher
+    assert last_params == {"run_id": "load-run-1"}
+
+    for cypher, params in plan.statements[1:-1]:
+        if cypher.startswith("CREATE CONSTRAINT"):
+            continue
+        assert "extract_run_id      = $extract_run_id" in cypher, cypher
+        assert "extract_code_commit = $extract_code_commit" in cypher, cypher
+        assert params["extract_run_id"] == "extract-run-1"
+        assert params["extract_code_commit"] == "abc123-dirty"
+    rel = next(c for c, _ in plan.statements if "MERGE (src)-[r:INVOKES]->(dst)" in c)
+    assert "r.extract_run_id" in rel and rel.rstrip().endswith("RETURN count(r) AS written")
+
+
+def test_an_empty_confirmed_set_plans_no_jobrun() -> None:
+    """The live path returns before it opens anything on an empty set; the plan says
+    the same - a :JobRun brackets a write that happens."""
+    g = _fixture_graph()
+    prov = ExtractProvenance.from_header(_HEADER)
+    plan = plan_curated(g, set(), provenance=prov, load_run_id="load-run-1")
+    assert plan.statements == ()
+
+
+def test_a_stamped_plan_needs_the_loads_own_run_id() -> None:
+    g = _fixture_graph()
+    with pytest.raises(ValueError, match="run id"):
+        plan_curated(g, set(g.rels), provenance=ExtractProvenance.from_header(_HEADER))
+
+
+def test_the_live_load_runs_the_stamped_plan_under_one_run_id(tmp_path: Path, monkeypatch) -> None:
+    """The file run log and the :JobRun share the load's run id, and the log's meta
+    names the extract (run id, code commit, artifact)."""
+    monkeypatch.setenv("DRYDOCS_LOGDIR", str(tmp_path / "logs"))
+    g = _fixture_graph()
+    client = _FakeClient()
+    prov = ExtractProvenance.from_header(_HEADER, artifact="/z/x.json")
+    written = write_curated(g, set(g.rels), client=client, provenance=prov, run_id="load-run-9")
+    assert written == 4
+    opened = [p for c, p in client.calls if "MERGE (run:JobRun" in c]
+    assert [p["run_id"] for p in opened] == ["load-run-9"]
+    assert all(p.get("extract_run_id") == "extract-run-1" for c, p in client.calls if "rows" in p)
+    logs = list((tmp_path / "logs").rglob("*lineage.curated*"))
+    assert logs, "a run log per live load (G107)"
+    text = logs[0].read_text(encoding="utf-8")
+    assert "load-run-9" in text and "extract-run-1" in text and "abc123-dirty" in text
+    assert "controlm_variables.csv" in text, "the extract's sources block is in the log"
+
+
+def test_gate_bound_labels_names_what_a_live_load_would_refuse(tmp_path: Path) -> None:
+    """The pure companion of the writer's gate check: same registry read, no database,
+    so the plan print can say it. Against the REAL registry TRIGGERS is the one still
+    planned; against a synthetic registry an unregistered label reads UNREGISTERED."""
+    real = gate_bound_labels(["INVOKES", "TRIGGERS", "READS_FROM", "WRITES_TO", "USES_ARTIFACT"])
+    assert real == [("TRIGGERS", "scheduler_triggers", "planned")]
+    assert gate_bound_labels(["INVOKES"]) == []
+    registry = tmp_path / "vocab"
+    registry.mkdir()
+    (registry / "00-x.yaml").write_text(
+        "  - id:           scheduler_invokes\n    status:       planned\n", encoding="utf-8"
+    )
+    assert gate_bound_labels(["INVOKES", "TRIGGERS"], registry) == [
+        ("INVOKES", "scheduler_invokes", "planned"),
+        ("TRIGGERS", "scheduler_triggers", "UNREGISTERED"),
+    ]

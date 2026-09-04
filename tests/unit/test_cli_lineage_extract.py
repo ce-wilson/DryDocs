@@ -162,3 +162,42 @@ def test_an_explicit_out_dir_inside_a_read_zone_is_refused(tmp_path: Path, monke
 def test_the_verb_is_registered_on_the_root_beside_lineage_review() -> None:
     names = {c.name for c in cli_mod.app.registered_commands}
     assert {"lineage-extract", "lineage-review"} <= names
+
+
+# --- LIN2 (c): the LIN1 follow-ups that bite at load time -----------------------------
+
+
+def test_every_lineage_input_zone_id_is_a_declared_zone() -> None:
+    """LINEAGE_INPUT_ZONES names zone ids as string literals; before this guard a typo
+    refused every input for that hop - correctly closed, wrongly. Every id resolves to a
+    declared READ zone in config/data-zones.yaml or a source-registry drop (the same
+    union ``read_zone_containing`` searches)."""
+    from drydocs_core.data_zones import READ, all_zones
+
+    declared = {z.id for z in all_zones() if z.mode == READ}
+    for option, ids in cli_mod.LINEAGE_INPUT_ZONES.items():
+        for zone_id in ids:
+            assert zone_id in declared, f"--{option}: zone id {zone_id!r} is declared nowhere"
+
+
+def test_the_extract_prunes_the_staged_zone_to_keep(tmp_path: Path, monkeypatch):
+    """Retention (LIN2 c): after a successful write the extract keeps the newest --keep
+    artifacts; 0 keeps everything; the default is DEFAULT_KEEP."""
+    from drydocs_lineage.staging import DEFAULT_KEEP
+
+    monkeypatch.setenv("DRYDOCS_DATA_ROOT", str(tmp_path))
+    monkeypatch.setenv("DRYDOCS_LOGDIR", str(tmp_path / "logs"))
+    staged = tmp_path / "lineage" / "staged"
+    staged.mkdir(parents=True)
+    old = [staged / f"lineage-2025010{d}T000000Z-old{d}.json" for d in range(1, 4)]
+    for p in old:
+        p.write_text("{}", encoding="utf-8")
+    result = runner.invoke(cli_mod.app, ["lineage-extract", "--keep", "2"])
+    assert result.exit_code == 0, _plain(result.output)
+    assert "pruned 2 older artifact(s)" in _plain(result.output)
+    left = _artifacts(tmp_path)
+    assert len(left) == 2 and old[2] in left and old[0] not in left
+    result = runner.invoke(cli_mod.app, ["lineage-extract", "--keep", "0"])
+    assert result.exit_code == 0 and "pruned" not in _plain(result.output)
+    assert len(_artifacts(tmp_path)) == 3
+    assert DEFAULT_KEEP == 10

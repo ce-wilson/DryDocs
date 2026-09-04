@@ -202,16 +202,16 @@ def stage_chain(
     return staged
 
 
-def code_commit(repo: Path | None = None) -> str:
-    """The commit the extractor code was at, or ``"unknown"`` outside a git checkout.
+#: The suffix a dirty tree earns (the ``git describe --dirty`` convention). A reader
+#: that wants the bare sha strips it; a reader that trusts the sha blindly must not.
+DIRTY_SUFFIX = "-dirty"
 
-    The extractors carry no version attribute of their own (a number nobody bumps is
-    worse than none), so the tree's commit is what tells two artifacts staged before
-    and after a parsing change apart - the LIN1 review's deviation (c)."""
-    root = repo or repo_root(Path(__file__).resolve().parents[1])  # Idea-109: the CALLER's checkout
+
+def _git(args: list[str], root: Path) -> str | None:
+    """stdout of one git command, or ``None`` when git is absent or the command fails."""
     try:
         result = subprocess.run(
-            ["git", "rev-parse", "HEAD"],
+            ["git", *args],
             cwd=root,
             capture_output=True,
             text=True,
@@ -219,9 +219,37 @@ def code_commit(repo: Path | None = None) -> str:
             timeout=10,
         )
     except (OSError, subprocess.SubprocessError):
+        return None
+    return result.stdout if result.returncode == 0 else None
+
+
+def code_commit(repo: Path | None = None) -> str:
+    """The commit the extractor code was at, or ``"unknown"`` outside a git checkout.
+
+    The extractors carry no version attribute of their own (a number nobody bumps is
+    worse than none), so the tree's commit is what tells two artifacts staged before
+    and after a parsing change apart - the LIN1 review's deviation (c).
+
+    A DIRTY tree reports ``<sha>-dirty`` (LIN2 c; the 93f4d832 verify pass): HEAD
+    alone claims the artifact was built from a commit it was not built from when the
+    working tree carries uncommitted edits to the very extractors that ran. Tracked
+    modifications and untracked files both count - ``git status --porcelain`` - and a
+    status that cannot be read leaves the sha bare rather than guessing either way.
+    """
+    root = repo or repo_root(Path(__file__).resolve().parents[1])  # Idea-109: the CALLER's checkout
+    out = _git(["rev-parse", "HEAD"], root)
+    sha = (out or "").strip()
+    if not sha:
         return "unknown"
-    sha = result.stdout.strip()
-    return sha if result.returncode == 0 and sha else "unknown"
+    status = _git(["status", "--porcelain"], root)
+    if status is not None and status.strip():
+        return sha + DIRTY_SUFFIX
+    return sha
+
+
+def is_dirty_commit(commit: str) -> bool:
+    """Whether an artifact header's ``code_commit`` names an uncommitted tree."""
+    return commit.endswith(DIRTY_SUFFIX)
 
 
 def artifact_name(run_id: str, captured_at: datetime) -> str:
@@ -229,6 +257,47 @@ def artifact_name(run_id: str, captured_at: datetime) -> str:
     sorts chronologically and "the newest" is derivable (the LIN1 review's point 4)."""
     stamp = captured_at.astimezone(UTC).strftime("%Y%m%dT%H%M%SZ")
     return f"lineage-{stamp}-{run_id}.json"
+
+
+#: The artifact file name shape ``artifact_name`` writes; what ``newest_artifact`` and
+#: ``prune_staged`` recognise. Anything else in the zone is left alone.
+ARTIFACT_GLOB = "lineage-*.json"
+
+#: Retention of lineage/staged/ (LIN2 c, decided here): the extract keeps the NEWEST
+#: ``DEFAULT_KEEP`` artifacts and prunes the rest after a successful write; the load
+#: never deletes. Why N and not newest-only: the load names its extract by run id, and
+#: a re-run of the load against yesterday's artifact - to see what a parsing change
+#: moved - needs yesterday's artifact to still be there. Why not keep-all: the zone is
+#: a WRITE zone rebuilt from the declared read zones, and the run log (G107) carries
+#: every header regardless, so an artifact past the window is a rebuild away and its
+#: provenance is not lost with it.
+DEFAULT_KEEP = 10
+
+
+def staged_artifacts(staged_dir: Path) -> list[Path]:
+    """Every artifact in the zone, OLDEST FIRST. The UTC stamp leads the name, so the
+    listing order is the capture order without opening a file."""
+    if not staged_dir.is_dir():
+        return []
+    return sorted(p for p in staged_dir.glob(ARTIFACT_GLOB) if p.is_file())
+
+
+def newest_artifact(staged_dir: Path) -> Path | None:
+    """The artifact ``lineage-load`` reads when given none: the last by name."""
+    found = staged_artifacts(staged_dir)
+    return found[-1] if found else None
+
+
+def prune_staged(staged_dir: Path, *, keep: int = DEFAULT_KEEP) -> list[Path]:
+    """Delete every artifact but the newest ``keep``; returns what was removed
+    (oldest first). ``keep <= 0`` keeps everything and removes nothing."""
+    if keep <= 0:
+        return []
+    found = staged_artifacts(staged_dir)
+    doomed = found[:-keep] if len(found) > keep else []
+    for path in doomed:
+        path.unlink()
+    return doomed
 
 
 def artifact_dict(

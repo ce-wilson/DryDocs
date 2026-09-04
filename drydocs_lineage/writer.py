@@ -63,6 +63,7 @@ silent shrink.
 
 from __future__ import annotations
 
+import json
 import re
 from collections.abc import Iterable
 from dataclasses import dataclass
@@ -262,6 +263,87 @@ _MATCH_FRAGMENT = {
 }
 
 
+#: LIN2 (c): the load names its extract. When a plan is cut from a STAGED artifact
+#: (``lineage-load``), every node and rel it MERGEs carries the artifact's run id and
+#: the code commit the extractor ran at, and the load opens a :JobRun that carries the
+#: artifact's ``sources`` block verbatim - the file the extractor actually read,
+#: discovered or given, present or absent (the LIN1 lane review's condition). Plain
+#: PROPERTIES and the existing :JobRun label (O28's ruling, base.py: a relationship
+#: type is an ontology decision; a run record carries none) - no new label, no new
+#: edge. Without a provenance the statements are exactly what they were before LIN2.
+_PROV_NODE_SET = (
+    ",\n    {var}.extract_run_id      = $extract_run_id,\n"
+    "    {var}.extract_code_commit = $extract_code_commit"
+)
+
+_JOB_RUN_OPEN = """\
+MERGE (run:JobRun {run_id: $run_id})
+  ON CREATE SET run.kind       = 'load',
+                run.loader     = 'lineage-load',
+                run.started_at = datetime($written_at)
+SET run.source              = 'drydocs-lineage',
+    run.target              = 'drydocs',
+    run.extract_run_id      = $extract_run_id,
+    run.extract_code_commit = $extract_code_commit,
+    run.extract_captured_at = $extract_captured_at,
+    run.extract_artifact    = $extract_artifact,
+    run.sources             = $sources,
+    run.confirmed_rels      = $confirmed_rels,
+    run.status              = 'STARTED'"""
+
+_JOB_RUN_CLOSE = """\
+MATCH (run:JobRun {run_id: $run_id})
+SET run.status       = 'COMPLETED',
+    run.completed_at = datetime()"""
+
+
+@dataclass(frozen=True)
+class ExtractProvenance:
+    """What a staged artifact says about itself, as the load stamps it (LIN2 c)."""
+
+    run_id: str
+    code_commit: str
+    captured_at: str = ""
+    artifact: str = ""
+    #: the artifact's ``sources`` block, one JSON string per hop in hop order (Neo4j
+    #: holds no list of maps; O28's list-of-JSON-strings shape, parsed back by any reader)
+    sources: tuple[str, ...] = ()
+
+    @classmethod
+    def from_header(cls, header: dict[str, Any], *, artifact: str = "") -> ExtractProvenance:
+        """From the header ``staging.read_artifact`` returns (everything but the graph)."""
+        return cls(
+            run_id=str(header.get("run_id") or ""),
+            code_commit=str(header.get("code_commit") or "unknown"),
+            captured_at=str(header.get("captured_at") or ""),
+            artifact=artifact,
+            sources=tuple(json.dumps(src, sort_keys=True) for src in (header.get("sources") or [])),
+        )
+
+    @property
+    def dirty(self) -> bool:
+        """The extractor ran on an uncommitted tree (``staging.code_commit``'s marker)."""
+        return self.code_commit.endswith("-dirty")
+
+    def params(self) -> dict[str, Any]:
+        return {"extract_run_id": self.run_id, "extract_code_commit": self.code_commit}
+
+
+def gate_bound_labels(
+    rel_types: Iterable[str], registry: Path | None = None
+) -> list[tuple[str, str, str]]:
+    """``(label, vocab id, status)`` for every label whose vocabulary entry is not
+    ``active`` - what a live load WOULD refuse, computed without a database so the plan
+    print can say it (LIN2 a). PURE: the same registry read ``_write_curated`` makes."""
+    wanted = {t: VOCAB_IDS[t] for t in rel_types if t in VOCAB_IDS}
+    statuses = vocabulary_status(wanted.values(), registry)
+    return sorted(
+        (label, vid, statuses.get(vid, "UNREGISTERED"))
+        for label, vid in wanted.items()
+        if statuses.get(vid) != "active"
+    )
+
+
 @dataclass(frozen=True)
 class WritePlan:
     """The exact statements a live load runs — gate/review material."""
@@ -399,8 +481,20 @@ def _resolve_file_ops(
     return resolved, unresolved
 
 
-def plan_curated(graph: LineageGraph, confirmed: set[tuple[str, str, str]]) -> WritePlan:
-    """Validate the curated subset and return the exact write batches (PURE)."""
+def plan_curated(
+    graph: LineageGraph,
+    confirmed: set[tuple[str, str, str]],
+    *,
+    provenance: ExtractProvenance | None = None,
+    load_run_id: str | None = None,
+) -> WritePlan:
+    """Validate the curated subset and return the exact write batches (PURE).
+
+    With ``provenance`` (LIN2 c) every MERGEd node and rel also carries
+    ``extract_run_id`` / ``extract_code_commit``, and the plan opens with a :JobRun
+    keyed by ``load_run_id`` that carries the artifact's sources block, and closes it
+    last. Without it the plan is byte-for-byte what it was before LIN2.
+    """
     unknown = confirmed - graph.rels
     if unknown:
         raise ValueError(
@@ -463,16 +557,42 @@ def plan_curated(graph: LineageGraph, confirmed: set[tuple[str, str, str]]) -> W
                 }
             )
 
+    prov_params = provenance.params() if provenance is not None else {}
+
+    def _stamped(merge: str, var: str) -> str:
+        return merge + (_PROV_NODE_SET.format(var=var) if provenance is not None else "")
+
     statements: list[tuple[str, dict[str, Any]]] = []
+    # The :JobRun brackets a write that happens: an empty confirmed set is a no-op the
+    # live path returns from before it opens anything, and the plan says the same.
+    stamp_run = provenance is not None and bool(confirmed)
+    if stamp_run:
+        if not load_run_id:
+            raise ValueError("a provenance-stamped plan needs the load's own run id")
+        statements.append(
+            (
+                _JOB_RUN_OPEN,
+                {
+                    "run_id": load_run_id,
+                    **prov_params,
+                    "extract_captured_at": provenance.captured_at,
+                    "extract_artifact": provenance.artifact,
+                    "sources": list(provenance.sources),
+                    "confirmed_rels": len(confirmed),
+                },
+            )
+        )
     if script_rows:
         statements.append((_SCRIPT_CONSTRAINT, {}))
-        statements.append((_SCRIPT_MERGE, {"rows": script_rows}))
+        statements.append((_stamped(_SCRIPT_MERGE, "s"), {"rows": script_rows, **prov_params}))
     if etl_process_rows:
         statements.append((_ETL_PROCESS_CONSTRAINT, {}))
-        statements.append((_ETL_PROCESS_MERGE, {"rows": etl_process_rows}))
+        statements.append(
+            (_stamped(_ETL_PROCESS_MERGE, "e"), {"rows": etl_process_rows, **prov_params})
+        )
     if asset_rows:
         statements.append((_ASSET_CONSTRAINT, {}))
-        statements.append((_ASSET_MERGE, {"rows": asset_rows}))
+        statements.append((_stamped(_ASSET_MERGE, "a"), {"rows": asset_rows, **prov_params}))
 
     # rel batches, one statement per (src class, label, dst class) shape
     groups: dict[tuple[str, str, str], list[dict[str, Any]]] = {}
@@ -492,10 +612,13 @@ def plan_curated(graph: LineageGraph, confirmed: set[tuple[str, str, str]]) -> W
             + "  ON CREATE SET r.first_seen_at = datetime($written_at),\n"
             + "                r.source        = 'drydocs-lineage',\n"
             + f"                r.vocab_id      = '{VOCAB_IDS[rel_type]}'\n"
-            + "SET r.last_seen_at = datetime($written_at)\n"
-            + "RETURN count(r) AS written"
+            + "SET r.last_seen_at = datetime($written_at)"
+            + (_PROV_NODE_SET.format(var="r") if provenance is not None else "")
+            + "\nRETURN count(r) AS written"
         )
-        statements.append((cypher, {"rows": rows}))
+        statements.append((cypher, {"rows": rows, **prov_params}))
+    if stamp_run:
+        statements.append((_JOB_RUN_CLOSE, {"run_id": load_run_id}))
 
     roles = [r.get("script_role") for r in script_rows]
     return WritePlan(
@@ -522,6 +645,8 @@ def _write_curated(
     client: Any = None,
     *,
     registry: Path | None = None,
+    provenance: ExtractProvenance | None = None,
+    load_run_id: str | None = None,
 ) -> int:
     """Write the CONFIRMED subset of ``graph``'s rels (+ their endpoint nodes) to
     ground truth; returns the count of rels written.
@@ -535,7 +660,7 @@ def _write_curated(
     """
     if not confirmed:
         return 0
-    plan = plan_curated(graph, confirmed)
+    plan = plan_curated(graph, confirmed, provenance=provenance, load_run_id=load_run_id)
 
     if client is None:
         raise ValueError(
@@ -1085,6 +1210,8 @@ def write_curated(
     client: Any = None,
     *,
     registry: Path | None = None,
+    provenance: ExtractProvenance | None = None,
+    run_id: str | None = None,
 ) -> int:
     """Curated ground-truth write, wrapped in a run log (G107).
 
@@ -1092,17 +1219,37 @@ def write_curated(
     run, not behaviour. The empty-``confirmed`` guard runs BEFORE the log opens
     deliberately: nothing was asked for, so there is no batch to record, and a
     log per no-op call would bury the real runs.
+
+    With ``provenance`` (LIN2 c) the run log's meta names the extract - its run id,
+    code commit and the artifact path - and the same ``run_id`` keys the file log AND
+    the :JobRun the plan opens, so the two records of one load share one id.
     """
     if not confirmed:
         return 0
+    meta: dict[str, Any] = {"confirmed rels": len(confirmed)}
+    if provenance is not None:
+        meta["extract run_id"] = provenance.run_id
+        meta["extract code_commit"] = provenance.code_commit
+        meta["extract artifact"] = provenance.artifact
     with batch_run_log(
         "lineage.curated",
+        run_id=run_id,
+        source=provenance.artifact if provenance is not None else "",
         target=DATABASE,
-        meta={"confirmed rels": len(confirmed)},
+        meta=meta,
     ) as summary:
-        written = _write_curated(graph, confirmed, client, registry=registry)
+        written = _write_curated(
+            graph,
+            confirmed,
+            client,
+            registry=registry,
+            provenance=provenance,
+            load_run_id=run_id,
+        )
         summary["rels written"] = written
         summary["confirmed rels"] = len(confirmed)
+        if provenance is not None:
+            summary["extract sources"] = [json.loads(src) for src in provenance.sources]
         return written
 
 

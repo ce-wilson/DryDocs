@@ -6,8 +6,11 @@ a browser: one section per Control-M folder, a card per job showing
 job/node-target/run-as/application/command and the dependencies it INVOKES (plus
 TRIGGERS, and the READS_FROM / WRITES_TO file-op candidates the G14 extractor
 pass emits), an assertion panel at the top
-(the FR/TC discipline without Cypher), and a per-folder comment box persisted to
-localStorage with one-click export of all notes as JSON.
+(the FR/TC discipline without Cypher), a per-rel DECISION control on every
+dependency row (LIN2 b: confirm / reject, persisted to localStorage), and a
+per-folder comment box, with one-click export of decisions + notes as the
+``drydocs.lineage-decisions.v1`` file ``drydocs lineage-load --confirmed`` reads
+(the shape is documented in :mod:`drydocs_lineage.curation`).
 
 Pattern mirrors ``drydocs.review.graph_review`` (pure renderer, ontology-free, the SME
 reviews *the data*) — mirrored, not imported: components never import each other.
@@ -109,6 +112,24 @@ def _children(graph: LineageGraph, job_id: str) -> list[tuple[str, object]]:
     return out
 
 
+#: LIN2 (b): the per-rel decision control. Its values ARE ``CurationStatus`` (the
+#: empty option is "not decided", exported as nothing); the export writes the file
+#: ``drydocs_lineage.curation`` documents and ``drydocs lineage-load --confirmed`` reads.
+_DECISION_OPTIONS = (
+    ("", "&mdash;"),
+    ("confirmed", "confirm"),
+    ("rejected", "reject"),
+)
+
+
+def _decision_control(src: str, rel: str, dst: str) -> str:
+    opts = "".join(f'<option value="{v}">{label}</option>' for v, label in _DECISION_OPTIONS)
+    return (
+        f'<select class="decide" data-from="{_e(src)}" data-type="{_e(rel)}" '
+        f'data-to="{_e(dst)}" title="curation decision for this rel">{opts}</select>'
+    )
+
+
 def _job_card(graph: LineageGraph, job) -> str:
     rows = []
     if job.node_target:
@@ -132,7 +153,8 @@ def _job_card(graph: LineageGraph, job) -> str:
                 path.rstrip("/").rsplit("/", 1)[-1] if path else ""
             )
             items.append(
-                f'<li class="dep{warn}"><span class="rel">{_e(rel)}</span> '
+                f'<li class="dep{warn}">{_decision_control(job.node_id, rel, node.node_id)}'
+                f'<span class="rel">{_e(rel)}</span> '
                 f'<span class="kind k-{_e(kind)}">{_e(kind)}</span> '
                 f'<span class="dname">{_e(name)}</span>'
                 f'{f"<span class=path>{_e(path)}</span>" if path else ""}</li>'
@@ -258,7 +280,10 @@ def to_html(
             for k, n in sorted(kinds.items())
         )
         w(f'<div class="chips">{chips}</div>')
-    w('<button class="export" onclick="exportNotes()">&#11015; Export SME notes (JSON)</button>')
+    w(
+        '<button class="export" onclick="exportNotes()">&#11015; Export decisions + notes '
+        "(JSON)</button>"
+    )
     w("</div></header>")
 
     # assertion panel
@@ -367,22 +392,38 @@ padding:6px 10px;background:var(--card)}
 .arow.dead{border-left-color:var(--fail)}
 .arow.mis{border-left-color:var(--warn)}
 .arow.dyn{border-left-color:var(--ok)}
+.decide{font-size:11px;margin-right:6px;border:1px solid var(--line);border-radius:4px;
+background:var(--card);color:inherit;padding:1px 2px}
+.decide.confirmed{border-color:var(--ok);color:var(--ok);font-weight:600}
+.decide.rejected{border-color:var(--fail);color:var(--fail);font-weight:600}
 .apath{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:600;word-break:break-all}
 .ahosts{color:var(--mut);margin-left:8px}
 .areason{color:var(--mut);margin-top:2px}
 """
 
 _JS = """
+const DECISIONS_SCHEMA='drydocs.lineage-decisions.v1';
+function _key(s){return s.dataset.from+'|'+s.dataset.type+'|'+s.dataset.to;}
 function _notes(){const o={};document.querySelectorAll('textarea.note').forEach(t=>{
  if(t.value.trim())o[t.dataset.sid]=t.value;});return o;}
-function _save(){try{localStorage.setItem('drydocs-lineage-review-'+DOC_ID,JSON.stringify(_notes()));}catch(e){}}
+function _decisions(){const o={};document.querySelectorAll('select.decide').forEach(s=>{
+ if(s.value)o[_key(s)]=s.value;});return o;}
+function _paint(s){s.classList.remove('confirmed','rejected');if(s.value)s.classList.add(s.value);}
+function _save(){try{localStorage.setItem('drydocs-lineage-review-'+DOC_ID,JSON.stringify(_notes()));
+ localStorage.setItem('drydocs-lineage-decisions-'+DOC_ID,JSON.stringify(_decisions()));}catch(e){}}
 function _load(){try{const d=JSON.parse(localStorage.getItem('drydocs-lineage-review-'+DOC_ID)||'{}');
- document.querySelectorAll('textarea.note').forEach(t=>{if(d[t.dataset.sid])t.value=d[t.dataset.sid];});}catch(e){}}
+ document.querySelectorAll('textarea.note').forEach(t=>{if(d[t.dataset.sid])t.value=d[t.dataset.sid];});
+ const c=JSON.parse(localStorage.getItem('drydocs-lineage-decisions-'+DOC_ID)||'{}');
+ document.querySelectorAll('select.decide').forEach(s=>{if(c[_key(s)])s.value=c[_key(s)];_paint(s);});}catch(e){}}
 document.addEventListener('input',e=>{if(e.target.classList&&e.target.classList.contains('note'))_save();});
-function exportNotes(){const n=_notes();const out={doc:DOC_ID,exported:new Date().toISOString(),
+document.addEventListener('change',e=>{if(e.target.classList&&e.target.classList.contains('decide')){_paint(e.target);_save();}});
+function exportNotes(){const n=_notes();const decisions=[];
+ document.querySelectorAll('select.decide').forEach(s=>{if(s.value)decisions.push(
+  {from:s.dataset.from,type:s.dataset.type,to:s.dataset.to,decision:s.value});});
+ const out={schema:DECISIONS_SCHEMA,doc:DOC_ID,exported:new Date().toISOString(),decisions:decisions,
  notes:Object.keys(n).map(k=>({folder:k,note:n[k]}))};
  const b=new Blob([JSON.stringify(out,null,2)],{type:'application/json'});
  const a=document.createElement('a');a.href=URL.createObjectURL(b);
- a.download='lineage-review-notes-'+DOC_ID+'.json';document.body.appendChild(a);a.click();a.remove();}
+ a.download='lineage-decisions-'+DOC_ID+'.json';document.body.appendChild(a);a.click();a.remove();}
 window.addEventListener('DOMContentLoaded',_load);
 """

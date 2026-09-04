@@ -18,12 +18,19 @@ import pytest
 from drydocs.cli_shared import DEFAULT_SAMPLES_DIR
 from drydocs_lineage.staging import (
     ARTIFACT_SCHEMA,
+    DEFAULT_KEEP,
+    DIRTY_SUFFIX,
     HOPS,
     REQUIRED,
     StagingError,
     artifact_name,
+    code_commit,
+    is_dirty_commit,
+    newest_artifact,
+    prune_staged,
     read_artifact,
     stage_chain,
+    staged_artifacts,
     write_artifact,
 )
 
@@ -328,3 +335,84 @@ def test_reading_something_else_as_an_artifact_is_refused(tmp_path: Path) -> Non
     other.write_text(json.dumps({"schema": "drydocs.lineage-graph.v1"}), encoding="utf-8")
     with pytest.raises(ValueError, match="not a staged lineage artifact"):
         read_artifact(other)
+
+
+# --- LIN2 (c): the two LIN1 follow-ups that bite at load time, and retention ---------
+
+
+def _git_repo(tmp_path: Path) -> Path:
+    import subprocess
+
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    env = {
+        "GIT_AUTHOR_NAME": "t",
+        "GIT_AUTHOR_EMAIL": "t@example.invalid",
+        "GIT_COMMITTER_NAME": "t",
+        "GIT_COMMITTER_EMAIL": "t@example.invalid",
+    }
+    import os
+
+    env = {**os.environ, **env}
+    subprocess.run(["git", "init", "-q"], cwd=repo, check=True, env=env)
+    (repo / "a.txt").write_text("a\n", encoding="utf-8")
+    subprocess.run(["git", "add", "a.txt"], cwd=repo, check=True, env=env)
+    subprocess.run(["git", "commit", "-q", "-m", "one"], cwd=repo, check=True, env=env)
+    return repo
+
+
+def test_code_commit_marks_a_dirty_tree(tmp_path: Path) -> None:
+    """The 93f4d832 verify pass: HEAD alone claims a commit the artifact was not built
+    from when the tree carries uncommitted edits. Clean -> bare sha; a modified tracked
+    file OR an untracked file -> ``<sha>-dirty`` (git describe's convention)."""
+    repo = _git_repo(tmp_path)
+    clean = code_commit(repo)
+    assert len(clean) == 40 and not is_dirty_commit(clean)
+    (repo / "a.txt").write_text("changed\n", encoding="utf-8")
+    dirty = code_commit(repo)
+    assert dirty == clean + DIRTY_SUFFIX and is_dirty_commit(dirty)
+    (repo / "a.txt").write_text("a\n", encoding="utf-8")
+    (repo / "stray.txt").write_text("x\n", encoding="utf-8")
+    assert is_dirty_commit(code_commit(repo)), "an untracked file is a dirty tree too"
+
+
+def test_code_commit_outside_a_checkout_is_unknown_not_a_guess(tmp_path: Path) -> None:
+    bare = tmp_path / "not-a-repo"
+    bare.mkdir()
+    assert code_commit(bare) == "unknown"
+
+
+def _touch_artifacts(staged: Path, stamps: list[str]) -> list[Path]:
+    staged.mkdir(parents=True, exist_ok=True)
+    out = []
+    for i, stamp in enumerate(stamps):
+        p = staged / f"lineage-{stamp}-run{i}.json"
+        p.write_text("{}", encoding="utf-8")
+        out.append(p)
+    (staged / "notes.txt").write_text("not an artifact", encoding="utf-8")
+    return out
+
+
+def test_newest_artifact_is_derived_from_the_name_alone(tmp_path: Path) -> None:
+    """The stamp leads, so the newest is the last by name - no file is opened, and a
+    stray non-artifact file in the zone is ignored."""
+    staged = tmp_path / "lineage" / "staged"
+    assert newest_artifact(staged) is None  # the zone does not exist yet
+    files = _touch_artifacts(staged, ["20260904T120000Z", "20260903T235959Z", "20260904T120001Z"])
+    assert newest_artifact(staged) == files[2]
+    assert staged_artifacts(staged) == [files[1], files[0], files[2]]
+
+
+def test_prune_keeps_the_newest_n_and_the_load_side_never_deletes(tmp_path: Path) -> None:
+    """Retention, as decided in LIN2: the EXTRACT prunes to the newest ``keep`` after a
+    successful write; ``keep <= 0`` keeps everything. DEFAULT_KEEP is the verb's default
+    and is pinned so a change to it is a decision, not a drift."""
+    assert DEFAULT_KEEP == 10
+    staged = tmp_path / "lineage" / "staged"
+    files = _touch_artifacts(staged, [f"2026090{d}T000000Z" for d in range(1, 6)])
+    assert prune_staged(staged, keep=0) == []
+    assert prune_staged(staged, keep=10) == []
+    removed = prune_staged(staged, keep=2)
+    assert removed == files[:3]
+    assert staged_artifacts(staged) == files[3:]
+    assert (staged / "notes.txt").exists(), "only artifacts are ever pruned"
