@@ -194,14 +194,36 @@ shrink-only rule wants the exemption gone. T22's third leg, the `ddschema` provi
 reads "pending (producer belief, as of 2026-08-03)"; refresh it with the company's chunk-5 sha
 (port pen).
 
-### R7 - the "module-local-cache bug" has no producer-side trace
+### R7 - the "module-local-cache bug" has no producer-side trace, but it has a producer-side candidate
 
 The desktop's notes say the `cli_consumer` rewire fixed a module-local-cache bug. Nothing
-producer-side records it: not the inbox, the port-prompt, the manifest, `cli_shared.py`, `cli.py`,
-or any commit subject. If the fix touched `cli_shared.py` or `cli.py` (both canonical-producer,
-the seven rows from RELAY-25 (2)), the next wholesale take erases it and it must back-flow now;
-if it lived in `cli_consumer.py` (canonical-company), nothing is owed. One question to the
-company: which file.
+producer-side records it by that name: not the inbox, the port-prompt, the manifest,
+`cli_shared.py`, `cli.py`, or any commit subject. If the fix touched `cli_shared.py` or `cli.py`
+(both canonical-producer, the seven rows from RELAY-25 (2)), the next wholesale take erases it and
+it must back-flow now; if it lived in `cli_consumer.py` (canonical-company), nothing is owed.
+
+**NARROWED 2026-09-04 (laptop), so the answer is a confirmation rather than an investigation.**
+The producer already carries a fix for exactly this bug CLASS, and it is the seam the rewire was
+made against. `register_loaders` (`drydocs/cli_shared.py:398`) exists because `LOADER_SOURCE` and
+the unchained set are DERIVED from `LOADER_REGISTRY`, and the root re-exports the dict OBJECTS
+(`cli.py:107-118`). Two failure modes follow, and both are module-local-cache bugs in the plain
+sense that an imported name is a local cache of an object:
+
+- **Rebinding** `LOADER_REGISTRY` in the consumer strands every module that already imported it.
+  RELAY-25's sixth postscript names this: the seam "re-derives the views IN PLACE ... a rebind
+  would strand every earlier import."
+- **Mutating** `LOADER_REGISTRY` directly leaves the two derived views stale. The docstring says
+  so, and records the discovery: "Found at the company's chunk-4 S8 take (2026-09-03): seventeen
+  company loaders vanished from the ad-hoc `load` path because the monolith's registry was
+  replaced and nothing declared them back."
+
+That is the same seventeen loaders, the same take, and the same session the rewire belongs to. So
+the likely answer is that the fix IS the rewire - a `register_loaders` call from
+`cli_consumer.py`, replacing a direct mutation or rebind - in which case the producer half is
+already `f338097d` (past the tag, take by name) and **nothing back-flows**. The question to the
+company reduces to: confirm the fix is a call to the producer's seam from your own module, or
+name the producer file it edited. Only the second answer owes a back-flow, and it owes it before
+the next roll takes those seven rows wholesale.
 
 ### R8 - 22 known-red carried across two carve-outs
 
@@ -376,13 +398,21 @@ the tag exactly; **C35, G116 and G117** are producer ids added at `aed7229b`, so
 reclassification as producer-origin is right, and retiring the known-red band guard on that basis
 is sound. R5 is discharged by that bump, and nothing was extended to make it green.
 
-Still owed from §2 and §3, both deferred by the company to the post-suite report, both fine:
-**R7** (which file held the module-local-cache fix - `cli_shared.py` or `cli.py` means it
-back-flows, `cli_consumer.py` means nothing is owed) and **R2** (where T24 (1) sits, plus the
-chunk-4 union check's exit code). One correction to §2 on that check: their backlog holds 540
-items against the tag's 642 producer ids, so the union cannot exit 0 until the remaining classes
-land. That is expected mid-port, and it makes the check the END gate of the range rather than a
-carve-out 6 precondition - which is how B3 reads it, and §2 should have said so.
+Still owed, both deferred by the company to the post-suite report, both fine: **R7** in §3 (which
+file held the module-local-cache fix) and **R2** in §2 (where T24 (1) sits, plus the chunk-4 union
+check's exit code). One correction to §2 on that check: their backlog holds 540 items against the
+tag's 642 producer ids, so the union cannot exit 0 until the remaining classes land. That is
+expected mid-port, and it makes the check the END gate of the range rather than a carve-out 6
+precondition - which is how B3 reads it, and §2 should have said so.
+
+**Where the answers land, and what closes each (Lane A relay, 2026-09-04).** Both questions were
+posed by this file, so both close in it, under the `reviews` pen; the desktop has stayed off it.
+R7 is narrowed in §3 to a confirmation with a named producer-side candidate, so the closing form
+is one of two sentences: *the fix is a `register_loaders` call from `cli_consumer.py`, nothing
+back-flows*, or *it edited `<producer file>`, which back-flows before the next roll*. R2 closes on
+two facts: the carve-out or chunk that carries T24 (1), and the union check's exit code with the
+producer ref it ran against. Until those arrive, §2 and §3 stay open by design - an unanswered
+question recorded as open is the point of the section, and neither blocks carve-out 7.
 
 One process note. The full-suite run excluded `test_port_reconcile_guards.py` by `--ignore` and
 ran it separately with the env var armed. That is the correct way to run a guard that needs a
