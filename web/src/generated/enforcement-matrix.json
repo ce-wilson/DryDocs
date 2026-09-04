@@ -237,6 +237,7 @@
         "config/taxonomy/controlm.yaml",
         "config/taxonomy/domains.yaml",
         "config/taxonomy/editions.yaml",
+        "config/taxonomy/exampletodelete.txt",
         "config/taxonomy/lob-product-team.yaml",
         "config/taxonomy/location-gazetteer.yaml",
         "config/taxonomy/medallion-stages.yaml",

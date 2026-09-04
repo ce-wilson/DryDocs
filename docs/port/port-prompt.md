@@ -2241,6 +2241,20 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   taking the transitive closure as clean-adds was the right move; that is the workplan's
   G5 firing for the second time, and its test (P2) is producer debt, not yours.
 
+  **NINTH POSTSCRIPT - THE PRODUCER MUST NEVER PREDICT ONE OF YOUR IDS, AND TWICE NOW IT
+  HAS (2026-09-04, from your carve-out 7):** a producer document said "`Idea-10018` next"
+  and your allocator returned `Idea-10022`, because `Idea-10018`-`10021` were already
+  taken in your history. You asked the tool instead of trusting the instruction and no
+  duplicate was minted - which is exactly the I6 collision class, caught by the mechanism
+  built for it. The defect is the producer's and it is a CLASS, not a typo: the producer
+  holds no transcript of your inbox, so any producer sentence naming your next number is
+  a guess dressed as an instruction, and a work order derived from it inherits the guess.
+  **The rule, both directions: an id is obtained from `validate.py --next-id <series>` on
+  the tree that will hold it, never read off a document.** Where a producer note needs to
+  refer to your ids at all it cites ones you have REPORTED, by number, in the past tense.
+  If a future work order names a specific next id, treat it as the error it is and run the
+  allocator.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
@@ -5201,11 +5215,16 @@ construction. It is recorded here only because those refs are now visible on
     correction exists because a path-by-path walk reads the ledger entry while it works.
     Note what this does to a count: some of the producer-only paths in a `.claude/**`
     diff are producer-only ON PURPOSE, so "N producer-only" is never "take N".
-    **TAKE `PORT-MANIFEST.yaml` AT `fe4df356` OR LATER WHEN YOU WALK `.claude/**`, and
-    that sha is deliberate here (added 2026-09-04):** this skill's never-port row
-    (`b1c0b782`) and the `row_may_match_nothing` entry that goes with it (`fe4df356`)
-    are both PAST `port-base-20260902` and therefore outside the range you are
-    applying. Take the
+    **TAKE `PORT-MANIFEST.yaml` AT `fe4df356` — that sha exactly, not "or later"
+    (corrected 2026-09-04 after your carve-out 7 said so, and you were right):** this
+    skill's never-port row (`b1c0b782`) and the `row_may_match_nothing` entry that goes
+    with it (`fe4df356`) are both PAST `port-base-20260902` and therefore outside the
+    range you are applying. An out-of-range take is an EXCEPTION, and an exception is
+    sized to the thing it excuses: "or later" would silently widen it to whatever the
+    producer's HEAD happened to be on the day you ran, which is the same defect as the
+    item-file "or later" the EIGHTH POSTSCRIPT retired, one level up. Take the file at
+    `fe4df356`; anything the producer added to it after that sha arrives in a later
+    range, in the ordinary way. Take the
     `.claude/**` tree with an older manifest and
     `test_no_manifest_row_matches_nothing` reports a hole for a row that is doing its
     job — the generated `docs/lane-<x>-handoff.md` and the eval workspace match nothing

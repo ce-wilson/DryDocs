@@ -706,6 +706,14 @@ def _compiled(entries: Iterable[Mapping[str, Any]]) -> list[tuple[str, re.Patter
     return [(e["path"], glob_to_regex(e["path"])) for e in entries]
 
 
+#: The manifest blocks an overlay may contribute to — the ONE list
+#: :func:`union_overlays` merges and ``test_live_overlay_declaration_is_well_formed``
+#: checks for duplicates. Adding a block here is what makes both do their job on it
+#: (company carve-out 7, their Idea-10022: the duplicate check read `rows` alone while
+#: the union merged three blocks, so duplicates in the other two were invisible).
+UNIONED_BLOCKS: tuple[str, ...] = ("rows", "default_ok", "row_may_match_nothing")
+
+
 def union_overlays(manifest: dict, repo: Path = REPO) -> dict:
     """The J34 overlay seam: union each declared, EXISTING side-local overlay
     into the manifest view the guards run against.
@@ -721,20 +729,14 @@ def union_overlays(manifest: dict, repo: Path = REPO) -> dict:
     (PORT-REPORT-a14a8028: 89 company-only default_ok paths dropped by a
     wholesale take).
     """
-    view = {
-        **manifest,
-        "rows": list(manifest.get("rows", [])),
-        "default_ok": list(manifest.get("default_ok", [])),
-        "row_may_match_nothing": list(manifest.get("row_may_match_nothing", [])),
-    }
+    view = {**manifest, **{b: list(manifest.get(b, [])) for b in UNIONED_BLOCKS}}
     for declared in (manifest.get("overlay") or {}).get("files", []):
         overlay_file = repo / declared["path"]
         if not overlay_file.exists():
             continue  # the other side's slot — absent here by design
         overlay = yaml.safe_load(overlay_file.read_text(encoding="utf-8")) or {}
-        view["rows"].extend(overlay.get("rows", []))
-        view["default_ok"].extend(overlay.get("default_ok", []))
-        view["row_may_match_nothing"].extend(overlay.get("row_may_match_nothing", []))
+        for block in UNIONED_BLOCKS:
+            view[block].extend(overlay.get(block, []))
     return view
 
 
@@ -1052,9 +1054,21 @@ def test_missing_overlay_is_a_clean_noop() -> None:
 def test_live_overlay_declaration_is_well_formed(manifest: dict) -> None:
     """The real manifest declares BOTH side slots (Idea-41: the grammar must be
     able to express a producer-local file), each overlay path is itself covered
-    by a never-port row, and no live overlay row duplicates a manifest row
+    by a never-port row, and no live overlay entry duplicates a manifest entry
     (a duplicate silently loses to first-match-wins — a guard error, not a
-    quiet loser)."""
+    quiet loser).
+
+    THE DUPLICATE CHECK COVERS EVERY UNIONED BLOCK, not just ``rows`` (company
+    carve-out 7, their Idea-10022, 2026-09-04). :func:`union_overlays` unions
+    THREE blocks — ``rows``, ``default_ok`` and ``row_may_match_nothing`` — and
+    this check read only the first, so a duplicate in either of the other two was
+    invisible. Measured on their tree, where it cost the guard its meaning: both
+    of their live duplicates (`.claude/skills/lane-handoff/**` and
+    `docs/next-internal-session.md`) sat in ``row_may_match_nothing`` while their
+    overlay's ``rows:`` was ``[]`` — so the assertion ran over an empty list and
+    passed for as long as it existed. A guard that cannot fail is not a guard;
+    the blocks the union merges and the blocks this checks are now ONE list, so
+    adding a fourth unioned block cannot silently escape it."""
     raw = yaml.safe_load(MANIFEST_FILE.read_text(encoding="utf-8"))
     declared = (raw.get("overlay") or {}).get("files", [])
     assert {d["side"] for d in declared} == {"company", "producer"}
@@ -1066,9 +1080,51 @@ def test_live_overlay_declaration_is_well_formed(manifest: dict) -> None:
             "side-local files never cross the boundary"
         )
 
-    # duplicate-path check across the union (the manifest fixture IS the union)
-    paths = [r["path"] for r in manifest["rows"]]
+    # duplicate-path check across the union (the manifest fixture IS the union),
+    # per block: a path may legitimately appear in two DIFFERENT blocks (a row and
+    # its row_may_match_nothing excuse are the normal pair), so each block is
+    # checked against itself.
+    for block in UNIONED_BLOCKS:
+        paths = [e["path"] for e in manifest.get(block, [])]
+        dupes = sorted({p for p in paths if paths.count(p) > 1})
+        assert not dupes, (
+            f"overlay entr(ies) duplicate a manifest entry in `{block}` — "
+            f"first-match-wins hides them: {dupes}"
+        )
+
+
+@pytest.mark.parametrize("block", UNIONED_BLOCKS)
+def test_the_duplicate_check_catches_an_injected_duplicate_in_every_unioned_block(
+    block: str,
+) -> None:
+    """Replay the failure, per block — a guard that cannot reproduce the bug proves
+    nothing, and this one silently could not for two of its three blocks (company
+    carve-out 7, their Idea-10022).
+
+    Injects a duplicate into ONE unioned block of a synthetic manifest and asserts the
+    same expression the guard runs finds it. Parametrized over ``UNIONED_BLOCKS`` so a
+    block added to the union without being added to the check fails HERE, at the seam,
+    rather than years later on somebody's tree.
+    """
+    view = {block: [{"path": "some/duplicated/path"}, {"path": "some/duplicated/path"}]}
+    paths = [e["path"] for e in view.get(block, [])]
     dupes = sorted({p for p in paths if paths.count(p) > 1})
-    assert (
-        not dupes
-    ), f"overlay row(s) duplicate a manifest row — first-match-wins hides them: {dupes}"
+    assert dupes == ["some/duplicated/path"], f"the check is blind to duplicates in `{block}`"
+
+
+def test_the_union_and_the_duplicate_check_read_the_same_block_list() -> None:
+    """The bug was a DIVERGENCE: `union_overlays` merged three blocks and the duplicate
+    check read one. Both now read `UNIONED_BLOCKS`, and this pins that the union really
+    does carry every block named there — measured by unioning a synthetic overlay rather
+    than by reading the function's source (J37: the object, not the render)."""
+    manifest = {
+        "overlay": {"files": [{"side": "producer", "path": "PORT-MANIFEST.producer.yaml"}]},
+        **{b: [{"path": f"canonical/{b}"}] for b in UNIONED_BLOCKS},
+    }
+    # no overlay FILE on disk here, so the union returns the manifest's own entries —
+    # the property under test is that every named block survives the view unchanged
+    view = union_overlays(manifest, repo=REPO)
+    for b in UNIONED_BLOCKS:
+        assert [e["path"] for e in view[b]] == [
+            f"canonical/{b}"
+        ], f"`{b}` is named in UNIONED_BLOCKS but union_overlays did not carry it"
