@@ -2255,6 +2255,45 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   If a future work order names a specific next id, treat it as the error it is and run the
   allocator.
 
+  **TENTH POSTSCRIPT - THE TWO CARVE-OUTS THAT REMAIN, AND THE ONE TRAP IN EACH
+  (2026-09-04, written here rather than into a work order because a work order is where
+  the `Idea-10018` prediction came from - the ledger is the channel):**
+
+  **`web/**` - the trap is that a `derived` row sits INSIDE a canonical-producer tree.**
+  `web/**` is canonical-producer, but `web/src/generated/**` is `derived` and its row
+  comes FIRST (first match wins), so the generated subtree is REGENERATED on your side
+  and never carried as bytes. This matters more than a usual derived row because
+  `gates.json` carries GATE STATE: take it as a file and you import the producer's gate
+  status into a surface your own console reads. Regenerate with `poetry run python
+  scripts/render_board.py` (default paths refresh `gates.json`,
+  `enforcement-matrix.json`, `load-map.json` and both load-map surfaces together), and
+  run it AFTER every source it reads is merged, in one pass - the order the workplan
+  already sets for renderers. Then `git diff --quiet` on the generated paths: a diff
+  means a source did not land, not that the renderer is wrong. Your own chunk-1 report
+  already found this class from the other end (the seven `web/src/generated/**`
+  re-dispositions that moved `derived` 4 -> 11); this is the same fact at apply time.
+
+  **The acronym sweep - the trap is a file class, not a string.** Two things the sweep
+  must not do. (1) `config/gate-prompts/**` is **canonical-company**: your gate specs
+  win and the producer's never cross. The producer's `cdo-crosswalk.yaml` reads SIGNED
+  OFF 2026-08-05 with 13 confirmations by name; your twin reads DRAFT with a session
+  pending. A sweep that rewrites that file from the producer's copy fabricates a company
+  ratification that never happened, inside the file class `config/gate-log.md` cites as
+  authority - and a dropped field is merely absent while a fabricated sign-off is
+  present and confident. T24 (2) records that a partial application already imported a
+  gate signature once; carve it out by hand. (2) The J55 guard derives the retired token
+  at TEST TIME from `internal/cdo-reference/README.md`'s RENAMED sentence and never
+  writes it, so on your tree that note must exist or the guard FAILS CLOSED - by design,
+  and the design is yours: it was hardened on 2026-09-03 from your own chunk-1 report,
+  where the README existed without the note and the guard skipped green on the tree that
+  publishes. If `internal/` is absent entirely it SKIPS and says the skip proves nothing;
+  if `internal/` is present the note is required. Authoring one sentence is the fix, and
+  it is cheaper than reading a green skip as a pass.
+
+  **Sequencing, unchanged and worth restating because it is counter-intuitive:** T24 (2)
+  is DEFERRED out of the range and runs BEFORE the wipe-reload, not after - the wipe is
+  precisely when the new names must already be in place.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
