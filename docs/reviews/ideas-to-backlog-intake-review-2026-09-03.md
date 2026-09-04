@@ -126,11 +126,16 @@ that no item names:
 | `test_plan_ideas.py:109` | the id-extraction twin |
 | `test_plan_ideas.py:163` | `int(i.removeprefix("Idea-").rstrip(...))` — the band guard's parse |
 
-**And an eighth *item* site nobody has named, already broken independent of the edition
-segment:** `.claude/skills/lane-handoff-workspace/grade.py:42` uses
-`r"\*\*([A-Z]{1,4}\d{1,4}[a-z]?)\*\*"` — `{1,4}` cannot match today's five- and six-letter
-module codes `DOCGEN`, `AGENT`, `GRAPH`. That is a live PLAN1 regression sitting in the
-lane-handoff grader. It should be fixed now, not bundled into PLAN2.
+**An eighth site, and a correction to how this review first reported it (2026-09-04).**
+`.claude/skills/lane-handoff-workspace/grade.py:42` used `r"\*\*([A-Z]{1,4}\d{1,4}[a-z]?)\*\*"`
+— `{1,4}` cannot match the five- and six-letter module codes `DOCGEN`, `AGENT`, `GRAPH`. This
+review originally called it "a live PLAN1 regression" and put it in the sequence as a trunk fix.
+**It is not a trunk file.** `.gitignore:188` ignores `.claude/skills/*-workspace/**` (only each
+iteration's `review.html` / `benchmark.md` are tracked) and `PORT-MANIFEST.yaml:318` is its
+never-port row — it is skill-creator eval scaffolding that exists on the laptop alone. The
+desktop could not have fixed it; the laptop did, locally, on 2026-09-04 (`[A-Z]+`, the
+allocator's own `_ID_RE` series grammar). The lesson is J63's, pointed the other way: a review
+that reads a machine-local file reports a machine-local defect, and must say so.
 
 ## G6 — three factual corrections to the plan's premises
 
@@ -450,7 +455,7 @@ Grammar chain first — it is claimed, ready, and the inbox work depends on the 
 | 1 | **CFG1** then **CFG2** | As proposed. Both greenfield; CFG1 is on the Ready strip. |
 | 2 | **DOC1** (G4) | Cheap (`fable`, docs). Must precede or accompany PLAN2, which cites it. |
 | 3 | **PLAN2** | With refreshed line numbers (G7), all **15** id-shape sites (G5), the carve-out (G1), and the `CLAUDE.md` / `git-readme.md` sweep (G8). |
-| 4 | *(independent, now)* `lane-handoff-workspace/grade.py:42` | `[A-Z]{1,4}` cannot match `DOCGEN`/`AGENT`/`GRAPH` — a live PLAN1 regression, unrelated to the segment. |
+| 4 | ~~`lane-handoff-workspace/grade.py:42`~~ — **DONE locally, laptop, 2026-09-04** | Not a trunk file (gitignored eval scaffolding, never-port; see G5). Nothing for the desktop here. |
 | 5a | **ADR 0019 — shard the idea inbox** (0018 is the highest), module `docs`/`DOC` | Six clauses mirroring ADR 0013. Deciders: user. The R6 phantom citation (B4a) is its rationale exhibit. |
 | 5b | **Extract `drydocs_core/text_similarity.py`**, module `drydocs-core`/`CORE` | Re-point `port_rename_detect` and its tests. Independent; can precede everything. |
 | 5c | **The shard, ONE commit**, module `drydocs-plan`/`PLAN` | `idea_store.py` + splitter + four-check proof + tombstone + render + guards + every re-point + the `PORT-MANIFEST` rows. Big on purpose — a half-re-pointed tree is two sources of truth, the defect being fixed. |
