@@ -716,10 +716,22 @@ rows:
     entry_rule: >
       Schema/rollup/next_ready guards are producer-canonical. The ALLOCATOR-BAND
       block is per-side for the same reason as test_plan_ideas.py — producer
-      asserts <= 9999, the company asserts >= 10000, and each keeps its own
-      PORTED_COMPANY_IDS. This file's own entry_rule above already records why:
-      "both sides run their own plan against OVERLAPPING ids". The bands remove
-      the id collision; that rule still governs genuinely shared items.
+      asserts <= 9999, the company asserts >= 10000, and each side keeps its own
+      band NAMES and id set (the producer's PRODUCER_BAND_CEILING /
+      PORTED_COMPANY_IDS; the company's COMPANY_BAND_FLOOR / PRE_PARTITION_COMPANY_IDS
+      since its 2026-08-24 polarity rework — the row describes the split, never
+      the other side's spelling). THE FREEZE BLOCK IS MECHANISM AND CROSSES WHOLE
+      (PLAN1 + PLAN3, 2026-09-03): FROZEN_SERIES / FROZEN_BAND, `_frozen_strays`
+      and the agreement guards read the allocator's own tables and judge a
+      band-shaped id against the band's max, so they are the same test on both
+      trees; `_frozen_strays` reads PRODUCER_BAND_CEILING by name, and a side
+      that spells the boundary differently defines that name from its own
+      constant (COMPANY_BAND_FLOOR - 1) rather than editing the function — and
+      pins it to a literal 9999 when the band rule retires (gate §C4), because
+      the freeze guard outlives the band. This file's own entry_rule above
+      already records why: "both sides run their own plan against OVERLAPPING
+      ids". The bands remove the id collision; that rule still governs genuinely
+      shared items.
   - path: "tests/unit/test_taxonomy_ontology_map.py"
     disposition: canonical-producer
     note: "the map guard (2026-07-09); consumer's map content differs, the guard is content-agnostic"

@@ -2210,6 +2210,37 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   shape - keep your 17, take the drift-guard logic): the fifth postscript above. Nothing
   else from your report is outstanding on this side.
 
+  **EIGHTH POSTSCRIPT - carve-out 6, three producer corrections (2026-09-04; your report
+  is transcribed and verified in
+  `docs/reviews/company-carve-out-6-readiness-review-2026-09-04.md` §6):** (1) The
+  brackets at steps 305 and 308 called `tests/unit/test_backlog.py` canonical-producer.
+  Its manifest row says per-entry and has since 2026-08-24; the brackets are corrected
+  in place above and the row now names the split by NAME: the freeze block
+  (FROZEN_SERIES / FROZEN_BAND, `_frozen_strays`, the agreement guards) is mechanism and
+  crosses whole; the band block stays yours, in your spelling. Your
+  `PRODUCER_BAND_CEILING = COMPANY_BAND_FLOOR - 1` is that rule applied exactly, and it
+  diffs clean next roll. One forward note rides with it: COMPANY_BAND_FLOOR retires with
+  the band rule (gate §C4, when PLAN2 ports) and `_frozen_strays` does not, so when the
+  constant goes, pin PRODUCER_BAND_CEILING to a literal 9999 with the reason, or the
+  freeze guard's band arm goes with it. (2) The step 305 addendum that every company-only
+  module needs a `series:` code had no subject: `docmeta-acquire` is a component GROUP in
+  `component_map.py` mapped to the already-registered `drydocs-docmeta` module, and your
+  `modules.yaml` equals the producer's at 20 and 20. The rule stands for any FUTURE
+  company-only module; the measurement retires the caution. (3) ITEM FILES ARE TAKEN AT
+  THE TAG. "At `<sha>` or later" is a mechanism idiom — a guard or a module that changed
+  past the tag is the same guard, newer — and it does not survive contact with a file
+  whose `status` is data: CFG1 and CFG2 taken from HEAD arrive `done` while every
+  artifact their acceptance names landed past the tag and outside your range (a board
+  that lies), and PLAN2 taken from HEAD names a second gate prompt you cannot hold and
+  turns a guard red. So: `docs/restructure/backlog/items/*.yaml` at `port-base-20260902`,
+  always; a sha only where a postscript rules a take-by-name, and then for the named
+  mechanism file alone. Your 642 baseline is the producer's item count at the tag to the
+  id, so your range discipline already reads tag-pinned; this writes the rule where the
+  next work order will read it. Also verified from your report: the two red tests
+  (`KeyError: CFG2`) were slice closure — PLAN2 depends on CFG2 depends on CFG1 — and
+  taking the transitive closure as clean-adds was the right move; that is the workplan's
+  G5 firing for the second time, and its test (P2) is producer debt, not yours.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
@@ -5076,8 +5107,10 @@ construction. It is recorded here only because those refs are now visible on
     action moved to the Node 24 runtime and the web app builds on 24; GHE runners are
     yours, so this is a note for your workflow, not a take.
 
-305. PLAN1 — THE SERIES IS THE MODULE; THE 27 LETTERS ARE FROZEN [allocator + guards
-    canonical-producer; modules.yaml per-entry; CLAUDE.md canonical-producer] (`100f018b`
+305. PLAN1 — THE SERIES IS THE MODULE; THE 27 LETTERS ARE FROZEN [validate.py
+    canonical-producer; test_backlog.py PER-ENTRY by its row — bracket corrected 2026-09-04,
+    EIGHTH POSTSCRIPT; modules.yaml per-entry; CLAUDE.md canonical-producer; item files at
+    `port-base-20260902`] (`100f018b`
     eighteen groom mints, `375dd962` PLAN1, `169a7a58` the ruling recorded and C41
     re-pointed, `8abcb359` an Idea header repaired, `6f2b91bc` a trunk merge, `664bca4a`
     CLAUDE.md gains ONE PEN PER SURFACE — the working agreement the 2026-09-02 collisions
@@ -5093,7 +5126,8 @@ construction. It is recorded here only because those refs are now visible on
 306. C41 — GATE `ontology-domain-registry-and-edition-grain` SIGNED 14/14, EIGHT ITEMS
     MINTED, ONT2'S STORE RULED [config/gate-prompts canonical-company: the SIGNED prompt
     is the PRODUCER'S signature and never overwrites your DRAFT or absent file;
-    gate-log union-append; items per-entry] (`2978230e` C41 mint, `c1a883a5` the draft,
+    gate-log union-append; items per-entry, at `port-base-20260902`] (`2978230e` C41 mint,
+    `c1a883a5` the draft,
     `39b90843` SIGNED OFF, `12ec1b3c` the seven E1 bodies + the B5 rider, `6828e102` +
     `fb310c06` ONT2 — acronyms get their own store, the software-registry block was a
     holding place). The rulings that reach your tree as MECHANISM: domains.yaml comes
@@ -5113,8 +5147,10 @@ construction. It is recorded here only because those refs are now visible on
     and RELAY-24 are the reason this range is being rolled before your retry rather than
     hand-carried.
 
-308. PLAN3 — FROZEN_BAND, SO THE FREEZE CAN PORT GREEN [validate.py + test_backlog.py
-    canonical-producer] (`5fa37ea7` mint, `e7dc4153` build). `FROZEN_SERIES` was measured
+308. PLAN3 — FROZEN_BAND, SO THE FREEZE CAN PORT GREEN [validate.py canonical-producer;
+    test_backlog.py PER-ENTRY by its row — the freeze block crosses whole, the band block
+    stays yours (bracket corrected 2026-09-04, EIGHTH POSTSCRIPT); PLAN3.yaml at
+    `port-base-20260902`] (`5fa37ea7` mint, `e7dc4153` build). `FROZEN_SERIES` was measured
     on the producer's tree (G tops out at 136); YOUR `G10001–G10003` and `DD10001–DD10003`
     were legal when minted under the band rule. `FROZEN_BAND = {G: 10003, DD: 10003}`
     judges a band-shaped number against the band's own max, a letter-shaped one against
