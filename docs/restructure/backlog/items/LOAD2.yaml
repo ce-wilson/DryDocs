@@ -7,7 +7,7 @@ phase: 6
 agent: main
 model: opus
 priority: p1
-status: in_progress
+status: done
 depends_on:
 - G115
 inputs:
@@ -56,3 +56,61 @@ notes: |
   P6 is right, the docstring was wrong, corrected producer-side; the mechanism is this item.
   p1 because it sits in front of the first per-data-center load G115 was built for, and a
   wrong-domain value fails as an EMPTY data center rather than as an error.
+
+  BUILT 2026-09-04 (desktop, Lane A; claimed 6c731a92, built 3e211932). 3276 unit tests
+  green.
+
+  (b) as built: `_scope_binds` emits `data_center_filter` (LONG - CM_HOSTS, CM_AVG_RUN)
+  and `data_center_code` (SHORT - CM_DEF_VTAB, so folders/jobs/variables) from ONE
+  --data-center value. The three VTAB statements were rebound and each of the five files
+  now states which domain its own column speaks. The G115 guard was re-domained rather
+  than duplicated: DC_BOUND_SQL became a mapping of file -> expected bind, and it also
+  asserts each statement does NOT bind the other domain - binding the wrong one is not a
+  type error, it is zero rows, so the negative half is the half that matters.
+
+  (c) as built: config/taxonomy/data-centers.yaml (schema drydocs.data-centers.v1,
+  classification Internal, classification_only, S6 schema family + malformed fixture)
+  read by drydocs_core/data_centers.py. The reader prefers the J13 internal twin
+  (internal/controlm-config/data-centers.yaml, absent producer-side) over the publishable
+  sample and records which on `.source`, so a translation proven on a synthetic sample
+  never reads as proven on the estate (J18) - the refusal message names the venue too.
+  A LIKE pattern passes through to both binds untouched (an operator pattern is their own
+  instrument); a value in neither domain refuses with both spellings named and exits 2.
+
+  WHY THE NON-DERIVABILITY CLAIM IS NOW EVIDENCE RATHER THAN AN ASSERTION. The acceptance
+  said the P032 -> P32 shape LOOKS derivable and must not be asserted. The bundled corpus
+  proves the stronger direction: controlm_folders__sample.csv carries P12/P14/P32/P33 and
+  controlm_hosts__sample.csv carries T012-E0700-SYN/T014-E0700-SYN - the same data centers
+  in the two domains. Deriving T012-E0700-SYN from P12 needs four facts the short code
+  does not contain: the environment letter, the zero pad, the default time (E0700) and the
+  suffix (SYN). A test pins that every row carries a time and a suffix and that the suffix
+  is not inferable from the code, so nobody later "simplifies" the registry into a format
+  string.
+
+  (d) as built, and the proof of the removed failure: `--data-center T012-E0700-SYN` (the
+  long form) now yields `data_center_code == "P12"`, which is exactly what the folders
+  sample carries - the value that used to select nothing now selects rows. The corpus test
+  asserts the two samples share NO value, since the split is only testable if each sample
+  speaks exactly one domain. NO LIVE VENUE was used: the producer holds no psgmgr
+  connection, so this is proven on the committed samples and the declared registry, and
+  the estate-side proof belongs to the tree that has both (J18).
+
+  TWO CORPUS OBSERVATIONS RECORDED, NOT FIXED - neither is this item's to change. (1) The
+  samples disagree on the environment letter: folders carries `P` while hosts carries `T`,
+  and the naming-convention page's sanitization ruling (SME 2026-08-11) says a publishable
+  copy swaps position 1 to `T`. Re-lettering committed fixtures ripples through the suite
+  and is its own item. (2) P32/P33 appear in the folders sample with no host rows behind
+  them, so their long names complete the pairing on the corpus's own -SYN convention and
+  are marked unobserved in the registry.
+
+  ONE PIECE DELIBERATELY NOT DONE, awaiting the SME's timing call: the PORT-MANIFEST row
+  for config/taxonomy/data-centers.yaml. Without one it falls through to `config/**`
+  canonical-producer, which is the third-instance defect the port test review named
+  (source-registry.yaml fell through the same way and drove test_source_registry from 1
+  failure to 7); real company rows will need per-entry, on the lob-product-team shape. It
+  is held because the manifest is the one surface a by-name take reaches mid-port - the
+  company took it at fe4df356 for carve-out 7 - and carve-outs 8 and 9 do not take it, so
+  adding the row cannot reach the in-flight range. It is a one-row add whenever the word
+  comes.
+
+  (e) held: no collision probe, no folder/job identity change - both stay gate-bound in P6.
