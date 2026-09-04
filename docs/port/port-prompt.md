@@ -5182,16 +5182,30 @@ construction. It is recorded here only because those refs are now visible on
     four in a subprocess against a tmp TEMP. Your heredocs were right; the skill is now
     right too. The block also says a multi-day apply should not snapshot into TEMP.
 
-311. THE lane-handoff SKILL [.claude/skills canonical-producer; its `*-workspace/` is
-    never-port — step 300] (`fe120bf9`). The producer's two machines split a burst by a
-    generated, self-retiring handoff file with a validated queue and a surface fence.
-    Not a company mechanism; it crosses because `.claude/**` crosses, and it is harmless
-    on your side. The eval workspace under it (a 1,325-line review page of run
-    transcripts) does not cross — the row is in this roll.
+311. THE lane-handoff SKILL [**never-port at the manifest sha below** — a SPECIFIC row
+    above the `.claude/**` glob, first match wins; its `*-workspace/` and the generated
+    `docs/lane-*-handoff.md` have their own never-port rows — step 300] (`fe120bf9`).
+    The producer's two machines split a burst by a generated, self-retiring handoff file
+    with a validated queue and a surface fence.
+    **CORRECTION 2026-09-04 — THIS STEP AS FIRST WRITTEN SAID THE SKILL CROSSES, AND AT
+    THE TAG IT DID.** The roll described the tree at `port-base-20260902`, where the
+    skill sat under the `.claude/**` canonical-producer default and only its workspace
+    was carved out. The user's producer-only ruling landed after the tag (`b1c0b782`),
+    and `fe4df356` — the sha the paragraph below tells you to take — carries the row that
+    makes `.claude/skills/lane-handoff/**` never-port. **So at that manifest the skill
+    does NOT cross: do not take it.** The reason is in the row: lanes split a burst
+    across two producer machines for throughput, and the company port is the opposite
+    need — one pen, methodical, accuracy over speed — so a two-lane split tool is the
+    wrong instrument on your side. Read the ROW, not this prose, wherever the two
+    disagree; the manifest is the single source of disposition truth, and this
+    correction exists because a path-by-path walk reads the ledger entry while it works.
+    Note what this does to a count: some of the producer-only paths in a `.claude/**`
+    diff are producer-only ON PURPOSE, so "N producer-only" is never "take N".
     **TAKE `PORT-MANIFEST.yaml` AT `fe4df356` OR LATER WHEN YOU WALK `.claude/**`, and
-    that sha is deliberate here (added 2026-09-04):** this skill's
-    `row_may_match_nothing` entry landed at `fe4df356`, which is PAST
-    `port-base-20260902` and therefore outside the range you are applying. Take the
+    that sha is deliberate here (added 2026-09-04):** this skill's never-port row
+    (`b1c0b782`) and the `row_may_match_nothing` entry that goes with it (`fe4df356`)
+    are both PAST `port-base-20260902` and therefore outside the range you are
+    applying. Take the
     `.claude/**` tree with an older manifest and
     `test_no_manifest_row_matches_nothing` reports a hole for a row that is doing its
     job — the generated `docs/lane-<x>-handoff.md` and the eval workspace match nothing
