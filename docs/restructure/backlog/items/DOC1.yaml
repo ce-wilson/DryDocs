@@ -7,7 +7,7 @@ phase: 8
 agent: main
 model: fable
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 gates:
 - ontology-domain-registry-and-edition-grain
@@ -57,3 +57,20 @@ acceptance: |
   records it so the amendment does not read as though the roll-up exists.
 
   No code; the ADR still awaits its own Phase 0 gate (the URN shared-vs-owned question).
+notes: |
+  BUILT 2026-09-04 (desktop, Lane A; claimed 683f1901, step 2 of the intake review's
+  sequence). docs/decisions/0015-team-edition-template.md: an AMENDED banner at the top on
+  the 0002/0006 shape (pointer only), the dated section "Amendment 2026-09-04" under
+  Decision after D6 with A1 (D2: the thin instance-owned backlog; backlog_store to the kept
+  set with a scope filter; the plan renders follow it; port_preflight/port_backlog_union
+  stay cut), A2 (D6: groom-backlog ships with a mandatory --scope, and why mandatory - the
+  I6 failure one level up), A3 (D3 and the id grammar say the same thing; the Area Product
+  grain with the SME's definition; the company base mints its own code; the band retires;
+  the Idea rider still to sign), A4 (D4's reason in the SME's words: the aggregate query is
+  what the frozen ontology protects; extend-never-override, built at CFG1), A5 (the four
+  guards, each a test in the frozen class, built by their own items), the F8 open question
+  recorded as open with the composite rail named as the likely answer, and "what this does
+  not do" (no code; Phase 0 still blocks). The follow-up table gains row 3a for the roll-up
+  question; relates_to gains the gate log; docs/decisions/README.md index line updated.
+  D2/D3/D4/D6 original text untouched (e). Doc guards green (runbook currency, fences,
+  560-test doc subset).
