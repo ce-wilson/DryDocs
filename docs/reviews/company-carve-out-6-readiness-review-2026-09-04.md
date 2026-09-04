@@ -113,6 +113,21 @@ naming the freeze block as mechanism that crosses whole, and correct the two bra
 305 and 308 to `test_backlog.py per-entry`. The mislabel is not hypothetical on this tree: the
 same bracket shape is what sent `test_runbook_currency.py` wholesale.
 
+**The one place the ported mechanism can go red on the company's data, and the fix is theirs:**
+`test_every_module_has_a_series_code_and_no_code_can_collide` asserts every name in
+`modules.yaml` `modules:` has an entry in its `series:` map (`test_backlog.py:400-419`;
+`module_series()` reads the map, `validate.py:301-310`). The company's `modules.yaml` is a
+per-entry UNION that keeps its own modules ("never drop one"), and its `component_map.py`
+carries at least one company-only group (`docmeta-acquire`, per the `test_module_boundary.py`
+row) that CORE1's join guards tie to a `modules.yaml` name. Every company-only module therefore
+needs a `series:` code at carve-out 6 - three or more uppercase letters, not a frozen letter,
+not `DD`, unique across the union and not one of the producer's twenty (`CORE`, `LOAD`, `REV`,
+`PLAN`, `DOCGEN`, `LIN`, `DEEP`, `REM`, `WEB`, `API`, `AGENT`, `META`, `PORT`, `LIBS`, `REF`,
+`TAX`, `ONT`, `CFG`, `GRAPH`, `DOC`). The code is per-side data in a per-entry map; it is not a
+licence to mint under it (R4) - the code, like the id, becomes edition-scoped when PLAN2 ports.
+Said here rather than left to the guard, because the fix a session reaches for when a ported
+test names its own module is to delete the test, which is the `DEFERRED_VERBS` class again.
+
 ### R2 - T24 (1), the vocabulary migration, is not in the plan as reported
 
 The company's "next" is 6 (PLAN1 + PLAN3), 7 (`.claude/**`), 8 (`web/**`) and 9 (the acronym
@@ -217,7 +232,7 @@ free number at roll time.
 
 | Carve-out | Take | Guard that closes it | Watch |
 |---|---|---|---|
-| 6 - PLAN1 + PLAN3 | `validate.py` whole; `test_backlog.py` BY THE ROW (R1); `modules.yaml` union; `CLAUDE.md` mint rule | `test_frozen_series_take_no_new_ids`, `test_the_legacy_band_ids_pass_and_the_next_one_does_not`, both agreement guards; `--next-id G` and `--next-id DD` refused by name | mint no module-series id until `edition:` exists (R4); bump `PRODUCER_BASELINE`, extend nothing (R5) |
+| 6 - PLAN1 + PLAN3 | `validate.py` whole; `test_backlog.py` BY THE ROW (R1); `modules.yaml` union, with a `series:` code for every company-only module (R1); `CLAUDE.md` mint rule | `test_frozen_series_take_no_new_ids`, `test_the_legacy_band_ids_pass_and_the_next_one_does_not`, `test_every_module_has_a_series_code_and_no_code_can_collide`, both agreement guards; `--next-id G` and `--next-id DD` refused by name | mint no module-series id until `edition:` exists (R4); bump `PRODUCER_BASELINE`, extend nothing (R5) |
 | T24 (1) - where it goes | fragments first, the vocabulary guards green, then the two lineage modules with their tests | `test_schema.py`, `test_yaml_fragments.py`; gate-bound activations cite the company's gate; zero dangling ids | precondition: the union check exits 0 (R2); do not run the migration cypher |
 | 7 - `.claude/**` | path-by-path; `PORT-MANIFEST.yaml` at `fe4df356` or later | the totality guard and `test_no_manifest_row_matches_nothing` in `test_port_reconcile_guards.py` | R3's two `.claude/` facts |
 | 8 - `web/**` | by name, never `web/src` wholesale (K7-K15) | the drift guards on the company's sources; `web/src/generated/**` regenerated, never carried | the workplan's rule 2 |
