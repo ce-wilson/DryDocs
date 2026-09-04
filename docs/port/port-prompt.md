@@ -5188,6 +5188,17 @@ construction. It is recorded here only because those refs are now visible on
     Not a company mechanism; it crosses because `.claude/**` crosses, and it is harmless
     on your side. The eval workspace under it (a 1,325-line review page of run
     transcripts) does not cross — the row is in this roll.
+    **TAKE `PORT-MANIFEST.yaml` AT `fe4df356` OR LATER WHEN YOU WALK `.claude/**`, and
+    that sha is deliberate here (added 2026-09-04):** this skill's
+    `row_may_match_nothing` entry landed at `fe4df356`, which is PAST
+    `port-base-20260902` and therefore outside the range you are applying. Take the
+    `.claude/**` tree with an older manifest and
+    `test_no_manifest_row_matches_nothing` reports a hole for a row that is doing its
+    job — the generated `docs/lane-<x>-handoff.md` and the eval workspace match nothing
+    on your tree BY DESIGN, because both are producer-machine artifacts. Same commit
+    carries `drydocs_core/component_map.py`'s per-entry row, which the ADR 0018 step
+    above needs for the same reason. This is a take-by-name on ONE mechanism file, which
+    is the only case the tag rule (EIGHTH POSTSCRIPT) admits.
 
 312. S16 — THE COMPOSITION ROOT DISCOVERS `drydocs/cli_consumer.py`; `cli.py` IS
     CANONICAL-PRODUCER; RELAY-24 SAYS HOW TO ADOPT S8 [canonical-producer + the manifest
