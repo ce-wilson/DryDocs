@@ -7,7 +7,7 @@ phase: 8
 agent: main
 model: fable
 priority: p2
-status: in_progress
+status: done
 depends_on:
 - CFG1
 gates:
@@ -51,3 +51,38 @@ acceptance: |
 
   Depends on CFG1 only for the shared file conventions; the two registries never share
   (§A2).
+notes: |
+  BUILT 2026-09-04 (desktop, Lane A; claimed 0d73a80d, step 1b of the intake review's
+  sequence, on CFG1 done at 2c744212). config/taxonomy/editions.yaml (schema
+  drydocs.editions.v1, classification Internal, classification_only, TWO synthetic rows
+  `XMPL` and `SMPL` with invented area_product_ids and `sample: true`) +
+  config/schemas/editions.schema.json (S6 family; malformed fixture = a lowercase code)
+  + drydocs_core/edition_registry.py (the reader; `code_collisions()` and
+  `unresolved_area_products()` as PURE functions - the module series, the frozen set
+  and the loaded :AreaProduct set are handed in, core imports neither modules.yaml's
+  reader nor the allocator nor a driver) + tests/unit/test_edition_registry.py (13
+  guards) + the per-entry PORT-MANIFEST row beside lob-product-team with its UNNAMED
+  FIELDS clause (ENTRY_FILES covers it) + the MODULE_MAP row. 3226 unit tests green on
+  the desktop.
+
+  (e) as built: every code unique, 2-5 uppercase, never a module series (read from
+  modules.yaml through validate.py's own module_series()), never a frozen letter (the
+  allocator's FROZEN_SERIES), never DD (refused at load, not only reported); a
+  companion proves the check catches each kind. The :AreaProduct resolution runs for
+  REAL rows only: producer-side there are none, and the test SKIPS with that reason
+  rather than passing quietly; with real rows and no reachable graph it skips with
+  "graph unreachable" (J18) - a venue that cannot answer is not one that answered yes.
+  The company's suite, which has real rows and a graph, is where it runs green or red.
+
+  ONE FIELD THE ACCEPTANCE DID NOT NAME: `sample: true`. lob-product-team.yaml marks
+  its synthetic shape in a header comment; a per-row boolean lets the guard PROVE the
+  producer's file carries samples only, and lets the resolution check skip invented ids
+  by construction instead of by list. `minted_by` is constrained to the two BASES: an
+  edition is declared by a base (B2), so an edition row minted by another edition is
+  refused.
+
+  (c) held: the company's code is not named and the sample does not guess it - `XMPL`
+  is CFG1's base-owned fixture code (tests/unit/test_domain_registry.py) so the two
+  fixtures agree, `SMPL` carries a legacy_band so the field's shape is exercised.
+  (d) held: no real row here, so no transcription file was needed; the header says a
+  real row cites the named machine-local file, never an image.

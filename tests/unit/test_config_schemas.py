@@ -61,6 +61,10 @@ FAMILIES: dict[str, tuple[str, list[Path]]] = {
         "domains.schema.json",
         [REPO / "config" / "taxonomy" / "domains.yaml"],
     ),
+    "editions": (
+        "editions.schema.json",
+        [REPO / "config" / "taxonomy" / "editions.yaml"],
+    ),
 }
 
 
@@ -182,6 +186,25 @@ _MALFORMED: dict[str, tuple[dict | list, str]] = {
             ],
         },
         "$.domains[0]",
+    ),
+    # edition registry: a lowercase code (the segment is 2-5 UPPERCASE letters, sC1)
+    "editions": (
+        {
+            "schema": "drydocs.editions.v1",
+            "classification": "Internal",
+            "updated": "2026-09-04",
+            "editions": [
+                {
+                    "code": "xmpl",
+                    "title": "T",
+                    "area_product_id": "AP",
+                    "minted_by": "producer",
+                    "registered_at": "2026-09-04",
+                    "authority": "x",
+                }
+            ],
+        },
+        "$.editions[0].code",
     ),
 }
 

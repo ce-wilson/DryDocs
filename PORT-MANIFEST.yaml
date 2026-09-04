@@ -843,6 +843,24 @@ rows:
       reference material. Lived at repo-root `docs/design/ui-exploration/**` until S9 (2026-08-21) moved it here;
       the row stays ABOVE the `docs/design/**` evaluate row on purpose, because this material is
       producer-authored reference the consumer never finalizes."
+  - path: "config/taxonomy/editions.yaml"
+    disposition: per-entry
+    entry_rule: >
+      Rows keyed by `code` UNION, on the lob-product-team shape exactly: the
+      company's REAL rows (its own code and every Area-Product edition it cuts,
+      each minted at ITS OWN gate — §C3) are estate data and stay; the producer's
+      rows are the SYNTHETIC sample (`sample: true`, invented codes and
+      area_product_ids) and never overwrite or shadow them. `legacy_band` on a
+      company row is the company's reading of its own history and is never set by
+      the producer. Producer-owned MECHANISM crosses whole: the header comment,
+      `schema`, `classification`, `updated` and the field list. UNNAMED FIELDS:
+      the producer owns them on sample rows, the company owns them on its own.
+    note: >
+      CFG2 (2026-09-04). Classification Internal on both sides (real rows name
+      Area Products). drydocs_core/edition_registry.py reads it; the code
+      collision check (module series, frozen letters, DD) is a pure function the
+      company's suite runs against ITS OWN modules.yaml, and the :AreaProduct
+      resolution check runs for real only where real rows live (J18).
   - path: "config/taxonomy/lob-product-team.yaml"
     disposition: per-entry
     entry_rule: >

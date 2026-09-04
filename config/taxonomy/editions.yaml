@@ -1,0 +1,90 @@
+# =============================================================================
+# config/taxonomy/editions.yaml — the EDITION REGISTRY: an edition is a DECLARED
+# segment on an id, keyed to a real Area Product (gate ontology-domain-registry-
+# and-edition-grain, SIGNED OFF 2026-09-02 14/14, §C1-§C4; built at CFG2).
+#
+# WHAT AN EDITION IS. A tenant of the id space — a generated Team Edition instance
+# (ADR 0015) or the company base — named by a short CODE that prefixes its ids:
+# `[<EDITION>-]<MODULE><n>` (§C1), edition first, base edition unprefixed. `LOAD12`
+# is producer main; `<code>-LOAD12` is that edition's twelfth load item. The Idea
+# series takes the same segment once the `idea-series-grammar` rider signs.
+#
+# THE GRAIN IS THE AREA PRODUCT (§C2, the SME's definition as the ruling of
+# record): "where two or three applications are delivering on the same business
+# topic." That definition — not the Product Catalog tier name — is what qualifies
+# a row. `area_product_id` is K5 §B's key: constraints.cypher makes it UNIQUE on
+# :AreaProduct and area_products.cypher loads it, so an edition joins to a node
+# the graph already holds. Change the grain later and every code re-mints, which
+# is why it is a ruling and not a default.
+#
+# WHO MINTS (§B2 / §C3): a base mints, an instance requests. THE COMPANY BASE IS
+# AN EDITION AND MINTS ITS OWN CODE AT ITS OWN GATE. The producer does not name it
+# and this file's sample must not guess it: every row below is SYNTHETIC
+# (`sample: true`), on the lob-product-team.yaml pattern — a publishable shape
+# producer-side, real rows company-side, a per-entry PORT-MANIFEST row so a port
+# cannot flatten them. Before a REAL row is written the Area Product list is
+# transcribed to a named machine-local file and THAT file is cited in the row's
+# provenance — never an image (§C2 (d)).
+#
+# THE NUMERIC BAND SURVIVES ONLY AS HISTORY (§C4): both legacy partition rules
+# retired forward-only; `legacy_band` on a row records the 10000+ band the company
+# base used before it had a code, for reading old ids, and nothing else.
+#
+# THE TWO REGISTRIES NEVER SHARE (§A2): a domain partitions the VOCABULARY
+# (config/taxonomy/domains.yaml); an edition partitions the ID SPACE (this file).
+# An edition's own domains are rows in the domain registry whose `minted_by` is
+# the edition code declared here.
+#
+# Reader: drydocs_core/edition_registry.py. Guards: tests/unit/test_edition_registry.py
+# — every code is unique, 2-5 uppercase letters, never a module series code
+# (docs/restructure/backlog/modules.yaml), never a frozen letter series, never DD;
+# producer-side every row is a sample; a real row's area_product_id resolves
+# against the loaded :AreaProduct set where a graph is present (J18: skip where it
+# is not — the check runs for real where real rows live).
+# =============================================================================
+
+schema: drydocs.editions.v1
+classification: Internal               # real rows name Area Products (J23 handling); this sample is synthetic
+classification_only: true
+updated: 2026-09-04
+
+# Fields (all required unless marked):
+#   code             the id segment — 2-5 uppercase letters, unique; never a module
+#                    code, never a frozen letter, never DD
+#   title            display name
+#   area_product_id  the :AreaProduct key (K5 §B) the edition is cut at
+#   minted_by        the BASE that declared it (producer | company)
+#   registered_at    the date the declaring gate signed
+#   authority        the gate id or ADR that declared it
+#   legacy_band      (nullable) the numeric band this edition's ids used before it
+#                    had a code — history only
+#   sample           true on a synthetic row; a real row omits it or says false
+#   note             (optional)
+
+editions:
+  # ---- SYNTHETIC SAMPLE — invented editions, invented area_product_ids ---------
+  # The same code CFG1's base-owned fixture uses (tests/unit/test_domain_registry.py
+  # SYNTHETIC_EDITION), so the two fixtures agree. Nothing here names a real
+  # Area Product, a real application or the company's code.
+  - code: XMPL
+    title: Example Edition (synthetic)
+    area_product_id: AP_SAMPLE_001
+    minted_by: producer
+    registered_at: 2026-09-04
+    authority: ontology-domain-registry-and-edition-grain
+    legacy_band: ~
+    sample: true
+    note: >-
+      Invented. Exists so the guards, the port row and CFG1's base-owned fixture
+      have a positive case producer-side; a company row replaces nothing here.
+  - code: SMPL
+    title: Second Sample Edition (synthetic)
+    area_product_id: AP_SAMPLE_002
+    minted_by: producer
+    registered_at: 2026-09-04
+    authority: ontology-domain-registry-and-edition-grain
+    legacy_band: 20000
+    sample: true
+    note: >-
+      Invented, carrying a legacy_band so the field's shape is exercised: a band
+      is read for old ids only and never used to mint.
