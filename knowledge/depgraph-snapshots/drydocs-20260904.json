@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-02T22:41:48",
-    "date": "20260902",
+    "captured_at": "2026-09-04T09:31:00",
+    "date": "20260904",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "df0b0437",
-      "full": "df0b0437c5588292665608523494031fee4ae427",
+      "commit": "ba7f7920",
+      "full": "ba7f79201fd6c20cf9843833fcdec524a9c67a3d",
       "branch": "main",
-      "describe": "port-base-20260902",
-      "subject": "chore(port): ledger roll - the cited-paths check reads never-port zones as never claims; three real citations in two skills fixed (lane-handoff, run-drydocs-console)",
+      "describe": "port-base-20260902-98-gba7f7920",
+      "subject": "fix(CFG2): the sample's legacy_band sits in the publish-boundary guard's synthetic block and the header no longer spells the band as a five-digit literal - test_bare_ids_in_taxonomy_samples_knowledge_are_synthetic read both as possible real ids; pen: backlog · port · adr · gates · snapshot",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -2087,10 +2087,46 @@
       "kind": "dir"
     },
     {
+      "file_id": "drydocs/.claude/skills/lane-handoff-workspace/iteration-1/benchmark.md",
+      "name": "benchmark.md",
+      "extension": ".md",
+      "rel_path": ".claude/skills/lane-handoff-workspace/iteration-1/benchmark.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/.claude/skills/lane-handoff-workspace/iteration-1/review.html",
       "name": "review.html",
       "extension": ".html",
       "rel_path": ".claude/skills/lane-handoff-workspace/iteration-1/review.html",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/lane-handoff-workspace/iteration-2",
+      "name": "iteration-2",
+      "extension": "",
+      "rel_path": ".claude/skills/lane-handoff-workspace/iteration-2",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/lane-handoff-workspace/iteration-2/benchmark.md",
+      "name": "benchmark.md",
+      "extension": ".md",
+      "rel_path": ".claude/skills/lane-handoff-workspace/iteration-2/benchmark.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/lane-handoff-workspace/iteration-2/review.html",
+      "name": "review.html",
+      "extension": ".html",
+      "rel_path": ".claude/skills/lane-handoff-workspace/iteration-2/review.html",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -5840,6 +5876,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/.pre-commit-config.yaml",
+      "name": ".pre-commit-config.yaml",
+      "extension": ".yaml",
+      "rel_path": ".pre-commit-config.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/CHANGELOG.md",
       "name": "CHANGELOG.md",
       "extension": ".md",
@@ -6605,6 +6650,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/config/gate-prompts/idea-series-grammar.yaml",
+      "name": "idea-series-grammar.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/gate-prompts/idea-series-grammar.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/config/gate-prompts/medallion-stage-vocabulary.yaml",
       "name": "medallion-stage-vocabulary.yaml",
       "extension": ".yaml",
@@ -7046,6 +7100,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/config/schemas/domains.schema.json",
+      "name": "domains.schema.json",
+      "extension": ".json",
+      "rel_path": "config/schemas/domains.schema.json",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/schemas/editions.schema.json",
+      "name": "editions.schema.json",
+      "extension": ".json",
+      "rel_path": "config/schemas/editions.schema.json",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/config/schemas/precedence.schema.json",
       "name": "precedence.schema.json",
       "extension": ".json",
@@ -7284,6 +7356,24 @@
       "name": "controlm.yaml",
       "extension": ".yaml",
       "rel_path": "config/taxonomy/controlm.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/taxonomy/domains.yaml",
+      "name": "domains.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/taxonomy/domains.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/taxonomy/editions.yaml",
+      "name": "editions.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/taxonomy/editions.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -9471,6 +9561,15 @@
       "name": "generic-naming.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/epics/generic-naming.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/epics/lineage-chain.yaml",
+      "name": "lineage-chain.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/epics/lineage-chain.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -12896,10 +12995,37 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/LIN1.yaml",
+      "name": "LIN1.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/LIN1.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/LIN2.yaml",
+      "name": "LIN2.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/LIN2.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/LOAD1.yaml",
       "name": "LOAD1.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/LOAD1.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/LOAD2.yaml",
+      "name": "LOAD2.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/LOAD2.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -15470,6 +15596,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/reviews/README.md",
+      "name": "README.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/README.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/reviews/SDLC-CHECKPOINT.md",
       "name": "SDLC-CHECKPOINT.md",
       "extension": ".md",
@@ -15978,6 +16113,42 @@
       "name": "planning-BETA.md",
       "extension": ".md",
       "rel_path": "docs/reviews/graph-vs-files-experiment/results/planning-BETA.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/reviews/ideas-to-backlog-intake-review-2026-09-03.md",
+      "name": "ideas-to-backlog-intake-review-2026-09-03.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/ideas-to-backlog-intake-review-2026-09-03.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/reviews/job-etl-binding-second-pass-options-2026-09-04.md",
+      "name": "job-etl-binding-second-pass-options-2026-09-04.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/job-etl-binding-second-pass-options-2026-09-04.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/reviews/job-etl-binding-second-pass-review-2026-09-04.md",
+      "name": "job-etl-binding-second-pass-review-2026-09-04.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/job-etl-binding-second-pass-review-2026-09-04.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/reviews/lineage-chain-extract-load-workplan-2026-09-03.md",
+      "name": "lineage-chain-extract-load-workplan-2026-09-03.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/lineage-chain-extract-load-workplan-2026-09-03.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -18728,6 +18899,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs_api/agent_query.py",
+      "name": "agent_query.py",
+      "extension": ".py",
+      "rel_path": "drydocs_api/agent_query.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs_api/app.py",
       "name": "app.py",
       "extension": ".py",
@@ -18849,6 +19029,15 @@
       "name": "routing.py",
       "extension": ".py",
       "rel_path": "drydocs_api/routing.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs_api/schemas.py",
+      "name": "schemas.py",
+      "extension": ".py",
+      "rel_path": "drydocs_api/schemas.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -19106,6 +19295,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs_core/edition_registry.py",
+      "name": "edition_registry.py",
+      "extension": ".py",
+      "rel_path": "drydocs_core/edition_registry.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs_core/entity_extract.py",
       "name": "entity_extract.py",
       "extension": ".py",
@@ -19299,6 +19497,15 @@
       "name": "concept_scheme.py",
       "extension": ".py",
       "rel_path": "drydocs_core/ontology/concept_scheme.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs_core/ontology/domain_registry.py",
+      "name": "domain_registry.py",
+      "extension": ".py",
+      "rel_path": "drydocs_core/ontology/domain_registry.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -20253,6 +20460,15 @@
       "name": "review.py",
       "extension": ".py",
       "rel_path": "drydocs_lineage/review.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs_lineage/staging.py",
+      "name": "staging.py",
+      "extension": ".py",
+      "rel_path": "drydocs_lineage/staging.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -21833,10 +22049,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260902-1748.json",
-      "name": "drydocs-20260902-1748.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260902.json",
+      "name": "drydocs-20260902.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260902-1748.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260902.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -22706,6 +22922,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/scripts/dump_openapi.py",
+      "name": "dump_openapi.py",
+      "extension": ".py",
+      "rel_path": "scripts/dump_openapi.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/scripts/embed.sh",
       "name": "embed.sh",
       "extension": ".sh",
@@ -23426,6 +23651,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_agent_query.py",
+      "name": "test_agent_query.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_agent_query.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_agent_telemetry.py",
       "name": "test_agent_telemetry.py",
       "extension": ".py",
@@ -23606,6 +23840,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_cli_lineage_extract.py",
+      "name": "test_cli_lineage_extract.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_cli_lineage_extract.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_cli_registry.py",
       "name": "test_cli_registry.py",
       "extension": ".py",
@@ -23700,6 +23943,15 @@
       "name": "test_console_origins.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_console_origins.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_console_print_gutter.py",
+      "name": "test_console_print_gutter.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_console_print_gutter.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -23966,10 +24218,28 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_domain_registry.py",
+      "name": "test_domain_registry.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_domain_registry.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_drydocs_api.py",
       "name": "test_drydocs_api.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_drydocs_api.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_edition_registry.py",
+      "name": "test_edition_registry.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_edition_registry.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -24191,6 +24461,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_lane_handoff.py",
+      "name": "test_lane_handoff.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_lane_handoff.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_launcher_registry.py",
       "name": "test_launcher_registry.py",
       "extension": ".py",
@@ -24330,6 +24609,15 @@
       "name": "test_lineage_snowflake_catalog.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_lineage_snowflake_catalog.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_lineage_staging.py",
+      "name": "test_lineage_staging.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_lineage_staging.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -24533,6 +24821,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_openapi_client.py",
+      "name": "test_openapi_client.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_openapi_client.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_oracle_kerberos_login.py",
       "name": "test_oracle_kerberos_login.py",
       "extension": ".py",
@@ -24663,6 +24960,15 @@
       "name": "test_precedence.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_precedence.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_precommit_config.py",
+      "name": "test_precommit_config.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_precommit_config.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -25136,6 +25442,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_subprocess_encoding.py",
+      "name": "test_subprocess_encoding.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_subprocess_encoding.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_supplements.py",
       "name": "test_supplements.py",
       "extension": ".py",
@@ -25568,6 +25883,42 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/scripts",
+      "name": "scripts",
+      "extension": "",
+      "rel_path": "web/scripts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/web/scripts/captureRoutes.mjs",
+      "name": "captureRoutes.mjs",
+      "extension": ".mjs",
+      "rel_path": "web/scripts/captureRoutes.mjs",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/scripts/genApiTypes.ts",
+      "name": "genApiTypes.ts",
+      "extension": ".ts",
+      "rel_path": "web/scripts/genApiTypes.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/scripts/writeApiTypes.mjs",
+      "name": "writeApiTypes.mjs",
+      "extension": ".mjs",
+      "rel_path": "web/scripts/writeApiTypes.mjs",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src",
       "name": "src",
       "extension": "",
@@ -25770,6 +26121,15 @@
       "name": "RelEdge.tsx",
       "extension": ".tsx",
       "rel_path": "web/src/components/RelEdge.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/components/SignIn.test.tsx",
+      "name": "SignIn.test.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/components/SignIn.test.tsx",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -26135,6 +26495,24 @@
       "kind": "dir"
     },
     {
+      "file_id": "drydocs/web/src/generated/api.d.ts",
+      "name": "api.d.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/generated/api.d.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/generated/api.test.ts",
+      "name": "api.test.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/generated/api.test.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/generated/context-types.json",
       "name": "context-types.json",
       "extension": ".json",
@@ -26175,6 +26553,15 @@
       "name": "load-map.json",
       "extension": ".json",
       "rel_path": "web/src/generated/load-map.json",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/generated/openapi.json",
+      "name": "openapi.json",
+      "extension": ".json",
+      "rel_path": "web/src/generated/openapi.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -26324,6 +26711,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/lib/apiClient.test.ts",
+      "name": "apiClient.test.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lib/apiClient.test.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/lib/apiClient.ts",
+      "name": "apiClient.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lib/apiClient.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/lib/auth.ts",
       "name": "auth.ts",
       "extension": ".ts",
@@ -26436,6 +26841,24 @@
       "name": "nvl-mapping.ts",
       "extension": ".ts",
       "rel_path": "web/src/lib/nvl-mapping.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/lib/paperForm.test.ts",
+      "name": "paperForm.test.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lib/paperForm.test.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/lib/paperForm.ts",
+      "name": "paperForm.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lib/paperForm.ts",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -26628,6 +27051,15 @@
       "project": "drydocs",
       "circular": false,
       "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/web/src/modules/registry.test.ts",
+      "name": "registry.test.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/modules/registry.test.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
     },
     {
       "file_id": "drydocs/web/src/modules/registry.ts",
@@ -27098,6 +27530,15 @@
       "kind": "dir"
     },
     {
+      "file_id": "drydocs/web/src/styles/print.css",
+      "name": "print.css",
+      "extension": ".css",
+      "rel_path": "web/src/styles/print.css",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/styles/tokens.css",
       "name": "tokens.css",
       "extension": ".css",
@@ -27492,6 +27933,10 @@
     ],
     [
       "drydocs/drydocs/cli.py",
+      "drydocs/drydocs_core/data_zones.py"
+    ],
+    [
+      "drydocs/drydocs/cli.py",
       "drydocs/drydocs_core/log_kinds.py"
     ],
     [
@@ -27517,6 +27962,10 @@
     [
       "drydocs/drydocs/cli.py",
       "drydocs/drydocs_lineage/review.py"
+    ],
+    [
+      "drydocs/drydocs/cli.py",
+      "drydocs/drydocs_lineage/staging.py"
     ],
     [
       "drydocs/drydocs/cli.py",
@@ -28439,22 +28888,6 @@
       "drydocs/drydocs/review/publishing/__init__.py"
     ],
     [
-      "drydocs/drydocs/publishing/__init__.py",
-      "drydocs/drydocs/review/publishing/assembler.py"
-    ],
-    [
-      "drydocs/drydocs/publishing/__init__.py",
-      "drydocs/drydocs/review/publishing/preview.py"
-    ],
-    [
-      "drydocs/drydocs/publishing/__init__.py",
-      "drydocs/drydocs/review/publishing/publisher.py"
-    ],
-    [
-      "drydocs/drydocs/publishing/__init__.py",
-      "drydocs/drydocs/review/publishing/validator.py"
-    ],
-    [
       "drydocs/drydocs/review/gate_pages.py",
       "drydocs/drydocs_core/repo_paths.py"
     ],
@@ -28575,6 +29008,30 @@
       "drydocs/drydocs_api/sessions.py"
     ],
     [
+      "drydocs/drydocs_api/agent_query.py",
+      "drydocs/drydocs_api/app.py"
+    ],
+    [
+      "drydocs/drydocs_api/agent_query.py",
+      "drydocs/drydocs_api/ephemeral_specs.py"
+    ],
+    [
+      "drydocs/drydocs_api/agent_query.py",
+      "drydocs/drydocs_api/exports.py"
+    ],
+    [
+      "drydocs/drydocs_api/agent_query.py",
+      "drydocs/drydocs_api/handlers.py"
+    ],
+    [
+      "drydocs/drydocs_api/agent_query.py",
+      "drydocs/drydocs_api/queries.py"
+    ],
+    [
+      "drydocs/drydocs_api/agent_query.py",
+      "drydocs/drydocs_api/query_specs.py"
+    ],
+    [
       "drydocs/drydocs_api/app.py",
       "drydocs/drydocs_api/audit.py"
     ],
@@ -28621,6 +29078,10 @@
     [
       "drydocs/drydocs_api/app.py",
       "drydocs/drydocs_api/query_specs.py"
+    ],
+    [
+      "drydocs/drydocs_api/app.py",
+      "drydocs/drydocs_api/schemas.py"
     ],
     [
       "drydocs/drydocs_api/app.py",
@@ -28863,6 +29324,10 @@
       "drydocs/drydocs_core/repo_paths.py"
     ],
     [
+      "drydocs/drydocs_core/edition_registry.py",
+      "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
       "drydocs/drydocs_core/entity_extract.py",
       "drydocs/drydocs_core/orchestration/controlm/folder_name.py"
     ],
@@ -28972,6 +29437,10 @@
     ],
     [
       "drydocs/drydocs_core/ontology/concept_scheme.py",
+      "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
+      "drydocs/drydocs_core/ontology/domain_registry.py",
       "drydocs/drydocs_core/repo_paths.py"
     ],
     [
@@ -29339,6 +29808,30 @@
       "drydocs/drydocs_lineage/writer.py"
     ],
     [
+      "drydocs/drydocs_lineage/staging.py",
+      "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
+      "drydocs/drydocs_lineage/staging.py",
+      "drydocs/drydocs_lineage/extractors/controlm_inventory.py"
+    ],
+    [
+      "drydocs/drydocs_lineage/staging.py",
+      "drydocs/drydocs_lineage/extractors/dpl_mac.py"
+    ],
+    [
+      "drydocs/drydocs_lineage/staging.py",
+      "drydocs/drydocs_lineage/extractors/dpl_registry.py"
+    ],
+    [
+      "drydocs/drydocs_lineage/staging.py",
+      "drydocs/drydocs_lineage/extractors/glue_tables.py"
+    ],
+    [
+      "drydocs/drydocs_lineage/staging.py",
+      "drydocs/drydocs_lineage/model.py"
+    ],
+    [
       "drydocs/drydocs_lineage/writer.py",
       "drydocs/drydocs_core/__init__.py"
     ],
@@ -29525,6 +30018,10 @@
     [
       "drydocs/scripts/doc_to_pdf.py",
       "drydocs/drydocs/docgen/doc_pdf.py"
+    ],
+    [
+      "drydocs/scripts/dump_openapi.py",
+      "drydocs/drydocs_api/app.py"
     ],
     [
       "drydocs/scripts/external_vendor_scrape.py",
@@ -29775,6 +30272,22 @@
       "drydocs/drydocs_core/run_log.py"
     ],
     [
+      "drydocs/tests/unit/test_agent_query.py",
+      "drydocs/drydocs_api/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_agent_query.py",
+      "drydocs/drydocs_api/agent_query.py"
+    ],
+    [
+      "drydocs/tests/unit/test_agent_query.py",
+      "drydocs/drydocs_api/exports.py"
+    ],
+    [
+      "drydocs/tests/unit/test_agent_query.py",
+      "drydocs/drydocs_api/query_specs.py"
+    ],
+    [
       "drydocs/tests/unit/test_agent_telemetry.py",
       "drydocs/drydocs_api/query_specs.py"
     ],
@@ -29963,8 +30476,24 @@
       "drydocs/drydocs_api/query_specs.py"
     ],
     [
+      "drydocs/tests/unit/test_cli_lineage_extract.py",
+      "drydocs/drydocs/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_cli_lineage_extract.py",
+      "drydocs/drydocs/cli.py"
+    ],
+    [
+      "drydocs/tests/unit/test_cli_lineage_extract.py",
+      "drydocs/drydocs/cli_shared.py"
+    ],
+    [
       "drydocs/tests/unit/test_cli_registry.py",
       "drydocs/drydocs/cli.py"
+    ],
+    [
+      "drydocs/tests/unit/test_cli_registry.py",
+      "drydocs/drydocs/cli_shared.py"
     ],
     [
       "drydocs/tests/unit/test_cmdline_staging.py",
@@ -30089,6 +30618,10 @@
     [
       "drydocs/tests/unit/test_console_origins.py",
       "drydocs/drydocs_api/app.py"
+    ],
+    [
+      "drydocs/tests/unit/test_console_print_gutter.py",
+      "drydocs/drydocs/docgen/design_doc.py"
     ],
     [
       "drydocs/tests/unit/test_constraint_drift.py",
@@ -30331,6 +30864,22 @@
       "drydocs/drydocs_core/docs_verify.py"
     ],
     [
+      "drydocs/tests/unit/test_domain_registry.py",
+      "drydocs/drydocs_core/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_domain_registry.py",
+      "drydocs/drydocs_core/ontology/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_domain_registry.py",
+      "drydocs/drydocs_core/ontology/domain_registry.py"
+    ],
+    [
+      "drydocs/tests/unit/test_domain_registry.py",
+      "drydocs/drydocs_core/yaml_fragments.py"
+    ],
+    [
       "drydocs/tests/unit/test_drydocs_api.py",
       "drydocs/drydocs_api/app.py"
     ],
@@ -30361,6 +30910,26 @@
     [
       "drydocs/tests/unit/test_drydocs_api.py",
       "drydocs/drydocs_api/sessions.py"
+    ],
+    [
+      "drydocs/tests/unit/test_edition_registry.py",
+      "drydocs/drydocs_core/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_edition_registry.py",
+      "drydocs/drydocs_core/config.py"
+    ],
+    [
+      "drydocs/tests/unit/test_edition_registry.py",
+      "drydocs/drydocs_core/edition_registry.py"
+    ],
+    [
+      "drydocs/tests/unit/test_edition_registry.py",
+      "drydocs/drydocs_core/neo4j_client.py"
+    ],
+    [
+      "drydocs/tests/unit/test_edition_registry.py",
+      "drydocs/drydocs_core/ontology/domain_registry.py"
     ],
     [
       "drydocs/tests/unit/test_email_concerns.py",
@@ -30807,6 +31376,14 @@
       "drydocs/drydocs_lineage/extractors/__init__.py"
     ],
     [
+      "drydocs/tests/unit/test_lineage_staging.py",
+      "drydocs/drydocs/cli_shared.py"
+    ],
+    [
+      "drydocs/tests/unit/test_lineage_staging.py",
+      "drydocs/drydocs_lineage/staging.py"
+    ],
+    [
       "drydocs/tests/unit/test_lineage_writer.py",
       "drydocs/drydocs_lineage/__init__.py"
     ],
@@ -31017,6 +31594,14 @@
     [
       "drydocs/tests/unit/test_notifications_carry_through.py",
       "drydocs/drydocs_core/notifications.py"
+    ],
+    [
+      "drydocs/tests/unit/test_openapi_client.py",
+      "drydocs/drydocs_api/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_openapi_client.py",
+      "drydocs/drydocs_api/schemas.py"
     ],
     [
       "drydocs/tests/unit/test_oracle_kerberos_login.py",
@@ -31579,6 +32164,10 @@
       "drydocs/drydocs_core/orchestration/controlm/standard_selection.py"
     ],
     [
+      "drydocs/tests/unit/test_subprocess_encoding.py",
+      "drydocs/tests/source_scan.py"
+    ],
+    [
       "drydocs/tests/unit/test_supplements.py",
       "drydocs/drydocs/__init__.py"
     ],
@@ -31967,6 +32556,14 @@
       "drydocs/web/src/lib/auth.ts"
     ],
     [
+      "drydocs/web/src/components/SignIn.test.tsx",
+      "drydocs/web/src/components/SignIn.tsx"
+    ],
+    [
+      "drydocs/web/src/components/SignIn.test.tsx",
+      "drydocs/web/src/lib/auth.ts"
+    ],
+    [
       "drydocs/web/src/components/SignIn.tsx",
       "drydocs/web/src/lib/auth.ts"
     ],
@@ -32151,6 +32748,10 @@
       "drydocs/web/src/lib/status.ts"
     ],
     [
+      "drydocs/web/src/generated/api.test.ts",
+      "drydocs/web/scripts/genApiTypes.ts"
+    ],
+    [
       "drydocs/web/src/layout/Aside.tsx",
       "drydocs/web/src/components/ModuleIcon.tsx"
     ],
@@ -32207,8 +32808,16 @@
       "drydocs/web/src/lib/auth.ts"
     ],
     [
-      "drydocs/web/src/lib/auth.ts",
+      "drydocs/web/src/lib/apiClient.test.ts",
+      "drydocs/web/src/lib/apiClient.ts"
+    ],
+    [
+      "drydocs/web/src/lib/apiClient.ts",
       "drydocs/web/src/lib/reachability.ts"
+    ],
+    [
+      "drydocs/web/src/lib/auth.ts",
+      "drydocs/web/src/lib/apiClient.ts"
     ],
     [
       "drydocs/web/src/lib/canvasRoutes.test.ts",
@@ -32220,11 +32829,11 @@
     ],
     [
       "drydocs/web/src/lib/corpusStatus.ts",
-      "drydocs/web/src/lib/auth.ts"
+      "drydocs/web/src/lib/apiClient.ts"
     ],
     [
       "drydocs/web/src/lib/corpusStatus.ts",
-      "drydocs/web/src/lib/reachability.ts"
+      "drydocs/web/src/lib/auth.ts"
     ],
     [
       "drydocs/web/src/lib/cypher-labels.test.ts",
@@ -32236,6 +32845,10 @@
     ],
     [
       "drydocs/web/src/lib/graphApi.ts",
+      "drydocs/web/src/lib/apiClient.ts"
+    ],
+    [
+      "drydocs/web/src/lib/graphApi.ts",
       "drydocs/web/src/lib/auth.ts"
     ],
     [
@@ -32243,12 +32856,16 @@
       "drydocs/web/src/lib/graph.ts"
     ],
     [
-      "drydocs/web/src/lib/graphApi.ts",
-      "drydocs/web/src/lib/reachability.ts"
+      "drydocs/web/src/lib/intakeApi.ts",
+      "drydocs/web/src/lib/apiClient.ts"
     ],
     [
       "drydocs/web/src/lib/intakeApi.ts",
       "drydocs/web/src/lib/graphApi.ts"
+    ],
+    [
+      "drydocs/web/src/lib/mappingsApi.ts",
+      "drydocs/web/src/lib/apiClient.ts"
     ],
     [
       "drydocs/web/src/lib/mappingsApi.ts",
@@ -32265,6 +32882,10 @@
     [
       "drydocs/web/src/lib/nvl-mapping.ts",
       "drydocs/web/src/modules/registry.ts"
+    ],
+    [
+      "drydocs/web/src/lib/paperForm.test.ts",
+      "drydocs/web/src/lib/paperForm.ts"
     ],
     [
       "drydocs/web/src/lib/reachability.test.ts",
@@ -32329,6 +32950,10 @@
     [
       "drydocs/web/src/main.tsx",
       "drydocs/web/src/App.tsx"
+    ],
+    [
+      "drydocs/web/src/modules/registry.test.ts",
+      "drydocs/web/src/modules/registry.ts"
     ],
     [
       "drydocs/web/src/ownership/AssetSearchPanel.tsx",
@@ -32465,6 +33090,10 @@
     [
       "drydocs/web/src/routes/AskRoute.tsx",
       "drydocs/web/src/layout/ModuleToolbar.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/AskRoute.tsx",
+      "drydocs/web/src/lib/apiClient.ts"
     ],
     [
       "drydocs/web/src/routes/AskRoute.tsx",
@@ -33165,6 +33794,11 @@
       "drydocs",
       "CONTAINS",
       "drydocs/.gitignore"
+    ],
+    [
+      "drydocs",
+      "CONTAINS",
+      "drydocs/.pre-commit-config.yaml"
     ],
     [
       "drydocs",
@@ -34592,9 +35226,29 @@
       "drydocs/.claude/skills/lane-handoff-workspace/iteration-1"
     ],
     [
+      "drydocs/.claude/skills/lane-handoff-workspace",
+      "CONTAINS",
+      "drydocs/.claude/skills/lane-handoff-workspace/iteration-2"
+    ],
+    [
+      "drydocs/.claude/skills/lane-handoff-workspace/iteration-1",
+      "CONTAINS",
+      "drydocs/.claude/skills/lane-handoff-workspace/iteration-1/benchmark.md"
+    ],
+    [
       "drydocs/.claude/skills/lane-handoff-workspace/iteration-1",
       "CONTAINS",
       "drydocs/.claude/skills/lane-handoff-workspace/iteration-1/review.html"
+    ],
+    [
+      "drydocs/.claude/skills/lane-handoff-workspace/iteration-2",
+      "CONTAINS",
+      "drydocs/.claude/skills/lane-handoff-workspace/iteration-2/benchmark.md"
+    ],
+    [
+      "drydocs/.claude/skills/lane-handoff-workspace/iteration-2",
+      "CONTAINS",
+      "drydocs/.claude/skills/lane-handoff-workspace/iteration-2/review.html"
     ],
     [
       "drydocs/.claude/skills/lane-handoff/evals",
@@ -36959,6 +37613,11 @@
     [
       "drydocs/config/gate-prompts",
       "CONTAINS",
+      "drydocs/config/gate-prompts/idea-series-grammar.yaml"
+    ],
+    [
+      "drydocs/config/gate-prompts",
+      "CONTAINS",
       "drydocs/config/gate-prompts/medallion-stage-vocabulary.yaml"
     ],
     [
@@ -37159,6 +37818,16 @@
     [
       "drydocs/config/schemas",
       "CONTAINS",
+      "drydocs/config/schemas/domains.schema.json"
+    ],
+    [
+      "drydocs/config/schemas",
+      "CONTAINS",
+      "drydocs/config/schemas/editions.schema.json"
+    ],
+    [
+      "drydocs/config/schemas",
+      "CONTAINS",
       "drydocs/config/schemas/precedence.schema.json"
     ],
     [
@@ -37225,6 +37894,16 @@
       "drydocs/config/taxonomy",
       "CONTAINS",
       "drydocs/config/taxonomy/controlm.yaml"
+    ],
+    [
+      "drydocs/config/taxonomy",
+      "CONTAINS",
+      "drydocs/config/taxonomy/domains.yaml"
+    ],
+    [
+      "drydocs/config/taxonomy",
+      "CONTAINS",
+      "drydocs/config/taxonomy/editions.yaml"
     ],
     [
       "drydocs/config/taxonomy",
@@ -38520,6 +39199,11 @@
       "drydocs/docs/restructure/backlog/epics",
       "CONTAINS",
       "drydocs/docs/restructure/backlog/epics/generic-naming.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/epics",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/epics/lineage-chain.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/epics",
@@ -40419,7 +41103,22 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/LIN1.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/LIN2.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/LOAD1.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/LOAD2.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -41824,6 +42523,11 @@
     [
       "drydocs/docs/reviews",
       "CONTAINS",
+      "drydocs/docs/reviews/README.md"
+    ],
+    [
+      "drydocs/docs/reviews",
+      "CONTAINS",
       "drydocs/docs/reviews/SDLC-CHECKPOINT.md"
     ],
     [
@@ -41885,6 +42589,26 @@
       "drydocs/docs/reviews",
       "CONTAINS",
       "drydocs/docs/reviews/graph-vs-files-experiment"
+    ],
+    [
+      "drydocs/docs/reviews",
+      "CONTAINS",
+      "drydocs/docs/reviews/ideas-to-backlog-intake-review-2026-09-03.md"
+    ],
+    [
+      "drydocs/docs/reviews",
+      "CONTAINS",
+      "drydocs/docs/reviews/job-etl-binding-second-pass-options-2026-09-04.md"
+    ],
+    [
+      "drydocs/docs/reviews",
+      "CONTAINS",
+      "drydocs/docs/reviews/job-etl-binding-second-pass-review-2026-09-04.md"
+    ],
+    [
+      "drydocs/docs/reviews",
+      "CONTAINS",
+      "drydocs/docs/reviews/lineage-chain-extract-load-workplan-2026-09-03.md"
     ],
     [
       "drydocs/docs/reviews",
@@ -43604,6 +44328,11 @@
     [
       "drydocs/drydocs_api",
       "CONTAINS",
+      "drydocs/drydocs_api/agent_query.py"
+    ],
+    [
+      "drydocs/drydocs_api",
+      "CONTAINS",
       "drydocs/drydocs_api/app.py"
     ],
     [
@@ -43674,6 +44403,11 @@
     [
       "drydocs/drydocs_api",
       "CONTAINS",
+      "drydocs/drydocs_api/schemas.py"
+    ],
+    [
+      "drydocs/drydocs_api",
+      "CONTAINS",
       "drydocs/drydocs_api/sessions.py"
     ],
     [
@@ -43740,6 +44474,11 @@
       "drydocs/drydocs_core",
       "CONTAINS",
       "drydocs/drydocs_core/docs_verify.py"
+    ],
+    [
+      "drydocs/drydocs_core",
+      "CONTAINS",
+      "drydocs/drydocs_core/edition_registry.py"
     ],
     [
       "drydocs/drydocs_core",
@@ -43960,6 +44699,11 @@
       "drydocs/drydocs_core/ontology",
       "CONTAINS",
       "drydocs/drydocs_core/ontology/concept_scheme.py"
+    ],
+    [
+      "drydocs/drydocs_core/ontology",
+      "CONTAINS",
+      "drydocs/drydocs_core/ontology/domain_registry.py"
     ],
     [
       "drydocs/drydocs_core/ontology",
@@ -44360,6 +45104,11 @@
       "drydocs/drydocs_lineage",
       "CONTAINS",
       "drydocs/drydocs_lineage/review.py"
+    ],
+    [
+      "drydocs/drydocs_lineage",
+      "CONTAINS",
+      "drydocs/drydocs_lineage/staging.py"
     ],
     [
       "drydocs/drydocs_lineage",
@@ -45314,7 +46063,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260902-1748.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260902.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -45734,6 +46483,11 @@
     [
       "drydocs/scripts",
       "CONTAINS",
+      "drydocs/scripts/dump_openapi.py"
+    ],
+    [
+      "drydocs/scripts",
+      "CONTAINS",
       "drydocs/scripts/embed.sh"
     ],
     [
@@ -46129,6 +46883,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_agent_query.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_agent_telemetry.py"
     ],
     [
@@ -46229,6 +46988,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_cli_lineage_extract.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_cli_registry.py"
     ],
     [
@@ -46280,6 +47044,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_console_origins.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_console_print_gutter.py"
     ],
     [
       "drydocs/tests/unit",
@@ -46429,7 +47198,17 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_domain_registry.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_drydocs_api.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_edition_registry.py"
     ],
     [
       "drydocs/tests/unit",
@@ -46554,6 +47333,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_lane_handoff.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_launcher_registry.py"
     ],
     [
@@ -46630,6 +47414,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_lineage_snowflake_catalog.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_lineage_staging.py"
     ],
     [
       "drydocs/tests/unit",
@@ -46744,6 +47533,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_openapi_client.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_oracle_kerberos_login.py"
     ],
     [
@@ -46815,6 +47609,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_precedence.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_precommit_config.py"
     ],
     [
       "drydocs/tests/unit",
@@ -47079,6 +47878,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_subprocess_encoding.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_supplements.py"
     ],
     [
@@ -47239,6 +48043,11 @@
     [
       "drydocs/web",
       "CONTAINS",
+      "drydocs/web/scripts"
+    ],
+    [
+      "drydocs/web",
+      "CONTAINS",
       "drydocs/web/src"
     ],
     [
@@ -47340,6 +48149,21 @@
       "drydocs/web/public/vendor-icons",
       "CONTAINS",
       "drydocs/web/public/vendor-icons/snowflake.svg"
+    ],
+    [
+      "drydocs/web/scripts",
+      "CONTAINS",
+      "drydocs/web/scripts/captureRoutes.mjs"
+    ],
+    [
+      "drydocs/web/scripts",
+      "CONTAINS",
+      "drydocs/web/scripts/genApiTypes.ts"
+    ],
+    [
+      "drydocs/web/scripts",
+      "CONTAINS",
+      "drydocs/web/scripts/writeApiTypes.mjs"
     ],
     [
       "drydocs/web/src",
@@ -47554,6 +48378,11 @@
     [
       "drydocs/web/src/components",
       "CONTAINS",
+      "drydocs/web/src/components/SignIn.test.tsx"
+    ],
+    [
+      "drydocs/web/src/components",
+      "CONTAINS",
       "drydocs/web/src/components/SignIn.tsx"
     ],
     [
@@ -47729,6 +48558,16 @@
     [
       "drydocs/web/src/generated",
       "CONTAINS",
+      "drydocs/web/src/generated/api.d.ts"
+    ],
+    [
+      "drydocs/web/src/generated",
+      "CONTAINS",
+      "drydocs/web/src/generated/api.test.ts"
+    ],
+    [
+      "drydocs/web/src/generated",
+      "CONTAINS",
       "drydocs/web/src/generated/context-types.json"
     ],
     [
@@ -47750,6 +48589,11 @@
       "drydocs/web/src/generated",
       "CONTAINS",
       "drydocs/web/src/generated/load-map.json"
+    ],
+    [
+      "drydocs/web/src/generated",
+      "CONTAINS",
+      "drydocs/web/src/generated/openapi.json"
     ],
     [
       "drydocs/web/src/generated",
@@ -47819,6 +48663,16 @@
     [
       "drydocs/web/src/lib",
       "CONTAINS",
+      "drydocs/web/src/lib/apiClient.test.ts"
+    ],
+    [
+      "drydocs/web/src/lib",
+      "CONTAINS",
+      "drydocs/web/src/lib/apiClient.ts"
+    ],
+    [
+      "drydocs/web/src/lib",
+      "CONTAINS",
       "drydocs/web/src/lib/auth.ts"
     ],
     [
@@ -47880,6 +48734,16 @@
       "drydocs/web/src/lib",
       "CONTAINS",
       "drydocs/web/src/lib/nvl-mapping.ts"
+    ],
+    [
+      "drydocs/web/src/lib",
+      "CONTAINS",
+      "drydocs/web/src/lib/paperForm.test.ts"
+    ],
+    [
+      "drydocs/web/src/lib",
+      "CONTAINS",
+      "drydocs/web/src/lib/paperForm.ts"
     ],
     [
       "drydocs/web/src/lib",
@@ -47960,6 +48824,11 @@
       "drydocs/web/src/loads",
       "CONTAINS",
       "drydocs/web/src/loads/demoLoads.ts"
+    ],
+    [
+      "drydocs/web/src/modules",
+      "CONTAINS",
+      "drydocs/web/src/modules/registry.test.ts"
     ],
     [
       "drydocs/web/src/modules",
@@ -48194,6 +49063,11 @@
     [
       "drydocs/web/src/styles",
       "CONTAINS",
+      "drydocs/web/src/styles/print.css"
+    ],
+    [
+      "drydocs/web/src/styles",
+      "CONTAINS",
       "drydocs/web/src/styles/tokens.css"
     ],
     [
@@ -48241,13 +49115,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2712,
-    "edges": 1473,
+    "files": 2759,
+    "edges": 1520,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 3021,
-    "directories": 310
+    "rels": 3070,
+    "directories": 312
   }
 }
