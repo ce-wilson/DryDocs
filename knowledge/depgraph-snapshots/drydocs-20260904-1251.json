@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-04T12:13:02",
+    "captured_at": "2026-09-04T12:52:00",
     "date": "20260904",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "d94e4588",
-      "full": "d94e45881132c23f164cc11461b06223025b5775",
+      "commit": "f74ad5b9",
+      "full": "f74ad5b9dd5caa8448436beb614fc4e4d3c9ff37",
       "branch": "main",
-      "describe": "port-base-20260902-108-gd94e4588",
-      "subject": "chore(LIN2): done - notes carry the decisions-file format, the retention decision, and the venue-tagged proof (desktop, neo4jtest, drydocs: plan 5/10/16 == graph, idempotent, TRIGGERS refused); board + roadmap re-rendered; pen: backlog ┬╖ port ┬╖ adr ┬╖ gates ┬╖ snapshot",
+      "describe": "port-base-20260902-111-gf74ad5b9",
+      "subject": "port(prompt): step 311 names the sha the .claude/** walk needs - the lane-handoff row_may_match_nothing entry and component_map.py's per-entry row landed at fe4df356, past port-base-20260902, so a walk with an older manifest reports a hole for a row doing its job; the one take-by-name the tag rule admits; pen: port ┬╖ backlog ┬╖ adr ┬╖ gates ┬╖ snapshot",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -22058,10 +22058,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260904-1011.json",
-      "name": "drydocs-20260904-1011.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260904.json",
+      "name": "drydocs-20260904.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260904-1011.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260904.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -46160,7 +46160,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260904-1011.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260904.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
