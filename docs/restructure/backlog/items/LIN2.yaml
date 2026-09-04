@@ -36,6 +36,15 @@ acceptance: |
   the review surface's confirmations (lineage-review's JSON export), passed as
   `--confirmed <file>`; with no confirmations the write is the empty set and says so.
   Nothing reaches `drydocs` uncurated (the package invariant).
+  THE PRODUCER DOES NOT EXIST YET (review 0015fcfa R2, 2026-09-04): lineage-review's
+  export is per-FOLDER free text (`{doc, exported, notes: [{folder, note}]}`,
+  review.py exportNotes) and plan_curated wants (from, type, to) rel triples, so
+  today's export cannot produce the confirmed set. LIN2 closes the gap at the
+  smallest honest grain: the review page exports a per-REL decision
+  (`{from, type, to, decision}`), the verb reads that shape, and the file format is
+  written down in the item. The binding-level curation state
+  (docs/reviews/job-etl-binding-second-pass-options-2026-09-04.md section 6-4) is
+  the later item that replaces it; LIN2 does not build it.
 
   (c) THE LOAD NAMES ITS EXTRACT, AND THE PROVENANCE IT WRITES IS WHAT THE EXTRACTOR
   READ. The run log and the written nodes carry the artifact's run id and code_commit,
@@ -45,6 +54,14 @@ acceptance: |
   review names the file the extractor actually read, discovered or given - and a test
   proves a discovered variables CSV reaches the graph as present, not absent. Retention
   of lineage/staged/ (newest-only, or N) is decided and written down in this item.
+  Two LIN1 follow-ups from the 93f4d832 verify pass (laptop) land here because they
+  bite at load time: code_commit() reports HEAD on a DIRTY tree, so an artifact
+  staged from uncommitted code claims a commit it was not built from - the header
+  carries a dirty marker (`<sha>-dirty`, the `git describe` convention) and the load
+  prints it; and LINEAGE_INPUT_ZONES in drydocs/cli.py names zone ids as string
+  literals with nothing asserting they exist in config/data-zones.yaml or the source
+  registry - a typo refuses every input, correctly closed and wrongly - so a unit
+  test asserts every id resolves to a declared zone.
 
   (d) VENUE-TAGGED PROOF. On the desktop, `neo4jtest`, database `drydocs`: the bundled-
   sample artifact from LIN1 loads its ETLProcess / Script / DataAsset nodes and the four

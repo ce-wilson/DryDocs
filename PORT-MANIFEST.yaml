@@ -644,13 +644,39 @@ rows:
   - path: "tests/unit/test_variable_*.py"
     disposition: canonical-producer
     note: "carry the sample skipif guards — re-deriving them caused divergence in a prior port"
+  - path: "drydocs_core/component_map.py"
+    disposition: per-entry
+    entry_rule: >
+      COMPONENT_GROUPS / COMPONENT_MODULE / SURFACE_OWNERS entries UNION by key.
+      The mechanism is producer-canonical: CORE_PREFIXES, ENTRYPOINT_MODULES,
+      DECLARED_COMPONENT_IMPORTS and every ruling comment cross whole. Company-only
+      GROUPS stay (docmeta-acquire — drydocs.docmeta, drydocs.scrapers — and any
+      group the company adds for a package the producer does not hold), exactly as
+      `tests/unit/test_module_boundary.py` keeps them: since ADR 0018 D1 the guard
+      IMPORTS this file, so a wholesale take of the map drops the company's groups
+      through the guard's own import and the default-deny check fails on their
+      first module. MOVES WITH `tests/unit/test_module_boundary.py` and
+      `MODULE_MAP.md`, ALWAYS — three files, one classification: this one is THE
+      declaration (ADR 0018 D1), the guard reads it, the map's component tables are
+      rendered from it (`scripts/render_module_map.py`; re-render after the merge,
+      never hand-edit the tables).
+    note: >
+      2026-09-04, on the company's chunk-5 apply of port-base-20260902 (their idea
+      inbox; the producer holds no transcript). The file was born 2026-09-02 (ADR
+      0018 D1) without a row and fell through to the `drydocs_core/**`
+      evaluate-on-collision default — the third member of the J68 pair with no
+      seat at the table. Guarded by `test_every_declaration_names_the_guard_that_reads_it`,
+      which now carries the triple.
   - path: "tests/unit/test_module_boundary.py"
     disposition: per-entry
     entry_rule: >
       Module-group entries UNION: the boundary mechanism (ENTRYPOINT_MODULES
       exemption + default-deny) is producer-canonical; company-only groups
       (docmeta-acquire — drydocs.docmeta, drydocs.scrapers — at
-      PORT-REPORT-5417ef10) are never dropped by a port.
+      PORT-REPORT-5417ef10) are never dropped by a port. Since ADR 0018 D1 the
+      groups live in `drydocs_core/component_map.py` (its own per-entry row
+      above) and this file imports them; the union happens THERE, and this
+      file's own diff is mechanism.
     note: "was canonical-producer until Relay #2 of PORT-REPORT-5417ef10 — taking it wholesale failed the company guard on their extended groups"
   - path: "tests/unit/test_plan_ideas.py"
     disposition: per-entry
@@ -1400,6 +1426,13 @@ row_may_match_nothing:
     reason: >
       J40: same as drydocs/docmeta/** — company-only capability, row exists to protect,
       matches nothing producer-side by construction.
+  - path: ".claude/skills/lane-handoff/**"
+    reason: >
+      never-port producer-only tooling (user ruling 2026-09-02): the skill never
+      crosses, so on the COMPANY side the row matches nothing by construction — the
+      row is the carve-out from the `.claude/**` canonical-producer default doing
+      its job, not a dead row. Producer-side it always matches. Added 2026-09-04
+      from the company's chunk-5 apply of port-base-20260902 (their idea inbox).
   - path: "docs/lane-*-handoff.md"
     reason: >
       the per-burst handoff retires itself when its queue empties (lane-handoff, 2026-09-02),

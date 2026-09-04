@@ -199,6 +199,19 @@ DECLARATION_GUARD_PAIRS: tuple[tuple[str, str, str], ...] = (
         "classification, so a module the map loses is a module the guard rejects",
     ),
     (
+        "drydocs_core/component_map.py",
+        "tests/unit/test_module_boundary.py",
+        "since ADR 0018 D1 the groups the guard enforces live in this file and the "
+        "guard imports them; the third member of the pair above, born 2026-09-02 "
+        "without a row and found by the company's chunk-5 apply of port-base-20260902",
+    ),
+    (
+        "drydocs_core/component_map.py",
+        "MODULE_MAP.md",
+        "the map's component tables are RENDERED from the declaration; a merge that "
+        "moves one without re-rendering the other is two classifications",
+    ),
+    (
         "config/source-registry.yaml",
         "tests/unit/test_source_registry.py",
         "the registry declares the systems and datasets; the guard validates them, "
