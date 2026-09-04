@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-04T10:12:02",
+    "captured_at": "2026-09-04T12:13:02",
     "date": "20260904",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "5803d091",
-      "full": "5803d09117ae3cfbe3ad81ad27c353d46eb859da",
+      "commit": "d94e4588",
+      "full": "d94e45881132c23f164cc11461b06223025b5775",
       "branch": "main",
-      "describe": "port-base-20260902-101-g5803d091",
-      "subject": "docs(DOC1): ADR 0015 amended by dated section - Team Edition ships a thin instance-owned backlog, inbox and board (D2), groom-backlog with a mandatory --scope (D6), the edition as a declared segment keyed to area_product_id so D3 and the id grammar agree (C1-C3), the ontology frozen BECAUSE the aggregate query needs one vocabulary (B5 rider), four named guards, and the aggregate roll-up recorded OPEN (F8) with follow-up row 3a; original D2/D3/D4/D6 text untouched; README index updated; done; pen: backlog · port · adr · gates · snapshot",
+      "describe": "port-base-20260902-108-gd94e4588",
+      "subject": "chore(LIN2): done - notes carry the decisions-file format, the retention decision, and the venue-tagged proof (desktop, neo4jtest, drydocs: plan 5/10/16 == graph, idempotent, TRIGGERS refused); board + roadmap re-rendered; pen: backlog ┬╖ port ┬╖ adr ┬╖ gates ┬╖ snapshot",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -15650,6 +15650,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/reviews/company-carve-out-6-readiness-review-2026-09-04.md",
+      "name": "company-carve-out-6-readiness-review-2026-09-04.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/company-carve-out-6-readiness-review-2026-09-04.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/reviews/doc-inventory-2026-07-22.md",
       "name": "doc-inventory-2026-07-22.md",
       "extension": ".md",
@@ -22049,10 +22058,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260904.json",
-      "name": "drydocs-20260904.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260904-1011.json",
+      "name": "drydocs-20260904-1011.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260904.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260904-1011.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -23588,6 +23597,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/integration/test_lineage_load_e2e.py",
+      "name": "test_lineage_load_e2e.py",
+      "extension": ".py",
+      "rel_path": "tests/integration/test_lineage_load_e2e.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/integration/test_meta_graph_exclusion.py",
       "name": "test_meta_graph_exclusion.py",
       "extension": ".py",
@@ -23844,6 +23862,15 @@
       "name": "test_cli_lineage_extract.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_cli_lineage_extract.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_cli_lineage_load.py",
+      "name": "test_cli_lineage_load.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_cli_lineage_load.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -24510,6 +24537,15 @@
       "name": "test_lineage_controlm_xml.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_lineage_controlm_xml.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_lineage_curation.py",
+      "name": "test_lineage_curation.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_lineage_curation.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -27953,6 +27989,10 @@
     ],
     [
       "drydocs/drydocs/cli.py",
+      "drydocs/drydocs_lineage/curation.py"
+    ],
+    [
+      "drydocs/drydocs/cli.py",
       "drydocs/drydocs_lineage/extractors/__init__.py"
     ],
     [
@@ -27966,6 +28006,10 @@
     [
       "drydocs/drydocs/cli.py",
       "drydocs/drydocs_lineage/staging.py"
+    ],
+    [
+      "drydocs/drydocs/cli.py",
+      "drydocs/drydocs_lineage/writer.py"
     ],
     [
       "drydocs/drydocs/cli.py",
@@ -29676,6 +29720,10 @@
       "drydocs/drydocs_lineage/writer.py"
     ],
     [
+      "drydocs/drydocs_lineage/curation.py",
+      "drydocs/drydocs_lineage/model.py"
+    ],
+    [
       "drydocs/drydocs_lineage/extractors/__init__.py",
       "drydocs/drydocs_lineage/extractors/catalog_crosscheck.py"
     ],
@@ -30248,6 +30296,22 @@
       "drydocs/drydocs_api/guard.py"
     ],
     [
+      "drydocs/tests/integration/test_lineage_load_e2e.py",
+      "drydocs/drydocs/cli.py"
+    ],
+    [
+      "drydocs/tests/integration/test_lineage_load_e2e.py",
+      "drydocs/drydocs_core/neo4j_client.py"
+    ],
+    [
+      "drydocs/tests/integration/test_lineage_load_e2e.py",
+      "drydocs/drydocs_lineage/model.py"
+    ],
+    [
+      "drydocs/tests/integration/test_lineage_load_e2e.py",
+      "drydocs/drydocs_lineage/writer.py"
+    ],
+    [
       "drydocs/tests/integration/test_meta_graph_exclusion.py",
       "drydocs/drydocs_api/query_specs.py"
     ],
@@ -30486,6 +30550,26 @@
     [
       "drydocs/tests/unit/test_cli_lineage_extract.py",
       "drydocs/drydocs/cli_shared.py"
+    ],
+    [
+      "drydocs/tests/unit/test_cli_lineage_extract.py",
+      "drydocs/drydocs_core/data_zones.py"
+    ],
+    [
+      "drydocs/tests/unit/test_cli_lineage_extract.py",
+      "drydocs/drydocs_lineage/staging.py"
+    ],
+    [
+      "drydocs/tests/unit/test_cli_lineage_load.py",
+      "drydocs/drydocs/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_cli_lineage_load.py",
+      "drydocs/drydocs/cli.py"
+    ],
+    [
+      "drydocs/tests/unit/test_cli_lineage_load.py",
+      "drydocs/drydocs_lineage/curation.py"
     ],
     [
       "drydocs/tests/unit/test_cli_registry.py",
@@ -31222,6 +31306,14 @@
     [
       "drydocs/tests/unit/test_lineage_controlm_xml.py",
       "drydocs/drydocs_lineage/extractors/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_lineage_curation.py",
+      "drydocs/drydocs_lineage/curation.py"
+    ],
+    [
+      "drydocs/tests/unit/test_lineage_curation.py",
+      "drydocs/drydocs_lineage/review.py"
     ],
     [
       "drydocs/tests/unit/test_lineage_deepdoc_scaffold.py",
@@ -42553,6 +42645,11 @@
     [
       "drydocs/docs/reviews",
       "CONTAINS",
+      "drydocs/docs/reviews/company-carve-out-6-readiness-review-2026-09-04.md"
+    ],
+    [
+      "drydocs/docs/reviews",
+      "CONTAINS",
       "drydocs/docs/reviews/doc-inventory-2026-07-22.md"
     ],
     [
@@ -46063,7 +46160,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260904.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260904-1011.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -46858,6 +46955,11 @@
     [
       "drydocs/tests/integration",
       "CONTAINS",
+      "drydocs/tests/integration/test_lineage_load_e2e.py"
+    ],
+    [
+      "drydocs/tests/integration",
+      "CONTAINS",
       "drydocs/tests/integration/test_meta_graph_exclusion.py"
     ],
     [
@@ -46989,6 +47091,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_cli_lineage_extract.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_cli_lineage_load.py"
     ],
     [
       "drydocs/tests/unit",
@@ -47359,6 +47466,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_lineage_controlm_xml.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_lineage_curation.py"
     ],
     [
       "drydocs/tests/unit",
@@ -49115,13 +49227,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2759,
-    "edges": 1520,
+    "files": 2763,
+    "edges": 1534,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 3070,
+    "rels": 3074,
     "directories": 312
   }
 }
