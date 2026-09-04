@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-04T12:52:00",
+    "captured_at": "2026-09-04T16:07:27",
     "date": "20260904",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "f74ad5b9",
-      "full": "f74ad5b9dd5caa8448436beb614fc4e4d3c9ff37",
+      "commit": "a5ff4a84",
+      "full": "a5ff4a8464ee7f4175ba0ffae68e60b30fa377f4",
       "branch": "main",
-      "describe": "port-base-20260902-111-gf74ad5b9",
-      "subject": "port(prompt): step 311 names the sha the .claude/** walk needs - the lane-handoff row_may_match_nothing entry and component_map.py's per-entry row landed at fe4df356, past port-base-20260902, so a walk with an older manifest reports a hole for a row doing its job; the one take-by-name the tag rule admits; pen: port ┬╖ backlog ┬╖ adr ┬╖ gates ┬╖ snapshot",
+      "describe": "port-base-20260902-114-ga5ff4a84",
+      "subject": "port(prompt): step 311 said the lane-handoff skill CROSSES; at the manifest sha the same step tells them to take, it is never-port - corrected in place",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -22058,10 +22058,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260904.json",
-      "name": "drydocs-20260904.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260904-1251.json",
+      "name": "drydocs-20260904-1251.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260904.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260904-1251.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -46160,7 +46160,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260904.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260904-1251.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
