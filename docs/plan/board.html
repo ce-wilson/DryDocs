@@ -74,7 +74,7 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 .capture-status{font-size:.78rem;color:#166534;margin:.3rem 0 0;min-height:1.1em}</style>
 </head><body>
 <h1>DryDocs — project board</h1>
-<p class="subtitle">Rendered from <code>docs/restructure/backlog/</code> 645 items &middot; 131 todo / 7 in progress / 2 blocked / 505 done. The repo is the system of record; this page is a working aid.</p>
+<p class="subtitle">Rendered from <code>docs/restructure/backlog/</code> 645 items &middot; 131 todo / 6 in progress / 2 blocked / 506 done. The repo is the system of record; this page is a working aid.</p>
 <p class="subtitle">Location: <code id="board-url"></code> <button type="button" id="board-url-copy">copy</button></p>
 <script>document.getElementById('board-url').textContent=window.location.href;document.getElementById('board-url-copy').onclick=function(){navigator.clipboard.writeText(window.location.href);};</script>
 <p class="subtitle"><a class="capture-link" href="roadmap.html">Module roadmap &rarr;</a> <a class="capture-link" href="ideas.html">Idea inbox &rarr;</a></p>
@@ -85,7 +85,7 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P3</span><span class="status-badge status-done">done</span></div><h3>Config-driven loaders</h3><p class="goal">Precedence + source gating read config/, not hardcoded logic (Epic D).</p><div class="progress"><div class="progress-bar" style="width:82%"></div></div><p class="progress-text">9 / 11</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P4</span><span class="status-badge status-todo">todo</span></div><h3>Context graph pilot</h3><p class="goal">SOSA/SSN observation modeling answers one live support question (Epic E).</p><div class="progress"><div class="progress-bar" style="width:0%"></div></div><p class="progress-text">0 / 2</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P5</span><span class="status-badge status-todo">todo</span></div><h3>Orchestrator expansion</h3><p class="goal">AutoSys + Airflow land as BMC-baseline concepts via confirmed crosswalks (Epic F).</p><div class="progress"><div class="progress-bar" style="width:40%"></div></div><p class="progress-text">2 / 5</p></div>
-<div class="phase-card"><div class="phase-head"><span class="phase-id">P6</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Modular architecture / component topology</h3><p class="goal">ADR 0002 — core extraction, multi-DB topology, component packages (Epic G).</p><div class="progress"><div class="progress-bar" style="width:84%"></div></div><p class="progress-text">125 / 148</p></div>
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P6</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Modular architecture / component topology</h3><p class="goal">ADR 0002 — core extraction, multi-DB topology, component packages (Epic G).</p><div class="progress"><div class="progress-bar" style="width:85%"></div></div><p class="progress-text">126 / 148</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P7</span><span class="status-badge status-done">done</span></div><h3>Review toolkit back-flow</h3><p class="goal">Company SME-review/HITL toolkit reproduced generically, offline (Epic H).</p><div class="progress"><div class="progress-bar" style="width:88%"></div></div><p class="progress-text">7 / 8</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P8</span><span class="status-badge status-in_progress">in_progress</span><span class="release">v0.3.0</span></div><h3>Planning &amp; release infrastructure</h3><p class="goal">Repo-native project board + capture loop; groundwork for versioned releases (Epic I).</p><div class="progress"><div class="progress-bar" style="width:74%"></div></div><p class="progress-text">73 / 98</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P9</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Application attribution</h3><p class="goal">Jobs attributed to SEAL applications (seal_app_ref) end-to-end — gate-confirmed match policy, loader, verify coverage (Epic K).</p><div class="progress"><div class="progress-bar" style="width:87%"></div></div><p class="progress-text">33 / 38</p></div>
@@ -3099,7 +3099,7 @@ transcribed from seven company artifacts on an UNMERGED research branch and cite
 
 Related: MM2, MM3, MM6, MM10, MM12, R16, L28, G102, ADR 0007, ADR 0011, Idea-236.
 </p></div></div></div></div>
-<div class="column" data-status="in_progress"><div class="column-head"><h2>In progress</h2><span class="count" data-count-for="in_progress">7</span></div><div class="column-body"><div class="card" id="card-E1" data-id="E1" data-module="ontology" data-phase="4" data-epic="context-graph" data-type="task" data-status="in_progress" data-search="e1 register sosa/ssn observation terms via the gate" tabindex="0"><div class="card-head"><span class="card-id">E1</span><span class="card-title">Register SOSA/SSN observation terms via the gate</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P4</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / ontology-mapper</span></div><div class="epic">context-graph</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C1" data-target="card-C1">C1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> sosa:* terms present with IRIs; status planned-&gt;confirmed via gate</p><p class="notes"><strong>Notes:</strong> Registration step DONE (main, 2026-06-22): sosa/ssn prefixes in namespaces.py; terms seeded in drydocs_core/schema/sosa_experimental_supplement.cypher (opt-in `drydocs apply-sosa-supplement`, NOT in bootstrap; every term adoption:&quot;experimental&quot;); 4 context relationships in relationship_vocabulary.yaml (sosa_observes/has_result/ made_by_sensor/observed_property, status planned, domain context); README split into Declared-Adopted vs Experimental/Early-Adoption. REMAINING for ontology-mapper: take the `jobrun-observation` map entry through the HITL gate (resolve ControlMJobRun-as-Observation vs separate-Observation-node; run-history source), then planned-&gt;confirmed. GATE SESSION DEFERRED 2026-07-14 (SME: not ready yet) — page stays rendered/pending; nothing flips; re-present at a future session (see gate-log 2026-07-14 deferral note).
+<div class="column" data-status="in_progress"><div class="column-head"><h2>In progress</h2><span class="count" data-count-for="in_progress">6</span></div><div class="column-body"><div class="card" id="card-E1" data-id="E1" data-module="ontology" data-phase="4" data-epic="context-graph" data-type="task" data-status="in_progress" data-search="e1 register sosa/ssn observation terms via the gate" tabindex="0"><div class="card-head"><span class="card-id">E1</span><span class="card-title">Register SOSA/SSN observation terms via the gate</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P4</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / ontology-mapper</span></div><div class="epic">context-graph</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C1" data-target="card-C1">C1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> sosa:* terms present with IRIs; status planned-&gt;confirmed via gate</p><p class="notes"><strong>Notes:</strong> Registration step DONE (main, 2026-06-22): sosa/ssn prefixes in namespaces.py; terms seeded in drydocs_core/schema/sosa_experimental_supplement.cypher (opt-in `drydocs apply-sosa-supplement`, NOT in bootstrap; every term adoption:&quot;experimental&quot;); 4 context relationships in relationship_vocabulary.yaml (sosa_observes/has_result/ made_by_sensor/observed_property, status planned, domain context); README split into Declared-Adopted vs Experimental/Early-Adoption. REMAINING for ontology-mapper: take the `jobrun-observation` map entry through the HITL gate (resolve ControlMJobRun-as-Observation vs separate-Observation-node; run-history source), then planned-&gt;confirmed. GATE SESSION DEFERRED 2026-07-14 (SME: not ready yet) — page stays rendered/pending; nothing flips; re-present at a future session (see gate-log 2026-07-14 deferral note).
 </p></div></div>
 <div class="card" id="card-G62" data-id="G62" data-module="drydocs-lineage" data-phase="6" data-epic="component-topology" data-type="task" data-status="in_progress" data-search="g62 run the rua-bundle data-profile gate: the sme names the load population, the agent profiles it, and only the walked population enters the curated load" tabindex="0"><div class="card-head"><span class="card-id">G62</span><span class="card-title">Run the rua-bundle data-profile gate: the SME names the load population, the agent profiles it, and only the walked population enters the curated load</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-lineage</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">component-topology</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-G22" data-target="card-G22">G22</a> <a class="dep-link" href="#card-G23" data-target="card-G23">G23</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> USER-GATED START — the SME convenes the session; the pull loop SKIPS this item until then (the C12/J13 idiom). The drafted rua-bundle-data-profile page is walked in its ruled two-step order: section A the SME identifies the source data (which hosts&#x27; bundles, where they sit, which collector produced each — Internal, recorded company-side, never on the page), section B the agent profiles that population through the G20 extractor in STAGING with zero graph writes, and section C consumes the profile to admit or trim the population, dispose of the hash-absent and collision cases it counts, and clear the F1 sweep. Sign-off transcribed to config/gate-log.md; gates.json + the enforcement matrix regenerate. No population the page has not walked enters the G23 curated load.
 </p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-09 from Idea-85, which asked only for ids and scheduling — the four post-G22 data-profile prompts were drafted 2026-08-07 and unsigned, and an unsigned prompt with no backlog id is invisible to the pull loop. Sessions run COMPANY-SIDE because the identify-the-source-data step names real hosts and paths (Internal); what lands producer-side is the transcription and the regenerated gate surfaces. Model fable: the ruling decides what may be written to the graph.
@@ -3145,70 +3145,7 @@ flow identity by dataflow, ingest mode). Seven synthetic sample logs reproduce t
 shapes including the cut task-service JSON, the transform with no provenance id, and a
 printed bearer token (redacted and counted). Real logs live under
 internal-local/controlm-output-logs/ (git-ignored). The Python extractor is still this
-item&#x27;s deliverable; the PoC fixed its field list and skip-reason set.</p></div></div>
-<div class="card" id="card-LIN2" data-id="LIN2" data-module="drydocs-lineage" data-phase="6" data-epic="lineage-chain" data-type="task" data-status="in_progress" data-search="lin2 drydocs lineage-load - plan_curated over a staged lineage artifact, write_curated for the active labels, plan-only by default" tabindex="0"><div class="card-head"><span class="card-id">LIN2</span><span class="card-title">drydocs lineage-load - plan_curated over a staged lineage artifact, write_curated for the active labels, plan-only by default</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-lineage</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">lineage-chain</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-LIN1" data-target="card-LIN1">LIN1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Phase 1 of the lineage-chain workplan
-(docs/reviews/lineage-chain-extract-load-workplan-2026-09-03.md). The LOAD half.
-
-(a) THE VERB. `drydocs lineage-load [&lt;artifact&gt;]` in drydocs/cli.py beside
-lineage-extract (the S8 rule LIN1 recorded: component-wiring verbs stay in the root)
-reads a staged artifact LIN1 wrote - by default the NEWEST in the declared
-lineage/staged/ zone, which the sortable artifact name makes derivable without
-opening a file - rebuilds the LineageGraph, runs drydocs_lineage.writer.plan_curated
-and prints the WritePlan (nodes, edges by label, the planned-label refusals, the
-unresolved file-op candidates) - and STOPS. That is the default. `--write` runs
-write_curated against the ground-truth database for the ACTIVE labels only
-(scheduler_invokes, scheduler_uses_artifact, scheduler_reads_from, scheduler_writes_to,
-as signed at G55); a planned label (scheduler_triggers) is still refused by the writer
-and the refusal is printed, never swallowed.
-
-(b) CURATION IS THE GATE, NOT A FLAG. The confirmed set write_curated takes comes from
-the review surface&#x27;s confirmations (lineage-review&#x27;s JSON export), passed as
-`--confirmed &lt;file&gt;`; with no confirmations the write is the empty set and says so.
-Nothing reaches `drydocs` uncurated (the package invariant).
-THE PRODUCER DOES NOT EXIST YET (review 0015fcfa R2, 2026-09-04): lineage-review&#x27;s
-export is per-FOLDER free text (`{doc, exported, notes: [{folder, note}]}`,
-review.py exportNotes) and plan_curated wants (from, type, to) rel triples, so
-today&#x27;s export cannot produce the confirmed set. LIN2 closes the gap at the
-smallest honest grain: the review page exports a per-REL decision
-(`{from, type, to, decision}`), the verb reads that shape, and the file format is
-written down in the item. The binding-level curation state
-(docs/reviews/job-etl-binding-second-pass-options-2026-09-04.md section 6-4) is
-the later item that replaces it; LIN2 does not build it.
-
-(c) THE LOAD NAMES ITS EXTRACT, AND THE PROVENANCE IT WRITES IS WHAT THE EXTRACTOR
-READ. The run log and the written nodes carry the artifact&#x27;s run id and code_commit,
-so a graph fact traces to the extract, the source files and the code that produced it
-(G107; the provenance-envelope shape). The LIN1 lane review&#x27;s condition: the sources
-block the load stamps onto the graph is the artifact&#x27;s sources block - which since the
-review names the file the extractor actually read, discovered or given - and a test
-proves a discovered variables CSV reaches the graph as present, not absent. Retention
-of lineage/staged/ (newest-only, or N) is decided and written down in this item.
-Two LIN1 follow-ups from the 93f4d832 verify pass (laptop) land here because they
-bite at load time: code_commit() reports HEAD on a DIRTY tree, so an artifact
-staged from uncommitted code claims a commit it was not built from - the header
-carries a dirty marker (`&lt;sha&gt;-dirty`, the `git describe` convention) and the load
-prints it; and LINEAGE_INPUT_ZONES in drydocs/cli.py names zone ids as string
-literals with nothing asserting they exist in config/data-zones.yaml or the source
-registry - a typo refuses every input, correctly closed and wrongly - so a unit
-test asserts every id resolves to a declared zone.
-
-(d) VENUE-TAGGED PROOF. On the desktop, `neo4jtest`, database `drydocs`: the bundled-
-sample artifact from LIN1 loads its ETLProcess / Script / DataAsset nodes and the four
-active edge labels; a second run is idempotent (MERGE, counts unchanged); the graph
-count matches the WritePlan. Recorded in the notes with the venue named (J18).
-
-(e) GUARDS. plan-only is proven with no database (the unit conftest&#x27;s non-terminal
-console); the write path is proven behind the testcontainers e2e marker (J9), not in
-the unit suite; the writer&#x27;s gate-bound refusal has a test that asserts the message.
-
-(f) NOT IN SCOPE. Activating a planned label (gate-bound). Reload / removed-from-source
-marking for lineage (a later item, on the D7 tombstone pattern).
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-03 (desktop, allocator) with LIN1 as the Phase 1 pair. write_curated
-and plan_curated have existed since G55 (2026-08-07) and have never had a command;
-lineage-review renders the SME page and writes nothing. Depends on LIN1 for the
-artifact shape. Built on the desktop (Lane A): the live container and the samples are
-here.
-</p></div></div></div></div>
+item&#x27;s deliverable; the PoC fixed its field list and skip-reason set.</p></div></div></div></div>
 <div class="column" data-status="blocked"><div class="column-head"><h2>Blocked</h2><span class="count" data-count-for="blocked">2</span></div><div class="column-body"><div class="card" id="card-C33" data-id="C33" data-module="drydocs-load" data-phase="2" data-epic="ontology-mapping" data-type="task" data-status="blocked" data-search="c33 build the adhoc software-version loader the software-version-context gate authorized and deliberately did not build" tabindex="0"><div class="card-head"><span class="card-id">C33</span><span class="card-title">Build the adhoc software-version loader the software-version-context gate authorized and deliberately did not build</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-load</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">ontology-mapping</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The gate signed the SHAPE and nothing else: reg_appuser_uses_software is registered status: planned, no loader exists, and the adhoc-sme-email corpus stays confirmed: false for that reason alone. This item builds exactly what sections A-E signed -- the loader itself (MERGE key per section Q3 below, edge properties per B3, as_of from the email&#x27;s sent date), the :Document minted from the hand-recorded citation, the evidence: block&#x27;s as_of filled in on the abinitio product row, registration in config/manual-loads/manifest.yaml per E4, and the C1 install-path pattern rows in the invocation_patterns shape. SECTION Q3 IS SETTLED BEFORE THE MERGE KEY IS WRITTEN, not after. The gate deferred it with the consequence stated: if the estate re-points installs by symlink, install_path is a poor key and identity moves to (fid, version), which is a RE-KEY rather than an edit. If Q3 cannot be answered, the item STOPS at that question and says so -- a guessed identity key is the failure the identity gate&#x27;s D2/C3 exist to prevent. Two things this build must NOT do: write the section F application-level rollup (blocked on K17, and not behind a flag), and auto-append observed versions to the curated versions: list (C2). The vocabulary entry flips planned -&gt; active only if its gate says so; nothing here signs anything.
 </p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-11 from Idea-98, the first of the follow-ups C25&#x27;s close note carries. model fable because the deliverable lands a MERGE KEY -- the identity decision the gate deferred -- while the code around it is ordinary loader work. The observable close signal is the corpus flipping confirmed: false -&gt; true on adhoc-sme-email, which is exactly why it must not flip on a guessed key.
 STOPPED AT Q3, 2026-08-21 -- as the acceptance requires. The repo holds no answer to
@@ -3262,7 +3199,7 @@ relay -- guessing spellings is the defect this item exists to prevent. The (d) s
 guard (fixture headers drawn from the recorded list, not the module constant) also waits
 on that list; a guard against nothing would be decoration.
 </p></div></div></div></div>
-<div class="column" data-status="done"><div class="column-head"><h2>Done</h2><span class="count" data-count-for="done">505</span></div><div class="column-body"><div class="card" id="card-A1" data-id="A1" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a1 audit reference registry paths for staleness" tabindex="0"><div class="card-head"><span class="card-id">A1</span><span class="card-title">Audit reference registry paths for staleness</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every entry marked ok/stale; stale paths fixed or flagged</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All local mirrors + platform/standard doc paths resolve; no stale entries. verified: 2026-06-21 in REGISTRY.yaml.</p></div></div>
+<div class="column" data-status="done"><div class="column-head"><h2>Done</h2><span class="count" data-count-for="done">506</span></div><div class="column-body"><div class="card" id="card-A1" data-id="A1" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a1 audit reference registry paths for staleness" tabindex="0"><div class="card-head"><span class="card-id">A1</span><span class="card-title">Audit reference registry paths for staleness</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every entry marked ok/stale; stale paths fixed or flagged</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All local mirrors + platform/standard doc paths resolve; no stale entries. verified: 2026-06-21 in REGISTRY.yaml.</p></div></div>
 <div class="card" id="card-A2" data-id="A2" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a2 account for every bmc doc in the source manifest" tabindex="0"><div class="card-head"><span class="card-id">A2</span><span class="card-title">Account for every BMC doc in the source manifest</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every .md in bmc-controlm/ accounted for in the manifest</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All 26 bmc-controlm .md files are referenced in SOURCE-MANIFEST.md (0 uncovered).</p></div></div>
 <div class="card" id="card-A3" data-id="A3" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a3 seed the research index with linked rationale" tabindex="0"><div class="card-head"><span class="card-id">A3</span><span class="card-title">Seed the research index with linked rationale</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> &gt;=5 rows, each with a working link and a &#x27;why it matters&#x27;</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. 7 rows with working links (3 Neo4j blogs + PROV-O/SOSA/ORG/agent-memory) + why-it-matters.</p></div></div>
 <div class="card" id="card-A4" data-id="A4" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a4 registry.yaml points the dcat row at a per-standard readme that was never written" tabindex="0"><div class="card-head"><span class="card-id">A4</span><span class="card-title">REGISTRY.yaml points the dcat row at a per-standard README that was never written</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> reference/REGISTRY.yaml&#x27;s dcat row no longer cites a path that does not exist. Exactly one of two resolutions, and the choice is recorded in the close note: (a) write reference/standards/dcat/README.md following the dcmi-terms pattern from M4 — namespace, what we use it for, the specific terms we reference, source_url — or (b) re-point the row&#x27;s `docs:` at reference/standards/README.md the way the skos row already does. Nothing else in the registry changes.
@@ -12546,6 +12483,130 @@ data-zones comment says four; the zone check is PER HOP (LINEAGE_INPUT_ZONES) - 
 jobs CSV under dpl-mac/ is refused as a misfile and the message names the hop&#x27;s own
 zone - with a test. Also caught by the full suite: the commit anchor climbed to the
 repo root with a bare __file__ (Idea-109 guard) and now goes through repo_root().
+</p></div></div>
+<div class="card" id="card-LIN2" data-id="LIN2" data-module="drydocs-lineage" data-phase="6" data-epic="lineage-chain" data-type="task" data-status="done" data-search="lin2 drydocs lineage-load - plan_curated over a staged lineage artifact, write_curated for the active labels, plan-only by default" tabindex="0"><div class="card-head"><span class="card-id">LIN2</span><span class="card-title">drydocs lineage-load - plan_curated over a staged lineage artifact, write_curated for the active labels, plan-only by default</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-lineage</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">lineage-chain</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-LIN1" data-target="card-LIN1">LIN1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Phase 1 of the lineage-chain workplan
+(docs/reviews/lineage-chain-extract-load-workplan-2026-09-03.md). The LOAD half.
+
+(a) THE VERB. `drydocs lineage-load [&lt;artifact&gt;]` in drydocs/cli.py beside
+lineage-extract (the S8 rule LIN1 recorded: component-wiring verbs stay in the root)
+reads a staged artifact LIN1 wrote - by default the NEWEST in the declared
+lineage/staged/ zone, which the sortable artifact name makes derivable without
+opening a file - rebuilds the LineageGraph, runs drydocs_lineage.writer.plan_curated
+and prints the WritePlan (nodes, edges by label, the planned-label refusals, the
+unresolved file-op candidates) - and STOPS. That is the default. `--write` runs
+write_curated against the ground-truth database for the ACTIVE labels only
+(scheduler_invokes, scheduler_uses_artifact, scheduler_reads_from, scheduler_writes_to,
+as signed at G55); a planned label (scheduler_triggers) is still refused by the writer
+and the refusal is printed, never swallowed.
+
+(b) CURATION IS THE GATE, NOT A FLAG. The confirmed set write_curated takes comes from
+the review surface&#x27;s confirmations (lineage-review&#x27;s JSON export), passed as
+`--confirmed &lt;file&gt;`; with no confirmations the write is the empty set and says so.
+Nothing reaches `drydocs` uncurated (the package invariant).
+THE PRODUCER DOES NOT EXIST YET (review 0015fcfa R2, 2026-09-04): lineage-review&#x27;s
+export is per-FOLDER free text (`{doc, exported, notes: [{folder, note}]}`,
+review.py exportNotes) and plan_curated wants (from, type, to) rel triples, so
+today&#x27;s export cannot produce the confirmed set. LIN2 closes the gap at the
+smallest honest grain: the review page exports a per-REL decision
+(`{from, type, to, decision}`), the verb reads that shape, and the file format is
+written down in the item. The binding-level curation state
+(docs/reviews/job-etl-binding-second-pass-options-2026-09-04.md section 6-4) is
+the later item that replaces it; LIN2 does not build it.
+
+(c) THE LOAD NAMES ITS EXTRACT, AND THE PROVENANCE IT WRITES IS WHAT THE EXTRACTOR
+READ. The run log and the written nodes carry the artifact&#x27;s run id and code_commit,
+so a graph fact traces to the extract, the source files and the code that produced it
+(G107; the provenance-envelope shape). The LIN1 lane review&#x27;s condition: the sources
+block the load stamps onto the graph is the artifact&#x27;s sources block - which since the
+review names the file the extractor actually read, discovered or given - and a test
+proves a discovered variables CSV reaches the graph as present, not absent. Retention
+of lineage/staged/ (newest-only, or N) is decided and written down in this item.
+Two LIN1 follow-ups from the 93f4d832 verify pass (laptop) land here because they
+bite at load time: code_commit() reports HEAD on a DIRTY tree, so an artifact
+staged from uncommitted code claims a commit it was not built from - the header
+carries a dirty marker (`&lt;sha&gt;-dirty`, the `git describe` convention) and the load
+prints it; and LINEAGE_INPUT_ZONES in drydocs/cli.py names zone ids as string
+literals with nothing asserting they exist in config/data-zones.yaml or the source
+registry - a typo refuses every input, correctly closed and wrongly - so a unit
+test asserts every id resolves to a declared zone.
+
+(d) VENUE-TAGGED PROOF. On the desktop, `neo4jtest`, database `drydocs`: the bundled-
+sample artifact from LIN1 loads its ETLProcess / Script / DataAsset nodes and the four
+active edge labels; a second run is idempotent (MERGE, counts unchanged); the graph
+count matches the WritePlan. Recorded in the notes with the venue named (J18).
+
+(e) GUARDS. plan-only is proven with no database (the unit conftest&#x27;s non-terminal
+console); the write path is proven behind the testcontainers e2e marker (J9), not in
+the unit suite; the writer&#x27;s gate-bound refusal has a test that asserts the message.
+
+(f) NOT IN SCOPE. Activating a planned label (gate-bound). Reload / removed-from-source
+marking for lineage (a later item, on the D7 tombstone pattern).
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-03 (desktop, allocator) with LIN1 as the Phase 1 pair. write_curated
+and plan_curated have existed since G55 (2026-08-07) and have never had a command;
+lineage-review renders the SME page and writes nothing. Depends on LIN1 for the
+artifact shape. Built on the desktop (Lane A): the live container and the samples are
+here.
+
+BUILT 2026-09-04 (desktop, Lane A; claimed bd5d57bc, built 9fcce1fc). `drydocs
+lineage-load [&lt;artifact&gt;] [--confirmed &lt;file&gt;] [--write]` in drydocs/cli.py beside
+lineage-extract. Plan-only by default and proven with no database; --write runs
+write_curated for the active labels; a planned label is refused by the writer and the
+refusal is printed (exit 2). 3262 unit tests green on the desktop; integration 3/3.
+
+(b) THE DECISIONS FILE, written down: schema `drydocs.lineage-decisions.v1`; keys
+`doc`, `exported`, `decisions: [{from, type, to, decision}]`, `notes: [{folder,
+note}]`. from/type/to are the graph&#x27;s own rel triple (node ids as the artifact
+carries them, the registered label; the READS/WRITES prototype spellings normalise
+through REL_ALIASES); `decision` is a CurationStatus value (confirmed | rejected |
+proposed); a rel the SME never touched is absent and stays proposed by construction.
+The lineage-review page grew a decision control per dependency row (persisted in
+localStorage, exported with the notes by the one button); drydocs_lineage.curation
+documents the shape and reads it (load_decisions - total refusals: unknown schema,
+unknown status, unregistered label, one rel decided twice with different answers).
+The load refuses a decisions file naming a rel the artifact does not carry (the page
+was rendered from another extract) rather than writing the intersection. This is the
+per-rel grain the review called the smallest honest one; the binding-level state is
+the later item.
+
+(c) PROVENANCE AS BUILT. ExtractProvenance (writer.py) is read off the artifact
+header; with it, plan_curated stamps extract_run_id / extract_code_commit on every
+MERGEd node AND rel and brackets the plan with a :JobRun {loader: &#x27;lineage-load&#x27;}
+carrying the artifact&#x27;s sources block verbatim as a list of JSON strings (O28&#x27;s
+property shape on the existing label: no new label, no new edge, so no ontology
+decision). The same run id keys the file run log (G107) and the :JobRun. Without a
+provenance the plan is byte-for-byte what it was before LIN2 (a test pins it). The
+two LIN1 follow-ups: code_commit() reports `&lt;sha&gt;-dirty` when `git status
+--porcelain` is non-empty (tracked edits or untracked files) and the load prints
+DIRTY TREE; a unit test asserts every LINEAGE_INPUT_ZONES id is a declared READ zone
+(data-zones.yaml + the source-registry drops, the same union read_zone_containing
+searches). RETENTION DECIDED: lineage-extract --keep N (DEFAULT_KEEP = 10) prunes the
+staged zone to the newest N after a successful write; 0 keeps all; the load never
+deletes. N and not newest-only because a re-run of the load against yesterday&#x27;s
+artifact needs yesterday&#x27;s artifact; not keep-all because the zone is a WRITE zone
+rebuilt from the read zones and the run log carries every header regardless.
+
+(d) VENUE-TAGGED PROOF - desktop, container `neo4jtest`, database `drydocs`
+(2026-09-04 11:56 local). The bundled-sample artifact (run e19653ca, 33 processes,
+17 INVOKES candidates, 0 data assets) with a decisions file confirming 16 and
+rejecting 1: plan = 5 Script, 10 ETLProcess, 16 INVOKES; graph after --write = 5 / 10
+/ 16, every one stamped with the extract run id and code commit bd5d57bc; :JobRun
+COMPLETED with the five-hop sources block and controlm_variables present: true.
+Second --write: counts unchanged (5 / 10 / 16), one more :JobRun (each load is its
+own run). A synthetic artifact carrying a TRIGGERS rel, confirmed: the plan prints
+GATE-BOUND: TRIGGERS (scheduler_triggers) is planned, and --write prints REFUSED
+... scheduler_triggers=planned with nothing written. WHAT THE SAMPLE DOES NOT PROVE:
+the bundled jobs carry INVOKES only, so USES_ARTIFACT / READS_FROM / WRITES_TO landed
+on the live graph in no row here; their activation is proven by the writer&#x27;s registry
+read (gate_bound_labels returns exactly [TRIGGERS] against the real registry) and the
+plan shapes are the existing G13/G14/G97 unit tests. The integration test
+(tests/integration/test_lineage_load_e2e.py, EE image from dev-environment.yaml,
+31s) repeats the sample proof against a fresh container: plan == graph, idempotent,
+stamped, sources verbatim, plan-only touches nothing.
+
+(e) as built: 10 CLI tests through a fake client on the drydocs.cli._client seam
+(plan-only never builds a client - a test patches it to raise), the refusal message
+asserted, the write path behind the integration marker (J9). (f) held: nothing
+activated, no reload / tombstone marking.
 </p></div></div></div></div>
 </div>
 <div class="capture">

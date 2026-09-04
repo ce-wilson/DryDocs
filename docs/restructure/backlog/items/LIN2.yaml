@@ -7,7 +7,7 @@ phase: 6
 agent: main
 model: opus
 priority: p1
-status: in_progress
+status: done
 depends_on:
 - LIN1
 inputs:
@@ -80,3 +80,64 @@ notes: |
   lineage-review renders the SME page and writes nothing. Depends on LIN1 for the
   artifact shape. Built on the desktop (Lane A): the live container and the samples are
   here.
+
+  BUILT 2026-09-04 (desktop, Lane A; claimed bd5d57bc, built 9fcce1fc). `drydocs
+  lineage-load [<artifact>] [--confirmed <file>] [--write]` in drydocs/cli.py beside
+  lineage-extract. Plan-only by default and proven with no database; --write runs
+  write_curated for the active labels; a planned label is refused by the writer and the
+  refusal is printed (exit 2). 3262 unit tests green on the desktop; integration 3/3.
+
+  (b) THE DECISIONS FILE, written down: schema `drydocs.lineage-decisions.v1`; keys
+  `doc`, `exported`, `decisions: [{from, type, to, decision}]`, `notes: [{folder,
+  note}]`. from/type/to are the graph's own rel triple (node ids as the artifact
+  carries them, the registered label; the READS/WRITES prototype spellings normalise
+  through REL_ALIASES); `decision` is a CurationStatus value (confirmed | rejected |
+  proposed); a rel the SME never touched is absent and stays proposed by construction.
+  The lineage-review page grew a decision control per dependency row (persisted in
+  localStorage, exported with the notes by the one button); drydocs_lineage.curation
+  documents the shape and reads it (load_decisions - total refusals: unknown schema,
+  unknown status, unregistered label, one rel decided twice with different answers).
+  The load refuses a decisions file naming a rel the artifact does not carry (the page
+  was rendered from another extract) rather than writing the intersection. This is the
+  per-rel grain the review called the smallest honest one; the binding-level state is
+  the later item.
+
+  (c) PROVENANCE AS BUILT. ExtractProvenance (writer.py) is read off the artifact
+  header; with it, plan_curated stamps extract_run_id / extract_code_commit on every
+  MERGEd node AND rel and brackets the plan with a :JobRun {loader: 'lineage-load'}
+  carrying the artifact's sources block verbatim as a list of JSON strings (O28's
+  property shape on the existing label: no new label, no new edge, so no ontology
+  decision). The same run id keys the file run log (G107) and the :JobRun. Without a
+  provenance the plan is byte-for-byte what it was before LIN2 (a test pins it). The
+  two LIN1 follow-ups: code_commit() reports `<sha>-dirty` when `git status
+  --porcelain` is non-empty (tracked edits or untracked files) and the load prints
+  DIRTY TREE; a unit test asserts every LINEAGE_INPUT_ZONES id is a declared READ zone
+  (data-zones.yaml + the source-registry drops, the same union read_zone_containing
+  searches). RETENTION DECIDED: lineage-extract --keep N (DEFAULT_KEEP = 10) prunes the
+  staged zone to the newest N after a successful write; 0 keeps all; the load never
+  deletes. N and not newest-only because a re-run of the load against yesterday's
+  artifact needs yesterday's artifact; not keep-all because the zone is a WRITE zone
+  rebuilt from the read zones and the run log carries every header regardless.
+
+  (d) VENUE-TAGGED PROOF - desktop, container `neo4jtest`, database `drydocs`
+  (2026-09-04 11:56 local). The bundled-sample artifact (run e19653ca, 33 processes,
+  17 INVOKES candidates, 0 data assets) with a decisions file confirming 16 and
+  rejecting 1: plan = 5 Script, 10 ETLProcess, 16 INVOKES; graph after --write = 5 / 10
+  / 16, every one stamped with the extract run id and code commit bd5d57bc; :JobRun
+  COMPLETED with the five-hop sources block and controlm_variables present: true.
+  Second --write: counts unchanged (5 / 10 / 16), one more :JobRun (each load is its
+  own run). A synthetic artifact carrying a TRIGGERS rel, confirmed: the plan prints
+  GATE-BOUND: TRIGGERS (scheduler_triggers) is planned, and --write prints REFUSED
+  ... scheduler_triggers=planned with nothing written. WHAT THE SAMPLE DOES NOT PROVE:
+  the bundled jobs carry INVOKES only, so USES_ARTIFACT / READS_FROM / WRITES_TO landed
+  on the live graph in no row here; their activation is proven by the writer's registry
+  read (gate_bound_labels returns exactly [TRIGGERS] against the real registry) and the
+  plan shapes are the existing G13/G14/G97 unit tests. The integration test
+  (tests/integration/test_lineage_load_e2e.py, EE image from dev-environment.yaml,
+  31s) repeats the sample proof against a fresh container: plan == graph, idempotent,
+  stamped, sources verbatim, plan-only touches nothing.
+
+  (e) as built: 10 CLI tests through a fake client on the drydocs.cli._client seam
+  (plan-only never builds a client - a test patches it to raise), the refusal message
+  asserted, the write path behind the integration marker (J9). (f) held: nothing
+  activated, no reload / tombstone marking.
