@@ -27,8 +27,8 @@
 # provenance — never an image (§C2 (d)).
 #
 # THE NUMERIC BAND SURVIVES ONLY AS HISTORY (§C4): both legacy partition rules
-# retired forward-only; `legacy_band` on a row records the 10000+ band the company
-# base used before it had a code, for reading old ids, and nothing else.
+# retired forward-only; `legacy_band` on a row records the five-digit band the
+# company base used before it had a code, for reading old ids, and nothing else.
 #
 # THE TWO REGISTRIES NEVER SHARE (§A2): a domain partitions the VOCABULARY
 # (config/taxonomy/domains.yaml); an edition partitions the ID SPACE (this file).
@@ -83,8 +83,10 @@ editions:
     minted_by: producer
     registered_at: 2026-09-04
     authority: ontology-domain-registry-and-edition-grain
-    legacy_band: 20000
+    legacy_band: 70001                 # the publish-boundary guard's synthetic block, on purpose
     sample: true
     note: >-
       Invented, carrying a legacy_band so the field's shape is exercised: a band
-      is read for old ids only and never used to mint.
+      is read for old ids only and never used to mint. The value sits in the
+      70001-70099 block test_publish_boundary_values.py reserves for synthetic
+      numbers, so no real band is echoed here.
