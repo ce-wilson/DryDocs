@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://drydocs.internal/schemas/data-centers.schema.json",
+  "title": "drydocs.data-centers.v1 — the data-center spelling registry (LOAD2)",
+  "description": "One row per data center, carrying BOTH spellings: the short Control-M server code (CM_DEF_VTAB.DATA_CENTER) and the long-form name (CM_HOSTS / CM_AVG_RUN). The pairing is declared because short -> long is not derivable: the long form carries a default-time segment and a suffix the short code does not contain.",
+  "type": "object",
+  "required": ["schema", "classification", "data_centers"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": "drydocs.data-centers.v1" },
+    "classification": { "enum": ["Internal", "Internal-Public", "External"] },
+    "classification_only": { "type": "boolean" },
+    "updated": { "description": "date or string (YAML parses bare dates)" },
+    "data_centers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["code", "name"],
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9]{1,7}$",
+            "description": "SHORT Control-M server code — what CM_DEF_VTAB.DATA_CENTER carries."
+          },
+          "name": {
+            "type": "string",
+            "minLength": 3,
+            "description": "LONG-form data-center name — what CM_HOSTS and CM_AVG_RUN carry."
+          },
+          "default_time": { "type": "string" },
+          "suffix": { "type": "string" },
+          "sample": { "type": "boolean" },
+          "note": { "type": "string" }
+        }
+      }
+    }
+  }
+}

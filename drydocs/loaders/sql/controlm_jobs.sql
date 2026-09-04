@@ -23,8 +23,16 @@
 --   :developer_sid  authoring developer SID — J.AUTHOR/CREATION_USER/CHANGE_USERID
 --                   (lowercase-initial; trailing 'p' = automation release process)
 --   :row_cap        ROWNUM sample cap
---   :data_center_filter  data-center name LIKE pattern — T.DATA_CENTER (G115,
---                   the per-data-center run recipe; long-form name)
+-- LOAD2 (2026-09-04): this statement reads CM_DEF_VTAB, which carries the SHORT
+-- Control-M server code, so it binds :data_center_code. CM_HOSTS and CM_AVG_RUN
+-- carry the LONG-form name and bind :data_center_filter. The scope helper emits
+-- BOTH from one --data-center value (drydocs/cli_shared.py _data_center_binds) and
+-- python-oracledb drops the one this statement does not name. Before LOAD2 every
+-- statement bound :data_center_filter and a long-form value here returned ZERO ROWS,
+-- reading as an empty data center rather than as an error.
+--   :data_center_code  data-center LIKE pattern — T.DATA_CENTER (G115 the
+--                   per-data-center run recipe; LOAD2: CM_DEF_VTAB carries the
+--                   SHORT server code, never the long-form name)
 --   (operational who-ran-it identity is separate — psgmgr.CM_AUD_ACTS, later)
 -- =============================================================================
 
@@ -72,6 +80,6 @@ WHERE  J.IS_CURRENT_VERSION = 'Y'
   AND  (:folder_filter      IS NULL OR T.SCHED_TABLE LIKE :folder_filter)
   AND  (:run_as             IS NULL OR J.OWNER        =  :run_as)   -- tenant FID user
   AND  (:developer_sid      IS NULL OR :developer_sid IN (J.AUTHOR, J.CREATION_USER, J.CHANGE_USERID))
-  AND  (:data_center_filter IS NULL OR T.DATA_CENTER LIKE :data_center_filter)
+  AND  (:data_center_code IS NULL OR T.DATA_CENTER LIKE :data_center_code)
   AND  (:row_cap            IS NULL OR ROWNUM        <=  :row_cap)
 ;

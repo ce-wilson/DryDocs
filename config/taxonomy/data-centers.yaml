@@ -1,0 +1,99 @@
+# =============================================================================
+# config/taxonomy/data-centers.yaml — the DATA-CENTER SPELLING REGISTRY: the
+# short Control-M server code and the long-form data-center name, DECLARED as a
+# pair (LOAD2 (c); RELAY-25, the company's P6 finding on the live replica).
+#
+# WHY THIS FILE EXISTS. One `--data-center` value has to reach two families of
+# psgmgr tables that spell a data center differently:
+#
+#   SHORT code   CM_DEF_VTAB.DATA_CENTER  -> folders, and the folder-joined jobs
+#                                            and variables extracts
+#   LONG name    CM_HOSTS.DATA_CENTER, CM_AVG_RUN.DATA_CENTER
+#
+# A long-form value against the VTAB family returns ZERO ROWS and reads as an
+# empty data center rather than as an error — the failure LOAD2 exists to
+# remove.
+#
+# THE PAIRING IS DECLARED BECAUSE SHORT -> LONG IS NOT DERIVABLE, and the
+# bundled sample corpus is the proof rather than an argument about it. The two
+# committed samples carry the SAME data centers in the two spellings:
+# `controlm_folders__sample.csv` holds `P12`, `P14`, `P32`, `P33` and
+# `controlm_hosts__sample.csv` holds `T012-E0700-SYN`, `T014-E0700-SYN`.
+# Getting from `P12` to `T012-E0700-SYN` needs four facts the short code does
+# not contain: the environment letter, the zero pad, the default time (`E0700`)
+# and the suffix (`SYN`). The zero-padding LOOKS derivable and the rest is not
+# derivable at all, which is why this is a lookup and never a computation.
+# The grammar itself is documented in
+# knowledge/standards/technology/data-center-naming-convention.md (position 1 =
+# environment, `E####` = default time, suffix ignored for scheduling).
+#
+# THE ROWS HERE ARE SYNTHETIC, on the lob-product-team.yaml / editions.yaml
+# pattern: a publishable SHAPE producer-side, real rows in the internal twin.
+# They are the bundled corpus's own values so that one `--data-center` option
+# reaches both sample families (LOAD2 d) — `P12` selects folder rows by its
+# short code and host rows by its long name, in one run.
+#
+# TWO OBSERVATIONS RECORDED RATHER THAN FIXED (neither is LOAD2's to change):
+#   1. The corpus is inconsistent on the environment letter — the folders sample
+#      carries `P` in position 1 while the hosts sample carries `T`, and the
+#      naming-convention page's sanitization rule (SME 2026-08-11) says a
+#      publishable copy swaps that character to `T`. The pairs below record the
+#      corpus as it IS; re-lettering committed fixtures ripples through the
+#      test suite and belongs to its own item.
+#   2. `P32` and `P33` appear in the folders sample with no host rows behind
+#      them, so their long names follow the corpus's own `-SYN` convention to
+#      complete the pairing. They are marked below; nothing observes them.
+#
+# THE INTERNAL TWIN (J13) holds the real inventory:
+# `internal/controlm-config/data-centers.yaml`, same schema, `sample` absent or
+# false. drydocs_core/data_centers.py reads the TWIN when it is present and this
+# file otherwise, and says which one it read — a translation proven against a
+# synthetic sample is not a translation proven against the estate (J18).
+#
+# Reader: drydocs_core/data_centers.py. Guards: tests/unit/test_data_centers.py.
+# =============================================================================
+
+schema: drydocs.data-centers.v1
+classification: Internal            # real rows name production data centers (J23 handling)
+classification_only: true
+updated: 2026-09-04
+
+# Fields (all required unless marked):
+#   code           the SHORT Control-M server code — CM_DEF_VTAB.DATA_CENTER
+#   name           the LONG-form data-center name — CM_HOSTS / CM_AVG_RUN
+#   default_time   the E#### segment read as a time, per the naming standard
+#   suffix         the trailing segment (ignored for scheduling; recorded)
+#   sample         true on a synthetic row; a real row omits it or says false
+#   note           (optional)
+
+data_centers:
+  # ---- SYNTHETIC SAMPLE — the bundled corpus's own values --------------------
+  # Observed in BOTH samples: the short code in controlm_folders__sample.csv and
+  # the long name in controlm_hosts__sample.csv. These two pairs are what make
+  # LOAD2 (d) testable on the bundled corpus.
+  - code: P12
+    name: T012-E0700-SYN
+    default_time: "07:00 EST"
+    suffix: SYN
+    sample: true
+  - code: P14
+    name: T014-E0700-SYN
+    default_time: "07:00 EST"
+    suffix: SYN
+    sample: true
+  # Short code observed in the folders sample; no host rows behind them, so the
+  # long name completes the pairing on the corpus's own convention. Nothing
+  # observes these two — they exist so a folders-family run over the sample is
+  # not refused for a data center the sample really carries.
+  - code: P32
+    name: T032-E0700-SYN
+    default_time: "07:00 EST"
+    suffix: SYN
+    sample: true
+    note: "long name unobserved — completes the pairing for a short code the folders sample carries"
+  - code: P33
+    name: T033-E0700-SYN
+    default_time: "07:00 EST"
+    suffix: SYN
+    sample: true
+    note: "long name unobserved — completes the pairing for a short code the folders sample carries"

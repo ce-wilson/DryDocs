@@ -861,25 +861,45 @@ def _scope_binds(
                           start with a lowercase letter; a SID ending in lowercase
                           'p' is the automation release process, not a person.
       row_cap             unordered ROWNUM sample cap
-      data_center_filter  data-center LIKE pattern (G115). TWO value domains,
-                          not one - corrected 2026-09-03 from the company's P6
-                          finding, which the producer's own SQL comments already
-                          agreed with: CM_DEF_VTAB.DATA_CENTER (folders, and the
-                          folder-joined jobs and variables extracts) carries the
-                          SHORT Control-M server code, while CM_HOSTS and
-                          CM_AVG_RUN carry the LONG-form name. The 2026-07-22
-                          probe (drydocs/loaders/sql/adhoc/profile_cm_avg_run.sql)
+      data_center_filter  LONG-form data-center name - CM_HOSTS.DATA_CENTER and
+                          CM_AVG_RUN.DATA_CENTER (G115).
+      data_center_code    SHORT Control-M server code - CM_DEF_VTAB.DATA_CENTER,
+                          so folders and the folder-joined jobs and variables
+                          extracts (LOAD2).
+
+                          TWO VALUE DOMAINS, TWO BINDS, ONE OPTION. The operator
+                          passes ONE --data-center value in either spelling and
+                          both binds are emitted; each statement binds the one
+                          its own column carries, and python-oracledb drops the
+                          named bind a statement does not use, so the full dict
+                          stays safe everywhere. Before LOAD2 there was one bind
+                          and one value domain: a long-form value against the
+                          VTAB family returned ZERO ROWS and read as an empty
+                          data center rather than as an error, which is the
+                          failure this closes.
+
+                          THE PAIRING IS DECLARED, NEVER DERIVED
+                          (config/taxonomy/data-centers.yaml, read through
+                          drydocs_core.data_centers; the internal twin holds the
+                          real inventory). The long form carries a default-time
+                          segment and a suffix that the short code does not
+                          contain at all - nothing in 'T32' says 7:00 AM EST - so
+                          short -> long cannot be computed, however derivable the
+                          zero-padding looks. A value in NEITHER domain is
+                          refused with both spellings named.
+
+                          A LIKE PATTERN still passes through untouched, like
+                          folder_filter: a value carrying '%' or '_' is not a
+                          data-center name, so it is bound to BOTH binds as
+                          given and the operator's pattern does the work. That is
+                          the one case where the two binds carry the same string.
+
+                          The 2026-07-22 probe
+                          (drydocs/loaders/sql/adhoc/profile_cm_avg_run.sql)
                           profiled CM_AVG_RUN alone, so its "long-form" answer
-                          was true of that table and over-generalized here. One
-                          bind value therefore serves one family at a time: pass
-                          the short code to a folders/jobs/variables run and the
-                          long form to a hosts/avg-run run; a long-form value
-                          against the VTAB family returns zero rows and looks
-                          like an empty data center. The short-to-long mapping is
-                          a declared fact (the internal data-center inventory),
-                          never derived in code - a second bind carrying it is
-                          the LOAD item that closes this. The pattern still
-                          passes through untouched, like folder_filter.
+                          was true of that table and was over-generalized to the
+                          family; the company's P6 work on the live replica
+                          found it (2026-09-03, RELAY-25).
 
     Operational employee identity (who *ran* actions, vs who authored the
     definition) is separate and not here — it lives in psgmgr.CM_AUD_ACTS;
@@ -897,13 +917,43 @@ def _scope_binds(
     Case-folding the DIRECTORY side is a separate matter and does not belong in
     this bind (gate fid-identity-and-scope §Q6).
     """
+    dc_long, dc_short = _data_center_binds(data_center)
     return {
         "folder_filter": folder,
         "run_as": run_as.upper() if run_as else run_as,
         "developer_sid": developer_sid,
         "row_cap": row_cap,
-        "data_center_filter": data_center,
+        "data_center_filter": dc_long,
+        "data_center_code": dc_short,
     }
+
+
+#: LIKE metacharacters: a value carrying one is an operator PATTERN, not a name.
+_LIKE_CHARS = ("%", "_")
+
+
+def _data_center_binds(value: str | None) -> tuple[str | None, str | None]:
+    """``(long, short)`` for one ``--data-center`` value (LOAD2 b/c).
+
+    ``None`` means no filter on that dimension and both binds stay NULL. A LIKE
+    PATTERN passes through to both binds unchanged - the operator's pattern is doing
+    the work and the registry has nothing to say about it. Anything else is resolved
+    through the declared registry, so one value reaches the table that speaks each
+    domain; a value in neither domain is refused with both spellings named, because
+    passing it through is the silent zero-row result this item exists to remove.
+    """
+    if value is None:
+        return None, None
+    if any(ch in value for ch in _LIKE_CHARS):
+        return value, value
+    from drydocs_core.data_centers import DataCenterError, resolve
+
+    try:
+        dc = resolve(value)
+    except DataCenterError as exc:
+        console.print(f"[red]{exc}[/]")
+        raise typer.Exit(2) from None
+    return dc.name, dc.code
 
 
 # Reusable scope CLI options — attach to any command that runs a psgmgr extract.
@@ -941,9 +991,11 @@ def _data_center_opt():
         None,
         "--data-center",
         help=(
-            "Data-center LIKE pattern. SHORT server code for folders/jobs/variables "
-            "(CM_DEF_VTAB, e.g. 'T32'); LONG-form name for hosts/avg-run (e.g. "
-            "'T032-E0700-DMA' or 'T032%') - two value domains, one bind, one family per run. "
-            f"{_SCOPE_HELP}"
+            "Data center, in EITHER spelling: the short server code (e.g. 'T32', what "
+            "CM_DEF_VTAB carries) or the long-form name (e.g. 'T032-E0700-DMA', what "
+            "CM_HOSTS and CM_AVG_RUN carry). One value reaches every table in the domain "
+            "that table speaks - the pairing is declared in config/taxonomy/"
+            "data-centers.yaml. A LIKE pattern ('T032%') is passed through to both "
+            f"columns as given. {_SCOPE_HELP}"
         ),
     )

@@ -235,9 +235,9 @@
         "config/taxonomy/business-application.yaml",
         "config/taxonomy/context-types.yaml",
         "config/taxonomy/controlm.yaml",
+        "config/taxonomy/data-centers.yaml",
         "config/taxonomy/domains.yaml",
         "config/taxonomy/editions.yaml",
-        "config/taxonomy/exampletodelete.txt",
         "config/taxonomy/lob-product-team.yaml",
         "config/taxonomy/location-gazetteer.yaml",
         "config/taxonomy/medallion-stages.yaml",
@@ -672,6 +672,7 @@
       "env_refs": [],
       "files": [
         "config/schemas/classification.schema.json",
+        "config/schemas/data-centers.schema.json",
         "config/schemas/domains.schema.json",
         "config/schemas/editions.schema.json",
         "config/schemas/precedence.schema.json",

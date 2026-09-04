@@ -32,6 +32,10 @@
 -- pattern). Use case: server-patching / maintenance-window planning.
 --
 -- Scope binds (optional, NULL = no filter): :grpname_filter (H.GRPNAME LIKE),
+-- LOAD2 (2026-09-04): this column carries the LONG-form data-center name, so
+-- this statement binds :data_center_filter. The CM_DEF_VTAB family (folders,
+-- jobs, variables) carries the SHORT server code and binds :data_center_code;
+-- one --data-center value emits both binds and each statement uses its own.
 -- :row_cap (ROWNUM sample cap), :data_center_filter (H.DATA_CENTER LIKE —
 -- G115; this column is long-form, so the family-shared long-form pattern
 -- applies directly). :folder_filter / :run_as / :developer_sid do

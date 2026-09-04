@@ -65,6 +65,10 @@ FAMILIES: dict[str, tuple[str, list[Path]]] = {
         "editions.schema.json",
         [REPO / "config" / "taxonomy" / "editions.yaml"],
     ),
+    "data-centers": (
+        "data-centers.schema.json",
+        [REPO / "config" / "taxonomy" / "data-centers.yaml"],
+    ),
 }
 
 
@@ -205,6 +209,16 @@ _MALFORMED: dict[str, tuple[dict | list, str]] = {
             ],
         },
         "$.editions[0].code",
+    ),
+    # data-center registry: a row with only one spelling (the PAIRING is the fact)
+    "data-centers": (
+        {
+            "schema": "drydocs.data-centers.v1",
+            "classification": "Internal",
+            "updated": "2026-09-04",
+            "data_centers": [{"code": "P12"}],
+        },
+        "$.data_centers[0]",
     ),
 }
 
