@@ -12,6 +12,7 @@ depends_on:
 - CFG2
 gates:
 - ontology-domain-registry-and-edition-grain
+- idea-series-grammar
 inputs:
 - docs/reviews/restructure-design-review-2026-09-02.md
 - .claude/skills/groom-backlog/validate.py

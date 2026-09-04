@@ -411,6 +411,7 @@
         "config/gate-prompts/envelope-property-terms.yaml",
         "config/gate-prompts/etlprocess-kind-enum.yaml",
         "config/gate-prompts/fid-identity-and-scope.yaml",
+        "config/gate-prompts/idea-series-grammar.yaml",
         "config/gate-prompts/medallion-stage-vocabulary.yaml",
         "config/gate-prompts/ontology-domain-registry-and-edition-grain.yaml",
         "config/gate-prompts/pending-source-correction.yaml",

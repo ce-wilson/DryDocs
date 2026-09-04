@@ -1290,6 +1290,19 @@
     {
       "kind": "prompt-only",
       "date": null,
+      "title": "idea-series-grammar (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/idea-series-grammar.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": [
+        "PLAN2"
+      ]
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
       "title": "registry-wiring-readiness (gate page rendered — session not yet run)",
       "status": "open",
       "prompt_files": [

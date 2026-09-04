@@ -1,0 +1,163 @@
+# GATE idea-series-grammar — DRAFTED 2026-09-04. A RIDER to
+# ontology-domain-registry-and-edition-grain (SIGNED 2026-09-02, 14/14), on the C40 shape:
+# the signed gate ruled the ITEM id grammar and retired both partition rules; it never
+# ruled the Idea series (the words Idea, IDEAS.md and inbox appear in neither the prompt
+# nor the record — review 2f9ebfc7 G2). PLAN2 found the gap and named it as an open
+# question in its own acceptance; a build item is the wrong venue for a grammar ruling,
+# so the question comes here and PLAN2 (b) implements what signs.
+# UNSIGNED. Nothing changes in the allocator until this signs. Mechanism only: the
+# company's ids are cited by number as reported, never with their bodies.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: idea-series-grammar
+title: >-
+  SME Gate (rider) — the Idea series takes the same edition segment as an item id, and a
+  venue with no declared edition may still capture an idea: the carve-out that keeps the
+  company's last open channel open between PLAN2 porting and its own edition gate
+step: >-
+  Rider drafted 2026-09-04 from the intake review (docs/reviews/ideas-to-backlog-intake-
+  review-2026-09-03.md, G1 blocking, G2 blocking, G3, G5), after the signed record
+  "ontology-domain-registry-and-edition-grain" (config/gate-log.md, 2026-09-02) settled
+  `[<EDITION>-]<MODULE><n>` for items. Blocks PLAN2 clause (b) only; CFG1, CFG2 and DOC1
+  are unaffected and proceed.
+summary: >-
+  (a) THE GAP. The allocator treats `Idea` as its own case (validate.py IDEA_SERIES): the
+  `--next-id Idea` path reads the inbox headers and mints `Idea-<highest+1>` without ever
+  calling next_id(), so none of the three refusals that shut every company ITEM route
+  (DD reserved, 27 letters frozen, the 9999 ceiling) touches it. That is how Idea-10012
+  came to exist company-side, and it is also the ONLY channel the company has left: every
+  sanctioned item mint is refused there. (b) THE GRAMMAR QUESTION. Signed C1 rules
+  `[<EDITION>-]<MODULE><n>` for items. Either the Idea series takes the same segment
+  (`<EDITION>-Idea-<n>`, base edition unprefixed — one grammar, two id kinds) or it stays
+  band-numbered as a written exception (one grammar with two shapes, a standing tax).
+  PLAN2 recommends the first; this rider asks the SME to rule it. (c) THE CARVE-OUT, which
+  is the part that matters more than the grammar. PLAN2's venue rule — "a venue whose file
+  declares no `edition:` mints nothing and the refusal names the key to set" — applied
+  uniformly to Idea would leave the company with NO channel at all between PLAN2 porting
+  and its own edition gate, and that window is not short: CFG2 (c) bars the producer from
+  naming the company's code, so the company must run its own gate first. The inbox is a
+  capture surface, not a commitment surface; refusing a capture loses the thought, refusing
+  an item mint only delays work. (d) THE MECHANISM the ruling buys: the Idea branch routes
+  through a `next_idea_id()` that finally applies the three rules it skips today (max+1,
+  never the lowest gap; the floor; the venue check), so "Idea-10017 is the last band idea"
+  becomes a mechanism instead of a claim about timing (G3). (e) NOTHING RENUMBERS. Every
+  existing Idea id parses unchanged; the segment is optional and the base has none.
+
+meta:
+  Module: >-
+    drydocs-plan — the allocator (.claude/skills/groom-backlog/validate.py: _IDEA_RE :75,
+    _IDEA_IN_DIFF_RE :81, the short-circuit :360-364 and the literal mint :363, the render
+    at :393 and :416) and its guard (tests/unit/test_plan_ideas.py: _HEADER :92-93, the
+    id-extraction twin :109, the band guard's parse :163). Seven Idea-shape sites the
+    signed gate's fifteen-site count did not include (G5). No loader, no graph write.
+  Source: >-
+    config/gate-log.md 2026-09-02 "ontology-domain-registry-and-edition-grain" 14/14
+    (C1 the grammar, C4 both partition rules retired forward-only; the record's scope,
+    which is items only); docs/restructure/backlog/items/PLAN2.yaml acceptance (b), the
+    paragraph "THE IDEA SERIES HAS NO GRAMMAR IN THIS ITEM YET"; docs/reviews/
+    ideas-to-backlog-intake-review-2026-09-03.md G1-G3, G5; docs/restructure/IDEAS.md
+    "Allocator bands" section (the 2026-08-18 band rule as the inbox states it).
+  Precedent: >-
+    C40 for the rider shape (a signed ruling gets a revisit axis rather than an amendment
+    smuggled into a build item); the ETLProcess kind-enum rider (G27, 2026-07-22) for a
+    rider drafted from a build item's open question; I6 for mint-stub-then-body, which the
+    Idea path has never had; G87 for never renumbering an id-bearing thing.
+  Registry ref: >-
+    Producer inbox: highest Idea-255 (2026-09-04), 1-9999 by the band guard. Company inbox:
+    Idea-10012 and Idea-10015..10017 reported by number (their inbox; the producer holds no
+    transcript and company ideas never cross, port-prompt.md). Editions declared: none.
+  Classification: >-
+    Internal-Public — mechanism only. The company's edition code is theirs to declare
+    (CFG2 c); this prompt names none.
+  Counts: >-
+    Measured 2026-09-04 (producer desktop, main fe4df356): Idea-shape sites 7 (the four
+    allocator sites and the three guard sites named in Module); item-shape sites 8 per the
+    signed gate; company-minted band ideas known by report 4 (10012, 10015, 10016, 10017).
+
+provenance:
+  - label: The Idea path bypasses every refusal
+    source_object: .claude/skills/groom-backlog/validate.py
+    key: "_report_allocation :360-364; next_id :316-350"
+    loader: NONE — the allocator's own code.
+    properties:
+      - name: the_short_circuit
+        origin: source
+        from: >-
+          "if series.strip().upper() == IDEA_SERIES: numbers, counts, refs = idea_ids();
+          highest = max(numbers, default=0); label, allocated = \"Idea\", f\"Idea-{highest + 1}\""
+      - name: the_three_item_refusals
+        origin: source
+        from: >-
+          "refused: the {series}-series is reserved for company-side-only items" (:318);
+          "refused: the {series}-series was FROZEN on {FROZEN_ON}" (:323); "refused:
+          {series}{nxt} is in the COMPANY band (>{PRODUCER_BAND_CEILING})" (:346)
+      - name: none_of_them_reach_idea
+        origin: derived
+        from: >-
+          the Idea branch returns before next_id() is called, so the reserved, frozen and
+          ceiling refusals are never evaluated for it; the only band enforcement on Idea is
+          tests/unit/test_plan_ideas.py:153-171, a guard over the PRODUCER's own file.
+  - label: The signed gate's scope
+    source_object: config/gate-log.md
+    key: "2026-09-02 — ontology-domain-registry-and-edition-grain, C1 and C4"
+    loader: NONE — a signed record.
+    properties:
+      - name: c1_grammar
+        origin: source
+        from: "[<EDITION>-]<MODULE><n>, edition first, base edition unprefixed"
+      - name: c4_retirement
+        origin: source
+        from: "both legacy partition rules retire, forward-only"
+      - name: items_only
+        origin: derived
+        from: >-
+          neither the record nor the 191-line prompt contains the words Idea, IDEAS.md,
+          inbox or idea inbox (review 2f9ebfc7 G2, verified 2026-09-03); the grammar is
+          ruled for item ids and silent on the inbox.
+  - label: Where the gap was first named
+    source_object: docs/restructure/backlog/items/PLAN2.yaml
+    key: "acceptance (b), the paragraph beginning THE IDEA SERIES HAS NO GRAMMAR"
+    loader: NONE — a todo item's acceptance.
+    properties:
+      - name: the_open_question
+        origin: source
+        from: >-
+          "either `<EDITION>-Idea-<n>` on the same segment rule ... or the Idea series
+          stays band-numbered forward-only as a deliberate exception ... Recommend the
+          first"
+      - name: the_venue_rule
+        origin: source
+        from: >-
+          "a venue whose file declares no `edition:` mints nothing and the refusal names
+          the key to set"
+      - name: wrong_venue_for_a_ruling
+        origin: derived
+        from: >-
+          a build item's acceptance is where a signed clause is implemented, not where a
+          grammar is decided; a ruling made there never reaches gate-log.md and reads as
+          landed-or-not by which document is open (G2).
+
+sections:
+  - title: A. What is settled, and what this rider may not touch
+    confirmations:
+      - "A1. THE ITEM GRAMMAR IS NOT REOPENED. `[<EDITION>-]<MODULE><n>` stands as signed (C1); the 27 letters stay frozen; both partition rules stay retired forward-only (C4); no id of any kind moves. This rider adds the Idea series to a ruling that was silent on it and nothing else."
+      - "A2. THE COMPANY'S IDEAS ARE THEIRS. Company ideas never cross (port-prompt.md); the producer cites Idea-10012 and Idea-10015..10017 by number as reported and holds no body. Nothing here classifies, moves or renumbers a company id; the company applies the signed clause through its own gate, as with every ruling."
+
+  - title: B. The grammar
+    confirmations:
+      - "B1. THE IDEA SERIES TAKES THE SAME SEGMENT AS AN ITEM: `[<EDITION>-]Idea-<n>`, edition first, base edition unprefixed. `Idea-255` is producer main; `<code>-Idea-1` is that edition's first idea. One grammar, two id kinds (`<MODULE><n>` and `Idea-<n>`), one segment rule — PLAN2's recommendation, taken because the alternative (band-numbered Idea as a written exception) is one grammar with two shapes and a standing tax at every id-shape site. Every existing Idea id parses unchanged."
+      - "B2. THE INBOX IS INSTANCE-OWNED, which is what gives the segment a meaning. An edition's inbox is its own capture surface (DOC1 amends ADR 0015 D2 to say so); the cross-estate view is a query over the ideas, never a sort over their ids. If DOC1 does not land before PLAN2, PLAN2 (b) cites THIS clause for the instance-owned inbox rather than an unlanded amendment (G4)."
+
+  - title: C. The carve-out — a capture surface never refuses a capture
+    confirmations:
+      - "C1. A VENUE WITH NO DECLARED `edition:` MAY STILL MINT AN IDEA. PLAN2's venue rule (mint nothing, name the key) applies to ITEM ids only. For an Idea, an undeclared venue mints band-shaped — `Idea-<n>`, n above 9999 — until the venue declares its code, and the id it gets is stable from then on (never re-prefixed when the code arrives). The refusal that names CFG2 fires for item ids alone. Reason: between PLAN2 porting and the company's own edition gate the company has NO other channel (every item route is refused: DD reserved, letters frozen, ceiling), and that window is real — CFG2 (c) bars the producer from naming their code, so their gate must run first. Refusing a capture loses the thought; refusing an item mint only delays work."
+      - "C2. ONE BRANCH, NOT TWO RULES (G3). 'A declared venue mints prefixed; an undeclared venue mints band-shaped' is a single branch in `next_idea_id()`. The band on the Idea path is therefore ADDED here as the undeclared-venue shape — it was never enforced in code for ideas — and it ends per venue on the day that venue declares its code, not by a retirement date."
+
+  - title: D. The mechanism the ruling buys
+    confirmations:
+      - "D1. THE IDEA BRANCH GOES THROUGH `next_idea_id()` AND GETS THE THREE RULES IT SKIPS TODAY: max+1 across local, every remote ref and history (never the lowest gap — a gap is a burned id), the floor, and the venue check of C1. The short-circuit at validate.py:360-364 retires; `_IDEA_RE` / `_IDEA_IN_DIFF_RE` and the guard's `_HEADER` learn the optional segment (the seven Idea-shape sites, G5). `--next-id Idea` returns the same number before and after on the producer, which is the acceptance's proof."
+      - "D2. THE BAND GUARD ON THE PRODUCER'S INBOX STAYS AS IS (test_plan_ideas.py:153-171, PORTED_COMPANY_IDS hand-maintained): a five-digit Idea in the producer file is still a company entry that landed here and gets looked at once. It is a guard over one file, never the allocator's rule."
+
+  - title: E. Fence
+    confirmations:
+      - "E1. NOT RULED HERE: the sharded inbox (ADR 0019, the intake review's pass 2 — its own decision, and it does not land while a port range containing IDEAS.md is mid-apply); the idea-to-item join fields; dedupe. This rider decides the id's SHAPE and who may mint one, nothing about the file the id lives in."
