@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-04T09:31:00",
+    "captured_at": "2026-09-04T10:12:02",
     "date": "20260904",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "ba7f7920",
-      "full": "ba7f79201fd6c20cf9843833fcdec524a9c67a3d",
+      "commit": "5803d091",
+      "full": "5803d09117ae3cfbe3ad81ad27c353d46eb859da",
       "branch": "main",
-      "describe": "port-base-20260902-98-gba7f7920",
-      "subject": "fix(CFG2): the sample's legacy_band sits in the publish-boundary guard's synthetic block and the header no longer spells the band as a five-digit literal - test_bare_ids_in_taxonomy_samples_knowledge_are_synthetic read both as possible real ids; pen: backlog · port · adr · gates · snapshot",
+      "describe": "port-base-20260902-101-g5803d091",
+      "subject": "docs(DOC1): ADR 0015 amended by dated section - Team Edition ships a thin instance-owned backlog, inbox and board (D2), groom-backlog with a mandatory --scope (D6), the edition as a declared segment keyed to area_product_id so D3 and the id grammar agree (C1-C3), the ontology frozen BECAUSE the aggregate query needs one vocabulary (B5 rider), four named guards, and the aggregate roll-up recorded OPEN (F8) with follow-up row 3a; original D2/D3/D4/D6 text untouched; README index updated; done; pen: backlog · port · adr · gates · snapshot",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -22049,10 +22049,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260902.json",
-      "name": "drydocs-20260902.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260904.json",
+      "name": "drydocs-20260904.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260902.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260904.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -46063,7 +46063,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260902.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260904.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
