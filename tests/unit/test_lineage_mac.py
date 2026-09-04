@@ -413,3 +413,19 @@ def test_ambiguous_casing_counted_never_guessed(tmp_path: Path) -> None:
     assert cov.clone_ambiguous_folders == 1
     assert cov.clone_pipeline_folders == 0
     assert cov.clone_dataset_folders == 0
+
+
+def test_the_serialized_coverage_carries_a_count_not_every_pipeline_guid(tmp_path) -> None:
+    """Idea-254: the artifact's coverage block is a HEADER. `clone_pipeline_guids` is one
+    entry per pipeline folder the clone walk parsed - unbounded at estate scale - so
+    `as_dict()` serializes the distinct COUNT and keeps the list on the object, where
+    staging's registry cross-check reads it. `clone_missing_set_guids` stays a list: it is
+    the fetch work list, bounded by what is missing, and it IS the finding."""
+    cov = MacCoverage()
+    cov.clone_pipeline_guids = ["g1", "g2", "g3"]
+    cov.clone_missing_set_guids = ["g9"]
+    out = cov.as_dict()
+    assert "clone_pipeline_guids" not in out, "the unbounded list never reaches the header"
+    assert out["clone_pipeline_guids_distinct"] == 3
+    assert out["clone_missing_set_guids"] == ["g9"], "the work list stays a list"
+    assert cov.clone_pipeline_guids == ["g1", "g2", "g3"], "the object keeps what staging reads"
