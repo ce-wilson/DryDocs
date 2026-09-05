@@ -23,6 +23,8 @@
 # this page unusual among gate prompts — it does NOT need placeholders.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-17
+
 id: corporate-backbone-vocabulary
 title: "SME Gate — the corporate backbone: does :Company enter the vocabulary, is the effective-dated segment edge one type or two, and does a single-company label belong in a portable repo"
 step: "ontology.cypher has seeded (:Company {name:'JPMC'})-[:HAS_BUSINESS_SEGMENT]->(:BusinessSegment) since M0 with a live uniqueness constraint; BusinessSegment and CatalogLOB are registered in the vocabulary, :Company and both segment edges are not — and no guard can see the gap"

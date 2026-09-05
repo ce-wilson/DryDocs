@@ -13,6 +13,8 @@
 # D1/Q1 rulings).
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-26
+
 id: source-registry-v2
 title: "SME Gate — source-registry schema v2: SYSTEM/DATASET two-level identity, qualified replica ids (origin@db.schema.table), per-side loader overlay, URN handle, reconcile guard"
 step: "Decision gate for the registry redesign (N7) — decides FROM internal/registry-redesign/REGISTRY-PLAN.md (the 2026-07-31 plan of record: three distinctions, id grammar, CDO authority field, migration sketch) bundling the four coupled decisions the backlog acceptance names as ONE design"

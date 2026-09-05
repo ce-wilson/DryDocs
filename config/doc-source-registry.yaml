@@ -103,6 +103,8 @@
 # =============================================================================
 
 schema: drydocs.doc-source-registry.v1
+classification: Internal-Public
+
 updated: 2026-09-03
 
 # The capture ladder as DATA (G134): the vocabulary `capture_rung` draws from and

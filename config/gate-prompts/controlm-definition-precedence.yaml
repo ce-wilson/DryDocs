@@ -10,6 +10,8 @@
 # use the registry's [db] grammar; no real SIDs, servers, or data values.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-20
+
 id: controlm-definition-precedence
 title: "SME Gate — Control-M definition precedence: when the deftable XML export and the psgmgr replica disagree about an object, which one is the definition source of record?"
 step: "Follows controlm-q1q3-phase1 (signed 2026-07-07 — the five psgmgr extracts are confirmed and loading) and the G46/G47/G48 cmd-line resolution build (closed 2026-07-29, ruling deliberately NOT made there). Blocks: the confirmed: false on registry row controlm:deftable-xml-export, and the D9 sibling ruling stays separate (two INTERNAL tiers — a different axis of the same precedence file)."

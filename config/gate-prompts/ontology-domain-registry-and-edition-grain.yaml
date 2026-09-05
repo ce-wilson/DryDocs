@@ -8,6 +8,8 @@
 # declared segment on an id — and the ADR 0015 amendment the second one depends on.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-09-02
+
 id: ontology-domain-registry-and-edition-grain
 title: >-
   SME Gate — the two remaining axes: an ontology domain is a MINTED object with a registry

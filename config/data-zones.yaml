@@ -66,6 +66,9 @@
 # declaring a one-command rebuild instead. Not a blanket exception: the guard
 # fails a new in-tree zone that declares neither.
 schema: drydocs.data-zones.v1
+classification: Internal-Public
+updated: 2026-09-03
+
 
 zones:
   # ---- rua bundles (G19) ----------------------------------------------------

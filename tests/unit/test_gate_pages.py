@@ -124,6 +124,48 @@ def test_all_committed_specs_follow_the_standard_format() -> None:
         assert origins <= {"source", "derived"}, f"{path.name}: bad origins {origins}"
 
 
+def test_every_spec_carries_the_dated_identity_header() -> None:
+    """J58 clause (d): the one key these 60 specs lacked.
+
+    They were already a governed exception with their own enforced header
+    (Module / Source / Registry ref / Classification, asserted above) and NO
+    date key at all — so nothing recorded when a signed spec last moved. The
+    shape comes from the one identity schema, `gatePrompt` profile:
+    `schema` + `classification` at the root plus `updated`; `source` stays in
+    `meta` where the assertion above already reads it.
+
+    ENFORCED HERE ON PURPOSE. `test_config_identity_header.py` owns the schema
+    and the file-class map, but these files keep ONE guard rather than gaining a
+    second one racing over the same directory — the acceptance says so in as
+    many words, and two guards over one directory is how a rule ends up half
+    enforced in each.
+    """
+    import datetime
+    import json
+
+    import yaml
+    from jsonschema import Draft202012Validator
+
+    repo = DEFAULT_GATE_PROMPTS_DIR.parents[1]
+    schema = json.loads(
+        (repo / "config" / "schemas" / "identity-header.schema.json").read_text(encoding="utf-8")
+    )
+    validator = Draft202012Validator({**schema, "$ref": "#/$defs/gatePrompt"})
+
+    specs = sorted(DEFAULT_GATE_PROMPTS_DIR.glob("*.yaml"))
+    assert specs, "no committed gate specs found"
+    offenders: list[str] = []
+    for path in specs:
+        raw = yaml.safe_load(path.read_text(encoding="utf-8"))
+        # A bare `2026-08-04` parses to a date; the schema wants its ISO form.
+        if isinstance(raw.get("updated"), datetime.date | datetime.datetime):
+            raw = {**raw, "updated": raw["updated"].isoformat()[:10]}
+        offenders += [f"{path.name}: {e.message}" for e in validator.iter_errors(raw) if not e.path]
+    assert not offenders, "gate specs missing the dated identity header:\n  " + "\n  ".join(
+        offenders
+    )
+
+
 def test_committed_q1q3_spec_loads_and_renders() -> None:
     spec = load_gate_spec(DEFAULT_GATE_PROMPTS_DIR / "controlm-q1q3-phase1.yaml")
     assert spec.classification == "Internal-Public"

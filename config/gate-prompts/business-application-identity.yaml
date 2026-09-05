@@ -89,6 +89,8 @@
 # mislabel would have propagated it further.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-09-02
+
 id: business-application-identity
 title: "SME Gate — BusinessApplication identity: rename the canonical key seal_id -> app_id, or keep it?"
 step: "Rules the property contract for the canonical :BusinessApplication node before the console hardens against it — and the MERGE-key cutover that four loaders share"

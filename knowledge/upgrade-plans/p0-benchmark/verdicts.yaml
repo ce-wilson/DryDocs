@@ -1,4 +1,7 @@
 schema: drydocs.benchmark-verdicts.v1
+classification: Internal-Public
+updated: 2026-08-21
+
 source_run: knowledge/upgrade-plans/p0-benchmark/benchmark_p0_results.json
 verdict_record:
 - docs/design/graph-retrieval-benchmark-explainer.md (Rev 2, commit 0e036ff)

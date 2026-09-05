@@ -28,6 +28,8 @@
 # =============================================================================
 
 schema: drydocs.doc-capture.v1
+classification: Internal-Public
+
 updated: 2026-08-04
 
 capture:

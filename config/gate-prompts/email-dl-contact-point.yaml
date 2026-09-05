@@ -16,6 +16,8 @@
 # synthetic fixtures only (the standing sample-data-only rule for neo4jtest).
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-12
+
 id: email-dl-contact-point
 title: "SME Gate — email Distribution Lists: ontology class, contact-point edges, the notification authoring surface, source model, and the context-graph membership leg"
 step: "Decides how a DL enters the graph at all four layers — and WHERE downstream notification config should be authored going forward (Description field vs escalation-db special instructions vs extraction-only)"

@@ -9,6 +9,8 @@
 # commit under internal/server-inventory/, excluded from any public push).
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-19
+
 id: server-location-ontology
 title: "SME Gate — server/location ontology: the Server identity spine, the geography grain and located-node contract, and the Control-M join rule"
 step: "Z2 rules every meaning edge for the Z1-registered server export BEFORE the Z3 loader exists: what a Server IS (vs ExecutionHost / ControlMServer / ControlMHostGroup), how geography is carried and declared, and how the inventory joins Control-M's host topology — with the explicit two-DCs fence"

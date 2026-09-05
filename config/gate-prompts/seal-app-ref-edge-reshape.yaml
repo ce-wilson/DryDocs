@@ -24,6 +24,8 @@
 # publishable tree (PUBLISH-BOUNDARY.md; the sealid-in-strings lesson).
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-26
+
 id: seal-app-ref-edge-reshape
 title: "SME Gate — Application↔Control-M attribution close-out: folder grain, app-code defined mapping (tier 1/2), edge shape, steward overrides until source-fixed"
 step: "Closes out the K3 §F deferral + the 2026-07-22 grain correction in one ruling: what the authoritative application↔folder mapping IS, who authors it, and how wrong source values are overridden until fixed"

@@ -7,6 +7,8 @@
 # names. classification: Internal-Public.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-07-20
+
 id: seal-tom-attribution-reshape
 title: "SME Gate — SEAL ontology reshape + scraped-docs source-of-record"
 step: "Pre-activation gate for the 2026-07-08 review — resolves the :Application typing conflict before any of it is built"

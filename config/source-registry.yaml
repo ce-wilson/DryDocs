@@ -70,6 +70,8 @@
 # =============================================================================
 
 schema: drydocs.source-registry.v2
+classification: Internal-Public
+
 updated: 2026-08-19     # Z3: infra:server-export flips confirmed: true (gate server-location-ontology 12/12 + the loader build, same day). Prior same day, Z1: system `infra` + dataset infra:server-export registered confirmed: false. Prior: 2026-08-07 gate rua-load-shapes SIGNED OFF (G22, 28/28): exec-hosts:rua-bundle, bitbucket:repo-objects-manifest and the two dpl registries flip confirmed:true
 
 # ---------------------------------------------------------------------------

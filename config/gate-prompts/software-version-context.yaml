@@ -23,6 +23,8 @@
 # company-side.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-09
+
 id: software-version-context
 title: "SME Gate — software VERSION as context: evidence grain, edge shape, version cardinality, and how an adhoc email attaches as evidence"
 step: "Pre-build gate — rules the shape BEFORE any adhoc loader is written; the app-level rollup is separately blocked on gate fid-identity-and-scope"

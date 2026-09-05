@@ -8,6 +8,8 @@
 # classification: Internal-Public.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-07-20
+
 id: software-usage-patterns
 title: "SME Gate — Control-M CMD_LINE invocation-pattern -> software product table (plan-07 Phase 3)"
 step: "Pre-build gate for plan-07 Phase 3 — confirms the pattern table BEFORE any derivation loader is written"

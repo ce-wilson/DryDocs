@@ -20,6 +20,8 @@
 # and are laid out in §B.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-25
+
 id: standard-identity-and-carrier
 title: "SME Gate — standard identity and its carrier: a stable id for a validation standard, where per-team profiles live, and the fence that keeps the DD digit out of it"
 step: "G84 built adoption measurement and G94 will build the selector (TASKTYPE + JOB_ROLE + launcher classification -> a standard identity plus its token set) — but 'a standard identity' does not exist yet: today the per-job-type sets are code-as-data in TOKEN_REGISTRY, whose own docstring calls itself the single source both the parser and the published register read from. Giving a standard an id outside that module is a CONTRACT CHANGE, and storing per-team profiles is a governance surface. Four questions, evidence attached, nothing pre-picked."

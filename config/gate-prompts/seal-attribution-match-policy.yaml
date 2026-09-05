@@ -6,6 +6,8 @@
 # names, or job names. classification: Internal-Public.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-07-20
+
 id: seal-attribution-match-policy
 title: "SME Gate — SEAL attribution match policy (job -> Application, m3_seal_app_ref)"
 step: "Pre-activation gate for backlog K2 — confirms the match policy BEFORE the loader is built"

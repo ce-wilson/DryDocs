@@ -57,6 +57,8 @@
 # repo — real rows are Internal and live company-side.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-09-02
+
 id: fid-identity-and-scope
 title: "SME Gate — functional-id identity (FID vs FID name), ownership as an as-of fact, transfer detection, and the ingest scope"
 step: "Pre-pull gate — rules identity and scope BEFORE any directory extract is taken; unblocks the K2 FID reconciliation tier"

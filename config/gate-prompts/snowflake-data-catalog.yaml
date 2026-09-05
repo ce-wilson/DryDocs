@@ -17,6 +17,8 @@
 # lists instead of intuition. Where a clause needs a number, it names the report.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-12
+
 id: snowflake-data-catalog
 title: "SME Gate — data catalog: one node or two (dcat dataset/distribution), cross-authority unification, the producing-app attribution family and its precedence against SEAL, contact-point fold-in, and what is deferred to layer 4"
 step: "The activation gate for the G42 catalog seam: the extractor stages datasets + distributions with origin, registration source, candidate URNs and producing-app ids, and the G43 cross-checks measure how they line up against the G25 DPL registry, G41 Glue placements and SEAL — all candidate-side today, none graph-resident"

@@ -41,6 +41,9 @@
 # root block is the shape in which that class cannot recur. (The zone-resolver bug
 # and the guard gap behind it are Idea-171's residue and are NOT fixed here.)
 schema: drydocs.log-kinds.v1
+classification: Internal-Public
+updated: 2026-09-02
+
 
 root:
   base: home # under the user's home directory, the run-log idiom since G19

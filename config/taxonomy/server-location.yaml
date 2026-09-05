@@ -23,6 +23,9 @@
 # building locations live under internal/server-inventory/, never here.
 # =============================================================================
 
+schema: drydocs.server-location.v1
+updated: 2026-08-19
+
 taxonomy: server-location
 domain: technology
 taxonomy_path_root: technology/infrastructure/server-location

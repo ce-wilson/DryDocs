@@ -6,6 +6,8 @@
 # center or application values.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-09-04
+
 id: controlm-folder-identity-grain
 title: "SME Gate — folder and job identity carry the data center, and which key carries it"
 step: "Resolves the node-key grain before the first multi-data-center load; P6's probe reports into this page"

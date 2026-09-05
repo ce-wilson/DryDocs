@@ -2,6 +2,8 @@
 # Nothing here is ruled. reg_derived_from stays status: planned until sign-off.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-09-01
+
 id: replica-derivation-edge
 title: >-
   SME Gate — replica-ness is recorded three times and as no edge: does a typed derivation

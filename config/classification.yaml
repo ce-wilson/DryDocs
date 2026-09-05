@@ -14,6 +14,8 @@
 # =============================================================================
 
 schema: drydocs.classification.v1
+classification: Internal-Public
+
 updated: 2026-07-31        # J23: Internal-Confidential collapsed into Internal (3 levels; a 4th tier can return if a real handling difference ever materializes)
 
 levels:

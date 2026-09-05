@@ -32,6 +32,8 @@
 # phase-12 chain is complete.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-21
+
 id: ui-write-surface
 title: "SME Gate — the write-surface boundary for the WHOLE web console (every drydocs-web page + drydocs-api): which console actions may ever write, and through what mechanism"
 step: "Pre-decision gate for backlog O20 — the terminus of the Epic O read-only chain (O13 mappings artifact flow + O19 read-only gates page are its dependencies, both done 2026-07-21)"

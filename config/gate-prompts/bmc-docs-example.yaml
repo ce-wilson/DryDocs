@@ -6,6 +6,8 @@
 # confidential handling is a note on the entry, not its own level.)
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-01
+
 id: bmc-docs-structural
 title: "SME Gate Prompt — Control-M structural skeleton (example)"
 step: "Step 0 of the load plan (example) — bmc-docs folder/job/condition skeleton"

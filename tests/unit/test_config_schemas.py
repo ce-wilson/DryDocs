@@ -92,12 +92,31 @@ def test_every_family_has_a_valid_schema() -> None:
         assert files, f"{family}: the live-file glob matched nothing — the family moved?"
 
 
+#: Schemas that govern something OTHER than one family's file shape, each with
+#: the guard that owns it. A schema here is still claimed — by a test rather
+#: than by a file glob — so the stray check below stays a real tripwire.
+CROSS_CUTTING: dict[str, str] = {
+    # J58: the identity header (schema/source/classification/updated) is shared
+    # BY every governed family rather than owned by one, so it has no live-file
+    # glob of its own. Its files are chosen by file CLASS, and that map plus the
+    # validation live in tests/unit/test_config_identity_header.py.
+    "identity-header.schema.json": "tests/unit/test_config_identity_header.py",
+}
+
+
 def test_no_stray_schema_files() -> None:
     """Every schema on disk is claimed by a family — an unclaimed schema is
     either a rename leftover or an unguarded new family."""
-    claimed = {name for name, _ in FAMILIES.values()}
+    claimed = {name for name, _ in FAMILIES.values()} | set(CROSS_CUTTING)
     on_disk = {p.name for p in SCHEMAS.glob("*.schema.json")}
     assert on_disk == claimed, f"unclaimed/missing schemas: {on_disk ^ claimed}"
+
+
+def test_cross_cutting_schemas_are_valid_and_their_guard_exists() -> None:
+    """A cross-cutting schema is claimed by a TEST, so that test has to be there."""
+    for name, guard in CROSS_CUTTING.items():
+        Draft202012Validator.check_schema(_schema(name))
+        assert (REPO / guard).is_file(), f"{name} names {guard} as its guard, which is missing"
 
 
 # --------------------------------------------------------------------------- #

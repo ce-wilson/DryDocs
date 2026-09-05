@@ -35,6 +35,8 @@
 
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-21
+
 id: data-flow-overview
 title: "SME Gate — the data-flow overview record: one identity for %%DATAFLOW, :AppDataFlow and the runbook data series"
 step: "MM2 — ontology proposal before MM3 (log-substrate extractor), MM8 (R13 second consequence), MM9 (email → flow binding), MM10 (investigate v1) write anything"

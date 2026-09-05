@@ -9,6 +9,8 @@
 # 2026-08-09 re-reference and are reused here on that precedent.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-26
+
 id: medallion-stage-vocabulary
 title: "SME Gate — the medallion stage vocabulary: the canonical set, the not-four-of-a-kind structure, and whether the estate has one zone vocabulary or two"
 step: "B5 captures the stage taxonomy in config/taxonomy/ as pure classification (the Epic B idiom); the canonical set needs SME confirmation before any dataset/job stage-attribution edge may ever be declared (planned-only, behind its own gate)"

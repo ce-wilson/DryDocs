@@ -12,6 +12,9 @@
 # *ownership/business context* (config/precedence.yaml: lob-product-team).
 # =============================================================================
 
+schema: drydocs.lob-product-team.v1
+updated: 2026-08-26
+
 taxonomy: lob-product-team
 domain: business
 taxonomy_path_root: business/lob
