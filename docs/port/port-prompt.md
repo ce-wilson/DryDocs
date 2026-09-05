@@ -2445,6 +2445,33 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   which; `grep -c "id: axway"` settles it. The backlog items swept acronym-only with your
   status intact is the items row's Clause 4 rule, correctly applied. Nothing is asked back.
 
+  **SEVENTEENTH POSTSCRIPT - THE COUNT CHECK WAS ANSWERED, AND THE ANSWER SHOWS WHY A COUNT
+  IS NOT A COMPOSITION (2026-09-05, from your carve-out 8 close report):** `id: axway` -> 0,
+  so the first branch held: your numbers were right and the Axway attribution was not. But
+  the render you then reported - **15 vendors / 16 products, "the company's original"** - is
+  the PRE-RANGE file grafted back, and the range is not empty for this file: O81 (2026-08-31,
+  inside port-base-20260826..20260902) added the `neo4j-nvl` product row, 15 -> 16 at the
+  producer. Your original was 15 + `servicenow` = 16; the per-entry rule (a row one side
+  holds stays) makes the landed target **15 / 17**, and 16 matches the producer's base count
+  only by coincidence - `servicenow` standing where `neo4j-nvl` should. A count cannot see
+  that; `grep -c "id: neo4j-nvl" config/taxonomy/software-registry.yaml` can, and 1 is the
+  answer. It is not cosmetic: `test_software_registry.py::
+  test_web_console_stack_matches_the_locked_site_plan` at the base asserts `neo4j-nvl` in the
+  web-console stack, and `test_docs_coverage.py`'s 16/14 pin passes on your file for the
+  wrong reason. Add the row from the base (`git show port-base-20260902:config/taxonomy/
+  software-registry.yaml`, the `neo4j-nvl` block under `products`), keep `servicenow`.
+  **The gap you found is real and the fourteenth caused it:** it named the three drift
+  guards as bare stems in parentheses, and the paste repeated them, so they read as test
+  functions when they are FILES - `tests/unit/test_location_gazetteer.py`,
+  `test_remediation_profile.py`, `test_remediation_profile_json.py`,
+  `test_world_map_generated.py` - in the tree since 2026-08-22 / 08-25 / 08-31 and never
+  listed as part of the carve-out. `tests/**` is evaluate-on-collision, which is moot for
+  a file you do not have: clean-adds, taken at the base, as you did (45 passed). One
+  wording correction to your report, so the ledger does not carry it: the guards had "no
+  guard on either side" is not so - they existed producer-side with their artifacts; they
+  were absent on yours because the scope note left them out. Everything else on the list
+  closed as written. Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
