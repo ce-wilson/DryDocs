@@ -112,3 +112,10 @@ notes: |
 
   FIRST CYCLE ORDER puts drydocs-web last (slot 9) because it was reviewed at mint;
   the sweep covers unreviewed ground before returning to it.
+
+  LANE REVIEW 2026-09-05 (Lane A, desktop; docs/reviews/module-review-sweep-plan-review-2026-09-05.md):
+  clauses (a)-(h) hold. One defect, closed: the plan this item names as its first input lived
+  only on review/module-sweep, so the input did not resolve on main - fixed by the --no-ff
+  merge 6743ee9d (docs-only). The plan itself took six fixes at 5f02599f (slug key, scope read
+  from component_map, merge not rebase, resume a partial report, no trunk close ritual or
+  snapshot in a firing, slot 9 report landed). Clause (i) still waits on the first firing.
