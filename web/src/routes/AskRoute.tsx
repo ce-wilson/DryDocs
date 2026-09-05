@@ -3,7 +3,7 @@ import ModuleToolbar from '../layout/ModuleToolbar'
 import EmptyState from '../components/ui/EmptyState'
 import SpecGrid from '../explorer/SpecGrid'
 import { createPublicApi } from '../lib/apiClient'
-import { ask, controlPart, type AskEnvelope, type AskSource, type AskStep } from '../ask/askApi'
+import { ask, AskStopped, controlPart, type AskEnvelope, type AskSource, type AskStep } from '../ask/askApi'
 import TaskGraphPane from '../ask/TaskGraphPane'
 import FileReport from '../ask/FileReport'
 import type { Persona } from '../lib/auth'
@@ -25,6 +25,9 @@ interface Turn {
   envelope: AskEnvelope | null
   error: string | null
   running: boolean
+  /** WEB12 (c): the person ended this turn. Rendered as stopped — never as an
+   *  answer, and never as an error, because neither is what happened. */
+  stopped?: boolean
 }
 
 // O64: ONE completed turn per persona survives navigation, in browser-local
@@ -109,6 +112,13 @@ export default function AskRoute({ persona }: { persona: Persona }) {
     setTurns(loadLastTurn(persona.id))
   }
   const running = turns.some((t) => t.running)
+  // One controller per in-flight turn, so Stop ends THIS turn and the ref is
+  // cleared the moment it settles.
+  const inFlight = useRef<AbortController | null>(null)
+
+  function onStop() {
+    inFlight.current?.abort()
+  }
 
   async function onAsk() {
     const q = question.trim()
@@ -118,6 +128,8 @@ export default function AskRoute({ persona }: { persona: Persona }) {
     setTurns((prev) => [...prev, { id, question: q, steps: [], envelope: null, error: null, running: true }])
     const patch = (fn: (t: Turn) => Turn) =>
       setTurns((prev) => prev.map((t) => (t.id === id ? fn(t) : t)))
+    const ctl = new AbortController()
+    inFlight.current = ctl
 
     // R4 handshake: forward this session's api token so the agent can register
     // ephemeral specs WE own. If drydocs-api is down the question still runs —
@@ -138,6 +150,7 @@ export default function AskRoute({ persona }: { persona: Persona }) {
         question: q,
         control,
         onStep: (step) => patch((t) => ({ ...t, steps: [...t.steps.filter((s) => s.i !== step.i), step] })),
+        signal: ctl.signal,
       })
       if (envelope.status === 'error') {
         patch((t) => ({ ...t, error: envelope.error ?? 'agent error', running: false }))
@@ -158,7 +171,13 @@ export default function AskRoute({ persona }: { persona: Persona }) {
         patch((t) => ({ ...t, envelope, steps: envelope.steps ?? t.steps, running: false }))
       }
     } catch (e) {
-      patch((t) => ({ ...t, error: (e as Error).message, running: false }))
+      if (e instanceof AskStopped) {
+        patch((t) => ({ ...t, running: false, stopped: true }))
+      } else {
+        patch((t) => ({ ...t, error: (e as Error).message, running: false }))
+      }
+    } finally {
+      if (inFlight.current === ctl) inFlight.current = null
     }
   }
 
@@ -230,6 +249,18 @@ export default function AskRoute({ persona }: { persona: Persona }) {
             >
               Ask
             </button>
+            {/* WEB12 (c). Before this the UI offered only `disabled={running}`,
+                so an agent looping until its token budget ran out held the
+                surface for the whole run with no way out but a reload. */}
+            {running && (
+              <button
+                type="button"
+                onClick={onStop}
+                className="rounded-md border border-edge bg-bg-2 px-3 py-1 text-sm font-medium text-text"
+              >
+                Stop
+              </button>
+            )}
           </form>
         </div>
       </div>
@@ -243,6 +274,12 @@ function TurnCard({ turn, specClass }: { turn: Turn; specClass: Record<string, s
   return (
     <section className="rounded-lg border border-edge bg-panel-2/40 p-3">
       <p className="text-sm font-medium text-text">“{turn.question}”</p>
+
+      {turn.stopped && (
+        <p className="mt-2 rounded border border-edge bg-panel-2 px-2 py-1 text-[11px] text-muted">
+          Stopped — the steps below are what had arrived; there is no answer for this turn.
+        </p>
+      )}
 
       {/* streamed agent steps — live while running, then the envelope's record */}
       <ol className="mt-2 flex flex-col gap-1" aria-label="Agent steps">

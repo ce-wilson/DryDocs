@@ -7,7 +7,6 @@ import { canAccessModule, MODULES } from '../modules/registry'
 import ModuleToolbar from '../layout/ModuleToolbar'
 import SpecGraphPane from '../components/SpecGraphPane'
 import EmptyState from '../components/ui/EmptyState'
-import { useGraphAccess } from '../data/graphAccess'
 
 // `/graph/:specId` — one canvas surface, full page (O86).
 //
@@ -40,7 +39,6 @@ import { useGraphAccess } from '../data/graphAccess'
 export default function GraphCanvasRoute({ persona }: { persona: Persona }) {
   const { specId } = useParams<{ specId: string }>()
   const [selected, setSelected] = useState<CanvasNode | null>(null)
-  const { access } = useGraphAccess()
 
   if (!isCanvasSpecId(specId)) {
     return (
@@ -92,7 +90,6 @@ export default function GraphCanvasRoute({ persona }: { persona: Persona }) {
         </h2>
         <div className="min-h-0 flex-1">
         <SpecGraphPane
-          access={access}
           specId={specId}
           title={surface.title}
           selected={selected}

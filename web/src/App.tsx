@@ -65,15 +65,13 @@ export default function App() {
       )
       return
     }
-    let cancelled = false
+    const ctl = new AbortController()
     void signIn(as, secret)
       .then((s) => {
-        if (!cancelled) setSession(s)
+        if (!ctl.signal.aborted) setSession(s)
       })
       .catch((err: unknown) => console.warn(`?as=${as} sign-in refused:`, err))
-    return () => {
-      cancelled = true
-    }
+    return () => ctl.abort()
   }, [session])
 
   // One 401 anywhere ends the session everywhere. Without this the shell keeps
@@ -119,7 +117,7 @@ export default function App() {
           <Route index element={<OverviewRoute persona={persona} />} />
 
           <Route path="explorer" element={<ExplorerRoute persona={persona} />} />
-          <Route path="explorer/live" element={<ExplorerLiveRoute personaId={session.personaId} />} />
+          <Route path="explorer/live" element={<ExplorerLiveRoute />} />
           <Route path="explorer/tower/:towerKey" element={<ExplorerTowerRoute persona={persona} />} />
 
           {/* R5: the Ask spoke — every persona, including non-admin (the whole

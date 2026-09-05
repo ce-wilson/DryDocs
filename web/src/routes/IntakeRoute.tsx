@@ -118,24 +118,22 @@ export default function IntakeRoute({ persona }: { persona: Persona }) {
   const [backfill, setBackfill] = useState<BackfillRow[]>([])
 
   useEffect(() => {
-    let cancelled = false
+    const ctl = new AbortController()
     const run = <T,>(spec: string, set: (rows: T[]) => void, setLive?: (v: boolean) => void) =>
       access
-        .runSpec(spec)
+        .runSpec(spec, {}, { signal: ctl.signal })
         .then((r: SpecResult) => {
-          if (cancelled) return
+          if (ctl.signal.aborted) return
           set(r.rows as unknown as T[])
           setLive?.(r.rows.length > 0)
         })
         .catch(() => {
-          if (!cancelled) set([])
+          if (!ctl.signal.aborted) set([])
         })
     run<AreaRow>(AREA_TREE_SPEC, setAreaRows, setAreaLive)
     run<AppRow>(APP_SPEC, setApps)
     run<BackfillRow>(BACKFILL_SPEC, setBackfill)
-    return () => {
-      cancelled = true
-    }
+    return () => ctl.abort()
   }, [access])
 
   // ── §1 area cascade state

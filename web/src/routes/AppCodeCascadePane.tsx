@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react'
-import type { createApiAccess } from '../lib/graphApi'
 import type { AppCodeEntry, MappingGrid, MappingsApi } from '../lib/mappingsApi'
 import type { SpecResult } from '../lib/graph'
 import {
@@ -13,6 +12,7 @@ import {
   type UnmappedFolderRow,
 } from '../data/mappingsDemo'
 import EmptyState from '../components/ui/EmptyState'
+import { useGraphAccess } from '../data/graphAccess'
 
 // K11 — the steward mapping cascade (gate seal-app-ref-edge-reshape §G,
 // SIGNED OFF 2026-08-03). The act is ORCHESTRATOR-FIRST (§G1): Product Line
@@ -114,17 +114,17 @@ function StepLabel({ n, title }: { n: number; title: string }) {
 
 export default function AppCodeCascadePane({
   mappings,
-  access,
   grid,
   apiDown,
   personaId,
 }: {
   mappings: MappingsApi
-  access: ReturnType<typeof createApiAccess>
   grid: MappingGrid | null
   apiDown: string | null
   personaId: string
 }) {
+  const { access } = useGraphAccess()
+
   // ── live data (each spec degrades to its SYNTHESIZED demo frame, with notice)
   const [cascade, setCascade] = useState<CascadeRow[] | null>(null)
   const [cascadeLive, setCascadeLive] = useState(false)
@@ -135,7 +135,9 @@ export default function AppCodeCascadePane({
   const [allApps, setAllApps] = useState<AppOption[] | null>(null)
 
   useEffect(() => {
-    let cancelled = false
+    // Five reads, ONE controller: leaving the pane cancels all of them, which
+    // the shared cancelled flag could not do.
+    const ctl = new AbortController()
     const run = <T,>(
       spec: string,
       demo: readonly T[],
@@ -143,9 +145,9 @@ export default function AppCodeCascadePane({
       setLive?: (live: boolean) => void,
     ) =>
       access
-        .runSpec(spec)
+        .runSpec(spec, {}, { signal: ctl.signal })
         .then((r: SpecResult) => {
-          if (cancelled) return
+          if (ctl.signal.aborted) return
           if (r.rows.length > 0) {
             set(r.rows as unknown as T[])
             setLive?.(true)
@@ -154,23 +156,21 @@ export default function AppCodeCascadePane({
           }
         })
         .catch(() => {
-          if (!cancelled) set([...demo])
+          if (!ctl.signal.aborted) set([...demo])
         })
     run(CASCADE_SPEC, DEMO_CASCADE, setCascade, setCascadeLive)
     run(ORCHESTRATORS_SPEC, DEMO_ORCHESTRATORS, setOrchestrators)
     run(APP_ORCH_SPEC, DEMO_APP_ORCHESTRATORS, setAppOrch)
     run(UNMAPPED_SPEC, DEMO_UNMAPPED_FOLDERS, setFolders, setFoldersLive)
     access
-      .runSpec(APP_SPEC)
-      .then((r) => {
-        if (!cancelled) setAllApps(r.rows as unknown as AppOption[])
+      .runSpec(APP_SPEC, {}, { signal: ctl.signal })
+      .then((r: SpecResult) => {
+        if (!ctl.signal.aborted) setAllApps(r.rows as unknown as AppOption[])
       })
       .catch(() => {
-        if (!cancelled) setAllApps([])
+        if (!ctl.signal.aborted) setAllApps([])
       })
-    return () => {
-      cancelled = true
-    }
+    return () => ctl.abort()
   }, [access])
 
   // ── cascade selection state

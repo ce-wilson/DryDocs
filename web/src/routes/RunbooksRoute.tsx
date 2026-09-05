@@ -13,7 +13,6 @@ import {
   RUNBOOK_NODES,
   SERIES_FRAME,
 } from '../runbooks/demoRunbooks'
-import { useGraphAccess } from '../data/graphAccess'
 
 // /runbooks (O17): the shared template — graph pane = the data-series
 // provisioning chain (FileWatcher -> RAW -> ING -> LD). Series binds
@@ -32,7 +31,6 @@ export default function RunbooksRoute() {
   // different namespace. Collapsing them would make a click on one surface
   // highlight an unrelated row on the other.
   const [canvasNode, setCanvasNode] = useState<CanvasNode | null>(null)
-  const { access } = useGraphAccess()
 
   const selectedLabel = RUNBOOK_NODES.find((n) => n.id === selectedId)?.label
   const frameProps = { selectedId, onSelect: setSelectedId }
@@ -63,7 +61,6 @@ export default function RunbooksRoute() {
         // and the canvas says so rather than showing an empty rectangle.
         'Series graph': (
           <SpecGraphPane
-            access={access}
             specId="runbooks.series.v1"
             title="Data-series traversal · job → ETL process → asset"
             selected={canvasNode}

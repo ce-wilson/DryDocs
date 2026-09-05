@@ -17,10 +17,14 @@ import { join, relative } from 'node:path'
 export const SRC = new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')
 
 // One left-to-right alternation, matched ONCE per token. An earlier draft
-// stripped comments first and strings second, which ate `//localhost:8001'` out
+// stripped comments first and strings second, which ate the `//` of a URL out
 // of a string literal and left a dangling quote that mis-parsed the rest of the
 // line — a stripper that corrupts the code it is about to scan produces silent
 // false negatives, which is the worst failure mode a guard can have.
+//
+// (The URL is described rather than quoted here on purpose: this file is the
+// one file the mis-tokenisation note below applies to, so a literal example
+// inside it would show up as a real hit in WEB12's scan for that same URL.)
 const TOKENS = /\/\*[\s\S]*?\*\/|\/\/[^\n]*|`(?:[^`\\]|\\.)*`|'(?:[^'\\\n]|\\.)*'|"(?:[^"\\\n]|\\.)*"/g
 
 /** Source with comments and string/template literals neutralised.
@@ -47,6 +51,20 @@ export function codeOnly(source: string): string {
   })
 }
 
+/** Source with COMMENTS stripped and string literals kept.
+ *
+ * For the guards whose subject IS a literal — a hard-coded URL, an error
+ * message — where codeOnly would strip the very text being looked for and every
+ * assertion would pass vacuously. That is not hypothetical: WEB12's
+ * hard-coded-API-URL scan was written with codeOnly first and matched NOTHING,
+ * including the twelve real offenders, because the URL only ever appears inside
+ * quotes. Choose deliberately: codeOnly for a code shape, this for a literal. */
+export function withoutComments(source: string): string {
+  return source.replace(TOKENS, (tok) =>
+    tok.startsWith('/*') || tok.startsWith('//') ? ' ' : tok,
+  )
+}
+
 /** Every hand-written TypeScript source under `dir`, tests excluded.
  *
  * Tests are excluded because a guard's own fixtures name the pattern it
@@ -65,10 +83,17 @@ export function tsSources(dir: string = SRC, out: string[] = []): string[] {
   return out
 }
 
-/** Repo-relative, forward-slashed paths of the sources whose CODE matches. */
-export function filesMatching(pattern: RegExp, files: string[] = tsSources()): string[] {
+/** Repo-relative, forward-slashed paths of the sources whose CODE matches.
+ *
+ * `strip` chooses what "code" means for this guard: codeOnly (the default)
+ * for a code shape, withoutComments when the pattern is itself a literal. */
+export function filesMatching(
+  pattern: RegExp,
+  strip: (s: string) => string = codeOnly,
+  files: string[] = tsSources(),
+): string[] {
   return files
-    .filter((f) => pattern.test(codeOnly(readFileSync(f, 'utf8'))))
+    .filter((f) => pattern.test(strip(readFileSync(f, 'utf8'))))
     .map((f) => relative(SRC, f).replace(/\\/g, '/'))
 }
 

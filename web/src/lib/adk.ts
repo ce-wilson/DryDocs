@@ -81,11 +81,17 @@ export async function runAgentSse(
   sessionId: string,
   parts: AdkPart[],
   onEvent: (event: AdkEvent) => void,
+  // WEB12 (c): the ONE surface with genuinely unbounded latency is the one that
+  // must be stoppable. No deadline here on purpose — an agent may legitimately
+  // take minutes — but a person must be able to end the turn, and the fetch and
+  // the reader BOTH have to hear about it or the stream keeps arriving.
+  signal?: AbortSignal,
 ): Promise<void> {
   const res = await fetch(`${baseUrl}/run_sse`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: runBody(app, userId, sessionId, parts),
+    signal,
   })
   if (!res.ok || !res.body) {
     throw new Error(`${res.status} ${res.statusText}: ${await res.text()}`)
@@ -93,7 +99,10 @@ export async function runAgentSse(
   const reader = res.body.getReader()
   const decoder = new TextDecoder()
   let buffer = ''
+  const stop = () => void reader.cancel()
+  signal?.addEventListener('abort', stop)
   for (;;) {
+    if (signal?.aborted) break
     const { done, value } = await reader.read()
     if (done) break
     buffer += decoder.decode(value, { stream: true })

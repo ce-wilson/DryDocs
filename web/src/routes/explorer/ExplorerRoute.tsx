@@ -124,7 +124,6 @@ export default function ExplorerRoute({ persona }: { persona: Persona }) {
         // the console invented (see nvl-mapping.ts).
         'App neighbourhood': (
           <SpecGraphPane
-            access={access}
             specId="explorer.folder-applications.v1"
             title="Application neighbourhood · folder → application · folder → data centre"
             selected={canvasNode}
