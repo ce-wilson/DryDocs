@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-05T01:08:55",
+    "captured_at": "2026-09-05T02:18:15",
     "date": "20260905",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "f2ec87db",
-      "full": "f2ec87dba1ca197b88c49d6226da483e8214e029",
+      "commit": "e1c82161",
+      "full": "e1c8216103a0e4f8d448de3b42093917d5f4063b",
       "branch": "main",
-      "describe": "port-base-20260902-133-gf2ec87db",
-      "subject": "port(manifest): per-entry row for config/taxonomy/data-centers.yaml - the LOAD2 hold released, third config/** fall-through closed",
+      "describe": "port-base-20260902-143-ge1c82161",
+      "subject": "feat(PLAN4): venue-aware grooming, the edit side - owner_of by segment, --check-venue-edits (REWRITE / UNSTAMPED / STATE FLIP), the pending file and --mint-pending",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -9116,6 +9116,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/lane-b-handoff.md",
+      "name": "lane-b-handoff.md",
+      "extension": ".md",
+      "rel_path": "docs/lane-b-handoff.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/next-session-handoff.md",
       "name": "next-session-handoff.md",
       "extension": ".md",
@@ -15582,6 +15591,24 @@
       "name": "plan.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/plan.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/ideas",
+      "name": "ideas",
+      "extension": "",
+      "rel_path": "docs/restructure/ideas",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/ideas/README.md",
+      "name": "README.md",
+      "extension": ".md",
+      "rel_path": "docs/restructure/ideas/README.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -22103,10 +22130,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260905.json",
-      "name": "drydocs-20260905.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260905-0108.json",
+      "name": "drydocs-20260905-0108.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260905.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260905-0108.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -30487,6 +30514,10 @@
     ],
     [
       "drydocs/tests/unit/test_backlog.py",
+      "drydocs/drydocs_core/edition_registry.py"
+    ],
+    [
+      "drydocs/tests/unit/test_backlog.py",
       "drydocs/tests/source_scan.py"
     ],
     [
@@ -38211,6 +38242,11 @@
     [
       "drydocs/docs",
       "CONTAINS",
+      "drydocs/docs/lane-b-handoff.md"
+    ],
+    [
+      "drydocs/docs",
+      "CONTAINS",
       "drydocs/docs/next-session-handoff.md"
     ],
     [
@@ -39282,6 +39318,11 @@
       "drydocs/docs/restructure",
       "CONTAINS",
       "drydocs/docs/restructure/backlog.yaml"
+    ],
+    [
+      "drydocs/docs/restructure",
+      "CONTAINS",
+      "drydocs/docs/restructure/ideas"
     ],
     [
       "drydocs/docs/restructure",
@@ -42687,6 +42728,11 @@
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
       "drydocs/docs/restructure/backlog/items/Z9.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/ideas",
+      "CONTAINS",
+      "drydocs/docs/restructure/ideas/README.md"
     ],
     [
       "drydocs/docs/reviews",
@@ -46251,7 +46297,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260905.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260905-0108.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -49323,13 +49369,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2769,
-    "edges": 1537,
+    "files": 2771,
+    "edges": 1538,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 3080,
-    "directories": 312
+    "rels": 3083,
+    "directories": 313
   }
 }
