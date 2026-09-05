@@ -37,7 +37,6 @@ from drydocs_api.query_specs import (
     DISPLAY_LIMIT_PARAM,
     QuerySpec,
     UnknownSpecError,
-    display_limit_param,
     is_watermarked,
     query_spec,
 )
@@ -187,8 +186,23 @@ def _collect_trust(row: Mapping[str, object], seen: set[str]) -> None:
 
 
 def applied_limit(spec: QuerySpec, bound: Mapping[str, object]) -> int | None:
-    """The ceiling that governs this run, or None when the spec has none."""
-    if not display_limit_param(spec):
+    """The ceiling that governs this run, or None when there is none.
+
+    Keyed on the CYPHER binding ``$limit`` and a bound integer for it — not on
+    the spec DECLARING a ``limit`` parameter. The distinction is the ephemeral
+    case and it is not hypothetical: an R4 ephemeral spec is built with
+    ``params=()`` (user params fail closed) while its ceiling arrives in
+    ``bound_params``, frozen at registration. Keyed on the declaration, every
+    capped Ask-path answer would report ``truncated: false, limit: null`` — the
+    exact false-completeness claim this item exists to abolish, on the surface
+    most likely to produce it.
+
+    The conjunction is still what makes the probe safe: if the Cypher binds
+    ``$limit`` then the driver really applies it, so more rows than the ceiling
+    can only mean the ceiling bit. A spec that declared the parameter without
+    binding it would have had a cap invented for it; that cannot happen here.
+    """
+    if ("$" + DISPLAY_LIMIT_PARAM) not in spec.cypher:
         return None
     value = bound.get(DISPLAY_LIMIT_PARAM)
     return value if isinstance(value, int) and not isinstance(value, bool) else None
@@ -216,6 +230,14 @@ def resolve_export_limit(
     display = applied_limit(spec, bound)
     if requested is None:
         return display
+    if is_ephemeral_ref(spec.id):
+        # R4: an ephemeral spec's params are FROZEN at registration and replayed
+        # verbatim — that is what makes an agent-registered query reproducible.
+        # Reporting its completeness is free; rewriting its bound limit is not.
+        raise ValueError(
+            f"'{spec.id}' is an ephemeral spec: its params are frozen at registration (R4), "
+            "so its export ceiling cannot be raised"
+        )
     if display is None:
         raise ValueError(
             f"spec '{spec.id}' declares no '{DISPLAY_LIMIT_PARAM}' parameter, so there is "

@@ -147,3 +147,48 @@ notes: |
   expected Lane B close failure (Lane B does not render; Lane A's render at merge
   is the fix). ruff check clean; ruff format clean. In web/: tsc -b exit 0 with
   WEB4's strict flag on, npm run build exit 0, vitest 147/147, oxlint 0 errors.
+
+  CORRECTION, same day, before merge — THE EPHEMERAL PATH WAS REPORTING FALSE
+  COMPLETENESS, and the note above described the wrong rule.
+
+  As first written, `applied_limit` keyed on the spec DECLARING a `limit`
+  parameter. An R4 ephemeral spec is built with `params=()` — user-supplied params
+  fail closed, which is the frozen-params rule — while its ceiling arrives in
+  `bound_params`, frozen at registration. So an agent-registered query whose
+  Cypher ends `LIMIT $limit` with a bound value of 50 was reported as
+  `truncated: false, limit: null`: a capped answer claiming completeness, on the
+  Ask surface, which is the surface most likely to produce one. That is this
+  item's own defect, reintroduced one layer down.
+
+  `applied_limit` now keys on the CYPHER binding `$limit` plus a bound integer for
+  it. The conjunction still does the safety work it was there for — if the Cypher
+  binds `$limit` the driver really applies it, so more rows than the ceiling can
+  only mean the ceiling bit, and no cap is ever invented for a spec that does not
+  apply one.
+
+  `display_limit_param()` is DELETED rather than left beside the new rule. It
+  described what governs completeness and no longer did; a helper that states a
+  superseded rule and whose only remaining caller is a test is how the superseded
+  rule gets re-adopted later. The registry invariant it expressed (a declared
+  `limit` and a bound `$limit` go together) is asserted directly from the spec
+  fields in the test that owns it.
+
+  CLAUSE (c) DOES NOT REACH AN EPHEMERAL SPEC, and that is a ruling, not a gap:
+  raising an ephemeral's export ceiling would rewrite a param frozen at
+  registration, and being replayed verbatim is what makes an agent-registered
+  query reproducible (R4). Reporting its completeness is free; rewriting its bound
+  limit is not. The refusal is explicit and names R4 — a 422, never a silent
+  downgrade to the frozen value.
+
+  Four tests cover it: a frozen ceiling reports truncated, an ephemeral with no
+  `$limit` reports null, the manifest records the frozen ceiling, and a raise
+  attempt is refused.
+
+  Also corrected: agent_query.py's module docstring still said "the same ten
+  keys". Its twin in exports.py had been updated and this one had not — the exact
+  two-expressions shape the web review found eight times, so it is worth naming
+  rather than fixing quietly.
+
+  Found by review before merge, not by a test — nothing in the suite exercised an
+  ephemeral spec through the completeness path, because the tests were written
+  against the rule as understood. The four above close that.
