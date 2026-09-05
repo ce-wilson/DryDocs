@@ -99,6 +99,26 @@ describe('every declared gate is real (clause b, reverse)', () => {
     expect(accessForPath('/intake')).toBeUndefined()
   })
 
+  it('App.tsx actually mounts the gate, ahead of every gated route', () => {
+    // Without this, deleting the one <Route element={<RouteAccessGate .../>}>
+    // line would open every gated route and every OTHER test here would still
+    // pass — canAccessPath would keep answering correctly to nobody. That is
+    // precisely the O59 failure: a correct predicate no route consulted.
+    const src = readFileSync(APP, 'utf8')
+    const gateAt = src.indexOf('<RouteAccessGate')
+    expect(gateAt).toBeGreaterThan(-1)
+    for (const path of [
+      ...MODULES.filter((m) => m.access && m.access !== 'all').map((m) => m.path),
+      ...GATED_SURFACES.map((s) => s.path),
+    ]) {
+      // `path="x"` and not `<Route path="x"` — several routes wrap onto their
+      // own line, and a prefix that only matches the one-line spelling would
+      // pass by finding nothing.
+      const routeAt = src.indexOf(`path="${path.slice(1)}"`)
+      expect(routeAt, `no route declares ${path}`).toBeGreaterThan(gateAt)
+    }
+  })
+
   it('an ungated path is ungated for everyone', () => {
     for (const role of ROLES) {
       expect(canAccessPath('/explorer', role)).toBe(true)

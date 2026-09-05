@@ -164,8 +164,25 @@ def test_the_module_is_registered_with_an_access_designation() -> None:
 
 
 def test_the_route_is_gated_the_same_way_the_registry_says() -> None:
-    """Registry designation and router gate must not drift apart."""
+    """Registry designation and router gate must not drift apart.
+
+    WEB3 changed HOW that is true, so this changed with it. Until then the route
+    restated ``role === 'steward' || role === 'admin'`` inline and this asserted
+    the restatement — a guard that required the duplication whose drift it was
+    guarding against. Now App.tsx wraps every route in one ``RouteAccessGate``
+    that derives the gate from this module's own ``access: 'sme'``, so the two
+    CANNOT drift: there is one expression. What is asserted is therefore the
+    structure — the route exists, it sits inside the gate, and it carries no
+    predicate of its own — with the gate's own behaviour covered in web/ by
+    src/layout/RouteAccessGate.test.tsx and src/modules/routeAccess.test.ts.
+    """
     app = APP.read_text(encoding="utf-8")
     assert 'path="load-map"' in app, "/load-map is not routed"
-    gate = app.split('path="load-map"', 1)[1].split("/>", 1)[0]
-    assert "steward" in gate and "admin" in gate, "the SME designation is not enforced on the route"
+    gate_at = app.find("<RouteAccessGate")
+    assert gate_at > -1, "App.tsx no longer mounts the registry-derived route gate"
+    assert app.find('path="load-map"') > gate_at, "/load-map is routed outside the gate"
+    route = app.split('path="load-map"', 1)[1].split("/>", 1)[0]
+    assert "steward" not in route and "admin" not in route, (
+        "the /load-map route grew its own role predicate again — that is the second "
+        "expression WEB3 removed, and the O59 bug's shape"
+    )
