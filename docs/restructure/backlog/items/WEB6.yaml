@@ -1,0 +1,21 @@
+id: WEB6
+epic: web-console
+title: A runtime row-shape validator at the spec-result-to-typed-row seam retires the twenty-one as-unknown-as
+  double casts with one readable message
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- WEB4
+inputs:
+- docs/reviews/modules/web-2026-09-05.md
+acceptance: |
+  STUB - body follows in the next commit (mint rule I6).
+notes: 'Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md,
+  part B). Stub pushed before the body per the mint rule.
+
+  '

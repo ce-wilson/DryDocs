@@ -1,0 +1,21 @@
+id: WEB2
+epic: web-console
+title: The grid renders the row ceiling the way the canvas already renders its node ceiling - a TRUNCATED
+  n/N badge on capped results, and no export button says "full" unless the manifest says complete
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on:
+- API1
+inputs:
+- docs/reviews/modules/web-2026-09-05.md
+acceptance: |
+  STUB - body follows in the next commit (mint rule I6).
+notes: 'Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md,
+  part B). Stub pushed before the body per the mint rule.
+
+  '

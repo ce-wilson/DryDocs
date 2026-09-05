@@ -1,0 +1,21 @@
+id: WEB1
+epic: web-console
+title: Provenance of rendered data is a typed union - one useLiveOrDemo seam and one provenance component
+  replace the five per-route try-live-else-demo fallbacks, a shell-mount readiness probe answers "is the
+  API down" once, and every fallback activation is counted
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- docs/reviews/modules/web-2026-09-05.md
+acceptance: |
+  STUB - body follows in the next commit (mint rule I6).
+notes: 'Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md,
+  part B). Stub pushed before the body per the mint rule.
+
+  '

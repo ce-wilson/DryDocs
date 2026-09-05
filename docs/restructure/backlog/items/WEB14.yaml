@@ -1,0 +1,20 @@
+id: WEB14
+epic: web-console
+title: A token-parity test holds the hand-frozen custom properties in public/landing.html and public/agent-test.html
+  to src/styles/tokens.css, on the repo's generated-artifact drift-test habit
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- docs/reviews/modules/web-2026-09-05.md
+acceptance: |
+  STUB - body follows in the next commit (mint rule I6).
+notes: 'Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md,
+  part B). Stub pushed before the body per the mint rule.
+
+  '

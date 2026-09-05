@@ -1,0 +1,21 @@
+id: API1
+epic: web-console
+title: Result completeness is part of the read contract - every spec result says whether the 500-row ceiling
+  capped it, and the export manifest records truncated plus the ceiling instead of filing a capped extract
+  as the answer
+type: task
+module: drydocs-api
+phase: 12
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- docs/reviews/modules/web-2026-09-05.md
+acceptance: |
+  STUB - body follows in the next commit (mint rule I6).
+notes: 'Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md,
+  part B). Stub pushed before the body per the mint rule.
+
+  '

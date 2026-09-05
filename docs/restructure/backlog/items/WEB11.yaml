@@ -1,0 +1,20 @@
+id: WEB11
+epic: web-console
+title: One storage module owns every console localStorage key with a prefix and a version, and both sign-out
+  and session rejection call its clearAll so query results do not outlive the session on a shared desktop
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- docs/reviews/modules/web-2026-09-05.md
+acceptance: |
+  STUB - body follows in the next commit (mint rule I6).
+notes: 'Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md,
+  part B). Stub pushed before the body per the mint rule.
+
+  '

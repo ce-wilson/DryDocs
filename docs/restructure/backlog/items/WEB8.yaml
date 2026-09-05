@@ -1,0 +1,22 @@
+id: WEB8
+epic: web-console
+title: The typed-client guarantee has no holes - the mappings, intake and corpus routes are modelled in
+  drydocs_api.schemas so the fifteen unwrapAs sites retire, and the ADK agent calls get a typed contract
+  instead of raw fetch
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on:
+- WEB4
+inputs:
+- docs/reviews/modules/web-2026-09-05.md
+acceptance: |
+  STUB - body follows in the next commit (mint rule I6).
+notes: 'Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md,
+  part B). Stub pushed before the body per the mint rule.
+
+  '
