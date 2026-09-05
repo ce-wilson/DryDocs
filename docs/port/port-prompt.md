@@ -2375,6 +2375,30 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   first does work the roll after, when your real rows exist. `editions.yaml` and
   `domains.yaml` already had their rows. Nothing is asked back.
 
+  **FOURTEENTH POSTSCRIPT - CARVE-OUT 8 IS WIDER THAN `web/**`, AND THE TENTH POSTSCRIPT
+  UNDERSTATED THE RENDER CHAIN (2026-09-05, from your carve-out 8 scoping report; the
+  widened scope is CONFIRMED):** `web/src/generated/**` is `derived`, and three of its
+  seven changed artifacts are written by renderers that live OUTSIDE `web/**`:
+  `scripts/render_gazetteer.py` (reads `config/taxonomy/location-gazetteer.yaml`,
+  classification External), `scripts/render_remediation_profile.py` (self-contained) and
+  `scripts/render_world_map.py` (reads `external/geo/world-atlas/countries-110m.json`).
+  Each has a drift guard that REGENERATES and compares (`test_location_gazetteer`,
+  `test_remediation_profile_json`, `test_world_map_generated`), so taking the bytes without
+  the renderers leaves three guards red with no way to green them - the renderers are what
+  the disposition means. All are clean-adds in the range (`scripts/**` is evaluate, which
+  is moot for a file you do not have; take `external/geo/**` as a directory, its
+  `SOURCE-MANIFEST.md` and `LICENSE` ride with the data). Two corrections to the tenth:
+  (1) **take `scripts/render_board.py` too.** At the port base it already chains
+  `render_gazetteer`, `render_remediation_diff` and `render_remediation_profile`
+  (`render_board.py:59-90`); yours "writes five of seven" because your copy is behind the
+  base, and it will stay behind on every future render until it crosses (hand-merge if you
+  edited it, wholesale otherwise). (2) **`world-map.ts` is deliberately NOT in that
+  chain** (`:76-78`: its input is vendored data that changes only when someone moves
+  editions) - run `poetry run python scripts/render_world_map.py` separately. So the pass
+  is: `web/**` minus generated (wholesale) -> the three renderers + `render_board.py` ->
+  the two inputs -> `render_board.py` AND `render_world_map.py` -> `git diff --quiet` on
+  all seven generated paths -> the three drift guards green. Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
