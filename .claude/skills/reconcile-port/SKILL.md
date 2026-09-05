@@ -341,6 +341,33 @@ stay skipped — confirm with the operator if a new one appears.
   governance, `pat_product_owners`, and the `products` step-2a supplement fields — all ride
   C27's trigger.
 
+## Apply rules from the company's 2026-09-05 close-out (port-base-20260902)
+
+Three mistakes the company made and caught on the 2026-09-02..05 apply, kept here as
+rules because each cost a revert (their words, lightly shortened):
+
+1. **A per-entry file is never a wholesale take.** `config/taxonomy/software-registry.yaml`
+   taken whole dropped a company-owned row; the manifest's per-entry row and its
+   `entry_rule` are the take. Read the row before touching the file.
+2. **Run the affected suites BEFORE a package-level take.** A take of
+   `drydocs_api/{app,handlers,sessions,personas}` moved the suite from 21 failures to 102
+   and was reverted. `drydocs_api/**` is `default_ok` - "hand-merge on collision" - and
+   that is not "take the package".
+3. **For a themed sweep, apply the DELTA; take whole files only from the certified tag.**
+   Extracting whole files from a mid-range commit (the acronym sweep) regressed
+   `PORT-MANIFEST.yaml` past a later manifest commit, dropped a `.gitignore` entry, and
+   pulled in an unrelated gate-bound map row. A mid-range commit's file is the tree at
+   that commit and carries every earlier commit with it.
+
+**Acceptance is a set-compare, never a count.** The method that closed the range: run
+`pytest tests/unit --lf -q --tb=no` on the branch; `git worktree add --detach <tmp>
+<main-sha>` and run the same suite there with the MAIN repo's interpreter (the worktree
+has no venv of its own); compare the two failure lists as SETS (`Compare-Object` on
+PowerShell, `comm -3` on sorted lists elsewhere). Identical sets close the range; a
+matching COUNT proves nothing - 16 matched 16 on the software registry with a different
+row standing in (seventeenth postscript). Name any order-dependent test that moves the
+full-run count.
+
 ## Track-1 acceptance (the contract)
 
 Run as a SINGLE line (multi-line `\` continuations break in some agent shells):

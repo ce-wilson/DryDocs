@@ -53,7 +53,7 @@ updated: 2026-09-05   # 2026-08-20 (J51): six PER-ENTRY rows for canonical-produ
                       # (per function), detect.py + __init__ (per detector id), test_runbook_
                       # currency (per exemption table, retirement trigger named), email-dl-
                       # contact-point (company keeps the file, producer SME intent crosses by
-                      # section), ui-components (the K7-K15 hold IS the rule), doc-source-
+                      # section), ui-components (rows union; the K7-K15 hold WAS the rule until 2026-09-05), doc-source-
                       # registry (field split: company owns graph_locator/captured_at/manifest/
                       # source; confirmed is per-repo). Same day: the backlog rows for the
                       # Y2 shard (ADR 0013) and the F4 per-repo-status ruling.
@@ -1014,13 +1014,22 @@ rows:
   - path: "config/taxonomy/ui-components.yaml"
     disposition: per-entry
     entry_rule: >
-      components[] keyed by id. The K7-K15 Tier-B HOLD is the entry_rule: the
-      company = the producer MINUS the held AppCodeCascadePane route row (the
-      m3_belongs_to_application tier stays planned there). Take every producer
-      entry except those under a named hold; keep company-only entries. The
-      counts are TRACKED (company 68/29 vs producer 69/29 at caa0406), never
-      asserted equal — test_ui_components.py's assertion is per-side.
-    note: "J51 (2026-08-20). Resolved to config/** canonical-producer by omission; caa0406 kept the hold by hand."
+      components[] keyed by id; rows UNION - take every producer row, keep every
+      company-only row. The K7-K15 Tier-B HOLD is NO LONGER the rule (retired
+      2026-09-05): the company's carve-out 8 apply found its tree already
+      carrying both the AppCodeCascadePane route row and the route file, and
+      honoring "producer MINUS the held row" would have failed three guards on
+      its side at once (test_ui_components.py's per-side (bound, total) pin,
+      the route-file evidence check, the drift test). The hold's subject was
+      always the LOAD - m3_belongs_to_application stays planned company-side,
+      T23 family - never the taxonomy row: a component that exists is
+      classification, and classification is not gated. The counts are TRACKED
+      per side, never asserted equal (producer 40/88 at 08af6985; the company
+      reported 31/72 -> 40/88 at its 4d9ddba7). The lesson is one row up: an
+      entry_rule may describe the PRODUCER's tree; one that describes the
+      consumer's ("company = producer minus X") goes stale the moment the
+      consumer moves, and only the consumer can see that it did.
+    note: "J51 (2026-08-20). Resolved to config/** canonical-producer by omission; caa0406 kept the hold by hand. Hold retired 2026-09-05 (the company's close-out on port-base-20260902, its one finding for the SME)."
   - path: "config/doc-source-registry.yaml"
     disposition: per-entry
     entry_rule: >

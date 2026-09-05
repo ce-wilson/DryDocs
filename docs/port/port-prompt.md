@@ -1847,6 +1847,13 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   **AND THE ONE THING THAT IS NOT A RENAME:** `internal/**` is company-side
   Internal content and never crosses. Rename your own directory if you hold one;
   do not take the producer's six transcripts.
+  **CORRECTED 2026-09-05 (your carve-out 9 found it):** "never crosses" was wrong;
+  the word is "never PUBLISHES". `internal/**` is `default_ok`, and its manifest
+  reason says the private company remote is exactly where Internal content
+  belongs - a private remote is not a public mirror. So the transcripts cross, they
+  stay as captured (the file-scoped rule below), and `internal/cdo-reference/
+  README.md` reached you as a clean-add carrying its own RENAMED note. See the
+  EIGHTEENTH POSTSCRIPT.
   **CORRECTION (2026-09-02, from your own apply) — THE SWEEP IS REQUIRED, AND THE
   RELAY ABOVE SAID THE OPPOSITE.** "Use that list rather than a token sweep" was
   wrong, and the guard caught it on your side: `tests/unit/
@@ -2090,7 +2097,10 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   chunk 7's wipe).
   **YOUR SEVEN QUESTIONS - the mechanism half:** Q1 answered above. Q2: yes, the company
   authors its own RENAMED note (one sentence naming the former directory) - the guard's
-  regex reads `internal/<token>-reference/`, and (5) makes its absence a failure. Q3 and Q5
+  regex reads `internal/<token>-reference/`, and (5) makes its absence a failure.
+  [CORRECTED 2026-09-05: the premise was wrong on both sides - the README crossed as a
+  clean-add under the `internal/**` default_ok row, so nobody authors a second note; your
+  close-out's Q2 strike-through is the answer of record. EIGHTEENTH POSTSCRIPT.] Q3 and Q5
   are company housekeeping - the `never-port` row on `docs/company-prompts/` protects the
   directory from producer DELETIONS; moving your own flat stragglers into it is your call
   and nothing here objects; the one orphan left under your `docs/Product/` after the S14 move likewise (it is a company-only file; move it beside the rest under `knowledge/org/`, delete it, or give it a row). Q4: the
@@ -2471,6 +2481,54 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   guard on either side" is not so - they existed producer-side with their artifacts; they
   were absent on yours because the scope note left them out. Everything else on the list
   closed as written. Nothing is asked back.
+
+  **EIGHTEENTH POSTSCRIPT - THE CLOSE-OUT IS READ, THE RANGE IS CLOSED, AND TWO PRODUCER
+  CLAIMS ARE WITHDRAWN (2026-09-05, from your PORT-REPORT on `port-base-20260902`,
+  COMPLETE at your `4d9ddba7`):** `[SME-REPORTED]` for what your report measured;
+  `[VERIFIED-PRODUCER]` for what changed here. Your acceptance method is the right one and
+  is now the skill's method: `--lf` on the branch, a detached worktree at your main sha run
+  with the MAIN repo's interpreter, and a set-compare of the two failure lists - 21 against
+  21, identical, the one order-dependent test named. A COUNT of failures proves nothing
+  (the seventeenth postscript said why for rows; it holds for tests); a set-compare does.
+  **THE FINDING FOR THE SME - accepted, and the manifest row is rewritten
+  [VERIFIED-PRODUCER]:** the K7-K15 hold on `AppCodeCascadePane` was stale. Your tree
+  carried the route row and the route file before carve-out 8 began, and honoring
+  "producer MINUS the held row" would have failed three guards on your side at once. The
+  `config/taxonomy/ui-components.yaml` entry_rule now reads rows-union, counts tracked per
+  side, hold retired. The hold's subject was always the LOAD (`m3_belongs_to_application`
+  stays planned your side, T23 family), never the taxonomy row - a component that exists
+  is classification, and classification is not gated. Your 40/88 is the producer's 40/88
+  at `08af6985`. Nothing to do on your side; the row reaches you at the next roll and
+  describes what you already hold. The row also records why it went stale: an entry_rule
+  may describe the producer's tree, and one that describes the CONSUMER's ("company =
+  producer minus X") is stale the moment the consumer moves - and only the consumer can
+  see that it did.
+  **THE PREMISE CORRECTION - accepted, and three producer sentences are corrected in
+  place [VERIFIED-PRODUCER]:** `internal/**` is `default_ok`, and its recorded reason says
+  the private company remote is exactly where Internal content belongs. So
+  `internal/cdo-reference/README.md` reached you as a clean-add carrying its own RENAMED
+  note, J55 reads it, and nobody authors a second one. RELAY-21's "`internal/**` ... never
+  crosses", RELAY-25's Q2 answer, and step 303's note on the two `internal/research/` logs
+  were wrong for one reason: they read "never publishes" (true - never to a public mirror)
+  as "never crosses" (false - a private remote is not a mirror). Each now carries a dated
+  correction beside the original. The J55 docstring says "never publishes" and was right
+  all along.
+  **YOUR THREE MISTAKES ARE THE SKILL'S RULES NOW [VERIFIED-PRODUCER]:** the reconcile-port
+  skill carries them in your words. (2) Run the affected suites BEFORE a package-level
+  take: `drydocs_api/**` is `default_ok`, and "hand-merge on collision" is not "take the
+  package". (3) For a themed sweep, apply the DELTA to the company file and take whole
+  files only from the certified tag: a mid-range commit's file is the tree at that commit
+  and carries every earlier commit with it. (1) was already the software-registry
+  per-entry row and the seventeenth postscript. On the `script-scm-status` row you backed
+  out: it is G61 (2026-08-25, gate `script-provenance-gaps`, proposed and unsigned) and
+  predates the range - a gate-bound map row your own gate rules on, so backing it out of
+  an acronym sweep was right.
+  **THE PERSONAS RESOLUTION** - one user-tier seat, the two producer demo rows dropped, the
+  SME persona relabeled, the O69 mechanism kept whole - is a relabel under the
+  `drydocs_api/**` hand-merge rule and is yours; the producer's roster is its demo roster
+  and nothing here revisits it. **YOUR SEVEN QUESTIONS** were answered in RELAY-25; your
+  Q2 strike-through supersedes that relay's Q2, as above, and Q1's cypher is the chunk-4
+  union clean-add RELAY-25 already names. Nothing is asked back.
 
 OWED COMPANY-SIDE:
 
@@ -5332,7 +5390,10 @@ construction. It is recorded here only because those refs are now visible on
     transcribed and attributed to an unmerged research branch; `9d0d2171` + `756e4989`
     Idea-236; `0b02a61d` + `303b27be` Idea-238). The skills cross whole. The two logs
     under `internal/research/` are Internal and never cross — they are named here so the
-    range's `internal/**` additions read as deliberate, not as a leak.
+    range's `internal/**` additions read as deliberate, not as a leak. [CORRECTED
+    2026-09-05: they never PUBLISH; they do cross - `internal/**` is `default_ok` and the
+    private company remote is not a mirror. The point of naming them stands: deliberate,
+    not a leak. EIGHTEENTH POSTSCRIPT.]
 
 304. CI ON NODE 24 [.github evaluate — keep your workflows, adapt] (`10dcd15b`). Every
     action moved to the Node 24 runtime and the web app builds on 24; GHE runners are
