@@ -9,6 +9,9 @@
 # Contains NO company data and NO secrets (names/ports only; passwords live in
 # gitignored .env files, never in a committed file).
 schema: drydocs.dev-environment.v1
+classification: Internal-Public
+updated: 2026-09-05
+
 
 # WHICH EDITION THIS CHECKOUT RUNS AS (PLAN2 b, 2026-09-05; gate
 # ontology-domain-registry-and-edition-grain §C1/§C4). The id allocator

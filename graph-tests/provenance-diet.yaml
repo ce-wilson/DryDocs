@@ -5,6 +5,8 @@
 # classification: Internal-Public (shape/consistency only — no counts/IDs).
 classification: Internal-Public
 schema: drydocs.graph-tests.v1
+updated: 2026-07-20
+
 suite: provenance-diet
 description: >
   Cheap live-graph check for the provenance-edge diet: WAS_GENERATED_BY is

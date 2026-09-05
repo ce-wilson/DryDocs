@@ -51,6 +51,8 @@
 # its own SME gate. Nothing here touches a dataset id or a derived URN.
 # =============================================================================
 schema: drydocs.source-bindings.v1
+classification: Internal-Public
+
 updated: 2026-08-30 # G125 — first build, from ADR 0017 (ACCEPTED 2026-08-30)
 
 profiles:

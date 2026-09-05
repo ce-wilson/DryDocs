@@ -10,6 +10,8 @@
 # classification: External.
 classification: External
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-04
+
 id: airflow-crosswalk
 title: "SME Gate — Airflow/MWAA to BMC Control-M baseline crosswalk"
 step: "Onboarding step 2 of external/orchestration/airflow/README.md (crosswalk confirmation, before source activation)"

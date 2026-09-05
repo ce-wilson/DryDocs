@@ -9,6 +9,8 @@
 # refs and Bitbucket access stay company-side (PUBLISH-BOUNDARY.md).
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-07
+
 id: repo-manifest-data-profile
 title: "SME Gate — repo manifest data profile: name the repos and bless trusted_ref (HITL, Internal), profile the sweeps (agent), then rule corroboration and the commit_date stub"
 step: "Follows rua-load-shapes (G22, signed 2026-08-07). The registry row bitbucket:repo-objects-manifest is confirmed: true with trusted_ref: ~ — null means server-extract-only truth until a HUMAN sets it. The corroboration sweep may NAME a candidate ref mechanically; only this gate blesses one."

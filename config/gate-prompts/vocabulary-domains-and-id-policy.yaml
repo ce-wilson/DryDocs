@@ -29,6 +29,8 @@
 # Mechanism-only: domain strings, id conventions, status dispositions; no data values.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-12
+
 id: vocabulary-domains-and-id-policy
 title: "SME Gate — vocabulary domain renames (scheduler, business_application, human), id-prefix policy, and planned-entry dispositions"
 step: "Vocabulary ratification (pre-remediation-loader) — renames the domain partitions to tool-agnostic names, rules the id convention for NEW entries, registers the human domain, and ratifies or retires every never-ruled planned entry"

@@ -10,6 +10,8 @@
 # nothing. Mechanism-only: GUIDs, SEAL ids and registry URLs stay company-side.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-07
+
 id: dpl-dataset-registry-contract
 title: "SME Gate — dpl dataset-registry contract: identify a real export (HITL, Internal), profile it against the ASSUMED contract (agent), then rule the contract, the audit stub, and discovery precedence"
 step: "Follows rua-load-shapes (G22, signed 2026-08-07). The registry row dpl:dataset-registry is confirmed: true under the same activation as its pipeline sibling, and carries the same ASSUMED-contract caveat — plus its own: the clone-lag ruling (SME 2026-07-23) that the BULK export is the backup discovery source when per-SEAL pulls lag."

@@ -11,6 +11,8 @@
 # instances stay company-side (PUBLISH-BOUNDARY.md).
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-07-21
+
 id: platforms-taxonomy
 title: "SME Gate — retire :SchedulerKind into the software-registry model: no new classes (role over class), USES_SOFTWARE landing, REQUIRES_SCHEDULER retirement"
 step: "Decision gate for the platforms/SchedulerKind reconciliation — decides FROM the captured company-confirmed shape (config/taxonomy/platforms.yaml#company_confirmed, C11 2026-07-21) plus the 2026-07-21 pm SME rulings that dissolved the Ais* classes into the registry model"

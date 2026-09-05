@@ -11,6 +11,9 @@
 # Captured 2026-06-20 (template).
 # =============================================================================
 
+schema: drydocs.oracle-schemas.v1
+updated: 2026-08-01
+
 taxonomy: oracle-schemas
 domain: data
 taxonomy_path_root: data/oracle

@@ -33,6 +33,8 @@
 # recommendations stand as drafted.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-31
+
 id: console-auth-boundary
 title: "SME Gate — the console's authentication boundary: which of the surveyed auth PRACTICES the console adopts, now that the ADR 0015 watched-source trigger has fired"
 step: "Pre-decision gate for backlog O71 — opened by the fired watch trigger on the fastapi/full-stack-fastapi-template register row (ADR 0015, Sources & tooling watch)"

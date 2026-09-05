@@ -5,6 +5,8 @@
 # classification: Internal-Public (shape/consistency only — no counts/IDs).
 classification: Internal-Public
 schema: drydocs.graph-tests.v1
+updated: 2026-07-20
+
 suite: bmc-docs-lexical
 description: >
   Live invariants for the bmc-docs lexical-graph loader: every chunk belongs

@@ -27,6 +27,8 @@
 
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-26
+
 id: dcat-theme-subject-scheme
 title: "SME Gate — dcat:theme: is a Product a Concept or does it HAVE one, annotation depth, the per-subject cap as a detector, and unclassified vs out-of-scope"
 step: "Ontology mapping (C34) — rules the dcat:theme edge over the already-declared lob-product-team skos:ConceptScheme; registers HAS_THEME active or re-targets it; no loader until a follow-up build item"

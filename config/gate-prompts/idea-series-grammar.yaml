@@ -19,6 +19,8 @@
 # the shape C1 rules is unchanged by one number. Cited by number as reported, still.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-09-05
+
 id: idea-series-grammar
 title: >-
   SME Gate (rider) — the Idea series takes the same edition segment as an item id, and a

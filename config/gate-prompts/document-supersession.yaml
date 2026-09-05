@@ -10,6 +10,8 @@
 # is why the G102 fold changed WHERE the nodes live and changed nothing here.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-19
+
 id: document-supersession
 title: "SME Gate — document supersession: the SUPERSEDES edge, what 'current' means structurally, and whether a cached currency flag is worth a second encoding"
 step: "docs_supersedes registered status: planned (45-local-docs) + map row doc-supersedes-doc proposed (40-mappings-docs) — nothing loads until this page signs"

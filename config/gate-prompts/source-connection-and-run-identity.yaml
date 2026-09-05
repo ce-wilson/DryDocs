@@ -29,6 +29,8 @@
 # Schema stays shape-only and ENFORCEMENT IS THE TEST.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-27
+
 id: source-connection-and-run-identity
 title: "SME Gate — source connection by reference, the restricted connection record, and run input identity"
 step: "Registering a DB-backed source today nulls the connection field and points at prose; the run record cannot name its input. This page puts six sections to the SME: the connection block on SYSTEM rows (references, never values), the restricted-connection-record term and handling marker, the acquisition.since field and transition history, the :JobRun input-identity envelope, declare-or-refuse as a standing acquisition rule, and the fence. Nothing lands until sign-off; the --csv defect closure and the S13 import fix build independently as plain bugs."

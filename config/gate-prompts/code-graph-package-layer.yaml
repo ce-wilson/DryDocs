@@ -93,6 +93,8 @@
 # our own repo-relative path. There is no company data in a code snapshot.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-02
+
 id: code-graph-package-layer
 title: "SME Gate — Code graph level two: does the PACKAGE become a node, how is a package identified when __init__.py is not a sound test, and what does HAS_MODULE mean once there are two levels"
 step: "Re-opens self-documentation-code-graph §B1/§B2/§C4 only — adds a package level above the file level, rules how packages are identified offline, and settles the edge naming before a second orchestrator or a second project tree makes it expensive"

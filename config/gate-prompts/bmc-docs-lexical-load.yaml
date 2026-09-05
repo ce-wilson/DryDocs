@@ -5,6 +5,8 @@
 # deterministic). classification: Internal-Public (mechanism + public-doc metadata only).
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-07-20
+
 id: bmc-docs-lexical-load
 title: "SME Gate — bmc-docs lexical load (Document→Chunk) + DESCRIBES → software ontology"
 step: "New source + 2 node types + 4 edge types — everything stops at proposed/planned until this gate"

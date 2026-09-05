@@ -10,6 +10,8 @@
 # data. classification: External.
 classification: External
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-04
+
 id: autosys-crosswalk
 title: "SME Gate — AutoSys to BMC Control-M baseline crosswalk"
 step: "Onboarding step 2 of external/orchestration/autosys/README.md (crosswalk confirmation, before source activation)"

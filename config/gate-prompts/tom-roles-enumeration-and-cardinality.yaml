@@ -47,6 +47,8 @@
 # classification: Internal-Public
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-26
+
 id: tom-roles-enumeration-and-cardinality
 title: "SME Gate — the TOM role register: which classes exist, which are required, and what the load does when one is missing"
 step: "Amendment to seal-tom-attribution-reshape §B (2026-07-10) — before any further attribution loading, and before the taxonomy capture's divergent roles: list is reconciled"

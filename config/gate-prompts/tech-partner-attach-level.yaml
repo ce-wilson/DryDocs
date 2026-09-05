@@ -39,6 +39,8 @@
 # classification: Internal-Public
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-27
+
 id: tech-partner-attach-level
 title: "SME Gate — the Tech Partner attach level: product or area-product, whether Area Tech Partner is its own concept, and what the CTO rename note describes after the correction"
 step: "Amendment to product-cabinet-attribution §B (K5, signed 2026-07-20) — before any Product Cabinet loader is built against the scheme, so the first attribution rows land on the right node class"

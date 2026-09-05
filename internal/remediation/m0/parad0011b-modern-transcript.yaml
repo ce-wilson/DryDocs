@@ -1,6 +1,9 @@
 # INTERNAL — the dev team's existing modern rewrite (the M0 greenfield reference),
 # transcribed from production screenshots 2026-06-11. Never publish.
 schema: drydocs.remediation.transcript.v1
+classification: Internal
+updated: 2026-07-20
+
 source: production screenshots 2026-06-11 (worked-example Gate 3 reference)
 folder:
   name: PRARAG-HLDM-89211-MLCM-ORIG-CRM-TRUST-DLY

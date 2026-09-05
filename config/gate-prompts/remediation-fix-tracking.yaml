@@ -19,6 +19,8 @@
 # Mechanism-only: property names and status enums; no real fix ids, no data values.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-12
+
 id: remediation-fix-tracking
 title: "SME Gate — fix-tracking properties for remediation targets (names, status enum, writer)"
 step: "Remediation fix module (xml_io epic) — rules the property names a write-authorized loader applies from drydocs.remediation.fix-tracking.v1 change-sets; the emitting component stays no-graph-write (NFR-REM-1, unchanged)"

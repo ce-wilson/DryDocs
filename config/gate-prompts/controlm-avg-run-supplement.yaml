@@ -18,6 +18,8 @@
 # 85.7%, jobs→stats 29.6% (partial enrichment by construction).
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-07-22
+
 id: controlm-avg-run-supplement
 title: "SME Gate — CM_AVG_RUN runtime-stats property supplement onto ControlMJob"
 step: "Resolves the timing-property landing before the supplement loader is written (temporal runtime supplement, phase 1)"

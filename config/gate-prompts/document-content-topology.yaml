@@ -47,6 +47,8 @@
 # with a public source_url. classification: Internal-Public.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-26
+
 id: document-content-topology
 title: "SME Gate — the document/content database topology, and what ddcontext is actually for"
 step: "ADR 0002 D1 amendment + ADR 0006 charter amendment — before G31 sizes the proxy-node spine"

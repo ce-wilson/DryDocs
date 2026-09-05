@@ -4,6 +4,8 @@
 # Mechanism-only: column names and rules, no data values. classification: Internal-Public.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-07-20
+
 id: controlm-q1q3-phase1
 title: "SME Gate — Control-M Q1–Q3 resolutions + phase-1 load scope"
 step: "Ratifies the 06a ER-review answers before loader changes (feeds doc 06 Phase 0)"

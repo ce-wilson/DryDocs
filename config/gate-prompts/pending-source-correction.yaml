@@ -21,6 +21,8 @@
 # the deferred halves come back.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-18
+
 id: pending-source-correction
 title: "SME Gate — the pending-source-correction lifecycle: one vocabulary for the manual→automated and override→source-corrected flips, what evidence flips each, who may flip, and how an unflipped placeholder is reported"
 step: "N12 landed acquisition.mode on all 29 dataset rows (15 automated/db, 14 manual) and O24's override store carries origin-flagged steward corrections with a source-corrections report — two placeholder states, no ruled flip for either"

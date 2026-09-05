@@ -20,6 +20,8 @@
 # =============================================================================
 
 schema: drydocs.platform-codes.v1
+classification: Internal
+
 updated: 2026-08-05
 source: "DAT SRE Control-M Job Naming Standards, Framework -> APPCODE table (see folder-naming-convention.md in this directory)"
 

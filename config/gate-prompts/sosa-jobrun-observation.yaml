@@ -5,6 +5,8 @@
 # values. classification: Internal-Public.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-07-20
+
 id: sosa-jobrun-observation
 title: "SME Gate — SOSA/SSN jobrun-observation modelling decision (context-graph pilot)"
 step: "Resolves the open Observation-shape question before the E2 loader is written (backlog E1 remainder)"

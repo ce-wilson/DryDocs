@@ -40,6 +40,9 @@
 # =============================================================================
 
 schema: drydocs.medallion-stages.v1
+classification: Internal-Public
+updated: 2026-08-26
+
 taxonomy: medallion-stages
 source: dpl                      # the v2 SYSTEM id — the zone model is DPL's
 authority: internal-standards    # config/precedence.yaml

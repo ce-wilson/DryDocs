@@ -10,6 +10,8 @@
 # =============================================================================
 
 schema: drydocs.precedence.v1
+classification: Internal-Public
+
 updated: 2026-07-15   # K4 clause 7 — seal-pat-source-of-record wired into the live chain
 
 # The ordered authority chain. Lower index = higher authority.

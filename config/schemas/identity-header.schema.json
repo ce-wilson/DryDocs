@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "drydocs:config/schemas/identity-header.schema.json",
+  "title": "Governed config identity header (schema / source / classification / updated)",
+  "description": "J58. The four-key identity block, expressed ONCE so every guard validates against this file instead of re-deriving the rule. The exemplar is config/source-mappings/design-docs.yaml.\n\nTHE BLOCK IS FOUR KEYS; THE REQUIRED SET IS THREE OF THEM PLUS `source` WHERE A SOURCE EXISTS. That is not a softening of the rule, it is what the tree already encodes: config/schemas/data-centers.schema.json, domains.schema.json and editions.schema.json are CLOSED at the top level (`additionalProperties: false`) and each lists exactly `schema` + `classification` + `updated` (+ `classification_only`). Three reviewed family schemas independently settled on that triple because a file authored in this repository has no upstream extract to name, and requiring `source` there would either break those closed schemas or force a fabricated value into a repo whose whole discipline is not inventing data. So `source` is REQUIRED on the source-describing family (config/source-mappings/**, whose entire purpose is to describe one registered source) and PERMITTED everywhere else, where it names a config/source-registry.yaml dataset id when one genuinely applies.\n\nWHICH FILES MUST CARRY IT IS DECIDED BY FILE CLASS, and the classes are enumerated here rather than left to a glob nobody can find. The machine-readable class map lives in tests/unit/test_config_identity_header.py; this prose is what it means. The posture is DEFAULT-DENY, the same rule test_module_boundary.py applies to modules: a tracked YAML in no class fails as UNCLASSIFIED, so a new governed file cannot quietly arrive without a header.\n\nREQUIRED — governed DATA files. Source mappings, registries, taxonomy config, crosswalks, glossaries, graph tests, the manual-load manifest, the port manifest, the roadmap, the reference registry. These are read by loaders and by people as statements of fact about the estate, so each has to say what shape it is, where it came from, how sensitive it is, and when it last moved.\n\nREQUIRED (dated profile) — gate prompts. config/gate-prompts/*.yaml already carry an enforced header of their own (Module / Source / Registry ref / Classification inside `meta`, enforced by tests/unit/test_gate_pages.py) but carried NO date key at all. They take the `gatePrompt` profile below: schema + classification at the root, plus `updated`. Their `source` stays in `meta` where their own guard already reads it, and test_gate_pages stays the single enforcement point over those files rather than a second guard arriving over the same 60.\n\nFORBIDDEN — template-class files. A hand-maintained date inside a file whose updates arrive as a three-way MERGE is a guaranteed conflict on every update (ADR 0015 D4). The .template.yaml files a session COPIES before filling in are the case here: the copy's date is the copy's business, and a date in the template only ever conflicts.\n\nEXEMPT, each with its reason:\n  * FRAGMENT — a file that is one section of a larger composed document (drydocs_core/ontology/relationship_vocabulary/*.yaml, config/taxonomy-ontology-map/[0-9]0-mappings-*.yaml). Identity belongs to the composition, not the piece; several are YAML LISTS at the root and cannot hold a mapping key at all.\n  * TOOLING — a file whose schema belongs to somebody else (.github/workflows/ci.yml, .pre-commit-config.yaml). Our keys would be invalid against GitHub's and pre-commit's own schemas.\n  * GENERATED — written by a tool, so a hand-maintained header would be overwritten or would lie (docs/design/feedback/*.yaml, the HITL export).\n  * FIXTURE — a test fixture's shape IS the thing under test, so a header would change what the test is testing.\n\nWHAT THIS SCHEMA DOES NOT DO: it checks PRESENCE and SHAPE. It never compares `updated` against anything — the lying-date problem is J59's, split off deliberately because the check that would catch it cannot run in CI.\n\nA NOTE ON `updated` AND YAML: a bare `2026-07-20` parses to a Python date, not a string. The guard normalizes date objects to their ISO form before validating, so this schema can require a real date string rather than leaving the key untyped the way the older schemas had to.",
+  "type": "object",
+  "$ref": "#/$defs/governed",
+  "$defs": {
+    "schemaKey": {
+      "description": "The file's own shape id. Load-bearing beyond documentation: copier migrations key on it.",
+      "type": "string",
+      "pattern": "^drydocs\\.[a-z0-9]+(?:-[a-z0-9]+)*\\.v[0-9]+$"
+    },
+    "sourceKey": {
+      "description": "Where the content came from — a config/source-registry.yaml dataset id where one applies, else a stable `repo:`/`internal:` id. Never a real endpoint, host or credential.",
+      "type": "string",
+      "minLength": 1
+    },
+    "classificationKey": {
+      "description": "The sensitivity tier from config/classification.yaml. Three levels since the J23 collapse of Internal-Confidential into Internal.",
+      "enum": ["External", "Internal-Public", "Internal"]
+    },
+    "updatedKey": {
+      "description": "ISO date the file's content last moved. Presence and shape only — freshness is J59.",
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "layerKey": {
+      "description": "Optional. The conceptual layer (CLAUDE.md section 1) where the vocabulary domain applies.",
+      "type": "string",
+      "minLength": 1
+    },
+    "domainKey": {
+      "description": "Optional. The vocabulary domain (config/taxonomy/domains.yaml) where one applies.",
+      "type": "string",
+      "minLength": 1
+    },
+    "governed": {
+      "description": "Governed data files authored in this repository: the triple the closed family schemas already settled on. `source` is permitted and named when a registered dataset genuinely applies.",
+      "type": "object",
+      "required": ["schema", "classification", "updated"],
+      "properties": {
+        "schema": { "$ref": "#/$defs/schemaKey" },
+        "source": { "$ref": "#/$defs/sourceKey" },
+        "classification": { "$ref": "#/$defs/classificationKey" },
+        "updated": { "$ref": "#/$defs/updatedKey" },
+        "layer": { "$ref": "#/$defs/layerKey" },
+        "domain": { "$ref": "#/$defs/domainKey" }
+      }
+    },
+    "full": {
+      "description": "The source-describing family (config/source-mappings/**): all four keys, because such a file exists to describe exactly one registered source and is meaningless without naming it.",
+      "type": "object",
+      "required": ["schema", "source", "classification", "updated"],
+      "properties": {
+        "schema": { "$ref": "#/$defs/schemaKey" },
+        "source": { "$ref": "#/$defs/sourceKey" },
+        "classification": { "$ref": "#/$defs/classificationKey" },
+        "updated": { "$ref": "#/$defs/updatedKey" },
+        "layer": { "$ref": "#/$defs/layerKey" },
+        "domain": { "$ref": "#/$defs/domainKey" }
+      }
+    },
+    "gatePrompt": {
+      "description": "Gate prompts: schema + classification at the root plus the date this item adds. `source` stays inside `meta`, where test_gate_pages already enforces it.",
+      "type": "object",
+      "required": ["schema", "classification", "updated"],
+      "properties": {
+        "schema": { "$ref": "#/$defs/schemaKey" },
+        "classification": { "$ref": "#/$defs/classificationKey" },
+        "updated": { "$ref": "#/$defs/updatedKey" },
+        "layer": { "$ref": "#/$defs/layerKey" },
+        "domain": { "$ref": "#/$defs/domainKey" }
+      }
+    },
+    "templateForbidden": {
+      "description": "Template-class files: the identity keys a copy will own must NOT be baked into the template. `schema` is allowed and wanted — it is what a migration keys on.",
+      "type": "object",
+      "not": { "required": ["updated"] }
+    }
+  }
+}

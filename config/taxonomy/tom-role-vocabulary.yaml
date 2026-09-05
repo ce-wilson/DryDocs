@@ -45,6 +45,8 @@
 # =============================================================================
 
 schema: drydocs.tom-role-vocabulary.v1
+updated: 2026-08-26
+
 taxonomy: tom-role-vocabulary
 concept: TOMRole                      # skos:Concept in scheme tom_roles
 scheme: tom_roles
