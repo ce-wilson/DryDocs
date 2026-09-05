@@ -206,7 +206,11 @@ def test_items_have_valid_v2_fields() -> None:
 # allocation need no coordination: producer 1-9999, company 10000+, readable by
 # LENGTH so there is no boundary to remember.
 
-#: Producer allocates at or below this, in EVERY letter series. Company is above it.
+#: THE BAND, RETIRED FORWARD-ONLY (gate ontology-domain-registry-and-edition-grain §C4,
+#: 2026-09-02; built at PLAN2, 2026-09-05). It governs no new mint: a venue is named by
+#: its EDITION SEGMENT now, and the allocator's band check became the edition-segment
+#: check (`_parse` below reads both). The constant stays because old ids are still READ
+#: by it - FROZEN_BAND is judged against it, and the base edition stays at or below it.
 PRODUCER_BAND_CEILING = 9999
 
 #: Company items that have legitimately arrived through a per-entry port merge.
@@ -215,13 +219,31 @@ PRODUCER_BAND_CEILING = 9999
 PORTED_COMPANY_IDS: frozenset[str] = frozenset()
 
 
-def test_producer_allocates_below_the_company_band() -> None:
-    """No item minted here may take a company number.
+def _parse(iid: str) -> tuple[str | None, str, int] | None:
+    """``(edition, series, number)`` through THE ALLOCATOR'S regex, or None.
 
-    Forward-only: historical ids are never renumbered (they are join keys -- the G87
-    ruling, and config/gate-log.md cites them inside signed records), so a low number
-    means "allocated before the partition", not "producer". The rule governs the NEXT
-    id in each series.
+    One parser, on purpose (PLAN2 a). Three places in this file used to pull the
+    letters and the digits out of an id by hand (``isalpha()`` / ``isdigit()`` joins),
+    and none of them FAILED on an edition segment - they turned ``XMPL-LOAD1`` into
+    series ``XMPLLOAD`` and quietly stopped guarding, which is worse than failing.
+    Reading the allocator's regex means there is one grammar the guards cannot drift
+    from; the allocator is already imported here for the agreement guards.
+    """
+    m = _allocator()._ID_RE.match(str(iid))
+    if not m:
+        return None
+    return (m.group("edition"), m.group("series"), int(m.group("number")))
+
+
+def test_the_base_backlog_carries_no_band_shaped_id() -> None:
+    """No item minted here may take a band-shaped number.
+
+    The band is RETIRED as a partition rule (§C4), but the base edition stays at or
+    below the ceiling, so a five-digit id in THIS backlog is still one of two things:
+    a company id that arrived through a port (add it to PORTED_COMPANY_IDS, so it is
+    looked at once), or a mint that bypassed the allocator. Forward-only: historical
+    ids are never renumbered (join keys - the G87 ruling, and config/gate-log.md cites
+    them inside signed records).
     """
     doc = _load()
     stray = []
@@ -229,13 +251,13 @@ def test_producer_allocates_below_the_company_band() -> None:
         iid = str(item.get("id", ""))
         if iid in PORTED_COMPANY_IDS:
             continue
-        digits = "".join(ch for ch in iid if ch.isdigit())
-        if digits and int(digits) > PRODUCER_BAND_CEILING:
+        parsed = _parse(iid)
+        if parsed and parsed[2] > PRODUCER_BAND_CEILING:
             stray.append(iid)
     assert not stray, (
-        f"backlog ids in the COMPANY band (>{PRODUCER_BAND_CEILING}): {sorted(stray)}. "
-        "Producer allocates 1-9999 in every series. If these arrived through a port, "
-        "add them to PORTED_COMPANY_IDS rather than widening the band."
+        f"band-shaped backlog ids (>{PRODUCER_BAND_CEILING}): {sorted(stray)}. The base "
+        "edition stays below the retired band. If these arrived through a port, add them "
+        "to PORTED_COMPANY_IDS rather than widening anything."
     )
 
 
@@ -287,15 +309,197 @@ def test_next_free_is_max_plus_one_and_never_fills_a_gap() -> None:
 
 
 def test_the_allocator_refuses_the_reserved_series() -> None:
+    """DD is frozen: the company reserve retired as a partition rule (§C4), the
+    refusal names the replacement (the edition segment) and the record."""
     alloc = _allocator()
-    with pytest.raises(SystemExit, match="reserved for company-side"):
+    with pytest.raises(SystemExit, match="FROZEN.*edition segment"):
         alloc.next_id("DD", {"DD1"})
 
 
-def test_the_allocator_refuses_to_cross_into_the_company_band() -> None:
+def test_the_allocator_refuses_a_band_shaped_base_id() -> None:
+    """The base stays below the retired band; the refusal names the segment as the
+    replacement, never a wider band."""
     alloc = _allocator()
-    with pytest.raises(SystemExit, match="COMPANY band"):
-        alloc.next_id("PLAN", {"PLAN" + str(PRODUCER_BAND_CEILING)})
+    with pytest.raises(SystemExit, match="band-shaped.*edition segment"):
+        alloc.next_id("PLAN", {"PLAN" + str(PRODUCER_BAND_CEILING)}, venue="base")
+
+
+# ---- the edition segment (PLAN2, 2026-09-05) -----------------------------------------
+# Gate ontology-domain-registry-and-edition-grain §C1/§C4 and its rider
+# idea-series-grammar §B1/§C1/§D1. `[<EDITION>-]<MODULE><n>` and `[<EDITION>-]Idea-<n>`,
+# edition first, the base unprefixed. Both halves DECLARED: the segment in
+# config/taxonomy/editions.yaml (CFG2), the series in modules.yaml. The venue a session
+# runs as is DECLARED in config/dev-environment.yaml `edition:`, never inferred.
+
+#: The one fixed list both parsers must agree on (PLAN2 e - "two parsers, one grammar").
+#: validate.py accepted uppercase only and no suffix; backlog_store.py accepted any case
+#: and an optional [a-z] suffix; nothing asserted they agreed. The suffix is RULED here:
+#: an item id never carries one (the split suffix is an Idea-inbox shape), so both
+#: parsers refuse `G129a`; and both are uppercase-only.
+PARSE_AGREEMENT: dict[str, tuple[str | None, str, int] | None] = {
+    "G129": (None, "G", 129),
+    "MM4": (None, "MM", 4),
+    "DD7": (None, "DD", 7),
+    "LOAD12": (None, "LOAD", 12),
+    "PLAN2": (None, "PLAN", 2),
+    "G10003": (None, "G", 10003),
+    "DD10001": (None, "DD", 10001),
+    "XMPL-LOAD1": ("XMPL", "LOAD", 1),
+    "SMPL-PLAN12": ("SMPL", "PLAN", 12),
+    "AB-CFG3": ("AB", "CFG", 3),
+    # refused by both: lowercase, a suffix, a 1-letter or 6-letter segment, no number
+    "load1": None,
+    "G129a": None,
+    "xmpl-LOAD1": None,
+    "X-LOAD1": None,
+    "XMPLQZ-LOAD1": None,
+    "LOAD": None,
+    "LOAD-1": None,
+}
+
+
+def _store_parse(iid: str) -> tuple[str | None, str, int] | None:
+    from drydocs_core import backlog_store
+
+    m = backlog_store._ID_RE.match(iid)
+    return None if not m else (m.group("edition"), m.group("series"), int(m.group("number")))
+
+
+def test_the_two_parsers_agree_on_one_grammar() -> None:
+    for iid, expected in PARSE_AGREEMENT.items():
+        assert _parse(iid) == expected, f"allocator parse of {iid!r}"
+        assert _store_parse(iid) == expected, f"backlog_store parse of {iid!r}"
+
+
+def test_every_current_id_round_trips_through_the_grammar() -> None:
+    """The first guard written (PLAN2 a): every id in the tree parses, and printing the
+    parse back gives the id. No existing id moves and none changes shape."""
+    doc = _load()
+    broken = []
+    for item in doc.get("items", []):
+        iid = str(item.get("id", ""))
+        parsed = _parse(iid)
+        if parsed is None:
+            broken.append(f"{iid} (unparsed)")
+            continue
+        edition, series, number = parsed
+        rebuilt = f"{edition}-{series}{number}" if edition else f"{series}{number}"
+        if rebuilt != iid:
+            broken.append(f"{iid} -> {rebuilt}")
+    assert not broken, f"ids that do not round-trip through the grammar: {broken}"
+
+
+def _declared_editions() -> set[str]:
+    from drydocs_core.edition_registry import load_registry
+
+    return set(load_registry(reload=True).codes())
+
+
+def test_an_edition_segment_must_be_declared_and_the_base_carries_none() -> None:
+    """Both halves declared (PLAN2 b): a segment is a code in editions.yaml or it is a
+    typo, not a tenant; a module code is in modules.yaml `series:`. And THIS backlog is
+    the base edition's, so no item here carries a segment at all - an instance's items
+    live in the instance's own backlog (ADR 0015 D2, amended at DOC1)."""
+    doc = _load()
+    codes = _declared_editions()
+    by_code = {v: k for k, v in _module_series().items()}
+    undeclared, segmented, unknown_series = [], [], []
+    for item in doc.get("items", []):
+        iid = str(item.get("id", ""))
+        parsed = _parse(iid)
+        if parsed is None:
+            continue
+        edition, series, _ = parsed
+        if edition is not None:
+            segmented.append(iid)
+            if edition not in codes:
+                undeclared.append(iid)
+        if series not in by_code and series not in FROZEN_SERIES and series not in FROZEN_BAND:
+            unknown_series.append(iid)
+    assert not undeclared, f"ids whose edition segment no editions.yaml row declares: {undeclared}"
+    assert not segmented, (
+        f"the base backlog carries edition-segment ids: {segmented}. The base is unprefixed; "
+        "an edition's items live in that edition's own backlog."
+    )
+    assert (
+        not unknown_series
+    ), f"ids whose series is neither a module code nor a frozen letter: {unknown_series}"
+
+
+def test_the_allocator_mints_into_the_declared_venue_and_refuses_the_rest() -> None:
+    """PLAN2 b/d/e, from fixtures - the tree only ever exhibits the base case."""
+    alloc = _allocator()
+    codes = {"XMPL", "SMPL"}
+    taken = {"LOAD11", "LOAD12", "XMPL-LOAD1", "XMPL-LOAD2", "SMPL-LOAD7"}
+    ms = alloc.module_series()
+    assert ms["drydocs-load"] == "LOAD"
+
+    # the base mints unprefixed, counting only unprefixed ids
+    assert alloc.next_id("LOAD", taken, venue="base") == ("LOAD13", 12)
+    # the base may mint DOWNWARD for an edition it hosts, counting that edition's ids
+    alloc.declared_editions = lambda: codes  # type: ignore[method-assign]
+    assert alloc.next_id("LOAD", taken, edition="XMPL", venue="base") == ("XMPL-LOAD3", 2)
+    # an instance mints its own segment without asking
+    assert alloc.next_id("LOAD", taken, venue="SMPL") == ("SMPL-LOAD8", 7)
+    assert alloc.next_id("LOAD", taken, edition="SMPL", venue="SMPL") == ("SMPL-LOAD8", 7)
+    # an undeclared SEGMENT is a typo, not a tenant
+    with pytest.raises(SystemExit, match="not declared.*typo, not a tenant"):
+        alloc.next_id("LOAD", taken, edition="NOPE", venue="base")
+    # an instance never mints for its base or for a sibling (downward only)
+    with pytest.raises(SystemExit, match="never mints for its base"):
+        alloc.next_id("LOAD", taken, edition="base", venue="SMPL")
+    with pytest.raises(SystemExit, match="mints for itself only"):
+        alloc.next_id("LOAD", taken, edition="XMPL", venue="SMPL")
+    # a venue whose own declaration is not in the registry is refused, naming the file
+    with pytest.raises(SystemExit, match="does not declare that code"):
+        alloc.next_id("LOAD", taken, venue="GHOST")
+    # a venue with NO `edition:` mints no item, and the refusal names the key and CFG2
+    with pytest.raises(SystemExit, match="declares no `edition:`.*editions.yaml"):
+        alloc.next_id("LOAD", taken, venue=None)
+
+
+def test_the_idea_path_goes_through_next_idea_id_with_the_same_rules() -> None:
+    """Rider D1/C1/C2 from fixtures: max+1 never the gap; the floor; the venue check in
+    ONE branch - a declared venue mints prefixed (or unprefixed for the base), an
+    undeclared venue mints band-shaped until it declares."""
+    alloc = _allocator()
+    alloc.declared_editions = lambda: {"XMPL", "SMPL"}  # type: ignore[method-assign]
+    ideas = {(None, 1), (None, 2), (None, 257), (None, 10034), ("XMPL", 1), ("XMPL", 4)}
+    # base: unprefixed at or below the ceiling; a band-shaped entry (a ported company
+    # idea) is NOT counted, or one union-append would jump the base to 10035
+    assert alloc.next_idea_id(ideas, venue="base") == ("Idea-258", 257)
+    # never the lowest gap
+    assert alloc.next_idea_id({(None, 5), (None, 9)}, venue="base") == ("Idea-10", 9)
+    # a declared edition counts its own
+    assert alloc.next_idea_id(ideas, venue="XMPL") == ("XMPL-Idea-5", 4)
+    assert alloc.next_idea_id(ideas, edition="SMPL", venue="base") == ("SMPL-Idea-1", 0)
+    # an UNDECLARED venue still captures (C1) - band-shaped, above the ceiling, max+1
+    assert alloc.next_idea_id(ideas, venue=None) == ("Idea-10035", 10034)
+    assert alloc.next_idea_id({(None, 3)}, venue=None) == ("Idea-10000", 0)
+    # ... but it cannot override, because it does not know what it is
+    with pytest.raises(SystemExit, match="declares no `edition:`"):
+        alloc.next_idea_id(ideas, edition="XMPL", venue=None)
+    # the Idea regexes carry the segment and the split suffix stays a split
+    header = "- **`XMPL-Idea-3a`** · 2026-09-05 · `[plan]` · **open** · prio? **Med** — x"
+    assert alloc._idea_numbers(header) == {("XMPL", 3)}
+    assert alloc._idea_numbers(header.replace("XMPL-", "")) == {(None, 3)}
+
+
+def test_the_frozen_band_ids_parse_and_pass_under_the_new_grammar() -> None:
+    """The six legacy band ids stay legal forever, forward-only (PLAN3's table, read as
+    PLAN2 finds it)."""
+    for iid in ("G10001", "G10002", "G10003", "DD10001", "DD10002", "DD10003"):
+        assert _parse(iid) is not None
+    assert _frozen_strays(["G10001", "DD10003"]) == []
+
+
+def test_the_venue_is_declared_in_the_venue_file_and_the_producer_is_the_base() -> None:
+    """PLAN2 b: the allocator reads config/dev-environment.yaml `edition:` and nothing
+    else. The producer declares `base` - it is never undeclared (rider C1)."""
+    alloc = _allocator()
+    assert alloc.venue_edition() == alloc.BASE_EDITION
+    doc = yaml.safe_load((REPO / "config" / "dev-environment.yaml").read_text(encoding="utf-8"))
+    assert doc.get("edition") == "base"
 
 
 # ---- the series is the module (ruling 2026-09-02) ----------------------------------
@@ -370,11 +574,15 @@ def _frozen_strays(ids: list[str]) -> list[str]:
     """
     stray = []
     for iid in ids:
-        series = "".join(ch for ch in iid if ch.isalpha())
-        digits = "".join(ch for ch in iid if ch.isdigit())
-        if not digits or (series not in FROZEN_SERIES and series not in FROZEN_BAND):
+        parsed = _parse(iid)
+        if parsed is None:
             continue
-        n = int(digits)
+        # The freeze is on the SERIES whatever segment precedes it: an edition id in a
+        # frozen letter (`XMPL-G1`) is as much a stray as `G137` - the letters closed
+        # for every venue, not only the base.
+        _edition, series, n = parsed
+        if series not in FROZEN_SERIES and series not in FROZEN_BAND:
+            continue
         if n > PRODUCER_BAND_CEILING:
             if n > FROZEN_BAND.get(series, 0):
                 stray.append(iid)
@@ -462,7 +670,10 @@ def test_a_module_series_id_belongs_to_that_module() -> None:
     wrong = []
     for item in doc.get("items", []):
         iid = str(item.get("id", ""))
-        series = "".join(ch for ch in iid if ch.isalpha())
+        parsed = _parse(iid)
+        if parsed is None:
+            continue
+        series = parsed[1]
         if series in by_code and item.get("module") != by_code[series]:
             wrong.append(f"{iid} (module: {item.get('module')!r}, series says {by_code[series]!r})")
     assert not wrong, f"module-series ids filed under a different module: {wrong}"

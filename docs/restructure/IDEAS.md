@@ -38,16 +38,27 @@ file already used (`2026-08-05 — [bug] **Title**`), just carrying identity and
 
 | Field | Rule |
 |---|---|
-| **id** | `Idea-<n>`, assigned in CAPTURE order — oldest is `Idea-1`. Ids are **stable references**: never renumber, never reuse. **Ask the allocator for the next one** (I6): `python .claude/skills/groom-backlog/validate.py --next-id Idea` — it reads this file, every remote ref's copy of it, and every revision in history, because a branch that appended an entry is invisible to a local read. New entries still go at the TOP; position is chronology, the id is identity. **This side allocates 1–9999** — see the allocator bands below. |
+| **id** | `Idea-<n>`, assigned in CAPTURE order — oldest is `Idea-1`. Ids are **stable references**: never renumber, never reuse. **Ask the allocator for the next one** (I6): `python .claude/skills/groom-backlog/validate.py --next-id Idea` — it reads this file, every remote ref's copy of it, and every revision in history, because a branch that appended an entry is invisible to a local read. New entries still go at the TOP; position is chronology, the id is identity. **The grammar is `[<EDITION>-]Idea-<n>`** (rider `idea-series-grammar`, signed 2026-09-05): this inbox is the BASE edition's and its ids carry no segment; an edition's inbox mints `<code>-Idea-<n>`. The venue is read from `config/dev-environment.yaml` `edition:`, never inferred — see the bands section below for the retired number rule and what replaced it. |
 | **split** | A big entry whose parts have DIFFERENT dispositions splits into `Idea-Na`, `Idea-Nb`, … Split only when the parts would carry different **status or priority or target item** — not merely because an entry is long. |
 | **date** | Capture date. Unchanged by later edits; a later finding is a `KEPT-UPDATED <date>` line in the body. |
 | **tag** | `idea` · `bug` · `doc` · `source` · `question` · `chore` — as before. |
 | **status** | `open` (needs a decision or a groom) · `parked → <trigger>` (deliberately waiting on a NAMED trigger) · `groomed → <ids>` (produced backlog items) · `merged → <id>` (folded into an existing item's acceptance or notes) · `closed` (resolved, kept for the record). |
 | **prio** | **the user's** call: `High` · `Med` · `Low` · `Deferred`. Written `prio?` while the value is **proposed by the agent and not yet confirmed**; written `prio` once the user has ruled it. Confirming is a one-character delete, which is the point. |
 
-### Allocator bands — which side minted this id (added 2026-08-18)
+### Allocator bands — RETIRED forward-only 2026-09-05; kept so old ids can still be read (added 2026-08-18)
 
-**Producer allocates `1–9999`. Company allocates `10000+`.** Same rule in every series — here and
+**What replaced them (PLAN2; gate `ontology-domain-registry-and-edition-grain` §C1/§C4 and its rider
+`idea-series-grammar`).** A venue is named by its EDITION SEGMENT, not by its number: `[<EDITION>-]Idea-<n>`,
+edition first, the base unprefixed. Which edition a checkout mints into is DECLARED in
+`config/dev-environment.yaml` `edition:` — `base` here; a code minted at the venue's own edition gate into
+`config/taxonomy/editions.yaml` elsewhere — and never inferred from a hostname or from the ids in the tree.
+The allocator (`--next-id Idea [--edition <code>]`) goes through `next_idea_id()`: max+1 in the venue's own
+inbox, never the lowest gap. ONE carve-out (rider C1): a venue with NO `edition:` key may still capture an idea —
+band-shaped, `Idea-<n>` above 9999 — until it declares, because a capture surface never refuses a capture;
+the id is stable from then on. Nothing historical moves. The text below is the retired rule, kept because
+every id it produced is still read by it.
+
+**Producer allocated `1–9999`. Company allocated `10000+`.** Same rule in every series — here and
 in the backlog's letter series (`backlog/items/<id>.yaml`). The grammar does not change, so `Idea-10012` and `G10604` parse
 with every existing regex and no historical id moves.
 
@@ -71,8 +82,9 @@ renumbered, because ids are join keys and renaming one in place re-points every 
 (the G87 ruling). So a low number means "allocated before the partition", NOT "producer" — that
 residual ambiguity is frozen on the day this rule landed and shrinks in relevance from there.
 
-Enforced by `tests/unit/test_plan_ideas.py::test_new_idea_ids_stay_in_this_sides_band` and the
-matching backlog guard. The grandfather line is a committed constant, never "the current max" —
+Still enforced on THIS file by `tests/unit/test_plan_ideas.py::test_producer_allocates_below_the_company_band` (rider D2: a
+five-digit Idea in the base inbox is a company entry that landed here and gets looked at once — a guard over one file,
+never the allocator's rule) and the matching backlog guard. The grandfather line is a committed constant, never "the current max" —
 a computed floor rises with every new id and silently re-legalizes the band.
 
 **Why `merged` exists, and why it is the most useful status.** Most inbox entries are not

@@ -89,8 +89,15 @@ def test_committed_ideas_page_matches_its_source() -> None:
     )
 
 
+#: The inbox id grammar: `[<EDITION>-]Idea-<n>[a-z]` - the optional edition segment
+#: (rider idea-series-grammar B1, 2026-09-05; 2-5 uppercase letters, declared in
+#: config/taxonomy/editions.yaml), the number, the optional SPLIT suffix. The base
+#: inbox is unprefixed, so every existing header matches unchanged. Same segment the
+#: allocator's _IDEA_RE carries; test_backlog.py holds the two grammars to one list.
+_IDEA_ID = r"(?:[A-Z]{2,5}-)?Idea-\d+[a-z]?"
+
 _HEADER = re.compile(
-    r"^- \*\*`(Idea-\d+[a-z]?)`\*\* · \d{4}-\d{2}-\d{2} · `\[[a-z]+\]` · "
+    rf"^- \*\*`({_IDEA_ID})`\*\* · \d{{4}}-\d{{2}}-\d{{2}} · `\[[a-z]+\]` · "
     r"\*\*(open|parked|groomed|merged|closed)\b.*?\*\* · prio\?? "
     r"\*\*(High|Med|Low|Deferred)\*\* —"
 )
@@ -106,7 +113,7 @@ def _inbox_entries() -> list[str]:
 def _all_idea_ids() -> list[str]:
     """Every `Idea-<n>` header in the file — inbox AND audit trail."""
     return re.findall(
-        r"^- \*\*`(Idea-\d+[a-z]?)`\*\* ·", DEFAULT_IDEAS_PATH.read_text(encoding="utf-8"), re.M
+        rf"^- \*\*`({_IDEA_ID})`\*\* ·", DEFAULT_IDEAS_PATH.read_text(encoding="utf-8"), re.M
     )
 
 
@@ -160,8 +167,9 @@ def test_producer_allocates_below_the_company_band() -> None:
     stray = sorted(
         n
         for n in (
-            int(i.removeprefix("Idea-").rstrip("abcdefghijklmnopqrstuvwxyz"))
+            int(i.split("Idea-", 1)[1].rstrip("abcdefghijklmnopqrstuvwxyz"))
             for i in _all_idea_ids()
+            if "-Idea-" not in i  # an edition's own inbox counts from 1; only the base is banded
         )
         if n > PRODUCER_BAND_CEILING and n not in PORTED_COMPANY_IDS
     )

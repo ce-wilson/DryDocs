@@ -2399,6 +2399,21 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   the two inputs -> `render_board.py` AND `render_world_map.py` -> `git diff --quiet` on
   all seven generated paths -> the three drift guards green. Nothing is asked back.
 
+  **FIFTEENTH POSTSCRIPT - WHEN PLAN2 PORTS, YOUR ALLOCATOR ASKS FOR YOUR EDITION
+  (2026-09-05; PLAN2 built, not yet in a port range):** `.claude/**` is canonical-producer,
+  so `validate.py` becomes the PLAN2 allocator on your side at the next roll. It reads
+  `config/dev-environment.yaml` `edition:` - your copy, canonical-company, never overwritten
+  by a port - to know which edition it mints into. Until that key names the code your own
+  edition gate mints into `config/taxonomy/editions.yaml`, `--next-id --module <m>` REFUSES,
+  and the refusal names the key and both files: that is §C4 as signed ("the company mints
+  nothing new until it has minted its edition code"), not a defect. `--next-id Idea` still
+  answers, band-shaped above 9999 - the shape `Idea-10009`-`10034` already have - until the
+  key is set (rider idea-series-grammar C1). The number band and the DD reserve retired
+  forward-only; nothing you hold moves, and `G10001`-`G10003` / `DD10001`-`DD10003` stay
+  legal under FROZEN_BAND. Once the key is set, your items mint `<code>-<MODULE><n>` and
+  your ideas `<code>-Idea-<n>`, counting from 1 in your own inbox of numbers. The producer
+  cannot name your code (CFG2 c) and does not. Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has

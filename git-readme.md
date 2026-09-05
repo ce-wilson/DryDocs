@@ -192,13 +192,19 @@ delete+add). Doc/code references to the old path were repointed in the same comm
 - `tests/unit/test_backlog.py` (NEW — Epic I) — fails CI if `docs/restructure/backlog.yaml` violates
   **schema v2**: missing `title/type/module/phase`, duplicate/cyclic/unresolved ids, unknown module or
   phase, or a `summary:`/`next_ready:` roll-up that drifts from the items (both are computed views).
-- **Backlog id allocation — the cross-repo convention (user decision 2026-07-20, after the first
-  bundle-port reconcile):** company-side-only items take the reserved **DD-series** (`DD1`, `DD2`, …).
-  The producer NEVER allocates DD ids; the company side NEVER allocates producer-style epic-letter
-  ids. (Motivating incident: the 2026-07-20 reconcile re-added company-only items as `C10`/`K6`/`N3`,
-  colliding with producer `C10`/`K6` shipped in the very next range — renumber those three to
-  `DD1`–`DD3` at the next company session.) Ids are stable references: on any future collision the
-  DD-series is the escape hatch — producer ids are never renumbered.
+- **Backlog id allocation — RETIRED forward-only (gate `ontology-domain-registry-and-edition-grain`
+  §C4, signed 2026-09-02; built at PLAN2, 2026-09-05; record in `config/gate-log.md`).** The 2026-07-20
+  cross-repo convention reserved the **DD-series** for company-side-only items and said the company side
+  never allocates producer-style letter ids; the 2026-08-18 band rule (producer 1–9999, company 10000+)
+  generalized it and never withdrew it, which is how `DD10` and `DD10001` both came to obey a written
+  rule (Idea-162). Both govern NO new mint. What replaced them: the grammar `[<EDITION>-]<MODULE><n>`
+  (and `[<EDITION>-]Idea-<n>`), edition first, the base unprefixed; the venue DECLARED in
+  `config/dev-environment.yaml` `edition:`; the segment declared in `config/taxonomy/editions.yaml`. Every
+  id the old rules produced stays where it is — `DD1`–`DD10`, `DD10001`–`DD10003`, `G10001`–`G10003` are
+  frozen at the band's own max (`FROZEN_BAND`) and stay readable; DD is refused for new mints like every
+  frozen series. (The motivating incident stands as history: the 2026-07-20 reconcile re-added
+  company-only items as `C10`/`K6`/`N3`, colliding with producer `C10`/`K6` in the very next range.)
+  Ids are stable references and are never renumbered.
 - **Port baseline after the 2026-07-20 history squash + bundle:** the producer squashed its history
   to `c5a84c3` "Initial import" AFTER cutting the `3ae9b08` bundle you already applied
   (your PORT-REPORT-bd7952f.md) — your main holds the complete pre-squash history. Every future

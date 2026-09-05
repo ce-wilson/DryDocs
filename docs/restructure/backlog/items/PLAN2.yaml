@@ -7,7 +7,7 @@ phase: 8
 agent: main
 model: fable
 priority: p1
-status: in_progress
+status: done
 depends_on:
 - CFG2
 gates:
@@ -110,3 +110,78 @@ acceptance: |
   must parse identically in both, and rule the suffix (no item id carries one today).
 
   Depends on CFG2 (the edition registry the segment validates against).
+notes: |
+  Minted 2026-09-02 under PLAN1 at gate ontology-domain-registry-and-edition-grain §E1;
+  (b)'s Idea half ruled at the rider idea-series-grammar (SIGNED 9/9, 2026-09-05).
+
+  BUILT 2026-09-05 (desktop, Lane A; claimed ca49cd89). 3288 unit tests green (floor 3278),
+  ruff clean, CLI import + --help green. Acceptance proof for the rider's D1: `--next-id
+  Idea` returned Idea-258 before and after.
+
+  (a) as built - the seven sites: validate.py `_ID_RE` and `_FILE_RE` (the filename regex
+  now anchors at a token boundary, so `XMPL-LOAD1.yaml` yields `XMPL-LOAD1` and never
+  `LOAD1`); backlog_store.py `_ID_RE` (uppercase only, no suffix, named groups; an unparsed
+  id sorts LAST as text with a comment saying so); test_backlog.py's three bare
+  `isalpha()`/`isdigit()` joins replaced by ONE `_parse()` over the allocator's regex; and
+  drydocs/port/port_preflight.py's three claim patterns, which now admit the `<CODE>-`
+  segment (pinned by three new ritual subjects in test_port_preflight.py). The Idea shape
+  got the same seven-site treatment the rider's Module line enumerates: `_IDEA_RE`,
+  `_IDEA_IN_DIFF_RE`, the short-circuit at :360-364 (retired - `next_idea_id()` replaces
+  it), the two render lines, and test_plan_ideas.py's `_HEADER`, `_all_idea_ids` and the
+  band guard's parse (which now skips an edition's own inbox: only the base is banded).
+  The round-trip guard over every current id was written first and passed unchanged.
+
+  (b) as built. `venue_edition()` reads config/dev-environment.yaml `edition:` and nothing
+  else; the producer declares `base` (added in this commit, with the reason in the file's
+  own comment - it is canonical-company, so the company's copy carries the company's code
+  and a port never overwrites it). `resolve_edition(requested, venue, kind=...)` is the one
+  place the downward-only rule lives: a base may `--edition <code>` for a code
+  editions.yaml declares; an instance mints for itself only; an undeclared segment is
+  refused as "a typo, not a tenant"; a venue whose own declared code is not in the
+  registry is refused naming both files. `next_id()` counts max+1 WITHIN the (edition,
+  series) pair - `XMPL-LOAD1` starts that edition's LOAD numbers at 1 - and the base stays
+  at or below PRODUCER_BAND_CEILING (a band-shaped base number is refused as the retired
+  rule's shape). `next_idea_id()` is the rider's one branch: base unprefixed at or below
+  the ceiling, counting only unprefixed ids at or below it (so a company idea that lands
+  by union-append never jumps the base to 10035); a declared code counts its own; an
+  UNDECLARED venue mints band-shaped `Idea-<n>` above the ceiling and may not override.
+
+  (c) as built. The allocator's band check became the edition check above; the DD refusal
+  stays and now names the retirement and the replacement; git-readme.md:196-201 is
+  rewritten around the retirement with the record cited (the 2026-07-20 incident kept as
+  history); CLAUDE.md's mint rule and SKILL.md:50 carry the `--edition` case and the
+  undeclared-venue rule; the inbox header's "Allocator bands" section is retitled RETIRED,
+  leads with what replaced it, and keeps the old text and its tokens because every id the
+  old rule produced is still read by it (test_plan_ideas' documentation guard still holds).
+  FROZEN_BAND is read as PLAN3 left it and nothing in it moves. F12: `fetch_remotes()`
+  reports success or failure through a new `_git_run()`, and `_report_allocation` prints a
+  third warning when the fetch failed on a checkout that has refs - the case the other two
+  warnings could not see. The report also prints `venue:` first.
+
+  (d) as built: the item-path refusal for a venue with no `edition:` names the key, both
+  files, §C4 and the sentence "the company mints nothing new until it has minted its code".
+
+  (e) as built - nine new guards in test_backlog.py: the two-parser agreement over a fixed
+  list of seventeen ids (ten parse, seven refused by BOTH - lowercase, a suffix, a 1- or
+  6-letter segment, no number), which RULES the suffix: no item id carries one; the
+  round-trip; edition-present => declared and the base carries no segment and every
+  series is a module code or a frozen letter; the allocator matrix (base, downward,
+  instance-for-itself, undeclared segment, instance-for-base, instance-for-sibling,
+  ghost venue, undeclared venue); the Idea path matrix (base ignores band-shaped
+  entries, never the gap, declared code, downward, undeclared venue band-shaped from
+  10000, undeclared cannot override, the segment in both Idea regexes with the split
+  suffix intact); the six FROZEN_BAND ids parse and pass; the venue file declares base.
+  The frozen-strays helper now reads the SERIES whatever segment precedes it, so an
+  edition id in a frozen letter (`XMPL-G1`) is a stray for every venue, not only the base.
+
+  WHAT THIS CHANGES FOR THE COMPANY WHEN IT PORTS, said plainly: `.claude/**` is
+  canonical-producer, so their allocator becomes this one, and until their
+  dev-environment.yaml declares `edition: <their code>` it mints no ITEM id (by design,
+  §C4/PLAN2 d - CFG2 (c) bars the producer from naming the code, so their edition gate
+  runs first) and mints ideas band-shaped (rider C1, exactly the shape their 10009..10034
+  already have). The relay is DOC2's; a one-paragraph FIFTEENTH POSTSCRIPT in the ledger
+  says it now so the refusal is never a surprise.
+
+  NOT DONE HERE, by the acceptance's own fences: PLAN4 (the edit side; `--mint-pending`
+  goes through this `next_idea_id()`), the sharded inbox (ADR 0019), the company's own
+  edition code (their gate). Idea-257 (the SME's B1 note) stays parked for grooming.

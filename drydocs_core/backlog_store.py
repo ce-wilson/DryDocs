@@ -81,15 +81,27 @@ def _load_file(path: Path) -> Any:
         raise BacklogStoreError(f"{path}: {exc}") from exc
 
 
-_ID_RE = re.compile(r"^([A-Za-z]+)(\d+)([a-z]?)$")
+#: The id grammar, ``[<EDITION>-]<SERIES><n>`` (gate ontology-domain-registry-and-
+#: edition-grain §C1; PLAN2): an optional 2-5 letter edition segment, the series, the
+#: number. Uppercase only and NO letter suffix - the ``[a-z]`` split suffix is an
+#: Idea-inbox shape and no item id has ever carried one (PLAN2 e ruled it). Duplicated
+#: from the allocator (.claude/skills/groom-backlog/validate.py) DELIBERATELY: core
+#: imports nothing from under .claude/, so tests/unit/test_backlog.py holds the two
+#: parsers to one fixed list of ids that must parse identically.
+_ID_RE = re.compile(r"^(?:(?P<edition>[A-Z]{2,5})-)?(?P<series>[A-Z]+)(?P<number>\d+)$")
 
 
-def natural_id_key(item_id: str) -> tuple[str, int, str]:
-    """``C2`` < ``C10``; non-conforming ids sort after, by text."""
+def natural_id_key(item_id: str) -> tuple[str, str, int]:
+    """``C2`` < ``C10``; base ids before edition ids; non-conforming ids after, by text.
+
+    An id the grammar cannot parse sorts LAST as text, never silently among the
+    conforming ones - before PLAN2 a segment id fell through here and sorted after
+    every conforming id without anything saying so.
+    """
     m = _ID_RE.match(str(item_id))
     if not m:
-        return ("~" + str(item_id), 0, "")
-    return (m.group(1), int(m.group(2)), m.group(3))
+        return ("~", "~" + str(item_id), 0)
+    return (m.group("edition") or "", m.group("series"), int(m.group("number")))
 
 
 def item_paths(backlog_dir: Path) -> list[Path]:

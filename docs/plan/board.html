@@ -74,7 +74,7 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 .capture-status{font-size:.78rem;color:#166534;margin:.3rem 0 0;min-height:1.1em}</style>
 </head><body>
 <h1>DryDocs — project board</h1>
-<p class="subtitle">Rendered from <code>docs/restructure/backlog/</code> 646 items &middot; 131 todo / 6 in progress / 2 blocked / 507 done. The repo is the system of record; this page is a working aid.</p>
+<p class="subtitle">Rendered from <code>docs/restructure/backlog/</code> 646 items &middot; 130 todo / 6 in progress / 2 blocked / 508 done. The repo is the system of record; this page is a working aid.</p>
 <p class="subtitle">Location: <code id="board-url"></code> <button type="button" id="board-url-copy">copy</button></p>
 <script>document.getElementById('board-url').textContent=window.location.href;document.getElementById('board-url-copy').onclick=function(){navigator.clipboard.writeText(window.location.href);};</script>
 <p class="subtitle"><a class="capture-link" href="roadmap.html">Module roadmap &rarr;</a> <a class="capture-link" href="ideas.html">Idea inbox &rarr;</a></p>
@@ -87,7 +87,7 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P5</span><span class="status-badge status-todo">todo</span></div><h3>Orchestrator expansion</h3><p class="goal">AutoSys + Airflow land as BMC-baseline concepts via confirmed crosswalks (Epic F).</p><div class="progress"><div class="progress-bar" style="width:40%"></div></div><p class="progress-text">2 / 5</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P6</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Modular architecture / component topology</h3><p class="goal">ADR 0002 — core extraction, multi-DB topology, component packages (Epic G).</p><div class="progress"><div class="progress-bar" style="width:86%"></div></div><p class="progress-text">127 / 148</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P7</span><span class="status-badge status-done">done</span></div><h3>Review toolkit back-flow</h3><p class="goal">Company SME-review/HITL toolkit reproduced generically, offline (Epic H).</p><div class="progress"><div class="progress-bar" style="width:88%"></div></div><p class="progress-text">7 / 8</p></div>
-<div class="phase-card"><div class="phase-head"><span class="phase-id">P8</span><span class="status-badge status-in_progress">in_progress</span><span class="release">v0.3.0</span></div><h3>Planning &amp; release infrastructure</h3><p class="goal">Repo-native project board + capture loop; groundwork for versioned releases (Epic I).</p><div class="progress"><div class="progress-bar" style="width:74%"></div></div><p class="progress-text">73 / 99</p></div>
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P8</span><span class="status-badge status-in_progress">in_progress</span><span class="release">v0.3.0</span></div><h3>Planning &amp; release infrastructure</h3><p class="goal">Repo-native project board + capture loop; groundwork for versioned releases (Epic I).</p><div class="progress"><div class="progress-bar" style="width:75%"></div></div><p class="progress-text">74 / 99</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P9</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Application attribution</h3><p class="goal">Jobs attributed to SEAL applications (seal_app_ref) end-to-end — gate-confirmed match policy, loader, verify coverage (Epic K).</p><div class="progress"><div class="progress-bar" style="width:87%"></div></div><p class="progress-text">33 / 38</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P10</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Documentation infrastructure</h3><p class="goal">Every design doc (TDD/Runbook/BRD) conforms to a canonical outline; deterministic md→HTML/PDF render; HITL markup loop (digital + pen/paper) re-attaches to a requirement-traceability backbone (Epic L).</p><div class="progress"><div class="progress-bar" style="width:73%"></div></div><p class="progress-text">30 / 41</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P11</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Source governance ledgers</h3><p class="goal">Per-source governance as test-enforced config: audit envelope + edge diet (doc 06, Epic M) and column-mapping ledgers (doc 08, Epic N); property-term bindings via the gate.</p><div class="progress"><div class="progress-bar" style="width:61%"></div></div><p class="progress-text">20 / 33</p></div>
@@ -98,7 +98,7 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P16</span><span class="status-badge status-todo">todo</span></div><h3>Self-documentation — DryDocs&#x27; own code in the graph</h3><p class="goal">DryDocs documents ITSELF the way it documents Control-M: the project&#x27;s code-dependency snapshot enters the knowledge graph under the software ontology (SWO), under an explicit :Project root, so &#x27;which module loads this job&#x27; is a query rather than a JSON file a human reads (Epic U).</p><div class="progress"><div class="progress-bar" style="width:83%"></div></div><p class="progress-text">24 / 29</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P17</span><span class="status-badge status-todo">todo</span></div><h3>Mind-map — deepdoc leaves the placeholder</h3><p class="goal">The per-data-flow overview record and its first producer: a graph-seeded, mind-map-driven investigator over the SDLC/ops corpora (Jira, Bitbucket, Confluence, email, Control-M Output logs) whose every finding is :Uncertain, weighted, and carries a provenance breadcrumb to its source; promotion is an SME gate write (Epic MM; docs/design/deepdoc-data-flow-overview.md).</p><div class="progress"><div class="progress-bar" style="width:21%"></div></div><p class="progress-text">3 / 14</p></div>
 </div>
-<div class="ready-strip"><strong>Ready to pull</strong> (113; <code>todo</code> with every <code>depends_on</code> done &mdash; derived, never stored): <a class="ready-id" href="#REF1"><code>REF1</code></a> <a class="ready-id" href="#C35"><code>C35</code></a> <a class="ready-id" href="#C36"><code>C36</code></a> <a class="ready-id" href="#C37"><code>C37</code></a> <a class="ready-id" href="#C39"><code>C39</code></a> <a class="ready-id" href="#G100"><code>G100</code></a> <a class="ready-id" href="#ONT2"><code>ONT2</code></a> <a class="ready-id" href="#D9"><code>D9</code></a> <a class="ready-id" href="#D11"><code>D11</code></a> <a class="ready-id" href="#G63"><code>G63</code></a> <a class="ready-id" href="#G64"><code>G64</code></a> <a class="ready-id" href="#G65"><code>G65</code></a> <a class="ready-id" href="#G106"><code>G106</code></a> <a class="ready-id" href="#G116"><code>G116</code></a> <a class="ready-id" href="#G117"><code>G117</code></a> <a class="ready-id" href="#G118"><code>G118</code></a> <a class="ready-id" href="#G119"><code>G119</code></a> <a class="ready-id" href="#G120"><code>G120</code></a> <a class="ready-id" href="#G127"><code>G127</code></a> <a class="ready-id" href="#G131"><code>G131</code></a> <a class="ready-id" href="#G132"><code>G132</code></a> <a class="ready-id" href="#G136"><code>G136</code></a> <a class="ready-id" href="#H8"><code>H8</code></a> <a class="ready-id" href="#I5"><code>I5</code></a> <a class="ready-id" href="#I7"><code>I7</code></a> <a class="ready-id" href="#I8"><code>I8</code></a> <a class="ready-id" href="#PLAN2"><code>PLAN2</code></a> <a class="ready-id" href="#PLAN4"><code>PLAN4</code></a> <a class="ready-id" href="#J54"><code>J54</code></a> <a class="ready-id" href="#J56"><code>J56</code></a> <a class="ready-id" href="#J57"><code>J57</code></a> <a class="ready-id" href="#J58"><code>J58</code></a> <a class="ready-id" href="#J60"><code>J60</code></a> <a class="ready-id" href="#J61"><code>J61</code></a> <a class="ready-id" href="#J64"><code>J64</code></a> <a class="ready-id" href="#J65"><code>J65</code></a> <a class="ready-id" href="#J67"><code>J67</code></a> <a class="ready-id" href="#J70"><code>J70</code></a> <a class="ready-id" href="#J73"><code>J73</code></a> <a class="ready-id" href="#J74"><code>J74</code></a> <a class="ready-id" href="#J75"><code>J75</code></a> <a class="ready-id" href="#J77"><code>J77</code></a> <a class="ready-id" href="#J78"><code>J78</code></a> <a class="ready-id" href="#K23"><code>K23</code></a> <a class="ready-id" href="#K29"><code>K29</code></a> <a class="ready-id" href="#L23"><code>L23</code></a> <a class="ready-id" href="#L29"><code>L29</code></a> <a class="ready-id" href="#N17"><code>N17</code></a> <a class="ready-id" href="#N18"><code>N18</code></a> <a class="ready-id" href="#N19"><code>N19</code></a> <a class="ready-id" href="#N22"><code>N22</code></a> <a class="ready-id" href="#N23"><code>N23</code></a> <a class="ready-id" href="#N24"><code>N24</code></a> <a class="ready-id" href="#N25"><code>N25</code></a> <a class="ready-id" href="#N26"><code>N26</code></a> <a class="ready-id" href="#N27"><code>N27</code></a> <a class="ready-id" href="#N28"><code>N28</code></a> <a class="ready-id" href="#G85"><code>G85</code></a> <a class="ready-id" href="#G86"><code>G86</code></a> <a class="ready-id" href="#O23"><code>O23</code></a> <a class="ready-id" href="#O26"><code>O26</code></a> <a class="ready-id" href="#O43"><code>O43</code></a> <a class="ready-id" href="#O44"><code>O44</code></a> <a class="ready-id" href="#O48"><code>O48</code></a> <a class="ready-id" href="#O50"><code>O50</code></a> <a class="ready-id" href="#O63"><code>O63</code></a> <a class="ready-id" href="#O68"><code>O68</code></a> <a class="ready-id" href="#O72"><code>O72</code></a> <a class="ready-id" href="#O82"><code>O82</code></a> <a class="ready-id" href="#O89"><code>O89</code></a> <a class="ready-id" href="#P6"><code>P6</code></a> <a class="ready-id" href="#Q22"><code>Q22</code></a> <a class="ready-id" href="#Q24"><code>Q24</code></a> <a class="ready-id" href="#Q28"><code>Q28</code></a> <a class="ready-id" href="#R7"><code>R7</code></a> <a class="ready-id" href="#R8"><code>R8</code></a> <a class="ready-id" href="#R11"><code>R11</code></a> <a class="ready-id" href="#R12"><code>R12</code></a> <a class="ready-id" href="#R13"><code>R13</code></a> <a class="ready-id" href="#R15"><code>R15</code></a> <a class="ready-id" href="#R16"><code>R16</code></a> <a class="ready-id" href="#R17"><code>R17</code></a> <a class="ready-id" href="#R18"><code>R18</code></a> <a class="ready-id" href="#R19"><code>R19</code></a> <a class="ready-id" href="#G90"><code>G90</code></a> <a class="ready-id" href="#S11"><code>S11</code></a> <a class="ready-id" href="#U10"><code>U10</code></a> <a class="ready-id" href="#U11"><code>U11</code></a> <a class="ready-id" href="#U16"><code>U16</code></a> <a class="ready-id" href="#U23"><code>U23</code></a> <a class="ready-id" href="#U27"><code>U27</code></a> <a class="ready-id" href="#V4"><code>V4</code></a> <a class="ready-id" href="#V5"><code>V5</code></a> <a class="ready-id" href="#V6"><code>V6</code></a> <a class="ready-id" href="#V7"><code>V7</code></a> <a class="ready-id" href="#V9"><code>V9</code></a> <a class="ready-id" href="#V10"><code>V10</code></a> <a class="ready-id" href="#V11"><code>V11</code></a> <a class="ready-id" href="#Y3"><code>Y3</code></a> <a class="ready-id" href="#Y6"><code>Y6</code></a> <a class="ready-id" href="#Y7"><code>Y7</code></a> <a class="ready-id" href="#Z4"><code>Z4</code></a> <a class="ready-id" href="#Z6"><code>Z6</code></a> <a class="ready-id" href="#Z7"><code>Z7</code></a> <a class="ready-id" href="#Z8"><code>Z8</code></a> <a class="ready-id" href="#GN2"><code>GN2</code></a> <a class="ready-id" href="#MM5"><code>MM5</code></a> <a class="ready-id" href="#MM6"><code>MM6</code></a> <a class="ready-id" href="#MM9"><code>MM9</code></a> <a class="ready-id" href="#MM11"><code>MM11</code></a> <a class="ready-id" href="#MM12"><code>MM12</code></a> <a class="ready-id" href="#MM13"><code>MM13</code></a> <a class="ready-id" href="#MM14"><code>MM14</code></a></div>
+<div class="ready-strip"><strong>Ready to pull</strong> (113; <code>todo</code> with every <code>depends_on</code> done &mdash; derived, never stored): <a class="ready-id" href="#REF1"><code>REF1</code></a> <a class="ready-id" href="#C35"><code>C35</code></a> <a class="ready-id" href="#C36"><code>C36</code></a> <a class="ready-id" href="#C37"><code>C37</code></a> <a class="ready-id" href="#C39"><code>C39</code></a> <a class="ready-id" href="#G100"><code>G100</code></a> <a class="ready-id" href="#ONT2"><code>ONT2</code></a> <a class="ready-id" href="#D9"><code>D9</code></a> <a class="ready-id" href="#D11"><code>D11</code></a> <a class="ready-id" href="#G63"><code>G63</code></a> <a class="ready-id" href="#G64"><code>G64</code></a> <a class="ready-id" href="#G65"><code>G65</code></a> <a class="ready-id" href="#G106"><code>G106</code></a> <a class="ready-id" href="#G116"><code>G116</code></a> <a class="ready-id" href="#G117"><code>G117</code></a> <a class="ready-id" href="#G118"><code>G118</code></a> <a class="ready-id" href="#G119"><code>G119</code></a> <a class="ready-id" href="#G120"><code>G120</code></a> <a class="ready-id" href="#G127"><code>G127</code></a> <a class="ready-id" href="#G131"><code>G131</code></a> <a class="ready-id" href="#G132"><code>G132</code></a> <a class="ready-id" href="#G136"><code>G136</code></a> <a class="ready-id" href="#H8"><code>H8</code></a> <a class="ready-id" href="#I5"><code>I5</code></a> <a class="ready-id" href="#I7"><code>I7</code></a> <a class="ready-id" href="#I8"><code>I8</code></a> <a class="ready-id" href="#PLAN4"><code>PLAN4</code></a> <a class="ready-id" href="#DOC2"><code>DOC2</code></a> <a class="ready-id" href="#J54"><code>J54</code></a> <a class="ready-id" href="#J56"><code>J56</code></a> <a class="ready-id" href="#J57"><code>J57</code></a> <a class="ready-id" href="#J58"><code>J58</code></a> <a class="ready-id" href="#J60"><code>J60</code></a> <a class="ready-id" href="#J61"><code>J61</code></a> <a class="ready-id" href="#J64"><code>J64</code></a> <a class="ready-id" href="#J65"><code>J65</code></a> <a class="ready-id" href="#J67"><code>J67</code></a> <a class="ready-id" href="#J70"><code>J70</code></a> <a class="ready-id" href="#J73"><code>J73</code></a> <a class="ready-id" href="#J74"><code>J74</code></a> <a class="ready-id" href="#J75"><code>J75</code></a> <a class="ready-id" href="#J77"><code>J77</code></a> <a class="ready-id" href="#J78"><code>J78</code></a> <a class="ready-id" href="#K23"><code>K23</code></a> <a class="ready-id" href="#K29"><code>K29</code></a> <a class="ready-id" href="#L23"><code>L23</code></a> <a class="ready-id" href="#L29"><code>L29</code></a> <a class="ready-id" href="#N17"><code>N17</code></a> <a class="ready-id" href="#N18"><code>N18</code></a> <a class="ready-id" href="#N19"><code>N19</code></a> <a class="ready-id" href="#N22"><code>N22</code></a> <a class="ready-id" href="#N23"><code>N23</code></a> <a class="ready-id" href="#N24"><code>N24</code></a> <a class="ready-id" href="#N25"><code>N25</code></a> <a class="ready-id" href="#N26"><code>N26</code></a> <a class="ready-id" href="#N27"><code>N27</code></a> <a class="ready-id" href="#N28"><code>N28</code></a> <a class="ready-id" href="#G85"><code>G85</code></a> <a class="ready-id" href="#G86"><code>G86</code></a> <a class="ready-id" href="#O23"><code>O23</code></a> <a class="ready-id" href="#O26"><code>O26</code></a> <a class="ready-id" href="#O43"><code>O43</code></a> <a class="ready-id" href="#O44"><code>O44</code></a> <a class="ready-id" href="#O48"><code>O48</code></a> <a class="ready-id" href="#O50"><code>O50</code></a> <a class="ready-id" href="#O63"><code>O63</code></a> <a class="ready-id" href="#O68"><code>O68</code></a> <a class="ready-id" href="#O72"><code>O72</code></a> <a class="ready-id" href="#O82"><code>O82</code></a> <a class="ready-id" href="#O89"><code>O89</code></a> <a class="ready-id" href="#P6"><code>P6</code></a> <a class="ready-id" href="#Q22"><code>Q22</code></a> <a class="ready-id" href="#Q24"><code>Q24</code></a> <a class="ready-id" href="#Q28"><code>Q28</code></a> <a class="ready-id" href="#R7"><code>R7</code></a> <a class="ready-id" href="#R8"><code>R8</code></a> <a class="ready-id" href="#R11"><code>R11</code></a> <a class="ready-id" href="#R12"><code>R12</code></a> <a class="ready-id" href="#R13"><code>R13</code></a> <a class="ready-id" href="#R15"><code>R15</code></a> <a class="ready-id" href="#R16"><code>R16</code></a> <a class="ready-id" href="#R17"><code>R17</code></a> <a class="ready-id" href="#R18"><code>R18</code></a> <a class="ready-id" href="#R19"><code>R19</code></a> <a class="ready-id" href="#G90"><code>G90</code></a> <a class="ready-id" href="#S11"><code>S11</code></a> <a class="ready-id" href="#U10"><code>U10</code></a> <a class="ready-id" href="#U11"><code>U11</code></a> <a class="ready-id" href="#U16"><code>U16</code></a> <a class="ready-id" href="#U23"><code>U23</code></a> <a class="ready-id" href="#U27"><code>U27</code></a> <a class="ready-id" href="#V4"><code>V4</code></a> <a class="ready-id" href="#V5"><code>V5</code></a> <a class="ready-id" href="#V6"><code>V6</code></a> <a class="ready-id" href="#V7"><code>V7</code></a> <a class="ready-id" href="#V9"><code>V9</code></a> <a class="ready-id" href="#V10"><code>V10</code></a> <a class="ready-id" href="#V11"><code>V11</code></a> <a class="ready-id" href="#Y3"><code>Y3</code></a> <a class="ready-id" href="#Y6"><code>Y6</code></a> <a class="ready-id" href="#Y7"><code>Y7</code></a> <a class="ready-id" href="#Z4"><code>Z4</code></a> <a class="ready-id" href="#Z6"><code>Z6</code></a> <a class="ready-id" href="#Z7"><code>Z7</code></a> <a class="ready-id" href="#Z8"><code>Z8</code></a> <a class="ready-id" href="#GN2"><code>GN2</code></a> <a class="ready-id" href="#MM5"><code>MM5</code></a> <a class="ready-id" href="#MM6"><code>MM6</code></a> <a class="ready-id" href="#MM9"><code>MM9</code></a> <a class="ready-id" href="#MM11"><code>MM11</code></a> <a class="ready-id" href="#MM12"><code>MM12</code></a> <a class="ready-id" href="#MM13"><code>MM13</code></a> <a class="ready-id" href="#MM14"><code>MM14</code></a></div>
 <div class="filters">
   <label>Module<select id="f-module"><option value="">All</option>
 <option value="config">config</option>
@@ -180,7 +180,7 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
   <button type="button" id="f-clear">Clear filters</button>
 </div>
 <div class="board">
-<div class="column" data-status="todo"><div class="column-head"><h2>To do</h2><span class="count" data-count-for="todo">131</span></div><div class="column-body"><div class="card ready" id="card-REF1" data-id="REF1" data-module="reference" data-phase="2" data-epic="reference-hygiene" data-type="task" data-status="todo" data-search="ref1 register spec-kit and the spec-driven-development write-up as external reference - the precedent the code/requirements split cites" tabindex="0"><div class="card-head"><span class="card-id">REF1</span><span class="card-title">Register spec-kit and the spec-driven-development write-up as External reference - the precedent the code/requirements split cites</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Gate ontology-domain-registry-and-edition-grain §B4 (SIGNED OFF 2026-09-02, &quot;split now&quot;): the split proceeds on the 2018 FCD
+<div class="column" data-status="todo"><div class="column-head"><h2>To do</h2><span class="count" data-count-for="todo">130</span></div><div class="column-body"><div class="card ready" id="card-REF1" data-id="REF1" data-module="reference" data-phase="2" data-epic="reference-hygiene" data-type="task" data-status="todo" data-search="ref1 register spec-kit and the spec-driven-development write-up as external reference - the precedent the code/requirements split cites" tabindex="0"><div class="card-head"><span class="card-id">REF1</span><span class="card-title">Register spec-kit and the spec-driven-development write-up as External reference - the precedent the code/requirements split cites</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Gate ontology-domain-registry-and-edition-grain §B4 (SIGNED OFF 2026-09-02, &quot;split now&quot;): the split proceeds on the 2018 FCD
 evidence and the reference is registered BEHIND it, not before it. This tree has never heard
 of spec-driven development - a case-insensitive grep for spec-kit or spec-driven is empty
 across every .md, .yaml and .py - and ONT1&#x27;s proposal cites it, so it must exist as a
@@ -1167,93 +1167,6 @@ Filed in epic project-board (module drydocs-plan, phase 8) beside I6&#x27;s allo
 Y: this is groom-time TOOLING, where Y7 is the schema and the derivation. Related: Y7, I6, G68,
 O59, Idea-140.
 </p></div></div>
-<div class="card ready" id="card-PLAN2" data-id="PLAN2" data-module="drydocs-plan" data-phase="8" data-epic="project-board" data-type="task" data-status="todo" data-search="plan2 the edition segment in the id grammar - [&lt;edition&gt;-]&lt;module&gt;&lt;n&gt; in three regexes, both halves declared, the band check replaced, the dd reserve and the 10000 band retired forward-only" tabindex="0"><div class="card-head"><span class="card-id">PLAN2</span><span class="card-title">The edition segment in the id grammar - [&lt;EDITION&gt;-]&lt;MODULE&gt;&lt;n&gt; in three regexes, both halves declared, the band check replaced, the DD reserve and the 10000 band retired forward-only</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-plan</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">project-board</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-CFG2" data-target="card-CFG2">CFG2</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Gate ontology-domain-registry-and-edition-grain §C1 + §C4 (SIGNED OFF 2026-09-02). PLAN1 made the series the module; this adds the
-OPTIONAL edition segment in front of it and retires the two numeric partition rules.
-
-(a) GRAMMAR: `[&lt;EDITION&gt;-]&lt;MODULE&gt;&lt;n&gt;`, edition first, base edition unprefixed. `LOAD12` is
-producer main; `&lt;code&gt;-LOAD12` is that edition&#x27;s twelfth load item. SEVEN id-shape sites
-change, not three (review F1, docs/reviews/restructure-design-review-2026-09-02.md): validate.py :67 `_ID_RE` and :68
-`_FILE_RE` (the filename regex today matches `LOAD1` inside `AUTO-LOAD1.yaml` and silently
-DROPS the segment); backlog_store.py `_ID_RE` (natural_id_key sorts an unparsed id after
-every conforming one); the three bare-character extractions in test_backlog.py (:232
-digits, :395-396 and :417 `isalpha()` joins - these do not fail on a segment, they turn
-`AUTO-LOAD1` into series `AUTOLOAD` and STOP GUARDING, which is worse than failing); and
-drydocs/port_preflight.py :88, whose claim-commit pattern `[A-Za-z]+[0-9]+` stops
-recognizing an edition claim and lets the port coverage guard count it as substantive.
-The three test_backlog.py extractions are replaced by ONE parse helper that uses the
-allocator&#x27;s regex (the test already imports the allocator for the agreement guards at
-:267 and :352), so there is one grammar the test cannot drift from. Every existing id
-parses unchanged - the round-trip guard over all 630+ ids is the first test written.
-
-(b) BOTH HALVES DECLARED: an edition segment must be a `code` in editions.yaml (CFG2) and a
-module code must be in modules.yaml `series`; an undeclared edition is a typo, not a tenant,
-and fails; an undeclared module code fails as it does today.
-
-THE VENUE IS DECLARED, NOT INFERRED (review F2 - the most important finding): `.claude/**`
-is canonical-producer, so the company runs THIS allocator, and once the band retires
-nothing tells it which venue it is in - a company session that forgets `--edition` mints
-`LOAD13`, the producer&#x27;s next id, and nothing refuses it. So the allocator reads the
-venue&#x27;s edition from config/dev-environment.yaml, key `edition:` - `base` on the producer,
-the company&#x27;s own code on the company - the file that is already canonical-company
-(PORT-MANIFEST.yaml:322) and already carries a per-side flag for exactly this reason
-(`capability_assert`, and its note: &quot;the divergence lives in the one file already ruled
-per-side&quot;). `--next-id --module &lt;m&gt;` mints in the venue&#x27;s edition; `--edition &lt;code&gt;`
-overrides DOWNWARD only (a base may mint for an instance it hosts; an instance may not
-mint for its base or for a sibling); a venue whose file declares no `edition:` mints
-nothing and the refusal names the key to set. ADR 0015 D3&#x27;s &quot;declared, not inferred&quot;,
-applied to the allocator&#x27;s own venue.
-
-THE IDEA SERIES HAS NO GRAMMAR IN THIS ITEM YET (found 2026-09-03: the company minted
-Idea-10012 in the band during its port retry, and the band retires forward-only). The
-allocator treats `Idea` as its own case (validate.py IDEA_SERIES), outside the module
-codes, so `[&lt;EDITION&gt;-]&lt;MODULE&gt;&lt;n&gt;` says nothing about the inbox. Rule it here, one way:
-either `&lt;EDITION&gt;-Idea-&lt;n&gt;` on the same segment rule (an instance&#x27;s inbox is its own,
-DOC1 says the inbox is instance-owned), or the Idea series stays band-numbered
-forward-only as a deliberate exception written into the band-retirement text. The
-first is consistent; the second is cheaper and leaves one grammar with two shapes.
-Recommend the first; the guard in (e) covers `Idea` ids too.
-
-(c) RETIRE BOTH PARTITION RULES, FORWARD-ONLY: the DD reserve (git-readme.md:197,
-2026-07-20) and the 10000 band (PRODUCER_BAND_CEILING, 2026-08-18). Neither governs a new
-mint. DD1-DD10, DD10001-DD10003 and G10001-G10003 stay readable and stay in the frozen
-table; the band check in the allocator becomes the edition-segment check of (b); the
-git-readme sentence is retired with a pointer to the gate record; RESERVED_SERIES keeps DD
-refused (it is frozen, like the letters). CLAUDE.md&#x27;s mint rule and the skill gain the
-`--edition` case.
-
-THE FROZEN_BAND TABLE IS PLAN3&#x27;S, NOT THIS ITEM&#x27;S (re-pointed 2026-09-02). It was
-first written here (review F3) and then pulled out, because PLAN1 merged after
-port-base-20260901 and the next roll carries the freeze before this item can land -
-Idea-242&#x27;s trigger. PLAN3 ships FROZEN_BAND = {&quot;G&quot;: 10003, &quot;DD&quot;: 10003} with its
-agreement guard on main before that roll; this item&#x27;s band retirement (above) reads
-FROZEN_BAND as it finds it and retires nothing in it - the six legacy band ids stay
-legal forever, forward-only.
-
-THE FETCH FAILURE IS SILENT WHEN REMOTE REFS EXIST (review F12): `_git` returns &quot;&quot; on any
-failure, and the two warnings after the fetch (validate.py :360, :368) fire only when
-there are NO remote refs or NONE could be read. A failed fetch on a checkout that has
-refs is neither - the stale refs read fine and the union is silently a day old, which is
-the case the fetch exists to cover. The fetch call alone reports success or failure, and
-a failed fetch prints a third warning: fetch failed, remote refs may be stale, treat the
-number as provisional.
-
-(d) UNTIL THE COMPANY MINTS ITS EDITION CODE IT MINTS NOTHING NEW - and the allocator&#x27;s
-refusal message for a band-shaped or DD id says exactly that, naming CFG2&#x27;s file. Acceptable
-only because the code is one row and one push away (§C4).
-
-(e) GUARDS in test_backlog.py: round-trip over every current id; edition present =&gt;
-declared; module code present =&gt; declared; a base item never carries a segment; the
-allocator refuses an undeclared edition, a DD id, and a band-shaped number, each naming the
-replacement; a venue with no declared `edition:` is refused naming the key; the three
-FROZEN_BAND ids parse and pass. TWO PARSERS, ONE GRAMMAR (review F4): validate.py :67
-accepts uppercase only and no suffix, backlog_store.py :84 accepts any case and an
-optional `[a-z]` suffix, and nothing asserts they agree - the FROZEN_SERIES and ceiling
-constants have agreement guards because the duplication is deliberate; the regex is the
-one duplicated thing without one. Add it: a fixed list of ids, one with a segment, that
-must parse identically in both, and rule the suffix (no item id carries one today).
-
-Depends on CFG2 (the edition registry the segment validates against).
-</p></div></div>
 <div class="card ready" id="card-PLAN4" data-id="PLAN4" data-module="drydocs-plan" data-phase="8" data-epic="project-board" data-type="task" data-status="todo" data-search="plan4 venue-aware grooming, the edit side - an entry another venue owns is changed by stamped append only, its state token left to the owner; candidates land through a pending file minted in one pass; the mint side is plan2 (b)" tabindex="0"><div class="card-head"><span class="card-id">PLAN4</span><span class="card-title">Venue-aware grooming, the edit side - an entry another venue owns is changed by stamped append only, its state token left to the owner; candidates land through a pending file minted in one pass; the mint side is PLAN2 (b)</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-plan</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">project-board</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> WHAT THIS IS, AND WHAT IT IS NOT. Two venues (producer, company) groom ONE inbox
 (docs/restructure/IDEAS.md, union-append) and one item set (per-entry item files).
 Nothing today says what a session may do to an entry the OTHER venue owns. &quot;Read-only&quot;
@@ -1358,7 +1271,7 @@ RELATED. PLAN2 (b) owns the mint side and re-keys owner_of to the edition segmen
 CFG2 owns the venue declaration PLAN2 reads; test_plan_ideas.py&#x27;s PORTED_COMPANY_IDS
 presence guard stays as the &quot;look at it once&quot; tripwire and is not replaced by this.
 </p></div></div>
-<div class="card" id="card-DOC2" data-id="DOC2" data-module="docs" data-phase="8" data-epic="release-infrastructure" data-type="task" data-status="todo" data-search="doc2 relay-23 - the frozen letters, mint by module code, the edition segment and the retired partition rules reach the company through the port-prompt" tabindex="0"><div class="card-head"><span class="card-id">DOC2</span><span class="card-title">RELAY-23 - the frozen letters, mint by module code, the edition segment and the retired partition rules reach the company through the port-prompt</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">release-infrastructure</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-PLAN2" data-target="card-PLAN2">PLAN2</a> <a class="dep-link" href="#card-PLAN3" data-target="card-PLAN3">PLAN3</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Gate ontology-domain-registry-and-edition-grain §E1 (SIGNED OFF 2026-09-02): a cross-repo convention change is inert until it
+<div class="card ready" id="card-DOC2" data-id="DOC2" data-module="docs" data-phase="8" data-epic="release-infrastructure" data-type="task" data-status="todo" data-search="doc2 relay-23 - the frozen letters, mint by module code, the edition segment and the retired partition rules reach the company through the port-prompt" tabindex="0"><div class="card-head"><span class="card-id">DOC2</span><span class="card-title">RELAY-23 - the frozen letters, mint by module code, the edition segment and the retired partition rules reach the company through the port-prompt</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">release-infrastructure</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-PLAN2" data-target="card-PLAN2">PLAN2</a> <a class="dep-link" href="#card-PLAN3" data-target="card-PLAN3">PLAN3</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Gate ontology-domain-registry-and-edition-grain §E1 (SIGNED OFF 2026-09-02): a cross-repo convention change is inert until it
 reaches the other side, and the company&#x27;s allocator only WORKS once it holds an edition
 code. RELAY-24 carries PLAN1 + this gate to the company through the port-prompt, in the
 roll that carries commit 375dd962 (PLAN1 mechanism) and 39b90843 (this gate).
@@ -3265,7 +3178,7 @@ relay -- guessing spellings is the defect this item exists to prevent. The (d) s
 guard (fixture headers drawn from the recorded list, not the module constant) also waits
 on that list; a guard against nothing would be decoration.
 </p></div></div></div></div>
-<div class="column" data-status="done"><div class="column-head"><h2>Done</h2><span class="count" data-count-for="done">507</span></div><div class="column-body"><div class="card" id="card-A1" data-id="A1" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a1 audit reference registry paths for staleness" tabindex="0"><div class="card-head"><span class="card-id">A1</span><span class="card-title">Audit reference registry paths for staleness</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every entry marked ok/stale; stale paths fixed or flagged</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All local mirrors + platform/standard doc paths resolve; no stale entries. verified: 2026-06-21 in REGISTRY.yaml.</p></div></div>
+<div class="column" data-status="done"><div class="column-head"><h2>Done</h2><span class="count" data-count-for="done">508</span></div><div class="column-body"><div class="card" id="card-A1" data-id="A1" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a1 audit reference registry paths for staleness" tabindex="0"><div class="card-head"><span class="card-id">A1</span><span class="card-title">Audit reference registry paths for staleness</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every entry marked ok/stale; stale paths fixed or flagged</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All local mirrors + platform/standard doc paths resolve; no stale entries. verified: 2026-06-21 in REGISTRY.yaml.</p></div></div>
 <div class="card" id="card-A2" data-id="A2" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a2 account for every bmc doc in the source manifest" tabindex="0"><div class="card-head"><span class="card-id">A2</span><span class="card-title">Account for every BMC doc in the source manifest</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every .md in bmc-controlm/ accounted for in the manifest</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All 26 bmc-controlm .md files are referenced in SOURCE-MANIFEST.md (0 uncovered).</p></div></div>
 <div class="card" id="card-A3" data-id="A3" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a3 seed the research index with linked rationale" tabindex="0"><div class="card-head"><span class="card-id">A3</span><span class="card-title">Seed the research index with linked rationale</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> &gt;=5 rows, each with a working link and a &#x27;why it matters&#x27;</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. 7 rows with working links (3 Neo4j blogs + PROV-O/SOSA/ORG/agent-memory) + why-it-matters.</p></div></div>
 <div class="card" id="card-A4" data-id="A4" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a4 registry.yaml points the dcat row at a per-standard readme that was never written" tabindex="0"><div class="card-head"><span class="card-id">A4</span><span class="card-title">REGISTRY.yaml points the dcat row at a per-standard README that was never written</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> reference/REGISTRY.yaml&#x27;s dcat row no longer cites a path that does not exist. Exactly one of two resolutions, and the choice is recorded in the close note: (a) write reference/standards/dcat/README.md following the dcmi-terms pattern from M4 — namespace, what we use it for, the specific terms we reference, source_url — or (b) re-point the row&#x27;s `docs:` at reference/standards/README.md the way the skos row already does. Nothing else in the registry changes.
@@ -6759,6 +6672,167 @@ tip 664bca4a). Built on the laptop-vantage UI session, closed by the desktop ses
 the merge under the one-pen rule (CLAUDE.md §0). The first ids minted under it the same day:
 CFG1 CFG2 PLAN2 DOC1 DOC2 REF1 ONT1 ONT2 (gate ontology-domain-registry-and-edition-grain).
 The edition segment that follows this is PLAN2.
+</p></div></div>
+<div class="card" id="card-PLAN2" data-id="PLAN2" data-module="drydocs-plan" data-phase="8" data-epic="project-board" data-type="task" data-status="done" data-search="plan2 the edition segment in the id grammar - [&lt;edition&gt;-]&lt;module&gt;&lt;n&gt; in three regexes, both halves declared, the band check replaced, the dd reserve and the 10000 band retired forward-only" tabindex="0"><div class="card-head"><span class="card-id">PLAN2</span><span class="card-title">The edition segment in the id grammar - [&lt;EDITION&gt;-]&lt;MODULE&gt;&lt;n&gt; in three regexes, both halves declared, the band check replaced, the DD reserve and the 10000 band retired forward-only</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-plan</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">project-board</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-CFG2" data-target="card-CFG2">CFG2</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Gate ontology-domain-registry-and-edition-grain §C1 + §C4 (SIGNED OFF 2026-09-02). PLAN1 made the series the module; this adds the
+OPTIONAL edition segment in front of it and retires the two numeric partition rules.
+
+(a) GRAMMAR: `[&lt;EDITION&gt;-]&lt;MODULE&gt;&lt;n&gt;`, edition first, base edition unprefixed. `LOAD12` is
+producer main; `&lt;code&gt;-LOAD12` is that edition&#x27;s twelfth load item. SEVEN id-shape sites
+change, not three (review F1, docs/reviews/restructure-design-review-2026-09-02.md): validate.py :67 `_ID_RE` and :68
+`_FILE_RE` (the filename regex today matches `LOAD1` inside `AUTO-LOAD1.yaml` and silently
+DROPS the segment); backlog_store.py `_ID_RE` (natural_id_key sorts an unparsed id after
+every conforming one); the three bare-character extractions in test_backlog.py (:232
+digits, :395-396 and :417 `isalpha()` joins - these do not fail on a segment, they turn
+`AUTO-LOAD1` into series `AUTOLOAD` and STOP GUARDING, which is worse than failing); and
+drydocs/port_preflight.py :88, whose claim-commit pattern `[A-Za-z]+[0-9]+` stops
+recognizing an edition claim and lets the port coverage guard count it as substantive.
+The three test_backlog.py extractions are replaced by ONE parse helper that uses the
+allocator&#x27;s regex (the test already imports the allocator for the agreement guards at
+:267 and :352), so there is one grammar the test cannot drift from. Every existing id
+parses unchanged - the round-trip guard over all 630+ ids is the first test written.
+
+(b) BOTH HALVES DECLARED: an edition segment must be a `code` in editions.yaml (CFG2) and a
+module code must be in modules.yaml `series`; an undeclared edition is a typo, not a tenant,
+and fails; an undeclared module code fails as it does today.
+
+THE VENUE IS DECLARED, NOT INFERRED (review F2 - the most important finding): `.claude/**`
+is canonical-producer, so the company runs THIS allocator, and once the band retires
+nothing tells it which venue it is in - a company session that forgets `--edition` mints
+`LOAD13`, the producer&#x27;s next id, and nothing refuses it. So the allocator reads the
+venue&#x27;s edition from config/dev-environment.yaml, key `edition:` - `base` on the producer,
+the company&#x27;s own code on the company - the file that is already canonical-company
+(PORT-MANIFEST.yaml:322) and already carries a per-side flag for exactly this reason
+(`capability_assert`, and its note: &quot;the divergence lives in the one file already ruled
+per-side&quot;). `--next-id --module &lt;m&gt;` mints in the venue&#x27;s edition; `--edition &lt;code&gt;`
+overrides DOWNWARD only (a base may mint for an instance it hosts; an instance may not
+mint for its base or for a sibling); a venue whose file declares no `edition:` mints
+nothing and the refusal names the key to set. ADR 0015 D3&#x27;s &quot;declared, not inferred&quot;,
+applied to the allocator&#x27;s own venue.
+
+THE IDEA SERIES HAS NO GRAMMAR IN THIS ITEM YET (found 2026-09-03: the company minted
+Idea-10012 in the band during its port retry, and the band retires forward-only). The
+allocator treats `Idea` as its own case (validate.py IDEA_SERIES), outside the module
+codes, so `[&lt;EDITION&gt;-]&lt;MODULE&gt;&lt;n&gt;` says nothing about the inbox. Rule it here, one way:
+either `&lt;EDITION&gt;-Idea-&lt;n&gt;` on the same segment rule (an instance&#x27;s inbox is its own,
+DOC1 says the inbox is instance-owned), or the Idea series stays band-numbered
+forward-only as a deliberate exception written into the band-retirement text. The
+first is consistent; the second is cheaper and leaves one grammar with two shapes.
+Recommend the first; the guard in (e) covers `Idea` ids too.
+
+(c) RETIRE BOTH PARTITION RULES, FORWARD-ONLY: the DD reserve (git-readme.md:197,
+2026-07-20) and the 10000 band (PRODUCER_BAND_CEILING, 2026-08-18). Neither governs a new
+mint. DD1-DD10, DD10001-DD10003 and G10001-G10003 stay readable and stay in the frozen
+table; the band check in the allocator becomes the edition-segment check of (b); the
+git-readme sentence is retired with a pointer to the gate record; RESERVED_SERIES keeps DD
+refused (it is frozen, like the letters). CLAUDE.md&#x27;s mint rule and the skill gain the
+`--edition` case.
+
+THE FROZEN_BAND TABLE IS PLAN3&#x27;S, NOT THIS ITEM&#x27;S (re-pointed 2026-09-02). It was
+first written here (review F3) and then pulled out, because PLAN1 merged after
+port-base-20260901 and the next roll carries the freeze before this item can land -
+Idea-242&#x27;s trigger. PLAN3 ships FROZEN_BAND = {&quot;G&quot;: 10003, &quot;DD&quot;: 10003} with its
+agreement guard on main before that roll; this item&#x27;s band retirement (above) reads
+FROZEN_BAND as it finds it and retires nothing in it - the six legacy band ids stay
+legal forever, forward-only.
+
+THE FETCH FAILURE IS SILENT WHEN REMOTE REFS EXIST (review F12): `_git` returns &quot;&quot; on any
+failure, and the two warnings after the fetch (validate.py :360, :368) fire only when
+there are NO remote refs or NONE could be read. A failed fetch on a checkout that has
+refs is neither - the stale refs read fine and the union is silently a day old, which is
+the case the fetch exists to cover. The fetch call alone reports success or failure, and
+a failed fetch prints a third warning: fetch failed, remote refs may be stale, treat the
+number as provisional.
+
+(d) UNTIL THE COMPANY MINTS ITS EDITION CODE IT MINTS NOTHING NEW - and the allocator&#x27;s
+refusal message for a band-shaped or DD id says exactly that, naming CFG2&#x27;s file. Acceptable
+only because the code is one row and one push away (§C4).
+
+(e) GUARDS in test_backlog.py: round-trip over every current id; edition present =&gt;
+declared; module code present =&gt; declared; a base item never carries a segment; the
+allocator refuses an undeclared edition, a DD id, and a band-shaped number, each naming the
+replacement; a venue with no declared `edition:` is refused naming the key; the three
+FROZEN_BAND ids parse and pass. TWO PARSERS, ONE GRAMMAR (review F4): validate.py :67
+accepts uppercase only and no suffix, backlog_store.py :84 accepts any case and an
+optional `[a-z]` suffix, and nothing asserts they agree - the FROZEN_SERIES and ceiling
+constants have agreement guards because the duplication is deliberate; the regex is the
+one duplicated thing without one. Add it: a fixed list of ids, one with a segment, that
+must parse identically in both, and rule the suffix (no item id carries one today).
+
+Depends on CFG2 (the edition registry the segment validates against).
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-02 under PLAN1 at gate ontology-domain-registry-and-edition-grain §E1;
+(b)&#x27;s Idea half ruled at the rider idea-series-grammar (SIGNED 9/9, 2026-09-05).
+
+BUILT 2026-09-05 (desktop, Lane A; claimed ca49cd89). 3288 unit tests green (floor 3278),
+ruff clean, CLI import + --help green. Acceptance proof for the rider&#x27;s D1: `--next-id
+Idea` returned Idea-258 before and after.
+
+(a) as built - the seven sites: validate.py `_ID_RE` and `_FILE_RE` (the filename regex
+now anchors at a token boundary, so `XMPL-LOAD1.yaml` yields `XMPL-LOAD1` and never
+`LOAD1`); backlog_store.py `_ID_RE` (uppercase only, no suffix, named groups; an unparsed
+id sorts LAST as text with a comment saying so); test_backlog.py&#x27;s three bare
+`isalpha()`/`isdigit()` joins replaced by ONE `_parse()` over the allocator&#x27;s regex; and
+drydocs/port/port_preflight.py&#x27;s three claim patterns, which now admit the `&lt;CODE&gt;-`
+segment (pinned by three new ritual subjects in test_port_preflight.py). The Idea shape
+got the same seven-site treatment the rider&#x27;s Module line enumerates: `_IDEA_RE`,
+`_IDEA_IN_DIFF_RE`, the short-circuit at :360-364 (retired - `next_idea_id()` replaces
+it), the two render lines, and test_plan_ideas.py&#x27;s `_HEADER`, `_all_idea_ids` and the
+band guard&#x27;s parse (which now skips an edition&#x27;s own inbox: only the base is banded).
+The round-trip guard over every current id was written first and passed unchanged.
+
+(b) as built. `venue_edition()` reads config/dev-environment.yaml `edition:` and nothing
+else; the producer declares `base` (added in this commit, with the reason in the file&#x27;s
+own comment - it is canonical-company, so the company&#x27;s copy carries the company&#x27;s code
+and a port never overwrites it). `resolve_edition(requested, venue, kind=...)` is the one
+place the downward-only rule lives: a base may `--edition &lt;code&gt;` for a code
+editions.yaml declares; an instance mints for itself only; an undeclared segment is
+refused as &quot;a typo, not a tenant&quot;; a venue whose own declared code is not in the
+registry is refused naming both files. `next_id()` counts max+1 WITHIN the (edition,
+series) pair - `XMPL-LOAD1` starts that edition&#x27;s LOAD numbers at 1 - and the base stays
+at or below PRODUCER_BAND_CEILING (a band-shaped base number is refused as the retired
+rule&#x27;s shape). `next_idea_id()` is the rider&#x27;s one branch: base unprefixed at or below
+the ceiling, counting only unprefixed ids at or below it (so a company idea that lands
+by union-append never jumps the base to 10035); a declared code counts its own; an
+UNDECLARED venue mints band-shaped `Idea-&lt;n&gt;` above the ceiling and may not override.
+
+(c) as built. The allocator&#x27;s band check became the edition check above; the DD refusal
+stays and now names the retirement and the replacement; git-readme.md:196-201 is
+rewritten around the retirement with the record cited (the 2026-07-20 incident kept as
+history); CLAUDE.md&#x27;s mint rule and SKILL.md:50 carry the `--edition` case and the
+undeclared-venue rule; the inbox header&#x27;s &quot;Allocator bands&quot; section is retitled RETIRED,
+leads with what replaced it, and keeps the old text and its tokens because every id the
+old rule produced is still read by it (test_plan_ideas&#x27; documentation guard still holds).
+FROZEN_BAND is read as PLAN3 left it and nothing in it moves. F12: `fetch_remotes()`
+reports success or failure through a new `_git_run()`, and `_report_allocation` prints a
+third warning when the fetch failed on a checkout that has refs - the case the other two
+warnings could not see. The report also prints `venue:` first.
+
+(d) as built: the item-path refusal for a venue with no `edition:` names the key, both
+files, §C4 and the sentence &quot;the company mints nothing new until it has minted its code&quot;.
+
+(e) as built - nine new guards in test_backlog.py: the two-parser agreement over a fixed
+list of seventeen ids (ten parse, seven refused by BOTH - lowercase, a suffix, a 1- or
+6-letter segment, no number), which RULES the suffix: no item id carries one; the
+round-trip; edition-present =&gt; declared and the base carries no segment and every
+series is a module code or a frozen letter; the allocator matrix (base, downward,
+instance-for-itself, undeclared segment, instance-for-base, instance-for-sibling,
+ghost venue, undeclared venue); the Idea path matrix (base ignores band-shaped
+entries, never the gap, declared code, downward, undeclared venue band-shaped from
+10000, undeclared cannot override, the segment in both Idea regexes with the split
+suffix intact); the six FROZEN_BAND ids parse and pass; the venue file declares base.
+The frozen-strays helper now reads the SERIES whatever segment precedes it, so an
+edition id in a frozen letter (`XMPL-G1`) is a stray for every venue, not only the base.
+
+WHAT THIS CHANGES FOR THE COMPANY WHEN IT PORTS, said plainly: `.claude/**` is
+canonical-producer, so their allocator becomes this one, and until their
+dev-environment.yaml declares `edition: &lt;their code&gt;` it mints no ITEM id (by design,
+§C4/PLAN2 d - CFG2 (c) bars the producer from naming the code, so their edition gate
+runs first) and mints ideas band-shaped (rider C1, exactly the shape their 10009..10034
+already have). The relay is DOC2&#x27;s; a one-paragraph FIFTEENTH POSTSCRIPT in the ledger
+says it now so the refusal is never a surprise.
+
+NOT DONE HERE, by the acceptance&#x27;s own fences: PLAN4 (the edit side; `--mint-pending`
+goes through this `next_idea_id()`), the sharded inbox (ADR 0019), the company&#x27;s own
+edition code (their gate). Idea-257 (the SME&#x27;s B1 note) stays parked for grooming.
 </p></div></div>
 <div class="card" id="card-PLAN3" data-id="PLAN3" data-module="drydocs-plan" data-phase="8" data-epic="project-board" data-type="chore" data-status="done" data-search="plan3 frozen_band - the legacy band ids (g10001-g10003, dd10001-dd10003) are frozen at the band&#x27;s own max, so the letter freeze can port without handing the company a red suite" tabindex="0"><div class="card-head"><span class="card-id">PLAN3</span><span class="card-title">FROZEN_BAND - the legacy band ids (G10001-G10003, DD10001-DD10003) are frozen at the band&#x27;s own max, so the letter freeze can port without handing the company a red suite</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-plan</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p0</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">project-board</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Minted 2026-09-02 from Idea-242 because its trigger fired: PLAN1 (the letter freeze)
 merged AFTER port-base-20260901 - 113 commits already sit past the base - so the next
