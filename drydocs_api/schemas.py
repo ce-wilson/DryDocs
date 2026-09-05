@@ -119,3 +119,12 @@ class SpecRunOut(_Declared):
     rows: list[dict[str, Any]]
     watermarked: bool
     ephemeral: bool
+    #: API1 (d): completeness, declared. `truncated` says the spec's ceiling cut
+    #: the answer; `limit` is the ceiling that applied, or null for a spec that
+    #: has none. Both are modelled HERE so the generated client carries them as
+    #: typed fields and the console renders from the contract — not from
+    #: `rows.length === limit`, which is a second expression of a fact the
+    #: server already knows and is wrong precisely when the answer is exactly
+    #: 500 rows.
+    truncated: bool
+    limit: int | None = None

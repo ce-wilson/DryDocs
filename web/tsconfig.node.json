@@ -13,6 +13,14 @@
     "moduleDetection": "force",
     "noEmit": true,
 
+    /* Type checking — WEB4: strict is the Vite React-TS template default and was
+       written out of this file at some point. It is back on because the O70 bet
+       (a server change the console has not caught up with is a tsc error) is only
+       cashed while strictNullChecks enforces the optional fields src/generated/api.d.ts
+       declares. CI runs `npm run build` = `tsc -b && vite build`, so this is enforced
+       from the commit that lands it. */
+    "strict": true,
+
     /* Linting */
     "noUnusedLocals": true,
     "noUnusedParameters": true,

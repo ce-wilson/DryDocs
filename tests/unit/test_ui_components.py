@@ -349,10 +349,16 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     evidence rule asks for. Their pure helpers -- profileData.ts,
     findingClasses.ts, slotShapes.ts -- are .ts and stay outside the scan
     boundary for the same reason nvl-mapping.ts does.
+    88 -> 89 at WEB3 (2026-09-05): RouteAccessGate, deliberately UNBOUND, so the
+    total moves and bound stays at 40. It is the ONE route gate for the whole
+    console -- a pathless layout route that reads modules/registry.ts and admits
+    or redirects whatever path is current -- so binding it to a module would name
+    one of the twelve it serves, the same misstatement TrustLegend and StatusItems
+    are unbound to avoid. That it is unbindable is the point of the component.
     """
     comps = _ui()["components"]
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
         40,
-        88,
+        89,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"

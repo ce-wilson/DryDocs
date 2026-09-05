@@ -82,11 +82,14 @@ components:
   - { id: App,                     area: entry,        path: App.tsx }
   - { id: main,                    area: entry,        path: main.tsx }
 
-  # --- layout (6) ---
+  # --- layout (7) ---
   - { id: Aside,                   area: layout,       path: layout/Aside.tsx }
   - { id: Header,                  area: layout,       path: layout/Header.tsx }
   - { id: ModuleToolbar,           area: layout,       path: layout/ModuleToolbar.tsx }
   - { id: RightSidebarSlot,        area: layout,       path: layout/RightSidebarSlot.tsx }
+  # WEB3: the one route gate, derived from modules/registry.ts — a layout
+  # component because it is a pathless layout route, not a page.
+  - { id: RouteAccessGate,         area: layout,       path: layout/RouteAccessGate.tsx }
   - { id: Shell,                   area: layout,       path: layout/Shell.tsx }
   - { id: rightSidebarContext,     area: layout,       path: layout/rightSidebarContext.tsx }
 
