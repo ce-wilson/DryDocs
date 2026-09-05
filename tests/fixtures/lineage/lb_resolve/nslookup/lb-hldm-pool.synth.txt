@@ -1,0 +1,10 @@
+; query: lb-hldm-pool.synth
+Server:		10.0.0.53
+Address:	10.0.0.53#53
+
+Non-authoritative answer:
+lb-hldm-pool.synth	canonical name = pool-hldm-a.synth.
+Name:	host-hldm-02.synth
+Address: 10.0.0.11
+Name:	host-hldm-03.synth
+Address: 10.0.0.12
