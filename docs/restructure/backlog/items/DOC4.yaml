@@ -1,0 +1,17 @@
+id: DOC4
+epic: doc-infrastructure
+title: Standing module review sweep - ten sized slots on a two-day cadence, /system-design + /tech-debt per firing, reports accumulating on review/module-sweep with slot state derived not stored
+type: task
+module: docs
+phase: 10
+agent: main
+model: opus
+priority: p2
+status: in_progress
+depends_on: []
+inputs:
+- docs/reviews/module-review-sweep-plan.md
+acceptance: |
+  STUB - body follows in the next commit (mint rule I6).
+notes: |
+  Minted 2026-09-05. Stub pushed before the body per the mint rule.
