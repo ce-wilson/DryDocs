@@ -1,0 +1,21 @@
+id: PLAN4
+epic: project-board
+title: Venue-aware grooming - the allocator enforces the band on ideas as it does on items, both venues can mint, and an entry another venue owns is edited by stamped append only, its state token left to the owner
+type: task
+module: drydocs-plan
+phase: 8
+agent: main
+model: opus
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- .claude/skills/groom-backlog/validate.py
+- .claude/skills/groom-backlog/SKILL.md
+- tests/unit/test_plan_ideas.py
+- tests/unit/test_backlog.py
+- docs/restructure/IDEAS.md
+acceptance: |
+  STUB - body follows (I6: the id is claimed by this push, the acceptance by the next).
+notes: |
+  Minted 2026-09-05 (desktop, Lane A).
