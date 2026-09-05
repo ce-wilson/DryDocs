@@ -40,26 +40,42 @@ the second pass over a module in a later cycle can say what moved.
 Ten slots. Sized so a firing spends roughly comparable effort on each, which flat
 per-module rotation does not: the largest module is forty times the smallest.
 
-| slot | module family | first-party lines |
-|------|---------------|-------------------|
-| 1 | drydocs-core | 14,876 |
-| 2 | drydocs-load | 14,538 |
-| 3 | drydocs-lineage | 6,984 |
-| 4 | drydocs-api | 6,717 |
-| 5 | drydocs-remediation | 4,418 |
-| 6 | drydocs-review + drydocs-agents | 4,851 |
-| 7 | drydocs-port + drydocs-docgen + drydocs-docmeta | 3,770 |
-| 8 | drydocs-plan + drydocs-deepdoc + drydocs-libs | 2,188 |
-| 9 | drydocs-web | 22,715 |
-| 10 | cross-module seams | the boundary itself |
+| slot | slug | module family | first-party lines |
+|------|------|---------------|-------------------|
+| 1 | `core` | drydocs-core | 14,876 |
+| 2 | `load` | drydocs-load | 14,538 |
+| 3 | `lineage` | drydocs-lineage | 6,984 |
+| 4 | `api` | drydocs-api | 6,717 |
+| 5 | `remediation` | drydocs-remediation | 4,418 |
+| 6 | `review-agents` | drydocs-review + drydocs-agents | 4,851 |
+| 7 | `port-docgen-docmeta` | drydocs-port + drydocs-docgen + drydocs-docmeta | 3,770 |
+| 8 | `plan-deepdoc-libs` | drydocs-plan + drydocs-deepdoc + drydocs-libs | 2,188 |
+| 9 | `web` | drydocs-web | 22,715 |
+| 10 | `seams` | cross-module seams | the boundary itself |
+
+The **slug is the key** the derivation in the next subsection reads and the report
+filename carries (`docs/reviews/modules/<slug>-<YYYY-MM-DD>.md`). It is fixed here so
+two firings cannot spell one family two ways and each conclude the other never ran.
+
+A slot's **scope is read, never retyped.** For slots 1 to 8 it is the dotted prefixes of
+every `COMPONENT_GROUPS` group whose `COMPONENT_MODULE` value is one of the family's
+modules, plus `CORE_PREFIXES` for slot 1 - all three from
+`drydocs_core/component_map.py`, the importable object (J37), so a module that moves
+between components moves slot with it. Slot 9 is the two `drydocs-web` directories in
+`MODULE_MAP.md`'s top-level table (`web/`, `drydocs-icons/`); slot 10 is
+`tests/unit/test_module_boundary.py` and `component_map.py` themselves. The report's
+`scope:` line records what was resolved at that firing.
 
 Sizes measured 2026-09-05, excluding `.venv`, `node_modules`, `dist` and
 `__pycache__`. They are a sizing aid, not a contract; re-measure when a slot feels
 wrong rather than trusting the table.
 
 **Slot 9 (`drydocs-web`) was reviewed on 2026-09-05** across three lenses
-(`/architecture`, `/system-design`, `/tech-debt`). It sits at the end of the first
-cycle deliberately, so the sweep covers unreviewed ground before returning to it.
+(`/architecture`, `/system-design`, `/tech-debt`); the report is
+`docs/reviews/modules/web-2026-09-05.md`, landed by the secondary review so the
+derivation below sees it and the second pass has something to move against. It sits
+at the end of the first cycle deliberately, so the sweep covers unreviewed ground
+before returning to it.
 
 **Slot 10 is not a module.** It reviews what per-module slots structurally cannot
 see: whether the module boundary invariant actually holds
@@ -75,8 +91,12 @@ There is no cursor file. Consistent with how the backlog derives `next_ready` an
 never stores it, each firing computes its own slot:
 
 1. List `docs/reviews/modules/`.
-2. For each slot, find the most recent report date for that family.
-3. Take the slot with no report, or the oldest report; break ties by slot number.
+2. For each slot, find the most recent report date whose filename starts with the
+   slot's slug.
+3. If that most recent report has no `## Ranked` section, it is a partial report:
+   resume it (section 5) instead of deriving a new slot.
+4. Otherwise take the slot with no report, or the oldest report; break ties by slot
+   number.
 
 This is self-correcting. A missed firing does not desynchronise anything, a firing
 that dies halfway leaves a partial report that the next firing finishes rather than
@@ -152,15 +172,20 @@ Every step below runs in `.claude/worktrees/review-sweep`, on branch
 
 **0. Establish the venue.**
 Confirm the branch with `git branch --show-current` — it must be
-`review/module-sweep`. Confirm the tree is clean. `git pull --rebase` and rebase
-onto `origin/main` so the review reads current code, not the code as of the last
-firing.
+`review/module-sweep`. Confirm the tree is clean. Then `git pull --ff-only` and
+`git merge --no-edit origin/main`, so the review reads current code, not the code as
+of the last firing. **Merge, never rebase**: the branch is pushed and both machines
+may run a firing, so rewriting its history strands the other machine's copy (the J31
+shape) and the guard in step 6 is `git push` without `--force`, ever. Only this plan
+and `docs/reviews/modules/` can conflict; resolve on the branch.
 
 **1. Derive the slot** by the rule in section 2. Announce it.
 
 **2. Open the report file immediately, before reading any module code.**
-Path: `docs/reviews/modules/<family>-<YYYY-MM-DD>.md`. Write the J63 stamp and the
-empty section skeleton. Commit it. This is not ceremony — see section 5.
+Path: `docs/reviews/modules/<slug>-<YYYY-MM-DD>.md`. Write the J63 stamp and the
+empty section skeleton. Commit it. This is not ceremony — see section 5. If step 1
+derived a partial report instead, re-read it and continue from its first empty
+section; do not open a second file for the same slot.
 
 **3. Measure before reading.** Run the module's tests, the guards that cover it,
 the linter, and whatever counts the lenses call for. Record raw numbers into the
@@ -221,8 +246,18 @@ is a third writer and stays inside its own fence.
 - **Never** module code, config, or tests. The sweep is read-only outside its
   report.
 - **Never** `git stash` in any form. The worktree stack is shared.
-- **No merge to main.** The branch accumulates; a human merges when the findings
-  are wanted in trunk.
+- **Never the session ritual's close steps** (CLAUDE.md section 0, step 3): no
+  `render_board.py`, no `render_design_doc.py`, no CI check, and **no
+  `knowledge/depgraph-snapshots/snapshot.ps1`**. Those record the state of TRUNK after
+  a trunk push; the sweep pushes no trunk commit, so there is nothing for them to
+  record, and `snapshot` is a Lane A pen (`lane-handoff` skill, rule 2: the machine
+  holding `backlog` renders once and snapshots once at its close). A firing that ran
+  the snapshot would write a trunk artifact from a branch venue. Ruled by the
+  secondary review, 2026-09-05.
+- **No merge to main by the sweep.** The branch accumulates; a human merges when the
+  findings are wanted in trunk. The first such merge was the secondary review's own
+  (2026-09-05, `--no-ff`, docs-only), which put this plan and the slot 9 report on
+  `main` so DOC4's `inputs` resolve there and backlog items can cite the report file.
 
 If a firing finds something genuinely urgent — a live credential, a data-loss path,
 a broken publish boundary — it still writes only the report, and says so at the top
@@ -255,11 +290,12 @@ small in a terminal.
 # <family> — module review, <YYYY-MM-DD>
 
 reviewed_commit: <sha>
-reviewed_branch: review/module-sweep (rebased on origin/main <sha>)
+reviewed_branch: review/module-sweep (merged origin/main <sha>)
 reviewed_port_base: n/a — producer-side review
 slot: <n> of 10
 lenses: system-design, tech-debt
-scope: <the dotted prefixes and directories this family covers>
+scope: <the dotted prefixes and directories this family covers, resolved from
+       component_map.py at this firing - section 2>
 prior report: <path, or "first pass">
 
 ## Measured
@@ -349,3 +385,10 @@ Written 2026-09-05, from the three-pass lens review of `web/` run the same day
 lens scoping in section 3, the finding bar in section 9, and the compaction
 mechanism in section 5 are all distilled from what worked and what nearly failed in
 that run.
+
+Secondary review 2026-09-05 (`docs/reviews/module-review-sweep-plan-review-2026-09-05.md`,
+Lane A desktop, subject `e44cc5b4`): added the slug column and the read-not-typed
+scope rule (section 2), the partial-report resume rule (sections 2 and 4), replaced the
+rebase in step 0 with a merge, excluded the trunk close ritual and the depgraph
+snapshot from the sweep (section 6), and landed the slot 9 report the derivation had no
+way to see.
