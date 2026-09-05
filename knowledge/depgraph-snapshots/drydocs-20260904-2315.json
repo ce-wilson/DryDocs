@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-04T16:07:27",
+    "captured_at": "2026-09-04T23:15:28",
     "date": "20260904",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "a5ff4a84",
-      "full": "a5ff4a8464ee7f4175ba0ffae68e60b30fa377f4",
+      "commit": "863c6733",
+      "full": "863c673300fc61747582f22b1d3d1ba4ef0a7d96",
       "branch": "main",
-      "describe": "port-base-20260902-114-ga5ff4a84",
-      "subject": "port(prompt): step 311 said the lane-handoff skill CROSSES; at the manifest sha the same step tells them to take, it is never-port - corrected in place",
+      "describe": "port-base-20260902-124-g863c6733",
+      "subject": "feat(gates): draft controlm-folder-identity-grain - folder identity carries the data center, plus the UI test case for what BMC does not document",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -6506,6 +6506,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/config/gate-prompts/controlm-folder-identity-grain.yaml",
+      "name": "controlm-folder-identity-grain.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/gate-prompts/controlm-folder-identity-grain.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/config/gate-prompts/controlm-hosts-topology.yaml",
       "name": "controlm-hosts-topology.yaml",
       "extension": ".yaml",
@@ -7100,6 +7109,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/config/schemas/data-centers.schema.json",
+      "name": "data-centers.schema.json",
+      "extension": ".json",
+      "rel_path": "config/schemas/data-centers.schema.json",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/config/schemas/domains.schema.json",
       "name": "domains.schema.json",
       "extension": ".json",
@@ -7356,6 +7374,15 @@
       "name": "controlm.yaml",
       "extension": ".yaml",
       "rel_path": "config/taxonomy/controlm.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/taxonomy/data-centers.yaml",
+      "name": "data-centers.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/taxonomy/data-centers.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -19241,6 +19268,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs_core/data_centers.py",
+      "name": "data_centers.py",
+      "extension": ".py",
+      "rel_path": "drydocs_core/data_centers.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs_core/data_root.py",
       "name": "data_root.py",
       "extension": ".py",
@@ -22058,10 +22094,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260904-1251.json",
-      "name": "drydocs-20260904-1251.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260904.json",
+      "name": "drydocs-20260904.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260904-1251.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260904.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -24069,6 +24105,15 @@
       "name": "test_cypher_split.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_cypher_split.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_data_centers.py",
+      "name": "test_data_centers.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_data_centers.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -28325,6 +28370,10 @@
     ],
     [
       "drydocs/drydocs/cli_shared.py",
+      "drydocs/drydocs_core/data_centers.py"
+    ],
+    [
+      "drydocs/drydocs/cli_shared.py",
       "drydocs/drydocs_core/repo_paths.py"
     ],
     [
@@ -29342,6 +29391,10 @@
     [
       "drydocs/drydocs_core/config.py",
       "drydocs/drydocs_core/run_log.py"
+    ],
+    [
+      "drydocs/drydocs_core/data_centers.py",
+      "drydocs/drydocs_core/repo_paths.py"
     ],
     [
       "drydocs/drydocs_core/data_root.py",
@@ -30786,6 +30839,10 @@
     [
       "drydocs/tests/unit/test_cypher_split.py",
       "drydocs/drydocs_core/neo4j_client.py"
+    ],
+    [
+      "drydocs/tests/unit/test_data_centers.py",
+      "drydocs/drydocs_core/data_centers.py"
     ],
     [
       "drydocs/tests/unit/test_data_root.py",
@@ -37625,6 +37682,11 @@
     [
       "drydocs/config/gate-prompts",
       "CONTAINS",
+      "drydocs/config/gate-prompts/controlm-folder-identity-grain.yaml"
+    ],
+    [
+      "drydocs/config/gate-prompts",
+      "CONTAINS",
       "drydocs/config/gate-prompts/controlm-hosts-topology.yaml"
     ],
     [
@@ -37910,6 +37972,11 @@
     [
       "drydocs/config/schemas",
       "CONTAINS",
+      "drydocs/config/schemas/data-centers.schema.json"
+    ],
+    [
+      "drydocs/config/schemas",
+      "CONTAINS",
       "drydocs/config/schemas/domains.schema.json"
     ],
     [
@@ -37986,6 +38053,11 @@
       "drydocs/config/taxonomy",
       "CONTAINS",
       "drydocs/config/taxonomy/controlm.yaml"
+    ],
+    [
+      "drydocs/config/taxonomy",
+      "CONTAINS",
+      "drydocs/config/taxonomy/data-centers.yaml"
     ],
     [
       "drydocs/config/taxonomy",
@@ -44550,6 +44622,11 @@
     [
       "drydocs/drydocs_core",
       "CONTAINS",
+      "drydocs/drydocs_core/data_centers.py"
+    ],
+    [
+      "drydocs/drydocs_core",
+      "CONTAINS",
       "drydocs/drydocs_core/data_root.py"
     ],
     [
@@ -46160,7 +46237,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260904-1251.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260904.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -47206,6 +47283,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_cypher_split.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_data_centers.py"
     ],
     [
       "drydocs/tests/unit",
@@ -49227,13 +49309,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2763,
-    "edges": 1534,
+    "files": 2768,
+    "edges": 1537,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 3074,
+    "rels": 3079,
     "directories": 312
   }
 }
