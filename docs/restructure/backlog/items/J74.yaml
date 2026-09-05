@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - PUBLISH-BOUNDARY.md
@@ -60,3 +60,17 @@ notes: |
   their git rm --cached of the deepdoc scrape removed the blob from the tip while it stays
   reachable in history. They named it a history-rewrite decision, not a tip-level one, and
   left it to the SME. The same decision exists here and had never been written down.
+
+  CLOSED 2026-09-05 (laptop, Lane B, wip/J74-laptop).
+
+  (a) THE RULING IS MADE, BY THE USER, IN SESSION: the public push CARRIES HISTORY, and the 34 are an accepted class. Option (b) of the three. The evidence put in front of the ruling: the count re-measured at 34 of 2,057 commits (the item recorded 34 of 1,816 - the repo grew and the count did not, which is the ceiling behaving before it existed); no public twin remote exists in this clone, only origin = ce-wilson/DryDocs, so there is nothing already published to stay consistent with and the choice was genuinely open; and PUBLISH-BOUNDARY.md's own documented mechanism is a .gitignore for the public remote, which pushes a branch and therefore carries history already. THE ARGUMENT THAT DECIDED IT, and it is not in the item's three options: the published tree CITES SHAS THROUGHOUT - reviewed_commit stamps, the shas inside SIGNED gate-log records, port-base tags, PORT-REPORT pins - so a tip-only push would publish a repo whose every provenance citation dangles. The provenance discipline IS the thing being published; it has to resolve. PUBLISH-BOUNDARY.md now carries that ruling, the 34, the reason they are below the CLAUDE.md section 3 line (the token names an ORG UNIT, never a person, host or credential), and the pointer to the guard.
+
+  (b) THE MECHANISM: tests/unit/test_publish_boundary_history_ceiling.py. Reads git log per commit, counts messages carrying the retired token, asserts against CEILING = 34. The token is never written literally - derived at test time from internal/cdo-reference/README.md, the J55 idiom, so the guard cannot become a place the retired string leaks from. Fail-closed the same way J55 is: internal/ present but the RENAMED note missing is a failure, not a skip, because a guard green and silent on the tree that publishes is worse than no guard.
+
+  AN INSTRUMENT PROBLEM FOUND AND HANDLED (J76 - check the instrument before the subject). CI runs actions/checkout with no fetch-depth, so it clones at depth 1, where git log sees ONE commit and the count comes back near zero: a pass that measured nothing and would sit green forever. The guard detects a shallow clone and SKIPS LOUDLY instead. This is not a weakness of the enforcement point, it is the right one: a commit message cannot be fixed after a push without the very rewrite this ceiling exists to avoid, so the moment to catch it is the pre-push suite on the machine that wrote it. Giving CI fetch-depth: 0 would let it run there too; .github/ is outside this item's inputs and this lane's pens, so that is handed back rather than done.
+
+  A SECOND ASSERTION GUARDS THE GUARD: a ceiling drifting well above the real count silently tolerates new occurrences, so a drop of more than two fails and asks for the number to be re-recorded.
+
+  (c) The docstring says why a ceiling and not zero, in those terms. (d) J55 is untouched, and both files say why they are two guards on two surfaces.
+
+  (e) PROVED, THEN REMOVED. Green at the ceiling. An empty synthetic commit carrying the token - its message built from the token DERIVED at runtime from the mapping file, so the retired string was never typed into any command - took the count to 35 and the guard failed, naming the new sha first in its message. Unwound with git reset --hard back to the exact baseline sha, tree verified clean, guard verified green again. PUBLISH-BOUNDARY.md contains the word history.
