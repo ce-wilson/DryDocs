@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-05T00:41:56",
+    "captured_at": "2026-09-05T01:08:55",
     "date": "20260905",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "f9c8605b",
-      "full": "f9c8605b866ea4b534ee3b14a8f54c0c6015cc76",
+      "commit": "f2ec87db",
+      "full": "f2ec87dba1ca197b88c49d6226da483e8214e029",
       "branch": "main",
-      "describe": "port-base-20260902-131-gf9c8605b",
-      "subject": "docs(port): TWELFTH POSTSCRIPT - the renumber pass landed at 10023..10034; the producer's \"10022..10033\" corrected by stamped postscript",
+      "describe": "port-base-20260902-133-gf2ec87db",
+      "subject": "port(manifest): per-entry row for config/taxonomy/data-centers.yaml - the LOAD2 hold released, third config/** fall-through closed",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -22103,10 +22103,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260904-2315.json",
-      "name": "drydocs-20260904-2315.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260905.json",
+      "name": "drydocs-20260905.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260904-2315.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260905.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -46251,7 +46251,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260904-2315.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260905.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
