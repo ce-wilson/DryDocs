@@ -34,9 +34,11 @@ acceptance: |
   reads the band: a number above PRODUCER_BAND_CEILING is company-owned, at or below is
   producer-owned, the FROZEN_BAND legacy ids read as company. PLAN2 (b) re-keys it to the
   edition segment when that lands; nothing else in this item knows how ownership is
-  spelled. The venue a session RUNS AS is declared, never inferred from a hostname: the
-  J34 overlay seam already declares it - PORT-MANIFEST.company.yaml present means company,
-  absent means producer - and PLAN2's `edition:` key supersedes that when it exists.
+  spelled. The venue a session RUNS AS is declared, never inferred from a hostname, and
+  it is PLAN2's declaration, not a second one: config/dev-environment.yaml `edition:` -
+  `base` on the producer, the company's code on the company, no key = undeclared (the
+  idea-series-grammar rider C1 defines undeclared the same way). One venue file for the
+  mint side and the edit side.
 
   (b) THE EDIT RULE, for an entry the running venue does not own. On IDEAS.md entries, and
   on the acceptance/notes of an item file owned by the other venue (status on item files
