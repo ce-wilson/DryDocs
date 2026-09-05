@@ -70,12 +70,37 @@ fields:
   - { name: business_application, contract: "owning business application — the download grain" }
 
 # One synthetic end-to-end path (shape only; ids in the reserved 70001-70099 block).
+#
+# Z8 (2026-09-05) — THE SAMPLE FILES NOW REFERENCE EACH OTHER. The capture was
+# built in isolation and so was every other sample, so the names never met: the
+# export invented servers srv-synth-01..03 / -51 / -52 owned by application
+# 70055 while the Control-M samples named hosts host-hldm-02/03 and
+# host-auto-01/02 and folders carrying applications 70002 / 70011 / 70012 /
+# 70021 / 70022 / 70031 / 70041. Under the signed T1 exact and T2 short-name
+# tiers those two name spaces can never join, so a full run of the bundled
+# samples reported 4 of 4 hosts UNMATCHED and 1 application unmatched — every
+# counter honest, and the success path never once exercised.
+#
+# The FIXTURES moved, never the tiers and never the MATCH-only app leg: both are
+# gate-signed (server-location-ontology, 12/12) and neither was the defect. The
+# names below are the Control-M sample's own, and the owning application is
+# 70002, which the bundled SEAL sample already carries and whose folder
+# PRARAG-HLDM-70002-PEX-RFND-DLY runs its jobs on exactly these hosts.
+#
+# WHAT IS DELIBERATELY STILL UNMATCHED, so the coverage counters keep a live
+# subject (Z8 acceptance (e)): the AUTO family's hosts, host-auto-01 and
+# host-auto-02. The export is pulled PER BUSINESS APPLICATION, one file each —
+# their application's file is simply not bundled, which is the truest possible
+# reason for a gap in a per-application feed, and the fixture guard pins it so
+# nobody closes it by accident. Servers host-hldm-04, -51 and -52 are the same
+# coverage lesson from the other side: inventory boxes (a spare and the two DR
+# machines) that carry no scheduled work and so match no Control-M host.
 nodes:
   applications:
-    - { id: 70055, name: "Synthetic App 70055" }
+    - { id: 70002, name: "Synthetic App 70002 (the SEAL sample's own)" }
   servers:
-    - { id: srv-synth-01, parent_application: 70055, designation: PROD, rack: R-101 }
-    - { id: srv-synth-51, parent_application: 70055, designation: DR,   rack: R-901 }
+    - { id: host-hldm-02, parent_application: 70002, designation: PROD, rack: R-101 }
+    - { id: host-hldm-51, parent_application: 70002, designation: DR,   rack: R-901 }
   racks:
     - { id: R-101, parent_data_center: SYNTH-BLDG-A }
     - { id: R-901, parent_data_center: SYNTH-BLDG-B }

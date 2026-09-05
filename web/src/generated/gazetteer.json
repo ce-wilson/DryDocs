@@ -128,6 +128,19 @@
   },
   "cities": [
     {
+      "id": "syn-modelton",
+      "name": "Modelton",
+      "state": "MD2",
+      "country_id": null,
+      "country_alias": "SYN",
+      "lat": 9.0,
+      "lon": -27.0,
+      "x": 425.0,
+      "y": 225.0,
+      "grain": "city",
+      "synthetic": true
+    },
+    {
       "id": "syn-otherton",
       "name": "Otherton",
       "state": "OT",

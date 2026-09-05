@@ -149,5 +149,14 @@ synthetic:
   countries:
     - { id: SYN, name: Synthetica, aliases: [SYN] }
   cities:
-    - { id: syn-sampleville, name: Sampleville, state: SV, country_alias: SYN, lat: 14.0, lon: -34.0, grain: city }
-    - { id: syn-otherton,    name: Otherton,    state: OT, country_alias: SYN, lat: 11.5, lon: -30.5, grain: city }
+    - { id: syn-sampleville, name: Sampleville, state: SV,  country_alias: SYN, lat: 14.0, lon: -34.0, grain: city }
+    - { id: syn-otherton,    name: Otherton,    state: OT,  country_alias: SYN, lat: 11.5, lon: -30.5, grain: city }
+    # Z8: the export fixture's SECOND synthetic city (the DR building's). Z3 and
+    # Z5 each invented one and picked different names — the export said Modelton,
+    # this file said Otherton — so 2 of the export's 5 servers resolved to nothing
+    # and the map drew three dots for a five-server estate. Adding the row is pure
+    # classification: a place name means a point, and nothing here claims anyone
+    # occupies it. Otherton STAYS: it is the row a console test and the Z9 drill-
+    # down card are written against, and a gazetteer is a lookup table, so a row
+    # no fixture currently cites costs nothing and removing it would break both.
+    - { id: syn-modelton,    name: Modelton,    state: MD2, country_alias: SYN, lat:  9.0, lon: -27.0, grain: city }
