@@ -105,6 +105,30 @@
         "title": "EphemeralRegisterBody",
         "type": "object"
       },
+      "ExportBody": {
+        "description": "The export request: a spec run's params, plus API1 (c)'s raisable ceiling.\n\nA separate model from ``QueryBody`` because the ceiling is an EXPORT\ndecision. Raising the limit on a grid read would change what is on screen;\nraising it here changes what lands in a file that carries a manifest, and\nthose are different permissions to grant. Omitted (the default) keeps\ntoday's behaviour exactly \u2014 the display limit the console echoes back \u2014 so\na caller that has not been updated is unaffected.",
+        "properties": {
+          "limit": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Limit"
+          },
+          "params": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Params",
+            "type": "object"
+          }
+        },
+        "title": "ExportBody",
+        "type": "object"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -435,6 +459,17 @@
             "title": "Keys",
             "type": "array"
           },
+          "limit": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Limit"
+          },
           "params": {
             "additionalProperties": true,
             "title": "Params",
@@ -452,6 +487,10 @@
             "title": "Spec Id",
             "type": "string"
           },
+          "truncated": {
+            "title": "Truncated",
+            "type": "boolean"
+          },
           "watermarked": {
             "title": "Watermarked",
             "type": "boolean"
@@ -467,7 +506,8 @@
           "keys",
           "rows",
           "watermarked",
-          "ephemeral"
+          "ephemeral",
+          "truncated"
         ],
         "title": "SpecRunOut",
         "type": "object"
@@ -2056,7 +2096,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/QueryBody"
+                "$ref": "#/components/schemas/ExportBody"
               }
             }
           },
