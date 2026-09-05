@@ -6,9 +6,19 @@ signed shapes, IDEMPOTENTLY, with the sanitized fixture e2e green".
 
 * bootstrap + the full default supplement chain (which now includes the
   infrastructure supplement — chain step 5);
-* a seeded :BusinessApplication (the fixture's synthetic app 70055) and three
+* a seeded :BusinessApplication (the fixture's synthetic app 70002) and three
   seeded :ExecutionHost nodes — one exact-name match, one FQDN whose short
   name matches exactly one server (T2), one that matches nothing;
+
+Z8 (2026-09-05) — WHY THE SEEDS MOVED, AND WHAT THIS TEST DOES *NOT* PROVE.
+The seeds are the fixture's own names now (host-hldm-02 exact,
+HOST-HLDM-03.corp.example normalized) because the fixture was realigned onto
+the Control-M sample's hosts so the bundled demo can join without help. That
+realignment is what this test must not be mistaken for proving: seeding a
+matching host proves the TIER, and it proved the tier just as well when the
+fixture named servers nothing else had heard of. The demo path — the samples
+meeting each other with no test seeding the join — is pinned in
+tests/unit/test_server_inventory_fixture.py and exercised end to end by Z7.
 * `drydocs load-server-inventory --export <fixture>` — loader + the derived
   resolution pass in one verb;
 * shape assertions per the signed rulings, then the verb AGAIN and a
@@ -110,13 +120,15 @@ def loaded(neo4j_env):
     with _client(neo4j_env) as cli:
         # The fixture's synthetic app (the reserved 70001-70099 block) — the
         # §C2 leg is MATCH-only, so the app must pre-exist to get its port.
+        # In the bundled demo the SEAL sample supplies it; here the test does,
+        # because this run loads the export and nothing else.
         cli.run(
-            "MERGE (a:BusinessApplication {app_id: '70055'}) "
-            "SET a.seal_id = '70055', a.name = 'Synthetic App 70055'"
+            "MERGE (a:BusinessApplication {app_id: '70002'}) "
+            "SET a.seal_id = '70002', a.name = 'Synthetic App 70002'"
         )
         # Three Control-M-side hosts: T1 exact, T2 short-name, unmatched.
-        cli.run("MERGE (h:ExecutionHost:Agent {nodeid: 'srv-synth-01'})")
-        cli.run("MERGE (h:ExecutionHost:Agent {nodeid: 'SRV-SYNTH-02.corp.example'})")
+        cli.run("MERGE (h:ExecutionHost:Agent {nodeid: 'host-hldm-02'})")
+        cli.run("MERGE (h:ExecutionHost:Agent {nodeid: 'HOST-HLDM-03.corp.example'})")
         cli.run("MERGE (h:ExecutionHost:Agent {nodeid: 'no-such-box'})")
     _invoke(neo4j_env, "load-server-inventory", "--export", str(FIXTURE))
     return neo4j_env
@@ -131,7 +143,7 @@ def test_signed_shapes_landed(loaded) -> None:
         # One technology port, five RUNS_ON legs (both PROD and DR — §A3).
         assert census["port_runs"] == 5
         ports = cli.run(
-            "MATCH (a:BusinessApplication {app_id:'70055'})-[:HAS_PORT]->"
+            "MATCH (a:BusinessApplication {app_id:'70002'})-[:HAS_PORT]->"
             "(p:Port {kind:'Technology'}) RETURN count(p) AS n"
         )[0]
         assert ports["n"] == 1
@@ -143,8 +155,8 @@ def test_signed_shapes_landed(loaded) -> None:
             "r.match_evidence AS evidence ORDER BY nodeid"
         )
         assert {(t["nodeid"], t["tier"]) for t in tiers} == {
-            ("srv-synth-01", "exact"),
-            ("SRV-SYNTH-02.corp.example", "normalized"),
+            ("host-hldm-02", "exact"),
+            ("HOST-HLDM-03.corp.example", "normalized"),
         }
         assert all(t["evidence"] for t in tiers)
         unmatched = cli.run(
