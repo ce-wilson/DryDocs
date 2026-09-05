@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-04T23:15:28",
-    "date": "20260904",
+    "captured_at": "2026-09-05T00:41:56",
+    "date": "20260905",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "863c6733",
-      "full": "863c673300fc61747582f22b1d3d1ba4ef0a7d96",
+      "commit": "f9c8605b",
+      "full": "f9c8605b866ea4b534ee3b14a8f54c0c6015cc76",
       "branch": "main",
-      "describe": "port-base-20260902-124-g863c6733",
-      "subject": "feat(gates): draft controlm-folder-identity-grain - folder identity carries the data center, plus the UI test case for what BMC does not document",
+      "describe": "port-base-20260902-131-gf9c8605b",
+      "subject": "docs(port): TWELFTH POSTSCRIPT - the renumber pass landed at 10023..10034; the producer's \"10022..10033\" corrected by stamped postscript",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -14399,6 +14399,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/PLAN4.yaml",
+      "name": "PLAN4.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/PLAN4.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/Q1.yaml",
       "name": "Q1.yaml",
       "extension": ".yaml",
@@ -22094,10 +22103,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260904.json",
-      "name": "drydocs-20260904.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260904-2315.json",
+      "name": "drydocs-20260904-2315.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260904.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260904-2315.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -42032,6 +42041,11 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/PLAN4.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/Q1.yaml"
     ],
     [
@@ -46237,7 +46251,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260904.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260904-2315.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -49309,13 +49323,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2768,
+    "files": 2769,
     "edges": 1537,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 3079,
+    "rels": 3080,
     "directories": 312
   }
 }
