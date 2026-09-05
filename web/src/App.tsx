@@ -126,11 +126,11 @@ export default function App() {
               point: agentic Q&A without the admin-only raw-Cypher console). */}
           <Route path="ask" element={<AskRoute persona={persona} />} />
 
-          <Route path="lineage" element={<LineageRoute persona={persona} />} />
-          <Route path="lineage/asset/:assetId" element={<LineageRoute persona={persona} />} />
+          <Route path="lineage" element={<LineageRoute />} />
+          <Route path="lineage/asset/:assetId" element={<LineageRoute />} />
           <Route path="ownership" element={<OwnershipRoute persona={persona} />} />
           <Route path="ownership/asset/:assetId" element={<AssetPathRoute />} />
-          <Route path="runbooks" element={<RunbooksRoute persona={persona} />} />
+          <Route path="runbooks" element={<RunbooksRoute />} />
           {/* O59 set this module's registry access to 'sme'. That hid the nav
               entry but left the ROUTE open to anyone typing the URL. The gate is
               RouteAccessGate above now, derived from that same registry entry —
@@ -142,12 +142,12 @@ export default function App() {
               so RouteAccessGate lets it through and the host check inside is the
               gate (canAccessModule, same function, same vocabulary). */}
           <Route path="graph/:specId" element={<GraphCanvasRoute persona={persona} />} />
-          <Route path="docs" element={<DocsRoute persona={persona} />} />
-          <Route path="docs/document/:docId" element={<DocsRoute persona={persona} />} />
+          <Route path="docs" element={<DocsRoute />} />
+          <Route path="docs/document/:docId" element={<DocsRoute />} />
           <Route path="software" element={<SoftwareRoute persona={persona} />} />
           <Route path="gates" element={<GatesRoute />} />
-          <Route path="loads" element={<LoadsRoute persona={persona} />} />
-          <Route path="loads/run/:runId" element={<LoadsRoute persona={persona} />} />
+          <Route path="loads" element={<LoadsRoute />} />
+          <Route path="loads/run/:runId" element={<LoadsRoute />} />
           <Route path="load-map" element={<LoadMapRoute />} />
           <Route path="under-the-hood" element={<UnderTheHoodRoute />} />
 

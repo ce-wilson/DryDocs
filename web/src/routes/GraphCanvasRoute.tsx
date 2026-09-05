@@ -1,14 +1,13 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Navigate, useParams } from 'react-router-dom'
 
 import type { Persona } from '../lib/auth'
-import { apiBaseUrl } from '../lib/auth'
-import { createApiAccess } from '../lib/graphApi'
 import { CANVAS_ROUTES, isCanvasSpecId, type CanvasNode } from '../lib/nvl-mapping'
 import { canAccessModule, MODULES } from '../modules/registry'
 import ModuleToolbar from '../layout/ModuleToolbar'
 import SpecGraphPane from '../components/SpecGraphPane'
 import EmptyState from '../components/ui/EmptyState'
+import { useGraphAccess } from '../data/graphAccess'
 
 // `/graph/:specId` — one canvas surface, full page (O86).
 //
@@ -41,7 +40,7 @@ import EmptyState from '../components/ui/EmptyState'
 export default function GraphCanvasRoute({ persona }: { persona: Persona }) {
   const { specId } = useParams<{ specId: string }>()
   const [selected, setSelected] = useState<CanvasNode | null>(null)
-  const access = useMemo(() => createApiAccess(apiBaseUrl(), persona.id), [persona.id])
+  const { access } = useGraphAccess()
 
   if (!isCanvasSpecId(specId)) {
     return (

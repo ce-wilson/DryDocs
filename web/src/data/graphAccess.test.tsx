@@ -67,7 +67,11 @@ let access: RecordingAccess
 function wrapper({ children }: { children: ReactNode }) {
   return (
     <GraphAccessContext.Provider
-      value={{ access: access as unknown as GraphAccess, apiUrl: 'http://api.test' }}
+      value={{
+        access: access as unknown as GraphAccess,
+        apiUrl: 'http://api.test',
+        getToken: () => Promise.resolve('test-token'),
+      }}
     >
       {children}
     </GraphAccessContext.Provider>

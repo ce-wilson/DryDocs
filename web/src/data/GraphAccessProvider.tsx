@@ -1,7 +1,7 @@
 import { useMemo, type ReactNode } from 'react'
 
 import { apiBaseUrl } from '../lib/auth'
-import { createApiAccess } from '../lib/graphApi'
+import { createApiAccess, createApiClient } from '../lib/graphApi'
 import { GraphAccessContext, type GraphAccessValue } from './graphAccess'
 
 /** WEB12 — ONE GraphAccess for the session, mounted above the routes.
@@ -24,7 +24,8 @@ export function GraphAccessProvider({
 }) {
   const value = useMemo<GraphAccessValue>(() => {
     const apiUrl = apiBaseUrl()
-    return { access: createApiAccess(apiUrl, personaId), apiUrl }
+    const client = createApiClient(apiUrl, personaId)
+    return { access: createApiAccess(apiUrl, personaId, client), apiUrl, getToken: client.getToken }
   }, [personaId])
   return <GraphAccessContext.Provider value={value}>{children}</GraphAccessContext.Provider>
 }

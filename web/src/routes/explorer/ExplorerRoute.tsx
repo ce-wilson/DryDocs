@@ -1,6 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { Persona } from '../../lib/auth'
-import { createApiAccess } from '../../lib/graphApi'
 import { MODULES } from '../../modules/registry'
 import { useRightSidebar } from '../../layout/rightSidebarContext'
 import ModuleTemplate from '../ModuleTemplate'
@@ -21,6 +20,7 @@ import {
   type Selection,
 } from '../../explorer/demoGraph'
 import type { TowerKey } from '../../data/towers'
+import { useGraphAccess } from '../../data/graphAccess'
 
 // Explorer (`/explorer`, O9): the first full instantiation of the shared
 // module template — React Flow tower graph over the four data-frame tabs, with
@@ -72,8 +72,7 @@ export default function ExplorerRoute({ persona }: { persona: Persona }) {
   // O11: each tab binds to its versioned QuerySpec via the GraphAccess api
   // adapter; the O9 demo frames survive as the visible fallback when
   // drydocs-api (or the graph) is unavailable.
-  const apiUrl = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:8001'
-  const access = useMemo(() => createApiAccess(apiUrl, persona.id), [apiUrl, persona.id])
+  const { access } = useGraphAccess()
 
   // selection → inspector (the template's right sidebar slot)
   useEffect(() => {
@@ -109,16 +108,12 @@ export default function ExplorerRoute({ persona }: { persona: Persona }) {
       }
       tabContent={{
         Applications: (
-          <SpecGrid
-            access={access}
-            specId="explorer.applications.v1"
+          <SpecGrid specId="explorer.applications.v1"
             fallback={<DataFrame cols={APPLICATIONS_FRAME.cols} rows={APPLICATIONS_FRAME.rows} {...frameProps} />}
           />
         ),
         Folders: (
-          <SpecGrid
-            access={access}
-            specId="explorer.folder-applications.v1"
+          <SpecGrid specId="explorer.folder-applications.v1"
             fallback={<DataFrame cols={FOLDERS_FRAME.cols} rows={FOLDERS_FRAME.rows} {...frameProps} />}
           />
         ),
@@ -137,30 +132,22 @@ export default function ExplorerRoute({ persona }: { persona: Persona }) {
           />
         ),
         'App codes': (
-          <SpecGrid
-            access={access}
-            specId="explorer.controlm-app-codes.v1"
+          <SpecGrid specId="explorer.controlm-app-codes.v1"
             fallback={<DataFrame cols={APP_CODES_FRAME.cols} rows={APP_CODES_FRAME.rows} {...frameProps} />}
           />
         ),
         Jobs: (
-          <SpecGrid
-            access={access}
-            specId="explorer.jobs.v2"
+          <SpecGrid specId="explorer.jobs.v2"
             fallback={<DataFrame cols={JOBS_FRAME.cols} rows={JOBS_FRAME.rows} {...frameProps} />}
           />
         ),
         Conditions: (
-          <SpecGrid
-            access={access}
-            specId="explorer.conditions.v2"
+          <SpecGrid specId="explorer.conditions.v2"
             fallback={<DataFrame cols={CONDITIONS_FRAME.cols} rows={CONDITIONS_FRAME.rows} {...frameProps} />}
           />
         ),
         Servers: (
-          <SpecGrid
-            access={access}
-            specId="explorer.servers.v1"
+          <SpecGrid specId="explorer.servers.v1"
             fallback={<DataFrame cols={SERVERS_FRAME.cols} rows={SERVERS_FRAME.rows} {...frameProps} />}
           />
         ),

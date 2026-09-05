@@ -3,11 +3,11 @@ import ModuleToolbar from '../layout/ModuleToolbar'
 import EmptyState from '../components/ui/EmptyState'
 import SpecGrid from '../explorer/SpecGrid'
 import { createPublicApi } from '../lib/apiClient'
-import { createApiAccess, createApiClient } from '../lib/graphApi'
 import { ask, controlPart, type AskEnvelope, type AskSource, type AskStep } from '../ask/askApi'
 import TaskGraphPane from '../ask/TaskGraphPane'
 import FileReport from '../ask/FileReport'
 import type { Persona } from '../lib/auth'
+import { useGraphAccess } from '../data/graphAccess'
 
 // The Ask spoke (R5 / ADR 0007): free-text Q&A over the knowledge graph for
 // EVERY persona — the agent tier does the reasoning, the server does the
@@ -64,30 +64,28 @@ const STEP_LABEL: Record<string, string> = {
 }
 
 export default function AskRoute({ persona }: { persona: Persona }) {
-  const apiUrl = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:8001'
   const adkUrl = (import.meta.env.VITE_ADK_URL as string | undefined) ?? 'http://localhost:8000'
 
-  // ONE shared client: the token handed to the agent (the R4 owner token) and
-  // the runSpec/exportSpec calls must belong to the SAME api session, or the
-  // agent-registered explore_refs would 404 for this page.
-  const client = useMemo(() => createApiClient(apiUrl, persona.id), [apiUrl, persona.id])
-  const access = useMemo(() => createApiAccess(apiUrl, persona.id, client), [apiUrl, persona.id, client])
+  // ONE shared client, now the SESSION's: the token handed to the agent (the R4
+  // owner token) and the runSpec/exportSpec calls must belong to the SAME api
+  // session, or the agent-registered explore_refs would 404 for this page. WEB12
+  // moved that client to the provider, so this page shares it with every other
+  // surface instead of holding the only correct copy of the rule.
+  const { apiUrl, getToken } = useGraphAccess()
 
   // spec id -> classification, for citation chips ('spec:<id>' sources).
   const [specClass, setSpecClass] = useState<Record<string, string>>({})
   useEffect(() => {
-    let cancelled = false
+    const ctl = new AbortController()
     // O70: the public typed client — the list is unauthenticated and its rows
     // are SpecOut, the server's declaration, so `classification` is not assumed.
     createPublicApi(apiUrl)
-      .GET('/specs')
+      .GET('/specs', { signal: ctl.signal })
       .then(({ data }) => {
-        if (!cancelled && data) setSpecClass(Object.fromEntries(data.map((s) => [s.id, s.classification])))
+        if (data) setSpecClass(Object.fromEntries(data.map((s) => [s.id, s.classification])))
       })
       .catch(() => undefined)
-    return () => {
-      cancelled = true
-    }
+    return () => ctl.abort()
   }, [apiUrl])
 
   const sessionId = useMemo(
@@ -126,7 +124,7 @@ export default function AskRoute({ persona }: { persona: Persona }) {
     // steps simply carry no explore_ref (honest degradation, matching the agent).
     let control: ReturnType<typeof controlPart> | undefined
     try {
-      control = controlPart(await client.getToken(), apiUrl)
+      control = controlPart(await getToken(), apiUrl)
     } catch {
       control = undefined
     }
@@ -184,7 +182,7 @@ export default function AskRoute({ persona }: { persona: Persona }) {
               </span>
             </summary>
             <div className="border-t border-edge p-3">
-              <FileReport personaId={persona.id} />
+              <FileReport />
             </div>
           </details>
           <header>
@@ -206,7 +204,7 @@ export default function AskRoute({ persona }: { persona: Persona }) {
           )}
 
           {turns.map((turn) => (
-            <TurnCard key={turn.id} turn={turn} access={access} specClass={specClass} />
+            <TurnCard key={turn.id} turn={turn} specClass={specClass} />
           ))}
 
           <form
@@ -239,15 +237,7 @@ export default function AskRoute({ persona }: { persona: Persona }) {
   )
 }
 
-function TurnCard({
-  turn,
-  access,
-  specClass,
-}: {
-  turn: Turn
-  access: ReturnType<typeof createApiAccess>
-  specClass: Record<string, string>
-}) {
+function TurnCard({ turn, specClass }: { turn: Turn; specClass: Record<string, string> }) {
   const envelope = turn.envelope
   const watermarked = (envelope?.sources ?? []).some((s) => s.trust === 'SYNTHESIZED')
   return (
@@ -305,7 +295,7 @@ function TurnCard({
             </summary>
             <div className="mt-2 flex flex-col gap-2">
               {(envelope.steps ?? []).map((step) => (
-                <StepDetail key={step.i} step={step} access={access} />
+                <StepDetail key={step.i} step={step} />
               ))}
             </div>
           </details>
@@ -398,7 +388,7 @@ function MetricsChip({ envelope }: { envelope: AskEnvelope }) {
   )
 }
 
-function StepDetail({ step, access }: { step: AskStep; access: ReturnType<typeof createApiAccess> }) {
+function StepDetail({ step }: { step: AskStep }) {
   const [open, setOpen] = useState(false)
   const [copied, setCopied] = useState<string | null>(null)
 
@@ -486,9 +476,7 @@ function StepDetail({ step, access }: { step: AskStep; access: ReturnType<typeof
           {/* the R4 payoff: the SAME SpecGrid the Explorer uses, pointed at the
               ephemeral ref — run + both export paths + manifest, zero raw Cypher
               leaving the browser. */}
-          <SpecGrid
-            access={access}
-            specId={step.explore_ref}
+          <SpecGrid specId={step.explore_ref}
             fallback={
               <EmptyState
                 title="Ephemeral spec unavailable"
