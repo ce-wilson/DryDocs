@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-05T02:18:15",
+    "captured_at": "2026-09-05T14:14:52",
     "date": "20260905",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "e1c82161",
-      "full": "e1c8216103a0e4f8d448de3b42093917d5f4063b",
+      "commit": "70d6e14b",
+      "full": "70d6e14bf867f9248678bde85f7314cbe8f917cd",
       "branch": "main",
-      "describe": "port-base-20260902-143-ge1c82161",
-      "subject": "feat(PLAN4): venue-aware grooming, the edit side - owner_of by segment, --check-venue-edits (REWRITE / UNSTAMPED / STATE FLIP), the pending file and --mint-pending",
+      "describe": "port-base-20260902-167-g70d6e14b",
+      "subject": "fix(groom-backlog): --mint-pending writes with newline='' so an LF inbox stays LF on Windows",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -7131,6 +7131,15 @@
       "name": "editions.schema.json",
       "extension": ".json",
       "rel_path": "config/schemas/editions.schema.json",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/schemas/identity-header.schema.json",
+      "name": "identity-header.schema.json",
+      "extension": ".json",
+      "rel_path": "config/schemas/identity-header.schema.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -20384,10 +20393,28 @@
       "kind": "dir"
     },
     {
+      "file_id": "drydocs/drydocs_lineage/collect/LB-RESOLVE.md",
+      "name": "LB-RESOLVE.md",
+      "extension": ".md",
+      "rel_path": "drydocs_lineage/collect/LB-RESOLVE.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs_lineage/collect/README.md",
       "name": "README.md",
       "extension": ".md",
       "rel_path": "drydocs_lineage/collect/README.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs_lineage/collect/lb_resolve.sh",
+      "name": "lb_resolve.sh",
+      "extension": ".sh",
+      "rel_path": "drydocs_lineage/collect/lb_resolve.sh",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -20496,6 +20523,15 @@
       "name": "glue_tables.py",
       "extension": ".py",
       "rel_path": "drydocs_lineage/extractors/glue_tables.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs_lineage/extractors/lb_resolution.py",
+      "name": "lb_resolution.py",
+      "extension": ".py",
+      "rel_path": "drydocs_lineage/extractors/lb_resolution.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -22130,10 +22166,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260905-0108.json",
-      "name": "drydocs-20260905-0108.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260905.json",
+      "name": "drydocs-20260905.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260905-0108.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260905.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -23525,6 +23561,15 @@
       "kind": "dir"
     },
     {
+      "file_id": "drydocs/tests/fixtures/attribution/stg_app_fact__bundled-samples.csv",
+      "name": "stg_app_fact__bundled-samples.csv",
+      "extension": ".csv",
+      "rel_path": "tests/fixtures/attribution/stg_app_fact__bundled-samples.csv",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/fixtures/attribution/stg_app_fact__synthetic.csv",
       "name": "stg_app_fact__synthetic.csv",
       "extension": ".csv",
@@ -23547,6 +23592,87 @@
       "name": "jobs.csv",
       "extension": ".csv",
       "rel_path": "tests/fixtures/lineage/jobs.csv",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/fixtures/lineage/lb_resolve",
+      "name": "lb_resolve",
+      "extension": "",
+      "rel_path": "tests/fixtures/lineage/lb_resolve",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/tests/fixtures/lineage/lb_resolve/meta.txt",
+      "name": "meta.txt",
+      "extension": ".txt",
+      "rel_path": "tests/fixtures/lineage/lb_resolve/meta.txt",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/fixtures/lineage/lb_resolve/nslookup",
+      "name": "nslookup",
+      "extension": "",
+      "rel_path": "tests/fixtures/lineage/lb_resolve/nslookup",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/tests/fixtures/lineage/lb_resolve/nslookup/garbled-answer.synth.txt",
+      "name": "garbled-answer.synth.txt",
+      "extension": ".txt",
+      "rel_path": "tests/fixtures/lineage/lb_resolve/nslookup/garbled-answer.synth.txt",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/fixtures/lineage/lb_resolve/nslookup/host-auto-01.txt",
+      "name": "host-auto-01.txt",
+      "extension": ".txt",
+      "rel_path": "tests/fixtures/lineage/lb_resolve/nslookup/host-auto-01.txt",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/fixtures/lineage/lb_resolve/nslookup/lb-hldm-pool.synth.txt",
+      "name": "lb-hldm-pool.synth.txt",
+      "extension": ".txt",
+      "rel_path": "tests/fixtures/lineage/lb_resolve/nslookup/lb-hldm-pool.synth.txt",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/fixtures/lineage/lb_resolve/nslookup/lb-mixed-pool.synth.txt",
+      "name": "lb-mixed-pool.synth.txt",
+      "extension": ".txt",
+      "rel_path": "tests/fixtures/lineage/lb_resolve/nslookup/lb-mixed-pool.synth.txt",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/fixtures/lineage/lb_resolve/nslookup/lb-orphan-pool.synth.txt",
+      "name": "lb-orphan-pool.synth.txt",
+      "extension": ".txt",
+      "rel_path": "tests/fixtures/lineage/lb_resolve/nslookup/lb-orphan-pool.synth.txt",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/fixtures/lineage/lb_resolve/nslookup/no-such-alias.synth.txt",
+      "name": "no-such-alias.synth.txt",
+      "extension": ".txt",
+      "rel_path": "tests/fixtures/lineage/lb_resolve/nslookup/no-such-alias.synth.txt",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -23867,6 +23993,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_bundled_demo_interlock.py",
+      "name": "test_bundled_demo_interlock.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_bundled_demo_interlock.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_business_key_backbone.py",
       "name": "test_business_key_backbone.py",
       "extension": ".py",
@@ -24015,6 +24150,15 @@
       "name": "test_component_run_logs.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_component_run_logs.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_config_identity_header.py",
+      "name": "test_config_identity_header.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_config_identity_header.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -24677,6 +24821,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_lineage_lb_resolution.py",
+      "name": "test_lineage_lb_resolution.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_lineage_lb_resolution.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_lineage_mac.py",
       "name": "test_lineage_mac.py",
       "extension": ".py",
@@ -25104,6 +25257,15 @@
       "name": "test_provenance_migration.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_provenance_migration.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_publish_boundary_history_ceiling.py",
+      "name": "test_publish_boundary_history_ceiling.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_publish_boundary_history_ceiling.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -31495,6 +31657,10 @@
     [
       "drydocs/tests/unit/test_lineage_inventory.py",
       "drydocs/drydocs_lineage/writer.py"
+    ],
+    [
+      "drydocs/tests/unit/test_lineage_lb_resolution.py",
+      "drydocs/drydocs_lineage/extractors/lb_resolution.py"
     ],
     [
       "drydocs/tests/unit/test_lineage_mac.py",
@@ -38023,6 +38189,11 @@
       "drydocs/config/schemas",
       "CONTAINS",
       "drydocs/config/schemas/editions.schema.json"
+    ],
+    [
+      "drydocs/config/schemas",
+      "CONTAINS",
+      "drydocs/config/schemas/identity-header.schema.json"
     ],
     [
       "drydocs/config/schemas",
@@ -45352,7 +45523,17 @@
     [
       "drydocs/drydocs_lineage/collect",
       "CONTAINS",
+      "drydocs/drydocs_lineage/collect/LB-RESOLVE.md"
+    ],
+    [
+      "drydocs/drydocs_lineage/collect",
+      "CONTAINS",
       "drydocs/drydocs_lineage/collect/README.md"
+    ],
+    [
+      "drydocs/drydocs_lineage/collect",
+      "CONTAINS",
+      "drydocs/drydocs_lineage/collect/lb_resolve.sh"
     ],
     [
       "drydocs/drydocs_lineage/collect",
@@ -45403,6 +45584,11 @@
       "drydocs/drydocs_lineage/extractors",
       "CONTAINS",
       "drydocs/drydocs_lineage/extractors/glue_tables.py"
+    ],
+    [
+      "drydocs/drydocs_lineage/extractors",
+      "CONTAINS",
+      "drydocs/drydocs_lineage/extractors/lb_resolution.py"
     ],
     [
       "drydocs/drydocs_lineage/extractors",
@@ -46297,7 +46483,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260905-0108.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260905.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -47037,12 +47223,62 @@
     [
       "drydocs/tests/fixtures/attribution",
       "CONTAINS",
+      "drydocs/tests/fixtures/attribution/stg_app_fact__bundled-samples.csv"
+    ],
+    [
+      "drydocs/tests/fixtures/attribution",
+      "CONTAINS",
       "drydocs/tests/fixtures/attribution/stg_app_fact__synthetic.csv"
     ],
     [
       "drydocs/tests/fixtures/lineage",
       "CONTAINS",
       "drydocs/tests/fixtures/lineage/jobs.csv"
+    ],
+    [
+      "drydocs/tests/fixtures/lineage",
+      "CONTAINS",
+      "drydocs/tests/fixtures/lineage/lb_resolve"
+    ],
+    [
+      "drydocs/tests/fixtures/lineage/lb_resolve",
+      "CONTAINS",
+      "drydocs/tests/fixtures/lineage/lb_resolve/meta.txt"
+    ],
+    [
+      "drydocs/tests/fixtures/lineage/lb_resolve",
+      "CONTAINS",
+      "drydocs/tests/fixtures/lineage/lb_resolve/nslookup"
+    ],
+    [
+      "drydocs/tests/fixtures/lineage/lb_resolve/nslookup",
+      "CONTAINS",
+      "drydocs/tests/fixtures/lineage/lb_resolve/nslookup/garbled-answer.synth.txt"
+    ],
+    [
+      "drydocs/tests/fixtures/lineage/lb_resolve/nslookup",
+      "CONTAINS",
+      "drydocs/tests/fixtures/lineage/lb_resolve/nslookup/host-auto-01.txt"
+    ],
+    [
+      "drydocs/tests/fixtures/lineage/lb_resolve/nslookup",
+      "CONTAINS",
+      "drydocs/tests/fixtures/lineage/lb_resolve/nslookup/lb-hldm-pool.synth.txt"
+    ],
+    [
+      "drydocs/tests/fixtures/lineage/lb_resolve/nslookup",
+      "CONTAINS",
+      "drydocs/tests/fixtures/lineage/lb_resolve/nslookup/lb-mixed-pool.synth.txt"
+    ],
+    [
+      "drydocs/tests/fixtures/lineage/lb_resolve/nslookup",
+      "CONTAINS",
+      "drydocs/tests/fixtures/lineage/lb_resolve/nslookup/lb-orphan-pool.synth.txt"
+    ],
+    [
+      "drydocs/tests/fixtures/lineage/lb_resolve/nslookup",
+      "CONTAINS",
+      "drydocs/tests/fixtures/lineage/lb_resolve/nslookup/no-such-alias.synth.txt"
     ],
     [
       "drydocs/tests/fixtures/remediation",
@@ -47192,6 +47428,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_bundled_demo_interlock.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_business_key_backbone.py"
     ],
     [
@@ -47273,6 +47514,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_component_run_logs.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_config_identity_header.py"
     ],
     [
       "drydocs/tests/unit",
@@ -47642,6 +47888,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_lineage_lb_resolution.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_lineage_mac.py"
     ],
     [
@@ -47878,6 +48129,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_provenance_migration.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_publish_boundary_history_ceiling.py"
     ],
     [
       "drydocs/tests/unit",
@@ -49369,13 +49625,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2771,
-    "edges": 1538,
+    "files": 2787,
+    "edges": 1539,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 3083,
-    "directories": 313
+    "rels": 3101,
+    "directories": 315
   }
 }
