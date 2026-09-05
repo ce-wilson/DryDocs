@@ -1,6 +1,8 @@
-import { readFileSync, readdirSync } from 'node:fs'
-import { join, relative } from 'node:path'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
+
+import { codeOnly, filesMatching, SRC, tsSources } from '../test/sourceScan'
 
 import {
   accessForPath,
@@ -23,7 +25,6 @@ import {
 // Both directions are asserted, per clause (b): every non-'all' module has a
 // gated route, AND every declared gate corresponds to a route that exists.
 
-const SRC = new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')
 const APP = join(SRC, 'App.tsx')
 
 const ROLES = ['user', 'steward', 'admin'] as const
@@ -129,31 +130,6 @@ describe('every declared gate is real (clause b, reverse)', () => {
 
 // ── clause (c): the registry stays the single check ─────────────────────────
 
-/** Strip comments and string/template literals before scanning for code.
- *
- * J66, and it is not a formality here: the comments in App.tsx, Aside.tsx and
- * registry.ts EXPLAIN the predicate this scan forbids, quoting it verbatim. A
- * scan over raw source would fail on its own explanation and teach the next
- * person to delete the explanation — which, in a codebase whose comments carry
- * its rulings, costs more than the guard is worth. */
-function codeOnly(source: string): string {
-  return source
-    .replace(/\/\*[\s\S]*?\*\//g, ' ')
-    .replace(/\/\/[^\n]*/g, ' ')
-    .replace(/`(?:[^`\\]|\\.)*`/g, '``')
-    .replace(/'(?:[^'\\\n]|\\.)*'/g, "''")
-    .replace(/"(?:[^"\\\n]|\\.)*"/g, '""')
-}
-
-function tsSources(dir: string, out: string[] = []): string[] {
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    const full = join(dir, entry.name)
-    if (entry.isDirectory()) tsSources(full, out)
-    else if (/\.tsx?$/.test(entry.name) && !/\.test\.tsx?$/.test(entry.name)) out.push(full)
-  }
-  return out
-}
-
 /** Files allowed to compare a role or a persona id, each with its reason.
  *
  * Default-deny, the shape test_module_boundary.py uses: a file not listed here
@@ -186,14 +162,11 @@ describe('no route authorization outside the registry (clause c)', () => {
   })
 
   it('finds the sources it means to scan', () => {
-    expect(tsSources(SRC).length).toBeGreaterThan(100)
+    expect(tsSources().length).toBeGreaterThan(100)
   })
 
   it('every role or persona comparison is in a file that declares why', () => {
-    const offenders = tsSources(SRC)
-      .filter((f) => PREDICATE.test(codeOnly(readFileSync(f, 'utf8'))))
-      .map((f) => relative(SRC, f).replace(/\\/g, '/'))
-      .filter((rel) => !(rel in ALLOWED))
+    const offenders = filesMatching(PREDICATE).filter((rel) => !(rel in ALLOWED))
     expect(offenders).toEqual([])
   })
 
@@ -202,11 +175,7 @@ describe('no route authorization outside the registry (clause c)', () => {
   })
 
   it('the allow-list has no dead entries', () => {
-    const withPredicate = new Set(
-      tsSources(SRC)
-        .filter((f) => PREDICATE.test(codeOnly(readFileSync(f, 'utf8'))))
-        .map((f) => relative(SRC, f).replace(/\\/g, '/')),
-    )
+    const withPredicate = new Set(filesMatching(PREDICATE))
     expect(Object.keys(ALLOWED).filter((f) => !withPredicate.has(f))).toEqual([])
   })
 })

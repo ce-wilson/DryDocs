@@ -12,6 +12,7 @@ import {
 } from './lib/auth'
 import SignIn from './components/SignIn'
 import Shell, { type EnvName } from './layout/Shell'
+import { GraphAccessProvider } from './data/GraphAccessProvider'
 import RouteAccessGate from './layout/RouteAccessGate'
 import OverviewRoute from './routes/OverviewRoute'
 import ExplorerRoute from './routes/explorer/ExplorerRoute'
@@ -98,6 +99,11 @@ export default function App() {
   const persona = personaFor(session)
 
   return (
+    // WEB12: ONE GraphAccess for the session, above the routes. Sixteen routes
+    // used to build their own with useMemo(() => createApiAccess(...)); one
+    // client per session is also what lets the R4 ephemeral specs the Ask
+    // agent registers resolve for this session's reads.
+    <GraphAccessProvider personaId={session.personaId}>
     <Routes>
       <Route
         element={<Shell session={session} persona={persona} env={env} onEnvChange={setEnv} onSignOut={handleSignOut} />}
@@ -166,5 +172,6 @@ export default function App() {
         </Route>
       </Route>
     </Routes>
+    </GraphAccessProvider>
   )
 }
