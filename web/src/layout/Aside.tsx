@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import type { Persona } from '../lib/auth'
-import { canAccessModule, MODULES } from '../modules/registry'
+import { canAccessModule, canAccessPath, MODULES } from '../modules/registry'
 import ModuleIcon from '../components/ModuleIcon'
 
 // The ASIDE zone: global module nav (site-plan §3's registry, one entry per
@@ -57,7 +57,11 @@ export default function Aside({
         ))}
       </ul>
 
-      {(persona.role === 'steward' || persona.role === 'admin') && (
+      {/* WEB3: the nav entry and the ROUTE gate for these three surfaces now
+          read the same declaration (registry.ts GATED_SURFACES). They used to
+          be two inline predicates over one policy — the A1 shape, and exactly
+          how O59 hid a module from the nav while leaving its route open. */}
+      {canAccessPath('/mappings', persona.role) && (
         <NavLink to="/mappings" className={({ isActive }) => navItemClass(isActive)} title={collapsed ? 'Mappings' : undefined}>
           <span className="flex h-5 w-5 shrink-0 items-center justify-center" aria-hidden="true">⇄</span>
           {!collapsed && <span className="truncate">Mappings</span>}
@@ -67,14 +71,14 @@ export default function Aside({
         </NavLink>
       )}
 
-      {persona.role === 'admin' && (
+      {canAccessPath('/admin/config', persona.role) && (
         <NavLink to="/admin/config" className={({ isActive }) => navItemClass(isActive)} title={collapsed ? 'Configuration' : undefined}>
           <ModuleIcon id="admin-config" className="h-5 w-5 shrink-0" />
           {!collapsed && <span className="truncate">Configuration</span>}
         </NavLink>
       )}
 
-      {persona.role === 'admin' && (
+      {canAccessPath('/console', persona.role) && (
         <NavLink to="/console" className={({ isActive }) => navItemClass(isActive)} title={collapsed ? 'Console (dev)' : undefined}>
           <span className="flex h-5 w-5 shrink-0 items-center justify-center font-mono text-xs" aria-hidden="true">{'>_'}</span>
           {!collapsed && <span>Console (dev)</span>}
