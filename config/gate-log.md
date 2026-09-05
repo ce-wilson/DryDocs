@@ -4432,3 +4432,55 @@ answered and stays open as a rider. Nothing renumbers; no id moves.
   acronyms domain, four tiers — from the §B5 rider). C41 closes on the mint, per E1.
 - **§F1 — CONFIRMED.** Not reopened: PLAN1, the psgmgr publish ceiling, the 13 domains'
   membership, G102, the reconciliation edge's semantics.
+
+## 2026-09-05 — GATE: idea-series-grammar — SIGNED OFF 9/9 (PLAN2)
+
+**Prompt:** `config/gate-prompts/idea-series-grammar.yaml` (rider to
+ontology-domain-registry-and-edition-grain, SIGNED 2026-09-02, on the C40 shape) ·
+**Backlog:** PLAN2 clause (b), which this unblocks; PLAN4 is fenced out (E1) ·
+**Session:** producer desktop, in-chat; the page was refreshed the same day before the
+session (f071194f: DOC1 landed, C1 names the venue file, the company's 09-05 renumber
+recorded as C1's shape). The SME answered the three rulings (B1, C1, D1) in one message;
+the other six confirmations restate the parent record, DOC1, PLAN2's own text or the
+standing band guard and are recorded as confirmed-as-drafted — reopenable under C40. One
+ruling (B1) carries an SME NOTE that is not a condition and is carried to the inbox as
+Idea-257. Nothing renumbers; no id moves.
+
+- **§A1/§A2 — CONFIRMED.** The item grammar is not reopened; the company's ideas are
+  theirs (cited here by number only — 10012, 10015..10017, 10021), their 2026-09-05
+  renumber pass is theirs and not re-ruled, and the producer's one constraint on it lives
+  in the port ledger (ELEVENTH POSTSCRIPT).
+- **§B1 — RULED: THE IDEA SERIES TAKES THE SAME EDITION SEGMENT AS AN ITEM.**
+  `[<EDITION>-]Idea-<n>`, edition first, base unprefixed; every existing id parses. SME,
+  verbatim: *"Idea series take the same edition segment as items, each subject area might
+  need some re-tooling based to business."* The second clause is recorded as a NOTE, not a
+  condition on the grammar: the SEGMENT is uniform; what a given subject area does with its
+  inbox may need re-tooling to its business, and that is inboxed as Idea-257 for grooming
+  rather than decided here.
+- **§B2 — CONFIRMED.** The inbox is instance-owned (DOC1, done, amended ADR 0015 D2);
+  the cross-estate view is a query over ideas, never a sort over ids.
+- **§C1 — RULED: YES — A VENUE WITH NO DECLARED `edition:` MAY STILL MINT AN IDEA.**
+  Undeclared means `config/dev-environment.yaml` carries no `edition:` key; the producer
+  declares `base` and is never undeclared. An undeclared venue mints band-shaped
+  (`Idea-<n>`, n > 9999) until it declares, and the id is stable from then on — never
+  re-prefixed. PLAN2's mint-nothing rule applies to ITEM ids only. The company's
+  10022..10033 of 2026-09-05 is read as legitimate under this clause. Reason of record: a
+  capture surface never refuses a capture; the window between PLAN2 porting and the
+  company's own edition gate is real because CFG2 (c) bars the producer from naming their
+  code.
+- **§C2 — CONFIRMED.** One branch in `next_idea_id()`, not two rules; the band on the Idea
+  path ends PER VENUE on the day that venue declares, never by date — and the date-shaped
+  claim ("Idea-10017 is the last band idea") had already failed by the session (10022 on
+  09-04, 10022..10033 on 09-05), which is the evidence for this clause.
+- **§D1 — RULED: YES — THE IDEA BRANCH GOES THROUGH `next_idea_id()`.** Max+1 across
+  local, every remote ref and history (never the lowest gap — a gap is a burned id); the
+  floor; the venue check of C1. The short-circuit at validate.py:360-364 retires; the seven
+  Idea-shape sites learn the optional segment. Acceptance proof: `--next-id Idea` returns
+  the same number before and after on the producer. PLAN4 (d)'s `--mint-pending` allocates
+  through the SAME function.
+- **§D2 — CONFIRMED.** `test_plan_ideas.py`'s band guard over the producer's own inbox
+  (PORTED_COMPANY_IDS, hand-maintained) stays as the look-at-it-once tripwire; it is never
+  the allocator's rule.
+- **§E1 — CONFIRMED.** Not ruled: the sharded inbox (ADR 0019), the idea-to-item join
+  fields, dedupe, and PLAN4's edit rule for entries another venue owns (a working
+  agreement, no gate needed).

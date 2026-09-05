@@ -1129,6 +1129,20 @@
       ]
     },
     {
+      "kind": "log-entry",
+      "date": "2026-09-05",
+      "title": "GATE: idea-series-grammar — SIGNED OFF 9/9 (PLAN2)",
+      "status": "signed-off",
+      "prompt_files": [
+        "config/gate-prompts/idea-series-grammar.yaml",
+        "config/gate-prompts/ontology-domain-registry-and-edition-grain.yaml"
+      ],
+      "log_ref": "config/gate-log.md:4436",
+      "unblocks": [
+        "PLAN2"
+      ]
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",
@@ -1296,19 +1310,6 @@
       "log_ref": null,
       "unblocks": [
         "G118"
-      ]
-    },
-    {
-      "kind": "prompt-only",
-      "date": null,
-      "title": "idea-series-grammar (gate page rendered — session not yet run)",
-      "status": "open",
-      "prompt_files": [
-        "config/gate-prompts/idea-series-grammar.yaml"
-      ],
-      "log_ref": null,
-      "unblocks": [
-        "PLAN2"
       ]
     },
     {

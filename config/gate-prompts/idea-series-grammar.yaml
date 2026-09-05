@@ -9,7 +9,8 @@
 # C1 names the venue file so "undeclared" cannot be read as the producer; the company's
 # 2026-09-05 renumber pass (Idea-10022..10033, by report) is recorded as the exact shape
 # C1 sanctions and as the proof that a dated retirement was the wrong instrument (G3).
-# UNSIGNED. Nothing changes in the allocator until this signs. Mechanism only: the
+# SIGNED OFF 2026-09-05 (9/9, gate-log): B1 same segment (SME note -> Idea-257), C1 yes,
+# D1 yes; the rest confirmed-as-drafted. PLAN2 (b) unblocked. Mechanism only: the
 # company's ids are cited by number as reported, never with their bodies.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
