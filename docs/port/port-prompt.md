@@ -2294,6 +2294,43 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   is DEFERRED out of the range and runs BEFORE the wipe-reload, not after - the wipe is
   precisely when the new names must already be in place.
 
+  **ELEVENTH POSTSCRIPT - THE IDEA-SERIES RENUMBER PASS: LEAVE `Idea-10018`-`10021`
+  WHERE THEY ARE (2026-09-05; from your research-tooling landing report, which found
+  the collision and correctly did not execute the repair):**
+
+  Your `feat/dd_lineage` branch appended `Idea-10006`-`10021`; your main independently
+  minted `Idea-10009`-`10017` for different content, so twelve of the branch's ids
+  collide and must move. Your own count says `10018`-`10021` are FREE on main. Do not
+  move those four. "A single allocator pass from 10022" renumbers all sixteen and
+  breaks a citation the producer cannot follow: **`Idea-10021` (F-1, the Control-M QR
+  for jobs using MFTS 6) is cited by number here** - in a backlog item's acceptance
+  (`C44`: "F-1 ... is company-band Idea-10021 and stays theirs"), in the `Idea-236`
+  inbox entry, and in the transcribed `JOB-MFTS-MM-research.md`, the same document your
+  branch-side inventory lists as `(10021)`. The citation channel is ONE-WAY by the
+  standing rule - the producer cites your ids as reported and never renames them - so if
+  `10021` moves, a producer item points at whatever you allocate there next. Renumber
+  only `10006`-`10017`, keep the `(renumbered from ...)` marker on each moved entry (the
+  shape your own `Idea-10009` already carries), and leave `10018`-`10021` untouched.
+
+  The same inventory confirms the producer's OTHER company-band citations are safe:
+  `10012` / `10015` / `10016` / `10017` are your main-native 09-03 mints and do not move;
+  `10018` here is the prediction already recorded as wrong; `10022` is your allocator's
+  own answer. `10021` is the producer's whole exposure.
+
+  Two of your other conclusions are adopted producer-side rather than argued with. (1)
+  Per-file by authorship, not a blanket rewrite: the main-native citations
+  (`G116.yaml:21` "from Idea-10010", `G117.yaml:21` "from Idea-10011", `roadmap.yaml:93`,
+  `cli_consumer.py:131`) are correct today and a `+13` sweep would break them while
+  repairing the two files whose join keys point into the branch's numbering. (2) The
+  pending-file pen: a research session writes candidate ideas to a per-branch pending
+  file and the landing session mints them into `IDEAS.md` in one allocator pass. That
+  removes the race rather than asking two sessions to be careful, and it is the shape
+  the path-scoped extraction already handles as a clean-add. It is being minted here as
+  the groom-backlog venue-and-band item, alongside the allocator gap your collision
+  exposed on this side: the Idea path computes `highest + 1` and never consults the band
+  ceiling that the item path enforces (`validate.py:363`), so the allocator that "refuses
+  the company band by itself" does so for items only. Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
