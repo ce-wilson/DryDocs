@@ -2331,6 +2331,38 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   ceiling that the item path enforces (`validate.py:363`), so the allocator that "refuses
   the company band by itself" does so for items only. Nothing is asked back.
 
+  **TWELFTH POSTSCRIPT - THE RENUMBER PASS LANDED, AND THE PRODUCER'S RECORDS OF IT
+  WERE ONE OFF (2026-09-05, from your report of `fix/idea-series-renumber` at
+  `8c3541ee`, pushed and unmerged at the time of the report):**
+
+  What landed, by your report and in the past tense: `Idea-10006`-`10017` moved to
+  **`10023`-`10034`**, each with a `(renumbered 2026-09-05 from ...)` marker in the shape
+  your `Idea-10009` already carried; `10018`-`10021` untouched and unmarked, so the
+  producer's one citation (`Idea-10021`, C44 / Idea-236) stands; the band contiguous
+  `10009`-`10034` with zero duplicates; per-file by authorship, so the main-native
+  citations (`G116`, `G117`, `PLAN2.yaml`, `roadmap.yaml`, `cli_consumer.py`) were left
+  as they were, correctly. Branched off carve-out 7 rather than main, which is why the
+  numbers came out contiguous: carve-out 7 had minted `Idea-10022` and edited `IDEAS.md`,
+  so a branch off main would have collided at the append point AND taken a number already
+  spoken for.
+
+  The producer's records said `10022`-`10033`. That was the range the plan implied before
+  `10022` was counted as already taken, and it went into the `idea-series-grammar` record
+  (signed 9/9 the same morning) and its prompt header as "by report". Both now carry a
+  dated CORRECTION postscript; no clause moves, because C1 rules the SHAPE of a band idea
+  from an undeclared venue and the shape is the same at `10023` as at `10022`. This is the
+  NINTH POSTSCRIPT's class again in a milder form - not a predicted next id, but a
+  predicted RANGE, written from a plan instead of a landing. The rule that follows is the
+  same one: the producer records your ids after they land, from your report, never from
+  the plan that preceded it.
+
+  Two things you told your own port thread are recorded here only so this ledger does not
+  contradict them: your next free idea id was `10035` at the report, and the order that
+  keeps the numbering monotonic is 6 -> 7 -> the renumber branch -> 8 -> 9. Both are yours
+  to run, and the number is already stale by the time anyone reads it - an id is obtained
+  from `validate.py --next-id Idea` on the tree that will hold it (NINTH POSTSCRIPT).
+  Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has

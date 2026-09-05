@@ -12,6 +12,11 @@
 # SIGNED OFF 2026-09-05 (9/9, gate-log): B1 same segment (SME note -> Idea-257), C1 yes,
 # D1 yes; the rest confirmed-as-drafted. PLAN2 (b) unblocked. Mechanism only: the
 # company's ids are cited by number as reported, never with their bodies.
+# CORRECTION 2026-09-05, after signing: the renumber pass LANDED as 10006..10017 ->
+# 10023..10034 (not 10022..10033 — Idea-10022 was carve-out 7's own mint, so the pass began
+# after it); 10018..10021 untouched; band 10009..10034, 26 by report. The clauses below
+# keep the range they were signed with; the correction is a gate-log postscript, since
+# the shape C1 rules is unchanged by one number. Cited by number as reported, still.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
 id: idea-series-grammar

@@ -4484,3 +4484,15 @@ Idea-257. Nothing renumbers; no id moves.
 - **§E1 — CONFIRMED.** Not ruled: the sharded inbox (ADR 0019), the idea-to-item join
   fields, dedupe, and PLAN4's edit rule for entries another venue owns (a working
   agreement, no gate needed).
+
+**CORRECTION 2026-09-05, appended after signing (the range, not the ruling).** The record
+above reads the company's renumber pass as `10022..10033`, from the report available at
+the session. The pass landed later the same day and the company reports the map as
+**`10006..10017 -> 10023..10034`** — `Idea-10022` was carve-out 7's own allocator mint on
+2026-09-04, so the pass began after it; `10018..10021` untouched, as the ledger's ELEVENTH
+POSTSCRIPT asked, so the producer's one citation (`Idea-10021`) stands; band contiguous
+`10009..10034`, next free `10035` by their report. No clause moves: C1 sanctions the SHAPE
+(band ideas from an undeclared venue), which `10023..10034` has exactly as `10022..10033`
+did, and A2 rules nothing about the range. Recorded here rather than edited into the
+clauses because the record is signed. Same-day note: the prompt header carries the same
+correction; the Counts line's 25 becomes 26 by the same report.
