@@ -818,6 +818,195 @@ def test_no_id_carries_two_different_titles_across_the_remote_trunk() -> None:
 GATE_PROMPTS = REPO / "config" / "gate-prompts"
 
 
+# ---- venue-aware grooming, the edit side (PLAN4, 2026-09-05) ---------------------------
+# Two venues groom one inbox and one item set. What a session may do to an entry the
+# OTHER venue owns is a mechanism now: the existing text survives verbatim as a prefix,
+# additions are stamped `[<venue> YYYY-MM-DD]`, the inbox state token is the owner's.
+# These run from FIXTURES, not the live tree: CI's tree is clean against itself and the
+# detector is only meaningful against a base (`--check-venue-edits --base <ref>`).
+
+_INBOX_FIXTURE = """## Inbox
+
+- **`Idea-10034`** · 2026-09-05 · `[plan]` · **open** · prio? **Med** —
+  **A band-shaped entry - the other venue's.** body line.
+
+- **`XMPL-Idea-2`** · 2026-09-05 · `[plan]` · **parked → CFG2** · prio? **Low** —
+  **An edition's entry.** body.
+
+- **`Idea-257`** · 2026-09-05 · `[plan]` · **open** · prio? **Med** —
+  **Ours, the base's.** body.
+
+## Recently groomed (audit trail)
+"""
+
+
+def test_owner_of_is_one_function_keyed_to_the_edition_segment() -> None:
+    """PLAN4 (a): a segment names its edition; no segment at or below the ceiling is the
+    base; no segment above it is the undeclared venue's band (the company's shape
+    before it declared). Items and ideas alike; unparseable is None."""
+    alloc = _allocator()
+    assert alloc.owner_of("PLAN4") == "base"
+    assert alloc.owner_of("Idea-257") == "base"
+    assert alloc.owner_of("G10003") == alloc.BAND_VENUE
+    assert alloc.owner_of("DD10001") == alloc.BAND_VENUE
+    assert alloc.owner_of("Idea-10034") == alloc.BAND_VENUE
+    assert alloc.owner_of("XMPL-LOAD1") == "XMPL"
+    assert alloc.owner_of("XMPL-Idea-2a") == "XMPL"
+    assert alloc.owner_of("not-an-id") is None
+    # an UNDECLARED venue (None) owns the band; a declared one owns its own segment
+    assert alloc.owns(None, "Idea-10034") and not alloc.owns(None, "Idea-257")
+    assert alloc.owns("base", "Idea-257") and not alloc.owns("base", "Idea-10034")
+    assert alloc.owns("XMPL", "XMPL-Idea-2") and not alloc.owns("XMPL", "Idea-257")
+
+
+def test_the_detector_catches_a_rewrite_an_unstamped_append_and_a_state_flip() -> None:
+    """PLAN4 (c): the three failure modes, each on an entry the base does not own."""
+    alloc = _allocator()
+    old = _INBOX_FIXTURE
+    rewrite = old.replace("body line.", "a different body.")
+    unstamped = old.replace("body line.", "body line.\n  an answer with no stamp")
+    flip = old.replace(
+        "`[plan]` · **open** · prio? **Med** —\n  **A band-shaped",
+        "`[plan]` · **closed** · prio? **Med** —\n  **A band-shaped",
+    )
+    removed = old.replace(
+        "- **`XMPL-Idea-2`** · 2026-09-05 · `[plan]` · **parked → CFG2** · prio? **Low** —\n"
+        "  **An edition's entry.** body.\n\n",
+        "",
+    )
+    header_rewrite = old.replace("`[plan]` · **parked → CFG2**", "`[bug]` · **parked → CFG2**")
+
+    (f,) = alloc.venue_edit_findings_ideas(old, rewrite, "base")
+    assert f.startswith("REWRITE Idea-10034")
+    (f,) = alloc.venue_edit_findings_ideas(old, unstamped, "base")
+    assert f.startswith("UNSTAMPED Idea-10034")
+    (f,) = alloc.venue_edit_findings_ideas(old, flip, "base")
+    assert f.startswith("STATE FLIP Idea-10034: open -> closed") and "proposed:" in f
+    (f,) = alloc.venue_edit_findings_ideas(old, removed, "base")
+    assert f == "REWRITE XMPL-Idea-2: the entry was removed"
+    (f,) = alloc.venue_edit_findings_ideas(old, header_rewrite, "base")
+    assert f == "REWRITE XMPL-Idea-2: the header changed"
+
+
+def test_a_stamped_append_an_owners_own_flip_and_an_item_status_change_pass() -> None:
+    """PLAN4 (b)/(c): everything that lands. A proposed close is a stamped append; the
+    owner flips its own token freely; item-file status is venue-local and out of scope."""
+    alloc = _allocator()
+    old = _INBOX_FIXTURE
+    proposed = old.replace(
+        "body line.",
+        "body line.\n  [base 2026-09-05] proposed: closed - answered at LOAD2 (c); see LOAD2.yaml",
+    )
+    assert alloc.venue_edit_findings_ideas(old, proposed, "base") == []
+    own_flip = old.replace(
+        "- **`Idea-257`** · 2026-09-05 · `[plan]` · **open**",
+        "- **`Idea-257`** · 2026-09-05 · `[plan]` · **groomed → PLAN9**",
+    )
+    assert alloc.venue_edit_findings_ideas(old, own_flip, "base") == []
+    # the other venue, running as itself, may flip its own token and rewrite its own body
+    theirs = old.replace("body line.", "rewritten by the owner").replace(
+        "`[plan]` · **open** · prio? **Med** —\n  **A band-shaped",
+        "`[plan]` · **closed** · prio? **Med** —\n  **A band-shaped",
+    )
+    assert alloc.venue_edit_findings_ideas(old, theirs, None) == []
+    # an edition running as itself owns its segment
+    assert (
+        alloc.venue_edit_findings_ideas(
+            old, old.replace("**An edition's entry.** body.", "**An edition's entry.** new"), "XMPL"
+        )
+        == []
+    )
+
+    before = {"id": "G10003", "status": "todo", "notes": "Minted.", "acceptance": "(a) x"}
+    after_ok = {
+        "id": "G10003",
+        "status": "done",
+        "notes": "Minted.\n\n[base 2026-09-05] BUILT here; see G10003 close.",
+        "acceptance": "(a) x",
+    }
+    assert alloc.venue_edit_findings_item("G10003", before, after_ok, "base") == []
+    after_bad = {
+        "id": "G10003",
+        "status": "done",
+        "notes": "Rewritten.",
+        "acceptance": "(a) x",
+        "title": "new",
+    }
+    found = alloc.venue_edit_findings_item("G10003", before, after_bad, "base")
+    assert any(f.startswith("REWRITE G10003.notes") for f in found)
+    assert any(f.startswith("REWRITE G10003.title") for f in found)
+    # the base's own item: nothing to say, whatever changed
+    assert alloc.venue_edit_findings_item("PLAN4", before, after_bad, "base") == []
+
+
+def test_check_venue_edits_is_wired_as_a_detector_with_a_base() -> None:
+    """The CLI form the reconcile-port skill runs; against its own HEAD it is vacuous
+    (the tree is clean against itself), which is the point of requiring a base."""
+    alloc = _allocator()
+    assert alloc.check_venue_edits("HEAD", venue="base") == []
+    skill = (REPO / ".claude" / "skills" / "reconcile-port" / "SKILL.md").read_text(
+        encoding="utf-8"
+    )
+    assert (
+        "--check-venue-edits --base" in skill
+    ), "the reconcile-port skill no longer runs the venue-edit detector at the previous port base"
+
+
+def test_the_pending_file_mints_n_consecutive_ids_in_one_pass() -> None:
+    """PLAN4 (d): candidates carry `Idea-?`, never a number; the landing pass allocates
+    consecutively through next_idea_id() - the same function, one code path - inserts
+    at the top of the inbox newest first, and a real id in a pending file is refused."""
+    alloc = _allocator()
+    pending = (
+        "# pending-feat-x\n\n"
+        "- **`Idea-?`** · 2026-09-05 · `[plan]` · **open** · prio? **Med** — **first.** body\n"
+        "  more body\n"
+        "- **`Idea-?`** · 2026-09-05 · `[bug]` · **open** · prio? **Low** — **second.**\n"
+    )
+    assert alloc.pending_file_problems(pending) == []
+    candidates = alloc.pending_candidates(pending)
+    assert len(candidates) == 2
+    minted = alloc.mint_pending(candidates, {(None, 257), (None, 10034)}, venue="base")
+    assert [i for i, _ in minted] == ["Idea-258", "Idea-259"]
+    assert minted[0][1].startswith("- **`Idea-258`** · 2026-09-05 · `[plan]`")
+    assert "Idea-?" not in minted[0][1] + minted[1][1]
+    # an edition's pending file mints into its own inbox of numbers
+    assert [i for i, _ in alloc.mint_pending(candidates, {("XMPL", 4)}, venue="XMPL")] == [
+        "XMPL-Idea-5",
+        "XMPL-Idea-6",
+    ]
+    # an undeclared venue still lands its captures, band-shaped (rider C1)
+    assert [i for i, _ in alloc.mint_pending(candidates, {(None, 10034)}, venue=None)] == [
+        "Idea-10035",
+        "Idea-10036",
+    ]
+    inbox = "intro\n\n## Inbox\n\n- **`Idea-257`** · old\n\n## Recently groomed\n"
+    out = alloc.insert_into_inbox(inbox, [e for _, e in minted])
+    assert out.index("Idea-259") < out.index("Idea-258") < out.index("Idea-257")
+    # refused: a real id, or a bullet that is not a candidate
+    problems = alloc.pending_file_problems(pending + "- **`Idea-9`** · x\n- a plain bullet\n")
+    assert any("never carries a real id" in p for p in problems)
+    assert any("a candidate opens" in p for p in problems)
+
+
+def test_retired_is_not_free_a_renumbered_idea_stays_taken() -> None:
+    """PLAN4 (e): the allocator reads inbox HISTORY, so a number whose header was
+    renumbered away is still taken. This is the case the company's hand count got
+    wrong on 2026-09-05 (10006-10008 read as free from the live headers). The fixture
+    is a `git log -p` shaped history in which Idea-10006 became Idea-10023."""
+    alloc = _allocator()
+    history = (
+        "-- **`Idea-10006`** · 2026-09-03 · `[plan]` · **open** · prio? **Med** — **x.**\n"
+        "+- **`Idea-10023`** · 2026-09-03 · `[plan]` · **open** · prio? **Med** — **x.**"
+        " *(renumbered 2026-09-05 from Idea-10006)*\n"
+    )
+    live = "- **`Idea-10023`** · 2026-09-03 · `[plan]` · **open** · prio? **Med** — **x.**\n"
+    taken = alloc._idea_numbers(live) | alloc._idea_numbers(history, alloc._IDEA_IN_DIFF_RE)
+    assert (None, 10006) in taken, "the renumbered-away number must stay in the taken set"
+    allocated, _ = alloc.next_idea_id(taken, venue=None)
+    assert allocated == "Idea-10024" and allocated != "Idea-10006"
+
+
 def test_declared_gates_are_lists_of_known_prompt_slugs() -> None:
     """J50: `gates:` is optional; when present it is a list of slugs that exist
     as config/gate-prompts/<slug>.yaml. render_gates.py reads ONLY this field

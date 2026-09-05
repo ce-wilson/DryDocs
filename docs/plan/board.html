@@ -74,7 +74,7 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 .capture-status{font-size:.78rem;color:#166534;margin:.3rem 0 0;min-height:1.1em}</style>
 </head><body>
 <h1>DryDocs — project board</h1>
-<p class="subtitle">Rendered from <code>docs/restructure/backlog/</code> 646 items &middot; 129 todo / 7 in progress / 2 blocked / 508 done. The repo is the system of record; this page is a working aid.</p>
+<p class="subtitle">Rendered from <code>docs/restructure/backlog/</code> 646 items &middot; 127 todo / 8 in progress / 2 blocked / 509 done. The repo is the system of record; this page is a working aid.</p>
 <p class="subtitle">Location: <code id="board-url"></code> <button type="button" id="board-url-copy">copy</button></p>
 <script>document.getElementById('board-url').textContent=window.location.href;document.getElementById('board-url-copy').onclick=function(){navigator.clipboard.writeText(window.location.href);};</script>
 <p class="subtitle"><a class="capture-link" href="roadmap.html">Module roadmap &rarr;</a> <a class="capture-link" href="ideas.html">Idea inbox &rarr;</a></p>
@@ -87,7 +87,7 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P5</span><span class="status-badge status-todo">todo</span></div><h3>Orchestrator expansion</h3><p class="goal">AutoSys + Airflow land as BMC-baseline concepts via confirmed crosswalks (Epic F).</p><div class="progress"><div class="progress-bar" style="width:40%"></div></div><p class="progress-text">2 / 5</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P6</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Modular architecture / component topology</h3><p class="goal">ADR 0002 — core extraction, multi-DB topology, component packages (Epic G).</p><div class="progress"><div class="progress-bar" style="width:86%"></div></div><p class="progress-text">127 / 148</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P7</span><span class="status-badge status-done">done</span></div><h3>Review toolkit back-flow</h3><p class="goal">Company SME-review/HITL toolkit reproduced generically, offline (Epic H).</p><div class="progress"><div class="progress-bar" style="width:88%"></div></div><p class="progress-text">7 / 8</p></div>
-<div class="phase-card"><div class="phase-head"><span class="phase-id">P8</span><span class="status-badge status-in_progress">in_progress</span><span class="release">v0.3.0</span></div><h3>Planning &amp; release infrastructure</h3><p class="goal">Repo-native project board + capture loop; groundwork for versioned releases (Epic I).</p><div class="progress"><div class="progress-bar" style="width:75%"></div></div><p class="progress-text">74 / 99</p></div>
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P8</span><span class="status-badge status-in_progress">in_progress</span><span class="release">v0.3.0</span></div><h3>Planning &amp; release infrastructure</h3><p class="goal">Repo-native project board + capture loop; groundwork for versioned releases (Epic I).</p><div class="progress"><div class="progress-bar" style="width:76%"></div></div><p class="progress-text">75 / 99</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P9</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Application attribution</h3><p class="goal">Jobs attributed to SEAL applications (seal_app_ref) end-to-end — gate-confirmed match policy, loader, verify coverage (Epic K).</p><div class="progress"><div class="progress-bar" style="width:87%"></div></div><p class="progress-text">33 / 38</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P10</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Documentation infrastructure</h3><p class="goal">Every design doc (TDD/Runbook/BRD) conforms to a canonical outline; deterministic md→HTML/PDF render; HITL markup loop (digital + pen/paper) re-attaches to a requirement-traceability backbone (Epic L).</p><div class="progress"><div class="progress-bar" style="width:73%"></div></div><p class="progress-text">30 / 41</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P11</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Source governance ledgers</h3><p class="goal">Per-source governance as test-enforced config: audit envelope + edge diet (doc 06, Epic M) and column-mapping ledgers (doc 08, Epic N); property-term bindings via the gate.</p><div class="progress"><div class="progress-bar" style="width:61%"></div></div><p class="progress-text">20 / 33</p></div>
@@ -98,7 +98,7 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P16</span><span class="status-badge status-todo">todo</span></div><h3>Self-documentation — DryDocs&#x27; own code in the graph</h3><p class="goal">DryDocs documents ITSELF the way it documents Control-M: the project&#x27;s code-dependency snapshot enters the knowledge graph under the software ontology (SWO), under an explicit :Project root, so &#x27;which module loads this job&#x27; is a query rather than a JSON file a human reads (Epic U).</p><div class="progress"><div class="progress-bar" style="width:83%"></div></div><p class="progress-text">24 / 29</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P17</span><span class="status-badge status-todo">todo</span></div><h3>Mind-map — deepdoc leaves the placeholder</h3><p class="goal">The per-data-flow overview record and its first producer: a graph-seeded, mind-map-driven investigator over the SDLC/ops corpora (Jira, Bitbucket, Confluence, email, Control-M Output logs) whose every finding is :Uncertain, weighted, and carries a provenance breadcrumb to its source; promotion is an SME gate write (Epic MM; docs/design/deepdoc-data-flow-overview.md).</p><div class="progress"><div class="progress-bar" style="width:21%"></div></div><p class="progress-text">3 / 14</p></div>
 </div>
-<div class="ready-strip"><strong>Ready to pull</strong> (112; <code>todo</code> with every <code>depends_on</code> done &mdash; derived, never stored): <a class="ready-id" href="#REF1"><code>REF1</code></a> <a class="ready-id" href="#C35"><code>C35</code></a> <a class="ready-id" href="#C36"><code>C36</code></a> <a class="ready-id" href="#C37"><code>C37</code></a> <a class="ready-id" href="#C39"><code>C39</code></a> <a class="ready-id" href="#G100"><code>G100</code></a> <a class="ready-id" href="#ONT2"><code>ONT2</code></a> <a class="ready-id" href="#D9"><code>D9</code></a> <a class="ready-id" href="#D11"><code>D11</code></a> <a class="ready-id" href="#G63"><code>G63</code></a> <a class="ready-id" href="#G64"><code>G64</code></a> <a class="ready-id" href="#G65"><code>G65</code></a> <a class="ready-id" href="#G106"><code>G106</code></a> <a class="ready-id" href="#G116"><code>G116</code></a> <a class="ready-id" href="#G117"><code>G117</code></a> <a class="ready-id" href="#G118"><code>G118</code></a> <a class="ready-id" href="#G119"><code>G119</code></a> <a class="ready-id" href="#G120"><code>G120</code></a> <a class="ready-id" href="#G127"><code>G127</code></a> <a class="ready-id" href="#G131"><code>G131</code></a> <a class="ready-id" href="#G132"><code>G132</code></a> <a class="ready-id" href="#G136"><code>G136</code></a> <a class="ready-id" href="#H8"><code>H8</code></a> <a class="ready-id" href="#I5"><code>I5</code></a> <a class="ready-id" href="#I7"><code>I7</code></a> <a class="ready-id" href="#I8"><code>I8</code></a> <a class="ready-id" href="#PLAN4"><code>PLAN4</code></a> <a class="ready-id" href="#DOC2"><code>DOC2</code></a> <a class="ready-id" href="#J54"><code>J54</code></a> <a class="ready-id" href="#J56"><code>J56</code></a> <a class="ready-id" href="#J57"><code>J57</code></a> <a class="ready-id" href="#J58"><code>J58</code></a> <a class="ready-id" href="#J60"><code>J60</code></a> <a class="ready-id" href="#J61"><code>J61</code></a> <a class="ready-id" href="#J64"><code>J64</code></a> <a class="ready-id" href="#J65"><code>J65</code></a> <a class="ready-id" href="#J67"><code>J67</code></a> <a class="ready-id" href="#J70"><code>J70</code></a> <a class="ready-id" href="#J73"><code>J73</code></a> <a class="ready-id" href="#J74"><code>J74</code></a> <a class="ready-id" href="#J75"><code>J75</code></a> <a class="ready-id" href="#J77"><code>J77</code></a> <a class="ready-id" href="#J78"><code>J78</code></a> <a class="ready-id" href="#K23"><code>K23</code></a> <a class="ready-id" href="#K29"><code>K29</code></a> <a class="ready-id" href="#L23"><code>L23</code></a> <a class="ready-id" href="#L29"><code>L29</code></a> <a class="ready-id" href="#N17"><code>N17</code></a> <a class="ready-id" href="#N18"><code>N18</code></a> <a class="ready-id" href="#N19"><code>N19</code></a> <a class="ready-id" href="#N22"><code>N22</code></a> <a class="ready-id" href="#N23"><code>N23</code></a> <a class="ready-id" href="#N24"><code>N24</code></a> <a class="ready-id" href="#N25"><code>N25</code></a> <a class="ready-id" href="#N26"><code>N26</code></a> <a class="ready-id" href="#N27"><code>N27</code></a> <a class="ready-id" href="#N28"><code>N28</code></a> <a class="ready-id" href="#G85"><code>G85</code></a> <a class="ready-id" href="#G86"><code>G86</code></a> <a class="ready-id" href="#O23"><code>O23</code></a> <a class="ready-id" href="#O26"><code>O26</code></a> <a class="ready-id" href="#O43"><code>O43</code></a> <a class="ready-id" href="#O44"><code>O44</code></a> <a class="ready-id" href="#O48"><code>O48</code></a> <a class="ready-id" href="#O50"><code>O50</code></a> <a class="ready-id" href="#O63"><code>O63</code></a> <a class="ready-id" href="#O68"><code>O68</code></a> <a class="ready-id" href="#O72"><code>O72</code></a> <a class="ready-id" href="#O82"><code>O82</code></a> <a class="ready-id" href="#O89"><code>O89</code></a> <a class="ready-id" href="#P6"><code>P6</code></a> <a class="ready-id" href="#Q22"><code>Q22</code></a> <a class="ready-id" href="#Q24"><code>Q24</code></a> <a class="ready-id" href="#Q28"><code>Q28</code></a> <a class="ready-id" href="#R7"><code>R7</code></a> <a class="ready-id" href="#R8"><code>R8</code></a> <a class="ready-id" href="#R11"><code>R11</code></a> <a class="ready-id" href="#R12"><code>R12</code></a> <a class="ready-id" href="#R13"><code>R13</code></a> <a class="ready-id" href="#R15"><code>R15</code></a> <a class="ready-id" href="#R16"><code>R16</code></a> <a class="ready-id" href="#R17"><code>R17</code></a> <a class="ready-id" href="#R18"><code>R18</code></a> <a class="ready-id" href="#R19"><code>R19</code></a> <a class="ready-id" href="#G90"><code>G90</code></a> <a class="ready-id" href="#S11"><code>S11</code></a> <a class="ready-id" href="#U10"><code>U10</code></a> <a class="ready-id" href="#U11"><code>U11</code></a> <a class="ready-id" href="#U16"><code>U16</code></a> <a class="ready-id" href="#U23"><code>U23</code></a> <a class="ready-id" href="#U27"><code>U27</code></a> <a class="ready-id" href="#V4"><code>V4</code></a> <a class="ready-id" href="#V5"><code>V5</code></a> <a class="ready-id" href="#V6"><code>V6</code></a> <a class="ready-id" href="#V7"><code>V7</code></a> <a class="ready-id" href="#V9"><code>V9</code></a> <a class="ready-id" href="#V10"><code>V10</code></a> <a class="ready-id" href="#V11"><code>V11</code></a> <a class="ready-id" href="#Y3"><code>Y3</code></a> <a class="ready-id" href="#Y6"><code>Y6</code></a> <a class="ready-id" href="#Y7"><code>Y7</code></a> <a class="ready-id" href="#Z4"><code>Z4</code></a> <a class="ready-id" href="#Z6"><code>Z6</code></a> <a class="ready-id" href="#Z7"><code>Z7</code></a> <a class="ready-id" href="#GN2"><code>GN2</code></a> <a class="ready-id" href="#MM5"><code>MM5</code></a> <a class="ready-id" href="#MM6"><code>MM6</code></a> <a class="ready-id" href="#MM9"><code>MM9</code></a> <a class="ready-id" href="#MM11"><code>MM11</code></a> <a class="ready-id" href="#MM12"><code>MM12</code></a> <a class="ready-id" href="#MM13"><code>MM13</code></a> <a class="ready-id" href="#MM14"><code>MM14</code></a></div>
+<div class="ready-strip"><strong>Ready to pull</strong> (110; <code>todo</code> with every <code>depends_on</code> done &mdash; derived, never stored): <a class="ready-id" href="#REF1"><code>REF1</code></a> <a class="ready-id" href="#C35"><code>C35</code></a> <a class="ready-id" href="#C36"><code>C36</code></a> <a class="ready-id" href="#C37"><code>C37</code></a> <a class="ready-id" href="#C39"><code>C39</code></a> <a class="ready-id" href="#G100"><code>G100</code></a> <a class="ready-id" href="#ONT2"><code>ONT2</code></a> <a class="ready-id" href="#D9"><code>D9</code></a> <a class="ready-id" href="#D11"><code>D11</code></a> <a class="ready-id" href="#G63"><code>G63</code></a> <a class="ready-id" href="#G64"><code>G64</code></a> <a class="ready-id" href="#G65"><code>G65</code></a> <a class="ready-id" href="#G106"><code>G106</code></a> <a class="ready-id" href="#G116"><code>G116</code></a> <a class="ready-id" href="#G117"><code>G117</code></a> <a class="ready-id" href="#G118"><code>G118</code></a> <a class="ready-id" href="#G119"><code>G119</code></a> <a class="ready-id" href="#G120"><code>G120</code></a> <a class="ready-id" href="#G127"><code>G127</code></a> <a class="ready-id" href="#G131"><code>G131</code></a> <a class="ready-id" href="#G132"><code>G132</code></a> <a class="ready-id" href="#G136"><code>G136</code></a> <a class="ready-id" href="#H8"><code>H8</code></a> <a class="ready-id" href="#I5"><code>I5</code></a> <a class="ready-id" href="#I7"><code>I7</code></a> <a class="ready-id" href="#I8"><code>I8</code></a> <a class="ready-id" href="#DOC2"><code>DOC2</code></a> <a class="ready-id" href="#J54"><code>J54</code></a> <a class="ready-id" href="#J56"><code>J56</code></a> <a class="ready-id" href="#J57"><code>J57</code></a> <a class="ready-id" href="#J58"><code>J58</code></a> <a class="ready-id" href="#J60"><code>J60</code></a> <a class="ready-id" href="#J61"><code>J61</code></a> <a class="ready-id" href="#J64"><code>J64</code></a> <a class="ready-id" href="#J65"><code>J65</code></a> <a class="ready-id" href="#J67"><code>J67</code></a> <a class="ready-id" href="#J70"><code>J70</code></a> <a class="ready-id" href="#J73"><code>J73</code></a> <a class="ready-id" href="#J74"><code>J74</code></a> <a class="ready-id" href="#J75"><code>J75</code></a> <a class="ready-id" href="#J77"><code>J77</code></a> <a class="ready-id" href="#J78"><code>J78</code></a> <a class="ready-id" href="#K23"><code>K23</code></a> <a class="ready-id" href="#K29"><code>K29</code></a> <a class="ready-id" href="#L23"><code>L23</code></a> <a class="ready-id" href="#L29"><code>L29</code></a> <a class="ready-id" href="#N17"><code>N17</code></a> <a class="ready-id" href="#N18"><code>N18</code></a> <a class="ready-id" href="#N19"><code>N19</code></a> <a class="ready-id" href="#N22"><code>N22</code></a> <a class="ready-id" href="#N23"><code>N23</code></a> <a class="ready-id" href="#N24"><code>N24</code></a> <a class="ready-id" href="#N25"><code>N25</code></a> <a class="ready-id" href="#N26"><code>N26</code></a> <a class="ready-id" href="#N27"><code>N27</code></a> <a class="ready-id" href="#N28"><code>N28</code></a> <a class="ready-id" href="#G85"><code>G85</code></a> <a class="ready-id" href="#G86"><code>G86</code></a> <a class="ready-id" href="#O23"><code>O23</code></a> <a class="ready-id" href="#O26"><code>O26</code></a> <a class="ready-id" href="#O43"><code>O43</code></a> <a class="ready-id" href="#O44"><code>O44</code></a> <a class="ready-id" href="#O48"><code>O48</code></a> <a class="ready-id" href="#O50"><code>O50</code></a> <a class="ready-id" href="#O63"><code>O63</code></a> <a class="ready-id" href="#O68"><code>O68</code></a> <a class="ready-id" href="#O72"><code>O72</code></a> <a class="ready-id" href="#O82"><code>O82</code></a> <a class="ready-id" href="#O89"><code>O89</code></a> <a class="ready-id" href="#P6"><code>P6</code></a> <a class="ready-id" href="#Q22"><code>Q22</code></a> <a class="ready-id" href="#Q24"><code>Q24</code></a> <a class="ready-id" href="#Q28"><code>Q28</code></a> <a class="ready-id" href="#R7"><code>R7</code></a> <a class="ready-id" href="#R8"><code>R8</code></a> <a class="ready-id" href="#R11"><code>R11</code></a> <a class="ready-id" href="#R12"><code>R12</code></a> <a class="ready-id" href="#R13"><code>R13</code></a> <a class="ready-id" href="#R15"><code>R15</code></a> <a class="ready-id" href="#R16"><code>R16</code></a> <a class="ready-id" href="#R17"><code>R17</code></a> <a class="ready-id" href="#R18"><code>R18</code></a> <a class="ready-id" href="#R19"><code>R19</code></a> <a class="ready-id" href="#G90"><code>G90</code></a> <a class="ready-id" href="#S11"><code>S11</code></a> <a class="ready-id" href="#U10"><code>U10</code></a> <a class="ready-id" href="#U11"><code>U11</code></a> <a class="ready-id" href="#U16"><code>U16</code></a> <a class="ready-id" href="#U23"><code>U23</code></a> <a class="ready-id" href="#U27"><code>U27</code></a> <a class="ready-id" href="#V4"><code>V4</code></a> <a class="ready-id" href="#V5"><code>V5</code></a> <a class="ready-id" href="#V6"><code>V6</code></a> <a class="ready-id" href="#V7"><code>V7</code></a> <a class="ready-id" href="#V9"><code>V9</code></a> <a class="ready-id" href="#V10"><code>V10</code></a> <a class="ready-id" href="#V11"><code>V11</code></a> <a class="ready-id" href="#Y3"><code>Y3</code></a> <a class="ready-id" href="#Y6"><code>Y6</code></a> <a class="ready-id" href="#Y7"><code>Y7</code></a> <a class="ready-id" href="#Z4"><code>Z4</code></a> <a class="ready-id" href="#Z6"><code>Z6</code></a> <a class="ready-id" href="#GN2"><code>GN2</code></a> <a class="ready-id" href="#MM5"><code>MM5</code></a> <a class="ready-id" href="#MM6"><code>MM6</code></a> <a class="ready-id" href="#MM9"><code>MM9</code></a> <a class="ready-id" href="#MM11"><code>MM11</code></a> <a class="ready-id" href="#MM12"><code>MM12</code></a> <a class="ready-id" href="#MM13"><code>MM13</code></a> <a class="ready-id" href="#MM14"><code>MM14</code></a></div>
 <div class="filters">
   <label>Module<select id="f-module"><option value="">All</option>
 <option value="config">config</option>
@@ -180,7 +180,7 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
   <button type="button" id="f-clear">Clear filters</button>
 </div>
 <div class="board">
-<div class="column" data-status="todo"><div class="column-head"><h2>To do</h2><span class="count" data-count-for="todo">129</span></div><div class="column-body"><div class="card ready" id="card-REF1" data-id="REF1" data-module="reference" data-phase="2" data-epic="reference-hygiene" data-type="task" data-status="todo" data-search="ref1 register spec-kit and the spec-driven-development write-up as external reference - the precedent the code/requirements split cites" tabindex="0"><div class="card-head"><span class="card-id">REF1</span><span class="card-title">Register spec-kit and the spec-driven-development write-up as External reference - the precedent the code/requirements split cites</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Gate ontology-domain-registry-and-edition-grain §B4 (SIGNED OFF 2026-09-02, &quot;split now&quot;): the split proceeds on the 2018 FCD
+<div class="column" data-status="todo"><div class="column-head"><h2>To do</h2><span class="count" data-count-for="todo">127</span></div><div class="column-body"><div class="card ready" id="card-REF1" data-id="REF1" data-module="reference" data-phase="2" data-epic="reference-hygiene" data-type="task" data-status="todo" data-search="ref1 register spec-kit and the spec-driven-development write-up as external reference - the precedent the code/requirements split cites" tabindex="0"><div class="card-head"><span class="card-id">REF1</span><span class="card-title">Register spec-kit and the spec-driven-development write-up as External reference - the precedent the code/requirements split cites</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Gate ontology-domain-registry-and-edition-grain §B4 (SIGNED OFF 2026-09-02, &quot;split now&quot;): the split proceeds on the 2018 FCD
 evidence and the reference is registered BEHIND it, not before it. This tree has never heard
 of spec-driven development - a case-insensitive grep for spec-kit or spec-driven is empty
 across every .md, .yaml and .py - and ONT1&#x27;s proposal cites it, so it must exist as a
@@ -1166,110 +1166,6 @@ nothing catches stale cross-item PROSE.
 Filed in epic project-board (module drydocs-plan, phase 8) beside I6&#x27;s allocator rather than in
 Y: this is groom-time TOOLING, where Y7 is the schema and the derivation. Related: Y7, I6, G68,
 O59, Idea-140.
-</p></div></div>
-<div class="card ready" id="card-PLAN4" data-id="PLAN4" data-module="drydocs-plan" data-phase="8" data-epic="project-board" data-type="task" data-status="todo" data-search="plan4 venue-aware grooming, the edit side - an entry another venue owns is changed by stamped append only, its state token left to the owner; candidates land through a pending file minted in one pass; the mint side is plan2 (b)" tabindex="0"><div class="card-head"><span class="card-id">PLAN4</span><span class="card-title">Venue-aware grooming, the edit side - an entry another venue owns is changed by stamped append only, its state token left to the owner; candidates land through a pending file minted in one pass; the mint side is PLAN2 (b)</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-plan</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">project-board</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> WHAT THIS IS, AND WHAT IT IS NOT. Two venues (producer, company) groom ONE inbox
-(docs/restructure/IDEAS.md, union-append) and one item set (per-entry item files).
-Nothing today says what a session may do to an entry the OTHER venue owns. &quot;Read-only&quot;
-is the wrong rule and would break the working convention: item notes are appended with
-dated BUILT/Groomed blocks, acceptance has been amended in place with a dated marker
-(LOAD1: &quot;as amended at acceptance (2026-09-02 ...)&quot;), and the company legitimately sets
-status: done on producer items it builds because item files are per-entry and status is
-venue-local by disposition. The rule that survives is about what MERGES AS A UNION and
-what does not. This item is the EDIT side of venue awareness. The MINT side - the Idea
-path&#x27;s floor/ceiling/venue refusals, next_idea_id() - is PLAN2 (b) under the
-idea-series-grammar rider (its clause (d) already specifies it) and is NOT redone here.
-
-(a) ONE OWNERSHIP FUNCTION. `owner_of(id) -&gt; venue` in validate.py, one place. Today it
-reads the band: a number above PRODUCER_BAND_CEILING is company-owned, at or below is
-producer-owned, the FROZEN_BAND legacy ids read as company. PLAN2 (b) re-keys it to the
-edition segment when that lands; nothing else in this item knows how ownership is
-spelled. The venue a session RUNS AS is declared, never inferred from a hostname, and
-it is PLAN2&#x27;s declaration, not a second one: config/dev-environment.yaml `edition:` -
-`base` on the producer, the company&#x27;s code on the company, no key = undeclared (the
-idea-series-grammar rider C1 defines undeclared the same way). One venue file for the
-mint side and the edit side.
-
-(b) THE EDIT RULE, for an entry the running venue does not own. On IDEAS.md entries, and
-on the acceptance/notes of an item file owned by the other venue (status on item files
-is venue-local and OUT of scope):
-  - the existing text survives VERBATIM as a prefix of the new text - nothing already
-    written is modified or removed;
-  - anything added is a block stamped `[&lt;venue&gt; &lt;YYYY-MM-DD&gt;]`;
-  - the inbox state token (open|parked|groomed|merged|closed) is the OWNER&#x27;s. A
-    non-owner who has the answer appends a stamped `proposed: closed - &lt;why&gt;; see &lt;ref&gt;`
-    line and the owner flips the token at its next groom. Reason, stated in the guard&#x27;s
-    message: two sides appending to one entry union-merge by construction; two sides
-    editing one token is the conflict IDEAS.md is already the &quot;proven conflict site,
-    3x&quot; for.
-Findings, answers, amendments to a gap, a proposed close - all of it lands. Only
-rewriting and token flips are refused.
-
-(c) THE GUARD IS A DETECTOR WITH A BASE, NOT A TREE ASSERTION. `validate.py
---check-venue-edits --base &lt;ref&gt;` diffs IDEAS.md and the item files between &lt;ref&gt; and the
-working tree, classifies each changed entry by owner_of, and reports three failure modes
-on entries the running venue does not own: a REWRITE (old text not a prefix of new), an
-UNSTAMPED append, a STATE FLIP. Unit tests prove each is caught and that a stamped
-append, an owner&#x27;s own token flip, and a status change on an item file all pass - from
-fixtures, not from the live tree, because CI&#x27;s tree is clean and the check is only
-meaningful against a base. It is wired where it matters: the reconcile-port skill runs
-it with --base at the previous port base, since the company apply is where producer
-entries get edited (and the reverse at back-flow).
-
-(d) THE PENDING FILE, the pattern that removes the allocator race instead of asking two
-sessions to be careful. A session that captures ideas on a branch or in a worktree
-writes them to docs/restructure/ideas/pending-&lt;branch&gt;.md as headerless candidates -
-the file never contains an `Idea-&lt;n&gt;` header, guarded. At landing, `validate.py
---mint-pending &lt;file&gt;` allocates N consecutive ids in ONE allocator pass, writes the
-headers into IDEAS.md, and empties the file. Path-scoped extraction already treats such
-a file as a clean-add, which is why it works across a merge. Documented in SKILL.md and
-in the IDEAS.md header beside the band text the capturer already reads.
-
-(e) RETIRED-IS-NOT-FREE, PINNED. The allocator reads inbox HISTORY (git log --all -p),
-so a number whose header was renumbered away is still taken. A fixture test proves it:
-an IDEAS history where Idea-N was renumbered to Idea-M must not report N as free. This
-is the case the company&#x27;s hand count got wrong on 2026-09-05 (10006-10008 read as free
-from the live headers; main&#x27;s 10009-10011 name them as retired).
-
-(f) SKILL.md:50 CORRECTED. &quot;It refuses the DD-series and the company band by itself&quot; is
-true for ITEMS; the Idea path&#x27;s refusals arrive with PLAN2 (b). The line says so, and
-the skill gains the edit rule (b) and the pending-file pattern (d) as operating text.
-
-(g) GUARDED, EVERY DECLARATION. The edit rule and the pending-file rule each name the
-guard that reads them (J68); the detector goes through tests/source_scan.py where it
-reads source (J66). 3278-floor unit suite green; render_board.py leaves no diff.
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 (desktop, Lane A; stub 13333546). p1 because the company is about to
-run the first cross-venue renumber pass with no rule for what it may touch, and the same
-question arrives producer-side the first time a company idea lands here by union-append.
-opus because (b) is a working agreement being turned into a mechanism and the boundary
-cases (amend-in-place precedent, venue-local status) need judgement, not transcription.
-
-TITLE CORRECTED AT BODY TIME, and why (recorded because I6 says settle the title before
-the stub, and this one was not). The stub&#x27;s title claimed the mint side too - &quot;the
-allocator enforces the band on ideas as it does on items, both venues can mint&quot;. That
-half is already specified by the idea-series-grammar rider, clause (d) (next_idea_id():
-max+1, never the lowest gap; the floor; the venue check) and is PLAN2 (b)&#x27;s to build once
-the rider signs. Carrying it here would have been a second item for one mechanism. The
-body and title were pushed together so the trunk never held the two titles apart.
-
-PROVENANCE. The company&#x27;s research-tooling landing (2026-09-04/05) found feat/dd_lineage
-had appended Idea-10006..10021 while main independently minted Idea-10009..10017 for
-different content - the SECOND collision on that series (the first was repaired
-2026-08-28 by renumbering, and main&#x27;s Idea-10009 carries the marker). The company
-correctly did not execute the repair while a second session still held the pen on
-IDEAS.md. The ledger&#x27;s ELEVENTH POSTSCRIPT carries the producer&#x27;s one constraint on the
-pass (leave 10018-10021; Idea-10021 is cited here in C44 and Idea-236) and adopts two of
-the company&#x27;s conclusions: per-file-by-authorship, and the pending-file pen. This item
-makes both a mechanism.
-
-THE RULING BEHIND (b) is the SME&#x27;s, 2026-09-05: &quot;if the backlog files were read only,
-they might still need to change - finding more answers, closing, amending old items that
-had gaps.&quot; Read-only was the first proposal and was wrong; additive-and-stamped with the
-token reserved is what replaced it, and it is the G87 move (ids are join keys - add and
-deprecate, never rename) applied to entry state.
-
-RELATED. PLAN2 (b) owns the mint side and re-keys owner_of to the edition segment;
-CFG2 owns the venue declaration PLAN2 reads; test_plan_ideas.py&#x27;s PORTED_COMPANY_IDS
-presence guard stays as the &quot;look at it once&quot; tripwire and is not replaced by this.
 </p></div></div>
 <div class="card ready" id="card-DOC2" data-id="DOC2" data-module="docs" data-phase="8" data-epic="release-infrastructure" data-type="task" data-status="todo" data-search="doc2 relay-23 - the frozen letters, mint by module code, the edition segment and the retired partition rules reach the company through the port-prompt" tabindex="0"><div class="card-head"><span class="card-id">DOC2</span><span class="card-title">RELAY-23 - the frozen letters, mint by module code, the edition segment and the retired partition rules reach the company through the port-prompt</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">release-infrastructure</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-PLAN2" data-target="card-PLAN2">PLAN2</a> <a class="dep-link" href="#card-PLAN3" data-target="card-PLAN3">PLAN3</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Gate ontology-domain-registry-and-edition-grain §E1 (SIGNED OFF 2026-09-02): a cross-repo convention change is inert until it
 reaches the other side, and the company&#x27;s allocator only WORKS once it holds an edition
@@ -2871,29 +2767,6 @@ close, it becomes O26 again. Any blessed-field design must be able to express th
 <div class="card ready" id="card-Z6" data-id="Z6" data-module="drydocs-web" data-phase="6" data-epic="server-location" data-type="task" data-status="todo" data-search="z6 global time-zone runtime map: folder/job start-to-end spans across a world time-zone view, rendered in the browser&#x27;s local time zone" tabindex="0"><div class="card-head"><span class="card-id">Z6</span><span class="card-title">Global time-zone runtime map: folder/job start-to-end spans across a world time-zone view, rendered in the browser&#x27;s local time zone</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">server-location</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-Z5" data-target="card-Z5">Z5</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Reusing the Z5 map core: for a selected folder or job, its runtime span (start to end) renders across a global time-zone map, and the display converts to the viewing browser&#x27;s local time zone (read from the browser, never hardcoded). Spans that cross midnight or span zones render without truncation. Runtime data comes from the temporal sources already ruled (the cm_avg_run dataset family) where available; where a folder has no explicit time, the Control-M DC-name default-time semantics (e.g. T032-E0700-DMA = default 07:00 EST) may seed the span ONLY if labeled as a default, never presented as an observed runtime.
 </p><p class="notes"><strong>Notes:</strong> User directive 2026-08-08. This is where the two meanings of &quot;DC&quot; earn their keep in one view: the SCHEDULING default time comes from the Control-M DC name, the PHYSICAL place from the Z1 export — the map shows both without conflating them.
 </p></div></div>
-<div class="card ready" id="card-Z7" data-id="Z7" data-module="drydocs-load" data-phase="6" data-epic="server-location" data-type="task" data-status="todo" data-search="z7 light up the teams dimension end to end on the bundled samples: folder attribution plus a host join the samples make themselves, with no seeded edge" tabindex="0"><div class="card-head"><span class="card-id">Z7</span><span class="card-title">Light up the Teams dimension end to end on the bundled samples: folder attribution plus a host join the samples make themselves, with no seeded edge</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-load</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">server-location</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-Z3" data-target="card-Z3">Z3</a> <a class="dep-link" href="#card-Z5" data-target="card-Z5">Z5</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Against a local graph loaded only by documented verbs on the bundled synthetic samples — ingest-controlm, load-folder-attribution, load-server-inventory — the QuerySpec map.team-locations.v1 returns at least one row, and every row it returns resolves to a point in the gazetteer, so the console&#x27;s Teams dimension draws instead of reading as empty. Nothing may be seeded by a test to make that happen: the samples themselves supply the join, which today they cannot, because the Control-M sample hosts and the server-export server names share no value under the signed T1/T2 tiers. The coverage counters keep telling the truth — apps_unmatched, unmatched hosts and unplaceable rows still report real gaps; the change is that the SUCCESS path is exercised as well, not that gaps go quiet. tests/integration/test_server_inventory_e2e.py, which seeds its own matching host today, is updated to the aligned names and stays green, and the existing fixture guards (reserved synthetic app block 70001-70099, one application per file, both PROD and DR designations, no Control-M scheduling-DC grammar in the physical data-center field) all still pass.
-</p><p class="notes"><strong>Notes:</strong> Raised 2026-08-27 from Idea-193, after running the whole Z3 chain on the desktop for the
-first time to find out why the Z5 Locations map drew nothing. The chain itself was healthy:
-constraints applied, the infrastructure supplement verified 6 of 6 terms, the loader took 5
-rows and rejected none, and every coverage counter named its own gap without being asked.
-WHAT IS ACTUALLY MISSING is that the sample files do not reference each other. Control-M
-sample hosts are host-hldm-02, host-hldm-03, host-auto-01 and host-auto-02; the server export
-names srv-synth-01 through srv-synth-03 plus srv-synth-51 and srv-synth-52. The signed tiers
-are exact and normalized-short-name, so those two sets can never meet and the resolution pass
-correctly reported 4 of 4 hosts unmatched. Separately the export names application 70055 while
-the graph carries 70051 through 70053, and the gazetteer has no row for the export&#x27;s second
-synthetic city, so two of five servers cannot be placed even once they load.
-TEAMS NEEDS ONE MORE THING THAN JOBS DOES. The team spec reaches place through the batch port
-— application to port to folder to job to host to server to data center — so it also needs
-BELONGS_TO_APPLICATION edges, which the K8 load-folder-attribution verb writes and which stood
-at zero on this machine. Jobs needs only the host join. Do the host join first and Jobs lights
-up on its own; Teams needs both.
-WHY THIS IS WORTH A TASK RATHER THAN A FIXTURE TWEAK: the bundled samples are the only
-end-to-end demonstration anyone gets without company data, and today, run together, they
-exercise the coverage-reporting path and never the success path. The T1 tier IS proven in
-isolation — the e2e seeds its own matching host and asserts the exact match — but nothing
-proves the demo path, where the samples have to meet on their own. That is the gap this closes.
-</p></div></div>
 <div class="card ready" id="card-GN2" data-id="GN2" data-module="drydocs-load" data-phase="6" data-epic="generic-naming" data-type="task" data-status="todo" data-search="gn2 execute the rename as one frozen unit and port it as one unit — data-named commands, loaders and source ids" tabindex="0"><div class="card-head"><span class="card-id">GN2</span><span class="card-title">Execute the rename as ONE frozen unit and port it as one unit — data-named commands, loaders and source ids</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-load</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">generic-naming</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-GN1" data-target="card-GN1">GN1</a> <a class="dep-link" href="#card-G79" data-target="card-G79">G79</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The mechanical rename ADR 0012 authorises, executed as a SINGLE frozen change and ported as a SINGLE unit -- the SME&#x27;s condition, and the right one: a wide rename landing in pieces leaves the two repos disagreeing about verb names for as long as the pieces take. Scope, in the layer order the ADR rules: CLI verbs (with deprecated aliases per the policy), LOADER_REGISTRY keys and loader class names, milestone-id verify commands, and -- only if the ADR rules them in the same unit -- source registry ids via the cross-repo path. Every derived surface regenerates and is proven current: load-map.json, load-map.html, ingest.sh, the startup runbook Appendix B (held by test_load_sequence_surfaces), the load runbook, and the skills that name verbs. MUST NOT overlap an in-flight port. The change freezes other producer work, lands, is ported, and only then does normal work resume.
 </p><p class="notes"><strong>Notes:</strong> Raised 2026-08-11 with GN1. depends_on G79 as well as GN1 so the split lands under the OLD names first: splitting and renaming together makes the port diff unreviewable, and the split is the part that carries behavioural risk while the rename is mechanical.
 </p></div></div>
@@ -3057,7 +2930,7 @@ transcribed from seven company artifacts on an UNMERGED research branch and cite
 
 Related: MM2, MM3, MM6, MM10, MM12, R16, L28, G102, ADR 0007, ADR 0011, Idea-236.
 </p></div></div></div></div>
-<div class="column" data-status="in_progress"><div class="column-head"><h2>In progress</h2><span class="count" data-count-for="in_progress">7</span></div><div class="column-body"><div class="card" id="card-E1" data-id="E1" data-module="ontology" data-phase="4" data-epic="context-graph" data-type="task" data-status="in_progress" data-search="e1 register sosa/ssn observation terms via the gate" tabindex="0"><div class="card-head"><span class="card-id">E1</span><span class="card-title">Register SOSA/SSN observation terms via the gate</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P4</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / ontology-mapper</span></div><div class="epic">context-graph</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C1" data-target="card-C1">C1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> sosa:* terms present with IRIs; status planned-&gt;confirmed via gate</p><p class="notes"><strong>Notes:</strong> Registration step DONE (main, 2026-06-22): sosa/ssn prefixes in namespaces.py; terms seeded in drydocs_core/schema/sosa_experimental_supplement.cypher (opt-in `drydocs apply-sosa-supplement`, NOT in bootstrap; every term adoption:&quot;experimental&quot;); 4 context relationships in relationship_vocabulary.yaml (sosa_observes/has_result/ made_by_sensor/observed_property, status planned, domain context); README split into Declared-Adopted vs Experimental/Early-Adoption. REMAINING for ontology-mapper: take the `jobrun-observation` map entry through the HITL gate (resolve ControlMJobRun-as-Observation vs separate-Observation-node; run-history source), then planned-&gt;confirmed. GATE SESSION DEFERRED 2026-07-14 (SME: not ready yet) — page stays rendered/pending; nothing flips; re-present at a future session (see gate-log 2026-07-14 deferral note).
+<div class="column" data-status="in_progress"><div class="column-head"><h2>In progress</h2><span class="count" data-count-for="in_progress">8</span></div><div class="column-body"><div class="card" id="card-E1" data-id="E1" data-module="ontology" data-phase="4" data-epic="context-graph" data-type="task" data-status="in_progress" data-search="e1 register sosa/ssn observation terms via the gate" tabindex="0"><div class="card-head"><span class="card-id">E1</span><span class="card-title">Register SOSA/SSN observation terms via the gate</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P4</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / ontology-mapper</span></div><div class="epic">context-graph</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C1" data-target="card-C1">C1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> sosa:* terms present with IRIs; status planned-&gt;confirmed via gate</p><p class="notes"><strong>Notes:</strong> Registration step DONE (main, 2026-06-22): sosa/ssn prefixes in namespaces.py; terms seeded in drydocs_core/schema/sosa_experimental_supplement.cypher (opt-in `drydocs apply-sosa-supplement`, NOT in bootstrap; every term adoption:&quot;experimental&quot;); 4 context relationships in relationship_vocabulary.yaml (sosa_observes/has_result/ made_by_sensor/observed_property, status planned, domain context); README split into Declared-Adopted vs Experimental/Early-Adoption. REMAINING for ontology-mapper: take the `jobrun-observation` map entry through the HITL gate (resolve ControlMJobRun-as-Observation vs separate-Observation-node; run-history source), then planned-&gt;confirmed. GATE SESSION DEFERRED 2026-07-14 (SME: not ready yet) — page stays rendered/pending; nothing flips; re-present at a future session (see gate-log 2026-07-14 deferral note).
 </p></div></div>
 <div class="card" id="card-G62" data-id="G62" data-module="drydocs-lineage" data-phase="6" data-epic="component-topology" data-type="task" data-status="in_progress" data-search="g62 run the rua-bundle data-profile gate: the sme names the load population, the agent profiles it, and only the walked population enters the curated load" tabindex="0"><div class="card-head"><span class="card-id">G62</span><span class="card-title">Run the rua-bundle data-profile gate: the SME names the load population, the agent profiles it, and only the walked population enters the curated load</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-lineage</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">component-topology</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-G22" data-target="card-G22">G22</a> <a class="dep-link" href="#card-G23" data-target="card-G23">G23</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> USER-GATED START — the SME convenes the session; the pull loop SKIPS this item until then (the C12/J13 idiom). The drafted rua-bundle-data-profile page is walked in its ruled two-step order: section A the SME identifies the source data (which hosts&#x27; bundles, where they sit, which collector produced each — Internal, recorded company-side, never on the page), section B the agent profiles that population through the G20 extractor in STAGING with zero graph writes, and section C consumes the profile to admit or trim the population, dispose of the hash-absent and collision cases it counts, and clear the F1 sweep. Sign-off transcribed to config/gate-log.md; gates.json + the enforcement matrix regenerate. No population the page has not walked enters the G23 curated load.
 </p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-09 from Idea-85, which asked only for ids and scheduling — the four post-G22 data-profile prompts were drafted 2026-08-07 and unsigned, and an unsigned prompt with no backlog id is invisible to the pull loop. Sessions run COMPANY-SIDE because the identify-the-source-data step names real hosts and paths (Internal); what lands producer-side is the transcription and the regenerated gate surfaces. Model fable: the ruling decides what may be written to the graph.
@@ -3090,6 +2963,29 @@ first, so the email domain rides -- the route reads docs.email-unassigned.v1 via
 run_named; a graph-unavailable answer degrades to the named read path, never an error
 or a silent zero. 7 tests in test_mapping_api.py; full suite 2590 passed / ruff check +
 format clean (venue: worktree of origin/main on MSI desktop). Console pane = follow-on.
+</p></div></div>
+<div class="card" id="card-Z7" data-id="Z7" data-module="drydocs-load" data-phase="6" data-epic="server-location" data-type="task" data-status="in_progress" data-search="z7 light up the teams dimension end to end on the bundled samples: folder attribution plus a host join the samples make themselves, with no seeded edge" tabindex="0"><div class="card-head"><span class="card-id">Z7</span><span class="card-title">Light up the Teams dimension end to end on the bundled samples: folder attribution plus a host join the samples make themselves, with no seeded edge</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-load</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">server-location</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-Z3" data-target="card-Z3">Z3</a> <a class="dep-link" href="#card-Z5" data-target="card-Z5">Z5</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Against a local graph loaded only by documented verbs on the bundled synthetic samples — ingest-controlm, load-folder-attribution, load-server-inventory — the QuerySpec map.team-locations.v1 returns at least one row, and every row it returns resolves to a point in the gazetteer, so the console&#x27;s Teams dimension draws instead of reading as empty. Nothing may be seeded by a test to make that happen: the samples themselves supply the join, which today they cannot, because the Control-M sample hosts and the server-export server names share no value under the signed T1/T2 tiers. The coverage counters keep telling the truth — apps_unmatched, unmatched hosts and unplaceable rows still report real gaps; the change is that the SUCCESS path is exercised as well, not that gaps go quiet. tests/integration/test_server_inventory_e2e.py, which seeds its own matching host today, is updated to the aligned names and stays green, and the existing fixture guards (reserved synthetic app block 70001-70099, one application per file, both PROD and DR designations, no Control-M scheduling-DC grammar in the physical data-center field) all still pass.
+</p><p class="notes"><strong>Notes:</strong> Raised 2026-08-27 from Idea-193, after running the whole Z3 chain on the desktop for the
+first time to find out why the Z5 Locations map drew nothing. The chain itself was healthy:
+constraints applied, the infrastructure supplement verified 6 of 6 terms, the loader took 5
+rows and rejected none, and every coverage counter named its own gap without being asked.
+WHAT IS ACTUALLY MISSING is that the sample files do not reference each other. Control-M
+sample hosts are host-hldm-02, host-hldm-03, host-auto-01 and host-auto-02; the server export
+names srv-synth-01 through srv-synth-03 plus srv-synth-51 and srv-synth-52. The signed tiers
+are exact and normalized-short-name, so those two sets can never meet and the resolution pass
+correctly reported 4 of 4 hosts unmatched. Separately the export names application 70055 while
+the graph carries 70051 through 70053, and the gazetteer has no row for the export&#x27;s second
+synthetic city, so two of five servers cannot be placed even once they load.
+TEAMS NEEDS ONE MORE THING THAN JOBS DOES. The team spec reaches place through the batch port
+— application to port to folder to job to host to server to data center — so it also needs
+BELONGS_TO_APPLICATION edges, which the K8 load-folder-attribution verb writes and which stood
+at zero on this machine. Jobs needs only the host join. Do the host join first and Jobs lights
+up on its own; Teams needs both.
+WHY THIS IS WORTH A TASK RATHER THAN A FIXTURE TWEAK: the bundled samples are the only
+end-to-end demonstration anyone gets without company data, and today, run together, they
+exercise the coverage-reporting path and never the success path. The T1 tier IS proven in
+isolation — the e2e seeds its own matching host and asserts the exact match — but nothing
+proves the demo path, where the samples have to meet on their own. That is the gap this closes.
 </p></div></div>
 <div class="card" id="card-Z8" data-id="Z8" data-module="drydocs-load" data-phase="6" data-epic="server-location" data-type="task" data-status="in_progress" data-search="z8 the z1/z3 and z5 sample files were each built correctly and never meet, so the bundled demo can only ever fill one of the map&#x27;s three dimensions — make the three fixtures interlock" tabindex="0"><div class="card-head"><span class="card-id">Z8</span><span class="card-title">The Z1/Z3 and Z5 sample files were each built correctly and never meet, so the bundled demo can only ever fill one of the map&#x27;s three dimensions — make the three fixtures interlock</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-load</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">server-location</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Running the bundled samples end to end draws a map with all three dimensions populated — servers placed, jobs joined, teams attributed — instead of a correct coverage report over an empty world.
 
@@ -3178,7 +3074,7 @@ relay -- guessing spellings is the defect this item exists to prevent. The (d) s
 guard (fixture headers drawn from the recorded list, not the module constant) also waits
 on that list; a guard against nothing would be decoration.
 </p></div></div></div></div>
-<div class="column" data-status="done"><div class="column-head"><h2>Done</h2><span class="count" data-count-for="done">508</span></div><div class="column-body"><div class="card" id="card-A1" data-id="A1" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a1 audit reference registry paths for staleness" tabindex="0"><div class="card-head"><span class="card-id">A1</span><span class="card-title">Audit reference registry paths for staleness</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every entry marked ok/stale; stale paths fixed or flagged</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All local mirrors + platform/standard doc paths resolve; no stale entries. verified: 2026-06-21 in REGISTRY.yaml.</p></div></div>
+<div class="column" data-status="done"><div class="column-head"><h2>Done</h2><span class="count" data-count-for="done">509</span></div><div class="column-body"><div class="card" id="card-A1" data-id="A1" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a1 audit reference registry paths for staleness" tabindex="0"><div class="card-head"><span class="card-id">A1</span><span class="card-title">Audit reference registry paths for staleness</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every entry marked ok/stale; stale paths fixed or flagged</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All local mirrors + platform/standard doc paths resolve; no stale entries. verified: 2026-06-21 in REGISTRY.yaml.</p></div></div>
 <div class="card" id="card-A2" data-id="A2" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a2 account for every bmc doc in the source manifest" tabindex="0"><div class="card-head"><span class="card-id">A2</span><span class="card-title">Account for every BMC doc in the source manifest</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every .md in bmc-controlm/ accounted for in the manifest</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All 26 bmc-controlm .md files are referenced in SOURCE-MANIFEST.md (0 uncovered).</p></div></div>
 <div class="card" id="card-A3" data-id="A3" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a3 seed the research index with linked rationale" tabindex="0"><div class="card-head"><span class="card-id">A3</span><span class="card-title">Seed the research index with linked rationale</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> &gt;=5 rows, each with a working link and a &#x27;why it matters&#x27;</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. 7 rows with working links (3 Neo4j blogs + PROV-O/SOSA/ORG/agent-memory) + why-it-matters.</p></div></div>
 <div class="card" id="card-A4" data-id="A4" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a4 registry.yaml points the dcat row at a per-standard readme that was never written" tabindex="0"><div class="card-head"><span class="card-id">A4</span><span class="card-title">REGISTRY.yaml points the dcat row at a per-standard README that was never written</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> reference/REGISTRY.yaml&#x27;s dcat row no longer cites a path that does not exist. Exactly one of two resolutions, and the choice is recorded in the close note: (a) write reference/standards/dcat/README.md following the dcmi-terms pattern from M4 — namespace, what we use it for, the specific terms we reference, source_url — or (b) re-point the row&#x27;s `docs:` at reference/standards/README.md the way the skos row already does. Nothing else in the registry changes.
@@ -6862,6 +6758,163 @@ PLAN2, and PLAN2 (c) no longer carries the table. Ships on main before the next 
 </p><p class="notes"><strong>Notes:</strong> DONE 2026-09-02 (desktop, main): FROZEN_BAND in validate.py + test_backlog.py, agreement
 guard extended, fixture test for the six legacy band ids, DOC2 freeze half re-pointed here,
 PLAN2 (c) re-pointed. Ships before the next roll, which carries PLAN1.
+</p></div></div>
+<div class="card" id="card-PLAN4" data-id="PLAN4" data-module="drydocs-plan" data-phase="8" data-epic="project-board" data-type="task" data-status="done" data-search="plan4 venue-aware grooming, the edit side - an entry another venue owns is changed by stamped append only, its state token left to the owner; candidates land through a pending file minted in one pass; the mint side is plan2 (b)" tabindex="0"><div class="card-head"><span class="card-id">PLAN4</span><span class="card-title">Venue-aware grooming, the edit side - an entry another venue owns is changed by stamped append only, its state token left to the owner; candidates land through a pending file minted in one pass; the mint side is PLAN2 (b)</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-plan</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">project-board</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> WHAT THIS IS, AND WHAT IT IS NOT. Two venues (producer, company) groom ONE inbox
+(docs/restructure/IDEAS.md, union-append) and one item set (per-entry item files).
+Nothing today says what a session may do to an entry the OTHER venue owns. &quot;Read-only&quot;
+is the wrong rule and would break the working convention: item notes are appended with
+dated BUILT/Groomed blocks, acceptance has been amended in place with a dated marker
+(LOAD1: &quot;as amended at acceptance (2026-09-02 ...)&quot;), and the company legitimately sets
+status: done on producer items it builds because item files are per-entry and status is
+venue-local by disposition. The rule that survives is about what MERGES AS A UNION and
+what does not. This item is the EDIT side of venue awareness. The MINT side - the Idea
+path&#x27;s floor/ceiling/venue refusals, next_idea_id() - is PLAN2 (b) under the
+idea-series-grammar rider (its clause (d) already specifies it) and is NOT redone here.
+
+(a) ONE OWNERSHIP FUNCTION. `owner_of(id) -&gt; venue` in validate.py, one place. Today it
+reads the band: a number above PRODUCER_BAND_CEILING is company-owned, at or below is
+producer-owned, the FROZEN_BAND legacy ids read as company. PLAN2 (b) re-keys it to the
+edition segment when that lands; nothing else in this item knows how ownership is
+spelled. The venue a session RUNS AS is declared, never inferred from a hostname, and
+it is PLAN2&#x27;s declaration, not a second one: config/dev-environment.yaml `edition:` -
+`base` on the producer, the company&#x27;s code on the company, no key = undeclared (the
+idea-series-grammar rider C1 defines undeclared the same way). One venue file for the
+mint side and the edit side.
+
+(b) THE EDIT RULE, for an entry the running venue does not own. On IDEAS.md entries, and
+on the acceptance/notes of an item file owned by the other venue (status on item files
+is venue-local and OUT of scope):
+  - the existing text survives VERBATIM as a prefix of the new text - nothing already
+    written is modified or removed;
+  - anything added is a block stamped `[&lt;venue&gt; &lt;YYYY-MM-DD&gt;]`;
+  - the inbox state token (open|parked|groomed|merged|closed) is the OWNER&#x27;s. A
+    non-owner who has the answer appends a stamped `proposed: closed - &lt;why&gt;; see &lt;ref&gt;`
+    line and the owner flips the token at its next groom. Reason, stated in the guard&#x27;s
+    message: two sides appending to one entry union-merge by construction; two sides
+    editing one token is the conflict IDEAS.md is already the &quot;proven conflict site,
+    3x&quot; for.
+Findings, answers, amendments to a gap, a proposed close - all of it lands. Only
+rewriting and token flips are refused.
+
+(c) THE GUARD IS A DETECTOR WITH A BASE, NOT A TREE ASSERTION. `validate.py
+--check-venue-edits --base &lt;ref&gt;` diffs IDEAS.md and the item files between &lt;ref&gt; and the
+working tree, classifies each changed entry by owner_of, and reports three failure modes
+on entries the running venue does not own: a REWRITE (old text not a prefix of new), an
+UNSTAMPED append, a STATE FLIP. Unit tests prove each is caught and that a stamped
+append, an owner&#x27;s own token flip, and a status change on an item file all pass - from
+fixtures, not from the live tree, because CI&#x27;s tree is clean and the check is only
+meaningful against a base. It is wired where it matters: the reconcile-port skill runs
+it with --base at the previous port base, since the company apply is where producer
+entries get edited (and the reverse at back-flow).
+
+(d) THE PENDING FILE, the pattern that removes the allocator race instead of asking two
+sessions to be careful. A session that captures ideas on a branch or in a worktree
+writes them to docs/restructure/ideas/pending-&lt;branch&gt;.md as headerless candidates -
+the file never contains an `Idea-&lt;n&gt;` header, guarded. At landing, `validate.py
+--mint-pending &lt;file&gt;` allocates N consecutive ids in ONE allocator pass, writes the
+headers into IDEAS.md, and empties the file. Path-scoped extraction already treats such
+a file as a clean-add, which is why it works across a merge. Documented in SKILL.md and
+in the IDEAS.md header beside the band text the capturer already reads.
+
+(e) RETIRED-IS-NOT-FREE, PINNED. The allocator reads inbox HISTORY (git log --all -p),
+so a number whose header was renumbered away is still taken. A fixture test proves it:
+an IDEAS history where Idea-N was renumbered to Idea-M must not report N as free. This
+is the case the company&#x27;s hand count got wrong on 2026-09-05 (10006-10008 read as free
+from the live headers; main&#x27;s 10009-10011 name them as retired).
+
+(f) SKILL.md:50 CORRECTED. &quot;It refuses the DD-series and the company band by itself&quot; is
+true for ITEMS; the Idea path&#x27;s refusals arrive with PLAN2 (b). The line says so, and
+the skill gains the edit rule (b) and the pending-file pattern (d) as operating text.
+
+(g) GUARDED, EVERY DECLARATION. The edit rule and the pending-file rule each name the
+guard that reads them (J68); the detector goes through tests/source_scan.py where it
+reads source (J66). 3278-floor unit suite green; render_board.py leaves no diff.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 (desktop, Lane A; stub 13333546). p1 because the company is about to
+run the first cross-venue renumber pass with no rule for what it may touch, and the same
+question arrives producer-side the first time a company idea lands here by union-append.
+opus because (b) is a working agreement being turned into a mechanism and the boundary
+cases (amend-in-place precedent, venue-local status) need judgement, not transcription.
+
+TITLE CORRECTED AT BODY TIME, and why (recorded because I6 says settle the title before
+the stub, and this one was not). The stub&#x27;s title claimed the mint side too - &quot;the
+allocator enforces the band on ideas as it does on items, both venues can mint&quot;. That
+half is already specified by the idea-series-grammar rider, clause (d) (next_idea_id():
+max+1, never the lowest gap; the floor; the venue check) and is PLAN2 (b)&#x27;s to build once
+the rider signs. Carrying it here would have been a second item for one mechanism. The
+body and title were pushed together so the trunk never held the two titles apart.
+
+PROVENANCE. The company&#x27;s research-tooling landing (2026-09-04/05) found feat/dd_lineage
+had appended Idea-10006..10021 while main independently minted Idea-10009..10017 for
+different content - the SECOND collision on that series (the first was repaired
+2026-08-28 by renumbering, and main&#x27;s Idea-10009 carries the marker). The company
+correctly did not execute the repair while a second session still held the pen on
+IDEAS.md. The ledger&#x27;s ELEVENTH POSTSCRIPT carries the producer&#x27;s one constraint on the
+pass (leave 10018-10021; Idea-10021 is cited here in C44 and Idea-236) and adopts two of
+the company&#x27;s conclusions: per-file-by-authorship, and the pending-file pen. This item
+makes both a mechanism.
+
+THE RULING BEHIND (b) is the SME&#x27;s, 2026-09-05: &quot;if the backlog files were read only,
+they might still need to change - finding more answers, closing, amending old items that
+had gaps.&quot; Read-only was the first proposal and was wrong; additive-and-stamped with the
+token reserved is what replaced it, and it is the G87 move (ids are join keys - add and
+deprecate, never rename) applied to entry state.
+
+RELATED. PLAN2 (b) owns the mint side and re-keys owner_of to the edition segment;
+CFG2 owns the venue declaration PLAN2 reads; test_plan_ideas.py&#x27;s PORTED_COMPANY_IDS
+presence guard stays as the &quot;look at it once&quot; tripwire and is not replaced by this.
+
+BUILT 2026-09-05 (desktop, Lane A; claimed 5e90ed02), the same session as PLAN2, on top
+of PLAN2&#x27;s `next_idea_id()` and `owner_of`-by-segment as the acceptance foresaw. Unit
+suite green, ruff clean.
+
+(a) as built: `owner_of(id)` in validate.py - a segment names its edition; no segment at
+or below PRODUCER_BAND_CEILING is `base`; no segment above it is BAND_VENUE (&quot;band&quot;), the
+undeclared venue&#x27;s shape, reported as such and never as the company&#x27;s name. Items and
+ideas alike, None for the unparseable. `owns(venue, id)` is the one comparison: an
+UNDECLARED venue (None) owns the band. The running venue is `venue_edition()` - PLAN2&#x27;s
+declaration in config/dev-environment.yaml `edition:`, no second one.
+
+(b)/(c) as built: `venue_edit_findings_ideas(old, new, venue)` and
+`venue_edit_findings_item(id, old_doc, new_doc, venue)` are pure functions over texts,
+so the fixtures drive them; `check_venue_edits(base_ref)` wires them to `git show` /
+`git ls-tree` of the base against the working tree, and `--check-venue-edits --base
+&lt;ref&gt;` is the CLI (exit 1 with the findings named). Three failure modes on a foreign
+entry: REWRITE (old text not a prefix of new; also a removed entry or a changed header),
+UNSTAMPED (an append with no `[&lt;venue&gt; YYYY-MM-DD]`), STATE FLIP (only the token
+changed, with the message saying why and what to append instead). On item files
+`acceptance` and `notes` follow the append rule, `status` and `annotations` are out of
+scope, any other field changing is a REWRITE. Fixture guards prove each is caught and
+that a stamped `proposed: closed` append, an owner&#x27;s own flip, an owner&#x27;s own rewrite,
+an edition running as itself, and an item status change all pass. Wired into the
+reconcile-port skill as step 6 (at the previous port base); run here against
+port-base-20260902 it reports nothing, as it must on a base tree.
+
+(d) as built: docs/restructure/ideas/pending-&lt;branch&gt;.md, header shape with `Idea-?`,
+appended at the bottom (top = oldest = lowest number). `--mint-pending &lt;file&gt;`
+refuses a file carrying any real id or a non-candidate bullet, allocates every
+candidate consecutively through `next_idea_id()` (one pass; the fixture shows the base,
+an edition and an undeclared venue each landing in their own inbox of numbers), inserts
+at the top of `## Inbox` newest first, and rewrites the file to its header. README in
+the directory; two manifest rows (`pending-*.md` never-port - a candidate that crossed
+would be minted as the other venue&#x27;s thought; the README canonical-producer); the
+inbox header points at both the pending file and the edit rule beside the retired band
+text. Guard: test_plan_ideas.py refuses a real id in any pending file.
+
+(e) as built: the fixture is a `git log -p`-shaped history where Idea-10006 became
+Idea-10023; the union keeps 10006 and the allocator answers 10024, never 10006.
+
+(f) as built: SKILL.md:50 was already corrected at PLAN2 (the Idea path&#x27;s refusals have
+landed); the skill gains two operating sections, &quot;Editing an entry another venue owns&quot;
+and &quot;Capturing on a branch: the pending file&quot;.
+
+(g): each declaration names its guard (the README, the skill text, the manifest notes,
+the inbox header all point at test_backlog.py / test_plan_ideas.py); the detector reads
+Markdown and YAML, never Python source, so source_scan does not apply and this note says
+so rather than leaving the J66 line to be re-derived.
+
+NOT DONE HERE: the company&#x27;s own run of the detector (their reconcile, their venue); the
+sharded inbox&#x27;s rows (R6); nothing about what a domain or edition does with its inbox
+(Idea-257, parked).
 </p></div></div>
 <div class="card" id="card-CFG2" data-id="CFG2" data-module="config" data-phase="8" data-epic="release-infrastructure" data-type="task" data-status="done" data-search="cfg2 the edition registry - config/taxonomy/editions.yaml keyed to area_product_id, internal with a synthetic sample, per-entry manifest row; the company base mints its own code" tabindex="0"><div class="card-head"><span class="card-id">CFG2</span><span class="card-title">The edition registry - config/taxonomy/editions.yaml keyed to area_product_id, Internal with a synthetic sample, per-entry manifest row; the company base mints its own code</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">release-infrastructure</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-CFG1" data-target="card-CFG1">CFG1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Gate ontology-domain-registry-and-edition-grain §C2-§C3 (SIGNED OFF 2026-09-02). The grain is the AREA PRODUCT, with the SME&#x27;s
 definition as the ruling of record: an Area Product is where two or three applications are

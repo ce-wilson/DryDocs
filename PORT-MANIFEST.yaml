@@ -280,6 +280,20 @@ rows:
   - path: "config/gate-log.md"
     disposition: union-append
     note: "chronological union of both sides' gate records; dropping either side's entries is an audit violation"
+  - path: "docs/restructure/ideas/pending-*.md"
+    disposition: never-port
+    note: >
+      PLAN4 (d) (2026-09-05): a branch session's idea CANDIDATES, minted into IDEAS.md at
+      landing by one allocator pass and emptied. Transient and venue-local by
+      construction - a candidate that crossed would be minted into the other venue's
+      inbox as that venue's own thought. `*` does not span separators, so this row is
+      the one directory level and nothing below it.
+  - path: "docs/restructure/ideas/README.md"
+    disposition: canonical-producer
+    note: >
+      The pending-file shape and the landing command (PLAN4 d). Mechanism prose only.
+      The sharded inbox R6 may one day put in this directory is not this row: it gets
+      its own union-append rows when it lands, on the IDEAS.md shape below.
   - path: "docs/restructure/IDEAS.md"
     disposition: union-append
     note: "inbox + audit trail; both sides append — merge is the union (proven conflict site, 3x on 2026-07-09)"
@@ -1513,6 +1527,12 @@ row_may_match_nothing:
       row is the carve-out from the `.claude/**` canonical-producer default doing
       its job, not a dead row. Producer-side it always matches. Added 2026-09-04
       from the company's chunk-5 apply of port-base-20260902 (their idea inbox).
+  - path: "docs/restructure/ideas/pending-*.md"
+    reason: >
+      PLAN4 (d): a pending file exists only between a branch capture and its landing pass,
+      which empties it and normally deletes it before merge; on a clean trunk the glob
+      matches nothing BY DESIGN, and the row exists so that one caught mid-flight never
+      crosses as a clean-add and gets minted as the other venue's thought.
   - path: "docs/lane-*-handoff.md"
     reason: >
       the per-burst handoff retires itself when its queue empties (lane-handoff, 2026-09-02),

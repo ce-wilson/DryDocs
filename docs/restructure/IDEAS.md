@@ -58,6 +58,13 @@ band-shaped, `Idea-<n>` above 9999 — until it declares, because a capture surf
 the id is stable from then on. Nothing historical moves. The text below is the retired rule, kept because
 every id it produced is still read by it.
 
+**Capturing on a branch or in a worktree? Do not mint here.** Append the candidate to
+`docs/restructure/ideas/pending-<branch>.md` with `Idea-?` for the number, and mint at landing with
+`validate.py --mint-pending <file>` - N consecutive ids in one allocator pass (PLAN4 d). **Editing an entry
+another venue owns?** Add, never rewrite: the old text stays verbatim, your addition is stamped
+`[<venue> <YYYY-MM-DD>]`, and the state token is the owner's - append `proposed: closed - <why>; see <ref>`
+and let the owner flip it (PLAN4 b; `validate.py --check-venue-edits --base <ref>` reads the rule).
+
 **Producer allocated `1–9999`. Company allocated `10000+`.** Same rule in every series — here and
 in the backlog's letter series (`backlog/items/<id>.yaml`). The grammar does not change, so `Idea-10012` and `G10604` parse
 with every existing regex and no historical id moves.

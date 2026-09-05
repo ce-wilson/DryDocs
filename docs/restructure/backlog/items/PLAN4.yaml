@@ -7,7 +7,7 @@ phase: 8
 agent: main
 model: opus
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - .claude/skills/groom-backlog/validate.py
@@ -122,3 +122,56 @@ notes: |
   RELATED. PLAN2 (b) owns the mint side and re-keys owner_of to the edition segment;
   CFG2 owns the venue declaration PLAN2 reads; test_plan_ideas.py's PORTED_COMPANY_IDS
   presence guard stays as the "look at it once" tripwire and is not replaced by this.
+
+  BUILT 2026-09-05 (desktop, Lane A; claimed 5e90ed02), the same session as PLAN2, on top
+  of PLAN2's `next_idea_id()` and `owner_of`-by-segment as the acceptance foresaw. Unit
+  suite green, ruff clean.
+
+  (a) as built: `owner_of(id)` in validate.py - a segment names its edition; no segment at
+  or below PRODUCER_BAND_CEILING is `base`; no segment above it is BAND_VENUE ("band"), the
+  undeclared venue's shape, reported as such and never as the company's name. Items and
+  ideas alike, None for the unparseable. `owns(venue, id)` is the one comparison: an
+  UNDECLARED venue (None) owns the band. The running venue is `venue_edition()` - PLAN2's
+  declaration in config/dev-environment.yaml `edition:`, no second one.
+
+  (b)/(c) as built: `venue_edit_findings_ideas(old, new, venue)` and
+  `venue_edit_findings_item(id, old_doc, new_doc, venue)` are pure functions over texts,
+  so the fixtures drive them; `check_venue_edits(base_ref)` wires them to `git show` /
+  `git ls-tree` of the base against the working tree, and `--check-venue-edits --base
+  <ref>` is the CLI (exit 1 with the findings named). Three failure modes on a foreign
+  entry: REWRITE (old text not a prefix of new; also a removed entry or a changed header),
+  UNSTAMPED (an append with no `[<venue> YYYY-MM-DD]`), STATE FLIP (only the token
+  changed, with the message saying why and what to append instead). On item files
+  `acceptance` and `notes` follow the append rule, `status` and `annotations` are out of
+  scope, any other field changing is a REWRITE. Fixture guards prove each is caught and
+  that a stamped `proposed: closed` append, an owner's own flip, an owner's own rewrite,
+  an edition running as itself, and an item status change all pass. Wired into the
+  reconcile-port skill as step 6 (at the previous port base); run here against
+  port-base-20260902 it reports nothing, as it must on a base tree.
+
+  (d) as built: docs/restructure/ideas/pending-<branch>.md, header shape with `Idea-?`,
+  appended at the bottom (top = oldest = lowest number). `--mint-pending <file>`
+  refuses a file carrying any real id or a non-candidate bullet, allocates every
+  candidate consecutively through `next_idea_id()` (one pass; the fixture shows the base,
+  an edition and an undeclared venue each landing in their own inbox of numbers), inserts
+  at the top of `## Inbox` newest first, and rewrites the file to its header. README in
+  the directory; two manifest rows (`pending-*.md` never-port - a candidate that crossed
+  would be minted as the other venue's thought; the README canonical-producer); the
+  inbox header points at both the pending file and the edit rule beside the retired band
+  text. Guard: test_plan_ideas.py refuses a real id in any pending file.
+
+  (e) as built: the fixture is a `git log -p`-shaped history where Idea-10006 became
+  Idea-10023; the union keeps 10006 and the allocator answers 10024, never 10006.
+
+  (f) as built: SKILL.md:50 was already corrected at PLAN2 (the Idea path's refusals have
+  landed); the skill gains two operating sections, "Editing an entry another venue owns"
+  and "Capturing on a branch: the pending file".
+
+  (g): each declaration names its guard (the README, the skill text, the manifest notes,
+  the inbox header all point at test_backlog.py / test_plan_ideas.py); the detector reads
+  Markdown and YAML, never Python source, so source_scan does not apply and this note says
+  so rather than leaving the J66 line to be re-derived.
+
+  NOT DONE HERE: the company's own run of the detector (their reconcile, their venue); the
+  sharded inbox's rows (R6); nothing about what a domain or edition does with its inbox
+  (Idea-257, parked).

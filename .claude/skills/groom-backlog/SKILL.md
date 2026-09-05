@@ -69,6 +69,32 @@ as `- [tag] one line. (why/where seen)` with tag ∈ idea | bug | doc | source |
   touching edge meaning routes through the HITL gate (`docs/restructure/03-hitl-sme-flow.md`)
   — the item's acceptance must say "via the gate", and the mapping stays `planned` until confirmed.
 
+## Editing an entry another venue owns (PLAN4, 2026-09-05)
+
+Two venues groom this one inbox and one item set, so an entry you did not mint is one you may ADD TO
+and never rewrite. The rule, and the detector that reads it (`validate.py --check-venue-edits --base
+<ref>`; fixtures in `tests/unit/test_backlog.py`): the existing text survives VERBATIM as a prefix of
+the new text; anything you add is a block stamped `[<venue> <YYYY-MM-DD>]` (`[base 2026-09-05]` here);
+the inbox state token (`open|parked|groomed|merged|closed`) is the OWNER's - when you have the answer,
+append `[base <date>] proposed: closed - <why>; see <ref>` and the owner flips it at its next groom.
+Ownership is `owner_of(id)` in validate.py, keyed to the edition segment: a segment names its edition;
+no segment at or below 9999 is the base; no segment above it is the undeclared venue's band. Item-file
+`status` is venue-local (the company legitimately sets `done` on producer items it builds) and is out
+of scope; `acceptance` and `notes` follow the append rule; any other field changing on a foreign item
+is a REWRITE. Why: two sides appending to one entry union-merge by construction; two sides editing
+one token is the conflict IDEAS.md is already the proven site for, three times.
+
+## Capturing on a branch: the pending file (PLAN4 d)
+
+A session on a branch or in a worktree does NOT mint into IDEAS.md (the inbox top is where two
+machines collide in one burst). It appends candidates to `docs/restructure/ideas/pending-<branch>.md`
+in the header shape with `Idea-?` for the number - the file never carries a real id (guarded by
+`tests/unit/test_plan_ideas.py`). At landing, `validate.py --mint-pending <file>` allocates every
+candidate consecutively in ONE allocator pass through `next_idea_id()`, writes the headers into the
+inbox (top, newest first) and empties the file; top of the pending file = oldest capture = lowest
+number. This removes the allocator race instead of asking two sessions to be careful, and the
+path-scoped extraction already treats such a file as a clean-add across a merge. Never-port.
+
 ## Mechanics of a groom run (in order)
 
 1. **Write one file per promoted item**: `docs/restructure/backlog/items/<id>.yaml`, a

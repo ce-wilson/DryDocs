@@ -73,7 +73,17 @@ the accumulated lessons from prior ports. Read both.
    `items` key, so a check aimed there would compare two empty sets and pass for
    being wrong. Paste the printed block into the port report. This covers the UNION
    half only — the status-regression half is the J16 before/after guard above.
-6. **Don't push.** Write a port report (template below) and stop.
+6. **CHECK THE VENUE EDITS (PLAN4).** Producer entries get EDITED at a company apply (and
+   company entries at a back-flow), and the rule for an entry the running venue does not own is
+   additive-and-stamped: the old text survives verbatim as a prefix, additions carry
+   `[<venue> YYYY-MM-DD]`, the inbox state token is the owner's (a non-owner appends a stamped
+   `proposed: closed - <why>; see <ref>` line). Item-file `status` is venue-local and out of scope.
+   Run it from this repo against the base you ported from:
+   `python .claude/skills/groom-backlog/validate.py --check-venue-edits --base <previous port base>`
+   Exit 0 = every touched foreign entry is a stamped append. Exit 1 names each REWRITE, UNSTAMPED
+   append and STATE FLIP; restore the old text as the prefix and stamp what you added. The venue is
+   read from `config/dev-environment.yaml` `edition:` (yours), so the check knows which side it is on.
+7. **Don't push.** Write a port report (template below) and stop.
 
 ## Encoding trap (company send-back, PORT-REPORT-ae21ee4, 2026-08-10)
 

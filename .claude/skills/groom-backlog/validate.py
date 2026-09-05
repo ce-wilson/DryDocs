@@ -9,6 +9,8 @@ Usage (from the repo root):
     python .claude/skills/groom-backlog/validate.py --next-id Idea
     python .claude/skills/groom-backlog/validate.py --next-id --module drydocs-load --edition XMPL
     python .claude/skills/groom-backlog/validate.py --show-ids --module drydocs-load
+    python .claude/skills/groom-backlog/validate.py --check-venue-edits --base origin/main
+    python .claude/skills/groom-backlog/validate.py --mint-pending docs/restructure/ideas/pending-<branch>.md
 
 WHY THE ALLOCATOR LIVES HERE (I6). "Next free number in the matching epic's
 letter" was a SENTENCE IN A SKILL FILE, and a sentence cannot look anywhere. It
@@ -676,6 +678,356 @@ def _report_allocation(series: str, show_all: bool, edition: str | None = None) 
     return 0
 
 
+# ---------------------------------------------------------------------------
+# Venue-aware grooming, the EDIT side (PLAN4, 2026-09-05).
+# ---------------------------------------------------------------------------
+# Two venues groom ONE inbox (IDEAS.md, union-append at port time) and one item set
+# (per-entry item files). What a session may do to an entry the OTHER venue owns was
+# a working agreement with no mechanism, and "read-only" was the wrong rule: item
+# notes get dated BUILT blocks appended, acceptance has been amended in place with a
+# dated marker, and the company legitimately sets `status: done` on producer items it
+# builds. The rule that survives is about what MERGES AS A UNION and what does not:
+#
+#   - the existing text survives VERBATIM as a prefix of the new text;
+#   - anything added is a block stamped `[<venue> <YYYY-MM-DD>]`;
+#   - the inbox STATE TOKEN (open|parked|groomed|merged|closed) is the OWNER's. A
+#     non-owner appends a stamped `proposed: closed - <why>; see <ref>` line and the
+#     owner flips the token at its next groom.
+#
+# Two sides APPENDING to one entry union-merge by construction; two sides EDITING one
+# token is the conflict IDEAS.md is already the "proven conflict site, 3x" for.
+# Findings, answers, amendments to a gap, a proposed close - all of it lands. Only
+# rewriting and token flips are refused. Item-file `status` is venue-local by
+# disposition and OUT of scope here.
+#
+# Ownership is read off the id and nowhere else (one function, `owner_of`), and it is
+# keyed to the EDITION SEGMENT (PLAN2): a segment names its edition; no segment at or
+# below PRODUCER_BAND_CEILING is the base; no segment above it is the UNDECLARED
+# venue's (the band the company minted in before it declared its code). The venue a
+# session RUNS AS comes from `venue_edition()` - declared, never inferred.
+#
+# Guards: tests/unit/test_backlog.py (the fixture matrix: REWRITE / UNSTAMPED / STATE
+# FLIP caught; a stamped append, an owner's own flip, an item status change pass) and
+# tests/unit/test_plan_ideas.py (a pending file never carries an `Idea-<n>` header).
+
+#: The venue that owns a band-shaped, unprefixed id: the company's pre-declaration
+#: shape (rider idea-series-grammar C1). Reported as such rather than as "company",
+#: because the producer never names the company's code and the band says only that
+#: the venue had not declared one yet.
+BAND_VENUE = "band"
+
+#: The stamp every non-owner addition carries: `[base 2026-09-05]`, `[XMPL 2026-09-05]`.
+#: `band` is accepted for an undeclared venue's own appends.
+_STAMP_RE = re.compile(r"\[(?:base|band|[A-Z]{2,5}) \d{4}-\d{2}-\d{2}\]")
+
+#: The inbox state token inside a header: `**open**`, `**groomed → J66 (2026-08-30)**`.
+_STATE_RE = re.compile(r"\*\*(open|parked|groomed|merged|closed)\b[^*]*\*\*")
+
+#: An inbox entry header, with the id captured whole: `- **`XMPL-Idea-3`** ·`.
+_ENTRY_HEAD_RE = re.compile(rf"^- \*\*`(?P<id>{_EDITION_SEGMENT}Idea-\d+[a-z]?)`\*\* ·")
+
+#: Item-file fields that are venue-local (never a venue-edit finding) or bookkeeping.
+_ITEM_FIELDS_OUT_OF_SCOPE = frozenset({"status", "annotations"})
+#: Item-file fields the append rule governs; everything else is a REWRITE if it changes.
+_ITEM_APPEND_FIELDS = ("acceptance", "notes")
+
+
+def owner_of(item_or_idea_id: str) -> str | None:
+    """The venue that OWNS an id: ``base``, an edition code, or BAND_VENUE.
+
+    None for an id the grammar cannot parse. One place, so nothing else in the edit
+    side knows how ownership is spelled: PLAN2 keyed it to the edition segment, and
+    a future ruling changes it here only.
+    """
+    iid = str(item_or_idea_id).strip()
+    m = _ID_RE.match(iid)
+    edition: str | None
+    number: int
+    if m:
+        edition, number = m.group("edition"), int(m.group("number"))
+    else:
+        idea = re.match(rf"^{_EDITION_SEGMENT}Idea-(?P<number>\d+)[a-z]?$", iid)
+        if not idea:
+            return None
+        edition, number = idea.group("edition"), int(idea.group("number"))
+    if edition:
+        return edition
+    return BAND_VENUE if number > PRODUCER_BAND_CEILING else BASE_EDITION
+
+
+def owns(venue: str | None, item_or_idea_id: str) -> bool:
+    """Does the running venue own this id? An UNDECLARED venue (None) owns the band."""
+    owner = owner_of(item_or_idea_id)
+    if owner is None:
+        return True  # unparseable: not this guard's finding
+    return owner == (BAND_VENUE if venue is None else venue)
+
+
+def _inbox_entries(markdown: str) -> dict[str, tuple[str, str]]:
+    """``id -> (header_line, body)`` for every headed entry in an IDEAS.md text.
+
+    The body is every line after the header up to the next header or `## ` heading,
+    right-stripped. Position in the file is chronology and is deliberately NOT part
+    of the entry - a stamped append changes no position.
+    """
+    entries: dict[str, tuple[str, str]] = {}
+    current: str | None = None
+    head = ""
+    body: list[str] = []
+
+    def flush() -> None:
+        if current is not None:
+            entries[current] = (head, "\n".join(body).rstrip())
+
+    for line in markdown.splitlines():
+        m = _ENTRY_HEAD_RE.match(line)
+        if m:
+            flush()
+            current, head, body = m.group("id"), line.rstrip(), []
+            continue
+        if line.startswith("## "):
+            flush()
+            current = None
+            continue
+        if current is not None:
+            body.append(line)
+    flush()
+    return entries
+
+
+def _append_findings(where: str, old: str, new: str) -> list[str]:
+    """The append rule on one text: verbatim prefix, stamped addition."""
+    old_s, new_s = old.rstrip(), new.rstrip()
+    if old_s == new_s:
+        return []
+    if not new_s.startswith(old_s):
+        return [f"REWRITE {where}: the existing text is not a prefix of the new text"]
+    added = new_s[len(old_s) :]
+    if not _STAMP_RE.search(added):
+        return [f"UNSTAMPED {where}: the appended text carries no `[<venue> YYYY-MM-DD]` stamp"]
+    return []
+
+
+def venue_edit_findings_ideas(old_md: str, new_md: str, venue: str | None) -> list[str]:
+    """Findings on IDEAS.md entries the running venue does NOT own, old vs new."""
+    before, after = _inbox_entries(old_md), _inbox_entries(new_md)
+    findings: list[str] = []
+    for iid, (old_head, old_body) in before.items():
+        if owns(venue, iid):
+            continue
+        if iid not in after:
+            findings.append(f"REWRITE {iid}: the entry was removed")
+            continue
+        new_head, new_body = after[iid]
+        if old_head != new_head:
+            old_state, new_state = _STATE_RE.search(old_head), _STATE_RE.search(new_head)
+            if (
+                old_state
+                and new_state
+                and old_head.replace(old_state.group(0), "")
+                == new_head.replace(new_state.group(0), "")
+            ):
+                findings.append(
+                    f"STATE FLIP {iid}: {old_state.group(1)} -> {new_state.group(1)} by a non-owner. "
+                    "The token is the owner's; append a stamped `proposed: <state> - <why>; see "
+                    "<ref>` line instead. Two sides appending union-merge; two sides editing one "
+                    "token is the conflict IDEAS.md is the proven site for."
+                )
+            else:
+                findings.append(f"REWRITE {iid}: the header changed")
+        findings.extend(_append_findings(iid, old_body, new_body))
+    return findings
+
+
+def venue_edit_findings_item(
+    item_id: str, old_doc: dict, new_doc: dict, venue: str | None
+) -> list[str]:
+    """Findings on ONE item file the running venue does not own. `status` is venue-local."""
+    if owns(venue, item_id):
+        return []
+    findings: list[str] = []
+    for field in _ITEM_APPEND_FIELDS:
+        findings.extend(
+            _append_findings(
+                f"{item_id}.{field}", str(old_doc.get(field) or ""), str(new_doc.get(field) or "")
+            )
+        )
+    for field in sorted(set(old_doc) | set(new_doc)):
+        if field in _ITEM_FIELDS_OUT_OF_SCOPE or field in _ITEM_APPEND_FIELDS:
+            continue
+        if old_doc.get(field) != new_doc.get(field):
+            findings.append(f"REWRITE {item_id}.{field}: changed on an item another venue owns")
+    return findings
+
+
+def check_venue_edits(base_ref: str, venue: str | None = _READ_VENUE) -> list[str]:
+    """Diff IDEAS.md and the item files between ``base_ref`` and the working tree, and
+    report every venue-edit finding. A DETECTOR WITH A BASE, never a tree assertion:
+    CI's tree is clean against itself, so the check means something only against a
+    ref - the previous port base at a reconcile, `origin/main` at a session close.
+    """
+    venue = _venue(venue)
+    findings: list[str] = []
+
+    old_md = _git("show", f"{base_ref}:{IDEAS_REL}")
+    local_md_path = REPO_ROOT / IDEAS_REL
+    new_md = local_md_path.read_text(encoding="utf-8") if local_md_path.exists() else ""
+    if old_md:
+        findings.extend(venue_edit_findings_ideas(old_md, new_md, venue))
+
+    old_items = _git("ls-tree", "-r", "--name-only", base_ref, "--", ITEMS_REL)
+    for line in old_items.splitlines():
+        m = _FILE_RE.search(line.strip())
+        if not m:
+            continue
+        iid = m.group("id")
+        if owns(venue, iid):
+            continue
+        old_doc = yaml.safe_load(_git("show", f"{base_ref}:{line.strip()}") or "") or {}
+        local = REPO_ROOT / line.strip()
+        if not local.exists():
+            findings.append(f"REWRITE {iid}: the item file was removed")
+            continue
+        new_doc = yaml.safe_load(local.read_text(encoding="utf-8")) or {}
+        findings.extend(venue_edit_findings_item(iid, old_doc, new_doc, venue))
+    return findings
+
+
+# ---------------------------------------------------------------------------
+# The pending file (PLAN4 d): candidates captured on a branch, minted in ONE pass.
+# ---------------------------------------------------------------------------
+#: Where a session that captures on a branch or in a worktree writes candidates.
+PENDING_DIR_REL = "docs/restructure/ideas"
+PENDING_GLOB = "pending-*.md"
+#: The placeholder a candidate header carries instead of a number. The file NEVER
+#: contains an `Idea-<n>` header (guarded): an id exists only from the landing pass.
+PENDING_PLACEHOLDER = "Idea-?"
+_PENDING_HEAD_RE = re.compile(r"^- \*\*`Idea-\?`\*\* ·")
+#: Any real id shape in a pending file is the defect the file exists to prevent.
+_PENDING_FORBIDDEN_RE = re.compile(rf"`{_EDITION_SEGMENT}Idea-\d+[a-z]?`")
+
+
+def pending_candidates(text: str) -> list[str]:
+    """The candidate blocks of a pending file, oldest FIRST (the file is append-only,
+    so the top is the oldest capture and takes the lowest number)."""
+    blocks: list[list[str]] = []
+    for line in text.splitlines():
+        if _PENDING_HEAD_RE.match(line):
+            blocks.append([line.rstrip()])
+        elif blocks and (line.startswith("  ") or line.strip() == ""):
+            blocks[-1].append(line.rstrip())
+    return ["\n".join(b).rstrip() for b in blocks if b]
+
+
+def pending_file_problems(text: str) -> list[str]:
+    """Why a pending file is not mintable: a real id header, or a bullet that is not
+    a candidate."""
+    problems = [
+        f"line {n}: a pending file never carries a real id ({m.group(0)})"
+        for n, line in enumerate(text.splitlines(), 1)
+        for m in [_PENDING_FORBIDDEN_RE.search(line)]
+        if m
+    ]
+    problems += [
+        f"line {n}: a candidate opens `- **`Idea-?`** ·` (the header minus the number)"
+        for n, line in enumerate(text.splitlines(), 1)
+        if line.startswith("- ") and not _PENDING_HEAD_RE.match(line)
+    ]
+    return problems
+
+
+def mint_pending(
+    candidates: list[str],
+    taken: set[IdeaId],
+    *,
+    edition: str | None = None,
+    venue: str | None = _READ_VENUE,
+) -> list[tuple[str, str]]:
+    """``[(id, entry_text)]`` for N candidates, allocated CONSECUTIVELY in one pass
+    through `next_idea_id()` - one allocator, one code path, no race between two
+    sessions each asking for "the next one" (rider D1)."""
+    minted: list[tuple[str, str]] = []
+    pool = set(taken)
+    for block in candidates:
+        allocated, _ = next_idea_id(pool, edition=edition, venue=venue)
+        seg, _, num = allocated.rpartition("Idea-")
+        pool.add((seg[:-1] if seg else None, int(num)))
+        minted.append((allocated, block.replace(PENDING_PLACEHOLDER, allocated, 1)))
+    return minted
+
+
+def insert_into_inbox(markdown: str, entries: list[str]) -> str:
+    """New entries at the TOP of `## Inbox`, newest (highest id) first - position is
+    chronology, the id is identity (the inbox header's own rule)."""
+    marker = "## Inbox\n"
+    at = markdown.find(marker)
+    if at < 0:
+        raise SystemExit(f"refused: {IDEAS_REL} has no `## Inbox` heading")
+    head = markdown[: at + len(marker)]
+    tail = markdown[at + len(marker) :].lstrip("\n")
+    block = "\n\n".join(reversed(entries))
+    return f"{head}\n{block}\n\n{tail}"
+
+
+def _mint_pending_cli(path_arg: str, edition: str | None) -> int:
+    path = Path(path_arg)
+    if not path.is_absolute():
+        path = REPO_ROOT / path
+    if not path.exists():
+        raise SystemExit(f"refused: no pending file at {path}")
+    text = path.read_text(encoding="utf-8")
+    problems = pending_file_problems(text)
+    if problems:
+        raise SystemExit("refused: the pending file is not mintable:\n  " + "\n  ".join(problems))
+    candidates = pending_candidates(text)
+    if not candidates:
+        print("nothing to mint: the pending file holds no candidates")
+        return 0
+    fetched = fetch_remotes()
+    ideas, counts, refs = idea_ids()
+    if not fetched:
+        print(
+            "WARNING: `git fetch --all` FAILED; the union may be stale. Re-check before "
+            "you push.",
+            file=sys.stderr,
+        )
+    minted = mint_pending(candidates, ideas, edition=edition, venue=venue_edition())
+    inbox = REPO_ROOT / IDEAS_REL
+    inbox.write_text(
+        insert_into_inbox(inbox.read_text(encoding="utf-8"), [e for _, e in minted]),
+        encoding="utf-8",
+    )
+    path.write_text(_pending_header(path.stem), encoding="utf-8")
+    print(
+        f"minted {len(minted)} idea(s) in one pass into {IDEAS_REL}: "
+        + ", ".join(i for i, _ in minted)
+    )
+    print(
+        f"  sources: local={counts['local']} remote={counts['remote']} history={counts['history']}; refs read {len(refs)}"
+    )
+    print(
+        f"  emptied {path.relative_to(REPO_ROOT)}; the headers are in the inbox now - render, commit and PUSH."
+    )
+    return 0
+
+
+def _pending_header(stem: str) -> str:
+    return (
+        f"# {stem} - idea candidates captured on a branch, minted at landing\n"
+        "\n"
+        "Append candidates at the BOTTOM, one per bullet, in the inbox header shape with\n"
+        "`Idea-?` in place of the number:\n"
+        "\n"
+        "    - **`Idea-?`** · 2026-09-05 · `[tag]` · **open** · prio? **Med** — **title.** body...\n"
+        "\n"
+        "This file NEVER carries a real id (guarded): an id exists only from the landing pass,\n"
+        "`python .claude/skills/groom-backlog/validate.py --mint-pending <this file>`, which\n"
+        "allocates every candidate consecutively in ONE allocator run, writes the headers into\n"
+        "IDEAS.md (top of the inbox, newest first) and empties this file. Top of this file =\n"
+        "oldest capture = lowest number. Never-port (PORT-MANIFEST.yaml).\n"
+    )
+
+
 def main() -> int:
     fails: list[str] = []
     sys.path.insert(0, str(REPO_ROOT))
@@ -779,6 +1131,28 @@ def main() -> int:
 
 
 def _cli(argv: list[str]) -> int:
+    if argv and argv[0] == "--check-venue-edits":
+        # PLAN4 (c): a detector with a base. `--base <ref>` is required - against
+        # its own tree the check is vacuous, which is why it is not a test.
+        if len(argv) < 3 or argv[1] != "--base":
+            raise SystemExit("usage: validate.py --check-venue-edits --base <ref>")
+        findings = check_venue_edits(argv[2])
+        venue = venue_edition()
+        print(f"venue: {venue if venue is not None else 'UNDECLARED'}; base: {argv[2]}")
+        if findings:
+            print(f"VENUE-EDIT FINDINGS ({len(findings)}):")
+            for f in findings:
+                print(" -", f)
+            return 1
+        print("no edits to entries another venue owns, or every one is a stamped append")
+        return 0
+    if argv and argv[0] == "--mint-pending":
+        if len(argv) < 2:
+            raise SystemExit(
+                "usage: validate.py --mint-pending <docs/restructure/ideas/pending-<branch>.md> [--edition <code>]"
+            )
+        edition = argv[argv.index("--edition") + 1] if "--edition" in argv[2:] else None
+        return _mint_pending_cli(argv[1], edition)
     if argv and argv[0] in ("--next-id", "--show-ids"):
         show = argv[0] == "--show-ids"
         rest = list(argv[1:])

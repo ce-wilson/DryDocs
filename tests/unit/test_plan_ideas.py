@@ -198,3 +198,20 @@ def test_no_markdown_escape_leaks_into_the_render() -> None:
     "literal asterisk" reaches the published page as backslash-asterisk. Caught this way
     once already, on the first draft of the prio marker."""
     assert "\\*" not in DEFAULT_IDEAS_OUT_PATH.read_text(encoding="utf-8")
+
+
+def test_a_pending_file_never_carries_a_real_idea_id() -> None:
+    """PLAN4 (d): docs/restructure/ideas/pending-<branch>.md holds CANDIDATES (`Idea-?`),
+    minted into IDEAS.md at landing in one allocator pass. A real header in one is an id
+    that exists in a branch and nowhere the allocator's union can see it yet - the exact
+    collision the pending file exists to remove. The README beside them is exempt."""
+    pending_dir = DEFAULT_IDEAS_PATH.parent / "ideas"
+    offenders = []
+    for path in sorted(pending_dir.glob("pending-*.md")):
+        for n, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            if re.search(r"`(?:[A-Z]{2,5}-)?Idea-\d+[a-z]?`", line):
+                offenders.append(f"{path.name}:{n}")
+    assert not offenders, (
+        f"pending files carrying a real Idea id: {offenders}. Candidates use `Idea-?`; "
+        "mint at landing with validate.py --mint-pending <file>."
+    )
