@@ -881,12 +881,16 @@ def _scope_binds(
                           THE PAIRING IS DECLARED, NEVER DERIVED
                           (config/taxonomy/data-centers.yaml, read through
                           drydocs_core.data_centers; the internal twin holds the
-                          real inventory). The long form carries a default-time
-                          segment and a suffix that the short code does not
-                          contain at all - nothing in 'T32' says 7:00 AM EST - so
-                          short -> long cannot be computed, however derivable the
-                          zero-padding looks. A value in NEITHER domain is
-                          refused with both spellings named.
+                          real inventory). The reason is the VENDOR BASELINE and
+                          not a parsing rule of ours: BMC defines no format for
+                          the data-center name, so a Control-M/Server name is
+                          free-form as far as the product is concerned and
+                          nothing in a short code determines a long one - the
+                          zero-padding merely LOOKS derivable. The E#### time
+                          reading is an INTERNAL convention (precedence tier 2,
+                          SME-asserted and mutable) and may not be present at
+                          all, so no code may require it. A value in NEITHER
+                          domain is refused with both spellings named.
 
                           A LIKE PATTERN still passes through untouched, like
                           folder_filter: a value carrying '%' or '_' is not a

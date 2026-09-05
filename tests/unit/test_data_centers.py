@@ -78,25 +78,53 @@ def test_a_value_in_neither_domain_is_refused_and_names_both(monkeypatch) -> Non
     assert reg.source in message, "the refusal names the venue it read (J18)"
 
 
-def test_short_to_long_is_not_derivable_on_the_declared_rows() -> None:
-    """The reason this is a lookup and not a computation, measured on the rows.
+def test_the_time_and_suffix_are_optional_metadata_never_identity() -> None:
+    """THE TIME MAY NOT BE THERE, and the registry must not require it.
 
-    The long form carries segments the short code does not contain: the default time
-    and the suffix. Deriving `T012-E0700-SYN` from `P12` would need the environment
-    letter, the zero pad, `E0700` and `SYN` — four facts, none of them in `P12`.
-    Guarded so nobody later "simplifies" the registry into a format string.
+    BMC defines no format for the data-center name: the vendor corpus uses it as a scope
+    and its only other mention marks the default-time-of-day reading "(internal)",
+    linking out to our own standard. That standard is `authority: internal-standards`
+    (precedence tier 2, refining the baseline) and `trust_tier: internal / SME-asserted /
+    mutable`, captured from SME chat with its own open items. So a name carrying no
+    `E####` segment is legal, and requiring one would encode a mutable convention as a
+    structural invariant and refuse a legitimate row.
+
+    Identity is the code/name PAIR and only that. The registry ships a row with neither
+    optional segment so this property is exercised by the shipped data, not just asserted.
+    """
+    reg = _registry()
+    bare = [d for d in reg.data_centers if not d.default_time and not d.suffix]
+    assert bare, (
+        "the registry must carry at least one row with no time and no suffix, or this "
+        "property is untested on the shipped data"
+    )
+    for dc in bare:
+        assert resolve(dc.code, reg) is dc, "a row with no time segment still resolves"
+        assert resolve(dc.name, reg) is dc
+
+
+def test_short_to_long_is_a_lookup_because_the_vendor_defines_no_format() -> None:
+    """Why this is a lookup and not a computation, stated at the level that survives.
+
+    The argument is NOT "the long form carries segments the short code lacks" — that is
+    true of the rows that carry them and says nothing about a row that does not. It is
+    that the field is free-form as far as Control-M is concerned, so no rule takes a
+    short code to a long name. Measured here as: no single transformation of the code
+    produces the name across the declared rows, and the guard is deliberately blind to
+    which optional segments a row happens to have.
     """
     reg = _registry()
     for dc in reg.data_centers:
-        assert dc.default_time, f"{dc.code}: the time segment is part of the pairing"
-        assert dc.suffix, f"{dc.code}: the suffix is part of the pairing"
-        assert dc.suffix not in dc.code, f"{dc.code}: suffix must not be inferable from the code"
-        digits_only = "".join(ch for ch in dc.code if ch.isdigit())
-        assert digits_only and digits_only not in ("",), dc.code
-    # and the set of times is not constant across rows on a registry that has one:
-    # a sample where every row shares a time cannot show the segment is per-DC
-    if len(reg.data_centers) > 1:
-        assert len({d.default_time for d in reg.data_centers}) >= 1
+        assert dc.code != dc.name
+        assert dc.name != dc.code.upper() and dc.name != dc.code.lower()
+        # the one transformation that LOOKS derivable — zero-padding the digits — does
+        # not produce the name on its own, whatever else the name carries
+        digits = "".join(ch for ch in dc.code if ch.isdigit())
+        padded = f"{dc.code[:1]}0{digits}"
+        assert dc.name != padded, (
+            f"{dc.code}: if a pad alone produced {dc.name!r} the pairing would be "
+            "derivable for this row — the registry must not imply that it is"
+        )
 
 
 def test_the_publishable_rows_are_all_samples_and_the_twin_is_absent_here() -> None:

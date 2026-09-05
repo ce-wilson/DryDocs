@@ -11,9 +11,17 @@ center rather than as an error — the failure this module exists to remove.
   the INTERNAL TWIN when it is present and the publishable sample otherwise, and records
   which on :attr:`DataCenterRegistry.source` so a caller can name its venue (J18).
 - :func:`resolve` — one operator value to the pair of spellings, or a refusal that names
-  both domains. Never computes one spelling from the other: the long form carries the
-  default-time and suffix segments that the short code does not contain, so short → long
-  is not derivable and the pairing is a declared fact (LOAD2 c).
+  both domains. Never computes one spelling from the other, and the reason is the VENDOR
+  BASELINE, not a parsing rule of ours: BMC defines no format for the data-center name
+  (the corpus uses it as a scope and marks the default-time reading "(internal)"), so a
+  Control-M/Server name is free-form as far as the product is concerned and nothing in a
+  short code determines a long one. The pairing is therefore a declared fact (LOAD2 c).
+
+``default_time`` and ``suffix`` are OPTIONAL metadata, recorded where a name carries
+them. The ``E####``-as-default-time reading comes from an internal standard that is
+``authority: internal-standards`` (precedence tier 2) and ``trust_tier: internal /
+SME-asserted / mutable`` — so THE TIME MAY SIMPLY NOT BE THERE, and nothing here may
+require it. Identity is the ``code``/``name`` pair and only that.
 
 Pure config read, no graph write, no database.
 """

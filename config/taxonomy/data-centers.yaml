@@ -15,17 +15,30 @@
 # remove.
 #
 # THE PAIRING IS DECLARED BECAUSE SHORT -> LONG IS NOT DERIVABLE, and the
-# bundled sample corpus is the proof rather than an argument about it. The two
-# committed samples carry the SAME data centers in the two spellings:
+# reason is the VENDOR BASELINE rather than any parsing rule of ours. BMC
+# defines NO format for the data-center name: the corpus uses it as a scope
+# ("within the same data center", controlm-planning-utils.md) and its only other
+# mention marks the default-time-of-day reading "(internal)" and links out to
+# our own standard (controlm-order-parameters.md). A Control-M/Server name is
+# free-form as far as the product is concerned, so nothing in a short code
+# determines the long name. That holds whatever any given name looks like.
+#
+# THE E#### TIME IS AN INTERNAL CONVENTION AND MAY SIMPLY NOT BE THERE.
+# knowledge/standards/technology/data-center-naming-convention.md is
+# `authority: internal-standards` (precedence tier 2, refining the BMC
+# baseline), `trust_tier: internal / SME-asserted / mutable`, captured from SME
+# chat, and it carries its own "open items to confirm — do not fill
+# speculatively". So `default_time` and `suffix` below are OPTIONAL metadata
+# recorded where they are known: nothing in the reader or the guards requires
+# them, and a data center whose name carries no time segment registers exactly
+# like one that does. Requiring them would encode a mutable convention as a
+# structural invariant and refuse a legitimate row.
+#
+# The bundled corpus still shows the two domains are real: the committed samples
+# carry the SAME data centers in the two spellings —
 # `controlm_folders__sample.csv` holds `P12`, `P14`, `P32`, `P33` and
-# `controlm_hosts__sample.csv` holds `T012-E0700-SYN`, `T014-E0700-SYN`.
-# Getting from `P12` to `T012-E0700-SYN` needs four facts the short code does
-# not contain: the environment letter, the zero pad, the default time (`E0700`)
-# and the suffix (`SYN`). The zero-padding LOOKS derivable and the rest is not
-# derivable at all, which is why this is a lookup and never a computation.
-# The grammar itself is documented in
-# knowledge/standards/technology/data-center-naming-convention.md (position 1 =
-# environment, `E####` = default time, suffix ignored for scheduling).
+# `controlm_hosts__sample.csv` holds `T012-E0700-SYN`, `T014-E0700-SYN` — and
+# `P12` yields `T012-E0700-SYN` by lookup only.
 #
 # THE ROWS HERE ARE SYNTHETIC, on the lob-product-team.yaml / editions.yaml
 # pattern: a publishable SHAPE producer-side, real rows in the internal twin.
@@ -61,8 +74,9 @@ updated: 2026-09-04
 # Fields (all required unless marked):
 #   code           the SHORT Control-M server code — CM_DEF_VTAB.DATA_CENTER
 #   name           the LONG-form data-center name — CM_HOSTS / CM_AVG_RUN
-#   default_time   the E#### segment read as a time, per the naming standard
-#   suffix         the trailing segment (ignored for scheduling; recorded)
+#   default_time   (optional) the E#### segment read as a time, where the name
+#                  carries one — an INTERNAL, mutable convention, never required
+#   suffix         (optional) the trailing segment, where there is one
 #   sample         true on a synthetic row; a real row omits it or says false
 #   note           (optional)
 
@@ -97,3 +111,16 @@ data_centers:
     suffix: SYN
     sample: true
     note: "long name unobserved — completes the pairing for a short code the folders sample carries"
+  # A name carrying NEITHER optional segment. It is here so the registry itself
+  # demonstrates that the time and the suffix are metadata and not identity: this
+  # row resolves in both directions exactly like the four above. Nothing observes
+  # it; it exercises the shape a real inventory is free to take.
+  - code: P41
+    name: T041
+    sample: true
+    note: >-
+      A BARE name — no E#### segment and no suffix. The BMC baseline defines no
+      format for this field and the time convention is internal and mutable
+      (tier 2), so a name like this is legal and must register; requiring the
+      segments would refuse it. Note also that `T041` is not `P41` padded: the
+      pairing is still a lookup for a name this plain.
