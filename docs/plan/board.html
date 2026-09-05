@@ -1254,8 +1254,107 @@ must parse identically in both, and rule the suffix (no item id carries one toda
 
 Depends on CFG2 (the edition registry the segment validates against).
 </p></div></div>
-<div class="card ready" id="card-PLAN4" data-id="PLAN4" data-module="drydocs-plan" data-phase="8" data-epic="project-board" data-type="task" data-status="todo" data-search="plan4 venue-aware grooming - the allocator enforces the band on ideas as it does on items, both venues can mint, and an entry another venue owns is edited by stamped append only, its state token left to the owner" tabindex="0"><div class="card-head"><span class="card-id">PLAN4</span><span class="card-title">Venue-aware grooming - the allocator enforces the band on ideas as it does on items, both venues can mint, and an entry another venue owns is edited by stamped append only, its state token left to the owner</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-plan</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">project-board</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> STUB - body follows (I6: the id is claimed by this push, the acceptance by the next).
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 (desktop, Lane A).
+<div class="card ready" id="card-PLAN4" data-id="PLAN4" data-module="drydocs-plan" data-phase="8" data-epic="project-board" data-type="task" data-status="todo" data-search="plan4 venue-aware grooming, the edit side - an entry another venue owns is changed by stamped append only, its state token left to the owner; candidates land through a pending file minted in one pass; the mint side is plan2 (b)" tabindex="0"><div class="card-head"><span class="card-id">PLAN4</span><span class="card-title">Venue-aware grooming, the edit side - an entry another venue owns is changed by stamped append only, its state token left to the owner; candidates land through a pending file minted in one pass; the mint side is PLAN2 (b)</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-plan</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">project-board</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> WHAT THIS IS, AND WHAT IT IS NOT. Two venues (producer, company) groom ONE inbox
+(docs/restructure/IDEAS.md, union-append) and one item set (per-entry item files).
+Nothing today says what a session may do to an entry the OTHER venue owns. &quot;Read-only&quot;
+is the wrong rule and would break the working convention: item notes are appended with
+dated BUILT/Groomed blocks, acceptance has been amended in place with a dated marker
+(LOAD1: &quot;as amended at acceptance (2026-09-02 ...)&quot;), and the company legitimately sets
+status: done on producer items it builds because item files are per-entry and status is
+venue-local by disposition. The rule that survives is about what MERGES AS A UNION and
+what does not. This item is the EDIT side of venue awareness. The MINT side - the Idea
+path&#x27;s floor/ceiling/venue refusals, next_idea_id() - is PLAN2 (b) under the
+idea-series-grammar rider (its clause (d) already specifies it) and is NOT redone here.
+
+(a) ONE OWNERSHIP FUNCTION. `owner_of(id) -&gt; venue` in validate.py, one place. Today it
+reads the band: a number above PRODUCER_BAND_CEILING is company-owned, at or below is
+producer-owned, the FROZEN_BAND legacy ids read as company. PLAN2 (b) re-keys it to the
+edition segment when that lands; nothing else in this item knows how ownership is
+spelled. The venue a session RUNS AS is declared, never inferred from a hostname: the
+J34 overlay seam already declares it - PORT-MANIFEST.company.yaml present means company,
+absent means producer - and PLAN2&#x27;s `edition:` key supersedes that when it exists.
+
+(b) THE EDIT RULE, for an entry the running venue does not own. On IDEAS.md entries, and
+on the acceptance/notes of an item file owned by the other venue (status on item files
+is venue-local and OUT of scope):
+  - the existing text survives VERBATIM as a prefix of the new text - nothing already
+    written is modified or removed;
+  - anything added is a block stamped `[&lt;venue&gt; &lt;YYYY-MM-DD&gt;]`;
+  - the inbox state token (open|parked|groomed|merged|closed) is the OWNER&#x27;s. A
+    non-owner who has the answer appends a stamped `proposed: closed - &lt;why&gt;; see &lt;ref&gt;`
+    line and the owner flips the token at its next groom. Reason, stated in the guard&#x27;s
+    message: two sides appending to one entry union-merge by construction; two sides
+    editing one token is the conflict IDEAS.md is already the &quot;proven conflict site,
+    3x&quot; for.
+Findings, answers, amendments to a gap, a proposed close - all of it lands. Only
+rewriting and token flips are refused.
+
+(c) THE GUARD IS A DETECTOR WITH A BASE, NOT A TREE ASSERTION. `validate.py
+--check-venue-edits --base &lt;ref&gt;` diffs IDEAS.md and the item files between &lt;ref&gt; and the
+working tree, classifies each changed entry by owner_of, and reports three failure modes
+on entries the running venue does not own: a REWRITE (old text not a prefix of new), an
+UNSTAMPED append, a STATE FLIP. Unit tests prove each is caught and that a stamped
+append, an owner&#x27;s own token flip, and a status change on an item file all pass - from
+fixtures, not from the live tree, because CI&#x27;s tree is clean and the check is only
+meaningful against a base. It is wired where it matters: the reconcile-port skill runs
+it with --base at the previous port base, since the company apply is where producer
+entries get edited (and the reverse at back-flow).
+
+(d) THE PENDING FILE, the pattern that removes the allocator race instead of asking two
+sessions to be careful. A session that captures ideas on a branch or in a worktree
+writes them to docs/restructure/ideas/pending-&lt;branch&gt;.md as headerless candidates -
+the file never contains an `Idea-&lt;n&gt;` header, guarded. At landing, `validate.py
+--mint-pending &lt;file&gt;` allocates N consecutive ids in ONE allocator pass, writes the
+headers into IDEAS.md, and empties the file. Path-scoped extraction already treats such
+a file as a clean-add, which is why it works across a merge. Documented in SKILL.md and
+in the IDEAS.md header beside the band text the capturer already reads.
+
+(e) RETIRED-IS-NOT-FREE, PINNED. The allocator reads inbox HISTORY (git log --all -p),
+so a number whose header was renumbered away is still taken. A fixture test proves it:
+an IDEAS history where Idea-N was renumbered to Idea-M must not report N as free. This
+is the case the company&#x27;s hand count got wrong on 2026-09-05 (10006-10008 read as free
+from the live headers; main&#x27;s 10009-10011 name them as retired).
+
+(f) SKILL.md:50 CORRECTED. &quot;It refuses the DD-series and the company band by itself&quot; is
+true for ITEMS; the Idea path&#x27;s refusals arrive with PLAN2 (b). The line says so, and
+the skill gains the edit rule (b) and the pending-file pattern (d) as operating text.
+
+(g) GUARDED, EVERY DECLARATION. The edit rule and the pending-file rule each name the
+guard that reads them (J68); the detector goes through tests/source_scan.py where it
+reads source (J66). 3278-floor unit suite green; render_board.py leaves no diff.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 (desktop, Lane A; stub 13333546). p1 because the company is about to
+run the first cross-venue renumber pass with no rule for what it may touch, and the same
+question arrives producer-side the first time a company idea lands here by union-append.
+opus because (b) is a working agreement being turned into a mechanism and the boundary
+cases (amend-in-place precedent, venue-local status) need judgement, not transcription.
+
+TITLE CORRECTED AT BODY TIME, and why (recorded because I6 says settle the title before
+the stub, and this one was not). The stub&#x27;s title claimed the mint side too - &quot;the
+allocator enforces the band on ideas as it does on items, both venues can mint&quot;. That
+half is already specified by the idea-series-grammar rider, clause (d) (next_idea_id():
+max+1, never the lowest gap; the floor; the venue check) and is PLAN2 (b)&#x27;s to build once
+the rider signs. Carrying it here would have been a second item for one mechanism. The
+body and title were pushed together so the trunk never held the two titles apart.
+
+PROVENANCE. The company&#x27;s research-tooling landing (2026-09-04/05) found feat/dd_lineage
+had appended Idea-10006..10021 while main independently minted Idea-10009..10017 for
+different content - the SECOND collision on that series (the first was repaired
+2026-08-28 by renumbering, and main&#x27;s Idea-10009 carries the marker). The company
+correctly did not execute the repair while a second session still held the pen on
+IDEAS.md. The ledger&#x27;s ELEVENTH POSTSCRIPT carries the producer&#x27;s one constraint on the
+pass (leave 10018-10021; Idea-10021 is cited here in C44 and Idea-236) and adopts two of
+the company&#x27;s conclusions: per-file-by-authorship, and the pending-file pen. This item
+makes both a mechanism.
+
+THE RULING BEHIND (b) is the SME&#x27;s, 2026-09-05: &quot;if the backlog files were read only,
+they might still need to change - finding more answers, closing, amending old items that
+had gaps.&quot; Read-only was the first proposal and was wrong; additive-and-stamped with the
+token reserved is what replaced it, and it is the G87 move (ids are join keys - add and
+deprecate, never rename) applied to entry state.
+
+RELATED. PLAN2 (b) owns the mint side and re-keys owner_of to the edition segment;
+CFG2 owns the venue declaration PLAN2 reads; test_plan_ideas.py&#x27;s PORTED_COMPANY_IDS
+presence guard stays as the &quot;look at it once&quot; tripwire and is not replaced by this.
 </p></div></div>
 <div class="card" id="card-DOC2" data-id="DOC2" data-module="docs" data-phase="8" data-epic="release-infrastructure" data-type="task" data-status="todo" data-search="doc2 relay-23 - the frozen letters, mint by module code, the edition segment and the retired partition rules reach the company through the port-prompt" tabindex="0"><div class="card-head"><span class="card-id">DOC2</span><span class="card-title">RELAY-23 - the frozen letters, mint by module code, the edition segment and the retired partition rules reach the company through the port-prompt</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">release-infrastructure</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-PLAN2" data-target="card-PLAN2">PLAN2</a> <a class="dep-link" href="#card-PLAN3" data-target="card-PLAN3">PLAN3</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Gate ontology-domain-registry-and-edition-grain §E1 (SIGNED OFF 2026-09-02): a cross-repo convention change is inert until it
 reaches the other side, and the company&#x27;s allocator only WORKS once it holds an edition
