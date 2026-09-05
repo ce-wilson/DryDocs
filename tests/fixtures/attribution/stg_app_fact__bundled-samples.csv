@@ -1,0 +1,3 @@
+app_fact_sk,run_id,data_center,folder_id,job_id,fact_type,fact_value,environment,source_var
+1,sample-run,P12,161014,3,SEAL,70002,P,%%SEAL
+2,sample-run,P12,161014,5,SEAL,70002,P,%%SEAL
