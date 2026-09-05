@@ -2363,6 +2363,18 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   from `validate.py --next-id Idea` on the tree that will hold it (NINTH POSTSCRIPT).
   Nothing is asked back.
 
+  **THIRTEENTH POSTSCRIPT - ONE MANIFEST ROW, ADDED BETWEEN THE RANGE AND THE NEXT ROLL
+  (2026-09-05):** `config/taxonomy/data-centers.yaml` (LOAD2, the short-code / long-name
+  data-center spelling registry) now has a `per-entry` row on the `lob-product-team.yaml`
+  shape - rows keyed by `code`, your real rows stay, the producer's `sample: true` rows
+  never overwrite them, header / schema / field list cross whole. Without it the file fell
+  through to the `config/**` canonical-producer default, the third instance of the class
+  that dropped `lob-product-team.yaml` rows once and drove `test_source_registry` 1 -> 7.
+  It does not reach carve-outs 8 or 9 (neither takes the manifest), and the file itself is
+  after `port-base-20260902`, so at the next roll it arrives as a clean-add and the row
+  first does work the roll after, when your real rows exist. `editions.yaml` and
+  `domains.yaml` already had their rows. Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has

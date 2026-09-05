@@ -48,7 +48,7 @@
 # =============================================================================
 schema: drydocs.port-manifest.v1
 classification: Internal-Public
-updated: 2026-08-20   # 2026-08-20 (J51): six PER-ENTRY rows for canonical-producer paths the
+updated: 2026-09-05   # 2026-08-20 (J51): six PER-ENTRY rows for canonical-producer paths the
                       # company legitimately EXTENDS (Idea-142's class): description_tokens
                       # (per function), detect.py + __init__ (per detector id), test_runbook_
                       # currency (per exemption table, retirement trigger named), email-dl-
@@ -855,6 +855,34 @@ rows:
       reference material. Lived at repo-root `docs/design/ui-exploration/**` until S9 (2026-08-21) moved it here;
       the row stays ABOVE the `docs/design/**` evaluate row on purpose, because this material is
       producer-authored reference the consumer never finalizes."
+  - path: "config/taxonomy/data-centers.yaml"
+    disposition: per-entry
+    entry_rule: >
+      Rows in `data_centers` keyed by `code` UNION, on the lob-product-team shape:
+      the company's REAL rows (its Control-M/Server codes paired with their long
+      data-center names, `sample` absent or false) are estate data and stay; the
+      producer's rows are the SYNTHETIC sample (`sample: true`, the bundled
+      corpus's own P12/P14/P32/P33/P41) and never overwrite or shadow them.
+      `default_time` and `suffix` are OPTIONAL per-row metadata (LOAD2: the E####
+      time is an internal, mutable tier-2 convention, never required) and are the
+      row owner's. Producer-owned MECHANISM crosses whole: the header comment,
+      `schema`, `classification`, `classification_only`, `updated` and the field
+      list. The reader prefers the J13 twin (`internal/controlm-config/
+      data-centers.yaml`, never ported) when present, so a company that keeps its
+      real rows in the twin still needs this row: a wholesale take would replace
+      whatever it holds here with the sample and the reader would report `.source`
+      as the sample on a tree that has real data.
+    note: >
+      LOAD2 (c) (2026-09-04), row added 2026-09-05 on the SME's call. Without it the
+      file fell through to the config/** canonical-producer default - the THIRD
+      instance of that class (lob-product-team.yaml at the 2026-08-20 apply,
+      source-registry.yaml at the 2026-09-01 apply, which drove test_source_registry
+      1 -> 7 failures). Added between the in-flight range and the next roll on
+      purpose: carve-outs 8 and 9 do not take the manifest, so the row cannot reach
+      them, and the file itself is post-port-base-20260902 and arrives company-side
+      as a clean-add at the next roll - disposition first matters the roll after,
+      once real rows exist. Classification Internal on both sides (real rows name
+      production data centers, J23 handling).
   - path: "config/taxonomy/editions.yaml"
     disposition: per-entry
     entry_rule: >

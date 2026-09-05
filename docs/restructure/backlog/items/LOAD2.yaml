@@ -135,3 +135,8 @@ notes: |
   comes.
 
   (e) held: no collision probe, no folder/job identity change - both stay gate-bound in P6.
+
+  [base 2026-09-05] The held PORT-MANIFEST row LANDED on the SME's call: per-entry, rows
+  keyed by `code`, sample rows never overwrite real ones, mechanism crosses whole. Timing
+  as the note above reasoned - carve-outs 8 and 9 do not take the manifest, and the file is
+  post-port-base-20260902 so it reaches the company as a clean-add first. Nothing else held.
