@@ -993,11 +993,15 @@ def _mint_pending_cli(path_arg: str, edition: str | None) -> int:
         )
     minted = mint_pending(candidates, ideas, edition=edition, venue=venue_edition())
     inbox = REPO_ROOT / IDEAS_REL
+    # newline="" on BOTH sides: the default translates "\n" to os.linesep on Windows, and
+    # the first landing (2026-09-05) rewrote an LF inbox as CRLF - git normalized the blob,
+    # the working copy did not, and every later diff of the file was noise.
     inbox.write_text(
-        insert_into_inbox(inbox.read_text(encoding="utf-8"), [e for _, e in minted]),
+        insert_into_inbox(inbox.read_text(encoding="utf-8", newline=""), [e for _, e in minted]),
         encoding="utf-8",
+        newline="",
     )
-    path.write_text(_pending_header(path.stem), encoding="utf-8")
+    path.write_text(_pending_header(path.stem), encoding="utf-8", newline="")
     print(
         f"minted {len(minted)} idea(s) in one pass into {IDEAS_REL}: "
         + ", ".join(i for i, _ in minted)
