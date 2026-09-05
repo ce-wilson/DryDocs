@@ -6368,15 +6368,36 @@ never reads as proven on the estate (J18) - the refusal message names the venue 
 A LIKE pattern passes through to both binds untouched (an operator pattern is their own
 instrument); a value in neither domain refuses with both spellings named and exits 2.
 
-WHY THE NON-DERIVABILITY CLAIM IS NOW EVIDENCE RATHER THAN AN ASSERTION. The acceptance
-said the P032 -&gt; P32 shape LOOKS derivable and must not be asserted. The bundled corpus
-proves the stronger direction: controlm_folders__sample.csv carries P12/P14/P32/P33 and
-controlm_hosts__sample.csv carries T012-E0700-SYN/T014-E0700-SYN - the same data centers
-in the two domains. Deriving T012-E0700-SYN from P12 needs four facts the short code
-does not contain: the environment letter, the zero pad, the default time (E0700) and the
-suffix (SYN). A test pins that every row carries a time and a suffix and that the suffix
-is not inferable from the code, so nobody later &quot;simplifies&quot; the registry into a format
-string.
+WHY THE NON-DERIVABILITY CLAIM IS NOW EVIDENCE RATHER THAN AN ASSERTION - AND THE FIRST
+VERSION OF IT WAS WRONG. The build argued that short -&gt; long is not derivable BECAUSE
+the long form carries a default time (E0700) and a suffix the short code lacks. The SME
+challenged it the same day - &quot;the time may not be there&quot; - and the BMC corpus settles
+it against the first version: the vendor defines NO format for this field. The corpus
+uses &quot;data center&quot; as a scope (controlm-planning-utils.md) and its only other mention
+marks the default-time-of-day reading &quot;(internal)&quot; and links out to our own standard
+(controlm-order-parameters.md). That standard is authority: internal-standards
+(precedence tier 2, refining the baseline), trust_tier: internal / SME-asserted /
+mutable, captured from SME chat, with its own &quot;open items to confirm - do not fill
+speculatively&quot;. So an E#### segment MAY SIMPLY NOT BE THERE, and an argument resting on
+it is an argument about the rows that happen to carry one.
+
+Corrected in the same session (commit follows the build): the reason is the VENDOR
+BASELINE - the name is free-form as far as Control-M is concerned, so no rule takes a
+short code to a long name, whatever any given name looks like. `default_time` and
+`suffix` are OPTIONAL metadata in the schema, the reader and the guards; the registry
+ships a BARE row (P41 / T041, no segments at all) so the property is exercised by the
+shipped data rather than asserted, and a test proves that row resolves in both
+directions like any other. The replaced guard - which required a time and a suffix on
+every row - would have refused a legitimate real row in the internal twin, i.e. it
+encoded a mutable tier-2 convention as a structural invariant. The surviving
+non-derivability test is deliberately blind to which optional segments a row has and
+only asserts that the one transformation that LOOKS derivable (zero-padding the digits)
+does not produce the name.
+
+The corpus evidence for the two DOMAINS is unaffected and still stands:
+controlm_folders__sample.csv carries P12/P14/P32/P33 and controlm_hosts__sample.csv
+carries T012-E0700-SYN/T014-E0700-SYN - the same data centers, two spellings, and P12
+reaches T012-E0700-SYN by lookup only.
 
 (d) as built, and the proof of the removed failure: `--data-center T012-E0700-SYN` (the
 long form) now yields `data_center_code == &quot;P12&quot;`, which is exactly what the folders

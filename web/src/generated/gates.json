@@ -1194,6 +1194,17 @@
     {
       "kind": "prompt-only",
       "date": null,
+      "title": "controlm-folder-identity-grain (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/controlm-folder-identity-grain.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": []
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
       "title": "data-flow-overview (gate page rendered — session not yet run)",
       "status": "open",
       "prompt_files": [

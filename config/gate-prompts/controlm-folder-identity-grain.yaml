@@ -1,0 +1,279 @@
+# SME gate-prompt spec — the identity grain of :ControlMFolder, :ControlMJob and :Condition.
+# Prepared with the SME NOT present — this page STOPS at the gate. Nothing here is confirmed:
+# no constraint is dropped or created, no loader MERGE pattern changes, no migration runs, and
+# the multi-data-center load stays held until this page is signed.
+# Mechanism-only: column names, constraint text, counts and rules — no real folder, job, data
+# center or application values.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+id: controlm-folder-identity-grain
+title: "SME Gate — folder and job identity carry the data center, and which key carries it"
+step: "Resolves the node-key grain before the first multi-data-center load; P6's probe reports into this page"
+summary: >
+  The graph keys folders on folder_id alone (CM_DEF_VTAB.TABLE_ID) and jobs on
+  (folder_id, job_id). Neither carries the data center. The host layer, signed at
+  controlm-hosts-topology 2026-07-09, keys host groups on (data_center, name) with the
+  reason stated in the constraints file — "the same GRPNAME can exist in several DCs".
+  Same source, same file, opposite grain, fourteen lines apart. SME direction 2026-09-04:
+  folder identity must carry the data center — two folders of the same name on two
+  Control-M/Servers are two folders. This page rules WHICH KEY carries it, because the
+  candidates differ on rename behaviour and on whether the key is a business key. It also
+  carries the probe (SQL, read-only) and the UI test case (interactive, non-production)
+  that supply the facts the ruling needs.
+meta:
+  Module: "drydocs-load · Control-M definition identity (M3 core)"
+  Source: "oracle:psgmgr.CM_DEF_VTAB (folders) × CM_DEF_VJOB (jobs) — definition replica"
+  Software: "controlm (Control-M) MADE_BY bmc — config/taxonomy/software-registry.yaml"
+  Registry ref: "controlm-psgmgr — confirmed (config/source-registry.yaml)"
+  Classification: "Internal (source data) · this page Internal-Public (mechanism only)"
+  Constraints today: "drydocs_core/schema/constraints.cypher — controlmfolder_id (f.folder_id UNIQUE), controlmjob_key ((j.folder_id, j.job_id) NODE KEY), condition_key ((c.folder_id, c.name) NODE KEY)"
+  Loader today: "drydocs/loaders/cypher/controlm_folders.cypher — MERGE (f:ControlMFolder:Collection {folder_id: row.folder_id})"
+  Extract today: "drydocs/loaders/sql/controlm_folders.sql:60 — J.TABLE_ID = T.TABLE_ID, no data-center predicate; the guarded form is present and commented out at controlm_staging_ddl.sql:139"
+  Precedent: "controlm-hosts-topology (SIGNED 2026-07-09) — controlmhostgroup_key (g.data_center, g.name); its still-owed probe P3 (DC-domain match vs CM_DEF_VTAB) is the same seam LOAD2 opened"
+  Related: "LOAD2 (BUILT 2026-09-04) — the two data-center value domains and the declared spelling registry; P6 — the collision probe, whose readout lands here"
+
+# ---------------------------------------------------------------------------
+# What the vendor baseline supports, and where it is silent. Precedence tier 1
+# (CLAUDE.md section 4); every row cites the corpus page and line.
+# ---------------------------------------------------------------------------
+baseline:
+  - fact: "Control-M/Server is REQUIRED on every folder and determines the execution environment."
+    cite: "external/orchestration/bmc-controlm/controlm-folder-creation.md:44; controlm-folder-definition-parameters.md:47"
+    bearing: "SUPPORTS the ruling. A folder without its server is under-specified by BMC's own definition of the object, not merely by our convention."
+  - fact: "Folder Name is the 'Identifier for the folder' — 1-64 chars (z/OS 1-8), case-sensitive, no $ / * ? \" and no blanks."
+    cite: "external/orchestration/bmc-controlm/controlm-folder-creation.md:44"
+    bearing: "Supports the NAME being identity-bearing. States no uniqueness scope."
+  - fact: "Job names must be unique WITHIN EACH SUB-FOLDER scope; duplicate job names across folders require the allowDuplicateJobNames system setting."
+    cite: "external/orchestration/bmc-controlm/controlm-subfolder-creation.md:62,151; controlm-api-folder-reference.md:207,209,445"
+    bearing: "The contrast is the finding. BMC states a uniqueness scope for JOB names, twice, with a setting that relaxes it — and states none for FOLDER names."
+  - fact: "duplicatedefjob 'Duplicates jobs within same data center'."
+    cite: "external/orchestration/bmc-controlm/controlm-planning-utils.md:41"
+    bearing: "The data center is a scope boundary in the vendor's own tooling."
+  - fact: "Folder rename is a supported first-class operation: all jobs must be fully loaded first, and references in conditional actions, event definitions, job prerequisites and documentation need MANUAL update."
+    cite: "external/orchestration/bmc-controlm/controlm-folder-creation.md:97-110"
+    bearing: "CUTS AGAINST a name-based key. Renames happen and are expected to leave stale references behind."
+  - fact: "SILENCE: no statement anywhere in the 27-page corpus that folder names are unique, at any scope."
+    cite: "searched 2026-09-04 on the vendor's own vocabulary (folder name / Control-M/Server / duplicate / unique / rename), not on psgmgr column names"
+    bearing: "Option A cannot be asserted from the baseline. It needs the probe or the SME."
+  - fact: "SILENCE: TABLE_ID appears nowhere in the corpus."
+    cite: "same search"
+    bearing: "TABLE_ID is a database-internal surrogate, not a documented product concept — the ADR 0001 objection to Option B."
+
+# ---------------------------------------------------------------------------
+# The three candidate keys. C is carried so the page records why it was ruled out.
+# ---------------------------------------------------------------------------
+options:
+  - n: A
+    key: "(data_center, sched_table)"
+    fixes_merge: true
+    business_key: true
+    survives_rename: false
+    for: "ADR 0001 — identity is always a BUSINESS key, never an internal node id; it is what lets a corpus rebuild and re-link. Same shape as the signed host-group key."
+    against: "BMC documents no folder-name uniqueness at any scope, and documents rename as supported with manual ripple. A rename makes a new node with no history."
+    needs: "PROBE-2 and PROBE-3 clean, plus an SME statement that renames are rare."
+  - n: B
+    key: "(data_center, folder_id)"
+    fixes_merge: true
+    business_key: false
+    survives_rename: "assumed — UI-5 tests it"
+    for: "Smallest change from today; keeps folder_id as the jobs/conditions join key; the data-center half is vendor-grounded."
+    against: "Keeps a vendor surrogate as identity, which ADR 0001 disfavors."
+    needs: "UI-5 — if a rename does NOT preserve TABLE_ID, B's only advantage over A is gone."
+  - n: C
+    key: "sched_table alone"
+    fixes_merge: false
+    business_key: true
+    survives_rename: false
+    for: "—"
+    against: "RULED OUT on the page: does not fix the merge. Recorded so the option is not re-proposed."
+
+# ---------------------------------------------------------------------------
+# Why a constraint alone is not the fix. Recorded because it was proposed twice
+# in the session that produced this page, and the reasoning is not obvious.
+# ---------------------------------------------------------------------------
+mechanism_note: >
+  A Neo4j constraint is a VALIDATOR, not a key for MERGE. The loader's
+  MERGE (f:ControlMFolder {folder_id: row.folder_id}) decides identity; a constraint can only
+  reject a write afterwards. Two rows carrying the same TABLE_ID from two data centers collapse
+  onto one node BEFORE any constraint is evaluated, and the surviving node holds exactly one
+  data_center value — so a uniqueness constraint on :ControlMServer.name (which already exists
+  and is already satisfied) or a composite constraint added without touching the MERGE pattern
+  would both pass. Whichever key is ruled, the loader's MERGE pattern changes with it, and the
+  constraint backs it up rather than creating it.
+
+# ---------------------------------------------------------------------------
+# Three silent symptoms of the current key. These hold whatever the probe returns
+# and are the evidence that the key is under-specified rather than merely at risk.
+# ---------------------------------------------------------------------------
+symptoms:
+  - n: 1
+    symptom: "Property overwrite — sched_table, app_code, table_status, instance_name take whichever data center's row the batch wrote last. Non-deterministic between runs."
+    where: "drydocs/loaders/cypher/controlm_folders.cypher, the folder SET block"
+  - n: 2
+    symptom: "Two SCHEDULED_ON edges — MERGE (f)-[r:SCHEDULED_ON]->(srv) fires once per row against a different server, silently breaking the invariant the loader states in its own header: 'Each folder is scheduled on exactly one server.'"
+    where: "same file, the Folder -> Server block"
+  - n: 3
+    symptom: "Provenance degradation — row_checksum alternates between the two rows' values, so row_changed is true on every run and the delta-only WAS_GENERATED_BY edge (SME sign-off 2026-07-06) fires every time."
+    where: "same file, the provenance tail"
+  - n: 4
+    symptom: "Extract-side cross join — controlm_folders.sql:60 joins J.TABLE_ID = T.TABLE_ID with no data-center predicate, so on a collision the bad rows are manufactured UPSTREAM of any graph constraint."
+    where: "drydocs/loaders/sql/controlm_folders.sql:60; guarded form commented out at controlm_staging_ddl.sql:139"
+
+# ---------------------------------------------------------------------------
+# PROBE — SQL, read-only, counts only. User-run on the internal network; the agent
+# transcribes the conclusion (the P1 arrangement). Producer holds no psgmgr access.
+# ---------------------------------------------------------------------------
+probe:
+  venue: "internal network, live psgmgr replica — NOT the producer tree (J18)"
+  rule: "counts only, never result rows"
+  questions:
+    - id: PROBE-1
+      asks: "Does TABLE_ID collide across data centers?"
+      sql: "SELECT TABLE_ID, COUNT(DISTINCT DATA_CENTER) dc FROM psgmgr.CM_DEF_VTAB GROUP BY TABLE_ID HAVING COUNT(DISTINCT DATA_CENTER) > 1"
+      report: "count of colliding TABLE_IDs, and the max dc count"
+      decides: "whether the existing single-DC graph needs a data migration or only a constraint widening"
+    - id: PROBE-2
+      asks: "Is SCHED_TABLE ever blank or null?"
+      report: "count of rows with no SCHED_TABLE"
+      decides: "Option A requires the property present on every node — any blank rules A out"
+    - id: PROBE-3
+      asks: "Does SCHED_TABLE repeat WITHIN one data center?"
+      sql: "GROUP BY DATA_CENTER, SCHED_TABLE HAVING COUNT(*) > 1"
+      report: "count of repeating (DATA_CENTER, SCHED_TABLE) pairs"
+      decides: "Option A's key is only viable at zero. This is the fact BMC does not document."
+    - id: PROBE-4
+      asks: "Are there folders defined on a Control-M/Server the owning application does not run on?"
+      report: "count by data center, no folder names"
+      decides: "nothing structural — it measures the wrong-data-center exposure described below"
+  note: >
+    PROBE-4 exists because a team choosing the wrong data center is A KNOWN POSSIBILITY for
+    this estate: the job is defined, nothing errors, and nothing fires. It is recorded as a
+    failure mode the design must account for, NOT as a claimed incident, and no part of the
+    ruling depends on confirming it. It is the operational reason the grain matters: a merged
+    node reports the folder as present and scheduled — the union of both definitions — which
+    is worse than an absent node, because a missing answer sends someone looking and a
+    confidently wrong one stops the search.
+
+# ---------------------------------------------------------------------------
+# UI TEST CASE — interactive, in the Control-M planning domain. This is a WRITE
+# test and belongs in a NON-PRODUCTION environment, run by whoever holds Control-M
+# access. It exists because the corpus is SILENT on folder-name uniqueness: the
+# product's own behaviour is the only remaining authority below the SME.
+# ---------------------------------------------------------------------------
+ui_test_case:
+  id: UI-FOLDER-NAMING-SCHEDULING
+  venue: "Control-M planning domain (Workspace), NON-PRODUCTION Control-M/Server pair — never production"
+  why: >
+    BMC documents the folder name's character rules and calls it the folder's identifier, but
+    states no uniqueness scope for it — while stating one for job names twice. What the product
+    ENFORCES is therefore the fact the ruling needs, and it can only be read off the product.
+    Each step records the outcome AND the exact message text; a silent accept is itself a result.
+  precondition: "Two Control-M/Servers reachable from one workspace, referred to here as SERVER-1 and SERVER-2. Test folder name referred to as NAME-X. No real names on this page."
+  steps:
+    - id: UI-1
+      action: "Create a folder NAME-X on SERVER-1. Save to workspace, then check in."
+      records: "baseline — the folder exists, and its TABLE_ID as read from CM_DEF_VTAB after replication"
+    - id: UI-2
+      action: "Create a SECOND folder NAME-X on the SAME SERVER-1."
+      records: "accepted / rejected / warned, and the exact message. THIS IS THE CENTRAL QUESTION the corpus does not answer."
+    - id: UI-3
+      action: "Create a folder NAME-X on SERVER-2 (the different server)."
+      records: "accepted / rejected / warned, and the exact message. An accept confirms the SME direction from the product side: same name, two servers, two folders."
+    - id: UI-4
+      action: "If UI-3 was accepted: view both NAME-X folders in the planning tree and in Monitoring."
+      records: "whether the UI disambiguates them by server, and how. If the product itself cannot tell them apart on screen, that is a finding about the estate, not only about our graph."
+    - id: UI-5
+      action: "Rename NAME-X on SERVER-1, then re-read CM_DEF_VTAB."
+      records: "WHETHER TABLE_ID IS PRESERVED ACROSS THE RENAME. This decides Option B's only advantage over Option A — if a rename mints a new TABLE_ID, B does not survive renames either and the A-vs-B trade collapses to the ADR 0001 argument alone."
+    - id: UI-6
+      action: "On the renamed folder, inspect the references BMC says need manual update — conditional actions, event definitions, job prerequisites."
+      records: "which updated automatically and which broke. Sizes the real cost of a rename, which is what 'renames are rare' has to be judged against."
+    - id: UI-7
+      action: "Scheduling half. On a folder, set Order Method to each of Automatic (Daily), None (Manual Order), Specific User Daily; attempt to save with the Control-M/Server field cleared."
+      records: "that Control-M/Server is enforced as required at save time (the baseline says it is required — this confirms the product enforces it, which is what lets us treat it as identity-bearing rather than as an optional property)"
+    - id: UI-8
+      action: "Change a saved folder's Control-M/Server to the other server and save."
+      records: "whether the folder MOVES (same TABLE_ID, new DATA_CENTER) or a new definition is created. A move means data_center is mutable on a stable identity — which affects whether it may sit inside a NODE KEY at all, since a node key property cannot change without deleting and recreating the node."
+  caveat: >
+    UI-8 is the step most likely to change the ruling in an unexpected direction. If a folder can
+    be re-pointed at another Control-M/Server in place, then data_center is a MUTABLE property of
+    a stable folder, and putting it in a node key converts an ordinary edit into a delete-and-
+    recreate that loses the node's history. In that case the answer may be a composite key plus a
+    recorded server-migration event rather than a composite key alone — and the SCHEDULED_ON.since
+    audit trail the loader already maintains for exactly this purpose becomes the mechanism.
+
+# ---------------------------------------------------------------------------
+# The three node classes whose key changes. No NEW label and no NEW edge is
+# proposed — this gate re-grains existing identity, so the mapping table records
+# today's key beside the proposed one.
+# ---------------------------------------------------------------------------
+mapping:
+  - n: 1
+    element: "Folder (CM_DEF_VTAB row, IS_CURRENT_VERSION='Y')"
+    target: ":ControlMFolder:Collection — key TODAY {folder_id}; PROPOSED {data_center, folder_id} (B) or {data_center, sched_table} (A)"
+    edge: "(:ControlMFolder)-[:SCHEDULED_ON]->(:ControlMServer)  [EXISTING — the edge is already correct; the folder NODE is what merges]"
+  - n: 2
+    element: "Job (CM_DEF_VJOB row joined to its folder)"
+    target: ":ControlMJob — key TODAY (folder_id, job_id); PROPOSED (data_center, folder_id, job_id)"
+    edge: "—  [inherits the folder's grain; no edge change]"
+  - n: 3
+    element: "Condition (in/out prerequisite scoped to a folder)"
+    target: ":Condition — key TODAY (folder_id, name); PROPOSED (data_center, folder_id, name)"
+    edge: "—  [inherits the folder's grain; no edge change]"
+  - n: 4
+    element: "Data center (CM_DEF_VTAB.DATA_CENTER)"
+    target: ":ControlMServer:Platform {name} — UNCHANGED, already UNIQUE and already one node per value"
+    edge: "—  [recorded so the page is explicit that the server node was never the defect]"
+
+provenance:
+  - label: ":ControlMFolder (re-grained)"
+    source_object: "psgmgr CM_DEF_VTAB"
+    key: "PROPOSED (DATA_CENTER, TABLE_ID) — option B; or (DATA_CENTER, SCHED_TABLE) — option A"
+    loader: "drydocs/loaders/cypher/controlm_folders.cypher (MERGE pattern changes with the ruling)"
+    properties:
+      - {name: data_center, origin: source, from: DATA_CENTER, note: "short Control-M server code in this family (LOAD2); ENTERS THE KEY under both options — mutability tested by UI-8"}
+      - {name: folder_id, origin: source, from: TABLE_ID, note: "vendor-internal surrogate; documented nowhere in the BMC corpus; key under option B, plain property under A"}
+      - {name: sched_table, origin: source, from: SCHED_TABLE, note: "the folder name BMC calls the folder's identifier; key under option A — blank/duplicate census is PROBE-2/PROBE-3"}
+      - {name: app_code, origin: derived, from: "folder_name.parse_folder_name(SCHED_TABLE)", note: "unchanged by this gate; listed because it is derived FROM the candidate key A"}
+  - label: ":ControlMJob / :Condition (re-grained)"
+    source_object: "psgmgr CM_DEF_VJOB × CM_DEF_VTAB"
+    key: "PROPOSED (DATA_CENTER, TABLE_ID, JOB_ID) / (DATA_CENTER, TABLE_ID, condition name)"
+    loader: "drydocs/loaders/cypher/controlm_jobs.cypher, controlm_conditions_in.cypher, controlm_conditions_out.cypher"
+    properties:
+      - {name: data_center, origin: source, from: DATA_CENTER, note: "carried down from the folder; the extract join at controlm_folders.sql:60 gains the predicate in the same change"}
+      - {name: folder_id, origin: source, from: TABLE_ID, note: "remains the join key to the folder regardless of which option wins"}
+      - {name: job_id, origin: source, from: JOB_ID, note: "unchanged"}
+
+sections:
+  - title: "A. The grain (SME direction 2026-09-04, recorded for confirmation)"
+    confirmations:
+      - "Folder identity carries the data center: two folders of the same name on two Control-M/Servers are two folders, not one."
+      - "The same rule extends to :ControlMJob and :Condition, both of which key on folder_id today and inherit the defect."
+      - "The vendor baseline supports the grain independently: Control-M/Server is REQUIRED on every folder and determines its execution environment (controlm-folder-creation.md:44)."
+      - "This matches the host layer, signed at controlm-hosts-topology 2026-07-09, whose controlmhostgroup_key is (data_center, name) for the same reason."
+  - title: "B. Which key (the decision this page exists for)"
+    confirmations:
+      - "Option B (data_center, folder_id) is the page's recommendation: smallest change, keeps the jobs/conditions join key, data-center half vendor-grounded."
+      - "Option A (data_center, sched_table) is better under ADR 0001 (business key, re-linkable after rebuild) and becomes the recommendation if PROBE-2 and PROBE-3 return zero AND the SME rules renames rare."
+      - "Option C (sched_table alone) is ruled out on the page: it does not fix the merge."
+      - "The choice is NOT decided by the probe alone — rename frequency is an SME fact, not a query."
+  - title: "C. Mechanism — the constraint is not the fix"
+    confirmations:
+      - "A constraint validates; MERGE decides identity. Whichever key is ruled, drydocs/loaders/cypher/controlm_folders.cypher's MERGE pattern changes with it."
+      - "The extract-side join (controlm_folders.sql:60) gains the data-center predicate in the same change; the guarded form already exists commented out in the staging DDL."
+      - "This is a node-key migration on live constraints, so it carries a migration cypher on the migrate_*.cypher precedent and is idempotent."
+  - title: "D. Evidence owed before signing"
+    confirmations:
+      - "PROBE-1..4 readout transcribed onto this page (counts only, venue named)."
+      - "UI-1..8 outcomes transcribed onto this page, each with the product's exact message where one appeared."
+      - "UI-5 specifically: whether TABLE_ID survives a rename. Option B rests on it."
+      - "UI-8 specifically: whether data_center is mutable in place. If it is, the node-key form is reopened per the caveat above."
+  - title: "E. Held, and explicitly not decided here"
+    confirmations:
+      - "The multi-data-center load stays HELD until this page is signed — the single-data-center pilot structurally cannot expose the collision, and per-data-center extraction over multiple production data centers is exactly the regime where it fires."
+      - "No constraint is dropped or created, no MERGE pattern changes, no migration runs from this page alone."
+      - "The controlm-hosts-topology residual P3 (DC-domain match vs CM_DEF_VTAB) is adjacent and partly answered by LOAD2's two-domain registry; closing it is not this gate's business."
+  - title: "F. Sign-off"
+    confirmations:
+      - "This page was prepared with the SME NOT present — nothing here is confirmed."
+      - "Safe to transcribe into config/gate-log.md once an SME has reviewed this page and recorded the calls (A grain, B key choice, C mechanism scope, D evidence accepted)."
