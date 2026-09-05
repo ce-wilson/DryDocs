@@ -746,6 +746,37 @@ rows:
       already records why: "both sides run their own plan against OVERLAPPING
       ids". The bands remove the id collision; that rule still governs genuinely
       shared items.
+  - path: "tests/unit/test_config_identity_header.py"
+    disposition: per-entry
+    entry_rule: >
+      The J58 guard (2026-09-05): one JSON Schema for the identity header, and a
+      DEFAULT-DENY walk over every tracked YAML - a file in no declared class
+      fails. The walk, the schema binding and the header assertions are
+      mechanism and cross whole. The CLASSES dict is per-side DATA on the
+      test_backlog.py shape: it declares which tracked YAML files carry which
+      header class and why, and a company-only YAML (its own taxonomy rows,
+      gate prompts, source registries) is in no producer class by construction,
+      so the guard goes red on arrival BY DESIGN and the company adds its own
+      entries with their reason. Take the test whole; keep every company-only
+      CLASSES entry; never delete an entry because the producer has no such
+      file. The schema it binds (config/schemas/identity-header.schema.json) is
+      canonical-producer by the config/** default.
+    note: "J58 (2026-09-05, 182523e7). Row added at the sixth roll so the tests/** default cannot revert the company's CLASSES entries at the next port."
+  - path: "tests/unit/test_publish_boundary_history_ceiling.py"
+    disposition: per-entry
+    entry_rule: >
+      The J74 guard (2026-09-05): the retired acronym may not appear in a NEW
+      commit message, enforced as a ceiling over the whole history - the count
+      may never rise above the number recorded. The mechanism (the log walk, the
+      token read from internal/cdo-reference/README.md, fail-closed when the
+      README is absent, exactly like J55) crosses whole. CEILING is per-side
+      DATA: the producer MEASURED its 34 on its own 2,057-commit history and
+      ruled that a push carries history, so the 34 are accepted and frozen. The
+      company's history is disjoint and its count is its own - measure it with
+      the test's own log command, set the company CEILING with the recorded
+      reason, and keep it. A port never copies the producer's number over the
+      company's; the number is what the guard protects, not what it ships.
+    note: "J74 (2026-09-05, 74cd5990 + b65626fe). Row added at the sixth roll for the same reason as test_config_identity_header.py."
   - path: "tests/unit/test_taxonomy_ontology_map.py"
     disposition: canonical-producer
     note: "the map guard (2026-07-09); consumer's map content differs, the guard is content-agnostic"
