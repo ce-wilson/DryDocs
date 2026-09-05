@@ -13,9 +13,24 @@ depends_on:
 - API1
 inputs:
 - docs/reviews/modules/web-2026-09-05.md
+- web/src/explorer/SpecGrid.tsx
+- web/src/components/GraphCanvas.tsx
+- web/src/lib/nvl-mapping.ts
+- web/src/lib/graph.ts
 acceptance: |
-  STUB - body follows in the next commit (mint rule I6).
-notes: 'Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md,
-  part B). Stub pushed before the body per the mint rule.
+  (a) SpecGrid renders a TRUNCATED n/N badge whenever the result's `truncated` field (API1) is
+      true - the same badge, same wording and same placement the canvas uses for its node
+      ceiling, so one vocabulary of completeness serves both surfaces.
+  (b) The two server-export buttons stop saying "full" unless the export manifest says
+      `truncated: false`; otherwise the label states the ceiling ("first 500 rows") and the
+      status line after export says what was exported, including the cap.
+  (c) Where API1 made the ceiling raisable, the export path offers it; where it did not, the
+      button says so rather than implying completeness.
+  (d) A vitest covers the capped and the uncapped case for the grid, mirroring the two canvas
+      tests, and asserts the badge is driven by the typed field and not by `rows.length`.
+notes: |
+  Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
 
-  '
+  Covers S1's console half. Depends on API1 because rendering completeness from a heuristic
+  (`rows.length === 500`) would be a second source of truth for the same fact - the shape the
+  whole report warns against.

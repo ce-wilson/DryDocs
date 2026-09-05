@@ -13,9 +13,53 @@ status: todo
 depends_on: []
 inputs:
 - docs/reviews/modules/web-2026-09-05.md
+- web/src/explorer/SpecGrid.tsx
+- web/src/components/SpecGraphPane.tsx
+- web/src/routes/OverviewRoute.tsx
+- web/src/routes/LoadsRoute.tsx
+- web/src/routes/MappingsRoute.tsx
+- web/src/lib/corpusStatus.ts
+- web/src/components/TrustLegend.tsx
+- web/src/lib/reachability.ts
+- drydocs_api/app.py
 acceptance: |
-  STUB - body follows in the next commit (mint rule I6).
-notes: 'Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md,
-  part B). Stub pushed before the body per the mint rule.
+  Whether the numbers on screen came from the graph or from a constant in the bundle is the
+  console's most important trust signal, and today five routes decide it five different ways
+  (A5). After this item there is ONE way.
 
-  '
+  (a) A `useLiveOrDemo` seam returns a discriminated union - `live | empty | demo | error` -
+      and is the ONLY path by which a route may reach one of the eleven demo modules
+      (demoGraph, demoLineage, demoLoads, demoOwnership, demoProductRollup, demoRemediation,
+      demoRunbooks, demoDocs, demoSwimlane, demoStatus, mappingsDemo). `empty` and `error` are
+      distinct states: a request that failed is never rendered as a result that was empty.
+  (b) One presentational component renders the provenance state, and every route that can
+      show demo data renders it. The SYNTHESIZED watermark, the LIVE/DEMO badge and the
+      TrustLegend agree with the union, not with a per-route string.
+  (c) A source-scan guard (vitest) fails when any file outside the seam imports a demo module -
+      the same enforcement shape the parent repo uses for render parsing (J37) and code-not-prose
+      reads (J66): the seam is the only path because a test says so, not because a comment asks.
+  (d) One readiness probe at shell mount calls `/health` (public today, uncalled by anything in
+      web/src) so the console says "the API is down" once, instead of eleven modules each
+      discovering it at the moment they fail. It shares its implementation with O63's probe -
+      one probe, three surfaces (shell, Ask ladder, admin strip) - and never invents a green
+      (O56 rule: a probe that could not run renders "not checked").
+  (e) Every fallback activation is counted and the count is visible to an operator (a counter
+      on the admin status strip is enough); a console quietly serving fabricated numbers is the
+      exact failure the rest of the provenance machinery exists to prevent (S8).
+  (f) Loading is no longer modelled as data-is-still-null: the union carries a `loading` state
+      or the seam composes with WEB12's hook so that loading, loaded-empty and hung are three
+      screens, not one.
+notes: |
+  Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+  Covers A5 (rank 2 in the report), S6's readiness half and S8's fallback counter. Ranked first
+  by the architecture pass because the product thesis is provenance and this is where the
+  console contradicts it.
+
+  ADR CANDIDATE: "provenance state of rendered data is a typed union, not a per-route
+  convention." The item can build the seam without the ADR; the ADR records why a route may
+  never reach a demo module directly, so the next route added does not.
+
+  Build order: WEB12 (the data-layer hook) first or alongside, or the seam's transport half is
+  written twice. O63 (todo) owns the probe's Ask and admin surfaces; this item adds the shell
+  mount and must reuse, not fork, that probe.

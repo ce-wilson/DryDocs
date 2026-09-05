@@ -12,9 +12,25 @@ status: todo
 depends_on: []
 inputs:
 - docs/reviews/modules/web-2026-09-05.md
+- web/tsconfig.app.json
+- web/tsconfig.node.json
+- web/src/generated/api.d.ts
 acceptance: |
-  STUB - body follows in the next commit (mint rule I6).
-notes: 'Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md,
-  part B). Stub pushed before the body per the mint rule.
+  Neither tsconfig sets `strict`, `strictNullChecks` or `noImplicitAny`; the Vite React-TS
+  template ships strict true, so this was removed or written out (A3). The O70 architecture's
+  central claim - a server change the console has not caught up with is a tsc error - is only
+  partly cashed while optional fields in the generated api.d.ts are not enforced.
 
-  '
+  (a) `strict: true` in both tsconfigs; `tsc -b` and `npm run build` pass on the whole of
+      web/src with no `@ts-expect-error` or `@ts-ignore` added to get there (a source scan
+      asserts the count of those directives does not rise from today's baseline).
+  (b) Every error the flag surfaces is fixed at its site, not silenced by a cast; where a fix
+      needs the row-shape validator (WEB6) the site is listed in this item's done-note and WEB6
+      picks it up, so nothing is left half-typed and unrecorded.
+  (c) The web CI job runs the same `tsc -b` it runs today, so the setting is enforced from the
+      commit that lands it.
+notes: |
+  Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+  Covers A3 (rank 5, shared with T2 and T5 as one root). Build this BEFORE WEB6 and WEB8 - a
+  validator and a typed client mean nothing while the compiler is off.

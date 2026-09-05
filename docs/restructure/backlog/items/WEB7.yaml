@@ -13,9 +13,39 @@ status: todo
 depends_on: []
 inputs:
 - docs/reviews/modules/web-2026-09-05.md
+- web/vite.config.ts
+- web/src/App.tsx
+- web/src/routes/AdminConfigRoute.tsx
+- web/src/generated/enforcement-matrix.json
+- web/src/generated/gates.json
+- .github/workflows/ci.yml
+- PUBLISH-BOUNDARY.md
 acceptance: |
-  STUB - body follows in the next commit (mint rule I6).
-notes: 'Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md,
-  part B). Stub pushed before the body per the mint rule.
+  There is no code splitting - vite.config.ts is three lines, no React.lazy or dynamic import
+  exists in web/src, and the build is one 3,676,794-byte chunk. Every generated artifact is a
+  static import, so a user-tier persona downloads the full enforcement matrix (275 KB) and the
+  gate record (44 KB) for routes it can never open and can read both from devtools; the route
+  gate is a render decision, not a delivery decision (A4).
 
-  '
+  (a) React.lazy on AdminConfigRoute and the Locations tab, then the steward routes, so the
+      role-gated artifacts (about 420 KB raw) load only for a persona whose gate passes. The
+      split follows the authorization boundary, not file size - a chunk is admissible to a
+      role or it is not.
+  (b) A bundle-size ceiling in the web CI job asserts the initial chunk against a recorded
+      number and fails when it grows past it (S8); the number is recorded in the job, with the
+      date, and ratchets down, never up, without a note.
+  (c) The item RECORDS the publish-boundary answer for each generated artifact shipped to the
+      browser - which are Internal-Public and safe in any bundle, and which the split exists to
+      keep from a role - by citing each artifact's source classification; if any artifact turns
+      out to carry Internal values, that is a finding for the HITL gate, not a bundle decision.
+  (d) The generation pipeline is unchanged; the drift tests over web/src/generated still pass.
+notes: |
+  Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+  Covers A4 (rank 10) and S8's bundle-budget half. O34 (done) cleared the npm advisories and
+  explicitly DEFERRED code splitting; this item is that deferral coming due, with the reason A4
+  adds - the delivery-versus-render distinction - which O34 did not have.
+
+  ADR CANDIDATE: "the code-splitting boundary follows the authorization boundary." S3 / WEB10
+  notes there is partly no splitting decision because there is no deployment decision to make
+  one against; build (a) and (b) regardless, they are correct under any delivery shape.

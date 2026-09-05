@@ -12,9 +12,30 @@ status: todo
 depends_on: []
 inputs:
 - docs/reviews/modules/web-2026-09-05.md
+- web/README.md
+- web/src/App.tsx
+- web/src/modules/registry.ts
+- web/src/lib/auth.ts
 acceptance: |
-  STUB - body follows in the next commit (mint rule I6).
-notes: 'Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md,
-  part B). Stub pushed before the body per the mint rule.
+  web/README.md is materially wrong on the security model in four places (A8): it says there
+  is no `?as=` parameter (App.tsx has one, DEV-only, requiring VITE_DEV_CONSOLE_SECRET); it says
+  nine module routes (registry.ts declares twelve); it says all modules are open to every
+  signed-in persona and only /console is role-gated (five modules carry access 'sme' and
+  App.tsx gates six routes plus /console, /admin/config and /intake); and its persona table
+  carries the three SID-shaped names auth.ts retired on 2026-08-28 for publish-boundary
+  reasons. A doc that understates the authorization surface is the doc a company-side reader
+  reaches first.
 
-  '
+  (a) The README states the model the code implements: the DEV-only `?as=` affordance and its
+      secret gate; the module count and each module's access level, read from registry.ts; the
+      route gates; the six personas by their current names and roles.
+  (b) Where WEB3 lands first, the README describes the derived gate; where it has not, the
+      README says the two expressions exist and cites WEB3 - it never describes a state the
+      code is not in.
+  (c) A test keeps the module count and access table in the README equal to registry.ts
+      (rendered from the importable object, J37 style), so the fourth drift does not happen.
+notes: |
+  Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+  Covers A8 (rank 14). Point 3 - understating the authorization surface - is why this is p2
+  and not p3.

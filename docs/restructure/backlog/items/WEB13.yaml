@@ -13,9 +13,41 @@ status: todo
 depends_on: []
 inputs:
 - docs/reviews/modules/web-2026-09-05.md
+- web/package.json
+- web/.oxlintrc.json
+- .github/workflows/ci.yml
+- web/src/layout/useRouteA11y.ts
+- web/src/routes/AdminConfigRoute.tsx
+- web/src/routes/explorer/ExplorerRoute.tsx
+- web/src/components/TowerIcon.tsx
+- config/taxonomy/ui-tests.yaml
 acceptance: |
-  STUB - body follows in the next commit (mint rule I6).
-notes: 'Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md,
-  part B). Stub pushed before the body per the mint rule.
+  Four numbers drift with nothing under them (T1, T2, T7, T8): statement coverage is 7.51
+  percent (955 / 12,716) with `@vitest/coverage-v8` declared and no script, CI step or
+  threshold; lint emits ten warnings and exits 0 with no `--max-warnings`; the advisory count
+  went from three at O34 to five with no audit step to notice; and a dead file and a dead
+  dependency sit unflagged. Plus three `eslint-disable-next-line react-hooks/exhaustive-deps`
+  lines suppress a rule that has never run - there is no ESLint in the project and
+  `.oxlintrc.json` enables only `react/rules-of-hooks` and `react/only-export-components`.
 
-  '
+  (a) `test:coverage` script in package.json; the web CI job runs it with a statement floor
+      at today's number (7.51, recorded with the date) that only ratchets up. Coverage growth
+      itself is O43's work (the seed suites); this item is the gate, not the tests.
+  (b) `--max-warnings 0` on the lint step; the ten warnings are fixed or individually waived
+      in config with a reason.
+  (c) `react-hooks/exhaustive-deps` enabled in oxlint (or the equivalent rule the linter
+      offers); the three inert suppressions are deleted and each site's deliberate omission is
+      re-expressed as a real, scoped suppression or a fix - never carried as fiction.
+  (d) A warn-only `npm audit --audit-level=high` step in the web CI job (report, never block -
+      the same posture as the snapshot ritual's lint check), so the count is read every run.
+  (e) `src/components/TowerIcon.tsx` and the `clsx` dependency are removed. Optional residue,
+      not acceptance: fold src/docs/ and src/docsmod/ into one directory; move
+      src/data/mappingsDemo.ts and routes/AppCodeCascadePane.tsx to their feature directories.
+notes: |
+  Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+  Covers T1, T2, T7, T8 - the tech-debt pass's "cheap ratchet". A7 (test topology inverted) is
+  T1 with a measurement attached and is not a separate item; O43 (todo) seeds the suites that
+  move the floor. O34 (done) recorded the advisory count as three; it is five now, root
+  `@neo4j-nvl/base -> @segment/analytics-next`, none of it reaching dist - the finding is the
+  unobserved drift, not the CVEs.

@@ -13,9 +13,32 @@ depends_on:
 - WEB4
 inputs:
 - docs/reviews/modules/web-2026-09-05.md
+- web/src/lib/graph.ts
+- web/src/explorer/SpecGrid.tsx
+- web/src/routes/MappingsRoute.tsx
+- web/src/routes/LoadMapRoute.tsx
+- web/src/routes/LoadsRoute.tsx
+- web/src/routes/IntakeRoute.tsx
+- web/src/routes/SoftwareRoute.tsx
+- web/src/routes/AppCodeCascadePane.tsx
 acceptance: |
-  STUB - body follows in the next commit (mint rule I6).
-notes: 'Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md,
-  part B). Stub pushed before the body per the mint rule.
+  Twenty-one `as unknown as` casts cluster at one seam - a spec result's untyped rows crossing
+  into a typed row (`res.rows as unknown as LocationRow[]`) in FileReport, LocationMap,
+  AppCodeCascadePane, IntakeRoute, LoadMapRoute, LoadsRoute, MappingsRoute and SoftwareRoute
+  (T5). The compiler is switched off exactly where the server contract meets the render.
 
-  '
+  (a) One runtime row-shape validator at the seam: given a spec id and its rows, it checks the
+      columns the row type requires and returns typed rows or a readable message naming the
+      spec, the missing or mistyped column and the row index. Where a spec's columns are
+      declared server-side (query_specs `columns`), the validator reads them - never a second
+      hand-typed list.
+  (b) All twenty-one double casts are gone; a source scan (J66 style, code only) asserts the
+      count of `as unknown as` under web/src is zero, so the seam cannot re-grow.
+  (c) A row that fails validation renders the message in place of the panel (WEB5's boundary
+      is the backstop, not the presentation) and is counted where WEB1 counts fallbacks.
+  (d) Tests cover a conforming row set, a missing column and a wrong type for two specs.
+notes: |
+  Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+  Covers T5 (rank 5, one root with A3 and T2). Depends on WEB4: without strictNullChecks the
+  validator's own return type is not enforced either.

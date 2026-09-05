@@ -12,9 +12,22 @@ status: todo
 depends_on: []
 inputs:
 - docs/reviews/modules/web-2026-09-05.md
+- web/src/App.tsx
+- web/src/layout/Aside.tsx
 acceptance: |
-  STUB - body follows in the next commit (mint rule I6).
-notes: 'Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md,
-  part B). Stub pushed before the body per the mint rule.
+  There is no ErrorBoundary and no componentDidCatch in web/src; React 19 unmounts the whole
+  tree on an uncaught render error, so one bad row produces a white page with no navigation and
+  no way back but a reload (S7).
 
-  '
+  (a) One error boundary per route outlet, keyed on pathname so navigation clears it; a render
+      throw in one route leaves the shell, the nav and every other route usable.
+  (b) The fallback panel shows the error message verbatim (the O63 honesty rule - the exact
+      string is what a reader pastes into a ticket) and a retry affordance; it never shows a
+      stack trace or any value from the data that threw.
+  (c) A vitest renders a route that throws and asserts the shell survives and the panel shows.
+notes: |
+  Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+  Covers S7 (rank 9). About twenty lines; worth more once WEB4 is on (the compiler catches the
+  nulls) and WEB6 lands (a failed cast becomes a message, not a throw) - but this is the floor
+  under both and is independent of them.

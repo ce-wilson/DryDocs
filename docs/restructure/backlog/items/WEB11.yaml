@@ -12,9 +12,29 @@ status: todo
 depends_on: []
 inputs:
 - docs/reviews/modules/web-2026-09-05.md
+- web/src/lib/auth.ts
+- web/src/routes/AskRoute.tsx
+- web/src/lib/theme.ts
+- web/src/routes/AppCodeCascadePane.tsx
 acceptance: |
-  STUB - body follows in the next commit (mint rule I6).
-notes: 'Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md,
-  part B). Stub pushed before the body per the mint rule.
+  `signOut()` removes `drydocs.session.v2` and revokes the token; seven other localStorage
+  writers stay - the Ask last completed turn (answer, executed Cypher, per-step row counts,
+  task graph; per persona), the app-code tray (per persona), onboarding progress, aside
+  collapsed, theme, split-pane position, grid column widths. The first two are query results
+  readable after sign-out by whoever opens the browser next, under a console that renders an
+  INTERNAL banner over the same data on screen. `sessionRejected()` has the same gap (S4).
 
-  '
+  (a) One storage module owns every console key: a prefix, a version, typed get/set, and a
+      `clearAll()`. No `localStorage.` call exists outside it (source scan, J66 style).
+  (b) Both `signOut()` and `sessionRejected()` call `clearAll()`.
+  (c) Keys worth keeping across sign-outs (theme, aside collapsed, column widths) OPT OUT
+      explicitly in the module, so the retention decision is visible in one place; the Ask turn
+      and the tray do not opt out. O64's design - the last completed turn survives navigation
+      within a session - is preserved exactly; it is sign-out, not navigation, that clears it.
+  (d) A test signs out with every key populated and asserts only the opted-out keys remain;
+      another does the same through `sessionRejected()`.
+notes: |
+  Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+  Covers S4 (rank 6). O64 (done) chose per-persona persistence of the Ask turn for a good
+  reason (loss on navigation); this item respects that choice and bounds it at the session.

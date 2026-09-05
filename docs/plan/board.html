@@ -2129,8 +2129,37 @@ resolved from it). Capture it to understand the export; assert only from the exp
 MODEL fable because (b) is a schema decision on a registry every loader reads, and (f) decides
 what an unlabeled existing entry becomes. Related: N26, J23, the classification layer.
 </p></div></div>
-<div class="card ready" id="card-API1" data-id="API1" data-module="drydocs-api" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="api1 result completeness is part of the read contract - every spec result says whether the 500-row ceiling capped it, and the export manifest records truncated plus the ceiling instead of filing a capped extract as the answer" tabindex="0"><div class="card-head"><span class="card-id">API1</span><span class="card-title">Result completeness is part of the read contract - every spec result says whether the 500-row ceiling capped it, and the export manifest records truncated plus the ceiling instead of filing a capped extract as the answer</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-api</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> STUB - body follows in the next commit (mint rule I6).
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B). Stub pushed before the body per the mint rule.
+<div class="card ready" id="card-API1" data-id="API1" data-module="drydocs-api" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="api1 result completeness is part of the read contract - every spec result says whether the 500-row ceiling capped it, and the export manifest records truncated plus the ceiling instead of filing a capped extract as the answer" tabindex="0"><div class="card-head"><span class="card-id">API1</span><span class="card-title">Result completeness is part of the read contract - every spec result says whether the 500-row ceiling capped it, and the export manifest records truncated plus the ceiling instead of filing a capped extract as the answer</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-api</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Every QuerySpec shares one `_LIMIT` parameter, default 500, applied as `LIMIT $limit`. A spec
+whose true answer is 900 rows returns 500 and nothing in the response says so; the server
+export re-applies the same bound params, streams exactly 500 rows and registers a provenance
+manifest with `row_count: 500` and no field saying the extract was capped (S1). After this
+item the READ CONTRACT carries completeness.
+
+(a) Every spec result carries `truncated: bool` and the `limit` that applied. Cheapest
+    mechanism, the builder chooses and records: run with `limit + 1` and report whether the
+    extra row existed, or return a pre-limit count where the Cypher can afford it.
+(b) The export manifest records `truncated` and the ceiling beside `row_count`. A manifest
+    that describes a capped extract says so in the artifact itself, because the manifest is
+    the governance record and outlives the screen that produced it.
+(c) The export path can run WITHOUT the display limit, or with a caller-raised one, so the
+    other 400 rows are obtainable from the console at all - today no surface can raise it.
+(d) `drydocs_api.schemas` models both fields so the O70 generated client picks them up and
+    WEB2 renders them from typed fields, not from a heuristic on `rows.length === limit`.
+(e) Tests: a spec fixture with more rows than the limit yields `truncated: true`; one with
+    fewer yields `false`; the export manifest for each records the matching value; the
+    OpenAPI drift test (tests/unit/test_openapi_client.py) is regenerated, not hand-edited.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+Covers S1&#x27;s server half, ranked first across all three passes. The console half is WEB2,
+which depends on this item.
+
+ADR CANDIDATE: &quot;result completeness is part of the read contract - no export may be labelled
+complete without it.&quot; The canvas already solved this for nodes (NODE_CEILING = 300 with a
+TRUNCATED n/N badge and two tests in GraphCanvas / nvl-mapping); this item gives the API the
+same property so every consumer inherits it.
+
+R15 (todo) is the Ask cousin - exact versus lower-bound labelling on query answers. Same
+principle, different surface; link, do not merge.
 </p></div></div>
 <div class="card ready" id="card-G85" data-id="G85" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="requirement" data-status="todo" data-search="g85 agent lookup beside the fix diff — cite the vendor→standards→team chain from the verified bmc corpus" tabindex="0"><div class="card-head"><span class="card-id">G85</span><span class="card-title">Agent lookup beside the fix diff — cite the vendor→standards→team chain from the verified BMC corpus</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">requirement</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> DETERMINISTIC FIRST, AGENT SECOND (user direction 2026-08-12): every remediation decision stays with the rules engine and the xml_io post-conditions; the agent never decides. It answers &quot;why is this the rule?&quot; and &quot;does the vendor actually say that?&quot; beside the SME diff, walking the three tiers that are ALREADY the ratified precedence order (CLAUDE.md section 4) -- (1) VENDOR: what BMC says the object is, from external/orchestration/bmc-controlm/ (the BASELINE); (2) PLATFORM STANDARDS APPLIED: how knowledge/standards/ + the R1-R28 rules registry refine it; (3) TEAM: who owns the thing being changed (LOB-&gt;Product-&gt;Team, SEAL/escalation routing). So the surface is a visualization of the existing precedence chain, not a new concept. HARD REQUIREMENTS: (a) every answer cites its corpus doc AND its trust level -- an answer sourced from a [GROUNDED search-snippets-only] capture (e.g. the XML-definition stub) must say so, never present it as vendor ground truth (the SOURCE-MANIFEST trust ladder is the contract); (b) read-only, no graph write -- consistent with the remediation module invariant; (c) precomputed material rides the generated-artifact pattern; a live agent call is its own seam, never a QuerySpec; (d) the FULL BMC scrape is loaded first -- declared as this feature&#x27;s substrate in drydocs_remediation/module-requirements.md section 3, with the 403- blocked fetch list re-run from a network that reaches documents.bmc.com. GATED BEHIND the fix-diff surface existing (it reviews a diff; without one it reviews nothing). Precedents: the Q&amp;A console for the answer surface; docmeta for citation handling.
 </p><p class="notes"><strong>Notes:</strong> Groomed from the 2026-08-12 user follow-up (&quot;an agent query against the verified bmc documentation, to show vendor, then the platform standards applied, then the team&quot;). Scope-noted as its own epic slice, larger than the defect fixes it rode in with; most useful once a real (non-demo) fix diff exists to review beside it.
@@ -2394,50 +2423,358 @@ beside the doc ones in `docs/design/feedback/` or in their own directory. It dep
 whether `doc:` can name a console route without confusing the graph loader, which is a
 question for whoever builds (a) with the loader in front of them.
 </p></div></div>
-<div class="card ready" id="card-WEB1" data-id="WEB1" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web1 provenance of rendered data is a typed union - one useliveordemo seam and one provenance component replace the five per-route try-live-else-demo fallbacks, a shell-mount readiness probe answers &quot;is the api down&quot; once, and every fallback activation is counted" tabindex="0"><div class="card-head"><span class="card-id">WEB1</span><span class="card-title">Provenance of rendered data is a typed union - one useLiveOrDemo seam and one provenance component replace the five per-route try-live-else-demo fallbacks, a shell-mount readiness probe answers &quot;is the API down&quot; once, and every fallback activation is counted</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> STUB - body follows in the next commit (mint rule I6).
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B). Stub pushed before the body per the mint rule.
+<div class="card ready" id="card-WEB1" data-id="WEB1" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web1 provenance of rendered data is a typed union - one useliveordemo seam and one provenance component replace the five per-route try-live-else-demo fallbacks, a shell-mount readiness probe answers &quot;is the api down&quot; once, and every fallback activation is counted" tabindex="0"><div class="card-head"><span class="card-id">WEB1</span><span class="card-title">Provenance of rendered data is a typed union - one useLiveOrDemo seam and one provenance component replace the five per-route try-live-else-demo fallbacks, a shell-mount readiness probe answers &quot;is the API down&quot; once, and every fallback activation is counted</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Whether the numbers on screen came from the graph or from a constant in the bundle is the
+console&#x27;s most important trust signal, and today five routes decide it five different ways
+(A5). After this item there is ONE way.
+
+(a) A `useLiveOrDemo` seam returns a discriminated union - `live | empty | demo | error` -
+    and is the ONLY path by which a route may reach one of the eleven demo modules
+    (demoGraph, demoLineage, demoLoads, demoOwnership, demoProductRollup, demoRemediation,
+    demoRunbooks, demoDocs, demoSwimlane, demoStatus, mappingsDemo). `empty` and `error` are
+    distinct states: a request that failed is never rendered as a result that was empty.
+(b) One presentational component renders the provenance state, and every route that can
+    show demo data renders it. The SYNTHESIZED watermark, the LIVE/DEMO badge and the
+    TrustLegend agree with the union, not with a per-route string.
+(c) A source-scan guard (vitest) fails when any file outside the seam imports a demo module -
+    the same enforcement shape the parent repo uses for render parsing (J37) and code-not-prose
+    reads (J66): the seam is the only path because a test says so, not because a comment asks.
+(d) One readiness probe at shell mount calls `/health` (public today, uncalled by anything in
+    web/src) so the console says &quot;the API is down&quot; once, instead of eleven modules each
+    discovering it at the moment they fail. It shares its implementation with O63&#x27;s probe -
+    one probe, three surfaces (shell, Ask ladder, admin strip) - and never invents a green
+    (O56 rule: a probe that could not run renders &quot;not checked&quot;).
+(e) Every fallback activation is counted and the count is visible to an operator (a counter
+    on the admin status strip is enough); a console quietly serving fabricated numbers is the
+    exact failure the rest of the provenance machinery exists to prevent (S8).
+(f) Loading is no longer modelled as data-is-still-null: the union carries a `loading` state
+    or the seam composes with WEB12&#x27;s hook so that loading, loaded-empty and hung are three
+    screens, not one.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+Covers A5 (rank 2 in the report), S6&#x27;s readiness half and S8&#x27;s fallback counter. Ranked first
+by the architecture pass because the product thesis is provenance and this is where the
+console contradicts it.
+
+ADR CANDIDATE: &quot;provenance state of rendered data is a typed union, not a per-route
+convention.&quot; The item can build the seam without the ADR; the ADR records why a route may
+never reach a demo module directly, so the next route added does not.
+
+Build order: WEB12 (the data-layer hook) first or alongside, or the seam&#x27;s transport half is
+written twice. O63 (todo) owns the probe&#x27;s Ask and admin surfaces; this item adds the shell
+mount and must reuse, not fork, that probe.
 </p></div></div>
-<div class="card" id="card-WEB2" data-id="WEB2" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web2 the grid renders the row ceiling the way the canvas already renders its node ceiling - a truncated n/n badge on capped results, and no export button says &quot;full&quot; unless the manifest says complete" tabindex="0"><div class="card-head"><span class="card-id">WEB2</span><span class="card-title">The grid renders the row ceiling the way the canvas already renders its node ceiling - a TRUNCATED n/N badge on capped results, and no export button says &quot;full&quot; unless the manifest says complete</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-API1" data-target="card-API1">API1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> STUB - body follows in the next commit (mint rule I6).
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B). Stub pushed before the body per the mint rule.
+<div class="card" id="card-WEB2" data-id="WEB2" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web2 the grid renders the row ceiling the way the canvas already renders its node ceiling - a truncated n/n badge on capped results, and no export button says &quot;full&quot; unless the manifest says complete" tabindex="0"><div class="card-head"><span class="card-id">WEB2</span><span class="card-title">The grid renders the row ceiling the way the canvas already renders its node ceiling - a TRUNCATED n/N badge on capped results, and no export button says &quot;full&quot; unless the manifest says complete</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-API1" data-target="card-API1">API1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) SpecGrid renders a TRUNCATED n/N badge whenever the result&#x27;s `truncated` field (API1) is
+    true - the same badge, same wording and same placement the canvas uses for its node
+    ceiling, so one vocabulary of completeness serves both surfaces.
+(b) The two server-export buttons stop saying &quot;full&quot; unless the export manifest says
+    `truncated: false`; otherwise the label states the ceiling (&quot;first 500 rows&quot;) and the
+    status line after export says what was exported, including the cap.
+(c) Where API1 made the ceiling raisable, the export path offers it; where it did not, the
+    button says so rather than implying completeness.
+(d) A vitest covers the capped and the uncapped case for the grid, mirroring the two canvas
+    tests, and asserts the badge is driven by the typed field and not by `rows.length`.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+Covers S1&#x27;s console half. Depends on API1 because rendering completeness from a heuristic
+(`rows.length === 500`) would be a second source of truth for the same fact - the shape the
+whole report warns against.
 </p></div></div>
-<div class="card ready" id="card-WEB3" data-id="WEB3" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web3 route authorization derives from the module registry - app.tsx gates through canaccessmodule instead of six inline steward-or-admin predicates, with a vitest asserting every non-&quot;all&quot; module has a gated route" tabindex="0"><div class="card-head"><span class="card-id">WEB3</span><span class="card-title">Route authorization derives from the module registry - App.tsx gates through canAccessModule instead of six inline steward-or-admin predicates, with a vitest asserting every non-&quot;all&quot; module has a gated route</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> STUB - body follows in the next commit (mint rule I6).
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B). Stub pushed before the body per the mint rule.
+<div class="card ready" id="card-WEB3" data-id="WEB3" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web3 route authorization derives from the module registry - app.tsx gates through canaccessmodule instead of six inline steward-or-admin predicates, with a vitest asserting every non-&quot;all&quot; module has a gated route" tabindex="0"><div class="card-head"><span class="card-id">WEB3</span><span class="card-title">Route authorization derives from the module registry - App.tsx gates through canAccessModule instead of six inline steward-or-admin predicates, with a vitest asserting every non-&quot;all&quot; module has a gated route</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Authorization has two expressions: `canAccessModule()` in the module registry drives the nav,
+the Overview spokes and the canvas host, while App.tsx restates
+`persona.role === &#x27;steward&#x27; || persona.role === &#x27;admin&#x27;` inline six times (A1). The comment on
+the remediation route records that this divergence already shipped one bug (O59 set the
+module&#x27;s access to &#x27;sme&#x27;, hid the nav entry, and left the route reachable by URL).
+
+(a) App.tsx derives every module route&#x27;s gate from MODULES through `canAccessModule`; the
+    six inline predicates are gone. `/intake` (gated on a persona id) and `/console` (gated on
+    a role) are expressed in the same vocabulary or the item records why they cannot be and
+    hands that question to the ADR.
+(b) A vitest asserts that every module id with a non-&#x27;all&#x27; access has a gated route and that
+    no route gate exists that the registry does not declare - both directions, so the next
+    module added with access &#x27;sme&#x27; cannot reproduce the O59 shape.
+(c) The registry stays the single check: no new predicate on role or persona appears outside
+    `canAccessModule` and the test above (a source scan over web/src, J66 style).
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+Covers A1 (rank 4). ADR CANDIDATE: &quot;route authorization derives from the module registry&quot; -
+the ADR-sized part is only how persona-scoped and role-scoped gates share one access
+vocabulary; the derivation itself needs no ruling and is built here.
 </p></div></div>
-<div class="card ready" id="card-WEB4" data-id="WEB4" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web4 typescript strict on in web/ - strictnullchecks and noimplicitany enforced so the generated api.d.ts optional fields the o70 client declares are checked by the compiler and not asserted past" tabindex="0"><div class="card-head"><span class="card-id">WEB4</span><span class="card-title">TypeScript strict on in web/ - strictNullChecks and noImplicitAny enforced so the generated api.d.ts optional fields the O70 client declares are checked by the compiler and not asserted past</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> STUB - body follows in the next commit (mint rule I6).
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B). Stub pushed before the body per the mint rule.
+<div class="card ready" id="card-WEB4" data-id="WEB4" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web4 typescript strict on in web/ - strictnullchecks and noimplicitany enforced so the generated api.d.ts optional fields the o70 client declares are checked by the compiler and not asserted past" tabindex="0"><div class="card-head"><span class="card-id">WEB4</span><span class="card-title">TypeScript strict on in web/ - strictNullChecks and noImplicitAny enforced so the generated api.d.ts optional fields the O70 client declares are checked by the compiler and not asserted past</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Neither tsconfig sets `strict`, `strictNullChecks` or `noImplicitAny`; the Vite React-TS
+template ships strict true, so this was removed or written out (A3). The O70 architecture&#x27;s
+central claim - a server change the console has not caught up with is a tsc error - is only
+partly cashed while optional fields in the generated api.d.ts are not enforced.
+
+(a) `strict: true` in both tsconfigs; `tsc -b` and `npm run build` pass on the whole of
+    web/src with no `@ts-expect-error` or `@ts-ignore` added to get there (a source scan
+    asserts the count of those directives does not rise from today&#x27;s baseline).
+(b) Every error the flag surfaces is fixed at its site, not silenced by a cast; where a fix
+    needs the row-shape validator (WEB6) the site is listed in this item&#x27;s done-note and WEB6
+    picks it up, so nothing is left half-typed and unrecorded.
+(c) The web CI job runs the same `tsc -b` it runs today, so the setting is enforced from the
+    commit that lands it.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+Covers A3 (rank 5, shared with T2 and T5 as one root). Build this BEFORE WEB6 and WEB8 - a
+validator and a typed client mean nothing while the compiler is off.
 </p></div></div>
-<div class="card ready" id="card-WEB5" data-id="WEB5" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web5 an error boundary per route outlet, keyed on pathname - one render throw breaks one panel instead of blanking the whole console" tabindex="0"><div class="card-head"><span class="card-id">WEB5</span><span class="card-title">An error boundary per route outlet, keyed on pathname - one render throw breaks one panel instead of blanking the whole console</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> STUB - body follows in the next commit (mint rule I6).
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B). Stub pushed before the body per the mint rule.
+<div class="card ready" id="card-WEB5" data-id="WEB5" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web5 an error boundary per route outlet, keyed on pathname - one render throw breaks one panel instead of blanking the whole console" tabindex="0"><div class="card-head"><span class="card-id">WEB5</span><span class="card-title">An error boundary per route outlet, keyed on pathname - one render throw breaks one panel instead of blanking the whole console</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> There is no ErrorBoundary and no componentDidCatch in web/src; React 19 unmounts the whole
+tree on an uncaught render error, so one bad row produces a white page with no navigation and
+no way back but a reload (S7).
+
+(a) One error boundary per route outlet, keyed on pathname so navigation clears it; a render
+    throw in one route leaves the shell, the nav and every other route usable.
+(b) The fallback panel shows the error message verbatim (the O63 honesty rule - the exact
+    string is what a reader pastes into a ticket) and a retry affordance; it never shows a
+    stack trace or any value from the data that threw.
+(c) A vitest renders a route that throws and asserts the shell survives and the panel shows.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+Covers S7 (rank 9). About twenty lines; worth more once WEB4 is on (the compiler catches the
+nulls) and WEB6 lands (a failed cast becomes a message, not a throw) - but this is the floor
+under both and is independent of them.
 </p></div></div>
-<div class="card" id="card-WEB6" data-id="WEB6" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web6 a runtime row-shape validator at the spec-result-to-typed-row seam retires the twenty-one as-unknown-as double casts with one readable message" tabindex="0"><div class="card-head"><span class="card-id">WEB6</span><span class="card-title">A runtime row-shape validator at the spec-result-to-typed-row seam retires the twenty-one as-unknown-as double casts with one readable message</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-WEB4" data-target="card-WEB4">WEB4</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> STUB - body follows in the next commit (mint rule I6).
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B). Stub pushed before the body per the mint rule.
+<div class="card" id="card-WEB6" data-id="WEB6" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web6 a runtime row-shape validator at the spec-result-to-typed-row seam retires the twenty-one as-unknown-as double casts with one readable message" tabindex="0"><div class="card-head"><span class="card-id">WEB6</span><span class="card-title">A runtime row-shape validator at the spec-result-to-typed-row seam retires the twenty-one as-unknown-as double casts with one readable message</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-WEB4" data-target="card-WEB4">WEB4</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Twenty-one `as unknown as` casts cluster at one seam - a spec result&#x27;s untyped rows crossing
+into a typed row (`res.rows as unknown as LocationRow[]`) in FileReport, LocationMap,
+AppCodeCascadePane, IntakeRoute, LoadMapRoute, LoadsRoute, MappingsRoute and SoftwareRoute
+(T5). The compiler is switched off exactly where the server contract meets the render.
+
+(a) One runtime row-shape validator at the seam: given a spec id and its rows, it checks the
+    columns the row type requires and returns typed rows or a readable message naming the
+    spec, the missing or mistyped column and the row index. Where a spec&#x27;s columns are
+    declared server-side (query_specs `columns`), the validator reads them - never a second
+    hand-typed list.
+(b) All twenty-one double casts are gone; a source scan (J66 style, code only) asserts the
+    count of `as unknown as` under web/src is zero, so the seam cannot re-grow.
+(c) A row that fails validation renders the message in place of the panel (WEB5&#x27;s boundary
+    is the backstop, not the presentation) and is counted where WEB1 counts fallbacks.
+(d) Tests cover a conforming row set, a missing column and a wrong type for two specs.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+Covers T5 (rank 5, one root with A3 and T2). Depends on WEB4: without strictNullChecks the
+validator&#x27;s own return type is not enforced either.
 </p></div></div>
-<div class="card ready" id="card-WEB7" data-id="WEB7" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web7 code splitting follows the authorization boundary - react.lazy on the admin and steward routes and the locations tab so about 420 kb of role-gated artifacts stop shipping to every persona, plus a bundle-size ceiling in the web ci job" tabindex="0"><div class="card-head"><span class="card-id">WEB7</span><span class="card-title">Code splitting follows the authorization boundary - React.lazy on the admin and steward routes and the Locations tab so about 420 KB of role-gated artifacts stop shipping to every persona, plus a bundle-size ceiling in the web CI job</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> STUB - body follows in the next commit (mint rule I6).
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B). Stub pushed before the body per the mint rule.
+<div class="card ready" id="card-WEB7" data-id="WEB7" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web7 code splitting follows the authorization boundary - react.lazy on the admin and steward routes and the locations tab so about 420 kb of role-gated artifacts stop shipping to every persona, plus a bundle-size ceiling in the web ci job" tabindex="0"><div class="card-head"><span class="card-id">WEB7</span><span class="card-title">Code splitting follows the authorization boundary - React.lazy on the admin and steward routes and the Locations tab so about 420 KB of role-gated artifacts stop shipping to every persona, plus a bundle-size ceiling in the web CI job</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> There is no code splitting - vite.config.ts is three lines, no React.lazy or dynamic import
+exists in web/src, and the build is one 3,676,794-byte chunk. Every generated artifact is a
+static import, so a user-tier persona downloads the full enforcement matrix (275 KB) and the
+gate record (44 KB) for routes it can never open and can read both from devtools; the route
+gate is a render decision, not a delivery decision (A4).
+
+(a) React.lazy on AdminConfigRoute and the Locations tab, then the steward routes, so the
+    role-gated artifacts (about 420 KB raw) load only for a persona whose gate passes. The
+    split follows the authorization boundary, not file size - a chunk is admissible to a
+    role or it is not.
+(b) A bundle-size ceiling in the web CI job asserts the initial chunk against a recorded
+    number and fails when it grows past it (S8); the number is recorded in the job, with the
+    date, and ratchets down, never up, without a note.
+(c) The item RECORDS the publish-boundary answer for each generated artifact shipped to the
+    browser - which are Internal-Public and safe in any bundle, and which the split exists to
+    keep from a role - by citing each artifact&#x27;s source classification; if any artifact turns
+    out to carry Internal values, that is a finding for the HITL gate, not a bundle decision.
+(d) The generation pipeline is unchanged; the drift tests over web/src/generated still pass.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+Covers A4 (rank 10) and S8&#x27;s bundle-budget half. O34 (done) cleared the npm advisories and
+explicitly DEFERRED code splitting; this item is that deferral coming due, with the reason A4
+adds - the delivery-versus-render distinction - which O34 did not have.
+
+ADR CANDIDATE: &quot;the code-splitting boundary follows the authorization boundary.&quot; S3 / WEB10
+notes there is partly no splitting decision because there is no deployment decision to make
+one against; build (a) and (b) regardless, they are correct under any delivery shape.
 </p></div></div>
-<div class="card" id="card-WEB8" data-id="WEB8" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web8 the typed-client guarantee has no holes - the mappings, intake and corpus routes are modelled in drydocs_api.schemas so the fifteen unwrapas sites retire, and the adk agent calls get a typed contract instead of raw fetch" tabindex="0"><div class="card-head"><span class="card-id">WEB8</span><span class="card-title">The typed-client guarantee has no holes - the mappings, intake and corpus routes are modelled in drydocs_api.schemas so the fifteen unwrapAs sites retire, and the ADK agent calls get a typed contract instead of raw fetch</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-WEB4" data-target="card-WEB4">WEB4</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> STUB - body follows in the next commit (mint rule I6).
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B). Stub pushed before the body per the mint rule.
+<div class="card" id="card-WEB8" data-id="WEB8" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web8 the typed-client guarantee has no holes - the mappings, intake and corpus routes are modelled in drydocs_api.schemas so the fifteen unwrapas sites retire, and the adk agent calls get a typed contract instead of raw fetch" tabindex="0"><div class="card-head"><span class="card-id">WEB8</span><span class="card-title">The typed-client guarantee has no holes - the mappings, intake and corpus routes are modelled in drydocs_api.schemas so the fifteen unwrapAs sites retire, and the ADK agent calls get a typed contract instead of raw fetch</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-WEB4" data-target="card-WEB4">WEB4</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The O70 guarantee has two holes. `unwrapAs` in lib/apiClient.ts marks every route
+drydocs_api.schemas has not modelled - fifteen sites outside tests, eight of them in
+mappingsApi (domains, grid, options, changeset, drafts, open drafts, promoted diff,
+corrections), two in intakeApi, one in corpusStatus - and mappings is the one module with
+WRITE surfaces, so a drifted route writes wrong rather than renders wrong (T3). Separately,
+lib/adk.ts talks raw fetch to the agent server with no schema behind it (A2).
+
+(a) The mappings, intake and corpus-status routes are modelled in `drydocs_api.schemas`; the
+    OpenAPI schema and web/src/generated/api.d.ts regenerate; every `unwrapAs` site retires
+    and the helper is deleted or its call count asserted at zero by a test.
+(b) The ADK calls get a typed contract: either a schema the agent server publishes and a
+    generated client on the same pattern, or a hand-declared TypeScript contract in one
+    module with a drift test against a recorded fixture of the server&#x27;s responses - the
+    builder chooses and records why. `askApi.ts` moves from src/ask to src/lib with the other
+    API wrappers.
+(c) The drift tests at both ends of the chain (tests/unit/test_openapi_client.py,
+    web/src/generated/api.test.ts) pass on the regenerated artifacts.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+Covers T3 (rank 12) and A2. O70 (done) left the `unwrapAs` list as its named follow-up; this
+is that follow-up with a closure date. Depends on WEB4 so the new types are enforced when
+they land.
 </p></div></div>
-<div class="card ready" id="card-WEB9" data-id="WEB9" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web9 credential propagation to the agent tier - the drydocs-api bearer token leaves the ask message body and rides a header, a short-ttl exchange token or a session id, so no credential lands in an agent transcript" tabindex="0"><div class="card-head"><span class="card-id">WEB9</span><span class="card-title">Credential propagation to the agent tier - the drydocs-api bearer token leaves the Ask message body and rides a header, a short-TTL exchange token or a session id, so no credential lands in an agent transcript</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> STUB - body follows in the next commit (mint rule I6).
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B). Stub pushed before the body per the mint rule.
+<div class="card ready" id="card-WEB9" data-id="WEB9" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web9 credential propagation to the agent tier - the drydocs-api bearer token leaves the ask message body and rides a header, a short-ttl exchange token or a session id, so no credential lands in an agent transcript" tabindex="0"><div class="card-head"><span class="card-id">WEB9</span><span class="card-title">Credential propagation to the agent tier - the drydocs-api bearer token leaves the Ask message body and rides a header, a short-TTL exchange token or a session id, so no credential lands in an agent transcript</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The Ask spoke sends the console&#x27;s live drydocs-api bearer token INSIDE a message part
+(`controlPart(apiToken, apiUrl)` -&gt; `{ drydocs_control: { api_token, api_url } }`), cross-origin,
+to an agent server with no authentication of its own, on every turn (S2). Message content is
+what agent frameworks persist, replay and log, so the credential inherits the transcript&#x27;s
+retention. The requirement - the agent registers ephemeral specs owned by this session - is
+legitimate; the CARRIER is the finding.
+
+GATE-BOUND. This item drafts the ruling and builds after it:
+
+(a) An ADR (or a rider on ADR 0005) rules what carries session identity across the origin
+    boundary and what may never appear in a transcript, choosing among: an Authorization
+    header on the ADK call; a single-use exchange token minted by drydocs-api for the agent
+    with a short TTL scoped to ephemeral-spec registration; or the agent holding its own
+    credential and the console passing only a session id. The draft states the blast radius
+    honestly (short-lived, read-only token) so the ruling is proportionate.
+(b) After the ruling: no credential appears in any message part; a test over askApi asserts
+    the request body contains no token, and the agent side reads identity from the ruled
+    carrier only.
+(c) Existing persisted ADK sessions that carry a token part are addressed by the ruling
+    (purge, expire, or record why not) - the item does not decide this.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+Covers S2 (rank 3). ADR CANDIDATE: &quot;credential propagation to the agent tier.&quot; Spans
+drydocs-web and agents/; minted in the WEB series because the console is where the token
+leaves the trust boundary, and the item names the agent-side inputs. Nothing here writes the
+graph, so the gate is the ADR review, not the ontology gate.
 </p></div></div>
-<div class="card ready" id="card-WEB10" data-id="WEB10" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web10 the console&#x27;s delivery shape - same-origin behind the api or one reverse proxy, a runtime-configured api base instead of a build-time inlined vite_api_url, and a production build that fails rather than falling back to localhost" tabindex="0"><div class="card-head"><span class="card-id">WEB10</span><span class="card-title">The console&#x27;s delivery shape - same-origin behind the API or one reverse proxy, a runtime-configured API base instead of a build-time inlined VITE_API_URL, and a production build that fails rather than falling back to localhost</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> STUB - body follows in the next commit (mint rule I6).
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B). Stub pushed before the body per the mint rule.
+<div class="card ready" id="card-WEB10" data-id="WEB10" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web10 the console&#x27;s delivery shape - same-origin behind the api or one reverse proxy, a runtime-configured api base instead of a build-time inlined vite_api_url, and a production build that fails rather than falling back to localhost" tabindex="0"><div class="card-head"><span class="card-id">WEB10</span><span class="card-title">The console&#x27;s delivery shape - same-origin behind the API or one reverse proxy, a runtime-configured API base instead of a build-time inlined VITE_API_URL, and a production build that fails rather than falling back to localhost</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The API base is `import.meta.env.VITE_API_URL`, inlined at build time, with
+`http://localhost:8001` as the fallback in twelve files; nothing serves the built console
+(no Dockerfile, proxy config or static mount - `dist/` is built by CI and consumed by
+nothing), so the console is cross-origin to its API in every environment, which is why the
+CORS allowlist, its env override and the O85 diagnostic probe exist at all (S3). ADR 0005
+settled ACCESS; nothing has settled DELIVERY.
+
+GATE-BOUND (an ADR). This item drafts and, after the ruling, builds:
+
+(a) The ADR rules the delivery shape: same-origin - `dist/` served by drydocs-api or one
+    reverse proxy in front of both - or a stated reason to stay cross-origin; and a
+    runtime-configured API base (a `/config` endpoint or an injected `window.__DRYDOCS__`
+    read at boot) so one build promotes across environments.
+(b) After the ruling: a production build with no configured API base FAILS at build or at
+    boot with a message naming the setting; it never falls back to localhost. The twelve
+    literals collapse into `apiBaseUrl()` (WEB12 does the mechanical part; this item owns the
+    rule). Same for VITE_ADK_URL and port 8000.
+(c) Same-origin, if ruled: the allowlist, its env override and the probe&#x27;s blocked-origin
+    branch are removed or reduced to the dev bench, and reachability.ts&#x27;s record of the
+    O69-to-2026-08-30 port drift is cited as the class of defect the shape retires.
+(d) O72&#x27;s Compose stack (todo) is where the ruled shape is first exercised; this item adds
+    the serving process to that stack&#x27;s plan rather than a second one.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+Covers S3 (rank 7). ADR CANDIDATE: &quot;the console&#x27;s delivery shape.&quot; Link O72 (one-command
+local stack) - O72 composes the four processes the runbook starts by hand; a ruled delivery
+shape decides whether there are four or three.
 </p></div></div>
-<div class="card ready" id="card-WEB11" data-id="WEB11" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web11 one storage module owns every console localstorage key with a prefix and a version, and both sign-out and session rejection call its clearall so query results do not outlive the session on a shared desktop" tabindex="0"><div class="card-head"><span class="card-id">WEB11</span><span class="card-title">One storage module owns every console localStorage key with a prefix and a version, and both sign-out and session rejection call its clearAll so query results do not outlive the session on a shared desktop</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> STUB - body follows in the next commit (mint rule I6).
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B). Stub pushed before the body per the mint rule.
+<div class="card ready" id="card-WEB11" data-id="WEB11" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web11 one storage module owns every console localstorage key with a prefix and a version, and both sign-out and session rejection call its clearall so query results do not outlive the session on a shared desktop" tabindex="0"><div class="card-head"><span class="card-id">WEB11</span><span class="card-title">One storage module owns every console localStorage key with a prefix and a version, and both sign-out and session rejection call its clearAll so query results do not outlive the session on a shared desktop</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> `signOut()` removes `drydocs.session.v2` and revokes the token; seven other localStorage
+writers stay - the Ask last completed turn (answer, executed Cypher, per-step row counts,
+task graph; per persona), the app-code tray (per persona), onboarding progress, aside
+collapsed, theme, split-pane position, grid column widths. The first two are query results
+readable after sign-out by whoever opens the browser next, under a console that renders an
+INTERNAL banner over the same data on screen. `sessionRejected()` has the same gap (S4).
+
+(a) One storage module owns every console key: a prefix, a version, typed get/set, and a
+    `clearAll()`. No `localStorage.` call exists outside it (source scan, J66 style).
+(b) Both `signOut()` and `sessionRejected()` call `clearAll()`.
+(c) Keys worth keeping across sign-outs (theme, aside collapsed, column widths) OPT OUT
+    explicitly in the module, so the retention decision is visible in one place; the Ask turn
+    and the tray do not opt out. O64&#x27;s design - the last completed turn survives navigation
+    within a session - is preserved exactly; it is sign-out, not navigation, that clears it.
+(d) A test signs out with every key populated and asserts only the opted-out keys remain;
+    another does the same through `sessionRejected()`.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+Covers S4 (rank 6). O64 (done) chose per-persona persistence of the Ask turn for a good
+reason (loss on navigation); this item respects that choice and bounds it at the session.
 </p></div></div>
-<div class="card ready" id="card-WEB12" data-id="WEB12" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web12 a usegraphquery data-layer hook replaces the forty transport preambles - one abortcontroller per request, a deadline, in-flight dedupe, a stated no-retry rule, and a stop control on the ask stream" tabindex="0"><div class="card-head"><span class="card-id">WEB12</span><span class="card-title">A useGraphQuery data-layer hook replaces the forty transport preambles - one AbortController per request, a deadline, in-flight dedupe, a stated no-retry rule, and a stop control on the Ask stream</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> STUB - body follows in the next commit (mint rule I6).
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B). Stub pushed before the body per the mint rule.
+<div class="card ready" id="card-WEB12" data-id="WEB12" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web12 a usegraphquery data-layer hook replaces the forty transport preambles - one abortcontroller per request, a deadline, in-flight dedupe, a stated no-retry rule, and a stop control on the ask stream" tabindex="0"><div class="card-head"><span class="card-id">WEB12</span><span class="card-title">A useGraphQuery data-layer hook replaces the forty transport preambles - one AbortController per request, a deadline, in-flight dedupe, a stated no-retry rule, and a stop control on the Ask stream</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Every route reimplements connect, fetch, guard against unmount, set state: the VITE_API_URL
+literal with its localhost fallback in twelve files beside `apiBaseUrl()` which already does
+it, `useMemo(() =&gt; createApiAccess(...))` in sixteen, the hand-rolled `let cancelled = false`
+effect in fourteen (A6, T6). No request has a deadline or a cancel path - zero
+AbortController, zero `signal:` in web/src - so a hung request and a loading one are the same
+screen, navigating away leaves the work running, and the Ask stream cannot be stopped (S5).
+Nothing dedupes: two panes needing one spec run it twice (S6).
+
+(a) One `useGraphQuery(specId, params)` hook (or equivalent, builder&#x27;s name) owns the
+    transport: it obtains access from one shared provider (no per-route `createApiAccess`),
+    passes an AbortController signal and aborts on unmount and on param change, applies a
+    deadline (a recorded default, per-call override), dedupes identical in-flight requests,
+    and returns a state union - loading | data | empty | error(timeout | aborted | failed).
+(b) The forty preambles are gone: zero `localhost:8001` literals outside `apiBaseUrl()`,
+    zero `createApiAccess(` outside the provider, zero `let cancelled = false` in web/src -
+    each asserted by a source scan.
+(c) The Ask stream (`runAgentSse`) accepts a signal and the UI has a stop control that aborts
+    it; a stopped turn renders as stopped, never as an answer.
+(d) NO RETRY, stated: the hook does not retry, and its module comment records that a read
+    console chooses not to and why (a transient 502 must surface, not be papered over) - the
+    report&#x27;s point that a defensible choice should be a stated one.
+(e) A cache is NOT built here unless trivial; the union and the dedupe are what WEB1&#x27;s seam
+    composes with, and a cache with classification-aware invalidation is its own decision.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+Covers A6, T6, S5 and S6&#x27;s dedupe half (rank 8). The report notes this hook also gives T2&#x27;s
+missing lint rule (WEB13) nothing left to police. Build before or with WEB1.
 </p></div></div>
-<div class="card ready" id="card-WEB13" data-id="WEB13" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web13 the web ci ratchet - a test:coverage script with a floor at today&#x27;s 7.51 percent, --max-warnings 0 on lint, react-hooks/exhaustive-deps enabled with the three inert suppressions deleted, a warn-only npm audit --audit-level=high step, and towericon.tsx plus clsx removed" tabindex="0"><div class="card-head"><span class="card-id">WEB13</span><span class="card-title">The web CI ratchet - a test:coverage script with a floor at today&#x27;s 7.51 percent, --max-warnings 0 on lint, react-hooks/exhaustive-deps enabled with the three inert suppressions deleted, a warn-only npm audit --audit-level=high step, and TowerIcon.tsx plus clsx removed</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> STUB - body follows in the next commit (mint rule I6).
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B). Stub pushed before the body per the mint rule.
+<div class="card ready" id="card-WEB13" data-id="WEB13" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web13 the web ci ratchet - a test:coverage script with a floor at today&#x27;s 7.51 percent, --max-warnings 0 on lint, react-hooks/exhaustive-deps enabled with the three inert suppressions deleted, a warn-only npm audit --audit-level=high step, and towericon.tsx plus clsx removed" tabindex="0"><div class="card-head"><span class="card-id">WEB13</span><span class="card-title">The web CI ratchet - a test:coverage script with a floor at today&#x27;s 7.51 percent, --max-warnings 0 on lint, react-hooks/exhaustive-deps enabled with the three inert suppressions deleted, a warn-only npm audit --audit-level=high step, and TowerIcon.tsx plus clsx removed</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Four numbers drift with nothing under them (T1, T2, T7, T8): statement coverage is 7.51
+percent (955 / 12,716) with `@vitest/coverage-v8` declared and no script, CI step or
+threshold; lint emits ten warnings and exits 0 with no `--max-warnings`; the advisory count
+went from three at O34 to five with no audit step to notice; and a dead file and a dead
+dependency sit unflagged. Plus three `eslint-disable-next-line react-hooks/exhaustive-deps`
+lines suppress a rule that has never run - there is no ESLint in the project and
+`.oxlintrc.json` enables only `react/rules-of-hooks` and `react/only-export-components`.
+
+(a) `test:coverage` script in package.json; the web CI job runs it with a statement floor
+    at today&#x27;s number (7.51, recorded with the date) that only ratchets up. Coverage growth
+    itself is O43&#x27;s work (the seed suites); this item is the gate, not the tests.
+(b) `--max-warnings 0` on the lint step; the ten warnings are fixed or individually waived
+    in config with a reason.
+(c) `react-hooks/exhaustive-deps` enabled in oxlint (or the equivalent rule the linter
+    offers); the three inert suppressions are deleted and each site&#x27;s deliberate omission is
+    re-expressed as a real, scoped suppression or a fix - never carried as fiction.
+(d) A warn-only `npm audit --audit-level=high` step in the web CI job (report, never block -
+    the same posture as the snapshot ritual&#x27;s lint check), so the count is read every run.
+(e) `src/components/TowerIcon.tsx` and the `clsx` dependency are removed. Optional residue,
+    not acceptance: fold src/docs/ and src/docsmod/ into one directory; move
+    src/data/mappingsDemo.ts and routes/AppCodeCascadePane.tsx to their feature directories.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+Covers T1, T2, T7, T8 - the tech-debt pass&#x27;s &quot;cheap ratchet&quot;. A7 (test topology inverted) is
+T1 with a measurement attached and is not a separate item; O43 (todo) seeds the suites that
+move the floor. O34 (done) recorded the advisory count as three; it is five now, root
+`@neo4j-nvl/base -&gt; @segment/analytics-next`, none of it reaching dist - the finding is the
+unobserved drift, not the CVEs.
 </p></div></div>
-<div class="card ready" id="card-WEB14" data-id="WEB14" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web14 a token-parity test holds the hand-frozen custom properties in public/landing.html and public/agent-test.html to src/styles/tokens.css, on the repo&#x27;s generated-artifact drift-test habit" tabindex="0"><div class="card-head"><span class="card-id">WEB14</span><span class="card-title">A token-parity test holds the hand-frozen custom properties in public/landing.html and public/agent-test.html to src/styles/tokens.css, on the repo&#x27;s generated-artifact drift-test habit</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> STUB - body follows in the next commit (mint rule I6).
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B). Stub pushed before the body per the mint rule.
+<div class="card ready" id="card-WEB14" data-id="WEB14" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web14 a token-parity test holds the hand-frozen custom properties in public/landing.html and public/agent-test.html to src/styles/tokens.css, on the repo&#x27;s generated-artifact drift-test habit" tabindex="0"><div class="card-head"><span class="card-id">WEB14</span><span class="card-title">A token-parity test holds the hand-frozen custom properties in public/landing.html and public/agent-test.html to src/styles/tokens.css, on the repo&#x27;s generated-artifact drift-test habit</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> tokens.css is the source (152 lines, light and dark). Two shipped pages carry hand-frozen
+copies - landing.html (48 custom properties, self-contained by design under the no-CDN
+intranet rule) and agent-test.html (39, SME-re-ruled independent on 2026-07-29). The pages
+are deliberate; the frozen copy is the debt, and nothing detects the day they stop agreeing
+(T4).
+
+(a) A vitest reads the `:root` and `.dark` custom properties from tokens.css and the
+    properties declared in each page, and asserts every shared key has an equal value.
+(b) Keys deliberately different (if any) are listed in the test with the reason, so a
+    divergence is a recorded decision, not a silent one.
+(c) The pages stay self-contained; the test is the drift guard, on the repo&#x27;s
+    generated-artifact drift-test habit, not a generator.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+Covers T4 (rank 13). About thirty lines.
 </p></div></div>
-<div class="card ready" id="card-WEB15" data-id="WEB15" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web15 web/readme.md states the security model the code implements - the dev-only ?as= affordance, twelve modules not nine, the five sme-access modules and the gated routes, and the six retired-name personas" tabindex="0"><div class="card-head"><span class="card-id">WEB15</span><span class="card-title">web/README.md states the security model the code implements - the DEV-only ?as= affordance, twelve modules not nine, the five sme-access modules and the gated routes, and the six retired-name personas</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> STUB - body follows in the next commit (mint rule I6).
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B). Stub pushed before the body per the mint rule.
+<div class="card ready" id="card-WEB15" data-id="WEB15" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web15 web/readme.md states the security model the code implements - the dev-only ?as= affordance, twelve modules not nine, the five sme-access modules and the gated routes, and the six retired-name personas" tabindex="0"><div class="card-head"><span class="card-id">WEB15</span><span class="card-title">web/README.md states the security model the code implements - the DEV-only ?as= affordance, twelve modules not nine, the five sme-access modules and the gated routes, and the six retired-name personas</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> web/README.md is materially wrong on the security model in four places (A8): it says there
+is no `?as=` parameter (App.tsx has one, DEV-only, requiring VITE_DEV_CONSOLE_SECRET); it says
+nine module routes (registry.ts declares twelve); it says all modules are open to every
+signed-in persona and only /console is role-gated (five modules carry access &#x27;sme&#x27; and
+App.tsx gates six routes plus /console, /admin/config and /intake); and its persona table
+carries the three SID-shaped names auth.ts retired on 2026-08-28 for publish-boundary
+reasons. A doc that understates the authorization surface is the doc a company-side reader
+reaches first.
+
+(a) The README states the model the code implements: the DEV-only `?as=` affordance and its
+    secret gate; the module count and each module&#x27;s access level, read from registry.ts; the
+    route gates; the six personas by their current names and roles.
+(b) Where WEB3 lands first, the README describes the derived gate; where it has not, the
+    README says the two expressions exist and cites WEB3 - it never describes a state the
+    code is not in.
+(c) A test keeps the module count and access table in the README equal to registry.ts
+    (rendered from the importable object, J37 style), so the fourth drift does not happen.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+Covers A8 (rank 14). Point 3 - understating the authorization surface - is why this is p2
+and not p3.
 </p></div></div>
 <div class="card ready" id="card-P6" data-id="P6" data-module="config" data-phase="13" data-epic="runtime-topology" data-type="task" data-status="todo" data-search="p6 run the data-center collision probe on live psgmgr before any multi-data-center load — one table id in two data centers silently merges two folders into one graph node" tabindex="0"><div class="card-head"><span class="card-id">P6</span><span class="card-title">Run the data-center collision probe on live psgmgr before any multi-data-center load — one table id in two data centers silently merges two folders into one graph node</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P13</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">runtime-topology</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE PROBE. One grouped count over the folder-definition view: how many table ids appear in more than one data center. Counts only, never result rows — the producer side has no psgmgr access, so this is user-run on the internal network and the agent transcribes the conclusion, exactly the arrangement P1 records.
 

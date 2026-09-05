@@ -13,9 +13,36 @@ status: todo
 depends_on: []
 inputs:
 - docs/reviews/modules/web-2026-09-05.md
+- web/src/ask/askApi.ts
+- web/src/lib/adk.ts
+- web/src/lib/auth.ts
+- agents/graph_qa/agent.py
+- drydocs_api/app.py
 acceptance: |
-  STUB - body follows in the next commit (mint rule I6).
-notes: 'Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md,
-  part B). Stub pushed before the body per the mint rule.
+  The Ask spoke sends the console's live drydocs-api bearer token INSIDE a message part
+  (`controlPart(apiToken, apiUrl)` -> `{ drydocs_control: { api_token, api_url } }`), cross-origin,
+  to an agent server with no authentication of its own, on every turn (S2). Message content is
+  what agent frameworks persist, replay and log, so the credential inherits the transcript's
+  retention. The requirement - the agent registers ephemeral specs owned by this session - is
+  legitimate; the CARRIER is the finding.
 
-  '
+  GATE-BOUND. This item drafts the ruling and builds after it:
+
+  (a) An ADR (or a rider on ADR 0005) rules what carries session identity across the origin
+      boundary and what may never appear in a transcript, choosing among: an Authorization
+      header on the ADK call; a single-use exchange token minted by drydocs-api for the agent
+      with a short TTL scoped to ephemeral-spec registration; or the agent holding its own
+      credential and the console passing only a session id. The draft states the blast radius
+      honestly (short-lived, read-only token) so the ruling is proportionate.
+  (b) After the ruling: no credential appears in any message part; a test over askApi asserts
+      the request body contains no token, and the agent side reads identity from the ruled
+      carrier only.
+  (c) Existing persisted ADK sessions that carry a token part are addressed by the ruling
+      (purge, expire, or record why not) - the item does not decide this.
+notes: |
+  Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+  Covers S2 (rank 3). ADR CANDIDATE: "credential propagation to the agent tier." Spans
+  drydocs-web and agents/; minted in the WEB series because the console is where the token
+  leaves the trust boundary, and the item names the agent-side inputs. Nothing here writes the
+  graph, so the gate is the ADR review, not the ontology gate.

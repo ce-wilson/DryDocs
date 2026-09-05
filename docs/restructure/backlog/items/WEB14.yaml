@@ -12,9 +12,23 @@ status: todo
 depends_on: []
 inputs:
 - docs/reviews/modules/web-2026-09-05.md
+- web/src/styles/tokens.css
+- web/public/landing.html
+- web/public/agent-test.html
 acceptance: |
-  STUB - body follows in the next commit (mint rule I6).
-notes: 'Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md,
-  part B). Stub pushed before the body per the mint rule.
+  tokens.css is the source (152 lines, light and dark). Two shipped pages carry hand-frozen
+  copies - landing.html (48 custom properties, self-contained by design under the no-CDN
+  intranet rule) and agent-test.html (39, SME-re-ruled independent on 2026-07-29). The pages
+  are deliberate; the frozen copy is the debt, and nothing detects the day they stop agreeing
+  (T4).
 
-  '
+  (a) A vitest reads the `:root` and `.dark` custom properties from tokens.css and the
+      properties declared in each page, and asserts every shared key has an equal value.
+  (b) Keys deliberately different (if any) are listed in the test with the reason, so a
+      divergence is a recorded decision, not a silent one.
+  (c) The pages stay self-contained; the test is the drift guard, on the repo's
+      generated-artifact drift-test habit, not a generator.
+notes: |
+  Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+  Covers T4 (rank 13). About thirty lines.

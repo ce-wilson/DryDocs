@@ -13,9 +13,40 @@ status: todo
 depends_on: []
 inputs:
 - docs/reviews/modules/web-2026-09-05.md
+- drydocs_api/query_specs.py
+- drydocs_api/exports.py
+- drydocs_api/schemas.py
+- tests/unit/test_openapi_client.py
 acceptance: |
-  STUB - body follows in the next commit (mint rule I6).
-notes: 'Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md,
-  part B). Stub pushed before the body per the mint rule.
+  Every QuerySpec shares one `_LIMIT` parameter, default 500, applied as `LIMIT $limit`. A spec
+  whose true answer is 900 rows returns 500 and nothing in the response says so; the server
+  export re-applies the same bound params, streams exactly 500 rows and registers a provenance
+  manifest with `row_count: 500` and no field saying the extract was capped (S1). After this
+  item the READ CONTRACT carries completeness.
 
-  '
+  (a) Every spec result carries `truncated: bool` and the `limit` that applied. Cheapest
+      mechanism, the builder chooses and records: run with `limit + 1` and report whether the
+      extra row existed, or return a pre-limit count where the Cypher can afford it.
+  (b) The export manifest records `truncated` and the ceiling beside `row_count`. A manifest
+      that describes a capped extract says so in the artifact itself, because the manifest is
+      the governance record and outlives the screen that produced it.
+  (c) The export path can run WITHOUT the display limit, or with a caller-raised one, so the
+      other 400 rows are obtainable from the console at all - today no surface can raise it.
+  (d) `drydocs_api.schemas` models both fields so the O70 generated client picks them up and
+      WEB2 renders them from typed fields, not from a heuristic on `rows.length === limit`.
+  (e) Tests: a spec fixture with more rows than the limit yields `truncated: true`; one with
+      fewer yields `false`; the export manifest for each records the matching value; the
+      OpenAPI drift test (tests/unit/test_openapi_client.py) is regenerated, not hand-edited.
+notes: |
+  Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+  Covers S1's server half, ranked first across all three passes. The console half is WEB2,
+  which depends on this item.
+
+  ADR CANDIDATE: "result completeness is part of the read contract - no export may be labelled
+  complete without it." The canvas already solved this for nodes (NODE_CEILING = 300 with a
+  TRUNCATED n/N badge and two tests in GraphCanvas / nvl-mapping); this item gives the API the
+  same property so every consumer inherits it.
+
+  R15 (todo) is the Ask cousin - exact versus lower-bound labelling on query answers. Same
+  principle, different surface; link, do not merge.

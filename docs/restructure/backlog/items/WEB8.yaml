@@ -14,9 +14,35 @@ depends_on:
 - WEB4
 inputs:
 - docs/reviews/modules/web-2026-09-05.md
+- web/src/lib/apiClient.ts
+- web/src/lib/mappingsApi.ts
+- web/src/lib/intakeApi.ts
+- web/src/lib/corpusStatus.ts
+- web/src/lib/adk.ts
+- web/src/ask/askApi.ts
+- drydocs_api/schemas.py
+- tests/unit/test_openapi_client.py
 acceptance: |
-  STUB - body follows in the next commit (mint rule I6).
-notes: 'Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md,
-  part B). Stub pushed before the body per the mint rule.
+  The O70 guarantee has two holes. `unwrapAs` in lib/apiClient.ts marks every route
+  drydocs_api.schemas has not modelled - fifteen sites outside tests, eight of them in
+  mappingsApi (domains, grid, options, changeset, drafts, open drafts, promoted diff,
+  corrections), two in intakeApi, one in corpusStatus - and mappings is the one module with
+  WRITE surfaces, so a drifted route writes wrong rather than renders wrong (T3). Separately,
+  lib/adk.ts talks raw fetch to the agent server with no schema behind it (A2).
 
-  '
+  (a) The mappings, intake and corpus-status routes are modelled in `drydocs_api.schemas`; the
+      OpenAPI schema and web/src/generated/api.d.ts regenerate; every `unwrapAs` site retires
+      and the helper is deleted or its call count asserted at zero by a test.
+  (b) The ADK calls get a typed contract: either a schema the agent server publishes and a
+      generated client on the same pattern, or a hand-declared TypeScript contract in one
+      module with a drift test against a recorded fixture of the server's responses - the
+      builder chooses and records why. `askApi.ts` moves from src/ask to src/lib with the other
+      API wrappers.
+  (c) The drift tests at both ends of the chain (tests/unit/test_openapi_client.py,
+      web/src/generated/api.test.ts) pass on the regenerated artifacts.
+notes: |
+  Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+  Covers T3 (rank 12) and A2. O70 (done) left the `unwrapAs` list as its named follow-up; this
+  is that follow-up with a closure date. Depends on WEB4 so the new types are enforced when
+  they land.

@@ -13,9 +13,30 @@ status: todo
 depends_on: []
 inputs:
 - docs/reviews/modules/web-2026-09-05.md
+- web/src/App.tsx
+- web/src/modules/registry.ts
+- web/src/layout/Aside.tsx
+- web/src/routes/OverviewRoute.tsx
+- web/src/routes/GraphCanvasRoute.tsx
 acceptance: |
-  STUB - body follows in the next commit (mint rule I6).
-notes: 'Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md,
-  part B). Stub pushed before the body per the mint rule.
+  Authorization has two expressions: `canAccessModule()` in the module registry drives the nav,
+  the Overview spokes and the canvas host, while App.tsx restates
+  `persona.role === 'steward' || persona.role === 'admin'` inline six times (A1). The comment on
+  the remediation route records that this divergence already shipped one bug (O59 set the
+  module's access to 'sme', hid the nav entry, and left the route reachable by URL).
 
-  '
+  (a) App.tsx derives every module route's gate from MODULES through `canAccessModule`; the
+      six inline predicates are gone. `/intake` (gated on a persona id) and `/console` (gated on
+      a role) are expressed in the same vocabulary or the item records why they cannot be and
+      hands that question to the ADR.
+  (b) A vitest asserts that every module id with a non-'all' access has a gated route and that
+      no route gate exists that the registry does not declare - both directions, so the next
+      module added with access 'sme' cannot reproduce the O59 shape.
+  (c) The registry stays the single check: no new predicate on role or persona appears outside
+      `canAccessModule` and the test above (a source scan over web/src, J66 style).
+notes: |
+  Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+  Covers A1 (rank 4). ADR CANDIDATE: "route authorization derives from the module registry" -
+  the ADR-sized part is only how persona-scoped and role-scoped gates share one access
+  vocabulary; the derivation itself needs no ruling and is built here.

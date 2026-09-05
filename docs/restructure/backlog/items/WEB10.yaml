@@ -13,9 +13,37 @@ status: todo
 depends_on: []
 inputs:
 - docs/reviews/modules/web-2026-09-05.md
+- web/src/lib/auth.ts
+- web/src/lib/reachability.ts
+- web/.env.example
+- drydocs_api/app.py
+- docs/decisions/0005-browser-neo4j-access-path.md
 acceptance: |
-  STUB - body follows in the next commit (mint rule I6).
-notes: 'Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md,
-  part B). Stub pushed before the body per the mint rule.
+  The API base is `import.meta.env.VITE_API_URL`, inlined at build time, with
+  `http://localhost:8001` as the fallback in twelve files; nothing serves the built console
+  (no Dockerfile, proxy config or static mount - `dist/` is built by CI and consumed by
+  nothing), so the console is cross-origin to its API in every environment, which is why the
+  CORS allowlist, its env override and the O85 diagnostic probe exist at all (S3). ADR 0005
+  settled ACCESS; nothing has settled DELIVERY.
 
-  '
+  GATE-BOUND (an ADR). This item drafts and, after the ruling, builds:
+
+  (a) The ADR rules the delivery shape: same-origin - `dist/` served by drydocs-api or one
+      reverse proxy in front of both - or a stated reason to stay cross-origin; and a
+      runtime-configured API base (a `/config` endpoint or an injected `window.__DRYDOCS__`
+      read at boot) so one build promotes across environments.
+  (b) After the ruling: a production build with no configured API base FAILS at build or at
+      boot with a message naming the setting; it never falls back to localhost. The twelve
+      literals collapse into `apiBaseUrl()` (WEB12 does the mechanical part; this item owns the
+      rule). Same for VITE_ADK_URL and port 8000.
+  (c) Same-origin, if ruled: the allowlist, its env override and the probe's blocked-origin
+      branch are removed or reduced to the dev bench, and reachability.ts's record of the
+      O69-to-2026-08-30 port drift is cited as the class of defect the shape retires.
+  (d) O72's Compose stack (todo) is where the ruled shape is first exercised; this item adds
+      the serving process to that stack's plan rather than a second one.
+notes: |
+  Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+  Covers S3 (rank 7). ADR CANDIDATE: "the console's delivery shape." Link O72 (one-command
+  local stack) - O72 composes the four processes the runbook starts by hand; a ruled delivery
+  shape decides whether there are four or three.
