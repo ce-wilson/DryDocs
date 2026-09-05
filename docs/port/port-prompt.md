@@ -288,7 +288,7 @@ FORCE_COLOR / Idea-101 findings that motivated J41.)
   (EIGHTEENTH POSTSCRIPT: one SME finding accepted — the ui-components hold retired; two
   producer claims withdrawn — `internal/**` crosses, it never PUBLISHES; the company's
   three apply mistakes are now reconcile-port skill rules). **NEXT-PORT BASE:
-  `port-base-20260905`** — the sixth roll, `port-base-20260902..port-base-20260905`, 183
+  `port-base-20260905`** — the sixth roll, `port-base-20260902..port-base-20260905`, 186
   commits / 323 changed paths, steps 313–333, RELAY-26; Lane B's three in-flight `wip/`
   branches (API1, WEB3, WEB4) land in the range after this one.
 - **Producer base `port-base-20260826` (`9ef606b4`)**, applied company-side as
@@ -2548,7 +2548,7 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   FOR YOU, AND THE FOUR DECLARATIONS ONLY YOU CAN MAKE** (new 2026-09-05, at the roll).
   `[VERIFIED-PRODUCER]` throughout — every sha here is on the producer's `main` under the
   new tag, and nothing here restates a ruling that is yours.
-  **THE RANGE:** 183 commits, 131 of them in ledger steps 313–333 (the rest are the ritual
+  **THE RANGE:** 186 commits at the tag, 132 of them in ledger steps 313–333 (the rest are the ritual
   patterns `port_preflight.py` already recognizes); **323 changed paths across 8 classes**,
   the table is in the disposition section above. Your `port-base-20260902` apply is
   COMPLETE at your `4d9ddba7` (EIGHTEENTH POSTSCRIPT), so this is one range, tag..tag,
@@ -2997,7 +2997,7 @@ depgraph snapshots in the range are ritual — per-entry backlog union, derived
 regeneration, never-port outputs — and get no step. **Steps 273–296 are the
 2026-09-01 (fourth) roll**, covering `port-base-20260829..port-base-20260901`;
 steps 241–272 remain live below them because that base was certified and never
-applied, so the two rolls are one range for the consumer. **Steps 297–312 are the 2026-09-02 (fifth) roll**, covering `port-base-20260901..port-base-20260902`, rolled BEFORE the company's retry so that the retry applies ONE range, `port-base-20260826..port-base-20260902`, with all seven live relays inside it and nothing hand-carried (RELAY-24; the 20260901 apply is parked unmerged). **Steps 313–333 are the 2026-09-05 (sixth) roll**, covering `port-base-20260902..port-base-20260905` — 183 commits, 131 cited, the first roll since 2026-08-26 to start from a range the company had already applied COMPLETE (its `4d9ddba7`), so nothing is parked and nothing is hand-carried; RELAY-26 is its one relay.
+applied, so the two rolls are one range for the consumer. **Steps 297–312 are the 2026-09-02 (fifth) roll**, covering `port-base-20260901..port-base-20260902`, rolled BEFORE the company's retry so that the retry applies ONE range, `port-base-20260826..port-base-20260902`, with all seven live relays inside it and nothing hand-carried (RELAY-24; the 20260901 apply is parked unmerged). **Steps 313–333 are the 2026-09-05 (sixth) roll**, covering `port-base-20260902..port-base-20260905` — 186 commits at the tag, 132 cited, the first roll since 2026-08-26 to start from a range the company had already applied COMPLETE (its `4d9ddba7`), so nothing is parked and nothing is hand-carried; RELAY-26 is its one relay.
 
 124. LOCAL-INFRA CHORES + ONE ADR [venue-pinned / docs] (`8c4ee1e` G49, `5a6208e`
     G50, `3304666` G49 follow-up, `034eb70` G53). G49/G50 are DESKTOP-VENUE facts —
@@ -5634,8 +5634,9 @@ roll, so `port_preflight.py`'s patterns are untouched. The two RECORD_PREFIXES i
 (`docs/history/`, `internal/research/`) are the cited-paths check learning two document
 classes whose paths are facts about the tree they described, not a policy change.
 
-**SIXTH ROLL — `port-base-20260902..port-base-20260905` (2026-09-05).** 183 commits, 131
-cited below in steps 313–333; the rest are the ritual patterns. The range was cut from
+**SIXTH ROLL — `port-base-20260902..port-base-20260905` (2026-09-05).** 186 commits at the
+tag (183 when the ledger was written, plus the roll commit, its ritual follow-up and one Lane B
+claim that landed between them), 132 cited below in steps 313–333; the rest are the ritual patterns. The range was cut from
 `origin/main` at `7a56f6f1` with Lane B's three `wip/` branches deliberately excluded (their
 claims are in the range as status-only item commits; their work is the next range). Every
 producer-owned surface the company hand-edited during carve-outs 6–9 now has the producer
@@ -5864,9 +5865,11 @@ hand-carried and nothing parked.
     The three Lane B claims at the tag (API1, WEB3, WEB4 `in_progress`) are claims, not
     work — the work arrives in the next range.
 
-    LEDGER COVERAGE FOOTNOTE (2026-09-05, SIXTH ROLL). 183 commits in
-    `port-base-20260902..port-base-20260905`; 52 read as ritual under the existing patterns
-    (snapshots, claims, renders, grooms); 131 are cited in steps 313–333. No pattern
+    LEDGER COVERAGE FOOTNOTE (2026-09-05, SIXTH ROLL). 186 commits in
+    `port-base-20260902..port-base-20260905` (`git rev-list --count` at the tag); 54 read as
+    ritual under the existing patterns (snapshots, claims, renders, grooms); 132 are cited in
+    steps 313–333 — the 131 the ledger was written against plus the roll commit itself. The
+    counts were 183 / 52 / 131 when written and are corrected here at the tag, after the fact. No pattern
     spelling drifted this roll, so `port_preflight.py` is untouched. The roll commit
     (`7f676ce9`, subject `docs(port):` — outside the `chore(port): roll` ritual pattern, so
     it is cited here rather than exempted) touches `docs/port/port-prompt.md`,
