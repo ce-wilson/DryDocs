@@ -7,7 +7,7 @@ phase: 8
 agent: main
 model: opus
 priority: p1
-status: todo
+status: in_progress
 depends_on: []
 inputs:
 - .claude/skills/groom-backlog/validate.py
