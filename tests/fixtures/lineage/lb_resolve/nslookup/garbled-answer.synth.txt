@@ -1,0 +1,6 @@
+Server:		10.0.0.53
+Address:	10.0.0.53#53
+
+Non-authoritative answer:
+Name:	host-hldm-02.synth
+Address: 10.0.0.11

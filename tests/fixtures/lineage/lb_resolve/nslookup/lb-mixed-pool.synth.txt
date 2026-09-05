@@ -1,0 +1,9 @@
+; query: lb-mixed-pool.synth
+Server:		10.0.0.53
+Address:	10.0.0.53#53
+
+Non-authoritative answer:
+Name:	host-hldm-04.synth
+Address: 10.0.0.13
+Name:	host-notinventoried-09.synth
+Address: 10.0.0.99
