@@ -327,6 +327,9 @@ ENTRY_FILES: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("config/audit-fields.yaml", ("envelope", "sources")),
     ("config/taxonomy/domains.yaml", ("domains",)),
     ("config/taxonomy/editions.yaml", ("editions",)),
+    # 2026-09-05: the company's carve-out 8 apply lost its servicenow rows to a wholesale
+    # take under the config/** default; the row is per-entry now and its rule must be total.
+    ("config/taxonomy/software-registry.yaml", ("vendors", "products")),
 )
 
 

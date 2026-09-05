@@ -2414,6 +2414,37 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   your ideas `<code>-Idea-<n>`, counting from 1 in your own inbox of numbers. The producer
   cannot name your code (CFG2 c) and does not. Nothing is asked back.
 
+  **SIXTEENTH POSTSCRIPT - "TAKE `render_board.py` TOO" MEANT ITS WHOLE CHAIN, AND TWO OF
+  THE CHAIN'S INPUTS ARE PER-ENTRY (2026-09-05, from your carve-out 8 apply notes):** at
+  the base `scripts/render_board.py` imports and runs TEN renderers - `render_gates`,
+  `render_enforcement_matrix`, `render_load_map`, `render_software_registry`,
+  `render_context_types`, `render_gazetteer`, `render_remediation_diff`,
+  `render_remediation_profile`, `render_ideas`, `render_roadmap` - so taking it means each
+  renderer at the base AND each renderer's input at its manifest ROW, not wholesale. The
+  fourteenth named the two `web/**` inputs and stopped there; that is the sentence that
+  left you finding the rest by running the chain. Two of those inputs are per-entry, and
+  you hit both: (1) `docs/restructure/roadmap.yaml` HAS a per-entry row (structure from the
+  producer and any module you lack; YOUR stage / built / remaining / estimate judgments and
+  your `drydocs-libs` / `drydocs-port` modules stay on collision) - the wholesale take was
+  a misread of the manifest, not a gap in it, and what you then did (restore your file,
+  sweep only the acronym) IS the row's rule. (2) `config/taxonomy/software-registry.yaml`
+  had NO row and fell through to the config/** default - the producer's omission, the same
+  class as source-registry at the 2026-09-01 apply - so the wholesale take that dropped
+  your `servicenow` vendor and product rows was the manifest working as written, and
+  wrong. A per-entry row exists now (rows keyed by `id` union; a row one side holds stays;
+  `seal_id`, `drydocs_application_id` and `used_by_drydocs` are yours; `acronyms` is the
+  producer's authoritative home at the O68 (d) shape, which is also why the render broke on
+  your pre-O68 copy). Carve-out 8 does not take the manifest, so the row reaches you at the
+  next roll; your restore is what it prescribes. ONE COUNT TO RE-READ: at
+  `port-base-20260902` the producer's registry is 14 vendors / 16 products; the `axway` /
+  `mfts` rows are C43, 2026-09-03, OUTSIDE the range. 15 / 17 reconciles as 14 + servicenow
+  and 16 + servicenow only with axway ABSENT - so either your file has no axway and "the
+  producer added the Axway/MFTS row" misattributed the seventeenth product (the numbers
+  are right, the explanation was not), or it has axway, the input was taken past the base,
+  and one servicenow row is still missing (16 / 18 is then the target). The file says
+  which; `grep -c "id: axway"` settles it. The backlog items swept acronym-only with your
+  status intact is the items row's Clause 4 rule, correctly applied. Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has

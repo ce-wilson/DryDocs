@@ -954,6 +954,43 @@ rows:
       disk and every entry's `domain:` equal to it. The base-owned guard (§B5
       rider: an edition never reuses or deprecates a base id) is in the reader,
       so a bad union fails at load on either side.
+  - path: "config/taxonomy/software-registry.yaml"
+    disposition: per-entry
+    entry_rule: >
+      `vendors[]` and `products[]` are keyed by `id` and UNION: a row only one side
+      holds stays - the company ingests from ServiceNow and carries a `servicenow`
+      vendor and product the producer never will; the producer carries `axway` /
+      `mfts` from C43 (2026-09-03, after port-base-20260902). On a shared id the
+      PRODUCER's row wins, because the rows are vendor facts (`name`,
+      `publisher_url`, `icon`, `vendor`, `type`, `category`, `role`, `stack`,
+      `components`, `versions`, `documentation`, `license_note`, `white_label`,
+      `evidence`) governed by ADR 0004's vocabulary - with three exceptions the
+      file's own header names as reconciled company-side at port and which stay
+      the company's: `seal_id` (placeholder here, the registration id there),
+      `drydocs_application_id` (the same pattern, top level) and `used_by_drydocs`
+      (an estate fact per side). `acronyms` is a mapping, not a row set, and is the
+      producer's AUTHORITATIVE HOME by SME ruling (2026-07-21, header): take it
+      whole, at the O68 (d) shape - `scripts/render_software_registry.py` at the
+      base reads that shape and a pre-O68 input breaks the whole render_board.py
+      chain, which is how this row was found. `invocation_patterns`, `schema`,
+      `classification`, `adr` and the header comment are producer mechanism and
+      cross whole; `updated` is the row owner's. UNNAMED FIELDS: on a vendor or
+      product row belong to whichever side owns the row under the id rule above;
+      a new top-level key is the producer's.
+    note: >
+      Row added 2026-09-05 from the company's carve-out 8 apply notes: without it the
+      file fell through to the config/** canonical-producer default, and a wholesale
+      take dropped the company-only `servicenow` vendor and product rows (vendors
+      15 -> 14), restored by hand. Joins dev-environment (2026-07-28), source-bindings,
+      lob-product-team (2026-08-20), source-registry (2026-09-01) and data-centers
+      (2026-09-05) in the config/** fall-through class. The J68 pair guard cannot see
+      this one: the file's guard (test_software_registry.py) reads the file's SHAPE
+      and the loader contract, not its rows, so there is no declaration/guard pair to
+      hold to one disposition - the row has to be written. The J71 totality guard
+      does cover it, from the same commit (ENTRY_FILES in test_port_manifest.py).
+      Carve-out 8 does not take the manifest, so the row reaches the company at the
+      next roll; the FOURTEENTH postscript's "take render_board.py too" is what made
+      this input cross early, and the SIXTEENTH says what that sentence left out.
   - path: "config/taxonomy/tom-role-vocabulary.yaml"
     disposition: per-entry
     entry_rule: >
