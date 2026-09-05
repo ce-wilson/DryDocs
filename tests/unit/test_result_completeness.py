@@ -34,6 +34,7 @@ import json
 
 import pytest
 
+from drydocs_api.ephemeral_specs import EphemeralSpecStore
 from drydocs_api.exports import (
     EXPORT_LIMIT_CEILING,
     ExportLedger,
@@ -46,7 +47,6 @@ from drydocs_api.query_specs import (
     DEFAULT_DISPLAY_LIMIT,
     DISPLAY_LIMIT_PARAM,
     QUERY_SPECS,
-    display_limit_param,
     query_spec,
 )
 from drydocs_api.sessions import InMemorySessionStore
@@ -92,8 +92,9 @@ def _bound(spec_id: str, **params) -> dict:
 
 
 def _uncapped_spec_id() -> str:
+    needle = "$" + DISPLAY_LIMIT_PARAM
     for spec in QUERY_SPECS.values():
-        if not display_limit_param(spec):
+        if needle not in spec.cypher:
             return spec.id
     pytest.skip("every registered spec declares a display limit")
 
@@ -102,8 +103,8 @@ def _uncapped_spec_id() -> str:
 
 
 def test_a_declared_limit_and_a_bound_limit_go_together() -> None:
-    """``display_limit_param`` requires BOTH the parameter and a ``$limit`` the
-    Cypher binds, and the registry keeps them in lockstep.
+    """A registry spec's declared ``limit`` parameter and its bound ``$limit``
+    go together, and this holds them there.
 
     A spec that declared the parameter without using it would have every result
     over 500 rows reported as truncated AND SLICED — the API inventing a cap no
@@ -283,6 +284,95 @@ def test_a_nonsense_export_limit_is_refused(bad) -> None:
 def test_raising_a_ceiling_a_spec_does_not_have_is_refused() -> None:
     with pytest.raises(ValueError, match="no export ceiling to raise"):
         _export(_uncapped_spec_id(), total=10, limit=100)
+
+
+# ── the ephemeral case: the Ask surface inherits completeness too ────────────
+#
+# An R4 ephemeral spec is built with `params=()` — user-supplied params fail
+# closed — while its ceiling rides in `bound_params`, frozen at registration.
+# Keying completeness on the DECLARED parameter would have reported every capped
+# Ask-path answer as complete, which is this item's own defect on the surface
+# most likely to produce it. So `applied_limit` keys on the Cypher binding
+# `$limit` instead, and these tests are what hold it there.
+
+
+def _ephemeral(store: InMemorySessionStore, cypher: str, params: dict):
+    eph = EphemeralSpecStore()
+    ref = eph.register(_token_for(store), cypher, "drydocs", params).ref
+    return eph, ref
+
+
+def _token_for(store: InMemorySessionStore) -> str:
+    if not getattr(store, "_api1_token", None):
+        store._api1_token = store.issue("mouse").token  # type: ignore[attr-defined]
+    return store._api1_token  # type: ignore[attr-defined]
+
+
+EPH_CYPHER = "MATCH (n:BusinessApplication) RETURN n.app_id AS app_id LIMIT $limit"
+
+
+def test_an_ephemeral_spec_reports_its_frozen_ceiling() -> None:
+    store = InMemorySessionStore()
+    eph, ref = _ephemeral(store, EPH_CYPHER, {"limit": 50})
+    out = run_spec(
+        ref, {}, _token_for(store), store, LimitHonoringRunner(total=900, keys=["app_id"]), eph
+    )
+    assert out["limit"] == 50, "a frozen ceiling is still a ceiling"
+    assert out["truncated"] is True
+    assert len(out["rows"]) == 50
+
+
+def test_an_ephemeral_spec_without_a_ceiling_reports_none() -> None:
+    store = InMemorySessionStore()
+    eph, ref = _ephemeral(store, "MATCH (n:BusinessApplication) RETURN n.app_id AS app_id", {})
+    out = run_spec(
+        ref, {}, _token_for(store), store, LimitHonoringRunner(total=30, keys=["app_id"]), eph
+    )
+    assert out["limit"] is None and out["truncated"] is False
+    assert len(out["rows"]) == 30
+
+
+def test_an_ephemeral_export_ceiling_cannot_be_raised() -> None:
+    """R4's frozen params outrank clause (c)'s raisable ceiling.
+
+    Reporting an ephemeral's completeness is free; rewriting its bound limit
+    would break the property that makes an agent-registered query reproducible.
+    """
+    store = InMemorySessionStore()
+    eph, ref = _ephemeral(store, EPH_CYPHER, {"limit": 50})
+    with pytest.raises(ValueError, match="frozen at registration"):
+        job = export_spec(
+            ref,
+            {},
+            "csv",
+            _token_for(store),
+            store,
+            LimitHonoringRunner(total=900, keys=["app_id"]),
+            ExportLedger(),
+            ephemerals=eph,
+            limit=900,
+        )
+        list(job.chunks)
+
+
+def test_an_ephemeral_export_manifest_records_the_frozen_ceiling() -> None:
+    store = InMemorySessionStore()
+    eph, ref = _ephemeral(store, EPH_CYPHER, {"limit": 50})
+    ledger = ExportLedger()
+    job = export_spec(
+        ref,
+        {},
+        "csv",
+        _token_for(store),
+        store,
+        LimitHonoringRunner(total=900, keys=["app_id"]),
+        ledger,
+        ephemerals=eph,
+    )
+    list(job.chunks)
+    manifest = ledger.manifest(job.export_id)
+    assert manifest["truncated"] is True and manifest["limit"] == 50
+    assert manifest["row_count"] == 50
 
 
 def test_omitting_the_export_limit_keeps_exactly_todays_behaviour() -> None:

@@ -109,25 +109,12 @@ class UnknownSpecError(KeyError):
 DISPLAY_LIMIT_PARAM = "limit"
 #: The ceiling itself. 500 was already the value; it is a constant now so the
 #: manifest can record WHICH ceiling applied rather than a bare row count.
+#: What DECIDES whether a run is capped is exports.applied_limit, which keys
+#: on the Cypher binding `$limit` rather than on the declaration below — an
+#: R4 ephemeral spec declares no params and still carries a frozen ceiling.
 DEFAULT_DISPLAY_LIMIT = 500
 
 _LIMIT = (ParamSpec(DISPLAY_LIMIT_PARAM, "int", required=False, default=DEFAULT_DISPLAY_LIMIT),)
-
-
-def display_limit_param(spec: QuerySpec) -> bool:
-    """True when this spec has a display ceiling that actually applies.
-
-    BOTH halves are required: the declared parameter AND a ``$limit`` the Cypher
-    really binds. All 39 capped specs satisfy both today
-    (``tests/unit/test_result_completeness.py`` holds them there), and the
-    conjunction is deliberate — a spec that declared the parameter without using
-    it would otherwise have every result over 500 rows reported as truncated and
-    SLICED, which would be the API inventing a cap that no query applied.
-    """
-    return (
-        any(p.name == DISPLAY_LIMIT_PARAM for p in spec.params)
-        and ("$" + DISPLAY_LIMIT_PARAM) in spec.cypher
-    )
 
 
 def _with_ground_truth_exclusion(spec: QuerySpec) -> QuerySpec:
