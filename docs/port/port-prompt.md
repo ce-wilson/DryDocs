@@ -5868,8 +5868,12 @@ hand-carried and nothing parked.
     `port-base-20260902..port-base-20260905`; 52 read as ritual under the existing patterns
     (snapshots, claims, renders, grooms); 131 are cited in steps 313–333. No pattern
     spelling drifted this roll, so `port_preflight.py` is untouched. The roll commit
-    touches `docs/port/port-prompt.md`, `PORT-MANIFEST.yaml` (the two per-entry rows named
-    in RELAY-26) and the plan renders — no path the range had not already touched.
+    (`7f676ce9`, subject `docs(port):` — outside the `chore(port): roll` ritual pattern, so
+    it is cited here rather than exempted) touches `docs/port/port-prompt.md`,
+    `PORT-MANIFEST.yaml` (the two per-entry rows named in RELAY-26) and the plan renders —
+    no path the range had not already touched. The tag sits on the `chore(port): roll`
+    follow-up that re-renders the board after Lane B's WEB12 claim (`3919f5a0`) landed
+    between the roll's pull and its push.
 
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
