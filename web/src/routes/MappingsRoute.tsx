@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { Persona } from '../lib/auth'
-import { createApiAccess } from '../lib/graphApi'
 import {
   createMappingsApi,
   type MappingDomain,
@@ -9,12 +8,12 @@ import {
   type MappingsApi,
   type OverrideEntry,
 } from '../lib/mappingsApi'
-import type { SpecResult } from '../lib/graph'
 import { DEMO_OVERRIDE_GRID, type OverrideGridRow } from '../data/mappingsDemo'
 import ModuleToolbar from '../layout/ModuleToolbar'
 import EmptyState from '../components/ui/EmptyState'
 import AppCodeCascadePane from './AppCodeCascadePane'
 import DomainGridTable from './DomainGridTable'
+import { isResolved, useGraphAccess, useGraphQuery } from '../data/graphAccess'
 
 // /mappings — the O13 manual-mapping stewardship screen (wf-mapping-01).
 // Steward + admin only (server-enforced too — /mappings/* returns 403 below
@@ -60,9 +59,10 @@ function download(filename: string, content: string, type = 'text/plain') {
 }
 
 export default function MappingsRoute({ persona }: { persona: Persona }) {
-  const apiUrl = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:8001'
+  // The O13 mappings client is a different surface with its own API; it takes
+  // the base URL from the session rather than re-deriving it.
+  const { apiUrl } = useGraphAccess()
   const mappings = useMemo(() => createMappingsApi(apiUrl, persona.id), [apiUrl, persona.id])
-  const access = useMemo(() => createApiAccess(apiUrl, persona.id), [apiUrl, persona.id])
 
   const [apiDown, setApiDown] = useState<string | null>(null)
   const [domains, setDomains] = useState<MappingDomain[]>(FALLBACK_DOMAINS)
@@ -79,46 +79,42 @@ export default function MappingsRoute({ persona }: { persona: Persona }) {
   const [domainGrid, setDomainGrid] = useState<MappingGrid | null>(null)
 
   useEffect(() => {
-    let cancelled = false
+    const ctl = new AbortController()
     mappings
       .domains()
       .then((d) => {
-        if (cancelled) return
+        if (ctl.signal.aborted) return
         setDomains(d)
         setApiDown(null)
       })
       .catch((e: Error) => {
-        if (!cancelled) setApiDown(e.message)
+        if (!ctl.signal.aborted) setApiDown(e.message)
       })
     mappings
       .options()
       .then((o) => {
-        if (!cancelled) setOptions(o)
+        if (!ctl.signal.aborted) setOptions(o)
       })
       .catch(() => {
         /* options footer just stays empty — the apiDown notice already shows */
       })
-    return () => {
-      cancelled = true
-    }
+    return () => ctl.abort()
   }, [mappings])
 
   useEffect(() => {
-    let cancelled = false
+    const ctl = new AbortController()
     setDomainGrid(null)
     const available = domains.find((d) => d.id === activeDomain)?.available
     if (!available) return
     mappings
       .grid(activeDomain)
       .then((g) => {
-        if (!cancelled) setDomainGrid(g)
+        if (!ctl.signal.aborted) setDomainGrid(g)
       })
       .catch(() => {
         /* grid stays null → its section shows the api-down hint */
       })
-    return () => {
-      cancelled = true
-    }
+    return () => ctl.abort()
   }, [mappings, activeDomain, domains])
 
   const activeDef = domains.find((d) => d.id === activeDomain)
@@ -190,14 +186,12 @@ export default function MappingsRoute({ persona }: { persona: Persona }) {
           {activeDomain === 'seal-contact-override' ? (
             <SealOverridePane
               mappings={mappings}
-              access={access}
               grid={domainGrid}
               apiDown={apiDown}
             />
           ) : activeDomain === 'app-code-mapping' ? (
             <AppCodeCascadePane
               mappings={mappings}
-              access={access}
               grid={domainGrid}
               apiDown={apiDown}
               personaId={persona.id}
@@ -252,36 +246,32 @@ interface SealRoleRow {
 
 function SealOverridePane({
   mappings,
-  access,
   grid,
   apiDown,
 }: {
   mappings: MappingsApi
-  access: ReturnType<typeof createApiAccess>
   grid: MappingGrid | null
   apiDown: string | null
 }) {
-  // live SEAL attributions from the graph (the origin='source' rows the
-  // committed list may not have captured yet)
-  const [liveSource, setLiveSource] = useState<SealRoleRow[] | null>(null)
   const [drafts, setDrafts] = useState<OverrideEntry[]>([])
   const [dialogSeed, setDialogSeed] = useState<Partial<OverrideEntry> | null>(null)
   const [status, setStatus] = useState('')
 
-  useEffect(() => {
-    let cancelled = false
-    access
-      .runSpec(SEAL_ROLES_SPEC)
-      .then((r: SpecResult) => {
-        if (!cancelled) setLiveSource(r.rows as unknown as SealRoleRow[])
-      })
-      .catch(() => {
-        if (!cancelled) setLiveSource([])
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [access])
+  // live SEAL attributions from the graph (the origin='source' rows the
+  // committed list may not have captured yet)
+  const sealRoles = useGraphQuery(SEAL_ROLES_SPEC)
+  // Memoised on the query STATE, whose identity changes only when the read
+  // does: the rows feed a useMemo below, and a fresh array every render would
+  // rebuild the whole override grid on every keystroke.
+  const liveSource: SealRoleRow[] | null = useMemo(
+    () =>
+      isResolved(sealRoles)
+        ? (sealRoles.data.rows as unknown as SealRoleRow[])
+        : sealRoles.status === 'error'
+          ? []
+          : null,
+    [sealRoles],
+  )
 
   // one origin-flagged row list: committed grid rows (store) + live graph
   // attributions not already captured as a source row for that (app, role)

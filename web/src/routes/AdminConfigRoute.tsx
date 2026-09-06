@@ -155,7 +155,7 @@ export default function AdminConfigRoute() {
   useEffect(() => {
     sidebar.set(<SurfaceInspector s={selected} />)
     return () => sidebar.clear()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, [selected])
 
   const gateLog = SURFACES.find((s) => s.id === 'gate-record')?.extra_contents['config/gate-log.md']

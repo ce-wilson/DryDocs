@@ -9,7 +9,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - docs/reviews/modules/web-2026-09-05.md
@@ -51,3 +51,86 @@ notes: |
   move the floor. O34 (done) recorded the advisory count as three; it is five now, root
   `@neo4j-nvl/base -> @segment/analytics-next`, none of it reaching dist - the finding is the
   unobserved drift, not the CVEs.
+
+  DONE 2026-09-05 (Lane B, laptop). Four numbers now have something under them.
+
+  A CORRECTION TO THE REVIEW, AND IT CHANGED THE WORK. The report says the three
+  `eslint-disable-next-line react-hooks/exhaustive-deps` lines "suppress a rule
+  that has never run" and that "the mechanism behind them is fiction", and clause
+  (c) follows from that: delete them and re-express each site. THEY ARE NOT
+  INERT. oxlint honours eslint-style disable comments, so the moment the rule is
+  enabled those three comments work exactly as written — deleting them would have
+  turned three deliberate, well-commented dependency omissions into three red
+  builds.
+
+  Verified rather than assumed (J76): with `react-hooks/exhaustive-deps: error`
+  set and the comment REMOVED, useRouteA11y.ts fails with
+  `React Hook useEffect has a missing dependency: 'contentRef.current'`; with the
+  comment restored, it passes. So the mechanism was real; only the NAME was
+  fiction, because it named a linter this project does not have.
+
+  What landed instead is what clause (c) actually asks for once that is known: the
+  rule is enabled, and all three are renamed to `oxlint-disable-next-line`, which
+  names the linter that reads them. Each site keeps the comment that explains its
+  omission, which was sound all along — the report says so too.
+
+  Also worth carrying: oxlint reports react-hooks/exhaustive-deps BY DEFAULT even
+  though .oxlintrc.json never enabled it. It is set to "error" explicitly now
+  rather than left implicit, because a rule the config does not mention is a rule
+  the next config edit can silently drop.
+
+  (a) `test:coverage` with a statement floor, and the floor is 9.8, NOT the
+  report's 7.51. Re-measured at pull: 9.89 (the WEB3/WEB12/WEB1 guards and hook
+  tests moved it from 7.51). Setting a ratchet to a stale number would install a
+  floor already 2.4 points below the tree, which is a ratchet that ratchets
+  nothing. Branch and function floors ride along at 70/50, comfortably under the
+  73.3/52.7 measured, because they were the two numbers most likely to slide
+  while statements climbed.
+
+  The floor is 9.8 and not 9.89 on purpose: a floor pinned exactly to the measured
+  value fails on any refactor that adds one uncovered line, and a floor that fails
+  for reasons nobody caused is a floor people lower. Raise it when the measured
+  number clears the next half point.
+
+  PROVEN TO GATE, not assumed: `npm run test:coverage` exits 0 today, and the same
+  command with the threshold at 99 exits 1. A threshold that was silently ignored
+  would have looked identical from the outside, which is exactly how the meter got
+  bought and never read in the first place.
+
+  (b) `--max-warnings 0`, and it lives in the npm SCRIPT rather than the CI step,
+  so a local `npm run lint` and a CI run gate identically. The ten warnings were
+  all `react/only-export-components`, a fast-refresh advisory, across five files
+  that co-locate a constant or a hook with a component deliberately
+  (tableControls, TrustLegend, RelEdge, HubGlyphs, rightSidebarContext). They are
+  WAIVED per file in .oxlintrc.json `overrides`, which is the clause's own second
+  option, rather than split into ten files: splitting five deliberate
+  co-locations to satisfy an HMR advisory is churn, and the value being bought
+  here is that a NEW warning is red. Count is zero and `--max-warnings 0` passes.
+
+  The waiver's reasons live here rather than beside it because .oxlintrc.json is
+  JSON and cannot hold a comment. That is a small, real gap — a waiver whose
+  reason is one commit message away from invisible.
+
+  (d) `npm audit --audit-level=high` as its own npm script and a CI step that
+  reports and never blocks (`|| echo ::warning::`), the same posture the snapshot
+  ritual takes with its lint check. The finding is not the CVEs — five high, one
+  root (@neo4j-nvl/base -> @segment/analytics-next), none of it reaching dist —
+  it is that the count was recorded as three at O34, is five now, and nothing
+  noticed because nothing looked.
+
+  (e) TowerIcon.tsx deleted (19 lines, zero importers) and `clsx` removed from
+  dependencies (declared, imported nowhere). The ui-components ledger loses its
+  row and the pin moves 92 -> 91. Worth naming: noUnusedLocals catches an unused
+  local and cannot see an unused MODULE, which is why a dead component shows up in
+  a hand-maintained ledger and nowhere else.
+
+  NOT DONE, and it is listed as optional residue rather than acceptance: folding
+  src/docs/ and src/docsmod/, and moving mappingsDemo.ts and AppCodeCascadePane.tsx
+  to their feature directories. Both are pure moves whose diffs would bury this
+  item's five real changes, and AppCodeCascadePane in particular was just rewired
+  by WEB1 — moving it in the same burst makes that change unreviewable.
+
+  Gates at close: poetry run pytest -q = 3360 passed, 12 skipped, 1 failed
+  (test_plan_roadmap - the expected Lane B close failure). ruff clean. In web/:
+  tsc -b exit 0, oxlint --max-warnings 0 exit 0 with ZERO warnings (was ten),
+  npm run test:coverage exit 0 at 9.9% statements, vitest 225 tests.

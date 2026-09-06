@@ -1,13 +1,13 @@
 # DryDocs Console (web/)
 
-## Site shell (O8) — zone layout, theming, 9 module routes
+## Site shell (O8) — zone layout, theming, 12 module routes
 
 Post-sign-in, the app is a real `react-router` tree (deep-linkable, back-button
 safe), not the old `#/...` hash router. `src/layout/Shell.tsx` renders the zone
 shell — aside / header / page-owned toolbar (each route's own `ModuleToolbar`)
 / content / right-sidebar slot — driven by one typed config,
 `src/layout/shellConfig.ts`. `src/modules/registry.ts` is the single array of
-the 9 site-plan §3 modules that drives both the aside nav and the Overview
+the 12 modules that drives both the aside nav and the Overview
 radial hub (`src/routes/OverviewRoute.tsx`); every module route renders the
 shared skeleton in `src/routes/ModuleTemplate.tsx` (graph pane + resizable
 divider + data-frame tabs — populated per module by the O10–O19 builds:
@@ -28,11 +28,20 @@ self-hosted via `@fontsource` (no Google Fonts CDN).
 Signing in means proving a secret to `drydocs-api` and holding the opaque token it
 returns (`src/lib/auth.ts`, session key `drydocs.session.v2`). The **client-side
 picker this section used to describe is gone** — until 2026-08-28 any persona
-could be chosen with nothing verifying it, and `?as=<persona>` gave a headless
-sign-in for demos. Neither exists now: there is no `?as=`, and a browser that
-edits its stored session buys nothing, because the role that gates anything is
-re-derived from `PERSONAS` client-side and re-resolved from the token server-side
-on every request (ADR 0005 decision 3).
+could be chosen with nothing verifying it. A browser that edits its stored session
+buys nothing, because the role that gates anything is re-derived from `PERSONAS`
+client-side and re-resolved from the token server-side on every request
+(ADR 0005 decision 3).
+
+`?as=<persona>` STILL EXISTS, and this section used to say it did not. It is a
+DEV-ONLY affordance (the headless-verification skill drives pages with it), baked
+out of production bundles by the `import.meta.env.DEV` constant — the same
+build-time construction that makes the bolt adapter unreachable in a production
+build. It is a real sign-in, so it needs a real secret: `VITE_DEV_CONSOLE_SECRET`,
+set in the dev shell beside the one `scripts/set_console_credential.py` stored.
+There is no default and no fallback, because a baked-in dev password is the exact
+thing a credential step exists to remove. A reader auditing authentication needs
+to know it is there.
 
 Secrets are **machine-local and absent on a fresh clone**, so every login on a new
 checkout is refused until one is set — the correct default for a proof of concept,
@@ -42,19 +51,59 @@ bug. Set one with `poetry run python scripts/set_console_credential.py <persona>
 both git and `var/`). Real enterprise authn/authz still replaces this layer
 company-side per the ADR's Evidence.
 
-Three synthetic personas (never real SIDs — publish boundary):
+### The six synthetic personas
 
-| Persona | Role | Sees |
+Never real SIDs — publish boundary. The three SID-shaped display names this table
+carried until WEB15 were retired from `auth.ts` on 2026-08-28 and should not have
+outlived it here.
+
+| Persona | Role | Seat |
 |---|---|---|
-| `mouse` (J. Doe) | user | all 9 modules; Ownership is their own My Apps rollup (read-only, ServiceNow-derived, synthesized) |
-| `morpheus` (A. Smith) | admin | everything above, plus Console (dev) — the bolt/ADK sandbox — and the cosmetic Prod\|UAT\|Dev env toggle |
-| `trinity` (K. Chen) | steward | mapping stewardship (`/mappings`, O13): manual-tier grids, changeset drafts, override-list drafting (O24) — zero graph writes |
+| `morpheus` | admin | platform admin · all towers |
+| `trinity` | steward | mapping steward · manual tiers (O13) |
+| `neo` | user | app-support SME · context intake — the persona `/intake` admits by ID |
+| `mouse` | user | app access derived from ServiceNow |
+| `tank` | user | app access derived from ServiceNow · second seat |
+| `dozer` | user | app access derived from ServiceNow · third seat |
 
-All 9 site-plan modules are open to every signed-in persona (post-O8); only
-`/console` is role-gated (admin, checked in `src/App.tsx`) and the tower demo
-deep links (`/explorer/tower/:key`) keep the old per-persona rule
-(`canDrill` in `src/lib/views.ts`). The ADK agent flow uses the signed-in
-persona id as its `userId`.
+### What is gated, and where
+
+Three tiers, one vocabulary. `canAccessModule(access, role)` in
+`src/modules/registry.ts` is the ONLY check: `'all'` (the default) admits every
+signed-in persona, `'sme'` admits steward and admin, `'admin'` admits admin.
+
+**Five of the twelve modules are NOT open to a user-role persona**, which the
+previous version of this section denied outright:
+
+| Module | Path | Access |
+|---|---|---|
+| Remediation | `/remediation` | `sme` |
+| Software | `/software` | `sme` |
+| Gates | `/gates` | `sme` |
+| Load map | `/load-map` | `sme` |
+| Under the Hood | `/under-the-hood` | `sme` |
+
+Three more surfaces are gated and are deliberately NOT nav modules
+(`GATED_SURFACES` in the same file, same vocabulary): `/mappings` (`sme` — the
+write surface), `/admin/config` (`admin`) and `/console` (`admin` — the
+raw-Cypher sandbox, and steward does not get it).
+
+`/intake` is the one exception, and it is declared as one: it admits the SME
+PERSONA by id as well as steward and admin, which a ROLE vocabulary cannot
+express, so it keeps `canAccessIntake` in `src/lib/auth.ts` and is listed in
+`PERSONA_SCOPED_PATHS`.
+
+**All of it derives from the registry (WEB3).** One pathless `RouteAccessGate`
+inside the shell asks `canAccessPath` what the current pathname requires. Before
+WEB3, `App.tsx` restated `role === 'steward' || role === 'admin'` inline six
+times — and that divergence had already shipped a bug: O59 set `/remediation` to
+`sme`, which hid the nav entry and left the route reachable by typing the URL.
+A source scan in `src/modules/routeAccess.test.ts` now fails on any new role or
+persona predicate outside the registry.
+
+The tower demo deep links (`/explorer/tower/:key`) keep their own per-persona
+rule (`canDrill` in `src/lib/views.ts`) — a view filter, not a route gate. The
+ADK agent flow uses the signed-in persona id as its `userId`.
 
 Run it: `cp .env.example .env.local` (point `VITE_NEO4J_URI` at your local Neo4j —
 canonical container/ports live in `config/dev-environment.yaml`; bolt is

@@ -1,9 +1,8 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 
-import { apiBaseUrl } from '../lib/auth'
-import { createApiAccess } from '../lib/graphApi'
 import type { SpecResult } from '../lib/graph'
 import EmptyState from '../components/ui/EmptyState'
+import { useGraphAccess } from '../data/graphAccess'
 
 // The Ask file-name REPORT (O62): search a file, get the application, the
 // process, and who to escalate to.
@@ -66,13 +65,13 @@ const LEGS: readonly { key: keyof ReportRow | 'repo'; label: string; modelled: b
 const TH = 'border-b border-edge px-2.5 py-1.5 text-left font-semibold text-muted'
 const TD = 'border-b border-edge-soft px-2.5 py-1.5 align-top text-text'
 
-export default function FileReport({ personaId }: { personaId: string }) {
+export default function FileReport() {
   const [term, setTerm] = useState('')
   const [rows, setRows] = useState<ReportRow[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
-  const access = useMemo(() => createApiAccess(apiBaseUrl(), personaId), [personaId])
+  const { access } = useGraphAccess()
 
   async function run(e: React.FormEvent) {
     e.preventDefault()

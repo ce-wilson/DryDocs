@@ -1,11 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { MODULES } from '../modules/registry'
 import ModuleTemplate from './ModuleTemplate'
 import MiniDag, { type DagEdgeDef, type DagNodeDef } from '../components/MiniDag'
 import StatTiles from '../components/StatTiles'
 import EmptyState from '../components/ui/EmptyState'
 import type { Persona } from '../lib/auth'
-import { createApiAccess } from '../lib/graphApi'
 import VendorIcon from '../software/VendorIcon'
 import AcronymsPane from '../software/AcronymsPane'
 import {
@@ -24,6 +23,7 @@ import {
   unclaimedCorpora,
   type Product,
 } from '../software/softwareModel'
+import { useGraphQuery } from '../data/graphAccess'
 
 // /software (Q16) — READ-ONLY ledger view of vendor -> product -> corpus -> graph.
 // Static generated JSON (software-registry.json + the doc-corpus rows of
@@ -53,30 +53,17 @@ function edgeChip(state: ReturnType<typeof edgeState>): { text: string; token: s
 
 export default function SoftwareRoute({ persona }: { persona: Persona }) {
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [live, setLive] = useState<Map<string, number> | null>(null)
-
-  const apiUrl = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:8001'
-  const access = useMemo(() => createApiAccess(apiUrl, persona.id), [apiUrl, persona.id])
-
-  useEffect(() => {
-    let cancelled = false
-    access
-      .runSpec('software.doc-coverage.v1')
-      .then((r: { rows: unknown[] }) => {
-        if (cancelled || !r.rows.length) return
-        const counts = new Map<string, number>()
-        for (const row of r.rows as unknown as { product_id: string; documents: number }[]) {
-          counts.set(row.product_id, Number(row.documents ?? 0))
-        }
-        setLive(counts)
-      })
-      .catch(() => {
-        /* declaration-only view; the banner says so */
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [access])
+  // WEB12: a declaration-only view when the read is loading, empty or failed —
+  // the banner says which, and no case here fabricates a count.
+  const coverage = useGraphQuery('software.doc-coverage.v1')
+  const live: Map<string, number> | null =
+    coverage.status === 'data'
+      ? new Map(
+          (coverage.data.rows as unknown as { product_id: string; documents: number }[]).map(
+            (row) => [row.product_id, Number(row.documents ?? 0)] as const,
+          ),
+        )
+      : null
 
   const selected = PRODUCTS.find((p) => p.id === selectedId) ?? null
 
