@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
-import type { GraphAccess, SpecResult } from '../lib/graph'
+import { useMemo, useState, type ReactNode } from 'react'
+import { useGraphAccess, useGraphQuery } from '../data/graphAccess'
 import EmptyState from '../components/ui/EmptyState'
 
 // A QuerySpec-bound data frame (O11, site-plan §4): renders ONLY registry
@@ -16,10 +16,13 @@ import EmptyState from '../components/ui/EmptyState'
 // demo grid passed as `fallback` — with a visible notice, never silently.
 
 interface SpecGridProps {
-  access: GraphAccess
   specId: string
   fallback: ReactNode
 }
+
+// WEB12 dropped the `access` prop. Sixteen call sites passed a GraphAccess
+// their route had built, which is how the per-route client became a per-route
+// obligation; the frame reads the session's one client from context instead.
 
 function download(filename: string, content: Blob | string, type = 'text/plain') {
   const blob = typeof content === 'string' ? new Blob([content], { type }) : content
@@ -39,26 +42,17 @@ function toCsv(keys: string[], rows: Record<string, unknown>[]): string {
   return [keys.join(','), ...rows.map((r) => keys.map((k) => esc(r[k])).join(','))].join('\n') + '\n'
 }
 
-export default function SpecGrid({ access, specId, fallback }: SpecGridProps) {
-  const [result, setResult] = useState<SpecResult | null>(null)
-  const [error, setError] = useState<string | null>(null)
+export default function SpecGrid({ specId, fallback }: SpecGridProps) {
+  const { access } = useGraphAccess()
   const [filter, setFilter] = useState('')
   const [status, setStatus] = useState('')
 
-  useEffect(() => {
-    let cancelled = false
-    access
-      .runSpec(specId)
-      .then((r) => {
-        if (!cancelled) setResult(r)
-      })
-      .catch((e: Error) => {
-        if (!cancelled) setError(e.message)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [access, specId])
+  const query = useGraphQuery(specId)
+  const result = query.status === 'data' || query.status === 'empty' ? query.data : null
+  // A hung read used to be indistinguishable from a loading one; now the
+  // deadline turns it into an error with its own message, and the frame
+  // falls back to the demo grid the same way it does for a refusal.
+  const error = query.status === 'error' ? query.message : null
 
   const visible = useMemo(() => {
     if (!result) return []

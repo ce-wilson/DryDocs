@@ -111,6 +111,20 @@ class QueryBody(BaseModel):
     params: dict = {}
 
 
+class ExportBody(QueryBody):
+    """The export request: a spec run's params, plus API1 (c)'s raisable ceiling.
+
+    A separate model from ``QueryBody`` because the ceiling is an EXPORT
+    decision. Raising the limit on a grid read would change what is on screen;
+    raising it here changes what lands in a file that carries a manifest, and
+    those are different permissions to grant. Omitted (the default) keeps
+    today's behaviour exactly — the display limit the console echoes back — so
+    a caller that has not been updated is unaffected.
+    """
+
+    limit: int | None = None
+
+
 class RawBody(BaseModel):
     cypher: str
 
@@ -536,7 +550,7 @@ def create_app(
     @app.post("/specs/{spec_id}/export")
     def post_spec_export(
         spec_id: str,
-        body: QueryBody,
+        body: ExportBody,
         user: CurrentUser,
         format: str = "csv",
         x_drydocs_run_id: str | None = Header(default=None),
@@ -562,9 +576,14 @@ def create_app(
                     graph,
                     export_ledger,
                     ephemerals=ephemerals,
+                    limit=body.limit,
                 )
                 rec.detail["export_id"] = job.export_id
                 rec.detail["format"] = format
+                if body.limit is not None:
+                    # A raised ceiling is a deliberate act on a governed
+                    # artifact; the audit line is where that belongs.
+                    rec.detail["limit"] = body.limit
         except InvalidTokenError:
             raise HTTPException(401, "invalid session") from None
         except UnknownSpecError:
