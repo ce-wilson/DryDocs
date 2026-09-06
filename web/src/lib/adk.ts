@@ -1,4 +1,5 @@
-// Thin client for the ADK api_server REST surface (default http://localhost:8000).
+// Thin client for the ADK api_server REST surface, reached as `/agent` on the
+// page's own origin (agentBaseUrl(); the proxy forwards to the ADK server - ADR 0020).
 // Endpoints per https://adk.dev/runtime/api-server/
 
 export interface AdkEvent {
