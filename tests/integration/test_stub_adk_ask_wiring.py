@@ -264,10 +264,13 @@ def test_the_committed_sse_fixture_still_matches_what_the_stub_emits():
     updated.
     """
     expected = sse_body(events_for([{"text": "q"}], registrar=None))
-    actual = SSE_FIXTURE.read_text(encoding="utf-8")
+    # read_BYTES, not read_text: text mode translates CRLF to LF on the way
+    # in, so a fixture that had been eol-normalised would compare equal here
+    # while the vitest read different bytes off the same file. The blank line
+    # between frames IS the SSE delimiter, so "byte for byte" has to mean it.
+    actual = SSE_FIXTURE.read_bytes().decode("utf-8")
     assert actual == expected, (
-        "tests/fixtures/adk/stub-run-sse.txt is stale. Regenerate it with:\n"
-        '  poetry run python -c "from tests.stub_adk import events_for, sse_body; '
-        "import pathlib; pathlib.Path('tests/fixtures/adk/stub-run-sse.txt')"
-        ".write_text(sse_body(events_for([{'text': 'q'}], None)), encoding=\"utf-8\")\""
+        "tests/fixtures/adk/stub-run-sse.txt is stale. Regenerate it with: "
+        "poetry run python scripts/regen_stub_sse_fixture.py "
+        "(it writes BYTES, so the frame delimiters stay LF on every platform)"
     )

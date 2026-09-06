@@ -94,6 +94,21 @@ notes: |
   injects a CredentialChecker - which is why create_app takes one - and the test
   is venue-independent as a result (J18).
 
+  A THIRD ENVIRONMENT FACT, caught only because the guard was tightened. The
+  fixture records a WIRE FORMAT whose frame delimiter is a blank line, and the
+  first version of the drift guard compared it with read_text() - which
+  translates CRLF to LF on the way in. So a fixture that had been
+  eol-normalised (Python's text-mode write produces CRLF on Windows, and it
+  did) compared EQUAL on the python side while the vitest read different bytes
+  off the same file. The vitest passed anyway, by luck: splitting CRLF on the
+  single newline leaves the next segment starting at `data:`, so the count came
+  out right for the wrong reason. Fixed at all three points - the guard reads
+  BYTES, .gitattributes marks the path `-text`, and scripts/
+  regen_stub_sse_fixture.py writes bytes - so "byte for byte" now means bytes
+  on every platform. The lesson generalises past this item: a recorded wire
+  format is not a text file, and a comparison that normalises is not a
+  byte comparison.
+
   Lane B pen note: R12's inputs overlap Lane A's queue (web/src/ask with R19/R15,
   adk.ts with WEB9, query_specs.py with R19) as READS. This lane wrote none of
   them: the new files are tests/stub_adk.py, tests/integration/
