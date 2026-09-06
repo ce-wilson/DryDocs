@@ -227,7 +227,7 @@ def test_no_option_accepts_cypher():
         for a in sub.choices.values()
         for a in a._actions
     }
-    assert dests <= {"help", "spec_id", "param"}
+    assert dests <= {"help", "spec_id", "param", "verb_name"}  # verb_name: R16, a NAME
 
 
 # ---- the runner's failure is an outcome, not a traceback ----------------------------

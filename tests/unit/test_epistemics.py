@@ -210,6 +210,8 @@ def test_ungraded_envelope_is_null_and_validates() -> None:
 def test_registered_lineage_specs_grade_and_inventories_do_not() -> None:
     graded = {sid for sid, s in QUERY_SPECS.items() if s.walk is not None}
     assert {"lineage.hops.v1", "lineage.data-assets.v1"} <= graded
+    # R16: the three agent verbs walk the derived job chain and grade too.
+    assert {"verb.impact.v1", "verb.context.v1", "verb.trace.v1"} <= graded
     for sid in ("explorer.jobs.v2", "docs.documents.v1", "lineage.schema-definition.v1"):
         assert QUERY_SPECS[sid].walk is None, f"{sid} declares a walk it does not have"
 

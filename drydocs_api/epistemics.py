@@ -118,6 +118,22 @@ LINEAGE_WALK = WalkDeclaration(
     gate_pending=("scheduler_depends_on_file", "scheduler_invokes_utility"),
 )
 
+#: R16: the walk the three agent verbs (impact, context, trace) share. They
+#: traverse the derived WAS_INFORMED_BY chain — a successor job informed by a
+#: predecessor through a shared OUT->IN condition pair — and that chain is
+#: blind to every hand-off that is NOT a condition: a job that waits on a
+#: delivered file (``scheduler_depends_on_file``, planned, no loader) reaches
+#: its upstream through the file system and never through a condition, and a
+#: job whose command line went unparsed, or resolved to an unknown process,
+#: may write the very file another job's chain starts from. Both measurable
+#: causes therefore apply, plus the one planned edge a chain walk would take.
+#: ``scheduler_invokes_utility`` is deliberately NOT here: a Control-M utility
+#: invocation is a data hop (LINEAGE_WALK's concern), not a job-to-job one.
+CHAIN_WALK = WalkDeclaration(
+    probes=(CAUSE_UNPARSED_CMD_LINE, CAUSE_UNRESOLVED_INVOCATION),
+    gate_pending=("scheduler_depends_on_file",),
+)
+
 
 class _Declares(Protocol):
     database: str
