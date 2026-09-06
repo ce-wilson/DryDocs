@@ -158,10 +158,24 @@ unbound:
       drop zone, and the replica it also feeds is reached through `oracle-psgmgr`.
   - carrier: dpl
     reason: manual acquisition — per-SEAL Swagger exports land in the G19 drop zone
+  - carrier: filemover
+    reason: >
+      no connection and no feed — a legacy transfer surface registered (N27) so
+      the research's PEX-derived hops have a system to point at; nothing is read
+      from it.
   - carrier: exec-hosts
     reason: manual acquisition — the host inventory is a hand-dropped extract
   - carrier: infra
     reason: manual acquisition — infrastructure notes are hand-maintained
+  - carrier: mfts
+    reason: >
+      no connection — a platform DryDocs traces THROUGH (G14 command-line
+      lineage), registered at N27 as the other end of a relationship; what a
+      route is and whether one is ever read is C44's gate question.
+  - carrier: onemft
+    reason: >
+      no connection and no feed — the current transfer surface, registered (N27)
+      as a system distinct from `mfts`; no dataset, no loader.
   - carrier: pat
     reason: manual acquisition — the people/product reports are hand-pulled
   - carrier: repo

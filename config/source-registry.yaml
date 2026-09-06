@@ -72,7 +72,7 @@
 schema: drydocs.source-registry.v2
 classification: Internal-Public
 
-updated: 2026-08-19     # Z3: infra:server-export flips confirmed: true (gate server-location-ontology 12/12 + the loader build, same day). Prior same day, Z1: system `infra` + dataset infra:server-export registered confirmed: false. Prior: 2026-08-07 gate rua-load-shapes SIGNED OFF (G22, 28/28): exec-hosts:rua-bundle, bitbucket:repo-objects-manifest and the two dpl registries flip confirmed:true
+updated: 2026-09-06     # N27: systems `mfts`, `filemover`, `onemft` registered (three file-transfer platforms, no datasets). Prior 2026-08-19, Z3: infra:server-export flips confirmed: true (gate server-location-ontology 12/12 + the loader build, same day). Prior same day, Z1: system `infra` + dataset infra:server-export registered confirmed: false. Prior: 2026-08-07 gate rua-load-shapes SIGNED OFF (G22, 28/28): exec-hosts:rua-bundle, bitbucket:repo-objects-manifest and the two dpl registries flip confirmed:true
 
 # ---------------------------------------------------------------------------
 # SYSTEMS — the things we connect to. layer = BDAT four-value view
@@ -376,6 +376,84 @@ systems:
       when a company-side confirmation of what backs the site lands, record
       it here and flip, no re-gate. Mechanism only: no site name, URL,
       hostname or rack value here.
+
+  # --- N27 (2026-09-06): the three FILE-TRANSFER PLATFORMS -------------------
+  # Control-M command lines name transfer routes (G14 lineage; C42/C44), and a
+  # relationship whose other end is an unregistered thing has no source of
+  # record: Control-M is the source for the JOB, never for the PLATFORM the job
+  # hands a file to. So the platforms get SYSTEM rows here. Three rows, not one
+  # under three names: MFTS is Axway SecureTransport (C43, software-registry
+  # product `mfts`), and FileMover -> OneMFT is a SEPARATE lineage (FileMover
+  # the legacy surface, OneMFT its successor) — the research CORRECTION at
+  # internal/research/JOB-MFTS-MM-research.md (the table under H93) is the
+  # authority, and it exists because the first draft merged them.
+  # DATASETS ARE OUT OF SCOPE HERE: no route dataset, no URN, no loader — which
+  # platform a given route belongs to, and what a route IS in the graph, are
+  # C44's gate questions (email-dl-contact-point), not a registration's.
+  # Identifiers, never connection coordinates: the registration id and the
+  # named support group live in the research file (H93, H98); seal_id is the
+  # standing placeholder every committed system row carries (D1 amendment,
+  # gate source-registry-v2), and un-redaction of identifiers is N23's gate
+  # question (registry-wiring-readiness), not decided by a row.
+  - id: mfts
+    name: "MFTS (managed file transfer platform; Axway SecureTransport)"
+    disambiguation: "MFTS = the Axway SecureTransport deployment (software-registry product `mfts`). Distinct from systems `filemover` and `onemft`, which are one OTHER lineage — MFTS is not a former or later name of either."
+    seal_id: "[seal-id]"                # a registered business application: the id is in the research file (H93, corrected there); placeholder here per D1
+    cmdb_ci: ~
+    layer: technology
+    classification: Internal            # confidential handling: real route names, partner endpoints and the support group are company-side
+    binding: ~                          # no connection binding; the REASON is
+                                        # declared in source-bindings.yaml `unbound:`
+    locator:
+      source_product: mfts              # config/taxonomy/software-registry.yaml (C43)
+    sdlc: ~
+    notes: >
+      Registered at N27 from OQ-4 of the JOB-MFTS research (Idea-236 gap 2).
+      At minimum a :BusinessApplication — it carries a company registration
+      id and a named support group, both recorded in
+      internal/research/JOB-MFTS-MM-research.md (H93 and H98). OWNER: that
+      support group, by pointer (H98) — the registry names no owner field, so
+      the owner is recorded here the way `infra` records its site
+      (pointer-never-the-value). The PEX-trace evidence the research holds is
+      MFTS evidence only where the research re-stamps it as such (P5); the
+      route facts remain rung 5 until a capture lands (OQ-2).
+
+  - id: filemover
+    name: "FileMover (legacy file-transfer surface; replaced by OneMFT)"
+    disambiguation: "FileMover = the LEGACY transfer surface, replaced by system `onemft`. Distinct from system `mfts` (Axway SecureTransport) — not a former name of it."
+    seal_id: "[seal-id]"
+    cmdb_ci: ~
+    layer: technology
+    classification: Internal
+    binding: ~                          # no connection binding; the REASON is
+                                        # declared in source-bindings.yaml `unbound:`
+    locator: {}                         # no software-registry row: the vendor is unevidenced (C43 left it out on purpose)
+    sdlc: ~
+    notes: >
+      Registered at N27 so the PEX-derived transfer hops the research captured
+      on this lineage (H6, H7, H8, G-6) stay addressable to a registered
+      system rather than to a name in prose. Legacy: whether it survives as a
+      retired entry or is dropped is the separate call OQ-4 names; nothing
+      here pre-empts it. OWNER: not established by the research — recorded as
+      unknown, not inherited from MFTS.
+
+  - id: onemft
+    name: "OneMFT (current file-transfer surface; FileMover's successor)"
+    disambiguation: "OneMFT = FileMover's SUCCESSOR, the surface the PEX trace profiled. Distinct from system `mfts` (Axway SecureTransport) — a separate platform, not the same product under a newer name."
+    seal_id: "[seal-id]"
+    cmdb_ci: ~
+    layer: technology
+    classification: Internal
+    binding: ~                          # no connection binding; the REASON is
+                                        # declared in source-bindings.yaml `unbound:`
+    locator: {}                         # no software-registry row: the vendor is unevidenced (C43 left it out on purpose)
+    sdlc: ~
+    notes: >
+      Registered at N27. The UUID-shaped route id in the research's
+      four-namespace table is a OneMFT id (its column 3, re-labelled at the
+      correction); which id shape MFTS uses is OQ-1 and is not answered by
+      this row. OWNER: not established by the research — recorded as unknown,
+      not inherited from MFTS.
 
 # ---------------------------------------------------------------------------
 # DATASETS — what loaders read and gates rule. `confirmed` is PER DATASET.
