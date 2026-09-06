@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { lazy, useEffect, useState } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import {
   canAccessIntake,
@@ -23,20 +23,40 @@ import AskRoute from './routes/AskRoute'
 import OwnershipRoute from './routes/OwnershipRoute'
 import AssetPathRoute from './routes/AssetPathRoute'
 import IntakeRoute from './routes/IntakeRoute'
-import ConsoleRoute from './routes/ConsoleRoute'
-import MappingsRoute from './routes/MappingsRoute'
 import LineageRoute from './routes/LineageRoute'
-import AdminConfigRoute from './routes/AdminConfigRoute'
 import LoadsRoute from './routes/LoadsRoute'
 import RunbooksRoute from './routes/RunbooksRoute'
-import RemediationRoute from './routes/RemediationRoute'
 import GraphCanvasRoute from './routes/GraphCanvasRoute'
 import DocsRoute from './routes/DocsRoute'
-import SoftwareRoute from './routes/SoftwareRoute'
-import GatesRoute from './routes/GatesRoute'
-import LoadMapRoute from './routes/LoadMapRoute'
-import UnderTheHoodRoute from './routes/UnderTheHoodRoute'
 import './App.css'
+
+// WEB7 — CODE SPLITTING FOLLOWS THE AUTHORIZATION BOUNDARY, not file size.
+//
+// A4: the route gate was a RENDER decision and not a DELIVERY one. Every route
+// was a static import in one 3.7 MB chunk, so a user-tier persona downloaded
+// the enforcement matrix (295 KB) and the gate record (44 KB) for pages it can
+// never open — and could read both out of devtools. Hiding a page from someone
+// who has already been sent it is not an authorization boundary.
+//
+// THE SET IS EXACTLY THE GATED SET. Every module registry.ts marks with an
+// `access` level, plus the three GATED_SURFACES, and nothing else: a chunk is
+// admissible to a role or it is not, and splitting anything else here would be
+// a size decision wearing this item's clothes. modules/lazyRoutes.test.ts
+// derives the set from the registry and fails when the two disagree, so a new
+// gated module cannot arrive shipped-to-everyone.
+//
+// WHAT IS DELIBERATELY NOT SPLIT: load-map.json (56 KB) is imported by
+// lineage/laneBasis.ts, and /lineage is open to every role. It is admissible to
+// a user, so by this item's own rule it stays in the initial chunk.
+const MappingsRoute = lazy(() => import('./routes/MappingsRoute'))
+const AdminConfigRoute = lazy(() => import('./routes/AdminConfigRoute'))
+const ConsoleRoute = lazy(() => import('./routes/ConsoleRoute'))
+const RemediationRoute = lazy(() => import('./routes/RemediationRoute'))
+const SoftwareRoute = lazy(() => import('./routes/SoftwareRoute'))
+const GatesRoute = lazy(() => import('./routes/GatesRoute'))
+const LoadMapRoute = lazy(() => import('./routes/LoadMapRoute'))
+const UnderTheHoodRoute = lazy(() => import('./routes/UnderTheHoodRoute'))
+
 
 // O8 rebuild: real react-router routes (deep-linkable, back-button safe —
 // design-review's 🔴 #1 finding against the old `#/...` hash router) replace

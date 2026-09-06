@@ -1,4 +1,4 @@
-import { Component, useState, type ErrorInfo, type ReactNode } from 'react'
+import { Component, Suspense, useState, type ErrorInfo, type ReactNode } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 
 // WEB5 — one render throw breaks one panel, not the console.
@@ -90,7 +90,32 @@ export default function RouteErrorBoundary() {
   const [nonce, setNonce] = useState(0)
   return (
     <Boundary key={`${pathname}#${nonce}`} onReset={() => setNonce((n) => n + 1)}>
-      <Outlet />
+      {/* WEB7: the ONE Suspense boundary for the whole route tree, INSIDE the
+          error boundary on purpose. A lazy chunk that fails to load rejects
+          during render, which is a throw — so the boundary above catches a
+          network failure fetching a role-gated chunk and offers the same retry
+          it offers a render error, instead of leaving the console blank. One
+          boundary rather than one per lazy route, for the same reason there is
+          one error boundary: a per-route Suspense is a thing a new route can
+          forget to bring. */}
+      <Suspense fallback={<RouteLoading />}>
+        <Outlet />
+      </Suspense>
     </Boundary>
+  )
+}
+
+/** The pending state for a route whose chunk is still arriving.
+ *
+ *  Deliberately quiet: on a warm cache the chunk resolves in a frame or two, and
+ *  a large spinner that flashes is worse than a small line that does not. It
+ *  says LOADING rather than nothing so a genuinely slow network reads as
+ *  progress and not as a broken page — the same "never a blank" rule EmptyState
+ *  exists for. */
+function RouteLoading() {
+  return (
+    <p className="p-4 font-mono text-[11px] text-faint" role="status">
+      Loading…
+    </p>
   )
 }

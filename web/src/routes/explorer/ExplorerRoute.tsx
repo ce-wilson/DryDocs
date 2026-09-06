@@ -1,14 +1,25 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import type { Persona } from '../../lib/auth'
 import { MODULES } from '../../modules/registry'
 import { useRightSidebar } from '../../layout/rightSidebarContext'
 import ModuleTemplate from '../ModuleTemplate'
 import ExplorerGraphPane from '../../explorer/ExplorerGraphPane'
 import DataFrame from '../../explorer/DataFrame'
+import EmptyState from '../../components/ui/EmptyState'
 import SpecGrid from '../../explorer/SpecGrid'
 import SpecGraphPane from '../../components/SpecGraphPane'
 import type { CanvasNode } from '../../lib/nvl-mapping'
-import LocationMap, { type MapDimension } from '../../components/map/LocationMap'
+import type { MapDimension } from '../../components/map/LocationMap'
+
+// WEB7: the Locations tab is lazy on a DIFFERENT axis from the gated routes —
+// not authorization, but a tab nobody has opened yet. It carries the world map
+// (147 KB of coastline geometry) and the gazetteer, and three of the four tabs
+// on this page never touch either. Split here because the tab is a delivery
+// boundary the user makes explicit by clicking it; the tab strip itself is
+// unchanged, so an unopened tab costs nothing and an opened one costs one
+// fetch. Named in the item, and worth stating that it is NOT the authorization
+// rule above — /explorer is open to every role, and so is this tab.
+const LocationMap = lazy(() => import('../../components/map/LocationMap'))
 import NodeInspector from '../../explorer/NodeInspector'
 import {
   APP_CODES_FRAME,
@@ -151,7 +162,13 @@ export default function ExplorerRoute({ persona }: { persona: Persona }) {
           />
         ),
         Locations: (
-          <LocationMap access={access} dimensions={LOCATION_DIMENSIONS} placeNoun="data centers" />
+          // A LOCAL Suspense, not the route tree's. Without one the tab's
+          // suspension bubbles to RouteErrorBoundary and blanks the whole page
+          // — including the tab strip the reader just clicked — while a 157 KB
+          // chunk arrives. Here, only the panel says it is loading.
+          <Suspense fallback={<EmptyState title="Loading the map…" hint="Fetching the world outline." />}>
+            <LocationMap access={access} dimensions={LOCATION_DIMENSIONS} placeNoun="data centers" />
+          </Suspense>
         ),
       }}
     />

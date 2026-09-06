@@ -172,6 +172,17 @@ jobs:
       - name: Typecheck and build (tsc -b, vite build)
         run: npm run build
 
+      # WEB7 (b): the initial chunk is what EVERY persona downloads before
+      # anything renders, and until this step nothing measured it — so it grew
+      # from nobody deciding to (S8). The number and the ratchet rule live in
+      # web/scripts/checkBundleSize.mjs, one place, with the date it was
+      # measured; raising it requires writing down what arrived and why it
+      # belongs in the entry chunk. This BLOCKS, unlike the advisory step below:
+      # a bundle that quietly reacquires 1.2 MB of role-gated code has undone
+      # the authorization-boundary split, and a warning would not stop it.
+      - name: Initial-chunk size ceiling
+        run: npm run bundle:check
+
       # WEB13 (a): the ratchet. @vitest/coverage-v8 was declared and never read —
       # the instrument was bought and the numbers went unlooked-at. The floor is
       # 9.8% statements, measured 2026-09-05 (9.89 on the tree that set it), and
