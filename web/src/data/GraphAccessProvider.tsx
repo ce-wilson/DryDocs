@@ -25,7 +25,11 @@ export function GraphAccessProvider({
   const value = useMemo<GraphAccessValue>(() => {
     const apiUrl = apiBaseUrl()
     const client = createApiClient(apiUrl, personaId)
-    return { access: createApiAccess(apiUrl, personaId, client), apiUrl, getToken: client.getToken }
+    return {
+      access: createApiAccess(apiUrl, personaId, client),
+      apiUrl,
+      getSessionId: client.getSessionId,
+    }
   }, [personaId])
   return <GraphAccessContext.Provider value={value}>{children}</GraphAccessContext.Provider>
 }

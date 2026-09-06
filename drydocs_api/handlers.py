@@ -82,6 +82,10 @@ def login(
     session = store.issue(persona_id)
     return {
         "token": session.token,
+        # ADR 0019: the public handle the console hands to the agent tier in
+        # place of the token. Returned beside it, stored beside it, and the
+        # only one of the two that ever leaves the browser again.
+        "session_id": session.session_id,
         "persona_id": session.persona_id,
         "role": session.role,
         "expires_at": session.expires_at,

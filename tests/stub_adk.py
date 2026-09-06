@@ -159,15 +159,17 @@ class EphemeralRegistrar:
         self.errors: list[str] = []
 
     def register(self, control: dict[str, Any]) -> str | None:
-        token = control.get("api_token")
-        if not isinstance(token, str) or not token:
-            self.errors.append("control part carried no api_token")
+        # ADR 0019: the control part carries the session's public handle, not
+        # its token; the stub, like the real agent, authenticates itself.
+        owner = control.get("session_id")
+        if not isinstance(owner, str) or not owner:
+            self.errors.append("control part carried no session_id")
             return None
         headers = {"X-DryDocs-Agent-Key": self.agent_key} if self.agent_key else {}
         res = self.client.post(
             "/specs/ephemeral",
             json={
-                "owner_token": token,
+                "owner_session": owner,
                 "cypher": STUB_CYPHER,
                 "database": STUB_DATABASE,
                 "params": {},

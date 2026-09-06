@@ -32,10 +32,10 @@ export const DEFAULT_DEADLINE_MS = 20_000
 
 export interface GraphAccessValue {
   access: GraphAccess
-  /** The session's bearer token, from the SAME client the access uses.
-   *  R5 hands it to the graph_qa agent as the R4 owner token; sharing one
-   *  client is what makes the agent's ephemeral specs resolvable here. */
-  getToken(): Promise<string>
+  /** The session's public handle (ADR 0019), from the SAME client the access
+   *  uses. R5 hands it to the graph_qa agent as the owner of the ephemeral
+   *  specs it registers; sharing one client is what makes them resolvable here. */
+  getSessionId(): Promise<string>
   /** The one place the console's API base URL is known, for the diagnostics
    *  that need to name it. Reads apiBaseUrl(); no route re-derives it. */
   apiUrl: string

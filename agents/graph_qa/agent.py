@@ -52,16 +52,17 @@ def _get_provider() -> LiteLlmProvider:
 def _build_pipeline(control: dict, on_step, run_id: str | None = None) -> GraphQaPipeline:
     """Per-request pipeline: the provider (and its connection pool) is the
     singleton; the R4 registrar is per-request because the ephemeral specs it
-    mints are owned by the ASKING console session's token — which is also why
-    the run_id can close over it (G108 ruling D: the API audit's correlation
-    key back to this run's ledger lines)."""
+    mints are owned by the ASKING console session — named by its public
+    ``session_id`` handle (ADR 0019), never its token — which is also why the
+    run_id can close over it (G108 ruling D: the API audit's correlation key
+    back to this run's ledger lines)."""
     return GraphQaPipeline(
         provider=_get_provider(),
         run_read=run_read,
         graph_schema=graph_schema_detailed,
         ledger=_ledger,
         register_cypher=make_register(
-            owner_token=control.get("api_token"),
+            owner_session=control.get("session_id"),
             api_url=control.get("api_url"),
             run_id=run_id,
         ),

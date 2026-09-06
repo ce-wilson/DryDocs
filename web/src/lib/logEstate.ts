@@ -1,4 +1,4 @@
-import { sessionRejected, sessionToken } from './auth'
+import { sessionId, sessionRejected, sessionToken } from './auth'
 import { createAuthedApi, unwrapAs } from './apiClient'
 
 // O68 — the client for /admin/log-estate.
@@ -57,7 +57,7 @@ export async function fetchLogEstate(
   baseUrl: string,
   signal?: AbortSignal,
 ): Promise<LogEstatePayload> {
-  const api = createAuthedApi(baseUrl, { token: sessionToken, rejected: sessionRejected })
+  const api = createAuthedApi(baseUrl, { token: sessionToken, sessionId, rejected: sessionRejected })
   const result = await api.GET('/admin/log-estate', { signal })
 
   if (result.response.status === 401) throw new Error('the server refused this session')

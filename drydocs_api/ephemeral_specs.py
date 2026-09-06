@@ -19,8 +19,13 @@ The store's rules (all fail closed):
 - **Hash-addressed:** the ref is derived from (database, cypher, bound
   params), so re-registering the same execution is idempotent and the ref
   itself commits to what will run.
-- **Session-scoped:** a ref resolves only for the owning session token; any
-  other session sees the same 404 as a nonexistent ref (no existence leak).
+- **Session-scoped:** a ref resolves only for the owning session; any other
+  session sees the same 404 as a nonexistent ref (no existence leak). The
+  owner is named by its public ``session_id`` handle (ADR 0019), never by its
+  token: the agent registers "for session X" and authenticates itself with
+  the agent key, so no console credential ever travels to the agent tier. The
+  run/export paths map the caller's bearer to its ``session_id`` before the
+  lookup, so ownership is still decided by the credential the CALLER holds.
 - **TTL-bounded and capacity-bounded:** expired refs stop resolving; the
   store evicts oldest-first past capacity. Ephemeral means ephemeral —
   recurring Cypher graduates through the gate-bound promotion feed (R8),
@@ -98,7 +103,7 @@ def _ref_for(cypher: str, database: str, params: Mapping[str, object]) -> str:
 @dataclass(frozen=True)
 class EphemeralSpec:
     ref: str
-    owner_token: str
+    owner_session: str  # the owning session's public handle (ADR 0019)
     cypher: str
     database: str
     bound_params: Mapping[str, object]  # frozen at registration; replayed verbatim
@@ -132,7 +137,7 @@ class EphemeralSpec:
 
 
 class EphemeralSpecStore:
-    """Bounded in-memory registry keyed (owner_token, ref). In-memory is
+    """Bounded in-memory registry keyed (owner_session, ref). In-memory is
     deliberate, like the session store: ephemeral state dies with the server,
     and the durable path for recurring Cypher is spec promotion, not storage."""
 
@@ -149,7 +154,7 @@ class EphemeralSpecStore:
 
     def register(
         self,
-        owner_token: str,
+        owner_session: str,
         cypher: str,
         database: str,
         params: Mapping[str, object] | None = None,
@@ -182,7 +187,7 @@ class EphemeralSpecStore:
         now = self._clock()
         spec = EphemeralSpec(
             ref=_ref_for(cypher, database, bound),
-            owner_token=owner_token,
+            owner_session=owner_session,
             cypher=cypher,
             database=database,
             bound_params=bound,
@@ -191,19 +196,20 @@ class EphemeralSpecStore:
             expires_at=now + self._ttl,
             columns=tuple(ColumnDef(name=str(c), type="string") for c in columns),
         )
-        key = (owner_token, spec.ref)
+        key = (owner_session, spec.ref)
         self._specs[key] = spec  # idempotent re-register refreshes the TTL
         self._specs.move_to_end(key)
         while len(self._specs) > self._capacity:
             self._specs.popitem(last=False)
         return spec
 
-    def resolve(self, owner_token: str, ref: str) -> EphemeralSpec:
-        """Owner-scoped lookup: unknown, expired, and foreign-session refs all
-        raise the same :class:`UnknownSpecError` (mapped to 404 — no leak)."""
+    def resolve(self, owner_session: str, ref: str) -> EphemeralSpec:
+        """Owner-scoped lookup by the session's public handle: unknown,
+        expired, and foreign-session refs all raise the same
+        :class:`UnknownSpecError` (mapped to 404 — no leak)."""
         self._purge_expired()
         try:
-            return self._specs[(owner_token, ref)]
+            return self._specs[(owner_session, ref)]
         except KeyError as exc:
             raise UnknownSpecError(ref) from exc
 
@@ -219,7 +225,7 @@ class EphemeralSpecStore:
 def register_ephemeral(
     agent_key: str | None,
     expected_key: str | None,
-    owner_token: str,
+    owner_session: str,
     cypher: str,
     database: str,
     params: Mapping[str, object] | None,
@@ -228,19 +234,25 @@ def register_ephemeral(
     sessions: InMemorySessionStore,
     ephemerals: EphemeralSpecStore,
 ) -> dict[str, object]:
-    """Register one executed Cypher for the session named by ``owner_token``.
+    """Register one executed Cypher for the session named by ``owner_session``.
 
     The caller must present the server-side agent key — the trusted-caller
     gate that keeps this endpoint off-limits to browsers (see module doc).
     With no key configured the surface is disabled entirely (fail closed).
+
+    ``owner_session`` is the public ``session_id`` handle (ADR 0019 D2/D3),
+    not a token: it says WHOSE spec this is, and the agent key says who may
+    say so. A handle alone registers nothing, and a handle plus the key can
+    do exactly what the agent could always do — mint a ref into a session —
+    minus the ability to read as that user, which it never needed.
     """
     if not expected_key:
         raise Forbidden("ephemeral registration is disabled (DRYDOCS_AGENT_REG_KEY not configured)")
     if not agent_key or not secrets.compare_digest(agent_key, expected_key):
         raise Forbidden("ephemeral registration requires the agent key")
-    sessions.resolve(owner_token)  # raises InvalidTokenError — the owner must be live
+    sessions.resolve_by_id(owner_session)  # raises InvalidTokenError — the owner must be live
     spec = ephemerals.register(
-        owner_token,
+        owner_session,
         cypher,
         database,
         params=params,

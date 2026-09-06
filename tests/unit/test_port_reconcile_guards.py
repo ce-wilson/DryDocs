@@ -678,9 +678,18 @@ def test_snapshot_written_here_passes_its_own_stamp_check(tmp_path: Path) -> Non
 
     Skips when the four sources are dirty in the working tree (the writer refuses
     them by design, and a developer's half-edited gate-log is not a test failure).
+    Also skips on a branch that has moved past its fork point: the writer stamps
+    HEAD and the reader compares the stamp to where the branch left main, so a
+    round trip at HEAD only means something AT the branch base - which is where
+    the runbook takes the snapshot, before any apply commit. A J31 wip branch
+    with one commit on it is the everyday case (2026-09-06, wip/WEB9-desktop);
+    the guard was right there and the test's precondition was not met.
     """
     if reconcile_before.dirty_sources(REPO):
         pytest.skip("snapshot sources are dirty in this checkout; the writer refuses by design")
+    fork = reconcile_before.fork_point(REPO)
+    if fork is not None and fork != reconcile_before.head_sha(REPO):
+        pytest.skip("HEAD is past its fork point; the round trip is only meaningful at the base")
     before = tmp_path / "before"
     report = reconcile_before.write_snapshot(before, REPO)
     assert set(BEFORE_SNAPSHOTS) <= set(report.written)

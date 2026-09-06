@@ -4,13 +4,18 @@ The console sends the user's question as message part 0 and an OPTIONAL
 control part after it: a JSON object under the ``drydocs_control`` key
 carrying what the agent needs to act on the caller's behalf —
 
-    {"drydocs_control": {"api_token": "<drydocs-api session token>",
+    {"drydocs_control": {"session_id": "<drydocs-api session handle>",
                          "api_url": "http://localhost:8001"}}
 
-The token is the browser's own drydocs-api session (the R4 owner token):
-with it, the agent registers each executed Cypher as an ephemeral spec owned
-by THAT session, so Open-in-Explorer/Export work for the asking user and
-nobody else. Control parts never reach the LLM — the pipeline only ever sees
+``session_id`` is the browser's drydocs-api session named by its PUBLIC handle
+(ADR 0019): with it, the agent registers each executed Cypher as an ephemeral
+spec owned by THAT session, so Open-in-Explorer/Export work for the asking
+user and nobody else. The handle authorizes nothing — the agent authenticates
+itself to ``/specs/ephemeral`` with its own agent key, and the console's
+bearer token never rides in a message part (ADR 0019 D1). Before that ruling
+the field was ``api_token`` and carried the live token itself; R23 below is
+the seam that kept that out of the store, and it stays as defence in depth.
+Control parts never reach the LLM — the pipeline only ever sees
 part 0 — and an in-band part was chosen over ADK session state deliberately:
 the shape is fully owned by this repo on both ends, testable without an ADK
 runtime, and carries no assumption about ADK's request schema. Company-side
@@ -38,6 +43,11 @@ CONTROL_KEY = "drydocs_control"
 #: Control fields whose VALUE is a credential. ``api_url`` is deliberately not
 #: here: it is configuration, it is useful in a stored trace, and redacting it
 #: would make the persisted event harder to read for no security gain.
+#: ``session_id`` is not here either — it is a public handle (ADR 0019 D2) and
+#: a stored trace that shows it is a trace that correlates to the API audit.
+#: ``api_token`` STAYS although no current console sends it: a stale console
+#: build against a current agent is the one remaining path for a token to
+#: arrive, and this set is what keeps it out of the store (ADR 0019 D1/D4).
 SECRET_CONTROL_FIELDS = frozenset({"api_token"})
 
 #: What a redacted value reads as. A fixed marker rather than a deletion, so a

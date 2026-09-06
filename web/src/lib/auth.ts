@@ -105,6 +105,11 @@ export interface Session {
   signedInAt: string
   /** The opaque bearer token. The server is the only thing that can read it. */
   token: string
+  /** The session's PUBLIC handle (ADR 0019). It names the session and
+   *  authorizes nothing: this is what the Ask spoke forwards to the agent so
+   *  the specs it registers resolve for this session, and the bearer never
+   *  leaves the browser. */
+  sessionId: string
   /** ISO-8601. The server enforces this; the client honours it so the shell
    *  does not render a signed-in console whose every call is about to 401. */
   expiresAt: string
@@ -142,6 +147,7 @@ export async function signIn(personaId: string, secret: string): Promise<Session
     role: persona.role,
     signedInAt: new Date().toISOString(),
     token: data.token,
+    sessionId: data.session_id,
     expiresAt: data.expires_at,
   }
   store(session)
@@ -197,13 +203,17 @@ export function currentSession(): Session | null {
     return null
   }
   if (typeof parsed !== 'object' || parsed === null) return null
-  const { personaId, signedInAt, token, expiresAt } = parsed as {
+  const { personaId, signedInAt, token, sessionId, expiresAt } = parsed as {
     personaId?: unknown
     signedInAt?: unknown
     token?: unknown
+    sessionId?: unknown
     expiresAt?: unknown
   }
   if (typeof token !== 'string' || !token) return null
+  // A blob from before ADR 0019 has a token and no handle; it is signed out
+  // rather than patched, because the Ask handshake would have nothing to send.
+  if (typeof sessionId !== 'string' || !sessionId) return null
   // Role is re-derived from PERSONAS — the stored blob is untrusted, so a stale
   // or hand-edited value can never invent a role client-side, and the server
   // re-resolves it from the token regardless.
@@ -216,6 +226,7 @@ export function currentSession(): Session | null {
     role: persona.role,
     signedInAt: typeof signedInAt === 'string' ? signedInAt : '',
     token,
+    sessionId,
     expiresAt: expiry,
   }
 }
@@ -224,6 +235,12 @@ export function currentSession(): Session | null {
  *  than being handed a persona id they could log in with on their own. */
 export function sessionToken(): string | null {
   return currentSession()?.token ?? null
+}
+
+/** The current session's public handle, or null (ADR 0019). The Ask spoke
+ *  reads this, never sessionToken(), to name the session to the agent. */
+export function sessionId(): string | null {
+  return currentSession()?.sessionId ?? null
 }
 
 /** Drop the local session because the server refused its token. Distinct from

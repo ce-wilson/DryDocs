@@ -1,5 +1,12 @@
-import { type Api, createAuthedApi, requireToken, type Schemas, type SessionHooks, unwrap } from './apiClient'
-import { sessionRejected, sessionToken } from './auth'
+import {
+  type Api,
+  createAuthedApi,
+  requireSessionId,
+  type Schemas,
+  type SessionHooks,
+  unwrap,
+} from './apiClient'
+import { sessionId, sessionRejected, sessionToken } from './auth'
 import type {
   ExportOptions,
   GraphAccess,
@@ -33,7 +40,7 @@ import type {
 // exactly what they did — and the assertions below pin its hand-owned result
 // types to the server's declared ones.
 
-const SESSION: SessionHooks = { token: sessionToken, rejected: sessionRejected }
+const SESSION: SessionHooks = { token: sessionToken, sessionId, rejected: sessionRejected }
 
 /** The shared HTTP client behind every drydocs-api surface (GraphAccess here;
  *  the O13 mappings client in mappingsApi.ts, the O47 intake client). One auth
@@ -43,12 +50,13 @@ export interface ApiClient {
   /** The typed drydocs-api client (O70). Every call goes through it; a path or
    *  body the schema does not declare does not compile. */
   readonly api: Api
-  /** The session's own bearer token. R5 hands it to the graph_qa agent as the
-   *  R4 owner token, so ephemeral specs the agent registers resolve for THIS
-   *  session's runSpec/exportSpec calls — which is why the Ask spoke must
-   *  share ONE client between token and GraphAccess. Rejects when there is no
-   *  session; it cannot create one. */
-  getToken(): Promise<string>
+  /** The session's PUBLIC handle (ADR 0019). R5 hands it to the graph_qa
+   *  agent as the owner of the ephemeral specs it registers, so they resolve
+   *  for THIS session's runSpec/exportSpec calls — which is why the Ask spoke
+   *  must share ONE client between the handle and GraphAccess. The bearer
+   *  token has no accessor here on purpose: nothing outside the authed
+   *  middleware may read it. Rejects when there is no session. */
+  getSessionId(): Promise<string>
 }
 
 // personaId is kept in the signature for the ~15 call sites that pass it and
@@ -56,8 +64,8 @@ export interface ApiClient {
 export function createApiClient(baseUrl: string, personaId: string): ApiClient {
   return {
     api: createAuthedApi(baseUrl, SESSION, personaId),
-    async getToken(): Promise<string> {
-      return requireToken(SESSION, personaId)
+    async getSessionId(): Promise<string> {
+      return requireSessionId(SESSION, personaId)
     },
   }
 }

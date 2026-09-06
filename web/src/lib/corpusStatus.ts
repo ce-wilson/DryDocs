@@ -10,7 +10,7 @@
 // The token comes from the session the same way every other authed call gets it;
 // the request carries NO parameters, because the server chooses every query.
 
-import { sessionRejected, sessionToken } from './auth'
+import { sessionId, sessionRejected, sessionToken } from './auth'
 import { createAuthedApi, unwrapAs } from './apiClient'
 
 export interface CorpusRow {
@@ -43,7 +43,7 @@ export async function fetchCorpusStatus(
   // O85 network diagnosis; the path is checked against the schema. The
   // response type is still hand-declared — /docs-verify is a free object
   // server-side until drydocs_api.schemas models it.
-  const api = createAuthedApi(baseUrl, { token: sessionToken, rejected: sessionRejected })
+  const api = createAuthedApi(baseUrl, { token: sessionToken, sessionId, rejected: sessionRejected })
   const result = await api.GET('/docs-verify', { signal })
 
   if (result.response.status === 401) throw new Error('the server refused this session')

@@ -224,9 +224,13 @@ def wired(tmp_path):
         audit=ApiAuditLog(log_dir=audit_dir),
     )
     client = TestClient(app)
-    admin = client.post(
+    login = client.post(
         "/login", json={"persona_id": "morpheus", "secret": AUDIT_TEST_SECRET}
-    ).json()["token"]
+    ).json()
+    admin = login["token"]
+    # ADR 0019: the ephemeral registration names its owner by the public
+    # session handle, which the audit line then hashes as the actor.
+    client.admin_session_id = login["session_id"]  # type: ignore[attr-defined]
     return client, admin, audit_dir
 
 
@@ -251,7 +255,7 @@ def test_each_cypher_route_writes_exactly_one_audit_record(wired, monkeypatch):
     registered = client.post(
         "/specs/ephemeral",
         json={
-            "owner_token": admin,
+            "owner_session": client.admin_session_id,
             "cypher": "MATCH (n) RETURN n AS n",
             "database": "drydocs",
             "columns": ["n"],

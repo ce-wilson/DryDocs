@@ -72,7 +72,7 @@ function wrapper({ children }: { children: ReactNode }) {
       value={{
         access: access as unknown as GraphAccess,
         apiUrl: 'http://api.test',
-        getToken: () => Promise.resolve('test-token'),
+        getSessionId: () => Promise.resolve('test-token'),
       }}
     >
       {children}

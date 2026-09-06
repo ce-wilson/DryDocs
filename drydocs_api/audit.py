@@ -58,20 +58,23 @@ surface with no trail. Twelve routes:
   is, including invalid-token and forbidden outcomes with the ORIGINAL error
   class (never the mapped HTTPException).
 
-THE ACTOR IS ALWAYS HASHED — sha256 hexdigest of the bearer token, the same
+THE ACTOR IS ALWAYS HASHED — sha256 hexdigest of the session's public
+``session_id`` handle (ADR 0019; the bearer token before it), the same
 function the :AgentRun writer applies to caller identity (a known-value test
 pins the equivalence rather than asserting it). A raw actor value never lands,
 so the record stays publishable under the §3 sensitivity rules and cannot
-become the place a real identity leaks.
+become the place a real identity leaks. Hashing a handle that is not itself a
+secret is deliberate: the property the audit line promises is "no actor value
+in the clear", and it should not depend on which identifier a route passes.
 
 THE CORRELATION ID (ruling D) is what joins this record to the QA ledger: the
 ledger holds the question text keyed by ``run_id``, this record holds route and
 outcome, and without a shared key "what is searched" has half its answer in
 each file. Where the caller supplies an agent run id (``X-DryDocs-Run-Id``,
 sent by agents/common/ephemeral_client since G108) that is the correlation id;
-otherwise it falls back to the hashed session token — the same value
-control.py already passes as the owner token. ``correlation_source`` says
-which one won.
+otherwise it falls back to the hashed session handle — the same value
+control.py carries as ``session_id`` and the agent registers ephemeral specs
+under (ADR 0019). ``correlation_source`` says which one won.
 
 Sink and naming follow G105 exactly, the way the ``qa`` kind already does for
 jsonl: filenames DERIVED via ``log_kinds.log_filename`` in the directory
@@ -161,7 +164,7 @@ class AuditRecord:
     @property
     def correlation(self) -> tuple[str | None, str | None]:
         """(correlation_id, correlation_source): the agent run id where one was
-        supplied, else the hashed session token (ruling D)."""
+        supplied, else the hashed session handle (ruling D)."""
         if self.run_id:
             return self.run_id, "run_id"
         if self.actor_sha256:

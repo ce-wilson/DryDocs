@@ -12,6 +12,15 @@ browser tab cannot hold a live session indefinitely, and ``resolve`` is the one
 place that decides it — no caller re-checks the clock, and no caller can forget
 to. An expired token is a 401, exactly like an unknown one, and the client's
 answer to both is the same: return to the sign-in screen.
+
+ADR 0019 (WEB9) added the second identifier. ``session_id`` is a PUBLIC handle
+minted beside the token: random, opaque, not derivable from the token, and
+never accepted as a bearer. It exists so the console can name its session to
+the agent tier without handing over the credential -- the agent registers
+ephemeral specs "for session X" by handle and authenticates itself with its
+own agent key. ``resolve_by_id`` is the one lookup that takes a handle, and it
+returns the session for scoping only; nothing that authorizes a request reads
+it. A handle that leaks is a correlation id in the wrong hands, not a login.
 """
 
 from __future__ import annotations
@@ -33,6 +42,8 @@ DEFAULT_TTL = timedelta(hours=8)
 class Session:
     token: str
     persona_id: str
+    #: ADR 0019: the public handle. Identity, never authority -- see module doc.
+    session_id: str
     role: str
     issued_at: str  # ISO-8601 UTC
     expires_at: str  # ISO-8601 UTC
@@ -58,6 +69,7 @@ class ExpiredTokenError(InvalidTokenError):
 class InMemorySessionStore:
     def __init__(self, ttl: timedelta = DEFAULT_TTL) -> None:
         self._sessions: dict[str, Session] = {}
+        self._by_id: dict[str, str] = {}  # session_id -> token (ADR 0019)
         self._ttl = ttl
 
     @property
@@ -75,11 +87,13 @@ class InMemorySessionStore:
         session = Session(
             token=secrets.token_urlsafe(24),
             persona_id=p.id,
+            session_id=secrets.token_urlsafe(16),
             role=p.role,
             issued_at=issued.isoformat(timespec="seconds"),
             expires_at=(issued + self._ttl).isoformat(timespec="seconds"),
         )
         self._sessions[session.token] = session
+        self._by_id[session.session_id] = session.token
         return session
 
     def resolve(self, token: str, *, now: datetime | None = None) -> Session:
@@ -91,12 +105,33 @@ class InMemorySessionStore:
             # Drop it here rather than leaving it to a sweep: the store is
             # small, and an expired entry that lingers is one a later bug could
             # resurrect.
-            del self._sessions[token]
+            self._drop(token)
             raise ExpiredTokenError("session expired; sign in again")
         return session
 
+    def resolve_by_id(self, session_id: str, *, now: datetime | None = None) -> Session:
+        """The session behind a public handle (ADR 0019), or raise.
+
+        Unknown, revoked and expired all raise :class:`InvalidTokenError` the
+        same way ``resolve`` does, so the ephemeral-registration route maps
+        every case to one 401. This is a SCOPING lookup: a caller that holds a
+        handle learns which session owns a spec, never how to act as it -- the
+        returned ``token`` is for the store's own bookkeeping, and no route
+        hands it back out.
+        """
+        try:
+            token = self._by_id[session_id]
+        except KeyError as exc:
+            raise InvalidTokenError("unknown or revoked session id") from exc
+        return self.resolve(token, now=now)
+
     def revoke(self, token: str) -> None:
-        self._sessions.pop(token, None)
+        self._drop(token)
+
+    def _drop(self, token: str) -> None:
+        session = self._sessions.pop(token, None)
+        if session is not None:
+            self._by_id.pop(session.session_id, None)
 
     def revoke_identity(self, persona_id: str) -> int:
         """Drop EVERY session held by one persona; returns how many went (O75).
@@ -114,7 +149,7 @@ class InMemorySessionStore:
         """
         held = [t for t, s in self._sessions.items() if s.persona_id == persona_id]
         for token in held:
-            del self._sessions[token]
+            self._drop(token)
         return len(held)
 
     def purge_expired(self, *, now: datetime | None = None) -> int:
@@ -124,5 +159,5 @@ class InMemorySessionStore:
         moment = now if now is not None else datetime.now(UTC)
         stale = [t for t, s in self._sessions.items() if s.is_expired(moment)]
         for token in stale:
-            del self._sessions[token]
+            self._drop(token)
         return len(stale)

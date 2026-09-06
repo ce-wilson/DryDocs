@@ -32,6 +32,7 @@ function hooks(token: string | null): SessionHooks & { rejections: number } {
   const h = {
     rejections: 0,
     token: () => token,
+    sessionId: () => (token ? `sid-${token}` : null),
     rejected() {
       h.rejections += 1
     },
