@@ -3,9 +3,9 @@ handoff: drydocs.lane-handoff.v1
 lane: B
 machine: laptop
 generated: 2026-09-05
-generated_at: c87e7cca (main)
-queue: [G132, WEB2, WEB6, WEB8, WEB7, O63, R12, O43, G131, O89, O68]
-pens: [code:drydocs-lineage, code:drydocs-web, code:drydocs-agents]
+generated_at: 5f5acab9 (main)
+queue: [WEB2, WEB6, WEB8, WEB7, O63, R12, O43, G131, O89, O68]
+pens: [code:drydocs-web, code:drydocs-agents]
 ---
 
 # Lane B handoff — laptop, 2026-09-05
@@ -21,7 +21,7 @@ Collisions come from two sessions writing the same surface, not from two session
 existing. Your first commit message (or your `wip/` branch name) names what you hold:
 
 ```text
-pen: code:drydocs-lineage · code:drydocs-web · code:drydocs-agents
+pen: code:drydocs-web · code:drydocs-agents
 ```
 
 Lane A holds: `backlog · port · adr · gates · snapshot`. Anything not declared by either lane
@@ -40,7 +40,7 @@ is the pen for a SURFACE.
 4. Per-machine facts are yours to verify: `DRYDOCS_DATA_ROOT`, `DRYDOCS_LOGDIR`, the
    `.env`, and whether Neo4j is reachable here. Venue-stamp any live claim (J18).
 
-## Your queue, in order (11 items) — claim one at a time
+## Your queue, in order (10 items) — claim one at a time
 
 Every item below is `todo` with every dependency `done` at the generating commit — the
 same rule the board's Ready strip uses (`derive_summary`). Re-check on pull: the other
@@ -49,17 +49,16 @@ since PLAN1), so two lanes minting in disjoint series cannot collide on a number
 
 | # | Id | Title | Type / prio | Module | Model | Notes from the check |
 |---|---|---|---|---|---|---|
-| 1 | **G132** | The Control-M folder-pull collector lives only on a server - home it beside rua_inventory with its conf and a version-tagged output, and let the acquisition block name it without implying a cadence | task / p2 | `drydocs-lineage` | sonnet | clean |
-| 2 | **WEB2** | The grid renders the row ceiling the way the canvas already renders its node ceiling - a TRUNCATED n/N badge on capped results, and no export button says "full" unless the manifest says complete (after API1) | task / p1 | `drydocs-web` | sonnet | clean |
-| 3 | **WEB6** | A runtime row-shape validator at the spec-result-to-typed-row seam retires the twenty-one as-unknown-as double casts with one readable message (after WEB4) | task / p2 | `drydocs-web` | sonnet | clean |
-| 4 | **WEB8** | The typed-client guarantee has no holes - the mappings, intake and corpus routes are modelled in drydocs_api.schemas so the fifteen unwrapAs sites retire, and the ADK agent calls get a typed contract instead of raw fetch (after WEB4) | task / p2 | `drydocs-web` | sonnet | clean |
-| 5 | **WEB7** | Code splitting follows the authorization boundary - React.lazy on the admin and steward routes and the Locations tab so about 420 KB of role-gated artifacts stop shipping to every persona, plus a bundle-size ceiling in the web CI job | task / p2 | `drydocs-web` | sonnet | clean |
-| 6 | **O63** | Service reachability, surfaced twice from one probe: Ask diagnoses its own failure instead of printing a bare "Failed to fetch", and the admin page carries a service-status strip at the top | task / p2 | `drydocs-web` | sonnet | clean |
-| 7 | **R12** | Promote the R5 stub-ADK harness into a committed fixture: live-verify the web Ask wiring with no LLM key | task / p3 | `drydocs-agents` | sonnet | clean |
-| 8 | **O43** | Seed the remaining 9 UI test suites from verified behaviour, and decide whether a UI test runner is worth introducing | task / p2 | `drydocs-web` | sonnet | clean |
-| 9 | **G131** | The agent tier's environment file carries an empty Neo4j password and only a falsy check keeps it working | chore / p3 | `drydocs-agents` | haiku | clean |
-| 10 | **O89** | Console feedback has no stable anchors — give each console section a content-derived anchor id and export the same feedback YAML the design-doc L5 loop produces (after O88) | task / p2 | `drydocs-web` | sonnet | clean |
-| 11 | **O68** | The admin page should show the log estate: directory, path, size and capacity per kind — and must not render debug-tier Cypher until that display is reviewed (after G111) | task / p2 | `drydocs-web` | sonnet | clean |
+| 1 | **WEB2** | The grid renders the row ceiling the way the canvas already renders its node ceiling - a TRUNCATED n/N badge on capped results, and no export button says "full" unless the manifest says complete (after API1) | task / p1 | `drydocs-web` | sonnet | clean |
+| 2 | **WEB6** | A runtime row-shape validator at the spec-result-to-typed-row seam retires the twenty-one as-unknown-as double casts with one readable message (after WEB4) | task / p2 | `drydocs-web` | sonnet | clean |
+| 3 | **WEB8** | The typed-client guarantee has no holes - the mappings, intake and corpus routes are modelled in drydocs_api.schemas so the fifteen unwrapAs sites retire, and the ADK agent calls get a typed contract instead of raw fetch (after WEB4) | task / p2 | `drydocs-web` | sonnet | clean |
+| 4 | **WEB7** | Code splitting follows the authorization boundary - React.lazy on the admin and steward routes and the Locations tab so about 420 KB of role-gated artifacts stop shipping to every persona, plus a bundle-size ceiling in the web CI job | task / p2 | `drydocs-web` | sonnet | clean |
+| 5 | **O63** | Service reachability, surfaced twice from one probe: Ask diagnoses its own failure instead of printing a bare "Failed to fetch", and the admin page carries a service-status strip at the top | task / p2 | `drydocs-web` | sonnet | clean |
+| 6 | **R12** | Promote the R5 stub-ADK harness into a committed fixture: live-verify the web Ask wiring with no LLM key | task / p3 | `drydocs-agents` | sonnet | clean |
+| 7 | **O43** | Seed the remaining 9 UI test suites from verified behaviour, and decide whether a UI test runner is worth introducing | task / p2 | `drydocs-web` | sonnet | clean |
+| 8 | **G131** | The agent tier's environment file carries an empty Neo4j password and only a falsy check keeps it working | chore / p3 | `drydocs-agents` | haiku | clean |
+| 9 | **O89** | Console feedback has no stable anchors — give each console section a content-derived anchor id and export the same feedback YAML the design-doc L5 loop produces (after O88) | task / p2 | `drydocs-web` | sonnet | clean |
+| 10 | **O68** | The admin page should show the log estate: directory, path, size and capacity per kind — and must not render debug-tier Cypher until that display is reviewed (after G111) | task / p2 | `drydocs-web` | sonnet | clean |
 
 ## Surfaces — who holds which pen this burst
 
