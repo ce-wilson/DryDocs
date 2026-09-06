@@ -16,6 +16,7 @@ import type { ModuleDef } from '../modules/registry'
 import { useRightSidebar } from '../layout/rightSidebarContext'
 import ModuleTemplate from './ModuleTemplate'
 import EmptyState from '../components/ui/EmptyState'
+import LogEstatePanel from './LogEstatePanel'
 import matrix from '../generated/enforcement-matrix.json'
 
 // /admin/config (O12): the config-as-code TRACEABILITY LENS. NO edit controls
@@ -200,6 +201,11 @@ export default function AdminConfigRoute() {
         </div>
       }
       tabContent={{
+        // O68: the log estate, a PANEL on this page rather than a new one — the
+        // SME's own placement. It reads the host's disk through
+        // /admin/log-estate, which is why it sits behind the admin gate this
+        // page already is.
+        'Log estate': <LogEstatePanel />,
         'Enforcement matrix': (
           <div className="flex h-full min-h-0 flex-col gap-1.5">
             <p className="shrink-0 rounded border border-edge bg-panel-2 px-2 py-1 text-[11px] text-muted">

@@ -120,6 +120,13 @@ class ZoneState:
     zone: DataZone
     exists: bool
     file_count: int
+    #: O68 clause (b): the ONE genuinely missing field. The inventory counted
+    #: files and did not sum bytes, so "how much is on disk" — the question a
+    #: retention policy is actually about — could not be answered from it. It is
+    #: summed HERE, in core, and not in the API or the browser: the walk that
+    #: knows the file count is the only walk that should also be stating a size,
+    #: and a second walker in a higher layer would be free to disagree with it.
+    total_bytes: int = 0
 
     @property
     def empty(self) -> bool:
@@ -142,10 +149,22 @@ def inventory(zones: tuple[DataZone, ...] | None = None) -> tuple[ZoneState, ...
     for zone in zones if zones is not None else all_zones():
         exists = zone.path.is_dir()
         count = 0
+        size = 0
         if exists:
-            for _, _, files in os.walk(zone.path):
+            for root, _, files in os.walk(zone.path):
                 count += len(files)
-        out.append(ZoneState(zone=zone, exists=exists, file_count=count))
+                for name in files:
+                    try:
+                        size += os.path.getsize(os.path.join(root, name))
+                    except OSError:
+                        # A file that vanished or cannot be stat'ed between the
+                        # walk and the size call is not a reason to fail an
+                        # inventory: this is a read-only report on a live
+                        # directory, and a partial size is a truer answer than
+                        # an exception. It is still COUNTED, so the count and
+                        # the size can legitimately disagree by that file.
+                        pass
+        out.append(ZoneState(zone=zone, exists=exists, file_count=count, total_bytes=size))
     return tuple(out)
 
 
