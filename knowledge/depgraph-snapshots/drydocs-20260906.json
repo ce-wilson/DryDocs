@@ -1,17 +1,17 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-06T01:42:10",
+    "captured_at": "2026-09-06T12:17:24",
     "date": "20260906",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "a8e7d2b5",
-      "full": "a8e7d2b5b040be2ed8ca8d8dd62810cc72889481",
+      "commit": "017ebe9b",
+      "full": "017ebe9b93eb41639e23611d327445a19489e139",
       "branch": "main",
-      "describe": "port-base-20260905-85-ga8e7d2b5",
-      "subject": "docs(ideas): Idea-269 points at the preserved prototype (e89a66ca) and carries its three spec facts",
-      "dirty": false,
+      "describe": "port-base-20260905-100-g017ebe9b",
+      "subject": "chore(R16): claim - status in_progress (Lane A queue item 3; status-only, no render per Y5)",
+      "dirty": true,
       "untracked_present": false,
       "pr": null
     },
@@ -7910,6 +7910,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/decisions/0019-credential-propagation-to-the-agent-tier.md",
+      "name": "0019-credential-propagation-to-the-agent-tier.md",
+      "extension": ".md",
+      "rel_path": "docs/decisions/0019-credential-propagation-to-the-agent-tier.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/decisions/README.md",
       "name": "README.md",
       "extension": ".md",
@@ -9138,6 +9147,15 @@
       "name": "next-session-cron-prompt.md",
       "extension": ".md",
       "rel_path": "docs/history/next-session-cron-prompt.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/lane-a-handoff.md",
+      "name": "lane-a-handoff.md",
+      "extension": ".md",
+      "rel_path": "docs/lane-a-handoff.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -19250,6 +19268,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs_api/epistemics.py",
+      "name": "epistemics.py",
+      "extension": ".py",
+      "rel_path": "drydocs_api/epistemics.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs_api/exports.py",
       "name": "exports.py",
       "extension": ".py",
@@ -22400,10 +22427,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260906.json",
-      "name": "drydocs-20260906.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260906-0141.json",
+      "name": "drydocs-20260906-0141.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260906.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260906-0141.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -24884,6 +24911,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_epistemics.py",
+      "name": "test_epistemics.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_epistemics.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_essential_graphrag.py",
       "name": "test_essential_graphrag.py",
       "extension": ".py",
@@ -26603,6 +26639,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/ask/askApi.test.ts",
+      "name": "askApi.test.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/ask/askApi.test.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/ask/askApi.ts",
       "name": "askApi.ts",
       "extension": ".ts",
@@ -26922,6 +26967,24 @@
       "name": "EmptyState.tsx",
       "extension": ".tsx",
       "rel_path": "web/src/components/ui/EmptyState.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/components/ui/EpistemicBadge.test.tsx",
+      "name": "EpistemicBadge.test.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/components/ui/EpistemicBadge.test.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/components/ui/EpistemicBadge.tsx",
+      "name": "EpistemicBadge.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/components/ui/EpistemicBadge.tsx",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -27597,6 +27660,15 @@
       "name": "cypher-labels.ts",
       "extension": ".ts",
       "rel_path": "web/src/lib/cypher-labels.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/lib/epistemics.ts",
+      "name": "epistemics.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lib/epistemics.ts",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -28712,6 +28784,10 @@
     [
       "drydocs/agents/common/neo4j_tool.py",
       "drydocs/agents/common/env_merge.py"
+    ],
+    [
+      "drydocs/agents/common/specs_catalog.py",
+      "drydocs/drydocs_api/epistemics.py"
     ],
     [
       "drydocs/agents/common/specs_catalog.py",
@@ -30099,6 +30175,10 @@
     ],
     [
       "drydocs/drydocs_api/exports.py",
+      "drydocs/drydocs_api/epistemics.py"
+    ],
+    [
+      "drydocs/drydocs_api/exports.py",
       "drydocs/drydocs_api/guard.py"
     ],
     [
@@ -30196,6 +30276,10 @@
     [
       "drydocs/drydocs_api/mappings.py",
       "drydocs/drydocs_core/source_registry.py"
+    ],
+    [
+      "drydocs/drydocs_api/query_specs.py",
+      "drydocs/drydocs_api/epistemics.py"
     ],
     [
       "drydocs/drydocs_api/query_specs.py",
@@ -32102,6 +32186,42 @@
       "drydocs/drydocs_api/sessions.py"
     ],
     [
+      "drydocs/tests/unit/test_epistemics.py",
+      "drydocs/drydocs_api/ephemeral_specs.py"
+    ],
+    [
+      "drydocs/tests/unit/test_epistemics.py",
+      "drydocs/drydocs_api/epistemics.py"
+    ],
+    [
+      "drydocs/tests/unit/test_epistemics.py",
+      "drydocs/drydocs_api/exports.py"
+    ],
+    [
+      "drydocs/tests/unit/test_epistemics.py",
+      "drydocs/drydocs_api/guard.py"
+    ],
+    [
+      "drydocs/tests/unit/test_epistemics.py",
+      "drydocs/drydocs_api/query_specs.py"
+    ],
+    [
+      "drydocs/tests/unit/test_epistemics.py",
+      "drydocs/drydocs_api/schemas.py"
+    ],
+    [
+      "drydocs/tests/unit/test_epistemics.py",
+      "drydocs/drydocs_api/sessions.py"
+    ],
+    [
+      "drydocs/tests/unit/test_epistemics.py",
+      "drydocs/drydocs_core/ontology/schema_graph.py"
+    ],
+    [
+      "drydocs/tests/unit/test_epistemics.py",
+      "drydocs/drydocs_core/yaml_fragments.py"
+    ],
+    [
       "drydocs/tests/unit/test_essential_graphrag.py",
       "drydocs/drydocs/loaders/base.py"
     ],
@@ -32168,6 +32288,10 @@
     [
       "drydocs/tests/unit/test_gate_pages.py",
       "drydocs/drydocs/review/gate_pages.py"
+    ],
+    [
+      "drydocs/tests/unit/test_graph_qa.py",
+      "drydocs/drydocs_api/epistemics.py"
     ],
     [
       "drydocs/tests/unit/test_graph_review.py",
@@ -33582,6 +33706,10 @@
       "drydocs/web/src/lib/forceLayout.ts"
     ],
     [
+      "drydocs/web/src/ask/askApi.test.ts",
+      "drydocs/web/src/ask/askApi.ts"
+    ],
+    [
       "drydocs/web/src/ask/askApi.ts",
       "drydocs/web/src/lib/adk.ts"
     ],
@@ -33679,6 +33807,10 @@
     ],
     [
       "drydocs/web/src/components/ProvenanceNotice.tsx",
+      "drydocs/web/src/components/ui/EpistemicBadge.tsx"
+    ],
+    [
+      "drydocs/web/src/components/ProvenanceNotice.tsx",
       "drydocs/web/src/data/provenance.ts"
     ],
     [
@@ -33764,6 +33896,22 @@
     [
       "drydocs/web/src/components/map/resolve.ts",
       "drydocs/web/src/components/map/projection.ts"
+    ],
+    [
+      "drydocs/web/src/components/ui/EpistemicBadge.test.tsx",
+      "drydocs/web/src/components/ui/EpistemicBadge.tsx"
+    ],
+    [
+      "drydocs/web/src/components/ui/EpistemicBadge.test.tsx",
+      "drydocs/web/src/lib/epistemics.ts"
+    ],
+    [
+      "drydocs/web/src/components/ui/EpistemicBadge.test.tsx",
+      "drydocs/web/src/test/sourceScan.ts"
+    ],
+    [
+      "drydocs/web/src/components/ui/EpistemicBadge.tsx",
+      "drydocs/web/src/lib/epistemics.ts"
     ],
     [
       "drydocs/web/src/components/ui/IdChip.tsx",
@@ -33968,6 +34116,10 @@
     [
       "drydocs/web/src/explorer/SpecGrid.tsx",
       "drydocs/web/src/components/ui/EmptyState.tsx"
+    ],
+    [
+      "drydocs/web/src/explorer/SpecGrid.tsx",
+      "drydocs/web/src/components/ui/EpistemicBadge.tsx"
     ],
     [
       "drydocs/web/src/explorer/SpecGrid.tsx",
@@ -34480,6 +34632,10 @@
     [
       "drydocs/web/src/routes/AskRoute.tsx",
       "drydocs/web/src/components/ui/EmptyState.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/AskRoute.tsx",
+      "drydocs/web/src/components/ui/EpistemicBadge.tsx"
     ],
     [
       "drydocs/web/src/routes/AskRoute.tsx",
@@ -39474,6 +39630,11 @@
     [
       "drydocs/docs",
       "CONTAINS",
+      "drydocs/docs/lane-a-handoff.md"
+    ],
+    [
+      "drydocs/docs",
+      "CONTAINS",
       "drydocs/docs/lane-b-handoff.md"
     ],
     [
@@ -39715,6 +39876,11 @@
       "drydocs/docs/decisions",
       "CONTAINS",
       "drydocs/docs/decisions/0018-component-identity-declared-not-directory.md"
+    ],
+    [
+      "drydocs/docs/decisions",
+      "CONTAINS",
+      "drydocs/docs/decisions/0019-credential-propagation-to-the-agent-tier.md"
     ],
     [
       "drydocs/docs/decisions",
@@ -45929,6 +46095,11 @@
     [
       "drydocs/drydocs_api",
       "CONTAINS",
+      "drydocs/drydocs_api/epistemics.py"
+    ],
+    [
+      "drydocs/drydocs_api",
+      "CONTAINS",
       "drydocs/drydocs_api/exports.py"
     ],
     [
@@ -47664,7 +47835,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260906.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260906-0141.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -48974,6 +49145,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_epistemics.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_essential_graphrag.py"
     ],
     [
@@ -50069,6 +50245,11 @@
     [
       "drydocs/web/src/ask",
       "CONTAINS",
+      "drydocs/web/src/ask/askApi.test.ts"
+    ],
+    [
+      "drydocs/web/src/ask",
+      "CONTAINS",
       "drydocs/web/src/ask/askApi.ts"
     ],
     [
@@ -50235,6 +50416,16 @@
       "drydocs/web/src/components/ui",
       "CONTAINS",
       "drydocs/web/src/components/ui/EmptyState.tsx"
+    ],
+    [
+      "drydocs/web/src/components/ui",
+      "CONTAINS",
+      "drydocs/web/src/components/ui/EpistemicBadge.test.tsx"
+    ],
+    [
+      "drydocs/web/src/components/ui",
+      "CONTAINS",
+      "drydocs/web/src/components/ui/EpistemicBadge.tsx"
     ],
     [
       "drydocs/web/src/components/ui",
@@ -50565,6 +50756,11 @@
       "drydocs/web/src/lib",
       "CONTAINS",
       "drydocs/web/src/lib/cypher-labels.ts"
+    ],
+    [
+      "drydocs/web/src/lib",
+      "CONTAINS",
+      "drydocs/web/src/lib/epistemics.ts"
     ],
     [
       "drydocs/web/src/lib",
@@ -51031,13 +51227,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2854,
-    "edges": 1642,
+    "files": 2862,
+    "edges": 1663,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 3172,
+    "rels": 3180,
     "directories": 319
   }
 }
