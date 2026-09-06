@@ -18,6 +18,7 @@ store with a fake graph runner, so this is reproducible on any checkout with the
 
 from __future__ import annotations
 
+import importlib.util
 import json
 from pathlib import Path
 
@@ -33,7 +34,10 @@ from tests.stub_adk import (
 )
 
 pytest.importorskip("fastapi", reason="fastapi lives in the optional 'api' group")
-pytest.importorskip("httpx", reason="httpx lives in the optional 'api' group")
+# starlette's TestClient rides on httpx2 (>=1.3) or httpx; the api group ships
+# httpx2, so requiring httpx here skipped this test on every current venv.
+if not any(importlib.util.find_spec(name) for name in ("httpx2", "httpx")):
+    pytest.skip("httpx2/httpx live in the optional 'api' group", allow_module_level=True)
 
 # starlette's TestClient, not httpx.ASGITransport: as of httpx 0.28 that
 # transport is async-only, and everything here is a synchronous test. TestClient
