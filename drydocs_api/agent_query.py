@@ -22,7 +22,7 @@ is exactly what the item says must stay green.
 
 ONE ENVELOPE. ``run`` prints the same dict ``POST /specs/{id}/run`` returns
 (``exports.execute_spec``), so an agent reading this and a console reading the
-API see the same twelve keys (`truncated` and `limit` joined at API1). ``list`` and ``describe`` print the ``GET /specs``
+API see the same fourteen keys (`truncated` and `limit` joined at API1, `epistemic` and `causes` at R15). ``list`` and ``describe`` print the ``GET /specs``
 rows. No third shape is minted here.
 
 WHAT IT REFUSES, by name, on stdout: an unknown spec id; a param the spec does
