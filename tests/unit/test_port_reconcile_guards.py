@@ -19,19 +19,27 @@ Three rules:
 
 Consumer-side usage during reconcile-port (documented in that skill):
 
-    1. BEFORE applying the port, snapshot the consumer copies — ALL FOUR; each
-       live check below reads one, and a missing file fails the run:
-         mkdir %TEMP%/reconcile-before
-         python -c "from pathlib import Path; from drydocs_core import backlog_store, yaml_fragments as yf; \
-            Path('<before-dir>/relationship_vocabulary.yaml').write_text(yf.merged_text('drydocs_core/ontology/relationship_vocabulary'), encoding='utf-8'); \
-            Path('<before-dir>/taxonomy-ontology-map.yaml').write_text(yf.merged_text('config/taxonomy-ontology-map'), encoding='utf-8')"
-         poetry run python -c "from drydocs_core.backlog_store import dump_document as d; print(d(), end='')" > <before-dir>/backlog.yaml
-         cp config/gate-log.md  <before-dir>/
-       (S5: both registries are fragment DIRECTORIES now — the snapshot is the
-       MERGED document, so the before/after comparison stays file-shaped.)
+    1. BEFORE applying the port, on a CLEAN checkout, snapshot the consumer copies
+       with ONE call — every file the live checks read, plus the stamp:
+         poetry run python scripts/reconcile_before.py <before-dir>
+       It writes the four mandatory snapshots (the S5 registries as their MERGED
+       documents, the ADR 0013 backlog as its ASSEMBLED document, gate-log.md
+       byte-for-byte), the two optional J51 lists where their modules import, and
+       BASE.sha — the commit the tree was at. It REFUSES a dirty source, because a
+       stamp over an uncommitted edit names a commit the snapshot is not.
     2. Apply the port range / resolve collisions.
     3. RECONCILE_BEFORE_DIR=<before-dir> pytest tests/unit/test_port_reconcile_guards.py -q
-       → FAILS on any downgrade / dropped entry / audit truncation the merge introduced.
+       → FAILS on any downgrade / dropped entry / audit truncation the merge introduced,
+       and FIRST on a before-dir that cannot describe the tree under comparison
+       (``test_reconcile_before_dir_stamp_describes_this_tree_live``): no BASE.sha,
+       a sha that does not resolve here, one that is not an ancestor of HEAD, a
+       gate-log.md that differs from ``git show <sha>:config/gate-log.md``, or a sha
+       that is not where the apply branch left main. That last one is the 2026-09-05
+       case: a before-dir from an EARLIER apply outlived a skipped step 4 and produced
+       a 22nd baseline failure that was the instrument, not the subject (J76).
+       Then paste ``scripts/reconcile_before.py --describe <before-dir>`` into the
+       PORT-REPORT — sha, date, commits behind HEAD — so the report shows what the
+       guards ran against.
     4. AFTER the reconcile, CLEAR the variable and drop the snapshot dir. Nothing
        else does — and the variable outliving its before-dir is what makes the
        next unrelated run in that shell report four broken-looking failures.
@@ -52,6 +60,7 @@ from typing import Any
 
 import pytest
 
+from drydocs.port import reconcile_before
 from drydocs_core import backlog_store, yaml_fragments
 
 yaml = pytest.importorskip("yaml")
@@ -609,6 +618,95 @@ def test_reconcile_runbook_exemptions_no_drop_live() -> None:
     before = _optional_before("runbook-exemption-keys.txt")
     dropped = dropped_names(before or [], runbook_exemption_keys())
     assert not dropped, f"test_runbook_currency exemption keys DROPPED by the merge: {dropped}"
+
+
+# --- the stamp (2026-09-05): a before-dir says which commit it describes ------------
+# The five live checks above trust <before-dir> to be the tree the apply started
+# from. Nothing checked that until the company's 2026-09-05 apply ran the guards
+# against a before-dir left over from the PREVIOUS apply (step 4 skipped) and
+# spent its time on a phantom failure. scripts/reconcile_before.py now writes
+# BASE.sha beside the snapshots, and this guard refuses a before-dir that cannot
+# prove it describes this tree — the instrument is checked before the subject (J76).
+
+
+@_needs_before
+def test_reconcile_before_dir_stamp_describes_this_tree_live() -> None:
+    before_dir = Path(os.environ[BEFORE_DIR_ENV])
+    if not before_dir.is_dir():
+        before_text("gate-log.md")  # fails with the re-snapshot-or-clear wording
+    problems = reconcile_before.check_stamp(before_dir, REPO)
+    assert not problems, "\n".join(
+        [
+            f"{BEFORE_DIR_ENV} cannot be trusted; {reconcile_before.describe(before_dir, REPO)}",
+            *problems,
+        ]
+    )
+
+
+def test_stamp_parses_one_full_sha_and_nothing_else() -> None:
+    sha = "a" * 40
+    assert reconcile_before.parse_stamp(sha + "\n") == sha
+    assert reconcile_before.parse_stamp(None) is None, "absent file = no stamp"
+    assert reconcile_before.parse_stamp("") is None
+    assert reconcile_before.parse_stamp("fc57826f\n") is None, "an abbreviated sha protects nothing"
+    assert reconcile_before.parse_stamp("not a sha") is None
+
+
+def test_stamp_problems_name_each_way_a_before_dir_can_lie() -> None:
+    """The wording is the contract: each failure names its cause AND the fix."""
+    sha, other = "a" * 40, "b" * 40
+    ok = dict(resolves=True, is_ancestor=True, gate_log_matches=True)
+    assert reconcile_before.stamp_problems(sha, **ok) == []
+    assert reconcile_before.stamp_problems(sha, **ok, fork_point=sha) == []
+
+    (missing,) = reconcile_before.stamp_problems(None, **ok)
+    assert "predates the stamp or was hand-built" in missing
+    (foreign,) = reconcile_before.stamp_problems(sha, **{**ok, "resolves": False})
+    assert "another checkout" in foreign
+    (not_anc,) = reconcile_before.stamp_problems(sha, **{**ok, "is_ancestor": False})
+    assert "not an ancestor of HEAD" in not_anc
+    (edited,) = reconcile_before.stamp_problems(sha, **{**ok, "gate_log_matches": False})
+    assert "git show aaaaaaaa:config/gate-log.md" in edited
+    (stale,) = reconcile_before.stamp_problems(sha, **ok, fork_point=other)
+    assert "EARLIER apply outlived its teardown" in stale
+    for problem in (missing, foreign, not_anc, edited, stale):
+        assert "Re-snapshot" in problem, problem
+
+
+def test_snapshot_written_here_passes_its_own_stamp_check(tmp_path: Path) -> None:
+    """Round trip on THIS checkout: the writer's output satisfies the reader.
+
+    Skips when the four sources are dirty in the working tree (the writer refuses
+    them by design, and a developer's half-edited gate-log is not a test failure).
+    """
+    if reconcile_before.dirty_sources(REPO):
+        pytest.skip("snapshot sources are dirty in this checkout; the writer refuses by design")
+    before = tmp_path / "before"
+    report = reconcile_before.write_snapshot(before, REPO)
+    assert set(BEFORE_SNAPSHOTS) <= set(report.written)
+    assert reconcile_before.STAMP_FILE in report.written
+    assert reconcile_before.read_stamp(before) == reconcile_before.head_sha(REPO)
+    assert reconcile_before.check_stamp(before, REPO) == []
+    line = reconcile_before.describe(before, REPO)
+    assert "0 commits behind HEAD" in line and "MISSING" not in line
+    # The tampered-snapshot case is the one this checkout can always prove (the
+    # stale fork-point case needs a branch and a main ref; stamp_problems covers
+    # its wording above):
+    (before / "gate-log.md").write_text("tampered\n", encoding="utf-8")
+    (problem,) = reconcile_before.check_stamp(before, REPO)
+    assert "differs from git show" in problem
+
+
+def test_writer_refuses_a_dirty_source(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(reconcile_before, "dirty_sources", lambda repo: [" M config/gate-log.md"])
+    with pytest.raises(reconcile_before.ReconcileBeforeError, match="uncommitted changes"):
+        reconcile_before.write_snapshot(tmp_path / "before", REPO)
+    assert not (tmp_path / "before").exists(), "a refusal writes nothing"
+
+
+def test_describe_names_a_missing_or_unstamped_dir(tmp_path: Path) -> None:
+    assert "MISSING" in reconcile_before.describe(tmp_path / "nope", REPO)
+    assert f"NO {reconcile_before.STAMP_FILE}" in reconcile_before.describe(tmp_path, REPO)
 
 
 # --- before_text mechanics (run everywhere; these are what UNSET-vs-BROKEN means) --

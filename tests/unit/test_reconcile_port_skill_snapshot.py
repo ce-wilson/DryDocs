@@ -1,13 +1,16 @@
-"""The reconcile-port skill's before-snapshot one-liners RUN (P5, port test review 2026-09-02).
+"""The reconcile-port skill's before-snapshot step RUNS (P5, port test review 2026-09-02).
 
-The skill tells the company session to snapshot six files with ``poetry run python -c "..."``
-one-liners before applying a port. Two of them shipped with an escaped newline rendered as
-a real line break inside the ``-c`` string and failed as written - found by the company on
-2026-09-02, chunk 1 of the apply, exactly the gap the test review named (G4). The prose IS
-the subject here (J37's exception): this test reads the fenced block, extracts every
-``python -c`` command, runs each in a subprocess with ``TEMP`` pointed at a tmp dir, and
-asserts the file it names comes out non-empty. A one-liner whose import path moves (S2, S5
-and O58 each moved one) fails HERE, not at the consumer.
+The skill tells the company session to snapshot the consumer copies before applying a
+port. That step shipped first as six ``poetry run python -c "..."`` one-liners, two of
+which carried an escaped newline rendered as a real line break and failed as written -
+found by the company on 2026-09-02, chunk 1 of the apply, exactly the gap the test review
+named (G4). Since 2026-09-05 the step is ONE call, ``scripts/reconcile_before.py``, which
+also writes the ``BASE.sha`` stamp the guards now refuse to run without. The prose IS the
+subject here (J37's exception): this test reads the fenced block, extracts the step-1
+command the skill prints, runs it in a subprocess with ``TEMP`` pointed at a tmp dir, and
+asserts every file the guards read comes out non-empty and stamped. A script that moves,
+or an import path inside it that moves (S2, S5 and O58 each moved one), fails HERE, not
+at the consumer.
 """
 
 from __future__ import annotations
@@ -18,57 +21,100 @@ import subprocess
 import sys
 from pathlib import Path
 
-import pytest
-
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SKILL = REPO_ROOT / ".claude" / "skills" / "reconcile-port" / "SKILL.md"
 
-_ONE_LINER = re.compile(r'^poetry run python -c "(?P<code>.*)"\s*$', re.M)
+_STEP1 = re.compile(
+    r'^poetry run python (?P<script>scripts/reconcile_before\.py) "\$env:TEMP/(?P<dir>[\w-]+)"\s*$',
+    re.M,
+)
 
-#: The files the six one-liners write, so the test knows what to expect.
+#: What the guards read: the four mandatory snapshots, the two optional J51 lists (both
+#: modules import on the producer side, so both must appear here), and the stamp.
 EXPECTED = {
     "backlog.yaml",
-    "detect-rule-ids.txt",
-    "runbook-exemption-keys.txt",
+    "gate-log.md",
     "relationship_vocabulary.yaml",
     "taxonomy-ontology-map.yaml",
+    "detect-rule-ids.txt",
+    "runbook-exemption-keys.txt",
+    "BASE.sha",
 }
 
 
-def _one_liners() -> list[str]:
+def _step1_block() -> str:
     text = SKILL.read_text(encoding="utf-8")
     start = text.index("# 1. BEFORE applying the port")
     end = text.index("# 2. apply the range", start)
-    block = text[start:end]
-    return [m.group("code") for m in _ONE_LINER.finditer(block)]
+    return text[start:end]
 
 
-def test_the_block_still_has_its_one_liners() -> None:
-    codes = _one_liners()
-    assert len(codes) >= 4, f"expected the snapshot one-liners in SKILL.md, found {len(codes)}"
-    for code in codes:
-        assert (
-            "\n" not in code
-        ), "a one-liner carries a real line break - the 2026-09-02 mangling; use chr(10)"
+def test_the_block_has_the_one_snapshot_call_and_no_leftover_one_liners() -> None:
+    block = _step1_block()
+    matches = list(_STEP1.finditer(block))
+    assert (
+        len(matches) == 1
+    ), f"expected exactly one scripts/reconcile_before.py call in step 1, found {len(matches)}"
+    assert (
+        "python -c" not in block
+    ), "step 1 is one call now; a leftover one-liner is a second, unstamped path"
+    assert (REPO_ROOT / matches[0].group("script")).is_file()
 
 
-@pytest.mark.parametrize("code", _one_liners(), ids=lambda c: c[:60])
-def test_every_snapshot_one_liner_runs_and_writes_its_file(code: str, tmp_path: Path) -> None:
-    before = tmp_path / "reconcile-before"
-    before.mkdir()
+def test_the_step1_call_runs_and_writes_every_file_the_guards_read(tmp_path: Path) -> None:
+    m = _STEP1.search(_step1_block())
+    assert m is not None
+    if subprocess.run(
+        [
+            "git",
+            "status",
+            "--porcelain",
+            "--",
+            "config/gate-log.md",
+            "docs/restructure/backlog",
+            "drydocs_core/ontology/relationship_vocabulary",
+            "config/taxonomy-ontology-map",
+        ],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+    ).stdout.strip():
+        import pytest
+
+        pytest.skip("snapshot sources are dirty in this checkout; the writer refuses by design")
+    before = tmp_path / m.group("dir")
     env = dict(os.environ, TEMP=str(tmp_path), PYTHONIOENCODING="utf-8")
     env.pop("VIRTUAL_ENV", None)
     proc = subprocess.run(
-        [sys.executable, "-c", code],
+        [sys.executable, m.group("script"), str(before)],
         cwd=REPO_ROOT,
         env=env,
         capture_output=True,
         text=True,
         encoding="utf-8",
     )
-    assert proc.returncode == 0, f"one-liner failed:\n{code}\n--- stderr ---\n{proc.stderr[-2000:]}"
+    assert proc.returncode == 0, f"step 1 failed:\n--- stderr ---\n{proc.stderr[-2000:]}"
     written = {p.name for p in before.iterdir()}
-    assert written, f"one-liner ran but wrote nothing into {before}:\n{code}"
-    assert written <= EXPECTED, f"unexpected snapshot file(s) {written - EXPECTED} from:\n{code}"
+    assert written == EXPECTED, f"step 1 wrote {written}, the guards read {EXPECTED}"
     for p in before.iterdir():
         assert p.stat().st_size > 0, f"{p.name} is empty"
+    head = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+    ).stdout.strip()
+    assert (before / "BASE.sha").read_text(encoding="utf-8").strip() == head
+
+    describe = subprocess.run(
+        [sys.executable, m.group("script"), "--describe", str(before)],
+        cwd=REPO_ROOT,
+        env=env,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+    )
+    assert describe.returncode == 0, describe.stderr[-2000:]
+    assert head[:7] in describe.stdout and "commits behind HEAD" in describe.stdout
