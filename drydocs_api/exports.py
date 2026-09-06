@@ -30,6 +30,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 
 from drydocs_api.ephemeral_specs import EphemeralSpecStore, is_ephemeral_ref
+from drydocs_api.epistemics import grade
 from drydocs_api.guard import ensure_read_only
 from drydocs_api.handlers import GraphRunner, _authenticate
 from drydocs_api.queries import validate_params
@@ -301,8 +302,9 @@ def execute_spec(
 
     R9: this is the one dict both ``POST /specs/{id}/run`` and the agent query
     command (``drydocs_api.agent_query``) return, so an agent reading the CLI
-    and a console reading the API see the same twelve keys — ``truncated`` and
-    ``limit`` joined the envelope at API1, and they joined it HERE rather than
+    and a console reading the API see the same fourteen keys — ``truncated`` and
+    ``limit`` joined the envelope at API1, ``epistemic`` and ``causes`` at R15,
+    and they joined it HERE rather than
     at the route precisely so the agent tier inherits completeness too: an agent
     that files a 500-row answer as the answer is the same defect as a console
     that does. Exactly these keys:
@@ -320,6 +322,7 @@ def execute_spec(
         rows = rows[:limit]  # the probe row is evidence, never payload
     keys, watermarked = _apply_watermark(spec, list(keys), rows)
     out_rows = list(watermarked)
+    epistemic, causes = grade(spec, lambda c, p, d: runner.run(c, p, d)[1])
     return {
         "spec_id": spec.id,
         "database": spec.database,
@@ -340,6 +343,12 @@ def execute_spec(
         # of a fact the server already knows.
         "truncated": truncated,
         "limit": limit,
+        # R15: EXACT or LOWER-BOUND, with the causes that limited the walk —
+        # null for a spec that declares no walk. Zero rows + lower-bound and
+        # zero rows + exact are different answers, and the difference lives
+        # in these two keys and nowhere a consumer could infer it from.
+        "epistemic": epistemic,
+        "causes": causes,
     }
 
 
@@ -399,6 +408,9 @@ def export_spec(
     executed_at = (now or datetime.now(UTC)).isoformat(timespec="seconds")
 
     def chunks() -> Iterator[str]:
+        # R15: graded BEFORE the rows stream, against the same database, so the
+        # manifest describes the graph the rows came from.
+        epistemic, causes = grade(spec, lambda c, p, d: runner.run(c, p, d)[1])
         keys, rows = _rows_iter(runner, spec, _probe_params(bound, ceiling))
         keys, watermarked = _apply_watermark(spec, list(keys), rows)
         banner = banner_text(spec)
@@ -451,6 +463,11 @@ def export_spec(
                 # it, so the distinction is recorded IN the artifact.
                 "truncated": truncated,
                 "limit": ceiling,
+                # R15: the manifest outlives the screen, so the epistemic label
+                # and its causes ride in the governance record too — an
+                # exported lineage extract with zero rows says WHY it has zero.
+                "epistemic": epistemic,
+                "causes": causes,
                 "classification": spec.classification,
                 "trust_tiers_present": _trust_tiers(spec, trust_seen),
                 "exported_by": session.persona_id,

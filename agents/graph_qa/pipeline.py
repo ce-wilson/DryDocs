@@ -72,8 +72,25 @@ ANSWER_SYSTEM = (
     "You answer questions about the DryDocs knowledge graph from query "
     "results ONLY. Be concise and concrete; cite counts and names from the "
     "rows. If the rows cannot answer the question, say exactly what is "
-    "missing — never invent data."
+    "missing — never invent data. When the rows carry 'epistemic: lower-bound', "
+    "say so in those words and name the causes: the rows are a floor, not the "
+    "whole answer, and zero rows then means 'not visible to this walk', never "
+    "'none exist'."
 )
+
+
+def _epistemic_clause(envelope: Envelope) -> str:
+    """R15: the label the answering spec step earned, as given, for the answer
+    prompt — so a zero-row lower-bound answer is written as "nothing found,
+    and the walk could not have found it" and never as "there is nothing".
+    Empty when the answering tier was not a graded spec."""
+    if envelope.tier != "spec":
+        return ""
+    for step in reversed(envelope.steps):
+        if step.kind == "spec" and step.epistemic is not None:
+            named = ", ".join(str(c.get("detail", c.get("cause"))) for c in step.causes)
+            return f"; epistemic: {step.epistemic}" + (f" (causes: {named})" if named else "")
+    return ""
 
 
 def _extract_json(text: str) -> dict:
@@ -228,6 +245,13 @@ class GraphQaPipeline:
         step.rows, step.truncated, step.ms = result.row_count, result.truncated, result.ms
         step.notifications = list(getattr(result, "notifications", []) or [])
         step.explore_ref = self._explore_ref(spec.cypher, spec.database, resolved)
+        # R15: grade the walk against the same database the rows came from. The
+        # probes are the API's own (one count each), so the agent and the console
+        # cannot disagree about what bounded an answer.
+        step.epistemic, step.causes = specs_catalog.grade(
+            spec,
+            lambda c, p, d: self.run_read(c, params=p, database=d, row_cap=1).records,
+        )
         self._push_step(envelope, step)
         timings["retrieve"] += step.ms
         # G102: the trust signal is the spec's own declaration, not its database
@@ -419,7 +443,8 @@ class GraphQaPipeline:
                 envelope,
                 ANSWER_SYSTEM,
                 f"Question: {question}\n\nRows ({result.row_count}"
-                f"{', truncated' if result.truncated else ''}):\n{rows_json}",
+                f"{', truncated' if result.truncated else ''}"
+                f"{_epistemic_clause(envelope)}):\n{rows_json}",
                 timings,
                 step="answer",
             )

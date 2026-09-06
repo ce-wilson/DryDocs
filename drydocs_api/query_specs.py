@@ -42,6 +42,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
+from drydocs_api.epistemics import LINEAGE_WALK, WalkDeclaration
 from drydocs_api.guard import ensure_no_element_ids, ensure_read_only
 from drydocs_api.queries import ParamSpec
 
@@ -96,6 +97,15 @@ class QuerySpec:
     #: that is not listed here, and on any listed type that has since gone
     #: active (the list must shrink when the loader lands).
     planned_terms: tuple[str, ...] = ()
+    #: R15: what this spec's WALK can fail to see — the cause classes graded
+    #: at run time (unparsed cmd_line, unresolved invocations) and the planned
+    #: vocabulary entries whose edges it would traverse if they existed. A spec
+    #: that declares one answers `epistemic: exact | lower-bound` with the
+    #: causes that fired; a spec that declares none is UNGRADED (`epistemic:
+    #: null`) — inventories and schema dumps have no walk to be bounded, and
+    #: defaulting them to "exact" would be a claim nobody made. Property of
+    #: the ANSWER only: no node, property or edge, so no gate.
+    walk: WalkDeclaration | None = None
 
 
 class UnknownSpecError(KeyError):
@@ -148,6 +158,7 @@ def _with_ground_truth_exclusion(spec: QuerySpec) -> QuerySpec:
         params=spec.params,
         uncertain=spec.uncertain,
         planned_terms=spec.planned_terms,
+        walk=spec.walk,
     )
 
 
@@ -1166,6 +1177,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             ),
             classification="internal",
             params=_LIMIT,
+            walk=LINEAGE_WALK,  # R15: a hop list is a walk, and the walk is bounded
         ),
         QuerySpec(
             id="lineage.data-assets.v1",
@@ -1190,6 +1202,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             ),
             classification="internal",
             params=_LIMIT,
+            walk=LINEAGE_WALK,  # R15: writer/reader degrees count the same edges
         ),
         QuerySpec(
             id="lineage.schema-definition.v1",

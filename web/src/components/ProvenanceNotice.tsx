@@ -1,4 +1,5 @@
 import type { Provenance } from '../data/provenance'
+import EpistemicBadge from './ui/EpistemicBadge'
 
 // WEB1 (b) — ONE presentational component for the provenance state.
 //
@@ -27,7 +28,10 @@ export default function ProvenanceNotice<T>({
     return (
       <p className={`${BOX} border-edge bg-panel-2 text-muted`} data-provenance="empty">
         Live QuerySpec <code className="font-mono">{specId}</code> ran and returned no rows. This
-        is the graph&rsquo;s answer, not a failure.
+        is the graph&rsquo;s answer, not a failure.{' '}
+        {/* R15 clause (b): zero rows + lower-bound is a different answer from
+            zero rows + exact, and this is the one line a reader sees for it. */}
+        <EpistemicBadge epistemic={state.data.epistemic} causes={state.data.causes} />
       </p>
     )
   }
@@ -46,7 +50,8 @@ export default function ProvenanceNotice<T>({
         {state.because === 'empty' ? (
           <>
             Live QuerySpec <code className="font-mono">{specId}</code> ran and returned no rows, so
-            this frame is showing its demo data instead. Nothing here came from the graph.
+            this frame is showing its demo data instead. Nothing here came from the graph.{' '}
+            <EpistemicBadge epistemic={state.data?.epistemic} causes={state.data?.causes} />
           </>
         ) : (
           <>

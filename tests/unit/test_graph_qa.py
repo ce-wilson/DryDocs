@@ -422,3 +422,52 @@ def test_schema_prompt_sections_survive_oversized_vocabulary() -> None:
     assert "Properties by label" in prompt
     assert "sched_table" in prompt
     assert "Example queries" in prompt and "spec.a.v1" in prompt
+
+
+def test_spec_step_carries_the_epistemic_label_as_given() -> None:
+    """R15 (d): the agent renders the label the API's grader produced — on the
+    step, and in the answer prompt — and never re-derives one. A lineage spec
+    answering rows on a graph with unparsed command lines is a LOWER BOUND, and
+    the answer model is told so in those words."""
+    from drydocs_api.epistemics import CAUSE_PROBES, CAUSE_UNPARSED_CMD_LINE
+
+    lineage = specs_catalog.get_spec("lineage.hops.v1")
+    assert lineage is not None and lineage.walk is not None
+    provider = FakeProvider(
+        replies=[
+            '{"spec_id": "lineage.hops.v1", "params": {}}',  # router
+            "One hop, lower-bound.",  # answer
+        ]
+    )
+
+    def run_read(cypher, params=None, database=None, row_cap=100, timeout_s=15.0):
+        if cypher == CAUSE_PROBES[CAUSE_UNPARSED_CMD_LINE]:
+            return FakeResult(records=[{"n": 4}], keys=["n"], row_count=1)
+        if cypher in CAUSE_PROBES.values():
+            return FakeResult(records=[{"n": 0}], keys=["n"], row_count=1)
+        return FakeResult(records=[{"activity": "j1"}], keys=["activity"], row_count=1)
+
+    env = _pipeline(provider, run_read).answer("what does j1 write?", run_id="qa-test-r15")
+    step = next(s for s in env.steps if s.kind == "spec")
+    assert step.epistemic == "lower-bound"
+    assert [c["cause"] for c in step.causes] == [
+        CAUSE_UNPARSED_CMD_LINE,
+        "gate-pending-edge",
+        "gate-pending-edge",
+    ]
+    assert step.causes[0]["count"] == 4
+    _, answer_prompt = provider.calls[-1]
+    assert "epistemic: lower-bound" in answer_prompt
+    assert "unparsed-cmd-line" in answer_prompt and "scheduler_depends_on_file" in answer_prompt
+    # the envelope serializes the new fields beside the old ones
+    assert "epistemic" in env.to_dict()["steps"][step.i - 1]
+
+
+def test_ungraded_spec_step_is_null_not_exact() -> None:
+    provider = FakeProvider(
+        replies=[f'{{"spec_id": "{SPEC_ID}", "params": {{}}}}', "There is 1 application."]
+    )
+    env = _pipeline(provider, _ok_read).answer("how many applications?", run_id="qa-test-r15b")
+    step = next(s for s in env.steps if s.kind == "spec")
+    assert step.epistemic is None and step.causes == []
+    assert "epistemic" not in provider.calls[-1][1]

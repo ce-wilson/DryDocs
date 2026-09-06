@@ -18,6 +18,37 @@
         "title": "Body_post_intake_evidence_intake__intake_id__evidence_post",
         "type": "object"
       },
+      "CauseOut": {
+        "additionalProperties": false,
+        "description": "R15: one cause that limited a walk. `cause` is the DryDocs cause class\n(`unparsed-cmd-line` | `unresolved-invocation` | `gate-pending-edge`),\n`detail` names the concrete thing (the probe class, or the planned\nvocabulary entry id for a gate-pending edge), `count` is the measurement\nwhen one was taken and null when it could not be (a probe that returned no\ncount) or does not apply (a gate-pending edge has no count until it exists).",
+        "properties": {
+          "cause": {
+            "title": "Cause",
+            "type": "string"
+          },
+          "count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Count"
+          },
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          }
+        },
+        "required": [
+          "cause",
+          "detail"
+        ],
+        "title": "CauseOut",
+        "type": "object"
+      },
       "ChangesetBody": {
         "properties": {
           "draft_id": {
@@ -434,6 +465,14 @@
         "additionalProperties": false,
         "description": "A QuerySpec run (O11): the registry echoes the spec's contract back\nwith the rows, so the UI renders the classification banner and the\nSYNTHESIZED watermark without holding its own query definitions. This is\nthe server-side twin of the console's ``SpecResult`` seam type.",
         "properties": {
+          "causes": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/CauseOut"
+            },
+            "title": "Causes",
+            "type": "array"
+          },
           "classification": {
             "title": "Classification",
             "type": "string"
@@ -456,6 +495,21 @@
           "ephemeral": {
             "title": "Ephemeral",
             "type": "boolean"
+          },
+          "epistemic": {
+            "anyOf": [
+              {
+                "enum": [
+                  "exact",
+                  "lower-bound"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Epistemic"
           },
           "keys": {
             "items": {

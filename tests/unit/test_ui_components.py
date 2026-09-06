@@ -389,10 +389,16 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     to `explorer` would name the first of the surfaces that use it as its owner.
     Same rule as RelEdge and TrustLegend, and the reason the component exists at
     all: two surfaces that must not drift apart need one place to edit.
+    95 -> 96 at R15 (2026-09-06): EpistemicBadge, UNBOUND, bound stays 40. The
+    ONE way a graded answer says exact or lower-bound -- the grid, the Ask step
+    line and the provenance notice all render the server's label through it --
+    so it is TruncationBadge's rule again: a primitive shared so three surfaces
+    cannot drift belongs to none of them. Its hover-text helper, lib/epistemics.ts,
+    is .ts and outside the scan boundary.
     """
     comps = _ui()["components"]
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
         40,
-        95,
+        96,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"

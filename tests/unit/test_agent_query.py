@@ -107,6 +107,10 @@ def test_run_prints_exactly_the_api_envelope(capsys):
         # is the SAME dict the API returns — so the agent tier inherits it too.
         "truncated",
         "limit",
+        # R15: so does the epistemic label - an agent filing a lower-bound
+        # lineage answer as the answer is the same defect API1 named.
+        "epistemic",
+        "causes",
     }
     assert "ok" not in payload  # a success IS the envelope; only failures carry ok
 

@@ -59,7 +59,8 @@ transaction timeout 15 s.
     { "i": 1, "kind": "router", "spec_id": "explorer.jobs.v2", "ms": 480 },
     { "i": 2, "kind": "spec", "spec_id": "explorer.jobs.v2",
       "cypher": "MATCH …", "database": "drydocs", "rows": 42,
-      "truncated": false, "fix_retries": 0, "error": null, "explore_ref": null },
+      "truncated": false, "fix_retries": 0, "error": null, "explore_ref": null,
+      "epistemic": null, "causes": [] },
     { "i": 3, "kind": "answer", "ms": 1210 }
   ],
   "sources": [ { "document": "spec:explorer.jobs.v2", "trust": "CONFIRMED",

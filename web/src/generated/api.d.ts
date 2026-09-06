@@ -522,6 +522,23 @@ export type components = {
             /** Files */
             files: Blob[];
         };
+        /**
+         * CauseOut
+         * @description R15: one cause that limited a walk. `cause` is the DryDocs cause class
+         *     (`unparsed-cmd-line` | `unresolved-invocation` | `gate-pending-edge`),
+         *     `detail` names the concrete thing (the probe class, or the planned
+         *     vocabulary entry id for a gate-pending edge), `count` is the measurement
+         *     when one was taken and null when it could not be (a probe that returned no
+         *     count) or does not apply (a gate-pending edge has no count until it exists).
+         */
+        CauseOut: {
+            /** Cause */
+            cause: string;
+            /** Count */
+            count?: number | null;
+            /** Detail */
+            detail: string;
+        };
         /** ChangesetBody */
         ChangesetBody: {
             /** Draft Id */
@@ -744,6 +761,11 @@ export type components = {
          *     the server-side twin of the console's ``SpecResult`` seam type.
          */
         SpecRunOut: {
+            /**
+             * Causes
+             * @default []
+             */
+            causes: components["schemas"]["CauseOut"][];
             /** Classification */
             classification: string;
             /** Columns */
@@ -754,6 +776,8 @@ export type components = {
             database: string;
             /** Ephemeral */
             ephemeral: boolean;
+            /** Epistemic */
+            epistemic?: ("exact" | "lower-bound") | null;
             /** Keys */
             keys: string[];
             /** Limit */

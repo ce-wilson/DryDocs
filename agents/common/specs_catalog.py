@@ -20,6 +20,7 @@ _REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
+from drydocs_api.epistemics import grade  # noqa: E402
 from drydocs_api.guard import WriteRejected, ensure_read_only  # noqa: E402
 from drydocs_api.query_specs import (  # noqa: E402
     QUERY_SPECS,
@@ -35,6 +36,7 @@ __all__ = [
     "ensure_read_only",
     "catalog_lines",
     "get_spec",
+    "grade",
     "resolve_params",
 ]
 

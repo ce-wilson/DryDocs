@@ -49,7 +49,11 @@ export type Provenance<T> =
   | { status: 'loading' }
   | { status: 'live'; data: SpecResult; rows: T[] }
   | { status: 'empty'; data: SpecResult }
-  | { status: 'demo'; rows: T[]; because: DemoReason; message: string | null }
+  /** R15: `data` is the EMPTY live result when `because` is `empty`, so the
+   *  notice can still say what the graph's answer was graded — zero rows with
+   *  `lower-bound` is "not visible to this walk", not "none exist", and the
+   *  demo rows underneath must not bury that. Null on `error`: nothing ran. */
+  | { status: 'demo'; rows: T[]; because: DemoReason; message: string | null; data: SpecResult | null }
   | { status: 'error'; message: string; reason: QueryFailure }
   /** WEB6: the graph ANSWERED, and the answer does not match the shape this
    *  panel requires. A distinct state from `error` because it is a distinct
@@ -193,10 +197,12 @@ export function useLiveOrDemo<T>(
     }
   }
   if (query.status === 'empty') {
-    if (because === 'empty') return { status: 'demo', rows: [...demo!], because: 'empty', message: null }
+    if (because === 'empty') {
+      return { status: 'demo', rows: [...demo!], because: 'empty', message: null, data: query.data }
+    }
     return { status: 'empty', data: query.data }
   }
-  if (because === 'error') return { status: 'demo', rows: [...demo!], because: 'error', message }
+  if (because === 'error') return { status: 'demo', rows: [...demo!], because: 'error', message, data: null }
   return { status: 'error', message: query.message, reason: query.reason }
 }
 

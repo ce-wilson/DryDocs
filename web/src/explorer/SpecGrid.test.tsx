@@ -262,3 +262,63 @@ describe('the two surfaces share one badge', () => {
     expect(filesMatching(/\bexport default function\b/, codeOnly).length).toBeGreaterThan(20)
   })
 })
+
+// ── R15 clause (d): the epistemic label, rendered as given ──────────────────
+
+describe('the EPISTEMIC badge on the grid', () => {
+  it('renders lower-bound as the server wrote it, with the causes on hover', async () => {
+    await grid({
+      epistemic: 'lower-bound',
+      causes: [{ cause: 'unparsed-cmd-line', detail: 'unparsed-cmd-line', count: 4 }],
+      rows: rowsOfLength(3),
+    })
+    const badge = screen.getByText('lower-bound')
+    expect(badge.getAttribute('data-epistemic')).toBe('lower-bound')
+    expect(badge.getAttribute('title')).toContain('unparsed-cmd-line (unparsed-cmd-line: 4)')
+  })
+
+  it('renders exact as exact', async () => {
+    await grid({ epistemic: 'exact', causes: [], rows: rowsOfLength(3) })
+    expect(screen.getByText('exact').getAttribute('data-epistemic')).toBe('exact')
+  })
+
+  it('renders nothing for an ungraded spec — null is never shown as exact', async () => {
+    await grid({ epistemic: null, causes: [], rows: rowsOfLength(3) })
+    expect(screen.queryByText('exact')).toBeNull()
+    expect(screen.queryByText('lower-bound')).toBeNull()
+    expect(document.querySelector('[data-epistemic]')).toBeNull()
+  })
+
+  it('zero rows with lower-bound still shows the badge — the empty frame says WHY it is empty', async () => {
+    // Not through grid(): with zero rows there is no table to wait for. This
+    // frame declares a demo, so an empty live answer becomes the demo-on-empty
+    // notice — and THAT notice must carry the label, or the one case clause
+    // (b) exists for (zero rows, lower-bound) is the one case that loses it.
+    access = new Access(
+      specResult({
+        epistemic: 'lower-bound',
+        causes: [{ cause: 'gate-pending-edge', detail: 'scheduler_depends_on_file' }],
+        rows: [],
+      }),
+    )
+    render(<SpecGrid specId="test.spec.v1" fallback={<div>demo</div>} />, { wrapper })
+    const badge = await screen.findByText('lower-bound')
+    expect(badge.getAttribute('title')).toContain('scheduler_depends_on_file')
+    const notice = document.querySelector('[data-provenance="demo"]')
+    expect(notice?.getAttribute('data-demo-because')).toBe('empty')
+    expect(notice?.contains(badge)).toBe(true)
+  })
+
+  it('zero rows with exact says exact', async () => {
+    access = new Access(specResult({ epistemic: 'exact', causes: [], rows: [] }))
+    render(<SpecGrid specId="test.spec.v1" fallback={<div>demo</div>} />, { wrapper })
+    expect((await screen.findByText('exact')).getAttribute('data-epistemic')).toBe('exact')
+  })
+
+  it('zero rows ungraded says nothing about epistemics', async () => {
+    access = new Access(specResult({ epistemic: null, causes: [], rows: [] }))
+    render(<SpecGrid specId="test.spec.v1" fallback={<div>demo</div>} />, { wrapper })
+    await screen.findByText(/returned no rows/)
+    expect(document.querySelector('[data-epistemic]')).toBeNull()
+  })
+})

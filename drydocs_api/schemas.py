@@ -28,7 +28,7 @@ server declares them (recorded in the O70 close notes).
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict
 
@@ -109,6 +109,19 @@ class SpecOut(_Declared):
     watermarked: bool
 
 
+class CauseOut(_Declared):
+    """R15: one cause that limited a walk. `cause` is the DryDocs cause class
+    (`unparsed-cmd-line` | `unresolved-invocation` | `gate-pending-edge`),
+    `detail` names the concrete thing (the probe class, or the planned
+    vocabulary entry id for a gate-pending edge), `count` is the measurement
+    when one was taken and null when it could not be (a probe that returned no
+    count) or does not apply (a gate-pending edge has no count until it exists)."""
+
+    cause: str
+    detail: str
+    count: int | None = None
+
+
 class SpecRunOut(_Declared):
     """A QuerySpec run (O11): the registry echoes the spec's contract back
     with the rows, so the UI renders the classification banner and the
@@ -134,3 +147,11 @@ class SpecRunOut(_Declared):
     #: 500 rows.
     truncated: bool
     limit: int | None = None
+    #: R15: the epistemic label on the ANSWER. `exact` means every cause the
+    #: spec's walk declares measured zero; `lower-bound` means at least one
+    #: fired and `causes` names it; null means the spec declares no walk and is
+    #: ungraded — never read null as exact. Zero rows with `lower-bound` is a
+    #: different answer from zero rows with `exact`, and the console renders
+    #: the label as given rather than inventing its own wording for it.
+    epistemic: Literal["exact", "lower-bound"] | None = None
+    causes: list[CauseOut] = []
