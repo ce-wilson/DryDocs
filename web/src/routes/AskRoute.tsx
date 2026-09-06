@@ -8,6 +8,7 @@ import TaskGraphPane from '../ask/TaskGraphPane'
 import FileReport from '../ask/FileReport'
 import type { Persona } from '../lib/auth'
 import { useGraphAccess } from '../data/graphAccess'
+import * as storage from '../lib/storage'
 
 // The Ask spoke (R5 / ADR 0007): free-text Q&A over the knowledge graph for
 // EVERY persona — the agent tier does the reasoning, the server does the
@@ -45,7 +46,7 @@ function lastTurnKey(personaId: string): string {
 
 function loadLastTurn(personaId: string): Turn[] {
   try {
-    const raw = localStorage.getItem(lastTurnKey(personaId))
+    const raw = storage.read(lastTurnKey(personaId))
     if (!raw) return []
     const turn = JSON.parse(raw) as Turn
     if (!turn || typeof turn.question !== 'string' || !turn.envelope) return []
@@ -166,7 +167,7 @@ export default function AskRoute({ persona }: { persona: Persona }) {
         }
         // O64: the ONLY persistence write — success envelopes, nothing else
         try {
-          localStorage.setItem(lastTurnKey(persona.id), JSON.stringify(completed))
+          storage.writeJson(lastTurnKey(persona.id), completed)
         } catch {}
         patch((t) => ({ ...t, envelope, steps: envelope.steps ?? t.steps, running: false }))
       }

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
+import * as storage from '../../lib/storage'
 
 interface ResizableSplitProps {
   /** localStorage key — the divider position is "persisted per-module"
@@ -28,7 +29,7 @@ export default function ResizableSplit({
 }: ResizableSplitProps) {
   const [topPct, setTopPct] = useState(() => {
     try {
-      const stored = Number(localStorage.getItem(storageKey))
+      const stored = Number(storage.read(storageKey))
       return Number.isFinite(stored) && stored > 0 ? stored : defaultTopPct
     } catch {
       return defaultTopPct
@@ -42,7 +43,7 @@ export default function ResizableSplit({
   const persist = useCallback(
     (v: number) => {
       try {
-        localStorage.setItem(storageKey, String(v))
+        storage.write(storageKey, String(v))
       } catch {
         /* ignore */
       }

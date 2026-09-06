@@ -10,6 +10,7 @@ import ModuleIcon from '../components/ModuleIcon'
 import ModuleToolbar from '../layout/ModuleToolbar'
 import BrandMark from '../components/BrandMark'
 import { isResolved, useGraphQuery } from '../data/graphAccess'
+import * as storage from '../lib/storage'
 
 // The Overview / landing route (`/`) — O35 category-first rebuild per SME
 // feedback FB-2026-07-28-01/02 (docs/design/ui-exploration/wireframes/, keys WF-LND-*): the dense
@@ -198,7 +199,7 @@ const ONBOARDING_STEPS = [
 function OnboardingChecklist() {
   const [done, setDone] = useState<readonly string[]>(() => {
     try {
-      return JSON.parse(localStorage.getItem(ONBOARDING_KEY) ?? '[]') as string[]
+      return storage.readJson<string[]>(ONBOARDING_KEY, [])
     } catch {
       return []
     }
@@ -208,7 +209,7 @@ function OnboardingChecklist() {
     setDone((prev) => {
       const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
       try {
-        localStorage.setItem(ONBOARDING_KEY, JSON.stringify(next))
+        storage.writeJson(ONBOARDING_KEY, next)
       } catch {
         /* ignore */
       }

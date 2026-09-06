@@ -8,6 +8,7 @@ import Header, { type EnvName } from './Header'
 import SystemBanner from './SystemBanner'
 import Aside from './Aside'
 import RightSidebarSlot from './RightSidebarSlot'
+import * as storage from '../lib/storage'
 
 export type { EnvName }
 
@@ -40,7 +41,7 @@ function ShellGrid({ session, persona, env, onEnvChange, onSignOut }: ShellProps
   function toggleCollapsed(next: boolean) {
     setCollapsed(next)
     try {
-      localStorage.setItem(ASIDE_COLLAPSE_STORAGE_KEY, next ? '1' : '0')
+      storage.write(ASIDE_COLLAPSE_STORAGE_KEY, next ? '1' : '0')
     } catch {
       /* ignore */
     }

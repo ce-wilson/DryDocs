@@ -13,6 +13,7 @@ import {
 import EmptyState from '../components/ui/EmptyState'
 import { rowsOf, useLiveOrDemo } from '../data/provenance'
 import ProvenanceNotice from '../components/ProvenanceNotice'
+import * as storage from '../lib/storage'
 
 // K11 — the steward mapping cascade (gate seal-app-ref-edge-reshape §G,
 // SIGNED OFF 2026-08-03). The act is ORCHESTRATOR-FIRST (§G1): Product Line
@@ -73,7 +74,7 @@ function trayKey(personaId: string): string {
 
 function loadTray(personaId: string): TrayEntry[] {
   try {
-    const raw = localStorage.getItem(trayKey(personaId))
+    const raw = storage.read(trayKey(personaId))
     if (!raw) return []
     const parsed = JSON.parse(raw) as unknown
     return Array.isArray(parsed) ? (parsed as TrayEntry[]) : []
@@ -226,7 +227,7 @@ export default function AppCodeCascadePane({
   // ── tray (per-user, persisted; lifecycle chips ARE the provenance — §G7)
   const [tray, setTray] = useState<TrayEntry[]>(() => loadTray(personaId))
   useEffect(() => {
-    localStorage.setItem(trayKey(personaId), JSON.stringify(tray))
+    storage.writeJson(trayKey(personaId), tray)
   }, [tray, personaId])
 
   const [dialogOpen, setDialogOpen] = useState(false)
