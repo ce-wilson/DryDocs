@@ -74,7 +74,7 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 .capture-status{font-size:.78rem;color:#166534;margin:.3rem 0 0;min-height:1.1em}</style>
 </head><body>
 <h1>DryDocs — project board</h1>
-<p class="subtitle">Rendered from <code>docs/restructure/backlog/</code> 663 items &middot; 136 todo / 11 in progress / 2 blocked / 514 done. The repo is the system of record; this page is a working aid.</p>
+<p class="subtitle">Rendered from <code>docs/restructure/backlog/</code> 663 items &middot; 130 todo / 7 in progress / 2 blocked / 524 done. The repo is the system of record; this page is a working aid.</p>
 <p class="subtitle">Location: <code id="board-url"></code> <button type="button" id="board-url-copy">copy</button></p>
 <script>document.getElementById('board-url').textContent=window.location.href;document.getElementById('board-url-copy').onclick=function(){navigator.clipboard.writeText(window.location.href);};</script>
 <p class="subtitle"><a class="capture-link" href="roadmap.html">Module roadmap &rarr;</a> <a class="capture-link" href="ideas.html">Idea inbox &rarr;</a></p>
@@ -91,14 +91,14 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P9</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Application attribution</h3><p class="goal">Jobs attributed to SEAL applications (seal_app_ref) end-to-end — gate-confirmed match policy, loader, verify coverage (Epic K).</p><div class="progress"><div class="progress-bar" style="width:87%"></div></div><p class="progress-text">33 / 38</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P10</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Documentation infrastructure</h3><p class="goal">Every design doc (TDD/Runbook/BRD) conforms to a canonical outline; deterministic md→HTML/PDF render; HITL markup loop (digital + pen/paper) re-attaches to a requirement-traceability backbone (Epic L).</p><div class="progress"><div class="progress-bar" style="width:71%"></div></div><p class="progress-text">30 / 42</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P11</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Source governance ledgers</h3><p class="goal">Per-source governance as test-enforced config: audit envelope + edge diet (doc 06, Epic M) and column-mapping ledgers (doc 08, Epic N); property-term bindings via the gate.</p><div class="progress"><div class="progress-bar" style="width:61%"></div></div><p class="progress-text">20 / 33</p></div>
-<div class="phase-card"><div class="phase-head"><span class="phase-id">P12</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Web console / graph visualization</h3><p class="goal">Browser front-end over the knowledge graph: navigable C4/graph views, with a decided browser↔Neo4j access path (bolt-from-browser vs a thin API).</p><div class="progress"><div class="progress-bar" style="width:72%"></div></div><p class="progress-text">82 / 114</p></div>
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P12</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Web console / graph visualization</h3><p class="goal">Browser front-end over the knowledge graph: navigable C4/graph views, with a decided browser↔Neo4j access path (bolt-from-browser vs a thin API).</p><div class="progress"><div class="progress-bar" style="width:81%"></div></div><p class="progress-text">92 / 114</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P13</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Runtime topology &amp; maintenance windows</h3><p class="goal">Control-M host topology (CM_HOSTS) + runtime-stats supplement (CM_AVG_RUN) loaded per their gates; the maintenance-window question (best patch window for a host/group) answerable from the graph (Epic P).</p><div class="progress"><div class="progress-bar" style="width:83%"></div></div><p class="progress-text">5 / 6</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P14</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Document ingestion &amp; doc-graph benchmarks</h3><p class="goal">Unstructured documents as graph corpora (docmeta): the P0 benchmark verdict (traversal vs manifest-routed md vs vector RAG) with its evidence experiments, and the landing zone for the docmeta component&#x27;s P1+ phases once the verdict + docmeta ADR gate them (Epic Q).</p><div class="progress"><div class="progress-bar" style="width:89%"></div></div><p class="progress-text">24 / 27</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P15</span><span class="status-badge status-todo">todo</span></div><h3>Agentic Q&amp;A console</h3><p class="goal">Free-text questions answered by a tiered read-only agent (QuerySpec router → schema-grounded text2cypher → bounded graph-of-thoughts loop) with every executed Cypher exposed via ephemeral specs, per-run question/context/memory/token telemetry, and stale-source rescrape (Epic R; ADR 0007).</p><div class="progress"><div class="progress-bar" style="width:57%"></div></div><p class="progress-text">13 / 23</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P16</span><span class="status-badge status-todo">todo</span></div><h3>Self-documentation — DryDocs&#x27; own code in the graph</h3><p class="goal">DryDocs documents ITSELF the way it documents Control-M: the project&#x27;s code-dependency snapshot enters the knowledge graph under the software ontology (SWO), under an explicit :Project root, so &#x27;which module loads this job&#x27; is a query rather than a JSON file a human reads (Epic U).</p><div class="progress"><div class="progress-bar" style="width:83%"></div></div><p class="progress-text">24 / 29</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P17</span><span class="status-badge status-todo">todo</span></div><h3>Mind-map — deepdoc leaves the placeholder</h3><p class="goal">The per-data-flow overview record and its first producer: a graph-seeded, mind-map-driven investigator over the SDLC/ops corpora (Jira, Bitbucket, Confluence, email, Control-M Output logs) whose every finding is :Uncertain, weighted, and carries a provenance breadcrumb to its source; promotion is an SME gate write (Epic MM; docs/design/deepdoc-data-flow-overview.md).</p><div class="progress"><div class="progress-bar" style="width:21%"></div></div><p class="progress-text">3 / 14</p></div>
 </div>
-<div class="ready-strip"><strong>Ready to pull</strong> (117; <code>todo</code> with every <code>depends_on</code> done &mdash; derived, never stored): <a class="ready-id" href="#REF1"><code>REF1</code></a> <a class="ready-id" href="#C35"><code>C35</code></a> <a class="ready-id" href="#C36"><code>C36</code></a> <a class="ready-id" href="#C37"><code>C37</code></a> <a class="ready-id" href="#C39"><code>C39</code></a> <a class="ready-id" href="#G100"><code>G100</code></a> <a class="ready-id" href="#ONT2"><code>ONT2</code></a> <a class="ready-id" href="#D9"><code>D9</code></a> <a class="ready-id" href="#D11"><code>D11</code></a> <a class="ready-id" href="#G63"><code>G63</code></a> <a class="ready-id" href="#G64"><code>G64</code></a> <a class="ready-id" href="#G65"><code>G65</code></a> <a class="ready-id" href="#G106"><code>G106</code></a> <a class="ready-id" href="#G116"><code>G116</code></a> <a class="ready-id" href="#G117"><code>G117</code></a> <a class="ready-id" href="#G118"><code>G118</code></a> <a class="ready-id" href="#G119"><code>G119</code></a> <a class="ready-id" href="#G120"><code>G120</code></a> <a class="ready-id" href="#G127"><code>G127</code></a> <a class="ready-id" href="#G131"><code>G131</code></a> <a class="ready-id" href="#G132"><code>G132</code></a> <a class="ready-id" href="#G136"><code>G136</code></a> <a class="ready-id" href="#H8"><code>H8</code></a> <a class="ready-id" href="#I5"><code>I5</code></a> <a class="ready-id" href="#I7"><code>I7</code></a> <a class="ready-id" href="#I8"><code>I8</code></a> <a class="ready-id" href="#DOC2"><code>DOC2</code></a> <a class="ready-id" href="#J54"><code>J54</code></a> <a class="ready-id" href="#J56"><code>J56</code></a> <a class="ready-id" href="#J57"><code>J57</code></a> <a class="ready-id" href="#J59"><code>J59</code></a> <a class="ready-id" href="#J60"><code>J60</code></a> <a class="ready-id" href="#J61"><code>J61</code></a> <a class="ready-id" href="#J64"><code>J64</code></a> <a class="ready-id" href="#J65"><code>J65</code></a> <a class="ready-id" href="#J67"><code>J67</code></a> <a class="ready-id" href="#J70"><code>J70</code></a> <a class="ready-id" href="#J73"><code>J73</code></a> <a class="ready-id" href="#J75"><code>J75</code></a> <a class="ready-id" href="#J77"><code>J77</code></a> <a class="ready-id" href="#J78"><code>J78</code></a> <a class="ready-id" href="#K23"><code>K23</code></a> <a class="ready-id" href="#K29"><code>K29</code></a> <a class="ready-id" href="#L23"><code>L23</code></a> <a class="ready-id" href="#L29"><code>L29</code></a> <a class="ready-id" href="#N17"><code>N17</code></a> <a class="ready-id" href="#N18"><code>N18</code></a> <a class="ready-id" href="#N19"><code>N19</code></a> <a class="ready-id" href="#N22"><code>N22</code></a> <a class="ready-id" href="#N23"><code>N23</code></a> <a class="ready-id" href="#N24"><code>N24</code></a> <a class="ready-id" href="#N25"><code>N25</code></a> <a class="ready-id" href="#N26"><code>N26</code></a> <a class="ready-id" href="#N27"><code>N27</code></a> <a class="ready-id" href="#N28"><code>N28</code></a> <a class="ready-id" href="#G85"><code>G85</code></a> <a class="ready-id" href="#G86"><code>G86</code></a> <a class="ready-id" href="#O23"><code>O23</code></a> <a class="ready-id" href="#O26"><code>O26</code></a> <a class="ready-id" href="#O43"><code>O43</code></a> <a class="ready-id" href="#O44"><code>O44</code></a> <a class="ready-id" href="#O48"><code>O48</code></a> <a class="ready-id" href="#O50"><code>O50</code></a> <a class="ready-id" href="#O63"><code>O63</code></a> <a class="ready-id" href="#O68"><code>O68</code></a> <a class="ready-id" href="#O72"><code>O72</code></a> <a class="ready-id" href="#O82"><code>O82</code></a> <a class="ready-id" href="#O89"><code>O89</code></a> <a class="ready-id" href="#WEB1"><code>WEB1</code></a> <a class="ready-id" href="#WEB5"><code>WEB5</code></a> <a class="ready-id" href="#WEB7"><code>WEB7</code></a> <a class="ready-id" href="#WEB9"><code>WEB9</code></a> <a class="ready-id" href="#WEB10"><code>WEB10</code></a> <a class="ready-id" href="#WEB11"><code>WEB11</code></a> <a class="ready-id" href="#WEB13"><code>WEB13</code></a> <a class="ready-id" href="#WEB14"><code>WEB14</code></a> <a class="ready-id" href="#WEB15"><code>WEB15</code></a> <a class="ready-id" href="#P6"><code>P6</code></a> <a class="ready-id" href="#Q22"><code>Q22</code></a> <a class="ready-id" href="#Q24"><code>Q24</code></a> <a class="ready-id" href="#Q28"><code>Q28</code></a> <a class="ready-id" href="#R7"><code>R7</code></a> <a class="ready-id" href="#R8"><code>R8</code></a> <a class="ready-id" href="#R11"><code>R11</code></a> <a class="ready-id" href="#R12"><code>R12</code></a> <a class="ready-id" href="#R13"><code>R13</code></a> <a class="ready-id" href="#R15"><code>R15</code></a> <a class="ready-id" href="#R16"><code>R16</code></a> <a class="ready-id" href="#R17"><code>R17</code></a> <a class="ready-id" href="#R18"><code>R18</code></a> <a class="ready-id" href="#R19"><code>R19</code></a> <a class="ready-id" href="#G90"><code>G90</code></a> <a class="ready-id" href="#S11"><code>S11</code></a> <a class="ready-id" href="#U10"><code>U10</code></a> <a class="ready-id" href="#U11"><code>U11</code></a> <a class="ready-id" href="#U16"><code>U16</code></a> <a class="ready-id" href="#U23"><code>U23</code></a> <a class="ready-id" href="#U27"><code>U27</code></a> <a class="ready-id" href="#V4"><code>V4</code></a> <a class="ready-id" href="#V5"><code>V5</code></a> <a class="ready-id" href="#V6"><code>V6</code></a> <a class="ready-id" href="#V7"><code>V7</code></a> <a class="ready-id" href="#V9"><code>V9</code></a> <a class="ready-id" href="#V10"><code>V10</code></a> <a class="ready-id" href="#V11"><code>V11</code></a> <a class="ready-id" href="#Y3"><code>Y3</code></a> <a class="ready-id" href="#Y6"><code>Y6</code></a> <a class="ready-id" href="#Y7"><code>Y7</code></a> <a class="ready-id" href="#Z6"><code>Z6</code></a> <a class="ready-id" href="#GN2"><code>GN2</code></a> <a class="ready-id" href="#MM5"><code>MM5</code></a> <a class="ready-id" href="#MM6"><code>MM6</code></a> <a class="ready-id" href="#MM9"><code>MM9</code></a> <a class="ready-id" href="#MM11"><code>MM11</code></a> <a class="ready-id" href="#MM12"><code>MM12</code></a> <a class="ready-id" href="#MM13"><code>MM13</code></a> <a class="ready-id" href="#MM14"><code>MM14</code></a></div>
+<div class="ready-strip"><strong>Ready to pull</strong> (114; <code>todo</code> with every <code>depends_on</code> done &mdash; derived, never stored): <a class="ready-id" href="#REF1"><code>REF1</code></a> <a class="ready-id" href="#C35"><code>C35</code></a> <a class="ready-id" href="#C36"><code>C36</code></a> <a class="ready-id" href="#C37"><code>C37</code></a> <a class="ready-id" href="#C39"><code>C39</code></a> <a class="ready-id" href="#G100"><code>G100</code></a> <a class="ready-id" href="#ONT2"><code>ONT2</code></a> <a class="ready-id" href="#D9"><code>D9</code></a> <a class="ready-id" href="#D11"><code>D11</code></a> <a class="ready-id" href="#G63"><code>G63</code></a> <a class="ready-id" href="#G64"><code>G64</code></a> <a class="ready-id" href="#G65"><code>G65</code></a> <a class="ready-id" href="#G106"><code>G106</code></a> <a class="ready-id" href="#G116"><code>G116</code></a> <a class="ready-id" href="#G117"><code>G117</code></a> <a class="ready-id" href="#G118"><code>G118</code></a> <a class="ready-id" href="#G119"><code>G119</code></a> <a class="ready-id" href="#G120"><code>G120</code></a> <a class="ready-id" href="#G127"><code>G127</code></a> <a class="ready-id" href="#G131"><code>G131</code></a> <a class="ready-id" href="#G132"><code>G132</code></a> <a class="ready-id" href="#G136"><code>G136</code></a> <a class="ready-id" href="#H8"><code>H8</code></a> <a class="ready-id" href="#I5"><code>I5</code></a> <a class="ready-id" href="#I7"><code>I7</code></a> <a class="ready-id" href="#I8"><code>I8</code></a> <a class="ready-id" href="#DOC2"><code>DOC2</code></a> <a class="ready-id" href="#J54"><code>J54</code></a> <a class="ready-id" href="#J56"><code>J56</code></a> <a class="ready-id" href="#J57"><code>J57</code></a> <a class="ready-id" href="#J59"><code>J59</code></a> <a class="ready-id" href="#J60"><code>J60</code></a> <a class="ready-id" href="#J61"><code>J61</code></a> <a class="ready-id" href="#J64"><code>J64</code></a> <a class="ready-id" href="#J65"><code>J65</code></a> <a class="ready-id" href="#J67"><code>J67</code></a> <a class="ready-id" href="#J70"><code>J70</code></a> <a class="ready-id" href="#J73"><code>J73</code></a> <a class="ready-id" href="#J75"><code>J75</code></a> <a class="ready-id" href="#J77"><code>J77</code></a> <a class="ready-id" href="#J78"><code>J78</code></a> <a class="ready-id" href="#K23"><code>K23</code></a> <a class="ready-id" href="#K29"><code>K29</code></a> <a class="ready-id" href="#L23"><code>L23</code></a> <a class="ready-id" href="#L29"><code>L29</code></a> <a class="ready-id" href="#N17"><code>N17</code></a> <a class="ready-id" href="#N18"><code>N18</code></a> <a class="ready-id" href="#N19"><code>N19</code></a> <a class="ready-id" href="#N22"><code>N22</code></a> <a class="ready-id" href="#N23"><code>N23</code></a> <a class="ready-id" href="#N24"><code>N24</code></a> <a class="ready-id" href="#N25"><code>N25</code></a> <a class="ready-id" href="#N26"><code>N26</code></a> <a class="ready-id" href="#N27"><code>N27</code></a> <a class="ready-id" href="#N28"><code>N28</code></a> <a class="ready-id" href="#G85"><code>G85</code></a> <a class="ready-id" href="#G86"><code>G86</code></a> <a class="ready-id" href="#O23"><code>O23</code></a> <a class="ready-id" href="#O26"><code>O26</code></a> <a class="ready-id" href="#O43"><code>O43</code></a> <a class="ready-id" href="#O44"><code>O44</code></a> <a class="ready-id" href="#O48"><code>O48</code></a> <a class="ready-id" href="#O50"><code>O50</code></a> <a class="ready-id" href="#O63"><code>O63</code></a> <a class="ready-id" href="#O68"><code>O68</code></a> <a class="ready-id" href="#O72"><code>O72</code></a> <a class="ready-id" href="#O82"><code>O82</code></a> <a class="ready-id" href="#O89"><code>O89</code></a> <a class="ready-id" href="#WEB2"><code>WEB2</code></a> <a class="ready-id" href="#WEB6"><code>WEB6</code></a> <a class="ready-id" href="#WEB7"><code>WEB7</code></a> <a class="ready-id" href="#WEB8"><code>WEB8</code></a> <a class="ready-id" href="#WEB9"><code>WEB9</code></a> <a class="ready-id" href="#WEB10"><code>WEB10</code></a> <a class="ready-id" href="#P6"><code>P6</code></a> <a class="ready-id" href="#Q22"><code>Q22</code></a> <a class="ready-id" href="#Q24"><code>Q24</code></a> <a class="ready-id" href="#Q28"><code>Q28</code></a> <a class="ready-id" href="#R7"><code>R7</code></a> <a class="ready-id" href="#R8"><code>R8</code></a> <a class="ready-id" href="#R11"><code>R11</code></a> <a class="ready-id" href="#R12"><code>R12</code></a> <a class="ready-id" href="#R13"><code>R13</code></a> <a class="ready-id" href="#R15"><code>R15</code></a> <a class="ready-id" href="#R16"><code>R16</code></a> <a class="ready-id" href="#R17"><code>R17</code></a> <a class="ready-id" href="#R18"><code>R18</code></a> <a class="ready-id" href="#R19"><code>R19</code></a> <a class="ready-id" href="#G90"><code>G90</code></a> <a class="ready-id" href="#S11"><code>S11</code></a> <a class="ready-id" href="#U10"><code>U10</code></a> <a class="ready-id" href="#U11"><code>U11</code></a> <a class="ready-id" href="#U16"><code>U16</code></a> <a class="ready-id" href="#U23"><code>U23</code></a> <a class="ready-id" href="#U27"><code>U27</code></a> <a class="ready-id" href="#V4"><code>V4</code></a> <a class="ready-id" href="#V5"><code>V5</code></a> <a class="ready-id" href="#V6"><code>V6</code></a> <a class="ready-id" href="#V7"><code>V7</code></a> <a class="ready-id" href="#V9"><code>V9</code></a> <a class="ready-id" href="#V10"><code>V10</code></a> <a class="ready-id" href="#V11"><code>V11</code></a> <a class="ready-id" href="#Y3"><code>Y3</code></a> <a class="ready-id" href="#Y6"><code>Y6</code></a> <a class="ready-id" href="#Y7"><code>Y7</code></a> <a class="ready-id" href="#Z6"><code>Z6</code></a> <a class="ready-id" href="#GN2"><code>GN2</code></a> <a class="ready-id" href="#MM5"><code>MM5</code></a> <a class="ready-id" href="#MM6"><code>MM6</code></a> <a class="ready-id" href="#MM9"><code>MM9</code></a> <a class="ready-id" href="#MM11"><code>MM11</code></a> <a class="ready-id" href="#MM12"><code>MM12</code></a> <a class="ready-id" href="#MM13"><code>MM13</code></a> <a class="ready-id" href="#MM14"><code>MM14</code></a></div>
 <div class="filters">
   <label>Module<select id="f-module"><option value="">All</option>
 <option value="config">config</option>
@@ -180,7 +180,7 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
   <button type="button" id="f-clear">Clear filters</button>
 </div>
 <div class="board">
-<div class="column" data-status="todo"><div class="column-head"><h2>To do</h2><span class="count" data-count-for="todo">136</span></div><div class="column-body"><div class="card ready" id="card-REF1" data-id="REF1" data-module="reference" data-phase="2" data-epic="reference-hygiene" data-type="task" data-status="todo" data-search="ref1 register spec-kit and the spec-driven-development write-up as external reference - the precedent the code/requirements split cites" tabindex="0"><div class="card-head"><span class="card-id">REF1</span><span class="card-title">Register spec-kit and the spec-driven-development write-up as External reference - the precedent the code/requirements split cites</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Gate ontology-domain-registry-and-edition-grain §B4 (SIGNED OFF 2026-09-02, &quot;split now&quot;): the split proceeds on the 2018 FCD
+<div class="column" data-status="todo"><div class="column-head"><h2>To do</h2><span class="count" data-count-for="todo">130</span></div><div class="column-body"><div class="card ready" id="card-REF1" data-id="REF1" data-module="reference" data-phase="2" data-epic="reference-hygiene" data-type="task" data-status="todo" data-search="ref1 register spec-kit and the spec-driven-development write-up as external reference - the precedent the code/requirements split cites" tabindex="0"><div class="card-head"><span class="card-id">REF1</span><span class="card-title">Register spec-kit and the spec-driven-development write-up as External reference - the precedent the code/requirements split cites</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Gate ontology-domain-registry-and-edition-grain §B4 (SIGNED OFF 2026-09-02, &quot;split now&quot;): the split proceeds on the 2018 FCD
 evidence and the reference is registered BEHIND it, not before it. This tree has never heard
 of spec-driven development - a case-insensitive grep for spec-kit or spec-driven is empty
 across every .md, .yaml and .py - and ONT1&#x27;s proposal cites it, so it must exist as a
@@ -2391,47 +2391,7 @@ beside the doc ones in `docs/design/feedback/` or in their own directory. It dep
 whether `doc:` can name a console route without confusing the graph loader, which is a
 question for whoever builds (a) with the loader in front of them.
 </p></div></div>
-<div class="card ready" id="card-WEB1" data-id="WEB1" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web1 provenance of rendered data is a typed union - one useliveordemo seam and one provenance component replace the five per-route try-live-else-demo fallbacks, a shell-mount readiness probe answers &quot;is the api down&quot; once, and every fallback activation is counted" tabindex="0"><div class="card-head"><span class="card-id">WEB1</span><span class="card-title">Provenance of rendered data is a typed union - one useLiveOrDemo seam and one provenance component replace the five per-route try-live-else-demo fallbacks, a shell-mount readiness probe answers &quot;is the API down&quot; once, and every fallback activation is counted</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Whether the numbers on screen came from the graph or from a constant in the bundle is the
-console&#x27;s most important trust signal, and today five routes decide it five different ways
-(A5). After this item there is ONE way.
-
-(a) A `useLiveOrDemo` seam returns a discriminated union - `live | empty | demo | error` -
-    and is the ONLY path by which a route may reach one of the eleven demo modules
-    (demoGraph, demoLineage, demoLoads, demoOwnership, demoProductRollup, demoRemediation,
-    demoRunbooks, demoDocs, demoSwimlane, demoStatus, mappingsDemo). `empty` and `error` are
-    distinct states: a request that failed is never rendered as a result that was empty.
-(b) One presentational component renders the provenance state, and every route that can
-    show demo data renders it. The SYNTHESIZED watermark, the LIVE/DEMO badge and the
-    TrustLegend agree with the union, not with a per-route string.
-(c) A source-scan guard (vitest) fails when any file outside the seam imports a demo module -
-    the same enforcement shape the parent repo uses for render parsing (J37) and code-not-prose
-    reads (J66): the seam is the only path because a test says so, not because a comment asks.
-(d) One readiness probe at shell mount calls `/health` (public today, uncalled by anything in
-    web/src) so the console says &quot;the API is down&quot; once, instead of eleven modules each
-    discovering it at the moment they fail. It shares its implementation with O63&#x27;s probe -
-    one probe, three surfaces (shell, Ask ladder, admin strip) - and never invents a green
-    (O56 rule: a probe that could not run renders &quot;not checked&quot;).
-(e) Every fallback activation is counted and the count is visible to an operator (a counter
-    on the admin status strip is enough); a console quietly serving fabricated numbers is the
-    exact failure the rest of the provenance machinery exists to prevent (S8).
-(f) Loading is no longer modelled as data-is-still-null: the union carries a `loading` state
-    or the seam composes with WEB12&#x27;s hook so that loading, loaded-empty and hung are three
-    screens, not one.
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
-
-Covers A5 (rank 2 in the report), S6&#x27;s readiness half and S8&#x27;s fallback counter. Ranked first
-by the architecture pass because the product thesis is provenance and this is where the
-console contradicts it.
-
-ADR CANDIDATE: &quot;provenance state of rendered data is a typed union, not a per-route
-convention.&quot; The item can build the seam without the ADR; the ADR records why a route may
-never reach a demo module directly, so the next route added does not.
-
-Build order: WEB12 (the data-layer hook) first or alongside, or the seam&#x27;s transport half is
-written twice. O63 (todo) owns the probe&#x27;s Ask and admin surfaces; this item adds the shell
-mount and must reuse, not fork, that probe.
-</p></div></div>
-<div class="card" id="card-WEB2" data-id="WEB2" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web2 the grid renders the row ceiling the way the canvas already renders its node ceiling - a truncated n/n badge on capped results, and no export button says &quot;full&quot; unless the manifest says complete" tabindex="0"><div class="card-head"><span class="card-id">WEB2</span><span class="card-title">The grid renders the row ceiling the way the canvas already renders its node ceiling - a TRUNCATED n/N badge on capped results, and no export button says &quot;full&quot; unless the manifest says complete</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-API1" data-target="card-API1">API1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) SpecGrid renders a TRUNCATED n/N badge whenever the result&#x27;s `truncated` field (API1) is
+<div class="card ready" id="card-WEB2" data-id="WEB2" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web2 the grid renders the row ceiling the way the canvas already renders its node ceiling - a truncated n/n badge on capped results, and no export button says &quot;full&quot; unless the manifest says complete" tabindex="0"><div class="card-head"><span class="card-id">WEB2</span><span class="card-title">The grid renders the row ceiling the way the canvas already renders its node ceiling - a TRUNCATED n/N badge on capped results, and no export button says &quot;full&quot; unless the manifest says complete</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-API1" data-target="card-API1">API1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) SpecGrid renders a TRUNCATED n/N badge whenever the result&#x27;s `truncated` field (API1) is
     true - the same badge, same wording and same placement the canvas uses for its node
     ceiling, so one vocabulary of completeness serves both surfaces.
 (b) The two server-export buttons stop saying &quot;full&quot; unless the export manifest says
@@ -2447,23 +2407,7 @@ Covers S1&#x27;s console half. Depends on API1 because rendering completeness fr
 (`rows.length === 500`) would be a second source of truth for the same fact - the shape the
 whole report warns against.
 </p></div></div>
-<div class="card ready" id="card-WEB5" data-id="WEB5" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web5 an error boundary per route outlet, keyed on pathname - one render throw breaks one panel instead of blanking the whole console" tabindex="0"><div class="card-head"><span class="card-id">WEB5</span><span class="card-title">An error boundary per route outlet, keyed on pathname - one render throw breaks one panel instead of blanking the whole console</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> There is no ErrorBoundary and no componentDidCatch in web/src; React 19 unmounts the whole
-tree on an uncaught render error, so one bad row produces a white page with no navigation and
-no way back but a reload (S7).
-
-(a) One error boundary per route outlet, keyed on pathname so navigation clears it; a render
-    throw in one route leaves the shell, the nav and every other route usable.
-(b) The fallback panel shows the error message verbatim (the O63 honesty rule - the exact
-    string is what a reader pastes into a ticket) and a retry affordance; it never shows a
-    stack trace or any value from the data that threw.
-(c) A vitest renders a route that throws and asserts the shell survives and the panel shows.
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
-
-Covers S7 (rank 9). About twenty lines; worth more once WEB4 is on (the compiler catches the
-nulls) and WEB6 lands (a failed cast becomes a message, not a throw) - but this is the floor
-under both and is independent of them.
-</p></div></div>
-<div class="card" id="card-WEB6" data-id="WEB6" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web6 a runtime row-shape validator at the spec-result-to-typed-row seam retires the twenty-one as-unknown-as double casts with one readable message" tabindex="0"><div class="card-head"><span class="card-id">WEB6</span><span class="card-title">A runtime row-shape validator at the spec-result-to-typed-row seam retires the twenty-one as-unknown-as double casts with one readable message</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-WEB4" data-target="card-WEB4">WEB4</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Twenty-one `as unknown as` casts cluster at one seam - a spec result&#x27;s untyped rows crossing
+<div class="card ready" id="card-WEB6" data-id="WEB6" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web6 a runtime row-shape validator at the spec-result-to-typed-row seam retires the twenty-one as-unknown-as double casts with one readable message" tabindex="0"><div class="card-head"><span class="card-id">WEB6</span><span class="card-title">A runtime row-shape validator at the spec-result-to-typed-row seam retires the twenty-one as-unknown-as double casts with one readable message</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-WEB4" data-target="card-WEB4">WEB4</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Twenty-one `as unknown as` casts cluster at one seam - a spec result&#x27;s untyped rows crossing
 into a typed row (`res.rows as unknown as LocationRow[]`) in FileReport, LocationMap,
 AppCodeCascadePane, IntakeRoute, LoadMapRoute, LoadsRoute, MappingsRoute and SoftwareRoute
 (T5). The compiler is switched off exactly where the server contract meets the render.
@@ -2511,7 +2455,7 @@ ADR CANDIDATE: &quot;the code-splitting boundary follows the authorization bound
 notes there is partly no splitting decision because there is no deployment decision to make
 one against; build (a) and (b) regardless, they are correct under any delivery shape.
 </p></div></div>
-<div class="card" id="card-WEB8" data-id="WEB8" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web8 the typed-client guarantee has no holes - the mappings, intake and corpus routes are modelled in drydocs_api.schemas so the fifteen unwrapas sites retire, and the adk agent calls get a typed contract instead of raw fetch" tabindex="0"><div class="card-head"><span class="card-id">WEB8</span><span class="card-title">The typed-client guarantee has no holes - the mappings, intake and corpus routes are modelled in drydocs_api.schemas so the fifteen unwrapAs sites retire, and the ADK agent calls get a typed contract instead of raw fetch</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-WEB4" data-target="card-WEB4">WEB4</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The O70 guarantee has two holes. `unwrapAs` in lib/apiClient.ts marks every route
+<div class="card ready" id="card-WEB8" data-id="WEB8" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web8 the typed-client guarantee has no holes - the mappings, intake and corpus routes are modelled in drydocs_api.schemas so the fifteen unwrapas sites retire, and the adk agent calls get a typed contract instead of raw fetch" tabindex="0"><div class="card-head"><span class="card-id">WEB8</span><span class="card-title">The typed-client guarantee has no holes - the mappings, intake and corpus routes are modelled in drydocs_api.schemas so the fifteen unwrapAs sites retire, and the ADK agent calls get a typed contract instead of raw fetch</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-WEB4" data-target="card-WEB4">WEB4</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The O70 guarantee has two holes. `unwrapAs` in lib/apiClient.ts marks every route
 drydocs_api.schemas has not modelled - fifteen sites outside tests, eight of them in
 mappingsApi (domains, grid, options, changeset, drafts, open drafts, promoted diff,
 corrections), two in intakeApi, one in corpusStatus - and mappings is the one module with
@@ -2588,94 +2532,6 @@ GATE-BOUND (an ADR). This item drafts and, after the ruling, builds:
 Covers S3 (rank 7). ADR CANDIDATE: &quot;the console&#x27;s delivery shape.&quot; Link O72 (one-command
 local stack) - O72 composes the four processes the runbook starts by hand; a ruled delivery
 shape decides whether there are four or three.
-</p></div></div>
-<div class="card ready" id="card-WEB11" data-id="WEB11" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web11 one storage module owns every console localstorage key with a prefix and a version, and both sign-out and session rejection call its clearall so query results do not outlive the session on a shared desktop" tabindex="0"><div class="card-head"><span class="card-id">WEB11</span><span class="card-title">One storage module owns every console localStorage key with a prefix and a version, and both sign-out and session rejection call its clearAll so query results do not outlive the session on a shared desktop</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> `signOut()` removes `drydocs.session.v2` and revokes the token; seven other localStorage
-writers stay - the Ask last completed turn (answer, executed Cypher, per-step row counts,
-task graph; per persona), the app-code tray (per persona), onboarding progress, aside
-collapsed, theme, split-pane position, grid column widths. The first two are query results
-readable after sign-out by whoever opens the browser next, under a console that renders an
-INTERNAL banner over the same data on screen. `sessionRejected()` has the same gap (S4).
-
-(a) One storage module owns every console key: a prefix, a version, typed get/set, and a
-    `clearAll()`. No `localStorage.` call exists outside it (source scan, J66 style).
-(b) Both `signOut()` and `sessionRejected()` call `clearAll()`.
-(c) Keys worth keeping across sign-outs (theme, aside collapsed, column widths) OPT OUT
-    explicitly in the module, so the retention decision is visible in one place; the Ask turn
-    and the tray do not opt out. O64&#x27;s design - the last completed turn survives navigation
-    within a session - is preserved exactly; it is sign-out, not navigation, that clears it.
-(d) A test signs out with every key populated and asserts only the opted-out keys remain;
-    another does the same through `sessionRejected()`.
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
-
-Covers S4 (rank 6). O64 (done) chose per-persona persistence of the Ask turn for a good
-reason (loss on navigation); this item respects that choice and bounds it at the session.
-</p></div></div>
-<div class="card ready" id="card-WEB13" data-id="WEB13" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web13 the web ci ratchet - a test:coverage script with a floor at today&#x27;s 7.51 percent, --max-warnings 0 on lint, react-hooks/exhaustive-deps enabled with the three inert suppressions deleted, a warn-only npm audit --audit-level=high step, and towericon.tsx plus clsx removed" tabindex="0"><div class="card-head"><span class="card-id">WEB13</span><span class="card-title">The web CI ratchet - a test:coverage script with a floor at today&#x27;s 7.51 percent, --max-warnings 0 on lint, react-hooks/exhaustive-deps enabled with the three inert suppressions deleted, a warn-only npm audit --audit-level=high step, and TowerIcon.tsx plus clsx removed</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Four numbers drift with nothing under them (T1, T2, T7, T8): statement coverage is 7.51
-percent (955 / 12,716) with `@vitest/coverage-v8` declared and no script, CI step or
-threshold; lint emits ten warnings and exits 0 with no `--max-warnings`; the advisory count
-went from three at O34 to five with no audit step to notice; and a dead file and a dead
-dependency sit unflagged. Plus three `eslint-disable-next-line react-hooks/exhaustive-deps`
-lines suppress a rule that has never run - there is no ESLint in the project and
-`.oxlintrc.json` enables only `react/rules-of-hooks` and `react/only-export-components`.
-
-(a) `test:coverage` script in package.json; the web CI job runs it with a statement floor
-    at today&#x27;s number (7.51, recorded with the date) that only ratchets up. Coverage growth
-    itself is O43&#x27;s work (the seed suites); this item is the gate, not the tests.
-(b) `--max-warnings 0` on the lint step; the ten warnings are fixed or individually waived
-    in config with a reason.
-(c) `react-hooks/exhaustive-deps` enabled in oxlint (or the equivalent rule the linter
-    offers); the three inert suppressions are deleted and each site&#x27;s deliberate omission is
-    re-expressed as a real, scoped suppression or a fix - never carried as fiction.
-(d) A warn-only `npm audit --audit-level=high` step in the web CI job (report, never block -
-    the same posture as the snapshot ritual&#x27;s lint check), so the count is read every run.
-(e) `src/components/TowerIcon.tsx` and the `clsx` dependency are removed. Optional residue,
-    not acceptance: fold src/docs/ and src/docsmod/ into one directory; move
-    src/data/mappingsDemo.ts and routes/AppCodeCascadePane.tsx to their feature directories.
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
-
-Covers T1, T2, T7, T8 - the tech-debt pass&#x27;s &quot;cheap ratchet&quot;. A7 (test topology inverted) is
-T1 with a measurement attached and is not a separate item; O43 (todo) seeds the suites that
-move the floor. O34 (done) recorded the advisory count as three; it is five now, root
-`@neo4j-nvl/base -&gt; @segment/analytics-next`, none of it reaching dist - the finding is the
-unobserved drift, not the CVEs.
-</p></div></div>
-<div class="card ready" id="card-WEB14" data-id="WEB14" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web14 a token-parity test holds the hand-frozen custom properties in public/landing.html and public/agent-test.html to src/styles/tokens.css, on the repo&#x27;s generated-artifact drift-test habit" tabindex="0"><div class="card-head"><span class="card-id">WEB14</span><span class="card-title">A token-parity test holds the hand-frozen custom properties in public/landing.html and public/agent-test.html to src/styles/tokens.css, on the repo&#x27;s generated-artifact drift-test habit</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> tokens.css is the source (152 lines, light and dark). Two shipped pages carry hand-frozen
-copies - landing.html (48 custom properties, self-contained by design under the no-CDN
-intranet rule) and agent-test.html (39, SME-re-ruled independent on 2026-07-29). The pages
-are deliberate; the frozen copy is the debt, and nothing detects the day they stop agreeing
-(T4).
-
-(a) A vitest reads the `:root` and `.dark` custom properties from tokens.css and the
-    properties declared in each page, and asserts every shared key has an equal value.
-(b) Keys deliberately different (if any) are listed in the test with the reason, so a
-    divergence is a recorded decision, not a silent one.
-(c) The pages stay self-contained; the test is the drift guard, on the repo&#x27;s
-    generated-artifact drift-test habit, not a generator.
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
-
-Covers T4 (rank 13). About thirty lines.
-</p></div></div>
-<div class="card ready" id="card-WEB15" data-id="WEB15" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web15 web/readme.md states the security model the code implements - the dev-only ?as= affordance, twelve modules not nine, the five sme-access modules and the gated routes, and the six retired-name personas" tabindex="0"><div class="card-head"><span class="card-id">WEB15</span><span class="card-title">web/README.md states the security model the code implements - the DEV-only ?as= affordance, twelve modules not nine, the five sme-access modules and the gated routes, and the six retired-name personas</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> web/README.md is materially wrong on the security model in four places (A8): it says there
-is no `?as=` parameter (App.tsx has one, DEV-only, requiring VITE_DEV_CONSOLE_SECRET); it says
-nine module routes (registry.ts declares twelve); it says all modules are open to every
-signed-in persona and only /console is role-gated (five modules carry access &#x27;sme&#x27; and
-App.tsx gates six routes plus /console, /admin/config and /intake); and its persona table
-carries the three SID-shaped names auth.ts retired on 2026-08-28 for publish-boundary
-reasons. A doc that understates the authorization surface is the doc a company-side reader
-reaches first.
-
-(a) The README states the model the code implements: the DEV-only `?as=` affordance and its
-    secret gate; the module count and each module&#x27;s access level, read from registry.ts; the
-    route gates; the six personas by their current names and roles.
-(b) Where WEB3 lands first, the README describes the derived gate; where it has not, the
-    README says the two expressions exist and cites WEB3 - it never describes a state the
-    code is not in.
-(c) A test keeps the module count and access table in the README equal to registry.ts
-    (rendered from the importable object, J37 style), so the fourth drift does not happen.
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
-
-Covers A8 (rank 14). Point 3 - understating the authorization surface - is why this is p2
-and not p3.
 </p></div></div>
 <div class="card ready" id="card-P6" data-id="P6" data-module="config" data-phase="13" data-epic="runtime-topology" data-type="task" data-status="todo" data-search="p6 run the data-center collision probe on live psgmgr before any multi-data-center load — one table id in two data centers silently merges two folders into one graph node" tabindex="0"><div class="card-head"><span class="card-id">P6</span><span class="card-title">Run the data-center collision probe on live psgmgr before any multi-data-center load — one table id in two data centers silently merges two folders into one graph node</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P13</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">runtime-topology</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE PROBE. One grouped count over the folder-definition view: how many table ids appear in more than one data center. Counts only, never result rows — the producer side has no psgmgr access, so this is user-run on the internal network and the agent transcribes the conclusion, exactly the arrangement P1 records.
 
@@ -3149,7 +3005,7 @@ transcribed from seven company artifacts on an UNMERGED research branch and cite
 
 Related: MM2, MM3, MM6, MM10, MM12, R16, L28, G102, ADR 0007, ADR 0011, Idea-236.
 </p></div></div></div></div>
-<div class="column" data-status="in_progress"><div class="column-head"><h2>In progress</h2><span class="count" data-count-for="in_progress">11</span></div><div class="column-body"><div class="card" id="card-E1" data-id="E1" data-module="ontology" data-phase="4" data-epic="context-graph" data-type="task" data-status="in_progress" data-search="e1 register sosa/ssn observation terms via the gate" tabindex="0"><div class="card-head"><span class="card-id">E1</span><span class="card-title">Register SOSA/SSN observation terms via the gate</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P4</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / ontology-mapper</span></div><div class="epic">context-graph</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C1" data-target="card-C1">C1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> sosa:* terms present with IRIs; status planned-&gt;confirmed via gate</p><p class="notes"><strong>Notes:</strong> Registration step DONE (main, 2026-06-22): sosa/ssn prefixes in namespaces.py; terms seeded in drydocs_core/schema/sosa_experimental_supplement.cypher (opt-in `drydocs apply-sosa-supplement`, NOT in bootstrap; every term adoption:&quot;experimental&quot;); 4 context relationships in relationship_vocabulary.yaml (sosa_observes/has_result/ made_by_sensor/observed_property, status planned, domain context); README split into Declared-Adopted vs Experimental/Early-Adoption. REMAINING for ontology-mapper: take the `jobrun-observation` map entry through the HITL gate (resolve ControlMJobRun-as-Observation vs separate-Observation-node; run-history source), then planned-&gt;confirmed. GATE SESSION DEFERRED 2026-07-14 (SME: not ready yet) — page stays rendered/pending; nothing flips; re-present at a future session (see gate-log 2026-07-14 deferral note).
+<div class="column" data-status="in_progress"><div class="column-head"><h2>In progress</h2><span class="count" data-count-for="in_progress">7</span></div><div class="column-body"><div class="card" id="card-E1" data-id="E1" data-module="ontology" data-phase="4" data-epic="context-graph" data-type="task" data-status="in_progress" data-search="e1 register sosa/ssn observation terms via the gate" tabindex="0"><div class="card-head"><span class="card-id">E1</span><span class="card-title">Register SOSA/SSN observation terms via the gate</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P4</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / ontology-mapper</span></div><div class="epic">context-graph</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C1" data-target="card-C1">C1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> sosa:* terms present with IRIs; status planned-&gt;confirmed via gate</p><p class="notes"><strong>Notes:</strong> Registration step DONE (main, 2026-06-22): sosa/ssn prefixes in namespaces.py; terms seeded in drydocs_core/schema/sosa_experimental_supplement.cypher (opt-in `drydocs apply-sosa-supplement`, NOT in bootstrap; every term adoption:&quot;experimental&quot;); 4 context relationships in relationship_vocabulary.yaml (sosa_observes/has_result/ made_by_sensor/observed_property, status planned, domain context); README split into Declared-Adopted vs Experimental/Early-Adoption. REMAINING for ontology-mapper: take the `jobrun-observation` map entry through the HITL gate (resolve ControlMJobRun-as-Observation vs separate-Observation-node; run-history source), then planned-&gt;confirmed. GATE SESSION DEFERRED 2026-07-14 (SME: not ready yet) — page stays rendered/pending; nothing flips; re-present at a future session (see gate-log 2026-07-14 deferral note).
 </p></div></div>
 <div class="card" id="card-G62" data-id="G62" data-module="drydocs-lineage" data-phase="6" data-epic="component-topology" data-type="task" data-status="in_progress" data-search="g62 run the rua-bundle data-profile gate: the sme names the load population, the agent profiles it, and only the walked population enters the curated load" tabindex="0"><div class="card-head"><span class="card-id">G62</span><span class="card-title">Run the rua-bundle data-profile gate: the SME names the load population, the agent profiles it, and only the walked population enters the curated load</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-lineage</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">component-topology</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-G22" data-target="card-G22">G22</a> <a class="dep-link" href="#card-G23" data-target="card-G23">G23</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> USER-GATED START — the SME convenes the session; the pull loop SKIPS this item until then (the C12/J13 idiom). The drafted rua-bundle-data-profile page is walked in its ruled two-step order: section A the SME identifies the source data (which hosts&#x27; bundles, where they sit, which collector produced each — Internal, recorded company-side, never on the page), section B the agent profiles that population through the G20 extractor in STAGING with zero graph writes, and section C consumes the profile to admit or trim the population, dispose of the hash-absent and collision cases it counts, and clear the F1 sweep. Sign-off transcribed to config/gate-log.md; gates.json + the enforcement matrix regenerate. No population the page has not walked enters the G23 curated load.
 </p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-09 from Idea-85, which asked only for ids and scheduling — the four post-G22 data-profile prompts were drafted 2026-08-07 and unsigned, and an unsigned prompt with no backlog id is invisible to the pull loop. Sessions run COMPANY-SIDE because the identify-the-source-data step names real hosts and paths (Internal); what lands producer-side is the transcription and the regenerated gate surfaces. Model fable: the ruling decides what may be written to the graph.
@@ -3286,105 +3142,6 @@ run_named; a graph-unavailable answer degrades to the named read path, never an 
 or a silent zero. 7 tests in test_mapping_api.py; full suite 2590 passed / ruff check +
 format clean (venue: worktree of origin/main on MSI desktop). Console pane = follow-on.
 </p></div></div>
-<div class="card" id="card-API1" data-id="API1" data-module="drydocs-api" data-phase="12" data-epic="web-console" data-type="task" data-status="in_progress" data-search="api1 result completeness is part of the read contract - every spec result says whether the 500-row ceiling capped it, and the export manifest records truncated plus the ceiling instead of filing a capped extract as the answer" tabindex="0"><div class="card-head"><span class="card-id">API1</span><span class="card-title">Result completeness is part of the read contract - every spec result says whether the 500-row ceiling capped it, and the export manifest records truncated plus the ceiling instead of filing a capped extract as the answer</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-api</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Every QuerySpec shares one `_LIMIT` parameter, default 500, applied as `LIMIT $limit`. A spec
-whose true answer is 900 rows returns 500 and nothing in the response says so; the server
-export re-applies the same bound params, streams exactly 500 rows and registers a provenance
-manifest with `row_count: 500` and no field saying the extract was capped (S1). After this
-item the READ CONTRACT carries completeness.
-
-(a) Every spec result carries `truncated: bool` and the `limit` that applied. Cheapest
-    mechanism, the builder chooses and records: run with `limit + 1` and report whether the
-    extra row existed, or return a pre-limit count where the Cypher can afford it.
-(b) The export manifest records `truncated` and the ceiling beside `row_count`. A manifest
-    that describes a capped extract says so in the artifact itself, because the manifest is
-    the governance record and outlives the screen that produced it.
-(c) The export path can run WITHOUT the display limit, or with a caller-raised one, so the
-    other 400 rows are obtainable from the console at all - today no surface can raise it.
-(d) `drydocs_api.schemas` models both fields so the O70 generated client picks them up and
-    WEB2 renders them from typed fields, not from a heuristic on `rows.length === limit`.
-(e) Tests: a spec fixture with more rows than the limit yields `truncated: true`; one with
-    fewer yields `false`; the export manifest for each records the matching value; the
-    OpenAPI drift test (tests/unit/test_openapi_client.py) is regenerated, not hand-edited.
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
-
-Covers S1&#x27;s server half, ranked first across all three passes. The console half is WEB2,
-which depends on this item.
-
-ADR CANDIDATE: &quot;result completeness is part of the read contract - no export may be labelled
-complete without it.&quot; The canvas already solved this for nodes (NODE_CEILING = 300 with a
-TRUNCATED n/N badge and two tests in GraphCanvas / nvl-mapping); this item gives the API the
-same property so every consumer inherits it.
-
-R15 (todo) is the Ask cousin - exact versus lower-bound labelling on query answers. Same
-principle, different surface; link, do not merge.
-</p></div></div>
-<div class="card" id="card-WEB3" data-id="WEB3" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="in_progress" data-search="web3 route authorization derives from the module registry - app.tsx gates through canaccessmodule instead of six inline steward-or-admin predicates, with a vitest asserting every non-&quot;all&quot; module has a gated route" tabindex="0"><div class="card-head"><span class="card-id">WEB3</span><span class="card-title">Route authorization derives from the module registry - App.tsx gates through canAccessModule instead of six inline steward-or-admin predicates, with a vitest asserting every non-&quot;all&quot; module has a gated route</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Authorization has two expressions: `canAccessModule()` in the module registry drives the nav,
-the Overview spokes and the canvas host, while App.tsx restates
-`persona.role === &#x27;steward&#x27; || persona.role === &#x27;admin&#x27;` inline six times (A1). The comment on
-the remediation route records that this divergence already shipped one bug (O59 set the
-module&#x27;s access to &#x27;sme&#x27;, hid the nav entry, and left the route reachable by URL).
-
-(a) App.tsx derives every module route&#x27;s gate from MODULES through `canAccessModule`; the
-    six inline predicates are gone. `/intake` (gated on a persona id) and `/console` (gated on
-    a role) are expressed in the same vocabulary or the item records why they cannot be and
-    hands that question to the ADR.
-(b) A vitest asserts that every module id with a non-&#x27;all&#x27; access has a gated route and that
-    no route gate exists that the registry does not declare - both directions, so the next
-    module added with access &#x27;sme&#x27; cannot reproduce the O59 shape.
-(c) The registry stays the single check: no new predicate on role or persona appears outside
-    `canAccessModule` and the test above (a source scan over web/src, J66 style).
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
-
-Covers A1 (rank 4). ADR CANDIDATE: &quot;route authorization derives from the module registry&quot; -
-the ADR-sized part is only how persona-scoped and role-scoped gates share one access
-vocabulary; the derivation itself needs no ruling and is built here.
-</p></div></div>
-<div class="card" id="card-WEB4" data-id="WEB4" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="in_progress" data-search="web4 typescript strict on in web/ - strictnullchecks and noimplicitany enforced so the generated api.d.ts optional fields the o70 client declares are checked by the compiler and not asserted past" tabindex="0"><div class="card-head"><span class="card-id">WEB4</span><span class="card-title">TypeScript strict on in web/ - strictNullChecks and noImplicitAny enforced so the generated api.d.ts optional fields the O70 client declares are checked by the compiler and not asserted past</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Neither tsconfig sets `strict`, `strictNullChecks` or `noImplicitAny`; the Vite React-TS
-template ships strict true, so this was removed or written out (A3). The O70 architecture&#x27;s
-central claim - a server change the console has not caught up with is a tsc error - is only
-partly cashed while optional fields in the generated api.d.ts are not enforced.
-
-(a) `strict: true` in both tsconfigs; `tsc -b` and `npm run build` pass on the whole of
-    web/src with no `@ts-expect-error` or `@ts-ignore` added to get there (a source scan
-    asserts the count of those directives does not rise from today&#x27;s baseline).
-(b) Every error the flag surfaces is fixed at its site, not silenced by a cast; where a fix
-    needs the row-shape validator (WEB6) the site is listed in this item&#x27;s done-note and WEB6
-    picks it up, so nothing is left half-typed and unrecorded.
-(c) The web CI job runs the same `tsc -b` it runs today, so the setting is enforced from the
-    commit that lands it.
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
-
-Covers A3 (rank 5, shared with T2 and T5 as one root). Build this BEFORE WEB6 and WEB8 - a
-validator and a typed client mean nothing while the compiler is off.
-</p></div></div>
-<div class="card" id="card-WEB12" data-id="WEB12" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="in_progress" data-search="web12 a usegraphquery data-layer hook replaces the forty transport preambles - one abortcontroller per request, a deadline, in-flight dedupe, a stated no-retry rule, and a stop control on the ask stream" tabindex="0"><div class="card-head"><span class="card-id">WEB12</span><span class="card-title">A useGraphQuery data-layer hook replaces the forty transport preambles - one AbortController per request, a deadline, in-flight dedupe, a stated no-retry rule, and a stop control on the Ask stream</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Every route reimplements connect, fetch, guard against unmount, set state: the VITE_API_URL
-literal with its localhost fallback in twelve files beside `apiBaseUrl()` which already does
-it, `useMemo(() =&gt; createApiAccess(...))` in sixteen, the hand-rolled `let cancelled = false`
-effect in fourteen (A6, T6). No request has a deadline or a cancel path - zero
-AbortController, zero `signal:` in web/src - so a hung request and a loading one are the same
-screen, navigating away leaves the work running, and the Ask stream cannot be stopped (S5).
-Nothing dedupes: two panes needing one spec run it twice (S6).
-
-(a) One `useGraphQuery(specId, params)` hook (or equivalent, builder&#x27;s name) owns the
-    transport: it obtains access from one shared provider (no per-route `createApiAccess`),
-    passes an AbortController signal and aborts on unmount and on param change, applies a
-    deadline (a recorded default, per-call override), dedupes identical in-flight requests,
-    and returns a state union - loading | data | empty | error(timeout | aborted | failed).
-(b) The forty preambles are gone: zero `localhost:8001` literals outside `apiBaseUrl()`,
-    zero `createApiAccess(` outside the provider, zero `let cancelled = false` in web/src -
-    each asserted by a source scan.
-(c) The Ask stream (`runAgentSse`) accepts a signal and the UI has a stop control that aborts
-    it; a stopped turn renders as stopped, never as an answer.
-(d) NO RETRY, stated: the hook does not retry, and its module comment records that a read
-    console chooses not to and why (a transient 502 must surface, not be papered over) - the
-    report&#x27;s point that a defensible choice should be a stated one.
-(e) A cache is NOT built here unless trivial; the union and the dedupe are what WEB1&#x27;s seam
-    composes with, and a cache with classification-aware invalidation is its own decision.
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
-
-Covers A6, T6, S5 and S6&#x27;s dedupe half (rank 8). The report notes this hook also gives T2&#x27;s
-missing lint rule (WEB13) nothing left to police. Build before or with WEB1.
-</p></div></div>
 <div class="card" id="card-MM7" data-id="MM7" data-module="drydocs-lineage" data-phase="17" data-epic="mind-map" data-type="task" data-status="in_progress" data-search="mm7 control-m output-tab log extractor — launcher job kind, resolved arguments, placement handoff pair, landing prefix, compute target — joined onto :etlprocess by pipeline guid, dpl_mac-shaped, every skip counted" tabindex="0"><div class="card-head"><span class="card-id">MM7</span><span class="card-title">Control-M Output-tab log extractor — launcher job KIND, resolved arguments, placement handoff pair, landing prefix, compute target — joined onto :ETLProcess by pipeline GUID, dpl_mac-shaped, every skip counted</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-lineage</span><span class="chip" data-kind="phase">P17</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">mind-map</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-G17" data-target="card-G17">G17</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> drydocs_lineage/extractors/controlm_output.py takes (source, into: LineageGraph) like every extractor, reads Output text per &lt;job, order-id, run&gt; from a NAMED sysout file — the modern wrapper writes no identity into the body, so job name / order id / run stamp are parsed from the FILE NAME (tolerant scan, site-pinnable pattern override, name-derived date kept as run_date and never merged into the launcher&#x27;s -od) and a detached text blob is rejected with a counted reason — and joins onto already-staged DPL processes on the pipeline GUID (falling back to &lt;job, run&gt; when the command line carried a variable), returning an OutputCoverage dataclass with a counted reason for every skip (no_launcher_banner, kind_unknown, guid_mismatch_vs_cmdline, truncated_json, token_redacted, identity_not_in_filename, no_order_id_in_filename). It sets PROPERTIES only — launcher_kind (from the `Identified &#x27;&lt;KIND&gt;&#x27; Job` line), compute_target, provenance_guid (placement response) and the -proId of the ingestion consuming that placement, recorded as a run-scoped PAIR whose scope is those two jobs and which never keys an edge, landing_prefix, submission_cluster, image_digest, compute_profile_ref — and creates no edge (m3_* stay as they are). A synthetic mechanism-only fixture under tests/fixtures/ reproduces the four kinds seen (PLACEMENT, INGESTION, TRANSFORM, PROVISION), a placement handoff across exactly two jobs, a transform that logs no provenance id (expected-absent, counted, never reported as a break), and a line that carries a bearer token — which the extractor REDACTS before any field and counts. The source row is registered in config/source-registry.yaml with classification and an acquisition path per Idea-133 (mode, via). A chained run (inventory → mac → output) exists as one CLI invocation and curation.py&#x27;s stub docstring names it as the cadence hook; the Output read is described in the design doc §3 as an INPUT to deepdoc, not a deepdoc feature.</p><p class="notes"><strong>Notes:</strong> Iteration 2 of the launcher contract. Genuine greenfield: no code, item or idea in the repo ingests Control-M sysout today. The log is authoritative where CMDLINE carries a %%variable and it asserts the job kind G12 wanted. Iteration 3 (run-history join via the P4 tables) is named in the doc and not minted until this lands.
 
 POC 2026-08-21 (user direction: a proof of concept frames the implementation before the
@@ -3451,7 +3208,7 @@ relay -- guessing spellings is the defect this item exists to prevent. The (d) s
 guard (fixture headers drawn from the recorded list, not the module constant) also waits
 on that list; a guard against nothing would be decoration.
 </p></div></div></div></div>
-<div class="column" data-status="done"><div class="column-head"><h2>Done</h2><span class="count" data-count-for="done">514</span></div><div class="column-body"><div class="card" id="card-A1" data-id="A1" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a1 audit reference registry paths for staleness" tabindex="0"><div class="card-head"><span class="card-id">A1</span><span class="card-title">Audit reference registry paths for staleness</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every entry marked ok/stale; stale paths fixed or flagged</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All local mirrors + platform/standard doc paths resolve; no stale entries. verified: 2026-06-21 in REGISTRY.yaml.</p></div></div>
+<div class="column" data-status="done"><div class="column-head"><h2>Done</h2><span class="count" data-count-for="done">524</span></div><div class="column-body"><div class="card" id="card-A1" data-id="A1" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a1 audit reference registry paths for staleness" tabindex="0"><div class="card-head"><span class="card-id">A1</span><span class="card-title">Audit reference registry paths for staleness</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every entry marked ok/stale; stale paths fixed or flagged</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All local mirrors + platform/standard doc paths resolve; no stale entries. verified: 2026-06-21 in REGISTRY.yaml.</p></div></div>
 <div class="card" id="card-A2" data-id="A2" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a2 account for every bmc doc in the source manifest" tabindex="0"><div class="card-head"><span class="card-id">A2</span><span class="card-title">Account for every BMC doc in the source manifest</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every .md in bmc-controlm/ accounted for in the manifest</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All 26 bmc-controlm .md files are referenced in SOURCE-MANIFEST.md (0 uncovered).</p></div></div>
 <div class="card" id="card-A3" data-id="A3" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a3 seed the research index with linked rationale" tabindex="0"><div class="card-head"><span class="card-id">A3</span><span class="card-title">Seed the research index with linked rationale</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> &gt;=5 rows, each with a working link and a &#x27;why it matters&#x27;</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. 7 rows with working links (3 Neo4j blogs + PROV-O/SOSA/ORG/agent-memory) + why-it-matters.</p></div></div>
 <div class="card" id="card-A4" data-id="A4" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a4 registry.yaml points the dcat row at a per-standard readme that was never written" tabindex="0"><div class="card-head"><span class="card-id">A4</span><span class="card-title">REGISTRY.yaml points the dcat row at a per-standard README that was never written</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> reference/REGISTRY.yaml&#x27;s dcat row no longer cites a path that does not exist. Exactly one of two resolutions, and the choice is recorded in the close note: (a) write reference/standards/dcat/README.md following the dcmi-terms pattern from M4 — namespace, what we use it for, the specific terms we reference, source_url — or (b) re-point the row&#x27;s `docs:` at reference/standards/README.md the way the skos row already does. Nothing else in the registry changes.
@@ -9474,6 +9231,180 @@ mapping) is stated on the enum; finding (ii) the graph reach is why it is enforc
 tests/unit/test_source_labels.py walks every BaseLoader subclass: all 30 ship a declared value.
 No loader re-sourced, no Snowflake loader built.
 </p></div></div>
+<div class="card" id="card-API1" data-id="API1" data-module="drydocs-api" data-phase="12" data-epic="web-console" data-type="task" data-status="done" data-search="api1 result completeness is part of the read contract - every spec result says whether the 500-row ceiling capped it, and the export manifest records truncated plus the ceiling instead of filing a capped extract as the answer" tabindex="0"><div class="card-head"><span class="card-id">API1</span><span class="card-title">Result completeness is part of the read contract - every spec result says whether the 500-row ceiling capped it, and the export manifest records truncated plus the ceiling instead of filing a capped extract as the answer</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-api</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Every QuerySpec shares one `_LIMIT` parameter, default 500, applied as `LIMIT $limit`. A spec
+whose true answer is 900 rows returns 500 and nothing in the response says so; the server
+export re-applies the same bound params, streams exactly 500 rows and registers a provenance
+manifest with `row_count: 500` and no field saying the extract was capped (S1). After this
+item the READ CONTRACT carries completeness.
+
+(a) Every spec result carries `truncated: bool` and the `limit` that applied. Cheapest
+    mechanism, the builder chooses and records: run with `limit + 1` and report whether the
+    extra row existed, or return a pre-limit count where the Cypher can afford it.
+(b) The export manifest records `truncated` and the ceiling beside `row_count`. A manifest
+    that describes a capped extract says so in the artifact itself, because the manifest is
+    the governance record and outlives the screen that produced it.
+(c) The export path can run WITHOUT the display limit, or with a caller-raised one, so the
+    other 400 rows are obtainable from the console at all - today no surface can raise it.
+(d) `drydocs_api.schemas` models both fields so the O70 generated client picks them up and
+    WEB2 renders them from typed fields, not from a heuristic on `rows.length === limit`.
+(e) Tests: a spec fixture with more rows than the limit yields `truncated: true`; one with
+    fewer yields `false`; the export manifest for each records the matching value; the
+    OpenAPI drift test (tests/unit/test_openapi_client.py) is regenerated, not hand-edited.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+Covers S1&#x27;s server half, ranked first across all three passes. The console half is WEB2,
+which depends on this item.
+
+ADR CANDIDATE: &quot;result completeness is part of the read contract - no export may be labelled
+complete without it.&quot; The canvas already solved this for nodes (NODE_CEILING = 300 with a
+TRUNCATED n/N badge and two tests in GraphCanvas / nvl-mapping); this item gives the API the
+same property so every consumer inherits it.
+
+R15 (todo) is the Ask cousin - exact versus lower-bound labelling on query answers. Same
+principle, different surface; link, do not merge.
+
+DONE 2026-09-05 (Lane B, laptop). The read contract carries completeness.
+
+MECHANISM, RECORDED AS CLAUSE (a) ASKS THE BUILDER TO RECORD IT: `limit + 1`.
+The driver is asked for one row past the ceiling and `truncated` is whether that
+row came back. Chosen over the pre-limit `count()` the clause offers as the
+alternative because a count is a second traversal on every read of every frame,
+and it answers a question nobody asked (how many rows exist) where this answers
+the one that is asked (is what I am looking at all of it). One row over is the
+cheapest possible evidence and it is exact, not an estimate.
+
+THE PROBE ROW IS EVIDENCE, NEVER PAYLOAD. It is dropped in execute_spec before
+the envelope is built, and the export generator stops emitting at the ceiling,
+so no caller and no exported file ever sees row 501. Three tests pin that
+separately at the run, csv and jsonl paths, because &quot;the flag is right but the
+file has an extra row in it&quot; would break the very contract the flag states.
+
+THE ECHOED PARAMS STILL SAY 500 WHILE THE DRIVER WAS ASKED FOR 501, and that
+split is deliberate: SpecGrid feeds `result.params` straight back into
+`exportSpec`, so an echoed 501 would silently widen every subsequent export by
+one row, once per export, forever. Two existing tests asserted the old
+driver-side value and were UPDATED rather than worked around
+(test_agent_query.py, test_query_specs.py) - they now assert both halves, the
+probe the driver sees and the ceiling the caller is told, which is the pair that
+matters.
+
+(b) THE MANIFEST CARRIES `truncated` AND `limit` BESIDE `row_count`. The test
+that makes the point exports the same spec twice, once over the ceiling and once
+at exactly 500 rows: identical `row_count`, opposite `truncated`. That is the
+whole finding in two assertions - row_count alone cannot tell a complete answer
+from a cut one, and the manifest is the governance record that outlives the
+screen.
+
+(c) EXPORT_LIMIT_CEILING = 50_000, RAISABLE PER CALL via a new `ExportBody`
+(a subclass of QueryBody, because raising a grid&#x27;s limit changes what is on
+screen while raising an export&#x27;s changes what lands in a filed artifact - two
+different permissions to grant). Omitting it keeps today&#x27;s behaviour byte for
+byte, so an un-updated caller is unaffected; a test asserts that specifically.
+
+A CEILING AND NOT &quot;UNBOUNDED&quot;, DELIBERATELY. The clause offers either. An
+unbounded export over a result set nobody has counted is the failure the display
+limit was protecting against, relocated rather than fixed - and now that
+`truncated` is in the manifest, an export that hits 50,000 SAYS so, which is the
+property the item was actually buying. Raising the constant is a one-line
+reviewable edit. Over-ceiling and nonsense values (0, negative, a string) are
+REFUSED with 422 and never clamped: a caller who asked for 200,000 and silently
+received 50,000 would be handed exactly the quietly-capped artifact this item
+exists to abolish.
+
+THE ENVELOPE IS BUILT IN execute_spec, SO THE AGENT TIER INHERITS IT. R9&#x27;s &quot;the
+same ten keys&quot; is now twelve. This was not incidental - an agent that files a
+500-row answer as the answer is the same defect as a console that does, and
+putting the fields at the route instead would have fixed one and left the other.
+
+REGISTRY INVARIANT THE MECHANISM RESTS ON, now guarded: `display_limit_param`
+requires BOTH a declared `limit` parameter AND a `$limit` the Cypher actually
+binds. Measured at pull: 43 specs, 39 capped, 0 mismatched. The conjunction is
+not decoration - a spec that declared the parameter without binding it would
+have had every result over 500 rows reported as truncated AND SLICED, the API
+inventing a cap no query applied. test_result_completeness.py holds the registry
+there.
+
+FOR WEB2 (the console half, which depends on this): read `truncated` and `limit`
+off the typed result. `limit` is null for the four specs that have no ceiling -
+render nothing rather than &quot;0&quot;. The boundary case is why clause (d) exists and
+has its own test here: at exactly 500 rows `rows.length === limit` says
+TRUNCATED over a complete answer, and the server knows better because it asked
+for 501 and got 500. Where clause (c) made the ceiling raisable, it is raisable
+on the EXPORT path only; there is no raised-limit grid read.
+
+GENERATED ARTIFACTS AND THEIR WRITERS (Lane A runs these at merge if the source
+moved - the handoff&#x27;s third 2026-09-03 lesson):
+  web/src/generated/openapi.json  &lt;- poetry run python scripts/dump_openapi.py
+  web/src/generated/api.d.ts      &lt;- npm run api:types   (in web/)
+Both regenerated, never hand-edited, and both need DRYDOCS_DATA_ROOT set.
+
+TWO FINDINGS FOR THE INBOX, both hit in this session:
+
+1. scripts/dump_openapi.py TRUNCATES ITS OUTPUT BEFORE IT CAN FAIL.
+   `write_schema` opens the file &quot;w&quot; and only then calls `render_schema()`
+   inside the write expression, so any failure during app construction - an
+   unset DRYDOCS_DATA_ROOT is the easy one - leaves web/src/generated/openapi.json
+   at ZERO BYTES. Observed here exactly that way, and the next `npm run
+   api:types` then died on &quot;Unexpected end of JSON input&quot; pointing at the wrong
+   thing. One-line fix: render first, then open. The drift test does catch the
+   empty file, so the blast radius is one confusing loop and not a bad commit.
+
+2. `npm run api:types` NEEDS DRYDOCS_DATA_ROOT and says so only through a
+   Python traceback nested inside a Node stack. It is documented in
+   dump_openapi.py&#x27;s own docstring; it is not documented where a web developer
+   would look.
+
+Gates at close: poetry run pytest -q = 3356 passed, 12 skipped, 1 failed -
+test_plan_roadmap.py::test_committed_roadmap_page_matches_its_sources, the
+expected Lane B close failure (Lane B does not render; Lane A&#x27;s render at merge
+is the fix). ruff check clean; ruff format clean. In web/: tsc -b exit 0 with
+WEB4&#x27;s strict flag on, npm run build exit 0, vitest 147/147, oxlint 0 errors.
+
+CORRECTION, same day, before merge — THE EPHEMERAL PATH WAS REPORTING FALSE
+COMPLETENESS, and the note above described the wrong rule.
+
+As first written, `applied_limit` keyed on the spec DECLARING a `limit`
+parameter. An R4 ephemeral spec is built with `params=()` — user-supplied params
+fail closed, which is the frozen-params rule — while its ceiling arrives in
+`bound_params`, frozen at registration. So an agent-registered query whose
+Cypher ends `LIMIT $limit` with a bound value of 50 was reported as
+`truncated: false, limit: null`: a capped answer claiming completeness, on the
+Ask surface, which is the surface most likely to produce one. That is this
+item&#x27;s own defect, reintroduced one layer down.
+
+`applied_limit` now keys on the CYPHER binding `$limit` plus a bound integer for
+it. The conjunction still does the safety work it was there for — if the Cypher
+binds `$limit` the driver really applies it, so more rows than the ceiling can
+only mean the ceiling bit, and no cap is ever invented for a spec that does not
+apply one.
+
+`display_limit_param()` is DELETED rather than left beside the new rule. It
+described what governs completeness and no longer did; a helper that states a
+superseded rule and whose only remaining caller is a test is how the superseded
+rule gets re-adopted later. The registry invariant it expressed (a declared
+`limit` and a bound `$limit` go together) is asserted directly from the spec
+fields in the test that owns it.
+
+CLAUSE (c) DOES NOT REACH AN EPHEMERAL SPEC, and that is a ruling, not a gap:
+raising an ephemeral&#x27;s export ceiling would rewrite a param frozen at
+registration, and being replayed verbatim is what makes an agent-registered
+query reproducible (R4). Reporting its completeness is free; rewriting its bound
+limit is not. The refusal is explicit and names R4 — a 422, never a silent
+downgrade to the frozen value.
+
+Four tests cover it: a frozen ceiling reports truncated, an ephemeral with no
+`$limit` reports null, the manifest records the frozen ceiling, and a raise
+attempt is refused.
+
+Also corrected: agent_query.py&#x27;s module docstring still said &quot;the same ten
+keys&quot;. Its twin in exports.py had been updated and this one had not — the exact
+two-expressions shape the web review found eight times, so it is worth naming
+rather than fixing quietly.
+
+Found by review before merge, not by a test — nothing in the suite exercised an
+ephemeral spec through the completeness path, because the tests were written
+against the rule as understood. The four above close that.
+</p></div></div>
 <div class="card" id="card-O1" data-id="O1" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="requirement" data-status="done" data-search="o1 web console design pass: wireframes, a real c4/graph rendering, and the browser↔neo4j access decision" tabindex="0"><div class="card-head"><span class="card-id">O1</span><span class="card-title">Web console design pass: wireframes, a real C4/graph rendering, and the browser↔Neo4j access decision</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">requirement</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The web/ front-end leaves its throwaway-test-page state: wireframes committed; a decision recorded (ADR or design doc) on the browser↔Neo4j access path — bolt-from- browser vs a thin API — with rationale; the console renders a REAL C4 / graph view of the knowledge graph (NVL or an agraph-successor in web/, against the local EE DB) rather than the test page; drydocs-web&#x27;s build/run is documented. No secrets in web/ (publish boundary).
 </p><p class="notes"><strong>Notes:</strong> Groomed 2026-07-09 from the 2026-07-03 IDEAS note (updated 2026-07-09 with the active branches). Marked in_progress: a design pass is actively in flight (branches feature/ui-dark-landing-myapps + origin/feat/web-console-design-pass, untracked docs/design/ui-exploration/). Plan change (user-approved): created module drydocs-web + phase 12. The architecture is still open — the bolt-vs-thin-API call is the crux of this item. MERGED 2026-07-13 (groom, IDEAS 2026-07-12 artifact-design review sub-item 2): the design pass applies the artifact-design skill&#x27;s &quot;UI, not a document&quot; checklist + its AI-default-looks list as the review lens over the docs/design/ui-exploration/ mockups. RE-TIERED opus -&gt; fable on this groom touch (the G3 groom-touch policy; the bolt-vs-thin-API call is a boundary decision, the matrix top slot).
 </p></div></div>
@@ -11667,6 +11598,885 @@ id and the nav is shell chrome), automated_by the new file, sourced to this buil
 automated share moves 16/39 to 17/40 in tests/unit/test_ui_tests_ledger.py, with the dated
 line saying why the share moved: the claim is about a pure function and a registry constant,
 not a backfill. The header count in ui-tests.yaml moved with it.
+</p></div></div>
+<div class="card" id="card-WEB1" data-id="WEB1" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="done" data-search="web1 provenance of rendered data is a typed union - one useliveordemo seam and one provenance component replace the five per-route try-live-else-demo fallbacks, a shell-mount readiness probe answers &quot;is the api down&quot; once, and every fallback activation is counted" tabindex="0"><div class="card-head"><span class="card-id">WEB1</span><span class="card-title">Provenance of rendered data is a typed union - one useLiveOrDemo seam and one provenance component replace the five per-route try-live-else-demo fallbacks, a shell-mount readiness probe answers &quot;is the API down&quot; once, and every fallback activation is counted</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Whether the numbers on screen came from the graph or from a constant in the bundle is the
+console&#x27;s most important trust signal, and today five routes decide it five different ways
+(A5). After this item there is ONE way.
+
+(a) A `useLiveOrDemo` seam returns a discriminated union - `live | empty | demo | error` -
+    and is the ONLY path by which a route may reach one of the eleven demo modules
+    (demoGraph, demoLineage, demoLoads, demoOwnership, demoProductRollup, demoRemediation,
+    demoRunbooks, demoDocs, demoSwimlane, demoStatus, mappingsDemo). `empty` and `error` are
+    distinct states: a request that failed is never rendered as a result that was empty.
+(b) One presentational component renders the provenance state, and every route that can
+    show demo data renders it. The SYNTHESIZED watermark, the LIVE/DEMO badge and the
+    TrustLegend agree with the union, not with a per-route string.
+(c) A source-scan guard (vitest) fails when any file outside the seam imports a demo module -
+    the same enforcement shape the parent repo uses for render parsing (J37) and code-not-prose
+    reads (J66): the seam is the only path because a test says so, not because a comment asks.
+(d) One readiness probe at shell mount calls `/health` (public today, uncalled by anything in
+    web/src) so the console says &quot;the API is down&quot; once, instead of eleven modules each
+    discovering it at the moment they fail. It shares its implementation with O63&#x27;s probe -
+    one probe, three surfaces (shell, Ask ladder, admin strip) - and never invents a green
+    (O56 rule: a probe that could not run renders &quot;not checked&quot;).
+(e) Every fallback activation is counted and the count is visible to an operator (a counter
+    on the admin status strip is enough); a console quietly serving fabricated numbers is the
+    exact failure the rest of the provenance machinery exists to prevent (S8).
+(f) Loading is no longer modelled as data-is-still-null: the union carries a `loading` state
+    or the seam composes with WEB12&#x27;s hook so that loading, loaded-empty and hung are three
+    screens, not one.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+Covers A5 (rank 2 in the report), S6&#x27;s readiness half and S8&#x27;s fallback counter. Ranked first
+by the architecture pass because the product thesis is provenance and this is where the
+console contradicts it.
+
+ADR CANDIDATE: &quot;provenance state of rendered data is a typed union, not a per-route
+convention.&quot; The item can build the seam without the ADR; the ADR records why a route may
+never reach a demo module directly, so the next route added does not.
+
+Build order: WEB12 (the data-layer hook) first or alongside, or the seam&#x27;s transport half is
+written twice. O63 (todo) owns the probe&#x27;s Ask and admin surfaces; this item adds the shell
+mount and must reuse, not fork, that probe.
+
+DONE 2026-09-05 (Lane B, laptop). One way to say where the numbers came from.
+
+(a) THE UNION KEEPS APART WHAT THE FIVE FALLBACKS CONFLATED:
+  live  - rows from the graph
+  empty - a SUCCESS. The graph answered and had nothing. It carries the result,
+          because an empty frame still has a classification, a cypher and a
+          params echo to show; collapsing it into &quot;no data&quot; is how a successful
+          empty answer got rendered as a failure.
+  demo  - and it says WHY: `because: &#x27;empty&#x27; | &#x27;error&#x27;`. Those are different
+          facts about the system and a reader deserves to know which. Empty
+          means the graph answered and had nothing; error means it never
+          answered. Some routes treated them as one condition and some as two.
+  error - never carries rows.
+
+A SURFACE THAT PASSES NO DEMO GETS AN ERROR AND FABRICATES NOTHING. That has its
+own test, because a seam that invented rows for a surface declaring none would
+be worse than the five it replaces. SpecGraphPane passes null - it refuses to
+draw rather than draw something that is not the graph - and that policy is now
+DECLARED at the call site instead of implemented per pane. So is
+AppCodeCascadePane&#x27;s app picker: an invented application list offered to a
+steward as something to map is worse than an empty picker.
+
+ON THE SEAM: SpecGrid, SpecGraphPane, LoadsRoute, AppCodeCascadePane (four demo
+frames plus the picker). Those are the surfaces that were doing
+try-live-else-synthetic over a QuerySpec.
+
+(b) ProvenanceNotice is the one presentational component, and it renders NOTHING
+for `live` and `loading` deliberately. A badge that says LIVE on every healthy
+frame is a badge people stop seeing, and this notice exists to be seen. The
+LIVE/row-count line stays in SpecGrid&#x27;s own footer where it already was.
+
+(d) THE READINESS PROBE. /health was public, named in the client&#x27;s own comment,
+and called by nothing in web/src - so &quot;is the API up&quot; was rediscovered by each
+route at the moment it failed and answered locally by showing demo data. The
+shell asks once. THREE states, not two: `unchecked` is a real answer, and while
+the probe is in flight or if it could not run the banner says nothing rather
+than implying health (O56 - never invent a green). It reuses O63&#x27;s
+diagnoseNetworkFailure rather than forking a probe, so the message still says
+what it OBSERVED instead of asserting a cause.
+
+(e) THE FALLBACK COUNT IS IN THE SHELL, NOT ON THE FRAMES, and the placement is
+the whole point. S8&#x27;s finding is that when the API is unavailable this console
+does not crash, does not error and does not stop - it quietly serves fabricated
+numbers behind a badge, and the fallback is DESIGNED so the page still looks
+healthy. A per-frame badge cannot fix that, because the person who needs to know
+is not reading that frame. The banner carries the total, the number of distinct
+specs, and the last activation.
+
+EVERYONE SEES IT. An earlier draft put the count on the admin strip, as the
+clause suggests (&quot;a counter on the admin status strip is enough&quot;). That would
+have hidden &quot;these numbers are invented&quot; from exactly the people most likely to
+act on them, so it is in the shell for every persona instead. Flagging the
+deviation because it IS one.
+
+(f) Loading is a state, not a null - inherited from WEB12&#x27;s hook.
+
+(c) THE GUARD, AND THE INSTRUMENT TRAP IT WALKED INTO FOR THE SECOND TIME IN ONE
+BURST. A demo module is reached through an import PATH - &#x27;../loads/demoLoads&#x27; -
+which is a string literal, and codeOnly (the J66 stripper) neutralises string
+literals. Written that way the scan matched NOTHING: every offender list was
+empty and both assertions passed while proving nothing, exactly as WEB12&#x27;s
+hard-coded-URL scan had. What caught it was the DEAD-ENTRY test - a scan that
+finds nothing makes every allow-list entry look dead - which is the strongest
+argument for keeping that test in every allow-list guard.
+
+Three entries then had to come OUT, for the opposite reason: nvl-mapping.ts,
+demoSwimlane.ts and demoProductRollup.ts name a demo module only in a COMMENT,
+so withoutComments correctly does not see them and listing them would have been
+a false claim about the tree.
+
+THE ALLOW-LIST DRAWS A REAL DISTINCTION, stated in the file: a pane whose
+CONTENT is the demo graph - a surface with no live source at all - is not
+degrading from live data, and routing it through a seam that reports `demo`
+would say something false about a frame that never claimed to be live. Clause
+(c) forbids the try-live-else-synthetic PATH, and that is what the list holds
+the line on: a file that both reads a spec and imports a demo module has to
+argue for itself.
+
+WHAT IS NOT ON THE SEAM, and why: MappingsRoute&#x27;s `apiDown` string. It is the
+O13 mappings API - drafts, changesets, corrections - not a QuerySpec, so
+useLiveOrDemo cannot own it without inventing a spec id for a surface that has
+none. Its demo import is allow-listed with that reason. Making the mappings
+client speak the same union is a real follow-up and belongs with T3 (the
+unwrapAs sites), not here.
+
+FOR THE ADR the item nominates: the seam is built and needs no ruling. What the
+ADR should record is the rule the guard now enforces - a route may not reach a
+demo module directly - plus the carve-out above, because the next reader will
+otherwise read the allow-list as an erosion rather than as the boundary it is.
+
+Gates at close: poetry run pytest -q = 3360 passed, 12 skipped, 1 failed
+(test_plan_roadmap - the expected Lane B close failure). ruff clean. In web/:
+tsc -b exit 0, npm run build exit 0, vitest 18 files / 225 tests (was 13 / 147
+at the start of this burst), oxlint 0 errors / 10 warnings (the baseline,
+unchanged).
+</p></div></div>
+<div class="card" id="card-WEB3" data-id="WEB3" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="done" data-search="web3 route authorization derives from the module registry - app.tsx gates through canaccessmodule instead of six inline steward-or-admin predicates, with a vitest asserting every non-&quot;all&quot; module has a gated route" tabindex="0"><div class="card-head"><span class="card-id">WEB3</span><span class="card-title">Route authorization derives from the module registry - App.tsx gates through canAccessModule instead of six inline steward-or-admin predicates, with a vitest asserting every non-&quot;all&quot; module has a gated route</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Authorization has two expressions: `canAccessModule()` in the module registry drives the nav,
+the Overview spokes and the canvas host, while App.tsx restates
+`persona.role === &#x27;steward&#x27; || persona.role === &#x27;admin&#x27;` inline six times (A1). The comment on
+the remediation route records that this divergence already shipped one bug (O59 set the
+module&#x27;s access to &#x27;sme&#x27;, hid the nav entry, and left the route reachable by URL).
+
+(a) App.tsx derives every module route&#x27;s gate from MODULES through `canAccessModule`; the
+    six inline predicates are gone. `/intake` (gated on a persona id) and `/console` (gated on
+    a role) are expressed in the same vocabulary or the item records why they cannot be and
+    hands that question to the ADR.
+(b) A vitest asserts that every module id with a non-&#x27;all&#x27; access has a gated route and that
+    no route gate exists that the registry does not declare - both directions, so the next
+    module added with access &#x27;sme&#x27; cannot reproduce the O59 shape.
+(c) The registry stays the single check: no new predicate on role or persona appears outside
+    `canAccessModule` and the test above (a source scan over web/src, J66 style).
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+Covers A1 (rank 4). ADR CANDIDATE: &quot;route authorization derives from the module registry&quot; -
+the ADR-sized part is only how persona-scoped and role-scoped gates share one access
+vocabulary; the derivation itself needs no ruling and is built here.
+
+DONE 2026-09-05 (Lane B, laptop). One expression of authorization, in the
+registry.
+
+THE DESIGN CHOICE WORTH RECORDING: the acceptance says &quot;App.tsx derives every
+module route&#x27;s gate from MODULES through canAccessModule&quot;. That admits two
+readings - six DERIVED predicates instead of six hand-written ones, or one gate
+for all of them. It is one gate: a pathless &lt;RouteAccessGate&gt; layout route
+inside the Shell, which asks registry.ts what the current pathname requires.
+
+The reason is what the O59 bug actually was. It was not a WRONG predicate, it
+was a MISSING one - /remediation&#x27;s access went to &#x27;sme&#x27;, the nav honoured it,
+and nobody wrote the route gate. Six derived predicates would still have to be
+written one per route, so the seventh module could still arrive without one.
+With the gate a level up there is nothing per-route to forget: a new module is
+gated because it is in the registry, full stop.
+
+WHAT THE SIX PREDICATES WERE: remediation, software, gates, load-map,
+under-the-hood, mappings. All six are gone from App.tsx, which now contains no
+role comparison at all (asserted).
+
+/intake AND /console AND /admin/config - clause (a)&#x27;s &quot;expressed in the same
+vocabulary or record why not&quot;. Two different answers, and the difference is the
+point:
+
+  * /console, /admin/config and /mappings ARE expressible. They are role-gated;
+    they just are not nav MODULES. registry.ts gains GATED_SURFACES for them -
+    same `access` vocabulary, same canAccessModule, each row carrying the reason
+    it is gated. The category already existed: the `admin-config` ModuleId is
+    declared and deliberately kept out of MODULES (O12), so this names what was
+    already true rather than inventing a tier.
+  * /intake is NOT expressible. It admits the SME PERSONA (?as=neo) as well as
+    steward and admin, and `access` is a role vocabulary. It keeps
+    canAccessIntake at its route, and registry.ts declares it in
+    PERSONA_SCOPED_PATHS so the exception is a declaration and not an omission.
+    The vitest asserts it is the ONLY one - a second persona-scoped gate cannot
+    be added quietly.
+
+  FOR THE ADR the item nominates: the derivation is built and needs no ruling.
+  The open question is narrower than the item states it - not &quot;how do
+  persona-scoped and role-scoped gates share one vocabulary&quot; in general, but
+  whether `access` should admit a persona-id member (e.g. &#x27;sme-persona&#x27;) at the
+  cost of making a ROLE vocabulary hold a non-role, or whether GATED_SURFACES
+  should carry an optional predicate alongside `access`. One live case (/intake)
+  is not enough evidence to choose; a second would decide it.
+
+BEYOND THE ROUTES, AND INSIDE THE ITEM&#x27;S CLAUSE (c): Aside.tsx gated the SAME
+three surfaces with its own inline predicates for the nav entries. That is the
+identical two-expressions shape on the identical three surfaces - a nav that can
+show a link to a route that refuses you, or hide one you may open. All three now
+read canAccessPath. The one role comparison left in that file draws the &quot;stew&quot;
+badge, which is a label decision, not a gate.
+
+CLAUSE (b), BOTH DIRECTIONS, plus the one that matters more than either:
+  forward - every module with non-&#x27;all&#x27; access resolves to its declared access,
+    refuses a user, matches canAccessModule for all three roles, has a route in
+    App.tsx, and refuses a DEEP LINK under it (the O59 shape at one remove);
+  reverse - every GATED_SURFACES row names a route that exists, so a declaration
+    cannot outlive its route;
+  and THE GATE IS MOUNTED - one test reads App.tsx and asserts &lt;RouteAccessGate&gt;
+    appears ahead of every gated route. Without it, deleting that single line
+    would open every gated route while every other test in the file still
+    passed, because canAccessPath would go on answering correctly to nobody.
+    That is exactly the O59 failure - a correct check nothing consults - so a
+    suite that omitted this would have passed straight through the bug it exists
+    to prevent. Mutation-proven: dropping the mount fails only that test.
+
+RouteAccessGate.test.tsx is the behavioural half - it renders the gate at every
+gated path for all three roles and asserts the REDIRECT, not the predicate.
+
+CLAUSE (c) is a source scan with a default-deny allow-list (the
+test_module_boundary.py shape): every file containing a role or persona-id
+comparison must be listed with its reason, so a new inline predicate has to
+argue for itself in that table. Seven files are listed and every one is a
+DISPLAY or CAPABILITY decision, not route authorization: registry.ts (the
+definition itself), auth.ts (canAccessIntake), graph.ts (boltAllowed, a DEV-only
+adapter gate), views.ts (tower visibility), Aside.tsx (the badge), Header.tsx (an
+admin affordance), MappingsRoute.tsx (renders the word). A test asserts the
+allow-list has no DEAD entries either, so it shrinks when a site does.
+
+THE SCAN STRIPS COMMENTS AND STRING LITERALS FIRST, AND THAT IS J66 EXACTLY, NOT
+A FORMALITY: the comments in App.tsx, registry.ts and RouteAccessGate.tsx
+EXPLAIN the forbidden predicate by quoting it verbatim. A raw-source scan would
+fail on its own explanation and teach the next person to delete the explanation.
+The stripper has its own instrument check - four fixtures asserting a commented,
+block-commented and stringified predicate are all invisible while a real one is
+not.
+
+TWO EXISTING GUARDS MOVED, both because what they asserted is gone:
+
+  * test_load_map_console.py::test_the_route_is_gated_the_same_way_the_registry_says
+    asserted that the /load-map ROUTE contained &quot;steward&quot; and &quot;admin&quot; - a guard
+    that REQUIRED the duplication whose drift it was guarding against. Its
+    intent is now structural truth, so it asserts the structure: routed, inside
+    the gate, and carrying no predicate of its own (that last one inverted -
+    finding a role word there is now the failure).
+  * test_ui_components.py: RouteAccessGate registered in the O42 ledger; pin
+    88 -&gt; 89, bound stays 40. Deliberately UNBOUND - one gate serving twelve
+    modules, so binding it to any single one would misstate it, the same reason
+    TrustLegend and StatusItems are unbound. Being unbindable is the point of
+    the component.
+
+NOT CHANGED, and worth knowing: /graph/:specId keeps its own check. It is not a
+module path, so the gate lets it through, and GraphCanvasRoute gates on the
+HOST module of the requested spec - the same canAccessModule, on a value only
+the route knows. That is a derivation, not a second expression.
+
+Gates at close: poetry run pytest -q = 3356 passed, 12 skipped, 1 failed
+(test_plan_roadmap - the expected Lane B close failure). ruff clean both ways.
+In web/: tsc -b exit 0, npm run build exit 0, vitest 15 files / 187 tests
+(was 13 / 147), oxlint 0 errors.
+</p></div></div>
+<div class="card" id="card-WEB4" data-id="WEB4" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="done" data-search="web4 typescript strict on in web/ - strictnullchecks and noimplicitany enforced so the generated api.d.ts optional fields the o70 client declares are checked by the compiler and not asserted past" tabindex="0"><div class="card-head"><span class="card-id">WEB4</span><span class="card-title">TypeScript strict on in web/ - strictNullChecks and noImplicitAny enforced so the generated api.d.ts optional fields the O70 client declares are checked by the compiler and not asserted past</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Neither tsconfig sets `strict`, `strictNullChecks` or `noImplicitAny`; the Vite React-TS
+template ships strict true, so this was removed or written out (A3). The O70 architecture&#x27;s
+central claim - a server change the console has not caught up with is a tsc error - is only
+partly cashed while optional fields in the generated api.d.ts are not enforced.
+
+(a) `strict: true` in both tsconfigs; `tsc -b` and `npm run build` pass on the whole of
+    web/src with no `@ts-expect-error` or `@ts-ignore` added to get there (a source scan
+    asserts the count of those directives does not rise from today&#x27;s baseline).
+(b) Every error the flag surfaces is fixed at its site, not silenced by a cast; where a fix
+    needs the row-shape validator (WEB6) the site is listed in this item&#x27;s done-note and WEB6
+    picks it up, so nothing is left half-typed and unrecorded.
+(c) The web CI job runs the same `tsc -b` it runs today, so the setting is enforced from the
+    commit that lands it.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+Covers A3 (rank 5, shared with T2 and T5 as one root). Build this BEFORE WEB6 and WEB8 - a
+validator and a typed client mean nothing while the compiler is off.
+
+DONE 2026-09-05 (Lane B, laptop). `strict: true` in both tsconfigs, plus
+tests/unit/test_web_typescript_strict.py.
+
+CLAUSE (b) HAS AN EMPTY LIST, AND THAT IS THE FINDING. Turning strict on
+surfaced ZERO errors: `npx tsc -b --force` exits 0 on the whole of web/src with
+the flag set, and `npm run build` (tsc -b + vite build) exits 0. So no site was
+fixed, no site was cast past, and there is NOTHING to hand to WEB6 from this
+item - WEB6&#x27;s row-shape validator still has its own case (the 21 `as unknown as`
+double casts at the spec-result seam, T5), but it is not inheriting a half-typed
+site list from here.
+
+THE PASS WAS INSTRUMENT-CHECKED BEFORE IT WAS BELIEVED (J76). A clean pass under
+a flag that was just turned on is exactly the shape of a flag that is not
+actually applying, so: a throwaway `src/__strictprobe.ts` containing
+`export function probe(x?: string) { return x.length }` was compiled by the same
+`npx tsc -b --force` invocation and failed with `TS18048: &#x27;x&#x27; is possibly
+&#x27;undefined&#x27;`, exit 2. The enforcement is real; the tree was simply already
+strict-clean, which is consistent with the review&#x27;s own measurements (zero
+`any`, zero TODO/FIXME markers in 22,715 lines).
+
+BASELINES, MEASURED AT PULL (2026-09-05, on main at 6c51618e, before the flag
+flipped): `@ts-expect-error` + `@ts-ignore` under web/src = 0. Unchanged at
+close, and pinned as DIRECTIVE_BASELINE = 0 in the guard. The guard also counts
+`@ts-nocheck`, which the acceptance does not name but which is the same class
+and the widest of the three.
+
+THE GUARD HAS TWO HALVES BECAUSE EITHER ALONE IS DEFEATABLE. (1) The setting:
+`strict: true` in both files AND no strict sub-flag set back to `false`
+underneath it - `{&quot;strict&quot;: true, &quot;strictNullChecks&quot;: false}` type-checks like
+the flag was never set, and a guard reading only `strict` would call that
+compliant. (2) The escape hatch: the directive count. Both halves were
+mutation-probed - each fails when its rule is broken and passes when restored -
+because a guard that has never been seen to fail is not evidence.
+
+Its docstring records the J66 exception explicitly: the rule&#x27;s subject IS a
+comment (`// @ts-expect-error`), so `code_only()` would strip the very text
+being counted. It reads raw source on purpose. It cannot count itself - it
+lives under tests/unit/ and the scan glob is web/src only.
+
+CLAUSE (c) VERIFIED, NOT ASSUMED: .github/workflows/ci.yml&#x27;s web job runs
+`npm run lint`, then `npm run build` (= `tsc -b &amp;&amp; vite build`), then vitest and
+playwright, with `working-directory: web`. So the setting is enforced by CI from
+this commit; no CI change was needed.
+
+FINDING FOR THE INBOX - FOUR TypeScript FILES ARE OUTSIDE EVERY `tsc`
+INVOCATION, AND THEY WOULD PASS TODAY. tsconfig.app.json includes `src`;
+tsconfig.node.json includes `vite.config.ts` and nothing else. So
+`e2e/console.spec.ts`, `playwright.config.ts`, `scripts/genApiTypes.ts` and
+`vitest.config.ts` are type-checked by nothing, in CI or locally. This item did
+NOT widen the include, because clause (a) scopes the acceptance to &quot;the whole of
+web/src&quot; and widening coverage is a different change from turning strictness on
+(it would newly subject the playwright and vitest configs to `noUnusedLocals`
+and to every future toolchain bump). It is a one-line follow-up and the evidence
+is here so nobody has to re-derive it: a throwaway tsconfig extending
+tsconfig.node.json with all five files in `include` compiles clean, exit 0, on
+this tree. Lane A&#x27;s call whether to mint it.
+
+Gates at close: poetry run pytest -q = 3335 passed, 12 skipped; ruff check =
+clean; ruff format --check = 545 files already formatted; in web/ - tsc -b exit
+0, npm run build exit 0, vitest 13 files / 147 tests passed, oxlint 0 errors (10
+pre-existing fast-refresh warnings, which are WEB13&#x27;s `--max-warnings 0` clause,
+not this item&#x27;s).
+</p></div></div>
+<div class="card" id="card-WEB5" data-id="WEB5" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="done" data-search="web5 an error boundary per route outlet, keyed on pathname - one render throw breaks one panel instead of blanking the whole console" tabindex="0"><div class="card-head"><span class="card-id">WEB5</span><span class="card-title">An error boundary per route outlet, keyed on pathname - one render throw breaks one panel instead of blanking the whole console</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> There is no ErrorBoundary and no componentDidCatch in web/src; React 19 unmounts the whole
+tree on an uncaught render error, so one bad row produces a white page with no navigation and
+no way back but a reload (S7).
+
+(a) One error boundary per route outlet, keyed on pathname so navigation clears it; a render
+    throw in one route leaves the shell, the nav and every other route usable.
+(b) The fallback panel shows the error message verbatim (the O63 honesty rule - the exact
+    string is what a reader pastes into a ticket) and a retry affordance; it never shows a
+    stack trace or any value from the data that threw.
+(c) A vitest renders a route that throws and asserts the shell survives and the panel shows.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+Covers S7 (rank 9). About twenty lines; worth more once WEB4 is on (the compiler catches the
+nulls) and WEB6 lands (a failed cast becomes a message, not a throw) - but this is the floor
+under both and is independent of them.
+
+DONE 2026-09-05 (Lane B, laptop). One render throw breaks one panel.
+
+(a) A pathless RouteErrorBoundary layout route wraps every route&#x27;s outlet,
+INSIDE WEB3&#x27;s access gate and OUTSIDE every page. The nesting order is a
+decision: outside the gate, a route the persona may not open would render a
+boundary instead of redirecting, which turns an authorization decision into
+what looks like a bug.
+
+KEYED ON PATHNAME, and this is the part that is easy to leave out and makes the
+boundary nearly useless without it. A React error boundary LATCHES: once it has
+caught, it renders its fallback until its state is reset or it is remounted.
+Unkeyed, navigating away from a broken route carries the broken panel to the
+next route, and the console stays broken until a reload — the same outcome this
+item exists to prevent, one layer down. The key makes moving away the recovery,
+and it has its own test.
+
+(b) THE MESSAGE IS VERBATIM, per the O63 honesty rule: the exact string is what
+a reader pastes into a ticket, and a reworded one is a different string. No
+stack trace and no value from the data that threw — a render error on a row of
+INTERNAL data must not put that row on screen in the name of diagnosing it.
+Asserted both ways: the message is present, and the panel contains no stack
+frames and no &lt;pre&gt;.
+
+THE RETRY REMOUNTS, and that is not incidental. Clearing the boundary&#x27;s state
+alone would re-render the same components over the same already-failed data and
+throw again immediately — a button that looks like a retry and is not one. The
+key carries a nonce the retry bumps, so the subtree remounts and the hooks run
+again, which means the read actually happens again. Its test flips the failure
+off and asserts recovery, so a state-only reset would fail it.
+
+The component stack goes to console.error and nowhere else. The console has no
+telemetry (S8), so that is the only record a developer gets; it is deliberately
+not on screen, because a component stack is a developer artifact and the panel
+is for the person using the page.
+
+A class component, because React still has no hook for this — error boundaries
+are the one place a class is the only mechanism, which is worth saying so the
+next reader does not &quot;modernise&quot; it.
+
+Ledger: RouteErrorBoundary registered, pin 91 -&gt; 92, UNBOUND for the same reason
+as RouteAccessGate — one boundary for every route.
+
+Gates at close: poetry run pytest -q = 3360 passed, 12 skipped, 1 failed
+(test_plan_roadmap - the expected Lane B close failure). ruff clean. In web/:
+tsc -b exit 0, oxlint --max-warnings 0 exit 0, npm run test:coverage exit 0
+(WEB13&#x27;s floor holds with the six new tests), vitest 19 files / 231 tests.
+</p></div></div>
+<div class="card" id="card-WEB11" data-id="WEB11" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="done" data-search="web11 one storage module owns every console localstorage key with a prefix and a version, and both sign-out and session rejection call its clearall so query results do not outlive the session on a shared desktop" tabindex="0"><div class="card-head"><span class="card-id">WEB11</span><span class="card-title">One storage module owns every console localStorage key with a prefix and a version, and both sign-out and session rejection call its clearAll so query results do not outlive the session on a shared desktop</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> `signOut()` removes `drydocs.session.v2` and revokes the token; seven other localStorage
+writers stay - the Ask last completed turn (answer, executed Cypher, per-step row counts,
+task graph; per persona), the app-code tray (per persona), onboarding progress, aside
+collapsed, theme, split-pane position, grid column widths. The first two are query results
+readable after sign-out by whoever opens the browser next, under a console that renders an
+INTERNAL banner over the same data on screen. `sessionRejected()` has the same gap (S4).
+
+(a) One storage module owns every console key: a prefix, a version, typed get/set, and a
+    `clearAll()`. No `localStorage.` call exists outside it (source scan, J66 style).
+(b) Both `signOut()` and `sessionRejected()` call `clearAll()`.
+(c) Keys worth keeping across sign-outs (theme, aside collapsed, column widths) OPT OUT
+    explicitly in the module, so the retention decision is visible in one place; the Ask turn
+    and the tray do not opt out. O64&#x27;s design - the last completed turn survives navigation
+    within a session - is preserved exactly; it is sign-out, not navigation, that clears it.
+(d) A test signs out with every key populated and asserts only the opted-out keys remain;
+    another does the same through `sessionRejected()`.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+Covers S4 (rank 6). O64 (done) chose per-persona persistence of the Ask turn for a good
+reason (loss on navigation); this item respects that choice and bounds it at the session.
+
+DONE 2026-09-05 (Lane B, laptop). Sign-out clears what a session wrote.
+
+(a) lib/storage.ts owns every key. Zero `localStorage.` calls remain outside it
+(source scan; the instrument check asserts the scan can SEE a real call, because
+twice earlier in this burst a scan was written against the wrong stripper and
+passed vacuously — `localStorage.` is a code shape, so codeOnly is right here
+and that is stated rather than assumed).
+
+THE RETENTION DECISION IS THE DELIVERABLE, not the plumbing. STORAGE_KEYS
+declares, per key, whether it survives a sign-out and WHY. Before this the
+answer was &quot;whatever nobody remembered to remove&quot;, which is not a decision.
+
+(c) FOUR OPT OUT, and each says why in one sentence: theme and aside-collapsed
+(device display preferences that reveal nothing and that everyone expects to
+persist), split-pane positions and grid column widths (layout, not content).
+FOUR DO NOT: the session token; the Ask last-turn envelope; the app-code tray;
+onboarding progress. The first three are session state or query results. The
+fourth is a judgement call recorded as one — onboarding progress is about the
+PERSON, not the browser, so it goes with them.
+
+O64&#x27;s design is preserved exactly, and the item is right to insist on it: the
+last completed Ask turn still survives NAVIGATION within a session. It is
+sign-out that clears it, which is the boundary O64 never had.
+
+(b) BOTH paths call clearAll. `sessionRejected()` is the one that matters more
+and is easy to treat as the afterthought: nobody DECIDES to have their session
+expire, so on a shared support desktop that is the path actually taken.
+
+TWO DESIGN POINTS WORTH THE WORDS:
+
+  * clearAll sweeps by PREFIX, not by the table. A key someone adds and forgets
+    to declare is still cleared. The table decides what STAYS; the prefix
+    decides what is ours. `survivesSignOut` is default-deny for the same reason —
+    that is the safe direction to be wrong in.
+  * The keys are per-persona (`drydocs.ask.last-turn.&lt;id&gt;`), so clearing cannot
+    work from a fixed list at all. A second persona&#x27;s leftovers on the same
+    browser go too, and that has its own test.
+
+Every accessor is wrapped: storage throws outright in some contexts (a browser
+set to block site data, a sandboxed frame), and a console that will not render
+because it could not read a saved column width is worse than one that forgets
+the width.
+
+(d) The tests populate ALL EIGHT keys at their real spellings before clearing,
+because &quot;did it clear?&quot; is only answerable against a full store — a test that
+clears an empty store passes and proves nothing. Three of them: clearAll
+directly, through signOut, and through sessionRejected. One more asserts another
+application&#x27;s keys are left alone.
+
+Gates at close: poetry run pytest -q = 3360 passed, 12 skipped, 1 failed
+(test_plan_roadmap - the expected Lane B close failure). ruff clean. In web/:
+tsc -b exit 0, oxlint --max-warnings 0 exit 0, npm run test:coverage exit 0,
+vitest 20 files / 242 tests.
+</p></div></div>
+<div class="card" id="card-WEB12" data-id="WEB12" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="done" data-search="web12 a usegraphquery data-layer hook replaces the forty transport preambles - one abortcontroller per request, a deadline, in-flight dedupe, a stated no-retry rule, and a stop control on the ask stream" tabindex="0"><div class="card-head"><span class="card-id">WEB12</span><span class="card-title">A useGraphQuery data-layer hook replaces the forty transport preambles - one AbortController per request, a deadline, in-flight dedupe, a stated no-retry rule, and a stop control on the Ask stream</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Every route reimplements connect, fetch, guard against unmount, set state: the VITE_API_URL
+literal with its localhost fallback in twelve files beside `apiBaseUrl()` which already does
+it, `useMemo(() =&gt; createApiAccess(...))` in sixteen, the hand-rolled `let cancelled = false`
+effect in fourteen (A6, T6). No request has a deadline or a cancel path - zero
+AbortController, zero `signal:` in web/src - so a hung request and a loading one are the same
+screen, navigating away leaves the work running, and the Ask stream cannot be stopped (S5).
+Nothing dedupes: two panes needing one spec run it twice (S6).
+
+(a) One `useGraphQuery(specId, params)` hook (or equivalent, builder&#x27;s name) owns the
+    transport: it obtains access from one shared provider (no per-route `createApiAccess`),
+    passes an AbortController signal and aborts on unmount and on param change, applies a
+    deadline (a recorded default, per-call override), dedupes identical in-flight requests,
+    and returns a state union - loading | data | empty | error(timeout | aborted | failed).
+(b) The forty preambles are gone: zero `localhost:8001` literals outside `apiBaseUrl()`,
+    zero `createApiAccess(` outside the provider, zero `let cancelled = false` in web/src -
+    each asserted by a source scan.
+(c) The Ask stream (`runAgentSse`) accepts a signal and the UI has a stop control that aborts
+    it; a stopped turn renders as stopped, never as an answer.
+(d) NO RETRY, stated: the hook does not retry, and its module comment records that a read
+    console chooses not to and why (a transient 502 must surface, not be papered over) - the
+    report&#x27;s point that a defensible choice should be a stated one.
+(e) A cache is NOT built here unless trivial; the union and the dedupe are what WEB1&#x27;s seam
+    composes with, and a cache with classification-aware invalidation is its own decision.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+Covers A6, T6, S5 and S6&#x27;s dedupe half (rank 8). The report notes this hook also gives T2&#x27;s
+missing lint rule (WEB13) nothing left to police. Build before or with WEB1.
+
+DONE 2026-09-05 (Lane B, laptop). The console has a data layer.
+
+BASELINES MEASURED AT PULL (main at 6c51618e), and closed:
+
+  the VITE_API_URL literal with its localhost fallback   16 files -&gt; 1 (apiBaseUrl, the definition)
+  useMemo(() =&gt; createApiAccess(...))                    15 files -&gt; 2 (the factory, and the provider&#x27;s one call)
+  the hand-rolled `let cancelled = false` effect         12 files / 14 sites -&gt; 0
+  AbortController                                         0 -&gt; used by the hook and six call sites
+
+The review&#x27;s own numbers were 12 / 16 / 14. The difference is what each grep
+counts - files carrying the literal ANYWHERE (including reachability.ts&#x27;s
+operator messages) versus preambles - and both are recorded rather than
+reconciled, because the direction is what matters and the direction is to zero.
+
+THE SHAPE: data/graphAccess.ts owns the union, the dedupe, the request key and
+useGraphQuery; data/GraphAccessProvider.tsx is the one component, ALONE in its
+file so the module exports exactly one (WEB13 is about to make oxlint warnings
+fatal - the first draft put both in one .tsx and took the baseline from 10
+warnings to 16; it is back at 10). src/data/ because the review&#x27;s structural
+note is that there is no data layer at all: lib/ is documented as PURE modules
+and a hook is not pure.
+
+THE SEAM TAKES A RequestOptions BAG, not a positional signal. A deadline, a
+cancel and later a caller-raised export ceiling (API1 clause c) all belong to
+the REQUEST; adding them positionally rewrites every call site again.
+
+TWO BEHAVIOURS THE ACCEPTANCE IMPLIES AND DOES NOT STATE, both tested:
+
+  * ABORT-ON-UNMOUNT COLLIDES WITH DEDUPE UNDER STRICTMODE. React dev
+    double-mounts: mount 1 starts the request, unmount aborts it, mount 2 runs
+    immediately. If the aborted flight were still in the map, mount 2 would join
+    it and await an AbortError forever - a blank panel, in dev only, which is
+    the worst place to find one. The map entry is deleted BEFORE the abort, and
+    each subscriber tracks its own liveness rather than the controller&#x27;s.
+  * THE REQUEST KEY SORTS ITS PARAMS. Two call sites building the same params in
+    a different order are the same request; JSON.stringify says otherwise, and
+    the dedupe would silently do nothing for exactly the pairs it exists for.
+
+WHAT DELETED THE MOST: SpecGrid and SpecGraphPane DROPPED their `access` prop.
+Between them, ten call sites were passing a GraphAccess their route had built -
+which is how a per-route client became a per-route obligation. Then the compiler
+walked the consequence out: DocsRoute, LineageRoute, LoadsRoute and
+RunbooksRoute no longer take `persona` at all, FileReport no longer takes
+`personaId`, GraphExplorer and ExplorerLiveRoute take no props, and AskRoute&#x27;s
+TurnCard and StepDetail no longer take `access`. A prop that exists only to
+carry transport is transport leaking through the component tree, and
+noUnusedParameters made that visible the moment the preamble left.
+
+(c) THE ASK STREAM. runAgentSse takes a signal, and BOTH the fetch and the
+reader honour it - aborting the fetch alone leaves the reader draining a stream
+nobody is watching. A Stop button appears while a turn runs; a stopped turn
+throws AskStopped and renders AS STOPPED, which is neither an answer nor an
+error, because neither is what happened. askApi refuses its non-streaming
+fallback when the signal aborted: that fallback would restart the very turn the
+person just stopped, which is worse than offering no control.
+
+NO DEADLINE ON THAT SURFACE, deliberately, and the module comment says so:
+unbounded latency is what an agent turn IS. A stop control is the right answer
+there where a timeout is not. useGraphQuery&#x27;s deadline defaults to 20s, chosen
+against the SPECS rather than the network - the slowest reviewed traversals run
+in low single-digit seconds warm - with a per-call override.
+
+(d) NO RETRY, STATED IN THE MODULE COMMENT with the reason, which is the
+review&#x27;s own point that a defensible choice should be a stated one: retrying
+turns a transient 502 from a restarting API into a slow success and hides the
+condition an operator needs to see, and a retry storm against a saturated API
+makes the outage worse. A test asserts exactly one call after a failure.
+
+(e) NO CACHE. A settled request leaves the in-flight map; keeping it would make
+this a cache, and a cache with classification-aware invalidation is its own
+decision. The dedupe and the union are what WEB1&#x27;s seam composes with.
+
+THE CLAUSE (b) SCAN CAUGHT ITSELF BEFORE IT CAUGHT ANYTHING ELSE, and this is
+the finding worth carrying forward. Written with codeOnly - the J66 stripper,
+which neutralises string literals so a guard cannot fail on the comment
+explaining it - the hard-coded-URL scan matched NOTHING. Not the twelve real
+offenders; nothing at all, because that URL only ever appears inside quotes. It
+would have passed forever while proving nothing, which is the failure mode J76
+is about: the instrument read clean and the subject was not. sourceScan now
+offers withoutComments for patterns whose subject IS a literal, every guard
+names which stripper it needs and why, and the instrument check asserts a real
+literal is FOUND as well as asserting a commented one is not.
+
+FOR WEB13 (the CI ratchet), measured here so it is not re-derived: oxlint sits
+at TEN warnings, unchanged by this item, all react/only-export-components. The
+three `exhaustive-deps` suppressions this item was expected to reach are
+UNTOUCHED - useRouteA11y.ts, AdminConfigRoute.tsx, ExplorerRoute.tsx - because
+none of their effects was a transport preamble. WEB13&#x27;s &quot;three inert
+suppressions&quot; count still holds. One NEW exhaustive-deps warning did appear
+during this work (MappingsRoute&#x27;s liveSource, a fresh array feeding a useMemo)
+and was fixed at the site rather than suppressed, which is why the count is back
+at ten and not eleven. Note that oxlint DOES report react-hooks/exhaustive-deps
+today even though .oxlintrc.json does not enable it - worth checking before
+WEB13 assumes the rule is off.
+
+FOR WEB1: the seam it needs is here. `empty` and `error` are already distinct
+states carrying the result and the message; `loading` is a state rather than a
+null. What is NOT done, deliberately, is the demo fallback - SpecGrid, LoadsRoute
+and AppCodeCascadePane still map error-or-empty onto their demo modules in their
+own way. Half a useLiveOrDemo seam here is exactly what WEB1 would have to
+unpick, and Lane A&#x27;s ordering says written once.
+
+Gates at close: poetry run pytest -q = 3360 passed, 12 skipped, 1 failed
+(test_plan_roadmap - the expected Lane B close failure). ruff clean. In web/:
+tsc -b exit 0, npm run build exit 0, vitest 17 files / 211 tests (was 13 / 147),
+oxlint 0 errors / 10 warnings.
+</p></div></div>
+<div class="card" id="card-WEB13" data-id="WEB13" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="done" data-search="web13 the web ci ratchet - a test:coverage script with a floor at today&#x27;s 7.51 percent, --max-warnings 0 on lint, react-hooks/exhaustive-deps enabled with the three inert suppressions deleted, a warn-only npm audit --audit-level=high step, and towericon.tsx plus clsx removed" tabindex="0"><div class="card-head"><span class="card-id">WEB13</span><span class="card-title">The web CI ratchet - a test:coverage script with a floor at today&#x27;s 7.51 percent, --max-warnings 0 on lint, react-hooks/exhaustive-deps enabled with the three inert suppressions deleted, a warn-only npm audit --audit-level=high step, and TowerIcon.tsx plus clsx removed</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Four numbers drift with nothing under them (T1, T2, T7, T8): statement coverage is 7.51
+percent (955 / 12,716) with `@vitest/coverage-v8` declared and no script, CI step or
+threshold; lint emits ten warnings and exits 0 with no `--max-warnings`; the advisory count
+went from three at O34 to five with no audit step to notice; and a dead file and a dead
+dependency sit unflagged. Plus three `eslint-disable-next-line react-hooks/exhaustive-deps`
+lines suppress a rule that has never run - there is no ESLint in the project and
+`.oxlintrc.json` enables only `react/rules-of-hooks` and `react/only-export-components`.
+
+(a) `test:coverage` script in package.json; the web CI job runs it with a statement floor
+    at today&#x27;s number (7.51, recorded with the date) that only ratchets up. Coverage growth
+    itself is O43&#x27;s work (the seed suites); this item is the gate, not the tests.
+(b) `--max-warnings 0` on the lint step; the ten warnings are fixed or individually waived
+    in config with a reason.
+(c) `react-hooks/exhaustive-deps` enabled in oxlint (or the equivalent rule the linter
+    offers); the three inert suppressions are deleted and each site&#x27;s deliberate omission is
+    re-expressed as a real, scoped suppression or a fix - never carried as fiction.
+(d) A warn-only `npm audit --audit-level=high` step in the web CI job (report, never block -
+    the same posture as the snapshot ritual&#x27;s lint check), so the count is read every run.
+(e) `src/components/TowerIcon.tsx` and the `clsx` dependency are removed. Optional residue,
+    not acceptance: fold src/docs/ and src/docsmod/ into one directory; move
+    src/data/mappingsDemo.ts and routes/AppCodeCascadePane.tsx to their feature directories.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+Covers T1, T2, T7, T8 - the tech-debt pass&#x27;s &quot;cheap ratchet&quot;. A7 (test topology inverted) is
+T1 with a measurement attached and is not a separate item; O43 (todo) seeds the suites that
+move the floor. O34 (done) recorded the advisory count as three; it is five now, root
+`@neo4j-nvl/base -&gt; @segment/analytics-next`, none of it reaching dist - the finding is the
+unobserved drift, not the CVEs.
+
+DONE 2026-09-05 (Lane B, laptop). Four numbers now have something under them.
+
+A CORRECTION TO THE REVIEW, AND IT CHANGED THE WORK. The report says the three
+`eslint-disable-next-line react-hooks/exhaustive-deps` lines &quot;suppress a rule
+that has never run&quot; and that &quot;the mechanism behind them is fiction&quot;, and clause
+(c) follows from that: delete them and re-express each site. THEY ARE NOT
+INERT. oxlint honours eslint-style disable comments, so the moment the rule is
+enabled those three comments work exactly as written — deleting them would have
+turned three deliberate, well-commented dependency omissions into three red
+builds.
+
+Verified rather than assumed (J76): with `react-hooks/exhaustive-deps: error`
+set and the comment REMOVED, useRouteA11y.ts fails with
+`React Hook useEffect has a missing dependency: &#x27;contentRef.current&#x27;`; with the
+comment restored, it passes. So the mechanism was real; only the NAME was
+fiction, because it named a linter this project does not have.
+
+What landed instead is what clause (c) actually asks for once that is known: the
+rule is enabled, and all three are renamed to `oxlint-disable-next-line`, which
+names the linter that reads them. Each site keeps the comment that explains its
+omission, which was sound all along — the report says so too.
+
+Also worth carrying: oxlint reports react-hooks/exhaustive-deps BY DEFAULT even
+though .oxlintrc.json never enabled it. It is set to &quot;error&quot; explicitly now
+rather than left implicit, because a rule the config does not mention is a rule
+the next config edit can silently drop.
+
+(a) `test:coverage` with a statement floor, and the floor is 9.8, NOT the
+report&#x27;s 7.51. Re-measured at pull: 9.89 (the WEB3/WEB12/WEB1 guards and hook
+tests moved it from 7.51). Setting a ratchet to a stale number would install a
+floor already 2.4 points below the tree, which is a ratchet that ratchets
+nothing. Branch and function floors ride along at 70/50, comfortably under the
+73.3/52.7 measured, because they were the two numbers most likely to slide
+while statements climbed.
+
+The floor is 9.8 and not 9.89 on purpose: a floor pinned exactly to the measured
+value fails on any refactor that adds one uncovered line, and a floor that fails
+for reasons nobody caused is a floor people lower. Raise it when the measured
+number clears the next half point.
+
+PROVEN TO GATE, not assumed: `npm run test:coverage` exits 0 today, and the same
+command with the threshold at 99 exits 1. A threshold that was silently ignored
+would have looked identical from the outside, which is exactly how the meter got
+bought and never read in the first place.
+
+(b) `--max-warnings 0`, and it lives in the npm SCRIPT rather than the CI step,
+so a local `npm run lint` and a CI run gate identically. The ten warnings were
+all `react/only-export-components`, a fast-refresh advisory, across five files
+that co-locate a constant or a hook with a component deliberately
+(tableControls, TrustLegend, RelEdge, HubGlyphs, rightSidebarContext). They are
+WAIVED per file in .oxlintrc.json `overrides`, which is the clause&#x27;s own second
+option, rather than split into ten files: splitting five deliberate
+co-locations to satisfy an HMR advisory is churn, and the value being bought
+here is that a NEW warning is red. Count is zero and `--max-warnings 0` passes.
+
+The waiver&#x27;s reasons live here rather than beside it because .oxlintrc.json is
+JSON and cannot hold a comment. That is a small, real gap — a waiver whose
+reason is one commit message away from invisible.
+
+(d) `npm audit --audit-level=high` as its own npm script and a CI step that
+reports and never blocks (`|| echo ::warning::`), the same posture the snapshot
+ritual takes with its lint check. The finding is not the CVEs — five high, one
+root (@neo4j-nvl/base -&gt; @segment/analytics-next), none of it reaching dist —
+it is that the count was recorded as three at O34, is five now, and nothing
+noticed because nothing looked.
+
+(e) TowerIcon.tsx deleted (19 lines, zero importers) and `clsx` removed from
+dependencies (declared, imported nowhere). The ui-components ledger loses its
+row and the pin moves 92 -&gt; 91. Worth naming: noUnusedLocals catches an unused
+local and cannot see an unused MODULE, which is why a dead component shows up in
+a hand-maintained ledger and nowhere else.
+
+NOT DONE, and it is listed as optional residue rather than acceptance: folding
+src/docs/ and src/docsmod/, and moving mappingsDemo.ts and AppCodeCascadePane.tsx
+to their feature directories. Both are pure moves whose diffs would bury this
+item&#x27;s five real changes, and AppCodeCascadePane in particular was just rewired
+by WEB1 — moving it in the same burst makes that change unreviewable.
+
+Gates at close: poetry run pytest -q = 3360 passed, 12 skipped, 1 failed
+(test_plan_roadmap - the expected Lane B close failure). ruff clean. In web/:
+tsc -b exit 0, oxlint --max-warnings 0 exit 0 with ZERO warnings (was ten),
+npm run test:coverage exit 0 at 9.9% statements, vitest 225 tests.
+</p></div></div>
+<div class="card" id="card-WEB14" data-id="WEB14" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="done" data-search="web14 a token-parity test holds the hand-frozen custom properties in public/landing.html and public/agent-test.html to src/styles/tokens.css, on the repo&#x27;s generated-artifact drift-test habit" tabindex="0"><div class="card-head"><span class="card-id">WEB14</span><span class="card-title">A token-parity test holds the hand-frozen custom properties in public/landing.html and public/agent-test.html to src/styles/tokens.css, on the repo&#x27;s generated-artifact drift-test habit</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> tokens.css is the source (152 lines, light and dark). Two shipped pages carry hand-frozen
+copies - landing.html (48 custom properties, self-contained by design under the no-CDN
+intranet rule) and agent-test.html (39, SME-re-ruled independent on 2026-07-29). The pages
+are deliberate; the frozen copy is the debt, and nothing detects the day they stop agreeing
+(T4).
+
+(a) A vitest reads the `:root` and `.dark` custom properties from tokens.css and the
+    properties declared in each page, and asserts every shared key has an equal value.
+(b) Keys deliberately different (if any) are listed in the test with the reason, so a
+    divergence is a recorded decision, not a silent one.
+(c) The pages stay self-contained; the test is the drift guard, on the repo&#x27;s
+    generated-artifact drift-test habit, not a generator.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+Covers T4 (rank 13). About thirty lines.
+
+DONE 2026-09-05 (Lane B, laptop). The frozen token sheets have a guard.
+
+(a) src/styles/tokenParity.test.ts reads the custom properties declared in
+tokens.css&#x27;s `:root` and `:root.dark` blocks and in each page&#x27;s `:root`, and
+asserts every SHARED key has an equal value. A page may declare tokens of its
+own; those are ignored, because the parity question is about the overlap.
+
+BOTH PAGES FROZE THE DARK SHEET, and that was checked rather than assumed.
+agent-test.html says so in its own header. landing.html says nothing, and the
+item&#x27;s framing (&quot;landing.html, self-contained by design&quot;) does not say which —
+but its `--bg` is #0d1520, which is `:root.dark`&#x27;s value and not the #f4f6f9 of
+`:root`. Pairing landing.html with the light sheet, as a first pass did, reports
+every colour as drifted and the guard reads as broken on the day it lands. The
+pairing is DECLARED in the test with that evidence.
+
+THE PARSER HAD TO BE BRACE-MATCHED, and the first draft was not. Stopping at the
+first `}` read the blocks as a handful of properties each, and the counts test
+is the only reason that surfaced. A parser that silently under-reads makes a
+drift guard pass on a page it never really looked at — the same vacuous-pass
+failure this burst hit twice in source scans, in a third disguise.
+
+COUNTS, recorded rather than reconciled: this reads 22 declarations in `:root`,
+20 in `:root.dark`, 16 in landing.html and 18 in agent-test.html. The review
+reports 48 and 39 for the two pages. The difference is what is being counted —
+every `--x:` occurrence in the page, declarations and usages alike, versus
+declarations inside the `:root` block. The guard needs declarations.
+
+(b) DELIBERATE_DIVERGENCE is EMPTY, and that is a finding rather than an
+oversight: the pages and the sheet agree on every shared property today. That is
+exactly the right moment to install the guard — it starts from a true baseline
+instead of from a list of exceptions nobody can audit. A test asserts every
+waiver names a key that really is shared and carries a reason, so the list
+cannot grow into a place to hide drift.
+
+(c) THE PAGES STAY SELF-CONTAINED, and there is a test for that too — because
+the obvious &quot;fix&quot; for duplication is to link the sheet, and both pages exist
+precisely because they must not. landing.html is a drop-in swap slot under a
+no-CDN intranet rule; agent-test.html was SME-re-ruled independent on
+2026-07-29. The guard asserts neither page links tokens.css and both keep their
+inline style block. T4 is explicit that the pages are not the debt; the frozen
+copy is.
+
+Two more assertions keep the check from going vacuous: the source sheets must
+parse to a plausible size and must DIFFER from each other (otherwise pairing a
+page with either would pass), and each page must share enough keys for the
+comparison to mean something.
+
+Mutation-proven: changing --blue in landing.html fails with the key, both
+values and the sheet named; restored, it passes.
+
+Gates at close: poetry run pytest -q = 3360 passed, 12 skipped, 1 failed
+(test_plan_roadmap - the expected Lane B close failure). ruff clean. In web/:
+tsc -b exit 0, npm run build exit 0, oxlint --max-warnings 0 exit 0,
+npm run test:coverage exit 0, vitest 22 files / 261 tests.
+</p></div></div>
+<div class="card" id="card-WEB15" data-id="WEB15" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="done" data-search="web15 web/readme.md states the security model the code implements - the dev-only ?as= affordance, twelve modules not nine, the five sme-access modules and the gated routes, and the six retired-name personas" tabindex="0"><div class="card-head"><span class="card-id">WEB15</span><span class="card-title">web/README.md states the security model the code implements - the DEV-only ?as= affordance, twelve modules not nine, the five sme-access modules and the gated routes, and the six retired-name personas</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> web/README.md is materially wrong on the security model in four places (A8): it says there
+is no `?as=` parameter (App.tsx has one, DEV-only, requiring VITE_DEV_CONSOLE_SECRET); it says
+nine module routes (registry.ts declares twelve); it says all modules are open to every
+signed-in persona and only /console is role-gated (five modules carry access &#x27;sme&#x27; and
+App.tsx gates six routes plus /console, /admin/config and /intake); and its persona table
+carries the three SID-shaped names auth.ts retired on 2026-08-28 for publish-boundary
+reasons. A doc that understates the authorization surface is the doc a company-side reader
+reaches first.
+
+(a) The README states the model the code implements: the DEV-only `?as=` affordance and its
+    secret gate; the module count and each module&#x27;s access level, read from registry.ts; the
+    route gates; the six personas by their current names and roles.
+(b) Where WEB3 lands first, the README describes the derived gate; where it has not, the
+    README says the two expressions exist and cites WEB3 - it never describes a state the
+    code is not in.
+(c) A test keeps the module count and access table in the README equal to registry.ts
+    (rendered from the importable object, J37 style), so the fourth drift does not happen.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+Covers A8 (rank 14). Point 3 - understating the authorization surface - is why this is p2
+and not p3.
+
+DONE 2026-09-05 (Lane B, laptop). The README states the model the code implements.
+
+ALL FOUR CORRECTIONS, and the third is the one that made this p2:
+
+  1. `?as=` EXISTS. The section said outright &quot;there is no ?as=&quot;. It is a
+     DEV-ONLY affordance, baked out of production bundles by the
+     import.meta.env.DEV constant — the same build-time construction that makes
+     the bolt adapter unreachable in production — and it is a real sign-in
+     needing VITE_DEV_CONSOLE_SECRET, with no default and no fallback. A reader
+     auditing authentication needs to know it is there; the README told them the
+     opposite.
+  2. TWELVE modules, not nine. Heading and body both.
+  3. FIVE OF THE TWELVE ARE NOT OPEN to a user-role persona
+     (remediation, software, gates, load-map, under-the-hood), and the README
+     said every module was open and only /console was gated. A doc that
+     UNDERSTATES the authorization surface is worse than no doc, and it is the
+     doc a company-side reader reaches first. There is now a table of the gated
+     modules with their paths and levels, the three gated non-module surfaces
+     (/mappings, /admin/config, /console), and /intake named as the one
+     persona-scoped exception with the reason it cannot use the role vocabulary.
+  4. SIX personas by their CURRENT names. The three SID-shaped display names
+     were retired from auth.ts on 2026-08-28 for publish-boundary reasons and
+     should not have outlived it here; the table now carries the ids and seats
+     auth.ts actually declares.
+
+(b) WEB3 LANDED FIRST IN THIS SAME BURST, so the README describes the derived
+gate as built rather than citing the item as pending — which is what clause (b)
+asks for in that branch. It names RouteAccessGate, canAccessPath, the O59 bug
+that the two expressions caused, and the source scan that now refuses a new
+predicate outside the registry.
+
+(c) THE GUARD READS THE IMPORTABLE OBJECT AND LOOKS FOR IT IN THE PROSE — MODULES,
+GATED_SURFACES, PERSONA_SCOPED_PATHS and PERSONAS — rather than parsing the
+README into a model. That is J37&#x27;s direction of travel: the declaration is the
+source and the render must agree with it, not the other way round. Ten
+assertions, and two of them are shaped to catch the specific drift that
+happened: the README may not claim every module is open, and it may not deny
+`?as=`.
+
+The retired-name check is a PATTERN, not the three literals — an initial, a dot,
+a capitalised surname inside a table cell — so a FOURTH one cannot be added
+either. Writing the three retired names into a test to forbid them would have
+put them back in the tree, which is the opposite of why they were retired.
+
+Mutation-proven: 12 -&gt; 9 in the heading fails the count test; flipping one
+persona&#x27;s role in the table fails the persona test; both pass restored.
+
+Gates at close: poetry run pytest -q = 3360 passed, 12 skipped, 1 failed
+(test_plan_roadmap - the expected Lane B close failure). ruff clean. In web/:
+tsc -b exit 0, oxlint --max-warnings 0 exit 0, npm run test:coverage exit 0,
+vitest 21 files / 252 tests.
 </p></div></div>
 <div class="card" id="card-P1" data-id="P1" data-module="config" data-phase="13" data-epic="runtime-topology" data-type="task" data-status="done" data-search="p1 run the cm_hosts + cm_avg_run profiling probes internally; record conclusions + the dc scope call" tabindex="0"><div class="card-head"><span class="card-id">P1</span><span class="card-title">Run the CM_HOSTS + CM_AVG_RUN profiling probes internally; record conclusions + the DC scope call</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P13</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">haiku / main</span></div><div class="epic">runtime-topology</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Conclusions (counts/domains/match rates only — never result rows) recorded for cm_hosts P1–P5 and cm_avg_run P0–P8 (P4s scoped smoke test BEFORE the estate-wide join, per the user&#x27;s performance flag) in the two gate specs&#x27; provenance blocks + the ledger via fields; the 22-DC-vs-production scope call appended to config/gate-log.md as the controlm-hosts-topology residual resolution.
 </p><p class="notes"><strong>Notes:</strong> User-run on the internal network (no producer-side psgmgr access); agent transcribes.</p></div></div>
