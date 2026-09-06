@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# vitest coverage report (WEB13 test:coverage writes it; the floor is the artifact, not the HTML)
+coverage
