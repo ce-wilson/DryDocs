@@ -19,6 +19,8 @@ function specResult(rows: Record<string, unknown>[]): SpecResult {
     cypher: 'RETURN 1',
     params: {},
     watermarked: false,
+    truncated: false,
+    ephemeral: false,
     keys: ['a'],
     rows,
   }

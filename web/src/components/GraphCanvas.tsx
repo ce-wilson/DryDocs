@@ -6,6 +6,7 @@ import { InteractiveNvlWrapper } from '@neo4j-nvl/react'
 import type { CanvasGraph, CanvasNode } from '../lib/nvl-mapping'
 import { GRAPH_KIND_TOKEN, NODE_CEILING } from '../lib/nvl-mapping'
 import EmptyState from './ui/EmptyState'
+import TruncationBadge from './ui/TruncationBadge'
 
 // The NVL graph canvas (O81 step 3): pan / zoom / select over a graph the
 // MAPPER built from QuerySpec rows. This component knows nothing about specs,
@@ -64,6 +65,17 @@ export interface GraphCanvasProps {
    *  blocker is involved. Omitted when the canvas has no route (the header
    *  then renders no affordance rather than a dead one). */
   fullPageHref?: string
+  /** WEB2: did the ROW ceiling upstream bite, before the mapper ever saw the
+   *  rows? Two independent caps stand between the graph and this canvas — the
+   *  spec's `limit` on rows and NODE_CEILING on nodes — and this component only
+   *  ever knew about the second. 500 rows deduplicating to 280 nodes drew no
+   *  badge at all on a result the server had already truncated, so the surface
+   *  that gets completeness right was the one place it could be silently wrong.
+   *  Undefined means "not known", which is what a caller holding no spec result
+   *  should say; it is not the same as false. */
+  rowsTruncated?: boolean
+  /** The row ceiling that applied, for the hover text. */
+  rowLimit?: number | null
 }
 
 export default function GraphCanvas({
@@ -73,6 +85,8 @@ export default function GraphCanvas({
   title,
   badge,
   fullPageHref,
+  rowsTruncated,
+  rowLimit,
 }: GraphCanvasProps) {
   const epoch = useThemeEpoch()
   const byId = useRef(new Map<string, CanvasNode>())
@@ -123,7 +137,14 @@ export default function GraphCanvas({
   if (graph.nodes.length === 0) {
     return (
       <div className="flex h-full flex-col">
-        <CanvasHeader title={title} badge={badge} graph={graph} fullPageHref={fullPageHref} />
+        <CanvasHeader
+          title={title}
+          badge={badge}
+          graph={graph}
+          fullPageHref={fullPageHref}
+          rowsTruncated={rowsTruncated}
+          rowLimit={rowLimit}
+        />
         <EmptyState
           title="No graph to draw"
           hint={
@@ -138,7 +159,14 @@ export default function GraphCanvas({
 
   return (
     <div className="flex h-full flex-col">
-      <CanvasHeader title={title} badge={badge} graph={graph} fullPageHref={fullPageHref} />
+      <CanvasHeader
+        title={title}
+        badge={badge}
+        graph={graph}
+        fullPageHref={fullPageHref}
+        rowsTruncated={rowsTruncated}
+        rowLimit={rowLimit}
+      />
       {/* Fills the frame it is given rather than forcing a height: a fixed
           minimum overflowed the data-frame strip and pushed the graph below the
           fold. The strip is about 215px, which fits the graph but renders its
@@ -178,16 +206,27 @@ export default function GraphCanvas({
   )
 }
 
+/** " at 500 rows", or "" when the caller does not know the ceiling. Never
+ *  invents one: a hover text that names a limit nobody applied is the same
+ *  fabricated-completeness defect in a smaller font. */
+function rowCeiling(limit: number | null | undefined): string {
+  return typeof limit === 'number' ? ` at ${limit} rows` : ''
+}
+
 function CanvasHeader({
   title,
   badge,
   graph,
   fullPageHref,
+  rowsTruncated,
+  rowLimit,
 }: {
   title: string
   badge?: string
   graph: CanvasGraph
   fullPageHref?: string
+  rowsTruncated?: boolean
+  rowLimit?: number | null
 }) {
   return (
     <div className="flex flex-wrap items-center gap-2 border-b border-edge px-3 py-2">
@@ -200,15 +239,32 @@ function CanvasHeader({
       <span className="ml-auto font-mono text-[10px] text-faint">
         {graph.nodes.length} nodes · {graph.relationships.length} rels · {graph.rowCount} rows
       </span>
-      {graph.truncated && (
-        // The capped render says so, with both numbers, so the reader knows
-        // exactly how much of the answer is on screen.
-        <span
-          className="rounded-xs border border-yellow px-1.5 py-0.5 font-mono text-[10px] text-yellow"
-          title={`Capped at ${NODE_CEILING} nodes; the rows described ${graph.nodeCount}.`}
-        >
-          TRUNCATED {graph.nodes.length}/{graph.nodeCount}
-        </span>
+      {/* TWO CAPS, ONE BADGE. The node ceiling is this component's own and it
+          knows the true total; the row ceiling was applied by the server before
+          the mapper ever ran, and nobody here knows how many rows there really
+          were. Whichever bit, the reader gets the same word in the same place —
+          and when both did, the node cap is the one on screen, with the row cap
+          named in the hover text, because the node numbers are the ones the
+          picture is actually showing. */}
+      {graph.truncated ? (
+        <TruncationBadge
+          shown={graph.nodes.length}
+          total={graph.nodeCount}
+          unit="nodes"
+          title={
+            `Capped at ${NODE_CEILING} nodes; the rows described ${graph.nodeCount}.` +
+            (rowsTruncated ? ` The rows themselves were capped first${rowCeiling(rowLimit)}.` : '')
+          }
+        />
+      ) : (
+        rowsTruncated && (
+          <TruncationBadge
+            shown={graph.rowCount}
+            total={null}
+            unit="rows"
+            title={`This graph was drawn from a capped result${rowCeiling(rowLimit)}; the picture is complete for the rows it received, and those are not all the rows.`}
+          />
+        )
       )}
       {fullPageHref && (
         // A plain anchor, for the reason O86 clause (d) gives: middle-click and

@@ -86,6 +86,14 @@ export default function SpecGraphPane({
           title={title}
           badge={badge ?? result?.classification?.toUpperCase()}
           fullPageHref={fullPage ? undefined : canvasRoutePath(specId)}
+          // WEB2: the canvas caps NODES; the server had already capped ROWS
+          // before this pane ever called the mapper. Only this component holds
+          // both facts, so only it can hand the second one down — otherwise a
+          // capped result that happens to draw under NODE_CEILING renders with
+          // no notice at all, on the surface whose whole comment is that a
+          // quietly-cropped picture makes a false claim.
+          rowsTruncated={result?.truncated}
+          rowLimit={result?.limit}
         />
       </div>
       {selected && <SelectedNodeDetail node={selected} onClose={() => onSelect(null)} />}
