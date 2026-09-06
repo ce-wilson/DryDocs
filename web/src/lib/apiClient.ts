@@ -124,14 +124,3 @@ export function unwrap<T>(result: { data?: T; error?: unknown; response: Respons
   }
   return result.data as T
 }
-
-/** `unwrap` for a route the server still declares as a FREE OBJECT. The type
- *  the caller names is a claim the console makes about the wire, not one the
- *  schema backs — which is why this is a separate function with a separate
- *  name: every call site of it is a route drydocs_api.schemas has not modelled
- *  yet, and the list of them is the follow-up O70 left. When the server
- *  declares the shape, the call becomes a plain `unwrap` and the hand type an
- *  alias of the schema. */
-export function unwrapAs<T>(result: { data?: unknown; error?: unknown; response: Response }, what: string): T {
-  return unwrap(result, what) as T
-}
