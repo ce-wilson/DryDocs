@@ -372,10 +372,16 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     component shows up at all.
     91 -> 92 at WEB5 (2026-09-05): RouteErrorBoundary, UNBOUND for the same
     reason as RouteAccessGate -- one boundary for every route.
+    92 -> 93 at WEB2 (2026-09-05): TruncationBadge, UNBOUND, bound stays 40. It
+    is the ONE way a capped result says so -- the canvas's node ceiling and the
+    grid's row ceiling render the same badge in the same words -- so binding it
+    to `explorer` would name the first of the surfaces that use it as its owner.
+    Same rule as RelEdge and TrustLegend, and the reason the component exists at
+    all: two surfaces that must not drift apart need one place to edit.
     """
     comps = _ui()["components"]
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
         40,
-        92,
+        93,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"

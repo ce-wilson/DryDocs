@@ -129,7 +129,7 @@ components:
   - { id: ExplorerRoute,           area: route,        path: routes/explorer/ExplorerRoute.tsx,           module: explorer,   module_evidence: route-name }
   - { id: ExplorerTowerRoute,      area: route,        path: routes/explorer/ExplorerTowerRoute.tsx,      module: explorer,   module_evidence: route-dir }
 
-  # --- ui-primitive (8) ---
+  # --- ui-primitive (9) ---
   - { id: EmptyState,              area: ui-primitive, path: components/ui/EmptyState.tsx }
   - { id: IdChip,                  area: ui-primitive, path: components/ui/IdChip.tsx }
   - { id: Meter,                   area: ui-primitive, path: components/ui/Meter.tsx }
@@ -138,6 +138,7 @@ components:
   - { id: StatusItems,             area: ui-primitive, path: components/ui/StatusItems.tsx }   # O28 node-status envelope (also exports HealthGlyph)
   - { id: tableControls,           area: ui-primitive, path: components/ui/tableControls.tsx }   # filter/sort/group/CSV, extracted from DomainGridTable
   - { id: Tabs,                    area: ui-primitive, path: components/ui/Tabs.tsx }
+  - { id: TruncationBadge,         area: ui-primitive, path: components/ui/TruncationBadge.tsx }   # WEB2 one completeness vocabulary: the canvas's node ceiling and the grid's row ceiling
 
   # --- component (19) ---
   - { id: BrandMark,               area: component,    path: components/BrandMark.tsx }

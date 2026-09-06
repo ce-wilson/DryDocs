@@ -30,6 +30,21 @@ export interface SpecResult extends GraphResult {
   cypher: string
   params: Record<string, unknown>
   watermarked: boolean
+  /** WEB2/API1: did the row ceiling bite? The server probes at `limit + 1` and
+   *  answers this directly, so no surface has to guess from `rows.length` —
+   *  which is the guess that made a 500-row extract indistinguishable from a
+   *  complete one (review 2026-09-05, S1). */
+  truncated: boolean
+  /** The ceiling that applied, or null/absent when the spec has none. Optional
+   *  because the server declares it optional; a required field here would stop
+   *  `SpecRunOutCoversSpecResult` compiling. */
+  limit?: number | null
+  /** R4: an ephemeral (agent-registered) spec replays params frozen at
+   *  registration, so its ceiling CANNOT be raised. The seam carries the
+   *  server's own answer rather than letting the console re-derive it from the
+   *  `eph.` id prefix — a second source of truth for a server policy is exactly
+   *  what this item exists to remove. */
+  ephemeral: boolean
 }
 
 /** A completed server-side export: the streamed data plus its provenance
@@ -53,6 +68,23 @@ export interface RequestOptions {
   signal?: AbortSignal
 }
 
+/** Export-only options (WEB2, from API1 clause (c)).
+ *
+ * The ceiling rides in the options bag rather than as a fifth positional
+ * argument — the direction `RequestOptions` above already names. It does NOT
+ * ride in `RequestOptions` itself: three of the four seam methods have no
+ * ceiling to raise, and a field they would silently ignore is a worse seam than
+ * one extra type. Raising a GRID read's limit would change what is on screen;
+ * raising an EXPORT's changes what lands in a file that carries a manifest, and
+ * the server treats those as different permissions (ExportBody). */
+export interface ExportOptions extends RequestOptions {
+  /** Omitted (the default) keeps the display ceiling the run already applied.
+   *  The server 422s a value it will not honour — over its own ceiling, or on
+   *  an ephemeral spec — and the console surfaces that message rather than
+   *  holding its own copy of the rule. */
+  limit?: number | null
+}
+
 export interface GraphAccess {
   readonly kind: 'bolt' | 'api'
   /** Read-only query execution. Raw Cypher is a dev/admin affordance only. */
@@ -70,7 +102,7 @@ export interface GraphAccess {
     specId: string,
     params: Record<string, unknown>,
     format: 'csv' | 'jsonl',
-    opts?: RequestOptions,
+    opts?: ExportOptions,
   ): Promise<SpecExport>
 }
 

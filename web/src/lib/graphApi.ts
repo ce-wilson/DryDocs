@@ -1,6 +1,14 @@
 import { type Api, createAuthedApi, requireToken, type Schemas, type SessionHooks, unwrap } from './apiClient'
 import { sessionRejected, sessionToken } from './auth'
-import type { GraphAccess, GraphResult, NamedResult, RequestOptions, SpecExport, SpecResult } from './graph'
+import type {
+  ExportOptions,
+  GraphAccess,
+  GraphResult,
+  NamedResult,
+  RequestOptions,
+  SpecExport,
+  SpecResult,
+} from './graph'
 
 // The deployment adapter (ADR 0005): HTTP to the drydocs-api thin API.
 // Sessions are server-side; this adapter READS the token the sign-in flow
@@ -102,10 +110,13 @@ export function createApiAccess(
         `spec ${specId}`,
       )
     },
-    async exportSpec(specId, params, format, opts: RequestOptions = {}): Promise<SpecExport> {
+    async exportSpec(specId, params, format, opts: ExportOptions = {}): Promise<SpecExport> {
       const exported = await api.POST('/specs/{spec_id}/export', {
         params: { path: { spec_id: specId }, query: { format } },
-        body: { params },
+        // `limit` omitted rather than sent as null when the caller did not ask:
+        // ExportBody's default IS "the display ceiling", and a body that always
+        // carries the field would make every export look like a raise decision.
+        body: opts.limit == null ? { params } : { params, limit: opts.limit },
         parseAs: 'blob',
         signal: opts.signal,
       })
