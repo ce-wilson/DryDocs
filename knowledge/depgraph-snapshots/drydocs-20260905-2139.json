@@ -1,17 +1,17 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-05T20:44:50",
+    "captured_at": "2026-09-05T21:39:55",
     "date": "20260905",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "04f72b5b",
-      "full": "04f72b5ba422a4b2695ee0ae1addcfc6cde97e30",
+      "commit": "2aa90898",
+      "full": "2aa908983e53eb16f0b98b317d12e79aa932256c",
       "branch": "main",
-      "describe": "port-base-20260905-44-g04f72b5b",
-      "subject": "docs(ideas): inbox the Lane B hand-backs - Idea-266 web build follow-ups, Idea-267 api:types precondition, Idea-268 dump_openapi truncates before it fails",
-      "dirty": false,
+      "describe": "port-base-20260905-49-g2aa90898",
+      "subject": "feat(port): reconcile-port step 1 is one stamped call, and the guards check the instrument first",
+      "dirty": true,
       "untracked_present": false,
       "pr": null
     },
@@ -18863,6 +18863,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs/port/reconcile_before.py",
+      "name": "reconcile_before.py",
+      "extension": ".py",
+      "rel_path": "drydocs/port/reconcile_before.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs/port_backlog_union.py",
       "name": "port_backlog_union.py",
       "extension": ".py",
@@ -22355,10 +22364,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260905-1902.json",
-      "name": "drydocs-20260905-1902.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260905.json",
+      "name": "drydocs-20260905.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260905-1902.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260905.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -23502,6 +23511,15 @@
       "name": "project_pat_team_report.py",
       "extension": ".py",
       "rel_path": "scripts/project_pat_team_report.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/scripts/reconcile_before.py",
+      "name": "reconcile_before.py",
+      "extension": ".py",
+      "rel_path": "scripts/reconcile_before.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -29525,6 +29543,18 @@
       "drydocs/drydocs_core/repo_paths.py"
     ],
     [
+      "drydocs/drydocs/port/reconcile_before.py",
+      "drydocs/drydocs_core/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/port/reconcile_before.py",
+      "drydocs/drydocs_core/backlog_store.py"
+    ],
+    [
+      "drydocs/drydocs/port/reconcile_before.py",
+      "drydocs/drydocs_core/yaml_fragments.py"
+    ],
+    [
       "drydocs/drydocs/port_backlog_union.py",
       "drydocs/drydocs/port/__init__.py"
     ],
@@ -30743,6 +30773,14 @@
     [
       "drydocs/scripts/project_pat_team_report.py",
       "drydocs/drydocs/pat_projection.py"
+    ],
+    [
+      "drydocs/scripts/reconcile_before.py",
+      "drydocs/drydocs/port/port_preflight.py"
+    ],
+    [
+      "drydocs/scripts/reconcile_before.py",
+      "drydocs/drydocs/port/reconcile_before.py"
     ],
     [
       "drydocs/scripts/render_board.py",
@@ -32391,6 +32429,14 @@
     [
       "drydocs/tests/unit/test_port_preflight.py",
       "drydocs/drydocs/port/port_preflight.py"
+    ],
+    [
+      "drydocs/tests/unit/test_port_reconcile_guards.py",
+      "drydocs/drydocs/port/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_port_reconcile_guards.py",
+      "drydocs/drydocs/port/reconcile_before.py"
     ],
     [
       "drydocs/tests/unit/test_port_reconcile_guards.py",
@@ -45268,6 +45314,11 @@
       "drydocs/drydocs/port/port_rename_detect.py"
     ],
     [
+      "drydocs/drydocs/port",
+      "CONTAINS",
+      "drydocs/drydocs/port/reconcile_before.py"
+    ],
+    [
       "drydocs/drydocs/publishing",
       "CONTAINS",
       "drydocs/drydocs/publishing/__init__.py"
@@ -47130,7 +47181,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260905-1902.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260905.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -47601,6 +47652,11 @@
       "drydocs/scripts",
       "CONTAINS",
       "drydocs/scripts/project_pat_team_report.py"
+    ],
+    [
+      "drydocs/scripts",
+      "CONTAINS",
+      "drydocs/scripts/reconcile_before.py"
     ],
     [
       "drydocs/scripts",
@@ -50377,13 +50433,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2827,
-    "edges": 1580,
+    "files": 2829,
+    "edges": 1587,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 3143,
+    "rels": 3145,
     "directories": 317
   }
 }
