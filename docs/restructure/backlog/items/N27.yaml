@@ -8,7 +8,7 @@ phase: 11
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - config/source-registry.yaml
@@ -46,3 +46,29 @@ notes: |
 
   Same class as the registration gaps this session already named; the row is the smallest change
   that unblocks the rest. Related: C42, C43, C44, N26, Idea-236.
+
+  DONE 2026-09-06 (desktop, Lane A, 5c11aaea). Three SYSTEM rows - mfts, filemover, onemft - in
+  config/source-registry.yaml, each with a disambiguation sentence naming the other two (the
+  snow/snowflake shape), layer technology, classification Internal, binding ~ with a matching
+  unbound: entry in config/source-bindings.yaml. locator.source_product points MFTS at the C43
+  software-registry product; FileMover and OneMFT carry an empty locator because their vendor is
+  unevidenced and C43 left them out on purpose. No dataset, no URN, no loader (d). Render: the
+  load-map moved 16 to 19 systems, 40 datasets unchanged; full suite 3470 passed.
+
+  HOW (b) WAS MET, AND THE TENSION IT LEAVES: the acceptance reads as register the SEAL id and the
+  support-group name on the row. The row does not carry either value. seal_id is the standing
+  placeholder on every committed system row - the D1 amendment to gate source-registry-v2, and
+  the shape C43 followed for the same platform three days earlier - and the registry has no owner
+  field at all, so the owner is recorded in notes BY POINTER to the research file (H93 for the id,
+  H98 for the support group), the pointer-never-the-value idiom the infra row already uses. That
+  satisfies the registry's own mechanism for an identifier, and it is deliberately not a ruling on
+  whether identifiers may appear in an Internal-Public config file: the 2026-08-29 ruling says the
+  twin covers connection coordinates and not identifiers, the signed D1 amendment says seal_id is a
+  placeholder regardless, and the un-redaction of identifiers is exactly N23's question (gate
+  registry-wiring-readiness, I3 of the identity review). Ruling it there un-redacts all 19 rows at
+  once; ruling it here would have amended a signed record from inside a task item. The literal
+  values already sit in tracked item files (this one, C42) and in IDEAS.md, which is the same
+  question from the other side and is left for N23 too.
+
+  For C44: the other end of the route relationship is now registered, so its dependency is met;
+  which of the three platforms serves a given route stays OQ-3/OQ-7 and is the gate's to rule.
