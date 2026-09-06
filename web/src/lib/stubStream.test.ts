@@ -3,6 +3,7 @@ import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 import { parseAdkEvent, type AskEnvelope, type AskStep } from './askApi'
+import { isAdkEvent } from './adk'
 import { filesMatching, withoutComments } from '../test/sourceScan'
 
 // R12 — the OTHER end of the stub-ADK fixture.
@@ -50,15 +51,34 @@ describe('the console can read what the stub emits', () => {
     expect(frames(SSE)).toHaveLength(3)
   })
 
+  it('every recorded frame satisfies the declared ADK contract', () => {
+    // WEB8 (b). This is the tie between the hand-declared contract in lib/adk.ts
+    // and the recorded stream — the drift test the item asked for, in the shape
+    // it asked for it, because the agent server is a vendor's and no schema of
+    // it can be regenerated here (the reasons are in adk.ts's header).
+    //
+    // The frames used to reach parseAdkEvent through `as never`, which is what a
+    // cast is for: silencing the compiler about a shape nobody checked. They go
+    // through the REAL guard now, the same one runAgentSse admits a frame with,
+    // so a vendor change that stops the console reading its own events fails
+    // here rather than in a browser.
+    expect(frames(SSE).every(isAdkEvent)).toBe(true)
+    // ...and the guard is not vacuous: it rejects the shapes that would throw.
+    expect(isAdkEvent('not an object')).toBe(false)
+    expect(isAdkEvent(null)).toBe(false)
+    expect(isAdkEvent({ content: { parts: 'not an array' } })).toBe(false)
+  })
+
   it('parseAdkEvent classifies every frame — none is silently dropped', () => {
-    const parsed = frames(SSE).map((f) => parseAdkEvent(f as never))
+    const parsed = frames(SSE).filter(isAdkEvent).map((f) => parseAdkEvent(f))
     expect(parsed.every((p) => p !== null)).toBe(true)
     expect(parsed.map((p) => p?.kind)).toEqual(['step', 'step', 'final'])
   })
 
   it('the steps carry what the Ask surface renders', () => {
     const steps = frames(SSE)
-      .map((f) => parseAdkEvent(f as never))
+      .filter(isAdkEvent)
+      .map((f) => parseAdkEvent(f))
       .filter((p): p is { kind: 'step'; step: AskStep } => p?.kind === 'step')
       .map((p) => p.step)
     expect(steps.map((s) => s.kind)).toEqual(['router', 'spec'])
@@ -72,7 +92,7 @@ describe('the console can read what the stub emits', () => {
   })
 
   it('the last frame is the ENVELOPE, which is what ends a turn', () => {
-    const parsed = frames(SSE).map((f) => parseAdkEvent(f as never))
+    const parsed = frames(SSE).filter(isAdkEvent).map((f) => parseAdkEvent(f))
     const last = parsed[parsed.length - 1]
     expect(last?.kind).toBe('final')
     const envelope = (last as { kind: 'final'; envelope: AskEnvelope }).envelope
@@ -101,7 +121,7 @@ describe('the console can read what the stub emits', () => {
     // than against invented ones: a payload with `kind: 'step'` is a step and a
     // payload with a string `status` is final. Reordering the stream must not
     // change the classification.
-    const reversed = frames(SSE).reverse()
-    expect(reversed.map((f) => parseAdkEvent(f as never)?.kind)).toEqual(['final', 'step', 'step'])
+    const reversed = frames(SSE).filter(isAdkEvent).reverse()
+    expect(reversed.map((f) => parseAdkEvent(f)?.kind)).toEqual(['final', 'step', 'step'])
   })
 })

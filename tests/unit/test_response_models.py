@@ -7,7 +7,7 @@ And ``drydocs_api.schemas._Declared`` sets ``extra='forbid'``, which turns a
 disagreement into a RESPONSE-VALIDATION 500 — a declaration and its handler
 drifting apart is not a wrong field on the wire here, it is a dead route.
 
-The gap was real when WEB8 opened. ``test_mapping_api.py`` — 72 tests over the
+The gap was real when WEB8 opened. ``test_mapping_api.py`` — 48 tests over the
 richest surface in the group, and the only one with WRITE routes — calls the
 handler functions DIRECTLY. Nothing in the suite sent an HTTP request at
 ``/mappings/*`` or ``/intake/*``, so twenty freshly declared models would have
@@ -255,6 +255,15 @@ def test_intake_lifecycle_validates_every_shape(api, tmp_path):
     )
     intake_id = created["intake_id"]
     assert created["evidence"] == [], "a fresh record carries the key, empty"
+
+    # A WIRE CHANGE WEB8 MADE, pinned here rather than discovered later. The
+    # handler attaches the two thread fields only to a flagged draft; a response
+    # model serializes its DEFAULTS, so they are now present on every record.
+    # Harmless — both console consumers test truthiness — but it is a change,
+    # and openapi-typescript types a defaulted field as REQUIRED for exactly
+    # this reason, so the generated type and the wire agree only while this holds.
+    assert created["legal_transitions"]["thread_decision_required"] is False
+    assert created["legal_transitions"]["thread_decisions"] == []
 
     listed = _ok(client.get("/intake", headers=_auth(token)), "GET /intake")
     assert listed["intakes"], "the record just created is in the queue"

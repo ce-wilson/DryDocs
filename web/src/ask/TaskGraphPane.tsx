@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { forceLayout, trimEdge } from '../lib/forceLayout'
-import type { TaskGraphSnapshot } from './askApi'
+import type { TaskGraphSnapshot } from '../lib/askApi'
 
 // R6 — the Tier-2 task graph, one frame per iteration.
 //

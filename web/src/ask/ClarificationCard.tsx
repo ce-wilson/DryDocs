@@ -6,7 +6,7 @@ import {
   type AskClarification,
   type AskClarificationTerm,
   type Clarification,
-} from './askApi'
+} from '../lib/askApi'
 
 // R19 (b): the clarification request rendered as an actionable question. The
 // agent found a term it could not resolve and refused to pick a near match for
