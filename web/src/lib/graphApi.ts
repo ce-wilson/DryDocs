@@ -1,6 +1,6 @@
 import { type Api, createAuthedApi, requireToken, type Schemas, type SessionHooks, unwrap } from './apiClient'
 import { sessionRejected, sessionToken } from './auth'
-import type { GraphAccess, GraphResult, NamedResult, SpecExport, SpecResult } from './graph'
+import type { GraphAccess, GraphResult, NamedResult, RequestOptions, SpecExport, SpecResult } from './graph'
 
 // The deployment adapter (ADR 0005): HTTP to the drydocs-api thin API.
 // Sessions are server-side; this adapter READS the token the sign-in flow
@@ -74,28 +74,40 @@ export function createApiAccess(
 
   return {
     kind: 'api',
-    async runRead(query: string): Promise<GraphResult> {
-      const { keys, rows } = unwrap(await api.POST('/raw-cypher', { body: { cypher: query } }), 'api /raw-cypher')
+    async runRead(query: string, opts: RequestOptions = {}): Promise<GraphResult> {
+      const { keys, rows } = unwrap(
+        await api.POST('/raw-cypher', { body: { cypher: query }, signal: opts.signal }),
+        'api /raw-cypher',
+      )
       return { keys, rows }
     },
-    async runNamed(queryId: string, params = {}): Promise<NamedResult> {
+    async runNamed(queryId: string, params = {}, opts: RequestOptions = {}): Promise<NamedResult> {
       const { keys, rows, database } = unwrap(
-        await api.POST('/query/{query_id}', { params: { path: { query_id: queryId } }, body: { params } }),
+        await api.POST('/query/{query_id}', {
+          params: { path: { query_id: queryId } },
+          body: { params },
+          signal: opts.signal,
+        }),
         `api /query/${queryId}`,
       )
       return { keys, rows, database }
     },
-    async runSpec(specId: string, params = {}): Promise<SpecResult> {
+    async runSpec(specId: string, params = {}, opts: RequestOptions = {}): Promise<SpecResult> {
       return unwrap(
-        await api.POST('/specs/{spec_id}/run', { params: { path: { spec_id: specId } }, body: { params } }),
+        await api.POST('/specs/{spec_id}/run', {
+          params: { path: { spec_id: specId } },
+          body: { params },
+          signal: opts.signal,
+        }),
         `spec ${specId}`,
       )
     },
-    async exportSpec(specId, params, format): Promise<SpecExport> {
+    async exportSpec(specId, params, format, opts: RequestOptions = {}): Promise<SpecExport> {
       const exported = await api.POST('/specs/{spec_id}/export', {
         params: { path: { spec_id: specId }, query: { format } },
         body: { params },
         parseAs: 'blob',
+        signal: opts.signal,
       })
       const blob = unwrap(exported, `export ${specId}`) // stream fully consumed → manifest registered
       const exportId = exported.response.headers.get('X-DryDocs-Export-Id')

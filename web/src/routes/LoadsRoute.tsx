@@ -1,7 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import type { Persona } from '../lib/auth'
-import { createApiAccess } from '../lib/graphApi'
 import { MODULES } from '../modules/registry'
 import ModuleTemplate from './ModuleTemplate'
 import SpecGrid from '../explorer/SpecGrid'
@@ -9,6 +7,8 @@ import EmptyState from '../components/ui/EmptyState'
 import LoadsTimeline from '../loads/LoadsTimeline'
 import StatTiles from '../components/StatTiles'
 import { DEMO_RUNS, type RunRow } from '../loads/demoLoads'
+import { rowsOf, useLiveOrDemo } from '../data/provenance'
+import ProvenanceNotice from '../components/ProvenanceNotice'
 
 // /loads (O16): the shared template with the run TIMELINE as this module's
 // canvas — loader → :JobRun provenance, newest first. Frames (Runs / Rejects
@@ -16,38 +16,21 @@ import { DEMO_RUNS, type RunRow } from '../loads/demoLoads'
 // /loads/run/:runId deep links resolve to a selection. Empty states honest on
 // databases with no runs (the demo timeline shows with a visible badge).
 const loadsModule = MODULES.find((m) => m.id === 'loads')!
+const RUNS_SPEC = 'loads.runs.v1'
 
-export default function LoadsRoute({ persona }: { persona: Persona }) {
+export default function LoadsRoute() {
   const { runId } = useParams<{ runId: string }>()
   const [selectedRunId, setSelectedRunId] = useState<string | null>(runId ?? null)
-  const [runs, setRuns] = useState<readonly RunRow[] | null>(null)
-  const [live, setLive] = useState(false)
   // O40 (DL-10): status stat-tiles ARE the filter controls for the timeline below.
   const [statusFilter, setStatusFilter] = useState<string | null>(null)
 
-  const apiUrl = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:8001'
-  const access = useMemo(() => createApiAccess(apiUrl, persona.id), [apiUrl, persona.id])
-
-  useEffect(() => {
-    let cancelled = false
-    access
-      .runSpec('loads.runs.v1')
-      .then((r) => {
-        if (cancelled) return
-        if (r.rows.length > 0) {
-          setRuns(r.rows as unknown as RunRow[])
-          setLive(true)
-        } else {
-          setRuns(DEMO_RUNS)
-        }
-      })
-      .catch(() => {
-        if (!cancelled) setRuns(DEMO_RUNS)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [access])
+  // WEB1: one seam, one typed state. `live` is no longer a boolean this route
+  // maintains — it is the union's own status, and DEMO_RUNS is reached through
+  // the seam rather than beside it.
+  const provenance = useLiveOrDemo<RunRow>(RUNS_SPEC, DEMO_RUNS)
+  const live = provenance.status === 'live'
+  const runs: readonly RunRow[] | null =
+    provenance.status === 'loading' ? null : rowsOf(provenance)
 
   const fallbackNote = (
     <EmptyState
@@ -63,6 +46,9 @@ export default function LoadsRoute({ persona }: { persona: Persona }) {
       graphPane={
         runs ? (
           <div className="flex h-full min-h-0 flex-col">
+            <div className="shrink-0 px-3 pt-3">
+              <ProvenanceNotice state={provenance} specId={RUNS_SPEC} />
+            </div>
             <div className="shrink-0 px-3 pt-3">
               <StatTiles
                 tiles={[
@@ -87,13 +73,13 @@ export default function LoadsRoute({ persona }: { persona: Persona }) {
         )
       }
       tabContent={{
-        Runs: <SpecGrid access={access} specId="loads.runs.v1" fallback={fallbackNote} />,
-        Rejects: <SpecGrid access={access} specId="loads.rejects.v1" fallback={fallbackNote} />,
-        'Drift/coverage': <SpecGrid access={access} specId="loads.drift-coverage.v1" fallback={fallbackNote} />,
+        Runs: <SpecGrid specId="loads.runs.v1" fallback={fallbackNote} />,
+        Rejects: <SpecGrid specId="loads.rejects.v1" fallback={fallbackNote} />,
+        'Drift/coverage': <SpecGrid specId="loads.drift-coverage.v1" fallback={fallbackNote} />,
         // O28: the node-status envelope, live end-to-end — BaseLoader derives
         // the items, they ride on the :JobRun, and this frame is the same spec
         // the inspector and hub glyphs consume.
-        Status: <SpecGrid access={access} specId="loads.status-items.v1" fallback={fallbackNote} />,
+        Status: <SpecGrid specId="loads.status-items.v1" fallback={fallbackNote} />,
       }}
     />
   )
