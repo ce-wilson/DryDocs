@@ -9,7 +9,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - docs/reviews/modules/web-2026-09-05.md
@@ -46,3 +46,24 @@ notes: |
   drydocs-web and agents/; minted in the WEB series because the console is where the token
   leaves the trust boundary, and the item names the agent-side inputs. Nothing here writes the
   graph, so the gate is the ADR review, not the ontology gate.
+
+  DONE 2026-09-06 (desktop, Lane A). (a) ADR 0019 drafted PROPOSED (41ab34cf) with the three
+  carriers costed and the blast radius stated; the user RULED option C the same day (e755274b):
+  the agent holds its own credential (the existing DRYDOCS_AGENT_REG_KEY) and the console passes
+  only a public session handle. (b) Built on wip/WEB9-desktop (J31, pushed at the first edit)
+  and merged --no-ff as one unit (de6cb614): drydocs_api mints Session.session_id beside the
+  token and returns it from /login; POST /specs/ephemeral takes owner_session, the store is
+  keyed (session_id, ref), run/export map the bearer to its handle after authenticating, and
+  the audit actor is the hashed handle on every route so registration and run lines join on
+  one value; the agent sends owner_session and reads control.get("session_id"); the console
+  stores sessionId, exposes getSessionId and no token accessor at all, and
+  controlPart(sessionId, apiUrl) carries {session_id, api_url}. The clause (b) test is
+  web/src/ask/askApi.test.ts (no token field or value in the part) plus the redaction suite
+  pinning that a session_id part is stored as sent; api_token STAYS in SECRET_CONTROL_FIELDS
+  for a stale console build (ADR 0019 D1/D4). (c) Closed by ADR 0019 D4: no further purge, the
+  R23 record stands. Verified: 3398 unit passed / 13 skipped (the round-trip guard now skips
+  on a branch past its fork point, see 77cae33a), the 9 stub-ADK wiring tests RUN here for the
+  first time (the httpx importorskip was stale against the httpx2 the api group ships),
+  tsc -b clean, oxlint clean, 338 vitest passed, dump_openapi --check clean. Relay for the next
+  roll: control field api_token -> session_id, body owner_token -> owner_session, LoginOut
+  gains session_id; docs/port/port-prompt.md still names api_token.
