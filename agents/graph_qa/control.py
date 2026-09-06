@@ -19,7 +19,14 @@ because which drydocs-api this tier calls is its own deployment fact
 (``DRYDOCS_API_URL``, read in ``common.ephemeral_client``), not the page's to
 say -- a stale console that still sends it is ignored, never obeyed.
 Control parts never reach the LLM — the pipeline only ever sees
-part 0 — and an in-band part was chosen over ADK session state deliberately:
+part 0 — with ONE documented exception (R19): ``clarifications``, a list of
+``{term, resolution, declined}`` the person supplied when the previous turn
+came back as a clarification request. It is the person's own words about
+their own question, so the pipeline appends it to the question as a clause
+for the router and text2cypher calls (``term_resolution.clarification_clause``);
+it is user-authored, never a credential, and is not in
+``SECRET_CONTROL_FIELDS`` on purpose — a stored trace SHOULD show what the
+person said a term meant. An in-band part was chosen over ADK session state deliberately:
 the shape is fully owned by this repo on both ends, testable without an ADK
 runtime, and carries no assumption about ADK's request schema. Company-side
 OIDC replaces the whole handshake (ADR 0005 Evidence).

@@ -12,7 +12,7 @@ import { createSession, runAgentParts, runAgentSse, type AdkEvent, type AdkPart 
 
 export interface AskStep {
   i: number
-  kind: string // 'router' | 'spec' | 'text2cypher' | 'answer'
+  kind: string // 'declared' | 'clarify' | 'clarified' | 'router' | 'spec' | 'text2cypher' | 'answer' | 'tier2'
   ms: number
   spec_id?: string | null
   cypher?: string | null
@@ -26,6 +26,45 @@ export interface AskStep {
   // 'exact' | 'lower-bound' | null (ungraded). Rendered as given.
   epistemic?: string | null
   causes?: { cause: string; detail: string; count?: number | null }[]
+  // R19: the clarification prompt on a 'clarify' step; the person's own
+  // resolution (or 'declined: ...') on a 'clarified' step. Rendered as given.
+  note?: string | null
+}
+
+// R19 — the clarification contract (agents/graph_qa/term_resolution.py).
+// A term the agent could not resolve to a spec, a vocabulary row, a live
+// label/property or an approved glossary sense comes back as one of these,
+// with its candidates and the choices the card renders. The two fixed
+// choice ids are the free-text box and the answer-anyway action.
+export const FREE_TEXT_CHOICE = '__free_text__'
+export const PROCEED_CHOICE = '__proceed__'
+
+export interface AskClarificationChoice {
+  id: string
+  label: string
+  detail?: string
+  source?: string // 'glossary' | 'label' | 'relationship' | 'property' | 'spec' | 'you'
+}
+
+export interface AskClarificationTerm {
+  term: string
+  kind: string // 'acronym' | 'label'
+  candidates: AskClarificationChoice[]
+  choices: AskClarificationChoice[]
+}
+
+export interface AskClarification {
+  terms: AskClarificationTerm[]
+  prompt: string
+}
+
+/** One answer from the person, as the next turn's control part carries it:
+ *  `resolution` is their free text or the label of the choice they took;
+ *  `declined` is answer-anyway — the agent then says so on the answer. */
+export interface Clarification {
+  term: string
+  resolution: string | null
+  declined: boolean
 }
 
 export interface AskSource {
@@ -69,6 +108,9 @@ export interface AskEnvelope {
   sources?: AskSource[]
   metrics?: AskMetrics
   task_graph?: TaskGraphSnapshot[]
+  // R19: present only when status/tier is 'clarification' — the question the
+  // console asks instead of rendering an answer.
+  clarification?: AskClarification | null
 }
 
 /** The R5 control part: the session's PUBLIC handle, and nothing else.
@@ -79,6 +121,15 @@ export interface AskEnvelope {
  *  belong to. askApi.test.ts pins both absences. */
 export function controlPart(sessionId: string): AdkPart {
   return { text: JSON.stringify({ drydocs_control: { session_id: sessionId } }) }
+}
+
+/** R19: the control part for the turn that answers a clarification request —
+ *  the session handle plus the person's own words about their own terms.
+ *  Still no credential and no url (the same absences controlPart pins); the
+ *  clarifications are user-authored text, the one control field the agent
+ *  carries into a prompt (control.py documents the exception). */
+export function clarificationPart(sessionId: string, clarifications: Clarification[]): AdkPart {
+  return { text: JSON.stringify({ drydocs_control: { session_id: sessionId, clarifications } }) }
 }
 
 type Parsed = { kind: 'step'; step: AskStep } | { kind: 'final'; envelope: AskEnvelope } | null

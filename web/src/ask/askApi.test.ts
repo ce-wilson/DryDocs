@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { controlPart } from './askApi'
+import { clarificationPart, controlPart } from './askApi'
 
 // ADR 0019 (WEB9 clause b) - no credential rides in a message part. The R5
 // control part names the console session by its PUBLIC handle so the agent can
@@ -34,5 +34,31 @@ describe('controlPart', () => {
     // one positional string - the handle. A second argument does not compile
     // (tsc) and would be ignored at runtime; this pins the runtime half.
     expect(controlPart.length).toBe(1)
+  })
+})
+
+// R19: the re-ask turn carries the person's clarifications in the same control
+// part - user-authored words about their own terms, the one control field the
+// agent forwards into a prompt. The absences controlPart pins hold here too.
+describe('clarificationPart', () => {
+  const part = clarificationPart('sess-handle-1', [
+    { term: 'PDN', resolution: 'Production Delay Notification', declined: false },
+    { term: 'CTM', resolution: null, declined: true },
+  ])
+
+  it('carries the session handle and the clarifications, nothing else', () => {
+    const payload = JSON.parse(part.text) as { drydocs_control: Record<string, unknown> }
+    expect(Object.keys(payload.drydocs_control).sort()).toEqual(['clarifications', 'session_id'])
+    expect(payload.drydocs_control.session_id).toBe('sess-handle-1')
+    expect(payload.drydocs_control.clarifications).toEqual([
+      { term: 'PDN', resolution: 'Production Delay Notification', declined: false },
+      { term: 'CTM', resolution: null, declined: true },
+    ])
+  })
+
+  it('still carries no token and no api url', () => {
+    expect(part.text).not.toContain('token')
+    expect(part.text).not.toContain('api_url')
+    expect(part.text).not.toContain('http')
   })
 })

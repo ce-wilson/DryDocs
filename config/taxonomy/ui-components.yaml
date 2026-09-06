@@ -183,7 +183,7 @@ components:
   - { id: MapGlyphs,               area: icon,         path: components/map/MapGlyphs.tsx }
   - { id: HubGlyphs,               area: icon,         path: components/icons/HubGlyphs.tsx }
 
-  # --- ask (2) ---
+  # --- ask (3) ---
   # R6 Tier-2 task graph. Renders the agent's IN-PROCESS working memory (R1
   # ruling A) — deliberately its own visual language so it is never mistaken
   # for the knowledge graph, though it shares lib/forceLayout.ts.
@@ -192,6 +192,10 @@ components:
   # spec that accepts a search term, which is what lets 'not found' mean
   # something rather than being an empty slice of a full listing.
   - { id: FileReport,              area: ask,          path: ask/FileReport.tsx,                          module: ask,        module_evidence: directory }
+  # R19: the clarification card. Renders the agent's structured request for an
+  # unresolved acronym or label as choices the person makes; composes the next
+  # turn's clarifications and never picks a near match for them.
+  - { id: ClarificationCard,       area: ask,          path: ask/ClarificationCard.tsx,                   module: ask,        module_evidence: directory }
 
   # --- explorer (4) ---
   - { id: DataFrame,               area: explorer,     path: explorer/DataFrame.tsx,                      module: explorer,   module_evidence: directory }
