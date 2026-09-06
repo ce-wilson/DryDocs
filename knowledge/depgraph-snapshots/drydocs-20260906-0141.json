@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-06T01:01:11",
+    "captured_at": "2026-09-06T01:42:10",
     "date": "20260906",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "243992d2",
-      "full": "243992d22256a5350991813757a4fdf5bd65c835",
+      "commit": "a8e7d2b5",
+      "full": "a8e7d2b5b040be2ed8ca8d8dd62810cc72889481",
       "branch": "main",
-      "describe": "port-base-20260905-81-g243992d2",
-      "subject": "docs(ideas): Idea-269..273 - the Lane B close's five hand-backs, inboxed",
+      "describe": "port-base-20260905-85-ga8e7d2b5",
+      "subject": "docs(ideas): Idea-269 points at the preserved prototype (e89a66ca) and carries its three spec facts",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -2190,6 +2190,15 @@
       "name": "handoff.py",
       "extension": ".py",
       "rel_path": ".claude/skills/lane-handoff/scripts/handoff.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/lane-handoff/scripts/overlap_prototype.py",
+      "name": "overlap_prototype.py",
+      "extension": ".py",
+      "rel_path": ".claude/skills/lane-handoff/scripts/overlap_prototype.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -22391,10 +22400,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260905-2139.json",
-      "name": "drydocs-20260905-2139.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260906.json",
+      "name": "drydocs-20260906.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260905-2139.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260906.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -36668,6 +36677,11 @@
       "drydocs/.claude/skills/lane-handoff/scripts/handoff.py"
     ],
     [
+      "drydocs/.claude/skills/lane-handoff/scripts",
+      "CONTAINS",
+      "drydocs/.claude/skills/lane-handoff/scripts/overlap_prototype.py"
+    ],
+    [
       "drydocs/.claude/skills/oracle-db",
       "CONTAINS",
       "drydocs/.claude/skills/oracle-db/SKILL.md"
@@ -47650,7 +47664,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260905-2139.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260906.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -51017,13 +51031,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2853,
+    "files": 2854,
     "edges": 1642,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 3171,
+    "rels": 3172,
     "directories": 319
   }
 }
