@@ -123,6 +123,21 @@ notes: |
   drift guards (tests/unit/test_openapi_client.py, src/generated/api.test.ts) pass
   on the regenerated artifacts, clause (c) of WEB8's chain.
 
+  THE ENDPOINT IS EXERCISED, not merely registered. test_openapi_client proves
+  the route EXISTS; three TestClient cases prove it ANSWERS - 200 for an admin
+  with the real dependency chain resolving the log root and the zones from the
+  environment (a tmp tree, not this machine's logs), 403 for a user-tier
+  persona, 401 unauthenticated. Added at close review after noticing the
+  distinction; "registered" and "working" are different claims and only one of
+  them was covered. The 200 case also asserts the response text contains neither
+  `contents` nor `tail`, which is clause (c) checked on the wire rather than only
+  in the source.
+
+  Also dropped a defensive `getattr(zone, "mode", None)` for the plain attribute:
+  DataZone declares `mode`, so the getattr was guarding against a shape that
+  cannot occur and would have silently returned None if the field were ever
+  renamed - a fallback that hides the thing it is meant to survive.
+
   NOT VERIFIED IN A BROWSER. The panel is asserted by typecheck, build and source;
   whether the two tables read well against a real estate is a person's call. The
   CORE walk is verified against real fixtures on disk (tmp trees, not this

@@ -189,3 +189,81 @@ def test_the_panel_states_why_it_exists(clause: str) -> None:
     who should be told the CLI answers the same question, and that no log's text
     will ever appear here."""
     assert clause in PANEL.read_text(encoding="utf-8")
+
+
+# --------------------------------------------------------------------------- #
+# the endpoint actually answers (clause b: "a read endpoint over that")
+# --------------------------------------------------------------------------- #
+class _AcceptingCredentials:
+    """O75 re-checks on every request that the session's account still exists,
+    against a machine-local file a fresh clone does not have. Injected so the
+    test is venue-independent (J18) rather than passing only where someone has
+    signed in once."""
+
+    is_bootstrapped = True
+
+    def verify(self, identity: str, secret: str) -> bool:
+        return False
+
+    def has_identity(self, identity: str) -> bool:
+        return True
+
+
+@pytest.fixture()
+def api_client(monkeypatch, tmp_path):
+    """drydocs-api in process, with the data root pointed at a tmp tree.
+
+    G81: create_app builds the intake store at import and the data root has no
+    default. A per-test tmp_path also keeps the estate this reports from being
+    the developer's real one — the endpoint walks whatever DRYDOCS_LOGDIR names,
+    and a test that walked a real log directory would be both unrepeatable and
+    slow.
+    """
+    pytest.importorskip("fastapi", reason="fastapi lives in the optional 'api' group")
+    from fastapi.testclient import TestClient
+
+    from drydocs_api.app import create_app
+    from drydocs_api.sessions import InMemorySessionStore
+
+    monkeypatch.setenv("DRYDOCS_DATA_ROOT", str(tmp_path / "data"))
+    monkeypatch.setenv("DRYDOCS_LOGDIR", str(tmp_path / "logs"))
+    (tmp_path / "logs").mkdir(parents=True)
+    _write(tmp_path / "logs", "load.run.20260101.log", 128)
+
+    sessions = InMemorySessionStore()
+    app = create_app(runner=None, store=sessions, credentials=_AcceptingCredentials())
+    with TestClient(app) as client:
+        client.sessions = sessions  # type: ignore[attr-defined]
+        yield client
+
+
+def _bearer(client, persona: str) -> dict[str, str]:
+    return {"Authorization": f"Bearer {client.sessions.issue(persona).token}"}
+
+
+def test_the_endpoint_answers_for_an_admin(api_client) -> None:
+    """Registered is not the same as working. test_openapi_client proves the
+    route EXISTS; this proves it returns something, through the real dependency
+    chain that resolves the log root and the zones from the environment."""
+    res = api_client.get("/admin/log-estate", headers=_bearer(api_client, "morpheus"))
+    assert res.status_code == 200, res.text
+    body = res.json()
+    assert set(body) == {"kinds", "zones"}
+    kinds = {k["id"]: k for k in body["kinds"]}
+    assert "load" in kinds and "api-debug" in kinds
+    assert kinds["load"]["file_count"] == 1
+    assert kinds["load"]["total_bytes"] == 128
+    # the debug kind is REPORTED like any other, with no contents anywhere
+    assert kinds["api-debug"]["retention_days"] == 7
+    assert "contents" not in res.text and "tail" not in res.text
+
+
+def test_the_endpoint_is_admin_only(api_client) -> None:
+    """It names real paths on the host's disk — operational detail an admin is
+    asking for and a user-tier persona is not."""
+    res = api_client.get("/admin/log-estate", headers=_bearer(api_client, "mouse"))
+    assert res.status_code == 403, res.text
+
+
+def test_the_endpoint_refuses_an_unauthenticated_caller(api_client) -> None:
+    assert api_client.get("/admin/log-estate").status_code == 401

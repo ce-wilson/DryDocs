@@ -58,7 +58,7 @@ def log_estate() -> dict[str, Any]:
         {
             "id": s.zone.id,
             "path": str(s.zone.path),
-            "mode": getattr(s.zone, "mode", None),
+            "mode": s.zone.mode,
             "exists": s.exists,
             "file_count": s.file_count,
             "total_bytes": s.total_bytes,
