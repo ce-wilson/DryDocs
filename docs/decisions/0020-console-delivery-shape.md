@@ -1,7 +1,7 @@
 # ADR 0020 — The console's delivery shape: same-origin behind one reverse proxy, the API base is a PATH, and a production bundle inlines no deployment coordinate
 
 ```yaml
-status: PROPOSED        # drafted under WEB10 clause (a), 2026-09-06 (desktop); awaiting the user's ruling
+status: ACCEPTED        # drafted under WEB10 clause (a) and RULED option C by the user, both 2026-09-06 (desktop)
 date: 2026-09-06
 authored_by: the WEB10 draft, from the 2026-09-05 web module review finding S3 (docs/reviews/modules/web-2026-09-05.md)
 deciders: [chad.wilson]

@@ -26,3 +26,29 @@ notes: |
   NOT IN SCOPE: Traefik and automatic HTTPS, which the template ships and we would be adding
   for a deployment that does not exist. This is a local-development convenience, and framing
   it as anything more would invite exactly that scope.
+  2026-09-06 (WEB10, ADR 0020) - THE FIFTH SERVICE, AND ONE SENTENCE ABOVE IS NOW STALE.
+  ADR 0020 made the console same-origin with its services: the browser calls the PATHS
+  /api and /agent on the page's own origin and a reverse proxy forwards them, prefix
+  stripped, with dist/ served for everything else. In dev that proxy is Vite itself;
+  THIS stack is where the production shape is first exercised, so it gains a serving
+  process rather than a second stack being started for it:
+  - a reverse proxy (nginx or Caddy) that reads the path map from web/delivery.json -
+    the same file vite.config.ts and src/lib/auth.ts read - and forwards /api/* to
+    drydocs-api:8001 and /agent/* to the agent server:8000 with the prefix stripped,
+    serving web/dist/ (the production build, not the dev server) for every other path;
+  - a dead upstream answers 502 from the proxy, which is what the console reads as
+    the service behind that path being down (nginx and Caddy do this by default; Vite
+    was taught to match in vite.config.ts);
+  - /agent/run_sse is a server-sent-events stream, so the proxy disables response
+    buffering on that route (nginx proxy_buffering off; Caddy flush_interval -1) or
+    the Ask page sees the whole answer at once, at the end;
+  - the API's DRYDOCS_RUNTIME_VIEW_URL_TEMPLATE (served on GET /api/config) and the
+    agent's DRYDOCS_API_URL are set per environment in the Compose file, never baked
+    into the bundle; npm run dist:check is the guard that the bundle carries no
+    host:port, and the stack should run it as part of its build step.
+  The acceptance sentence 'Ports stay exactly as they are, because the API's CORS
+  allow-list names 5173 and 4173 specifically' describes the pre-WEB10 shape: there is
+  no allow-list and no port the browser depends on any more. Ports may still stay as
+  they are for the runbook's sake, but the reason is gone and the sentence should go
+  with it when this item is pulled (proposed here, not edited - the acceptance is the
+  puller's to settle against ADR 0020).

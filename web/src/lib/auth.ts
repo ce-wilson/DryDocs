@@ -21,6 +21,7 @@
 
 import { createPublicApi, detailOf } from './apiClient'
 import * as storage from './storage'
+import delivery from '../../delivery.json'
 
 export type Role = 'user' | 'steward' | 'admin'
 
@@ -94,9 +95,21 @@ export function canAccessIntake(persona: Persona): boolean {
   return persona.id === SME_PERSONA_ID || persona.role !== 'user'
 }
 
-/** The one place the API base URL is decided for auth calls. */
+/** The one place the API base is decided, and it is a PATH, not a URL (ADR 0020).
+ *  The console is same-origin with drydocs-api in every environment: a reverse
+ *  proxy (Vite's own in dev and preview, O72's in the Compose stack) forwards
+ *  `/api/...` on the page's origin to the API with the prefix stripped. So there
+ *  is no setting to be missing and no fallback to somebody's localhost - the
+ *  VITE_API_URL variable this used to read is retired, and a production bundle
+ *  carries no deployment coordinate at all (web/scripts/checkDistCoordinates.mjs).
+ *  The prefix comes from web/delivery.json, the same file vite.config.ts routes. */
 export function apiBaseUrl(): string {
-  return (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:8001'
+  return delivery.api.prefix
+}
+
+/** The agent server's base, by the same rule: `/agent/...` on this origin. */
+export function agentBaseUrl(): string {
+  return delivery.agent.prefix
 }
 
 export interface Session {

@@ -139,10 +139,12 @@ wrong. Your own `:8001` / `:5173` are never touched, adopted, or stopped.
 asserts against (`/gates`) renders from a committed generated artifact, so the
 whole path runs with no graph — which is exactly the CI runner's condition.
 
-**Ports are not freely chosen.** :5273 is a browser ORIGIN, and the API only
-accepts origins it names; the harness passes its own via `DRYDOCS_CORS_ORIGINS`,
-which *adds* to the built-in dev origins (5173, 4173) and never replaces them.
-Changing the web port means changing that variable with it.
+**The browser never learns the API's port.** The page calls `/api/*` on its own
+origin and Vite's proxy forwards it (ADR 0020), so the harness tells the Vite
+PROCESS where its API is — `DRYDOCS_API_UPSTREAM=http://localhost:8011` — and
+nothing on the API side names :5273. Changing either port means changing that
+one variable with it. (Before WEB10 the API held a CORS allowlist the harness
+had to extend with `DRYDOCS_CORS_ORIGINS`; that boundary is retired.)
 
 The case ledger is `config/taxonomy/ui-tests.yaml`: cases carrying `automated_by`
 are run by these files, and the rest are still checklists a person works through.
@@ -226,8 +228,11 @@ npm run dev                                   # in web/
 The full stack walkthrough is the governed runbook
 `docs/design/drydocs-web-console-runbook.md`.
 
-The graph must be loaded first (repo README "Quick start"). Point
-`VITE_API_URL` at the API if it is not on `http://localhost:8001`.
+The graph must be loaded first (repo README "Quick start"). The console calls
+the API as `/api` on its own origin; if drydocs-api is not on `http://localhost:8001`,
+set `DRYDOCS_API_UPSTREAM` in the shell that runs Vite (`DRYDOCS_AGENT_UPSTREAM`
+for the ADK server behind `/agent`). Both are read by the Vite process and never
+reach the bundle — `npm run dist:check` fails the build if any host:port does.
 
 **Which database the bolt panel talks to.** `VITE_NEO4J_DATABASE`, defaulting to
 `drydocs` — the project database (`config/dev-environment.yaml` `ground_truth`,

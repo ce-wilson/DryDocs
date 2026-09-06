@@ -87,6 +87,7 @@ from drydocs_api.personas import UnknownPersonaError
 from drydocs_api.queries import NAMED_QUERIES, ParamValidationError, UnknownQueryError
 from drydocs_api.query_specs import UnknownSpecError
 from drydocs_api.schemas import (
+    ConfigOut,
     HealthOut,
     LoginOut,
     NamedQueryOut,
@@ -246,44 +247,19 @@ def create_app(
     The default credential store RE-READS its file when it changes (O73), so
     adding or rotating a secret takes effect without restarting the server."""
     from fastapi import Depends, FastAPI, Header, HTTPException, Request, UploadFile
-    from fastapi.middleware.cors import CORSMiddleware
 
     app = FastAPI(
         title="drydocs-api", description="Thin read API over the knowledge graph (ADR 0005)"
     )
-    # The web console dev server is the only expected browser origin today.
-    # DRYDOCS_CORS_ORIGINS ADDS to this list and never replaces it, so unset means
-    # exactly the behaviour this line has always had. It exists because a hardcoded
-    # allowlist makes the console untestable on any other port, and the O80
-    # end-to-end suite needs its own so it never adopts or collides with a dev
-    # server somebody is already running.
-    #
-    # O85 — WHY 5199 IS IN THE BUILT-IN LIST, and why the ledger was not "fixed"
-    # instead. config/taxonomy/ui-tests.yaml cites `Vite :5199` in five `source`
-    # fields (O64, O65, O66), because five real verifications ran there: the
-    # standard port was taken by another dev server, so the fallback became the
-    # documented one and the allowlist never heard about it. Those source fields
-    # are a RECORD OF WHAT HAPPENED. Editing them to name a port the API already
-    # served would make a true record false to spare a config change, which is
-    # the wrong direction — so the config moved.
-    #
-    # AND NO `allow_origin_regex` FOR localhost, which is the tempting fix and is
-    # refused deliberately: "any port on this machine" is a materially wider trust
-    # boundary than "these named ports", it would be adopted here without a gate,
-    # and DRYDOCS_CORS_ORIGINS already covers the one-off case declaratively — the
-    # O80 suite and O59's live verification both used it rather than needing one.
-    extra_origins, _ = resolve_optional("DRYDOCS_CORS_ORIGINS", where="create_app()")
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=[
-            "http://localhost:5173",  # vite dev
-            "http://localhost:4173",  # vite preview
-            "http://localhost:5199",  # the ui-tests ledger's documented verification port
-            *[o.strip() for o in (extra_origins or "").split(",") if o.strip()],
-        ],
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+    # NO CORS MIDDLEWARE, on purpose (ADR 0020, WEB10). The console is same-origin
+    # with this API in every environment: a reverse proxy -- Vite's own in dev and
+    # preview, O72's in the Compose stack -- serves the page and forwards `/api/*`
+    # here with the prefix stripped, so no browser ever sends a cross-origin request
+    # and there is no allowlist to keep current. The allowlist that stood here from
+    # O69 drifted unobserved until 2026-08-30 (a documented verification port it
+    # never named); an allowlist that cannot drift is one that does not exist.
+    # DRYDOCS_CORS_ORIGINS is retired with it. A cross-origin caller is a deployment
+    # defect this API refuses by default rather than a case to configure for.
 
     sessions = store if store is not None else InMemorySessionStore()
     graph = runner if runner is not None else LiveRunner()
@@ -358,6 +334,15 @@ def create_app(
     @app.get("/health")
     def health() -> HealthOut:
         return HealthOut(status="ok")
+
+    # ADR 0020: the per-environment values the console needs at RUNTIME, served
+    # unauthenticated because none is a secret and the page has to read them
+    # before anyone signs in. This route is the only place a deployment fact
+    # reaches the bundle -- the build inlines none (the dist guard checks).
+    @app.get("/config")
+    def config() -> ConfigOut:
+        template, _ = resolve_optional("DRYDOCS_RUNTIME_VIEW_URL_TEMPLATE", where="GET /config")
+        return ConfigOut(runtime_view_url_template=template or None)
 
     # O58 — the doc-corpus reconciliation, as a NAMED SERVER-SIDE READ.
     #

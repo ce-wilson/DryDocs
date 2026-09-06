@@ -7,7 +7,7 @@ import { createPublicApi } from '../lib/apiClient'
 import { ask, AskStopped, controlPart, type AskEnvelope, type AskSource, type AskStep } from '../ask/askApi'
 import TaskGraphPane from '../ask/TaskGraphPane'
 import FileReport from '../ask/FileReport'
-import type { Persona } from '../lib/auth'
+import { agentBaseUrl, type Persona } from '../lib/auth'
 import { useGraphAccess } from '../data/graphAccess'
 import * as storage from '../lib/storage'
 
@@ -69,7 +69,9 @@ const STEP_LABEL: Record<string, string> = {
 }
 
 export default function AskRoute({ persona }: { persona: Persona }) {
-  const adkUrl = (import.meta.env.VITE_ADK_URL as string | undefined) ?? 'http://localhost:8000'
+  // The agent server is `/agent` on this origin (ADR 0020) - a path, decided in
+  // one place, with no build-time variable to be missing.
+  const adkUrl = agentBaseUrl()
 
   // ONE shared client, now the SESSION's: the handle handed to the agent (the
   // owner of the specs it registers, ADR 0019) and the runSpec/exportSpec calls
@@ -140,7 +142,7 @@ export default function AskRoute({ persona }: { persona: Persona }) {
     // explore_ref (honest degradation, matching the agent).
     let control: ReturnType<typeof controlPart> | undefined
     try {
-      control = controlPart(await getSessionId(), apiUrl)
+      control = controlPart(await getSessionId())
     } catch {
       control = undefined
     }

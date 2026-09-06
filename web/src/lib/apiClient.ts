@@ -1,7 +1,7 @@
 import createClient from 'openapi-fetch'
 
 import type { components, paths } from '../generated/api'
-import { diagnoseNetworkFailure } from './reachability'
+import { diagnoseNetworkFailure, isUpstreamDown, upstreamDownMessage } from './reachability'
 
 // O70. The console's HTTP layer: openapi-fetch over the GENERATED `paths` type
 // (src/generated/api.d.ts, from drydocs-api's own OpenAPI schema), so every
@@ -17,8 +17,10 @@ import { diagnoseNetworkFailure } from './reachability'
 //            the END of that session (O69: a client that can re-authenticate
 //            itself out of a rejection is a client for which the rejection
 //            means nothing). It must never fall back to bolt silently.
-// Both route a network failure through the O85 probe, because a dead server and
-// a blocked origin are the same TypeError to fetch and the message must say which.
+// Both tell a failure's two causes apart by the RESPONSE (reachability.ts, ADR
+// 0020): a thrown fetch is the page's own server not answering; a 502/503/504
+// is the reverse proxy answering for a drydocs-api that is not there. The
+// console is same-origin with the API everywhere, so there is no third cause.
 //
 // The session hooks are INJECTED rather than imported from lib/auth so that
 // auth.ts can use the public client for /login without a module cycle.
@@ -39,11 +41,16 @@ export interface SessionHooks {
 
 function diagnosingFetch(baseUrl: string): (request: Request) => Promise<Response> {
   return async (request) => {
+    let response: Response
     try {
-      return await globalThis.fetch(request)
+      response = await globalThis.fetch(request)
     } catch {
       throw new Error((await diagnoseNetworkFailure(baseUrl)).message)
     }
+    if (isUpstreamDown(response.status)) {
+      throw new Error(upstreamDownMessage(response.status, baseUrl))
+    }
+    return response
   }
 }
 

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useGraphAccess } from '../data/graphAccess'
 import { fallbackCount, onFallback, type FallbackCount } from '../data/provenance'
 import { useReadiness } from '../data/readiness'
+import { useRuntimeConfig } from '../lib/runtimeView'
 
 // WEB1 (d) and (e) — the console's two system-wide honesty signals, in one
 // strip above the header.
@@ -29,6 +30,9 @@ import { useReadiness } from '../data/readiness'
 export default function SystemBanner() {
   const { apiUrl } = useGraphAccess()
   const readiness = useReadiness(apiUrl)
+  // The other once-at-mount read (ADR 0020): the O39 deep-link template from
+  // GET /config, the API's non-secret per-deployment values.
+  useRuntimeConfig(apiUrl)
   const [fallbacks, setFallbacks] = useState<FallbackCount>(fallbackCount)
 
   useEffect(() => onFallback(setFallbacks), [])

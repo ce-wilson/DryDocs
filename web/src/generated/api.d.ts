@@ -19,6 +19,23 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/config": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Config */
+        get: operations["config_config_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/demo": {
         parameters: {
             query?: never;
@@ -558,6 +575,16 @@ export type components = {
             /** Type */
             type: string;
         };
+        /**
+         * ConfigOut
+         * @description GET /config (ADR 0020): the non-secret, per-environment values the console
+         *     reads at boot instead of having them inlined at build time. Nothing here may
+         *     be a credential or a coordinate the page could not already reach.
+         */
+        ConfigOut: {
+            /** Runtime View Url Template */
+            runtime_view_url_template: string | null;
+        };
         /** EphemeralRegisterBody */
         EphemeralRegisterBody: {
             /**
@@ -858,6 +885,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    config_config_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConfigOut"];
                 };
             };
         };

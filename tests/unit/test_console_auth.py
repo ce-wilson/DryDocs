@@ -302,7 +302,11 @@ def test_require_role_admits_and_refuses():
 #: shapes, never graph data. Both were public before this item; the guard's
 #: value is that they are now public by decision rather than by nobody
 #: noticing, and re-gating them would be a different item's call.
-PUBLIC_ROUTES = {"/health", "/queries", "/specs", "/login", "/demo"}
+#: /config (WEB10, ADR 0020) serves the per-deployment, NON-SECRET values the
+#: shell needs before anyone has signed in (the O39 deep-link template); it is
+#: public so that one build can be promoted through every environment, and
+#: test_console_delivery.py pins that it serves exactly that one key.
+PUBLIC_ROUTES = {"/health", "/queries", "/specs", "/login", "/demo", "/config"}
 
 #: The registration route is gated by an agent key, not a browser session; it
 #: takes the owner's token in its BODY, which is the thing being validated.

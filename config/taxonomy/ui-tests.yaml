@@ -184,8 +184,8 @@ suites:
           ...", which sends the reader to start a server that is already running, and is
           how the allowlist and the ledger's own documented port stayed out of step from
           O69 with nobody noticing.
-        source: "O85 fix 2026-08-31 — desktop, Chrome vs the console on :5199 against drydocs-api :8002, DRYDOCS_CORS_ORIGINS unset; both diagnosis branches driven against real servers (a live no-CORS server on :8099 and a dead :8098)"
-        automated_by: tests/unit/test_console_origins.py
+        source: "O85 fix 2026-08-31 — desktop, Chrome vs the console on :5199 against drydocs-api :8002, DRYDOCS_CORS_ORIGINS unset; both diagnosis branches driven against real servers (a live no-CORS server on :8099 and a dead :8098). RETIRED CLASS 2026-09-06 (ADR 0020, WEB10): the console is same-origin with its API through a reverse proxy, so there is no allowlist, no port to be unserved and no blocked-origin branch; the automated guard now pins the delivery shape (path map, no CORS middleware, no coordinate in dist) and the e2e suite signs in through the proxy"
+        automated_by: tests/unit/test_console_delivery.py
 
       - id: TC-SHELL-08
         description: A module designated sme is absent from the nav and the Overview spokes for

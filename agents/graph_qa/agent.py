@@ -63,7 +63,9 @@ def _build_pipeline(control: dict, on_step, run_id: str | None = None) -> GraphQ
         ledger=_ledger,
         register_cypher=make_register(
             owner_session=control.get("session_id"),
-            api_url=control.get("api_url"),
+            # api_url is NOT read from the control part (ADR 0020): which
+            # drydocs-api this tier calls is its own deployment fact,
+            # DRYDOCS_API_URL, resolved inside make_register.
             run_id=run_id,
         ),
         on_step=on_step,

@@ -16,6 +16,7 @@
     "api:types": "node scripts/writeApiTypes.mjs",
     "test:coverage": "vitest run --coverage --coverage.thresholds.statements=9.8 --coverage.thresholds.branches=70 --coverage.thresholds.functions=50",
     "bundle:check": "node scripts/checkBundleSize.mjs",
+    "dist:check": "node scripts/checkDistCoordinates.mjs",
     "audit:high": "npm audit --audit-level=high"
   },
   "overrides": {

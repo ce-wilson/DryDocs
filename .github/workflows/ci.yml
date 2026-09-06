@@ -183,6 +183,13 @@ jobs:
       - name: Initial-chunk size ceiling
         run: npm run bundle:check
 
+      # WEB10 (b): one build for every environment (ADR 0020). The bundle names
+      # no host and no port - the console calls the PATHS in web/delivery.json on
+      # its own origin and a reverse proxy does the rest. Before this, an unset
+      # VITE_API_URL pointed every browser at the user's own machine, silently.
+      - name: No deployment coordinate in dist
+        run: npm run dist:check
+
       # WEB13 (a): the ratchet. @vitest/coverage-v8 was declared and never read —
       # the instrument was bought and the numbers went unlooked-at. The floor is
       # 9.8% statements, measured 2026-09-05 (9.89 on the tree that set it), and
