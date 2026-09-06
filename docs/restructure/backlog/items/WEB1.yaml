@@ -9,7 +9,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - docs/reviews/modules/web-2026-09-05.md
@@ -63,3 +63,99 @@ notes: |
   Build order: WEB12 (the data-layer hook) first or alongside, or the seam's transport half is
   written twice. O63 (todo) owns the probe's Ask and admin surfaces; this item adds the shell
   mount and must reuse, not fork, that probe.
+
+  DONE 2026-09-05 (Lane B, laptop). One way to say where the numbers came from.
+
+  (a) THE UNION KEEPS APART WHAT THE FIVE FALLBACKS CONFLATED:
+    live  - rows from the graph
+    empty - a SUCCESS. The graph answered and had nothing. It carries the result,
+            because an empty frame still has a classification, a cypher and a
+            params echo to show; collapsing it into "no data" is how a successful
+            empty answer got rendered as a failure.
+    demo  - and it says WHY: `because: 'empty' | 'error'`. Those are different
+            facts about the system and a reader deserves to know which. Empty
+            means the graph answered and had nothing; error means it never
+            answered. Some routes treated them as one condition and some as two.
+    error - never carries rows.
+
+  A SURFACE THAT PASSES NO DEMO GETS AN ERROR AND FABRICATES NOTHING. That has its
+  own test, because a seam that invented rows for a surface declaring none would
+  be worse than the five it replaces. SpecGraphPane passes null - it refuses to
+  draw rather than draw something that is not the graph - and that policy is now
+  DECLARED at the call site instead of implemented per pane. So is
+  AppCodeCascadePane's app picker: an invented application list offered to a
+  steward as something to map is worse than an empty picker.
+
+  ON THE SEAM: SpecGrid, SpecGraphPane, LoadsRoute, AppCodeCascadePane (four demo
+  frames plus the picker). Those are the surfaces that were doing
+  try-live-else-synthetic over a QuerySpec.
+
+  (b) ProvenanceNotice is the one presentational component, and it renders NOTHING
+  for `live` and `loading` deliberately. A badge that says LIVE on every healthy
+  frame is a badge people stop seeing, and this notice exists to be seen. The
+  LIVE/row-count line stays in SpecGrid's own footer where it already was.
+
+  (d) THE READINESS PROBE. /health was public, named in the client's own comment,
+  and called by nothing in web/src - so "is the API up" was rediscovered by each
+  route at the moment it failed and answered locally by showing demo data. The
+  shell asks once. THREE states, not two: `unchecked` is a real answer, and while
+  the probe is in flight or if it could not run the banner says nothing rather
+  than implying health (O56 - never invent a green). It reuses O63's
+  diagnoseNetworkFailure rather than forking a probe, so the message still says
+  what it OBSERVED instead of asserting a cause.
+
+  (e) THE FALLBACK COUNT IS IN THE SHELL, NOT ON THE FRAMES, and the placement is
+  the whole point. S8's finding is that when the API is unavailable this console
+  does not crash, does not error and does not stop - it quietly serves fabricated
+  numbers behind a badge, and the fallback is DESIGNED so the page still looks
+  healthy. A per-frame badge cannot fix that, because the person who needs to know
+  is not reading that frame. The banner carries the total, the number of distinct
+  specs, and the last activation.
+
+  EVERYONE SEES IT. An earlier draft put the count on the admin strip, as the
+  clause suggests ("a counter on the admin status strip is enough"). That would
+  have hidden "these numbers are invented" from exactly the people most likely to
+  act on them, so it is in the shell for every persona instead. Flagging the
+  deviation because it IS one.
+
+  (f) Loading is a state, not a null - inherited from WEB12's hook.
+
+  (c) THE GUARD, AND THE INSTRUMENT TRAP IT WALKED INTO FOR THE SECOND TIME IN ONE
+  BURST. A demo module is reached through an import PATH - '../loads/demoLoads' -
+  which is a string literal, and codeOnly (the J66 stripper) neutralises string
+  literals. Written that way the scan matched NOTHING: every offender list was
+  empty and both assertions passed while proving nothing, exactly as WEB12's
+  hard-coded-URL scan had. What caught it was the DEAD-ENTRY test - a scan that
+  finds nothing makes every allow-list entry look dead - which is the strongest
+  argument for keeping that test in every allow-list guard.
+
+  Three entries then had to come OUT, for the opposite reason: nvl-mapping.ts,
+  demoSwimlane.ts and demoProductRollup.ts name a demo module only in a COMMENT,
+  so withoutComments correctly does not see them and listing them would have been
+  a false claim about the tree.
+
+  THE ALLOW-LIST DRAWS A REAL DISTINCTION, stated in the file: a pane whose
+  CONTENT is the demo graph - a surface with no live source at all - is not
+  degrading from live data, and routing it through a seam that reports `demo`
+  would say something false about a frame that never claimed to be live. Clause
+  (c) forbids the try-live-else-synthetic PATH, and that is what the list holds
+  the line on: a file that both reads a spec and imports a demo module has to
+  argue for itself.
+
+  WHAT IS NOT ON THE SEAM, and why: MappingsRoute's `apiDown` string. It is the
+  O13 mappings API - drafts, changesets, corrections - not a QuerySpec, so
+  useLiveOrDemo cannot own it without inventing a spec id for a surface that has
+  none. Its demo import is allow-listed with that reason. Making the mappings
+  client speak the same union is a real follow-up and belongs with T3 (the
+  unwrapAs sites), not here.
+
+  FOR THE ADR the item nominates: the seam is built and needs no ruling. What the
+  ADR should record is the rule the guard now enforces - a route may not reach a
+  demo module directly - plus the carve-out above, because the next reader will
+  otherwise read the allow-list as an erosion rather than as the boundary it is.
+
+  Gates at close: poetry run pytest -q = 3360 passed, 12 skipped, 1 failed
+  (test_plan_roadmap - the expected Lane B close failure). ruff clean. In web/:
+  tsc -b exit 0, npm run build exit 0, vitest 18 files / 225 tests (was 13 / 147
+  at the start of this burst), oxlint 0 errors / 10 warnings (the baseline,
+  unchanged).

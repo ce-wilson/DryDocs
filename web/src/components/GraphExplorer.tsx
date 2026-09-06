@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
-import { createApiAccess } from '../lib/graphApi'
 import { forceLayout, trimEdge, type PlacedNode } from '../lib/forceLayout'
 import { GNODE, GSUB } from './GraphSvg'
+import { useGraphAccess } from '../data/graphAccess'
 
 // The LIVE graph view (backlog O6, wf-console-01 V5): real WAS_INFORMED_BY
 // dependency edges from the knowledge graph, through the GraphAccess seam with
@@ -17,8 +17,6 @@ import { GNODE, GSUB } from './GraphSvg'
 // visual language, whose text classes it shares). NVL deferred — revisit when
 // the V5 explorer grows the C4 zoom ladder or >200-node scenes (decision on O6).
 // O30: styled inline via Tailwind/token classes (App.css retired).
-
-const env = import.meta.env
 
 interface DepEdge {
   source: string
@@ -51,9 +49,8 @@ function label(id: string): string {
   return id.length > 16 ? `${id.slice(0, 9)}…${id.slice(-6)}` : id
 }
 
-export default function GraphExplorer({ personaId }: { personaId: string }) {
-  const apiUrl = env.VITE_API_URL ?? 'http://localhost:8001'
-  const access = useMemo(() => createApiAccess(apiUrl, personaId), [apiUrl, personaId])
+export default function GraphExplorer() {
+  const { access } = useGraphAccess()
 
   const [edges, setEdges] = useState<DepEdge[] | null>(null)
   const [database, setDatabase] = useState('')
@@ -62,13 +59,16 @@ export default function GraphExplorer({ personaId }: { personaId: string }) {
   const [attempt, setAttempt] = useState(0)
 
   useEffect(() => {
-    let cancelled = false
+    // A named query, not a spec, so useGraphQuery does not own it — but the
+    // request still gets a real cancel: `let cancelled = false` stopped the
+    // setState and left the work running.
+    const ctl = new AbortController()
     setError('')
     setEdges(null)
     access
-      .runNamed('c4-graph')
+      .runNamed('c4-graph', {}, { signal: ctl.signal })
       .then((res) => {
-        if (cancelled) return
+        if (ctl.signal.aborted) return
         setDatabase(res.database)
         setEdges(
           res.rows.map((r) => ({
@@ -79,11 +79,9 @@ export default function GraphExplorer({ personaId }: { personaId: string }) {
         )
       })
       .catch((e: unknown) => {
-        if (!cancelled) setError(e instanceof Error ? e.message : String(e))
+        if (!ctl.signal.aborted) setError(e instanceof Error ? e.message : String(e))
       })
-    return () => {
-      cancelled = true
-    }
+    return () => ctl.abort()
   }, [access, attempt])
 
   const placed = useMemo(() => (edges && edges.length ? layout(edges) : []), [edges])

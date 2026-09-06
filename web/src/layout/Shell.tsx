@@ -5,8 +5,10 @@ import { ASIDE_COLLAPSE_STORAGE_KEY, initialAsideCollapsed, shellCssVars } from 
 import { RightSidebarProvider, useRightSidebar } from './rightSidebarContext'
 import { useRouteA11y } from './useRouteA11y'
 import Header, { type EnvName } from './Header'
+import SystemBanner from './SystemBanner'
 import Aside from './Aside'
 import RightSidebarSlot from './RightSidebarSlot'
+import * as storage from '../lib/storage'
 
 export type { EnvName }
 
@@ -39,7 +41,7 @@ function ShellGrid({ session, persona, env, onEnvChange, onSignOut }: ShellProps
   function toggleCollapsed(next: boolean) {
     setCollapsed(next)
     try {
-      localStorage.setItem(ASIDE_COLLAPSE_STORAGE_KEY, next ? '1' : '0')
+      storage.write(ASIDE_COLLAPSE_STORAGE_KEY, next ? '1' : '0')
     } catch {
       /* ignore */
     }
@@ -53,8 +55,9 @@ function ShellGrid({ session, persona, env, onEnvChange, onSignOut }: ShellProps
       style={{
         ...vars,
         gridTemplateColumns: 'var(--shell-aside-w) 1fr var(--shell-sidebar-w)',
-        gridTemplateRows: 'auto var(--shell-header-h) 1fr',
-        gridTemplateAreas: '"banner banner banner" "header header header" "aside main sidebar"',
+        gridTemplateRows: 'auto auto var(--shell-header-h) 1fr',
+        gridTemplateAreas:
+          '"banner banner banner" "sysbanner sysbanner sysbanner" "header header header" "aside main sidebar"',
       }}
     >
       {/* O69 re-decided this banner rather than leaving it standing. It read
@@ -72,6 +75,11 @@ function ShellGrid({ session, persona, env, onEnvChange, onSignOut }: ShellProps
       >
         SYNTHETIC ACCOUNT · {persona.id} ({session.role}) · session authenticated by drydocs-api ·
         credentials are machine-local, not a directory
+      </div>
+      {/* WEB1: readiness and the fallback count, in their own row so an empty
+          banner takes no height (grid rows are auto-sized). */}
+      <div style={{ gridArea: 'sysbanner' }}>
+        <SystemBanner />
       </div>
       <div style={{ gridArea: 'header', height: 'var(--shell-header-h)' }} className="min-w-0">
         <Header session={session} persona={persona} env={env} onEnvChange={onEnvChange} onSignOut={onSignOut} />

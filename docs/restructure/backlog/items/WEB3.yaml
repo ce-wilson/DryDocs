@@ -9,7 +9,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - docs/reviews/modules/web-2026-09-05.md
@@ -40,3 +40,114 @@ notes: |
   Covers A1 (rank 4). ADR CANDIDATE: "route authorization derives from the module registry" -
   the ADR-sized part is only how persona-scoped and role-scoped gates share one access
   vocabulary; the derivation itself needs no ruling and is built here.
+
+  DONE 2026-09-05 (Lane B, laptop). One expression of authorization, in the
+  registry.
+
+  THE DESIGN CHOICE WORTH RECORDING: the acceptance says "App.tsx derives every
+  module route's gate from MODULES through canAccessModule". That admits two
+  readings - six DERIVED predicates instead of six hand-written ones, or one gate
+  for all of them. It is one gate: a pathless <RouteAccessGate> layout route
+  inside the Shell, which asks registry.ts what the current pathname requires.
+
+  The reason is what the O59 bug actually was. It was not a WRONG predicate, it
+  was a MISSING one - /remediation's access went to 'sme', the nav honoured it,
+  and nobody wrote the route gate. Six derived predicates would still have to be
+  written one per route, so the seventh module could still arrive without one.
+  With the gate a level up there is nothing per-route to forget: a new module is
+  gated because it is in the registry, full stop.
+
+  WHAT THE SIX PREDICATES WERE: remediation, software, gates, load-map,
+  under-the-hood, mappings. All six are gone from App.tsx, which now contains no
+  role comparison at all (asserted).
+
+  /intake AND /console AND /admin/config - clause (a)'s "expressed in the same
+  vocabulary or record why not". Two different answers, and the difference is the
+  point:
+
+    * /console, /admin/config and /mappings ARE expressible. They are role-gated;
+      they just are not nav MODULES. registry.ts gains GATED_SURFACES for them -
+      same `access` vocabulary, same canAccessModule, each row carrying the reason
+      it is gated. The category already existed: the `admin-config` ModuleId is
+      declared and deliberately kept out of MODULES (O12), so this names what was
+      already true rather than inventing a tier.
+    * /intake is NOT expressible. It admits the SME PERSONA (?as=neo) as well as
+      steward and admin, and `access` is a role vocabulary. It keeps
+      canAccessIntake at its route, and registry.ts declares it in
+      PERSONA_SCOPED_PATHS so the exception is a declaration and not an omission.
+      The vitest asserts it is the ONLY one - a second persona-scoped gate cannot
+      be added quietly.
+
+    FOR THE ADR the item nominates: the derivation is built and needs no ruling.
+    The open question is narrower than the item states it - not "how do
+    persona-scoped and role-scoped gates share one vocabulary" in general, but
+    whether `access` should admit a persona-id member (e.g. 'sme-persona') at the
+    cost of making a ROLE vocabulary hold a non-role, or whether GATED_SURFACES
+    should carry an optional predicate alongside `access`. One live case (/intake)
+    is not enough evidence to choose; a second would decide it.
+
+  BEYOND THE ROUTES, AND INSIDE THE ITEM'S CLAUSE (c): Aside.tsx gated the SAME
+  three surfaces with its own inline predicates for the nav entries. That is the
+  identical two-expressions shape on the identical three surfaces - a nav that can
+  show a link to a route that refuses you, or hide one you may open. All three now
+  read canAccessPath. The one role comparison left in that file draws the "stew"
+  badge, which is a label decision, not a gate.
+
+  CLAUSE (b), BOTH DIRECTIONS, plus the one that matters more than either:
+    forward - every module with non-'all' access resolves to its declared access,
+      refuses a user, matches canAccessModule for all three roles, has a route in
+      App.tsx, and refuses a DEEP LINK under it (the O59 shape at one remove);
+    reverse - every GATED_SURFACES row names a route that exists, so a declaration
+      cannot outlive its route;
+    and THE GATE IS MOUNTED - one test reads App.tsx and asserts <RouteAccessGate>
+      appears ahead of every gated route. Without it, deleting that single line
+      would open every gated route while every other test in the file still
+      passed, because canAccessPath would go on answering correctly to nobody.
+      That is exactly the O59 failure - a correct check nothing consults - so a
+      suite that omitted this would have passed straight through the bug it exists
+      to prevent. Mutation-proven: dropping the mount fails only that test.
+
+  RouteAccessGate.test.tsx is the behavioural half - it renders the gate at every
+  gated path for all three roles and asserts the REDIRECT, not the predicate.
+
+  CLAUSE (c) is a source scan with a default-deny allow-list (the
+  test_module_boundary.py shape): every file containing a role or persona-id
+  comparison must be listed with its reason, so a new inline predicate has to
+  argue for itself in that table. Seven files are listed and every one is a
+  DISPLAY or CAPABILITY decision, not route authorization: registry.ts (the
+  definition itself), auth.ts (canAccessIntake), graph.ts (boltAllowed, a DEV-only
+  adapter gate), views.ts (tower visibility), Aside.tsx (the badge), Header.tsx (an
+  admin affordance), MappingsRoute.tsx (renders the word). A test asserts the
+  allow-list has no DEAD entries either, so it shrinks when a site does.
+
+  THE SCAN STRIPS COMMENTS AND STRING LITERALS FIRST, AND THAT IS J66 EXACTLY, NOT
+  A FORMALITY: the comments in App.tsx, registry.ts and RouteAccessGate.tsx
+  EXPLAIN the forbidden predicate by quoting it verbatim. A raw-source scan would
+  fail on its own explanation and teach the next person to delete the explanation.
+  The stripper has its own instrument check - four fixtures asserting a commented,
+  block-commented and stringified predicate are all invisible while a real one is
+  not.
+
+  TWO EXISTING GUARDS MOVED, both because what they asserted is gone:
+
+    * test_load_map_console.py::test_the_route_is_gated_the_same_way_the_registry_says
+      asserted that the /load-map ROUTE contained "steward" and "admin" - a guard
+      that REQUIRED the duplication whose drift it was guarding against. Its
+      intent is now structural truth, so it asserts the structure: routed, inside
+      the gate, and carrying no predicate of its own (that last one inverted -
+      finding a role word there is now the failure).
+    * test_ui_components.py: RouteAccessGate registered in the O42 ledger; pin
+      88 -> 89, bound stays 40. Deliberately UNBOUND - one gate serving twelve
+      modules, so binding it to any single one would misstate it, the same reason
+      TrustLegend and StatusItems are unbound. Being unbindable is the point of
+      the component.
+
+  NOT CHANGED, and worth knowing: /graph/:specId keeps its own check. It is not a
+  module path, so the gate lets it through, and GraphCanvasRoute gates on the
+  HOST module of the requested spec - the same canAccessModule, on a value only
+  the route knows. That is a derivation, not a second expression.
+
+  Gates at close: poetry run pytest -q = 3356 passed, 12 skipped, 1 failed
+  (test_plan_roadmap - the expected Lane B close failure). ruff clean both ways.
+  In web/: tsc -b exit 0, npm run build exit 0, vitest 15 files / 187 tests
+  (was 13 / 147), oxlint 0 errors.

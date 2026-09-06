@@ -4,6 +4,8 @@
 // theme), then kept in sync here as the user toggles or the OS scheme changes.
 // Mirror any change to the constants/logic below in the index.html boot script.
 
+import * as storage from './storage'
+
 export type ThemeMode = 'system' | 'dark' | 'light'
 
 export const THEME_STORAGE_KEY = 'drydocs.theme.v1'
@@ -33,7 +35,7 @@ export function applyThemeMode(mode: ThemeMode): void {
   root.setAttribute('data-theme-mode', mode)
   root.style.colorScheme = isDark ? 'dark' : 'light'
   try {
-    localStorage.setItem(THEME_STORAGE_KEY, mode)
+    storage.write(THEME_STORAGE_KEY, mode)
   } catch {
     /* privacy mode etc. — theme still applies for this page load */
   }

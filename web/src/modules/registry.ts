@@ -263,3 +263,82 @@ export const MODULES: readonly ModuleDef[] = [
 export function moduleByPath(pathname: string): ModuleDef | undefined {
   return MODULES.find((m) => pathname === m.path || pathname.startsWith(`${m.path}/`))
 }
+
+// ── WEB3: route authorization derives from THIS file ────────────────────────
+//
+// Before WEB3 authorization had two expressions. canAccessModule() drove the
+// nav (Aside), the Overview spokes and the canvas host gate, while App.tsx
+// restated `persona.role === 'steward' || persona.role === 'admin'` inline six
+// times. That divergence had already shipped one bug: O59 set /remediation's
+// registry access to 'sme', which hid the nav entry and left the route
+// reachable by typing the URL — a module was hidden and open at the same time.
+// The fix chosen then was to duplicate the predicate at the route, which is why
+// the next module added with access 'sme' would have reproduced it exactly.
+//
+// So the gate is now derived, and it is derived ONE level up from the routes:
+// App.tsx wraps every route in a single pathless gate that asks this file what
+// the current path requires. A new module cannot be added un-gated, because
+// nobody has to remember to gate it — there is no per-route predicate left to
+// forget.
+
+/** A route-gated surface that is NOT a nav module or an Overview spoke.
+ *
+ * The `admin-config` ModuleId above already establishes the category (O12:
+ * "admin surfaces reuse the shared template but are NOT nav modules"). These
+ * carry the SAME `access` vocabulary and go through the SAME canAccessModule,
+ * so being off the nav never means being off the check. */
+export interface GatedSurface {
+  path: string
+  access: NonNullable<ModuleDef['access']>
+  /** why this surface is gated — the sentence a future reader needs */
+  why: string
+}
+
+export const GATED_SURFACES: readonly GatedSurface[] = [
+  {
+    path: '/mappings',
+    access: 'sme',
+    why: 'O13: the mapping WRITE surface — drafts, changeset promotion, corrections. The server enforces the same boundary on /mappings/*; steward still has no /console.',
+  },
+  {
+    path: '/admin/config',
+    access: 'admin',
+    why: 'O12: the traceability lens — admin persona only.',
+  },
+  {
+    path: '/console',
+    access: 'admin',
+    why: 'ADR 0005: the raw-Cypher sandbox. Admin only, and deliberately NOT opened to steward.',
+  },
+]
+
+/** Paths whose gate is deliberately NOT expressible in the `access` vocabulary.
+ *
+ * `/intake` admits the SME PERSONA (`?as=neo`) as well as steward and admin, so
+ * its check is `canAccessIntake(persona)` in lib/auth.ts and it keeps its own
+ * route-level gate. `access` is a role vocabulary and this is a persona-scoped
+ * grant; widening the vocabulary to hold both is the ADR the item nominates
+ * ("route authorization derives from the module registry", whose ADR-sized part
+ * is exactly how persona-scoped and role-scoped gates share one vocabulary).
+ * Listed here rather than left silent so the exception is a declaration and not
+ * an omission — and so the both-directions test below can assert it is the ONLY
+ * one. */
+export const PERSONA_SCOPED_PATHS: readonly string[] = ['/intake']
+
+/** The access a path requires, or undefined when nothing gates it.
+ *
+ * Modules match by prefix (so `/lineage/asset/x` inherits `/lineage`), which is
+ * `moduleByPath`'s rule and the reason a deep link cannot slip past a gate its
+ * parent route carries. */
+export function accessForPath(pathname: string): ModuleDef['access'] | undefined {
+  const surface = GATED_SURFACES.find(
+    (s) => pathname === s.path || pathname.startsWith(`${s.path}/`),
+  )
+  if (surface) return surface.access
+  return moduleByPath(pathname)?.access
+}
+
+/** May this role open this path? The single question App.tsx asks. */
+export function canAccessPath(pathname: string, role: 'user' | 'steward' | 'admin'): boolean {
+  return canAccessModule(accessForPath(pathname), role)
+}
