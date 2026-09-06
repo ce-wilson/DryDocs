@@ -3,7 +3,7 @@ handoff: drydocs.lane-handoff.v1
 lane: B
 machine: laptop
 generated: 2026-09-05
-generated_at: 5f5acab9 (main)
+generated_at: 298806b6 (main)
 queue: [WEB2, WEB6, WEB8, WEB7, O63, R12, O43, G131, O89, O68]
 pens: [code:drydocs-web, code:drydocs-agents]
 ---
@@ -84,6 +84,7 @@ the change back through the sender.
 | `snapshot` (this skill's addition to §0) | `knowledge/depgraph-snapshots/` | Lane A — the session snapshot — one writer per burst |
 | Lane A's queue | the items WEB9, WEB10, R19, R15, R16, P6, N27 and their inputs | do not claim or edit |
 | `code:<module>` | everything an item in YOUR queue names in `inputs` | this lane, claimed per item |
+| `code:drydocs-web` | `config/taxonomy/ui-components.yaml` | this lane, with the module — the O42 ledger guard fails on any new .tsx, so every web item adds its row here (the 2026-09-05 Lane B close: five items touched it, none named it) |
 | — | `docs/plan/*.html`, `web/src/generated/**`, `docs/design/*.html` | derived renders — Lane A regenerates once at close; nobody merges them by hand (J43) |
 
 **Lane B claims status-only and never renders.** A claim is one item file, pushed;

@@ -90,6 +90,20 @@ PENS: dict[str, tuple[tuple[str, str], ...]] = {
 SECTION_0_PENS: tuple[str, ...] = ("backlog", "port", "adr")
 LANE_A_PENS: tuple[str, ...] = tuple(PENS)
 
+#: Surfaces a ``code:<module>`` pen carries that no item names in its ``inputs``: a
+#: file a guard makes every item in that module edit. Rendered under the
+#: ``code:<module>`` row when the module is in the lane's queue, so the edit reads as
+#: the pen's and not as scope creep. Keyed by module id, same shape as :data:`PENS`.
+MODULE_SURFACES: dict[str, tuple[tuple[str, str], ...]] = {
+    "drydocs-web": (
+        (
+            "config/taxonomy/ui-components.yaml",
+            "the O42 ledger guard fails on any new .tsx, so every web item adds its row here "
+            "(the 2026-09-05 Lane B close: five items touched it, none named it)",
+        ),
+    ),
+}
+
 #: Input paths that say "this item needs data that lives on one machine".
 VENUE_MARKERS: tuple[str, ...] = ("internal-local/", "DRYDOCS_DATA_ROOT", "data/DryDocs")
 
@@ -352,6 +366,11 @@ def render(
         )
     out += [
         "| `code:<module>` | everything an item in YOUR queue names in `inputs` | this lane, claimed per item |",
+    ]
+    for module in sorted({r["module"] for r in rows}):
+        for prefix, what in MODULE_SURFACES.get(module, ()):
+            out.append(f"| `code:{module}` | `{prefix}` | this lane, with the module — {what} |")
+    out += [
         "| — | `docs/plan/*.html`, `web/src/generated/**`, `docs/design/*.html` | derived renders — "
         "Lane A regenerates once at close; nobody merges them by hand (J43) |",
         "",
