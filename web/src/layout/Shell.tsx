@@ -6,6 +6,7 @@ import { RightSidebarProvider, useRightSidebar } from './rightSidebarContext'
 import { useRouteA11y } from './useRouteA11y'
 import Header, { type EnvName } from './Header'
 import SystemBanner from './SystemBanner'
+import FeedbackLayer from '../feedback/FeedbackLayer'
 import Aside from './Aside'
 import RightSidebarSlot from './RightSidebarSlot'
 import * as storage from '../lib/storage'
@@ -93,6 +94,11 @@ function ShellGrid({ session, persona, env, onEnvChange, onSignOut }: ShellProps
       <main ref={contentRef} style={{ gridArea: 'main' }} className="min-h-0 min-w-0 overflow-y-auto">
         <Outlet />
       </main>
+      {/* O89: the L5 screen loop, OUTSIDE main so its own bar is never one of
+          the blocks it anchors — and scoped to the routes O88's capture covers
+          (clause e), so the paper gutter and the screen control offer the same
+          ids on the same pages. It renders nothing at all elsewhere. */}
+      <FeedbackLayer />
     </div>
   )
 }

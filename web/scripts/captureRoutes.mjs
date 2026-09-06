@@ -42,6 +42,7 @@ import { chromium } from 'playwright'
 import { JSDOM } from 'jsdom'
 
 import { assemblePaperDocument, externalReferences, routeSlug } from '../src/lib/paperForm.ts'
+import { FEEDBACK_ROUTES } from '../src/feedback/consoleFeedback.ts'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const REPO_ROOT = resolve(HERE, '..', '..')
@@ -51,7 +52,11 @@ const REPO_ROOT = resolve(HERE, '..', '..')
 // capturable on any machine, and exactly the pages FB-03 says get reviewed.
 // Graph-backed routes are opt-in via --routes and are only as good as the graph
 // behind the API at capture time; the footer's commit and time say which moment.
-const DEFAULT_ROUTES = ['/gates', '/software', '/load-map']
+//
+// IMPORTED, NOT RESTATED (O89 clause e). The screen half offers its annotate
+// control on exactly these routes, and two lists would drift into a printout
+// whose gutter names ids no screen offers.
+const DEFAULT_ROUTES = [...FEEDBACK_ROUTES]
 
 function usage(message) {
   if (message) console.error(`captureRoutes: ${message}`)

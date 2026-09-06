@@ -82,7 +82,7 @@ components:
   - { id: App,                     area: entry,        path: App.tsx }
   - { id: main,                    area: entry,        path: main.tsx }
 
-  # --- layout (10) ---
+  # --- layout (11) ---
   - { id: Aside,                   area: layout,       path: layout/Aside.tsx }
   - { id: Header,                  area: layout,       path: layout/Header.tsx }
   - { id: ModuleToolbar,           area: layout,       path: layout/ModuleToolbar.tsx }
@@ -98,6 +98,7 @@ components:
   # OUTSIDE the surfaces doing the fabricating.
   - { id: SystemBanner,            area: layout,       path: layout/SystemBanner.tsx }
   - { id: rightSidebarContext,     area: layout,       path: layout/rightSidebarContext.tsx }
+  - { id: FeedbackLayer,           area: layout,       path: feedback/FeedbackLayer.tsx }   # O89 the L5 screen loop: an annotate control per anchored block, mounted beside main
 
   # --- route (24) ---
   - { id: AdminConfigRoute,        area: route,        path: routes/AdminConfigRoute.tsx }

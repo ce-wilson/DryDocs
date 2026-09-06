@@ -182,29 +182,44 @@ export function consoleAnchorValid(anchor: string, known: readonly string[]): st
  *  cell, a repeated "Total" row — and two blocks with one anchor would make a
  *  note ambiguous rather than merely imprecise. The suffix is ordinal within
  *  the collision only, so inserting an unrelated block never renumbers it. */
-export function injectMarginTags(root: ParentNode, slug: string, doc: Document): string[] {
+export interface AnchoredBlock {
+  el: HTMLElement
+  anchor: string
+}
+
+/** Every anchorable block under `root`, with its id — THE one function that
+ *  decides what is annotatable and what it is called.
+ *
+ *  Both halves of the loop call it: the paper gutter (`injectMarginTags`, below)
+ *  and the screen control (`feedback/consoleFeedback.ts`). That is clause (e)
+ *  made structural rather than promised — a printout's gutter cannot name an id
+ *  the screen does not offer, because there is nothing that could compute a
+ *  different answer.
+ *
+ *  IT MUTATES NOTHING, and that is what makes the shared use safe: injecting a
+ *  tag changes an element's textContent, and a table is reached before its own
+ *  rows, so computing anchors WHILE tagging hashed each row's table with the
+ *  table's tag already inside it — the row anchors stopped carrying the table as
+ *  a prefix and the degradation rule silently stopped working. Compute first,
+ *  then whoever called it can do what it likes to the DOM. */
+export function anchorBlocks(root: ParentNode, slug: string): AnchoredBlock[] {
   const blocks = Array.from(root.querySelectorAll<HTMLElement>(ANCHOR_SELECTOR)).filter(
     (el) => !el.closest(`.${PRINT_FOOTER_CLASS}`),
   )
-
-  // TWO PASSES, AND THE ORDER IS LOAD-BEARING. Every anchor is computed over the
-  // UNTOUCHED DOM before anything is injected, because injecting a tag changes
-  // the element's textContent — and a table is tagged before its own rows are
-  // reached, so a single pass hashed each row's table WITH the table's tag
-  // already inside it. The row anchors then no longer carried the table anchor
-  // as a prefix and the degradation rule silently stopped working. Caught by the
-  // prefix test, which is exactly why that property has a test of its own.
-  const anchors: string[] = []
   const seen = new Map<string, number>()
-  for (const el of blocks) {
+  return blocks.map((el) => {
     const base = anchorFor(el, slug)
     const dup = seen.get(base) ?? 0
     seen.set(base, dup + 1)
-    anchors.push(dup === 0 ? base : `${base}-${dup + 1}`)
-  }
+    return { el, anchor: dup === 0 ? base : `${base}-${dup + 1}` }
+  })
+}
 
-  for (const [i, el] of blocks.entries()) {
-    const anchor = anchors[i]
+export function injectMarginTags(root: ParentNode, slug: string, doc: Document): string[] {
+  const blocks = anchorBlocks(root, slug)
+  const anchors = blocks.map((b) => b.anchor)
+
+  for (const { el, anchor } of blocks) {
     const tag = doc.createElement('span')
     tag.className = MARGIN_TAG_CLASS
     tag.setAttribute('aria-hidden', 'true')

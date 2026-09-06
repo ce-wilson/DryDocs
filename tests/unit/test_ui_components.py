@@ -372,6 +372,12 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     component shows up at all.
     91 -> 92 at WEB5 (2026-09-05): RouteErrorBoundary, UNBOUND for the same
     reason as RouteAccessGate -- one boundary for every route.
+    93 -> 94 at O89 (2026-09-05): FeedbackLayer, UNBOUND, bound stays 40. It is
+    the L5 screen loop mounted beside `main` for every route the paper capture
+    covers, so it belongs to those three and to no module in particular -- the
+    same reason RouteErrorBoundary and RouteAccessGate are unbound. Filed under
+    `layout` rather than a `feedback` area of its own: one component does not
+    make an area, and it renders as shell chrome does.
     92 -> 93 at WEB2 (2026-09-05): TruncationBadge, UNBOUND, bound stays 40. It
     is the ONE way a capped result says so -- the canvas's node ceiling and the
     grid's row ceiling render the same badge in the same words -- so binding it
@@ -383,5 +389,5 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
         40,
-        93,
+        94,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"
