@@ -129,10 +129,13 @@ def _run_body(parts: list[dict], session_id: str = "s-1") -> dict:
     }
 
 
-def _control(token: str) -> dict:
-    """Exactly what ``askApi.controlPart`` builds."""
+def _control(session_id: str) -> dict:
+    """Exactly what ``askApi.controlPart`` builds (ADR 0019: the handle, never
+    the token)."""
     return {
-        "text": json.dumps({"drydocs_control": {"api_token": token, "api_url": "http://api.test"}})
+        "text": json.dumps(
+            {"drydocs_control": {"session_id": session_id, "api_url": "http://api.test"}}
+        )
     }
 
 
@@ -192,17 +195,19 @@ def test_run_and_run_sse_describe_the_same_turn(stub):
 
 
 def test_the_control_part_is_found_wherever_it_sits(stub):
-    token_part = _control("tok")
-    assert control_from_parts([{"text": "q"}, token_part])["api_token"] == "tok"
-    assert control_from_parts([token_part, {"text": "q"}])["api_token"] == "tok"
+    token_part = _control("sid")
+    assert control_from_parts([{"text": "q"}, token_part])["session_id"] == "sid"
+    assert control_from_parts([token_part, {"text": "q"}])["session_id"] == "sid"
     assert control_from_parts([{"text": "q"}]) is None
     # a part that is JSON but not a control part is not one
     assert control_from_parts([{"text": '{"something": 1}'}]) is None
 
 
 def test_the_explore_ref_resolves_for_the_owning_session(api, stub, sessions):
-    token = sessions.issue(PERSONA).token
-    res = stub.post("/run_sse", json=_run_body([{"text": "q"}, _control(token)]))
+    session = sessions.issue(PERSONA)
+    token = session.token
+    # ADR 0019: what crosses to the agent is the handle; the bearer stays here.
+    res = stub.post("/run_sse", json=_run_body([{"text": "q"}, _control(session.session_id)]))
     payloads = _payloads(_parse_sse(res.text))
     ref = payloads[1]["step"]["explore_ref"]
     assert ref, f"no explore_ref; registrar errors: {stub.registrar.errors}"  # type: ignore[attr-defined]
@@ -220,9 +225,9 @@ def test_the_explore_ref_resolves_for_the_owning_session(api, stub, sessions):
 
 
 def test_another_session_cannot_run_this_sessions_ref(api, stub, sessions):
-    owner = sessions.issue(PERSONA).token
+    owner = sessions.issue(PERSONA)
     other = sessions.issue(PERSONA).token
-    res = stub.post("/run_sse", json=_run_body([{"text": "q"}, _control(owner)]))
+    res = stub.post("/run_sse", json=_run_body([{"text": "q"}, _control(owner.session_id)]))
     ref = _payloads(_parse_sse(res.text))[1]["step"]["explore_ref"]
     assert ref
     denied = api.post(
@@ -235,7 +240,7 @@ def test_another_session_cannot_run_this_sessions_ref(api, stub, sessions):
 def test_a_failed_registration_is_surfaced_and_not_swallowed(api, stub, sessions):
     # The one failure mode that would make this fixture worthless is a stub that
     # emits `explore_ref: null` and says nothing when the handshake breaks.
-    res = stub.post("/run_sse", json=_run_body([{"text": "q"}, _control("not-a-real-token")]))
+    res = stub.post("/run_sse", json=_run_body([{"text": "q"}, _control("not-a-live-session")]))
     step = _payloads(_parse_sse(res.text))[1]["step"]
     assert step["explore_ref"] is None
     assert step["error"], "a failed registration must reach the step, not vanish"

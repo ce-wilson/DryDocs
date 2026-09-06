@@ -153,7 +153,9 @@ class ThreadDecisionBody(BaseModel):
 
 
 class EphemeralRegisterBody(BaseModel):
-    owner_token: str
+    # ADR 0019: the owning session's PUBLIC handle, never its token. The agent
+    # authenticates itself with X-DryDocs-Agent-Key; this field only scopes.
+    owner_session: str
     cypher: str
     database: str
     params: dict = {}
@@ -339,7 +341,7 @@ def create_app(
             path = getattr(route, "path", request.url.path)
             try:
                 with audit.observe(
-                    path, token=user.token, run_id=request.headers.get("x-drydocs-run-id")
+                    path, token=user.session_id, run_id=request.headers.get("x-drydocs-run-id")
                 ):
                     raise exc
             except Forbidden:
@@ -435,7 +437,7 @@ def create_app(
     ) -> NamedRunOut:
         try:
             with audit.observe(
-                "/query/{query_id}", token=user.token, run_id=x_drydocs_run_id
+                "/query/{query_id}", token=user.session_id, run_id=x_drydocs_run_id
             ) as rec:
                 rec.query_id = query_id
                 rec.params = body.params
@@ -461,7 +463,9 @@ def create_app(
         x_drydocs_run_id: str | None = Header(default=None),
     ) -> NamedRunOut:
         try:
-            with audit.observe("/raw-cypher", token=user.token, run_id=x_drydocs_run_id) as rec:
+            with audit.observe(
+                "/raw-cypher", token=user.session_id, run_id=x_drydocs_run_id
+            ) as rec:
                 rec.cypher = body.cypher  # debug tier only; the api line cannot carry it
                 out = run_raw(body.cypher, user.token, sessions, graph)
                 rec.database = str(out["database"])
@@ -493,10 +497,12 @@ def create_app(
     ) -> dict[str, object]:
         # Audited even though it executes nothing: the Cypher ENTERS the system
         # here, and it is the route the QA agent's run_id arrives on (ruling D).
-        # The actor is the OWNER session the ref is scoped to.
+        # The actor is the OWNER session the ref is scoped to -- its handle,
+        # which is what every other route records too (ADR 0019), so the
+        # registration and the later run/export join on one actor value.
         try:
             with audit.observe(
-                "/specs/ephemeral", token=body.owner_token, run_id=x_drydocs_run_id
+                "/specs/ephemeral", token=body.owner_session, run_id=x_drydocs_run_id
             ) as rec:
                 rec.cypher = body.cypher
                 rec.params = body.params
@@ -504,7 +510,7 @@ def create_app(
                 out = register_ephemeral(
                     x_drydocs_agent_key,
                     os.environ.get("DRYDOCS_AGENT_REG_KEY"),
-                    body.owner_token,
+                    body.owner_session,
                     body.cypher,
                     body.database,
                     body.params,
@@ -533,7 +539,7 @@ def create_app(
     ) -> SpecRunOut:
         try:
             with audit.observe(
-                "/specs/{spec_id}/run", token=user.token, run_id=x_drydocs_run_id
+                "/specs/{spec_id}/run", token=user.session_id, run_id=x_drydocs_run_id
             ) as rec:
                 rec.spec_id = spec_id
                 rec.params = body.params
@@ -564,7 +570,7 @@ def create_app(
             # MANIFEST's fact (it registers when the download completes). A
             # failure after streaming starts is the manifest's to reveal.
             with audit.observe(
-                "/specs/{spec_id}/export", token=user.token, run_id=x_drydocs_run_id
+                "/specs/{spec_id}/export", token=user.session_id, run_id=x_drydocs_run_id
             ) as rec:
                 rec.spec_id = spec_id
                 rec.params = body.params
@@ -657,7 +663,7 @@ def create_app(
             sessions,
             intake_store,
             audit_route="/intake",
-            audit_token=user.token,
+            audit_token=user.session_id,
         )
 
     @app.get("/intake")
@@ -686,7 +692,7 @@ def create_app(
                 sessions,
                 intake_store,
                 audit_route="/intake/{intake_id}/evidence",
-                audit_token=user.token,
+                audit_token=user.session_id,
             )
         return out
 
@@ -705,7 +711,7 @@ def create_app(
             sessions,
             intake_store,
             audit_route="/intake/{intake_id}/transition",
-            audit_token=user.token,
+            audit_token=user.session_id,
         )
 
     @app.post("/intake/{intake_id}/thread-decision")
@@ -722,7 +728,7 @@ def create_app(
             sessions,
             intake_store,
             audit_route="/intake/{intake_id}/thread-decision",
-            audit_token=user.token,
+            audit_token=user.session_id,
         )
 
     # ── O13 mapping stewardship (plan M2) — reads from the mapping-store
@@ -780,7 +786,7 @@ def create_app(
             mapping_store,
             draft_id=body.draft_id,
             audit_route="/mappings/overrides/draft",
-            audit_token=user.token,
+            audit_token=user.session_id,
         )
 
     @app.get("/mappings/drafts")
@@ -796,7 +802,7 @@ def create_app(
             sessions,
             mapping_store,
             audit_route="/mappings/drafts/{draft_id}/promote",
-            audit_token=user.token,
+            audit_token=user.session_id,
         )
 
     @app.get("/mappings/overrides/report")
@@ -842,7 +848,7 @@ def create_app(
             sessions,
             mapping_store,
             audit_route="/mappings/app-code/draft",
-            audit_token=user.token,
+            audit_token=user.session_id,
         )
 
     # K7 §B2 tier-3 readback (lifted from wip/k9-laptop at J30): dual-coded was

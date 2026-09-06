@@ -298,14 +298,19 @@ def test_raising_a_ceiling_a_spec_does_not_have_is_refused() -> None:
 
 def _ephemeral(store: InMemorySessionStore, cypher: str, params: dict):
     eph = EphemeralSpecStore()
-    ref = eph.register(_token_for(store), cypher, "drydocs", params).ref
+    # ADR 0019: the store is keyed by the session's public handle, not its token
+    ref = eph.register(_session_for(store).session_id, cypher, "drydocs", params).ref
     return eph, ref
 
 
+def _session_for(store: InMemorySessionStore):
+    if not getattr(store, "_api1_session", None):
+        store._api1_session = store.issue("mouse")  # type: ignore[attr-defined]
+    return store._api1_session  # type: ignore[attr-defined]
+
+
 def _token_for(store: InMemorySessionStore) -> str:
-    if not getattr(store, "_api1_token", None):
-        store._api1_token = store.issue("mouse").token  # type: ignore[attr-defined]
-    return store._api1_token  # type: ignore[attr-defined]
+    return _session_for(store).token
 
 
 EPH_CYPHER = "MATCH (n:BusinessApplication) RETURN n.app_id AS app_id LIMIT $limit"

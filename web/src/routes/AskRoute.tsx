@@ -70,12 +70,13 @@ const STEP_LABEL: Record<string, string> = {
 export default function AskRoute({ persona }: { persona: Persona }) {
   const adkUrl = (import.meta.env.VITE_ADK_URL as string | undefined) ?? 'http://localhost:8000'
 
-  // ONE shared client, now the SESSION's: the token handed to the agent (the R4
-  // owner token) and the runSpec/exportSpec calls must belong to the SAME api
-  // session, or the agent-registered explore_refs would 404 for this page. WEB12
-  // moved that client to the provider, so this page shares it with every other
-  // surface instead of holding the only correct copy of the rule.
-  const { apiUrl, getToken } = useGraphAccess()
+  // ONE shared client, now the SESSION's: the handle handed to the agent (the
+  // owner of the specs it registers, ADR 0019) and the runSpec/exportSpec calls
+  // must belong to the SAME api session, or the agent-registered explore_refs
+  // would 404 for this page. WEB12 moved that client to the provider, so this
+  // page shares it with every other surface instead of holding the only
+  // correct copy of the rule.
+  const { apiUrl, getSessionId } = useGraphAccess()
 
   // spec id -> classification, for citation chips ('spec:<id>' sources).
   const [specClass, setSpecClass] = useState<Record<string, string>>({})
@@ -132,12 +133,13 @@ export default function AskRoute({ persona }: { persona: Persona }) {
     const ctl = new AbortController()
     inFlight.current = ctl
 
-    // R4 handshake: forward this session's api token so the agent can register
-    // ephemeral specs WE own. If drydocs-api is down the question still runs —
-    // steps simply carry no explore_ref (honest degradation, matching the agent).
+    // R4 handshake: forward this session's PUBLIC handle so the agent can
+    // register ephemeral specs WE own (ADR 0019: the bearer token stays here).
+    // If drydocs-api is down the question still runs — steps simply carry no
+    // explore_ref (honest degradation, matching the agent).
     let control: ReturnType<typeof controlPart> | undefined
     try {
-      control = controlPart(await getToken(), apiUrl)
+      control = controlPart(await getSessionId(), apiUrl)
     } catch {
       control = undefined
     }

@@ -557,8 +557,8 @@ export type components = {
              * @default
              */
             description: string;
-            /** Owner Token */
-            owner_token: string;
+            /** Owner Session */
+            owner_session: string;
             /**
              * Params
              * @default {}
@@ -636,6 +636,10 @@ export type components = {
         /**
          * LoginOut
          * @description The session the browser holds. Never the secret (O69).
+         *
+         *     ``session_id`` (ADR 0019) is the public handle: the console passes it to the
+         *     graph_qa agent in the control part so the agent can register ephemeral specs
+         *     for THIS session without ever holding the token. It authorizes nothing.
          */
         LoginOut: {
             /** Expires At */
@@ -644,6 +648,8 @@ export type components = {
             persona_id: string;
             /** Role */
             role: string;
+            /** Session Id */
+            session_id: string;
             /** Token */
             token: string;
         };

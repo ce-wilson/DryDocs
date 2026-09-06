@@ -86,8 +86,8 @@
             "title": "Description",
             "type": "string"
           },
-          "owner_token": {
-            "title": "Owner Token",
+          "owner_session": {
+            "title": "Owner Session",
             "type": "string"
           },
           "params": {
@@ -98,7 +98,7 @@
           }
         },
         "required": [
-          "owner_token",
+          "owner_session",
           "cypher",
           "database"
         ],
@@ -218,7 +218,7 @@
       },
       "LoginOut": {
         "additionalProperties": false,
-        "description": "The session the browser holds. Never the secret (O69).",
+        "description": "The session the browser holds. Never the secret (O69).\n\n``session_id`` (ADR 0019) is the public handle: the console passes it to the\ngraph_qa agent in the control part so the agent can register ephemeral specs\nfor THIS session without ever holding the token. It authorizes nothing.",
         "properties": {
           "expires_at": {
             "title": "Expires At",
@@ -232,6 +232,10 @@
             "title": "Role",
             "type": "string"
           },
+          "session_id": {
+            "title": "Session Id",
+            "type": "string"
+          },
           "token": {
             "title": "Token",
             "type": "string"
@@ -239,6 +243,7 @@
         },
         "required": [
           "token",
+          "session_id",
           "persona_id",
           "role",
           "expires_at"

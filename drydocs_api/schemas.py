@@ -48,9 +48,15 @@ class StatusOut(_Declared):
 
 
 class LoginOut(_Declared):
-    """The session the browser holds. Never the secret (O69)."""
+    """The session the browser holds. Never the secret (O69).
+
+    ``session_id`` (ADR 0019) is the public handle: the console passes it to the
+    graph_qa agent in the control part so the agent can register ephemeral specs
+    for THIS session without ever holding the token. It authorizes nothing.
+    """
 
     token: str
+    session_id: str
     persona_id: str
     role: str
     expires_at: str

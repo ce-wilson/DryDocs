@@ -31,6 +31,8 @@ export type { paths }
 export interface SessionHooks {
   /** the held bearer token, or null when signed out */
   token(): string | null
+  /** the session's public handle (ADR 0019), or null when signed out */
+  sessionId(): string | null
   /** the server (or the absence of a token) ended the session: drop it, tell the app */
   rejected(): void
 }
@@ -61,6 +63,18 @@ export function requireToken(session: SessionHooks, personaId?: string): string 
     throw new Error(`not signed in${who} — the console session has ended`)
   }
   return token
+}
+
+/** The session's public handle (ADR 0019), with the same "no session ends the
+ *  session" rule as requireToken — a missing handle IS a missing session. */
+export function requireSessionId(session: SessionHooks, personaId?: string): string {
+  const id = session.sessionId()
+  if (!id) {
+    session.rejected()
+    const who = personaId ? ` as ${personaId}` : ''
+    throw new Error(`not signed in${who} — the console session has ended`)
+  }
+  return id
 }
 
 /** A client that sends the session's bearer token and ends the session on 401. */

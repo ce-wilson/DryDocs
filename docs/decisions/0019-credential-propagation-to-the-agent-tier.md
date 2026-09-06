@@ -209,11 +209,11 @@ on every future audit.
   claim and the agent key becomes a client credential; this ADR's shape is what
   that replaces, and the replacement should be a substitution, not a redesign.
 
-## Action items (the build — WEB9 clause (b); the ADR was ruled 2026-09-06, option C)
+## Action items (the build — WEB9 clause (b); ruled 2026-09-06, option C; built the same day on `wip/WEB9-desktop`)
 
-1. [ ] `drydocs_api/sessions.py`: `Session.session_id` minted at issue; `resolve_by_id`; login returns it.
-2. [ ] `drydocs_api/ephemeral_specs.py` + `app.py`: `owner_session` replaces `owner_token` on registration; store keyed `(session_id, ref)`; run/export map bearer → `session_id`; audit actor = `session_id`.
-3. [ ] `agents/common/ephemeral_client.py` + `graph_qa/agent.py`: send `owner_session`; `control.get("session_id")`.
-4. [ ] `web/src/ask/askApi.ts` + `lib/auth.ts`: store `sessionId`; `controlPart(sessionId, apiUrl)`; the request-body-has-no-token test.
-5. [ ] `graph_qa/control.py`: docstring names `session_id` as the control field; `api_token` stays in `SECRET_CONTROL_FIELDS` with a one-line reason (stale builds).
-6. [ ] `dump_openapi.py --check`, `npm run api:types`; ADR 0007 decision 4 gains a one-line pointer here.
+1. [x] `drydocs_api/sessions.py`: `Session.session_id` minted at issue; `resolve_by_id`; login returns it.
+2. [x] `drydocs_api/ephemeral_specs.py` + `app.py`: `owner_session` replaces `owner_token` on registration; store keyed `(session_id, ref)`; run/export map bearer → `session_id`; audit actor = `session_id`.
+3. [x] `agents/common/ephemeral_client.py` + `graph_qa/agent.py`: send `owner_session`; `control.get("session_id")`.
+4. [x] `web/src/ask/askApi.ts` + `lib/auth.ts`: store `sessionId`; `controlPart(sessionId, apiUrl)`; the request-body-has-no-token test.
+5. [x] `graph_qa/control.py`: docstring names `session_id` as the control field; `api_token` stays in `SECRET_CONTROL_FIELDS` with a one-line reason (stale builds).
+6. [x] `dump_openapi.py --check`, `npm run api:types`; ADR 0007 decision 4 gains a one-line pointer here.

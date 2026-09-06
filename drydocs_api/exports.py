@@ -256,16 +256,18 @@ def resolve_export_limit(
 
 
 def _resolve_spec(
-    spec_id: str, token: str, ephemerals: EphemeralSpecStore | None
+    spec_id: str, session_id: str, ephemerals: EphemeralSpecStore | None
 ) -> tuple[QuerySpec, dict[str, object]]:
     """Resolve a spec id for run/export. ``eph.`` refs resolve ONLY through the
     owning session's store entry (R4: foreign/expired/unknown all 404) and
     carry their params frozen at registration; registry ids resolve as before
-    with no fixed params."""
+    with no fixed params. ``session_id`` is the AUTHENTICATED caller's public
+    handle (ADR 0019) — the bearer was already resolved, so the lookup keys on
+    the same value the agent registered under."""
     if is_ephemeral_ref(spec_id):
         if ephemerals is None:
             raise UnknownSpecError(spec_id)
-        eph = ephemerals.resolve(token, spec_id)
+        eph = ephemerals.resolve(session_id, spec_id)
         return eph.as_query_spec(), dict(eph.bound_params)
     return query_spec(spec_id), {}
 
@@ -286,8 +288,8 @@ def run_spec(
     session's own ephemeral registration); watermark column appended for
     specs that declare uncertain=True (pre-fold this keyed on the
     retired ddcontext/ddall database names — ADR 0011 §117)."""
-    _authenticate(token, store)
-    spec, fixed = _resolve_spec(spec_id, token, ephemerals)
+    session = _authenticate(token, store)
+    spec, fixed = _resolve_spec(spec_id, session.session_id, ephemerals)
     bound = {**fixed, **validate_params(spec, params)}
     return execute_spec(spec, bound, runner)
 
@@ -385,7 +387,7 @@ def export_spec(
     if fmt not in ("csv", "jsonl"):
         raise ValueError(f"unsupported export format '{fmt}' (csv | jsonl)")
     session = _authenticate(token, store)
-    spec, fixed = _resolve_spec(spec_id, token, ephemerals)
+    spec, fixed = _resolve_spec(spec_id, session.session_id, ephemerals)
     bound = {**fixed, **validate_params(spec, params)}
     ensure_read_only(spec.cypher)
     ceiling = resolve_export_limit(spec, bound, limit)
