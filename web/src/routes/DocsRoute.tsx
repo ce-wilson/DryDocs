@@ -1,7 +1,5 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import type { Persona } from '../lib/auth'
-import { createApiAccess } from '../lib/graphApi'
 import { MODULES } from '../modules/registry'
 import ModuleTemplate from './ModuleTemplate'
 import SpecGrid from '../explorer/SpecGrid'
@@ -24,11 +22,9 @@ const docsModule = MODULES.find((m) => m.id === 'docs')!
 
 const NOTICE = 'SYNTHESIZED · ILLUSTRATIVE — the live corpus renders once bmc-docs is loaded in the target DB'
 
-export default function DocsRoute({ persona }: { persona: Persona }) {
+export default function DocsRoute() {
   const { docId } = useParams<{ docId: string }>()
   const [selectedId, setSelectedId] = useState<string | null>(docId ? 'doc' : null)
-  const apiUrl = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:8001'
-  const access = useMemo(() => createApiAccess(apiUrl, persona.id), [apiUrl, persona.id])
 
   const selectedLabel = docId ?? DOCS_NODES.find((n) => n.id === selectedId)?.label
   const frameProps = { selectedId, onSelect: setSelectedId }
@@ -54,23 +50,17 @@ export default function DocsRoute({ persona }: { persona: Persona }) {
         // The component owns its own fetch and its own error state.
         'Corpus status': <CorpusStatus />,
         Documents: (
-          <SpecGrid
-            access={access}
-            specId="docs.documents.v1"
+          <SpecGrid specId="docs.documents.v1"
             fallback={<LinkedDemoFrame frame={DOCUMENTS_FRAME} notice={NOTICE} {...frameProps} />}
           />
         ),
         Chunks: (
-          <SpecGrid
-            access={access}
-            specId="docs.chunks.v1"
+          <SpecGrid specId="docs.chunks.v1"
             fallback={<LinkedDemoFrame frame={CHUNKS_FRAME} notice={NOTICE} {...frameProps} />}
           />
         ),
         'Trust/provenance audit': (
-          <SpecGrid
-            access={access}
-            specId="docs.trust-provenance.v1"
+          <SpecGrid specId="docs.trust-provenance.v1"
             fallback={<LinkedDemoFrame frame={TRUST_FRAME} notice={NOTICE} {...frameProps} />}
           />
         ),

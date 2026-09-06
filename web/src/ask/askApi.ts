@@ -100,6 +100,19 @@ export interface AskOptions {
   /** the R4 handshake — omit to ask without explore_refs (agent still answers) */
   control?: AdkPart
   onStep: (step: AskStep) => void
+  /** WEB12 (c): abort the turn. A stopped turn throws AskStopped, never an
+   *  answer — the one thing a stop control must never produce is a result. */
+  signal?: AbortSignal
+}
+
+/** The turn was stopped by the person asking. Distinct from an agent error and
+ *  from a transport failure, because it renders differently and is nobody's
+ *  fault: a stopped turn is a stopped turn, not a failed one. */
+export class AskStopped extends Error {
+  constructor() {
+    super('stopped')
+    this.name = 'AskStopped'
+  }
 }
 
 let sessionReady: string | null = null
@@ -115,7 +128,7 @@ export async function ensureSession(adkUrl: string, app: string, userId: string,
  *  (SSE), falling back to the buffered /run when streaming isn't available —
  *  steps then arrive together with the answer, visibly but not live. */
 export async function ask(opts: AskOptions): Promise<AskEnvelope> {
-  const { adkUrl, app, userId, sessionId, question, control, onStep } = opts
+  const { adkUrl, app, userId, sessionId, question, control, onStep, signal } = opts
   const parts: AdkPart[] = control ? [{ text: question }, control] : [{ text: question }]
   await ensureSession(adkUrl, app, userId, sessionId)
 
@@ -128,11 +141,17 @@ export async function ask(opts: AskOptions): Promise<AskEnvelope> {
   }
 
   try {
-    await runAgentSse(adkUrl, app, userId, sessionId, parts, handle)
-  } catch {
+    await runAgentSse(adkUrl, app, userId, sessionId, parts, handle, signal)
+  } catch (err) {
+    // A STOP is not a transport failure. Falling back to the non-streaming
+    // endpoint here would restart the very turn the person just stopped, which
+    // is worse than not offering the control at all.
+    if (signal?.aborted) throw new AskStopped()
+    void err
     const events = await runAgentParts(adkUrl, app, userId, sessionId, parts)
     events.forEach(handle)
   }
+  if (signal?.aborted) throw new AskStopped()
   if (!final) throw new Error('agent returned no envelope — is the graph_qa app selected?')
   return final
 }

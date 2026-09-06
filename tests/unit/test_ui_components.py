@@ -349,10 +349,31 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     evidence rule asks for. Their pure helpers -- profileData.ts,
     findingClasses.ts, slotShapes.ts -- are .ts and stay outside the scan
     boundary for the same reason nvl-mapping.ts does.
+    88 -> 89 at WEB3 (2026-09-05): RouteAccessGate, deliberately UNBOUND, so the
+    total moves and bound stays at 40. It is the ONE route gate for the whole
+    console -- a pathless layout route that reads modules/registry.ts and admits
+    or redirects whatever path is current -- so binding it to a module would name
+    one of the twelve it serves, the same misstatement TrustLegend and StatusItems
+    are unbound to avoid. That it is unbindable is the point of the component.
+    89 -> 90 at WEB12 (2026-09-05): GraphAccessProvider, also UNBOUND, bound stays
+    40. It is the session's single GraphAccess, mounted above every route, so it
+    belongs to all twelve modules for the same reason RouteAccessGate does. Its
+    sibling data/graphAccess.ts (the context, the hook, the dedupe) is .ts and
+    stays outside the scan boundary, like nvl-mapping.ts and loadMapModel.ts.
+    90 -> 92 at WEB1 (2026-09-05): SystemBanner and ProvenanceNotice, both
+    UNBOUND, bound stays 40. SystemBanner reports readiness and the fallback
+    count for the whole console, and ProvenanceNotice renders the same trust
+    signal on every surface that can fall back -- binding either to one module
+    would name one of the twelve it serves. Their seam, data/provenance.ts, is
+    .ts and outside the scan boundary.
+    92 -> 91 at WEB13 (2026-09-05): TowerIcon.tsx DELETED. Nineteen lines, zero
+    importers, and noUnusedLocals cannot see an unused MODULE -- which is the
+    tech-debt pass's point about it, and the reason the ledger is where a dead
+    component shows up at all.
     """
     comps = _ui()["components"]
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
         40,
-        88,
+        91,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"

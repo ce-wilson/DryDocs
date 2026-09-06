@@ -9,7 +9,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - docs/reviews/modules/web-2026-09-05.md
@@ -50,3 +50,145 @@ notes: |
 
   R15 (todo) is the Ask cousin - exact versus lower-bound labelling on query answers. Same
   principle, different surface; link, do not merge.
+
+  DONE 2026-09-05 (Lane B, laptop). The read contract carries completeness.
+
+  MECHANISM, RECORDED AS CLAUSE (a) ASKS THE BUILDER TO RECORD IT: `limit + 1`.
+  The driver is asked for one row past the ceiling and `truncated` is whether that
+  row came back. Chosen over the pre-limit `count()` the clause offers as the
+  alternative because a count is a second traversal on every read of every frame,
+  and it answers a question nobody asked (how many rows exist) where this answers
+  the one that is asked (is what I am looking at all of it). One row over is the
+  cheapest possible evidence and it is exact, not an estimate.
+
+  THE PROBE ROW IS EVIDENCE, NEVER PAYLOAD. It is dropped in execute_spec before
+  the envelope is built, and the export generator stops emitting at the ceiling,
+  so no caller and no exported file ever sees row 501. Three tests pin that
+  separately at the run, csv and jsonl paths, because "the flag is right but the
+  file has an extra row in it" would break the very contract the flag states.
+
+  THE ECHOED PARAMS STILL SAY 500 WHILE THE DRIVER WAS ASKED FOR 501, and that
+  split is deliberate: SpecGrid feeds `result.params` straight back into
+  `exportSpec`, so an echoed 501 would silently widen every subsequent export by
+  one row, once per export, forever. Two existing tests asserted the old
+  driver-side value and were UPDATED rather than worked around
+  (test_agent_query.py, test_query_specs.py) - they now assert both halves, the
+  probe the driver sees and the ceiling the caller is told, which is the pair that
+  matters.
+
+  (b) THE MANIFEST CARRIES `truncated` AND `limit` BESIDE `row_count`. The test
+  that makes the point exports the same spec twice, once over the ceiling and once
+  at exactly 500 rows: identical `row_count`, opposite `truncated`. That is the
+  whole finding in two assertions - row_count alone cannot tell a complete answer
+  from a cut one, and the manifest is the governance record that outlives the
+  screen.
+
+  (c) EXPORT_LIMIT_CEILING = 50_000, RAISABLE PER CALL via a new `ExportBody`
+  (a subclass of QueryBody, because raising a grid's limit changes what is on
+  screen while raising an export's changes what lands in a filed artifact - two
+  different permissions to grant). Omitting it keeps today's behaviour byte for
+  byte, so an un-updated caller is unaffected; a test asserts that specifically.
+
+  A CEILING AND NOT "UNBOUNDED", DELIBERATELY. The clause offers either. An
+  unbounded export over a result set nobody has counted is the failure the display
+  limit was protecting against, relocated rather than fixed - and now that
+  `truncated` is in the manifest, an export that hits 50,000 SAYS so, which is the
+  property the item was actually buying. Raising the constant is a one-line
+  reviewable edit. Over-ceiling and nonsense values (0, negative, a string) are
+  REFUSED with 422 and never clamped: a caller who asked for 200,000 and silently
+  received 50,000 would be handed exactly the quietly-capped artifact this item
+  exists to abolish.
+
+  THE ENVELOPE IS BUILT IN execute_spec, SO THE AGENT TIER INHERITS IT. R9's "the
+  same ten keys" is now twelve. This was not incidental - an agent that files a
+  500-row answer as the answer is the same defect as a console that does, and
+  putting the fields at the route instead would have fixed one and left the other.
+
+  REGISTRY INVARIANT THE MECHANISM RESTS ON, now guarded: `display_limit_param`
+  requires BOTH a declared `limit` parameter AND a `$limit` the Cypher actually
+  binds. Measured at pull: 43 specs, 39 capped, 0 mismatched. The conjunction is
+  not decoration - a spec that declared the parameter without binding it would
+  have had every result over 500 rows reported as truncated AND SLICED, the API
+  inventing a cap no query applied. test_result_completeness.py holds the registry
+  there.
+
+  FOR WEB2 (the console half, which depends on this): read `truncated` and `limit`
+  off the typed result. `limit` is null for the four specs that have no ceiling -
+  render nothing rather than "0". The boundary case is why clause (d) exists and
+  has its own test here: at exactly 500 rows `rows.length === limit` says
+  TRUNCATED over a complete answer, and the server knows better because it asked
+  for 501 and got 500. Where clause (c) made the ceiling raisable, it is raisable
+  on the EXPORT path only; there is no raised-limit grid read.
+
+  GENERATED ARTIFACTS AND THEIR WRITERS (Lane A runs these at merge if the source
+  moved - the handoff's third 2026-09-03 lesson):
+    web/src/generated/openapi.json  <- poetry run python scripts/dump_openapi.py
+    web/src/generated/api.d.ts      <- npm run api:types   (in web/)
+  Both regenerated, never hand-edited, and both need DRYDOCS_DATA_ROOT set.
+
+  TWO FINDINGS FOR THE INBOX, both hit in this session:
+
+  1. scripts/dump_openapi.py TRUNCATES ITS OUTPUT BEFORE IT CAN FAIL.
+     `write_schema` opens the file "w" and only then calls `render_schema()`
+     inside the write expression, so any failure during app construction - an
+     unset DRYDOCS_DATA_ROOT is the easy one - leaves web/src/generated/openapi.json
+     at ZERO BYTES. Observed here exactly that way, and the next `npm run
+     api:types` then died on "Unexpected end of JSON input" pointing at the wrong
+     thing. One-line fix: render first, then open. The drift test does catch the
+     empty file, so the blast radius is one confusing loop and not a bad commit.
+
+  2. `npm run api:types` NEEDS DRYDOCS_DATA_ROOT and says so only through a
+     Python traceback nested inside a Node stack. It is documented in
+     dump_openapi.py's own docstring; it is not documented where a web developer
+     would look.
+
+  Gates at close: poetry run pytest -q = 3356 passed, 12 skipped, 1 failed -
+  test_plan_roadmap.py::test_committed_roadmap_page_matches_its_sources, the
+  expected Lane B close failure (Lane B does not render; Lane A's render at merge
+  is the fix). ruff check clean; ruff format clean. In web/: tsc -b exit 0 with
+  WEB4's strict flag on, npm run build exit 0, vitest 147/147, oxlint 0 errors.
+
+  CORRECTION, same day, before merge — THE EPHEMERAL PATH WAS REPORTING FALSE
+  COMPLETENESS, and the note above described the wrong rule.
+
+  As first written, `applied_limit` keyed on the spec DECLARING a `limit`
+  parameter. An R4 ephemeral spec is built with `params=()` — user-supplied params
+  fail closed, which is the frozen-params rule — while its ceiling arrives in
+  `bound_params`, frozen at registration. So an agent-registered query whose
+  Cypher ends `LIMIT $limit` with a bound value of 50 was reported as
+  `truncated: false, limit: null`: a capped answer claiming completeness, on the
+  Ask surface, which is the surface most likely to produce one. That is this
+  item's own defect, reintroduced one layer down.
+
+  `applied_limit` now keys on the CYPHER binding `$limit` plus a bound integer for
+  it. The conjunction still does the safety work it was there for — if the Cypher
+  binds `$limit` the driver really applies it, so more rows than the ceiling can
+  only mean the ceiling bit, and no cap is ever invented for a spec that does not
+  apply one.
+
+  `display_limit_param()` is DELETED rather than left beside the new rule. It
+  described what governs completeness and no longer did; a helper that states a
+  superseded rule and whose only remaining caller is a test is how the superseded
+  rule gets re-adopted later. The registry invariant it expressed (a declared
+  `limit` and a bound `$limit` go together) is asserted directly from the spec
+  fields in the test that owns it.
+
+  CLAUSE (c) DOES NOT REACH AN EPHEMERAL SPEC, and that is a ruling, not a gap:
+  raising an ephemeral's export ceiling would rewrite a param frozen at
+  registration, and being replayed verbatim is what makes an agent-registered
+  query reproducible (R4). Reporting its completeness is free; rewriting its bound
+  limit is not. The refusal is explicit and names R4 — a 422, never a silent
+  downgrade to the frozen value.
+
+  Four tests cover it: a frozen ceiling reports truncated, an ephemeral with no
+  `$limit` reports null, the manifest records the frozen ceiling, and a raise
+  attempt is refused.
+
+  Also corrected: agent_query.py's module docstring still said "the same ten
+  keys". Its twin in exports.py had been updated and this one had not — the exact
+  two-expressions shape the web review found eight times, so it is worth naming
+  rather than fixing quietly.
+
+  Found by review before merge, not by a test — nothing in the suite exercised an
+  ephemeral spec through the completeness path, because the tests were written
+  against the rule as understood. The four above close that.
