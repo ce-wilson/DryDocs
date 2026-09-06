@@ -47,3 +47,11 @@ notes: |
   Covers S3 (rank 7). ADR CANDIDATE: "the console's delivery shape." Link O72 (one-command
   local stack) - O72 composes the four processes the runbook starts by hand; a ruled delivery
   shape decides whether there are four or three.
+  DRAFTED 2026-09-06 (desktop, Lane A): clause (a) is docs/decisions/0020-console-delivery-shape.md,
+  PROPOSED, with its README row. Re-measured before drafting: the API-base literal is ONE definition
+  now (apiBaseUrl, WEB12 done 2026-09-05), the agent base is two files, and the O39 template is the
+  third build-time deployment value. Recommends option C - one reverse proxy path-routing /api, /agent
+  and / with prefixes stripped, the API base as the PATH /api, dev same-origin through Vite's proxy so
+  both allowlists go, a no-coordinate-in-dist CI guard, GET /api/config for the non-secret runtime
+  values, and api_url leaving the 0019 control part. Clauses (b)-(d) wait on the ruling; the ADR's
+  action items are their build list. Item stays in_progress, gate-bound, until the user rules.
