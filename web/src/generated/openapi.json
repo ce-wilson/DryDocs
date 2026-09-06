@@ -96,6 +96,28 @@
         "title": "ColumnOut",
         "type": "object"
       },
+      "ConfigOut": {
+        "additionalProperties": false,
+        "description": "GET /config (ADR 0020): the non-secret, per-environment values the console\nreads at boot instead of having them inlined at build time. Nothing here may\nbe a credential or a coordinate the page could not already reach.",
+        "properties": {
+          "runtime_view_url_template": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Runtime View Url Template"
+          }
+        },
+        "required": [
+          "runtime_view_url_template"
+        ],
+        "title": "ConfigOut",
+        "type": "object"
+      },
       "EphemeralRegisterBody": {
         "properties": {
           "columns": {
@@ -693,6 +715,24 @@
           }
         },
         "summary": "Get Log Estate"
+      }
+    },
+    "/config": {
+      "get": {
+        "operationId": "config_config_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfigOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Config"
       }
     },
     "/demo": {

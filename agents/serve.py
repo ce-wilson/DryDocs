@@ -15,7 +15,13 @@ CONVENTION (agents/README.md): an app is a directory with an ``agent.py``; a
 shared package has none and is therefore never an app. Run::
 
     cd agents
-    .venv\Scripts\python serve.py --allow_origins http://localhost:5173
+    .venv\Scripts\python serve.py
+
+NO ``--allow_origins`` (ADR 0020, WEB10): the console reaches this server as
+``/agent/*`` on its OWN origin, through the same reverse proxy that serves the
+page (Vite's in dev, O72's in the Compose stack), so no browser request is
+cross-origin and the allowlist ADK would install is left off. A cross-origin
+caller is a deployment defect, not a case to configure for.
 
 This launcher also installs the R23 CONTROL REDACTION, because it is the only
 place both halves are in scope: ADK's ``get_fast_api_app`` takes a session
@@ -75,7 +81,7 @@ def _install_control_redaction() -> None:
     setattr(fast_api, _ADK_SESSION_FACTORY, redacting_factory)
 
 
-def build_app(allow_origins: list[str] | None, host: str, port: int):
+def build_app(host: str, port: int):
     from google.adk.cli.fast_api import get_fast_api_app
     from google.adk.cli.utils._nested_agent_loader import NestedAgentLoader
 
@@ -84,7 +90,6 @@ def build_app(allow_origins: list[str] | None, host: str, port: int):
     return get_fast_api_app(
         agents_dir=str(AGENTS_DIR),
         agent_loader=NestedAgentLoader(str(AGENTS_DIR)),
-        allow_origins=allow_origins,
         web=False,  # the API server, exactly as `adk api_server` — only the loader differs
         host=host,
         port=port,
@@ -93,13 +98,12 @@ def build_app(allow_origins: list[str] | None, host: str, port: int):
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--allow_origins", nargs="*", default=["http://localhost:5173"])
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8000)
     args = parser.parse_args()
     import uvicorn
 
-    uvicorn.run(build_app(args.allow_origins, args.host, args.port), host=args.host, port=args.port)
+    uvicorn.run(build_app(args.host, args.port), host=args.host, port=args.port)
     return 0
 
 

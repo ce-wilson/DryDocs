@@ -25,9 +25,11 @@ import { codeOnly, filesMatching, withoutComments } from '../test/sourceScan'
 
 const ALLOWED: Record<string, Record<string, string>> = {
   // pattern -> file -> why this one occurrence is the definition, not a copy
-  'localhost:8001': {
-    'lib/auth.ts': 'apiBaseUrl() — THE definition. Twelve files used to inline its body beside it.',
-  },
+  // Empty since WEB10 (ADR 0020): apiBaseUrl() returns the PATH `/api` read from
+  // web/delivery.json, so no file under src/ names a host or port at all. The
+  // literal's last home was this entry; web/scripts/checkDistCoordinates.mjs
+  // guards the built bundle the same way.
+  'localhost:8001': {},
   'createApiAccess(': {
     'lib/graphApi.ts': 'the factory itself.',
     'data/GraphAccessProvider.tsx': 'the ONE call, for the session.',

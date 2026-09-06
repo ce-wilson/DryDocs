@@ -43,6 +43,14 @@ class HealthOut(_Declared):
     status: str
 
 
+class ConfigOut(_Declared):
+    """GET /config (ADR 0020): the non-secret, per-environment values the console
+    reads at boot instead of having them inlined at build time. Nothing here may
+    be a credential or a coordinate the page could not already reach."""
+
+    runtime_view_url_template: str | None
+
+
 class StatusOut(_Declared):
     status: str
 

@@ -1,10 +1,11 @@
-import { runtimeViewUrl, type RuntimeKind } from '../../lib/runtimeView'
+import { runtimeViewUrl, useRuntimeViewTemplate, type RuntimeKind } from '../../lib/runtimeView'
 
 // IdChip — the identifier-rendering convention (O38 / DL-6 + DL-11a;
 // docs/design/ui-exploration/ui-conventions.md §2): Control-M / product / run identifiers render
 // in Plex Mono inside a subtle chip, colored ONLY through the shared status
 // vocabulary tokens (§1) — same object, same look, on every surface. When the
-// O39 runtime-view template is configured (VITE_RUNTIME_VIEW_URL_TEMPLATE),
+// O39 runtime-view template is configured (served by GET /api/config from the
+// API's DRYDOCS_RUNTIME_VIEW_URL_TEMPLATE; ADR 0020),
 // the chip grows an external-link affordance to the runtime monitor; with the
 // template unset it renders nothing extra (the two-track seam: mechanism
 // here, company URL binding company-side only).
@@ -19,10 +20,11 @@ export function IdChip({
   /** status token per the shared vocabulary; omit for the neutral identifier look */
   token?: '--green' | '--yellow' | '--teal' | '--blue-br' | '--status-fail-soft' | '--muted'
   title?: string
-  /** set to render the O39 runtime-view link when the env template is configured */
+  /** set to render the O39 runtime-view link when the deployment serves a template */
   runtimeKind?: RuntimeKind
 }) {
-  const href = runtimeKind ? runtimeViewUrl(runtimeKind, id) : null
+  const template = useRuntimeViewTemplate()
+  const href = runtimeKind ? runtimeViewUrl(runtimeKind, id, template) : null
   const style = token ? { borderColor: `var(${token})`, color: `var(${token})` } : undefined
   return (
     <span

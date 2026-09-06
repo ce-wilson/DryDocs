@@ -38,14 +38,16 @@ import { defineConfig, devices } from '@playwright/test'
 // the suite never adopts, never collides with, and never has to stop a console
 // session somebody is using.
 const API_PORT = 8011
-// THE WEB PORT IS AN ORIGIN, which is the second bug the harness hit. The API's
-// CORS allowlist named exactly two browser origins — vite dev 5173 and vite
-// preview 4173 — so serving the console anywhere else failed every /login
-// preflight with no Access-Control-Allow-Origin and the page showed "Failed to
-// fetch". Rather than move the suite onto the developer's port and fight over it,
-// the allowlist now EXTENDS from DRYDOCS_CORS_ORIGINS (passed to the API below),
-// so this port is isolated and declared rather than borrowed. The API port needs
-// no such treatment: it is not an origin, only the page's own port is checked.
+// THE WEB PORT USED TO BE AN ORIGIN, which was the second bug the harness hit:
+// the API's CORS allowlist named exactly two browser origins (vite dev 5173 and
+// preview 4173), so serving the console anywhere else failed every /login
+// preflight and the page showed "Failed to fetch"; the fix was an allowlist
+// extension, DRYDOCS_CORS_ORIGINS, passed from here. ADR 0020 (WEB10) retired
+// that whole class: the console is same-origin with its API - the page fetches
+// `/api/...` on its own origin and the Vite dev server proxies it to
+// DRYDOCS_API_UPSTREAM, which is the ONE place this harness now says where its
+// API is. There is no allowlist to extend and no origin to declare; the port is
+// still dedicated so the suite never collides with a console session in use.
 const WEB_PORT = 5273
 const REPO_ROOT = join(import.meta.dirname, '..')
 
@@ -121,7 +123,6 @@ export default defineConfig({
       timeout: 120_000,
       env: {
         DRYDOCS_CONSOLE_CREDENTIALS: credentialPath,
-        DRYDOCS_CORS_ORIGINS: `http://localhost:${WEB_PORT}`,
       },
     },
     {
@@ -130,9 +131,10 @@ export default defineConfig({
       port: WEB_PORT,
       reuseExistingServer: false,
       timeout: 120_000,
-      // The console reads its API base from this at build/serve time; without it
-      // the app would call the developer's 8001 rather than the suite's API.
-      env: { VITE_API_URL: `http://localhost:${API_PORT}` },
+      // The Vite PROCESS reads this to know where to proxy `/api` (vite.config.ts);
+      // the page itself learns nothing but the path. Without it the proxy would
+      // forward to the developer's 8001 rather than the suite's API.
+      env: { DRYDOCS_API_UPSTREAM: `http://localhost:${API_PORT}` },
     },
   ],
 })

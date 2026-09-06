@@ -4,8 +4,7 @@ The console sends the user's question as message part 0 and an OPTIONAL
 control part after it: a JSON object under the ``drydocs_control`` key
 carrying what the agent needs to act on the caller's behalf —
 
-    {"drydocs_control": {"session_id": "<drydocs-api session handle>",
-                         "api_url": "http://localhost:8001"}}
+    {"drydocs_control": {"session_id": "<drydocs-api session handle>"}}
 
 ``session_id`` is the browser's drydocs-api session named by its PUBLIC handle
 (ADR 0019): with it, the agent registers each executed Cypher as an ephemeral
@@ -15,6 +14,10 @@ itself to ``/specs/ephemeral`` with its own agent key, and the console's
 bearer token never rides in a message part (ADR 0019 D1). Before that ruling
 the field was ``api_token`` and carried the live token itself; R23 below is
 the seam that kept that out of the store, and it stays as defence in depth.
+Until ADR 0020 (WEB10) the part also carried ``api_url``; it no longer does,
+because which drydocs-api this tier calls is its own deployment fact
+(``DRYDOCS_API_URL``, read in ``common.ephemeral_client``), not the page's to
+say -- a stale console that still sends it is ignored, never obeyed.
 Control parts never reach the LLM — the pipeline only ever sees
 part 0 — and an in-band part was chosen over ADK session state deliberately:
 the shape is fully owned by this repo on both ends, testable without an ADK
@@ -40,7 +43,8 @@ import json
 
 CONTROL_KEY = "drydocs_control"
 
-#: Control fields whose VALUE is a credential. ``api_url`` is deliberately not
+#: Control fields whose VALUE is a credential. A non-secret field a stale
+#: console still sends (``api_url``, retired at ADR 0020) is deliberately not
 #: here: it is configuration, it is useful in a stored trace, and redacting it
 #: would make the persisted event harder to read for no security gain.
 #: ``session_id`` is not here either — it is a public handle (ADR 0019 D2) and

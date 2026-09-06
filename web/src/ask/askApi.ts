@@ -71,12 +71,14 @@ export interface AskEnvelope {
   task_graph?: TaskGraphSnapshot[]
 }
 
-/** The R5 control part: the session's PUBLIC handle and the api url, and
- *  nothing else. ADR 0019 D1 — no credential rides in a message part. The
- *  agent authenticates itself to drydocs-api; the handle only names the
- *  session its registrations belong to. askApi.test.ts pins the absence. */
-export function controlPart(sessionId: string, apiUrl: string): AdkPart {
-  return { text: JSON.stringify({ drydocs_control: { session_id: sessionId, api_url: apiUrl } }) }
+/** The R5 control part: the session's PUBLIC handle, and nothing else.
+ *  ADR 0019 D1 — no credential rides in a message part; ADR 0020 — no api url
+ *  either, because which drydocs-api the agent calls is the agent's own
+ *  deployment fact (DRYDOCS_API_URL), not the page's to say. The agent
+ *  authenticates itself; the handle only names the session its registrations
+ *  belong to. askApi.test.ts pins both absences. */
+export function controlPart(sessionId: string): AdkPart {
+  return { text: JSON.stringify({ drydocs_control: { session_id: sessionId } }) }
 }
 
 type Parsed = { kind: 'step'; step: AskStep } | { kind: 'final'; envelope: AskEnvelope } | null

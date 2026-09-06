@@ -4,6 +4,8 @@ import { createAuthedApi, createPublicApi, detailOf, requireToken, type SessionH
 
 vi.mock('./reachability', () => ({
   diagnoseNetworkFailure: async (baseUrl: string) => ({ message: `diagnosed: nothing answered at ${baseUrl}` }),
+  isUpstreamDown: (status: number) => status === 502 || status === 503 || status === 504,
+  upstreamDownMessage: (status: number, where: string) => `diagnosed: upstream ${status} behind ${where}`,
 }))
 
 // O70. The transport policies the hand-written wrappers used to carry one copy
@@ -81,6 +83,13 @@ describe('the authed client', () => {
     )
     await expect(createAuthedApi(BASE, hooks('tok')).GET('/health')).rejects.toThrow(
       `diagnosed: nothing answered at ${BASE}`,
+    )
+  })
+
+  it('reads a proxy 502 as the upstream being down, not as an API answer (ADR 0020)', async () => {
+    fakeFetch(502, 'upstream not answering')
+    await expect(createAuthedApi(BASE, hooks('tok')).GET('/health')).rejects.toThrow(
+      `diagnosed: upstream 502 behind ${BASE}`,
     )
   })
 

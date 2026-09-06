@@ -3,7 +3,7 @@ import { boltAllowed, type GraphResult } from '../lib/graph'
 import { labelsNamedIn } from '../lib/cypher-labels'
 import { createBoltAccess } from '../lib/neo4j'
 import { listApps, createSession, runAgent, type AdkEvent } from '../lib/adk'
-import type { Role } from '../lib/auth'
+import { agentBaseUrl, type Role } from '../lib/auth'
 
 const env = import.meta.env
 
@@ -63,7 +63,9 @@ export default function CypherConsole({ personaId, role }: { personaId: string; 
   // --- dev-mode flow: browser -> bolt adapter -> Neo4j (GraphAccess seam) -----
   // Password is form-entered ONLY — never seeded from VITE_* env, which Vite
   // inlines into the built bundle (ADR 0005 decision 4).
-  const [uri, setUri] = useState(env.VITE_NEO4J_URI ?? 'bolt://localhost:7687')
+  // The bolt default is a DEV bench coordinate, so it is DEV-only: a production
+  // bundle names no host and no port (ADR 0020, web/scripts/checkDistCoordinates.mjs).
+  const [uri, setUri] = useState(env.VITE_NEO4J_URI ?? (import.meta.env.DEV ? 'bolt://localhost:7687' : ''))
   const [user, setUser] = useState(env.VITE_NEO4J_USER ?? 'neo4j')
   const [password, setPassword] = useState('')
   // O83: the fallback is the PROJECT database, not the driver's home database.
@@ -126,7 +128,10 @@ export default function CypherConsole({ personaId, role }: { personaId: string; 
   }
 
   // --- agent flows: browser -> adk api_server -> Neo4j ------------------------
-  const [adkUrl, setAdkUrl] = useState(env.VITE_ADK_URL ?? 'http://localhost:8000')
+  // Seeded with the same-origin `/agent` path (ADR 0020); the input stays
+  // editable because this is the dev bench, where pointing at another agent
+  // server for one session is the point.
+  const [adkUrl, setAdkUrl] = useState(agentBaseUrl())
   const [apps, setApps] = useState<string[]>([])
   const [app, setApp] = useState('graph_query')
   const [sessionId, setSessionId] = useState('')

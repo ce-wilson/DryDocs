@@ -185,21 +185,58 @@ DECLARED_VARIABLES: Final[tuple[EnvVar, ...]] = (
         group="roots",
         example="90",
     ),
+    # ADR 0020 (WEB10, 2026-09-06): the console is same-origin with drydocs-api and
+    # the agent server in every environment, so DRYDOCS_CORS_ORIGINS -- the extra
+    # browser origins the API's allowlist accepted -- is RETIRED with the allowlist
+    # itself. The variables that replaced the build-time VITE_* coordinates follow.
     EnvVar(
-        name="DRYDOCS_CORS_ORIGINS",
-        purpose="extra browser origins drydocs-api accepts, comma-separated (O80 e2e)",
+        name="DRYDOCS_API_UPSTREAM",
+        purpose="where Vite's dev/preview proxy forwards /api (ADR 0020)",
         group="machine-local",
-        example="http://localhost:5273",
+        example="http://localhost:8001",
         doc=(
-            "ADDS to the built-in dev origins (vite dev 5173, vite preview 4173); it never\n"
-            "replaces them, so an empty or unset value leaves the allowlist exactly as it\n"
-            "has always been. It exists because the allowlist was HARDCODED, which made the\n"
-            "console untestable anywhere but those two ports: the end-to-end suite needs its\n"
-            "own port so it never adopts, collides with, or has to stop a dev server\n"
-            "somebody is using, and a browser origin the API does not name fails every\n"
-            "preflight with no Access-Control-Allow-Origin. Entries are taken verbatim --\n"
-            "`*` is NOT special-cased here, and setting it would be a decision about a\n"
-            "deployed API rather than a convenience for a test."
+            "Read by the VITE PROCESS (web/vite.config.ts, from its shell environment), not\n"
+            "by Python and not from this .env -- it is declared here so the one list still\n"
+            "says which variables exist. The console calls the PATH /api on its own\n"
+            "origin; this is the drydocs-api the proxy forwards that path to, with the\n"
+            "prefix stripped. Unset means the default, which is the local API's port. The\n"
+            "value is never inlined into the bundle: a production build carries no\n"
+            "deployment coordinate at all (web/scripts/checkDistCoordinates.mjs)."
+        ),
+    ),
+    EnvVar(
+        name="DRYDOCS_AGENT_UPSTREAM",
+        purpose="where Vite's dev/preview proxy forwards /agent (ADR 0020)",
+        group="machine-local",
+        example="http://localhost:8000",
+        doc=(
+            "The agent server (agents/serve.py) behind the console's /agent path; same\n"
+            "rules as DRYDOCS_API_UPSTREAM. In the Compose stack (O72) the reverse proxy\n"
+            "carries this map instead and Vite is not running."
+        ),
+    ),
+    EnvVar(
+        name="DRYDOCS_API_URL",
+        purpose="the drydocs-api base the AGENT tier calls (ADR 0019/0020)",
+        group="machine-local",
+        example="http://localhost:8001",
+        doc=(
+            "Read by agents/common/ephemeral_client.py, server to server. It used to\n"
+            "arrive in the browser's control part as `api_url`; ADR 0020 moved it here\n"
+            "because the agent's API is the agent's deployment fact, not the page's."
+        ),
+    ),
+    EnvVar(
+        name="DRYDOCS_RUNTIME_VIEW_URL_TEMPLATE",
+        purpose="runtime-monitor deep-link template the console offers on entities (O39)",
+        group="machine-local",
+        example="https://runtime.example.internal/{kind}/{id}",
+        doc=(
+            "Served to the console by GET /api/config (ADR 0020) -- it was the build-time\n"
+            "VITE_RUNTIME_VIEW_URL_TEMPLATE, which baked one environment's URL into the\n"
+            "bundle. {kind} is job|folder|dataset|run and {id} is URI-encoded. Unset means\n"
+            "no link affordance renders. The REAL URL is company configuration; never a\n"
+            "company hostname in a committed file."
         ),
     ),
     EnvVar(

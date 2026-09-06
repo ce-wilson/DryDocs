@@ -138,7 +138,7 @@ npm run test:e2e      # playwright; needs test:e2e:install once
 The e2e suite (`web/e2e/console.spec.ts`) drives a real browser and bootstraps its own
 credential (`web/e2e/bootstrap_credential.py`) — it does not reuse your machine-local
 store. Python-side console guards live in `tests/unit/test_console_auth.py`,
-`test_console_origins.py`, `test_load_map_console.py`, `test_world_map_generated.py`.
+`test_console_delivery.py`, `test_load_map_console.py`, `test_world_map_generated.py`.
 
 ## Routes worth knowing
 
