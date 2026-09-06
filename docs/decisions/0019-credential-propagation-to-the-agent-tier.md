@@ -1,7 +1,7 @@
 # ADR 0019 — Credential propagation to the agent tier: the agent authenticates itself, the console passes a session HANDLE, and no credential rides in a message part
 
 ```yaml
-status: PROPOSED        # drafted under WEB9 clause (a), 2026-09-06 (desktop); awaiting the user's ruling
+status: ACCEPTED        # drafted under WEB9 clause (a) and RULED option C by the user, both 2026-09-06 (desktop)
 date: 2026-09-06
 authored_by: the WEB9 draft, from the 2026-09-05 web module review finding S2 (docs/reviews/modules/web-2026-09-05.md)
 deciders: [chad.wilson]
@@ -209,7 +209,7 @@ on every future audit.
   claim and the agent key becomes a client credential; this ADR's shape is what
   that replaces, and the replacement should be a substitution, not a redesign.
 
-## Action items (the build — WEB9 clause (b), after this ADR is ruled)
+## Action items (the build — WEB9 clause (b); the ADR was ruled 2026-09-06, option C)
 
 1. [ ] `drydocs_api/sessions.py`: `Session.session_id` minted at issue; `resolve_by_id`; login returns it.
 2. [ ] `drydocs_api/ephemeral_specs.py` + `app.py`: `owner_session` replaces `owner_token` on registration; store keyed `(session_id, ref)`; run/export map bearer → `session_id`; audit actor = `session_id`.
