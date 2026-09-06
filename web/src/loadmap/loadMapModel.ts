@@ -41,7 +41,11 @@ export interface LoaderRef {
   commands?: string[]
 }
 
-export interface LoadMapSource {
+/** A `type` and not an `interface`, deliberately: an interface has no implicit
+ *  index signature, so `LoadMapSource` did not satisfy `Record<string, unknown>`
+ *  and the page's four table-view calls each carried a double cast to get past
+ *  that. The alias satisfies it, and the casts are gone (WEB6). */
+export type LoadMapSource = {
   id: string
   home: string
   system: string | null
@@ -78,7 +82,18 @@ export interface SequenceStep {
   mode: string
   profiles: string[]
   note: string | null
-  loaders: LoaderRef[]
+  /** LOADER NAMES, not LoaderRefs — the two `loaders` keys in load-map.json
+   *  carry different shapes and this is the string one. `render_load_map.py`
+   *  writes `[cls.name for cls in COMMAND_LOADERS[step.command]]` here and full
+   *  rows under `sources[].loaders`.
+   *
+   *  It was declared `LoaderRef[]` until WEB6, and the file-wide double cast is
+   *  what let that through: the two readers of this field asked each string for
+   *  `.cli_name ?? .name` and got undefined, so /load-map's sequence table
+   *  rendered its loader column as bare commas while docs/plan/load-map.html —
+   *  generated from the same JSON by the same script — rendered the names, and
+   *  sequenceLoaderCount() answered 1 for 27 loaders. Measured, not inferred. */
+  loaders: string[]
 }
 
 /** A loader with no registry source — a DEFECT the JSON already carries. */
@@ -123,7 +138,7 @@ export interface StepWithUncommittedInput {
   exemption: string | null
 }
 
-const data = loadMapData as unknown as {
+const data = loadMapData as {
   note: string
   sequence: SequenceStep[]
   ad_hoc_commands: string[]
@@ -214,10 +229,10 @@ export function pipelineReach(s: LoadMapSource): PipelineReach {
   return { captured, mapped, loaded, label: reached.length ? reached.join(' → ') : 'registered only' }
 }
 
-/** Every loader named anywhere in the sequence, de-duplicated by cli name. */
+/** Every loader named anywhere in the sequence, de-duplicated by name. */
 export function sequenceLoaderCount(): number {
   const names = new Set<string>()
-  for (const step of SEQUENCE) for (const l of step.loaders) names.add(l.cli_name ?? l.name)
+  for (const step of SEQUENCE) for (const name of step.loaders) names.add(name)
   return names.size
 }
 

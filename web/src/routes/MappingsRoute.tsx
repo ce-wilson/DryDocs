@@ -14,6 +14,7 @@ import EmptyState from '../components/ui/EmptyState'
 import AppCodeCascadePane from './AppCodeCascadePane'
 import DomainGridTable from './DomainGridTable'
 import { isResolved, useGraphAccess, useGraphQuery } from '../data/graphAccess'
+import { validateRows, validateRowsOf, type RowShape } from '../data/rowShape'
 
 // /mappings — the O13 manual-mapping stewardship screen (wf-mapping-01).
 // Steward + admin only (server-enforced too — /mappings/* returns 403 below
@@ -235,6 +236,22 @@ export default function MappingsRoute({ persona }: { persona: Persona }) {
 
 const SEAL_ROLES_SPEC = 'mappings.seal-contact-roles.v1'
 
+/** The nine columns the seal-contact-override grid returns. Verified against
+ *  the server's own SELECT (drydocs_api/mappings.py, `seal-contact-override`),
+ *  which aliases app_seal_id AS app_id and emits the other eight verbatim — so
+ *  this is the full row, not a subset chosen to make the check pass. */
+const OVERRIDE_GRID_COLUMNS: RowShape<OverrideGridRow> = [
+  'app_id',
+  'role_name',
+  'origin',
+  'holder_sid',
+  'holder_name',
+  'rationale',
+  'authored_by',
+  'authored_on',
+  'status',
+]
+
 interface SealRoleRow {
   app_id: string
   application: string | null
@@ -243,6 +260,19 @@ interface SealRoleRow {
   holder_sid: string | null
   holder_name: string | null
 }
+
+/** WEB6: the columns SealRoleRow requires, checked at runtime. Names only —
+ *  their TYPES come from the result's own column declarations, so this is not a
+ *  second copy of the server's contract. `keyof SealRoleRow` means a rename of a
+ *  field here is a compile error, not a silently unchecked column. */
+const SEAL_ROLE_COLUMNS: RowShape<SealRoleRow> = [
+  'app_id',
+  'application',
+  'role_name',
+  'level',
+  'holder_sid',
+  'holder_name',
+]
 
 function SealOverridePane({
   mappings,
@@ -263,23 +293,52 @@ function SealOverridePane({
   // Memoised on the query STATE, whose identity changes only when the read
   // does: the rows feed a useMemo below, and a fresh array every render would
   // rebuild the whole override grid on every keystroke.
+  // WEB6: the columns this pane needs, checked against the server's own
+  // declarations. A spec that renamed `holder_sid` used to render a column of
+  // blanks; it now names the column. ONE call, memoised on the query state —
+  // the rows and the problem are two faces of one check, and computing them
+  // separately would let them disagree.
+  const live = useMemo(() => {
+    if (!isResolved(sealRoles)) return { rows: null, problem: null }
+    const checked = validateRows<SealRoleRow>(sealRoles.data, SEAL_ROLE_COLUMNS)
+    return checked.ok
+      ? { rows: checked.rows, problem: null }
+      : { rows: [] as SealRoleRow[], problem: checked.message }
+  }, [sealRoles])
+  // A shape failure reads as "no live rows" HERE rather than blanking the pane:
+  // the committed grid below is a real answer that does not depend on this read,
+  // so hiding it would cost the operator more than the mismatch does. The
+  // message rides on the pane's own status line instead.
   const liveSource: SealRoleRow[] | null = useMemo(
-    () =>
-      isResolved(sealRoles)
-        ? (sealRoles.data.rows as unknown as SealRoleRow[])
-        : sealRoles.status === 'error'
-          ? []
-          : null,
-    [sealRoles],
+    () => (sealRoles.status === 'error' ? [] : live.rows),
+    [sealRoles.status, live],
   )
 
   // one origin-flagged row list: committed grid rows (store) + live graph
   // attributions not already captured as a source row for that (app, role)
+  // WEB6: the O13 mappings grid declares KEYS and rows and no column types, so
+  // the same check runs presence-only over it — which is the half that catches a
+  // renamed column, and the half this cast was hiding.
+  const gridChecked = useMemo(
+    () =>
+      validateRowsOf<OverrideGridRow>(
+        { source: `mappings grid '${grid?.domain ?? 'override'}'`, keys: grid?.keys ?? [], rows: grid?.rows ?? [] },
+        OVERRIDE_GRID_COLUMNS,
+      ),
+    [grid],
+  )
+  // Part of the memo above rather than derived after it: a fresh `[]` on every
+  // render is a new identity, and the row memo below takes it as a dependency.
+  const gridRows: OverrideGridRow[] = useMemo(
+    () => (gridChecked.ok ? gridChecked.rows : []),
+    [gridChecked],
+  )
+
   const rows: OverrideGridRow[] = useMemo(() => {
     const isDemo = apiDown !== null && grid === null
     const stored: OverrideGridRow[] = isDemo
       ? [...DEMO_OVERRIDE_GRID]
-      : ((grid?.rows ?? []) as unknown as OverrideGridRow[])
+      : gridRows
     const covered = new Set(
       stored.filter((r) => r.origin === 'source').map((r) => `${r.app_id}|${r.role_name}`),
     )
@@ -302,7 +361,7 @@ function SealOverridePane({
         a.role_name.localeCompare(b.role_name) ||
         (a.origin === b.origin ? 0 : a.origin === 'source' ? -1 : 1),
     )
-  }, [grid, apiDown, liveSource])
+  }, [grid, apiDown, liveSource, gridRows])
 
   const demo = apiDown !== null && grid === null
 
@@ -452,6 +511,14 @@ function SealOverridePane({
             clear
           </button>
         </div>
+      )}
+      {live.problem && (
+        // WEB6 clause (c): said in place of the rows it would have rendered,
+        // and never mixed into the transient action status above it.
+        <p className="shrink-0 rounded border border-red/50 bg-red/10 px-2 py-1 text-[11px] text-red">
+          <b>Column mismatch.</b> {live.problem} Live SEAL attributions are not shown; the committed
+          grid below is unaffected.
+        </p>
       )}
       {status && <p className="shrink-0 font-mono text-[10px] text-muted">{status}</p>}
 

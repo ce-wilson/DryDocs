@@ -3,6 +3,7 @@ import { useState } from 'react'
 import type { SpecResult } from '../lib/graph'
 import EmptyState from '../components/ui/EmptyState'
 import { useGraphAccess } from '../data/graphAccess'
+import { validateRows, type RowShape } from '../data/rowShape'
 
 // The Ask file-name REPORT (O62): search a file, get the application, the
 // process, and who to escalate to.
@@ -38,6 +39,18 @@ interface ReportRow {
   application: string
   dev_team: string
 }
+
+const REPORT_COLUMNS: RowShape<ReportRow> = [
+  'asset',
+  'asset_kind',
+  'hop',
+  'activity',
+  'activity_type',
+  'folder',
+  'app_id',
+  'application',
+  'dev_team',
+]
 
 const SPEC_ID = 'ask.file-search.v1'
 
@@ -82,7 +95,15 @@ export default function FileReport() {
     setRows(null)
     try {
       const res: SpecResult = await access.runSpec(SPEC_ID, { term: q })
-      setRows(res.rows as unknown as ReportRow[])
+      // WEB6: this pane already has an error channel, so a column mismatch uses
+      // it rather than rendering a table of blanks. The spec is a registry one
+      // and not ephemeral, so its declared types are real and get checked too.
+      const checked = validateRows<ReportRow>(res, REPORT_COLUMNS)
+      if (!checked.ok) {
+        setError(checked.message)
+        return
+      }
+      setRows(checked.rows)
     } catch (err) {
       setError((err as Error).message)
     } finally {

@@ -99,7 +99,7 @@ export interface FolderSetProfile {
   summary: string
 }
 
-export const PROFILE = profileJson as unknown as FolderSetProfile
+export const PROFILE = profileJson as FolderSetProfile
 
 /** The banner every frame on this surface carries. */
 export const PROFILE_NOTICE =
@@ -113,7 +113,7 @@ export const PROFILE_NOTICE =
  * view above cannot answer it — every field is declared, so TypeScript would
  * say yes for a key that is not in the file — so the raw object is asked.
  */
-const RAW = profileJson as unknown as Record<string, unknown>
+const RAW: Record<string, unknown> = profileJson
 
 export function censusComputed(name: keyof FolderSetProfile): boolean {
   return RAW[name] !== undefined && RAW[name] !== null
