@@ -22,6 +22,14 @@
 
 # Binary documents — never eol-normalize (autocrlf=true would corrupt them).
 *.pdf binary
+
+# R12: a RECORDED WIRE FORMAT, not a text file. tests/fixtures/adk/*.txt holds
+# the exact SSE bytes the stub-ADK fixture emits, where the BLANK LINE between
+# frames is the delimiter lib/adk.ts's reader scans for. Normalising it to the
+# checkout's line endings would make the recorded bytes differ per platform,
+# which is precisely what a byte-for-byte drift guard cannot tolerate. `-text`
+# exempts it from eol translation in both directions.
+tests/fixtures/adk/*.txt -text
 # U25: the debt-metrics ledger is append-only JSONL; two machines appending in the same
 # window must both survive a merge (rows carry their own date + commit, order is irrelevant).
 knowledge/depgraph-snapshots/debt-metrics.jsonl merge=union
