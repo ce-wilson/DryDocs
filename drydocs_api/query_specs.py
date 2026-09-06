@@ -42,7 +42,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
-from drydocs_api.epistemics import LINEAGE_WALK, WalkDeclaration
+from drydocs_api.epistemics import CHAIN_WALK, LINEAGE_WALK, WalkDeclaration
 from drydocs_api.guard import ensure_no_element_ids, ensure_read_only
 from drydocs_api.queries import ParamSpec
 
@@ -161,6 +161,22 @@ def _with_ground_truth_exclusion(spec: QuerySpec) -> QuerySpec:
         walk=spec.walk,
     )
 
+
+#: R16: the job-chain hop ceiling the impact and trace verbs walk to. A
+#: literal, not a parameter, because Cypher does not take a variable-length
+#: bound from ``$param`` — and a fixed ceiling is also the honest shape: the
+#: `distance` / `hops` column says how far each row is, and a chain that runs
+#: past the ceiling is reported as far as the ceiling reaches. Twelve covers
+#: the deepest condition chain observed on the bundled samples with room.
+VERB_CHAIN_HOPS = 12
+
+#: The impact/trace verbs join a comma-separated list of names into one
+#: string column rather than returning a list, so the console's row-shape
+#: check (WEB6, tests/unit/test_row_shape_exceptions.py) sees a scalar that
+#: IS a scalar and needs no exemption. `reduce` is the join; the collect it
+#: folds is done one clause earlier so the collected alias is never a
+#: declared column.
+_JOIN = "reduce(s = '', x IN {items} | s + CASE WHEN s = '' THEN '' ELSE ', ' END + x)"
 
 QUERY_SPECS: dict[str, QuerySpec] = {
     s.id: _with_ground_truth_exclusion(s)
@@ -1563,6 +1579,173 @@ QUERY_SPECS: dict[str, QuerySpec] = {
                 ParamSpec("term", "string", required=True),
                 ParamSpec("limit", "int", required=False, default=200),
             ),
+        ),
+        # Placed LAST on purpose: the registry order is the graph_qa router's
+        # few-shot order (agents/graph_qa/schema_context.py, a character budget),
+        # and the short explorer specs are the idiom it should learn from, not
+        # these long chain walks.
+        # ── R16: the three agent verbs. Each is a REGISTRY ROW like any other —
+        # versioned, read-only at registry build, SchemaMeta/Uncertain excluded,
+        # element-id free, vocabulary-checked — and drydocs_api/verbs.py binds
+        # the verb NAME to the row. The verb layer adds no Cypher path of its
+        # own: `impact` IS `verb.impact.v1`, run through execute_spec, so what
+        # an agent gets from the verb is exactly what the API returns for the
+        # spec. Identity is `job_name` (indexed, not unique — the key is
+        # (folder_id, job_id)); every verb returns the folder beside the name
+        # so an ambiguous name is visible in the rows, never silently merged.
+        QuerySpec(
+            id="verb.impact.v1",
+            database="drydocs",
+            description=(
+                "Agent verb IMPACT — blast radius of one job: every downstream job the "
+                "derived WAS_INFORMED_BY chain reaches within "
+                f"{VERB_CHAIN_HOPS} hops, with its folder, the shortest distance, the "
+                "condition that gates its first hop, and the shortest chain as text. "
+                "Downstream means: informed by the seed, directly or transitively. "
+                "Condition-derived only — a hand-off through a delivered file is not a "
+                "condition and is not here (walk: CHAIN_WALK)."
+            ),
+            cypher=(
+                "MATCH (seed:ControlMJob) WHERE NOT seed:SchemaMeta AND seed.job_name = $job "
+                f"MATCH p = (down:ControlMJob)-[:WAS_INFORMED_BY*1..{VERB_CHAIN_HOPS}]->(seed) "
+                "WHERE NOT down:SchemaMeta "
+                "WITH seed, down, p ORDER BY length(p) "
+                "WITH seed, down, head(collect(p)) AS shortest "
+                "OPTIONAL MATCH (f:ControlMFolder)-[:CONTAINS_JOB]->(down) "
+                "WITH seed, down, shortest, f, [n IN nodes(shortest) | n.job_name] AS chain_nodes "
+                "RETURN seed.job_name AS seed_job, down.job_name AS job_name, "
+                "f.sched_table AS folder, length(shortest) AS distance, "
+                "head(relationships(shortest)).via_condition AS via_condition, "
+                "reduce(s = '', x IN chain_nodes | s + CASE WHEN s = '' THEN '' ELSE ' <- ' END + x) "
+                "AS chain "
+                "ORDER BY distance, job_name, folder LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("seed_job", "string", "Seed job"),
+                ColumnDef("job_name", "string", "Downstream job"),
+                ColumnDef("folder", "string", "Folder"),
+                ColumnDef("distance", "int", "Hops"),
+                ColumnDef("via_condition", "string", "Gated by condition"),
+                ColumnDef("chain", "string", "Shortest chain (downstream <- seed)"),
+            ),
+            classification="internal",
+            params=(ParamSpec("job", "string", required=True), *_LIMIT),
+            walk=CHAIN_WALK,
+        ),
+        QuerySpec(
+            id="verb.context.v1",
+            database="drydocs",
+            description=(
+                "Agent verb CONTEXT — one job in its neighborhood: folder and data "
+                "center (the default run time), the business application the folder "
+                "belongs to and the team that develops it, the job's cyclic/critical/"
+                "active flags, and its direct upstream and downstream jobs and IN/OUT "
+                "conditions by name. One row per job carrying the name; two rows means "
+                "two folders define a job of that name."
+            ),
+            cypher=(
+                "MATCH (j:ControlMJob) WHERE NOT j:SchemaMeta AND j.job_name = $job "
+                "OPTIONAL MATCH (f:ControlMFolder)-[:CONTAINS_JOB]->(j) "
+                "OPTIONAL MATCH (f)-[:SCHEDULED_ON]->(s:ControlMServer) "
+                "OPTIONAL MATCH (f)-[:BELONGS_TO_APPLICATION {role: 'seal_app_ref'}]"
+                "->(pt:Port)<-[:HAS_PORT]-(a:BusinessApplication) "
+                "WHERE pt.kind = 'BatchProcessing' "
+                "OPTIONAL MATCH (a)-[:WAS_ATTRIBUTED_TO {role: 'developed_by'}]->(dt:DevTeam) "
+                "WITH j, f, s, a, dt "
+                "OPTIONAL MATCH (j)-[:WAS_INFORMED_BY]->(up:ControlMJob) "
+                "WITH j, f, s, a, dt, collect(DISTINCT up.job_name) AS ups "
+                "OPTIONAL MATCH (down:ControlMJob)-[:WAS_INFORMED_BY]->(j) "
+                "WITH j, f, s, a, dt, ups, collect(DISTINCT down.job_name) AS downs "
+                "OPTIONAL MATCH (j)-[:REQUIRES_IN_CONDITION]->(ci:Condition) "
+                "WITH j, f, s, a, dt, ups, downs, collect(DISTINCT ci.name) AS ins "
+                "OPTIONAL MATCH (j)-[:EMITS_OUT_CONDITION]->(co:Condition) "
+                "WITH j, f, s, a, dt, ups, downs, ins, collect(DISTINCT co.name) AS outs "
+                "RETURN j.job_name AS job_name, f.sched_table AS folder, "
+                "s.name AS data_center, a.app_id AS app_id, a.name AS application, "
+                "dt.name AS owner_team, j.task_type AS task_type, "
+                "toString(j.cyclic) AS cyclic, toString(j.critical) AS critical, "
+                "toString(j.active) AS active, "
+                "size(ups) AS upstream_count, " + _JOIN.format(items="ups") + " AS upstream, "
+                "size(downs) AS downstream_count, "
+                + _JOIN.format(items="downs")
+                + " AS downstream, "
+                + _JOIN.format(items="ins")
+                + " AS in_conditions, "
+                + _JOIN.format(items="outs")
+                + " AS out_conditions "
+                "ORDER BY folder, job_name LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("job_name", "string", "Job"),
+                ColumnDef("folder", "string", "Folder"),
+                ColumnDef("data_center", "string", "Data center"),
+                ColumnDef("app_id", "string", "Application id"),
+                ColumnDef("application", "string", "Application"),
+                ColumnDef("owner_team", "string", "Developed by"),
+                ColumnDef("task_type", "string", "Task type"),
+                ColumnDef("cyclic", "string", "Cyclic"),
+                ColumnDef("critical", "string", "Critical"),
+                ColumnDef("active", "string", "Active"),
+                ColumnDef("upstream_count", "int", "Upstream jobs"),
+                ColumnDef("upstream", "string", "Upstream (direct)"),
+                ColumnDef("downstream_count", "int", "Downstream jobs"),
+                ColumnDef("downstream", "string", "Downstream (direct)"),
+                ColumnDef("in_conditions", "string", "IN conditions"),
+                ColumnDef("out_conditions", "string", "OUT conditions"),
+            ),
+            classification="internal",
+            params=(ParamSpec("job", "string", required=True), *_LIMIT),
+            walk=CHAIN_WALK,
+        ),
+        QuerySpec(
+            id="verb.trace.v1",
+            database="drydocs",
+            description=(
+                "Agent verb TRACE — the shortest job-chain path between two jobs, one "
+                "row per hop: step number, the hop's endpoints, whether the hop moves "
+                f"upstream or downstream, and the condition it rides. Up to {VERB_CHAIN_HOPS} "
+                "hops over WAS_INFORMED_BY in either direction; no rows means no "
+                "condition-derived path within the ceiling (a file hand-off would not "
+                "show — walk: CHAIN_WALK). Two jobs sharing a name yield one path per pair, "
+                "told apart by folder."
+            ),
+            cypher=(
+                "MATCH (a:ControlMJob), (b:ControlMJob) "
+                "WHERE NOT a:SchemaMeta AND NOT b:SchemaMeta "
+                "AND a.job_name = $from_job AND b.job_name = $to_job AND a <> b "
+                "OPTIONAL MATCH (fa:ControlMFolder)-[:CONTAINS_JOB]->(a) "
+                "OPTIONAL MATCH (fb:ControlMFolder)-[:CONTAINS_JOB]->(b) "
+                f"MATCH p = shortestPath((a)-[:WAS_INFORMED_BY*..{VERB_CHAIN_HOPS}]-(b)) "
+                "WITH a, fa, b, fb, p, relationships(p) AS rels, nodes(p) AS ns "
+                "UNWIND range(0, size(rels) - 1) AS i "
+                "WITH a, fa, b, fb, size(rels) AS hops, i + 1 AS step, rels[i] AS r, "
+                "ns[i] AS n1, ns[i + 1] AS n2 "
+                "RETURN a.job_name AS from_job, fa.sched_table AS from_folder, "
+                "b.job_name AS to_job, fb.sched_table AS to_folder, hops, step, "
+                "n1.job_name AS hop_from, n2.job_name AS hop_to, "
+                "CASE WHEN startNode(r) = n1 THEN 'upstream' ELSE 'downstream' END AS direction, "
+                "r.via_condition AS via_condition "
+                "ORDER BY hops, from_folder, to_folder, step LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("from_job", "string", "From"),
+                ColumnDef("from_folder", "string", "From folder"),
+                ColumnDef("to_job", "string", "To"),
+                ColumnDef("to_folder", "string", "To folder"),
+                ColumnDef("hops", "int", "Path length"),
+                ColumnDef("step", "int", "Step"),
+                ColumnDef("hop_from", "string", "Hop from"),
+                ColumnDef("hop_to", "string", "Hop to"),
+                ColumnDef("direction", "string", "Direction"),
+                ColumnDef("via_condition", "string", "Via condition"),
+            ),
+            classification="internal",
+            params=(
+                ParamSpec("from_job", "string", required=True),
+                ParamSpec("to_job", "string", required=True),
+                *_LIMIT,
+            ),
+            walk=CHAIN_WALK,
         ),
     )
 }
