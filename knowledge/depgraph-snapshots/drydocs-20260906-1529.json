@@ -1,17 +1,17 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-06T12:17:24",
+    "captured_at": "2026-09-06T15:29:59",
     "date": "20260906",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "017ebe9b",
-      "full": "017ebe9b93eb41639e23611d327445a19489e139",
+      "commit": "a317dd36",
+      "full": "a317dd36e0d86ab9a6231ab64b8ae20499cea49f",
       "branch": "main",
-      "describe": "port-base-20260905-100-g017ebe9b",
-      "subject": "chore(R16): claim - status in_progress (Lane A queue item 3; status-only, no render per Y5)",
-      "dirty": true,
+      "describe": "port-base-20260905-111-ga317dd36",
+      "subject": "chore(WEB10): done - the console's delivery shape is built and merged (96111884); board and roadmap re-rendered",
+      "dirty": false,
       "untracked_present": false,
       "pr": null
     },
@@ -7914,6 +7914,15 @@
       "name": "0019-credential-propagation-to-the-agent-tier.md",
       "extension": ".md",
       "rel_path": "docs/decisions/0019-credential-propagation-to-the-agent-tier.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/decisions/0020-console-delivery-shape.md",
+      "name": "0020-console-delivery-shape.md",
+      "extension": ".md",
+      "rel_path": "docs/decisions/0020-console-delivery-shape.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -19403,6 +19412,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs_api/verbs.py",
+      "name": "verbs.py",
+      "extension": ".py",
+      "rel_path": "drydocs_api/verbs.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs_core",
       "name": "drydocs_core",
       "extension": "",
@@ -22427,10 +22445,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260906-0141.json",
-      "name": "drydocs-20260906-0141.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260906.json",
+      "name": "drydocs-20260906.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260906-0141.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260906.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -24209,6 +24227,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_agent_verbs.py",
+      "name": "test_agent_verbs.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_agent_verbs.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_agents_app_discovery.py",
       "name": "test_agents_app_discovery.py",
       "extension": ".py",
@@ -24506,19 +24533,19 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/tests/unit/test_console_feedback.py",
-      "name": "test_console_feedback.py",
+      "file_id": "drydocs/tests/unit/test_console_delivery.py",
+      "name": "test_console_delivery.py",
       "extension": ".py",
-      "rel_path": "tests/unit/test_console_feedback.py",
+      "rel_path": "tests/unit/test_console_delivery.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
     },
     {
-      "file_id": "drydocs/tests/unit/test_console_origins.py",
-      "name": "test_console_origins.py",
+      "file_id": "drydocs/tests/unit/test_console_feedback.py",
+      "name": "test_console_feedback.py",
       "extension": ".py",
-      "rel_path": "tests/unit/test_console_origins.py",
+      "rel_path": "tests/unit/test_console_feedback.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -26351,6 +26378,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/delivery.json",
+      "name": "delivery.json",
+      "extension": ".json",
+      "rel_path": "web/delivery.json",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/e2e",
       "name": "e2e",
       "extension": "",
@@ -26562,6 +26598,15 @@
       "name": "checkBundleSize.mjs",
       "extension": ".mjs",
       "rel_path": "web/scripts/checkBundleSize.mjs",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/scripts/checkDistCoordinates.mjs",
+      "name": "checkDistCoordinates.mjs",
+      "extension": ".mjs",
+      "rel_path": "web/scripts/checkDistCoordinates.mjs",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -27786,6 +27831,15 @@
       "name": "reachability.ts",
       "extension": ".ts",
       "rel_path": "web/src/lib/reachability.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/lib/runtimeView.test.ts",
+      "name": "runtimeView.test.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lib/runtimeView.test.ts",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -30054,6 +30108,10 @@
       "drydocs/drydocs_api/query_specs.py"
     ],
     [
+      "drydocs/drydocs_api/agent_query.py",
+      "drydocs/drydocs_api/verbs.py"
+    ],
+    [
       "drydocs/drydocs_api/app.py",
       "drydocs/drydocs_api/audit.py"
     ],
@@ -30292,6 +30350,10 @@
     [
       "drydocs/drydocs_api/sessions.py",
       "drydocs/drydocs_api/personas.py"
+    ],
+    [
+      "drydocs/drydocs_api/verbs.py",
+      "drydocs/drydocs_api/query_specs.py"
     ],
     [
       "drydocs/drydocs_core/__init__.py",
@@ -31386,6 +31448,38 @@
       "drydocs/drydocs_api/query_specs.py"
     ],
     [
+      "drydocs/tests/unit/test_agent_verbs.py",
+      "drydocs/drydocs_api/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_agent_verbs.py",
+      "drydocs/drydocs_api/agent_query.py"
+    ],
+    [
+      "drydocs/tests/unit/test_agent_verbs.py",
+      "drydocs/drydocs_api/app.py"
+    ],
+    [
+      "drydocs/tests/unit/test_agent_verbs.py",
+      "drydocs/drydocs_api/epistemics.py"
+    ],
+    [
+      "drydocs/tests/unit/test_agent_verbs.py",
+      "drydocs/drydocs_api/exports.py"
+    ],
+    [
+      "drydocs/tests/unit/test_agent_verbs.py",
+      "drydocs/drydocs_api/guard.py"
+    ],
+    [
+      "drydocs/tests/unit/test_agent_verbs.py",
+      "drydocs/drydocs_api/query_specs.py"
+    ],
+    [
+      "drydocs/tests/unit/test_agent_verbs.py",
+      "drydocs/drydocs_api/verbs.py"
+    ],
+    [
       "drydocs/tests/unit/test_api_audit.py",
       "drydocs/drydocs_api/app.py"
     ],
@@ -31734,8 +31828,16 @@
       "drydocs/drydocs_api/sessions.py"
     ],
     [
-      "drydocs/tests/unit/test_console_origins.py",
+      "drydocs/tests/unit/test_console_delivery.py",
       "drydocs/drydocs_api/app.py"
+    ],
+    [
+      "drydocs/tests/unit/test_console_delivery.py",
+      "drydocs/drydocs_core/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_console_delivery.py",
+      "drydocs/drydocs_core/env_refs.py"
     ],
     [
       "drydocs/tests/unit/test_console_print_gutter.py",
@@ -34290,6 +34392,10 @@
       "drydocs/web/src/data/readiness.ts"
     ],
     [
+      "drydocs/web/src/layout/SystemBanner.tsx",
+      "drydocs/web/src/lib/runtimeView.ts"
+    ],
+    [
       "drydocs/web/src/layout/shellConfig.ts",
       "drydocs/web/src/lib/storage.ts"
     ],
@@ -34388,6 +34494,14 @@
     [
       "drydocs/web/src/lib/reachability.test.ts",
       "drydocs/web/src/lib/reachability.ts"
+    ],
+    [
+      "drydocs/web/src/lib/runtimeView.test.ts",
+      "drydocs/web/src/lib/runtimeView.ts"
+    ],
+    [
+      "drydocs/web/src/lib/runtimeView.ts",
+      "drydocs/web/src/lib/apiClient.ts"
     ],
     [
       "drydocs/web/src/lib/storage.test.ts",
@@ -39881,6 +39995,11 @@
       "drydocs/docs/decisions",
       "CONTAINS",
       "drydocs/docs/decisions/0019-credential-propagation-to-the-agent-tier.md"
+    ],
+    [
+      "drydocs/docs/decisions",
+      "CONTAINS",
+      "drydocs/docs/decisions/0020-console-delivery-shape.md"
     ],
     [
       "drydocs/docs/decisions",
@@ -46163,6 +46282,11 @@
       "drydocs/drydocs_api/static"
     ],
     [
+      "drydocs/drydocs_api",
+      "CONTAINS",
+      "drydocs/drydocs_api/verbs.py"
+    ],
+    [
       "drydocs/drydocs_api/static",
       "CONTAINS",
       "drydocs/drydocs_api/static/mapping_demo.html"
@@ -47835,7 +47959,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260906-0141.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260906.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -48755,6 +48879,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_agent_verbs.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_agents_app_discovery.py"
     ],
     [
@@ -48920,12 +49049,12 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
-      "drydocs/tests/unit/test_console_feedback.py"
+      "drydocs/tests/unit/test_console_delivery.py"
     ],
     [
       "drydocs/tests/unit",
       "CONTAINS",
-      "drydocs/tests/unit/test_console_origins.py"
+      "drydocs/tests/unit/test_console_feedback.py"
     ],
     [
       "drydocs/tests/unit",
@@ -49940,6 +50069,11 @@
     [
       "drydocs/web",
       "CONTAINS",
+      "drydocs/web/delivery.json"
+    ],
+    [
+      "drydocs/web",
+      "CONTAINS",
       "drydocs/web/e2e"
     ],
     [
@@ -50086,6 +50220,11 @@
       "drydocs/web/scripts",
       "CONTAINS",
       "drydocs/web/scripts/checkBundleSize.mjs"
+    ],
+    [
+      "drydocs/web/scripts",
+      "CONTAINS",
+      "drydocs/web/scripts/checkDistCoordinates.mjs"
     ],
     [
       "drydocs/web/scripts",
@@ -50830,6 +50969,11 @@
     [
       "drydocs/web/src/lib",
       "CONTAINS",
+      "drydocs/web/src/lib/runtimeView.test.ts"
+    ],
+    [
+      "drydocs/web/src/lib",
+      "CONTAINS",
       "drydocs/web/src/lib/runtimeView.ts"
     ],
     [
@@ -51227,13 +51371,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2862,
-    "edges": 1663,
+    "files": 2868,
+    "edges": 1678,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 3180,
+    "rels": 3186,
     "directories": 319
   }
 }
