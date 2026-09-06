@@ -1,17 +1,17 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-06T15:29:59",
+    "captured_at": "2026-09-06T16:20:20",
     "date": "20260906",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "a317dd36",
-      "full": "a317dd36e0d86ab9a6231ab64b8ae20499cea49f",
+      "commit": "470315a2",
+      "full": "470315a2af8dd13bd0f0524754390dc6c746f0ca",
       "branch": "main",
-      "describe": "port-base-20260905-111-ga317dd36",
-      "subject": "chore(WEB10): done - the console's delivery shape is built and merged (96111884); board and roadmap re-rendered",
-      "dirty": false,
+      "describe": "port-base-20260905-121-g470315a2",
+      "subject": "docs(P6): the data-center collision probe as an adhoc file - counts only, four questions, one answer to transcribe",
+      "dirty": true,
       "untracked_present": false,
       "pr": null
     },
@@ -6231,6 +6231,15 @@
       "name": "task_graph.py",
       "extension": ".py",
       "rel_path": "agents/graph_qa/task_graph.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/agents/graph_qa/term_resolution.py",
+      "name": "term_resolution.py",
+      "extension": ".py",
+      "rel_path": "agents/graph_qa/term_resolution.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -18602,6 +18611,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs/loaders/sql/adhoc/probe_dc_table_id_collision.sql",
+      "name": "probe_dc_table_id_collision.sql",
+      "extension": ".sql",
+      "rel_path": "drydocs/loaders/sql/adhoc/probe_dc_table_id_collision.sql",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs/loaders/sql/adhoc/profile_cm_avg_run.sql",
       "name": "profile_cm_avg_run.sql",
       "extension": ".sql",
@@ -19686,6 +19704,15 @@
       "name": "env_refs.py",
       "extension": ".py",
       "rel_path": "drydocs_core/env_refs.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs_core/glossary.py",
+      "name": "glossary.py",
+      "extension": ".py",
+      "rel_path": "drydocs_core/glossary.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -22445,10 +22472,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260906.json",
-      "name": "drydocs-20260906.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260906-1529.json",
+      "name": "drydocs-20260906-1529.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260906.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260906-1529.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -25037,6 +25064,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_graph_qa_clarification.py",
+      "name": "test_graph_qa_clarification.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_graph_qa_clarification.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_graph_review.py",
       "name": "test_graph_review.py",
       "extension": ".py",
@@ -26664,6 +26700,24 @@
       "project": "drydocs",
       "circular": false,
       "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/web/src/ask/ClarificationCard.test.tsx",
+      "name": "ClarificationCard.test.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/ask/ClarificationCard.test.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/ask/ClarificationCard.tsx",
+      "name": "ClarificationCard.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/ask/ClarificationCard.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
     },
     {
       "file_id": "drydocs/web/src/ask/FileReport.tsx",
@@ -28925,6 +28979,10 @@
     ],
     [
       "drydocs/agents/graph_qa/pipeline.py",
+      "drydocs/agents/graph_qa/term_resolution.py"
+    ],
+    [
+      "drydocs/agents/graph_qa/pipeline.py",
       "drydocs/agents/graph_qa/tier2.py"
     ],
     [
@@ -28934,6 +28992,14 @@
     [
       "drydocs/agents/graph_qa/schema_context.py",
       "drydocs/drydocs_core/yaml_fragments.py"
+    ],
+    [
+      "drydocs/agents/graph_qa/term_resolution.py",
+      "drydocs/drydocs_core/glossary.py"
+    ],
+    [
+      "drydocs/agents/graph_qa/term_resolution.py",
+      "drydocs/drydocs_core/ui_concepts.py"
     ],
     [
       "drydocs/agents/graph_qa/tier2.py",
@@ -30450,6 +30516,10 @@
     [
       "drydocs/drydocs_core/env_doctor.py",
       "drydocs/drydocs_core/source_bindings.py"
+    ],
+    [
+      "drydocs/drydocs_core/glossary.py",
+      "drydocs/drydocs_core/repo_paths.py"
     ],
     [
       "drydocs/drydocs_core/landing_zones.py",
@@ -32396,6 +32466,14 @@
       "drydocs/drydocs_api/epistemics.py"
     ],
     [
+      "drydocs/tests/unit/test_graph_qa_clarification.py",
+      "drydocs/drydocs_core/glossary.py"
+    ],
+    [
+      "drydocs/tests/unit/test_graph_qa_clarification.py",
+      "drydocs/tests/unit/test_graph_qa.py"
+    ],
+    [
       "drydocs/tests/unit/test_graph_review.py",
       "drydocs/drydocs/review/graph_review.py"
     ],
@@ -33784,6 +33862,18 @@
       "drydocs/web/src/routes/explorer/ExplorerTowerRoute.tsx"
     ],
     [
+      "drydocs/web/src/ask/ClarificationCard.test.tsx",
+      "drydocs/web/src/ask/ClarificationCard.tsx"
+    ],
+    [
+      "drydocs/web/src/ask/ClarificationCard.test.tsx",
+      "drydocs/web/src/ask/askApi.ts"
+    ],
+    [
+      "drydocs/web/src/ask/ClarificationCard.tsx",
+      "drydocs/web/src/ask/askApi.ts"
+    ],
+    [
       "drydocs/web/src/ask/FileReport.tsx",
       "drydocs/web/src/components/ui/EmptyState.tsx"
     ],
@@ -34730,6 +34820,10 @@
     [
       "drydocs/web/src/routes/AppCodeCascadePane.tsx",
       "drydocs/web/src/lib/storage.ts"
+    ],
+    [
+      "drydocs/web/src/routes/AskRoute.tsx",
+      "drydocs/web/src/ask/ClarificationCard.tsx"
     ],
     [
       "drydocs/web/src/routes/AskRoute.tsx",
@@ -39005,6 +39099,11 @@
       "drydocs/agents/graph_qa",
       "CONTAINS",
       "drydocs/agents/graph_qa/task_graph.py"
+    ],
+    [
+      "drydocs/agents/graph_qa",
+      "CONTAINS",
+      "drydocs/agents/graph_qa/term_resolution.py"
     ],
     [
       "drydocs/agents/graph_qa",
@@ -46009,6 +46108,11 @@
     [
       "drydocs/drydocs/loaders/sql/adhoc",
       "CONTAINS",
+      "drydocs/drydocs/loaders/sql/adhoc/probe_dc_table_id_collision.sql"
+    ],
+    [
+      "drydocs/drydocs/loaders/sql/adhoc",
+      "CONTAINS",
       "drydocs/drydocs/loaders/sql/adhoc/profile_cm_avg_run.sql"
     ],
     [
@@ -46370,6 +46474,11 @@
       "drydocs/drydocs_core",
       "CONTAINS",
       "drydocs/drydocs_core/env_refs.py"
+    ],
+    [
+      "drydocs/drydocs_core",
+      "CONTAINS",
+      "drydocs/drydocs_core/glossary.py"
     ],
     [
       "drydocs/drydocs_core",
@@ -47959,7 +48068,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260906.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260906-1529.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -49329,6 +49438,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_graph_qa_clarification.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_graph_review.py"
     ],
     [
@@ -50374,6 +50488,16 @@
     [
       "drydocs/web/src/ask",
       "CONTAINS",
+      "drydocs/web/src/ask/ClarificationCard.test.tsx"
+    ],
+    [
+      "drydocs/web/src/ask",
+      "CONTAINS",
+      "drydocs/web/src/ask/ClarificationCard.tsx"
+    ],
+    [
+      "drydocs/web/src/ask",
+      "CONTAINS",
       "drydocs/web/src/ask/FileReport.tsx"
     ],
     [
@@ -51371,13 +51495,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2868,
-    "edges": 1678,
+    "files": 2874,
+    "edges": 1688,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 3186,
+    "rels": 3192,
     "directories": 319
   }
 }
