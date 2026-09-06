@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: haiku
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - agents/common/neo4j_tool.py
@@ -35,3 +35,74 @@ notes: |
   Groomed 2026-08-30 (desktop, weekly groom) from Idea-203. Low priority and haiku because the
   work is a two-line change plus a README correction; it is captured because the failure mode is
   silent and tier-wide, not because it is urgent.
+
+  DONE 2026-09-05 (Lane B, laptop). The trap is removed, not annotated.
+
+  (a)+(b) THE DEPENDENCE IS GONE, which is more than either option the clause
+  offers. The clause allows "clear the blank line" OR "make the intent explicit at
+  the merge site"; a comment alone leaves the next tidier free to break it, and
+  the blank line lives in a MACHINE-LOCAL file that no commit can reach. So the
+  fix does the thing that survives both: a blank line in an env FILE means "not
+  set here", never "set to empty", and agents/common/env_merge.py drops those
+  placeholders BEFORE the fallback runs. After that the value check and the
+  membership check AGREE - so the exact rewrite this item warns about is now
+  merely a rewrite, and a test asserts the equivalence rather than trusting it.
+
+  TWO RULES, BOTH NAMED, because they are different rules and only one of them was
+  the defect:
+    * drop_blank_placeholders - only names the agents FILE declared blank AND that
+      are currently empty. Narrow on purpose: it removes a placeholder, it does
+      not tidy the environment.
+    * apply_fallbacks - still checks the VALUE and not just membership, and the
+      module says why: a variable the SHELL exported empty is a different thing
+      from a blank line in a file, and nothing here should delete it. Keeping the
+      value check preserves today's behaviour for that case exactly.
+
+  (c) THE README STEP THAT PRODUCED THE BLANK LINE IS CORRECTED, and so is the
+  file it points at - the step alone would not have been enough. `Copy-Item
+  .env.example .env  # fill NEO4J_PASSWORD` produced exactly the defect: copy,
+  don't fill, and NEO4J_PASSWORD= sits blank in agents/.env for the whole tier.
+  The three blank-valued lines - NEO4J_PASSWORD, GOOGLE_API_KEY,
+  ANTHROPIC_API_KEY - now ship COMMENTED OUT in agents/.env.example, so a copy
+  declares nothing it does not set and the root .env answers on a one-graph
+  machine. Uncommenting is now what an override looks like, which is what an
+  override should look like. The README says all of that where the copy step is.
+
+  AND THE FIRST ATTEMPT OVER-CORRECTED, caught by another guard rather than by
+  review. Commenting out the WHOLE Neo4j block broke
+  tests/unit/test_dev_environment.py, which holds both env templates to the
+  canonical bolt port and the ground-truth database. It was right to: NEO4J_URI,
+  NEO4J_USER and NEO4J_DATABASE carry REAL values, so they override with
+  something and were never the defect - only the blank line was. The rule is
+  narrower than "comment out the block" and the file now says which line is
+  commented and why the other three are not.
+
+  A GUARD ON THE EXAMPLE FILE, because the fix is only durable if the file stays
+  that way: tests/unit/test_agent_env_merge.py fails on any LIVE line in
+  agents/.env.example with an empty value, and names the consequence in the
+  message. Mutation-proven - uncommenting NEO4J_PASSWORD= fails it.
+
+  (d) NO CREDENTIAL VALUE IN ANY COMMIT. agents/.env stays gitignored and
+  untracked (checked, not assumed); every fixture in the test is a made-up string;
+  the reproduction probe printed SHAPE only ("set, 10 chars" / "EMPTY"), never a
+  value.
+
+  VENUE (J18), and it changes what could be reproduced here. Verified LIVE on the
+  LAPTOP - agents/.venv, local Neo4j EE at bolt://localhost:7687, database
+  `drydocs`, user neo4j - and the agent tier connects after the change:
+  graph_schema() returns success with 76 labels and 35 relationship types, before
+  and after. The item asks for verification "on this desktop"; this is the laptop,
+  which is why the venue is stated rather than the claim being made flatly.
+
+  AND THE BLANK LINE ITSELF WAS NOT REPRODUCIBLE HERE, which is worth recording
+  rather than letting the next reader wonder. On this laptop agents/.env carries a
+  REAL NEO4J_PASSWORD (10 chars), not a blank one; the blank key here is
+  GOOGLE_API_KEY. The file is machine-local, so the two machines differ by
+  construction - the item was groomed on the desktop from Idea-203, and the empty
+  password is presumably still true there. What that means: the DEFECT is
+  venue-specific, the FRAGILITY in the code is not, and the fix targets the
+  fragility. The unit test reproduces the trap from fixtures precisely so the
+  proof does not depend on which machine anyone is standing at.
+
+  Gates at close: poetry run pytest -q, ruff check, ruff format --check.
+  tests/unit/test_agent_env_merge.py 8 passed.
