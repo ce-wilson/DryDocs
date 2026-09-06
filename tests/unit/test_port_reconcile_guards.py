@@ -54,7 +54,7 @@ from __future__ import annotations
 import os
 import re
 import subprocess
-from collections.abc import Iterable, Mapping
+from collections.abc import Callable, Iterable, Mapping
 from pathlib import Path
 from typing import Any
 
@@ -697,8 +697,13 @@ def test_snapshot_written_here_passes_its_own_stamp_check(tmp_path: Path) -> Non
     assert "differs from git show" in problem
 
 
-def _tiny_repo(path: Path) -> Path:
-    """A one-file repo on ``main`` with a fake ``origin/main`` at its first commit."""
+def _tiny_repo(path: Path) -> tuple[Path, Callable[..., str]]:
+    """A one-file repo on ``main`` with a fake ``origin/main`` at its first commit.
+
+    Returns the path AND the git runner: every later git call goes through it, because
+    it carries the identity env. A bare ``subprocess.run(["git", "commit", ...])`` passed
+    here and exited 128 on the CI runner, which has no global ``user.name`` (2026-09-06).
+    """
     path.mkdir()
     env = {
         "GIT_AUTHOR_NAME": "t",
@@ -724,7 +729,7 @@ def _tiny_repo(path: Path) -> Path:
     run("add", "f.txt")
     run("commit", "-q", "-m", "c1")
     run("update-ref", "refs/remotes/origin/main", run("rev-parse", "HEAD"))
-    return path
+    return path, run
 
 
 def test_fork_point_is_none_on_main_even_when_main_is_ahead_of_origin(tmp_path: Path) -> None:
@@ -734,9 +739,9 @@ def test_fork_point_is_none_on_main_even_when_main_is_ahead_of_origin(tmp_path: 
     producer checkout with unpushed trunk commits saw its own fresh stamp as an
     earlier apply's leftover. The checked-out branch being ``main`` is the fact.
     """
-    repo = _tiny_repo(tmp_path / "repo")
+    repo, run = _tiny_repo(tmp_path / "repo")
     (repo / "f.txt").write_text("2\n", encoding="utf-8")
-    subprocess.run(["git", "commit", "-q", "-am", "c2"], cwd=repo, check=True)
+    run("commit", "-q", "-am", "c2")
     assert (
         reconcile_before.git(repo, "rev-parse", "origin/main").stdout
         != reconcile_before.git(repo, "rev-parse", "HEAD").stdout
@@ -747,11 +752,11 @@ def test_fork_point_is_none_on_main_even_when_main_is_ahead_of_origin(tmp_path: 
 def test_fork_point_on_a_branch_is_where_it_left_main(tmp_path: Path) -> None:
     """The consumer's shape, which the fix must not loosen: on an apply branch the
     fork point is the merge-base with main, and a stamp anywhere else is stale."""
-    repo = _tiny_repo(tmp_path / "repo")
+    repo, run = _tiny_repo(tmp_path / "repo")
     base = reconcile_before.head_sha(repo)
-    subprocess.run(["git", "checkout", "-q", "-b", "port/x"], cwd=repo, check=True)
+    run("checkout", "-q", "-b", "port/x")
     (repo / "f.txt").write_text("2\n", encoding="utf-8")
-    subprocess.run(["git", "commit", "-q", "-am", "c2"], cwd=repo, check=True)
+    run("commit", "-q", "-am", "c2")
     assert reconcile_before.fork_point(repo) == base
     assert reconcile_before.fork_point(repo) != reconcile_before.head_sha(repo)
 
