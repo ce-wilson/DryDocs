@@ -100,7 +100,7 @@ components:
   - { id: rightSidebarContext,     area: layout,       path: layout/rightSidebarContext.tsx }
   - { id: FeedbackLayer,           area: layout,       path: feedback/FeedbackLayer.tsx }   # O89 the L5 screen loop: an annotate control per anchored block, mounted beside main
 
-  # --- route (24) ---
+  # --- route (25) ---
   - { id: AdminConfigRoute,        area: route,        path: routes/AdminConfigRoute.tsx }
   - { id: AppCodeCascadePane,      area: route,        path: routes/AppCodeCascadePane.tsx }
   - { id: AskRoute,                area: route,        path: routes/AskRoute.tsx,                         module: ask,        module_evidence: route-name }
@@ -129,6 +129,7 @@ components:
   - { id: ExplorerLiveRoute,       area: route,        path: routes/explorer/ExplorerLiveRoute.tsx,       module: explorer,   module_evidence: route-dir }
   - { id: ExplorerRoute,           area: route,        path: routes/explorer/ExplorerRoute.tsx,           module: explorer,   module_evidence: route-name }
   - { id: ExplorerTowerRoute,      area: route,        path: routes/explorer/ExplorerTowerRoute.tsx,      module: explorer,   module_evidence: route-dir }
+  - { id: LogEstatePanel,          area: route,        path: routes/LogEstatePanel.tsx }   # O68 the log estate, a PANEL on the O12 admin page rather than a route of its own
 
   # --- ui-primitive (9) ---
   - { id: EmptyState,              area: ui-primitive, path: components/ui/EmptyState.tsx }

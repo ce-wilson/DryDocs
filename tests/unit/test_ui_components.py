@@ -372,6 +372,11 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     component shows up at all.
     91 -> 92 at WEB5 (2026-09-05): RouteErrorBoundary, UNBOUND for the same
     reason as RouteAccessGate -- one boundary for every route.
+    94 -> 95 at O68 (2026-09-05): LogEstatePanel, UNBOUND, bound stays 40. It is
+    filed `route` because it lives beside the route components and renders as a
+    tab of one, but it binds to no module: the admin page is not a registry
+    module (it is a GATED_SURFACE), so a binding would have to invent one -- the
+    same reason AdminConfigRoute itself carries none.
     93 -> 94 at O89 (2026-09-05): FeedbackLayer, UNBOUND, bound stays 40. It is
     the L5 screen loop mounted beside `main` for every route the paper capture
     covers, so it belongs to those three and to no module in particular -- the
@@ -389,5 +394,5 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
         40,
-        94,
+        95,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"

@@ -80,6 +80,16 @@ export default function FeedbackLayer({ enabled = false }: { enabled?: boolean }
     const blocks = annotatableBlocks(pathname, main2)
     setAvailable(blocks.map((b) => b.anchor))
     const added: HTMLElement[] = []
+    // STORAGE, NOT THE REF, FOR THE INITIAL VALUES — and this was a real bug
+    // rather than a precaution. On a navigation, the effect above schedules
+    // setNotes(loadNotes(newRoute)) and THIS effect runs in the same commit,
+    // when notesRef still holds the OLD route's notes. Every textarea was
+    // seeded empty and hidden while the badge counted the drafts that existed,
+    // so a reviewer arriving back at a page they had annotated saw "3 notes"
+    // and three blank boxes. Nothing was lost — typing still merged through the
+    // ref — but they had no way to know that. The ref stays for UPDATES, where
+    // it is correct; the initial value comes from the same place the count does.
+    const initial = loadNotes(pathname)
 
     for (const { el, anchor } of blocks) {
       el.setAttribute(ANCHOR_ATTRIBUTE, anchor)
@@ -93,7 +103,7 @@ export default function FeedbackLayer({ enabled = false }: { enabled?: boolean }
       const box = document.createElement('div')
       box.className = BOX_CLASS
       const ta = document.createElement('textarea')
-      ta.value = notesRef.current[anchor] ?? ''
+      ta.value = initial[anchor] ?? ''
       ta.setAttribute('aria-label', `Note for ${anchor}`)
       ta.placeholder = `note for ${anchor} …`
       box.hidden = !ta.value.trim()

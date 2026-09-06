@@ -172,6 +172,31 @@ notes: |
   while the code said codeOnly. The rule that keeps proving itself: choose the
   stripper deliberately, and probe every scan by breaking what it claims to catch.
 
+  A NAVIGATION BUG, found at close review and fixed with a test that could not
+  have been written earlier. The route effect schedules setNotes(loadNotes(new
+  route)); the DOM effect runs in the SAME commit, when notesRef still holds the
+  PREVIOUS route's notes - so on arriving at a page with saved drafts the badge
+  counted them and every textarea came up empty and hidden. Nothing was lost,
+  which is exactly what made it bad: typing still merged through the ref, so the
+  reviewer saw "3 notes" and three blank boxes with no way to tell which was
+  true. The DOM effect now reads STORAGE for the initial value and keeps the ref
+  for updates only, which removes the ordering dependency rather than
+  compensating for it.
+
+  Proving it needed a REAL in-router navigation. A fresh mount cannot reproduce
+  it - useState(loadNotes(pathname)) is already right there - so the first
+  version of the probe passed against the broken code and proved nothing. That
+  is the mutation-probe rule earning its keep a second time in one item: the
+  test that fails when you break the code is the only one that was testing it.
+  FeedbackLayer.test.tsx (7 cases) now navigates /gates -> /software and asserts
+  the arriving page's drafts are in their boxes.
+
+  The same compute-before-you-mutate trap then hit the TEST: it read the anchors
+  off the rendered page, after the layer had already inserted a control into
+  every block and changed their text. It failed loudly (an anchor matching no
+  label) rather than quietly agreeing with itself, and the anchors are now
+  computed from a clean copy of the markup.
+
   NOT DONE, and named rather than implied:
     * NO BROWSER VERIFICATION. Everything here is asserted under jsdom and by
       build. Whether the ✎ lands where a reviewer expects on a real page, and

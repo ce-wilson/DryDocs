@@ -2,6 +2,23 @@
 // Do not edit: regenerate with `poetry run python scripts/dump_openapi.py`
 // (repo root) then `npm run api:types`. src/generated/api.test.ts guards drift.
 export type paths = {
+    "/admin/log-estate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Log Estate */
+        get: operations["get_log_estate_admin_log_estate_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/demo": {
         parameters: {
             query?: never;
@@ -782,6 +799,39 @@ export type components = {
 };
 export type $defs = Record<string, never>;
 export interface operations {
+    get_log_estate_admin_log_estate_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_demo_demo_get: {
         parameters: {
             query?: never;

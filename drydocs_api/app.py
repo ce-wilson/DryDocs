@@ -66,6 +66,7 @@ from drydocs_api.intake import (
 from drydocs_api.intake import (
     transition as intake_transition,
 )
+from drydocs_api.log_estate import log_estate
 from drydocs_api.mappings import (
     ChangesetValidationError,
     MappingStore,
@@ -852,6 +853,21 @@ def create_app(
         user: CurrentUser,
     ) -> dict[str, object]:
         return _mapping_call(app_code_migration_report, user.token, sessions, mapping_store)
+
+    # O68: the log estate — per declared kind and zone, the directory, the file
+    # count, the size and the declared retention. ADMIN ONLY: it names real
+    # paths on the host's disk, which is operational detail and not something a
+    # user-tier persona is asking for. The payload is shaped in
+    # drydocs_api/log_estate.py and COMPUTED in drydocs_core — clause (b) puts
+    # the byte sum in core so a second walker cannot disagree with the first.
+    #
+    # It reports the api-debug kind's size and retention like any other kind's
+    # and cannot return its CONTENTS: there is no parameter here that names a
+    # file, because capturing Cypher text is ruled (ADR 0014 clause 6) and
+    # surfacing it is not (clause c).
+    @app.get("/admin/log-estate")
+    def get_log_estate(user: AdminUser) -> dict:
+        return log_estate()
 
     # Dev-mode demo page (same-origin, so no CORS surface): the live-data twin
     # of docs/design/ui-exploration/wf-mapping-01.html until the O8 React shell exists.
