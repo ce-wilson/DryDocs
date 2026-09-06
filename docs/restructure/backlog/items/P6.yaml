@@ -8,7 +8,7 @@ phase: 13
 agent: main
 model: opus
 priority: p1
-status: todo
+status: in_progress
 depends_on: []
 inputs:
 - drydocs/loaders/sql/ddl/controlm_staging_ddl.sql
