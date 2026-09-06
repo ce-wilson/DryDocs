@@ -2,13 +2,13 @@
 handoff: drydocs.lane-handoff.v1
 lane: B
 machine: laptop
-generated: 2026-09-05
-generated_at: 298806b6 (main)
-queue: [WEB2, WEB6, WEB8, WEB7, O63, R12, O43, G131, O89, O68]
+generated: 2026-09-06
+generated_at: 1f2f2a80 (main)
+queue: [WEB8, O63, O26, O50, Z6, R8]
 pens: [code:drydocs-web, code:drydocs-agents]
 ---
 
-# Lane B handoff — laptop, 2026-09-05
+# Lane B handoff — laptop, 2026-09-06
 
 **From:** Lane A (desktop). **To:** the Lane B session on the laptop.
 **Lifecycle:** a working handoff, not a durable record — the item files are. When
@@ -40,7 +40,7 @@ is the pen for a SURFACE.
 4. Per-machine facts are yours to verify: `DRYDOCS_DATA_ROOT`, `DRYDOCS_LOGDIR`, the
    `.env`, and whether Neo4j is reachable here. Venue-stamp any live claim (J18).
 
-## Your queue, in order (10 items) — claim one at a time
+## Your queue, in order (6 items) — claim one at a time
 
 Every item below is `todo` with every dependency `done` at the generating commit — the
 same rule the board's Ready strip uses (`derive_summary`). Re-check on pull: the other
@@ -49,16 +49,12 @@ since PLAN1), so two lanes minting in disjoint series cannot collide on a number
 
 | # | Id | Title | Type / prio | Module | Model | Notes from the check |
 |---|---|---|---|---|---|---|
-| 1 | **WEB2** | The grid renders the row ceiling the way the canvas already renders its node ceiling - a TRUNCATED n/N badge on capped results, and no export button says "full" unless the manifest says complete (after API1) | task / p1 | `drydocs-web` | sonnet | clean |
-| 2 | **WEB6** | A runtime row-shape validator at the spec-result-to-typed-row seam retires the twenty-one as-unknown-as double casts with one readable message (after WEB4) | task / p2 | `drydocs-web` | sonnet | clean |
-| 3 | **WEB8** | The typed-client guarantee has no holes - the mappings, intake and corpus routes are modelled in drydocs_api.schemas so the fifteen unwrapAs sites retire, and the ADK agent calls get a typed contract instead of raw fetch (after WEB4) | task / p2 | `drydocs-web` | sonnet | clean |
-| 4 | **WEB7** | Code splitting follows the authorization boundary - React.lazy on the admin and steward routes and the Locations tab so about 420 KB of role-gated artifacts stop shipping to every persona, plus a bundle-size ceiling in the web CI job | task / p2 | `drydocs-web` | sonnet | clean |
-| 5 | **O63** | Service reachability, surfaced twice from one probe: Ask diagnoses its own failure instead of printing a bare "Failed to fetch", and the admin page carries a service-status strip at the top | task / p2 | `drydocs-web` | sonnet | clean |
-| 6 | **R12** | Promote the R5 stub-ADK harness into a committed fixture: live-verify the web Ask wiring with no LLM key | task / p3 | `drydocs-agents` | sonnet | clean |
-| 7 | **O43** | Seed the remaining 9 UI test suites from verified behaviour, and decide whether a UI test runner is worth introducing | task / p2 | `drydocs-web` | sonnet | clean |
-| 8 | **G131** | The agent tier's environment file carries an empty Neo4j password and only a falsy check keeps it working | chore / p3 | `drydocs-agents` | haiku | clean |
-| 9 | **O89** | Console feedback has no stable anchors — give each console section a content-derived anchor id and export the same feedback YAML the design-doc L5 loop produces (after O88) | task / p2 | `drydocs-web` | sonnet | clean |
-| 10 | **O68** | The admin page should show the log estate: directory, path, size and capacity per kind — and must not render debug-tier Cypher until that display is reviewed (after G111) | task / p2 | `drydocs-web` | sonnet | clean |
+| 1 | **WEB8** | The typed-client guarantee has no holes - the mappings, intake and corpus routes are modelled in drydocs_api.schemas so the fifteen unwrapAs sites retire, and the ADK agent calls get a typed contract instead of raw fetch (after WEB4) | task / p2 | `drydocs-web` | sonnet | clean |
+| 2 | **O63** | Service reachability, surfaced twice from one probe: Ask diagnoses its own failure instead of printing a bare "Failed to fetch", and the admin page carries a service-status strip at the top | task / p2 | `drydocs-web` | sonnet | clean |
+| 3 | **O26** | App-to-app path runbook view: Runbooks-page tab with source/target application pickers, shortest-path TECHNICAL/DATA lanes, and a generated runbook grid citing path nodes (after O11, O17) | task / p2 | `drydocs-web` | sonnet | clean |
+| 4 | **O50** | Admin review queue for intake records: diff view, accept / return with note, and the waiting-on-gate park (after O46, O47) | requirement / p2 | `drydocs-web` | sonnet | clean |
+| 5 | **Z6** | Global time-zone runtime map: folder/job start-to-end spans across a world time-zone view, rendered in the browser's local time zone (after Z5) | task / p2 | `drydocs-web` | sonnet | clean |
+| 6 | **R8** | Answer evaluation + cap tuning: on-demand answer metrics over stored question/context/answer, agent-runs admin view, promotion feed of recurring Tier-1 Cypher into gate-reviewed permanent specs (after R3, R5) | requirement / p3 | `drydocs-agents` | sonnet | clean |
 
 ## Surfaces — who holds which pen this burst
 
@@ -82,10 +78,15 @@ the change back through the sender.
 | `gates` (this skill's addition to §0) | `config/gate-log.md` | Lane A — the signed gate record |
 | `gates` (this skill's addition to §0) | `config/crosswalks/` | Lane A — orchestrator crosswalks — gate-bound config |
 | `snapshot` (this skill's addition to §0) | `knowledge/depgraph-snapshots/` | Lane A — the session snapshot — one writer per burst |
-| Lane A's queue | the items WEB9, WEB10, R19, R15, R16, P6, N27 and their inputs | do not claim or edit |
+| Lane A's queue | the items P6, N27 and their inputs | do not claim or edit |
 | `code:<module>` | everything an item in YOUR queue names in `inputs` | this lane, claimed per item |
 | `code:drydocs-web` | `config/taxonomy/ui-components.yaml` | this lane, with the module — the O42 ledger guard fails on any new .tsx, so every web item adds its row here (the 2026-09-05 Lane B close: five items touched it, none named it) |
 | — | `docs/plan/*.html`, `web/src/generated/**`, `docs/design/*.html` | derived renders — Lane A regenerates once at close; nobody merges them by hand (J43) |
+
+**About Lane A's queue, from the same check** (for the sender to rule — this lane
+does nothing with these):
+
+- P6: status is 'in_progress', a queue lists todo items only
 
 **Lane B claims status-only and never renders.** A claim is one item file, pushed;
 Y5 tolerates it un-rendered, and Lane A renders once at close. **Lane B does not
