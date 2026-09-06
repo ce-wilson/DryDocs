@@ -40,20 +40,38 @@ export interface SpecExport {
   manifest: Record<string, unknown>
 }
 
+/** Per-call transport options (WEB12).
+ *
+ * One optional bag rather than a trailing `signal` argument on four methods:
+ * a deadline, a cancel and anything later (a caller-raised export ceiling —
+ * API1 clause (c) — is the obvious next one) all belong to the REQUEST, not to
+ * the query, and adding them positionally would rewrite every call site again.
+ *
+ * `signal` is honoured by the `api` adapter and ignored by `bolt`, which fails
+ * loud on every method that would need it. */
+export interface RequestOptions {
+  signal?: AbortSignal
+}
+
 export interface GraphAccess {
   readonly kind: 'bolt' | 'api'
   /** Read-only query execution. Raw Cypher is a dev/admin affordance only. */
-  runRead(query: string): Promise<GraphResult>
+  runRead(query: string, opts?: RequestOptions): Promise<GraphResult>
   /** Named view query (ADR 0005 decision 2): payload shaping lives server-side
    *  in drydocs-api's query registry — never duplicated in the browser. The
    *  api adapter POSTs /query/{id}; bolt has no registry and fails loud. */
-  runNamed(queryId: string, params?: Record<string, unknown>): Promise<NamedResult>
+  runNamed(queryId: string, params?: Record<string, unknown>, opts?: RequestOptions): Promise<NamedResult>
   /** QuerySpec run (O11): the data-frame read path. Registry results only —
    *  api adapter POSTs /specs/{id}/run; bolt fails loud (no registry). */
-  runSpec(specId: string, params?: Record<string, unknown>): Promise<SpecResult>
+  runSpec(specId: string, params?: Record<string, unknown>, opts?: RequestOptions): Promise<SpecResult>
   /** Server-side export (O11 path b): re-runs the spec server-side, streams
    *  csv/jsonl, then fetches the provenance manifest for the sidecar file. */
-  exportSpec(specId: string, params: Record<string, unknown>, format: 'csv' | 'jsonl'): Promise<SpecExport>
+  exportSpec(
+    specId: string,
+    params: Record<string, unknown>,
+    format: 'csv' | 'jsonl',
+    opts?: RequestOptions,
+  ): Promise<SpecExport>
 }
 
 // The explicit dev flag + role gate for the bolt adapter (ADR 0005 decision 4):

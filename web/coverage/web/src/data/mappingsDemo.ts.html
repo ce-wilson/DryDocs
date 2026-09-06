@@ -1,0 +1,361 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for web/src/data/mappingsDemo.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../prettify.css" />
+    <link rel="stylesheet" href="../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../index.html">All files</a> / <a href="index.html">web/src/data</a> mappingsDemo.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/26</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/26</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// SYNTHESIZED demo rows for the /mappings panes — the O9/O11 fallback idiom:
+// shown with a visible notice when drydocs-api (or the graph) is unavailable
+// or empty, never silently. Every value is synthetic (publish boundary — the
+// wf-mapping-01 wireframe's own examples).
+//
+// K15 (2026-08-05): CoverageRow + DEMO_COVERAGE removed with the job-grain
+// pane. They mirrored mappings.attribution-coverage.v1, a spec that read the
+// edge K8 retired — a demo fixture for a retired surface is a trap, because it
+// renders convincingly and describes nothing that exists.
+&nbsp;
+&nbsp;
+// O24 seal-contact-override grid rows (mirror of v_seal_contact_grid: the
+// SEAL source value and the user override arrive as ADJACENT origin-flagged
+// rows, source first). Synthetic values only.
+export interface OverrideGridRow {
+  app_id: string
+  role_name: string
+  origin: 'source' | 'override'
+  holder_sid: string | null
+  holder_name: string | null
+  rationale: string | null
+  authored_by: string | null
+  authored_on: string | null
+  status: 'active' | 'corrected-in-seal'
+}
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const DEMO_OVERRIDE_GRID: readonly OverrideGridRow[] = [</span>
+<span class="cstat-no" title="statement not covered" >  { app_id: 'APP-1234', role_name: 'L2 Operate Manager', origin: 'source', holder_sid: 'U111111', holder_name: null, rationale: null, authored_by: null, authored_on: null, status: 'active' },</span>
+<span class="cstat-no" title="statement not covered" >  { app_id: 'APP-1234', role_name: 'L2 Operate Manager', origin: 'override', holder_sid: 'U222222', holder_name: 'Sam Steward', rationale: 'person left the team', authored_by: 'trinity', authored_on: '2026-07-21', status: 'active' },</span>
+<span class="cstat-no" title="statement not covered" >  { app_id: 'APP-2222', role_name: 'L1 Operate Manager', origin: 'override', holder_sid: 'U333333', holder_name: null, rationale: 'role unassigned in SEAL', authored_by: 'trinity', authored_on: '2026-07-21', status: 'active' },</span>
+<span class="cstat-no" title="statement not covered" >]</span>
+&nbsp;
+// K11 — the app-code cascade pane's demo frames (synthetic values only).
+// Shapes mirror the mappings.catalog-cascade.v1 / mappings.orchestrators.v1 /
+// mappings.app-orchestrators.v1 / mappings.unmapped-folders.v1 spec columns.
+export interface CascadeRow {
+  product_line_id: string
+  product_line: string
+  product_id: string | null
+  product: string | null
+  app_id: string | null
+  application: string | null
+}
+&nbsp;
+export interface OrchestratorRow {
+  product_id: string
+  product: string
+}
+&nbsp;
+export interface AppOrchestratorRow {
+  app_id: string
+  product_id: string
+  product: string
+  source: string // 'batch-port' (declared prefill) | 'app-code-mapping' (confirmed)
+  origin: 'declared' | 'confirmed' | null
+  declared_raw: string | null
+}
+&nbsp;
+export interface UnmappedFolderRow {
+  folder_id: string
+  folder: string
+  app_code: string | null
+  data_center: string | null
+  jobs: number
+  run_as_users: string
+}
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const DEMO_CASCADE: readonly CascadeRow[] = [</span>
+<span class="cstat-no" title="statement not covered" >  { product_line_id: 'PL-100', product_line: 'Synthetic Risk', product_id: 'PRD-110', product: 'Risk Mart', app_id: 'APP-1234', application: 'Synthetic Risk Mart' },</span>
+<span class="cstat-no" title="statement not covered" >  { product_line_id: 'PL-100', product_line: 'Synthetic Risk', product_id: 'PRD-110', product: 'Risk Mart', app_id: 'APP-1235', application: 'Synthetic Risk Mart UI' },</span>
+<span class="cstat-no" title="statement not covered" >  { product_line_id: 'PL-200', product_line: 'Synthetic Ledger', product_id: 'PRD-210', product: 'Ledger Feed', app_id: 'APP-2222', application: 'Synthetic Ledger Feed' },</span>
+<span class="cstat-no" title="statement not covered" >  { product_line_id: 'PL-200', product_line: 'Synthetic Ledger', product_id: 'PRD-220', product: 'Ledger Archive', app_id: null, application: null },</span>
+<span class="cstat-no" title="statement not covered" >]</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const DEMO_ORCHESTRATORS: readonly OrchestratorRow[] = [</span>
+<span class="cstat-no" title="statement not covered" >  { product_id: 'controlm', product: 'BMC Control-M' },</span>
+<span class="cstat-no" title="statement not covered" >  { product_id: 'autosys', product: 'Broadcom Workload Automation' },</span>
+<span class="cstat-no" title="statement not covered" >]</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const DEMO_APP_ORCHESTRATORS: readonly AppOrchestratorRow[] = [</span>
+<span class="cstat-no" title="statement not covered" >  { app_id: 'APP-1234', product_id: 'controlm', product: 'BMC Control-M', source: 'batch-port', origin: 'declared', declared_raw: 'Control-M' },</span>
+<span class="cstat-no" title="statement not covered" >  { app_id: 'APP-2222', product_id: 'controlm', product: 'BMC Control-M', source: 'app-code-mapping', origin: 'confirmed', declared_raw: null },</span>
+  // mid-migration is a NORMAL state (§G3) — two orchestrators, no drift flag
+<span class="cstat-no" title="statement not covered" >  { app_id: 'APP-2222', product_id: 'autosys', product: 'Broadcom Workload Automation', source: 'batch-port', origin: 'declared', declared_raw: 'Autosys' },</span>
+<span class="cstat-no" title="statement not covered" >]</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const DEMO_UNMAPPED_FOLDERS: readonly UnmappedFolderRow[] = [</span>
+<span class="cstat-no" title="statement not covered" >  { folder_id: '70001', folder: 'PRARAG-DAILY', app_code: 'ARA', data_center: 'T032-E0700-DMA', jobs: 14, run_as_users: 'svc_riskbatch' },</span>
+<span class="cstat-no" title="statement not covered" >  { folder_id: '70002', folder: 'PRARAG-MONTHLY', app_code: 'ARA', data_center: 'T032-E0700-DMA', jobs: 3, run_as_users: 'svc_riskbatch' },</span>
+<span class="cstat-no" title="statement not covered" >  { folder_id: '70003', folder: 'PRBCDE-NIGHTLY', app_code: 'BCD', data_center: 'T045-E0600-DMB', jobs: 22, run_as_users: 'svc_ledger, svc_archive' },</span>
+<span class="cstat-no" title="statement not covered" >  { folder_id: '70004', folder: 'PRXYZQ-WEEKLY', app_code: 'XYZ', data_center: 'T045-E0600-DMB', jobs: 5, run_as_users: 'svc_platform' },</span>
+<span class="cstat-no" title="statement not covered" >]</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-09-06T00:52:39.927Z
+            </div>
+        <script src="../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../sorter.js"></script>
+        <script src="../../../block-navigation.js"></script>
+    </body>
+</html>
+    

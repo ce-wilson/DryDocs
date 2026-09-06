@@ -1,6 +1,4 @@
-import { useMemo, useState } from 'react'
-import type { Persona } from '../lib/auth'
-import { createApiAccess } from '../lib/graphApi'
+import { useState } from 'react'
 import { MODULES } from '../modules/registry'
 import ModuleTemplate from './ModuleTemplate'
 import SpecGrid from '../explorer/SpecGrid'
@@ -26,15 +24,13 @@ const runbooksModule = MODULES.find((m) => m.id === 'runbooks')!
 
 const NOTICE = 'SYNTHESIZED · ILLUSTRATIVE — live series data is company-side (mechanism-only fixtures)'
 
-export default function RunbooksRoute({ persona }: { persona: Persona }) {
+export default function RunbooksRoute() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   // O81: the canvas keeps its own selection rather than sharing selectedId —
   // that one is a DEMO node id (RUNBOOK_NODES), and a spec-derived node id is a
   // different namespace. Collapsing them would make a click on one surface
   // highlight an unrelated row on the other.
   const [canvasNode, setCanvasNode] = useState<CanvasNode | null>(null)
-  const apiUrl = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:8001'
-  const access = useMemo(() => createApiAccess(apiUrl, persona.id), [apiUrl, persona.id])
 
   const selectedLabel = RUNBOOK_NODES.find((n) => n.id === selectedId)?.label
   const frameProps = { selectedId, onSelect: setSelectedId }
@@ -55,9 +51,7 @@ export default function RunbooksRoute({ persona }: { persona: Persona }) {
       }
       tabContent={{
         Series: (
-          <SpecGrid
-            access={access}
-            specId="runbooks.series.v1"
+          <SpecGrid specId="runbooks.series.v1"
             fallback={<LinkedDemoFrame frame={SERIES_FRAME} notice={NOTICE} {...frameProps} />}
           />
         ),
@@ -67,7 +61,6 @@ export default function RunbooksRoute({ persona }: { persona: Persona }) {
         // and the canvas says so rather than showing an empty rectangle.
         'Series graph': (
           <SpecGraphPane
-            access={access}
             specId="runbooks.series.v1"
             title="Data-series traversal · job → ETL process → asset"
             selected={canvasNode}
@@ -82,9 +75,7 @@ export default function RunbooksRoute({ persona }: { persona: Persona }) {
           />
         ),
         'Metadata completeness': (
-          <SpecGrid
-            access={access}
-            specId="runbooks.metadata-completeness.v1"
+          <SpecGrid specId="runbooks.metadata-completeness.v1"
             fallback={<LinkedDemoFrame frame={COMPLETENESS_FRAME} notice={NOTICE} {...frameProps} />}
           />
         ),

@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 
-import { apiBaseUrl } from '../lib/auth'
 import { fetchCorpusStatus, type CorpusStatusPayload } from '../lib/corpusStatus'
 import EmptyState from '../components/ui/EmptyState'
 import StatusChip from '../components/ui/StatusChip'
+import { useGraphAccess } from '../data/graphAccess'
 
 // The docs-verify surface (O58): which declared corpus is actually loaded, and
 // in which database.
@@ -56,19 +56,21 @@ export default function CorpusStatus() {
   const [data, setData] = useState<CorpusStatusPayload | null>(null)
   const [error, setError] = useState<string | null>(null)
 
+  const { apiUrl } = useGraphAccess()
+
   useEffect(() => {
-    let cancelled = false
-    fetchCorpusStatus(apiBaseUrl())
+    // /docs-verify is not a QuerySpec, so useGraphQuery does not own it — but
+    // the request gets a real cancel and the session's base URL all the same.
+    const ctl = new AbortController()
+    fetchCorpusStatus(apiUrl, ctl.signal)
       .then((d) => {
-        if (!cancelled) setData(d)
+        if (!ctl.signal.aborted) setData(d)
       })
       .catch((e: Error) => {
-        if (!cancelled) setError(e.message)
+        if (!ctl.signal.aborted) setError(e.message)
       })
-    return () => {
-      cancelled = true
-    }
-  }, [])
+    return () => ctl.abort()
+  }, [apiUrl])
 
   const counts = useMemo(() => {
     if (!data) return []

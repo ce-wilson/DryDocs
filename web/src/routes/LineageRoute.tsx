@@ -1,7 +1,5 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import type { Persona } from '../lib/auth'
-import { createApiAccess } from '../lib/graphApi'
 import { MODULES } from '../modules/registry'
 import ModuleTemplate from './ModuleTemplate'
 import SpecGrid from '../explorer/SpecGrid'
@@ -25,7 +23,7 @@ import {
 // in Explorer (one lifted selection store).
 const lineageModule = MODULES.find((m) => m.id === 'lineage')!
 
-export default function LineageRoute({ persona }: { persona: Persona }) {
+export default function LineageRoute() {
   const { assetId } = useParams<{ assetId: string }>()
   const [selection, setSelection] = useState<LineageSelection | null>(() => {
     if (!assetId) return null
@@ -33,8 +31,6 @@ export default function LineageRoute({ persona }: { persona: Persona }) {
     return n ? { id: n.id, label: n.label, kind: n.kind } : null
   })
 
-  const apiUrl = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:8001'
-  const access = useMemo(() => createApiAccess(apiUrl, persona.id), [apiUrl, persona.id])
 
   const frameProps = { selection, onSelect: setSelection }
 
@@ -48,23 +44,17 @@ export default function LineageRoute({ persona }: { persona: Persona }) {
         // renders REAL registry systems from the generated load-map.
         Swimlanes: <SwimlaneView />,
         Hops: (
-          <SpecGrid
-            access={access}
-            specId="lineage.hops.v1"
+          <SpecGrid specId="lineage.hops.v1"
             fallback={<LineageDemoFrame frame={HOPS_FRAME} {...frameProps} />}
           />
         ),
         'Data assets': (
-          <SpecGrid
-            access={access}
-            specId="lineage.data-assets.v1"
+          <SpecGrid specId="lineage.data-assets.v1"
             fallback={<LineageDemoFrame frame={ASSETS_FRAME} {...frameProps} />}
           />
         ),
         'Schema definition': (
-          <SpecGrid
-            access={access}
-            specId="lineage.schema-definition.v1"
+          <SpecGrid specId="lineage.schema-definition.v1"
             fallback={<LineageDemoFrame frame={SCHEMA_FRAME} {...frameProps} />}
           />
         ),

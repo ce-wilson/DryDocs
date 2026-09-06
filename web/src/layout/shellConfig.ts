@@ -16,6 +16,8 @@
 //   template), never in the header — the header has no toolbarHeightPx-shaped
 //   slot for one.
 
+import * as storage from '../lib/storage'
+
 export interface ShellLayoutConfig {
   header: { heightPx: number }
   aside: { widthPx: number; collapsedWidthPx: number }
@@ -51,7 +53,7 @@ export const ASIDE_COLLAPSE_STORAGE_KEY = 'drydocs.aside-collapsed.v1'
 
 export function initialAsideCollapsed(): boolean {
   try {
-    return localStorage.getItem(ASIDE_COLLAPSE_STORAGE_KEY) === '1'
+    return storage.read(ASIDE_COLLAPSE_STORAGE_KEY) === '1'
   } catch {
     return false
   }

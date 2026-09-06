@@ -35,13 +35,16 @@ export interface CorpusStatusPayload {
   rows: CorpusRow[]
 }
 
-export async function fetchCorpusStatus(baseUrl: string): Promise<CorpusStatusPayload> {
+export async function fetchCorpusStatus(
+  baseUrl: string,
+  signal?: AbortSignal,
+): Promise<CorpusStatusPayload> {
   // O70: the typed client owns the token, the 401 → session-ended rule and the
   // O85 network diagnosis; the path is checked against the schema. The
   // response type is still hand-declared — /docs-verify is a free object
   // server-side until drydocs_api.schemas models it.
   const api = createAuthedApi(baseUrl, { token: sessionToken, rejected: sessionRejected })
-  const result = await api.GET('/docs-verify')
+  const result = await api.GET('/docs-verify', { signal })
 
   if (result.response.status === 401) throw new Error('the server refused this session')
   if (result.response.status === 403) {

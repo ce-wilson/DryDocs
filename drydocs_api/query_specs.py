@@ -102,7 +102,19 @@ class UnknownSpecError(KeyError):
     """Raised for a spec id not in the registry."""
 
 
-_LIMIT = (ParamSpec("limit", "int", required=False, default=500),)
+#: The name of the paging parameter every capped spec shares. Named rather than
+#: spelled inline because API1's completeness machinery has to ask "does this
+#: spec have a display ceiling?" in three places, and a string literal repeated
+#: three times is the shape this review found eight times over.
+DISPLAY_LIMIT_PARAM = "limit"
+#: The ceiling itself. 500 was already the value; it is a constant now so the
+#: manifest can record WHICH ceiling applied rather than a bare row count.
+#: What DECIDES whether a run is capped is exports.applied_limit, which keys
+#: on the Cypher binding `$limit` rather than on the declaration below — an
+#: R4 ephemeral spec declares no params and still carries a frozen ceiling.
+DEFAULT_DISPLAY_LIMIT = 500
+
+_LIMIT = (ParamSpec(DISPLAY_LIMIT_PARAM, "int", required=False, default=DEFAULT_DISPLAY_LIMIT),)
 
 
 def _with_ground_truth_exclusion(spec: QuerySpec) -> QuerySpec:

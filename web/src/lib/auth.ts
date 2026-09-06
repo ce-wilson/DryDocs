@@ -20,6 +20,7 @@
 // scripts/set_console_credential.py.
 
 import { createPublicApi, detailOf } from './apiClient'
+import * as storage from './storage'
 
 export type Role = 'user' | 'steward' | 'admin'
 
@@ -149,7 +150,7 @@ export async function signIn(personaId: string, secret: string): Promise<Session
 
 function store(session: Session): void {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(session))
+    storage.writeJson(STORAGE_KEY, session)
   } catch {
     // A console that cannot persist still works for this tab; a reload signs
     // out. Failing the sign-in over it would be worse.
@@ -161,11 +162,11 @@ function store(session: Session): void {
  *  down, must not leave the user looking signed in. */
 export function signOut(): void {
   const session = currentSession()
-  try {
-    localStorage.removeItem(STORAGE_KEY)
-  } catch {
-    /* nothing to clear */
-  }
+  // WEB11 (b): clearAll, not removeItem. This used to drop the session token
+  // and leave seven other keys behind, two of which held QUERY RESULTS keyed by
+  // persona rather than by session — readable by whoever opened the browser
+  // next. lib/storage.ts holds the retention decision for every key.
+  storage.clearAll()
   if (!session) return
   // The token is passed explicitly: the local session is already gone, so the
   // authed client (which reads it) is the wrong tool here. Plain fetch, not the
@@ -184,7 +185,7 @@ export function signOut(): void {
 export function currentSession(): Session | null {
   let raw: string | null
   try {
-    raw = localStorage.getItem(STORAGE_KEY)
+    raw = storage.read(STORAGE_KEY)
   } catch {
     return null
   }
@@ -229,11 +230,10 @@ export function sessionToken(): string | null {
  *  signOut(): there is no point telling the server to revoke a token it has
  *  already rejected, and the caller is mid-request. */
 export function sessionRejected(): void {
-  try {
-    localStorage.removeItem(STORAGE_KEY)
-  } catch {
-    /* nothing to clear */
-  }
+  // The same clearAll, and this is the path that matters MORE: it is the one
+  // taken when a session expires while a tab is open, which happens without
+  // anyone deciding to leave.
+  storage.clearAll()
   window.dispatchEvent(new CustomEvent(SESSION_REJECTED_EVENT))
 }
 

@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { SpecResult } from '../lib/graph'
 import type { Persona } from '../lib/auth'
-import { createApiAccess } from '../lib/graphApi'
 import { createIntakeApi, type IntakeRecord } from '../lib/intakeApi'
 import contextTypesData from '../generated/context-types.json'
 import ModuleToolbar from '../layout/ModuleToolbar'
 import IdChip from '../components/ui/IdChip'
 import IntakeStepper from '../components/IntakeStepper'
+import { useGraphAccess } from '../data/graphAccess'
 
 // O47 — the Context Intake page, slice 3 of docs/design/ui-exploration/sme-intake-page-plan.md.
 // Sections 1–3 are live against O45 (context-type artifact) and O46 (intake
@@ -108,8 +108,7 @@ function ThreadDiff({ delta }: { delta: string }) {
 }
 
 export default function IntakeRoute({ persona }: { persona: Persona }) {
-  const apiUrl = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:8001'
-  const access = useMemo(() => createApiAccess(apiUrl, persona.id), [apiUrl, persona.id])
+  const { access, apiUrl } = useGraphAccess()
   const intakeApi = useMemo(() => createIntakeApi(apiUrl, persona.id), [apiUrl, persona.id])
 
   // ── graph-backed pickers (degrade to empty-with-notice; never fabricate)
@@ -119,24 +118,22 @@ export default function IntakeRoute({ persona }: { persona: Persona }) {
   const [backfill, setBackfill] = useState<BackfillRow[]>([])
 
   useEffect(() => {
-    let cancelled = false
+    const ctl = new AbortController()
     const run = <T,>(spec: string, set: (rows: T[]) => void, setLive?: (v: boolean) => void) =>
       access
-        .runSpec(spec)
+        .runSpec(spec, {}, { signal: ctl.signal })
         .then((r: SpecResult) => {
-          if (cancelled) return
+          if (ctl.signal.aborted) return
           set(r.rows as unknown as T[])
           setLive?.(r.rows.length > 0)
         })
         .catch(() => {
-          if (!cancelled) set([])
+          if (!ctl.signal.aborted) set([])
         })
     run<AreaRow>(AREA_TREE_SPEC, setAreaRows, setAreaLive)
     run<AppRow>(APP_SPEC, setApps)
     run<BackfillRow>(BACKFILL_SPEC, setBackfill)
-    return () => {
-      cancelled = true
-    }
+    return () => ctl.abort()
   }, [access])
 
   // ── §1 area cascade state

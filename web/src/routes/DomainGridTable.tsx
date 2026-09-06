@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { MappingGrid } from '../lib/mappingsApi'
+import * as storage from '../lib/storage'
 
 // The read-only mapping.db grid for the registry-driven domains (ontology-map
 // and, when their reconciler tables land, fid-seal / alias-seal). Extracted
@@ -89,7 +90,7 @@ export default function DomainGridTable({
     setSort(null)
     setWidths(null)
     try {
-      const saved = localStorage.getItem(storageKey)
+      const saved = storage.read(storageKey)
       if (saved) setWidths(JSON.parse(saved) as Record<string, number>)
     } catch {
       /* private mode / blocked storage — the measured defaults below still apply */
@@ -124,7 +125,7 @@ export default function DomainGridTable({
     window.removeEventListener('pointerup', onPointerUp)
     setWidths((w) => {
       try {
-        if (w) localStorage.setItem(storageKey, JSON.stringify(w))
+        if (w) storage.writeJson(storageKey, w)
       } catch {
         /* not persisting is fine; the drag still applied for this session */
       }
@@ -188,7 +189,7 @@ export default function DomainGridTable({
   function resetColumns() {
     setWidths(null)
     try {
-      localStorage.removeItem(storageKey)
+      storage.remove(storageKey)
     } catch {
       /* nothing to clear */
     }
