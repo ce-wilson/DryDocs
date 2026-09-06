@@ -59,6 +59,18 @@ export default function ProvenanceNotice<T>({
     )
   }
 
+  if (state.status === 'shape') {
+    // WEB6 clause (c): the message stands IN PLACE OF the panel. WEB5's error
+    // boundary is the backstop for a throw, not the presentation for a fact the
+    // seam already established — and this is a fact, phrased for whoever has to
+    // act on it: the query ran, the service is up, and the columns moved.
+    return (
+      <p className={`${BOX} border-red/50 bg-red/10 text-red`} data-provenance="shape">
+        <b>Column mismatch.</b> {state.message}
+      </p>
+    )
+  }
+
   return (
     <p className={`${BOX} border-red/50 bg-red/10 text-red`} data-provenance="error">
       Live QuerySpec <code className="font-mono">{specId}</code>{' '}

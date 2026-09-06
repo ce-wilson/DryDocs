@@ -123,24 +123,25 @@ function start(access: GraphAccess, specId: string, params: Record<string, unkno
     existing.subscribers += 1
     return [key, existing]
   }
+  // The timer and the promise both close over the flight, and the flight holds
+  // both — so one of the three has to be named before it exists. It used to be
+  // the promise, seeded with a cast placeholder; naming the two locals first
+  // and building the record once removes the only field in this module that was
+  // ever briefly a lie (WEB6). Neither closure can run before the assignment:
+  // setTimeout does not fire synchronously and neither does `finally`.
   const controller = new AbortController()
-  const flight: Flight = {
-    controller,
-    timedOut: false,
-    subscribers: 1,
-    timer: setTimeout(() => {
-      flight.timedOut = true
-      controller.abort()
-    }, deadlineMs),
-    promise: undefined as unknown as Promise<SpecResult>,
-  }
-  flight.promise = access.runSpec(specId, params, { signal: controller.signal }).finally(() => {
-    clearTimeout(flight.timer)
+  const timer = setTimeout(() => {
+    flight.timedOut = true
+    controller.abort()
+  }, deadlineMs)
+  const promise = access.runSpec(specId, params, { signal: controller.signal }).finally(() => {
+    clearTimeout(timer)
     // A settled request is no longer in flight; leaving it in the map would
     // make this a cache, and a cache with classification-aware invalidation is
     // its own decision (clause e), not a side effect of deduping.
     if (inFlight.get(key) === flight) inFlight.delete(key)
   })
+  const flight: Flight = { controller, timedOut: false, subscribers: 1, timer, promise }
   inFlight.set(key, flight)
   return [key, flight]
 }

@@ -503,7 +503,7 @@ export type components = {
         /** Body_post_intake_evidence_intake__intake_id__evidence_post */
         Body_post_intake_evidence_intake__intake_id__evidence_post: {
             /** Files */
-            files: string[];
+            files: Blob[];
         };
         /** ChangesetBody */
         ChangesetBody: {

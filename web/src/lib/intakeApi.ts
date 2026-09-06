@@ -88,17 +88,23 @@ export function createIntakeApi(baseUrl: string, personaId: string): IntakeApi {
       )
     },
     async uploadEvidence(intakeId, files) {
-      // The schema describes the multipart `files` field as binary strings; the
-      // File objects are carried under that declared name and the serializer
-      // turns the declared body into the FormData fetch actually sends.
-      const body = { files } as unknown as EvidenceBody
+      // WEB6: NO CASTS HERE ANY MORE. The generated body now declares
+      // `files: Blob[]` (scripts/genApiTypes.ts maps the schema's binary
+      // content type), and `File extends Blob`, so the real objects satisfy the
+      // real type. Both double casts existed only because the generator had
+      // typed a binary upload as a string.
+      const body: EvidenceBody = { files }
       return record(
         await api.POST('/intake/{intake_id}/evidence', {
           params: { path: { intake_id: intakeId } },
           body,
           bodySerializer: (declared) => {
             const form = new FormData()
-            for (const f of declared.files as unknown as File[]) form.append('files', f, f.name)
+            // `name` is a File's, not a Blob's — the serializer receives what
+            // this method was handed, so the narrowing is real and local.
+            for (const f of declared.files) {
+              form.append('files', f, f instanceof File ? f.name : undefined)
+            }
             return form
           },
         }),

@@ -12,6 +12,7 @@ import {
   rowsOf,
   useLiveOrDemo,
 } from './provenance'
+import type { RowShape } from './rowShape'
 
 // WEB1 — the provenance seam and the guard that makes it the only path.
 
@@ -45,6 +46,10 @@ class Access {
   }
   answer(rows: Record<string, unknown>[]) {
     this.settle(specResult(rows))
+  }
+  /** WEB6: answer with a result whose columns are the caller's problem. */
+  answerWith(over: Partial<SpecResult>) {
+    this.settle({ ...specResult([{ id: 'r' }]), ...over })
   }
   refuse(message: string) {
     this.fail(new Error(message))
@@ -263,5 +268,68 @@ describe('the demo modules are reached through the seam (clause c)', () => {
     ]) {
       expect(onSeam).toContain(f)
     }
+  })
+})
+
+// ── WEB6: the shape state ───────────────────────────────────────────────────
+
+describe('a result whose columns do not match is its own state', () => {
+  interface ShapedRow {
+    id: string
+    label: string
+  }
+  const SHAPE: RowShape<ShapedRow> = ['id', 'label']
+  // The demo has to describe the SAME row type the shape does — the compiler
+  // says so, which is a small win on its own: a demo that drifted from the
+  // shape it stands in for used to be representable.
+  const SHAPED_DEMO: readonly ShapedRow[] = [{ id: 'demo-1', label: 'Demo one' }]
+
+  it('reports `shape`, not `live`, when a required column is absent', async () => {
+    const { result } = renderHook(() => useLiveOrDemo('s.v1', SHAPED_DEMO, { shape: SHAPE }), { wrapper })
+    await act(async () => access.answer([{ id: 'real' }]))
+    expect(result.current.status).toBe('shape')
+    if (result.current.status === 'shape') expect(result.current.message).toContain("'label'")
+  })
+
+  it('DOES NOT fall back to demo, even though this surface has one', async () => {
+    // The whole value of catching a contract change is that someone sees it.
+    // Substituting fabricated rows behind a badge would hide exactly the drift
+    // the check exists to expose — so this is asserted, not assumed.
+    const { result } = renderHook(() => useLiveOrDemo('s.v1', SHAPED_DEMO, { shape: SHAPE }), { wrapper })
+    await act(async () => access.answer([{ id: 'real' }]))
+    expect(result.current.status).not.toBe('demo')
+    expect(rowsOf(result.current)).toEqual([])
+  })
+
+  it('is COUNTED where an operator already looks, under its own reason', async () => {
+    const { result } = renderHook(() => useLiveOrDemo('s.v1', SHAPED_DEMO, { shape: SHAPE }), { wrapper })
+    await act(async () => access.answer([{ id: 'real' }]))
+    expect(result.current.status).toBe('shape')
+    expect(fallbackCount().total).toBe(1)
+    expect(fallbackCount().last?.because).toBe('shape')
+    expect(fallbackCount().bySpec['s.v1']).toBe(1)
+  })
+
+  it('a matching result stays live, and the rows come back typed', async () => {
+    const { result } = renderHook(() => useLiveOrDemo('s.v1', SHAPED_DEMO, { shape: SHAPE }), { wrapper })
+    await act(async () =>
+      access.answerWith({
+        keys: ['id', 'label'],
+        columns: [
+          { name: 'id', type: 'string', label: 'Id' },
+          { name: 'label', type: 'string', label: 'Label' },
+        ],
+        rows: [{ id: 'r1', label: 'One' }],
+      }),
+    )
+    expect(result.current.status).toBe('live')
+    expect(rowsOf(result.current)).toEqual([{ id: 'r1', label: 'One' }])
+    expect(fallbackCount().total).toBe(0)
+  })
+
+  it('a caller that declares NO shape is unaffected — the old behaviour, kept', async () => {
+    const { result } = renderHook(() => useLiveOrDemo('s.v1', DEMO), { wrapper })
+    await act(async () => access.answer([{ id: 'real' }]))
+    expect(result.current.status).toBe('live')
   })
 })

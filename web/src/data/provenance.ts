@@ -1,7 +1,8 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 
 import type { SpecResult } from '../lib/graph'
 import { useGraphQuery, type GraphQueryOptions, type QueryFailure } from './graphAccess'
+import { validateRows, type RowShape } from './rowShape'
 
 // WEB1 — provenance of rendered data is a typed union.
 //
@@ -32,6 +33,13 @@ import { useGraphQuery, type GraphQueryOptions, type QueryFailure } from './grap
  *  answer at all. Collapsing them is what the old fallbacks did. */
 export type DemoReason = 'empty' | 'error'
 
+/** What the operator-facing counter records. WIDER than `DemoReason`, and the
+ *  gap is the point: a shape failure is counted because an operator needs to
+ *  know the server's contract moved, but it never substitutes demo rows, so it
+ *  is not a demo reason. Naming it one would have been the cheaper edit and the
+ *  wrong one. */
+export type FallbackReason = DemoReason | 'shape'
+
 /** Where the rows on screen came from.
  *
  * `empty` is a SUCCESS: the graph answered, and the answer was no rows. It
@@ -43,6 +51,11 @@ export type Provenance<T> =
   | { status: 'empty'; data: SpecResult }
   | { status: 'demo'; rows: T[]; because: DemoReason; message: string | null }
   | { status: 'error'; message: string; reason: QueryFailure }
+  /** WEB6: the graph ANSWERED, and the answer does not match the shape this
+   *  panel requires. A distinct state from `error` because it is a distinct
+   *  fact — the service is up and the query ran; the contract moved — and a
+   *  distinct state from `demo` on purpose: see the note on `shape` below. */
+  | { status: 'shape'; data: SpecResult; message: string }
 
 // ── the fallback counter (clause e) ─────────────────────────────────────────
 //
@@ -59,7 +72,7 @@ export interface FallbackCount {
   /** per spec id, so an operator sees WHICH surface is fabricating */
   bySpec: Record<string, number>
   /** the most recent activation's reason and message, for the strip's detail */
-  last: { specId: string; because: DemoReason; message: string | null } | null
+  last: { specId: string; because: FallbackReason; message: string | null } | null
 }
 
 let counts: FallbackCount = { total: 0, bySpec: {}, last: null }
@@ -74,7 +87,7 @@ export function onFallback(fn: (c: FallbackCount) => void): () => void {
   return () => listeners.delete(fn)
 }
 
-export function recordFallback(specId: string, because: DemoReason, message: string | null): void {
+export function recordFallback(specId: string, because: FallbackReason, message: string | null): void {
   counts = {
     total: counts.total + 1,
     bySpec: { ...counts.bySpec, [specId]: (counts.bySpec[specId] ?? 0) + 1 },
@@ -91,7 +104,13 @@ export function __resetFallbackCount(): void {
 
 // ── the seam ────────────────────────────────────────────────────────────────
 
-export interface LiveOrDemoOptions extends GraphQueryOptions {
+export interface LiveOrDemoOptions<T> extends GraphQueryOptions {
+  /** WEB6: the columns this panel's row type requires. Given one, the rows are
+   *  CHECKED against the server's own column declarations before they are handed
+   *  over as `T[]`; without one they are cast, which is the old behaviour and
+   *  still the right one for a surface whose rows are `Record<string, unknown>`
+   *  anyway. Names only — the types come from the result (see rowShape.ts). */
+  shape?: RowShape<T>
   /** Render the demo rows when the graph answers with NO rows, not only when it
    *  fails. Default true: an unloaded database is the common case in this phase
    *  and a demo frame with a notice is more useful than an empty one. A surface
@@ -110,23 +129,43 @@ export interface LiveOrDemoOptions extends GraphQueryOptions {
 export function useLiveOrDemo<T>(
   specId: string,
   demo: readonly T[] | null,
-  opts: LiveOrDemoOptions = {},
+  opts: LiveOrDemoOptions<T> = {},
 ): Provenance<T> {
-  const { demoOnEmpty = true, ...queryOpts } = opts
+  const { demoOnEmpty = true, shape, ...queryOpts } = opts
   const query = useGraphQuery(specId, {}, queryOpts)
+
+  // WEB6: the shape check runs on the DATA state, before anything decides what
+  // to render. Memoised on the result identity — useGraphQuery returns a stable
+  // object per fetch, so this runs once per answer and not once per keystroke in
+  // a filter box above it.
+  const checked = useMemo(
+    () => (query.status === 'data' && shape ? validateRows<T>(query.data, shape) : null),
+    [query, shape],
+  )
+
+  // A SHAPE FAILURE NEVER FALLS BACK TO DEMO, even on a surface that has one.
+  // The whole value of catching it is that someone sees the server's contract
+  // moved; substituting fabricated rows behind a badge would hide precisely the
+  // drift this check exists to expose, on the surface best placed to report it.
+  const shapeFailed = checked !== null && !checked.ok
 
   // The count is a side effect and belongs in an effect, keyed on the state that
   // caused it — counting during render would double-count under StrictMode and
   // re-count on every unrelated re-render.
-  const because: DemoReason | null =
-    demo === null
+  const because: FallbackReason | null = shapeFailed
+    ? 'shape'
+    : demo === null
       ? null
       : query.status === 'error'
         ? 'error'
         : query.status === 'empty' && demoOnEmpty
           ? 'empty'
           : null
-  const message = query.status === 'error' ? query.message : null
+  const message = shapeFailed
+    ? (checked as { ok: false; message: string }).message
+    : query.status === 'error'
+      ? query.message
+      : null
   const counted = useRef<string | null>(null)
   useEffect(() => {
     if (!because) {
@@ -141,13 +180,23 @@ export function useLiveOrDemo<T>(
 
   if (query.status === 'loading') return { status: 'loading' }
   if (query.status === 'data') {
-    return { status: 'live', data: query.data, rows: query.data.rows as unknown as T[] }
+    if (checked && !checked.ok) {
+      return { status: 'shape', data: query.data, message: checked.message }
+    }
+    // The one cast left at this seam, and it now asserts something that was
+    // checked: `checked.rows` when a shape was given, the old unchecked cast
+    // only for a caller that declared none.
+    return {
+      status: 'live',
+      data: query.data,
+      rows: checked ? checked.rows : (query.data.rows as T[]),
+    }
   }
   if (query.status === 'empty') {
-    if (because === 'empty') return { status: 'demo', rows: [...demo!], because, message: null }
+    if (because === 'empty') return { status: 'demo', rows: [...demo!], because: 'empty', message: null }
     return { status: 'empty', data: query.data }
   }
-  if (because === 'error') return { status: 'demo', rows: [...demo!], because, message }
+  if (because === 'error') return { status: 'demo', rows: [...demo!], because: 'error', message }
   return { status: 'error', message: query.message, reason: query.reason }
 }
 

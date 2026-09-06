@@ -7,6 +7,7 @@ import ModuleToolbar from '../layout/ModuleToolbar'
 import IdChip from '../components/ui/IdChip'
 import IntakeStepper from '../components/IntakeStepper'
 import { useGraphAccess } from '../data/graphAccess'
+import { validateRows, type RowShape } from '../data/rowShape'
 
 // O47 — the Context Intake page, slice 3 of docs/design/ui-exploration/sme-intake-page-plan.md.
 // Sections 1–3 are live against O45 (context-type artifact) and O46 (intake
@@ -37,6 +38,17 @@ interface BackfillRow {
   product_id: string | null
   app_id: string | null
 }
+
+const AREA_COLUMNS: RowShape<AreaRow> = [
+  'product_line_id',
+  'product_line',
+  'product_id',
+  'product',
+  'area_product_id',
+  'area_product',
+]
+const APP_COLUMNS: RowShape<AppRow> = ['app_id', 'name']
+const BACKFILL_COLUMNS: RowShape<BackfillRow> = ['product_line_id', 'product_id', 'app_id']
 
 const UNKNOWN = '__unknown__'
 
@@ -116,23 +128,44 @@ export default function IntakeRoute({ persona }: { persona: Persona }) {
   const [areaLive, setAreaLive] = useState(false)
   const [apps, setApps] = useState<AppRow[] | null>(null)
   const [backfill, setBackfill] = useState<BackfillRow[]>([])
+  // First mismatch wins: three pickers read three specs, and three copies of
+  // the same sentence would be noise where one is a report.
+  const [shapeProblem, setShapeProblem] = useState<string | null>(null)
 
   useEffect(() => {
     const ctl = new AbortController()
-    const run = <T,>(spec: string, set: (rows: T[]) => void, setLive?: (v: boolean) => void) =>
+    // WEB6: the shape travels WITH the type parameter, so the helper cannot be
+    // called for a row type nobody declared columns for — which was how one
+    // generic cast covered three different specs and checked none of them.
+    const run = <T,>(
+      spec: string,
+      shape: RowShape<T>,
+      set: (rows: T[]) => void,
+      setLive?: (v: boolean) => void,
+    ) =>
       access
         .runSpec(spec, {}, { signal: ctl.signal })
         .then((r: SpecResult) => {
           if (ctl.signal.aborted) return
-          set(r.rows as unknown as T[])
-          setLive?.(r.rows.length > 0)
+          const checked = validateRows<T>(r, shape)
+          if (!checked.ok) {
+            // These are PICKERS. An empty picker with the page's existing
+            // "degrade to empty-with-notice" behaviour is the honest outcome;
+            // a picker populated from rows whose columns do not match would
+            // offer choices that submit the wrong ids.
+            setShapeProblem((prev) => prev ?? checked.message)
+            set([])
+            return
+          }
+          set(checked.rows)
+          setLive?.(checked.rows.length > 0)
         })
         .catch(() => {
           if (!ctl.signal.aborted) set([])
         })
-    run<AreaRow>(AREA_TREE_SPEC, setAreaRows, setAreaLive)
-    run<AppRow>(APP_SPEC, setApps)
-    run<BackfillRow>(BACKFILL_SPEC, setBackfill)
+    run<AreaRow>(AREA_TREE_SPEC, AREA_COLUMNS, setAreaRows, setAreaLive)
+    run<AppRow>(APP_SPEC, APP_COLUMNS, setApps)
+    run<BackfillRow>(BACKFILL_SPEC, BACKFILL_COLUMNS, setBackfill)
     return () => ctl.abort()
   }, [access])
 
@@ -293,6 +326,15 @@ export default function IntakeRoute({ persona }: { persona: Persona }) {
     <div>
       <ModuleToolbar crumbs={[{ label: 'Home', to: '/' }, { label: 'Context intake' }]} />
       <div className="flex flex-col gap-4 p-4">
+        {shapeProblem && (
+          // WEB6 clause (c): distinct from the empty-tree notice below, because
+          // "the load has not run" and "the columns moved" send a reader to two
+          // different people.
+          <p className="rounded border border-red/50 bg-red/10 p-2 text-xs text-red">
+            <b>Column mismatch.</b> {shapeProblem} The pickers below are empty rather than populated
+            from rows this page cannot read.
+          </p>
+        )}
         {!areaLive && areaRows !== null && (
           <p className="rounded border border-edge-soft bg-panel-2 p-2 text-xs text-faint">
             Area tree returned no rows — the catalog load has not run against this API, or the

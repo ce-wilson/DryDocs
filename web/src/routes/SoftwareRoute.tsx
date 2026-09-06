@@ -24,6 +24,14 @@ import {
   type Product,
 } from '../software/softwareModel'
 import { useGraphQuery } from '../data/graphAccess'
+import { validateRows, type RowShape } from '../data/rowShape'
+
+/** The two columns this page reads from software.doc-coverage.v1. */
+interface CoverageRow {
+  product_id: string
+  documents: number
+}
+const COVERAGE_COLUMNS: RowShape<CoverageRow> = ['product_id', 'documents']
 
 // /software (Q16) — READ-ONLY ledger view of vendor -> product -> corpus -> graph.
 // Static generated JSON (software-registry.json + the doc-corpus rows of
@@ -56,13 +64,17 @@ export default function SoftwareRoute({ persona }: { persona: Persona }) {
   // WEB12: a declaration-only view when the read is loading, empty or failed —
   // the banner says which, and no case here fabricates a count.
   const coverage = useGraphQuery('software.doc-coverage.v1')
+  // WEB6: `documents` is declared `int` server-side and this page renders it as
+  // a count. The old cast asserted both columns and checked neither, so a spec
+  // returning a string would have produced `Number('')` = 0 — a coverage of zero
+  // that looks exactly like a real one. Checked, a mismatch reads as "no live
+  // counts" and the declaration-only view stands, which is the same degradation
+  // WEB12 already chose for loading and error here.
+  const checkedCoverage =
+    coverage.status === 'data' ? validateRows<CoverageRow>(coverage.data, COVERAGE_COLUMNS) : null
   const live: Map<string, number> | null =
-    coverage.status === 'data'
-      ? new Map(
-          (coverage.data.rows as unknown as { product_id: string; documents: number }[]).map(
-            (row) => [row.product_id, Number(row.documents ?? 0)] as const,
-          ),
-        )
+    checkedCoverage?.ok === true
+      ? new Map(checkedCoverage.rows.map((row) => [row.product_id, Number(row.documents ?? 0)] as const))
       : null
 
   const selected = PRODUCTS.find((p) => p.id === selectedId) ?? null
