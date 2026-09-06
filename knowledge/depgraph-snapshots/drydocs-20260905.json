@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-05T19:02:41",
+    "captured_at": "2026-09-05T20:44:50",
     "date": "20260905",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "c2f5e1a1",
-      "full": "c2f5e1a1684455b3ea2fa21cf9c22b053da72697",
+      "commit": "04f72b5b",
+      "full": "04f72b5ba422a4b2695ee0ae1addcfc6cde97e30",
       "branch": "main",
-      "describe": "port-base-20260905-1-gc2f5e1a1",
-      "subject": "chore(port): ledger - the sixth roll's counts corrected at the tag (186 / 54 / 132)",
+      "describe": "port-base-20260905-44-g04f72b5b",
+      "subject": "docs(ideas): inbox the Lane B hand-backs - Idea-266 web build follow-ups, Idea-267 api:types precondition, Idea-268 dump_openapi truncates before it fails",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -22355,10 +22355,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260905.json",
-      "name": "drydocs-20260905.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260905-1902.json",
+      "name": "drydocs-20260905-1902.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260905.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260905-1902.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -25658,6 +25658,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_result_completeness.py",
+      "name": "test_result_completeness.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_result_completeness.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_review_labels.py",
       "name": "test_review_labels.py",
       "extension": ".py",
@@ -26067,6 +26076,15 @@
       "name": "test_vocabulary_endpoints.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_vocabulary_endpoints.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_web_typescript_strict.py",
+      "name": "test_web_typescript_strict.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_web_typescript_strict.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -26585,6 +26603,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/components/ProvenanceNotice.tsx",
+      "name": "ProvenanceNotice.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/components/ProvenanceNotice.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/components/RelEdge.tsx",
       "name": "RelEdge.tsx",
       "extension": ".tsx",
@@ -26643,15 +26670,6 @@
       "name": "TowerDrill.tsx",
       "extension": ".tsx",
       "rel_path": "web/src/components/TowerDrill.tsx",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/web/src/components/TowerIcon.tsx",
-      "name": "TowerIcon.tsx",
-      "extension": ".tsx",
-      "rel_path": "web/src/components/TowerIcon.tsx",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -26828,6 +26846,33 @@
       "kind": "dir"
     },
     {
+      "file_id": "drydocs/web/src/data/GraphAccessProvider.tsx",
+      "name": "GraphAccessProvider.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/data/GraphAccessProvider.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/data/graphAccess.test.tsx",
+      "name": "graphAccess.test.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/data/graphAccess.test.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/data/graphAccess.ts",
+      "name": "graphAccess.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/data/graphAccess.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/data/mappingsDemo.ts",
       "name": "mappingsDemo.ts",
       "extension": ".ts",
@@ -26846,10 +26891,46 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/data/provenance.test.tsx",
+      "name": "provenance.test.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/data/provenance.test.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/data/provenance.ts",
+      "name": "provenance.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/data/provenance.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/data/readiness.ts",
+      "name": "readiness.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/data/readiness.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/data/towers.ts",
       "name": "towers.ts",
       "extension": ".ts",
       "rel_path": "web/src/data/towers.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/data/transportPreamble.test.ts",
+      "name": "transportPreamble.test.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/data/transportPreamble.test.ts",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -27125,10 +27206,55 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/layout/RouteAccessGate.test.tsx",
+      "name": "RouteAccessGate.test.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/layout/RouteAccessGate.test.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/layout/RouteAccessGate.tsx",
+      "name": "RouteAccessGate.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/layout/RouteAccessGate.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/layout/RouteErrorBoundary.test.tsx",
+      "name": "RouteErrorBoundary.test.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/layout/RouteErrorBoundary.test.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/layout/RouteErrorBoundary.tsx",
+      "name": "RouteErrorBoundary.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/layout/RouteErrorBoundary.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/layout/Shell.tsx",
       "name": "Shell.tsx",
       "extension": ".tsx",
       "rel_path": "web/src/layout/Shell.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/layout/SystemBanner.tsx",
+      "name": "SystemBanner.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/layout/SystemBanner.tsx",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -27368,6 +27494,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/lib/storage.test.ts",
+      "name": "storage.test.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lib/storage.test.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/lib/storage.ts",
+      "name": "storage.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lib/storage.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/lib/theme.ts",
       "name": "theme.ts",
       "extension": ".ts",
@@ -27521,6 +27665,15 @@
       "kind": "dir"
     },
     {
+      "file_id": "drydocs/web/src/modules/readmeAccess.test.ts",
+      "name": "readmeAccess.test.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/modules/readmeAccess.test.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/modules/registry.test.ts",
       "name": "registry.test.ts",
       "extension": ".ts",
@@ -27534,6 +27687,15 @@
       "name": "registry.ts",
       "extension": ".ts",
       "rel_path": "web/src/modules/registry.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/modules/routeAccess.test.ts",
+      "name": "routeAccess.test.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/modules/routeAccess.test.ts",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -28007,10 +28169,37 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/styles/tokenParity.test.ts",
+      "name": "tokenParity.test.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/styles/tokenParity.test.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/styles/tokens.css",
       "name": "tokens.css",
       "extension": ".css",
       "rel_path": "web/src/styles/tokens.css",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/test",
+      "name": "test",
+      "extension": "",
+      "rel_path": "web/src/test",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/web/src/test/sourceScan.ts",
+      "name": "sourceScan.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/test/sourceScan.ts",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -32448,6 +32637,26 @@
       "drydocs/drydocs_core/repo_paths.py"
     ],
     [
+      "drydocs/tests/unit/test_result_completeness.py",
+      "drydocs/drydocs_api/ephemeral_specs.py"
+    ],
+    [
+      "drydocs/tests/unit/test_result_completeness.py",
+      "drydocs/drydocs_api/exports.py"
+    ],
+    [
+      "drydocs/tests/unit/test_result_completeness.py",
+      "drydocs/drydocs_api/queries.py"
+    ],
+    [
+      "drydocs/tests/unit/test_result_completeness.py",
+      "drydocs/drydocs_api/query_specs.py"
+    ],
+    [
+      "drydocs/tests/unit/test_result_completeness.py",
+      "drydocs/drydocs_api/sessions.py"
+    ],
+    [
       "drydocs/tests/unit/test_review_labels.py",
       "drydocs/drydocs/review/review_labels.py"
     ],
@@ -32901,6 +33110,18 @@
     ],
     [
       "drydocs/web/src/App.tsx",
+      "drydocs/web/src/data/GraphAccessProvider.tsx"
+    ],
+    [
+      "drydocs/web/src/App.tsx",
+      "drydocs/web/src/layout/RouteAccessGate.tsx"
+    ],
+    [
+      "drydocs/web/src/App.tsx",
+      "drydocs/web/src/layout/RouteErrorBoundary.tsx"
+    ],
+    [
+      "drydocs/web/src/App.tsx",
       "drydocs/web/src/layout/Shell.tsx"
     ],
     [
@@ -32997,15 +33218,11 @@
     ],
     [
       "drydocs/web/src/ask/FileReport.tsx",
-      "drydocs/web/src/lib/auth.ts"
+      "drydocs/web/src/data/graphAccess.ts"
     ],
     [
       "drydocs/web/src/ask/FileReport.tsx",
       "drydocs/web/src/lib/graph.ts"
-    ],
-    [
-      "drydocs/web/src/ask/FileReport.tsx",
-      "drydocs/web/src/lib/graphApi.ts"
     ],
     [
       "drydocs/web/src/ask/TaskGraphPane.tsx",
@@ -33057,11 +33274,11 @@
     ],
     [
       "drydocs/web/src/components/GraphExplorer.tsx",
-      "drydocs/web/src/lib/forceLayout.ts"
+      "drydocs/web/src/data/graphAccess.ts"
     ],
     [
       "drydocs/web/src/components/GraphExplorer.tsx",
-      "drydocs/web/src/lib/graphApi.ts"
+      "drydocs/web/src/lib/forceLayout.ts"
     ],
     [
       "drydocs/web/src/components/GraphSvg.tsx",
@@ -33100,6 +33317,10 @@
       "drydocs/web/src/lib/auth.ts"
     ],
     [
+      "drydocs/web/src/components/ProvenanceNotice.tsx",
+      "drydocs/web/src/data/provenance.ts"
+    ],
+    [
       "drydocs/web/src/components/SignIn.test.tsx",
       "drydocs/web/src/components/SignIn.tsx"
     ],
@@ -33117,6 +33338,10 @@
     ],
     [
       "drydocs/web/src/components/SpecGraphPane.tsx",
+      "drydocs/web/src/components/ProvenanceNotice.tsx"
+    ],
+    [
+      "drydocs/web/src/components/SpecGraphPane.tsx",
       "drydocs/web/src/components/ui/EmptyState.tsx"
     ],
     [
@@ -33125,7 +33350,7 @@
     ],
     [
       "drydocs/web/src/components/SpecGraphPane.tsx",
-      "drydocs/web/src/lib/graph.ts"
+      "drydocs/web/src/data/provenance.ts"
     ],
     [
       "drydocs/web/src/components/SpecGraphPane.tsx",
@@ -33141,14 +33366,6 @@
     ],
     [
       "drydocs/web/src/components/TowerDrill.tsx",
-      "drydocs/web/src/data/towers.ts"
-    ],
-    [
-      "drydocs/web/src/components/TowerIcon.tsx",
-      "drydocs/web/src/components/icons/HubGlyphs.tsx"
-    ],
-    [
-      "drydocs/web/src/components/TowerIcon.tsx",
       "drydocs/web/src/data/towers.ts"
     ],
     [
@@ -33188,8 +33405,72 @@
       "drydocs/web/src/lib/runtimeView.ts"
     ],
     [
+      "drydocs/web/src/components/ui/ResizableSplit.tsx",
+      "drydocs/web/src/lib/storage.ts"
+    ],
+    [
       "drydocs/web/src/components/ui/StatusItems.tsx",
       "drydocs/web/src/lib/status.ts"
+    ],
+    [
+      "drydocs/web/src/data/GraphAccessProvider.tsx",
+      "drydocs/web/src/data/graphAccess.ts"
+    ],
+    [
+      "drydocs/web/src/data/GraphAccessProvider.tsx",
+      "drydocs/web/src/lib/auth.ts"
+    ],
+    [
+      "drydocs/web/src/data/GraphAccessProvider.tsx",
+      "drydocs/web/src/lib/graphApi.ts"
+    ],
+    [
+      "drydocs/web/src/data/graphAccess.test.tsx",
+      "drydocs/web/src/data/graphAccess.ts"
+    ],
+    [
+      "drydocs/web/src/data/graphAccess.test.tsx",
+      "drydocs/web/src/lib/graph.ts"
+    ],
+    [
+      "drydocs/web/src/data/graphAccess.ts",
+      "drydocs/web/src/lib/graph.ts"
+    ],
+    [
+      "drydocs/web/src/data/provenance.test.tsx",
+      "drydocs/web/src/data/graphAccess.ts"
+    ],
+    [
+      "drydocs/web/src/data/provenance.test.tsx",
+      "drydocs/web/src/data/provenance.ts"
+    ],
+    [
+      "drydocs/web/src/data/provenance.test.tsx",
+      "drydocs/web/src/lib/graph.ts"
+    ],
+    [
+      "drydocs/web/src/data/provenance.test.tsx",
+      "drydocs/web/src/test/sourceScan.ts"
+    ],
+    [
+      "drydocs/web/src/data/provenance.ts",
+      "drydocs/web/src/data/graphAccess.ts"
+    ],
+    [
+      "drydocs/web/src/data/provenance.ts",
+      "drydocs/web/src/lib/graph.ts"
+    ],
+    [
+      "drydocs/web/src/data/readiness.ts",
+      "drydocs/web/src/lib/apiClient.ts"
+    ],
+    [
+      "drydocs/web/src/data/readiness.ts",
+      "drydocs/web/src/lib/reachability.ts"
+    ],
+    [
+      "drydocs/web/src/data/transportPreamble.test.ts",
+      "drydocs/web/src/test/sourceScan.ts"
     ],
     [
       "drydocs/web/src/docs/CorpusStatus.tsx",
@@ -33201,7 +33482,7 @@
     ],
     [
       "drydocs/web/src/docs/CorpusStatus.tsx",
-      "drydocs/web/src/lib/auth.ts"
+      "drydocs/web/src/data/graphAccess.ts"
     ],
     [
       "drydocs/web/src/docs/CorpusStatus.tsx",
@@ -33273,11 +33554,19 @@
     ],
     [
       "drydocs/web/src/explorer/SpecGrid.tsx",
+      "drydocs/web/src/components/ProvenanceNotice.tsx"
+    ],
+    [
+      "drydocs/web/src/explorer/SpecGrid.tsx",
       "drydocs/web/src/components/ui/EmptyState.tsx"
     ],
     [
       "drydocs/web/src/explorer/SpecGrid.tsx",
-      "drydocs/web/src/lib/graph.ts"
+      "drydocs/web/src/data/graphAccess.ts"
+    ],
+    [
+      "drydocs/web/src/explorer/SpecGrid.tsx",
+      "drydocs/web/src/data/provenance.ts"
     ],
     [
       "drydocs/web/src/explorer/demoGraph.ts",
@@ -33324,6 +33613,22 @@
       "drydocs/web/src/layout/rightSidebarContext.tsx"
     ],
     [
+      "drydocs/web/src/layout/RouteAccessGate.test.tsx",
+      "drydocs/web/src/layout/RouteAccessGate.tsx"
+    ],
+    [
+      "drydocs/web/src/layout/RouteAccessGate.test.tsx",
+      "drydocs/web/src/modules/registry.ts"
+    ],
+    [
+      "drydocs/web/src/layout/RouteAccessGate.tsx",
+      "drydocs/web/src/modules/registry.ts"
+    ],
+    [
+      "drydocs/web/src/layout/RouteErrorBoundary.test.tsx",
+      "drydocs/web/src/layout/RouteErrorBoundary.tsx"
+    ],
+    [
       "drydocs/web/src/layout/Shell.tsx",
       "drydocs/web/src/layout/Aside.tsx"
     ],
@@ -33334,6 +33639,10 @@
     [
       "drydocs/web/src/layout/Shell.tsx",
       "drydocs/web/src/layout/RightSidebarSlot.tsx"
+    ],
+    [
+      "drydocs/web/src/layout/Shell.tsx",
+      "drydocs/web/src/layout/SystemBanner.tsx"
     ],
     [
       "drydocs/web/src/layout/Shell.tsx",
@@ -33352,6 +33661,26 @@
       "drydocs/web/src/lib/auth.ts"
     ],
     [
+      "drydocs/web/src/layout/Shell.tsx",
+      "drydocs/web/src/lib/storage.ts"
+    ],
+    [
+      "drydocs/web/src/layout/SystemBanner.tsx",
+      "drydocs/web/src/data/graphAccess.ts"
+    ],
+    [
+      "drydocs/web/src/layout/SystemBanner.tsx",
+      "drydocs/web/src/data/provenance.ts"
+    ],
+    [
+      "drydocs/web/src/layout/SystemBanner.tsx",
+      "drydocs/web/src/data/readiness.ts"
+    ],
+    [
+      "drydocs/web/src/layout/shellConfig.ts",
+      "drydocs/web/src/lib/storage.ts"
+    ],
+    [
       "drydocs/web/src/lib/apiClient.test.ts",
       "drydocs/web/src/lib/apiClient.ts"
     ],
@@ -33362,6 +33691,10 @@
     [
       "drydocs/web/src/lib/auth.ts",
       "drydocs/web/src/lib/apiClient.ts"
+    ],
+    [
+      "drydocs/web/src/lib/auth.ts",
+      "drydocs/web/src/lib/storage.ts"
     ],
     [
       "drydocs/web/src/lib/canvasRoutes.test.ts",
@@ -33436,6 +33769,22 @@
       "drydocs/web/src/lib/reachability.ts"
     ],
     [
+      "drydocs/web/src/lib/storage.test.ts",
+      "drydocs/web/src/lib/auth.ts"
+    ],
+    [
+      "drydocs/web/src/lib/storage.test.ts",
+      "drydocs/web/src/lib/storage.ts"
+    ],
+    [
+      "drydocs/web/src/lib/storage.test.ts",
+      "drydocs/web/src/test/sourceScan.ts"
+    ],
+    [
+      "drydocs/web/src/lib/theme.ts",
+      "drydocs/web/src/lib/storage.ts"
+    ],
+    [
       "drydocs/web/src/lib/views.ts",
       "drydocs/web/src/lib/auth.ts"
     ],
@@ -33496,8 +33845,28 @@
       "drydocs/web/src/App.tsx"
     ],
     [
+      "drydocs/web/src/modules/readmeAccess.test.ts",
+      "drydocs/web/src/lib/auth.ts"
+    ],
+    [
+      "drydocs/web/src/modules/readmeAccess.test.ts",
+      "drydocs/web/src/modules/registry.ts"
+    ],
+    [
+      "drydocs/web/src/modules/readmeAccess.test.ts",
+      "drydocs/web/src/test/sourceScan.ts"
+    ],
+    [
       "drydocs/web/src/modules/registry.test.ts",
       "drydocs/web/src/modules/registry.ts"
+    ],
+    [
+      "drydocs/web/src/modules/routeAccess.test.ts",
+      "drydocs/web/src/modules/registry.ts"
+    ],
+    [
+      "drydocs/web/src/modules/routeAccess.test.ts",
+      "drydocs/web/src/test/sourceScan.ts"
     ],
     [
       "drydocs/web/src/ownership/AssetSearchPanel.tsx",
@@ -33593,6 +33962,10 @@
     ],
     [
       "drydocs/web/src/routes/AppCodeCascadePane.tsx",
+      "drydocs/web/src/components/ProvenanceNotice.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/AppCodeCascadePane.tsx",
       "drydocs/web/src/components/ui/EmptyState.tsx"
     ],
     [
@@ -33601,15 +33974,15 @@
     ],
     [
       "drydocs/web/src/routes/AppCodeCascadePane.tsx",
-      "drydocs/web/src/lib/graph.ts"
-    ],
-    [
-      "drydocs/web/src/routes/AppCodeCascadePane.tsx",
-      "drydocs/web/src/lib/graphApi.ts"
+      "drydocs/web/src/data/provenance.ts"
     ],
     [
       "drydocs/web/src/routes/AppCodeCascadePane.tsx",
       "drydocs/web/src/lib/mappingsApi.ts"
+    ],
+    [
+      "drydocs/web/src/routes/AppCodeCascadePane.tsx",
+      "drydocs/web/src/lib/storage.ts"
     ],
     [
       "drydocs/web/src/routes/AskRoute.tsx",
@@ -33629,6 +34002,10 @@
     ],
     [
       "drydocs/web/src/routes/AskRoute.tsx",
+      "drydocs/web/src/data/graphAccess.ts"
+    ],
+    [
+      "drydocs/web/src/routes/AskRoute.tsx",
       "drydocs/web/src/explorer/SpecGrid.tsx"
     ],
     [
@@ -33645,7 +34022,7 @@
     ],
     [
       "drydocs/web/src/routes/AskRoute.tsx",
-      "drydocs/web/src/lib/graphApi.ts"
+      "drydocs/web/src/lib/storage.ts"
     ],
     [
       "drydocs/web/src/routes/AssetPathRoute.tsx",
@@ -33693,14 +34070,6 @@
     ],
     [
       "drydocs/web/src/routes/DocsRoute.tsx",
-      "drydocs/web/src/lib/auth.ts"
-    ],
-    [
-      "drydocs/web/src/routes/DocsRoute.tsx",
-      "drydocs/web/src/lib/graphApi.ts"
-    ],
-    [
-      "drydocs/web/src/routes/DocsRoute.tsx",
       "drydocs/web/src/modules/registry.ts"
     ],
     [
@@ -33710,6 +34079,10 @@
     [
       "drydocs/web/src/routes/DomainGridTable.tsx",
       "drydocs/web/src/lib/mappingsApi.ts"
+    ],
+    [
+      "drydocs/web/src/routes/DomainGridTable.tsx",
+      "drydocs/web/src/lib/storage.ts"
     ],
     [
       "drydocs/web/src/routes/GatesRoute.tsx",
@@ -33745,10 +34118,6 @@
     ],
     [
       "drydocs/web/src/routes/GraphCanvasRoute.tsx",
-      "drydocs/web/src/lib/graphApi.ts"
-    ],
-    [
-      "drydocs/web/src/routes/GraphCanvasRoute.tsx",
       "drydocs/web/src/lib/nvl-mapping.ts"
     ],
     [
@@ -33765,6 +34134,10 @@
     ],
     [
       "drydocs/web/src/routes/IntakeRoute.tsx",
+      "drydocs/web/src/data/graphAccess.ts"
+    ],
+    [
+      "drydocs/web/src/routes/IntakeRoute.tsx",
       "drydocs/web/src/layout/ModuleToolbar.tsx"
     ],
     [
@@ -33777,23 +34150,11 @@
     ],
     [
       "drydocs/web/src/routes/IntakeRoute.tsx",
-      "drydocs/web/src/lib/graphApi.ts"
-    ],
-    [
-      "drydocs/web/src/routes/IntakeRoute.tsx",
       "drydocs/web/src/lib/intakeApi.ts"
     ],
     [
       "drydocs/web/src/routes/LineageRoute.tsx",
       "drydocs/web/src/explorer/SpecGrid.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/LineageRoute.tsx",
-      "drydocs/web/src/lib/auth.ts"
-    ],
-    [
-      "drydocs/web/src/routes/LineageRoute.tsx",
-      "drydocs/web/src/lib/graphApi.ts"
     ],
     [
       "drydocs/web/src/routes/LineageRoute.tsx",
@@ -33845,6 +34206,10 @@
     ],
     [
       "drydocs/web/src/routes/LoadsRoute.tsx",
+      "drydocs/web/src/components/ProvenanceNotice.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/LoadsRoute.tsx",
       "drydocs/web/src/components/StatTiles.tsx"
     ],
     [
@@ -33853,15 +34218,11 @@
     ],
     [
       "drydocs/web/src/routes/LoadsRoute.tsx",
+      "drydocs/web/src/data/provenance.ts"
+    ],
+    [
+      "drydocs/web/src/routes/LoadsRoute.tsx",
       "drydocs/web/src/explorer/SpecGrid.tsx"
-    ],
-    [
-      "drydocs/web/src/routes/LoadsRoute.tsx",
-      "drydocs/web/src/lib/auth.ts"
-    ],
-    [
-      "drydocs/web/src/routes/LoadsRoute.tsx",
-      "drydocs/web/src/lib/graphApi.ts"
     ],
     [
       "drydocs/web/src/routes/LoadsRoute.tsx",
@@ -33885,6 +34246,10 @@
     ],
     [
       "drydocs/web/src/routes/MappingsRoute.tsx",
+      "drydocs/web/src/data/graphAccess.ts"
+    ],
+    [
+      "drydocs/web/src/routes/MappingsRoute.tsx",
       "drydocs/web/src/data/mappingsDemo.ts"
     ],
     [
@@ -33894,14 +34259,6 @@
     [
       "drydocs/web/src/routes/MappingsRoute.tsx",
       "drydocs/web/src/lib/auth.ts"
-    ],
-    [
-      "drydocs/web/src/routes/MappingsRoute.tsx",
-      "drydocs/web/src/lib/graph.ts"
-    ],
-    [
-      "drydocs/web/src/routes/MappingsRoute.tsx",
-      "drydocs/web/src/lib/graphApi.ts"
     ],
     [
       "drydocs/web/src/routes/MappingsRoute.tsx",
@@ -33949,6 +34306,10 @@
     ],
     [
       "drydocs/web/src/routes/OverviewRoute.tsx",
+      "drydocs/web/src/data/graphAccess.ts"
+    ],
+    [
+      "drydocs/web/src/routes/OverviewRoute.tsx",
       "drydocs/web/src/data/towers.ts"
     ],
     [
@@ -33961,11 +34322,11 @@
     ],
     [
       "drydocs/web/src/routes/OverviewRoute.tsx",
-      "drydocs/web/src/lib/graphApi.ts"
+      "drydocs/web/src/lib/status.ts"
     ],
     [
       "drydocs/web/src/routes/OverviewRoute.tsx",
-      "drydocs/web/src/lib/status.ts"
+      "drydocs/web/src/lib/storage.ts"
     ],
     [
       "drydocs/web/src/routes/OverviewRoute.tsx",
@@ -33982,10 +34343,6 @@
     [
       "drydocs/web/src/routes/OwnershipRoute.tsx",
       "drydocs/web/src/lib/auth.ts"
-    ],
-    [
-      "drydocs/web/src/routes/OwnershipRoute.tsx",
-      "drydocs/web/src/lib/graphApi.ts"
     ],
     [
       "drydocs/web/src/routes/OwnershipRoute.tsx",
@@ -34065,14 +34422,6 @@
     ],
     [
       "drydocs/web/src/routes/RunbooksRoute.tsx",
-      "drydocs/web/src/lib/auth.ts"
-    ],
-    [
-      "drydocs/web/src/routes/RunbooksRoute.tsx",
-      "drydocs/web/src/lib/graphApi.ts"
-    ],
-    [
-      "drydocs/web/src/routes/RunbooksRoute.tsx",
       "drydocs/web/src/lib/nvl-mapping.ts"
     ],
     [
@@ -34101,11 +34450,11 @@
     ],
     [
       "drydocs/web/src/routes/SoftwareRoute.tsx",
-      "drydocs/web/src/lib/auth.ts"
+      "drydocs/web/src/data/graphAccess.ts"
     ],
     [
       "drydocs/web/src/routes/SoftwareRoute.tsx",
-      "drydocs/web/src/lib/graphApi.ts"
+      "drydocs/web/src/lib/auth.ts"
     ],
     [
       "drydocs/web/src/routes/SoftwareRoute.tsx",
@@ -34181,6 +34530,10 @@
     ],
     [
       "drydocs/web/src/routes/explorer/ExplorerRoute.tsx",
+      "drydocs/web/src/data/graphAccess.ts"
+    ],
+    [
+      "drydocs/web/src/routes/explorer/ExplorerRoute.tsx",
       "drydocs/web/src/data/towers.ts"
     ],
     [
@@ -34210,10 +34563,6 @@
     [
       "drydocs/web/src/routes/explorer/ExplorerRoute.tsx",
       "drydocs/web/src/lib/auth.ts"
-    ],
-    [
-      "drydocs/web/src/routes/explorer/ExplorerRoute.tsx",
-      "drydocs/web/src/lib/graphApi.ts"
     ],
     [
       "drydocs/web/src/routes/explorer/ExplorerRoute.tsx",
@@ -34258,6 +34607,10 @@
     [
       "drydocs/web/src/software/VendorIcon.tsx",
       "drydocs/web/src/software/softwareModel.ts"
+    ],
+    [
+      "drydocs/web/src/styles/tokenParity.test.ts",
+      "drydocs/web/src/test/sourceScan.ts"
     ],
     [
       "drydocs/web/src/underhood/HallucinationSpotlight.tsx",
@@ -46777,7 +47130,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260905.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260905-1902.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -48542,6 +48895,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_result_completeness.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_review_labels.py"
     ],
     [
@@ -48768,6 +49126,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_vocabulary_endpoints.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_web_typescript_strict.py"
     ],
     [
       "drydocs/tests/unit",
@@ -49092,6 +49455,11 @@
     [
       "drydocs/web/src",
       "CONTAINS",
+      "drydocs/web/src/test"
+    ],
+    [
+      "drydocs/web/src",
+      "CONTAINS",
       "drydocs/web/src/underhood"
     ],
     [
@@ -49177,6 +49545,11 @@
     [
       "drydocs/web/src/components",
       "CONTAINS",
+      "drydocs/web/src/components/ProvenanceNotice.tsx"
+    ],
+    [
+      "drydocs/web/src/components",
+      "CONTAINS",
       "drydocs/web/src/components/RelEdge.tsx"
     ],
     [
@@ -49208,11 +49581,6 @@
       "drydocs/web/src/components",
       "CONTAINS",
       "drydocs/web/src/components/TowerDrill.tsx"
-    ],
-    [
-      "drydocs/web/src/components",
-      "CONTAINS",
-      "drydocs/web/src/components/TowerIcon.tsx"
     ],
     [
       "drydocs/web/src/components",
@@ -49307,6 +49675,21 @@
     [
       "drydocs/web/src/data",
       "CONTAINS",
+      "drydocs/web/src/data/GraphAccessProvider.tsx"
+    ],
+    [
+      "drydocs/web/src/data",
+      "CONTAINS",
+      "drydocs/web/src/data/graphAccess.test.tsx"
+    ],
+    [
+      "drydocs/web/src/data",
+      "CONTAINS",
+      "drydocs/web/src/data/graphAccess.ts"
+    ],
+    [
+      "drydocs/web/src/data",
+      "CONTAINS",
       "drydocs/web/src/data/mappingsDemo.ts"
     ],
     [
@@ -49317,7 +49700,27 @@
     [
       "drydocs/web/src/data",
       "CONTAINS",
+      "drydocs/web/src/data/provenance.test.tsx"
+    ],
+    [
+      "drydocs/web/src/data",
+      "CONTAINS",
+      "drydocs/web/src/data/provenance.ts"
+    ],
+    [
+      "drydocs/web/src/data",
+      "CONTAINS",
+      "drydocs/web/src/data/readiness.ts"
+    ],
+    [
+      "drydocs/web/src/data",
+      "CONTAINS",
       "drydocs/web/src/data/towers.ts"
+    ],
+    [
+      "drydocs/web/src/data",
+      "CONTAINS",
+      "drydocs/web/src/data/transportPreamble.test.ts"
     ],
     [
       "drydocs/web/src/docs",
@@ -49442,7 +49845,32 @@
     [
       "drydocs/web/src/layout",
       "CONTAINS",
+      "drydocs/web/src/layout/RouteAccessGate.test.tsx"
+    ],
+    [
+      "drydocs/web/src/layout",
+      "CONTAINS",
+      "drydocs/web/src/layout/RouteAccessGate.tsx"
+    ],
+    [
+      "drydocs/web/src/layout",
+      "CONTAINS",
+      "drydocs/web/src/layout/RouteErrorBoundary.test.tsx"
+    ],
+    [
+      "drydocs/web/src/layout",
+      "CONTAINS",
+      "drydocs/web/src/layout/RouteErrorBoundary.tsx"
+    ],
+    [
+      "drydocs/web/src/layout",
+      "CONTAINS",
       "drydocs/web/src/layout/Shell.tsx"
+    ],
+    [
+      "drydocs/web/src/layout",
+      "CONTAINS",
+      "drydocs/web/src/layout/SystemBanner.tsx"
     ],
     [
       "drydocs/web/src/layout",
@@ -49572,6 +50000,16 @@
     [
       "drydocs/web/src/lib",
       "CONTAINS",
+      "drydocs/web/src/lib/storage.test.ts"
+    ],
+    [
+      "drydocs/web/src/lib",
+      "CONTAINS",
+      "drydocs/web/src/lib/storage.ts"
+    ],
+    [
+      "drydocs/web/src/lib",
+      "CONTAINS",
       "drydocs/web/src/lib/theme.ts"
     ],
     [
@@ -49632,12 +50070,22 @@
     [
       "drydocs/web/src/modules",
       "CONTAINS",
+      "drydocs/web/src/modules/readmeAccess.test.ts"
+    ],
+    [
+      "drydocs/web/src/modules",
+      "CONTAINS",
       "drydocs/web/src/modules/registry.test.ts"
     ],
     [
       "drydocs/web/src/modules",
       "CONTAINS",
       "drydocs/web/src/modules/registry.ts"
+    ],
+    [
+      "drydocs/web/src/modules",
+      "CONTAINS",
+      "drydocs/web/src/modules/routeAccess.test.ts"
     ],
     [
       "drydocs/web/src/ownership",
@@ -49872,7 +50320,17 @@
     [
       "drydocs/web/src/styles",
       "CONTAINS",
+      "drydocs/web/src/styles/tokenParity.test.ts"
+    ],
+    [
+      "drydocs/web/src/styles",
+      "CONTAINS",
       "drydocs/web/src/styles/tokens.css"
+    ],
+    [
+      "drydocs/web/src/test",
+      "CONTAINS",
+      "drydocs/web/src/test/sourceScan.ts"
     ],
     [
       "drydocs/web/src/underhood",
@@ -49919,13 +50377,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2807,
-    "edges": 1539,
+    "files": 2827,
+    "edges": 1580,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 3122,
-    "directories": 316
+    "rels": 3143,
+    "directories": 317
   }
 }
