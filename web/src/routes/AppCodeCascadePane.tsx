@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { AppCodeEntry, MappingGrid, MappingsApi } from '../lib/mappingsApi'
-import type { SpecResult } from '../lib/graph'
 import {
   DEMO_APP_ORCHESTRATORS,
   DEMO_CASCADE,
@@ -12,7 +11,8 @@ import {
   type UnmappedFolderRow,
 } from '../data/mappingsDemo'
 import EmptyState from '../components/ui/EmptyState'
-import { useGraphAccess } from '../data/graphAccess'
+import { rowsOf, useLiveOrDemo } from '../data/provenance'
+import ProvenanceNotice from '../components/ProvenanceNotice'
 
 // K11 — the steward mapping cascade (gate seal-app-ref-edge-reshape §G,
 // SIGNED OFF 2026-08-03). The act is ORCHESTRATOR-FIRST (§G1): Product Line
@@ -123,55 +123,25 @@ export default function AppCodeCascadePane({
   apiDown: string | null
   personaId: string
 }) {
-  const { access } = useGraphAccess()
+  // ── live data, WEB1: five reads through the ONE seam. The hand-rolled `run`
+  // helper this replaces held the demo policy in a closure that only this pane
+  // could see, and its `live` booleans were a second expression of a fact the
+  // union already carries.
+  const cascadeP = useLiveOrDemo<CascadeRow>(CASCADE_SPEC, DEMO_CASCADE)
+  const orchestratorsP = useLiveOrDemo<OrchestratorRow>(ORCHESTRATORS_SPEC, DEMO_ORCHESTRATORS)
+  const appOrchP = useLiveOrDemo<AppOrchestratorRow>(APP_ORCH_SPEC, DEMO_APP_ORCHESTRATORS)
+  const foldersP = useLiveOrDemo<UnmappedFolderRow>(UNMAPPED_SPEC, DEMO_UNMAPPED_FOLDERS)
+  // The app picker has NO demo: an invented application list would be offered
+  // to a steward as something to map, which is worse than an empty picker.
+  const allAppsP = useLiveOrDemo<AppOption>(APP_SPEC, null)
 
-  // ── live data (each spec degrades to its SYNTHESIZED demo frame, with notice)
-  const [cascade, setCascade] = useState<CascadeRow[] | null>(null)
-  const [cascadeLive, setCascadeLive] = useState(false)
-  const [orchestrators, setOrchestrators] = useState<OrchestratorRow[] | null>(null)
-  const [appOrch, setAppOrch] = useState<AppOrchestratorRow[] | null>(null)
-  const [folders, setFolders] = useState<UnmappedFolderRow[] | null>(null)
-  const [foldersLive, setFoldersLive] = useState(false)
-  const [allApps, setAllApps] = useState<AppOption[] | null>(null)
-
-  useEffect(() => {
-    // Five reads, ONE controller: leaving the pane cancels all of them, which
-    // the shared cancelled flag could not do.
-    const ctl = new AbortController()
-    const run = <T,>(
-      spec: string,
-      demo: readonly T[],
-      set: (rows: T[]) => void,
-      setLive?: (live: boolean) => void,
-    ) =>
-      access
-        .runSpec(spec, {}, { signal: ctl.signal })
-        .then((r: SpecResult) => {
-          if (ctl.signal.aborted) return
-          if (r.rows.length > 0) {
-            set(r.rows as unknown as T[])
-            setLive?.(true)
-          } else {
-            set([...demo])
-          }
-        })
-        .catch(() => {
-          if (!ctl.signal.aborted) set([...demo])
-        })
-    run(CASCADE_SPEC, DEMO_CASCADE, setCascade, setCascadeLive)
-    run(ORCHESTRATORS_SPEC, DEMO_ORCHESTRATORS, setOrchestrators)
-    run(APP_ORCH_SPEC, DEMO_APP_ORCHESTRATORS, setAppOrch)
-    run(UNMAPPED_SPEC, DEMO_UNMAPPED_FOLDERS, setFolders, setFoldersLive)
-    access
-      .runSpec(APP_SPEC, {}, { signal: ctl.signal })
-      .then((r: SpecResult) => {
-        if (!ctl.signal.aborted) setAllApps(r.rows as unknown as AppOption[])
-      })
-      .catch(() => {
-        if (!ctl.signal.aborted) setAllApps([])
-      })
-    return () => ctl.abort()
-  }, [access])
+  const cascade = cascadeP.status === 'loading' ? null : rowsOf(cascadeP)
+  const cascadeLive = cascadeP.status === 'live'
+  const orchestrators = orchestratorsP.status === 'loading' ? null : rowsOf(orchestratorsP)
+  const appOrch = appOrchP.status === 'loading' ? null : rowsOf(appOrchP)
+  const folders = foldersP.status === 'loading' ? null : rowsOf(foldersP)
+  const foldersLive = foldersP.status === 'live'
+  const allApps = allAppsP.status === 'loading' ? null : rowsOf(allAppsP)
 
   // ── cascade selection state
   const [productLineId, setProductLineId] = useState('')
@@ -484,7 +454,12 @@ export default function AppCodeCascadePane({
               waits on the product-scoped extract). Search the full application list instead:
             </p>
           ) : (
-            <p className="mt-1 text-[11px] text-faint">Pick a product first{cascadeLive ? '' : ' · SYNTHESIZED demo catalog'}.</p>
+            <>
+              <ProvenanceNotice state={cascadeP} specId={CASCADE_SPEC} />
+              <p className="mt-1 text-[11px] text-faint">
+                Pick a product first{cascadeLive ? '' : ' · SYNTHESIZED demo catalog'}.
+              </p>
+            </>
           )}
           {productId && productApps.length === 0 && (
             <div className="mt-1">

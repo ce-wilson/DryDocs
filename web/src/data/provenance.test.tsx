@@ -210,7 +210,7 @@ const NOT_A_FALLBACK: Record<string, string> = {
   'routes/OwnershipRoute.tsx': 'passes its demo frames to SpecGrid, which owns the seam.',
   'routes/explorer/ExplorerRoute.tsx': 'passes its demo frames to SpecGrid, which owns the seam.',
   'routes/MappingsRoute.tsx': 'the O13 mappings surface has its own API, not a QuerySpec.',
-  'routes/AppCodeCascadePane.tsx': 'five specs with per-frame demo rows — WEB1 follow-up.',
+  'routes/AppCodeCascadePane.tsx': 'ON the seam: four demo frames pass THROUGH useLiveOrDemo.',
   'routes/LoadsRoute.tsx': 'ON the seam: DEMO_RUNS is passed TO useLiveOrDemo.',
 }
 
@@ -252,8 +252,14 @@ describe('the demo modules are reached through the seam (clause c)', () => {
   })
 
   it('SpecGrid reaches its fallback through the seam and not around it', () => {
-    const grid = filesMatching(/useLiveOrDemo/)
-    expect(grid).toContain('explorer/SpecGrid.tsx')
-    expect(grid).toContain('routes/LoadsRoute.tsx')
+    const onSeam = filesMatching(/useLiveOrDemo/)
+    for (const f of [
+      'explorer/SpecGrid.tsx',
+      'components/SpecGraphPane.tsx',
+      'routes/LoadsRoute.tsx',
+      'routes/AppCodeCascadePane.tsx',
+    ]) {
+      expect(onSeam).toContain(f)
+    }
   })
 })

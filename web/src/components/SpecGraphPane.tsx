@@ -9,7 +9,8 @@ import {
 import GraphCanvas from './GraphCanvas'
 import EmptyState from './ui/EmptyState'
 import { IdChip } from './ui/IdChip'
-import { isResolved, useGraphQuery } from '../data/graphAccess'
+import { useLiveOrDemo } from '../data/provenance'
+import ProvenanceNotice from './ProvenanceNotice'
 
 // A QuerySpec-bound GRAPH frame (O81 step 4) — the canvas's sibling to SpecGrid.
 // SpecGrid renders a reviewed spec's rows as a table; this renders the SAME
@@ -51,21 +52,26 @@ export default function SpecGraphPane({
   // WEB12: one read, one state. The pane used to clear its own result on every
   // spec change to avoid drawing the previous surface's graph under the new
   // title; the hook resets to `loading` on a key change, so that is structural.
-  const query = useGraphQuery(specId)
-  const result = isResolved(query) ? query.data : null
-  const error = query.status === 'error' ? query.message : null
+  // WEB1: through the seam with NO demo. This pane refuses to draw rather than
+  // drawing something that is not the graph, and passing `null` is how that
+  // policy is now DECLARED instead of implemented per-pane.
+  const provenance = useLiveOrDemo(specId, null)
+  const result = provenance.status === 'live' || provenance.status === 'empty' ? provenance.data : null
 
   const graph = useMemo(() => {
     if (!result) return null
     return CANVAS_SURFACES[specId](result.rows)
   }, [result, specId])
 
-  if (error) {
+  if (provenance.status === 'error') {
     return (
-      <EmptyState
-        title="The graph could not be loaded"
-        hint={`${specId} — ${error}. Nothing is drawn rather than drawing something that is not the graph.`}
-      />
+      <div className="flex h-full min-h-0 flex-col gap-2 p-2">
+        <ProvenanceNotice state={provenance} specId={specId} />
+        <EmptyState
+          title="The graph could not be loaded"
+          hint="Nothing is drawn rather than drawing something that is not the graph."
+        />
+      </div>
     )
   }
   if (!graph) return <EmptyState title="Loading the graph…" hint={specId} />
