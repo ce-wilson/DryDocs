@@ -395,10 +395,13 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     so it is TruncationBadge's rule again: a primitive shared so three surfaces
     cannot drift belongs to none of them. Its hover-text helper, lib/epistemics.ts,
     is .ts and outside the scan boundary.
+    96 -> 97 at R19 (2026-09-06): ClarificationCard, BOUND to `ask` by directory
+    evidence -- it lives under ask/ and serves exactly the one route that renders
+    it. Both counts move by one.
     """
     comps = _ui()["components"]
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
-        40,
-        96,
+        41,
+        97,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"
