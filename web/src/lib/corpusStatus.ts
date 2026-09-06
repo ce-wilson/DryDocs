@@ -11,38 +11,27 @@
 // the request carries NO parameters, because the server chooses every query.
 
 import { sessionId, sessionRejected, sessionToken } from './auth'
-import { createAuthedApi, unwrapAs } from './apiClient'
+import type { Schemas } from './apiClient'
+import { createAuthedApi, unwrap } from './apiClient'
 
-export interface CorpusRow {
-  corpus_id: string
-  target_db: string
-  status: string
-  documents: number
-  chunks: number
-  detail: string
-  ok: boolean
-}
-
-export interface CorpusStatusPayload {
-  classification: string
-  /** Every database the sweep intends to visit. */
-  databases_swept: string[]
-  /** Those the server actually has. The difference is what the page must render
-   *  as "not queried" rather than as zero rows (the O56 honesty rule). */
-  databases_queried: string[]
-  /** The status vocabulary, from the server. Never hand-copied into the UI. */
-  statuses: string[]
-  rows: CorpusRow[]
-}
+// WEB8: these were hand-declared interfaces while /docs-verify answered with a
+// free object. The server declares the shape now, so they are ALIASES of the
+// generated schema — the names stay because the pages import them, but the
+// definition has exactly one home. Why each field is on the wire (the O56
+// honesty rule behind `databases_queried`, the server-sent `statuses`
+// vocabulary) is recorded where the shape is now decided: CorpusStatusOut in
+// drydocs_api/schemas.py.
+export type CorpusRow = Schemas['CorpusRowOut']
+export type CorpusStatusPayload = Schemas['CorpusStatusOut']
 
 export async function fetchCorpusStatus(
   baseUrl: string,
   signal?: AbortSignal,
 ): Promise<CorpusStatusPayload> {
   // O70: the typed client owns the token, the 401 → session-ended rule and the
-  // O85 network diagnosis; the path is checked against the schema. The
-  // response type is still hand-declared — /docs-verify is a free object
-  // server-side until drydocs_api.schemas models it.
+  // O85 network diagnosis; the path is checked against the schema. WEB8: the
+  // RESPONSE is now checked too — the server declares CorpusStatusOut, so this
+  // is a plain `unwrap` and the payload type is the generated one.
   const api = createAuthedApi(baseUrl, { token: sessionToken, sessionId, rejected: sessionRejected })
   const result = await api.GET('/docs-verify', { signal })
 
@@ -52,5 +41,5 @@ export async function fetchCorpusStatus(
     // a generic failure: this is a designation, not a fault.
     throw new Error('this reconciliation is an SME surface — steward or admin only')
   }
-  return unwrapAs<CorpusStatusPayload>(result, 'docs-verify')
+  return unwrap(result, 'docs-verify')
 }

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { createAuthedApi, createPublicApi, detailOf, requireToken, type SessionHooks, unwrap, unwrapAs } from './apiClient'
+import { createAuthedApi, createPublicApi, detailOf, requireToken, type SessionHooks, unwrap } from './apiClient'
 
 vi.mock('./reachability', () => ({
   diagnoseNetworkFailure: async (baseUrl: string) => ({ message: `diagnosed: nothing answered at ${baseUrl}` }),
@@ -166,10 +166,5 @@ describe('unwrap', () => {
     expect(detailOf('plain refusal', res(500))).toBe('plain refusal')
     expect(detailOf(undefined, res(502, 'Bad Gateway'))).toBe('Bad Gateway')
     expect(() => unwrap({ response: res(500, 'Server Error') }, 'z')).toThrow('z failed (500): Server Error')
-  })
-
-  it('unwrapAs is the same check with a claimed type', () => {
-    expect(unwrapAs<{ n: number }>({ data: { n: 2 }, response: res(200) }, 'x').n).toBe(2)
-    expect(() => unwrapAs<{ n: number }>({ error: 'no', response: res(403) }, 'x')).toThrow('x failed (403): no')
   })
 })

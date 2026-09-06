@@ -1,5 +1,6 @@
 import { sessionId, sessionRejected, sessionToken } from './auth'
-import { createAuthedApi, unwrapAs } from './apiClient'
+import type { Schemas } from './apiClient'
+import { createAuthedApi, unwrap } from './apiClient'
 
 // O68 — the client for /admin/log-estate.
 //
@@ -15,43 +16,21 @@ import { createAuthedApi, unwrapAs } from './apiClient'
 // attach a claim ("live from the graph") that is simply false, on a page whose
 // entire subject is where things actually are.
 //
-// THE RESPONSE TYPE IS HAND-DECLARED, and says so: /admin/log-estate returns a
-// free `dict` server-side until drydocs_api.schemas models it, which is WEB8's
-// list and not this item's. `unwrapAs` is the marker for exactly that — every
-// call site of it is a route the schema has not modelled yet.
+// WEB8 CLOSED THIS ONE. The note that stood here said the response type was
+// hand-declared because /admin/log-estate returned a free `dict` server-side
+// "until drydocs_api.schemas models it, which is WEB8's list". It does now, so
+// these are aliases of the generated schema and the `unwrapAs` marker is gone
+// with the last of its call sites.
+//
+// Worth keeping from that note: this route was added by O68, AFTER O70 drew up
+// the follow-up list, so it opened the same hole a second time and no test
+// noticed. The schema guard now runs the other way round — every JSON route
+// must declare a model — so the next route added this way fails rather than
+// joins a list.
 
-export interface LogKindRow {
-  id: string
-  level: string
-  retention_days: number
-  rotation: string
-  format: string
-  status: string
-  dir: string | null
-  path: string
-  exists: boolean
-  file_count: number
-  total_bytes: number
-  /** Age of the oldest file on disk, or null when there are none. The half of
-   *  the retention question the declaration cannot answer. */
-  oldest_days: number | null
-  over_retention: boolean
-}
-
-export interface DataZoneRow {
-  id: string
-  path: string
-  mode: string | null
-  exists: boolean
-  file_count: number
-  total_bytes: number
-  empty: boolean
-}
-
-export interface LogEstatePayload {
-  kinds: LogKindRow[]
-  zones: DataZoneRow[]
-}
+export type LogKindRow = Schemas['LogKindOut']
+export type DataZoneRow = Schemas['LogZoneOut']
+export type LogEstatePayload = Schemas['LogEstateOut']
 
 export async function fetchLogEstate(
   baseUrl: string,
@@ -67,7 +46,7 @@ export async function fetchLogEstate(
     // operational detail an admin is asking for and a user-tier persona is not.
     throw new Error('the log estate is an admin surface')
   }
-  return unwrapAs<LogEstatePayload>(result, 'admin/log-estate')
+  return unwrap(result, 'admin/log-estate')
 }
 
 /** Bytes as a person reads them. Base 1024, one decimal — the panel is about

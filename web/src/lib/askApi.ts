@@ -8,7 +8,7 @@
 // agent's Cypher runs server-side in READ mode, and the only "state" the UI
 // creates is TTL-bounded ephemeral specs owned by its own session.
 
-import { createSession, runAgentParts, runAgentSse, type AdkEvent, type AdkPart } from '../lib/adk'
+import { createSession, runAgentParts, runAgentSse, type AdkEvent, type AdkPart } from './adk'
 
 export interface AskStep {
   i: number

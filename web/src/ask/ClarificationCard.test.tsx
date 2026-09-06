@@ -2,7 +2,7 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { FREE_TEXT_CHOICE, PROCEED_CHOICE, type AskClarification } from './askApi'
+import { FREE_TEXT_CHOICE, PROCEED_CHOICE, type AskClarification } from '../lib/askApi'
 import ClarificationCard from './ClarificationCard'
 
 // R19 (b): the card renders the agent's clarification request as an actionable

@@ -1,4 +1,5 @@
-import { unwrapAs } from './apiClient'
+import type { Schemas } from './apiClient'
+import { unwrap } from './apiClient'
 import { createApiClient } from './graphApi'
 
 // The O13 mappings client — the /mappings/* surface of drydocs-api
@@ -8,33 +9,37 @@ import { createApiClient } from './graphApi'
 // ARTIFACT (CSV text + manifest snippet) — the server writes nothing, the
 // loader stays the only graph writer (wf-mapping-01's one rule).
 //
-// O70: the paths, path/query parameters and request bodies below are checked
-// against the generated schema (lib/apiClient.ts). The RESPONSE types on this
-// page are still the hand-declared interfaces, because the server declares
-// these routes as free objects — the day drydocs_api.schemas models them, the
-// casts at each `unwrap` go and the interfaces become aliases of the schema.
+// WEB8 — "the day drydocs_api.schemas models them" arrived. The note that stood
+// here said the response types were hand-declared because the server declared
+// these routes as free objects, and that when it modelled them the casts would
+// go and the interfaces would become aliases. Both have happened.
+//
+// THIS MODULE IS WHY THE ITEM WAS PRIORITISED. It is the only one in the group
+// with WRITE surfaces (draft, promote), so a route drifting from its declared
+// shape here writes wrong rather than renders wrong — the web review's T3.
+// Nine casts stood between the console and the server on exactly that surface.
+//
+// The `rows` of a grid and the label/relationship option lists stay
+// `Record<string, unknown>`, and now do so BY DECLARATION rather than by
+// default: those are per-domain SELECTs whose columns belong to the domain, not
+// to the route, so the server models the envelope and leaves the row open. See
+// the note on MappingGridOut in drydocs_api/schemas.py.
 
-export interface MappingDomain {
-  id: string
-  title: string
-  kind: 'quintuple' | 'manual' | 'override' | 'defined'
-  source: string
-  tier: number | null
-  available: boolean
-}
+export type MappingDomain = Schemas['MappingDomainOut']
+export type MappingGrid = Schemas['MappingGridOut']
+export type MappingOptions = Schemas['MappingOptionsOut']
 
-export interface MappingGrid {
-  domain: string
-  keys: string[]
-  rows: Record<string, unknown>[]
-}
-
-export interface MappingOptions {
-  labels: Record<string, unknown>[]
-  relationships: Record<string, unknown>[]
-  status_summary: { status: string; n: number }[]
-}
-
+// STALE, AND WEB8 COULD NOT FIX IT HERE. The server refuses this shape: at K7
+// §A1 the job-grain changeset was retired, and POST /mappings/changeset now
+// requires `app_code` + `app_id` per entry ("authoring is per app code", §B1).
+// Found by driving the route in tests/unit/test_response_models.py, which is
+// the first thing in the suite to send it a request.
+//
+// It survives here because WEB8 declares RESPONSES: the request body is
+// `ChangesetBody.entries: list = []` server-side — a free list — so no
+// generated type covers an entry, and correcting this interface alone would
+// swap one unguarded hand-declaration for another. Modelling the request
+// bodies is its own item; handed back in the WEB8 close notes.
 export interface DraftEntry {
   folder_id: string
   job_id: string
@@ -43,14 +48,7 @@ export interface DraftEntry {
   create_target_if_missing?: boolean
 }
 
-export interface ChangesetArtifact {
-  filename: string
-  csv: string
-  manifest_snippet: string
-  entries: number
-  lifecycle: string
-  note: string
-}
+export type ChangesetArtifact = Schemas['ChangesetArtifactOut']
 
 // O24 — SEAL-contact overrides (ui-write-surface gate SME-3, M2 tier).
 // Drafting returns the COMPLETE updated committed file (commit-by-replace);
@@ -70,40 +68,13 @@ export interface OverrideEntry {
 // receipt; a separate promote call turns the draft into a unified diff. The
 // old shape could not survive two editors — each held a full file built from
 // the same base, so whichever was committed last erased the other.
-export interface DraftReceipt {
-  draft_id: string
-  domain: string
-  entries: number
-  pending: number
-  committed_rows: number
-  note: string
-}
+export type DraftReceipt = Schemas['DraftReceiptOut']
 
-export interface PromotedDiff {
-  draft_id: string
-  domain: string
-  path: string
-  filename: string
-  diff: string
-  entries: number
-  note: string
-}
+export type PromotedDiff = Schemas['PromotedDiffOut']
 
-export interface OpenDraft {
-  draft_id: string
-  domain: string
-  entries: number
-  authored_by: string
-  authored_on: string
-}
+export type OpenDraft = Schemas['OpenDraftOut']
 
-export interface CorrectionsReport {
-  filename: string
-  markdown: string
-  count: number
-  generated_on: string
-  generated_by: string
-}
+export type CorrectionsReport = Schemas['CorrectionsReportOut']
 
 // K9/K11 — the K7 defined-mapping store (app-code -> application). Drafting
 // writes rows to the draft buffer (S4, O24 mechanics verbatim); validation is
@@ -140,48 +111,48 @@ export function createMappingsApi(baseUrl: string, personaId: string): MappingsA
   const { api } = createApiClient(baseUrl, personaId)
   return {
     async domains() {
-      const body = unwrapAs<{ domains: MappingDomain[] }>(
+      const body = unwrap(
         await api.GET('/mappings/domains'),
         'mappings/domains',
       )
       return body.domains
     },
     async grid(domainId) {
-      return unwrapAs<MappingGrid>(
+      return unwrap(
         await api.GET('/mappings/grid/{domain_id}', { params: { path: { domain_id: domainId } } }),
         `mappings/grid/${domainId}`,
       )
     },
     async options() {
-      return unwrapAs<MappingOptions>(await api.GET('/mappings/options'), 'mappings/options')
+      return unwrap(await api.GET('/mappings/options'), 'mappings/options')
     },
     async draftChangeset(entries) {
-      return unwrapAs<ChangesetArtifact>(
+      return unwrap(
         await api.POST('/mappings/changeset', { body: { entries } }),
         'mappings/changeset',
       )
     },
     async draftOverride(entries, draftId) {
-      return unwrapAs<DraftReceipt>(
+      return unwrap(
         await api.POST('/mappings/overrides/draft', { body: { entries, draft_id: draftId } }),
         'mappings/overrides/draft',
       )
     },
     async draftAppCode(entries, draftId) {
-      return unwrapAs<DraftReceipt>(
+      return unwrap(
         await api.POST('/mappings/app-code/draft', { body: { entries, draft_id: draftId } }),
         'mappings/app-code/draft',
       )
     },
     async drafts(domain) {
-      const body = unwrapAs<{ drafts: OpenDraft[] }>(
+      const body = unwrap(
         await api.GET('/mappings/drafts', { params: { query: domain ? { domain } : {} } }),
         'mappings/drafts',
       )
       return body.drafts
     },
     async promoteDraft(draftId) {
-      return unwrapAs<PromotedDiff>(
+      return unwrap(
         await api.POST('/mappings/drafts/{draft_id}/promote', {
           params: { path: { draft_id: draftId } },
         }),
@@ -189,7 +160,7 @@ export function createMappingsApi(baseUrl: string, personaId: string): MappingsA
       )
     },
     async correctionsReport() {
-      return unwrapAs<CorrectionsReport>(
+      return unwrap(
         await api.GET('/mappings/overrides/report'),
         'mappings/overrides/report',
       )
