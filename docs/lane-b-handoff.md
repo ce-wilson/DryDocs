@@ -3,9 +3,9 @@ handoff: drydocs.lane-handoff.v1
 lane: B
 machine: laptop
 generated: 2026-09-05
-generated_at: c38177ff (main)
-queue: [G132, WEB4, API1, WEB3, WEB12, WEB1, WEB13, WEB5, WEB11, WEB15, WEB14]
-pens: [code:drydocs-lineage, code:drydocs-web, code:drydocs-api]
+generated_at: c87e7cca (main)
+queue: [G132, WEB2, WEB6, WEB8, WEB7, O63, R12, O43, G131, O89, O68]
+pens: [code:drydocs-lineage, code:drydocs-web, code:drydocs-agents]
 ---
 
 # Lane B handoff — laptop, 2026-09-05
@@ -21,7 +21,7 @@ Collisions come from two sessions writing the same surface, not from two session
 existing. Your first commit message (or your `wip/` branch name) names what you hold:
 
 ```text
-pen: code:drydocs-lineage · code:drydocs-web · code:drydocs-api
+pen: code:drydocs-lineage · code:drydocs-web · code:drydocs-agents
 ```
 
 Lane A holds: `backlog · port · adr · gates · snapshot`. Anything not declared by either lane
@@ -50,16 +50,16 @@ since PLAN1), so two lanes minting in disjoint series cannot collide on a number
 | # | Id | Title | Type / prio | Module | Model | Notes from the check |
 |---|---|---|---|---|---|---|
 | 1 | **G132** | The Control-M folder-pull collector lives only on a server - home it beside rua_inventory with its conf and a version-tagged output, and let the acquisition block name it without implying a cadence | task / p2 | `drydocs-lineage` | sonnet | clean |
-| 2 | **WEB4** | TypeScript strict on in web/ - strictNullChecks and noImplicitAny enforced so the generated api.d.ts optional fields the O70 client declares are checked by the compiler and not asserted past | task / p1 | `drydocs-web` | sonnet | clean |
-| 3 | **API1** | Result completeness is part of the read contract - every spec result says whether the 500-row ceiling capped it, and the export manifest records truncated plus the ceiling instead of filing a capped extract as the answer | task / p1 | `drydocs-api` | sonnet | clean |
-| 4 | **WEB3** | Route authorization derives from the module registry - App.tsx gates through canAccessModule instead of six inline steward-or-admin predicates, with a vitest asserting every non-"all" module has a gated route | task / p1 | `drydocs-web` | sonnet | clean |
-| 5 | **WEB12** | A useGraphQuery data-layer hook replaces the forty transport preambles - one AbortController per request, a deadline, in-flight dedupe, a stated no-retry rule, and a stop control on the Ask stream | task / p2 | `drydocs-web` | sonnet | clean |
-| 6 | **WEB1** | Provenance of rendered data is a typed union - one useLiveOrDemo seam and one provenance component replace the five per-route try-live-else-demo fallbacks, a shell-mount readiness probe answers "is the API down" once, and every fallback activation is counted | task / p1 | `drydocs-web` | sonnet | clean |
-| 7 | **WEB13** | The web CI ratchet - a test:coverage script with a floor at today's 7.51 percent, --max-warnings 0 on lint, react-hooks/exhaustive-deps enabled with the three inert suppressions deleted, a warn-only npm audit --audit-level=high step, and TowerIcon.tsx plus clsx removed | task / p2 | `drydocs-web` | sonnet | clean |
-| 8 | **WEB5** | An error boundary per route outlet, keyed on pathname - one render throw breaks one panel instead of blanking the whole console | task / p2 | `drydocs-web` | sonnet | clean |
-| 9 | **WEB11** | One storage module owns every console localStorage key with a prefix and a version, and both sign-out and session rejection call its clearAll so query results do not outlive the session on a shared desktop | task / p2 | `drydocs-web` | sonnet | clean |
-| 10 | **WEB15** | web/README.md states the security model the code implements - the DEV-only ?as= affordance, twelve modules not nine, the five sme-access modules and the gated routes, and the six retired-name personas | task / p2 | `drydocs-web` | sonnet | clean |
-| 11 | **WEB14** | A token-parity test holds the hand-frozen custom properties in public/landing.html and public/agent-test.html to src/styles/tokens.css, on the repo's generated-artifact drift-test habit | task / p3 | `drydocs-web` | sonnet | clean |
+| 2 | **WEB2** | The grid renders the row ceiling the way the canvas already renders its node ceiling - a TRUNCATED n/N badge on capped results, and no export button says "full" unless the manifest says complete (after API1) | task / p1 | `drydocs-web` | sonnet | clean |
+| 3 | **WEB6** | A runtime row-shape validator at the spec-result-to-typed-row seam retires the twenty-one as-unknown-as double casts with one readable message (after WEB4) | task / p2 | `drydocs-web` | sonnet | clean |
+| 4 | **WEB8** | The typed-client guarantee has no holes - the mappings, intake and corpus routes are modelled in drydocs_api.schemas so the fifteen unwrapAs sites retire, and the ADK agent calls get a typed contract instead of raw fetch (after WEB4) | task / p2 | `drydocs-web` | sonnet | clean |
+| 5 | **WEB7** | Code splitting follows the authorization boundary - React.lazy on the admin and steward routes and the Locations tab so about 420 KB of role-gated artifacts stop shipping to every persona, plus a bundle-size ceiling in the web CI job | task / p2 | `drydocs-web` | sonnet | clean |
+| 6 | **O63** | Service reachability, surfaced twice from one probe: Ask diagnoses its own failure instead of printing a bare "Failed to fetch", and the admin page carries a service-status strip at the top | task / p2 | `drydocs-web` | sonnet | clean |
+| 7 | **R12** | Promote the R5 stub-ADK harness into a committed fixture: live-verify the web Ask wiring with no LLM key | task / p3 | `drydocs-agents` | sonnet | clean |
+| 8 | **O43** | Seed the remaining 9 UI test suites from verified behaviour, and decide whether a UI test runner is worth introducing | task / p2 | `drydocs-web` | sonnet | clean |
+| 9 | **G131** | The agent tier's environment file carries an empty Neo4j password and only a falsy check keeps it working | chore / p3 | `drydocs-agents` | haiku | clean |
+| 10 | **O89** | Console feedback has no stable anchors — give each console section a content-derived anchor id and export the same feedback YAML the design-doc L5 loop produces (after O88) | task / p2 | `drydocs-web` | sonnet | clean |
+| 11 | **O68** | The admin page should show the log estate: directory, path, size and capacity per kind — and must not render debug-tier Cypher until that display is reviewed (after G111) | task / p2 | `drydocs-web` | sonnet | clean |
 
 ## Surfaces — who holds which pen this burst
 
@@ -83,16 +83,9 @@ the change back through the sender.
 | `gates` (this skill's addition to §0) | `config/gate-log.md` | Lane A — the signed gate record |
 | `gates` (this skill's addition to §0) | `config/crosswalks/` | Lane A — orchestrator crosswalks — gate-bound config |
 | `snapshot` (this skill's addition to §0) | `knowledge/depgraph-snapshots/` | Lane A — the session snapshot — one writer per burst |
-| Lane A's queue | the items WEB9, WEB10, WEB7, K29, N19, N23, P6 and their inputs | do not claim or edit |
+| Lane A's queue | the items WEB9, WEB10, R19, R15, R16, P6, N27 and their inputs | do not claim or edit |
 | `code:<module>` | everything an item in YOUR queue names in `inputs` | this lane, claimed per item |
 | — | `docs/plan/*.html`, `web/src/generated/**`, `docs/design/*.html` | derived renders — Lane A regenerates once at close; nobody merges them by hand (J43) |
-
-**About Lane A's queue, from the same check** (for the sender to rule — this lane
-does nothing with these):
-
-- K29: gate-bound: tech-partner-attach-level (an SME session, not a build)
-- N19: gate-bound: source-connection-and-run-identity (an SME session, not a build)
-- N23: gate-bound: registry-wiring-readiness (an SME session, not a build)
 
 **Lane B claims status-only and never renders.** A claim is one item file, pushed;
 Y5 tolerates it un-rendered, and Lane A renders once at close. **Lane B does not
