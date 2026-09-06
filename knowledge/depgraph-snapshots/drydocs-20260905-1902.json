@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-05T16:12:40",
+    "captured_at": "2026-09-05T19:02:41",
     "date": "20260905",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "be83296f",
-      "full": "be83296f682070254a4d19a03afa44cc667d00aa",
+      "commit": "c2f5e1a1",
+      "full": "c2f5e1a1684455b3ea2fa21cf9c22b053da72697",
       "branch": "main",
-      "describe": "port-base-20260902-177-gbe83296f",
-      "subject": "docs(DOC4): lane review note - the only defect was the unresolved plan input, closed by the merge; clause (i) still waits on the first firing",
+      "describe": "port-base-20260905-1-gc2f5e1a1",
+      "subject": "chore(port): ledger - the sixth roll's counts corrected at the tag (186 / 54 / 132)",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -22355,10 +22355,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260905-1414.json",
-      "name": "drydocs-20260905-1414.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260905.json",
+      "name": "drydocs-20260905.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260905-1414.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260905.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -46777,7 +46777,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260905-1414.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260905.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
