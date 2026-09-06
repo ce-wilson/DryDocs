@@ -327,7 +327,10 @@ def test_run_spec_routes_to_spec_database_and_requires_auth():
     runner = FakeRunner()
     out = run_spec("explorer.jobs.v2", {}, _token(store), store, runner)
     assert runner.calls[0][2] == "drydocs"
-    assert runner.calls[0][1] == {"limit": 500}  # default applied
+    # API1: the default (500) is applied and the driver is asked for one row
+    # PAST it, which is how `truncated` is answered without a second traversal.
+    assert runner.calls[0][1] == {"limit": 501}
+    assert out["params"] == {"limit": 500}  # what the caller is told still says 500
     assert out["classification"] == "internal"
     assert out["watermarked"] is False
     with pytest.raises(InvalidTokenError):

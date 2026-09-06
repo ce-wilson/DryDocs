@@ -1,0 +1,1132 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for web/scripts/captureRoutes.mjs</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">web/scripts</a> captureRoutes.mjs</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/329</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>0/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>0/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/329</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a>
+<a name='L267'></a><a href='#L267'>267</a>
+<a name='L268'></a><a href='#L268'>268</a>
+<a name='L269'></a><a href='#L269'>269</a>
+<a name='L270'></a><a href='#L270'>270</a>
+<a name='L271'></a><a href='#L271'>271</a>
+<a name='L272'></a><a href='#L272'>272</a>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a>
+<a name='L275'></a><a href='#L275'>275</a>
+<a name='L276'></a><a href='#L276'>276</a>
+<a name='L277'></a><a href='#L277'>277</a>
+<a name='L278'></a><a href='#L278'>278</a>
+<a name='L279'></a><a href='#L279'>279</a>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a>
+<a name='L306'></a><a href='#L306'>306</a>
+<a name='L307'></a><a href='#L307'>307</a>
+<a name='L308'></a><a href='#L308'>308</a>
+<a name='L309'></a><a href='#L309'>309</a>
+<a name='L310'></a><a href='#L310'>310</a>
+<a name='L311'></a><a href='#L311'>311</a>
+<a name='L312'></a><a href='#L312'>312</a>
+<a name='L313'></a><a href='#L313'>313</a>
+<a name='L314'></a><a href='#L314'>314</a>
+<a name='L315'></a><a href='#L315'>315</a>
+<a name='L316'></a><a href='#L316'>316</a>
+<a name='L317'></a><a href='#L317'>317</a>
+<a name='L318'></a><a href='#L318'>318</a>
+<a name='L319'></a><a href='#L319'>319</a>
+<a name='L320'></a><a href='#L320'>320</a>
+<a name='L321'></a><a href='#L321'>321</a>
+<a name='L322'></a><a href='#L322'>322</a>
+<a name='L323'></a><a href='#L323'>323</a>
+<a name='L324'></a><a href='#L324'>324</a>
+<a name='L325'></a><a href='#L325'>325</a>
+<a name='L326'></a><a href='#L326'>326</a>
+<a name='L327'></a><a href='#L327'>327</a>
+<a name='L328'></a><a href='#L328'>328</a>
+<a name='L329'></a><a href='#L329'>329</a>
+<a name='L330'></a><a href='#L330'>330</a>
+<a name='L331'></a><a href='#L331'>331</a>
+<a name='L332'></a><a href='#L332'>332</a>
+<a name='L333'></a><a href='#L333'>333</a>
+<a name='L334'></a><a href='#L334'>334</a>
+<a name='L335'></a><a href='#L335'>335</a>
+<a name='L336'></a><a href='#L336'>336</a>
+<a name='L337'></a><a href='#L337'>337</a>
+<a name='L338'></a><a href='#L338'>338</a>
+<a name='L339'></a><a href='#L339'>339</a>
+<a name='L340'></a><a href='#L340'>340</a>
+<a name='L341'></a><a href='#L341'>341</a>
+<a name='L342'></a><a href='#L342'>342</a>
+<a name='L343'></a><a href='#L343'>343</a>
+<a name='L344'></a><a href='#L344'>344</a>
+<a name='L345'></a><a href='#L345'>345</a>
+<a name='L346'></a><a href='#L346'>346</a>
+<a name='L347'></a><a href='#L347'>347</a>
+<a name='L348'></a><a href='#L348'>348</a>
+<a name='L349'></a><a href='#L349'>349</a>
+<a name='L350'></a><a href='#L350'>350</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >// `npm run paper` — capture executed console routes to self-contained printable<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
+<span class="cstat-no" title="statement not covered" >// HTML (O88), the console's paper form for the L6 pen-and-paper feedback loop.</span>
+<span class="cstat-no" title="statement not covered" >//</span>
+<span class="cstat-no" title="statement not covered" >//   npm run paper -- --persona mouse                       # the named starting set</span>
+<span class="cstat-no" title="statement not covered" >//   npm run paper -- --persona trinity --routes /gates,/software,/load-map --web http://localhost:5173</span>
+<span class="cstat-no" title="statement not covered" >//   echo "$SECRET" | npm run paper -- --persona mouse --secret-stdin</span>
+<span class="cstat-no" title="statement not covered" >//</span>
+<span class="cstat-no" title="statement not covered" >// CAPTURE, DO NOT RE-IMPLEMENT (clause a). The console is a React SPA over a</span>
+<span class="cstat-no" title="statement not covered" >// live API, so its paper form is the EXECUTED DOM: this script drives the running</span>
+<span class="cstat-no" title="statement not covered" >// console through headless Edge — the same browser the `verify` skill's design-doc</span>
+<span class="cstat-no" title="statement not covered" >// recipe launches — and writes what the browser rendered. Edge is DRIVEN through</span>
+<span class="cstat-no" title="statement not covered" >// Playwright rather than flagged with --dump-dom because a flag cannot sign in,</span>
+<span class="cstat-no" title="statement not covered" >// and clause (d) forbids a sign-in screen presented as a captured page. Without</span>
+<span class="cstat-no" title="statement not covered" >// Edge on the machine, --browser chromium uses the O80 harness's build; the</span>
+<span class="cstat-no" title="statement not covered" >// manifest records which executed the page.</span>
+<span class="cstat-no" title="statement not covered" >//</span>
+<span class="cstat-no" title="statement not covered" >// THE PAYLOAD IS NOT COMMITTED (clause e). A capture of a live console can carry</span>
+<span class="cstat-no" title="statement not covered" >// real graph values, so it lands under DRYDOCS_DATA_ROOT/console-captures/&lt;utc</span>
+<span class="cstat-no" title="statement not covered" >// stamp&gt;/ (mandatory, G81 — no default root; --out overrides). The committed</span>
+<span class="cstat-no" title="statement not covered" >// artifacts are this script, src/lib/paperForm.ts and src/styles/print.css.</span>
+<span class="cstat-no" title="statement not covered" >//</span>
+<span class="cstat-no" title="statement not covered" >// THE SECRET NEVER TOUCHES ARGV OR THE ENVIRONMENT. It is read from a no-echo</span>
+<span class="cstat-no" title="statement not covered" >// prompt, or from stdin with --secret-stdin, used once in the sign-in form, and</span>
+<span class="cstat-no" title="statement not covered" >// never written anywhere — O80's provenance record distinguishes a prompted</span>
+<span class="cstat-no" title="statement not covered" >// secret from a generated one, and a flag would be a third, unrecorded origin.</span>
+<span class="cstat-no" title="statement not covered" >//</span>
+<span class="cstat-no" title="statement not covered" >// THE FOOTER NAMES THE MOMENT (clause b): route, the capture host's HEAD (with</span>
+<span class="cstat-no" title="statement not covered" >// "(dirty)" when the tree differed), the UTC time, the API origin the page ITSELF</span>
+<span class="cstat-no" title="statement not covered" >// requested at sign-in (observed, not configured), the persona, the browser.</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >import { execFileSync } from 'node:child_process'</span>
+<span class="cstat-no" title="statement not covered" >import { createHash } from 'node:crypto'</span>
+<span class="cstat-no" title="statement not covered" >import { mkdirSync, writeFileSync } from 'node:fs'</span>
+<span class="cstat-no" title="statement not covered" >import { dirname, join, resolve } from 'node:path'</span>
+<span class="cstat-no" title="statement not covered" >import { createInterface } from 'node:readline'</span>
+<span class="cstat-no" title="statement not covered" >import { fileURLToPath } from 'node:url'</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >// `playwright` is the runtime package `@playwright/test` (a devDependency) pins at</span>
+<span class="cstat-no" title="statement not covered" >// its own version; `@playwright/test` re-exports only the test API, not the</span>
+<span class="cstat-no" title="statement not covered" >// browser launchers, so the launcher comes from the package that owns it.</span>
+<span class="cstat-no" title="statement not covered" >import { chromium } from 'playwright'</span>
+<span class="cstat-no" title="statement not covered" >import { JSDOM } from 'jsdom'</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >import { assemblePaperDocument, externalReferences, routeSlug } from '../src/lib/paperForm.ts'</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >const HERE = dirname(fileURLToPath(import.meta.url))</span>
+<span class="cstat-no" title="statement not covered" >const REPO_ROOT = resolve(HERE, '..', '..')</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >// The named starting set (clause d): the three SME-designated governed surfaces,</span>
+<span class="cstat-no" title="statement not covered" >// which render from COMMITTED GENERATED ARTIFACTS and therefore need no graph —</span>
+<span class="cstat-no" title="statement not covered" >// capturable on any machine, and exactly the pages FB-03 says get reviewed.</span>
+<span class="cstat-no" title="statement not covered" >// Graph-backed routes are opt-in via --routes and are only as good as the graph</span>
+<span class="cstat-no" title="statement not covered" >// behind the API at capture time; the footer's commit and time say which moment.</span>
+<span class="cstat-no" title="statement not covered" >const DEFAULT_ROUTES = ['/gates', '/software', '/load-map']</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >function usage(message) {</span>
+<span class="cstat-no" title="statement not covered" >  if (message) console.error(`captureRoutes: ${message}`)</span>
+<span class="cstat-no" title="statement not covered" >  console.error(</span>
+<span class="cstat-no" title="statement not covered" >    'usage: node scripts/captureRoutes.mjs --persona &lt;id&gt; [--routes /a,/b] [--web URL] ' +</span>
+<span class="cstat-no" title="statement not covered" >      '[--out DIR] [--browser msedge|chromium] [--secret-stdin] [--verify-print]',</span>
+<span class="cstat-no" title="statement not covered" >  )</span>
+<span class="cstat-no" title="statement not covered" >  return 2</span>
+<span class="cstat-no" title="statement not covered" >}</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >function parseArgs(argv) {</span>
+<span class="cstat-no" title="statement not covered" >  const opts = {</span>
+<span class="cstat-no" title="statement not covered" >    persona: null,</span>
+<span class="cstat-no" title="statement not covered" >    routes: DEFAULT_ROUTES,</span>
+<span class="cstat-no" title="statement not covered" >    web: 'http://localhost:5173',</span>
+<span class="cstat-no" title="statement not covered" >    out: null,</span>
+<span class="cstat-no" title="statement not covered" >    browser: 'msedge',</span>
+<span class="cstat-no" title="statement not covered" >    secretStdin: false,</span>
+<span class="cstat-no" title="statement not covered" >    verifyPrint: false,</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+<span class="cstat-no" title="statement not covered" >  for (let i = 0; i &lt; argv.length; i += 1) {</span>
+<span class="cstat-no" title="statement not covered" >    const arg = argv[i]</span>
+<span class="cstat-no" title="statement not covered" >    const next = () =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >      i += 1</span>
+<span class="cstat-no" title="statement not covered" >      if (i &gt;= argv.length) throw new Error(`${arg} needs a value`)</span>
+<span class="cstat-no" title="statement not covered" >      return argv[i]</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+<span class="cstat-no" title="statement not covered" >    switch (arg) {</span>
+<span class="cstat-no" title="statement not covered" >      case '--persona':</span>
+<span class="cstat-no" title="statement not covered" >        opts.persona = next()</span>
+<span class="cstat-no" title="statement not covered" >        break</span>
+<span class="cstat-no" title="statement not covered" >      case '--routes':</span>
+<span class="cstat-no" title="statement not covered" >        opts.routes = next()</span>
+<span class="cstat-no" title="statement not covered" >          .split(',')</span>
+<span class="cstat-no" title="statement not covered" >          .map((r) =&gt; r.trim())</span>
+<span class="cstat-no" title="statement not covered" >          .filter(Boolean)</span>
+<span class="cstat-no" title="statement not covered" >        break</span>
+<span class="cstat-no" title="statement not covered" >      case '--web':</span>
+<span class="cstat-no" title="statement not covered" >        opts.web = next().replace(/\/+$/, '')</span>
+<span class="cstat-no" title="statement not covered" >        break</span>
+<span class="cstat-no" title="statement not covered" >      case '--out':</span>
+<span class="cstat-no" title="statement not covered" >        opts.out = next()</span>
+<span class="cstat-no" title="statement not covered" >        break</span>
+<span class="cstat-no" title="statement not covered" >      case '--browser':</span>
+<span class="cstat-no" title="statement not covered" >        opts.browser = next()</span>
+<span class="cstat-no" title="statement not covered" >        break</span>
+<span class="cstat-no" title="statement not covered" >      case '--secret-stdin':</span>
+<span class="cstat-no" title="statement not covered" >        opts.secretStdin = true</span>
+<span class="cstat-no" title="statement not covered" >        break</span>
+<span class="cstat-no" title="statement not covered" >      case '--verify-print':</span>
+<span class="cstat-no" title="statement not covered" >        opts.verifyPrint = true</span>
+<span class="cstat-no" title="statement not covered" >        break</span>
+<span class="cstat-no" title="statement not covered" >      default:</span>
+<span class="cstat-no" title="statement not covered" >        throw new Error(`unknown option ${arg}`)</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+<span class="cstat-no" title="statement not covered" >  if (!opts.persona) throw new Error('--persona is required')</span>
+<span class="cstat-no" title="statement not covered" >  if (!['msedge', 'chromium'].includes(opts.browser)) throw new Error('--browser is msedge or chromium')</span>
+<span class="cstat-no" title="statement not covered" >  for (const r of opts.routes) if (!r.startsWith('/')) throw new Error(`route must start with /: ${r}`)</span>
+<span class="cstat-no" title="statement not covered" >  return opts</span>
+<span class="cstat-no" title="statement not covered" >}</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >async function readSecret(fromStdin) {</span>
+<span class="cstat-no" title="statement not covered" >  if (fromStdin) {</span>
+<span class="cstat-no" title="statement not covered" >    const chunks = []</span>
+<span class="cstat-no" title="statement not covered" >    for await (const chunk of process.stdin) chunks.push(chunk)</span>
+<span class="cstat-no" title="statement not covered" >    return Buffer.concat(chunks).toString('utf8').replace(/\r?\n$/, '')</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+<span class="cstat-no" title="statement not covered" >  // No-echo prompt: readline with a muted output stream (the standard idiom).</span>
+<span class="cstat-no" title="statement not covered" >  const rl = createInterface({ input: process.stdin, output: process.stdout, terminal: true })</span>
+<span class="cstat-no" title="statement not covered" >  const muted = { muted: false }</span>
+<span class="cstat-no" title="statement not covered" >  const write = rl._writeToOutput.bind(rl)</span>
+<span class="cstat-no" title="statement not covered" >  rl._writeToOutput = (s) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    if (!muted.muted) write(s)</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+<span class="cstat-no" title="statement not covered" >  return new Promise((resolveSecret) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    rl.question('console secret (not echoed): ', (answer) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >      muted.muted = false</span>
+<span class="cstat-no" title="statement not covered" >      process.stdout.write('\n')</span>
+<span class="cstat-no" title="statement not covered" >      rl.close()</span>
+<span class="cstat-no" title="statement not covered" >      resolveSecret(answer)</span>
+<span class="cstat-no" title="statement not covered" >    })</span>
+<span class="cstat-no" title="statement not covered" >    muted.muted = true</span>
+<span class="cstat-no" title="statement not covered" >  })</span>
+<span class="cstat-no" title="statement not covered" >}</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >function gitCommit() {</span>
+<span class="cstat-no" title="statement not covered" >  const head = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: REPO_ROOT, encoding: 'utf8' }).trim()</span>
+<span class="cstat-no" title="statement not covered" >  const dirty = execFileSync('git', ['status', '--porcelain'], { cwd: REPO_ROOT, encoding: 'utf8' }).trim()</span>
+<span class="cstat-no" title="statement not covered" >  return dirty ? `${head} (dirty)` : head</span>
+<span class="cstat-no" title="statement not covered" >}</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >function outputDir(explicit, stamp) {</span>
+<span class="cstat-no" title="statement not covered" >  if (explicit) return resolve(explicit)</span>
+<span class="cstat-no" title="statement not covered" >  const root = process.env.DRYDOCS_DATA_ROOT</span>
+<span class="cstat-no" title="statement not covered" >  if (!root) {</span>
+<span class="cstat-no" title="statement not covered" >    throw new Error(</span>
+<span class="cstat-no" title="statement not covered" >      'DRYDOCS_DATA_ROOT is not set and --out was not given. Captures land under the data ' +</span>
+<span class="cstat-no" title="statement not covered" >        'root by the same rule as every other output (G81: no default root) — set it, or pass --out.',</span>
+<span class="cstat-no" title="statement not covered" >    )</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+<span class="cstat-no" title="statement not covered" >  return join(root, 'console-captures', stamp)</span>
+<span class="cstat-no" title="statement not covered" >}</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >/** In the page: turn every &lt;img&gt; and &lt;canvas&gt; into a data URI so the capture</span>
+<span class="cstat-no" title="statement not covered" > *  fetches nothing on open, and gather every stylesheet's rules as text. */</span>
+<span class="cstat-no" title="statement not covered" >async function inlineAndCollect(page) {</span>
+<span class="cstat-no" title="statement not covered" >  return page.evaluate(async () =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    const toDataUrl = async (url) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >      const res = await fetch(url)</span>
+<span class="cstat-no" title="statement not covered" >      const blob = await res.blob()</span>
+<span class="cstat-no" title="statement not covered" >      return await new Promise((ok, fail) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >        const reader = new FileReader()</span>
+<span class="cstat-no" title="statement not covered" >        reader.onload = () =&gt; ok(reader.result)</span>
+<span class="cstat-no" title="statement not covered" >        reader.onerror = () =&gt; fail(reader.error)</span>
+<span class="cstat-no" title="statement not covered" >        reader.readAsDataURL(blob)</span>
+<span class="cstat-no" title="statement not covered" >      })</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+<span class="cstat-no" title="statement not covered" >    for (const img of Array.from(document.images)) {</span>
+<span class="cstat-no" title="statement not covered" >      const src = img.currentSrc || img.src</span>
+<span class="cstat-no" title="statement not covered" >      if (!src || src.startsWith('data:')) continue</span>
+<span class="cstat-no" title="statement not covered" >      try {</span>
+<span class="cstat-no" title="statement not covered" >        img.setAttribute('src', await toDataUrl(src))</span>
+<span class="cstat-no" title="statement not covered" >        img.removeAttribute('srcset')</span>
+<span class="cstat-no" title="statement not covered" >      } catch {</span>
+<span class="cstat-no" title="statement not covered" >        img.setAttribute('data-dd-uninlined', src)</span>
+<span class="cstat-no" title="statement not covered" >      }</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+<span class="cstat-no" title="statement not covered" >    for (const canvas of Array.from(document.querySelectorAll('canvas'))) {</span>
+<span class="cstat-no" title="statement not covered" >      try {</span>
+<span class="cstat-no" title="statement not covered" >        const img = document.createElement('img')</span>
+<span class="cstat-no" title="statement not covered" >        img.src = canvas.toDataURL('image/png')</span>
+<span class="cstat-no" title="statement not covered" >        img.width = canvas.width</span>
+<span class="cstat-no" title="statement not covered" >        img.height = canvas.height</span>
+<span class="cstat-no" title="statement not covered" >        img.setAttribute('data-dd-from', 'canvas')</span>
+<span class="cstat-no" title="statement not covered" >        canvas.replaceWith(img)</span>
+<span class="cstat-no" title="statement not covered" >      } catch {</span>
+<span class="cstat-no" title="statement not covered" >        /* a tainted canvas stays a canvas; the reference sweep reports nothing for it */</span>
+<span class="cstat-no" title="statement not covered" >      }</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+<span class="cstat-no" title="statement not covered" >    const css = Array.from(document.styleSheets)</span>
+<span class="cstat-no" title="statement not covered" >      .map((sheet) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >        try {</span>
+<span class="cstat-no" title="statement not covered" >          return Array.from(sheet.cssRules)</span>
+<span class="cstat-no" title="statement not covered" >            .map((r) =&gt; r.cssText)</span>
+<span class="cstat-no" title="statement not covered" >            .join('\n')</span>
+<span class="cstat-no" title="statement not covered" >        } catch {</span>
+<span class="cstat-no" title="statement not covered" >          return ''</span>
+<span class="cstat-no" title="statement not covered" >        }</span>
+<span class="cstat-no" title="statement not covered" >      })</span>
+<span class="cstat-no" title="statement not covered" >      .join('\n')</span>
+<span class="cstat-no" title="statement not covered" >    // @font-face rules point at font files; the print sheet names system fonts</span>
+<span class="cstat-no" title="statement not covered" >    // and the screen copy falls back to them, so the rules go rather than the</span>
+<span class="cstat-no" title="statement not covered" >    // files coming along (hundreds of kB each and an external request otherwise).</span>
+<span class="cstat-no" title="statement not covered" >    return { css: css.replace(/@font-face\s*\{[^}]*\}/g, ''), html: document.documentElement.outerHTML }</span>
+<span class="cstat-no" title="statement not covered" >  })</span>
+<span class="cstat-no" title="statement not covered" >}</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >async function signIn(page, web, personaId, secret) {</span>
+<span class="cstat-no" title="statement not covered" >  await page.goto(`${web}/`, { waitUntil: 'networkidle' })</span>
+<span class="cstat-no" title="statement not covered" >  const heading = page.getByRole('heading', { name: 'DryDocs Console' })</span>
+<span class="cstat-no" title="statement not covered" >  await heading.waitFor({ timeout: 15_000 })</span>
+<span class="cstat-no" title="statement not covered" >  // A sign-in button's accessible name is the persona's display name — the id</span>
+<span class="cstat-no" title="statement not covered" >  // capitalised (lib/auth.ts) — followed by its role chip, so match the name at</span>
+<span class="cstat-no" title="statement not covered" >  // the START of the button text, case-insensitively, as a whole word.</span>
+<span class="cstat-no" title="statement not covered" >  await page.getByRole('button', { name: new RegExp(`^${personaId}\\b`, 'i') }).click()</span>
+<span class="cstat-no" title="statement not covered" >  await page.locator('#console-secret').fill(secret)</span>
+<span class="cstat-no" title="statement not covered" >  await page.getByRole('button', { name: 'Sign in' }).click()</span>
+<span class="cstat-no" title="statement not covered" >  try {</span>
+<span class="cstat-no" title="statement not covered" >    await heading.waitFor({ state: 'hidden', timeout: 15_000 })</span>
+<span class="cstat-no" title="statement not covered" >  } catch {</span>
+<span class="cstat-no" title="statement not covered" >    throw new Error(`sign-in as ${personaId} was refused — the sign-in screen is still up`)</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+<span class="cstat-no" title="statement not covered" >}</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >async function verifyPrintGutter(browser, file) {</span>
+<span class="cstat-no" title="statement not covered" >  const page = await browser.newPage()</span>
+<span class="cstat-no" title="statement not covered" >  try {</span>
+<span class="cstat-no" title="statement not covered" >    await page.goto(`file://${file}`)</span>
+<span class="cstat-no" title="statement not covered" >    await page.emulateMedia({ media: 'print' })</span>
+<span class="cstat-no" title="statement not covered" >    return await page.evaluate(() =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >      const tag = document.querySelector('.dd-margin-tag')</span>
+<span class="cstat-no" title="statement not covered" >      const footer = document.querySelector('.dd-print-footer')</span>
+<span class="cstat-no" title="statement not covered" >      return {</span>
+<span class="cstat-no" title="statement not covered" >        tagDisplay: tag ? getComputedStyle(tag).display : null,</span>
+<span class="cstat-no" title="statement not covered" >        footerDisplay: footer ? getComputedStyle(footer).display : null,</span>
+<span class="cstat-no" title="statement not covered" >      }</span>
+<span class="cstat-no" title="statement not covered" >    })</span>
+<span class="cstat-no" title="statement not covered" >  } finally {</span>
+<span class="cstat-no" title="statement not covered" >    await page.close()</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+<span class="cstat-no" title="statement not covered" >}</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >async function main() {</span>
+<span class="cstat-no" title="statement not covered" >  let opts</span>
+<span class="cstat-no" title="statement not covered" >  try {</span>
+<span class="cstat-no" title="statement not covered" >    opts = parseArgs(process.argv.slice(2))</span>
+<span class="cstat-no" title="statement not covered" >  } catch (err) {</span>
+<span class="cstat-no" title="statement not covered" >    return usage(err.message)</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+<span class="cstat-no" title="statement not covered" >  const stamp = new Date().toISOString().replace(/[:.]/g, '-').replace(/-\d{3}Z$/, 'Z')</span>
+<span class="cstat-no" title="statement not covered" >  const outDir = outputDir(opts.out, stamp)</span>
+<span class="cstat-no" title="statement not covered" >  const secret = await readSecret(opts.secretStdin)</span>
+<span class="cstat-no" title="statement not covered" >  if (!secret) return usage('an empty secret cannot sign in')</span>
+<span class="cstat-no" title="statement not covered" >  const commit = gitCommit()</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  let browser</span>
+<span class="cstat-no" title="statement not covered" >  let browserName = opts.browser</span>
+<span class="cstat-no" title="statement not covered" >  try {</span>
+<span class="cstat-no" title="statement not covered" >    browser = await chromium.launch({ channel: opts.browser === 'msedge' ? 'msedge' : undefined, headless: true })</span>
+<span class="cstat-no" title="statement not covered" >  } catch (err) {</span>
+<span class="cstat-no" title="statement not covered" >    if (opts.browser !== 'msedge') throw err</span>
+<span class="cstat-no" title="statement not covered" >    console.error(`captureRoutes: headless Edge unavailable (${err.message.split('\n')[0]}); using chromium`)</span>
+<span class="cstat-no" title="statement not covered" >    browser = await chromium.launch({ headless: true })</span>
+<span class="cstat-no" title="statement not covered" >    browserName = 'chromium'</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+<span class="cstat-no" title="statement not covered" >  const browserLabel = `${browserName} ${browser.version()}`</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  const manifest = {</span>
+<span class="cstat-no" title="statement not covered" >    schema: 'drydocs.console-capture.v1',</span>
+<span class="cstat-no" title="statement not covered" >    captured_at: new Date().toISOString(),</span>
+<span class="cstat-no" title="statement not covered" >    commit,</span>
+<span class="cstat-no" title="statement not covered" >    web: opts.web,</span>
+<span class="cstat-no" title="statement not covered" >    api: null,</span>
+<span class="cstat-no" title="statement not covered" >    persona: opts.persona,</span>
+<span class="cstat-no" title="statement not covered" >    browser: browserLabel,</span>
+<span class="cstat-no" title="statement not covered" >    routes: [],</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  try {</span>
+<span class="cstat-no" title="statement not covered" >    const context = await browser.newContext({ colorScheme: 'light', viewport: { width: 1280, height: 900 } })</span>
+<span class="cstat-no" title="statement not covered" >    const page = await context.newPage()</span>
+<span class="cstat-no" title="statement not covered" >    // The API the page READ, observed from its own sign-in request.</span>
+<span class="cstat-no" title="statement not covered" >    page.on('request', (req) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >      if (req.method() === 'POST' &amp;&amp; /\/login$/.test(req.url())) manifest.api = new URL(req.url()).origin</span>
+<span class="cstat-no" title="statement not covered" >    })</span>
+<span class="cstat-no" title="statement not covered" >    await signIn(page, opts.web, opts.persona, secret)</span>
+<span class="cstat-no" title="statement not covered" >    if (!manifest.api) throw new Error('no /login request was observed — cannot name the API the page read')</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    mkdirSync(outDir, { recursive: true })</span>
+<span class="cstat-no" title="statement not covered" >    for (const route of opts.routes) {</span>
+<span class="cstat-no" title="statement not covered" >      await page.goto(`${opts.web}${route}`, { waitUntil: 'load' })</span>
+<span class="cstat-no" title="statement not covered" >      // Best-effort quiet: a route that polls never reaches "networkidle", and a</span>
+<span class="cstat-no" title="statement not covered" >      // capture must not hang on it — 15 s of trying, then whatever the page shows,</span>
+<span class="cstat-no" title="statement not covered" >      // which the footer's timestamp is honest about either way.</span>
+<span class="cstat-no" title="statement not covered" >      await page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() =&gt; undefined)</span>
+<span class="cstat-no" title="statement not covered" >      await page.waitForTimeout(1_000) // the last spec run's rows land after the network goes quiet</span>
+<span class="cstat-no" title="statement not covered" >      const capturedAt = new Date().toISOString()</span>
+<span class="cstat-no" title="statement not covered" >      const { css, html } = await inlineAndCollect(page)</span>
+<span class="cstat-no" title="statement not covered" >      const provenance = { route, commit, capturedAt, api: manifest.api, persona: opts.persona, browser: browserLabel }</span>
+<span class="cstat-no" title="statement not covered" >      const dom = new JSDOM(html)</span>
+<span class="cstat-no" title="statement not covered" >      const tags = assemblePaperDocument(dom.window.document, { css, provenance })</span>
+<span class="cstat-no" title="statement not covered" >      const text = `&lt;!doctype html&gt;\n${dom.window.document.documentElement.outerHTML}\n`</span>
+<span class="cstat-no" title="statement not covered" >      const leftovers = externalReferences(text)</span>
+<span class="cstat-no" title="statement not covered" >      const file = join(outDir, `${routeSlug(route)}.html`)</span>
+<span class="cstat-no" title="statement not covered" >      writeFileSync(file, text, { encoding: 'utf8' })</span>
+<span class="cstat-no" title="statement not covered" >      const entry = {</span>
+<span class="cstat-no" title="statement not covered" >        route,</span>
+<span class="cstat-no" title="statement not covered" >        file,</span>
+<span class="cstat-no" title="statement not covered" >        captured_at: capturedAt,</span>
+<span class="cstat-no" title="statement not covered" >        margin_tags: tags,</span>
+<span class="cstat-no" title="statement not covered" >        bytes: Buffer.byteLength(text, 'utf8'),</span>
+<span class="cstat-no" title="statement not covered" >        sha256: createHash('sha256').update(text).digest('hex'),</span>
+<span class="cstat-no" title="statement not covered" >        self_contained: leftovers.length === 0,</span>
+<span class="cstat-no" title="statement not covered" >        external_references: leftovers,</span>
+<span class="cstat-no" title="statement not covered" >      }</span>
+<span class="cstat-no" title="statement not covered" >      if (opts.verifyPrint) entry.print_media = await verifyPrintGutter(browser, file)</span>
+<span class="cstat-no" title="statement not covered" >      manifest.routes.push(entry)</span>
+<span class="cstat-no" title="statement not covered" >      console.log(</span>
+<span class="cstat-no" title="statement not covered" >        `${route} -&gt; ${file} (${tags} tags, ${entry.bytes} bytes${leftovers.length ? `, ${leftovers.length} EXTERNAL REFERENCES` : ''})`,</span>
+<span class="cstat-no" title="statement not covered" >      )</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+<span class="cstat-no" title="statement not covered" >  } finally {</span>
+<span class="cstat-no" title="statement not covered" >    await browser.close()</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  const manifestPath = join(outDir, 'capture-manifest.json')</span>
+<span class="cstat-no" title="statement not covered" >  writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, { encoding: 'utf8' })</span>
+<span class="cstat-no" title="statement not covered" >  console.log(`manifest -&gt; ${manifestPath}`)</span>
+<span class="cstat-no" title="statement not covered" >  const unclean = manifest.routes.filter((r) =&gt; !r.self_contained)</span>
+<span class="cstat-no" title="statement not covered" >  if (unclean.length) {</span>
+<span class="cstat-no" title="statement not covered" >    console.error(`captureRoutes: ${unclean.length} capture(s) still reference external resources — not self-contained`)</span>
+<span class="cstat-no" title="statement not covered" >    return 1</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+<span class="cstat-no" title="statement not covered" >  return 0</span>
+<span class="cstat-no" title="statement not covered" >}</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >try {</span>
+<span class="cstat-no" title="statement not covered" >  process.exitCode = await main()</span>
+<span class="cstat-no" title="statement not covered" >} catch (err) {</span>
+<span class="cstat-no" title="statement not covered" >  // A refused sign-in, an unreachable console, a browser that would not launch:</span>
+<span class="cstat-no" title="statement not covered" >  // one line naming it, exit 1 — a stack trace is not the operator's outcome.</span>
+<span class="cstat-no" title="statement not covered" >  console.error(`captureRoutes: ${err instanceof Error ? err.message.split('\n')[0] : String(err)}`)</span>
+<span class="cstat-no" title="statement not covered" >  process.exitCode = 1</span>
+<span class="cstat-no" title="statement not covered" >}</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-09-06T00:32:34.767Z
+            </div>
+        <script src="../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../sorter.js"></script>
+        <script src="../../block-navigation.js"></script>
+    </body>
+</html>
+    

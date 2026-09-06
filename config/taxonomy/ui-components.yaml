@@ -82,12 +82,21 @@ components:
   - { id: App,                     area: entry,        path: App.tsx }
   - { id: main,                    area: entry,        path: main.tsx }
 
-  # --- layout (6) ---
+  # --- layout (10) ---
   - { id: Aside,                   area: layout,       path: layout/Aside.tsx }
   - { id: Header,                  area: layout,       path: layout/Header.tsx }
   - { id: ModuleToolbar,           area: layout,       path: layout/ModuleToolbar.tsx }
   - { id: RightSidebarSlot,        area: layout,       path: layout/RightSidebarSlot.tsx }
+  # WEB3: the one route gate, derived from modules/registry.ts — a layout
+  # component because it is a pathless layout route, not a page.
+  - { id: GraphAccessProvider,     area: layout,       path: data/GraphAccessProvider.tsx }
+  - { id: RouteAccessGate,         area: layout,       path: layout/RouteAccessGate.tsx }
+  # WEB5: one render throw breaks one panel, not the console.
+  - { id: RouteErrorBoundary,      area: layout,       path: layout/RouteErrorBoundary.tsx }
   - { id: Shell,                   area: layout,       path: layout/Shell.tsx }
+  # WEB1: readiness + the fallback count, in the shell so the signal sits
+  # OUTSIDE the surfaces doing the fabricating.
+  - { id: SystemBanner,            area: layout,       path: layout/SystemBanner.tsx }
   - { id: rightSidebarContext,     area: layout,       path: layout/rightSidebarContext.tsx }
 
   # --- route (24) ---
@@ -163,7 +172,7 @@ components:
   - { id: StatTiles,               area: component,    path: components/StatTiles.tsx }
   - { id: ThemeToggle,             area: component,    path: components/ThemeToggle.tsx }
   - { id: TowerDrill,              area: component,    path: components/TowerDrill.tsx }
-  - { id: TowerIcon,               area: component,    path: components/TowerIcon.tsx }
+  - { id: ProvenanceNotice,        area: component,    path: components/ProvenanceNotice.tsx }
   - { id: TrustLegend,             area: component,    path: components/TrustLegend.tsx }
 
   # --- icon (2) ---

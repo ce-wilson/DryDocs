@@ -550,6 +550,28 @@ export type components = {
                 [key: string]: unknown;
             };
         };
+        /**
+         * ExportBody
+         * @description The export request: a spec run's params, plus API1 (c)'s raisable ceiling.
+         *
+         *     A separate model from ``QueryBody`` because the ceiling is an EXPORT
+         *     decision. Raising the limit on a grid read would change what is on screen;
+         *     raising it here changes what lands in a file that carries a manifest, and
+         *     those are different permissions to grant. Omitted (the default) keeps
+         *     today's behaviour exactly — the display limit the console echoes back — so
+         *     a caller that has not been updated is unaffected.
+         */
+        ExportBody: {
+            /** Limit */
+            limit?: number | null;
+            /**
+             * Params
+             * @default {}
+             */
+            params: {
+                [key: string]: unknown;
+            };
+        };
         /** HealthOut */
         HealthOut: {
             /** Status */
@@ -711,6 +733,8 @@ export type components = {
             ephemeral: boolean;
             /** Keys */
             keys: string[];
+            /** Limit */
+            limit?: number | null;
             /** Params */
             params: {
                 [key: string]: unknown;
@@ -721,6 +745,8 @@ export type components = {
             }[];
             /** Spec Id */
             spec_id: string;
+            /** Truncated */
+            truncated: boolean;
             /** Watermarked */
             watermarked: boolean;
         };
@@ -1661,7 +1687,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["QueryBody"];
+                "application/json": components["schemas"]["ExportBody"];
             };
         };
         responses: {

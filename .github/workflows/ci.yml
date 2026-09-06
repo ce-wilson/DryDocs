@@ -158,7 +158,11 @@ jobs:
       - name: Install web dependencies
         run: npm ci
 
-      - name: Lint (oxlint)
+      # WEB13 (b): `--max-warnings 0` lives in the npm script, so a local run and
+      # a CI run gate identically. Ten fast-refresh advisories existed when this
+      # landed; five files carry a scoped waiver in .oxlintrc.json and the count
+      # is zero, so any NEW warning is a red build.
+      - name: Lint (oxlint, --max-warnings 0)
         run: npm run lint
 
       # O70: the generated client's whole promise is that an API change the
@@ -168,8 +172,21 @@ jobs:
       - name: Typecheck and build (tsc -b, vite build)
         run: npm run build
 
-      - name: Unit tests (vitest)
-        run: npm test
+      # WEB13 (a): the ratchet. @vitest/coverage-v8 was declared and never read —
+      # the instrument was bought and the numbers went unlooked-at. The floor is
+      # 9.8% statements, measured 2026-09-05 (9.89 on the tree that set it), and
+      # it only goes UP. Growing the number is O43's seed suites; this is the
+      # gate, not the tests.
+      - name: Unit tests with the coverage floor (vitest)
+        run: npm run test:coverage
+
+      # WEB13 (d): WARN-ONLY, deliberately, and the same posture the snapshot
+      # ritual takes with its lint check — report, never block. The finding this
+      # closes is not the CVEs (five high, one root, none of them reaching
+      # dist/): it is that the count was recorded as three at O34, is five now,
+      # and nothing noticed because nothing looked.
+      - name: Dependency advisories (npm audit, warn-only)
+        run: npm run audit:high || echo "::warning::npm audit reported advisories at high or above — see the log"
 
       - name: Install Chromium
         run: npx playwright install --with-deps chromium

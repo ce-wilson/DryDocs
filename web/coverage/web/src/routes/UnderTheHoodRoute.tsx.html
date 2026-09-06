@@ -1,0 +1,409 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for web/src/routes/UnderTheHoodRoute.tsx</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../prettify.css" />
+    <link rel="stylesheet" href="../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../index.html">All files</a> / <a href="index.html">web/src/routes</a> UnderTheHoodRoute.tsx</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/79</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>0/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>0/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/79</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import { useState } from 'react'<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
+<span class="cstat-no" title="statement not covered" >import ModuleToolbar from '../layout/ModuleToolbar'</span>
+<span class="cstat-no" title="statement not covered" >import StatTiles from '../components/StatTiles'</span>
+<span class="cstat-no" title="statement not covered" >import { CORPUS, EFFICIENCY, PROVENANCE_LINE, QUESTIONS, TOTALS } from '../underhood/benchmarkData'</span>
+<span class="cstat-no" title="statement not covered" >import StrategyCards from '../underhood/StrategyCards'</span>
+<span class="cstat-no" title="statement not covered" >import Scoreboard from '../underhood/Scoreboard'</span>
+<span class="cstat-no" title="statement not covered" >import QuestionDetail from '../underhood/QuestionDetail'</span>
+<span class="cstat-no" title="statement not covered" >import TokenMemoryChart from '../underhood/TokenMemoryChart'</span>
+<span class="cstat-no" title="statement not covered" >import HallucinationSpotlight from '../underhood/HallucinationSpotlight'</span>
+<span class="cstat-no" title="statement not covered" >import ThinkingLogicPanel from '../underhood/ThinkingLogicPanel'</span>
+&nbsp;
+// /under-the-hood (registry id `underhood`, phase 1): a benchmark showcase,
+// NOT a ModuleTemplate instantiation — like AssetPathRoute, this is a bespoke
+// page with its own ModuleToolbar breadcrumb, because its content (a fixed
+// 12-question live benchmark) doesn't fit the graph-pane + data-frame shape
+// every other module page shares. Data is the committed docmeta P0 verdict,
+// transcribed verbatim into underhood/benchmarkData.ts — nothing here is
+// invented.
+<span class="cstat-no" title="statement not covered" >export default function UnderTheHoodRoute() {</span>
+<span class="cstat-no" title="statement not covered" >  const [selectedId, setSelectedId] = useState&lt;string&gt;(QUESTIONS[0].id)</span>
+<span class="cstat-no" title="statement not covered" >  const selected = QUESTIONS.find((q) =&gt; q.id === selectedId) ?? QUESTIONS[0]</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  return (</span>
+<span class="cstat-no" title="statement not covered" >    &lt;div className="flex h-full min-h-0 flex-col"&gt;</span>
+<span class="cstat-no" title="statement not covered" >      &lt;ModuleToolbar crumbs={[{ label: 'Home', to: '/' }, { label: 'Under the Hood' }]} /&gt;</span>
+<span class="cstat-no" title="statement not covered" >      &lt;div className="min-h-0 flex-1 overflow-y-auto"&gt;</span>
+<span class="cstat-no" title="statement not covered" >        &lt;div className="mx-auto max-w-6xl px-4 py-6"&gt;</span>
+<span class="cstat-no" title="statement not covered" >          &lt;h2 tabIndex={-1} data-view-heading className="text-lg font-semibold text-text outline-none"&gt;</span>
+            Under the Hood — how the agent retrieves knowledge
+<span class="cstat-no" title="statement not covered" >          &lt;/h2&gt;</span>
+<span class="cstat-no" title="statement not covered" >          &lt;p className="mt-1 max-w-3xl text-xs leading-relaxed text-faint"&gt;</span>
+            Three ways an AI support agent can pull answers from a vendor documentation corpus, benchmarked
+<span class="cstat-no" title="statement not covered" >            head-to-head on 12 fixed support questions — the live test that decided DryDocs would{' '}</span>
+<span class="cstat-no" title="statement not covered" >            &lt;span className="font-semibold text-text"&gt;build&lt;/span&gt; its document-ingestion component as a graph,</span>
+            not shrink it to a file registry.
+<span class="cstat-no" title="statement not covered" >          &lt;/p&gt;</span>
+&nbsp;
+          {/* 1. at-a-glance stat tiles */}
+<span class="cstat-no" title="statement not covered" >          &lt;div className="mt-4"&gt;</span>
+<span class="cstat-no" title="statement not covered" >            &lt;StatTiles</span>
+<span class="cstat-no" title="statement not covered" >              tiles={[</span>
+<span class="cstat-no" title="statement not covered" >                { value: `${TOTALS.traversal.recall}`, label: 'Traversal recall' },</span>
+<span class="cstat-no" title="statement not covered" >                { value: EFFICIENCY.headline, label: 'Token efficiency' },</span>
+<span class="cstat-no" title="statement not covered" >                { value: `${TOTALS.traversal.tokens} vs ${TOTALS.manifest.tokens}`, label: 'Tokens ingested' },</span>
+<span class="cstat-no" title="statement not covered" >                { value: `${TOTALS.traversal.latencyMedianMs}ms`, label: 'Median traversal latency' },</span>
+<span class="cstat-no" title="statement not covered" >                { value: `${CORPUS.chunkCount} / ${CORPUS.docCount}`, label: 'Chunks / docs' },</span>
+<span class="cstat-no" title="statement not covered" >                { value: '3', label: 'Strategies tested live' },</span>
+<span class="cstat-no" title="statement not covered" >              ]}</span>
+<span class="cstat-no" title="statement not covered" >            /&gt;</span>
+<span class="cstat-no" title="statement not covered" >          &lt;/div&gt;</span>
+&nbsp;
+          {/* 2. the three strategy cards */}
+<span class="cstat-no" title="statement not covered" >          &lt;section className="mt-6"&gt;</span>
+<span class="cstat-no" title="statement not covered" >            &lt;h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-faint"&gt;Three retrieval strategies&lt;/h3&gt;</span>
+<span class="cstat-no" title="statement not covered" >            &lt;StrategyCards /&gt;</span>
+<span class="cstat-no" title="statement not covered" >          &lt;/section&gt;</span>
+&nbsp;
+          {/* 3. the scoreboard + detail panel */}
+<span class="cstat-no" title="statement not covered" >          &lt;section className="mt-6"&gt;</span>
+<span class="cstat-no" title="statement not covered" >            &lt;h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-faint"&gt;</span>
+              The scoreboard — 12 fixed support questions
+<span class="cstat-no" title="statement not covered" >            &lt;/h3&gt;</span>
+<span class="cstat-no" title="statement not covered" >            &lt;div className="grid grid-cols-1 gap-3 xl:grid-cols-[1.3fr_1fr]"&gt;</span>
+<span class="cstat-no" title="statement not covered" >              &lt;Scoreboard selectedId={selectedId} onSelect={setSelectedId} /&gt;</span>
+<span class="cstat-no" title="statement not covered" >              &lt;QuestionDetail question={selected} /&gt;</span>
+<span class="cstat-no" title="statement not covered" >            &lt;/div&gt;</span>
+<span class="cstat-no" title="statement not covered" >          &lt;/section&gt;</span>
+&nbsp;
+          {/* 4. token-memory tracker */}
+<span class="cstat-no" title="statement not covered" >          &lt;section className="mt-6"&gt;</span>
+<span class="cstat-no" title="statement not covered" >            &lt;h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-faint"&gt;Token-memory tracker&lt;/h3&gt;</span>
+<span class="cstat-no" title="statement not covered" >            &lt;TokenMemoryChart /&gt;</span>
+<span class="cstat-no" title="statement not covered" >          &lt;/section&gt;</span>
+&nbsp;
+          {/* 5. hallucination spotlight */}
+<span class="cstat-no" title="statement not covered" >          &lt;section className="mt-6"&gt;</span>
+<span class="cstat-no" title="statement not covered" >            &lt;HallucinationSpotlight /&gt;</span>
+<span class="cstat-no" title="statement not covered" >          &lt;/section&gt;</span>
+&nbsp;
+          {/* 6. thinking-logic panel */}
+<span class="cstat-no" title="statement not covered" >          &lt;section className="mt-6"&gt;</span>
+<span class="cstat-no" title="statement not covered" >            &lt;h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-faint"&gt;Reading the result&lt;/h3&gt;</span>
+<span class="cstat-no" title="statement not covered" >            &lt;ThinkingLogicPanel /&gt;</span>
+<span class="cstat-no" title="statement not covered" >          &lt;/section&gt;</span>
+&nbsp;
+          {/* corpus footnote + provenance */}
+<span class="cstat-no" title="statement not covered" >          &lt;p className="mt-6 text-[11px] leading-relaxed text-faint"&gt;</span>
+<span class="cstat-no" title="statement not covered" >            Corpus: {CORPUS.label} · {CORPUS.totalChars.toLocaleString()} chars · {CORPUS.chunkCount} chunks · trust</span>
+<span class="cstat-no" title="statement not covered" >            tiers{' '}</span>
+<span class="cstat-no" title="statement not covered" >            {CORPUS.tiers.map((t, i) =&gt; (</span>
+<span class="cstat-no" title="statement not covered" >              &lt;span key={t.tier}&gt;</span>
+<span class="cstat-no" title="statement not covered" >                {i &gt; 0 ? ' / ' : ''}</span>
+<span class="cstat-no" title="statement not covered" >                &lt;span className="font-mono" style={{ color: `var(${t.token})` }}&gt;</span>
+<span class="cstat-no" title="statement not covered" >                  {t.chunks} {t.tier}</span>
+<span class="cstat-no" title="statement not covered" >                &lt;/span&gt;{' '}</span>
+<span class="cstat-no" title="statement not covered" >                ({t.chars.toLocaleString()} ch)</span>
+<span class="cstat-no" title="statement not covered" >              &lt;/span&gt;</span>
+<span class="cstat-no" title="statement not covered" >            ))}</span>
+<span class="cstat-no" title="statement not covered" >            . Per-question efficiency range {EFFICIENCY.perQuestionRange}.</span>
+<span class="cstat-no" title="statement not covered" >          &lt;/p&gt;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >          &lt;p className="mt-2 font-mono text-[10px] text-faint"&gt;{PROVENANCE_LINE}&lt;/p&gt;</span>
+<span class="cstat-no" title="statement not covered" >          &lt;p className="mt-1 font-mono text-[10px] text-yellow"&gt;FIXTURE DATA · from committed benchmark record&lt;/p&gt;</span>
+<span class="cstat-no" title="statement not covered" >        &lt;/div&gt;</span>
+<span class="cstat-no" title="statement not covered" >      &lt;/div&gt;</span>
+<span class="cstat-no" title="statement not covered" >    &lt;/div&gt;</span>
+  )
+<span class="cstat-no" title="statement not covered" >}</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-09-06T00:32:34.767Z
+            </div>
+        <script src="../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../sorter.js"></script>
+        <script src="../../../block-navigation.js"></script>
+    </body>
+</html>
+    

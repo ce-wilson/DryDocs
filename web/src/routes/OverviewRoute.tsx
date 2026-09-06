@@ -1,8 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { Persona } from '../lib/auth'
 import { canDrill } from '../lib/views'
-import { createApiAccess } from '../lib/graphApi'
 import { parseStatusItems, type StatusItem } from '../lib/status'
 import { HealthGlyph } from '../components/ui/StatusItems'
 import { MODULES, canAccessModule } from '../modules/registry'
@@ -10,6 +9,7 @@ import { TOWERS } from '../data/towers'
 import ModuleIcon from '../components/ModuleIcon'
 import ModuleToolbar from '../layout/ModuleToolbar'
 import BrandMark from '../components/BrandMark'
+import { isResolved, useGraphQuery } from '../data/graphAccess'
 
 // The Overview / landing route (`/`) — O35 category-first rebuild per SME
 // feedback FB-2026-07-28-01/02 (docs/design/ui-exploration/wireframes/, keys WF-LND-*): the dense
@@ -27,25 +27,13 @@ export default function OverviewRoute({ persona }: { persona: Persona }) {
   // is the distinction the contract exists to preserve: a green tick for a
   // module nothing observes is how a dashboard ends up green because nothing is
   // watching. As producers land, they light their own spokes with no change here.
-  const [loadHealth, setLoadHealth] = useState<StatusItem[] | null>(null)
-  const apiUrl = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:8001'
-  const access = useMemo(() => createApiAccess(apiUrl, persona.id), [apiUrl, persona.id])
-
-  useEffect(() => {
-    let cancelled = false
-    access
-      .runSpec('loads.status-items.v1')
-      .then((r) => {
-        if (!cancelled) setLoadHealth(parseStatusItems(r.rows.map((row) => row.status_item)))
-      })
-      // No API (or no runs yet) leaves the spoke UNKNOWN — never a false green.
-      .catch(() => {
-        if (!cancelled) setLoadHealth(null)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [access])
+  // No API (or no runs yet) leaves the spoke UNKNOWN — never a false green.
+  // An EMPTY answer is still an answer, so it is parsed like a full one; only a
+  // failure or a still-loading read yields null.
+  const health = useGraphQuery('loads.status-items.v1')
+  const loadHealth: StatusItem[] | null = isResolved(health)
+    ? parseStatusItems(health.data.rows.map((row) => row.status_item))
+    : null
 
   return (
     <div className="flex h-full min-h-0 flex-col">
