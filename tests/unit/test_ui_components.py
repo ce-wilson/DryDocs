@@ -370,10 +370,12 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     importers, and noUnusedLocals cannot see an unused MODULE -- which is the
     tech-debt pass's point about it, and the reason the ledger is where a dead
     component shows up at all.
+    91 -> 92 at WEB5 (2026-09-05): RouteErrorBoundary, UNBOUND for the same
+    reason as RouteAccessGate -- one boundary for every route.
     """
     comps = _ui()["components"]
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
         40,
-        91,
+        92,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"

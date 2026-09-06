@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/107</span>
+                <span class='fraction'>0/110</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/107</span>
+                <span class='fraction'>0/110</span>
             </div>
         
             
@@ -238,7 +238,13 @@
 <a name='L173'></a><a href='#L173'>173</a>
 <a name='L174'></a><a href='#L174'>174</a>
 <a name='L175'></a><a href='#L175'>175</a>
-<a name='L176'></a><a href='#L176'>176</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -276,6 +282,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -345,6 +352,8 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -353,8 +362,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -406,6 +417,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -429,6 +441,7 @@
 <span class="cstat-no" title="statement not covered" >import Shell, { type EnvName } from './layout/Shell'</span>
 <span class="cstat-no" title="statement not covered" >import { GraphAccessProvider } from './data/GraphAccessProvider'</span>
 <span class="cstat-no" title="statement not covered" >import RouteAccessGate from './layout/RouteAccessGate'</span>
+<span class="cstat-no" title="statement not covered" >import RouteErrorBoundary from './layout/RouteErrorBoundary'</span>
 <span class="cstat-no" title="statement not covered" >import OverviewRoute from './routes/OverviewRoute'</span>
 <span class="cstat-no" title="statement not covered" >import ExplorerRoute from './routes/explorer/ExplorerRoute'</span>
 <span class="cstat-no" title="statement not covered" >import ExplorerLiveRoute from './routes/explorer/ExplorerLiveRoute'</span>
@@ -528,7 +541,11 @@
             and still reachable by URL because the two expressions of the same
             policy drifted. A pathless layout route so it runs on every
             navigation and a new module cannot arrive un-gated. */}
+        {/* WEB5: INSIDE the access gate, so a refused route redirects rather
+            than rendering a boundary, and OUTSIDE every page, so one render
+            throw breaks one panel instead of blanking the console. */}
 <span class="cstat-no" title="statement not covered" >        &lt;Route element={&lt;RouteAccessGate role={persona.role} /&gt;}&gt;</span>
+<span class="cstat-no" title="statement not covered" >        &lt;Route element={&lt;RouteErrorBoundary /&gt;}&gt;</span>
 <span class="cstat-no" title="statement not covered" >          &lt;Route index element={&lt;OverviewRoute persona={persona} /&gt;} /&gt;</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >          &lt;Route path="explorer" element={&lt;ExplorerRoute persona={persona} /&gt;} /&gt;</span>
@@ -583,6 +600,7 @@
 &nbsp;
 <span class="cstat-no" title="statement not covered" >          &lt;Route path="*" element={&lt;Navigate to="/" replace /&gt;} /&gt;</span>
 <span class="cstat-no" title="statement not covered" >        &lt;/Route&gt;</span>
+<span class="cstat-no" title="statement not covered" >        &lt;/Route&gt;</span>
 <span class="cstat-no" title="statement not covered" >      &lt;/Route&gt;</span>
 <span class="cstat-no" title="statement not covered" >    &lt;/Routes&gt;</span>
 <span class="cstat-no" title="statement not covered" >    &lt;/GraphAccessProvider&gt;</span>
@@ -595,7 +613,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-09-06T00:23:08.131Z
+                at 2026-09-06T00:32:34.767Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

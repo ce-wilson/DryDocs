@@ -14,6 +14,7 @@ import SignIn from './components/SignIn'
 import Shell, { type EnvName } from './layout/Shell'
 import { GraphAccessProvider } from './data/GraphAccessProvider'
 import RouteAccessGate from './layout/RouteAccessGate'
+import RouteErrorBoundary from './layout/RouteErrorBoundary'
 import OverviewRoute from './routes/OverviewRoute'
 import ExplorerRoute from './routes/explorer/ExplorerRoute'
 import ExplorerLiveRoute from './routes/explorer/ExplorerLiveRoute'
@@ -113,7 +114,11 @@ export default function App() {
             and still reachable by URL because the two expressions of the same
             policy drifted. A pathless layout route so it runs on every
             navigation and a new module cannot arrive un-gated. */}
+        {/* WEB5: INSIDE the access gate, so a refused route redirects rather
+            than rendering a boundary, and OUTSIDE every page, so one render
+            throw breaks one panel instead of blanking the console. */}
         <Route element={<RouteAccessGate role={persona.role} />}>
+        <Route element={<RouteErrorBoundary />}>
           <Route index element={<OverviewRoute persona={persona} />} />
 
           <Route path="explorer" element={<ExplorerRoute persona={persona} />} />
@@ -167,6 +172,7 @@ export default function App() {
           />
 
           <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
         </Route>
       </Route>
     </Routes>
