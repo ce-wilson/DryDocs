@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import ModuleToolbar from '../layout/ModuleToolbar'
 import EmptyState from '../components/ui/EmptyState'
+import EpistemicBadge from '../components/ui/EpistemicBadge'
 import SpecGrid from '../explorer/SpecGrid'
 import { createPublicApi } from '../lib/apiClient'
 import { ask, AskStopped, controlPart, type AskEnvelope, type AskSource, type AskStep } from '../ask/askApi'
@@ -368,6 +369,9 @@ function StepLine({ step }: { step: AskStep }) {
           {step.rows} rows · {step.database} · {step.ms} ms
         </span>
       )}
+      {/* R15: the walk's epistemic label beside its row count, as the agent
+          received it from the grader — never re-worded here. */}
+      <EpistemicBadge epistemic={step.epistemic} causes={step.causes} />
     </li>
   )
 }

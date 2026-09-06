@@ -4,6 +4,7 @@ import { useLiveOrDemo } from '../data/provenance'
 import ProvenanceNotice from '../components/ProvenanceNotice'
 import EmptyState from '../components/ui/EmptyState'
 import TruncationBadge from '../components/ui/TruncationBadge'
+import EpistemicBadge from '../components/ui/EpistemicBadge'
 
 // A QuerySpec-bound data frame (O11, site-plan §4): renders ONLY registry
 // results — the UI never invents Cypher. Ships both export paths:
@@ -219,6 +220,10 @@ export default function SpecGrid({ specId, fallback }: SpecGridProps) {
           // from, which is why they are not called row_count.
           truncated: r.truncated,
           limit: r.limit ?? null,
+          // R15: and the epistemic label, as given — a filtered view of a
+          // lower-bound answer is still a lower bound.
+          epistemic: r.epistemic ?? null,
+          causes: r.causes ?? [],
           trust_tiers_present: r.watermarked ? ['SYNTHESIZED'] : [],
           exported_at: new Date().toISOString(),
         },
@@ -273,6 +278,9 @@ export default function SpecGrid({ specId, fallback }: SpecGridProps) {
             }
           />
         )}
+        {/* R15: the epistemic label the server put on the answer, as given.
+            Renders nothing for an ungraded spec — see EpistemicBadge. */}
+        <EpistemicBadge epistemic={result.epistemic} causes={result.causes} />
         {canRaise && (
           // Clause (c): where API1 made the ceiling raisable, offer it — and
           // let the SERVER refuse a value it will not honour. The console holds

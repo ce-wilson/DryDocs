@@ -39,6 +39,16 @@ export interface SpecResult extends GraphResult {
    *  because the server declares it optional; a required field here would stop
    *  `SpecRunOutCoversSpecResult` compiling. */
   limit?: number | null
+  /** R15: the epistemic label on the ANSWER — 'exact' | 'lower-bound' | null.
+   *  Null means the spec declares no walk and is ungraded; it is NOT exact,
+   *  and no surface may render it as such. Optional for the same reason as
+   *  `limit`: the server declares it optional. */
+  epistemic?: string | null
+  /** R15: what limited the walk, as the server named it — cause class,
+   *  concrete detail (a planned vocabulary entry id, a probe class), and the
+   *  count when one was measured. Empty for an exact answer. Rendered as
+   *  given; the console invents no wording of its own for it. */
+  causes?: { cause: string; detail: string; count?: number | null }[]
   /** R4: an ephemeral (agent-registered) spec replays params frozen at
    *  registration, so its ceiling CANNOT be raised. The seam carries the
    *  server's own answer rather than letting the console re-derive it from the

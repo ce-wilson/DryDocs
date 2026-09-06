@@ -45,6 +45,13 @@ class StepRecord:
     # severity, position, description, category) — an unknown label that
     # presents as 0 rows is visible HERE, not lost. [] is a clean step.
     notifications: list[dict] = field(default_factory=list)
+    # R15: the epistemic label the spec's walk earned on THIS run — 'exact' |
+    # 'lower-bound' | None (ungraded: the spec declares no walk). `causes`
+    # names what limited the walk, machine-readably ({cause, detail, count}).
+    # Carried as given from drydocs_api.epistemics.grade; the agent renders
+    # the label, it never re-derives or re-words it.
+    epistemic: str | None = None
+    causes: list[dict] = field(default_factory=list)
 
 
 @dataclass

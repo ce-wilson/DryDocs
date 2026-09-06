@@ -22,6 +22,10 @@ export interface AskStep {
   fix_retries?: number
   error?: string | null
   explore_ref?: string | null // R4: eph.<hash> — runs/exports via /specs/{ref}
+  // R15: the label the spec's walk earned on this run, as the API graded it —
+  // 'exact' | 'lower-bound' | null (ungraded). Rendered as given.
+  epistemic?: string | null
+  causes?: { cause: string; detail: string; count?: number | null }[]
 }
 
 export interface AskSource {
