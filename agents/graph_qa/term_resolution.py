@@ -195,7 +195,7 @@ def detect_terms(question: str) -> list[DetectedTerm]:
 
     def add(term: str, kind: str) -> None:
         key = term.lower()
-        if key in seen:
+        if key in seen or key in HOUSE_TERMS:
             return
         seen.add(key)
         found.append(DetectedTerm(term=term, kind=kind))
