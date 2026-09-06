@@ -1,17 +1,17 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-06T16:20:20",
+    "captured_at": "2026-09-06T17:34:32",
     "date": "20260906",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "470315a2",
-      "full": "470315a2af8dd13bd0f0524754390dc6c746f0ca",
+      "commit": "2b99e4d3",
+      "full": "2b99e4d34d7e679fc615fe25e5d117b3d5e0dbc1",
       "branch": "main",
-      "describe": "port-base-20260905-121-g470315a2",
-      "subject": "docs(P6): the data-center collision probe as an adhoc file - counts only, four questions, one answer to transcribe",
-      "dirty": true,
+      "describe": "port-base-20260905-127-g2b99e4d3",
+      "subject": "chore(N27): done - three file-transfer platforms registered; (b) met by pointer, the un-redaction question stays with N23",
+      "dirty": false,
       "untracked_present": false,
       "pr": null
     },
@@ -22472,10 +22472,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260906-1529.json",
-      "name": "drydocs-20260906-1529.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260906.json",
+      "name": "drydocs-20260906.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260906-1529.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260906.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -48068,7 +48068,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260906-1529.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260906.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
