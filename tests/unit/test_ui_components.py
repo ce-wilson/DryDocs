@@ -360,10 +360,16 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     belongs to all twelve modules for the same reason RouteAccessGate does. Its
     sibling data/graphAccess.ts (the context, the hook, the dedupe) is .ts and
     stays outside the scan boundary, like nvl-mapping.ts and loadMapModel.ts.
+    90 -> 92 at WEB1 (2026-09-05): SystemBanner and ProvenanceNotice, both
+    UNBOUND, bound stays 40. SystemBanner reports readiness and the fallback
+    count for the whole console, and ProvenanceNotice renders the same trust
+    signal on every surface that can fall back -- binding either to one module
+    would name one of the twelve it serves. Their seam, data/provenance.ts, is
+    .ts and outside the scan boundary.
     """
     comps = _ui()["components"]
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
         40,
-        90,
+        92,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"

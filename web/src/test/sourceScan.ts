@@ -1,5 +1,5 @@
 import { readFileSync, readdirSync } from 'node:fs'
-import { join, relative } from 'node:path'
+import { join, relative, resolve } from 'node:path'
 
 // The console's source-scan helpers, shared by every guard that asserts a
 // pattern is absent from web/src (WEB3's role predicates, WEB12's transport
@@ -13,8 +13,14 @@ import { join, relative } from 'node:path'
 // It is a `.ts` deliberately: config/taxonomy/ui-components.yaml scans `.tsx`,
 // so a test helper here does not enter the component ledger.
 
-/** The repo's `web/src` directory, resolved from this module. */
-export const SRC = new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')
+/** The repo's `web/src` directory.
+ *
+ * From the RUNNER's root, not from `import.meta.url`: under the jsdom
+ * environment the module URL resolves to a bare path and the scan went looking
+ * in `C:\src`, where it found nothing and — worse — threw rather than passing
+ * vacuously. Vitest's root is `web/` in every environment, so this is stable
+ * across the node-env and jsdom-env guards that share this file. */
+export const SRC = resolve(process.cwd(), 'src')
 
 // One left-to-right alternation, matched ONCE per token. An earlier draft
 // stripped comments first and strings second, which ate the `//` of a URL out

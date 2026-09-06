@@ -1,5 +1,7 @@
 import { useMemo, useState, type ReactNode } from 'react'
-import { useGraphAccess, useGraphQuery } from '../data/graphAccess'
+import { useGraphAccess } from '../data/graphAccess'
+import { useLiveOrDemo } from '../data/provenance'
+import ProvenanceNotice from '../components/ProvenanceNotice'
 import EmptyState from '../components/ui/EmptyState'
 
 // A QuerySpec-bound data frame (O11, site-plan §4): renders ONLY registry
@@ -24,6 +26,12 @@ interface SpecGridProps {
 // their route had built, which is how the per-route client became a per-route
 // obligation; the frame reads the session's one client from context instead.
 
+// This frame's demo data is a ReactNode prop, not rows, so the seam is handed a
+// non-empty marker: it decides PROVENANCE, and the node itself is rendered here.
+// (SpecGrid is the one consumer shaped this way; every other call site passes
+// its real demo rows.)
+const DEMO_PRESENT: readonly Record<string, unknown>[] = []
+
 function download(filename: string, content: Blob | string, type = 'text/plain') {
   const blob = typeof content === 'string' ? new Blob([content], { type }) : content
   const url = URL.createObjectURL(blob)
@@ -47,48 +55,37 @@ export default function SpecGrid({ specId, fallback }: SpecGridProps) {
   const [filter, setFilter] = useState('')
   const [status, setStatus] = useState('')
 
-  const query = useGraphQuery(specId)
-  const result = query.status === 'data' || query.status === 'empty' ? query.data : null
-  // A hung read used to be indistinguishable from a loading one; now the
-  // deadline turns it into an error with its own message, and the frame
-  // falls back to the demo grid the same way it does for a refusal.
-  const error = query.status === 'error' ? query.message : null
+  // WEB1: the ONE provenance seam. `fallback` is this frame's synthetic demo
+  // node, so the seam is told there IS a demo and reports `demo` rather than
+  // `empty`/`error` — the same policy this frame already had, now stated once
+  // and counted where an operator can see it.
+  const provenance = useLiveOrDemo<Record<string, unknown>>(specId, DEMO_PRESENT)
+  // Nullable only for the filter memo, which runs before the guards below (a
+  // hook cannot be called conditionally). Past the guards the result is live.
+  const loaded = provenance.status === 'live' ? provenance.data : null
 
   const visible = useMemo(() => {
-    if (!result) return []
-    if (!filter) return result.rows
+    if (!loaded) return []
+    if (!filter) return loaded.rows
     const needle = filter.toLowerCase()
-    return result.rows.filter((r) =>
-      result.keys.some((k) => String(r[k] ?? '').toLowerCase().includes(needle)),
+    return loaded.rows.filter((r) =>
+      loaded.keys.some((k) => String(r[k] ?? '').toLowerCase().includes(needle)),
     )
-  }, [result, filter])
+  }, [loaded, filter])
 
-  if (error) {
+  if (provenance.status === 'loading') {
+    return <EmptyState title="Loading…" hint={`Running QuerySpec ${specId} via drydocs-api.`} />
+  }
+  if (provenance.status !== 'live') {
     return (
       <div className="flex h-full min-h-0 flex-col gap-2">
-        <p className="shrink-0 rounded border border-yellow/50 bg-yellow/10 px-2 py-1 text-[11px] text-yellow">
-          Live QuerySpec <code className="font-mono">{specId}</code> unavailable ({error.split('—')[0].trim()}) —
-          showing the SYNTHESIZED demo frame instead.
-        </p>
-        <div className="min-h-0 flex-1">{fallback}</div>
+        <ProvenanceNotice state={provenance} specId={specId} />
+        {provenance.status === 'demo' && <div className="min-h-0 flex-1">{fallback}</div>}
       </div>
     )
   }
-  if (!result) return <EmptyState title="Loading…" hint={`Running QuerySpec ${specId} via drydocs-api.`} />
 
-  // An EMPTY live result (graph not loaded yet) keeps the demo frame visible —
-  // with a notice, never silently. The LIVE grid takes over once rows exist.
-  if (result.rows.length === 0) {
-    return (
-      <div className="flex h-full min-h-0 flex-col gap-2">
-        <p className="shrink-0 rounded border border-edge bg-panel-2 px-2 py-1 text-[11px] text-muted">
-          QuerySpec <code className="font-mono">{specId}</code> ran against <code className="font-mono">{result.database}</code> and
-          returned no rows (graph not loaded) — showing the SYNTHESIZED demo frame.
-        </p>
-        <div className="min-h-0 flex-1">{fallback}</div>
-      </div>
-    )
-  }
+  const result = provenance.data
 
   // `internal` is the most restrictive level in the vocabulary — J23 collapsed
   // the former fourth tier into it (2026-07-31).
@@ -97,7 +94,7 @@ export default function SpecGrid({ specId, fallback }: SpecGridProps) {
   async function serverExport(format: 'csv' | 'jsonl') {
     setStatus(`exporting ${format}…`)
     try {
-      const { filename, blob, manifest } = await access.exportSpec(specId, result!.params, format)
+      const { filename, blob, manifest } = await access.exportSpec(specId, result.params, format)
       download(filename, blob)
       download(`${filename}.manifest.json`, JSON.stringify(manifest, null, 2), 'application/json')
       setStatus(`exported ${manifest.row_count} rows`)
@@ -135,7 +132,7 @@ export default function SpecGrid({ specId, fallback }: SpecGridProps) {
   }
 
   function copyAsCypher() {
-    const text = `// QuerySpec ${result!.spec_id} · database ${result!.database}\n// params: ${JSON.stringify(result!.params)}\n${result!.cypher}\n`
+    const text = `// QuerySpec ${result!.spec_id} · database ${result!.database}\n// params: ${JSON.stringify(result.params)}\n${result!.cypher}\n`
     navigator.clipboard.writeText(text).then(
       () => setStatus('Cypher copied'),
       () => setStatus('clipboard unavailable'),

@@ -7,7 +7,8 @@ import EmptyState from '../components/ui/EmptyState'
 import LoadsTimeline from '../loads/LoadsTimeline'
 import StatTiles from '../components/StatTiles'
 import { DEMO_RUNS, type RunRow } from '../loads/demoLoads'
-import { useGraphQuery } from '../data/graphAccess'
+import { rowsOf, useLiveOrDemo } from '../data/provenance'
+import ProvenanceNotice from '../components/ProvenanceNotice'
 
 // /loads (O16): the shared template with the run TIMELINE as this module's
 // canvas — loader → :JobRun provenance, newest first. Frames (Runs / Rejects
@@ -15,6 +16,7 @@ import { useGraphQuery } from '../data/graphAccess'
 // /loads/run/:runId deep links resolve to a selection. Empty states honest on
 // databases with no runs (the demo timeline shows with a visible badge).
 const loadsModule = MODULES.find((m) => m.id === 'loads')!
+const RUNS_SPEC = 'loads.runs.v1'
 
 export default function LoadsRoute() {
   const { runId } = useParams<{ runId: string }>()
@@ -22,18 +24,13 @@ export default function LoadsRoute() {
   // O40 (DL-10): status stat-tiles ARE the filter controls for the timeline below.
   const [statusFilter, setStatusFilter] = useState<string | null>(null)
 
-  // WEB12: the read is a state, not a nullable. `loading` keeps the pane blank
-  // as before; a live answer with rows is live; an EMPTY answer and a FAILED one
-  // both fall back to the demo timeline, which is what the hand-rolled effect
-  // did — WEB1 is where that conflation gets a typed provenance state.
-  const runsQuery = useGraphQuery('loads.runs.v1')
-  const live = runsQuery.status === 'data'
+  // WEB1: one seam, one typed state. `live` is no longer a boolean this route
+  // maintains — it is the union's own status, and DEMO_RUNS is reached through
+  // the seam rather than beside it.
+  const provenance = useLiveOrDemo<RunRow>(RUNS_SPEC, DEMO_RUNS)
+  const live = provenance.status === 'live'
   const runs: readonly RunRow[] | null =
-    runsQuery.status === 'loading'
-      ? null
-      : runsQuery.status === 'data'
-        ? (runsQuery.data.rows as unknown as RunRow[])
-        : DEMO_RUNS
+    provenance.status === 'loading' ? null : rowsOf(provenance)
 
   const fallbackNote = (
     <EmptyState
@@ -49,6 +46,9 @@ export default function LoadsRoute() {
       graphPane={
         runs ? (
           <div className="flex h-full min-h-0 flex-col">
+            <div className="shrink-0 px-3 pt-3">
+              <ProvenanceNotice state={provenance} specId={RUNS_SPEC} />
+            </div>
             <div className="shrink-0 px-3 pt-3">
               <StatTiles
                 tiles={[
