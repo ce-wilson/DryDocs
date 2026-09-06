@@ -83,7 +83,7 @@ export default function ExplorerRoute({ persona }: { persona: Persona }) {
     }
     // clearing on unmount keeps the inspector from leaking into other routes
     return () => sidebar.clear()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, [selection, persona])
 
   // selecting a node in another tower (via a frame row) re-frames the graph

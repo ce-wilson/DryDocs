@@ -137,7 +137,7 @@ components:
   - { id: tableControls,           area: ui-primitive, path: components/ui/tableControls.tsx }   # filter/sort/group/CSV, extracted from DomainGridTable
   - { id: Tabs,                    area: ui-primitive, path: components/ui/Tabs.tsx }
 
-  # --- component (20) ---
+  # --- component (19) ---
   - { id: BrandMark,               area: component,    path: components/BrandMark.tsx }
   - { id: CypherConsole,           area: component,    path: components/CypherConsole.tsx }
   # O81: the NVL canvas and its QuerySpec-bound frame. UNBOUND to any module on
@@ -170,7 +170,6 @@ components:
   - { id: StatTiles,               area: component,    path: components/StatTiles.tsx }
   - { id: ThemeToggle,             area: component,    path: components/ThemeToggle.tsx }
   - { id: TowerDrill,              area: component,    path: components/TowerDrill.tsx }
-  - { id: TowerIcon,               area: component,    path: components/TowerIcon.tsx }
   - { id: ProvenanceNotice,        area: component,    path: components/ProvenanceNotice.tsx }
   - { id: TrustLegend,             area: component,    path: components/TrustLegend.tsx }
 

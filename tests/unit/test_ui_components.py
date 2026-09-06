@@ -366,10 +366,14 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     signal on every surface that can fall back -- binding either to one module
     would name one of the twelve it serves. Their seam, data/provenance.ts, is
     .ts and outside the scan boundary.
+    92 -> 91 at WEB13 (2026-09-05): TowerIcon.tsx DELETED. Nineteen lines, zero
+    importers, and noUnusedLocals cannot see an unused MODULE -- which is the
+    tech-debt pass's point about it, and the reason the ledger is where a dead
+    component shows up at all.
     """
     comps = _ui()["components"]
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
         40,
-        92,
+        91,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"

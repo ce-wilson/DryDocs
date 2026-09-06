@@ -20,6 +20,6 @@ export function useRouteA11y(contentRef: React.RefObject<HTMLElement | null>) {
     }
     // location.key changes on every navigation (push, replace, pop/back) —
     // pathname alone would miss a re-navigation to the same path.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, [location.key])
 }
