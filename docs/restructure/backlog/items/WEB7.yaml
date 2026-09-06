@@ -9,7 +9,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - docs/reviews/modules/web-2026-09-05.md
@@ -49,3 +49,114 @@ notes: |
   ADR CANDIDATE: "the code-splitting boundary follows the authorization boundary." S3 / WEB10
   notes there is partly no splitting decision because there is no deployment decision to make
   one against; build (a) and (b) regardless, they are correct under any delivery shape.
+
+  DONE 2026-09-05 (Lane B, laptop). The gate is a delivery decision now, not only
+  a render one.
+
+  MEASURED, on this tree: the initial chunk went 3,711,290 -> 2,430,851 bytes
+  (gzip 1,013,770 -> 686,260). 1,280,439 bytes stop shipping to every persona.
+  The review's baseline was 3,676,794 at bcae4d02; this burst's own items had
+  added ~34 KB before the split, which is why the before-number here is larger.
+
+  (a) THE LAZY SET IS EXACTLY THE GATED SET, and a test derives it rather than
+  trusting the list. Eight route components - the six sme modules (remediation,
+  software, gates, load-map, under-the-hood, mappings) and the two admin surfaces
+  (admin/config, console) - are React.lazy. modules/lazyRoutes.test.ts reads
+  registry.ts (the same declaration RouteAccessGate reads) and checks App.tsx in
+  BOTH directions: a gated route that is still eager fails, and a lazy route that
+  is NOT gated fails too. The second direction matters as much as the first: the
+  item says a chunk is admissible to a role or it is not, so splitting an open
+  route to shave bytes is a different decision and must not arrive under this
+  item's cover.
+
+  Chunks, after: ConsoleRoute 625 KB (it carries the neo4j driver - the ADR 0005
+  bolt adapter, dev-only and admin-only, and now downloaded by neither anyone
+  else nor in production), AdminConfigRoute 293 KB (the enforcement matrix),
+  MappingsRoute 47, RemediationRoute 39, GatesRoute 36, SoftwareRoute 32,
+  UnderTheHoodRoute 24, LoadMapRoute 19.
+
+  DELIBERATELY NOT SPLIT: load-map.json (56 KB). lineage/laneBasis.ts imports it
+  and /lineage is open to every role, so it is admissible to a user and by this
+  item's own rule it stays. Splitting it would have been a size decision.
+
+  THE LOCATIONS TAB IS SPLIT ON A DIFFERENT AXIS, and the note says so rather
+  than letting it read as part of the authorization rule. /explorer is open to
+  everyone and so is the tab; the boundary is that three of the four tabs on that
+  page never touch the 147 KB world outline or the gazetteer, and opening the tab
+  is an explicit act. 157 KB chunk, and it carries its OWN Suspense so a tab load
+  does not blank the page - including the tab strip the reader just clicked.
+
+  ONE SUSPENSE FOR THE ROUTE TREE, INSIDE THE ERROR BOUNDARY. A lazy chunk that
+  fails to download rejects during render, which is a throw - so WEB5's boundary
+  catches a network failure fetching a role-gated chunk and offers the same retry
+  it offers a render error, instead of the console going blank. One boundary
+  rather than one per route, for the same reason there is one error boundary: a
+  per-route Suspense is a thing a new route can forget to bring. The nesting order
+  is asserted.
+
+  (b) A BLOCKING CEILING, not a warning. web/scripts/checkBundleSize.mjs measures
+  the INITIAL chunk (not total dist: splitting a route out of the entry chunk does
+  not shrink the total by a byte, so a total-size ceiling would score this item's
+  own change as a no-op) in RAW bytes (not gzip: gzip moves with the compressor
+  version and would make the recorded number un-reproducible between a runner and
+  a laptop). Ceiling 2,505,000, ~3% over today's measurement so whitespace is not
+  a red build. It ratchets DOWN freely; raising it requires a line saying what
+  arrived and why it belongs in the entry chunk. It blocks rather than warns
+  because a bundle that quietly reacquires 1.2 MB of role-gated code has undone
+  this item, and a warning would not stop that.
+
+  DEVIATION, stated: the clause says the number is "recorded in the job". It is
+  recorded in the SCRIPT the job runs, with its date and its rationale, so there
+  is exactly one number. Putting it in the workflow yaml as well would be a second
+  copy of a value, which is the shape this repo spends most of its guards
+  preventing.
+
+  The script also refuses to report a size when it cannot find exactly one
+  index-*.js, with exit code 2 and a different message - a glob that matched
+  nothing would otherwise report a comfortable zero, which is the vacuous pass
+  this check would be worthless for.
+
+  (c) THE PUBLISH-BOUNDARY ANSWER: EVERY GENERATED ARTIFACT IN THE BUNDLE IS
+  PUBLISHABLE, AND THE SPLIT IS NOT A CONFIDENTIALITY FIX. Traced to source:
+
+    world-map.ts (147 KB)          <- external/geo/world-atlas/countries-110m.json   EXTERNAL
+    gazetteer.json (7 KB)          <- config/taxonomy/location-gazetteer.yaml        External (declared)
+    software-registry.json (14 KB) <- config/taxonomy/software-registry.yaml         Internal-Public (declared)
+    context-types.json (1 KB)      <- config/taxonomy/context-types.yaml             Internal-Public (declared)
+    remediation-profile/-diff.json <- a SYNTHETIC folder-set export through the REAL
+                                      G68 profile() - the generator's own header
+                                      says so; invented FIDs                          publishable
+    gates.json (44 KB)             <- config/gate-log.md + config/gate-prompts/       config/ tier
+    load-map.json (56 KB)          <- config/source-registry.yaml + config/taxonomy/  config/ tier
+    enforcement-matrix.json (295KB)<- config/*.yaml across the tree                   config/ tier
+
+  No artifact carries Internal VALUES, so there is nothing here for the HITL gate.
+  Checked rather than asserted: the only `internal/` strings in any artifact are
+  PATH references and prose about the boundary itself - 32 in the enforcement
+  matrix ("PLACEHOLDER - real value internal/ twin only", "the
+  internal/server-inventory/ landing zone") and one in load-map.json - which is
+  exactly the reference-by-id-not-by-value that PUBLISH-BOUNDARY.md requires.
+
+  WHICH DEFLATES THE SHARPEST PART OF A4's FRAMING, and that is worth recording
+  rather than quietly leaving in place. "A user-tier persona can read both from
+  devtools" is true and is not a leak: everything in the bundle is publishable to
+  GitHub. The two boundaries are different axes - repo-to-GitHub is
+  classification, console-to-persona is authorization - and this item is about the
+  second. The reason to split stands on its own: shipping a role-gated page's data
+  to someone who cannot open the page is least-privilege waste and 1.2 MB of it,
+  whether or not the bytes are secret.
+
+  (d) The generation pipeline is untouched. No render script, no generated file
+  and no drift test changed; api.test.ts and the render guards pass.
+
+  ADR CANDIDATE, as the item nominates: "the code-splitting boundary follows the
+  authorization boundary." The material is here - the rule, the both-directions
+  test that enforces it, the one case that declines it (load-map.json on an open
+  route), and the second axis the Locations tab needed. Left for Lane A: the adr
+  pen is not this lane's.
+
+  Gates at close: poetry run pytest -q, ruff check, ruff format --check. In web/:
+  tsc -b --force exit 0, oxlint --max-warnings 0 exit 0, npm run build exit 0,
+  npm run bundle:check exit 0 (97.0% of ceiling), npm run test:coverage exit 0,
+  vitest 25 files / 306 tests. Mutation-proven: making one gated route eager again
+  fails the derivation test by name.
