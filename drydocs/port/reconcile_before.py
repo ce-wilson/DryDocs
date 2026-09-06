@@ -238,8 +238,17 @@ def fork_point(repo: Path) -> str | None:
 
     None when no ``origin/main``/``main`` resolves, or when HEAD IS main (an apply
     made directly on the trunk has no fork point — the ancestor check is all there
-    is, and the describe line's distance is what shows staleness).
+    is, and the describe line's distance is what shows staleness). "IS main" means
+    the checked-out branch is ``main``, or HEAD sits detached at the trunk tip. It
+    does NOT mean "HEAD equals the pushed tip": a producer checkout carries unpushed
+    trunk commits before every push, and reading ``origin/main`` as the fork point
+    there called a stamp written at HEAD an earlier apply's leftover (2026-09-06, the
+    Lane B merge close - eight merges on main, none pushed yet, round-trip guard red).
+    CI never saw it because CI's HEAD is always the pushed tip.
     """
+    branch = git(repo, "symbolic-ref", "--quiet", "--short", "HEAD")
+    if branch.returncode == 0 and branch.stdout.strip() == "main":
+        return None
     for ref in ("origin/main", "main"):
         tip = git(repo, "rev-parse", "--verify", "--quiet", f"{ref}^{{commit}}")
         if tip.returncode == 0:
