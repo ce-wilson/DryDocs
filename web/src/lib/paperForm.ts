@@ -15,12 +15,28 @@
 // anchored block (`_inject_margin_anchors`) and a `.dd-print-footer` that
 // repeats on every page (`doc_rev_footer`). The CLASSES and their print CSS are
 // reused verbatim (src/styles/print.css; tests/unit/test_console_print_gutter.py
-// pins the two sheets equal). The ANCHOR SCHEME cannot transfer: a design doc
-// tags blocks by their authored `id`, and the console has almost none, so tags
-// here are `<route-slug>.<n>` in DOM order over the blocks a reviewer marks —
-// headings, tables, tab panels. That ordinal is the key a scanned markup gets
-// re-attached by, which is why it is stable for a given DOM and written into a
-// `data-dd-anchor` attribute as well as the visible tag.
+// pins the two sheets equal).
+//
+// THE ANCHOR SCHEME IS CONTENT-DERIVED AS OF O89, and this replaces what O88
+// shipped two days earlier. O88 tagged blocks `<route-slug>.<n>` in DOM order,
+// under its own stated constraint — a design doc tags by authored id and the
+// console had none. O89 clause (b) is that an anchor keyed to an index does not
+// survive an inserted panel and a content-derived one does, and clause (e) is
+// that the paper gutter and the screen control must offer the SAME ids. Both
+// halves now call `anchorFor` below, so they agree by construction rather than
+// by two implementations being kept in step. Nothing was keyed to the ordinals
+// yet — no console feedback file, no scan — so the change costs no re-attachment.
+//
+// WHY A HASH AND NOT A SLUG, which is where this departs from L11's doc rule.
+// A design doc's anchorable text is a heading — a sentence, slugs beautifully.
+// The console's anchorables include DATA-FRAME ROWS, whose "own text" is a job
+// name or a folder name. Two consequences, and the second is the one that
+// settles it: identical first cells are ordinary in a 500-row grid, so slugs
+// collide exactly where the granularity matters most; and a slug would write
+// production identifiers into `docs/design/feedback/`, which is a published
+// path and precisely where SEALIDs have hidden inside folder-name strings
+// before. A short hash of the block's text is content-derived, survives
+// insertion, is unique per block, and carries no source text.
 //
 // A CAPTURE IS A MOMENT AND THE FOOTER SAYS SO. A design doc's footer is
 // `Rev N · commit <hash>` because its rev is authored. A console page has no
@@ -83,16 +99,112 @@ export function footerText(p: CaptureProvenance): string {
   return parts.join(' · ')
 }
 
-/** Tag every anchorable block under `root` with `<slug>.<n>`; returns the count.
+/** FNV-1a over the block's text, 8 hex chars.
+ *
+ *  Not cryptographic and does not need to be: the job is a stable, short,
+ *  content-derived id, and the input is text a reviewer can read on the page.
+ *  Written out rather than pulled from a library because the same function has
+ *  to run in the browser, under jsdom, and inside the capture driver, and a
+ *  dependency in this file would break the "pure over a Document" property the
+ *  header promises. */
+export function textHash(text: string): string {
+  let h = 0x811c9dc5
+  for (let i = 0; i < text.length; i++) {
+    h ^= text.charCodeAt(i)
+    h = Math.imul(h, 0x01000193) >>> 0
+  }
+  return h.toString(16).padStart(8, '0')
+}
+
+/** The text an anchor is derived FROM: collapsed whitespace, case-folded.
+ *
+ *  Collapsed because a re-render may reflow the same words differently, and an
+ *  anchor that moved because a line wrapped would be positional in disguise.
+ *  Truncated because a whole table's text is not what identifies it — the first
+ *  200 characters are, and a shorter input makes the hash no less stable. */
+export function anchorText(el: { tagName?: string; textContent: string | null }): string {
+  const text = (el.textContent ?? '').replace(/\s+/g, ' ').trim().toLowerCase().slice(0, 200)
+  // THE TAG NAME IS PART OF THE IDENTITY, and leaving it out was a real
+  // collision rather than a theoretical one: a `<div role="tabpanel">` whose
+  // only content is an `<h3>` has exactly its child's text, so the panel and
+  // the heading hashed identically and one of them took a `-2` suffix it had
+  // not earned. A heading and the panel containing it are different blocks to
+  // annotate; their element type says so without appealing to position.
+  return `${(el.tagName ?? '').toLowerCase()}|${text}`
+}
+
+/** The anchor for one block: `<route-slug>.<hash>`, or `<route-slug>.<table>.<row>`
+ *  for a data-frame row.
+ *
+ *  ROWS CARRY THEIR TABLE'S HASH AS A PREFIX, which is what makes a note on a
+ *  vanished row degrade to the table it was in rather than being dropped —
+ *  `feedback_anchor_valid`'s "fall back to the authored parent" rule (L11), in
+ *  the shape the console needs. `consoleAnchorValid` below is the other half.
+ *
+ *  THE `.` SEPARATOR IS THE NAMESPACE. A design-doc anchor is `<authored>` or
+ *  `<authored>--<slug>`; a console anchor always begins with a route slug and a
+ *  dot. The two share a YAML format and must not share an id space (clause b),
+ *  and the separators being disjoint is what lets a validator tell them apart
+ *  without being told which kind it is looking at. */
+export function anchorFor(el: HTMLElement, slug: string): string {
+  const own = textHash(anchorText(el))
+  const cell = el.tagName === 'TD' || el.tagName === 'TH'
+  if (!cell) return `${slug}.${own}`
+  const table = el.closest('table')
+  return table ? `${slug}.${textHash(anchorText(table))}.${own}` : `${slug}.${own}`
+}
+
+/** Does a recorded anchor still re-attach to the anchors a page now offers?
+ *
+ *  Exact match, else — for a row anchor — its TABLE prefix, so a note on a row
+ *  that has since gone re-attaches to the table rather than being silently
+ *  lost. A feedback loop that drops notes quietly is worse than none, because
+ *  the reviewer believes it worked (clause c).
+ *
+ *  Returns the anchor it re-attaches TO, or null when nothing takes it. */
+export function consoleAnchorValid(anchor: string, known: readonly string[]): string | null {
+  const set = new Set(known)
+  if (set.has(anchor)) return anchor
+  const parts = anchor.split('.')
+  if (parts.length < 3) return null
+  const base = parts.slice(0, -1).join('.')
+  return set.has(base) ? base : null
+}
+
+/** Tag every anchorable block under `root` with its content-derived anchor;
+ *  returns the anchors in document order.
+ *
  *  A `<table>` cannot hold a span as a direct child (browsers foster-parent it
  *  out), so its tag rides in the caption, which is a legal child and positions
- *  relative to the table. */
-export function injectMarginTags(root: ParentNode, slug: string, doc: Document): number {
-  let n = 0
-  for (const el of Array.from(root.querySelectorAll<HTMLElement>(ANCHOR_SELECTOR))) {
-    if (el.closest(`.${PRINT_FOOTER_CLASS}`)) continue
-    n += 1
-    const anchor = `${slug}.${n}`
+ *  relative to the table.
+ *
+ *  A COLLISION SUFFIX, because two blocks CAN carry the same text — an empty
+ *  cell, a repeated "Total" row — and two blocks with one anchor would make a
+ *  note ambiguous rather than merely imprecise. The suffix is ordinal within
+ *  the collision only, so inserting an unrelated block never renumbers it. */
+export function injectMarginTags(root: ParentNode, slug: string, doc: Document): string[] {
+  const blocks = Array.from(root.querySelectorAll<HTMLElement>(ANCHOR_SELECTOR)).filter(
+    (el) => !el.closest(`.${PRINT_FOOTER_CLASS}`),
+  )
+
+  // TWO PASSES, AND THE ORDER IS LOAD-BEARING. Every anchor is computed over the
+  // UNTOUCHED DOM before anything is injected, because injecting a tag changes
+  // the element's textContent — and a table is tagged before its own rows are
+  // reached, so a single pass hashed each row's table WITH the table's tag
+  // already inside it. The row anchors then no longer carried the table anchor
+  // as a prefix and the degradation rule silently stopped working. Caught by the
+  // prefix test, which is exactly why that property has a test of its own.
+  const anchors: string[] = []
+  const seen = new Map<string, number>()
+  for (const el of blocks) {
+    const base = anchorFor(el, slug)
+    const dup = seen.get(base) ?? 0
+    seen.set(base, dup + 1)
+    anchors.push(dup === 0 ? base : `${base}-${dup + 1}`)
+  }
+
+  for (const [i, el] of blocks.entries()) {
+    const anchor = anchors[i]
     const tag = doc.createElement('span')
     tag.className = MARGIN_TAG_CLASS
     tag.setAttribute('aria-hidden', 'true')
@@ -106,7 +218,7 @@ export function injectMarginTags(root: ParentNode, slug: string, doc: Document):
       el.prepend(tag)
     }
   }
-  return n
+  return anchors
 }
 
 /** Everything the page could still fetch on open: `src`/`srcset`/`poster`
@@ -134,14 +246,21 @@ export interface AssembleOptions {
   provenance: CaptureProvenance
 }
 
-/** Make `doc` self-contained and printable, in place. Returns the tag count.
+/** Make `doc` self-contained and printable, in place. Returns the ANCHORS it
+ *  tagged, in document order.
+ *
+ *  O89 changed this from a count to the ids themselves, because the count was
+ *  only ever a sanity number and the ids are what the loop needs: the capture
+ *  manifest records them, and the Python guard that reports an orphaned note
+ *  (clause c) checks a feedback file's anchors against exactly this list. A
+ *  count cannot answer "does this note still re-attach".
  *
  *  Removes what would run or fetch: scripts, stylesheet/preload/icon links,
  *  the dev server's injected `<style>` elements (their rules come back as the
  *  one inlined sheet), iframes. Adds the inlined sheet, the margin tags, the
  *  running footer, a `<meta>` carrying the provenance as JSON, and a title
  *  that says what this is. */
-export function assemblePaperDocument(doc: Document, opts: AssembleOptions): number {
+export function assemblePaperDocument(doc: Document, opts: AssembleOptions): string[] {
   const { css, provenance } = opts
   for (const el of Array.from(
     doc.querySelectorAll(
@@ -166,11 +285,11 @@ export function assemblePaperDocument(doc: Document, opts: AssembleOptions): num
   title.textContent = `DryDocs paper form — ${provenance.route} @ ${provenance.commit}`
 
   const root: ParentNode = doc.querySelector('main') ?? doc.body
-  const count = injectMarginTags(root, routeSlug(provenance.route), doc)
+  const anchors = injectMarginTags(root, routeSlug(provenance.route), doc)
 
   const footer = doc.createElement('div')
   footer.className = PRINT_FOOTER_CLASS
   footer.textContent = footerText(provenance)
   doc.body.appendChild(footer)
-  return count
+  return anchors
 }
