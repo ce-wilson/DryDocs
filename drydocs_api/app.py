@@ -87,11 +87,27 @@ from drydocs_api.personas import UnknownPersonaError
 from drydocs_api.queries import NAMED_QUERIES, ParamValidationError, UnknownQueryError
 from drydocs_api.query_specs import UnknownSpecError
 from drydocs_api.schemas import (
+    AppCodeMigrationsOut,
+    ChangesetArtifactOut,
     ConfigOut,
+    CorpusStatusOut,
+    CorrectionsReportOut,
+    DraftReceiptOut,
+    EphemeralRegisterOut,
     HealthOut,
+    IntakeEvidenceOut,
+    IntakeListOut,
+    IntakeRecordOut,
+    LogEstateOut,
     LoginOut,
+    MappingDomainsOut,
+    MappingGridOut,
+    MappingOptionsOut,
     NamedQueryOut,
     NamedRunOut,
+    OpenDraftsOut,
+    PendingCorrectionsReportOut,
+    PromotedDiffOut,
     SpecOut,
     SpecRunOut,
     StatusOut,
@@ -365,7 +381,7 @@ def create_app(
     # is a delta against a declaration, and an end user reads "wrong-db" as
     # breakage rather than as the governance signal it is.
     @app.get("/docs-verify")
-    def get_docs_verify(user: CurrentUser) -> dict[str, object]:
+    def get_docs_verify(user: CurrentUser) -> CorpusStatusOut:
         # BOTH roles, because require_role is an exact membership test, not a
         # ranking — `require_role(user, "steward")` refuses an ADMIN, which is
         # never what an SME-surface gate means here. This is the server-side
@@ -479,7 +495,7 @@ def create_app(
         body: EphemeralRegisterBody,
         x_drydocs_agent_key: str | None = Header(default=None),
         x_drydocs_run_id: str | None = Header(default=None),
-    ) -> dict[str, object]:
+    ) -> EphemeralRegisterOut:
         # Audited even though it executes nothing: the Cypher ENTERS the system
         # here, and it is the route the QA agent's run_id arrives on (ruling D).
         # The actor is the OWNER session the ref is scoped to -- its handle,
@@ -638,7 +654,7 @@ def create_app(
             raise HTTPException(409, str(exc)) from None
 
     @app.post("/intake")
-    def post_intake(body: IntakeCreateBody, user: CurrentUser) -> dict[str, object]:
+    def post_intake(body: IntakeCreateBody, user: CurrentUser) -> IntakeRecordOut:
         return _intake_call(
             create_intake,
             body.context_type,
@@ -652,11 +668,11 @@ def create_app(
         )
 
     @app.get("/intake")
-    def get_intakes(user: CurrentUser) -> dict[str, object]:
+    def get_intakes(user: CurrentUser) -> IntakeListOut:
         return _intake_call(list_intakes, user.token, sessions, intake_store)
 
     @app.get("/intake/{intake_id}")
-    def get_one_intake(intake_id: str, user: CurrentUser) -> dict[str, object]:
+    def get_one_intake(intake_id: str, user: CurrentUser) -> IntakeRecordOut:
         return _intake_call(get_intake, intake_id, user.token, sessions, intake_store)
 
     @app.post("/intake/{intake_id}/evidence")
@@ -664,7 +680,7 @@ def create_app(
         intake_id: str,
         files: list[UploadFile],
         user: CurrentUser,
-    ) -> dict[str, object]:
+    ) -> IntakeEvidenceOut:
         out: dict[str, object] = {}
         for f in files:
             data = await f.read()
@@ -686,7 +702,7 @@ def create_app(
         intake_id: str,
         body: IntakeTransitionBody,
         user: CurrentUser,
-    ) -> dict[str, object]:
+    ) -> IntakeRecordOut:
         return _intake_call(
             intake_transition,
             intake_id,
@@ -704,7 +720,7 @@ def create_app(
         intake_id: str,
         body: ThreadDecisionBody,
         user: CurrentUser,
-    ) -> dict[str, object]:
+    ) -> IntakeRecordOut:
         return _intake_call(
             thread_decision,
             intake_id,
@@ -742,19 +758,19 @@ def create_app(
             raise HTTPException(422, str(exc)) from None
 
     @app.get("/mappings/domains")
-    def get_domains(user: CurrentUser) -> dict[str, object]:
+    def get_domains(user: CurrentUser) -> MappingDomainsOut:
         return _mapping_call(list_domains, user.token, sessions)
 
     @app.get("/mappings/grid/{domain_id}")
-    def get_grid(domain_id: str, user: CurrentUser) -> dict[str, object]:
+    def get_grid(domain_id: str, user: CurrentUser) -> MappingGridOut:
         return _mapping_call(mapping_grid, domain_id, user.token, sessions, mapping_store)
 
     @app.get("/mappings/options")
-    def get_options(user: CurrentUser) -> dict[str, object]:
+    def get_options(user: CurrentUser) -> MappingOptionsOut:
         return _mapping_call(mapping_options, user.token, sessions, mapping_store)
 
     @app.post("/mappings/changeset")
-    def post_changeset(body: ChangesetBody, user: CurrentUser) -> dict[str, object]:
+    def post_changeset(body: ChangesetBody, user: CurrentUser) -> ChangesetArtifactOut:
         return _mapping_call(draft_changeset, body.entries, user.token, sessions, mapping_store)
 
     # ── O24 SEAL-contact overrides (ui-write-surface gate SME-3, M2 tier),
@@ -762,7 +778,7 @@ def create_app(
     # returns a receipt; promotion emits the diff to apply on a branch. The
     # server still writes no committed file — git is the only commit target. ──
     @app.post("/mappings/overrides/draft")
-    def post_override_draft(body: ChangesetBody, user: CurrentUser) -> dict[str, object]:
+    def post_override_draft(body: ChangesetBody, user: CurrentUser) -> DraftReceiptOut:
         return _mapping_call(
             draft_override,
             body.entries,
@@ -775,11 +791,11 @@ def create_app(
         )
 
     @app.get("/mappings/drafts")
-    def get_drafts(user: CurrentUser, domain: str | None = None) -> dict[str, object]:
+    def get_drafts(user: CurrentUser, domain: str | None = None) -> OpenDraftsOut:
         return _mapping_call(list_drafts, user.token, sessions, mapping_store, domain)
 
     @app.post("/mappings/drafts/{draft_id}/promote")
-    def post_promote_draft(draft_id: str, user: CurrentUser) -> dict[str, object]:
+    def post_promote_draft(draft_id: str, user: CurrentUser) -> PromotedDiffOut:
         return _mapping_call(
             promote_draft,
             draft_id,
@@ -791,11 +807,11 @@ def create_app(
         )
 
     @app.get("/mappings/overrides/report")
-    def get_override_report(user: CurrentUser) -> dict[str, object]:
+    def get_override_report(user: CurrentUser) -> CorrectionsReportOut:
         return _mapping_call(source_corrections_report, user.token, sessions, mapping_store)
 
     @app.get("/mappings/pending/report")
-    def get_pending_report(user: CurrentUser) -> dict[str, object]:
+    def get_pending_report(user: CurrentUser) -> PendingCorrectionsReportOut:
         # N14: the union report. The email rider count is a GRAPH read
         # (docs.email-unassigned.v1, Q21); the report itself must render with
         # no graph in reach, so an unreachable graph degrades to the explicit
@@ -825,7 +841,7 @@ def create_app(
     # artifact is the COMPLETE updated committed file. Server writes nothing;
     # the K8 loader stays the only graph writer (§E3). ──
     @app.post("/mappings/app-code/draft")
-    def post_app_code_draft(body: ChangesetBody, user: CurrentUser) -> dict[str, object]:
+    def post_app_code_draft(body: ChangesetBody, user: CurrentUser) -> DraftReceiptOut:
         return _mapping_call(
             draft_app_code_mapping,
             body.entries,
@@ -842,7 +858,7 @@ def create_app(
     @app.get("/mappings/app-code/migrations")
     def get_app_code_migrations(
         user: CurrentUser,
-    ) -> dict[str, object]:
+    ) -> AppCodeMigrationsOut:
         return _mapping_call(app_code_migration_report, user.token, sessions, mapping_store)
 
     # O68: the log estate — per declared kind and zone, the directory, the file
@@ -857,7 +873,7 @@ def create_app(
     # file, because capturing Cypher text is ruled (ADR 0014 clause 6) and
     # surfacing it is not (clause c).
     @app.get("/admin/log-estate")
-    def get_log_estate(user: AdminUser) -> dict:
+    def get_log_estate(user: AdminUser) -> LogEstateOut:
         return log_estate()
 
     # Dev-mode demo page (same-origin, so no CORS surface): the live-data twin

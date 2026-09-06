@@ -74,16 +74,42 @@ def test_generated_types_exist_beside_the_schema() -> None:
 
 # --- declarations: the seam's routes carry typed responses ------------------
 
-#: route -> (method, declared 200 model, list-of?)
+#: (route, method) -> (declared 200 model, list-of?)
+#:
+#: WEB8 re-keyed this by METHOD as well as path. ``/intake`` answers GET with the
+#: queue and POST with one created record, and those are different shapes — a
+#: path-keyed table could only pin one of them, which is how a surface with two
+#: verbs keeps half a guard.
 CONSOLE_ROUTES = {
-    "/health": ("get", "HealthOut", False),
-    "/login": ("post", "LoginOut", False),
-    "/logout": ("post", "StatusOut", False),
-    "/queries": ("get", "NamedQueryOut", True),
-    "/query/{query_id}": ("post", "NamedRunOut", False),
-    "/raw-cypher": ("post", "NamedRunOut", False),
-    "/specs": ("get", "SpecOut", True),
-    "/specs/{spec_id}/run": ("post", "SpecRunOut", False),
+    ("/health", "get"): ("HealthOut", False),
+    ("/login", "post"): ("LoginOut", False),
+    ("/logout", "post"): ("StatusOut", False),
+    ("/queries", "get"): ("NamedQueryOut", True),
+    ("/query/{query_id}", "post"): ("NamedRunOut", False),
+    ("/raw-cypher", "post"): ("NamedRunOut", False),
+    ("/specs", "get"): ("SpecOut", True),
+    ("/specs/{spec_id}/run", "post"): ("SpecRunOut", False),
+    # ── WEB8: O70's recorded follow-up, now declared ──────────────────────
+    ("/docs-verify", "get"): ("CorpusStatusOut", False),
+    ("/admin/log-estate", "get"): ("LogEstateOut", False),
+    ("/specs/ephemeral", "post"): ("EphemeralRegisterOut", False),
+    ("/intake", "get"): ("IntakeListOut", False),
+    ("/intake", "post"): ("IntakeRecordOut", False),
+    ("/intake/{intake_id}", "get"): ("IntakeRecordOut", False),
+    ("/intake/{intake_id}/evidence", "post"): ("IntakeEvidenceOut", False),
+    ("/intake/{intake_id}/transition", "post"): ("IntakeRecordOut", False),
+    ("/intake/{intake_id}/thread-decision", "post"): ("IntakeRecordOut", False),
+    ("/mappings/domains", "get"): ("MappingDomainsOut", False),
+    ("/mappings/grid/{domain_id}", "get"): ("MappingGridOut", False),
+    ("/mappings/options", "get"): ("MappingOptionsOut", False),
+    ("/mappings/changeset", "post"): ("ChangesetArtifactOut", False),
+    ("/mappings/overrides/draft", "post"): ("DraftReceiptOut", False),
+    ("/mappings/overrides/report", "get"): ("CorrectionsReportOut", False),
+    ("/mappings/pending/report", "get"): ("PendingCorrectionsReportOut", False),
+    ("/mappings/drafts", "get"): ("OpenDraftsOut", False),
+    ("/mappings/drafts/{draft_id}/promote", "post"): ("PromotedDiffOut", False),
+    ("/mappings/app-code/draft", "post"): ("DraftReceiptOut", False),
+    ("/mappings/app-code/migrations", "get"): ("AppCodeMigrationsOut", False),
 }
 
 
@@ -91,9 +117,10 @@ def _ok_schema(doc: dict, path: str, method: str) -> dict:
     return doc["paths"][path][method]["responses"]["200"]["content"]["application/json"]["schema"]
 
 
-@pytest.mark.parametrize("path", sorted(CONSOLE_ROUTES))
-def test_console_route_declares_its_response_model(path: str) -> None:
-    method, model, is_list = CONSOLE_ROUTES[path]
+@pytest.mark.parametrize("route", sorted(CONSOLE_ROUTES))
+def test_console_route_declares_its_response_model(route: tuple[str, str]) -> None:
+    path, method = route
+    model, is_list = CONSOLE_ROUTES[route]
     ref = {"$ref": f"#/components/schemas/{model}"}
     got = _ok_schema(_committed(), path, method)
     if is_list:
@@ -140,21 +167,60 @@ def test_declared_models_forbid_undeclared_keys() -> None:
         assert cls.model_config.get("extra") == "forbid", cls.__name__
 
 
-def test_routes_still_declared_as_free_objects_are_the_recorded_follow_up() -> None:
-    """Not a defect pin — a scope record. These prefixes return free objects
-    today; their browser wrappers use `unwrapAs` (a claimed type, not a
-    declared one). When one gains a model, move it OUT of this list and into
-    CONSOLE_ROUTES so the claim becomes a guard."""
+#: The ONLY operations allowed to answer without a declared model, each with the
+#: reason it is not one. Two return no JSON at all; the third is open by design.
+UNMODELLED = {
+    ("/demo", "get"): "the dev-mode demo PAGE — HTML, not JSON",
+    ("/specs/{spec_id}/export", "post"): "a streamed export file, not a JSON body",
+    ("/exports/{export_id}/manifest", "get"): (
+        "the export ledger record is open by design — the console types it "
+        "Record<string, unknown> and drydocs_api.schemas says so"
+    ),
+}
+
+
+def test_every_json_route_declares_a_response_model() -> None:
+    """WEB8, and the inversion of the test this replaces.
+
+    O70 modelled the query/spec surface and left a list of routes that still
+    answered with free objects; the guard here USED to assert that list was
+    non-empty, so that promoting a route out of it was a deliberate act. WEB8
+    emptied it, so the guard now runs the other way: every operation that
+    answers with JSON declares a model, and the only exceptions are the three
+    named in UNMODELLED with their reasons.
+
+    Why this direction is the stronger one. The old shape guarded the routes it
+    already knew about — a NEW route added with `-> dict[str, object]` was
+    invisible to it, which is exactly how /admin/log-estate (O68, after O70)
+    opened the same hole again and was found by re-measuring rather than by a
+    test. This shape fails on the new route instead."""
     doc = _committed()
-    free = [
-        p
-        for p in doc["paths"]
-        if p.startswith(("/mappings/", "/intake", "/docs-verify", "/specs/ephemeral", "/demo"))
-    ]
-    assert free, "the follow-up list emptied — retire this test and its note in O70"
-    for path in free:
-        for method, op in doc["paths"][path].items():
-            got = op["responses"]["200"]["content"]["application/json"]["schema"]
-            assert (
-                "$ref" not in got
-            ), f"{method.upper()} {path} now declares {got} — promote it to CONSOLE_ROUTES"
+    holes = []
+    for path, ops in doc["paths"].items():
+        for method, op in ops.items():
+            if (path, method) in UNMODELLED:
+                continue
+            content = op.get("responses", {}).get("200", {}).get("content", {})
+            schema = content.get("application/json", {}).get("schema")
+            if schema is None:
+                holes.append(f"{method.upper()} {path} — no JSON 200 body, and not in UNMODELLED")
+                continue
+            if "$ref" in schema:
+                continue
+            if schema.get("type") == "array" and "$ref" in schema.get("items", {}):
+                continue
+            holes.append(f"{method.upper()} {path} — answers {schema}")
+    assert not holes, (
+        "these operations answer JSON without a declared model — model them in "
+        "drydocs_api.schemas and add them to CONSOLE_ROUTES, or record the reason "
+        "in UNMODELLED:\n  " + "\n  ".join(holes)
+    )
+
+
+def test_the_unmodelled_exceptions_still_exist() -> None:
+    """An exception that outlives its route is a licence nobody revoked. If one
+    of these 404s out of the schema, delete its row rather than leave it."""
+    doc = _committed()
+    for path, method in UNMODELLED:
+        assert path in doc["paths"], f"{path} is gone — drop it from UNMODELLED"
+        assert method in doc["paths"][path], f"{method.upper()} {path} is gone — drop its row"
