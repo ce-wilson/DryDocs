@@ -128,7 +128,19 @@ def test_coverage_is_pinned_so_the_gap_stays_visible() -> None:
     # absent slot renders "not supplied", an uncomputed census renders "not
     # profiled" -- rather than that a thing appears. Those are the claims a
     # reader would otherwise have to take on trust.
-    assert (len(seeded), len(suites)) == (12, 13), (
+    # 12/13 -> 13/13 at O43 (2026-09-05): TS-UNDERHOOD, the last one. It went
+    # last for a reason worth stating rather than apologising for — the page
+    # renders a fixed committed benchmark and reads no graph, so almost nothing
+    # about it changes between sessions and almost nothing about it had been
+    # observed and written down. Its three cases are the three claims that are
+    # actually worth re-running, not three claims invented to close a gap.
+    #
+    # AND THE PIN'S JOB CHANGES HERE. It has meant "the gap is a visible number"
+    # since the file was written; at 13/13 the gap is zero, so from now on it
+    # guards the other direction — a new module adds a suite (the
+    # every-module-has-a-suite rule below), and this pin is what stops that suite
+    # arriving empty and unnoticed. Same number, opposite duty.
+    assert (len(seeded), len(suites)) == (13, 13), (
         f"UI test coverage changed: {len(seeded)}/{len(suites)} suites seeded — "
         f"update the pin (and be glad)"
     )
@@ -185,12 +197,22 @@ def test_the_automated_share_is_pinned_so_it_cannot_drift_up_quietly() -> None:
     rendered nav agrees with the filter, and they stay manual. Same share rule as
     O59: this moved up because the claim is about a pure function and a registry
     constant, not because anything was backfilled.
+
+    17/40 -> 19/43 at O43 (2026-09-05): TS-UNDERHOOD's three cases, two of them
+    automated — the benchmark data's regeneration guard (a claim about a
+    GENERATED artifact) and WEB7's lazy-route derivation (a claim about the
+    build). The third is the layout case and stays manual, because "nothing
+    reflowed" is a claim about what a reader sees at a real viewport and a unit
+    test over the same data would only re-assert the fixture it read. Two of
+    three is the highest share of any suite here and it is not evidence of
+    backfilling: it is what happens when a page's load-bearing claims are about
+    a committed artifact and a bundle rather than about pixels.
     """
     cases = [c for s in _tests()["suites"] for c in s["cases"]]
     automated = [c for c in cases if c.get("automated_by")]
     assert (len(automated), len(cases)) == (
-        17,
-        40,
+        19,
+        43,
     ), f"automated case count changed: {len(automated)}/{len(cases)} — update the pin"
 
 
@@ -217,13 +239,25 @@ def test_which_cases_should_i_run_after_changing_a_component() -> None:
     """'I changed LoadsTimeline — what do I re-test?'"""
     assert _cases_for_component("LoadsTimeline") == ["TC-LOADS-01", "TC-LOADS-02"]
     assert _cases_for_component("LoadsRoute") == ["TC-LOADS-01", "TC-LOADS-02"]
-    # a module whose suite is declared but unseeded resolves to nothing YET —
-    # correctly empty rather than falsely reassuring. The example moved from
-    # LineageGraphPane to HallucinationSpotlight at O60 (2026-08-31), when
-    # TS-LINEAGE was seeded: an "unseeded" example has to name a suite that is
-    # ACTUALLY unseeded, or the assertion stops testing the property and starts
-    # testing a stale fact. TS-UNDERHOOD is the last one left.
-    assert _cases_for_component("HallucinationSpotlight") == []
+    # THE UNSEEDED-SUITE CASE HAS NO INSTANCE LEFT, and that is recorded rather
+    # than patched around. This line asserted that a component in a declared-but-
+    # unseeded suite resolves to nothing YET; its example moved from
+    # LineageGraphPane to HallucinationSpotlight at O60 for exactly the reason
+    # the old comment gave — an "unseeded" example must name a suite that really
+    # is unseeded, or it stops testing the property and starts testing a stale
+    # fact. O43 (2026-09-05) seeded TS-UNDERHOOD, the last one, so there is no
+    # third example to move to and inventing an empty suite to keep the
+    # assertion alive would be writing fiction to satisfy a test.
+    #
+    # The property itself is NOT lost: the honest-emptiness case is still held by
+    # test_shared_components_resolve_to_nothing_and_that_is_honest below, over
+    # the unbound components, which is a different and still-live instance of it.
+    # Here the same component now demonstrates the POSITIVE half of the join.
+    assert _cases_for_component("HallucinationSpotlight") == [
+        "TC-UNDERHOOD-01",
+        "TC-UNDERHOOD-02",
+        "TC-UNDERHOOD-03",
+    ]
 
 
 def test_shared_components_resolve_to_nothing_and_that_is_honest() -> None:
