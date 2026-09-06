@@ -8,6 +8,7 @@ import {
   type CaptureProvenance,
   externalReferences,
   footerText,
+  consoleAnchorValid,
   injectMarginTags,
   MARGIN_TAG_CLASS,
   PAPER_STYLE_ID,
@@ -74,16 +75,20 @@ describe('footerText', () => {
 })
 
 describe('injectMarginTags', () => {
-  it('tags headings, tables, rows and tab panels in DOM order with <slug>.<n>, and nothing else', () => {
+  it('tags headings, tables, rows and tab panels, and nothing else', () => {
     const doc = page()
     const main = doc.querySelector('main')!
-    const count = injectMarginTags(main, 'gates', doc)
+    const anchors = injectMarginTags(main, 'gates', doc)
     const tags = Array.from(main.querySelectorAll(`.${MARGIN_TAG_CLASS}`)).map((t) => t.textContent)
-    expect(count).toBe(6)
-    expect(tags).toEqual(['gates.1', 'gates.2', 'gates.3', 'gates.4', 'gates.5', 'gates.6'])
-    expect(main.querySelector('h1')?.getAttribute(ANCHOR_ATTRIBUTE)).toBe('gates.1')
+    expect(anchors).toHaveLength(6)
+    expect(tags).toEqual(anchors)
+    // every anchor is namespaced to the route and content-derived (O89) — the
+    // shape, not the literal ids, because pinning six hashes would make this a
+    // test of the hash function rather than of the scheme.
+    for (const a of anchors) expect(a).toMatch(/^gates\.[0-9a-f]{8}(\.[0-9a-f]{8})?$/)
+    expect(new Set(anchors).size).toBe(anchors.length)
     // a row is anchored through its first cell, never its header cell
-    expect(main.querySelector('tbody td')?.getAttribute(ANCHOR_ATTRIBUTE)).toBe('gates.4')
+    expect(main.querySelector('tbody td')?.hasAttribute(ANCHOR_ATTRIBUTE)).toBe(true)
     expect(main.querySelector('thead th')?.hasAttribute(ANCHOR_ATTRIBUTE)).toBe(false)
     expect(main.querySelector('p')?.hasAttribute(ANCHOR_ATTRIBUTE)).toBe(false)
     // the visible tag and the machine-readable anchor agree
@@ -96,8 +101,67 @@ describe('injectMarginTags', () => {
     const doc = page()
     injectMarginTags(doc.querySelector('main')!, 'gates', doc)
     const table = doc.querySelector('table')!
-    expect(table.caption?.querySelector(`.${MARGIN_TAG_CLASS}`)?.textContent).toBe('gates.3')
+    expect(table.caption?.querySelector(`.${MARGIN_TAG_CLASS}`)?.textContent).toBe(
+      table.getAttribute(ANCHOR_ATTRIBUTE),
+    )
     expect(table.firstElementChild?.tagName).toBe('CAPTION')
+  })
+
+  // ── O89: the properties the ordinal scheme did not have ───────────────────
+
+  it('AN INSERTED BLOCK DOES NOT MOVE THE ANCHORS AROUND IT', () => {
+    // This is the whole reason the scheme changed. Under `<slug>.<n>` inserting
+    // a heading renumbered everything after it, so every prior note re-attached
+    // to the wrong block — silently, because the ids still resolved.
+    const before = page()
+    const beforeAnchors = injectMarginTags(before.querySelector('main')!, 'gates', before)
+
+    const after = page()
+    const main = after.querySelector('main')!
+    main.insertBefore(after.createElement('h2'), main.querySelector('table'))
+    main.querySelector('h2:empty')!.textContent = 'Inserted section'
+    const afterAnchors = injectMarginTags(main, 'gates', after)
+
+    expect(afterAnchors).toHaveLength(beforeAnchors.length + 1)
+    for (const a of beforeAnchors) expect(afterAnchors).toContain(a)
+  })
+
+  it('a ROW anchor carries its table as a prefix, so a lost row degrades to the table', () => {
+    const doc = page()
+    const anchors = injectMarginTags(doc.querySelector('main')!, 'gates', doc)
+    const table = doc.querySelector('table')!.getAttribute(ANCHOR_ATTRIBUTE)!
+    const row = doc.querySelector('tbody td')!.getAttribute(ANCHOR_ATTRIBUTE)!
+    expect(row.startsWith(`${table}.`)).toBe(true)
+    expect(consoleAnchorValid(row, anchors)).toBe(row)
+    // the row is gone; the note lands on the table rather than being dropped
+    expect(consoleAnchorValid(row, anchors.filter((a) => a !== row))).toBe(table)
+    // and when the table is gone too, nothing takes it — REPORTED, not invented
+    expect(consoleAnchorValid(row, anchors.filter((a) => a !== row && a !== table))).toBeNull()
+  })
+
+  it('two blocks with identical text get distinct anchors', () => {
+    const doc = page()
+    const main = doc.querySelector('main')!
+    const twin = doc.createElement('h2')
+    twin.textContent = 'Open gates' // the same text as the existing h2
+    main.appendChild(twin)
+    const anchors = injectMarginTags(main, 'gates', doc)
+    expect(new Set(anchors).size).toBe(anchors.length)
+    expect(anchors.filter((a) => a.endsWith('-2'))).toHaveLength(1)
+  })
+
+  it('a console anchor cannot be mistaken for a design-doc one', () => {
+    // The two share a YAML format and must not share an id space (clause b).
+    // Doc anchors are authored words, optionally `--`-derived; console anchors
+    // always begin with a route slug and a dot.
+    const doc = page()
+    const anchors = injectMarginTags(doc.querySelector('main')!, 'gates', doc)
+    for (const a of anchors) {
+      expect(a).toContain('.')
+      expect(a).not.toContain('--')
+    }
+    expect(consoleAnchorValid('traceability-matrix', anchors)).toBeNull()
+    expect(consoleAnchorValid('detailed-design--stage-2', anchors)).toBeNull()
   })
 
   it('is stable: the same DOM tags the same anchors twice over', () => {

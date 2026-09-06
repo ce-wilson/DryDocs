@@ -56,6 +56,12 @@ export const STORAGE_KEYS: readonly KeySpec[] = [
     why: 'which hub spokes this person has visited — about the PERSON, not the browser, so it goes with them.',
   },
   {
+    key: 'drydocs.feedback.console.',
+    prefixed: true,
+    survives: true,
+    why: "O89: a reviewer's UNSENT feedback drafts on a console route. It survives on purpose and the clause says why — drafts are per-viewer and must not need a backend, so the only place they exist is this browser, and clearing them at sign-out would silently discard a review someone had not finished. It is also the one surviving key that holds authored PROSE rather than a preference: the notes are the reviewer's own words about a page, never rows read from the graph, which is what makes keeping them a different decision from keeping the Ask turn above.",
+  },
+  {
     key: 'drydocs.theme.v1',
     survives: true,
     why: 'a display preference of the DEVICE. Carrying it across sign-outs is the behaviour anyone expects, and it reveals nothing.',

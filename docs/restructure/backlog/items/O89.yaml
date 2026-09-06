@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on:
 - O88
 inputs:
@@ -59,3 +59,138 @@ notes: |
   beside the doc ones in `docs/design/feedback/` or in their own directory. It depends on
   whether `doc:` can name a console route without confusing the graph loader, which is a
   question for whoever builds (a) with the loader in front of them.
+
+  DONE 2026-09-05 (Lane B, laptop). The console runs the doc loop, in the doc's
+  format, on the doc's anchors' terms.
+
+  THE CONFLICT THIS ITEM HAD TO RESOLVE, first, because it is why the work is
+  bigger than the clause list looks. O88 closed 2026-09-03 with a POSITIONAL
+  console anchor scheme - <route-slug>.<n> in DOM order - under its own stated
+  constraint that "a design doc tags blocks by their authored id, and the console
+  has almost none". O89 clause (b) says anchors are content-derived NEVER
+  positional, and clause (e) says the two halves must agree on which sections are
+  anchorable. Those cannot both hold over an ordinal scheme, so this item REPLACES
+  it. That is a completion of O88 rather than a reversal: O88 named the gap as a
+  constraint it could not close, and O89 exists to supply what it lacked. Nothing
+  was keyed to the ordinals - no console feedback file, no scan - so the change
+  cost no re-attachment, and two days after O88 is the cheapest moment it will
+  ever be. Committed as its own step for that reason.
+
+  (b) A HASH, NOT A SLUG, which is where the console departs from L11's rule and
+  the reason is not a preference. A design doc's anchorable text is a heading; the
+  console's includes DATA-FRAME ROWS, whose text is a job name or a folder name.
+  Identical first cells are ordinary in a 500-row grid, so slugs collide exactly
+  where the granularity matters most - and a slug would write production
+  identifiers into docs/design/feedback/, a PUBLISHED path, which is precisely
+  where SEALIDs have hidden inside folder-name strings before. <route-slug>.<hash8>
+  is content-derived, survives an insertion, is unique per block, and carries no
+  source text.
+
+  ROWS CARRY THEIR TABLE'S HASH AS A PREFIX, so a note on a row that has since gone
+  re-attaches to the table it was in - L11's degrade-to-the-authored-parent rule in
+  the shape the console needs. consoleAnchorValid() returns the anchor it
+  re-attaches TO, or null.
+
+  THE NAMESPACE IS THE SEPARATOR. A design-doc anchor is authored words, optionally
+  `--`-derived; a console anchor always begins with a route slug and a `.`. Disjoint
+  by construction, which is what lets one validator tell them apart without being
+  told which kind it is looking at, and what lets the two share a directory.
+
+  (e) MADE STRUCTURAL, NOT PROMISED. One anchorBlocks() answers for both halves,
+  and one FEEDBACK_ROUTES list serves both - the capture driver IMPORTS it. Two
+  lists would drift into a printout whose gutter names ids no screen offers, which
+  is the exact failure the clause describes.
+
+  (a) ONE FORMAT. The export is the existing doc:/notes: + per-note anchor:/note:
+  block, so one parser, one loader and one transcribe skill serve both surfaces.
+
+  `doc:` IS A STEM, `console.<route-slug>` - THE OPEN QUESTION THE ITEM DEFERRED,
+  now answered with the loader in front of me. drydocs/loaders/doc_traceability.py
+  takes `doc:` as a free string and the FILENAME carries the rev through
+  ^(?P<doc_id>.+)-rev(\d+)\.ya?ml$. A route path would break the filename
+  (slashes) and read as a doc stem resolving to no .md. And the files live in the
+  SAME directory as the doc ones, which was the other half of the open question:
+  the `console.` prefix already distinguishes them, so a second directory would be
+  a second place to look for one loop's output.
+
+  (c) REPORTED AT BOTH ENDS. In the browser the bar names the orphaned anchors
+  while the reviewer can still remember what they meant; in the repo,
+  tests/unit/test_console_feedback.py checks every committed console.*-rev<N>.yaml
+  against the anchors the CAPTURE recorded and fails with the anchors named. That
+  needed the manifest to carry them, so assemblePaperDocument now returns the
+  anchors rather than a count - a count cannot answer "does this note still
+  re-attach". An orphan is REPORTED AND STILL EXPORTED: dropping it would be the
+  quiet failure the clause exists to prevent, with a warning attached.
+
+  The re-attachment rule now has TWO implementations - TypeScript for the browser,
+  Python for the repo guard - because neither runtime can run the other. They are
+  pinned to the same worked cases in the Python test, and the duplication is named
+  there rather than left to be discovered.
+
+  (d) THE IDIOM IS PORTED, NOT REDESIGNED. design_doc.py's _FEEDBACK_JS keeps
+  {anchor: note} in localStorage under one key per document, shows a ✎ per anchored
+  block, marks an annotated block with a left rule, and offers one Copy control.
+  All four, with console tokens instead of the doc renderer's palette. Reviewers
+  move between the two surfaces; a second interaction to learn is a cost with no
+  benefit. Drafts go through WEB11's storage.ts under drydocs.feedback.console.
+  with survives: true - the clause requires per-viewer drafts with no backend, so
+  this browser is the only place they exist and clearing them at sign-out would
+  discard an unfinished review. It is the one surviving key holding authored PROSE
+  rather than a preference, and the row says so.
+
+  OFF BY DEFAULT, behind a toggle. The console is a working surface most of the
+  time; a ✎ beside every heading and every table row all day is chrome people
+  learn to stop seeing - the same argument ProvenanceNotice makes for rendering
+  nothing when a frame is healthy.
+
+  FOUR THINGS FOUND BY WRITING THE PROPERTIES DOWN, none visible from reading:
+    1. A <div role="tabpanel"> whose only content is an <h3> has exactly its
+       child's text, so panel and heading hashed identically. The element's TAG
+       NAME is part of the hash input now.
+    2. Injecting a tag CHANGES textContent, and a table is tagged before its own
+       rows are reached - so one pass hashed each row's table with the table's tag
+       already inside it, the row anchors stopped carrying the table as a prefix,
+       and the degradation rule silently stopped working. Two passes now: compute
+       over the untouched DOM, then inject.
+    3. The screen CSS did not belong in print.css. test_console_print_gutter.py
+       refused it: apart from the screen-side hide line and @page, nothing in that
+       sheet may sit outside @media print, because an unlayered selector there
+       beats Tailwind's layered utilities on screen (TC-SHELL-01's lesson). It is
+       in index.css; print.css hides the three classes on paper.
+    4. `on` is state and survives a navigation, so a reviewer who switched review
+       mode on and walked to an uncovered route got a component rendering nothing
+       while still decorating every heading on the page. The route check is in the
+       effect as well as at the render.
+
+  AND THE VACUOUS-SCAN TRAP AGAIN, third time this burst and worth recording
+  because the pattern is now unmistakable. The one-route-list guard read
+  codeOnly(driver) for a ROUTE LITERAL - and codeOnly neutralises literals, so it
+  matched nothing and reported no offender while a restated literal array sat
+  there. The first version was weaker still: it only checked the import survived,
+  which a restated list leaves untouched. Both were caught by mutation-probing,
+  neither by reading; the comment beside the assertion even said withoutComments
+  while the code said codeOnly. The rule that keeps proving itself: choose the
+  stripper deliberately, and probe every scan by breaking what it claims to catch.
+
+  NOT DONE, and named rather than implied:
+    * NO BROWSER VERIFICATION. Everything here is asserted under jsdom and by
+      build. Whether the ✎ lands where a reviewer expects on a real page, and
+      whether the print sheet still puts the gutter tag beside the right block
+      with the controls hidden, needs a person with a printout - which is the
+      paper half's own acceptance and is not something this lane can fake.
+    * NO :DocSection ROWS FOR CONSOLE ANCHORS. load-doc-traceability MATCHes
+      (origin, doc_id, anchor) against sections loaded from docs/design/*.md, so a
+      console note will load and resolve to nothing until a console origin exists.
+      The loader already REPORTS unresolved anchors rather than silently dropping
+      them, so this degrades honestly - but it is a real gap and it is
+      drydocs-lineage's, not this lane's pen. Hand-back for Lane A.
+    * The capture manifest's `anchors` field is new; a manifest written before
+      this change has none, and the Python guard skips rather than reporting every
+      note as orphaned. Re-run `npm run paper` to check re-attachment.
+
+  Ledger: FeedbackLayer (layout, UNBOUND - it serves the three captured routes and
+  no module in particular, same rule as RouteErrorBoundary), pin 93 -> 94.
+
+  Gates at close: poetry run pytest -q, ruff check, ruff format --check. In web/:
+  tsc -b --force exit 0, oxlint --max-warnings 0 exit 0, npm run build exit 0,
+  npm run bundle:check exit 0, vitest 27 files / 328 tests.

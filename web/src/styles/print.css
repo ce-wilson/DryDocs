@@ -1,5 +1,7 @@
 /* The console's print sheet (O88) — the paper form for the L6 pen-and-paper
-   feedback loop (Epic L). Everything below is @media print, apart from the one
+   feedback loop (Epic L). Everything below is 
+
+@media print, apart from the one
    screen-side line that hides the gutter tags and the capture footer and the
    @page box, so nothing here can reflow the console on screen: TC-SHELL-01's
    lesson is that an unlayered broad selector beats Tailwind's layered utilities,
@@ -50,6 +52,8 @@
      reserved above) so a printed page carries the anchor id beside its section — no @page
      margin-box support required, so headless Chromium print-to-pdf renders it reliably. */
   h1, h2, h3, h4, table, caption, tbody > tr > td:first-child, [role="tabpanel"] { position: relative; }
+  .dd-note-btn, .dd-note-box, .dd-fb-bar { display: none !important; }
+  .dd-annotated { box-shadow: none; padding-left: 0; }
   .dd-margin-tag {
     display: block; position: absolute; left: -0.6in; top: 0.1em; width: 0.54in;
     font: 6.2px/1.15 "Cascadia Mono","Consolas",monospace; text-align: right;

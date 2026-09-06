@@ -50,6 +50,37 @@ entry recording review outcomes, never produced by the Copy-feedback export:
   `rejected` | `superseded`. Set it when the rev that addresses the note lands (e.g. the
   runbook rev1 notes were applied in Rev 2).
 
+### Console feedback (O89)
+
+The console runs the same loop on its own pages, and files land **here**, in this
+directory, under a `console.`-prefixed stem: `console.<route-slug>-rev<N>.yaml`
+(e.g. `console.gates-rev1.yaml`). Same format, same loader, same transcription skill.
+
+Two things differ, both because a console page is a function of the graph at a moment
+rather than a `.md` anyone authored:
+
+- **Anchors are `<route-slug>.<hash>`**, or `<route-slug>.<table-hash>.<row-hash>` for a
+  data-frame row — a short hash of the block's own text, not a slug of it. A slug is right
+  for a design doc, whose anchorable text is a heading; the console's includes table rows,
+  where identical first cells are ordinary and where a slug would write production
+  identifiers into this directory. A row anchor carries its table as a prefix, so a note on
+  a row that has since gone re-attaches to the table rather than being lost — the same
+  degrade-to-the-parent rule as an L11 derived anchor, in the shape the console needs.
+  The `.` separator is also what keeps the two id spaces apart: a design-doc anchor is
+  authored words, optionally `--`-derived, and never begins with a route slug and a dot.
+- **`doc:` is `console.<route-slug>`, never a route path.** Slashes would break the file
+  name, and a bare route would read as a doc stem resolving to no `.md`.
+
+Which pages: the three governed surfaces the paper capture covers (`/gates`, `/software`,
+`/load-map`) — one list, `FEEDBACK_ROUTES` in `web/src/feedback/consoleFeedback.ts`, which
+`scripts/captureRoutes.mjs` imports, so a printout's gutter cannot name an id the screen
+does not offer.
+
+Re-attachment is checked by `tests/unit/test_console_feedback.py` against the anchors the
+capture recorded (`web/captures/capture-manifest.json`). A note that no longer re-attaches
+FAILS with its anchor named — it is never dropped, because a loop that loses notes quietly
+is worse than none.
+
 ### Derived subsection anchors (L11)
 
 When a section has **more than two** subsections (sub-headings, or a numbered step list with
