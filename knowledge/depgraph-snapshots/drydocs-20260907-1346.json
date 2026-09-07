@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-07T13:31:15",
+    "captured_at": "2026-09-07T13:46:30",
     "date": "20260907",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "eee64ce3",
-      "full": "eee64ce3b4498cd31340f2ef26871371cc0f1a85",
+      "commit": "dd599680",
+      "full": "dd599680294698b404ccd77f3f46263c34d41704",
       "branch": "main",
-      "describe": "port-base-20260905-174-geee64ce3",
-      "subject": "fix(port): render_port_dispositions takes the consumer's <pre-apply-tag> <base-tag> range",
+      "describe": "port-base-20260905-176-gdd599680",
+      "subject": "chore(K16): done on the K25 status call; the APPL_TYPE projection is rehomed to K26",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -22688,10 +22688,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260907-1317.json",
-      "name": "drydocs-20260907-1317.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260907.json",
+      "name": "drydocs-20260907.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260907-1317.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260907.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -48925,7 +48925,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260907-1317.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260907.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
