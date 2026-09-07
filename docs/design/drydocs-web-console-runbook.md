@@ -159,6 +159,56 @@ prerequisite only for live frames. Company-side deployment (OIDC, GHE) is not co
 
 From OFF to READY. Run from the repo root; each step states its success check.
 
+**Two paths, and they are alternatives, not stages.** Path A below is one command
+and is the right default. Path B is the per-process path, kept because debugging
+one service — `uvicorn --reload`, a breakpoint, Vite's HMR — is a real need that a
+container stack does not serve.
+
+### Path A — the whole stack, one command (backlog O72)
+
+```powershell
+docker compose up --wait          # from the repo root
+```
+
+*Success:* the command EXITS 0. `--wait` blocks until every service reports
+healthy and returns non-zero if one does not, and each service's health check is
+the corresponding Path B success check below — `/health` answering `ok`, the agent
+server listing exactly its four apps, the page serving its mount point. So the
+process you forgot is named at the shell rather than diagnosed in the browser
+three layers away, which is what this path exists to fix. Then open
+**http://localhost:4173** and sign in (Path B step 5 — the credential step is the
+same, and the file is bind-mounted read-only from `internal-local/`).
+
+`docker compose ps` shows the health column; `docker compose logs -f <service>`
+follows one; `docker compose down` stops the stack and `down -v` also discards
+its volumes.
+
+What it starts, and how it differs from Path B:
+
+- **five services, not four** — Neo4j, `drydocs-api`, the ADK agent server, and a
+  **reverse proxy serving the production build**. ADR 0020 made the console
+  same-origin with its services, so something must serve the page and forward
+  `/api` and `/agent` on that same origin; in Path B that something is Vite, and
+  here it is nginx in front of `dist/`. This stack is where that production shape
+  first runs.
+- **the console is on 4173, not 5173** — the same port Path B step 6 uses for the
+  production build, and it leaves 5173 free so `npm run dev` can run beside the
+  stack against the published `:8001` / `:8000`.
+- **its Neo4j is NOT `neo4jtest`** — the stack has its own volumes and publishes
+  no Neo4j port, so it neither collides with the canonical container nor risks two
+  servers on one store. It starts EMPTY with the ADR 0002 topology provisioned, so
+  frames show the demo fallback until something loads it. To point the stack at
+  the graph you already have, set `DRYDOCS_STACK_NEO4J_URI=bolt://host.docker.internal:7687`.
+- **no secret is baked** — Compose reads the repo-root `.env` for
+  `NEO4J_PASSWORD` and `ANTHROPIC_API_KEY`, and the console credential file is a
+  read-only bind mount. `.dockerignore` keeps `internal-local/`, `internal/` and
+  every `.env` out of the build context.
+
+Not in scope, deliberately: TLS, Traefik, and anything else shaped like a
+deployment. This is a local convenience.
+
+### Path B — process by process
+
 1. **(Optional) the graph:** companion runbook Startup §1–3 (`docker start …`,
    `drydocs check`, bootstrap/supplements). Skip entirely for a demo-only console.
 2. **drydocs-api:**

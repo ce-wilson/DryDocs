@@ -16,7 +16,31 @@ inputs:
 - web/package.json
 - docs/design/web-scaffolding-review.md
 acceptance: |
-  A committed Compose file brings up the console stack in one command: Neo4j, drydocs-api on 8001, the ADK agent server on 8000, and the Vite dev server on 5173. Each service declares a health check that is the runbook's own success test for that step - the API is healthy when /health answers ok, the agent server when it lists exactly its four apps, and Vite when it serves the page - so a broken dependency surfaces as an unhealthy service instead of a browser error three layers away. Ports stay exactly as they are, because the API's CORS allow-list names 5173 and 4173 specifically and a drifted port fails as a CORS error that reads like an API fault. The runbook's Startup section is updated to offer the one-command path alongside the per-process one, and keeps the per-process path, since debugging a single service is a real need. No credential is baked into the Compose file.
+  SETTLED AGAINST ADR 0020 at pull (2026-09-07, Lane B) - the item's own 2026-09-06 note
+  proposed this and left the edit to the puller. Two changes: the fifth service is named,
+  and the CORS sentence is struck. The original text is in git history.
+
+  A committed Compose file brings up the console stack in one command
+  (`docker compose up --wait`): Neo4j, drydocs-api on 8001, the ADK agent server on 8000,
+  and a REVERSE PROXY that serves the production build and forwards /api and /agent on the
+  page's own origin - the fifth service ADR 0020 requires, reading its path map from
+  web/delivery.json rather than restating it. Each service declares a health check that is
+  the runbook's own success test for that step - the API is healthy when /health answers ok,
+  the agent server when it lists exactly its four apps, and the console when it serves the
+  page - so a broken dependency surfaces as an unhealthy service instead of a browser error
+  three layers away. The runbook's Startup section is updated to offer the one-command path
+  alongside the per-process one, and keeps the per-process path, since debugging a single
+  service is a real need. No credential is baked into the Compose file or into any image.
+
+  ON PORTS. The old clause read "Ports stay exactly as they are, because the API's CORS
+  allow-list names 5173 and 4173 specifically and a drifted port fails as a CORS error that
+  reads like an API fault." STRUCK: since WEB10 / ADR 0020 there is no allow-list and the
+  browser depends on no port at all - it calls /api and /agent on its own origin. The
+  replacement rule is weaker on purpose, because the reason it was strong is gone: the API
+  and agent keep 8001 and 8000 so the runbook's Verify step (direct, then through the proxy)
+  still works, and the console is published on 4173, the port the runbook already uses for
+  the production build - which also leaves 5173 free for `npm run dev` beside the stack.
+  A port that moves now is an inconvenience, not a failure that misreports its own cause.
 notes: |
   Raised 2026-08-27 from the web-scaffolding review. The reviewed FastAPI template uses
   Compose for exactly this. Our runbook Startup section is four processes with four success

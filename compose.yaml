@@ -1,0 +1,279 @@
+# =============================================================================
+# compose.yaml — the DryDocs console stack, in one command (backlog O72)
+# =============================================================================
+#   docker compose up --wait
+#
+# `--wait` is the whole point, not a flag: it blocks until every service reports
+# HEALTHY and exits non-zero if one does not. The runbook's Startup section is
+# four processes with four success checks, and a session that starts them by hand
+# gets to discover in the browser which one it forgot — a missing agent server
+# presenting as a bare fetch failure with nothing in the API log. Each health
+# check below IS that step's success check, so the thing you forgot is named at
+# the shell instead of being diagnosed three layers away.
+#
+# The per-process path in docs/design/drydocs-web-console-runbook.md is KEPT.
+# Debugging one service — uvicorn --reload, a breakpoint, Vite's HMR — is a real
+# need, and this stack does not serve it.
+#
+# WHAT THIS IS NOT: a deployment. No Traefik, no TLS, no orchestration (O72's own
+# note fences that off). It is a local convenience that happens to be the first
+# place ADR 0020's PRODUCTION delivery shape actually runs — one origin, a proxy
+# path-routing /api and /agent, dist/ served for everything else.
+#
+# CREDENTIALS: none are baked. Every secret arrives as an environment variable
+# from your shell or a gitignored .env beside this file, and the console
+# credential file is a READ-ONLY BIND MOUNT (see `api.volumes`), so it lives in
+# the running container and never in an image layer. .dockerignore is the other
+# half of that rule.
+#
+# THE REPO-ROOT `.env` IS ALSO COMPOSE'S ENV FILE, and knowing that is the
+# difference between this working and this being baffling. Compose reads `.env`
+# from the project directory for INTERPOLATION — the `${...}` on the left of the
+# colon below — so the NEO4J_PASSWORD and ANTHROPIC_API_KEY a machine already set
+# for the CLI are the ones the stack starts with, and no second file is needed.
+#
+# The same fact is a trap for two names, which is why they are NOT interpolated
+# from their obvious variable: that .env sets NEO4J_URI to `bolt://localhost:7687`
+# for the HOST, and `localhost` inside the api container is the api container.
+# NEO4J_URI and NEO4J_DATABASE are therefore fixed to the stack's own values,
+# and pointing the stack at a different graph is a deliberate act with its own
+# variable name (DRYDOCS_STACK_NEO4J_URI). A stack that silently inherited a host
+# URI would fail as "cannot reach Neo4j" on a machine whose Neo4j is fine.
+
+name: drydocs
+
+# --- the graph ---------------------------------------------------------------
+# Facts (image tag, plugin mechanism, procedure allowlists) come from
+# config/dev-environment.yaml, which is the single source of truth for them;
+# tests/unit/test_compose_stack.py fails if this file drifts from it.
+#
+# THIS IS NOT THE `neo4jtest` CONTAINER, and it deliberately publishes no host
+# port. `neo4jtest` owns 7474/7687 on both producer machines and holds the real
+# graph in the `neo4j-testdata` volume; a stack that grabbed those ports would
+# refuse to start whenever the canonical container was running, which is nearly
+# always, and a stack that MOUNTED that volume would put two servers on one store
+# — the one mistake here that destroys data rather than annoying you. So the
+# stack gets its own volumes and reaches Neo4j over the Compose network only.
+#   * To use your existing graph instead:
+#     DRYDOCS_STACK_NEO4J_URI=bolt://host.docker.internal:7687
+#   * To browse the stack's own graph: add `ports: ["7475:7474"]` to the service.
+services:
+  # An INIT JOB, not a server: it copies the plugin jars out of the image into
+  # the plugins volume and exits, which is provision.ps1 STEP 1 verbatim. The
+  # env-var form (`NEO4J_PLUGINS=[apoc]`) is NOT used and must not be — it asks
+  # the entrypoint to DOWNLOAD each plugin at startup, and when the download
+  # cannot happen the container starts anyway with the plugin silently absent.
+  # That exact failure ran for weeks (config/dev-environment.yaml, 2026-07-28).
+  # The jars ship inside the image, version-matched to the server, so this needs
+  # no network.
+  neo4j-plugins:
+    image: neo4j:2026.05.0-enterprise
+    entrypoint: ["sh", "-c"]
+    command:
+      - >-
+        cp /var/lib/neo4j/labs/apoc-*-core.jar /plugins/ &&
+        cp /var/lib/neo4j/products/neo4j-graph-data-science-*.jar /plugins/
+    volumes:
+      - neo4j-plugins:/plugins
+
+  neo4j:
+    image: neo4j:2026.05.0-enterprise
+    depends_on:
+      neo4j-plugins:
+        condition: service_completed_successfully
+    environment:
+      # Enterprise, because ADR 0002's topology is multi-database and Community
+      # hosts exactly one. `eval` is the free evaluation license the local dev
+      # container has always run under.
+      NEO4J_ACCEPT_LICENSE_AGREEMENT: eval
+      NEO4J_AUTH: neo4j/${NEO4J_PASSWORD:?set NEO4J_PASSWORD in your shell or a gitignored .env beside compose.yaml}
+      NEO4J_dbms_security_procedures_unrestricted: apoc.*,gds.*
+      NEO4J_dbms_security_procedures_allowlist: apoc.*,gds.*
+    volumes:
+      - neo4j-data:/data
+      - neo4j-plugins:/plugins
+    healthcheck:
+      # cypher-shell rather than an HTTP probe on 7474: this asks the BOLT port
+      # the driver actually uses, with the credentials the driver actually uses,
+      # so a wrong password is an unhealthy service here instead of a 401 in the
+      # API three steps later. It ships in the image (/var/lib/neo4j/bin).
+      #
+      # SHOW DATABASES and not `RETURN 1`: the system database refuses a plain
+      # RETURN (`42N17: 'RETURN 1' is not allowed on the system database`), so the
+      # obvious probe reports a perfectly healthy server as unhealthy forever —
+      # measured here on the first run of this stack. SHOW DATABASES is also the
+      # better check: it proves the DBMS is SERVING, not merely listening.
+      test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "${NEO4J_PASSWORD:?}", "-d", "system", "SHOW DATABASES"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 30s
+
+  # The second init job: ADR 0002's topology. A fresh volume has only the
+  # Enterprise home database `neo4j`, and loading into THAT puts data where no
+  # query surface looks (config/dev-environment.yaml, home_db_warning). Runs the
+  # canonical file rather than restating its two statements, so the topology is
+  # declared once.
+  neo4j-provision:
+    image: neo4j:2026.05.0-enterprise
+    depends_on:
+      neo4j:
+        condition: service_healthy
+    volumes:
+      - ./drydocs_core/schema/provisioning:/provisioning:ro
+    entrypoint:
+      - cypher-shell
+      - -a
+      - neo4j://neo4j:7687
+      - -u
+      - neo4j
+      - -p
+      - ${NEO4J_PASSWORD:?}
+      - -d
+      - system
+      - -f
+      - /provisioning/01_databases.cypher
+
+  # --- drydocs-api (runbook Startup step 2) ----------------------------------
+  api:
+    build:
+      context: .
+      dockerfile: deploy/api.Dockerfile
+    depends_on:
+      neo4j-provision:
+        condition: service_completed_successfully
+    environment:
+      # Fixed, not inherited from .env's NEO4J_URI — see the header note.
+      NEO4J_URI: ${DRYDOCS_STACK_NEO4J_URI:-bolt://neo4j:7687}
+      NEO4J_USER: neo4j
+      NEO4J_PASSWORD: ${NEO4J_PASSWORD:?}
+      NEO4J_DATABASE: drydocs
+      # MANDATORY since G81 — resolve_data_root() raises rather than falling back,
+      # because the old ~/data/DryDocs default meant the same command in two
+      # shells targeted two trees. In the stack it is a named volume: a container
+      # path, so nothing here depends on where this machine keeps its data.
+      DRYDOCS_DATA_ROOT: /var/lib/drydocs/data
+      # The console credential file, mounted read-only below. Machine-local by
+      # construction (internal-local/ is gitignored AND in .dockerignore).
+      DRYDOCS_CONSOLE_CREDENTIALS: /run/console/console-credentials.json
+      # Empty disables ephemeral spec registration, which is the right default:
+      # the endpoint refuses when this is unset rather than accepting anonymous
+      # callers. Set it in BOTH this service and `agent` to turn the path on.
+      DRYDOCS_AGENT_REG_KEY: ${DRYDOCS_AGENT_REG_KEY:-}
+      DRYDOCS_RUNTIME_VIEW_URL_TEMPLATE: ${DRYDOCS_RUNTIME_VIEW_URL_TEMPLATE:-}
+      PYTHONUTF8: "1"
+    volumes:
+      # A DIRECTORY, not the file: a bind mount whose source is missing is
+      # created by Docker as an empty DIRECTORY, and a file-shaped mount would
+      # then make the API fail to read a path that is now a directory. Mounting
+      # the directory degrades to "no credentials configured", which is the
+      # honest state of a fresh clone and the message the API already has for it.
+      - ./internal-local:/run/console:ro
+      - api-data:/var/lib/drydocs/data
+      # var/mapping.db is a DERIVED artifact (O14 rebuilds it on a staleness
+      # hash miss), so it wants a writable path that survives a restart and is
+      # safe to delete — a named volume is exactly that.
+      - api-var:/app/var
+    # Published so the runbook's Verify step still works: it checks the API
+    # DIRECTLY and then THROUGH the proxy, and a pass on one with a fail on the
+    # other is what tells a proxy fault from an API fault.
+    ports:
+      - "8001:8001"
+    healthcheck:
+      # The runbook's own success check for step 2, asserted on the VALUE and not
+      # just on a 200: `Invoke-RestMethod .../health` returns {"status":"ok"}.
+      # python -c and not curl, because python:*-slim ships neither curl nor wget
+      # and a health check that cannot run marks a healthy service unhealthy.
+      test:
+        - CMD
+        - python
+        - -c
+        - |
+          import json, sys, urllib.request
+          with urllib.request.urlopen("http://localhost:8001/health", timeout=5) as r:
+              sys.exit(0 if json.load(r).get("status") == "ok" else 1)
+      interval: 10s
+      timeout: 10s
+      retries: 12
+      start_period: 20s
+
+  # --- ADK agent server (runbook Startup step 3) -----------------------------
+  agent:
+    build:
+      context: .
+      dockerfile: deploy/agent.Dockerfile
+    environment:
+      NEO4J_URI: ${DRYDOCS_STACK_NEO4J_URI:-bolt://neo4j:7687}
+      NEO4J_USER: neo4j
+      NEO4J_PASSWORD: ${NEO4J_PASSWORD:?}
+      NEO4J_DATABASE: drydocs
+      DRYDOCS_API_URL: ${DRYDOCS_API_URL:-http://api:8001}
+      DRYDOCS_AGENT_REG_KEY: ${DRYDOCS_AGENT_REG_KEY:-}
+      # The model provider. UNSET IS A SUPPORTED STATE: the server starts and
+      # /list-apps answers, and only an Ask TURN fails — which is the second
+      # failure O63's provider probe exists to tell apart from the first. So the
+      # health check below stays honest on a machine with no key.
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      PYTHONUTF8: "1"
+    ports:
+      - "8000:8000"
+    healthcheck:
+      # The runbook's success check for step 3, in full: "returns exactly
+      # controlm_fix, core_ingest, graph_qa, graph_query — four apps, not five".
+      # A fifth entry named `common` means the launcher fell back to `adk
+      # api_server`'s flat loader (R14), so asserting the SET and not the count
+      # turns that regression into a service that never comes up.
+      test:
+        - CMD
+        - python
+        - -c
+        - |
+          import json, sys, urllib.request
+          with urllib.request.urlopen("http://localhost:8000/list-apps", timeout=5) as r:
+              apps = sorted(json.load(r))
+          sys.exit(0 if apps == ["controlm_fix", "core_ingest", "graph_qa", "graph_query"] else 1)
+      interval: 10s
+      timeout: 10s
+      retries: 12
+      start_period: 30s
+
+  # --- the console and its reverse proxy (ADR 0020's fifth service) ----------
+  console:
+    build:
+      context: .
+      dockerfile: deploy/console.Dockerfile
+    depends_on:
+      # HEALTHY, not merely started. nginx resolves an upstream name once at
+      # start-up and exits if it cannot, so a proxy that starts first is a proxy
+      # that never starts. Waiting also makes a broken dependency present as an
+      # unhealthy service rather than as a 502 in the browser.
+      api:
+        condition: service_healthy
+      agent:
+        condition: service_healthy
+    # 4173 is the runbook's PRODUCTION-BUILD port (Startup step 6, `npm run
+    # preview`), and this service is that same thing: dist/ behind a proxy. It
+    # also leaves 5173 free, so `npm run dev` on the host can run beside the
+    # stack and proxy to the published 8001/8000 above.
+    ports:
+      - "4173:80"
+    healthcheck:
+      # The runbook's success check for step 4 is "the sign-in screen renders at
+      # that URL". A bare 200 would not prove it: the SPA fallback answers 200
+      # with index.html for EVERY path, so the check asserts the app's mount
+      # point is in what came back.
+      test: ["CMD-SHELL", "wget -qO- http://localhost/ | grep -q 'id=\"root\"'"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 5s
+
+volumes:
+  # All four are Compose-managed and project-scoped (`drydocs_*`), never the
+  # `neo4j-testdata` / `neo4j-testplugins` volumes the canonical container uses.
+  # `docker compose down -v` throws this stack away without touching the graph
+  # the session ritual depends on.
+  neo4j-data:
+  neo4j-plugins:
+  api-data:
+  api-var:

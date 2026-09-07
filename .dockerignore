@@ -1,0 +1,62 @@
+# =============================================================================
+# .dockerignore — the PUBLISH BOUNDARY in image form (O72)
+# =============================================================================
+# CLAUDE.md §3 keeps Internal material out of a public push. An image is the
+# other way the same material leaves the machine: a `COPY . .` bakes whatever is
+# in the build context into a layer, where it survives every later `rm` and
+# travels with the image. So the rule that decides what may be pushed to GitHub
+# decides what may enter a build context, and this file is where that is said.
+#
+# Read it as three groups, most important first.
+
+# ---- 1. NEVER BAKED: secrets and Internal material --------------------------
+# internal-local/ holds console-credentials.json (scrypt hashes of the console
+# secrets). The API still reads it in the stack — as a READ-ONLY BIND MOUNT at
+# run time (see compose.yaml), which is the point of excluding it here: the
+# secret reaches the running container and never the image.
+internal-local/
+internal/
+# .env* is gitignored for the same reason (root, agents/, web/) — Neo4j and
+# provider credentials. Compose passes what a service needs as environment.
+.env
+.env.*
+**/.env
+**/.env.*
+!.env.example
+!**/.env.example
+
+# ---- 2. CORRECTNESS: host state that must not leak into a build -------------
+# node_modules is platform-specific — a Windows tree copied into a Linux image
+# produces binaries that cannot run. `npm ci` in the build stage is what is
+# wanted, and it needs package-lock.json, not the installed tree.
+node_modules/
+**/node_modules/
+# A host build output would shadow the one the image builds, so the image could
+# ship a stale bundle that no build step in the Dockerfile ever produced.
+web/dist/
+web/coverage/
+web/playwright-report/
+web/test-results/
+# web/.env.local deserves its own line: Vite INLINES VITE_* values from it at
+# build time, so a host copy would bake this machine's deployment coordinates
+# into the bundle — which is exactly what `npm run dist:check` refuses (WEB10 /
+# ADR 0020). Excluding it is why that check passes inside the image on a laptop
+# where it fails on the host.
+web/.env.local
+
+# ---- 3. WEIGHT: large or irrelevant trees ----------------------------------
+.git/
+.github/
+.venv/
+**/.venv/
+**/__pycache__/
+**/*.pyc
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+var/
+logs/
+knowledge/depgraph-snapshots/
+docs/plan/
+SDLC-Docs/
+**/.DS_Store
