@@ -7,7 +7,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - tests/unit/test_controlm_cypher.py
@@ -45,3 +45,13 @@ notes: |
   fix is one assertion with a positive control, landable in the same session. Filed under
   J66/CORE2's epic because it is the same defect class: a source-reading guard that reads
   prose, not code.
+
+  DONE 2026-09-07 (desktop). (d) reproduced against the OLD guard first: marker reworded to
+  "deliberately off" with the join still commented -> 1 failed; predicate restored at :88
+  with the phrase kept in its trailing comment -> 1 passed. Fix: a compiled pattern
+  _CYCLIC_TYPE_JOIN (JOB_CYCLIC_IN, whitespace, =, optional qualifier, JOB_CYCLIC_OUT)
+  asserted absent from _sql_code(...) and, as the positive control, present in the raw file;
+  the marker stays as the final presence-only pin. Replayed against the NEW guard: restored
+  predicate -> fails on the absence assertion with the match named; reworded marker -> fails
+  only on the documentation pin, the join assertions hold. test_controlm_cypher 74 passed,
+  test_source_scan + test_no_render_parsing 24 passed, ruff check/format clean.

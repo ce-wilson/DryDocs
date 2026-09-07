@@ -455,11 +455,30 @@ def test_dependencies_sql_is_direct_only() -> None:
         assert alias in text, f"missing projection {alias}"
 
 
+# The cyclic-type comparison, as a pattern rather than a bare token: JOB_CYCLIC_IN and
+# JOB_CYCLIC_OUT are live SELECT aliases in the same file, so only the join between
+# them is the thing that must be absent.
+_CYCLIC_TYPE_JOIN = re.compile(r"JOB_CYCLIC_IN\s*=\s*(?:\w+\.)?JOB_CYCLIC_OUT")
+
+
 def test_recursive_sql_cyclic_type_disabled() -> None:
-    """The canonical version intentionally disables CYCLIC_TYPE matching."""
-    text = (SQL_DIR / "controlm_dependencies_recursive.sql").read_text(encoding="utf-8")
-    # The disabling marker appears at the cyclic-type comparison sites.
-    assert "intentionally disabled" in text
+    """The canonical version intentionally disables CYCLIC_TYPE matching.
+
+    LOAD5 (2026-09-07): until then this asserted the phrase "intentionally
+    disabled" in the raw file - a comment-presence check, which fails when the
+    marker is reworded with the join still off and passes when the predicate is
+    restored with the phrase left anywhere in the file (both reproduced). The
+    contract is the join's ABSENCE from executable SQL, read through
+    `_sql_code` (J66); the marker stays as a positive presence pin only.
+    """
+    raw = (SQL_DIR / "controlm_dependencies_recursive.sql").read_text(encoding="utf-8")
+    # Positive control (CORE2): the pattern matches the raw file, so the absence
+    # below is the comment stripper's doing and not a vacuous scan.
+    assert _CYCLIC_TYPE_JOIN.search(raw), "the disabled comparison should still be documented"
+    assert not _CYCLIC_TYPE_JOIN.search(_sql_code("controlm_dependencies_recursive.sql"))
+    # The marker is documentation, pinned as presence only - a comment can only
+    # false-pass a negative assertion, never this one.
+    assert "intentionally disabled" in raw
 
 
 # ---- Ontology supplement -------------------------------------------------
