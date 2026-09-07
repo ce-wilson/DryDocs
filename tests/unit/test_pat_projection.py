@@ -34,31 +34,24 @@ from drydocs.pat_projection import (
 REPO = Path(__file__).resolve().parents[2]
 LEDGER = REPO / "config" / "source-mappings" / "pat-team-report.yaml"
 
-# A synthetic report in the DEFAULT spellings, with the decoy column present and
-# every known-dropped column beside the ones we read. Ids are synthetic; SEAL ids
-# sit in the reserved 70001-70099 block the fixtures use.
-RAW_HEADERS = [
-    "Team ID",
-    "Legacy Team ID",
-    "Team Name",
-    "Team LoB Name",
-    "Product Line Name",
-    "Product ID",
-    "Product Name",
-    "Supporting Area Product ID",
-    "Supporting Area Product Name",
-    "Sponsoring Product ID",
-    "Sponsoring Product Name",
-    "Sponsoring Area Product ID",
-    "Sponsoring Area Product Name",
-    "Sponsoring Product Line Name",
-    "Seal IDs",
-    "Relationship Type",
-    "Team Type Name",
-    "JIRA Board",
-    "Team Status",
-    "Agile Framework",
-]
+
+def _recorded_headers() -> list[str]:
+    """The 43 column names of the live export, in export order, READ from the
+    column ledger — the recorded list (census closed 2026-08-29; re-confirmed
+    2026-09-07 against the SME's transposed header sheet, transcribed under
+    internal-local and cited from K30's close note). Never from DEFAULT_HEADER_MAP:
+    K30 (d) exists because the fixture used to be typed in the same believed
+    spellings the code looked for, so the two could be wrong together."""
+    doc = yaml.safe_load(LEDGER.read_text(encoding="utf-8"))
+    (obj,) = doc["objects"]
+    return [c["name"] for c in obj["columns"]]
+
+
+# The fixture's header row IS the recorded list — every column of the real export,
+# in its order, so the fixture exercises the decoy column, every known-dropped
+# column and the absence of `JIRA Board` exactly as a real run would. Values are
+# synthetic; SEAL ids sit in the reserved 70001-70099 block the fixtures use.
+RAW_HEADERS = _recorded_headers()
 
 
 def _row(**over: str) -> dict[str, str]:
@@ -76,7 +69,6 @@ def _row(**over: str) -> dict[str, str]:
             "Seal IDs": "70051; 70052",
             "Relationship Type": "Dedicated",
             "Team Type Name": "Technology",
-            "JIRA Board": "JIRA-AUTO",
             "Team Status": "Active",
             "Agile Framework": "Scrum",
         }
@@ -97,7 +89,6 @@ def test_projection_output_validates_through_both_loader_row_models():
                 "Supporting Area Product ID": "",
                 "Seal IDs": "70053",
                 "Relationship Type": "Aligned",
-                "JIRA Board": "JIRA-ONBOARD",
                 "Sponsoring Product ID": "PROD_AUTO_05",
                 "Sponsoring Area Product ID": "AP_AUTO_PUB",
             }
@@ -109,7 +100,9 @@ def test_projection_output_validates_through_both_loader_row_models():
     dev = [DevTeamRow.model_validate(t) for t in teams]
     pat = [PatProductMappingRow.model_validate(m) for m in mappings]
     assert [d.team_id for d in dev] == ["T0042", "T0099"]
-    assert dev[0].parent_product_id == "PROD_AUTO_05" and dev[0].jira_board_id == "JIRA-AUTO"
+    assert dev[0].parent_product_id == "PROD_AUTO_05"
+    # the real export has no `JIRA Board` column (K30-c): acknowledged, empty, exit-0
+    assert dev[0].jira_board_id == "" and report.acknowledged_absent == ("jira_board_id",)
     assert pat[0].seal_ids == "70051, 70052"  # the row model's ';' -> ',' normalisation
     assert pat[0].team_type == "dedicated" and pat[0].area_product_id == "AP_AUTO_PUB"
     assert pat[1].sponsored is True
@@ -163,11 +156,16 @@ def test_jira_board_id_is_acknowledged_absent_not_loud():
     without that header stays exit-0 (not (a)'s new loudness rule) and the
     report names it explicitly rather than staying silent."""
     assert "jira_board_id" in ACKNOWLEDGED_ABSENT
-    headers = [h for h in RAW_HEADERS if h != "JIRA Board"]
-    teams, _, report = project_rows([_row()], headers)
+    assert "JIRA Board" not in RAW_HEADERS  # the recorded list does not carry it
+    teams, _, report = project_rows([_row()], RAW_HEADERS)
     assert teams[0]["jira_board_id"] == ""
     assert report.acknowledged_absent == ("jira_board_id",)
     assert "acknowledged-absent" in "\n".join(report.lines())
+    # ...and when a sibling export's column IS joined in, the mapped field flows.
+    joined = [*RAW_HEADERS, "JIRA Board"]
+    teams, _, report = project_rows([_row(**{"JIRA Board": "JIRA-AUTO"})], joined)
+    assert teams[0]["jira_board_id"] == "JIRA-AUTO"
+    assert report.acknowledged_absent == ()
 
 
 def test_header_map_override_rejects_unknown_logical_fields(tmp_path: Path):
@@ -225,6 +223,35 @@ def test_file_round_trip_writes_the_two_names_the_refresh_chain_reads(tmp_path: 
     assert fixture.read_text(encoding="utf-8").splitlines()[0] == ",".join(
         PAT_PRODUCT_MAPPING_COLUMNS
     )
+
+
+def test_the_fixture_header_row_is_the_recorded_list_not_the_module_constant():
+    """K30 (d). The fixture used to write its header row in the SAME believed
+    spellings DEFAULT_HEADER_MAP looked for (it wrote "SEAL IDs"), so code and
+    test could be wrong together and the suite could not tell — which is exactly
+    what happened until the 2026-08-29 census. The structural fix: the fixture's
+    header row is drawn from the ledger's recorded 43-column list and is checked
+    here against three things the module constant cannot supply — the full
+    column count, the export order, and the 35 columns the map never names."""
+    doc = yaml.safe_load(LEDGER.read_text(encoding="utf-8"))
+    (obj,) = doc["objects"]
+    assert obj["profile"]["census"] == "closed"
+    recorded = [c["name"] for c in obj["columns"]]
+    assert RAW_HEADERS == recorded
+    assert len(RAW_HEADERS) == obj["profile"]["column_count"] == 43
+    assert len(set(RAW_HEADERS)) == 43
+    # Not derived from the module's own belief: the fixture carries columns the
+    # header map never mentions (the dropped ones), and every header the map DOES
+    # name for this report is a recorded column — the map is checked against the
+    # fixture, never the other way round.
+    believed = set(DEFAULT_HEADER_MAP.values())
+    assert len(set(RAW_HEADERS) - believed) == 35
+    assert believed - set(RAW_HEADERS) == {DEFAULT_HEADER_MAP["jira_board_id"]}
+    # And the fixture row helper fills every recorded column, so a run over it
+    # reports zero unknown headers — the shape a clean real run has.
+    _, _, report = project_rows([_row()], RAW_HEADERS)
+    assert report.unknown_headers == ()
+    assert set(report.dropped_by_design) == set(KNOWN_DROPPED)
 
 
 def test_the_ledger_is_authored_from_what_the_projection_reads():

@@ -9,7 +9,7 @@ phase: 9
 agent: main
 model: sonnet
 priority: p1
-status: blocked
+status: done
 depends_on: []
 inputs:
 - drydocs/pat_projection.py
@@ -55,3 +55,27 @@ notes: |
   relay -- guessing spellings is the defect this item exists to prevent. The (d) structural
   guard (fixture headers drawn from the recorded list, not the module constant) also waits
   on that list; a guard against nothing would be decoration.
+  CLOSED 2026-09-07 (desktop, Lane A). The landed artifact arrived: the SME supplied the
+  real TEAM_DETAILS_REPORT with its header transposed (43 rows, six sample teams) plus the
+  company-side profile of the Seal IDs column, transcribed to
+  internal-local/company-backflow/k30-team-details-report-header-list-2026-09-07.md (header
+  NAMES and shape facts; sample values deliberately not transcribed). Reading it against the
+  tree: the 43 headers are IDENTICAL, spelling and order, to the ledger's 43 rows - so the
+  2026-08-29 census (42dc12e8) had already done (b) and (e) from this same export shape, and
+  this item stayed blocked only because nobody re-read it after that commit. What was really
+  still open was (d), now done: tests/unit/test_pat_projection.py reads its fixture header
+  row FROM config/source-mappings/pat-team-report.yaml (all 43, export order) instead of a
+  typed list, and a new guard pins that the row equals the recorded list, carries the 35
+  columns DEFAULT_HEADER_MAP never names, that only jira_board_id's header is a non-column,
+  and that a run over the fixture reports zero unknown headers. Consequence made explicit in
+  the round-trip test: the real shape has no JIRA Board column, so jira_board_id is
+  acknowledged-absent on a normal run and flows only when a sibling export's column is
+  joined in (both asserted). The header-map comment that still called its spellings
+  "transcribed beliefs" now says measured, census 2026-08-29, re-confirmed 2026-09-07.
+  Ledger: Seal IDs note gains the shape facts the profile settled - delimiter semicolon +
+  space, multi-valued with long lists, token width 4 to 7 digits, no width filter on the
+  PAT path; updated 2026-09-07. (f) held: no values, no estate counts in the tree; the
+  transcription file carries the numbers machine-locally. One finding fell out that is NOT
+  this item's: the prose entity extractor fixes application ids at five digits and the live
+  population is 4 to 7 wide - Idea-284. Fixture counts: 43 headers, 2 synthetic rows,
+  11 tests in the module green; targeted suites 63 passed.
