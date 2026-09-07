@@ -2638,7 +2638,7 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   2026-09-07, mid-apply; acts at the NEXT roll, nothing here changes the range you are in).
   `[VERIFIED-PRODUCER]` — the producer built `scripts/reconcile_before.py` over
   `drydocs/port/reconcile_before.py` at `2aa90898` on 2026-09-05, AFTER `port-base-20260905`
-  (`5cad5653`) was cut: the tag holds neither file and its `reconcile-port/SKILL.md` never
+  (`5cad5653`) was cut: the tag holds neither file and its `.claude/skills/reconcile-port/SKILL.md` never
   names the script, so nothing in your current range mentions it. The producer shape: ONE
   call writes the four mandatory before-files the J7/J16 guards read
   (`relationship_vocabulary.yaml`, `taxonomy-ontology-map.yaml`, `backlog.yaml`,
