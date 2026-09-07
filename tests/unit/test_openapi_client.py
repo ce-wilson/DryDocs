@@ -72,6 +72,108 @@ def test_generated_types_exist_beside_the_schema() -> None:
     assert GENERATED_TYPES.is_file(), "run `npm run api:types` in web/"
 
 
+# --- API3: a failed render must not touch the committed artifact ------------
+#
+# The shape being guarded is an ORDERING, and the behavioural test is the guard:
+# reintroduce `with out.open("w") as fh: fh.write(render_schema())` and the two
+# tests below go red, because the artifact is truncated the moment the render is
+# reached. A source scan asserting the two calls are not nested would be a weaker
+# statement of the same thing — it would pass on any rewrite that kept the order
+# wrong in a new shape.
+
+
+def _explodes(message: str = "create_app() blew up"):
+    def boom() -> str:
+        raise RuntimeError(message)
+
+    return boom
+
+
+def test_a_failed_render_leaves_the_artifact_byte_identical(tmp_path) -> None:
+    """The defect, at the library boundary.
+
+    `open("w")` TRUNCATES, so rendering inside the `with` meant any failure in
+    `create_app()` — an unset DRYDOCS_DATA_ROOT is the one that happens (G81) —
+    emptied the committed file before the exception was raised. What the working
+    tree then held was a zero-byte openapi.json, which reads as a corrupt commit
+    rather than as a run that failed.
+    """
+    dump = _dumper()
+    artifact = tmp_path / "openapi.json"
+    original = b'{"openapi": "3.1.0", "committed": true}\n'
+    artifact.write_bytes(original)
+
+    dump.render_schema = _explodes()
+    with pytest.raises(RuntimeError, match="create_app"):
+        dump.write_schema(artifact)
+
+    assert (
+        artifact.read_bytes() == original
+    ), "the artifact was opened before the render succeeded — that is the API3 defect"
+
+
+def test_the_cli_exits_nonzero_and_names_what_failed(tmp_path, capsys) -> None:
+    """Clause (b). The exception's TYPE and MESSAGE both reach stderr, and the
+    output says the artifact is untouched — "did this just corrupt my working
+    tree" is the first question a failed dump raises, and the answer used to be
+    yes."""
+    dump = _dumper()
+    artifact = tmp_path / "openapi.json"
+    original = b'{"openapi": "3.1.0"}\n'
+    artifact.write_bytes(original)
+
+    dump.render_schema = _explodes("DRYDOCS_DATA_ROOT is not set")
+    code = dump.main(["--out", str(artifact)])
+
+    assert code == 1
+    assert artifact.read_bytes() == original
+    err = capsys.readouterr().err
+    assert "FAILED" in err
+    assert "RuntimeError" in err, "the exception type is named"
+    assert "DRYDOCS_DATA_ROOT is not set" in err, "and its message, which is the remediation"
+    assert "was NOT modified" in err
+
+
+def test_check_mode_reports_the_same_failure_rather_than_a_traceback(tmp_path, capsys) -> None:
+    """--check renders too, so it has the same failure and needs the same
+    message. It is the mode CI runs, where a traceback is furthest from anyone
+    who can act on it."""
+    dump = _dumper()
+    artifact = tmp_path / "openapi.json"
+    artifact.write_bytes(b"{}\n")
+    dump.render_schema = _explodes()
+
+    assert dump.main(["--check", "--out", str(artifact)]) == 1
+    assert "openapi dump FAILED" in capsys.readouterr().err
+
+
+def test_a_missing_artifact_is_reported_and_not_created_by_a_failed_run(tmp_path, capsys) -> None:
+    """The first-run case. A failed render must not leave an empty file behind
+    for the next step to parse — which is how `npm run api:types` came to fail
+    on an empty document with nothing pointing back at the cause."""
+    dump = _dumper()
+    artifact = tmp_path / "nested" / "openapi.json"
+    dump.render_schema = _explodes()
+
+    assert dump.main(["--out", str(artifact)]) == 1
+    assert not artifact.exists(), "a failed run created the artifact it could not fill"
+    assert "was NOT modified" in capsys.readouterr().err
+
+
+def test_a_successful_run_still_writes_and_reports_the_path(tmp_path, capsys) -> None:
+    """The positive control for the four tests above: they assert on a failure
+    path, and a `main` that returned 1 unconditionally would satisfy every one of
+    them. This is the same run succeeding."""
+    dump = _dumper()
+    artifact = tmp_path / "openapi.json"
+    dump.render_schema = lambda: '{"openapi": "3.1.0"}\n'
+
+    assert dump.main(["--out", str(artifact)]) == 0
+    assert artifact.read_text(encoding="utf-8") == '{"openapi": "3.1.0"}\n'
+    assert "wrote" in capsys.readouterr().out
+    assert dump.main(["--check", "--out", str(artifact)]) == 0
+
+
 # --- declarations: the seam's routes carry typed responses ------------------
 
 #: (route, method) -> (declared 200 model, list-of?)
