@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-07T13:46:30",
+    "captured_at": "2026-09-07T14:20:53",
     "date": "20260907",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "dd599680",
-      "full": "dd599680294698b404ccd77f3f46263c34d41704",
+      "commit": "f06ff632",
+      "full": "f06ff632e7c83415af960a710078619e3c75238d",
       "branch": "main",
-      "describe": "port-base-20260905-176-gdd599680",
-      "subject": "chore(K16): done on the K25 status call; the APPL_TYPE projection is rehomed to K26",
+      "describe": "port-base-20260905-179-gf06ff632",
+      "subject": "docs(plan): Lane B handoff - build-lane queue for the laptop session (CORE2, API2, API3, O51, WEB16, CFG3)",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -22688,10 +22688,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260907.json",
-      "name": "drydocs-20260907.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260907-1346.json",
+      "name": "drydocs-20260907-1346.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260907.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260907-1346.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -48925,7 +48925,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260907.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260907-1346.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
