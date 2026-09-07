@@ -727,7 +727,9 @@ _STATE_RE = re.compile(r"\*\*(open|parked|groomed|merged|closed)\b[^*]*\*\*")
 _ENTRY_HEAD_RE = re.compile(rf"^- \*\*`(?P<id>{_EDITION_SEGMENT}Idea-\d+[a-z]?)`\*\* ·")
 
 #: Item-file fields that are venue-local (never a venue-edit finding) or bookkeeping.
-_ITEM_FIELDS_OUT_OF_SCOPE = frozenset({"status", "annotations"})
+#: `hold` rides with `status` (Y7): both say whether THIS venue may pull the item, and a
+#: venue holding an item it did not mint is a ruling on its own pull, not an edit.
+_ITEM_FIELDS_OUT_OF_SCOPE = frozenset({"status", "annotations", "hold"})
 #: Item-file fields the append rule governs; everything else is a REWRITE if it changes.
 _ITEM_APPEND_FIELDS = ("acceptance", "notes")
 
@@ -1035,7 +1037,7 @@ def _pending_header(stem: str) -> str:
 def main() -> int:
     fails: list[str] = []
     sys.path.insert(0, str(REPO_ROOT))
-    from drydocs_core.backlog_store import derive_summary, load_backlog_document
+    from drydocs_core.backlog_store import derive_summary, hold_errors, load_backlog_document
 
     doc = load_backlog_document(BACKLOG)
 
@@ -1083,6 +1085,9 @@ def main() -> int:
         ):
             if not ok:
                 fails.append(f"[{iid}] bad {msg}")
+        # Y7: a hold is a declared shape, checked by the same function the unit guard
+        # uses; the derivation below already excludes a held item from next_ready.
+        fails.extend(hold_errors(it))
 
     for iid, it in by_id.items():
         for dep in it.get("depends_on", []):
@@ -1121,7 +1126,7 @@ def main() -> int:
     print(
         "derived: "
         + " ".join(f"{k}={derived[k]}" for k in ("todo", "in_progress", "blocked", "done"))
-        + f" next_ready={len(derived['next_ready'])}"
+        + f" next_ready={len(derived['next_ready'])} held={len(derived['held'])}"
     )
 
     print(f"items={len(items)} phases={len(phases)} modules={len(modules)}")

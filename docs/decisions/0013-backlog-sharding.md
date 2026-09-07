@@ -116,6 +116,28 @@ in parallel — the claim and close **commit messages** — and to `IDEAS.md` wh
 is a groom note. The step-134 rule ("recompute from items, never merge
 textually") is retired with the block it governed.
 
+### Clause 3a — A hold is a declared field, and the derivation reads it (Y7, 2026-09-07)
+
+**Added 2026-09-07.** `drydocs.backlog.v3` gains one OPTIONAL item field, `hold:`, a
+mapping with `since` (date placed) and `reason` (the human's words, verbatim) required
+and `by` (who placed it) and `until` (the EVENT that releases it — a ruling or a session,
+never a date) optional. `derive_summary` excludes a held item from `next_ready` and lists
+it under a second derived key, `held`; the board renders both, so a hold is a visible
+state with its reason one click away and never a silent absence from the ready list. A
+hold sits only on a `todo` or `blocked` item — on `in_progress` it means the item was
+pulled past it, on `done` it is stale, and both fail the guard. Releasing a hold is
+deleting the key, with the ruling recorded in `notes`. Clause 3 is unchanged: `held` is
+derived, never stored.
+
+**Why a new field and not a rule over annotations.** O26 was pulled and claimed on
+2026-09-02 because both its dependencies were done; its hold lived in
+`annotations.status`, which no derivation reads. The fix is NOT "block on any
+annotation": most annotations are notes, a general rule would refuse items nobody meant to
+hold, and a false hold is invisible in the other direction. Only the declared key holds,
+and the guard can tell a hold from a note without reading English. The same commit
+converted O26's annotation to the field (text intact) and declared the second live
+instance, G64, whose hold had been the opening sentence of its acceptance.
+
 ## Clause 4 — Claim mechanics and the residual race
 
 **Decided.** A claim is a **one-file, one-key edit**: `status: todo` →

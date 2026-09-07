@@ -1092,7 +1092,8 @@ def test_no_stored_rollup() -> None:
 
 def test_derived_summary_is_consistent() -> None:
     """The derivation itself: counts sum to the item total; next_ready is exactly the
-    todo items whose every dependency is done."""
+    todo items whose every dependency is done AND that carry no ``hold:`` (Y7); ``held``
+    is exactly the items that do."""
     doc = _load()
     summary = backlog_store.derive_summary(doc)
     items = {i["id"]: i for i in doc["items"]}
@@ -1101,9 +1102,137 @@ def test_derived_summary_is_consistent() -> None:
         iid
         for iid, item in items.items()
         if item["status"] == "todo"
+        and not backlog_store.is_held(item)
         and all(items[dep]["status"] == "done" for dep in item.get("depends_on", []))
     }
     assert set(summary["next_ready"]) == expected
+    assert set(summary["held"]) == {
+        iid for iid, item in items.items() if backlog_store.is_held(item)
+    }
+    assert not set(summary["held"]) & set(summary["next_ready"])
+
+
+# --- Y7: a hold is a declared field, read by the derivation, rendered by the board -------
+#
+# O26 was pulled and claimed on 2026-09-02 with its dependencies done and a hold sitting in
+# annotations.status, which no derivation reads. These pin the fix at all three surfaces:
+# the derivation (held leaves next_ready), the board (HELD is rendered, never dropped) and
+# the boundary (an annotation is a note and never a hold - a general rule over annotations
+# would hold items nobody meant to hold, invisibly).
+
+
+def _hold_doc(hold, status: str = "todo") -> dict:
+    """Two done deps and one todo item that is dependency-ready by construction."""
+    item = {"id": "H3", "status": status, "depends_on": ["H1", "H2"]}
+    if hold is not None:
+        item["hold"] = hold
+    return {
+        "items": [
+            {"id": "H1", "status": "done", "depends_on": []},
+            {"id": "H2", "status": "done", "depends_on": []},
+            item,
+        ]
+    }
+
+
+_HOLD = {
+    "since": "2026-07-22",
+    "by": "SME",
+    "until": "the template session rules",
+    "reason": "do not pull",
+}
+
+
+def test_held_item_is_excluded_from_next_ready() -> None:
+    """(c) and (g): dependency-ready, and still not ready, because a human said so."""
+    ready = backlog_store.derive_summary(_hold_doc(None))
+    assert ready["next_ready"] == ["H3"] and ready["held"] == []
+    held = backlog_store.derive_summary(_hold_doc(_HOLD))
+    assert held["next_ready"] == [], "a held item must leave next_ready"
+    assert held["held"] == ["H3"], "and must be listed as held, never silently dropped"
+
+
+def test_unblessed_annotation_does_not_hold() -> None:
+    """(b): the exact O26 shape before Y7 - a hold written as prose in annotations - does
+    NOT hold. Only the declared field does. This is the boundary, stated as a test so that
+    a future 'helpful' rule over annotations fails here first."""
+    doc = _hold_doc(None)
+    doc["items"][2]["annotations"] = {
+        "status": "SME HOLD 2026-07-22: do NOT pull this item until that session rules"
+    }
+    summary = backlog_store.derive_summary(doc)
+    assert summary["next_ready"] == ["H3"], "an annotation is a note, not a hold"
+    assert summary["held"] == []
+    assert not backlog_store.is_held(doc["items"][2])
+    assert backlog_store.hold_errors(doc["items"][2]) == []
+
+
+def test_held_item_is_rendered_as_held_with_its_text() -> None:
+    """(d): the board shows the item as HELD, with the hold text visible OUTSIDE the
+    collapsed detail, and lists it in the Held strip; it does not appear in the ready
+    strip and does not get the ready accent."""
+    from drydocs.plan.plan_board import backlog_from_dict, render_board
+
+    raw = _hold_doc(_HOLD)
+    for it in raw["items"]:
+        it.update(
+            title=f"t {it['id']}", type="chore", module="docs", agent="a", phase=8, priority="p2"
+        )
+    doc = {
+        "schema": "drydocs.backlog.v3",
+        "plan": {"phases": [{"id": 8, "title": "eight", "goal": "g"}]},
+        "items": raw["items"],
+    }
+    html = render_board(backlog_from_dict(doc))
+    h3 = html.index('id="card-H3"')
+    card_tag = html[html.rindex('<div class="card', 0, h3) : h3]
+    assert "held" in card_tag
+    assert "ready" not in card_tag, "a held item never wears the ready accent"
+    card = html[h3 : html.index('<div class="detail"', h3)]
+    assert "hold-badge" in card and "HELD" in card
+    assert "do not pull" in card, "the hold text is outside the collapsed detail"
+    assert "the template session rules" in card
+    held_strip = html[html.index('class="held-strip"') :]
+    held_strip = held_strip[: held_strip.index("</div>")]
+    assert "H3" in held_strip
+    ready_strip = html[html.index('class="ready-strip"') :]
+    ready_strip = ready_strip[: ready_strip.index("</div>")]
+    assert "H3" not in ready_strip
+
+
+def test_hold_shape_is_guarded_and_fails_closed() -> None:
+    """A malformed hold still HOLDS (fail closed - a typo must not release an item) and
+    is reported, so the mistake is visible rather than silently obeyed. A hold on a status
+    that cannot be pulled is a stale or bypassed hold, and fails too."""
+    bad = {"id": "X1", "status": "todo", "depends_on": [], "hold": "SME HOLD"}
+    assert backlog_store.is_held(bad)
+    assert backlog_store.hold_errors(bad), "a non-mapping hold is reported"
+    missing = {"id": "X2", "status": "todo", "depends_on": [], "hold": {"since": "2026-09-07"}}
+    assert any("reason" in e for e in backlog_store.hold_errors(missing))
+    unknown = {"id": "X3", "status": "todo", "depends_on": [], "hold": {**_HOLD, "date": "x"}}
+    assert any("date" in e for e in backlog_store.hold_errors(unknown))
+    done = {"id": "X4", "status": "done", "depends_on": [], "hold": dict(_HOLD)}
+    assert any("done" in e for e in backlog_store.hold_errors(done))
+    assert (
+        backlog_store.hold_errors({"id": "X5", "status": "todo", "depends_on": [], "hold": None})
+        == []
+    )
+    assert (
+        backlog_store.hold_errors(
+            {"id": "X6", "status": "blocked", "depends_on": [], "hold": dict(_HOLD)}
+        )
+        == []
+    )
+
+
+def test_every_committed_hold_is_well_formed() -> None:
+    """The fixtures are real items (O26, G64). Any hold in the tree passes the shape guard,
+    and the two the item named are present and held."""
+    doc = _load()
+    errors = [e for it in doc["items"] for e in backlog_store.hold_errors(it)]
+    assert errors == [], errors
+    held = set(backlog_store.derive_summary(doc)["held"])
+    assert {"O26", "G64"} <= held, f"the two live instances must be held: {sorted(held)}"
 
 
 def test_monolith_is_a_tombstone() -> None:

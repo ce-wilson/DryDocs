@@ -46,8 +46,9 @@ things share the word *port* — never conflate them:
   `IDEAS.md` is the inbox, groomed into item files via the **`groom-backlog` skill**.
   `backlog.yaml` is a tombstone.
 - **Pull rule (give this to a sub-agent verbatim):** *"Take the next `status: todo` item in
-  `docs/restructure/backlog/items/` whose every `depends_on` is `done` (the board's Ready-to-pull
-  strip lists them); **commit and push** `status: in_progress` in that one item file
+  `docs/restructure/backlog/items/` whose every `depends_on` is `done` and that carries no
+  `hold:` (the board's Ready-to-pull strip lists exactly these — a held item is excluded from
+  it and shown under **Held** with its reason, Y7); **commit and push** `status: in_progress` in that one item file
   **before starting work** — a claim ships NO render (Y5: the roadmap guard tolerates
   status-only drift, so the claim sha stays green; renders catch up at session close); do exactly that item, staying inside your layer; meet its
   `acceptance`; set it `done`."* Anything ambiguous → the HITL

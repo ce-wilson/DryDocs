@@ -64,6 +64,66 @@ STATUSES: tuple[str, ...] = ("todo", "in_progress", "blocked", "done")
 #: keyed by the field they annotated. Additive, informational, never required.
 ANNOTATIONS_FIELD = "annotations"
 
+#: The BLESSED HOLD (Y7, 2026-09-07; ADR 0013 Clause 3a). An optional ``hold:`` mapping
+#: on an item says "the dependencies are done and you still may not pull this" - the
+#: one thing ``depends_on`` cannot express, and the case it exists for (O26 was pulled
+#: on 2026-09-02 because both its deps were done; the hold was in an annotation no
+#: derivation read). The field is DECLARED so the guard tells a hold from a note
+#: without reading English: ``since`` (the date it was placed) and ``reason`` (the
+#: human's words, verbatim) are required; ``by`` (who placed it) and ``until`` (the
+#: EVENT that releases it - a ruling, a session - never a date) are optional. A held
+#: item stays ``todo`` (or ``blocked``): it is not blocked by a dependency and it is not
+#: in progress, it is waiting on a human. Releasing a hold is DELETING the key, with
+#: the ruling recorded in ``notes``.
+#:
+#: Deliberately NOT "block on any annotation" (Y7 b). Most annotations are notes, not
+#: holds; a general rule would refuse items nobody meant to hold, and a false hold is
+#: invisible in the other direction - an item that silently leaves the ready list
+#: with no reason is worse than today. Only this key holds; ``annotations`` never does.
+HOLD_FIELD = "hold"
+HOLD_REQUIRED_KEYS: tuple[str, ...] = ("since", "reason")
+HOLD_OPTIONAL_KEYS: tuple[str, ...] = ("by", "until")
+#: A hold may sit on an item in exactly these statuses. On ``in_progress`` it means
+#: somebody pulled past the hold; on ``done`` it is stale. Both are guard failures.
+HOLD_ALLOWED_STATUSES: tuple[str, ...] = ("todo", "blocked")
+
+
+def is_held(item: dict[str, Any]) -> bool:
+    """True when the item carries a ``hold:`` mapping - the declared shape, nothing else.
+
+    A ``hold: ~`` reads as no hold (the key was released in place); a hold that is not
+    a mapping is malformed and :func:`hold_errors` reports it, but it still HOLDS - a
+    malformed hold failing open would be the false-ready this field exists to close.
+    """
+    return item.get(HOLD_FIELD) is not None
+
+
+def hold_errors(item: dict[str, Any]) -> list[str]:
+    """Shape findings for one item's hold, empty when there is none or it is well-formed.
+
+    One function for the validator and the unit guard, so the two cannot disagree on
+    what a blessed hold looks like.
+    """
+    if not is_held(item):
+        return []
+    iid = str(item.get("id", "<no-id>"))
+    hold = item[HOLD_FIELD]
+    if not isinstance(hold, dict):
+        return [f"[{iid}] hold must be a mapping with {'/'.join(HOLD_REQUIRED_KEYS)}"]
+    errors: list[str] = []
+    for key in HOLD_REQUIRED_KEYS:
+        if hold.get(key) in (None, ""):
+            errors.append(f"[{iid}] hold is missing `{key}`")
+    unknown = sorted(set(hold) - set(HOLD_REQUIRED_KEYS) - set(HOLD_OPTIONAL_KEYS))
+    if unknown:
+        errors.append(f"[{iid}] hold carries unknown key(s) {unknown}")
+    if str(item.get("status", "")) not in HOLD_ALLOWED_STATUSES:
+        errors.append(
+            f"[{iid}] hold on a {item.get('status')!r} item - "
+            f"a hold sits only on {'/'.join(HOLD_ALLOWED_STATUSES)}"
+        )
+    return errors
+
 
 class BacklogStoreError(RuntimeError):
     """The backlog directory is missing, malformed, or internally inconsistent."""
@@ -203,11 +263,16 @@ def load_backlog_document(source: str | Path = DEFAULT_BACKLOG_DIR) -> dict[str,
 
 
 def derive_summary(doc: dict[str, Any]) -> dict[str, Any]:
-    """Counts per status + ``next_ready`` — computed, never stored.
+    """Counts per status + ``next_ready`` + ``held`` — computed, never stored.
 
-    ``next_ready`` = every ``todo`` item whose every ``depends_on`` is ``done``,
-    in document order. Prose preconditions in an item's notes are NOT consulted;
-    the claim commit is where a human reads them.
+    ``next_ready`` = every ``todo`` item whose every ``depends_on`` is ``done`` and
+    that carries no ``hold:`` (Y7), in document order. ``held`` = every item that
+    carries one, in document order - rendered, never dropped, because the point of a
+    hold is that a human wrote down why. Prose preconditions in an item's notes or
+    annotations are NOT consulted; only the blessed field holds.
+
+    This is THE rule. The board, the validator and the lane-handoff script all call
+    it, so the Ready-to-pull strip and the derived list cannot disagree.
     """
     items = doc.get("items") or []
     by_id = {str(i["id"]): i for i in items}
@@ -220,9 +285,11 @@ def derive_summary(doc: dict[str, Any]) -> dict[str, Any]:
         str(i["id"])
         for i in items
         if i.get("status") == "todo"
+        and not is_held(i)
         and all(by_id.get(str(d), {}).get("status") == "done" for d in (i.get("depends_on") or []))
     ]
-    return {**counts, "next_ready": next_ready}
+    held = [str(i["id"]) for i in items if is_held(i)]
+    return {**counts, "next_ready": next_ready, "held": held}
 
 
 # --- a file-shaped view (the reconcile-port before/after snapshot) ------------------
