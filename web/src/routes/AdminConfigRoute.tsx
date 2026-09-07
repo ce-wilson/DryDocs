@@ -17,6 +17,7 @@ import { useRightSidebar } from '../layout/rightSidebarContext'
 import ModuleTemplate from './ModuleTemplate'
 import EmptyState from '../components/ui/EmptyState'
 import LogEstatePanel from './LogEstatePanel'
+import SpecGrid from '../explorer/SpecGrid'
 import matrix from '../generated/enforcement-matrix.json'
 
 // /admin/config (O12): the config-as-code TRACEABILITY LENS. NO edit controls
@@ -206,6 +207,13 @@ export default function AdminConfigRoute() {
         // /admin/log-estate, which is why it sits behind the admin gate this
         // page already is.
         'Log estate': <LogEstatePanel />,
+        // R8: the agent-run admin view. A SpecGrid over console.agent-runs.v1
+        // rather than a bespoke panel — the spec already returns cost, latency
+        // and the R21 warning columns, so a hand-built table would be a second
+        // reading of one contract. It sits on THIS page because :AgentRun rows
+        // carry the question as sha256 only and are :Uncertain (the G102 fold),
+        // which makes them an operator's data and not a reader's.
+        'Agent runs': <SpecGrid specId="console.agent-runs.v1" />,
         'Enforcement matrix': (
           <div className="flex h-full min-h-0 flex-col gap-1.5">
             <p className="shrink-0 rounded border border-edge bg-panel-2 px-2 py-1 text-[11px] text-muted">
