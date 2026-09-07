@@ -138,6 +138,9 @@ HEADER = """# ==================================================================
 # case, and it is surfaced rather than left to be inferred from a zero.
 #
 # Regenerate: python -m common.spec_promotion (from agents/, with the venv).
+# Written beside the ledger in the run-log directory — machine-local, never the
+# repo: `runs_read` is a fact about one machine and a committed copy would read
+# as a statement about the project.
 # =============================================================================
 """
 
@@ -185,9 +188,17 @@ def write_candidates(out_path: Path, log_dir: Path | None = None) -> tuple[Path,
 
 
 def _default_out() -> Path:
-    return (
-        Path(__file__).resolve().parents[2] / "docs" / "design" / "spec-promotion-candidates.yaml"
-    )
+    """Beside the ledger it was computed from, NOT in the repo.
+
+    The artifact is machine-local by construction: its ``runs_read`` is a fact
+    about one machine's telemetry, and a committed copy would read as a
+    statement about the project. It lands in the run-log directory, which is
+    already the configured home for exactly this class of output. The gate that
+    promotes a candidate is where a tracked artifact belongs, and that is a
+    person's commit."""
+    from drydocs_core.run_log import resolve_log_dir
+
+    return resolve_log_dir() / "spec-promotion-candidates.yaml"
 
 
 def main() -> int:
