@@ -25,7 +25,7 @@ import pytest
 yaml = pytest.importorskip("yaml", reason="PyYAML not installed")
 jsonschema = pytest.importorskip("jsonschema", reason="jsonschema not installed (dev group)")
 
-from jsonschema import Draft202012Validator  # noqa: E402
+from jsonschema import Draft202012Validator, ValidationError  # noqa: E402
 
 REPO = Path(__file__).resolve().parents[2]
 SCHEMAS = REPO / "config" / "schemas"
@@ -299,3 +299,108 @@ def test_this_module_itself_stays_core_free() -> None:
     body = src.split('"""', 2)[2]  # ignore the docstring's prose mentions
     needle = "import " + "drydocs"  # split so this line does not match itself
     assert needle not in body, "the schema guard must not depend on the package"
+
+
+# --------------------------------------------------------------------------- #
+# CFG3: the closed schemas REFUSE a stray key — proven, not asserted
+# --------------------------------------------------------------------------- #
+#
+# A schema that is open accepts a misspelled key in silence, which is the same
+# failure class as a guard that scans nothing: it reports green while checking
+# less than it claims. `additionalProperties: false` is one line, and one line
+# is exactly the kind of thing that gets dropped in a merge — so each closure
+# below is demonstrated by a document that must FAIL, not by reading the schema
+# for the flag.
+
+#: family -> (a valid minimal document, the key to smuggle in, where it goes)
+CLOSED_AT_THE_TOP: dict[str, dict] = {
+    "precedence": {
+        "schema": "drydocs.precedence.v1",
+        "classification": "Internal-Public",
+        "updated": "2026-09-07",
+        "order": [{"id": "bmc-baseline", "authority": 1, "role": "vendor", "governs": ["job"]}],
+    },
+    "data-centers": {
+        "schema": "drydocs.data-centers.v1",
+        "classification": "Internal-Public",
+        "data_centers": [{"code": "P32", "name": "T032-E0700-DMA"}],
+    },
+}
+
+
+@pytest.mark.parametrize("family", sorted(CLOSED_AT_THE_TOP))
+def test_a_closed_schema_accepts_the_document_and_refuses_a_stray_key(family: str) -> None:
+    """Both halves, in one test, because either alone can pass on a mistake: a
+    schema that refuses everything also refuses the stray key."""
+    schema_name, _ = FAMILIES[family]
+    validator = Draft202012Validator(_schema(schema_name))
+    document = CLOSED_AT_THE_TOP[family]
+
+    validator.validate(document)  # the control: this document is valid
+
+    with pytest.raises(ValidationError) as info:
+        validator.validate({**document, "conflict_polcy": {}})  # a real typo shape
+    assert "conflict_polcy" in str(info.value)
+
+
+def test_precedence_declares_the_identity_header_it_actually_carries() -> None:
+    """The omission closing the schema surfaced (CFG3). `classification` was live
+    in config/precedence.yaml and declared by nothing, which is what an open
+    schema hides -- and closing without declaring it would have failed the file
+    the schema governs."""
+    props = _schema("precedence.schema.json")["properties"]
+    assert "classification" in props
+    assert set(props["classification"]["enum"]) == {"External", "Internal-Public", "Internal"}
+    live = yaml.safe_load((REPO / "config" / "precedence.yaml").read_text(encoding="utf-8"))
+    assert live["classification"] in props["classification"]["enum"]
+
+
+def test_a_vocabulary_entry_refuses_a_stray_key() -> None:
+    """The relationship-vocabulary schema's mapping branch was already closed, so
+    the top-level closure this item asks for was a no-op there. The hole was one
+    level down, on the entry, where a misspelled key on a relationship passed in
+    silence -- and an entry is where the keys that matter live."""
+    validator = Draft202012Validator(_schema("relationship-vocabulary.schema.json"))
+    entry = {
+        "id": "scheduler_scheduled_on",
+        "neo4j_label": "SCHEDULED_ON",
+        "inverse_label": "schedules",
+        "from_node": "ControlMFolder",
+        "to_node": "ControlMServer",
+        "status": "active",
+    }
+    validator.validate({"local_relationships": [entry]})
+
+    with pytest.raises(ValidationError) as info:
+        validator.validate({"local_relationships": [{**entry, "supersed_by": "x"}]})
+    assert "supersed_by" in str(info.value)
+
+
+def test_the_six_keys_the_closure_had_to_declare_are_really_in_the_tree() -> None:
+    """Instrument check (J76). Every key added to the entry schema was found in a
+    live fragment, not invented to make validation pass -- and if a fragment
+    stops using one, this says so rather than leaving a declaration nobody can
+    account for."""
+    declared = _schema("relationship-vocabulary.schema.json")["$defs"]["local_relationship"][
+        "properties"
+    ]
+    added = {
+        "deprecated_at",
+        "deprecation_note",
+        "superseded_by",
+        "skos_maps_to",
+        "sosa_maps_to",
+        "join_key",
+    }
+    assert added <= set(declared)
+
+    used: set[str] = set()
+    for path in sorted(
+        (REPO / "drydocs_core" / "ontology" / "relationship_vocabulary").glob("*.yaml")
+    ):
+        doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+        entries = doc.get("local_relationships") or [] if isinstance(doc, dict) else (doc or [])
+        for entry in entries:
+            if isinstance(entry, dict):
+                used |= set(entry)
+    assert added <= used, f"declared but used nowhere: {sorted(added - used)}"
