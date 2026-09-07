@@ -28,3 +28,8 @@ groom_log:
   note: 'Groomed 2026-09-02 from Idea-227. Z9: a synthetic city''s country reports a drawable outline
     it does not have, because the resolver reads country_id and ignores country_alias. Found by O80''s
     runner on its first run; the correct expectation is already in the repo as an it.fails case.'
+- date: '2026-09-07'
+  note: '2026-09-07 groom: LOAD4 - the bundled SEAL capture declares applications 70001-70003 and the sample folders
+      carry seven ids, so 7 of 8 folders in the demo cannot attribute. A fixture defect in Z7/Z8''s own material,
+      with a guard so it does not come back.'
+  attached_at: LOAD4

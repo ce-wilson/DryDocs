@@ -9,10 +9,24 @@ model: sonnet
 priority: p2
 status: todo
 depends_on: []
-inputs: []
+inputs:
+- scripts/dump_openapi.py
+- web/src/generated/openapi.json
+- web/package.json
 acceptance: |
-  STUB - minted 2026-09-07 by the groom of Idea-268; the body lands in the next
-  commit of the same groom run (the I6 mint protocol: final title first, pushed,
-  then the body).
+  scripts/dump_openapi.py opens web/src/generated/openapi.json for WRITING before it calls
+  render_schema(), so a render failure truncates the committed artifact to zero bytes. The
+  result reads as a corrupt commit rather than a failed run, and npm run api:types then fails on
+  an empty document one step later with no pointer back to the cause.
+
+  (a) Render to a string FIRST, then open and write - the artifact is never opened until there
+      is content to put in it.
+  (b) The script exits non-zero with the exception named, so the failing step says what failed.
+  (c) The test that pins the writer grows the failure case: a render that raises leaves the
+      existing artifact BYTE-IDENTICAL and the process exits non-zero.
 notes: |
-  Minted 2026-09-07 from docs/restructure/IDEAS.md Idea-268.
+  Minted 2026-09-07 from IDEAS.md Idea-268 (Lane B close report, laptop, 2026-09-05,
+  API1 hand-back one).
+
+  Two lines of fix and a test; the test is the point, since the same open-then-render shape is
+  easy to reintroduce.

@@ -9,10 +9,41 @@ model: fable
 priority: p2
 status: todo
 depends_on: []
-inputs: []
+inputs:
+- drydocs_api/query_specs.py
+- web/src/data/rowShape.ts
+- web/src/data/rowShape.test.ts
+- web/src/generated/openapi.json
 acceptance: |
-  STUB - minted 2026-09-07 by the groom of Idea-270; the body lands in the next
-  commit of the same groom run (the I6 mint protocol: final title first, pushed,
-  then the body).
+  ColumnDef.type is 'string' | 'int' only, so two server columns that return LISTS are
+  declared string: runbooks.series.v1 'lands' (collect(DISTINCT d.assetId)) and
+  lineage.schema-definition.v1 'properties' (a Cypher list comprehension). Verified at
+  drydocs_api/query_specs.py:73 (the vocabulary), :1003 and :1213 (the two declarations).
+  WEB6's client-side row-shape validator found them and exempts exactly those two by spec id,
+  with a bidirectional guard in rowShape.test.ts that fails when the server is fixed AND when a
+  third one appears - so this is not a two-string edit.
+
+  (a) ColumnDef grows a LIST column type, and the OpenAPI shape moves with it
+      (web/src/generated/openapi.json and api.d.ts are regenerated, not hand-edited).
+  (b) The two declarations move onto the new type.
+  (c) The client validator learns the new type and the two-spec exemption in
+      web/src/data/rowShape.ts is DELETED; rowShape.test.ts is updated in the same commit, since
+      it is written to fail exactly when this item lands.
+  (d) A server-side guard reads the SPEC OBJECT (J37 - never a render, never the source text)
+      and fails when a column whose Cypher collects or comprehends is declared scalar. That is
+      the clause that stops a third one appearing.
+  (e) The read contract's consumers still pass: the API tests, the web type-check and the
+      generated-artifact drift tests.
 notes: |
-  Minted 2026-09-07 from docs/restructure/IDEAS.md Idea-270.
+  Minted 2026-09-07 from IDEAS.md Idea-270 (Lane B close report, laptop, 2026-09-06,
+  hand-back api).
+
+  R15/R16 own the api package and are both DONE, so the entry's sequencing constraint ('land it
+  with or right after them, not before') is already satisfied - depends_on is empty for that
+  reason, not by oversight.
+
+  Filed web-console / phase 12 with API1, because it is the read contract this console
+  consumes; R15/R16 sit in agentic-qa / 15 and either filing would have been readable.
+
+  Model fable: this changes a published contract (the column vocabulary and its OpenAPI shape),
+  which is the boundary case the matrix reserves the top tier for.

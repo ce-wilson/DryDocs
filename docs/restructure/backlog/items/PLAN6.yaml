@@ -9,10 +9,33 @@ model: sonnet
 priority: p2
 status: todo
 depends_on: []
-inputs: []
+inputs:
+- .claude/skills/lane-handoff/scripts/handoff.py
+- config/dev-environment.yaml
+- docs/restructure/backlog/items/G132.yaml
+- tests/unit/test_lane_handoff.py
 acceptance: |
-  STUB - minted 2026-09-07 by the groom of Idea-264; the body lands in the next
-  commit of the same groom run (the I6 mint protocol: final title first, pushed,
-  then the body).
+  lane-handoff --suggest's V (venue-bound) marker reads only an item's inputs paths, so a
+  venue wall written in acceptance PROSE is invisible to it. G132 clause (g) says 'none of which
+  exist producer-side' and was still queued to the laptop, which hit the wall on read; the lane
+  left it todo rather than claim what only a server-side machine can build.
+
+  (a) The fix is NOT to parse prose. Items gain a declared, machine-readable venue requirement
+      (venue: or requires:), additive to the v3 schema, optional, and validated against the
+      venue codes config/dev-environment.yaml declares.
+  (b) --suggest flags any queued item whose declared venue the receiving machine does not
+      declare, and says which requirement failed.
+  (c) G132 is the worked example: it carries the declaration, and a --suggest run against a
+      machine without the server venue flags it. An item with no declaration behaves exactly as
+      today - silence, not a new failure.
+  (d) Pinned in tests/unit/test_lane_handoff.py and in the backlog schema guard.
 notes: |
-  Minted 2026-09-07 from docs/restructure/IDEAS.md Idea-264.
+  Minted 2026-09-07 from IDEAS.md Idea-264 (Lane B close report, laptop, 2026-09-05).
+
+  Additive schema field, so it does not disturb the 663 items that will never carry it - that
+  is why this is sonnet and PLAN5 is fable: PLAN5's outputs question changes how every item is
+  read, this one adds an optional field with a validator.
+
+  config/dev-environment.yaml is already the declared-not-inferred venue file (PLAN2 uses its
+  edition: key the same way), so the venue vocabulary has a home and this item does not invent
+  one.

@@ -105,3 +105,12 @@ notes: |
   zeroed and the six EM-instance attributes absent - is G133's half, because it
   is a correction to API-CALLS.md rather than a collector move. Whichever
   transport this collector ends up using, (d) is unchanged.
+
+  MERGED IN 2026-09-07 (groom of IDEAS.md Idea-261), clause (e) gains its second
+  reason. collect/ now holds TWO collectors - the rua inventory and the Z4
+  load-balancer resolver - under a README still titled "Run-As-User inventory
+  collector". The Z4 collector's README was deliberately written BESIDE the rua
+  one rather than rewriting it, because clause (e) owns the index. So when this
+  item runs, the index names both collectors and the per-collector READMEs stay;
+  the "either/or" in (e) is now settled in favour of the directory index, because
+  a two-collector directory already exists.

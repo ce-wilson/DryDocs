@@ -9,10 +9,25 @@ model: haiku
 priority: p3
 status: todo
 depends_on: []
-inputs: []
+inputs:
+- web/package.json
+- scripts/dump_openapi.py
+- web/README.md
 acceptance: |
-  STUB - minted 2026-09-07 by the groom of Idea-267; the body lands in the next
-  commit of the same groom run (the I6 mint protocol: final title first, pushed,
-  then the body).
+  npm run api:types needs DRYDOCS_DATA_ROOT set and says so only as a Python traceback
+  buried inside a Node stack: the script shells out to scripts/dump_openapi.py, which imports
+  settings that resolve the data root, so an unset root surfaces three layers down. The same
+  wall was hit twice - once on API1 and again at the Lane A merge.
+
+  (a) ONE of: the npm script checks the variable first and prints the one-line requirement, or
+      the web README's generated-artifacts section names the variable beside the command (it
+      names the command today and not the precondition). The first is preferred because it
+      fires at the moment of failure.
+  (b) Whichever is chosen, an unset DRYDOCS_DATA_ROOT produces a message that names the
+      variable, before any traceback.
 notes: |
-  Minted 2026-09-07 from docs/restructure/IDEAS.md Idea-267.
+  Minted 2026-09-07 from IDEAS.md Idea-267 (Lane B close report, laptop, 2026-09-05,
+  API1 hand-back two).
+
+  Small and mechanical, so haiku. API3 (Idea-268) is the other API1 hand-back and touches the
+  same script for a different reason; they can land together or apart.

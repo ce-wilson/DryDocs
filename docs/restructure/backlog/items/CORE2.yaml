@@ -9,10 +9,37 @@ model: sonnet
 priority: p1
 status: todo
 depends_on: []
-inputs: []
+inputs:
+- tests/source_scan.py
+- tests/unit/test_source_scan.py
 acceptance: |
-  STUB - minted 2026-09-07 by the groom of Idea-273; the body lands in the next
-  commit of the same groom run (the I6 mint protocol: final title first, pushed,
-  then the body).
+  Six of six absence scans across two Lane B bursts were VACUOUS on first write. Each was
+  the same mistake: code_only strips string literals, so a guard asserting that a LITERAL is
+  absent runs its pattern over a scan the literal was already removed from and passes on
+  nothing. without_comments is the stripper for a literal subject. J66 says which helper to
+  use; nothing today makes the wrong choice fail, and two of the six were caught only by
+  breaking the thing the guard claimed to catch. One case had a comment saying without_comments
+  beside code calling code_only.
+
+  (a) tests/source_scan.py grows an absence helper that takes a POSITIVE CONTROL:
+      absent(pattern, files, *, positive_control=<snippet>). It runs the chosen stripper over
+      the control FIRST and refuses (fails, with a message naming the stripper and the subject)
+      when the pattern no longer matches the control - the mutation probe, built in, so a
+      stripper/subject mismatch fails on the control and never silently on the tree.
+  (b) The refusal is proven by a test that supplies a literal subject with code_only and asserts
+      the helper fails on the control, not on the tree.
+  (c) Every existing absence guard in tests/unit/ is swept onto the helper. Any that cannot
+      supply a control says why, in a comment, next to the call.
+  (d) A guard over the guards: an absence-style scan that does not go through the helper is
+      listed, so the sweep does not silently un-sweep. Read the code, never the prose (J66) -
+      this guard's own explanation must not trip it, which is the failure J66 exists for.
 notes: |
-  Minted 2026-09-07 from docs/restructure/IDEAS.md Idea-273.
+  Minted 2026-09-07 from IDEAS.md Idea-273 (Lane B close report, laptop, 2026-09-06,
+  process findings). Instances cited there: WEB7's path= literal and O89's route literal
+  (twice) in the 2026-09-06 burst, three more in the 2026-09-05 burst.
+
+  p1 because it is the only entry in this groom whose defect class is 'a guard that reports
+  green while checking nothing', and it has now recurred six times in two days.
+
+  Epic release-infrastructure / phase 8 follows J66, which is where the source_scan rule was
+  established; module is drydocs-core per the entry, though the file itself is tests/.

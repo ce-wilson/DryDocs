@@ -9,10 +9,31 @@ model: sonnet
 priority: p3
 status: todo
 depends_on: []
-inputs: []
+inputs:
+- docs/design/feedback/
+- scripts/port_rename_check.py
 acceptance: |
-  STUB - minted 2026-09-07 by the groom of Idea-251; the body lands in the next
-  commit of the same groom run (the I6 mint protocol: final title first, pushed,
-  then the body).
+  The rename detector scores
+  docs/design/feedback/drydocs-startup-refresh-runbook-rev11.yaml and its rev1 sibling at 1.00
+  text similarity after normalization. For a feedback file keyed on anchors (L5/L6) that means
+  one of exactly two things, and which one matters: either the two revisions differ ONLY in
+  payload the normalizer strips, or the files really are the same and rev11 was captured empty.
+
+  (a) Determine which, by reading the two files rather than the detector's score.
+  (b) If the payload is the difference: the detector's normalized_text is too aggressive for
+      feedback YAML, which is a separate content class from prose and from fragments. Give it
+      its own normalization and pin the two files as the fixture.
+  (c) If the files are the same: rev11 was captured empty, which is a capture defect - record it
+      against the capture, and consider whether an empty-capture check belongs beside the
+      feedback loader (a template with no payload should not load silently).
+  (d) Either way the finding is written down, because a 1.00 score between rev1 and rev11 is the
+      kind of thing that gets re-discovered every port.
 notes: |
-  Minted 2026-09-07 from docs/restructure/IDEAS.md Idea-251.
+  Minted 2026-09-07 from IDEAS.md Idea-251 (the company's chunk-1 rename-look on
+  port-base-20260902, their PORT-REPORT question 7).
+
+  MODULE CHOICE, recorded because the entry left it open ('drydocs-docgen / drydocs-port'):
+  filed under drydocs-port, because the instrument that raised it is the port's rename detector
+  (a J72 measurement artifact) and clause (b) - the likely outcome - edits that detector. If (c)
+  turns out to be the answer, the follow-up is docgen's and gets its own item; nothing in this
+  item's acceptance depends on the choice.

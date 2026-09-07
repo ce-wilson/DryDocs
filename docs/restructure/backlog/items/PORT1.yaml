@@ -9,10 +9,43 @@ model: sonnet
 priority: p2
 status: todo
 depends_on: []
-inputs: []
+inputs:
+- scripts/render_port_dispositions.py
+- tests/unit/test_port_dispositions.py
+- scripts/port_rename_check.py
+- docs/port-prompt.md
 acceptance: |
-  STUB - minted 2026-09-07 by the groom of Idea-250; the body lands in the next
-  commit of the same groom run (the I6 mint protocol: final title first, pushed,
-  then the body).
+  Three back-flow adoptions from the company's chunk-1 apply of port-base-20260901, plus
+  one rule for the port workplan. The company holds the transcript; the producer holds the
+  mechanisms, which is why these land here.
+
+  (a) scripts/render_port_dispositions.py takes an OPTIONAL HEAD ref. The consumer's HEAD is its
+      own tree, so a range on their side classifies tag..tag and never tag..HEAD; they patched
+      main()/render() for it and the shape is the one to adopt.
+  (b) The fourth guard in tests/unit/test_port_dispositions.py (the APPLY-BY-DISPOSITION section
+      above STEP LEDGER in the port-prompt) is producer-only by nature - the company's
+      port-prompt copy is retired and carries neither marker - so it SKIPS when the markers are
+      absent, with a message saying so, rather than forcing the consumer to drop a test. The
+      skip is TRACKED-content-based, never a directory probe.
+  (c) scripts/port_rename_check.py spawns one git show per producer file across the whole tree.
+      Move it to git cat-file --batch on one pipe: minutes become seconds, and the whole-tree
+      look is what RELAY-20 asks for before every clean-add slice. Prove the speed-up with a
+      measured before/after on this tree, and prove the OUTPUT is unchanged on the same range.
+  (d) THE WORKPLAN RULE: a chunk plan that names a script names the COMMIT the script needs.
+      The company was told to run a renderer that landed after their base (J69 at bed22549).
+      Chunk 1 should also say: classify with git show <base>:PORT-MANIFEST.yaml, not with the
+      consumer's current manifest, and then diff the two manifests - the differences ARE the
+      port's own manifest rows. Both rules land in the port-prompt.
 notes: |
-  Minted 2026-09-07 from docs/restructure/IDEAS.md Idea-250.
+  Minted 2026-09-07 from IDEAS.md Idea-250 (company session's chunk-1 status, relayed by
+  the SME 2026-09-02; the producer holds no transcript, so traceability to their id is
+  one-directional).
+
+  The entry's fourth finding RESOLVED itself the same day in the company's favour and is
+  recorded here for the record, not as work: the producer's 519 was measured ..HEAD three
+  commits past the tag; tag..tag with the manifest at the tag is 516 / 130 / 150 / 4, and their
+  123 is 130 minus the seven derived rows. That resolution is exactly why clause (d) exists -
+  classifying with the wrong manifest is the mistake that produced the discrepancy.
+
+  First item in the PORT series (module drydocs-port, added at CORE1). Filed
+  release-infrastructure / phase 8 with the other port mechanisms (J34, J72).

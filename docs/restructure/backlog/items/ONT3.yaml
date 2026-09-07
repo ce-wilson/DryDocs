@@ -9,10 +9,55 @@ model: fable
 priority: p2
 status: todo
 depends_on: []
-inputs: []
+inputs:
+- config/taxonomy/lob-product-team.yaml
+- config/taxonomy/editions.yaml
+- reference/standards/
+- docs/restructure/03-hitl-sme-flow.md
+- config/gate-prompts/
 acceptance: |
-  STUB - minted 2026-09-07 by the groom of Idea-256; the body lands in the next
-  commit of the same groom run (the I6 mint protocol: final title first, pushed,
-  then the body).
+  The SME's five-tier naming formula - [LOB]_[PROD_LINE]_[FUNC_LAYER]_[LOGICAL_CONT]_[APP],
+  for system names, tags and database schemas - proposes one tier the declared taxonomy has NO
+  home for: the Logical Container, a data product (the sketch's examples: Applicant Credit
+  Assessment, Real-Time Equities Positions, Intraday Liquidity Balances). It sits between the
+  Area Product and the application. It is not the registry's dataset (that grammar is physical,
+  origin@db.schema.table) and not :DataAsset (the D1 proxy URN, also physical). A curated
+  LOGICAL container is what DPROD/EKGF is for, and DPROD is registered under reference/standards/
+  and instantiated nowhere.
+
+  ADMITTING THE TIER IS AN ONTOLOGY DECISION AND GOES THROUGH THE HITL GATE - never into an
+  import. This item DRAFTS the gate prompt; it does not decide.
+
+  (a) A gate prompt under config/gate-prompts/ asks whether the Logical Container tier is
+      admitted, and if so on what standard (DPROD/EKGF is the candidate the tree already
+      registers), with what identity, and in which registry.
+  (b) It carries the three findings that make the question answerable, from the source entry:
+      (1) the formula is a DIFFERENT AXIS, not a replacement - lob-product-team.yaml is
+      CatalogLOB > ProductLine > Product > DevTeam and ends at the org unit
+      (not_concepts: [dev_teams]); the formula ends at the APPLICATION and carries no DevTeam,
+      so it conflicts with nothing there. (2) THE EDITION GRAIN SURVIVES: FUNC_LAYER reads as the
+      Area Product, and gate ontology-domain-registry-and-edition-grain SC2 qualifies a ROW, not
+      a tier NAME - so a tier labelled Functional Layer still cuts editions at the same grain,
+      with no re-mint and no new ruling. Say this in the prompt so the SME is not asked to
+      re-decide it. (3) IF THE FORMULA EVER BECOMES A KEY: [APP] is the application ACRONYM, and
+      applications are keyed on app_id / SEAL id - an acronym is a LABEL, identity is a business
+      key, and the composite string would be a RENDER of it (the SG1 rule the registry already
+      applies to URNs).
+  (c) Any mapping the prompt proposes stays status: planned until the gate confirms it, and the
+      item's outcome is a drafted prompt plus a queued session - never a taxonomy edit.
+  (d) The synthetic source values are recorded as synthetic: the sketch's codes (RET, WLT, COM,
+      MTG, CLOS, AVE) collide with none of the declared LOB codes (CCB, AWM, CIB, CT, HR, ET),
+      so the material carries no real estate values and the prompt says so.
 notes: |
-  Minted 2026-09-07 from docs/restructure/IDEAS.md Idea-256.
+  Minted 2026-09-07 from IDEAS.md Idea-256 (the SME's synthetic hierarchy sketch,
+  2026-09-04, transcribed into the entry in full because the sketch file was deleted after
+  capture; nothing external is cited).
+
+  MODULE CHOICE, recorded: the entry says 'Module config / drydocs-core for any reader; the
+  DPROD question is ontology-mapper's'. The DELIVERABLE here is the gate prompt, so the item is
+  filed module ontology, agent ontology-mapper, epic ontology-mapping / phase 2. A later
+  config-side reader, if the gate admits the tier, is a separate item under config.
+
+  This item is deliberately NOT the admission of the tier. Findings (1) and (2) mean three of
+  the four things the entry raised need no ruling at all; only the Logical Container does, and
+  it is edge-and-tier semantics, so it routes through the gate.

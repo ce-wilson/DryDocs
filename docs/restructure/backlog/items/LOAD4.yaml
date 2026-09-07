@@ -9,10 +9,34 @@ model: sonnet
 priority: p2
 status: todo
 depends_on: []
-inputs: []
+inputs:
+- docs/restructure/backlog/items/Z7.yaml
+- docs/restructure/backlog/items/Z8.yaml
+- drydocs/data/samples
 acceptance: |
-  STUB - minted 2026-09-07 by the groom of Idea-259; the body lands in the next
-  commit of the same groom run (the I6 mint protocol: final title first, pushed,
-  then the body).
+  The bundled demo's coverage counters show 7 of 8 folders unattributed, and the reason is
+  that the fixture's application ids and its folder ids were authored apart: the SEAL capture
+  declares applications 70001-70003 while the sample folders carry 70002, 70011, 70012, 70021,
+  70022, 70031 and 70041. Only one folder can ever attribute, so the demo under-reports
+  attribution as a fixture defect rather than as a real gap.
+
+  (a) The mismatch is FIXED in one direction, and the item says which and why: either the SEAL
+      capture grows the six synthetic applications, or the sample folders narrow onto the three
+      that exist. Both are defensible; one is chosen and the choice is written into the fixture
+      header, not left to the next reader.
+  (b) The DELIBERATE gaps survive. Two hosts are unresolved on purpose so the demo shows a real
+      unresolved case; that set is named in the fixture header and is NOT closed by this item.
+      A run after the fix still reports them.
+  (c) The demo's coverage counters are re-measured after the fix and the new numbers are
+      recorded on this item, so 'attribution works on the samples' becomes a
+      sample-reproducible claim (J18) instead of a machine-pinned one.
+  (d) A guard pins the join: every application id referenced by a sample folder resolves in the
+      bundled SEAL capture, apart from an explicitly listed deliberate-gap set.
 notes: |
-  Minted 2026-09-07 from docs/restructure/IDEAS.md Idea-259.
+  Minted 2026-09-07 from IDEAS.md Idea-259 (Lane B close report, laptop, 2026-09-05, Z7).
+
+  Filed under Z7/Z8's epic (server-location, phase 6) because it is a defect in the fixtures
+  those two items built, not new demo work.
+
+  Clause (d) is the groom's addition: without it the same drift returns the next time either
+  half of the fixture is edited, which is exactly how it arrived.

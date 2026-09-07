@@ -30,3 +30,10 @@ groom_log:
   note: 'Groomed 2026-09-02 from Idea-230. I8: an item''s acceptance can be overtaken by its own dependency
     growing (O59 against G68''s fifth census) and nothing notices. A warn-only currency list at groom
     time, done items excluded because a closed item''s acceptance is a historical record.'
+- date: '2026-09-07'
+  note: '2026-09-07 groom: the two gaps in lane-handoff --suggest, kept apart because they are different missing
+      signals. PLAN5 folds in the queue-versus-queue input overlap check (four of ten items passed clean while
+      sharing write paths; seven when run cold) and CARRIES the ruling it needs rather than making it - does
+      an item declare outputs, or is docs/reviews/ excluded by convention. PLAN6 gives an item a declared
+      venue, so a wall written in acceptance prose stops being invisible.'
+  attached_at: PLAN5

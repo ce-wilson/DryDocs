@@ -9,10 +9,34 @@ model: sonnet
 priority: p2
 status: todo
 depends_on: []
-inputs: []
+inputs:
+- PORT-MANIFEST.yaml
+- drydocs/port/port_backlog_union.py
+- scripts/port_rename_check.py
 acceptance: |
-  STUB - minted 2026-09-07 by the groom of Idea-253; the body lands in the next
-  commit of the same groom run (the I6 mint protocol: final title first, pushed,
-  then the body).
+  The file-level port drop guard reports every path a take would REMOVE and has no way to
+  record that a specific drop was RULED. A retirement the port already decided is therefore
+  reported again at every chunk and reads like a finding.
+
+  (a) An accepted_drops: block in the SIDE-LOCAL overlay (PORT-MANIFEST.*.yaml, the J34 slot -
+      each side's own rulings, never carried across), keyed by path and carrying the ruling's
+      provenance (report id, date).
+  (b) The guard reads it: an accepted drop is LISTED under its own heading as ruled - never
+      silence, never a failure. That is the precedent one level up, in
+      drydocs/port/port_backlog_union.py's UNION_EXCLUSIONS.
+  (c) A STALE allowance fails the check: if the path exists again, the accepted drop is no longer
+      true and the guard says so. This clause is the whole reason the block is safe to add.
+  (d) Fixtures cover the three states - unruled drop (reported as a finding), ruled drop (listed
+      as ruled), stale allowance (fails).
 notes: |
-  Minted 2026-09-07 from docs/restructure/IDEAS.md Idea-253.
+  Minted 2026-09-07 from IDEAS.md Idea-253 (the company's chunk-5 apply of
+  port-base-20260902, their idea inbox, relayed by the SME 2026-09-04; the producer holds no
+  transcript, so traceability to their id is one-directional).
+
+  The entry's two siblings from the same apply landed directly at capture time (the
+  lane-handoff skill's row_may_match_nothing entry, and drydocs_core/component_map.py's
+  per-entry row); this one needed a seam and so became an item.
+
+  The shape is deliberately the UNION_EXCLUSIONS shape rather than a new invention: an accepted
+  difference is rendered under its own heading, never as silence and never as a failure, and a
+  stale allowance fails.

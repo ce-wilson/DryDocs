@@ -9,10 +9,42 @@ model: fable
 priority: p3
 status: todo
 depends_on: []
-inputs: []
+inputs:
+- docs/restructure/backlog/items/WEB7.yaml
+- web/src/modules/lazyRoutes.test.ts
+- web/scripts/checkBundleSize.mjs
+- PUBLISH-BOUNDARY.md
+- docs/adr/
 acceptance: |
-  STUB - minted 2026-09-07 by the groom of Idea-272; the body lands in the next
-  commit of the same groom run (the I6 mint protocol: final title first, pushed,
-  then the body).
+  WEB7 shipped a rule and the guard that enforces it, and the rule outlives the item: the
+  lazy-loaded route set IS the gated route set, derived from the one route table both the gate
+  and the split read, never kept as a second list. That belongs in an ADR, and the material is
+  all in hand.
+
+  (a) A new ADR, status PROPOSED, records the rule: code splitting follows the AUTHORIZATION
+      boundary, and the lazy set is DERIVED from the gated set in both directions (a gated
+      route left eager fails; a lazy route that is not gated fails too, because shaving bytes
+      off an open route is a different decision and must not arrive under this rule's cover).
+  (b) It cites WEB7 and the derivation guard BY PATH, plus the CI chunk ceiling (WEB7 clause b)
+      as the mechanism that keeps the split from silently reverting.
+  (c) It records the publish-boundary trace WEB7 clause (c) produced - every generated artifact
+      in the bundle is External, Internal-Public or config/ tier - and states the consequence
+      plainly: the split stands on least privilege, not on confidentiality. This is the sentence
+      the ADR exists to record, and it deflates the devtools-leak framing of review finding A4.
+  (d) It SETTLES, in the same ADR, the one case that declines the rule: /lineage is open to
+      every role and imports load-map.json, which pins that artifact in the initial chunk.
+      Either it is a stated exception (an open route may carry its own data) or it is a pending
+      gate question - the ADR says which, and does not leave it as a footnote.
+  (e) The ADR index line lands first, per the repo's ADR numbering convention.
 notes: |
-  Minted 2026-09-07 from docs/restructure/IDEAS.md Idea-272.
+  Minted 2026-09-07 from IDEAS.md Idea-272 (Lane B close report, laptop, 2026-09-06,
+  hand-back adr). WEB7's own close note nominates the ADR and says the adr pen was not that
+  lane's.
+
+  EPIC CHOICE, recorded: web-console / phase 12 rather than doc-infrastructure, because the
+  decision being recorded is the console's and the reader who needs it is reading WEB items.
+  Module is docs (the artifact is an ADR). The alternative filing (doc-infrastructure / 10)
+  was the runner-up and is not wrong; nothing downstream depends on which was picked.
+
+  Model fable: an ADR is a decision record that binds later work, which is the boundary case
+  the matrix reserves the top tier for.

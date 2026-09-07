@@ -164,3 +164,13 @@ groom_log:
     a slice must carry whole), J76 (the instrument corrupts the measurement and fails toward reassuring;
     one of the three instances admits a guard), J77 (a roll naming a range says which commits were red
     at push), J78 (a cancelled CI run is UNVERIFIED, not green).
+- date: '2026-09-07'
+  note: '2026-09-07 groom of the 2026-09-05..09-07 inbox: eight items in this epic. The PORT series opens - PORT1
+      (three back-flow adoptions from the company chunk-1 apply plus the workplan rule that a plan naming
+      a script names the commit it needs), PORT2 (rev1 and rev11 normalize to one anchor set), PORT3 (a canonical-producer
+      test pinning a never-port path fails on every consumer tree), PORT4 (the drop guard has no accepted-drop
+      seam), PORT5 (an entry_rule that asserts the consumer''s tree). Plus CORE2 (an absence guard needs a
+      positive control - six vacuous scans in two bursts), CORE3 (CI clones shallow so the J74 guard skips),
+      CORE4 (the skip-guard policy pattern-matches a directory where it should ask git) and CFG3 (two schemas
+      open at the top level).'
+  attached_at: PORT1
