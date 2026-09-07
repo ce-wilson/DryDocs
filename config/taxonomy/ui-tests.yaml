@@ -843,3 +843,26 @@ suites:
           a gate decision, not a UI one.
         source: "O62 build 2026-08-31 - desktop, Chrome vs Vite :5180 (origin supplied with DRYDOCS_CORS_ORIGINS) + drydocs-api :8007. The NOT-FOUND path ran against the live graph (0 :DataAsset nodes - the curated lineage load has not run here, confirmed by raw-cypher count); the FOUND path used rows injected at the API boundary, and rendered both processes with 3 not-found legs and the not-modelled repo leg."
         automated_by: tests/unit/test_ask_file_search_spec.py
+
+      - id: TC-ASK-05
+        description: A failed ask diagnoses itself instead of printing one red line
+        steps:
+          - With the agent server NOT started, ask any question on /ask.
+          - Read the block that replaces the old single-line error.
+          - Start the agent server with no ANTHROPIC_API_KEY and ask again.
+        expect: >
+          The browser's own words render FIRST and unchanged - "Failed to fetch"
+          stays "Failed to fetch", because that is the string a reader pastes
+          into a search or a ticket. A `checking` row appears immediately and is
+          distinct from both an ok and a down row, so a slow probe never reads
+          as a verdict. Then the two states render DIFFERENTLY, which is the
+          whole point: an unstarted agent server says nothing answered at
+          /agent, while a started one with no key carries the server's own
+          "ANTHROPIC_API_KEY is not set (agents/.env)" verbatim - naming the key
+          AND the file, which a paraphrase would lose. A server that is up but
+          does not serve graph_qa is a third verdict again, since "start it" is
+          the wrong fix there. The `contact DryDocs support` hand-off appears
+          ONLY when every check came back ok; a red row is the reader's next
+          action and a hand-off beside it would bury the fixable thing.
+        source: "O63 build 2026-09-06 - laptop, vitest jsdom (web/src/ask/FailureLadder.test.tsx, 6 cases) over an injected probe, plus the pure state machine in web/src/lib/askLadder.test.ts (10 cases) and the probe's own honesty rules in web/src/lib/serviceProbe.test.ts (12 cases). NOT a browser end-to-end: the agent stack was not run on this machine, so the two live failure states were reproduced through the probe seam rather than by stopping a real server. An end-to-end run upgrades this source."
+        automated_by: web/src/ask/FailureLadder.test.tsx

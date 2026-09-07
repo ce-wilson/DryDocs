@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - web/src/routes/AskRoute.tsx
@@ -132,3 +132,111 @@ notes: |
     reachability.ts is a natural input; proposed here, not added.
   The acceptance TEXT is left as written - amending it is the item author's call, and the notes
   above are enough for the builder to meet its intent under the ADR.
+
+  ── CLOSED 2026-09-06, Lane B (laptop), branch wip/O63-laptop from main at 5429f263 ──
+
+  BUILT TO THE PRE-BUILD CHECK, not to the clause text, on all three points it
+  raised. (c) pings `/agent/list-apps` on the page's own origin - VITE_ADK_URL is
+  retired (ADR 0020 D2) and never appears. (f) labels services by NAME
+  (drydocs-api, graph, agent server, agent provider); no port or host reaches the
+  bundle, and a test asserts that on the rendered strip as well as on the labels.
+  Rule 2's two failures are told apart by reusing reachability.ts's own
+  distinction for the `/agent` prefix rather than writing a second probe.
+
+  TWO SERVER ROUTES DID NOT EXIST AND NOW DO.
+
+  * GET /graph-status on drydocs-api. "The API is up" and "the graph behind it is
+    there" are different facts and /health only ever answered the first - the API
+    serves /health perfectly well with no graph, which is exactly the state that
+    presented as a broken page. Steward+admin (matching /docs-verify), no
+    parameters, a bare RETURN 1 chosen server-side, so ADR 0005's property holds
+    the way it does for the corpus sweep. `database` comes from SPEC_DATABASES,
+    the reviewed READ database, not from the nullable Neo4jSettings.database.
+    An unreachable graph is a VERDICT, not a 500: LiveRunner is lazy, so a wrong
+    NEO4J_URI first throws on this very call. `detail` is the exception CLASS -
+    a driver message quotes the URI it dialled, and the class is what actually
+    separates an auth failure from a refused connection.
+  * GET /drydocs-health on the agent server, added in serve.build_app. ADK owns
+    /, /health, /version, /list-apps, /run, /run_sse, /dev-ui* and /apps/* - read
+    off the installed vendor file rather than assumed - so the name is free, and
+    it is deliberately NOT /health: that one is ADK's and answers for the SERVER,
+    which is a different question from whether the agent can reach a model.
+
+  A REAL TRAP FOUND WHILE WIRING THE SECOND ONE. providers.py merges only the
+  REPO-ROOT .env at import; agents/.env - the file every ProviderConfigError
+  message names - is merged by common.neo4j_tool at ITS import (G131). A probe
+  importing providers alone would read a half-loaded environment and report
+  ANTHROPIC_API_KEY unset on a machine where a real turn succeeds. A false RED is
+  worse than no probe: it sends an operator to edit a file that is already
+  correct, which is the same harm this item was raised to remove. provider_check
+  imports common.neo4j_tool first and a test asserts that ORDER by parsing the
+  file.
+
+  THE HONESTY RULES, AND WHERE THEY BIT.
+
+  1. NEVER INVENT A GREEN - and never invent a RED either, which is the half the
+     clause does not say and the probe needed. The states are four: a check whose
+     DEPENDENCY is down is `not-checked`, never `down`, because it was never run.
+     A provider reported broken because there is no server to ask would
+     manufacture the second failure out of the first. An older agent server
+     without the probe route is `not-checked` too: it has not FAILED a check, it
+     has no check.
+  2. The two agent failures stay apart because the probe reads the STATUS, not
+     just the throw. adk.listApps() was the obvious reuse and is the wrong tool -
+     it throws on a non-2xx before the caller sees the status, and the status is
+     exactly what separates "nothing answered on this origin" from "the proxy
+     answered 502 for an agent that is not there". A THIRD case joins them: a
+     server up but not serving graph_qa, where "start it" is the wrong fix.
+  3. No secret reaches the page, asserted server-side against the real error text
+     rather than argued (test_service_probe.py). That test RUNS rather than
+     skips: providers.py imports only stdlib and python-dotenv, so agents/ on
+     sys.path is enough, and a skipped security assertion runs on no machine and
+     in no CI job while reading as coverage.
+
+  RULED AT BUILD TIME, as the item asked.
+  * `contact DryDocs support` stays a PLAIN STRING with no link. This is the
+    producer console, "support" is the person reading the screen, and inventing a
+    destination would be inventing a fact. Config on the
+    VITE_RUNTIME_VIEW_URL_TEMPLATE precedent if that ever changes.
+  * The ladder probes ONCE PER FAILURE with no re-check control - a repeat button
+    there would be a second, worse copy of the strip's Re-check, and the reader
+    whose turn just failed wants the answer, not an instrument. A new failure
+    runs a new probe, which is when the answer could have changed.
+  * The ladder is a PURE FUNCTION, `ladderStages(error, probe)`, because the
+    acceptance asks for a test of the state MACHINE "rather than its copy" and a
+    machine inside JSX can only be tested by rendering it and reading strings
+    back. The trap the clauses do not spell out: (d) reads like a sequence of
+    fresh requests, but the originating error has already arrived - the ladder
+    probes the SERVICES and reinterprets that error, and never silently re-asks
+    the person's question.
+
+  ONE PROBE, THREE CONSUMERS. readiness.ts's probeHealth MOVED into
+  lib/serviceProbe.ts and is re-exported, so the shell banner, the ladder and the
+  strip share one API check instead of two that could disagree. It went DOWN a
+  layer rather than the probe reaching up: data/ already depends on lib/.
+
+  LEDGER: two new .tsx, and they split on exactly the stated test. FailureLadder
+  is BOUND to `ask` by directory evidence (it lives under ask/, one consumer);
+  ServiceStatusStrip is UNBOUND - it lives in components/ with no directory
+  evidence, which is LogEstatePanel's position exactly, a panel on the same admin
+  page. Counts moved 97 -> 99 with the reasons in the guard's own narrative.
+
+  ONE CLAUSE WAS OVERTAKEN BY EVENTS: the acceptance says the TS-ASK suite is
+  "declared but empty today", which was true on 2026-08-20 and is not now - O64
+  and O62 filled it with TC-ASK-01..04. TC-ASK-05 is added for the ladder, and
+  its `source` says plainly what was and was not observed: vitest jsdom over an
+  injected probe, NOT a browser end-to-end, because the agent stack does not run
+  on this machine. An end-to-end run upgrades that source.
+
+  VERIFIED on this laptop (J18): full pytest suite, ruff check + ruff format,
+  tsc -b --force, oxlint 0, vite build, 401 vitest passing (36 files),
+  bundle:check 97.7% of ceiling, test:coverage 16.45/78.86/59.3 against floors
+  9.8/70/50. `npm run dist:check` fails HERE and passes in CI - my web/.env.local
+  inlines VITE_NEO4J_URI and VITE_ADK_URL into the bundle and WEB10's guard
+  correctly reports them; parking the file and rebuilding gives exit 0. Not this
+  branch, and main is green.
+
+  HANDED BACK TO LANE A: nothing blocking. Worth an idea - the agent server now
+  has a DryDocs-owned route on it (/drydocs-health), which is a new seam: if more
+  of them arrive they want a prefix and a note in agents/README.md rather than
+  accreting at the root beside ADK's own.

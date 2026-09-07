@@ -103,6 +103,15 @@ def test_docs_verify_validates_against_its_model(api):
     assert "statuses" in body and body["classification"]
 
 
+def test_graph_status_validates_against_its_model(api):
+    """O63. The behaviour (roles, the unreachable verdict, no coordinate in the
+    detail) is tests/unit/test_service_probe.py's; this tier only says the route
+    answers 200 through the framework with its model applied."""
+    client, token, _ = api
+    body = _ok(client.get("/graph-status", headers=_auth(token)), "GET /graph-status")
+    assert body["database"] and body["reachable"] is True
+
+
 def test_log_estate_validates_against_its_model(api):
     client, token, _ = api
     body = _ok(client.get("/admin/log-estate", headers=_auth(token)), "GET /admin/log-estate")
@@ -454,6 +463,7 @@ def test_every_console_route_in_the_schema_guard_was_driven_here() -> None:
         ("/specs", "get"),
         ("/specs/{spec_id}/run", "post"),
         ("/docs-verify", "get"),
+        ("/graph-status", "get"),
         ("/admin/log-estate", "get"),
         ("/specs/ephemeral", "post"),
         ("/intake", "get"),

@@ -217,12 +217,22 @@ def test_the_automated_share_is_pinned_so_it_cannot_drift_up_quietly() -> None:
     supplement properties (that loader is company-side), so no job on this side
     has an observed runtime to render. The share moved up because the claim is
     about rendered strings over a pure model, not because anything was backfilled.
+    20/44 -> 21/45 at O63 (2026-09-06): TC-ASK-05, automated by
+    web/src/ask/FailureLadder.test.tsx. READ WHAT THE AUTOMATION COVERS, because
+    this case is the one where the gap matters most: the vitest suite drives the
+    ladder over an INJECTED probe, so it holds the state machine, the verbatim
+    strings and the three distinct verdicts. It does NOT hold the thing the case
+    is really about -- that stopping a real agent server produces the first
+    state and an unset key produces the second -- because the agent stack does
+    not run on the machine that built this. The case's `source` says so in the
+    same words. Same share rule as O59: this moved up because a pure reducer is
+    exactly what a unit runner can hold, not because anything was backfilled.
     """
     cases = [c for s in _tests()["suites"] for c in s["cases"]]
     automated = [c for c in cases if c.get("automated_by")]
     assert (len(automated), len(cases)) == (
-        20,
-        44,
+        21,
+        45,
     ), f"automated case count changed: {len(automated)}/{len(cases)} — update the pin"
 
 
