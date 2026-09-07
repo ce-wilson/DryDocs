@@ -354,6 +354,26 @@ def test_thread_decision_validates_and_carries_the_optional_transition_fields(ap
     assert decided["thread_decision"] == "adds-value"
 
 
+def test_data_centers_validates_against_its_model(api):
+    """Z6's config read. Worth a drive of its own even though it touches no graph:
+    ``extra='forbid'`` turns a registry row that grew a field into a 500 here, and
+    this route is the ONLY path to the E#### default-time seed — a dead one means
+    every job with no explicit timing silently reports no runtime."""
+    client, token, _ = api
+    body = _ok(client.get("/data-centers", headers=_auth(token)), "GET /data-centers")
+    assert body["data_centers"], "the publishable sample is committed and never empty"
+    assert body["source"] in ("internal-twin", "publishable-sample"), (
+        "the venue is the J18 half of this payload: a default time shown without it "
+        "would make a synthetic sample read as a statement about production"
+    )
+    row = body["data_centers"][0]
+    assert set(row) == {"code", "name", "default_time", "suffix", "sample", "note"}
+    # OPTIONAL BY RULE, asserted as such: the E#### reading is an internal
+    # convention whose own open item is "confirm E is always Eastern", so a row
+    # with no default_time is a legitimate registration and must not 500.
+    assert all(isinstance(d["default_time"], str) for d in body["data_centers"])
+
+
 def test_every_console_route_in_the_schema_guard_was_driven_here() -> None:
     """The two guards are kept in step by name.
 
@@ -393,6 +413,7 @@ def test_every_console_route_in_the_schema_guard_was_driven_here() -> None:
         ("/mappings/drafts/{draft_id}/promote", "post"),
         ("/mappings/app-code/draft", "post"),
         ("/mappings/app-code/migrations", "get"),
+        ("/data-centers", "get"),
     }
     missing = set(CONSOLE_ROUTES) - driven
     assert not missing, f"declared but never driven through the framework: {sorted(missing)}"

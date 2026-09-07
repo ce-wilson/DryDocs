@@ -398,10 +398,17 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     96 -> 97 at R19 (2026-09-06): ClarificationCard, BOUND to `ask` by directory
     evidence -- it lives under ask/ and serves exactly the one route that renders
     it. Both counts move by one.
+    97 -> 99 at Z6 (2026-09-06): RuntimeSpanMap and RuntimeSpanPanel, both UNBOUND,
+    bound stays 41. LocationMap's rule and not a new one: the Z5 directive is
+    "module first, pages second", so the map takes its access and its registry as
+    props and the Explorer tab is only its first consumer. The SPLIT between the
+    two is worth the second row rather than being one file -- the map renders and
+    the panel fetches, which is what lets the map be driven against fixtures with
+    no server, and every clause Z6 has to meet is a claim about what it renders.
     """
     comps = _ui()["components"]
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
         41,
-        97,
+        99,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"

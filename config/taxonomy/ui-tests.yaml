@@ -464,6 +464,24 @@ suites:
           worse claim than "we could not place this".
         source: "Z5 defect, found by rendering the tab 2026-08-27; locked in by unit tests at O80 2026-08-31"
         automated_by: web/src/components/map/resolve.test.ts
+      - id: TC-EXPLORER-02
+        description: A DC default time is drawn as a default, never as an observed runtime
+        steps:
+          - Open Explorer -> Runtime clock and pick a job whose folder carries no
+            window_start/window_end and whose job carries no avg_start_time.
+          - Read the span line and the colour of the bar.
+          - Pick a job that DOES carry avg_start_time + avg_run_time and compare.
+        expect: >
+          The seeded one says "DEFAULT from the DC name - not an observed runtime"
+          and says the bar's LENGTH means nothing (the E#### segment carries a
+          start and no duration); the observed one says "Observed (job avg start +
+          avg run)". A job with neither reports "no runtime to draw" and draws no
+          bar at all. This is the clause Z6 exists to protect: a default rendered
+          the same way as a measurement turns a naming convention into a claim
+          about when something ran, and the person reading the map has no way to
+          tell which they are looking at.
+        source: "Z6 build 2026-09-06 - laptop; vitest over an injected spec result and an injected viewer zone, NOT a browser end-to-end: the producer graph carries no P4 supplement properties, so no job here has an observed runtime to render"
+        automated_by: web/src/components/map/RuntimeSpanMap.test.tsx
   - id: TS-LINEAGE
     module: lineage
     description: >
