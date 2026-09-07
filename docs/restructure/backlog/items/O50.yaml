@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on:
 - O46
 - O47
@@ -20,3 +20,111 @@ acceptance: |
   ?as=admin sees the intake queue rail: sme-confirmed records with a diff-style display of what the SME confirmed vs what the extractor proposed, and two actions — accept (→ admin-accepted) or return with a required note (→ admin-returned, back to the SME's drafts). The full status machine renders with the ui-conventions StatusChip vocabulary. THE LOAD BOUNDARY IS HONEST: admin-accepted records PARK with a "waiting on gate" chip naming what they wait on (corpus load = Q10 ← G31 ← G32; assignment edge = Q10's HITL gate) — acceptance here never triggers a load, and no code path from this surface writes the graph.
 notes: |
   Slice 6 (plan §7). Ends at admin-accepted by design; the load half belongs to Q10 and stays there.
+  ── CLOSED 2026-09-06, Lane B (laptop), branch wip/O50-laptop from main at f5eab98b ──
+
+  Section 7 is live. The rail holds TWO groups, not one: `sme-confirmed` awaiting
+  review and `admin-accepted` parked. A record that vanished on accept would read
+  as loaded, which is the single thing acceptance does not do, so the park is a
+  group and not an absence.
+
+  THE DIFF CLAUSE IS MET AT THE SHAPE THE STORE SUPPORTS, and the missing half is
+  NAMED rather than manufactured. "What the extractor proposed" is section 4's
+  candidate-binding set — plan lines 124-135, one row per recognized entity with
+  `status: proposed`. O48 builds the panel that produces it and the O46 intake
+  table has no column to hold it, so there is no producer. The panel prints
+  NO_PROPOSED_BINDINGS, which says that, instead of an unexplained blank pane —
+  "the extractor proposed nothing about this evidence" is a different and false
+  claim. `reviewSides.proposed` is typed `Fact[] | null` for the same reason:
+  `null` (nobody has run this) and `[]` (it ran and found nothing) are different
+  facts and the type keeps them apart.
+
+  What IS on the page beside the SME's answers: the parser preview per evidence
+  file, labelled "what the parser read off the evidence" — READ, not PROPOSED.
+  Those are email header facts (subject/from/date) and json top-level keys, and
+  they are not answers to the questions the SME answered (context type, area,
+  note). Putting them in a two-column DIFF would have manufactured agreement or
+  disagreement between two unrelated field sets, which is the shape of a finding
+  that is wrong on arrival. Plus the thread delta where one exists — the ONE real
+  machine-proposed / human-disposed pair in today's store — with the SME's ruling
+  above it.
+
+  THE LOAD BOUNDARY IS ASSERTED, NOT CLAIMED. "No code path from this surface
+  writes the graph" was a header comment; a header stays true until the day
+  somebody adds a load button with the record right there and the graph client one
+  import away. intakeReviewQueue.noGraphWrite.test.ts scans for every graph seam
+  (useGraphAccess / runSpec / runCypher / boltAllowed / lib-graph / graphAccess)
+  over `codeOnly` — J66, because the paragraph explaining the rule quotes every
+  name it forbids — plus a positive half over `withoutComments`, since an import
+  path IS a string literal and codeOnly neutralises those by design. An instrument
+  check sits beside them (J76).
+
+  THE GATES MOVED OUT OF A SENTENCE AND INTO DATA. `legal_transitions` says only
+  `waiting_on_gate: true` — a boolean, because the server's job is the machine and
+  not the prose — so the WHAT is the console's to carry. WAITING_ON in
+  lib/intakeReview.ts carries it once, and the stepper's chip and the rail's
+  standing note both render it, which is why a test can assert they agree
+  (getAllByText(/Q10 ← G31 ← G32/) is exactly 2).
+
+  TOKENS, so the §1 conformance grep is not second-guessed. "to review" is
+  `--teal`: the stepper already paints the CURRENT stage teal, and a confirmed
+  record is the admin's active work. "parked" is `--yellow`: §1's "queued, not yet
+  moving", which is what waiting on a gate is. Neither is `--green` (done) nor
+  `--status-fail-soft` (broken), and reading an accepted record as either is the
+  confusion the load boundary exists to prevent.
+
+  TWO THINGS THE BUILD CORRECTED.
+
+  * `?as=admin` IS NOT A PERSONA ID. The acceptance and plan §7 both write it;
+    `?as=` takes a persona id (App.tsx), `admin` is not one, and the admin seat is
+    `?as=morpheus` — DEV-only, and it needs VITE_DEV_CONSOLE_SECRET. The mechanism
+    is `canReviewIntake(persona)`.
+  * WEB3's clause-(c) guard caught `persona.role === 'admin'` inline in the route
+    and was right to. `canReviewIntake` now sits in lib/auth.ts beside
+    canAccessIntake — the file the ALLOWED table already names, and the one place
+    the page's persona rules belong. It is a DISPLAY decision and not a second
+    gate: accept and send-back are `_ADMIN` server-side, and a non-admin's legal
+    map comes back empty.
+
+  TWO COMPONENTS, both UNBOUND ('intake' is not a registry module — O47's rule,
+  not a new one). ThreadDiff is the interesting one: it did not arrive, it MOVED
+  out of IntakeRoute the moment it gained a second consumer, because the plan's
+  VERBATIM discipline for this panel says the admin sees exactly what the SME saw
+  and two renderers are two things that can disagree. A move is invisible to a
+  scan that counts files, so the pin's narrative is the only place that is
+  recorded. IntakeStepper gained `showActions` so the panel can render the machine
+  for context while the Decision section owns the buttons — one button row off one
+  server map, not two.
+
+  HANDED BACK TO LANE A.
+
+  1. MERGE ORDER AND THE EXACT RESOLUTION. wip/O63-laptop and wip/O50-laptop
+     branch from the same base and edit the same ledger lines. Merge O63 FIRST,
+     then O50, and resolve to: `# --- component (22) ---`, `# --- ask (4) ---`,
+     pin `(42, 101)`. O50's narrative paragraph then reads `99 -> 101`, not
+     `97 -> 99` — two paragraphs claiming the same move would be a false record.
+  2. THE INTAKE PAGE HAS NO ui-tests PATH AT ALL. Four live sections and no suite,
+     because every suite joins on a registry module and `intake` is not one (it is
+     a PERSONA_SCOPED_PATH). Deliberately NOT fixed here: the fix is a
+     NON_MODULE_SUITES entry with a stated reason, the shape `shell` already has,
+     and it moves the ledger's 13/13 coverage claim — a ledger-policy ruling, not
+     O50's to take.
+  3. O48's SEAM, derived from this build: the candidate-binding set has to land on
+     the intake store AND in IntakeRecordOut. When it does, `reviewSides.proposed`
+     flips from `null` to a list and NO_PROPOSED_BINDINGS retires. Nothing else in
+     the panel changes.
+  4. O26 STAYS `todo` — a live, undischarged SME HOLD, re-verified from primary
+     sources this session. Not built, and not buildable until the hold is
+     discharged. The handoff file cannot retire while it sits there.
+  5. `handoff.py --check` on this checkout reports O63 `in_progress`. Its `done`
+     is on wip/O63-laptop, unmerged — not a dead claim.
+
+  VERIFIED on this laptop (J18): full pytest suite (3496 passed, 16 skipped, one
+  expected red below), ruff check + ruff format,
+  tsc -b --force, oxlint 0, vite build, 394 vitest passing (35 files),
+  bundle:check 97.8% of ceiling, test:coverage 17.11/78.95/60.31 against floors
+  9.8/70/50. Every number here is from a run over THIS tree, not an earlier one.
+
+  EXPECTED RED, per the Lane B handoff:
+  test_committed_roadmap_page_matches_its_sources fails on this commit — a close
+  writes notes and Lane B does not render (Y5's tolerance covers a CLAIM, not a
+  close). Lane A renders once at merge.

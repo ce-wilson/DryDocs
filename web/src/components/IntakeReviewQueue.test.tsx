@@ -140,6 +140,22 @@ describe('the decision', () => {
     expect(screen.queryByRole('button', { name: 'Reject' })).toBeNull()
   })
 
+  it('renders the full status machine in the panel, gates and all', async () => {
+    // The acceptance asks for the machine in the ui-conventions vocabulary.
+    // The panel reuses IntakeStepper rather than drawing a second one, so what
+    // is asserted here is that it is REACHED — the stepper's own stage tokens
+    // are its tests' business, not this file's.
+    const parked = adminRecord({ status: PARKED_STATUS })
+    parked.legal_transitions = { ...parked.legal_transitions, transitions: [], waiting_on_gate: true }
+    render(<IntakeReviewQueue api={stubApi({ get: vi.fn(async () => parked) })} />)
+    fireEvent.click(await screen.findByText('i2'))
+    expect(await screen.findByText('Admin accepted')).toBeTruthy()
+    expect(screen.getByText('Loaded')).toBeTruthy()
+    // Twice on the page: the rail's standing note and the selected record's
+    // own park. Both come from WAITING_ON, which is why they cannot disagree.
+    expect(screen.getAllByText(/Q10 ← G31 ← G32/)).toHaveLength(2)
+  })
+
   it('offers nothing at a status whose map is empty, and says so', async () => {
     const parked = adminRecord({ status: PARKED_STATUS })
     parked.legal_transitions = { ...parked.legal_transitions, transitions: [], waiting_on_gate: true }
