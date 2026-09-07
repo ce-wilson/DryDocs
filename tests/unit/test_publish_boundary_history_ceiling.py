@@ -136,7 +136,21 @@ def test_no_new_commit_message_carries_the_retired_org_acronym() -> None:
         )
 
     pattern = re.compile(r"\b" + re.escape(token) + r"\b", re.IGNORECASE)
-    offenders = [sha for sha, message in _commit_messages() if pattern.search(message)]
+    records = _commit_messages()
+    offenders = [sha for sha, message in records if pattern.search(message)]
+
+    # THE VERDICT LINE (CORE3). A green guard and a skipped guard both read as
+    # "no failure" in a CI log, which is exactly the confusion that let this run
+    # inert since J74 landed. Saying the two numbers out loud makes a MEASURING
+    # run distinguishable from a SKIPPING one at a glance, and it surfaces the
+    # margin that `test_the_ceiling_is_not_stale_by_a_wide_margin` guards. The
+    # named CI step runs this file with `-s` so the line reaches the log; under
+    # the plain suite run pytest captures it, which is correct — one verdict in
+    # one place.
+    print(
+        f"[J74] MEASURED on a full clone: {len(offenders)} of {len(records)} commit "
+        f"messages carry the retired token; recorded ceiling {CEILING}."
+    )
 
     assert len(offenders) <= CEILING, (
         f"{len(offenders)} commit messages carry the retired internal org acronym "
