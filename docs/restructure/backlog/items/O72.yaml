@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - docs/design/drydocs-web-console-runbook.md
@@ -76,3 +76,115 @@ notes: |
   they are for the runbook's sake, but the reason is gone and the sentence should go
   with it when this item is pulled (proposed here, not edited - the acceptance is the
   puller's to settle against ADR 0020).
+
+  CLOSED 2026-09-07 (Lane B, laptop, wip/O72-laptop). The acceptance above was settled
+  first, as this note asked; that edit is in the branch's first commit and NOT in the
+  claim commit on main, because the roadmap fingerprint normalises out STATUS and
+  nothing else, so an un-rendered acceptance edit on main would have redded the trunk
+  for the whole window. The sender's intent - settled at pull, by the puller - is kept.
+
+  VENUE (J18): laptop, Docker Desktop 29.6.1 / Compose v5.3.0 on WSL2. No Neo4j on the
+  host was involved; the stack brings up its own.
+
+  WHAT LANDED
+  - compose.yaml (repo root, so the one command is `docker compose up --wait` from where
+    every other command runs): four long-running services and two init jobs. The init
+    jobs are neo4j-plugins, which copies the apoc and GDS jars out of the image into the
+    plugins volume - provision.ps1 STEP 1 verbatim, never NEO4J_PLUGINS, which downloads
+    at startup and leaves the plugin silently absent when it cannot - and neo4j-provision,
+    which applies 01_databases.cypher so the ADR 0002 topology exists rather than the
+    home database `neo4j`, where no query surface looks.
+  - deploy/{api,agent,console}.Dockerfile plus deploy/render_proxy_config.mjs. Two images
+    for Python because agents/ has always had its own interpreter and leads the poetry env
+    on the neo4j driver major; the console image is multi-stage, and its build stage runs
+    `npm run build` AND `npm run dist:check`, so a type error or a leaked coordinate is a
+    failed image rather than a shipped bundle.
+  - .dockerignore. This is the publish boundary in image form and it is the file that
+    matters most here: a COPY bakes the context into a layer that survives every later
+    delete and travels with the image, so the rule deciding what may be pushed decides
+    what may enter a build context.
+  - tests/unit/test_compose_stack.py, the four silent breakages: a service with no health
+    check (--wait quietly reverts to meaning "started"), a literal credential, an agent
+    app set that drifts from R14's four, and a restated path map.
+  - drydocs_core/component_map.py: deploy/ -> drydocs-web in SURFACE_OWNERS (ADR 0018 D3),
+    and MODULE_MAP.md re-rendered via scripts/render_module_map.py in the same commit.
+
+  THE PATH MAP IS RENDERED, NOT RETYPED. nginx cannot read JSON, so the server block is
+  generated at image-build time from web/delivery.json - the same file vite.config.ts and
+  src/lib/auth.ts read. A hand-written nginx.conf would be a fourth copy of ADR 0020's
+  map, and its failure is the worst kind: change delivery.json, dev keeps working because
+  Vite re-read it, and the stack forwards nothing - a prefix matching no location falls
+  through to the SPA fallback and answers 200 with index.html. A wrong answer that looks
+  like a right one.
+
+  VERIFIED LIVE, cold start from empty volumes: `docker compose up --wait` exited 0 in 33
+  seconds with all four services healthy and both init jobs exited. Then, THROUGH the
+  proxy on 4173 (health checks probe each service directly and prove nothing about the
+  prefix strip, which is the single most common way this config breaks):
+    /api/health          -> {"status":"ok"}
+    /agent/list-apps     -> the four apps
+    /mappings            -> 200, the SPA fallback
+    /api-notes           -> the SPA page, NOT the API - the location anchoring holds
+    POST /api/login      -> the API's own "no console credentials are configured on this
+                            machine" message, which is the honest state of THIS laptop
+                            (internal-local/ has no console-credentials.json) and proves
+                            POST routing as well as GET
+  Negative control: `docker compose stop api` -> /api/health answers 502 from nginx while
+  the page still serves 200, which is exactly the pair the runbook's troubleshooting table
+  distinguishes. After `docker compose start api` the proxy recovered with no restart, so
+  the stale-upstream-address worry does not apply here - measured, not assumed.
+  Boundary instrument check: inside the api container, /app/internal-local, /app/internal,
+  /app/.env and /app/web/.env.local are all ABSENT, while the credential file is present
+  under its read-only mount - the secret reaches the container and never a layer. Inside
+  neo4j, /plugins holds apoc-2026.05.0-core.jar and neo4j-graph-data-science-2026.05.0.jar,
+  version-matched to the server, which closes the failure dev-environment.yaml records.
+
+  TWO INSTRUMENTS WERE WRONG BEFORE THE SUBJECT WAS (J76), both found by running it:
+  - The neo4j health check used `RETURN 1`, which the system database REFUSES (42N17,
+    "not allowed on the system database"). A perfectly healthy server reported unhealthy
+    for ten straight probes. Replaced with SHOW DATABASES, which also proves the DBMS is
+    serving rather than merely listening.
+  - The console health check used http://localhost/. busybox wget resolves localhost to
+    ::1 first and nginx's `listen 80` binds IPv4 only, so the probe got connection refused
+    from a healthy nginx. Replaced with 127.0.0.1, which takes the resolver out of the
+    instrument. `docker compose up --wait` DID exit 1 naming the unhealthy container while
+    this was broken, which is the acceptance working correctly on a false negative.
+
+  Also corrected during the build, because this repo treats a false comment as a defect:
+  the renderer claimed its upstreams were overridable while console.Dockerfile declared no
+  ARG, so a build-arg could not reach it. ARGs added - and the script now reads them with
+  `||` rather than `??`, because an unset ARG expands to the EMPTY STRING, which `??`
+  accepts and which would render `proxy_pass /;`.
+
+  HANDBACK TO LANE A - PORT-MANIFEST rows (the `port` pen). Six new tracked paths fall
+  through; tests/unit/test_compose_stack.py is already covered by the tests/** row. The
+  disposition column is a PROPOSAL; Lane A rules:
+    .dockerignore                    canonical-producer  pure mechanism, no side-local value
+    deploy/api.Dockerfile            canonical-producer  mechanism
+    deploy/agent.Dockerfile          canonical-producer  mechanism
+    deploy/console.Dockerfile        canonical-producer  mechanism
+    deploy/render_proxy_config.mjs   canonical-producer  mechanism
+    compose.yaml                     canonical-company   it carries producer-local container
+                                     facts - the image tag it pins against
+                                     config/dev-environment.yaml, the `eval` license, the
+                                     published host ports - which is the same reason
+                                     dev-environment.yaml is canonical-company. Each side
+                                     keeps a stack wired to its own container.
+
+  ALSO FOR LANE A AT MERGE: this item edits docs/design/drydocs-web-console-runbook.md, so
+  the committed .html beside it is now stale and needs `render_design_doc.py`. Worth saying
+  because the handoff's check marked O72 "clean" - it flags Lane A pen INPUTS, and a design
+  doc edited as OUTPUT is not one, so this is a gap in the flagging, not in the item. Note
+  the suite does NOT catch it: there is no committed-vs-source guard for docs/design/*.html
+  the way test_plan_roadmap.py is one for the roadmap, so a stale design render is invisible
+  to CI. Raised as an idea below rather than fixed here.
+
+  Gates at close: pytest -q 3618 passed / 15 skipped, with exactly two expected failures -
+  test_committed_roadmap_page_matches_its_sources (this file's acceptance and notes changed
+  and Lane B does not render) and test_no_tracked_path_falls_through_silently (the six rows
+  above). ruff check and ruff format --check clean.
+
+  FOR THE INBOX (Lane B does not write IDEAS.md): a committed-render guard for
+  docs/design/*.html, the shape test_plan_roadmap.py already has - today a design doc can be
+  edited and its render left stale with nothing failing, which is the same class of silent
+  drift Y5 was built to make visible for the plan pages.

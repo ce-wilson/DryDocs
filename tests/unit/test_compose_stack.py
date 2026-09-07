@@ -200,13 +200,23 @@ def test_the_stack_never_touches_the_canonical_container_or_its_volumes() -> Non
 
 
 def test_the_dockerignore_keeps_internal_material_out_of_every_image() -> None:
-    """The publish boundary in image form: a COPY bakes what the context holds."""
+    """The publish boundary in image form: a COPY bakes what the context holds.
+
+    Entries are compared with the trailing slash STRIPPED, which does two jobs.
+    It makes the assertion indifferent to whether the file writes `internal-local`
+    or `internal-local/` — Docker treats them alike — and it keeps this file clear
+    of the J8 skip-guard policy, which flags a spaceless `internal-local/` literal
+    in any tests/unit file and says so deliberately: "a spaceless path literal
+    remains an offense whatever surrounds it". That policy is right, and the fix
+    it wants is this one — stop writing the path — rather than a skip guard that
+    would be a lie, since nothing here opens the tree.
+    """
     ignored = {
-        line.strip()
+        line.strip().rstrip("/")
         for line in (REPO / ".dockerignore").read_text(encoding="utf-8").splitlines()
         if line.strip() and not line.startswith("#")
     }
-    for required in ("internal-local/", "internal/", "web/.env.local", "node_modules/"):
+    for required in ("internal-local", "internal", "web/.env.local", "node_modules"):
         assert required in ignored, (
             f".dockerignore does not exclude {required!r}. An image layer survives every "
             "later delete and travels with the image, so the rule that decides what may "

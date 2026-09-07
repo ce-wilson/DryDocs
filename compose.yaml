@@ -262,7 +262,13 @@ services:
       # that URL". A bare 200 would not prove it: the SPA fallback answers 200
       # with index.html for EVERY path, so the check asserts the app's mount
       # point is in what came back.
-      test: ["CMD-SHELL", "wget -qO- http://localhost/ | grep -q 'id=\"root\"'"]
+      #
+      # 127.0.0.1 AND NOT localhost, measured on the first run of this stack:
+      # busybox wget resolves `localhost` to ::1 first, and nginx's `listen 80`
+      # binds IPv4 only, so the probe got a connection refused from a healthy
+      # server for ten straight attempts. The literal address takes the resolver
+      # out of the instrument.
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/ | grep -q 'id=\"root\"'"]
       interval: 10s
       timeout: 5s
       retries: 12

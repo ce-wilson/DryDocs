@@ -40,6 +40,13 @@ RUN npm run dist:check
 # The proxy config is RENDERED from web/delivery.json — the same file the bundle
 # and vite.config.ts read — so the path map exists once. See the script header.
 COPY deploy/render_proxy_config.mjs /app/deploy/
+# The upstreams default to the Compose service names inside the script. These
+# ARGs are what make the script's "overridable" claim true from a plain
+# `docker build --build-arg`, for an image fronting upstreams that are not this
+# stack's; unset, they expand to the empty string, which the script treats as
+# unset for exactly that reason.
+ARG DRYDOCS_API_UPSTREAM
+ARG DRYDOCS_AGENT_UPSTREAM
 RUN node /app/deploy/render_proxy_config.mjs ./delivery.json /app/default.conf
 
 # ---- stage 2: serve ---------------------------------------------------------

@@ -29,8 +29,11 @@ if (!deliveryPath || !outPath) {
 // The Compose service names are the defaults, not localhost: inside the network
 // each service IS a hostname, and `localhost` in the proxy container is the
 // proxy container. Overridable so the same image can front upstreams elsewhere.
-const API_UPSTREAM = process.env.DRYDOCS_API_UPSTREAM ?? 'http://api:8001'
-const AGENT_UPSTREAM = process.env.DRYDOCS_AGENT_UPSTREAM ?? 'http://agent:8000'
+// `||` and not `??`: an unset Dockerfile ARG expands to the EMPTY STRING, not to
+// undefined, so `??` would accept it and render `proxy_pass /;` — a config that
+// fails at nginx start with a message about the URI, three steps from the cause.
+const API_UPSTREAM = process.env.DRYDOCS_API_UPSTREAM || 'http://api:8001'
+const AGENT_UPSTREAM = process.env.DRYDOCS_AGENT_UPSTREAM || 'http://agent:8000'
 
 const delivery = JSON.parse(readFileSync(deliveryPath, 'utf8'))
 

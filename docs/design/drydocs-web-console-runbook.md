@@ -5,7 +5,16 @@
   (V1 coverage rule, 2026-08-04). The `Module:` line is what
   `tests/unit/test_runbook_coverage.py` reads; coverage is a claim the document
   makes about itself, never inferred from the filename.
-- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 4, 2026-09-06
+- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 5, 2026-09-07
+  adds the one-command stack (backlog O72):** Startup now offers two paths, and
+  Path A is `docker compose up --wait` — Compose brings up the same processes with
+  each service's health check set to that step's own success check, so a forgotten
+  process is named at the shell instead of diagnosed in the browser. It is FIVE
+  services, not four: ADR 0020's reverse proxy is a real process, played by Vite in
+  the per-process path and by nginx in front of `dist/` here, which makes this stack
+  the first place the production delivery shape actually runs. Path B, the
+  per-process path, is unchanged and is kept — debugging one service is a real need.
+  Not a deployment: no TLS, no Traefik. **Rev 4, 2026-09-06
   makes the console same-origin with its services (ADR 0020, backlog WEB10):** the
   browser calls the PATHS `/api` and `/agent` on the page's own origin and a reverse
   proxy forwards them — Vite's own dev and preview servers here, the Compose stack's
@@ -32,8 +41,10 @@
   only in the repo-root `.env`, and console secrets only in a machine-local
   `console-credentials.json` under `internal-local/`; neither is ever quoted here)
 - **Audience:** anyone bringing the DryDocs web console up locally — the UI stack is
-  four processes: Neo4j (optional, for live frames), drydocs-api, the ADK agent server
-  (only the Ask module needs it), and the Vite dev server
+  Neo4j (optional, for live frames), drydocs-api, the ADK agent server (only the Ask
+  module needs it), and something serving the page and forwarding `/api` and `/agent`
+  on its origin — the Vite dev server in the per-process path, a reverse proxy in
+  front of `dist/` in the one-command stack
 - **Companion:** `docs/design/drydocs-startup-refresh-runbook.md` (the graph itself —
   container, schema, ingest; explicitly out of scope here),
   `docs/design/drydocs-web-console-tdd.md` (architecture), `drydocs_api/README.md`,
@@ -46,14 +57,15 @@
 
 **Purpose.** Bring the DryDocs web console from OFF to VERIFIED in a local sandbox:
 the thin API (`drydocs-api`, FastAPI/uvicorn on port 8001), the ADK agent server
-(`agents/`, on port 8000) and the React console (`web/`, Vite on port 5173), signed in
-and serving frames — live QuerySpec grids when the graph has data, the SYNTHESIZED demo
-frames otherwise.
+(`agents/`, on port 8000) and the React console (`web/`, Vite on port 5173 in the
+per-process path, the production build behind a proxy on 4173 in the one-command
+stack), signed in and serving frames — live QuerySpec grids when the graph has data,
+the SYNTHESIZED demo frames otherwise.
 
 **In scope.** The API server (auth stub, QuerySpec registry, two-path export, mapping
 store); the ADK agent server behind the Ask module; the web dev server and its
-production build/preview; the mock-persona sign-in; verification of the frame/export
-round-trip.
+production build/preview; the one-command Compose stack that starts all of them
+(O72); the mock-persona sign-in; verification of the frame/export round-trip.
 
 **Which process serves which module.** Every module except Ask reads through
 drydocs-api, reached as `/api/*` on the console's own origin (the proxy forwards it to
@@ -370,6 +382,9 @@ Symptom → diagnosis → fix; each grounded in a real incident this stack has p
 
 | Symptom | Diagnosis | Fix |
 |---|---|---|
+| `docker compose up --wait` exits non-zero with `container drydocs-<x>-1 is unhealthy` | Path A working as designed: the named service failed ITS success check. This is the whole point — the answer is in the message, not in the browser | `docker compose logs <x>`, then `docker inspect drydocs-<x>-1 --format '{{json .State.Health}}'` for what the probe itself printed |
+| Path A: `Error ... port is already allocated` on 8000, 8001 or 4173 | Path B's processes are still running, or another stack holds the port. The two paths are alternatives | Stop the host processes, or `docker compose down`. Nothing here conflicts with `neo4jtest`: the stack publishes no Neo4j port |
+| Path A: sign-in says "no console credentials are configured on this machine" | Correct on a fresh clone, and stack-independent. The credential file is bind-mounted from `internal-local/`, so the API sees exactly what the host has | Prerequisite 6, on the HOST, then `docker compose restart api` is not even needed — the API re-reads the file on change |
 | Frames show "the server behind /api is not answering (the page's own server returned 502 for it)" | drydocs-api not running behind the proxy (the adapter fails loud by design — no silent bolt fallback). The page's own server IS up — it wrote the 502 | Startup step 2; if the API is up on a non-default port, set `DRYDOCS_API_UPSTREAM` for the Vite shell |
 | Frames show "nothing answered at /api on this page's own origin" | The server that serves the PAGE is gone (Vite or the production proxy), so the fetch threw. Not an API fault | Restart Vite (step 4) or the proxy; a dead API never produces this message since Rev 4 |
 | `ModuleNotFoundError: fastapi` / `uvicorn not found` | api dependency group not installed | `poetry install --with api` |
