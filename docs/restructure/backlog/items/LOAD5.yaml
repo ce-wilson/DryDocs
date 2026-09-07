@@ -1,0 +1,47 @@
+id: LOAD5
+epic: release-infrastructure
+title: "The cyclic-type guard asserts a comment phrase, not the absence of the join from executable SQL - reword the marker and it fails, re-enable the join and it passes"
+type: bug
+module: drydocs-load
+phase: 8
+agent: main
+model: sonnet
+priority: p1
+status: in_progress
+depends_on: []
+inputs:
+- tests/unit/test_controlm_cypher.py
+- drydocs/loaders/sql/controlm_dependencies_recursive.sql
+- docs/restructure/backlog/items/J66.yaml
+- docs/restructure/backlog/items/CORE2.yaml
+acceptance: |
+  `test_recursive_sql_cyclic_type_disabled` reads the raw SQL and asserts the phrase
+  "intentionally disabled" is present. That pins a COMMENT, not the behavior: the guard fails
+  when the marker is reworded with the join still correctly off, and it passes when the
+  `J_SUB.JOB_CYCLIC_IN = D_SUB.JOB_CYCLIC_OUT` predicate is restored with the phrase left
+  anywhere in the file. The eval case that depends on it (the cyclic-type trap) cites this
+  test as the thing that keeps the join off, and it is not.
+
+  (a) The guard asserts the cyclic-type COMPARISON is absent from `_sql_code(...)` - the
+      helper two functions up that strips `--` tails (J26) - by pattern
+      (`JOB_CYCLIC_IN`, optional whitespace, `=`, optional qualifier, `JOB_CYCLIC_OUT`),
+      not by bare token: `JOB_CYCLIC_IN` and `JOB_CYCLIC_OUT` are live SELECT aliases at
+      :57 and :77, so a bare-token assertion fails on correct SQL.
+  (b) The absence assertion carries a positive control (CORE2's rule): the same pattern
+      MATCHES the raw file, proving the stripper is what removes it and the scan is not
+      vacuous.
+  (c) The marker-presence check may stay only as a stated positive pin (the module docstring
+      already allows raw-text presence pins), with the test saying which assertion is the
+      contract.
+  (d) The two failure directions are reproduced before the fix and recorded on this item:
+      reworded marker -> old guard red; restored predicate -> old guard green.
+notes: |
+  Minted 2026-09-07 from IDEAS.md Idea-283 (the UI session's eval-case review, reviewed at
+  839eab1f on feat/cyclic-type-test-case).
+
+  Groomed ahead of its six siblings (Idea-277..282) on the user's ruling: it is the most
+  VISIBLE PROOF of the project's work - a guard that names the reasoning as its contract
+  (J66) turned out to be asserting the reasoning's wording instead of the behavior, and the
+  fix is one assertion with a positive control, landable in the same session. Filed under
+  J66/CORE2's epic because it is the same defect class: a source-reading guard that reads
+  prose, not code.
