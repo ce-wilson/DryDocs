@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://drydocs.internal/schemas/review-quality.schema.json",
+  "title": "drydocs.review-quality.v1 — reviewer-quality limits (O51, intake plan §8)",
+  "description": "Thresholds that FLAG an SME on the admin queue's quality rail. Nothing here acts: the admin decides whether to block, and the absence of any auto-block key is deliberate rather than an omission. Every rate limit is a fraction in [0,1] because every metric it is compared against is a share of the reviewer's decisions in the window.",
+  "type": "object",
+  "required": ["schema", "classification", "window_days", "min_decisions_for_flag", "limits", "review_floor"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": "drydocs.review-quality.v1" },
+    "classification": { "enum": ["Internal", "Internal-Public", "External"] },
+    "updated": { "description": "date or string (YAML parses bare dates)" },
+    "window_days": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 365,
+      "description": "The rolling window every rate is computed over."
+    },
+    "min_decisions_for_flag": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Below this many decisions in the window, rates are REPORTED but nothing is flagged -- one return out of two submissions is a 50% rate and means nothing."
+    },
+    "limits": {
+      "type": "object",
+      "required": ["auto_accept_rate_max", "admin_return_rate_max", "too_fast_rate_max"],
+      "additionalProperties": false,
+      "properties": {
+        "auto_accept_rate_max": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Declared and UNUSED until O48 builds the candidate-binding set there is nothing to compare a confirmation against today."
+        },
+        "admin_return_rate_max": { "type": "number", "minimum": 0, "maximum": 1 },
+        "too_fast_rate_max": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "review_floor": {
+      "type": "object",
+      "description": "floor = min(min_review_seconds + seconds_per_kb * KB, max_review_seconds)",
+      "required": ["min_review_seconds", "seconds_per_kb", "max_review_seconds"],
+      "additionalProperties": false,
+      "properties": {
+        "min_review_seconds": { "type": "number", "minimum": 0 },
+        "seconds_per_kb": { "type": "number", "minimum": 0 },
+        "max_review_seconds": { "type": "number", "minimum": 0 }
+      }
+    }
+  }
+}

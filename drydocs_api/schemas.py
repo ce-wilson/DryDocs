@@ -90,6 +90,67 @@ class StatusOut(_Declared):
     status: str
 
 
+class QualityFlagOut(_Declared):
+    """One limit an SME crossed. The metric that tripped travels WITH the
+    number and the limit it was compared against, so the rail can say what
+    happened without the console holding a second copy of the thresholds."""
+
+    metric: str
+    value: float
+    limit: float
+    detail: str
+
+
+class PersonaQualityOut(_Declared):
+    """O51: one reviewer's signals over the rolling window.
+
+    ``auto_accept_rate`` is NULLABLE ON PURPOSE and is null everywhere today.
+    The metric needs the agent's candidate-binding set (O48) to compare a
+    confirmation against; reporting 0.0 would read as a reviewer who modifies
+    everything, which is the best possible score. The reason travels beside it
+    in ``auto_accept_unavailable_because`` so no consumer has to guess whether
+    null means zero, missing, or broken."""
+
+    persona_id: str
+    submissions: int
+    auto_accept_rate: float | None
+    auto_accept_unavailable_because: str
+    too_fast_rate: float
+    admin_return_rate: float
+    median_review_seconds: float | None
+    flags: list[QualityFlagOut]
+    blocked: bool
+
+
+class PersonaBlockOut(_Declared):
+    """A submit block, open or lifted. Append-only in the store: an unblock
+    fills the three ``unblock*`` fields rather than deleting the row, because a
+    judgment about a person that can be erased is not a record."""
+
+    block_id: str
+    persona_id: str
+    blocked_at: str
+    blocked_by: str
+    reason: str
+    unblocked_at: str | None = None
+    unblocked_by: str | None = None
+    unblock_note: str | None = None
+
+
+class ReviewQualityOut(_Declared):
+    """GET /review-quality (admin only).
+
+    ``limits`` rides along so the console renders the number a metric was
+    compared against instead of restating the thresholds in TypeScript — the
+    same reason a spec result carries its own column declarations."""
+
+    window_days: int
+    min_decisions_for_flag: int
+    limits: dict[str, Any]
+    personas: list[PersonaQualityOut]
+    blocks: list[PersonaBlockOut]
+
+
 class LoginOut(_Declared):
     """The session the browser holds. Never the secret (O69).
 
