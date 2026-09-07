@@ -1,17 +1,17 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-07T17:35:09",
+    "captured_at": "2026-09-07T18:52:52",
     "date": "20260907",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "a15bb43e",
-      "full": "a15bb43e471aeb79a1ea66d92f879e6a18283ad2",
+      "commit": "2e71ede1",
+      "full": "2e71ede1e8918d26068e82210623853d8b20752c",
       "branch": "main",
-      "describe": "port-base-20260905-220-ga15bb43e",
-      "subject": "docs(plan): Lane B handoff - build-lane queue for the laptop session (WEB17, O72, CORE3, I8, G127, V10)",
-      "dirty": false,
+      "describe": "port-base-20260905-228-g2e71ede1",
+      "subject": "chore(G127): claim - escape the surviving historical database mentions and widen the guard (Lane B queue item 5)",
+      "dirty": true,
       "untracked_present": false,
       "pr": null
     },
@@ -22742,10 +22742,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260907-1549.json",
-      "name": "drydocs-20260907-1549.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260907.json",
+      "name": "drydocs-20260907.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260907-1549.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260907.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -49185,7 +49185,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260907-1549.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260907.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
