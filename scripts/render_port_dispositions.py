@@ -33,6 +33,15 @@ pre-apply tree and the producer tag — every path where the two trees differ, t
 silently dropped the second (found by the company's seventh-carve-out plan, which
 wrote the two-argument form against a script that could not take it); a third
 argument is refused rather than ignored, for the same reason.
+
+BOTH REFS MUST RESOLVE BEFORE THE DIFF RUNS. `_git` swallows a failed git call into
+"", so until 2026-09-07 a base that did not exist rendered as an EMPTY range — `wrote
+... 0 paths`, exit 0 — which is the instrument failing into clean (J76). Found by the
+company's carve-out D plan, which named a `port-base-<date>-fork` tag no roll has ever
+cut; its own Phase 0 caught it before applying. The producer cuts ONE tag per roll,
+`port-base-<date>`; the other end of a consumer range is the consumer's own pre-apply
+ref. A ref that does not resolve is now named on stderr and refused with exit 1, and
+nothing is written.
 """
 
 from __future__ import annotations
@@ -84,6 +93,11 @@ def newest_base_tag() -> str:
     """The most recent `port-base-*` tag — the base a consumer applies FROM."""
     tags = [t for t in _git("tag", "--list", "port-base-*").split() if t]
     return sorted(tags)[-1] if tags else ""
+
+
+def ref_resolves(ref: str) -> bool:
+    """True when `ref` names a commit in this repository (tag, branch, or sha)."""
+    return bool(_git("rev-parse", "--verify", "--quiet", f"{ref}^{{commit}}").strip())
 
 
 def changed_paths(base: str, head: str = "HEAD") -> list[str]:
@@ -176,6 +190,12 @@ def main(argv: list[str]) -> int:
         return 1
     # The consumer's range: `<pre-apply-tag> <base-tag>` (see the module docstring).
     head = argv[1] if len(argv) > 1 else "HEAD"
+    missing = [ref for ref in (base, head) if not ref_resolves(ref)]
+    if missing:
+        # By name, not as an empty range: an unresolvable ref is a wrong plan, and a
+        # plausible "wrote 0 paths" would let it through (J76).
+        print(f"ref does not resolve: {', '.join(missing)} — nothing written", file=sys.stderr)
+        return 1
     doc = yaml.safe_load(MANIFEST.read_text(encoding="utf-8"))
     paths = changed_paths(base, head)
     OUT.write_text(render(base, paths, doc, head), encoding="utf-8", newline="\n")
