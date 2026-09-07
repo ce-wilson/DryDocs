@@ -60,6 +60,18 @@ acceptance: |
   (g) PASS/FAIL: the gate section is re-posed with clauses (c), (d) and (e) as explicit questions
   and the evidence cited to the log; the item closes when the prompt is drafted and queued, and
   the SIGNING is a separate event recorded in config/gate-log.md.
+
+  (h) THE SESSION ITSELF (folded from C36, 2026-09-07, user ruling): once (g) is met, a
+  sign-off session for gate email-dl-contact-point is HELD and its outcome recorded in
+  config/gate-log.md as SIGNED, SME-DEFERRED with a named re-arm trigger, or BLOCKED with a
+  named blocker - silence is the one non-outcome. The session takes the whole page, not only
+  the re-posed G5 clauses: the 2026-08-12 G5 RECORD (the consumer contact attaches to a :Port)
+  is a direction, not a sign-off, and this is the session that signs or amends it. BEFORE the
+  session, the stale-premise sweep of the page against current facts (C28/K20 moved-premise
+  model; restate honestly, never re-ask signed clauses; L25 riders-not-edits). AFTER: follow-up
+  build items minted for every flip the ruling authorizes, or an explicit none-needed note in
+  the sign-off entry. (g)'s 'closes when drafted and queued' becomes 'closes when the session
+  has an outcome'.
 notes: |
   Groomed 2026-09-02 from Idea-236 gap 5 (desktop, backlog-groomer fork), which is itself the
   convening half of Idea-104.

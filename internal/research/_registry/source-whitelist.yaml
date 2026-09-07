@@ -1,0 +1,71 @@
+# =============================================================================
+# internal/research/_registry/source-whitelist.yaml — the research source ledger
+# (schema drydocs.source-whitelist.v1; research-probe-discipline §6.1)
+# =============================================================================
+# WHAT THIS IS: "where do I look for THIS question, and what did that source
+# actually answer" — one row per source per question class, confirmed-good and
+# proven dead ends alike. A row here is how a research question gets ROUTED to a
+# source (an MCP server, a CLI, a browser export) on the next session instead
+# of being re-discovered; `does_not_answer` is the half that saves the most.
+#
+# WHAT THIS IS NOT: an ingestion registry. A row GRADUATES to
+# config/source-registry.yaml or config/doc-source-registry.yaml through the HITL
+# gate (`graduates_to` records the id when it has); it never short-circuits one.
+# Which reader and which configuration serve a registered datapoint is the N24
+# rider's question (clauses (e)-(g)) and is ruled there, not here.
+#
+# CLASSIFICATION: Internal. Real company server names are allowed HERE and in
+# internal-local/ only; tracked producer text outside internal/ names a source by
+# its mechanism class ("technology-governance catalog MCP"). Hosts, URLs and
+# credentials are connection coordinates and stay in the machine-local twin even
+# here — the `host` field is left unset on purpose.
+#
+# The field list and the open user rulings (OQ-a .. OQ-e) are in
+# .claude/skills/research-probe-discipline/references/source-whitelist.template.yaml.
+# First instantiated 2026-09-07 with the one source a session had actually probed.
+# =============================================================================
+schema: drydocs.source-whitelist.v1
+classification: Internal
+updated: 2026-09-07
+
+entries:
+  # The company technology-governance catalog, reached through its MCP server.
+  # Probed company-side 2026-09-07 for C33 (software-version-context gate, Q3);
+  # transcribed producer-side at rung 5 to
+  # internal-local/research/2026-09-07-c33-governance-catalog-mcp-capture.md.
+  - id: polestar-technology-governance-mcp
+    name: "Polestar technology-governance catalog (MCP server 700290-polestar, streamable-http)"
+    subject_context: "the company's technology-governance catalog of record: one record per approved/restricted technology with vendor, taxonomy, preference status and lifecycle phase; it governs USE, it does not inventory INSTALLS"
+    access:
+      tool: "MCP server (remote, streamable-http), company VS Code; technology lookup by name"
+      auth: "company SSO on the MCP endpoint"
+      rung: 2
+    verified_on: 2026-09-07
+    verified_by: agent
+    outcome: irrelevant
+    answers:
+      - "governance status of a named technology: PREFERRED | ALLOWED | RESTRICTED | NOT_ALLOWED"
+      - "lifecycle phase and its date where one is set: DIVEST | DECOMMISSION (with target)"
+      - "the catalog's technology_id (the foreign key to record, never the name), vendor name, taxonomy"
+      - "absence: a product with no catalog entry (recorded as technology_id: ~ plus the query)"
+    does_not_answer:
+      - "C33 Q3 — whether an install_path is stable or re-pointed by symlink; DIVEST cuts both ways (consolidation churns paths, a frozen estate freezes them), so the read leaves Q3 MORE open, not less"
+      - "what is installed where, at which version — governance status has no authority over the software-registry ledger"
+      - "anything about an internal platform that is not a vendor technology (three registry products had no entry)"
+    replayable_query: "for each product id in config/taxonomy/software-registry.yaml, call the server's technology lookup with the product name; record technology_id, preference_status, lifecycle_phase, as_of; the 16 results of 2026-09-07 are in the machine-local capture above"
+    decay: 90d
+    classification: Internal
+    graduates_to: ~
+    notes: >
+      OUTCOME is `irrelevant` for the question that sent the probe (C33 Q3): results
+      returned, none answered it. For the governance-status question class the
+      same read was `good`, and that class is what the `answers` list records — a
+      second row is not minted for it because the source and the query are one.
+      Five sibling MCP servers exist in the same venue (data marketplace,
+      enterprise code index with its own tool-selection ladder, Jira, Confluence,
+      workflow engine); none has been probed, so none has a row — the inventory
+      is in the machine-local capture and each becomes a row on its first probe,
+      with its outcome. Lineage relevance: DIVEST/DECOMMISSION is a DATE on a
+      lineage SOURCE (the ETL platforms DryDocs reads from), not a judgment.
+      Remediation relevance: a job on a NOT_ALLOWED or DECOMMISSION technology is
+      a finding INPUT, never an auto-fix.

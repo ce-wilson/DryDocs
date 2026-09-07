@@ -10,7 +10,7 @@ agent: main
 model: sonnet
 priority: p2
 status: todo
-depends_on: []
+depends_on: [N23]
 inputs:
 - config/source-registry.yaml
 - config/gate-log.md
@@ -60,3 +60,7 @@ notes: |
   The reason this is a gate-drafting item rather than a build: minting a dataset id is the exact
   decision T19 ruled, and the entry says so in terms. A groom that picked the id would be
   grooming an id policy into a done deal.
+  SEQUENCED 2026-09-07 (desktop, Lane A; user ruling in-chat): depends_on N23. This item mints a
+  dataset id, and N23 puts the whole id grammar (un-redacted database and schema, the carrier
+  slot, the subset qualifier) to the SME as one question; an id minted under today's grammar
+  would be re-minted under N23's, so it waits. The question here is unchanged.

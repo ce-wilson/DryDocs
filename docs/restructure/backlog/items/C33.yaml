@@ -8,7 +8,7 @@ phase: 2
 agent: main
 model: fable
 priority: p2
-status: blocked
+status: todo
 depends_on: []
 gates: [software-version-context]
 inputs:
@@ -35,3 +35,31 @@ notes: |
   evidence.as_of on the abinitio row, and the manifest.yaml registration. UNBLOCK = one SME
   sentence answering Q3, logged as a RECORD in config/gate-log.md under the
   software-version-context gate.
+  FINDING 2026-09-07 (desktop, Lane A; from the company-side session of the same day, which
+  read the company technology-governance catalog through its MCP server for all 16 registry
+  products - transcribed to internal-local/research/2026-09-07-c33-governance-catalog-mcp-capture.md, cited
+  instead of the images). The subject platform is RESTRICTED with lifecycle DIVEST since
+  2026-05-01. THE READ DOES NOT ANSWER Q3, and the company session and this one agree on
+  why: a divestiture can mean installs are consolidated and re-pointed (paths CHURN) or that
+  the estate is frozen with no new installs (paths FREEZE), so Q3 is more open after the
+  read, not less. Blocked stands; the unblock is unchanged. What the read DOES change, kept
+  here so the SME session has it: (1) the value went UP - the loader's output is a
+  migration inventory for a platform being divested, not a version census for its own sake;
+  (2) the corpus is a one-shot spreadsheet, so the output is a DATED CENSUS and never a live
+  inventory - which gives the SME a sharper Q3 to accept or reject in one sentence: if the
+  MERGE key is the census row identity {source, as_of, fid, install_path}, the symlink
+  concern only bites on a re-run the corpus cannot produce; (3) the census date and the
+  governance-read date are two as_of values and never one field; (4) 'the fid population of
+  a divested platform is closed' is a flag-not-build detector candidate (Idea-275, which
+  also carries the other ETL platform's DECOMMISSION row, versions empty, no corpus - the
+  same shape this item's subject had before the email). The company-side governance
+  enrichment of the registry (per-product block, as_of mandatory, ids never names, absence
+  recorded, no graph write) is company-owned and does not port; its schema half is
+  Idea-276. Which source was asked and what it did not answer is the N24 clause (f)/(g)
+  case in the wild: the research question, the server that was read for it, and the
+  outcome (irrelevant to Q3, per the probe vocabulary) belong on the record, not inferred.
+  UNBLOCKED 2026-09-07 (desktop, SME in session): Q3 ruled as the census key
+  {source, as_of, fid, install_path} - RECORD appended under the software-version-context
+  gate in config/gate-log.md. B2 sharpened, not re-keyed; the MERGE key may now be written.
+  The build follows the acceptance as written; the synthetic-fixture / company-venue split
+  for the :Document citation is in the RECORD.

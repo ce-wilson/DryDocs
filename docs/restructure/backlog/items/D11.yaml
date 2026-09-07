@@ -24,6 +24,14 @@ acceptance: |
   older pull => re-pull first -- 03-hitl-sme-flow.md convention, 2026-08-27).
   AFTER: follow-up build items minted for every flip the ruling authorizes, or
   an explicit none-needed note in the sign-off entry.
+  RIDER (D9, folded 2026-09-07, user ruling): the session also takes the prompt's section D -
+  the INTERNAL precedence tier is two levels (platform-team standard refining the vendor
+  baseline, support-group standard refining the platform team's), which one wins where they
+  disagree (folder grammar, position-6 meaning, whether the app code carries the SEAL), and
+  whether the two levels ARE the base/edition split of the 2026-09-02 edition-grain ruling or
+  sit beside it. Precondition D3: the publishable folder-naming standard's position-6
+  'frequency = legacy' claim is verified against both source standards before the session.
+  config/precedence.yaml changes only after transcription, citing this gate (C1).
 notes: |
   Minted 2026-08-27 (Lane A groom pass, the run-the-gate sweep): 13 of 20
   drafted-unsigned gates had NO item owning the sign-off -- the drafting item

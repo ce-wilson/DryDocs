@@ -2,15 +2,15 @@
 handoff: drydocs.lane-handoff.v1
 lane: B
 machine: laptop
-generated: 2026-09-06
-generated_at: 1f2f2a80 (main)
-queue: [WEB8, O63, O26, O50, Z6, R8]
-pens: [code:drydocs-web, code:drydocs-agents]
+generated: 2026-09-07
+generated_at: e17dbad1 (main)
+queue: [CORE2, API2, API3, O51, WEB16, CFG3]
+pens: [code:drydocs-core, code:drydocs-api, code:drydocs-web, code:config]
 ---
 
-# Lane B handoff — laptop, 2026-09-06
+# Lane B handoff — laptop, 2026-09-07
 
-**From:** Lane A (desktop). **To:** the Lane B session on the laptop.
+**From:** the Lane A session. **To:** the Lane B session on the laptop.
 **Lifecycle:** a working handoff, not a durable record — the item files are. When
 the queue below is empty, delete this file in the closing commit
 (`python .claude/skills/lane-handoff/scripts/handoff.py --check <this file>` says when).
@@ -21,7 +21,7 @@ Collisions come from two sessions writing the same surface, not from two session
 existing. Your first commit message (or your `wip/` branch name) names what you hold:
 
 ```text
-pen: code:drydocs-web · code:drydocs-agents
+pen: code:drydocs-core · code:drydocs-api · code:drydocs-web · code:config
 ```
 
 Lane A holds: `backlog · port · adr · gates · snapshot`. Anything not declared by either lane
@@ -49,12 +49,12 @@ since PLAN1), so two lanes minting in disjoint series cannot collide on a number
 
 | # | Id | Title | Type / prio | Module | Model | Notes from the check |
 |---|---|---|---|---|---|---|
-| 1 | **WEB8** | The typed-client guarantee has no holes - the mappings, intake and corpus routes are modelled in drydocs_api.schemas so the fifteen unwrapAs sites retire, and the ADK agent calls get a typed contract instead of raw fetch (after WEB4) | task / p2 | `drydocs-web` | sonnet | clean |
-| 2 | **O63** | Service reachability, surfaced twice from one probe: Ask diagnoses its own failure instead of printing a bare "Failed to fetch", and the admin page carries a service-status strip at the top | task / p2 | `drydocs-web` | sonnet | clean |
-| 3 | **O26** | App-to-app path runbook view: Runbooks-page tab with source/target application pickers, shortest-path TECHNICAL/DATA lanes, and a generated runbook grid citing path nodes (after O11, O17) | task / p2 | `drydocs-web` | sonnet | clean |
-| 4 | **O50** | Admin review queue for intake records: diff view, accept / return with note, and the waiting-on-gate park (after O46, O47) | requirement / p2 | `drydocs-web` | sonnet | clean |
-| 5 | **Z6** | Global time-zone runtime map: folder/job start-to-end spans across a world time-zone view, rendered in the browser's local time zone (after Z5) | task / p2 | `drydocs-web` | sonnet | clean |
-| 6 | **R8** | Answer evaluation + cap tuning: on-demand answer metrics over stored question/context/answer, agent-runs admin view, promotion feed of recurring Tier-1 Cypher into gate-reviewed permanent specs (after R3, R5) | requirement / p3 | `drydocs-agents` | sonnet | clean |
+| 1 | **CORE2** | A source-scan absence guard needs a positive control - six of six absence scans were vacuous on first write because the stripper did not match the subject | task / p1 | `drydocs-core` | sonnet | clean |
+| 2 | **API2** | ColumnDef carries no list type, so two server columns that return lists are declared string - extend the vocabulary and delete the client-side exemption | bug / p2 | `drydocs-api` | fable | clean |
+| 3 | **API3** | scripts/dump_openapi.py opens the committed openapi.json before it renders, so a render failure leaves a zero-byte artifact | bug / p2 | `drydocs-api` | sonnet | clean |
+| 4 | **O51** | Reviewer-quality signals + admin block: auto-accept / too-fast / admin-return rates over a rolling window, limits flag, admin blocks (after O46, O50) | requirement / p2 | `drydocs-web` | sonnet | clean |
+| 5 | **WEB16** | npm run api:types needs DRYDOCS_DATA_ROOT and says so only as a Python traceback buried in a Node stack | chore / p3 | `drydocs-web` | haiku | clean |
+| 6 | **CFG3** | precedence.schema.json and relationship-vocabulary.schema.json accept any stray key - close them at the top level | chore / p3 | `config` | haiku | clean |
 
 ## Surfaces — who holds which pen this burst
 
@@ -78,7 +78,7 @@ the change back through the sender.
 | `gates` (this skill's addition to §0) | `config/gate-log.md` | Lane A — the signed gate record |
 | `gates` (this skill's addition to §0) | `config/crosswalks/` | Lane A — orchestrator crosswalks — gate-bound config |
 | `snapshot` (this skill's addition to §0) | `knowledge/depgraph-snapshots/` | Lane A — the session snapshot — one writer per burst |
-| Lane A's queue | the items P6, N27 and their inputs | do not claim or edit |
+| Lane A's queue | the items ONT3, DOC2, N23, C44, PLAN5 and their inputs | do not claim or edit |
 | `code:<module>` | everything an item in YOUR queue names in `inputs` | this lane, claimed per item |
 | `code:drydocs-web` | `config/taxonomy/ui-components.yaml` | this lane, with the module — the O42 ledger guard fails on any new .tsx, so every web item adds its row here (the 2026-09-05 Lane B close: five items touched it, none named it) |
 | — | `docs/plan/*.html`, `web/src/generated/**`, `docs/design/*.html` | derived renders — Lane A regenerates once at close; nobody merges them by hand (J43) |
@@ -86,7 +86,9 @@ the change back through the sender.
 **About Lane A's queue, from the same check** (for the sender to rule — this lane
 does nothing with these):
 
-- P6: status is 'in_progress', a queue lists todo items only
+- DOC2: gate-bound: ontology-domain-registry-and-edition-grain (an SME session, not a build)
+- N23: gate-bound: registry-wiring-readiness (an SME session, not a build)
+- C44: gate-bound: email-dl-contact-point (an SME session, not a build)
 
 **Lane B claims status-only and never renders.** A claim is one item file, pushed;
 Y5 tolerates it un-rendered, and Lane A renders once at close. **Lane B does not

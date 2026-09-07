@@ -48,6 +48,13 @@ acceptance: |
   (d) The synthetic source values are recorded as synthetic: the sketch's codes (RET, WLT, COM,
       MTG, CLOS, AVE) collide with none of the declared LOB codes (CCB, AWM, CIB, CT, HR, ET),
       so the material carries no real estate values and the prompt says so.
+  (e) RIDER FROM THE DEFERRED dcat-theme-subject-scheme GATE (C37, SME-DEFERRED 2026-09-07 with
+      this gate as its re-arm trigger): the prompt asks, for the Logical Container, the question
+      that page's section B asks for a Product - is the tier a skos:Concept in the
+      lob-product-team scheme, or does it HAVE one (the dcat:theme edge) - so the two tiers are
+      ruled with one idiom in one session. The deferred page stays on disk; its remaining
+      sections (annotation depth, the per-subject cap, unclassified vs out-of-scope) are re-run
+      or folded once this gate signs, and the prompt says which it recommends.
 notes: |
   Minted 2026-09-07 from IDEAS.md Idea-256 (the SME's synthetic hierarchy sketch,
   2026-09-04, transcribed into the entry in full because the sketch file was deleted after

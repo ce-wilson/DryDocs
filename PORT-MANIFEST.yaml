@@ -1004,8 +1004,14 @@ rows:
       whole, at the O68 (d) shape - `scripts/render_software_registry.py` at the
       base reads that shape and a pre-O68 input breaks the whole render_board.py
       chain, which is how this row was found. `invocation_patterns`, `schema`,
-      `classification`, `adr` and the header comment are producer mechanism and
-      cross whole; `updated` is the row owner's. UNNAMED FIELDS: on a vendor or
+      `adr` and the header comment are producer mechanism and cross whole;
+      `updated` is the row owner's. `classification` is the CONSUMER's (corrected
+      2026-09-07, RELAY-29): the J58 header turned a comment into a field a take
+      can carry, and the value is a side-local judgment — the producer repo is
+      outside the firm, so its Internal-Public means publishable from the
+      producer's public mirror; the same file holding firm rows is Internal
+      there. The rule for every per-entry row: `schema` is the producer's,
+      `classification` is the consumer's, `updated` is the row owner's. UNNAMED FIELDS: on a vendor or
       product row belong to whichever side owns the row under the id rule above;
       a new top-level key is the producer's.
     note: >

@@ -2,7 +2,7 @@
 
 Agent flows for the DryDocs web front end, built on
 [Google ADK 2.0](https://adk.dev/2.0/) (`pip install google-adk` — the OSS base of the
-company-internal Fusion SmartSDK). Sibling component to [`web/`](../web/); it is **not**
+company-internal agent SDK; the product's name is Internal and stays in internal/). Sibling component to [`web/`](../web/); it is **not**
 part of the poetry package (`drydocs`/`drydocs_core`) — it has its own venv so the agent
 runtime can be profiled/leak-tested in isolation.
 
