@@ -383,6 +383,7 @@ def test_data_centers_validates_against_its_model(api):
     # with no default_time is a legitimate registration and must not 500.
     assert all(isinstance(d["default_time"], str) for d in body["data_centers"])
 
+
 def test_a_blank_return_note_is_a_422_and_the_reason_reaches_the_caller(api):
     """O50: the admin queue's Send-back button is convenience; THIS is the rule.
 
