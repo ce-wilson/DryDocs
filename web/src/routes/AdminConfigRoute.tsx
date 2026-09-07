@@ -17,6 +17,7 @@ import { useRightSidebar } from '../layout/rightSidebarContext'
 import ModuleTemplate from './ModuleTemplate'
 import EmptyState from '../components/ui/EmptyState'
 import LogEstatePanel from './LogEstatePanel'
+import ReviewQualityTab from './ReviewQualityTab'
 import SpecGrid from '../explorer/SpecGrid'
 import ServiceStatusStrip from '../components/ServiceStatusStrip'
 import matrix from '../generated/enforcement-matrix.json'
@@ -220,6 +221,11 @@ export default function AdminConfigRoute() {
         // carry the question as sha256 only and are :Uncertain (the G102 fold),
         // which makes them an operator's data and not a reader's.
         'Agent runs': <SpecGrid specId="console.agent-runs.v1" />,
+        // O51: reviewer-quality signals and the admin block. Same placement
+        // argument as the log estate — it reads named people's numbers and holds
+        // a decision about a person, so it belongs behind the admin gate this
+        // page already is, not on a surface an SME can open.
+        'Reviewer quality': <ReviewQualityTab />,
         'Enforcement matrix': (
           <div className="flex h-full min-h-0 flex-col gap-1.5">
             <p className="shrink-0 rounded border border-edge bg-panel-2 px-2 py-1 text-[11px] text-muted">

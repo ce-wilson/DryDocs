@@ -154,6 +154,17 @@ SURFACES: list[dict] = [
         "gate_ref": None,
     },
     {
+        "id": "review-quality",
+        "title": "Reviewer-quality limits",
+        "file": "config/review-quality.yaml",
+        "consumers": ["drydocs_api/review_quality.py"],
+        "guard_tests": ["test_review_quality.py", "test_config_schemas.py"],
+        # No gate: the file holds THRESHOLDS and nothing it declares can act.
+        # The decision it feeds -- an admin blocking a reviewer from submitting
+        # -- is a person's, recorded in the store with who/when/why (O51).
+        "gate_ref": None,
+    },
+    {
         "id": "glossary",
         "title": "Business glossary (schema half)",
         "file": "config/glossary/",

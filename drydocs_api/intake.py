@@ -324,6 +324,21 @@ class IntakeStore:
                     action    TEXT NOT NULL,
                     detail    TEXT NOT NULL DEFAULT ''
                 );
+                -- O51: submit blocks. APPEND-ONLY: an unblock closes the open
+                -- row rather than deleting it, so "who blocked whom, when, why,
+                -- and who lifted it with what note" survives as a record. A
+                -- block table that could be emptied would be an audit surface
+                -- nobody could audit.
+                CREATE TABLE IF NOT EXISTS persona_block (
+                    block_id     TEXT PRIMARY KEY,
+                    persona_id   TEXT NOT NULL,
+                    blocked_at   TEXT NOT NULL,
+                    blocked_by   TEXT NOT NULL,
+                    reason       TEXT NOT NULL,
+                    unblocked_at TEXT,
+                    unblocked_by TEXT,
+                    unblock_note TEXT
+                );
                 """
             )
         return self._conn
@@ -647,6 +662,121 @@ def list_intakes(token: str, sessions: InMemorySessionStore, store: IntakeStore)
     return {"intakes": records}
 
 
+# ── O51: the submit block — decided by an admin, never by a threshold ────────
+#
+# THE ONE RULE THIS CODE EXISTS TO KEEP. A limit in config/review-quality.yaml
+# FLAGS; a person blocks. `block_persona` takes a session and refuses anyone but
+# an admin, so there is no argument shape in which a metric could call it, and
+# `drydocs_api/review_quality.py` — the module that computes the limits — imports
+# nothing from here. tests/unit/test_review_quality.py asserts both halves by
+# reading the code rather than trusting this paragraph.
+
+
+def _open_block(store: IntakeStore, persona_id: str) -> sqlite3.Row | None:
+    return store.conn.execute(
+        "SELECT * FROM persona_block WHERE persona_id = ? AND unblocked_at IS NULL"
+        " ORDER BY blocked_at DESC LIMIT 1",
+        (persona_id,),
+    ).fetchone()
+
+
+def blocked_personas(store: IntakeStore) -> dict[str, dict]:
+    """Every persona with an open block, by id. The console renders this beside
+    the metrics so a blocked reviewer is visible on the rail without a second
+    round trip."""
+    rows = store.conn.execute(
+        "SELECT * FROM persona_block WHERE unblocked_at IS NULL ORDER BY blocked_at"
+    )
+    return {str(row["persona_id"]): dict(row) for row in rows}
+
+
+def block_history(store: IntakeStore, persona_id: str) -> list[dict]:
+    """Every block ever placed on this persona, open or lifted, oldest first."""
+    return [
+        dict(row)
+        for row in store.conn.execute(
+            "SELECT * FROM persona_block WHERE persona_id = ? ORDER BY blocked_at",
+            (persona_id,),
+        )
+    ]
+
+
+def block_persona(
+    persona_id: str,
+    reason: str,
+    token: str,
+    sessions: InMemorySessionStore,
+    store: IntakeStore,
+) -> dict:
+    """Stop a persona SUBMITTING. Admin only, and the reason is required.
+
+    WHAT SURVIVES A BLOCK, because "blocked" is not "locked out": drafts stay,
+    evidence can still be uploaded, and every transition below `sme-confirmed`
+    still runs. A blocked reviewer can keep working on a record and cannot hand
+    it on — which is the point, and is why this is enforced at the submit rather
+    than at the door.
+    """
+    session = _authorize(token, sessions)
+    if session.role != "admin":
+        raise Forbidden("blocking a reviewer is an admin decision")
+    if not reason.strip():
+        raise IntakeValidationError(
+            "a block records WHY — the reviewer is told, and the next admin reads it"
+        )
+    if not persona_id.strip():
+        raise IntakeValidationError("a block names a persona")
+    existing = _open_block(store, persona_id)
+    if existing is not None:
+        raise IntakeValidationError(
+            f"{persona_id} is already blocked (since {existing['blocked_at']}"
+            f" by {existing['blocked_by']})"
+        )
+    block_id = uuid.uuid4().hex
+    store.conn.execute(
+        "INSERT INTO persona_block (block_id, persona_id, blocked_at, blocked_by, reason)"
+        " VALUES (?,?,?,?,?)",
+        (block_id, persona_id, _now(), session.persona_id, reason.strip()),
+    )
+    store.conn.commit()
+    return dict(_open_block(store, persona_id))
+
+
+def unblock_persona(
+    persona_id: str,
+    note: str,
+    token: str,
+    sessions: InMemorySessionStore,
+    store: IntakeStore,
+) -> dict:
+    """Lift a block. Admin only, and the NOTE is required.
+
+    Required for the same reason the block's reason is: the pair is the record
+    of a judgment about a person, and half a record is worse than none — it
+    reads as a decision nobody will own later.
+    """
+    session = _authorize(token, sessions)
+    if session.role != "admin":
+        raise Forbidden("lifting a block is an admin decision")
+    if not note.strip():
+        raise IntakeValidationError(
+            "an unblock goes on the record with a note — what changed, in one line"
+        )
+    row = _open_block(store, persona_id)
+    if row is None:
+        raise IntakeValidationError(f"{persona_id} is not blocked")
+    store.conn.execute(
+        "UPDATE persona_block SET unblocked_at = ?, unblocked_by = ?, unblock_note = ?"
+        " WHERE block_id = ?",
+        (_now(), session.persona_id, note.strip(), row["block_id"]),
+    )
+    store.conn.commit()
+    return dict(
+        store.conn.execute(
+            "SELECT * FROM persona_block WHERE block_id = ?", (row["block_id"],)
+        ).fetchone()
+    )
+
+
 def transition(
     intake_id: str,
     to: str,
@@ -675,6 +805,17 @@ def transition(
             "this intake continues a known thread — the Adds-value / No-new-value "
             "decision comes first (thread-decision endpoint)"
         )
+    if to == "sme-confirmed":
+        # O51. Enforced HERE and only here: both paths into sme-confirmed
+        # (correlated -> and admin-returned ->) are submits, and everything
+        # below it stays open so the reviewer's drafts survive the block.
+        block = _open_block(store, session.persona_id)
+        if block is not None:
+            raise Forbidden(
+                f"submitting is blocked for {session.persona_id} since "
+                f"{block['blocked_at']} ({block['blocked_by']}): {block['reason']}. "
+                "Drafts and evidence are unaffected; an admin lifts the block with a note."
+            )
     if to == "admin-returned" and not note.strip():
         raise IntakeValidationError("a return goes back with a note — the SME needs the why")
     store.conn.execute("UPDATE intake SET status = ? WHERE intake_id = ?", (to, intake_id))

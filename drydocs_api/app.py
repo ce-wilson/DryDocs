@@ -57,11 +57,14 @@ from drydocs_api.intake import (
     IntakeValidationError,
     UnknownIntakeError,
     add_evidence,
+    block_persona,
+    blocked_personas,
     create_intake,
     default_intake_root,
     get_intake,
     list_intakes,
     thread_decision,
+    unblock_persona,
 )
 from drydocs_api.intake import (
     transition as intake_transition,
@@ -86,6 +89,12 @@ from drydocs_api.mappings import (
 from drydocs_api.personas import UnknownPersonaError
 from drydocs_api.queries import NAMED_QUERIES, ParamValidationError, UnknownQueryError
 from drydocs_api.query_specs import SPEC_DATABASES, UnknownSpecError
+from drydocs_api.review_quality import (
+    decisions,
+    limits_as_dict,
+    load_limits,
+    summarize,
+)
 from drydocs_api.schemas import (
     AppCodeMigrationsOut,
     ChangesetArtifactOut,
@@ -110,7 +119,10 @@ from drydocs_api.schemas import (
     NamedRunOut,
     OpenDraftsOut,
     PendingCorrectionsReportOut,
+    PersonaBlockOut,
+    PersonaQualityOut,
     PromotedDiffOut,
+    ReviewQualityOut,
     SpecOut,
     SpecRunOut,
     StatusOut,
@@ -171,6 +183,16 @@ class IntakeTransitionBody(BaseModel):
 
 class ThreadDecisionBody(BaseModel):
     decision: str  # 'adds-value' | 'no-new-value'
+
+
+class BlockBody(BaseModel):
+    persona_id: str
+    reason: str = ""
+
+
+class UnblockBody(BaseModel):
+    persona_id: str
+    note: str = ""
 
 
 class EphemeralRegisterBody(BaseModel):
@@ -944,6 +966,61 @@ def create_app(
     @app.get("/admin/log-estate")
     def get_log_estate(user: AdminUser) -> LogEstateOut:
         return log_estate()
+
+    # ── O51: reviewer-quality signals + the admin block ──────────────────────
+    #
+    # ADMIN ONLY, all three, and for two different reasons. The GET reports
+    # numbers about named people, which is not reader data; the two POSTs are
+    # the decision itself. The limits are read from config on every request
+    # rather than cached at boot, so an edited threshold takes effect on the
+    # next refresh instead of on the next restart — the file is the seam the
+    # admin edits, and a cache would make it look like it had not worked.
+    #
+    # THE MACHINE MEASURES; THE HUMAN BLOCKS. Nothing in the GET path can
+    # write, and `review_quality` imports nothing that can block. Asserted in
+    # tests/unit/test_review_quality.py by reading the code, not this comment.
+    @app.get("/review-quality")
+    def get_review_quality(user: AdminUser) -> ReviewQualityOut:
+        limits = load_limits()
+        events = [dict(r) for r in intake_store.conn.execute("SELECT * FROM event")]
+        evidence = [dict(r) for r in intake_store.conn.execute("SELECT * FROM evidence")]
+        blocks = blocked_personas(intake_store)
+        made = decisions(events, evidence, limits)
+        return ReviewQualityOut(
+            window_days=limits.window_days,
+            min_decisions_for_flag=limits.min_decisions_for_flag,
+            limits=limits_as_dict(limits),
+            personas=[
+                PersonaQualityOut(**p.as_dict()) for p in summarize(made, limits, blocked=blocks)
+            ],
+            blocks=[PersonaBlockOut(**row) for row in blocks.values()],
+        )
+
+    @app.post("/review-quality/block")
+    def post_review_quality_block(body: BlockBody, user: AdminUser) -> PersonaBlockOut:
+        return _intake_call(
+            block_persona,
+            body.persona_id,
+            body.reason,
+            user.token,
+            sessions,
+            intake_store,
+            audit_route="/review-quality/block",
+            audit_token=user.session_id,
+        )
+
+    @app.post("/review-quality/unblock")
+    def post_review_quality_unblock(body: UnblockBody, user: AdminUser) -> PersonaBlockOut:
+        return _intake_call(
+            unblock_persona,
+            body.persona_id,
+            body.note,
+            user.token,
+            sessions,
+            intake_store,
+            audit_route="/review-quality/unblock",
+            audit_token=user.session_id,
+        )
 
     # Dev-mode demo page (same-origin, so no CORS surface): the live-data twin
     # of docs/design/ui-exploration/wf-mapping-01.html until the O8 React shell exists.

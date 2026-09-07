@@ -25,6 +25,24 @@
         "title": "AppCodeMigrationsOut",
         "type": "object"
       },
+      "BlockBody": {
+        "properties": {
+          "persona_id": {
+            "title": "Persona Id",
+            "type": "string"
+          },
+          "reason": {
+            "default": "",
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "persona_id"
+        ],
+        "title": "BlockBody",
+        "type": "object"
+      },
       "Body_post_intake_evidence_intake__intake_id__evidence_post": {
         "properties": {
           "files": {
@@ -1711,6 +1729,146 @@
         "title": "PendingCountsOut",
         "type": "object"
       },
+      "PersonaBlockOut": {
+        "additionalProperties": false,
+        "description": "A submit block, open or lifted. Append-only in the store: an unblock\nfills the three ``unblock*`` fields rather than deleting the row, because a\njudgment about a person that can be erased is not a record.",
+        "properties": {
+          "block_id": {
+            "title": "Block Id",
+            "type": "string"
+          },
+          "blocked_at": {
+            "title": "Blocked At",
+            "type": "string"
+          },
+          "blocked_by": {
+            "title": "Blocked By",
+            "type": "string"
+          },
+          "persona_id": {
+            "title": "Persona Id",
+            "type": "string"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "unblock_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unblock Note"
+          },
+          "unblocked_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unblocked At"
+          },
+          "unblocked_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unblocked By"
+          }
+        },
+        "required": [
+          "block_id",
+          "persona_id",
+          "blocked_at",
+          "blocked_by",
+          "reason"
+        ],
+        "title": "PersonaBlockOut",
+        "type": "object"
+      },
+      "PersonaQualityOut": {
+        "additionalProperties": false,
+        "description": "O51: one reviewer's signals over the rolling window.\n\n``auto_accept_rate`` is NULLABLE ON PURPOSE and is null everywhere today.\nThe metric needs the agent's candidate-binding set (O48) to compare a\nconfirmation against; reporting 0.0 would read as a reviewer who modifies\neverything, which is the best possible score. The reason travels beside it\nin ``auto_accept_unavailable_because`` so no consumer has to guess whether\nnull means zero, missing, or broken.",
+        "properties": {
+          "admin_return_rate": {
+            "title": "Admin Return Rate",
+            "type": "number"
+          },
+          "auto_accept_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Auto Accept Rate"
+          },
+          "auto_accept_unavailable_because": {
+            "title": "Auto Accept Unavailable Because",
+            "type": "string"
+          },
+          "blocked": {
+            "title": "Blocked",
+            "type": "boolean"
+          },
+          "flags": {
+            "items": {
+              "$ref": "#/components/schemas/QualityFlagOut"
+            },
+            "title": "Flags",
+            "type": "array"
+          },
+          "median_review_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Median Review Seconds"
+          },
+          "persona_id": {
+            "title": "Persona Id",
+            "type": "string"
+          },
+          "submissions": {
+            "title": "Submissions",
+            "type": "integer"
+          },
+          "too_fast_rate": {
+            "title": "Too Fast Rate",
+            "type": "number"
+          }
+        },
+        "required": [
+          "persona_id",
+          "submissions",
+          "auto_accept_rate",
+          "auto_accept_unavailable_because",
+          "too_fast_rate",
+          "admin_return_rate",
+          "median_review_seconds",
+          "flags",
+          "blocked"
+        ],
+        "title": "PersonaQualityOut",
+        "type": "object"
+      },
       "PromotedDiffOut": {
         "additionalProperties": false,
         "description": "POST /mappings/drafts/{draft_id}/promote \u2014 the unified diff to apply on a\nbranch. The server still writes nothing; git is the only commit target.",
@@ -1756,6 +1914,36 @@
         "title": "PromotedDiffOut",
         "type": "object"
       },
+      "QualityFlagOut": {
+        "additionalProperties": false,
+        "description": "One limit an SME crossed. The metric that tripped travels WITH the\nnumber and the limit it was compared against, so the rail can say what\nhappened without the console holding a second copy of the thresholds.",
+        "properties": {
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          },
+          "limit": {
+            "title": "Limit",
+            "type": "number"
+          },
+          "metric": {
+            "title": "Metric",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "number"
+          }
+        },
+        "required": [
+          "metric",
+          "value",
+          "limit",
+          "detail"
+        ],
+        "title": "QualityFlagOut",
+        "type": "object"
+      },
       "QueryBody": {
         "properties": {
           "params": {
@@ -1779,6 +1967,48 @@
           "cypher"
         ],
         "title": "RawBody",
+        "type": "object"
+      },
+      "ReviewQualityOut": {
+        "additionalProperties": false,
+        "description": "GET /review-quality (admin only).\n\n``limits`` rides along so the console renders the number a metric was\ncompared against instead of restating the thresholds in TypeScript \u2014 the\nsame reason a spec result carries its own column declarations.",
+        "properties": {
+          "blocks": {
+            "items": {
+              "$ref": "#/components/schemas/PersonaBlockOut"
+            },
+            "title": "Blocks",
+            "type": "array"
+          },
+          "limits": {
+            "additionalProperties": true,
+            "title": "Limits",
+            "type": "object"
+          },
+          "min_decisions_for_flag": {
+            "title": "Min Decisions For Flag",
+            "type": "integer"
+          },
+          "personas": {
+            "items": {
+              "$ref": "#/components/schemas/PersonaQualityOut"
+            },
+            "title": "Personas",
+            "type": "array"
+          },
+          "window_days": {
+            "title": "Window Days",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "window_days",
+          "min_decisions_for_flag",
+          "limits",
+          "personas",
+          "blocks"
+        ],
+        "title": "ReviewQualityOut",
         "type": "object"
       },
       "SpecOut": {
@@ -1991,6 +2221,24 @@
           "decision"
         ],
         "title": "ThreadDecisionBody",
+        "type": "object"
+      },
+      "UnblockBody": {
+        "properties": {
+          "note": {
+            "default": "",
+            "title": "Note",
+            "type": "string"
+          },
+          "persona_id": {
+            "title": "Persona Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "persona_id"
+        ],
+        "title": "UnblockBody",
         "type": "object"
       },
       "ValidationError": {
@@ -3512,6 +3760,164 @@
           }
         },
         "summary": "Post Raw"
+      }
+    },
+    "/review-quality": {
+      "get": {
+        "operationId": "get_review_quality_review_quality_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewQualityOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Review Quality"
+      }
+    },
+    "/review-quality/block": {
+      "post": {
+        "operationId": "post_review_quality_block_review_quality_block_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BlockBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonaBlockOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Post Review Quality Block"
+      }
+    },
+    "/review-quality/unblock": {
+      "post": {
+        "operationId": "post_review_quality_unblock_review_quality_unblock_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnblockBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonaBlockOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Post Review Quality Unblock"
       }
     },
     "/specs": {

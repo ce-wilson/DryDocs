@@ -496,6 +496,57 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/review-quality": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Review Quality */
+        get: operations["get_review_quality_review_quality_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/review-quality/block": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Post Review Quality Block */
+        post: operations["post_review_quality_block_review_quality_block_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/review-quality/unblock": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Post Review Quality Unblock */
+        post: operations["post_review_quality_unblock_review_quality_unblock_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/specs": {
         parameters: {
             query?: never;
@@ -582,6 +633,16 @@ export type components = {
             migrations: {
                 [key: string]: unknown;
             }[];
+        };
+        /** BlockBody */
+        BlockBody: {
+            /** Persona Id */
+            persona_id: string;
+            /**
+             * Reason
+             * @default
+             */
+            reason: string;
         };
         /** Body_post_intake_evidence_intake__intake_id__evidence_post */
         Body_post_intake_evidence_intake__intake_id__evidence_post: {
@@ -1378,6 +1439,61 @@ export type components = {
             overrides: number;
         };
         /**
+         * PersonaBlockOut
+         * @description A submit block, open or lifted. Append-only in the store: an unblock
+         *     fills the three ``unblock*`` fields rather than deleting the row, because a
+         *     judgment about a person that can be erased is not a record.
+         */
+        PersonaBlockOut: {
+            /** Block Id */
+            block_id: string;
+            /** Blocked At */
+            blocked_at: string;
+            /** Blocked By */
+            blocked_by: string;
+            /** Persona Id */
+            persona_id: string;
+            /** Reason */
+            reason: string;
+            /** Unblock Note */
+            unblock_note?: string | null;
+            /** Unblocked At */
+            unblocked_at?: string | null;
+            /** Unblocked By */
+            unblocked_by?: string | null;
+        };
+        /**
+         * PersonaQualityOut
+         * @description O51: one reviewer's signals over the rolling window.
+         *
+         *     ``auto_accept_rate`` is NULLABLE ON PURPOSE and is null everywhere today.
+         *     The metric needs the agent's candidate-binding set (O48) to compare a
+         *     confirmation against; reporting 0.0 would read as a reviewer who modifies
+         *     everything, which is the best possible score. The reason travels beside it
+         *     in ``auto_accept_unavailable_because`` so no consumer has to guess whether
+         *     null means zero, missing, or broken.
+         */
+        PersonaQualityOut: {
+            /** Admin Return Rate */
+            admin_return_rate: number;
+            /** Auto Accept Rate */
+            auto_accept_rate: number | null;
+            /** Auto Accept Unavailable Because */
+            auto_accept_unavailable_because: string;
+            /** Blocked */
+            blocked: boolean;
+            /** Flags */
+            flags: components["schemas"]["QualityFlagOut"][];
+            /** Median Review Seconds */
+            median_review_seconds: number | null;
+            /** Persona Id */
+            persona_id: string;
+            /** Submissions */
+            submissions: number;
+            /** Too Fast Rate */
+            too_fast_rate: number;
+        };
+        /**
          * PromotedDiffOut
          * @description POST /mappings/drafts/{draft_id}/promote — the unified diff to apply on a
          *     branch. The server still writes nothing; git is the only commit target.
@@ -1398,6 +1514,22 @@ export type components = {
             /** Path */
             path: string;
         };
+        /**
+         * QualityFlagOut
+         * @description One limit an SME crossed. The metric that tripped travels WITH the
+         *     number and the limit it was compared against, so the rail can say what
+         *     happened without the console holding a second copy of the thresholds.
+         */
+        QualityFlagOut: {
+            /** Detail */
+            detail: string;
+            /** Limit */
+            limit: number;
+            /** Metric */
+            metric: string;
+            /** Value */
+            value: number;
+        };
         /** QueryBody */
         QueryBody: {
             /**
@@ -1412,6 +1544,28 @@ export type components = {
         RawBody: {
             /** Cypher */
             cypher: string;
+        };
+        /**
+         * ReviewQualityOut
+         * @description GET /review-quality (admin only).
+         *
+         *     ``limits`` rides along so the console renders the number a metric was
+         *     compared against instead of restating the thresholds in TypeScript — the
+         *     same reason a spec result carries its own column declarations.
+         */
+        ReviewQualityOut: {
+            /** Blocks */
+            blocks: components["schemas"]["PersonaBlockOut"][];
+            /** Limits */
+            limits: {
+                [key: string]: unknown;
+            };
+            /** Min Decisions For Flag */
+            min_decisions_for_flag: number;
+            /** Personas */
+            personas: components["schemas"]["PersonaQualityOut"][];
+            /** Window Days */
+            window_days: number;
         };
         /**
          * SpecOut
@@ -1496,6 +1650,16 @@ export type components = {
         ThreadDecisionBody: {
             /** Decision */
             decision: string;
+        };
+        /** UnblockBody */
+        UnblockBody: {
+            /**
+             * Note
+             * @default
+             */
+            note: string;
+            /** Persona Id */
+            persona_id: string;
         };
         /** ValidationError */
         ValidationError: {
@@ -2452,6 +2616,107 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["NamedRunOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_review_quality_review_quality_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewQualityOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    post_review_quality_block_review_quality_block_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BlockBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PersonaBlockOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    post_review_quality_unblock_review_quality_unblock_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UnblockBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PersonaBlockOut"];
                 };
             };
             /** @description Validation Error */
