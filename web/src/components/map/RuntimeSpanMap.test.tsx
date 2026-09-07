@@ -100,7 +100,11 @@ const REGISTRY: DataCenterRow[] = [
   { code: 'P99', name: 'T099-PLAIN', default_time: '', suffix: '', sample: true, note: '' },
 ]
 
-async function pick(rows: Record<string, unknown>[], origin: string) {
+async function pick(
+  rows: Record<string, unknown>[],
+  name: string,
+  grain: 'job' | 'folder' = 'job',
+) {
   render(
     <RuntimeSpanMap
       access={access(rows)}
@@ -109,9 +113,11 @@ async function pick(rows: Record<string, unknown>[], origin: string) {
       viewerTimeZone="UTC"
     />,
   )
-  const select = await screen.findByRole('combobox')
-  fireEvent.change(select, { target: { value: origin } })
-  return select
+  const grainSelect = await screen.findByLabelText('Grain')
+  if (grain !== 'job') fireEvent.change(grainSelect, { target: { value: grain } })
+  const entity = screen.getByLabelText(grain === 'job' ? 'Job' : 'Folder')
+  fireEvent.change(entity, { target: { value: name } })
+  return entity
 }
 
 describe('the observed case', () => {
@@ -152,7 +158,7 @@ describe('the default-seeded case', () => {
         viewerTimeZone="UTC"
       />,
     )
-    fireEvent.change(await screen.findByRole('combobox'), { target: { value: 'JOB_A' } })
+    fireEvent.change(await screen.findByLabelText('Job'), { target: { value: 'JOB_A' } })
     expect(document.body.textContent).toContain('05:30 – 06:30')
   })
 
@@ -179,15 +185,61 @@ describe('a span that crosses midnight', () => {
 })
 
 describe('the two data centers stay apart', () => {
-  it('names the scheduling DC as the seed and the physical place as the pin', async () => {
+  it('names BOTH, each under a label that says which kind it is', async () => {
+    // POSITIVE assertions on purpose. An earlier draft of this test asserted
+    // that the two names never appeared adjacent, which passed for the wrong
+    // reason — neither name was rendered at all. Naming only one of them is the
+    // conflation by omission: a reader who sees "DEFAULT from the DC name" and
+    // one data center concludes that is the data center the name came from.
     await pick([row()], 'JOB_A')
-    const text = document.body.textContent ?? ''
-    // The seed came from the SCHEDULING dc; the pin's tooltip names the city.
-    expect(text).toMatch(/DC name/)
+    const scheduling = screen.getByText('Scheduling DC (Control-M)').parentElement!
+    const physical = screen.getByText('Physical data center').parentElement!
+    expect(scheduling.textContent).toContain('P32')
+    expect(scheduling.textContent).toContain('T032-E0700-DMA')
+    expect(physical.textContent).toContain('DC-EAST')
+    expect(physical.textContent).toContain('New York, NY')
+    // and neither name appears under the other's label
+    expect(scheduling.textContent).not.toContain('DC-EAST')
+    expect(physical.textContent).not.toContain('T032-E0700-DMA')
+    // the pin still carries the physical place and its nominal band
     const titles = [...document.querySelectorAll('title')].map((t) => t.textContent ?? '')
     expect(titles.some((t) => t.includes('New York') && t.includes('nominal'))).toBe(true)
-    // and nothing anywhere claims the two are the same object
-    expect(text).not.toMatch(/T032-E0700-DMA.*DC-EAST|DC-EAST.*T032-E0700-DMA/)
+  })
+
+  it('says "host never resolved" rather than borrowing the scheduling name', async () => {
+    await pick([row({ data_center: null, city: null, state: null, country: null })], 'JOB_A')
+    const physical = screen.getByText('Physical data center').parentElement!
+    expect(physical.textContent).toContain('host never resolved')
+    expect(physical.textContent).not.toContain('P32')
+  })
+})
+
+describe('the folder grain', () => {
+  it('reads the folder window, not one member job’s runtime', async () => {
+    // The acceptance names BOTH grains. A folder's span is the P4 window rollup
+    // — an EXTENT — and a member's avg_start_time standing in for it would
+    // answer a different question under this label.
+    const rows = [
+      row({ origin: 'JOB_A', avg_start_time: '03:00', avg_run_time: '600', window_start: '01:00', window_end: '05:00' }),
+      row({ origin: 'JOB_B', avg_start_time: '04:00', avg_run_time: '600', window_start: '01:00', window_end: '05:00' }),
+    ]
+    await pick(rows, 'FOLDER_A', 'folder')
+    const text = document.body.textContent ?? ''
+    expect(text).toContain('01:00 – 05:00') // the folder's own extent
+    expect(text).toMatch(/Folder window \(extent of its members\)/)
+    expect(text).not.toMatch(/Observed \(job avg start/)
+  })
+
+  it('lists each folder once, however many jobs it holds', async () => {
+    const rows = [row({ origin: 'JOB_A' }), row({ origin: 'JOB_B' }), row({ origin: 'JOB_C', folder: 'FOLDER_B' })]
+    render(
+      <RuntimeSpanMap access={access(rows)} dataCenters={REGISTRY} now={JAN_15} viewerTimeZone="UTC" />,
+    )
+    fireEvent.change(await screen.findByLabelText('Grain'), { target: { value: 'folder' } })
+    const options = [...screen.getByLabelText('Folder').querySelectorAll('option')].map(
+      (o) => o.textContent,
+    )
+    expect(options).toEqual(['— select a folder —', 'FOLDER_A', 'FOLDER_B'])
   })
 })
 
@@ -196,7 +248,7 @@ describe('honesty about the bands and the zone', () => {
     render(
       <RuntimeSpanMap access={access([row()])} dataCenters={REGISTRY} now={JAN_15} viewerTimeZone="UTC" />,
     )
-    await screen.findByRole('combobox')
+    await screen.findByLabelText('Job')
     const text = document.body.textContent ?? ''
     expect(text).toMatch(/nominal solar meridians/)
     expect(text).toMatch(/not political time zones/)
@@ -212,7 +264,7 @@ describe('honesty about the bands and the zone', () => {
         viewerTimeZone="UTC"
       />,
     )
-    await screen.findByRole('combobox')
+    await screen.findByLabelText('Job')
     expect(document.body.textContent).toMatch(/2 job\(s\) returned; 1 with no timing data at all/)
   })
 

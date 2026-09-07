@@ -82,6 +82,9 @@ const SPAN_COLUMNS: RowShape<SpanRow> = [
  *  that reads as a span; the label says the length means nothing. */
 const DEFAULT_SEED_MINUTES = 60
 
+/** The two grains the acceptance names. */
+type Grain = 'job' | 'folder'
+
 type Load =
   | { state: 'loading' }
   | { state: 'error'; message: string }
@@ -143,6 +146,7 @@ export default function RuntimeSpanMap({
 }: RuntimeSpanMapProps) {
   const [load, setLoad] = useState<Load>({ state: 'loading' })
   const [selected, setSelected] = useState<string | null>(null)
+  const [mode, setMode] = useState<Grain>('job')
 
   useEffect(() => {
     let live = true
@@ -169,7 +173,10 @@ export default function RuntimeSpanMap({
     }
   }, [access])
 
-  const rows = load.state === 'ready' ? load.rows : []
+  // Memoized because the fallback is a fresh literal: an unmemoized `[]` makes
+  // every derived useMemo below re-run on every render, which the hook linter
+  // catches and which would quietly re-resolve the whole gazetteer.
+  const rows = useMemo(() => (load.state === 'ready' ? load.rows : []), [load])
 
   const longByCode = useMemo(() => longNameByCode(dataCenters), [dataCenters])
   const declaredByCode = useMemo(() => declaredDefaultByCode(dataCenters), [dataCenters])
@@ -183,15 +190,43 @@ export default function RuntimeSpanMap({
     return defaultTimeOf(longByCode.get(code) ?? null)
   }
 
-  const selectedRow = rows.find((r) => r.origin === selected) ?? null
-  const span = selectedRow ? spanOf(selectedRow, dcDefaultFor(selectedRow)) : null
-
-  // Sites for the SELECTED origin only: this map answers "where does this run
-  // reach", not "where is everything".
-  const resolved = useMemo(
-    () => resolveRows(selectedRow ? [selectedRow] : []),
-    [selectedRow],
+  // The acceptance names BOTH grains — "for a selected folder or job" — and they
+  // are different questions rather than a filter of one another. A job's span is
+  // its own average run; a FOLDER's is the window_start/window_end rollup, which
+  // the P4 contract defines as min member start .. max member end. An EXTENT,
+  // never a sum, and never one member's runtime standing in for the folder's.
+  const folders = useMemo(
+    () => [...new Set(rows.map((r) => r.folder).filter((f): f is string => Boolean(f)))].sort(),
+    [rows],
   )
+  const options = mode === 'job' ? rows.map((r) => r.origin) : folders
+
+  const selectedRows = useMemo(
+    () =>
+      selected === null
+        ? []
+        : rows.filter((r) => (mode === 'job' ? r.origin === selected : r.folder === selected)),
+    [rows, mode, selected],
+  )
+  const head = selectedRows[0] ?? null
+
+  const span = head
+    ? mode === 'job'
+      ? spanOf(head, dcDefaultFor(head))
+      : // Folder grain: deliberately WITHOUT the job columns. Passing a member's
+        // avg_start_time here would answer "when does one job in this folder
+        // run" under a label that says "when does this folder run".
+        spanFor({
+          window_start: head.window_start,
+          window_end: head.window_end,
+          dcDefaultMinute: dcDefaultFor(head),
+          dcDefaultDurationMinutes: DEFAULT_SEED_MINUTES,
+        })
+    : null
+
+  // Sites for the SELECTION only: this map answers "where does this run reach",
+  // not "where is everything". A folder's sites are the union of its jobs'.
+  const resolved = useMemo(() => resolveRows(selectedRows), [selectedRows])
 
   const viewer = viewerTimeZone ?? viewerZone()
   const on = todayParts(now)
@@ -212,24 +247,43 @@ export default function RuntimeSpanMap({
     return out
   }, [])
 
+  // A JOB-grain count, said as one: it is the number of rows the map could not
+  // draw at job grain, and it does not become a folder count by switching the
+  // dropdown.
   const timingless = rows.filter((r) => spanOf(r, dcDefaultFor(r)).source === 'none').length
 
   return (
     <section className={className} aria-label="Runtime span map">
       <div className="mb-3 flex flex-wrap items-center gap-3">
         <label className="flex items-center gap-2 text-[13px]">
-          <span style={{ color: 'var(--muted)' }}>Job</span>
+          <span style={{ color: 'var(--muted)' }}>Grain</span>
+          <select
+            className="rounded-md border px-2 py-1 text-[13px]"
+            style={{ borderColor: 'var(--edge)', background: 'var(--panel)', color: 'var(--text)' }}
+            value={mode}
+            aria-label="Grain"
+            onChange={(e) => {
+              setMode(e.target.value as Grain)
+              setSelected(null)
+            }}
+          >
+            <option value="job">Job</option>
+            <option value="folder">Folder</option>
+          </select>
+        </label>
+        <label className="flex items-center gap-2 text-[13px]">
+          <span style={{ color: 'var(--muted)' }}>{mode === 'job' ? 'Job' : 'Folder'}</span>
           <select
             className="max-w-80 rounded-md border px-2 py-1 text-[13px]"
             style={{ borderColor: 'var(--edge)', background: 'var(--panel)', color: 'var(--text)' }}
             value={selected ?? ''}
+            aria-label={mode === 'job' ? 'Job' : 'Folder'}
             onChange={(e) => setSelected(e.target.value || null)}
           >
-            <option value="">— select a job —</option>
-            {rows.map((r) => (
-              <option key={r.origin} value={r.origin}>
-                {r.origin}
-                {r.folder ? ` · ${r.folder}` : ''}
+            <option value="">— select a {mode} —</option>
+            {options.map((name) => (
+              <option key={name} value={name}>
+                {name}
               </option>
             ))}
           </select>
@@ -296,14 +350,61 @@ export default function RuntimeSpanMap({
                   </>
                 )}
               </p>
-              {selectedRow?.start_next_day && (
+              {mode === 'job' && head?.start_next_day && (
                 <p style={{ color: 'var(--muted)' }}>
-                  start_next_day = {selectedRow.start_next_day} (carried from the graph, not applied
-                  here — the ordering rule it encodes is patch_window.py&rsquo;s)
+                  start_next_day = {head.start_next_day} (carried from the graph, not applied here —
+                  the ordering rule it encodes is patch_window.py&rsquo;s)
                 </p>
               )}
             </>
           )}
+        </div>
+      )}
+
+      {/* ---- the two data centers, side by side and never joined ----
+           On the screen as well as on the wire (gate server-location-ontology
+           B4). Naming only one of them would be the conflation by omission:
+           a reader who sees "DEFAULT from the DC name" and one data center
+           reasonably concludes that is the data center the name came from. */}
+      {head && (
+        <div className="mb-3 grid gap-2 md:grid-cols-2">
+          <div
+            className="rounded-lg border p-2 text-[13px]"
+            style={{ borderColor: 'var(--edge)', background: 'var(--panel)' }}
+          >
+            <p style={{ color: 'var(--muted)' }}>Scheduling DC (Control-M)</p>
+            <p>
+              {head.scheduling_dc ?? <span style={{ color: 'var(--muted)' }}>not recorded</span>}
+              {head.scheduling_dc && longByCode.get(head.scheduling_dc) && (
+                <span style={{ color: 'var(--muted)' }}>
+                  {' '}
+                  · {longByCode.get(head.scheduling_dc)}
+                </span>
+              )}
+            </p>
+            <p className="text-xs" style={{ color: 'var(--muted)' }}>
+              Where the E#### default time comes from. A scheduling name, not a place.
+            </p>
+          </div>
+          <div
+            className="rounded-lg border p-2 text-[13px]"
+            style={{ borderColor: 'var(--edge)', background: 'var(--panel)' }}
+          >
+            <p style={{ color: 'var(--muted)' }}>Physical data center</p>
+            <p>
+              {head.data_center ?? <span style={{ color: 'var(--muted)' }}>host never resolved</span>}
+              {head.city && (
+                <span style={{ color: 'var(--muted)' }}>
+                  {' '}
+                  · {head.city}
+                  {head.state ? `, ${head.state}` : ''}
+                </span>
+              )}
+            </p>
+            <p className="text-xs" style={{ color: 'var(--muted)' }}>
+              Where the host actually is. Never joined to the name above by name.
+            </p>
+          </div>
         </div>
       )}
 
