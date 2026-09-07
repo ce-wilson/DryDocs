@@ -37,7 +37,16 @@ import EpistemicBadge from '../components/ui/EpistemicBadge'
 
 interface SpecGridProps {
   specId: string
-  fallback: ReactNode
+  /** This frame's synthetic demo node.
+   *
+   *  OPTIONAL SINCE R8, and omitting it is a CLAIM rather than a convenience:
+   *  it says this spec has no synthetic demo at all. The provenance seam is
+   *  then handed `null` instead of the marker below, so an empty result reports
+   *  `empty` and a failed one reports `error` — never `demo`, which would put a
+   *  "showing demo data" badge over a frame that has no demo data to show. The
+   *  first caller is the agent-run telemetry grid: fabricating example runs
+   *  there would put invented cost and latency numbers on an operator's page. */
+  fallback?: ReactNode
 }
 
 // WEB12 dropped the `access` prop. Sixteen call sites passed a GraphAccess
@@ -120,7 +129,10 @@ export default function SpecGrid({ specId, fallback }: SpecGridProps) {
   // node, so the seam is told there IS a demo and reports `demo` rather than
   // `empty`/`error` — the same policy this frame already had, now stated once
   // and counted where an operator can see it.
-  const provenance = useLiveOrDemo<Record<string, unknown>>(specId, DEMO_PRESENT)
+  const provenance = useLiveOrDemo<Record<string, unknown>>(
+    specId,
+    fallback === undefined ? null : DEMO_PRESENT,
+  )
   // Nullable only for the filter memo, which runs before the guards below (a
   // hook cannot be called conditionally). Past the guards the result is live.
   const loaded = provenance.status === 'live' ? provenance.data : null
