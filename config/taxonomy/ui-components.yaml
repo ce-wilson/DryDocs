@@ -143,7 +143,7 @@ components:
   - { id: Tabs,                    area: ui-primitive, path: components/ui/Tabs.tsx }
   - { id: TruncationBadge,         area: ui-primitive, path: components/ui/TruncationBadge.tsx }   # WEB2 one completeness vocabulary: the canvas's node ceiling and the grid's row ceiling
 
-  # --- component (19) ---
+  # --- component (20) ---
   - { id: BrandMark,               area: component,    path: components/BrandMark.tsx }
   - { id: CypherConsole,           area: component,    path: components/CypherConsole.tsx }
   # O81: the NVL canvas and its QuerySpec-bound frame. UNBOUND to any module on
@@ -154,6 +154,7 @@ components:
   # CAVEAT above), and widening it waits on O42's disposition — one .ts row while
   # 25 others stay out would be an arbitrary exception, not coverage.
   - { id: GraphCanvas,             area: component,    path: components/GraphCanvas.tsx }
+  - { id: ServiceStatusStrip,      area: component,    path: components/ServiceStatusStrip.tsx }   # O63 (f): the standing view of lib/serviceProbe - on demand and timestamped, never a poll
   - { id: SpecGraphPane,           area: component,    path: components/SpecGraphPane.tsx }
   - { id: GraphExplorer,           area: component,    path: components/GraphExplorer.tsx }
   - { id: GraphSvg,                area: component,    path: components/GraphSvg.tsx }
@@ -183,7 +184,7 @@ components:
   - { id: MapGlyphs,               area: icon,         path: components/map/MapGlyphs.tsx }
   - { id: HubGlyphs,               area: icon,         path: components/icons/HubGlyphs.tsx }
 
-  # --- ask (3) ---
+  # --- ask (4) ---
   # R6 Tier-2 task graph. Renders the agent's IN-PROCESS working memory (R1
   # ruling A) — deliberately its own visual language so it is never mistaken
   # for the knowledge graph, though it shares lib/forceLayout.ts.
@@ -195,6 +196,7 @@ components:
   # R19: the clarification card. Renders the agent's structured request for an
   # unresolved acronym or label as choices the person makes; composes the next
   # turn's clarifications and never picks a near match for them.
+  - { id: FailureLadder,           area: ask,          path: ask/FailureLadder.tsx,                        module: ask,        module_evidence: directory }   # O63 (a)-(e): the staged self-diagnosis Ask shows instead of one red line
   - { id: ClarificationCard,       area: ask,          path: ask/ClarificationCard.tsx,                   module: ask,        module_evidence: directory }
 
   # --- explorer (4) ---

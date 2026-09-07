@@ -17,6 +17,7 @@ import { useRightSidebar } from '../layout/rightSidebarContext'
 import ModuleTemplate from './ModuleTemplate'
 import EmptyState from '../components/ui/EmptyState'
 import LogEstatePanel from './LogEstatePanel'
+import ServiceStatusStrip from '../components/ServiceStatusStrip'
 import matrix from '../generated/enforcement-matrix.json'
 
 // /admin/config (O12): the config-as-code TRACEABILITY LENS. NO edit controls
@@ -172,6 +173,11 @@ export default function AdminConfigRoute() {
       }
       graphPane={
         <div className="flex h-full min-h-0 flex-col">
+          {/* O63 (f): AT THE TOP, above the traceability chain, because it
+              answers a question asked BEFORE the page's own content - "is
+              anything missing right now?" - and an answer to that below the
+              fold is an answer nobody reads in time. */}
+          <ServiceStatusStrip />
           <div className="flex shrink-0 flex-wrap items-center gap-1.5 border-b border-edge-soft px-3 py-2">
             <span className="text-xs font-medium text-muted">
               Traceability chain — {selected.title}

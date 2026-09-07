@@ -261,6 +261,21 @@ export async function probeServices(
   return { services: [api, graph, agent, provider], checkedAt: now() }
 }
 
+/** The strip's timestamp, formatted for a reader.
+ *
+ *  Lives here rather than beside the component for two reasons: it formats a
+ *  ProbeResult field, so this is where it belongs; and exporting a non-component
+ *  from a component file breaks fast refresh (oxlint's react/only-export-components,
+ *  which the console gates at --max-warnings 0).
+ *
+ *  Locale-formatted rather than sliced out of an ISO string — it is read by a
+ *  person, in their own clock — and the caller injects the instant, so a test
+ *  never has to assert a format against a moving target. */
+export function checkedAtLabel(at: Date | null): string {
+  if (at === null) return 'not checked yet'
+  return `checked ${at.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+}
+
 /** The strip's pre-run state: every service present and unchecked, no
  *  timestamp. Rendering this rather than an empty strip is what stops a page
  *  from looking healthy before it has asked anything. */
