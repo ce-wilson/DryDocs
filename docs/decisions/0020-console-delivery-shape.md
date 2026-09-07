@@ -275,7 +275,7 @@ already did.
    `GET /config` added (runtime-view template from `DRYDOCS_RUNTIME_VIEW_URL_TEMPLATE`);
    `dump_openapi.py --check`, `npm run api:types`.
 4. [ ] `agents/serve.py`: `--allow_origins` removed; runbook Startup step 3 updated.
-5. [ ] `web/src/ask/askApi.ts` + `agents/graph_qa/control.py`: `api_url` leaves the control
+5. [ ] `web/src/lib/askApi.ts` (moved from `web/src/ask/` at WEB8, 2026-09-06) + `agents/graph_qa/control.py`: `api_url` leaves the control
    part; the agent resolves the API from `DRYDOCS_API_URL` only.
 6. [ ] `web/src/lib/reachability.ts`: `blocked-origin` retired; `unreachable` kept and
    DEV-guarded; proxy `502`/`503`/`504` rendered as "upstream not answering".

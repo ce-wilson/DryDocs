@@ -12,7 +12,7 @@ status: todo
 depends_on: []
 inputs:
 - web/src/routes/AskRoute.tsx
-- web/src/ask/askApi.ts
+- web/src/lib/askApi.ts
 - web/src/lib/adk.ts
 - web/src/routes/AdminConfigRoute.tsx
 - drydocs_api/app.py
