@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-06T19:12:32",
+    "captured_at": "2026-09-06T22:04:52",
     "date": "20260906",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "5511a571",
-      "full": "5511a5712eea1d852925fb96df85f60b80a46dc9",
+      "commit": "76cba80c",
+      "full": "76cba80cfac0458ac1dd6132c971dfc084cb7795",
       "branch": "main",
-      "describe": "port-base-20260905-136-g5511a571",
-      "subject": "docs(O63): pre-build check - clauses (c) and (f) predate ADR 0020; build to the path map, not the retired VITE_ADK_URL or the ports",
+      "describe": "port-base-20260905-141-g76cba80c",
+      "subject": "fix(J78): a cancelled CI run is neither green nor red - the snapshot check now says UNVERIFIED",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -22472,10 +22472,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260906-1734.json",
-      "name": "drydocs-20260906-1734.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260906.json",
+      "name": "drydocs-20260906.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260906-1734.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260906.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -48101,7 +48101,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260906-1734.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260906.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
