@@ -7,7 +7,7 @@ phase: 15
 agent: main
 model: sonnet
 priority: p1
-status: todo
+status: done
 depends_on:
 - R2
 - R5
@@ -21,3 +21,36 @@ acceptance: |
   (a) When the initial question contains an acronym, label, or domain term that does not resolve to a registered QuerySpec, active vocabulary row, live label/property, or approved acronym sense, the agent does not silently choose a near match; it returns a structured clarification request with the unresolved term, the detected candidate senses/labels, and one or more concise choices. (b) The Ask UI renders the clarification as an actionable question, preserves the pending question/session, and submits the user's selection or free-text clarification as the next turn. A confirmed clarification is visible in the trace and is used for the subsequent router/text2cypher decision. (c) If the user declines or no clarification is possible, the answer states the ambiguity and does not present a zero-row near-match as a definitive answer. Existing clear questions remain single-pass and unchanged. (d) Tests cover unknown acronym, ambiguous label with multiple candidates, user selection, cancellation, session persistence, and the no-clarification regression path.
 notes: |
   Requested as a companion to R18 after the Tower/TOMRole mismatch: the Explorer's synthesized Tower concept was silently mapped to the real TOMRole label. This is a disambiguation contract, not permission for the agent to invent ontology or relationship meanings; unresolved meaning still routes to the SME/HITL path.
+  DONE 2026-09-06 (desktop, Lane A). Built on wip/R19-desktop (J31, pushed at the first edit) and
+  merged --no-ff as one unit (merge f3a05b92). (a) agents/graph_qa/term_resolution.py detects
+  acronyms (stop words and house terms excluded; an all-caps question detects nothing), explicit
+  :Label tokens and CamelCase label shapes, and resolves each against a ResolutionIndex built from
+  the registered QuerySpecs (ids, segments, parameter names, description words), the active
+  vocabulary rows, the live schema (labels, relationship types, property keys and their parts), the
+  approved glossary senses (drydocs_core/glossary.py, new: confidence confirmed/corrected counts as
+  approved, candidate/likely may only be OFFERED) and the UI concepts. A term that resolves nowhere
+  stops the run before the router at tier clarification with the term, its candidates (glossary
+  senses, near labels/relationships/properties/spec ids) and choices, plus the two fixed choices
+  __free_text__ and __proceed__. Nothing is routed and no LLM is called for that turn. (b) The
+  console renders it as ClarificationCard (choices per term, a free-text box, Answer anyway, Cancel;
+  Continue disabled until every term has an answer) and re-asks the SAME question with
+  clarificationPart(session_id, clarifications) as the control part; the agent forwards
+  clarifications as the ONE non-secret control field, each one is traced as a clarified step with
+  its note, and clarification_clause appends them to the question for the router, text2cypher,
+  answer and tier-2 prompts. The envelope hashes the original question. A clarification envelope is
+  never persisted as the last turn. (c) Answer anyway is declined: true and declined_note prefixes
+  the answer stating the term was not resolved and that zero rows is not evidence; Cancel sends
+  nothing and the card is replaced by the prompt text. Detection runs first and the index is built
+  only when it finds something, so a lower-case question makes no schema call and the single pass is
+  byte-for-byte the old one (pinned by test_clear_question_is_the_same_single_pass). A schema read
+  failure skips the check and runs the old pass. (d) tests/unit/test_graph_qa_clarification.py (18
+  tests: unknown acronym, ambiguous acronym with two candidate senses, approved sense resolves, label
+  near a live label, selection reaches router and text2cypher prompts, clarified term never re-asked,
+  malformed clarifications, declined note, no-clarification regression, control part not a secret,
+  glossary reader) plus ClarificationCard.test.tsx (8) and askApi.test.ts clarificationPart (2).
+  Contract documented in agents/graph_qa/README.md; ClarificationCard registered in the UI ledger
+  (96 -> 97, bound 40 -> 41). Verified: poetry run pytest -q 3469 passed / 13 skipped; web lint,
+  tsc, build, bundle:check, dist:check, test:coverage 367 passed. Not done here, on purpose: no
+  ontology is invented and no glossary sense is promoted by a clarification - a term the person
+  resolves in free text is used for THAT question only, and a real term still belongs with an SME
+  through the HITL gate, which is what the declined note says.

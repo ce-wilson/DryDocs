@@ -1,0 +1,6 @@
+; query: host-auto-01
+Server:		10.0.0.53
+Address:	10.0.0.53#53
+
+Name:	host-auto-01.synth
+Address: 10.0.0.21

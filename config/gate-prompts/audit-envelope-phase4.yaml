@@ -14,6 +14,8 @@
 # headers beyond the one SME-confirmed `Application ID`.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-18
+
 id: audit-envelope-phase4
 title: "SME Gate — source audit envelope, Phase 4: SEAL extract, PAT catalog + people report, software registry (doc 06)"
 step: "Doc 06 Phase 4 — the per-source envelope decisions the 2026-07-07 Control-M gate deferred; decides which stubs in config/audit-fields.yaml flip to confirmed mappings and which are ruled stubs with a recorded reason"

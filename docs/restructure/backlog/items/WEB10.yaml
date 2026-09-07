@@ -1,0 +1,89 @@
+id: WEB10
+epic: web-console
+title: The console's delivery shape - same-origin behind the API or one reverse proxy, a runtime-configured
+  API base instead of a build-time inlined VITE_API_URL, and a production build that fails rather than
+  falling back to localhost
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- docs/reviews/modules/web-2026-09-05.md
+- web/src/lib/auth.ts
+- web/src/lib/reachability.ts
+- web/.env.example
+- drydocs_api/app.py
+- docs/decisions/0005-browser-neo4j-access-path.md
+acceptance: |
+  The API base is `import.meta.env.VITE_API_URL`, inlined at build time, with
+  `http://localhost:8001` as the fallback in twelve files; nothing serves the built console
+  (no Dockerfile, proxy config or static mount - `dist/` is built by CI and consumed by
+  nothing), so the console is cross-origin to its API in every environment, which is why the
+  CORS allowlist, its env override and the O85 diagnostic probe exist at all (S3). ADR 0005
+  settled ACCESS; nothing has settled DELIVERY.
+
+  GATE-BOUND (an ADR). This item drafts and, after the ruling, builds:
+
+  (a) The ADR rules the delivery shape: same-origin - `dist/` served by drydocs-api or one
+      reverse proxy in front of both - or a stated reason to stay cross-origin; and a
+      runtime-configured API base (a `/config` endpoint or an injected `window.__DRYDOCS__`
+      read at boot) so one build promotes across environments.
+  (b) After the ruling: a production build with no configured API base FAILS at build or at
+      boot with a message naming the setting; it never falls back to localhost. The twelve
+      literals collapse into `apiBaseUrl()` (WEB12 does the mechanical part; this item owns the
+      rule). Same for VITE_ADK_URL and port 8000.
+  (c) Same-origin, if ruled: the allowlist, its env override and the probe's blocked-origin
+      branch are removed or reduced to the dev bench, and reachability.ts's record of the
+      O69-to-2026-08-30 port drift is cited as the class of defect the shape retires.
+  (d) O72's Compose stack (todo) is where the ruled shape is first exercised; this item adds
+      the serving process to that stack's plan rather than a second one.
+notes: |
+  Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+  Covers S3 (rank 7). ADR CANDIDATE: "the console's delivery shape." Link O72 (one-command
+  local stack) - O72 composes the four processes the runbook starts by hand; a ruled delivery
+  shape decides whether there are four or three.
+  DRAFTED 2026-09-06 (desktop, Lane A): clause (a) is docs/decisions/0020-console-delivery-shape.md,
+  PROPOSED, with its README row. Re-measured before drafting: the API-base literal is ONE definition
+  now (apiBaseUrl, WEB12 done 2026-09-05), the agent base is two files, and the O39 template is the
+  third build-time deployment value. Recommends option C - one reverse proxy path-routing /api, /agent
+  and / with prefixes stripped, the API base as the PATH /api, dev same-origin through Vite's proxy so
+  both allowlists go, a no-coordinate-in-dist CI guard, GET /api/config for the non-secret runtime
+  values, and api_url leaving the 0019 control part. Clauses (b)-(d) wait on the ruling; the ADR's
+  action items are their build list. Item stays in_progress, gate-bound, until the user rules.
+  2026-09-06 DONE. The user ruled option C the same day; ADR 0020 flipped to ACCEPTED
+  (617cca63) and the shape was built on wip/WEB10-desktop (e2dc1223 code, 08639e6a
+  operator surfaces), merged --no-ff at 96111884. Clause by clause:
+  (a) ADR 0020 rules one path-routed reverse proxy: /api -> drydocs-api, /agent -> the
+  ADK server, /* -> web/dist/, prefixes stripped; the API base is the PATH /api, read from
+  web/delivery.json by vite.config.ts, src/lib/auth.ts and the guard alike. In dev the
+  proxy is Vite's own server.proxy / preview.proxy, so the shape is identical everywhere.
+  (b) VITE_API_URL, VITE_ADK_URL and VITE_RUNTIME_VIEW_URL_TEMPLATE are retired; every
+  localhost:8001 / :8000 literal collapsed into apiBaseUrl() / agentBaseUrl(); upstreams
+  are Vite PROCESS env (DRYDOCS_API_UPSTREAM, DRYDOCS_AGENT_UPSTREAM) and never reach the
+  bundle - npm run dist:check (web/scripts/checkDistCoordinates.mjs, a CI step) fails the
+  build on any host:port in dist/. The non-secret runtime value the browser still needs,
+  DRYDOCS_RUNTIME_VIEW_URL_TEMPLATE, is served by GET /api/config (unauthenticated by
+  design; PUBLIC_ROUTES in test_console_auth.py says why).
+  (c) Same-origin: the API's CORS middleware and DRYDOCS_CORS_ORIGINS are gone, so is
+  serve.py --allow_origins, so is the probe's blocked-origin branch; reachability.ts now
+  reads two verdicts - unreachable (the fetch threw: the page's own server is gone) and
+  upstream-down (the proxy answered 502/503/504). Its O69 -> 2026-08-30 drift is cited
+  in tests/unit/test_console_delivery.py as the retired defect class; that file replaces
+  test_console_origins.py, and TC-SHELL-07 in config/taxonomy/ui-tests.yaml points at it
+  (no new case, so the automated-share pin holds). api_url left the ADR 0019 control
+  part; the agent reads DRYDOCS_API_URL itself.
+  (d) O72 carries a dated note adding the reverse proxy as the Compose stack's fifth
+  service (reads web/delivery.json, serves web/dist/, 502 on a dead upstream, SSE
+  buffering off for /agent/run_sse, per-environment template and API URL, dist:check in
+  the build) and flags its acceptance's CORS sentence as stale - proposed, not edited.
+  Operator surfaces: runbook Rev 4 (docs/design/drydocs-web-console-runbook.md), the
+  run-drydocs-console skill, web/README.md, dev-environment.yaml service comments,
+  agents/.env.example. Gates at merge: ruff check + format clean, pytest 3446 passed /
+  0 failed, web lint + build + bundle:check + dist:check + vitest 357 + playwright 2.
+  For the next roll: this is a company-facing change (retired env vars, the /api base,
+  the deleted test) and goes in the relay.

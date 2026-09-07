@@ -29,7 +29,7 @@ def est_tokens(text: str) -> int:
 @dataclass
 class StepRecord:
     i: int
-    kind: str  # 'declared' | 'router' | 'spec' | 'text2cypher' | 'answer' | 'tier2'
+    kind: str  # 'declared' | 'clarify' | 'clarified' | 'router' | 'spec' | 'text2cypher' | 'answer' | 'tier2'
     ms: int = 0
     spec_id: str | None = None
     cypher: str | None = None
@@ -45,6 +45,17 @@ class StepRecord:
     # severity, position, description, category) — an unknown label that
     # presents as 0 rows is visible HERE, not lost. [] is a clean step.
     notifications: list[dict] = field(default_factory=list)
+    # R15: the epistemic label the spec's walk earned on THIS run — 'exact' |
+    # 'lower-bound' | None (ungraded: the spec declares no walk). `causes`
+    # names what limited the walk, machine-readably ({cause, detail, count}).
+    # Carried as given from drydocs_api.epistemics.grade; the agent renders
+    # the label, it never re-derives or re-words it.
+    epistemic: str | None = None
+    causes: list[dict] = field(default_factory=list)
+    # R19: free text a step wants the trace to show — the clarification
+    # prompt on a 'clarify' step, the person's own resolution (or that they
+    # declined) on a 'clarified' step. None on every other kind.
+    note: str | None = None
 
 
 @dataclass
@@ -88,7 +99,7 @@ class Metrics:
 class Envelope:
     run_id: str
     session_id: str
-    tier: str  # 'declared' | 'spec' | 'text2cypher' | 'tier2' | 'unanswered'
+    tier: str  # 'declared' | 'clarification' | 'spec' | 'text2cypher' | 'tier2' | 'unanswered'
     question_sha256: str
     question_chars: int
     answer: str
@@ -107,6 +118,11 @@ class Envelope:
     # already lays out, so the console renders them with no adapter. Empty on
     # every run that never reached Tier 2, which is most of them.
     task_graph: list[dict] = field(default_factory=list)
+    # R19: set ONLY when tier == 'clarification' — the structured request the
+    # console renders as a question ({terms: [{term, kind, candidates,
+    # choices}], prompt}). `answer` then carries the same prompt as text, so a
+    # consumer that knows nothing of R19 still shows a sentence, not a blank.
+    clarification: dict | None = None
 
     def to_dict(self) -> dict:
         return asdict(self)

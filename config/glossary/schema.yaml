@@ -1,6 +1,8 @@
 # Business glossary — SCHEMA (Internal-Public). G34 scaffold, 2026-08-21. No terms live here.
 # Definitions live in internal/glossary/terms.yaml (Internal) under this exact shape.
 schema: drydocs.glossary.v1
+updated: 2026-08-21
+
 classification: Internal-Public            # the shape; definitions are Internal
 scopes: [area, business-domain, technical-domain, industry]
 confidence_values: [candidate, likely, confirmed, corrected]

@@ -1,0 +1,120 @@
+id: WEB2
+epic: web-console
+title: The grid renders the row ceiling the way the canvas already renders its node ceiling - a TRUNCATED
+  n/N badge on capped results, and no export button says "full" unless the manifest says complete
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p1
+status: done
+depends_on:
+- API1
+inputs:
+- docs/reviews/modules/web-2026-09-05.md
+- web/src/explorer/SpecGrid.tsx
+- web/src/components/GraphCanvas.tsx
+- web/src/lib/nvl-mapping.ts
+- web/src/lib/graph.ts
+acceptance: |
+  (a) SpecGrid renders a TRUNCATED n/N badge whenever the result's `truncated` field (API1) is
+      true - the same badge, same wording and same placement the canvas uses for its node
+      ceiling, so one vocabulary of completeness serves both surfaces.
+  (b) The two server-export buttons stop saying "full" unless the export manifest says
+      `truncated: false`; otherwise the label states the ceiling ("first 500 rows") and the
+      status line after export says what was exported, including the cap.
+  (c) Where API1 made the ceiling raisable, the export path offers it; where it did not, the
+      button says so rather than implying completeness.
+  (d) A vitest covers the capped and the uncapped case for the grid, mirroring the two canvas
+      tests, and asserts the badge is driven by the typed field and not by `rows.length`.
+notes: |
+  Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+  Covers S1's console half. Depends on API1 because rendering completeness from a heuristic
+  (`rows.length === 500`) would be a second source of truth for the same fact - the shape the
+  whole report warns against.
+
+  DONE 2026-09-05 (Lane B, laptop). The row ceiling is on screen and the export
+  stops claiming completeness it cannot have.
+
+  (a) ONE BADGE, SHARED, AND A GUARD THAT KEEPS IT ONE. components/ui/
+  TruncationBadge is the canvas's badge lifted out verbatim - same wording, same
+  placement, same token - and both surfaces now render it. A source scan asserts
+  that exactly ONE file declares the word TRUNCATED, because the item's premise is
+  that the two surfaces must not drift apart, and they can only stay together if
+  there is a single place to edit. Mutation-proven both ways: a second declaration
+  in GraphCanvas fails the scan, and a COMMENT mentioning TRUNCATED does not (J66
+  - codeOnly strips comments, which is the whole reason these guards use it).
+
+  N IS NULLABLE, AND THAT IS THE HONEST PART RATHER THAN AN OMISSION. The canvas
+  knows its true total: it counted the nodes and then capped them. The grid never
+  does - API1 probes ONE row past the ceiling, which answers "there is more" and
+  not "how much more" - so the badge renders 500/500+ instead of a fabricated N.
+  Inventing a total for the grid would be the same false-completeness claim this
+  item exists to abolish, one field over.
+
+  THE BADGE IS DRIVEN BY result.truncated AND THE FIXTURES PROVE IT. Every test
+  breaks the rows.length/limit correlation on purpose: the capped case has THREE
+  rows and the uncapped case has exactly FIVE HUNDRED. A guard whose fixtures let
+  the field and the heuristic agree would pass against the defect it exists to
+  catch. Swapping the field for `rows.length === result.limit` fails four tests.
+
+  (b) THE LABEL STATES THE CEILING; THE STATUS LINE READS THE MANIFEST. A capped
+  result gets "⬇ CSV (first 500 rows)" and the word "full" appears nowhere on the
+  surface (asserted over every button, not just the two). After the export the
+  status line reads the MANIFEST's truncated/limit rather than the run result,
+  because the manifest is the artifact that gets filed and is what the reader can
+  re-check: "exported 500 rows - CAPPED at 500; the result has more". A manifest
+  without the field is an OLDER manifest and the line then claims neither.
+
+  (c) THE CEILING IS RAISABLE WHERE API1 MADE IT RAISABLE, AND THE CONSOLE HOLDS
+  NO COPY OF THE RULE. A new ExportOptions bag carries it - deliberately NOT
+  RequestOptions, whose own comment predicted this: three of the four seam methods
+  have no ceiling to raise, and a field they silently ignore is a worse seam than
+  one extra type. The input is offered only when the result was capped AND the
+  spec is not ephemeral; the numeric ceiling itself is never validated here.
+  EXPORT_LIMIT_CEILING stays server-side and its 422 detail reaches the status line
+  verbatim - confirmed by reading openapi-fetch's source, not assumed: its non-ok
+  branch always does response.text() + JSON.parse and ignores parseAs, so a blob
+  export's error still arrives as the server's own sentence.
+
+  EPHEMERAL IS READ, NOT DERIVED. SpecResult gains the server's own `ephemeral`
+  field rather than the console testing the id for an `eph.` prefix. The R4 freeze
+  is a server policy; a browser-side copy of it would be exactly the second source
+  of truth the item's depends_on note warns about. An ephemeral capped result gets
+  the reason on screen instead of a control that would 422.
+
+  (d) 17 vitests. Capped and uncapped for the badge, both labels, the three
+  manifest cases, the raise reaching the seam, the untouched case sending NO limit
+  (the server's default IS the display ceiling - sending it back explicitly would
+  turn every export into a raise request and start failing on ephemeral specs), a
+  half-typed value ignored, and the server's refusal surfaced.
+
+  EXTENSION BEYOND THE CLAUSES, FLAGGED RATHER THAN ABSORBED: THE CANVAS WAS BLIND
+  TO THE ROW CAP. Two independent ceilings stand between the graph and the picture
+  - the spec's limit on rows, NODE_CEILING on nodes - and GraphCanvas only ever
+  knew about the second. 500 rows deduplicating to 280 nodes drew NO badge at all
+  on a result the server had already truncated, so the surface whose whole comment
+  is that a quietly-cropped picture makes a false claim was the one place it could
+  be silently wrong. SpecGraphPane is the only component holding both facts, so it
+  hands rowsTruncated/rowLimit down; whichever cap bit, the reader gets the same
+  word in the same place, and when both did the node numbers are shown with the
+  row cap named in the hover text. GraphCanvas.tsx and nvl-mapping.ts are both in
+  this item's inputs and the title makes the canvas the model, which is why this
+  is in scope rather than a follow-up - but it is an addition to the clauses and
+  is named as one.
+
+  Also: the CLIENT-side sidecar manifest now records the truncation of the result
+  its filtered view was cut from. It was the one artifact where the cap could hide
+  completely - a filtered view of a capped result is twice removed from the answer
+  and its row_count says nothing about either.
+
+  Ledger: config/taxonomy/ui-components.yaml gains TruncationBadge (ui-primitive,
+  UNBOUND - it serves the canvas and the grid, so binding it to `explorer` would
+  name the first caller as owner; same rule as RelEdge and TrustLegend), pin
+  92 -> 93 with bound unchanged at 40.
+
+  Gates at close: poetry run pytest -q, ruff check, ruff format --check. In web/:
+  tsc -b --force exit 0, oxlint --max-warnings 0 exit 0, npm run build exit 0,
+  npm run test:coverage exit 0, vitest 23 files / 278 tests.

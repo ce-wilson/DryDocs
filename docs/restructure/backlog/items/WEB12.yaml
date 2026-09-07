@@ -1,0 +1,156 @@
+id: WEB12
+epic: web-console
+title: A useGraphQuery data-layer hook replaces the forty transport preambles - one AbortController per
+  request, a deadline, in-flight dedupe, a stated no-retry rule, and a stop control on the Ask stream
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- docs/reviews/modules/web-2026-09-05.md
+- web/src/lib/graph.ts
+- web/src/lib/graphApi.ts
+- web/src/lib/auth.ts
+- web/src/lib/adk.ts
+- web/src/routes/AskRoute.tsx
+- web/src/explorer/SpecGrid.tsx
+acceptance: |
+  Every route reimplements connect, fetch, guard against unmount, set state: the VITE_API_URL
+  literal with its localhost fallback in twelve files beside `apiBaseUrl()` which already does
+  it, `useMemo(() => createApiAccess(...))` in sixteen, the hand-rolled `let cancelled = false`
+  effect in fourteen (A6, T6). No request has a deadline or a cancel path - zero
+  AbortController, zero `signal:` in web/src - so a hung request and a loading one are the same
+  screen, navigating away leaves the work running, and the Ask stream cannot be stopped (S5).
+  Nothing dedupes: two panes needing one spec run it twice (S6).
+
+  (a) One `useGraphQuery(specId, params)` hook (or equivalent, builder's name) owns the
+      transport: it obtains access from one shared provider (no per-route `createApiAccess`),
+      passes an AbortController signal and aborts on unmount and on param change, applies a
+      deadline (a recorded default, per-call override), dedupes identical in-flight requests,
+      and returns a state union - loading | data | empty | error(timeout | aborted | failed).
+  (b) The forty preambles are gone: zero `localhost:8001` literals outside `apiBaseUrl()`,
+      zero `createApiAccess(` outside the provider, zero `let cancelled = false` in web/src -
+      each asserted by a source scan.
+  (c) The Ask stream (`runAgentSse`) accepts a signal and the UI has a stop control that aborts
+      it; a stopped turn renders as stopped, never as an answer.
+  (d) NO RETRY, stated: the hook does not retry, and its module comment records that a read
+      console chooses not to and why (a transient 502 must surface, not be papered over) - the
+      report's point that a defensible choice should be a stated one.
+  (e) A cache is NOT built here unless trivial; the union and the dedupe are what WEB1's seam
+      composes with, and a cache with classification-aware invalidation is its own decision.
+notes: |
+  Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+  Covers A6, T6, S5 and S6's dedupe half (rank 8). The report notes this hook also gives T2's
+  missing lint rule (WEB13) nothing left to police. Build before or with WEB1.
+
+  DONE 2026-09-05 (Lane B, laptop). The console has a data layer.
+
+  BASELINES MEASURED AT PULL (main at 6c51618e), and closed:
+
+    the VITE_API_URL literal with its localhost fallback   16 files -> 1 (apiBaseUrl, the definition)
+    useMemo(() => createApiAccess(...))                    15 files -> 2 (the factory, and the provider's one call)
+    the hand-rolled `let cancelled = false` effect         12 files / 14 sites -> 0
+    AbortController                                         0 -> used by the hook and six call sites
+
+  The review's own numbers were 12 / 16 / 14. The difference is what each grep
+  counts - files carrying the literal ANYWHERE (including reachability.ts's
+  operator messages) versus preambles - and both are recorded rather than
+  reconciled, because the direction is what matters and the direction is to zero.
+
+  THE SHAPE: data/graphAccess.ts owns the union, the dedupe, the request key and
+  useGraphQuery; data/GraphAccessProvider.tsx is the one component, ALONE in its
+  file so the module exports exactly one (WEB13 is about to make oxlint warnings
+  fatal - the first draft put both in one .tsx and took the baseline from 10
+  warnings to 16; it is back at 10). src/data/ because the review's structural
+  note is that there is no data layer at all: lib/ is documented as PURE modules
+  and a hook is not pure.
+
+  THE SEAM TAKES A RequestOptions BAG, not a positional signal. A deadline, a
+  cancel and later a caller-raised export ceiling (API1 clause c) all belong to
+  the REQUEST; adding them positionally rewrites every call site again.
+
+  TWO BEHAVIOURS THE ACCEPTANCE IMPLIES AND DOES NOT STATE, both tested:
+
+    * ABORT-ON-UNMOUNT COLLIDES WITH DEDUPE UNDER STRICTMODE. React dev
+      double-mounts: mount 1 starts the request, unmount aborts it, mount 2 runs
+      immediately. If the aborted flight were still in the map, mount 2 would join
+      it and await an AbortError forever - a blank panel, in dev only, which is
+      the worst place to find one. The map entry is deleted BEFORE the abort, and
+      each subscriber tracks its own liveness rather than the controller's.
+    * THE REQUEST KEY SORTS ITS PARAMS. Two call sites building the same params in
+      a different order are the same request; JSON.stringify says otherwise, and
+      the dedupe would silently do nothing for exactly the pairs it exists for.
+
+  WHAT DELETED THE MOST: SpecGrid and SpecGraphPane DROPPED their `access` prop.
+  Between them, ten call sites were passing a GraphAccess their route had built -
+  which is how a per-route client became a per-route obligation. Then the compiler
+  walked the consequence out: DocsRoute, LineageRoute, LoadsRoute and
+  RunbooksRoute no longer take `persona` at all, FileReport no longer takes
+  `personaId`, GraphExplorer and ExplorerLiveRoute take no props, and AskRoute's
+  TurnCard and StepDetail no longer take `access`. A prop that exists only to
+  carry transport is transport leaking through the component tree, and
+  noUnusedParameters made that visible the moment the preamble left.
+
+  (c) THE ASK STREAM. runAgentSse takes a signal, and BOTH the fetch and the
+  reader honour it - aborting the fetch alone leaves the reader draining a stream
+  nobody is watching. A Stop button appears while a turn runs; a stopped turn
+  throws AskStopped and renders AS STOPPED, which is neither an answer nor an
+  error, because neither is what happened. askApi refuses its non-streaming
+  fallback when the signal aborted: that fallback would restart the very turn the
+  person just stopped, which is worse than offering no control.
+
+  NO DEADLINE ON THAT SURFACE, deliberately, and the module comment says so:
+  unbounded latency is what an agent turn IS. A stop control is the right answer
+  there where a timeout is not. useGraphQuery's deadline defaults to 20s, chosen
+  against the SPECS rather than the network - the slowest reviewed traversals run
+  in low single-digit seconds warm - with a per-call override.
+
+  (d) NO RETRY, STATED IN THE MODULE COMMENT with the reason, which is the
+  review's own point that a defensible choice should be a stated one: retrying
+  turns a transient 502 from a restarting API into a slow success and hides the
+  condition an operator needs to see, and a retry storm against a saturated API
+  makes the outage worse. A test asserts exactly one call after a failure.
+
+  (e) NO CACHE. A settled request leaves the in-flight map; keeping it would make
+  this a cache, and a cache with classification-aware invalidation is its own
+  decision. The dedupe and the union are what WEB1's seam composes with.
+
+  THE CLAUSE (b) SCAN CAUGHT ITSELF BEFORE IT CAUGHT ANYTHING ELSE, and this is
+  the finding worth carrying forward. Written with codeOnly - the J66 stripper,
+  which neutralises string literals so a guard cannot fail on the comment
+  explaining it - the hard-coded-URL scan matched NOTHING. Not the twelve real
+  offenders; nothing at all, because that URL only ever appears inside quotes. It
+  would have passed forever while proving nothing, which is the failure mode J76
+  is about: the instrument read clean and the subject was not. sourceScan now
+  offers withoutComments for patterns whose subject IS a literal, every guard
+  names which stripper it needs and why, and the instrument check asserts a real
+  literal is FOUND as well as asserting a commented one is not.
+
+  FOR WEB13 (the CI ratchet), measured here so it is not re-derived: oxlint sits
+  at TEN warnings, unchanged by this item, all react/only-export-components. The
+  three `exhaustive-deps` suppressions this item was expected to reach are
+  UNTOUCHED - useRouteA11y.ts, AdminConfigRoute.tsx, ExplorerRoute.tsx - because
+  none of their effects was a transport preamble. WEB13's "three inert
+  suppressions" count still holds. One NEW exhaustive-deps warning did appear
+  during this work (MappingsRoute's liveSource, a fresh array feeding a useMemo)
+  and was fixed at the site rather than suppressed, which is why the count is back
+  at ten and not eleven. Note that oxlint DOES report react-hooks/exhaustive-deps
+  today even though .oxlintrc.json does not enable it - worth checking before
+  WEB13 assumes the rule is off.
+
+  FOR WEB1: the seam it needs is here. `empty` and `error` are already distinct
+  states carrying the result and the message; `loading` is a state rather than a
+  null. What is NOT done, deliberately, is the demo fallback - SpecGrid, LoadsRoute
+  and AppCodeCascadePane still map error-or-empty onto their demo modules in their
+  own way. Half a useLiveOrDemo seam here is exactly what WEB1 would have to
+  unpick, and Lane A's ordering says written once.
+
+  Gates at close: poetry run pytest -q = 3360 passed, 12 skipped, 1 failed
+  (test_plan_roadmap - the expected Lane B close failure). ruff clean. In web/:
+  tsc -b exit 0, npm run build exit 0, vitest 17 files / 211 tests (was 13 / 147),
+  oxlint 0 errors / 10 warnings.

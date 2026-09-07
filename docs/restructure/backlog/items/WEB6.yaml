@@ -1,0 +1,153 @@
+id: WEB6
+epic: web-console
+title: A runtime row-shape validator at the spec-result-to-typed-row seam retires the twenty-one as-unknown-as
+  double casts with one readable message
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- WEB4
+inputs:
+- docs/reviews/modules/web-2026-09-05.md
+- web/src/lib/graph.ts
+- web/src/explorer/SpecGrid.tsx
+- web/src/routes/MappingsRoute.tsx
+- web/src/routes/LoadMapRoute.tsx
+- web/src/routes/LoadsRoute.tsx
+- web/src/routes/IntakeRoute.tsx
+- web/src/routes/SoftwareRoute.tsx
+- web/src/routes/AppCodeCascadePane.tsx
+acceptance: |
+  Twenty-one `as unknown as` casts cluster at one seam - a spec result's untyped rows crossing
+  into a typed row (`res.rows as unknown as LocationRow[]`) in FileReport, LocationMap,
+  AppCodeCascadePane, IntakeRoute, LoadMapRoute, LoadsRoute, MappingsRoute and SoftwareRoute
+  (T5). The compiler is switched off exactly where the server contract meets the render.
+
+  (a) One runtime row-shape validator at the seam: given a spec id and its rows, it checks the
+      columns the row type requires and returns typed rows or a readable message naming the
+      spec, the missing or mistyped column and the row index. Where a spec's columns are
+      declared server-side (query_specs `columns`), the validator reads them - never a second
+      hand-typed list.
+  (b) All twenty-one double casts are gone; a source scan (J66 style, code only) asserts the
+      count of `as unknown as` under web/src is zero, so the seam cannot re-grow.
+  (c) A row that fails validation renders the message in place of the panel (WEB5's boundary
+      is the backstop, not the presentation) and is counted where WEB1 counts fallbacks.
+  (d) Tests cover a conforming row set, a missing column and a wrong type for two specs.
+notes: |
+  Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+  Covers T5 (rank 5, one root with A3 and T2). Depends on WEB4: without strictNullChecks the
+  validator's own return type is not enforced either.
+
+  DONE 2026-09-05 (Lane B, laptop). One check at the seam; the casts are at zero.
+
+  COUNT, per J63 rather than as a correction: the review says 21, its own tree
+  (bcae4d02) had 20, and this tree had 19 before the work - 20 minus 3 that went
+  with WEB12/WEB1 (AppCodeCascadePane twice, LoadsRoute once) plus 2 those same
+  items introduced (graphAccess's placeholder, provenance's own seam cast). The
+  arithmetic is recorded because "absent here" and "never existed" are different
+  claims and only one of them is a finding.
+
+  (a) THE CALLER NAMES THE COLUMNS; THE SERVER NAMES THE TYPES. TypeScript types
+  are erased, so a row type cannot be read at runtime and the caller must list the
+  columns it requires - typed `keyof T & string`, so a renamed field is a compile
+  error rather than a silently unchecked column. It does NOT list their types:
+  those come from `result.columns`, which is drydocs_api's own ColumnDef
+  declaration travelling with every result. That is the difference between this
+  and a hand-written schema per row type, and clause (a) is explicit that a second
+  copy of the server's contract is the thing to avoid.
+
+  THREE THINGS THAT WOULD HAVE FAILED ON REAL DATA ON DAY ONE, each read out of
+  the server rather than assumed:
+
+    1. NULL SATISFIES ANY DECLARED TYPE. explorer.jobs.v2 fills data_center from
+       an OPTIONAL MATCH and declares it string; a job with no server yields null.
+       A validator that rejected null would fail on correct data.
+    2. AN EPHEMERAL SPEC IS PRESENCE-ONLY. R4 registers an agent's columns as
+       ColumnDef(name, "string") for every column whatever it holds - the names
+       are the contract, the types are a placeholder - so type-checking one would
+       reject a perfectly good count. WEB2's `ephemeral` field on the seam is what
+       makes this knowable without the console re-deriving the `eph.` prefix rule.
+    3. TWO SERVER DECLARATIONS ARE WRONG (below), and are exempted from the TYPE
+       check only, never from the presence check.
+
+  (b) ZERO, AND NOT BY ALLOW-LISTING. Eleven of the nineteen were not at the row
+  seam, and each got its own real fix rather than an entry in a waiver list:
+    - LoadMapSource became a `type` alias. An interface has no implicit index
+      signature, so it never satisfied `Record<string, unknown>` and four
+      useTableView calls carried casts to get past that. One keyword, four casts.
+    - graphAccess's `undefined as unknown as Promise<SpecResult>` placeholder:
+      the timer, the promise and the flight are mutually circular, so one had to
+      be named before it existed. Naming the two locals first removes the only
+      field in that module that was ever briefly a lie.
+    - profileData's two JSON casts were SINGLE casts all along; nobody had tried.
+    - softwareModel got a type PREDICATE instead of a cast, so a malformed
+      doc-registry row is dropped and COUNTED (CORPORA_REJECTED, asserted zero
+      against the committed file) rather than rendered as undefined cells.
+    - the two intake casts stopped existing when the generator learned that a
+      binary schema field is a Blob (below).
+
+  (c) A SHAPE FAILURE IS ITS OWN STATE, AND NEVER FALLS BACK TO DEMO. It is not
+  `error` - the service is up, the query ran, the contract moved - and it is
+  emphatically not `demo`, even on a surface that has one: substituting fabricated
+  rows behind a badge would hide the exact drift the check exists to expose, on
+  the surface best placed to report it. Rendered by ProvenanceNotice (the existing
+  component, per the clause's "WEB5's boundary is the backstop, not the
+  presentation") and counted in the same FallbackCount the SystemBanner reads,
+  under a reason of its own. FallbackReason is deliberately WIDER than DemoReason:
+  naming a shape failure a demo reason would have been the cheaper edit and the
+  wrong one.
+
+  (d) 15 vitests on the validator, 5 on the seam state, 3 python. Conforming,
+  missing and mistyped for two specs, plus the null / ephemeral / exemption cases
+  and the row budget. Mutation-proven: the python guard fails when an exemption
+  goes stale AND when a new unexempted list column appears.
+
+  TWO REAL DEFECTS THE CASTS WERE HIDING. Both measured against the committed
+  file, not inferred from reading:
+
+    1. SequenceStep.loaders WAS DECLARED LoaderRef[] AND THE FILE CARRIES
+       string[]. render_load_map.py writes `[cls.name for cls in
+       COMMAND_LOADERS[step.command]]` there and full loader rows under
+       `sources[].loaders` - two shapes, one key name, and the console had the
+       wrong one. Its two readers asked each string for `.cli_name ?? .name` and
+       got undefined, so /load-map's sequence table rendered its loader column as
+       BARE COMMAS while docs/plan/load-map.html - same JSON, same generator -
+       rendered the names, and sequenceLoaderCount() answered 1 for 27 loaders.
+       Fixed here (the client was wrong; the file and the HTML render agree).
+    2. runbooks.series.v1 `lands` and lineage.schema-definition.v1 `properties`
+       return collected LISTS under `type: "string"`. ColumnDef has no list type
+       to declare, and query_specs.py is the api pen - HAND-BACK. The validator
+       exempts the two columns from the type check, and
+       tests/unit/test_row_shape_exceptions.py is bidirectional so the exemption
+       is self-retiring: it fails when the server declaration is fixed, and it
+       fails when a new list-under-a-scalar appears.
+
+  THE GENERATOR NOW MAPS A BINARY FIELD TO Blob, and getting there is worth
+  recording. FastAPI declares the evidence upload's `files` as binary, and
+  openapi-typescript's default made it `string[]`, so the one call site sending
+  real File objects needed two casts to get past its OWN generated type. The
+  documented recipe keys on `format: "binary"` - which is OpenAPI 3.0. drydocs_api
+  emits 3.1 (Pydantic v2), where the spelling is
+  `contentMediaType: "application/octet-stream"`. A transform written for `format`
+  alone regenerated a BYTE-IDENTICAL file and would have read as a working fix;
+  diffing against a backup instead of trusting the exit code is the only reason it
+  was caught. Both spellings are handled now. One line of api.d.ts changed.
+
+  WRITER FOR LANE A AT MERGE: `cd web && npm run api:types`. The SCHEMA did not
+  move, so scripts/dump_openapi.py is not needed and openapi.json is untouched.
+  web/src/generated/api.d.ts is committed here rather than left to the merge
+  because src/generated/api.test.ts regenerates in memory and compares - shipping
+  the generator change without the file would leave that guard red.
+
+  NOT DONE, and named: MappingsRoute's `apiDown` string is still a separate
+  fallback channel from the WEB1 seam. It is T3's, not this item's, and the grid
+  check landed beside it rather than through it.
+
+  Gates at close: poetry run pytest -q, ruff check, ruff format --check. In web/:
+  tsc -b --force exit 0, oxlint --max-warnings 0 exit 0, npm run build exit 0,
+  npm run test:coverage exit 0, vitest 24 files / 298 tests.

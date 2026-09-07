@@ -81,6 +81,12 @@ OWED COMPANY-SIDE:
         "chore(session): depgraph snapshot 2026-08-31, and the board catches up",
         "chore(O26): release the claim - the SME HOLD is live",
         "backlog(G125): claim in_progress (desktop)",
+        # THE EDITION SEGMENT (PLAN2, 2026-09-05): `[<EDITION>-]<MODULE><n>`. A claim
+        # for an edition's item is still a claim; before the segment was admitted it
+        # read as substantive and the coverage guard demanded a ledger step for it.
+        "chore(backlog): XMPL-LOAD1 in_progress",
+        "chore(XMPL-LOAD1): claim",
+        "backlog(XMPL-LOAD1): release claim",
     ],
 )
 def test_ritual_subjects_need_no_ledger_step(subject: str) -> None:

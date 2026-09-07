@@ -25,6 +25,8 @@
 # classification: Internal (idea summaries ride along; same boundary as the inbox).
 
 schema: drydocs.roadmap.v1
+classification: Internal-Public
+
 updated: "2026-08-08"
 
 modules:

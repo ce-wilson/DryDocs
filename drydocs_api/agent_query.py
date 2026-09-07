@@ -6,6 +6,8 @@ for agents (R9).
     python -m drydocs_api.agent_query list
     python -m drydocs_api.agent_query describe <spec-id>
     python -m drydocs_api.agent_query run <spec-id> [-p KEY=VALUE ...] [--pretty]
+    python -m drydocs_api.agent_query verbs
+    python -m drydocs_api.agent_query verb <impact|context|trace> [-p KEY=VALUE ...]
 
 WHY A COMMAND, AND WHY HERE. An agent that navigates the graph needs one
 surface that is deterministic (the same input yields the same bytes), testable
@@ -22,8 +24,18 @@ is exactly what the item says must stay green.
 
 ONE ENVELOPE. ``run`` prints the same dict ``POST /specs/{id}/run`` returns
 (``exports.execute_spec``), so an agent reading this and a console reading the
-API see the same ten keys. ``list`` and ``describe`` print the ``GET /specs``
+API see the same fourteen keys (`truncated` and `limit` joined at API1, `epistemic` and `causes` at R15). ``list`` and ``describe`` print the ``GET /specs``
 rows. No third shape is minted here.
+
+VERBS (R16). ``verb <name>`` is ``run`` under a purpose-built name: ``impact``,
+``context`` and ``trace`` each resolve, through ``drydocs_api.verbs``, to one
+registry spec (``verb.<name>.v1``) and then take EXACTLY the ``run`` path below
+- same validation, same ``execute_spec``, same envelope, so ``spec_id`` in the
+output names the spec the verb is and ``epistemic`` / ``causes`` arrive as the
+spec graded them. ``verbs`` lists the three with their params and row shape.
+An unknown verb is a usage failure (``unknown-verb``, exit 2) that names the
+valid set. There is still no Cypher operand: a verb is a name for a reviewed
+row, not a place to put a statement.
 
 WHAT IT REFUSES, by name, on stdout: an unknown spec id; a param the spec does
 not declare, a missing required one, or a value that cannot take the declared
@@ -55,9 +67,10 @@ agents venv (a separate interpreter; see ``agents/common/specs_catalog.py``)
 and the unit suite use it identically. (The ``neo4j`` package itself rides in
 with ``drydocs_core.config`` on every first-party import; no driver is built.)
 
-MCP (``mcp-neo4j-cypher``) is recorded as the richer LATER option and is out of
-scope here: it adds a config surface and a write-risk surface this command
-deliberately does not have.
+MCP. The generic ``neo4j-drydocs`` MCP server (free Cypher) stays beside this
+command, unchanged, for the sessions that want it. Exposing the verbs as MCP
+tools is configuration that calls ``main(["verb", ...])`` - not a component of
+this package, and not a Cypher surface on this command (R16).
 """
 
 from __future__ import annotations
@@ -72,6 +85,7 @@ from drydocs_api.exports import execute_spec, list_specs
 from drydocs_api.handlers import GraphRunner
 from drydocs_api.queries import ParamValidationError, validate_params
 from drydocs_api.query_specs import QUERY_SPECS, QuerySpec, UnknownSpecError, query_spec
+from drydocs_api.verbs import VERBS, UnknownVerbError, list_verbs, verb
 
 EXIT_OK = 0
 EXIT_RUN_FAILED = 1
@@ -176,6 +190,22 @@ def build_parser() -> argparse.ArgumentParser:
         metavar="KEY=VALUE",
         help="declared parameter, repeatable; converted to the declared type",
     )
+    sub.add_parser("verbs", help="the agent verbs (R16): name, spec, params, row shape")
+    vb = sub.add_parser(
+        "verb", help="run one agent verb (impact | context | trace) by name; same envelope as run"
+    )
+    # No argparse `choices` here on purpose: an unknown verb is refused below as
+    # JSON on stdout (`unknown-verb`, exit 2), the way an unknown spec is, so an
+    # agent parses one failure shape - not argparse's usage text on stderr.
+    vb.add_argument("verb_name", help="impact | context | trace")
+    vb.add_argument(
+        "-p",
+        "--param",
+        action="append",
+        default=[],
+        metavar="KEY=VALUE",
+        help="the verb's declared parameter, repeatable; see `verbs`",
+    )
     return ap
 
 
@@ -188,8 +218,18 @@ def main(argv: list[str] | None = None, *, runner: GraphRunner | None = None) ->
     if ns.command == "list":
         emit(list_specs(), pretty=ns.pretty)
         return EXIT_OK
+    if ns.command == "verbs":
+        emit(list_verbs(), pretty=ns.pretty)
+        return EXIT_OK
 
-    spec_id: str = ns.spec_id
+    if ns.command == "verb":
+        try:
+            spec_id: str = verb(ns.verb_name).spec_id
+        except UnknownVerbError as exc:
+            emit(_failure("unknown-verb", str(exc), verb=ns.verb_name, verbs=sorted(VERBS)))
+            return EXIT_USAGE
+    else:
+        spec_id = ns.spec_id
     if is_ephemeral_ref(spec_id):
         emit(
             _failure(

@@ -47,6 +47,8 @@
 # outside the ask. The CDO entry also backs the cdo-* config ids the same-day sanitization pass
 # introduces (its does_not_mean carries the collateralized-debt-obligation collision).
 schema: drydocs.glossary.v1
+updated: 2026-08-26
+
 classification: Internal-Public
 terms:
 - acronym: DRY

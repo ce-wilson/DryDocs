@@ -387,8 +387,11 @@ def test_the_live_coverage_census_is_pinned() -> None:
             # gate's §C5 ruling turns on exactly that distinction.
         )
         == (
-            16,  # 15->16 at O81 (2026-08-31): the neo4j-nvl product row
-            14,  # 13->14 at O81: NVL has no scraped corpus, so it counts as uncovered
+            17,  # 16->17 at C43 (2026-09-03): the mfts product row (Axway SecureTransport, the white-label case)
+            # 15->16 at O81 (2026-08-31): the neo4j-nvl product row
+            15,  # 14->15 at C43: no vendor documentation captured for the platform yet — the research names
+            # Axway's public docs as the next rung (an External corpus), so this is a task, not a miss
+            # 13->14 at O81: NVL has no scraped corpus, so it counts as uncovered
             # 14->13 at Q27 (2026-08-27): airflow gained its documentation pointer
             10,  # 9->10 at Q27: mwaa-implementation-docs registered — prior moves: chase-leadership-scrape 2026-08-27, Q10 ops-email-extracts 2026-08-19
             8,  # unclaimed 7->8 — org-structure gate evidence, not product documentation (same class as the email corpus before it)

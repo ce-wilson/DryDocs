@@ -108,7 +108,9 @@ ledger.** Concretely:
    browser still never submits raw Cypher. `/raw-cypher` stays admin+dev
    gated exactly per ADR 0005. Recurring Tier-1 Cypher becomes a *promotion
    feed* of candidates for permanent, reviewed specs — gate-bound, never
-   auto-registered.
+   auto-registered. *How the agent names the owning session without holding
+   its credential — the public `session_id` handle in the control part, the
+   agent key as the agent's own credential — is ADR 0019 (WEB9, 2026-09-06).*
 5. **Telemetry contract** (the asked-for metrics, three sinks):
    - *per-LLM-call JSONL ledger* in `DRYDOCS_LOGDIR` (never the repo):
      run_id, step, model, prompt/completion tokens, cost estimate,

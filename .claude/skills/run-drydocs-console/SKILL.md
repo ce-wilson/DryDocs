@@ -1,6 +1,6 @@
 ---
 name: run-drydocs-console
-description: Start, stop, or troubleshoot the DryDocs web console (the React/Vite UI at localhost:5173 and the drydocs-api backend at localhost:8001). Use when asked to run/start/launch the UI, web console, or front end; when the console renders but shows "nothing answered at http://localhost:8001"; when sign-in fails; or when a console page loads with stale or empty generated data. The CLI-only paths (ingest-controlm, m3-verify, the model/adapter smoke) live in the sibling run-drydocs skill.
+description: Start, stop, or troubleshoot the DryDocs web console (the React/Vite UI at localhost:5173 and the drydocs-api backend at localhost:8001). Use when asked to run/start/launch the UI, web console, or front end; when the console renders but shows "the server behind /api is not answering" or "nothing answered at /api"; when sign-in fails; or when a console page loads with stale or empty generated data. The CLI-only paths (ingest-controlm, m3-verify, the model/adapter smoke) live in the sibling run-drydocs skill.
 ---
 
 The DryDocs web console is **three tiers, started in order**. Each depends on the one
@@ -11,7 +11,7 @@ diagnose by tier before touching anything.
 |---|------|---------|-----------|
 | 1 | Neo4j | `bolt://localhost:7687`, db `drydocs` | Docker container (see `config/dev-environment.yaml`) |
 | 2 | drydocs-api | `http://127.0.0.1:8001` | `uvicorn drydocs_api.app:create_app --factory` |
-| 3 | web console | `http://localhost:5173` | `npm run dev` in `web/` |
+| 3 | web console | `http://localhost:5173` | `npm run dev` in `web/` — its proxy forwards `/api` → tier 2 and `/agent` → the ADK server (ADR 0020) |
 
 **The sibling skill is stale on this point and should not be believed:** `run-drydocs`
 says DryDocs is "pure CLI with no interactive TUI or GUI." That was true before the
@@ -35,15 +35,19 @@ Then confirm each tier ANSWERED rather than merely started — a listening port 
 a working service:
 
 ```powershell
-curl http://localhost:8001/health     # {"status":"ok"}
+curl http://localhost:8001/health     # {"status":"ok"} - the process
 curl -I http://localhost:5173/        # 200; title is "DryDocs Console"
+curl http://localhost:5173/api/health # same body, through Vite's proxy - what the browser does
 ```
 
 ## Which tier is broken — read the symptom
 
-- **"nothing answered at http://localhost:8001"** in the console UI → tier 2 is down.
-  This is the most common failure and the reason this skill exists. The console itself
-  is fine; start the API.
+- **"the server behind /api is not answering (the page's own server returned 502)"**
+  in the console UI → tier 2 is down. This is the most common failure and the reason
+  this skill exists. The console itself is fine; start the API. If the API IS up on a
+  non-default port, the Vite shell needs `DRYDOCS_API_UPSTREAM=http://localhost:<port>`.
+- **"nothing answered at /api on this page's own origin"** → tier 3 itself is gone
+  (the fetch threw, so nothing wrote a status). Restart Vite; this is never the API.
 - **Console loads, pages render, graph panels are empty** → tier 1. The API is up but
   has no graph behind it. Check the container and the `drydocs` database.
 - **Browser cannot connect at all on 5173** → tier 3, or the IPv6 gotcha below.
@@ -65,11 +69,12 @@ the hostname, not the v4 literal, before concluding the server is down.
 and leaves an empty log — the server runs, but its address line and every later HMR or
 compile error are invisible. Launch unpiped and read the log file.
 
-**CORS is an ADD-ON list, not a replacement.** `create_app()` ships an allowlist of
-`http://localhost:5173` (vite dev), `4173` (vite preview) and `5199` (the ui-tests
-ledger's documented verification port). `DRYDOCS_CORS_ORIGINS` ADDS to that list and
-never replaces it, so a console served on any other port needs that env var rather than
-an edit to the allowlist.
+**There is no CORS allowlist (ADR 0020, WEB10).** The console is same-origin with
+drydocs-api and the ADK server: it calls the PATHS `/api` and `/agent` and Vite's
+proxy (`web/vite.config.ts`, routes from `web/delivery.json`) forwards them, prefix
+stripped. Any Vite port works. `DRYDOCS_CORS_ORIGINS`, `serve.py --allow_origins`,
+`VITE_API_URL` and `VITE_ADK_URL` are retired; a doc or a shell that still sets them
+is describing the pre-WEB10 shape.
 
 **Sign-in reads a machine-local credentials store.** `internal-local/console-credentials.json`
 by default, overridden by `DRYDOCS_CONSOLE_CREDENTIALS`. It is gitignored and per-machine,
@@ -138,7 +143,7 @@ npm run test:e2e      # playwright; needs test:e2e:install once
 The e2e suite (`web/e2e/console.spec.ts`) drives a real browser and bootstraps its own
 credential (`web/e2e/bootstrap_credential.py`) — it does not reuse your machine-local
 store. Python-side console guards live in `tests/unit/test_console_auth.py`,
-`test_console_origins.py`, `test_load_map_console.py`, `test_world_map_generated.py`.
+`test_console_delivery.py`, `test_load_map_console.py`, `test_world_map_generated.py`.
 
 ## Routes worth knowing
 
@@ -151,7 +156,11 @@ store. Python-side console guards live in `tests/unit/test_console_auth.py`,
 
 ## Pointing the console elsewhere
 
-`VITE_API_URL` overrides the API base. It is read in exactly two places
-(`web/src/lib/auth.ts` for auth calls, `web/src/components/GraphExplorer.tsx` for graph
-calls), both defaulting to `http://localhost:8001`. If you change it, add the console's
-origin to `DRYDOCS_CORS_ORIGINS` on the API side or the browser will block the calls.
+The browser side never moves: `apiBaseUrl()` returns `/api` and `agentBaseUrl()`
+returns `/agent` (both from `web/delivery.json`, via `web/src/lib/auth.ts`). What
+moves is where the PROXY forwards to — `DRYDOCS_API_UPSTREAM` (default
+`http://localhost:8001`) and `DRYDOCS_AGENT_UPSTREAM` (default `http://localhost:8000`),
+read by the Vite process from the shell that runs `npm run dev` / `npm run preview`.
+Nothing on the API side changes when the console moves. The built bundle carries no
+host:port at all (`npm run dist:check` in `web/` proves it), so in production the same
+`dist/` sits behind whatever reverse proxy the Compose stack (O72) runs.

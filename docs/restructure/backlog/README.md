@@ -6,4 +6,6 @@ One item per file under `items/<id>.yaml`; epics under `epics/`; `plan.yaml` and
 
 Sharded from `backlog.yaml` on 2026-08-20 by `scripts/shard_backlog.py` (entry-level deep-equality proof run before the tombstone).
 
+**Declaring a hold (Y7, 2026-09-07; ADR 0013 Clause 3a):** an item whose dependencies are done but that a human has said not to pull carries an optional `hold:` mapping — `since` and `reason` required, `by` and `until` (the releasing EVENT, not a date) optional. `derive_summary` drops a held item from `next_ready` and lists it under `held`; the board shows it as HELD with the text. Only this field holds — an `annotations` note never does, on purpose (a general rule would hold items nobody meant to hold, invisibly). Release = delete the key and record the ruling in `notes`. A hold sits only on `todo`/`blocked`.
+
 **Declaring a gate edge (J50, 2026-08-21):** an item that genuinely waits on a HITL gate, or builds what a gate ruled, says so in an optional `gates: [<slug>, ...]` field (slugs = `config/gate-prompts/<slug>.yaml`; guarded by `tests/unit/test_backlog.py`). `scripts/render_gates.py` derives the board's *unblocks* edges from that field ONLY — a prose citation of a gate in `acceptance`/`notes` is never an edge (the same rule the gate log has at J28: only an entry *about* the gate counts).

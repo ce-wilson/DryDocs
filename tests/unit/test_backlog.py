@@ -206,7 +206,11 @@ def test_items_have_valid_v2_fields() -> None:
 # allocation need no coordination: producer 1-9999, company 10000+, readable by
 # LENGTH so there is no boundary to remember.
 
-#: Producer allocates at or below this, in EVERY letter series. Company is above it.
+#: THE BAND, RETIRED FORWARD-ONLY (gate ontology-domain-registry-and-edition-grain §C4,
+#: 2026-09-02; built at PLAN2, 2026-09-05). It governs no new mint: a venue is named by
+#: its EDITION SEGMENT now, and the allocator's band check became the edition-segment
+#: check (`_parse` below reads both). The constant stays because old ids are still READ
+#: by it - FROZEN_BAND is judged against it, and the base edition stays at or below it.
 PRODUCER_BAND_CEILING = 9999
 
 #: Company items that have legitimately arrived through a per-entry port merge.
@@ -215,13 +219,31 @@ PRODUCER_BAND_CEILING = 9999
 PORTED_COMPANY_IDS: frozenset[str] = frozenset()
 
 
-def test_producer_allocates_below_the_company_band() -> None:
-    """No item minted here may take a company number.
+def _parse(iid: str) -> tuple[str | None, str, int] | None:
+    """``(edition, series, number)`` through THE ALLOCATOR'S regex, or None.
 
-    Forward-only: historical ids are never renumbered (they are join keys -- the G87
-    ruling, and config/gate-log.md cites them inside signed records), so a low number
-    means "allocated before the partition", not "producer". The rule governs the NEXT
-    id in each series.
+    One parser, on purpose (PLAN2 a). Three places in this file used to pull the
+    letters and the digits out of an id by hand (``isalpha()`` / ``isdigit()`` joins),
+    and none of them FAILED on an edition segment - they turned ``XMPL-LOAD1`` into
+    series ``XMPLLOAD`` and quietly stopped guarding, which is worse than failing.
+    Reading the allocator's regex means there is one grammar the guards cannot drift
+    from; the allocator is already imported here for the agreement guards.
+    """
+    m = _allocator()._ID_RE.match(str(iid))
+    if not m:
+        return None
+    return (m.group("edition"), m.group("series"), int(m.group("number")))
+
+
+def test_the_base_backlog_carries_no_band_shaped_id() -> None:
+    """No item minted here may take a band-shaped number.
+
+    The band is RETIRED as a partition rule (§C4), but the base edition stays at or
+    below the ceiling, so a five-digit id in THIS backlog is still one of two things:
+    a company id that arrived through a port (add it to PORTED_COMPANY_IDS, so it is
+    looked at once), or a mint that bypassed the allocator. Forward-only: historical
+    ids are never renumbered (join keys - the G87 ruling, and config/gate-log.md cites
+    them inside signed records).
     """
     doc = _load()
     stray = []
@@ -229,13 +251,13 @@ def test_producer_allocates_below_the_company_band() -> None:
         iid = str(item.get("id", ""))
         if iid in PORTED_COMPANY_IDS:
             continue
-        digits = "".join(ch for ch in iid if ch.isdigit())
-        if digits and int(digits) > PRODUCER_BAND_CEILING:
+        parsed = _parse(iid)
+        if parsed and parsed[2] > PRODUCER_BAND_CEILING:
             stray.append(iid)
     assert not stray, (
-        f"backlog ids in the COMPANY band (>{PRODUCER_BAND_CEILING}): {sorted(stray)}. "
-        "Producer allocates 1-9999 in every series. If these arrived through a port, "
-        "add them to PORTED_COMPANY_IDS rather than widening the band."
+        f"band-shaped backlog ids (>{PRODUCER_BAND_CEILING}): {sorted(stray)}. The base "
+        "edition stays below the retired band. If these arrived through a port, add them "
+        "to PORTED_COMPANY_IDS rather than widening anything."
     )
 
 
@@ -287,15 +309,197 @@ def test_next_free_is_max_plus_one_and_never_fills_a_gap() -> None:
 
 
 def test_the_allocator_refuses_the_reserved_series() -> None:
+    """DD is frozen: the company reserve retired as a partition rule (§C4), the
+    refusal names the replacement (the edition segment) and the record."""
     alloc = _allocator()
-    with pytest.raises(SystemExit, match="reserved for company-side"):
+    with pytest.raises(SystemExit, match="FROZEN.*edition segment"):
         alloc.next_id("DD", {"DD1"})
 
 
-def test_the_allocator_refuses_to_cross_into_the_company_band() -> None:
+def test_the_allocator_refuses_a_band_shaped_base_id() -> None:
+    """The base stays below the retired band; the refusal names the segment as the
+    replacement, never a wider band."""
     alloc = _allocator()
-    with pytest.raises(SystemExit, match="COMPANY band"):
-        alloc.next_id("PLAN", {"PLAN" + str(PRODUCER_BAND_CEILING)})
+    with pytest.raises(SystemExit, match="band-shaped.*edition segment"):
+        alloc.next_id("PLAN", {"PLAN" + str(PRODUCER_BAND_CEILING)}, venue="base")
+
+
+# ---- the edition segment (PLAN2, 2026-09-05) -----------------------------------------
+# Gate ontology-domain-registry-and-edition-grain §C1/§C4 and its rider
+# idea-series-grammar §B1/§C1/§D1. `[<EDITION>-]<MODULE><n>` and `[<EDITION>-]Idea-<n>`,
+# edition first, the base unprefixed. Both halves DECLARED: the segment in
+# config/taxonomy/editions.yaml (CFG2), the series in modules.yaml. The venue a session
+# runs as is DECLARED in config/dev-environment.yaml `edition:`, never inferred.
+
+#: The one fixed list both parsers must agree on (PLAN2 e - "two parsers, one grammar").
+#: validate.py accepted uppercase only and no suffix; backlog_store.py accepted any case
+#: and an optional [a-z] suffix; nothing asserted they agreed. The suffix is RULED here:
+#: an item id never carries one (the split suffix is an Idea-inbox shape), so both
+#: parsers refuse `G129a`; and both are uppercase-only.
+PARSE_AGREEMENT: dict[str, tuple[str | None, str, int] | None] = {
+    "G129": (None, "G", 129),
+    "MM4": (None, "MM", 4),
+    "DD7": (None, "DD", 7),
+    "LOAD12": (None, "LOAD", 12),
+    "PLAN2": (None, "PLAN", 2),
+    "G10003": (None, "G", 10003),
+    "DD10001": (None, "DD", 10001),
+    "XMPL-LOAD1": ("XMPL", "LOAD", 1),
+    "SMPL-PLAN12": ("SMPL", "PLAN", 12),
+    "AB-CFG3": ("AB", "CFG", 3),
+    # refused by both: lowercase, a suffix, a 1-letter or 6-letter segment, no number
+    "load1": None,
+    "G129a": None,
+    "xmpl-LOAD1": None,
+    "X-LOAD1": None,
+    "XMPLQZ-LOAD1": None,
+    "LOAD": None,
+    "LOAD-1": None,
+}
+
+
+def _store_parse(iid: str) -> tuple[str | None, str, int] | None:
+    from drydocs_core import backlog_store
+
+    m = backlog_store._ID_RE.match(iid)
+    return None if not m else (m.group("edition"), m.group("series"), int(m.group("number")))
+
+
+def test_the_two_parsers_agree_on_one_grammar() -> None:
+    for iid, expected in PARSE_AGREEMENT.items():
+        assert _parse(iid) == expected, f"allocator parse of {iid!r}"
+        assert _store_parse(iid) == expected, f"backlog_store parse of {iid!r}"
+
+
+def test_every_current_id_round_trips_through_the_grammar() -> None:
+    """The first guard written (PLAN2 a): every id in the tree parses, and printing the
+    parse back gives the id. No existing id moves and none changes shape."""
+    doc = _load()
+    broken = []
+    for item in doc.get("items", []):
+        iid = str(item.get("id", ""))
+        parsed = _parse(iid)
+        if parsed is None:
+            broken.append(f"{iid} (unparsed)")
+            continue
+        edition, series, number = parsed
+        rebuilt = f"{edition}-{series}{number}" if edition else f"{series}{number}"
+        if rebuilt != iid:
+            broken.append(f"{iid} -> {rebuilt}")
+    assert not broken, f"ids that do not round-trip through the grammar: {broken}"
+
+
+def _declared_editions() -> set[str]:
+    from drydocs_core.edition_registry import load_registry
+
+    return set(load_registry(reload=True).codes())
+
+
+def test_an_edition_segment_must_be_declared_and_the_base_carries_none() -> None:
+    """Both halves declared (PLAN2 b): a segment is a code in editions.yaml or it is a
+    typo, not a tenant; a module code is in modules.yaml `series:`. And THIS backlog is
+    the base edition's, so no item here carries a segment at all - an instance's items
+    live in the instance's own backlog (ADR 0015 D2, amended at DOC1)."""
+    doc = _load()
+    codes = _declared_editions()
+    by_code = {v: k for k, v in _module_series().items()}
+    undeclared, segmented, unknown_series = [], [], []
+    for item in doc.get("items", []):
+        iid = str(item.get("id", ""))
+        parsed = _parse(iid)
+        if parsed is None:
+            continue
+        edition, series, _ = parsed
+        if edition is not None:
+            segmented.append(iid)
+            if edition not in codes:
+                undeclared.append(iid)
+        if series not in by_code and series not in FROZEN_SERIES and series not in FROZEN_BAND:
+            unknown_series.append(iid)
+    assert not undeclared, f"ids whose edition segment no editions.yaml row declares: {undeclared}"
+    assert not segmented, (
+        f"the base backlog carries edition-segment ids: {segmented}. The base is unprefixed; "
+        "an edition's items live in that edition's own backlog."
+    )
+    assert (
+        not unknown_series
+    ), f"ids whose series is neither a module code nor a frozen letter: {unknown_series}"
+
+
+def test_the_allocator_mints_into_the_declared_venue_and_refuses_the_rest() -> None:
+    """PLAN2 b/d/e, from fixtures - the tree only ever exhibits the base case."""
+    alloc = _allocator()
+    codes = {"XMPL", "SMPL"}
+    taken = {"LOAD11", "LOAD12", "XMPL-LOAD1", "XMPL-LOAD2", "SMPL-LOAD7"}
+    ms = alloc.module_series()
+    assert ms["drydocs-load"] == "LOAD"
+
+    # the base mints unprefixed, counting only unprefixed ids
+    assert alloc.next_id("LOAD", taken, venue="base") == ("LOAD13", 12)
+    # the base may mint DOWNWARD for an edition it hosts, counting that edition's ids
+    alloc.declared_editions = lambda: codes  # type: ignore[method-assign]
+    assert alloc.next_id("LOAD", taken, edition="XMPL", venue="base") == ("XMPL-LOAD3", 2)
+    # an instance mints its own segment without asking
+    assert alloc.next_id("LOAD", taken, venue="SMPL") == ("SMPL-LOAD8", 7)
+    assert alloc.next_id("LOAD", taken, edition="SMPL", venue="SMPL") == ("SMPL-LOAD8", 7)
+    # an undeclared SEGMENT is a typo, not a tenant
+    with pytest.raises(SystemExit, match="not declared.*typo, not a tenant"):
+        alloc.next_id("LOAD", taken, edition="NOPE", venue="base")
+    # an instance never mints for its base or for a sibling (downward only)
+    with pytest.raises(SystemExit, match="never mints for its base"):
+        alloc.next_id("LOAD", taken, edition="base", venue="SMPL")
+    with pytest.raises(SystemExit, match="mints for itself only"):
+        alloc.next_id("LOAD", taken, edition="XMPL", venue="SMPL")
+    # a venue whose own declaration is not in the registry is refused, naming the file
+    with pytest.raises(SystemExit, match="does not declare that code"):
+        alloc.next_id("LOAD", taken, venue="GHOST")
+    # a venue with NO `edition:` mints no item, and the refusal names the key and CFG2
+    with pytest.raises(SystemExit, match="declares no `edition:`.*editions.yaml"):
+        alloc.next_id("LOAD", taken, venue=None)
+
+
+def test_the_idea_path_goes_through_next_idea_id_with_the_same_rules() -> None:
+    """Rider D1/C1/C2 from fixtures: max+1 never the gap; the floor; the venue check in
+    ONE branch - a declared venue mints prefixed (or unprefixed for the base), an
+    undeclared venue mints band-shaped until it declares."""
+    alloc = _allocator()
+    alloc.declared_editions = lambda: {"XMPL", "SMPL"}  # type: ignore[method-assign]
+    ideas = {(None, 1), (None, 2), (None, 257), (None, 10034), ("XMPL", 1), ("XMPL", 4)}
+    # base: unprefixed at or below the ceiling; a band-shaped entry (a ported company
+    # idea) is NOT counted, or one union-append would jump the base to 10035
+    assert alloc.next_idea_id(ideas, venue="base") == ("Idea-258", 257)
+    # never the lowest gap
+    assert alloc.next_idea_id({(None, 5), (None, 9)}, venue="base") == ("Idea-10", 9)
+    # a declared edition counts its own
+    assert alloc.next_idea_id(ideas, venue="XMPL") == ("XMPL-Idea-5", 4)
+    assert alloc.next_idea_id(ideas, edition="SMPL", venue="base") == ("SMPL-Idea-1", 0)
+    # an UNDECLARED venue still captures (C1) - band-shaped, above the ceiling, max+1
+    assert alloc.next_idea_id(ideas, venue=None) == ("Idea-10035", 10034)
+    assert alloc.next_idea_id({(None, 3)}, venue=None) == ("Idea-10000", 0)
+    # ... but it cannot override, because it does not know what it is
+    with pytest.raises(SystemExit, match="declares no `edition:`"):
+        alloc.next_idea_id(ideas, edition="XMPL", venue=None)
+    # the Idea regexes carry the segment and the split suffix stays a split
+    header = "- **`XMPL-Idea-3a`** · 2026-09-05 · `[plan]` · **open** · prio? **Med** — x"
+    assert alloc._idea_numbers(header) == {("XMPL", 3)}
+    assert alloc._idea_numbers(header.replace("XMPL-", "")) == {(None, 3)}
+
+
+def test_the_frozen_band_ids_parse_and_pass_under_the_new_grammar() -> None:
+    """The six legacy band ids stay legal forever, forward-only (PLAN3's table, read as
+    PLAN2 finds it)."""
+    for iid in ("G10001", "G10002", "G10003", "DD10001", "DD10002", "DD10003"):
+        assert _parse(iid) is not None
+    assert _frozen_strays(["G10001", "DD10003"]) == []
+
+
+def test_the_venue_is_declared_in_the_venue_file_and_the_producer_is_the_base() -> None:
+    """PLAN2 b: the allocator reads config/dev-environment.yaml `edition:` and nothing
+    else. The producer declares `base` - it is never undeclared (rider C1)."""
+    alloc = _allocator()
+    assert alloc.venue_edition() == alloc.BASE_EDITION
+    doc = yaml.safe_load((REPO / "config" / "dev-environment.yaml").read_text(encoding="utf-8"))
+    assert doc.get("edition") == "base"
 
 
 # ---- the series is the module (ruling 2026-09-02) ----------------------------------
@@ -370,11 +574,15 @@ def _frozen_strays(ids: list[str]) -> list[str]:
     """
     stray = []
     for iid in ids:
-        series = "".join(ch for ch in iid if ch.isalpha())
-        digits = "".join(ch for ch in iid if ch.isdigit())
-        if not digits or (series not in FROZEN_SERIES and series not in FROZEN_BAND):
+        parsed = _parse(iid)
+        if parsed is None:
             continue
-        n = int(digits)
+        # The freeze is on the SERIES whatever segment precedes it: an edition id in a
+        # frozen letter (`XMPL-G1`) is as much a stray as `G137` - the letters closed
+        # for every venue, not only the base.
+        _edition, series, n = parsed
+        if series not in FROZEN_SERIES and series not in FROZEN_BAND:
+            continue
         if n > PRODUCER_BAND_CEILING:
             if n > FROZEN_BAND.get(series, 0):
                 stray.append(iid)
@@ -462,7 +670,10 @@ def test_a_module_series_id_belongs_to_that_module() -> None:
     wrong = []
     for item in doc.get("items", []):
         iid = str(item.get("id", ""))
-        series = "".join(ch for ch in iid if ch.isalpha())
+        parsed = _parse(iid)
+        if parsed is None:
+            continue
+        series = parsed[1]
         if series in by_code and item.get("module") != by_code[series]:
             wrong.append(f"{iid} (module: {item.get('module')!r}, series says {by_code[series]!r})")
     assert not wrong, f"module-series ids filed under a different module: {wrong}"
@@ -607,6 +818,195 @@ def test_no_id_carries_two_different_titles_across_the_remote_trunk() -> None:
 GATE_PROMPTS = REPO / "config" / "gate-prompts"
 
 
+# ---- venue-aware grooming, the edit side (PLAN4, 2026-09-05) ---------------------------
+# Two venues groom one inbox and one item set. What a session may do to an entry the
+# OTHER venue owns is a mechanism now: the existing text survives verbatim as a prefix,
+# additions are stamped `[<venue> YYYY-MM-DD]`, the inbox state token is the owner's.
+# These run from FIXTURES, not the live tree: CI's tree is clean against itself and the
+# detector is only meaningful against a base (`--check-venue-edits --base <ref>`).
+
+_INBOX_FIXTURE = """## Inbox
+
+- **`Idea-10034`** · 2026-09-05 · `[plan]` · **open** · prio? **Med** —
+  **A band-shaped entry - the other venue's.** body line.
+
+- **`XMPL-Idea-2`** · 2026-09-05 · `[plan]` · **parked → CFG2** · prio? **Low** —
+  **An edition's entry.** body.
+
+- **`Idea-257`** · 2026-09-05 · `[plan]` · **open** · prio? **Med** —
+  **Ours, the base's.** body.
+
+## Recently groomed (audit trail)
+"""
+
+
+def test_owner_of_is_one_function_keyed_to_the_edition_segment() -> None:
+    """PLAN4 (a): a segment names its edition; no segment at or below the ceiling is the
+    base; no segment above it is the undeclared venue's band (the company's shape
+    before it declared). Items and ideas alike; unparseable is None."""
+    alloc = _allocator()
+    assert alloc.owner_of("PLAN4") == "base"
+    assert alloc.owner_of("Idea-257") == "base"
+    assert alloc.owner_of("G10003") == alloc.BAND_VENUE
+    assert alloc.owner_of("DD10001") == alloc.BAND_VENUE
+    assert alloc.owner_of("Idea-10034") == alloc.BAND_VENUE
+    assert alloc.owner_of("XMPL-LOAD1") == "XMPL"
+    assert alloc.owner_of("XMPL-Idea-2a") == "XMPL"
+    assert alloc.owner_of("not-an-id") is None
+    # an UNDECLARED venue (None) owns the band; a declared one owns its own segment
+    assert alloc.owns(None, "Idea-10034") and not alloc.owns(None, "Idea-257")
+    assert alloc.owns("base", "Idea-257") and not alloc.owns("base", "Idea-10034")
+    assert alloc.owns("XMPL", "XMPL-Idea-2") and not alloc.owns("XMPL", "Idea-257")
+
+
+def test_the_detector_catches_a_rewrite_an_unstamped_append_and_a_state_flip() -> None:
+    """PLAN4 (c): the three failure modes, each on an entry the base does not own."""
+    alloc = _allocator()
+    old = _INBOX_FIXTURE
+    rewrite = old.replace("body line.", "a different body.")
+    unstamped = old.replace("body line.", "body line.\n  an answer with no stamp")
+    flip = old.replace(
+        "`[plan]` · **open** · prio? **Med** —\n  **A band-shaped",
+        "`[plan]` · **closed** · prio? **Med** —\n  **A band-shaped",
+    )
+    removed = old.replace(
+        "- **`XMPL-Idea-2`** · 2026-09-05 · `[plan]` · **parked → CFG2** · prio? **Low** —\n"
+        "  **An edition's entry.** body.\n\n",
+        "",
+    )
+    header_rewrite = old.replace("`[plan]` · **parked → CFG2**", "`[bug]` · **parked → CFG2**")
+
+    (f,) = alloc.venue_edit_findings_ideas(old, rewrite, "base")
+    assert f.startswith("REWRITE Idea-10034")
+    (f,) = alloc.venue_edit_findings_ideas(old, unstamped, "base")
+    assert f.startswith("UNSTAMPED Idea-10034")
+    (f,) = alloc.venue_edit_findings_ideas(old, flip, "base")
+    assert f.startswith("STATE FLIP Idea-10034: open -> closed") and "proposed:" in f
+    (f,) = alloc.venue_edit_findings_ideas(old, removed, "base")
+    assert f == "REWRITE XMPL-Idea-2: the entry was removed"
+    (f,) = alloc.venue_edit_findings_ideas(old, header_rewrite, "base")
+    assert f == "REWRITE XMPL-Idea-2: the header changed"
+
+
+def test_a_stamped_append_an_owners_own_flip_and_an_item_status_change_pass() -> None:
+    """PLAN4 (b)/(c): everything that lands. A proposed close is a stamped append; the
+    owner flips its own token freely; item-file status is venue-local and out of scope."""
+    alloc = _allocator()
+    old = _INBOX_FIXTURE
+    proposed = old.replace(
+        "body line.",
+        "body line.\n  [base 2026-09-05] proposed: closed - answered at LOAD2 (c); see LOAD2.yaml",
+    )
+    assert alloc.venue_edit_findings_ideas(old, proposed, "base") == []
+    own_flip = old.replace(
+        "- **`Idea-257`** · 2026-09-05 · `[plan]` · **open**",
+        "- **`Idea-257`** · 2026-09-05 · `[plan]` · **groomed → PLAN9**",
+    )
+    assert alloc.venue_edit_findings_ideas(old, own_flip, "base") == []
+    # the other venue, running as itself, may flip its own token and rewrite its own body
+    theirs = old.replace("body line.", "rewritten by the owner").replace(
+        "`[plan]` · **open** · prio? **Med** —\n  **A band-shaped",
+        "`[plan]` · **closed** · prio? **Med** —\n  **A band-shaped",
+    )
+    assert alloc.venue_edit_findings_ideas(old, theirs, None) == []
+    # an edition running as itself owns its segment
+    assert (
+        alloc.venue_edit_findings_ideas(
+            old, old.replace("**An edition's entry.** body.", "**An edition's entry.** new"), "XMPL"
+        )
+        == []
+    )
+
+    before = {"id": "G10003", "status": "todo", "notes": "Minted.", "acceptance": "(a) x"}
+    after_ok = {
+        "id": "G10003",
+        "status": "done",
+        "notes": "Minted.\n\n[base 2026-09-05] BUILT here; see G10003 close.",
+        "acceptance": "(a) x",
+    }
+    assert alloc.venue_edit_findings_item("G10003", before, after_ok, "base") == []
+    after_bad = {
+        "id": "G10003",
+        "status": "done",
+        "notes": "Rewritten.",
+        "acceptance": "(a) x",
+        "title": "new",
+    }
+    found = alloc.venue_edit_findings_item("G10003", before, after_bad, "base")
+    assert any(f.startswith("REWRITE G10003.notes") for f in found)
+    assert any(f.startswith("REWRITE G10003.title") for f in found)
+    # the base's own item: nothing to say, whatever changed
+    assert alloc.venue_edit_findings_item("PLAN4", before, after_bad, "base") == []
+
+
+def test_check_venue_edits_is_wired_as_a_detector_with_a_base() -> None:
+    """The CLI form the reconcile-port skill runs; against its own HEAD it is vacuous
+    (the tree is clean against itself), which is the point of requiring a base."""
+    alloc = _allocator()
+    assert alloc.check_venue_edits("HEAD", venue="base") == []
+    skill = (REPO / ".claude" / "skills" / "reconcile-port" / "SKILL.md").read_text(
+        encoding="utf-8"
+    )
+    assert (
+        "--check-venue-edits --base" in skill
+    ), "the reconcile-port skill no longer runs the venue-edit detector at the previous port base"
+
+
+def test_the_pending_file_mints_n_consecutive_ids_in_one_pass() -> None:
+    """PLAN4 (d): candidates carry `Idea-?`, never a number; the landing pass allocates
+    consecutively through next_idea_id() - the same function, one code path - inserts
+    at the top of the inbox newest first, and a real id in a pending file is refused."""
+    alloc = _allocator()
+    pending = (
+        "# pending-feat-x\n\n"
+        "- **`Idea-?`** · 2026-09-05 · `[plan]` · **open** · prio? **Med** — **first.** body\n"
+        "  more body\n"
+        "- **`Idea-?`** · 2026-09-05 · `[bug]` · **open** · prio? **Low** — **second.**\n"
+    )
+    assert alloc.pending_file_problems(pending) == []
+    candidates = alloc.pending_candidates(pending)
+    assert len(candidates) == 2
+    minted = alloc.mint_pending(candidates, {(None, 257), (None, 10034)}, venue="base")
+    assert [i for i, _ in minted] == ["Idea-258", "Idea-259"]
+    assert minted[0][1].startswith("- **`Idea-258`** · 2026-09-05 · `[plan]`")
+    assert "Idea-?" not in minted[0][1] + minted[1][1]
+    # an edition's pending file mints into its own inbox of numbers
+    assert [i for i, _ in alloc.mint_pending(candidates, {("XMPL", 4)}, venue="XMPL")] == [
+        "XMPL-Idea-5",
+        "XMPL-Idea-6",
+    ]
+    # an undeclared venue still lands its captures, band-shaped (rider C1)
+    assert [i for i, _ in alloc.mint_pending(candidates, {(None, 10034)}, venue=None)] == [
+        "Idea-10035",
+        "Idea-10036",
+    ]
+    inbox = "intro\n\n## Inbox\n\n- **`Idea-257`** · old\n\n## Recently groomed\n"
+    out = alloc.insert_into_inbox(inbox, [e for _, e in minted])
+    assert out.index("Idea-259") < out.index("Idea-258") < out.index("Idea-257")
+    # refused: a real id, or a bullet that is not a candidate
+    problems = alloc.pending_file_problems(pending + "- **`Idea-9`** · x\n- a plain bullet\n")
+    assert any("never carries a real id" in p for p in problems)
+    assert any("a candidate opens" in p for p in problems)
+
+
+def test_retired_is_not_free_a_renumbered_idea_stays_taken() -> None:
+    """PLAN4 (e): the allocator reads inbox HISTORY, so a number whose header was
+    renumbered away is still taken. This is the case the company's hand count got
+    wrong on 2026-09-05 (10006-10008 read as free from the live headers). The fixture
+    is a `git log -p` shaped history in which Idea-10006 became Idea-10023."""
+    alloc = _allocator()
+    history = (
+        "-- **`Idea-10006`** · 2026-09-03 · `[plan]` · **open** · prio? **Med** — **x.**\n"
+        "+- **`Idea-10023`** · 2026-09-03 · `[plan]` · **open** · prio? **Med** — **x.**"
+        " *(renumbered 2026-09-05 from Idea-10006)*\n"
+    )
+    live = "- **`Idea-10023`** · 2026-09-03 · `[plan]` · **open** · prio? **Med** — **x.**\n"
+    taken = alloc._idea_numbers(live) | alloc._idea_numbers(history, alloc._IDEA_IN_DIFF_RE)
+    assert (None, 10006) in taken, "the renumbered-away number must stay in the taken set"
+    allocated, _ = alloc.next_idea_id(taken, venue=None)
+    assert allocated == "Idea-10024" and allocated != "Idea-10006"
+
+
 def test_declared_gates_are_lists_of_known_prompt_slugs() -> None:
     """J50: `gates:` is optional; when present it is a list of slugs that exist
     as config/gate-prompts/<slug>.yaml. render_gates.py reads ONLY this field
@@ -692,7 +1092,8 @@ def test_no_stored_rollup() -> None:
 
 def test_derived_summary_is_consistent() -> None:
     """The derivation itself: counts sum to the item total; next_ready is exactly the
-    todo items whose every dependency is done."""
+    todo items whose every dependency is done AND that carry no ``hold:`` (Y7); ``held``
+    is exactly the items that do."""
     doc = _load()
     summary = backlog_store.derive_summary(doc)
     items = {i["id"]: i for i in doc["items"]}
@@ -701,9 +1102,137 @@ def test_derived_summary_is_consistent() -> None:
         iid
         for iid, item in items.items()
         if item["status"] == "todo"
+        and not backlog_store.is_held(item)
         and all(items[dep]["status"] == "done" for dep in item.get("depends_on", []))
     }
     assert set(summary["next_ready"]) == expected
+    assert set(summary["held"]) == {
+        iid for iid, item in items.items() if backlog_store.is_held(item)
+    }
+    assert not set(summary["held"]) & set(summary["next_ready"])
+
+
+# --- Y7: a hold is a declared field, read by the derivation, rendered by the board -------
+#
+# O26 was pulled and claimed on 2026-09-02 with its dependencies done and a hold sitting in
+# annotations.status, which no derivation reads. These pin the fix at all three surfaces:
+# the derivation (held leaves next_ready), the board (HELD is rendered, never dropped) and
+# the boundary (an annotation is a note and never a hold - a general rule over annotations
+# would hold items nobody meant to hold, invisibly).
+
+
+def _hold_doc(hold, status: str = "todo") -> dict:
+    """Two done deps and one todo item that is dependency-ready by construction."""
+    item = {"id": "H3", "status": status, "depends_on": ["H1", "H2"]}
+    if hold is not None:
+        item["hold"] = hold
+    return {
+        "items": [
+            {"id": "H1", "status": "done", "depends_on": []},
+            {"id": "H2", "status": "done", "depends_on": []},
+            item,
+        ]
+    }
+
+
+_HOLD = {
+    "since": "2026-07-22",
+    "by": "SME",
+    "until": "the template session rules",
+    "reason": "do not pull",
+}
+
+
+def test_held_item_is_excluded_from_next_ready() -> None:
+    """(c) and (g): dependency-ready, and still not ready, because a human said so."""
+    ready = backlog_store.derive_summary(_hold_doc(None))
+    assert ready["next_ready"] == ["H3"] and ready["held"] == []
+    held = backlog_store.derive_summary(_hold_doc(_HOLD))
+    assert held["next_ready"] == [], "a held item must leave next_ready"
+    assert held["held"] == ["H3"], "and must be listed as held, never silently dropped"
+
+
+def test_unblessed_annotation_does_not_hold() -> None:
+    """(b): the exact O26 shape before Y7 - a hold written as prose in annotations - does
+    NOT hold. Only the declared field does. This is the boundary, stated as a test so that
+    a future 'helpful' rule over annotations fails here first."""
+    doc = _hold_doc(None)
+    doc["items"][2]["annotations"] = {
+        "status": "SME HOLD 2026-07-22: do NOT pull this item until that session rules"
+    }
+    summary = backlog_store.derive_summary(doc)
+    assert summary["next_ready"] == ["H3"], "an annotation is a note, not a hold"
+    assert summary["held"] == []
+    assert not backlog_store.is_held(doc["items"][2])
+    assert backlog_store.hold_errors(doc["items"][2]) == []
+
+
+def test_held_item_is_rendered_as_held_with_its_text() -> None:
+    """(d): the board shows the item as HELD, with the hold text visible OUTSIDE the
+    collapsed detail, and lists it in the Held strip; it does not appear in the ready
+    strip and does not get the ready accent."""
+    from drydocs.plan.plan_board import backlog_from_dict, render_board
+
+    raw = _hold_doc(_HOLD)
+    for it in raw["items"]:
+        it.update(
+            title=f"t {it['id']}", type="chore", module="docs", agent="a", phase=8, priority="p2"
+        )
+    doc = {
+        "schema": "drydocs.backlog.v3",
+        "plan": {"phases": [{"id": 8, "title": "eight", "goal": "g"}]},
+        "items": raw["items"],
+    }
+    html = render_board(backlog_from_dict(doc))
+    h3 = html.index('id="card-H3"')
+    card_tag = html[html.rindex('<div class="card', 0, h3) : h3]
+    assert "held" in card_tag
+    assert "ready" not in card_tag, "a held item never wears the ready accent"
+    card = html[h3 : html.index('<div class="detail"', h3)]
+    assert "hold-badge" in card and "HELD" in card
+    assert "do not pull" in card, "the hold text is outside the collapsed detail"
+    assert "the template session rules" in card
+    held_strip = html[html.index('class="held-strip"') :]
+    held_strip = held_strip[: held_strip.index("</div>")]
+    assert "H3" in held_strip
+    ready_strip = html[html.index('class="ready-strip"') :]
+    ready_strip = ready_strip[: ready_strip.index("</div>")]
+    assert "H3" not in ready_strip
+
+
+def test_hold_shape_is_guarded_and_fails_closed() -> None:
+    """A malformed hold still HOLDS (fail closed - a typo must not release an item) and
+    is reported, so the mistake is visible rather than silently obeyed. A hold on a status
+    that cannot be pulled is a stale or bypassed hold, and fails too."""
+    bad = {"id": "X1", "status": "todo", "depends_on": [], "hold": "SME HOLD"}
+    assert backlog_store.is_held(bad)
+    assert backlog_store.hold_errors(bad), "a non-mapping hold is reported"
+    missing = {"id": "X2", "status": "todo", "depends_on": [], "hold": {"since": "2026-09-07"}}
+    assert any("reason" in e for e in backlog_store.hold_errors(missing))
+    unknown = {"id": "X3", "status": "todo", "depends_on": [], "hold": {**_HOLD, "date": "x"}}
+    assert any("date" in e for e in backlog_store.hold_errors(unknown))
+    done = {"id": "X4", "status": "done", "depends_on": [], "hold": dict(_HOLD)}
+    assert any("done" in e for e in backlog_store.hold_errors(done))
+    assert (
+        backlog_store.hold_errors({"id": "X5", "status": "todo", "depends_on": [], "hold": None})
+        == []
+    )
+    assert (
+        backlog_store.hold_errors(
+            {"id": "X6", "status": "blocked", "depends_on": [], "hold": dict(_HOLD)}
+        )
+        == []
+    )
+
+
+def test_every_committed_hold_is_well_formed() -> None:
+    """The fixtures are real items (O26, G64). Any hold in the tree passes the shape guard,
+    and the two the item named are present and held."""
+    doc = _load()
+    errors = [e for it in doc["items"] for e in backlog_store.hold_errors(it)]
+    assert errors == [], errors
+    held = set(backlog_store.derive_summary(doc)["held"])
+    assert {"O26", "G64"} <= held, f"the two live instances must be held: {sorted(held)}"
 
 
 def test_monolith_is_a_tombstone() -> None:

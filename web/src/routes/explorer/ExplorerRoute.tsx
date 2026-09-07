@@ -1,15 +1,25 @@
-import { useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import type { Persona } from '../../lib/auth'
-import { createApiAccess } from '../../lib/graphApi'
 import { MODULES } from '../../modules/registry'
 import { useRightSidebar } from '../../layout/rightSidebarContext'
 import ModuleTemplate from '../ModuleTemplate'
 import ExplorerGraphPane from '../../explorer/ExplorerGraphPane'
 import DataFrame from '../../explorer/DataFrame'
+import EmptyState from '../../components/ui/EmptyState'
 import SpecGrid from '../../explorer/SpecGrid'
 import SpecGraphPane from '../../components/SpecGraphPane'
 import type { CanvasNode } from '../../lib/nvl-mapping'
-import LocationMap, { type MapDimension } from '../../components/map/LocationMap'
+import type { MapDimension } from '../../components/map/LocationMap'
+
+// WEB7: the Locations tab is lazy on a DIFFERENT axis from the gated routes —
+// not authorization, but a tab nobody has opened yet. It carries the world map
+// (147 KB of coastline geometry) and the gazetteer, and three of the four tabs
+// on this page never touch either. Split here because the tab is a delivery
+// boundary the user makes explicit by clicking it; the tab strip itself is
+// unchanged, so an unopened tab costs nothing and an opened one costs one
+// fetch. Named in the item, and worth stating that it is NOT the authorization
+// rule above — /explorer is open to every role, and so is this tab.
+const LocationMap = lazy(() => import('../../components/map/LocationMap'))
 import NodeInspector from '../../explorer/NodeInspector'
 import {
   APP_CODES_FRAME,
@@ -21,6 +31,7 @@ import {
   type Selection,
 } from '../../explorer/demoGraph'
 import type { TowerKey } from '../../data/towers'
+import { useGraphAccess } from '../../data/graphAccess'
 
 // Explorer (`/explorer`, O9): the first full instantiation of the shared
 // module template — React Flow tower graph over the four data-frame tabs, with
@@ -72,8 +83,7 @@ export default function ExplorerRoute({ persona }: { persona: Persona }) {
   // O11: each tab binds to its versioned QuerySpec via the GraphAccess api
   // adapter; the O9 demo frames survive as the visible fallback when
   // drydocs-api (or the graph) is unavailable.
-  const apiUrl = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:8001'
-  const access = useMemo(() => createApiAccess(apiUrl, persona.id), [apiUrl, persona.id])
+  const { access } = useGraphAccess()
 
   // selection → inspector (the template's right sidebar slot)
   useEffect(() => {
@@ -84,7 +94,7 @@ export default function ExplorerRoute({ persona }: { persona: Persona }) {
     }
     // clearing on unmount keeps the inspector from leaking into other routes
     return () => sidebar.clear()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, [selection, persona])
 
   // selecting a node in another tower (via a frame row) re-frames the graph
@@ -109,16 +119,12 @@ export default function ExplorerRoute({ persona }: { persona: Persona }) {
       }
       tabContent={{
         Applications: (
-          <SpecGrid
-            access={access}
-            specId="explorer.applications.v1"
+          <SpecGrid specId="explorer.applications.v1"
             fallback={<DataFrame cols={APPLICATIONS_FRAME.cols} rows={APPLICATIONS_FRAME.rows} {...frameProps} />}
           />
         ),
         Folders: (
-          <SpecGrid
-            access={access}
-            specId="explorer.folder-applications.v1"
+          <SpecGrid specId="explorer.folder-applications.v1"
             fallback={<DataFrame cols={FOLDERS_FRAME.cols} rows={FOLDERS_FRAME.rows} {...frameProps} />}
           />
         ),
@@ -129,7 +135,6 @@ export default function ExplorerRoute({ persona }: { persona: Persona }) {
         // the console invented (see nvl-mapping.ts).
         'App neighbourhood': (
           <SpecGraphPane
-            access={access}
             specId="explorer.folder-applications.v1"
             title="Application neighbourhood · folder → application · folder → data centre"
             selected={canvasNode}
@@ -137,35 +142,33 @@ export default function ExplorerRoute({ persona }: { persona: Persona }) {
           />
         ),
         'App codes': (
-          <SpecGrid
-            access={access}
-            specId="explorer.controlm-app-codes.v1"
+          <SpecGrid specId="explorer.controlm-app-codes.v1"
             fallback={<DataFrame cols={APP_CODES_FRAME.cols} rows={APP_CODES_FRAME.rows} {...frameProps} />}
           />
         ),
         Jobs: (
-          <SpecGrid
-            access={access}
-            specId="explorer.jobs.v2"
+          <SpecGrid specId="explorer.jobs.v2"
             fallback={<DataFrame cols={JOBS_FRAME.cols} rows={JOBS_FRAME.rows} {...frameProps} />}
           />
         ),
         Conditions: (
-          <SpecGrid
-            access={access}
-            specId="explorer.conditions.v2"
+          <SpecGrid specId="explorer.conditions.v2"
             fallback={<DataFrame cols={CONDITIONS_FRAME.cols} rows={CONDITIONS_FRAME.rows} {...frameProps} />}
           />
         ),
         Servers: (
-          <SpecGrid
-            access={access}
-            specId="explorer.servers.v1"
+          <SpecGrid specId="explorer.servers.v1"
             fallback={<DataFrame cols={SERVERS_FRAME.cols} rows={SERVERS_FRAME.rows} {...frameProps} />}
           />
         ),
         Locations: (
-          <LocationMap access={access} dimensions={LOCATION_DIMENSIONS} placeNoun="data centers" />
+          // A LOCAL Suspense, not the route tree's. Without one the tab's
+          // suspension bubbles to RouteErrorBoundary and blanks the whole page
+          // — including the tab strip the reader just clicked — while a 157 KB
+          // chunk arrives. Here, only the panel says it is loading.
+          <Suspense fallback={<EmptyState title="Loading the map…" hint="Fetching the world outline." />}>
+            <LocationMap access={access} dimensions={LOCATION_DIMENSIONS} placeNoun="data centers" />
+          </Suspense>
         ),
       }}
     />

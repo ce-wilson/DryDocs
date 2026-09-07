@@ -426,7 +426,7 @@ def test_the_writer_runs_as_a_script(tmp_path) -> None:
     proc = subprocess.run(
         [sys.executable, str(REPO / "scripts" / "set_env_var.py"), "--help"],
         capture_output=True,
-        text=True,
+        encoding="utf-8",
         cwd=str(REPO),
     )
     assert proc.returncode == 0, proc.stderr

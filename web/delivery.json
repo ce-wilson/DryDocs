@@ -1,0 +1,4 @@
+{
+  "api": { "prefix": "/api" },
+  "agent": { "prefix": "/agent" }
+}

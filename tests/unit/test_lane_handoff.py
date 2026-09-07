@@ -199,6 +199,27 @@ def test_render_declares_the_pens_in_front_matter_and_the_first_commit_line(h, i
     assert "pen: backlog · port · adr · gates · snapshot" in text_a
 
 
+def test_a_module_surface_renders_with_its_code_pen_only_when_the_module_is_queued(h, items, ready):
+    # The row is generated from MODULE_SURFACES, so the test reads the structure rather
+    # than retyping the path (one vocabulary for surfaces — the skill's own rule).
+    module, surfaces = next(iter(h.MODULE_SURFACES.items()))
+    prefix = surfaces[0][0]
+    items["WEB1"] = _item_module(module)
+    ready.append("WEB1")
+    rows, _ = h.check_queue(["WEB1"], items, ready, "B")
+    text = h.render(lane="B", machine="laptop", sender="A", rows=rows, other_queue=[])
+    assert f"| `code:{module}` | `{prefix}` | this lane, with the module" in text
+    rows, _ = h.check_queue(["OPEN1"], items, ready, "B")
+    text = h.render(lane="B", machine="laptop", sender="A", rows=rows, other_queue=[])
+    assert prefix not in text
+    # and it is a module surface, not a Lane A pen: no surface flag for touching it
+    assert h.pen_of(prefix) is None
+
+
+def _item_module(module: str):
+    return _item("WEB1", module=module)
+
+
 # ---- check: MISSING is its own state ---------------------------------------------------
 
 

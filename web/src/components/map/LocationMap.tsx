@@ -23,6 +23,19 @@ import { COUNTRY_BY_ID, COUNTRY_SHAPES } from '../../generated/world-map'
 import { MapGlyph, type GlyphKind } from './MapGlyphs'
 import { frameFor, viewBox, WORLD_BOX, zoomOf, type Box } from './projection'
 import { COUNTRY_NAMES, resolveRows, type LocationRow, type PlacedSite } from './resolve'
+import { validateRows, type RowShape } from '../../data/rowShape'
+
+/** The shared map column shape, as MapDimension's own comment already
+ *  requires of every dimension spec — now checked rather than assumed. */
+const LOCATION_COLUMNS: RowShape<LocationRow> = [
+  'origin',
+  'origin_kind',
+  'data_center',
+  'city',
+  'state',
+  'country',
+  'location_grain',
+]
 
 export interface MapDimension {
   /** Registry spec id — must return the shared map column shape. */
@@ -71,7 +84,17 @@ export default function LocationMap({
       .runSpec(dimension.specId, params)
       .then((res) => {
         if (!live) return
-        setLoad({ state: 'ready', rows: res.rows as unknown as LocationRow[] })
+        // WEB6: the map's whole job is placing rows on a globe, so a column it
+        // cannot read is the difference between "nothing is there" and "the
+        // query changed" — the two states this component's own comment below
+        // insists must never look alike. Checked, a mismatch takes the SAME
+        // loud path a failed query does.
+        const checked = validateRows<LocationRow>(res, LOCATION_COLUMNS)
+        setLoad(
+          checked.ok
+            ? { state: 'ready', rows: checked.rows }
+            : { state: 'error', message: checked.message },
+        )
       })
       .catch((err: unknown) => {
         if (!live) return

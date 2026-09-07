@@ -1,11 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { MODULES } from '../modules/registry'
 import ModuleTemplate from './ModuleTemplate'
 import MiniDag, { type DagEdgeDef, type DagNodeDef } from '../components/MiniDag'
 import StatTiles from '../components/StatTiles'
 import EmptyState from '../components/ui/EmptyState'
 import type { Persona } from '../lib/auth'
-import { createApiAccess } from '../lib/graphApi'
 import VendorIcon from '../software/VendorIcon'
 import AcronymsPane from '../software/AcronymsPane'
 import {
@@ -24,6 +23,15 @@ import {
   unclaimedCorpora,
   type Product,
 } from '../software/softwareModel'
+import { useGraphQuery } from '../data/graphAccess'
+import { validateRows, type RowShape } from '../data/rowShape'
+
+/** The two columns this page reads from software.doc-coverage.v1. */
+interface CoverageRow {
+  product_id: string
+  documents: number
+}
+const COVERAGE_COLUMNS: RowShape<CoverageRow> = ['product_id', 'documents']
 
 // /software (Q16) — READ-ONLY ledger view of vendor -> product -> corpus -> graph.
 // Static generated JSON (software-registry.json + the doc-corpus rows of
@@ -53,30 +61,21 @@ function edgeChip(state: ReturnType<typeof edgeState>): { text: string; token: s
 
 export default function SoftwareRoute({ persona }: { persona: Persona }) {
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [live, setLive] = useState<Map<string, number> | null>(null)
-
-  const apiUrl = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:8001'
-  const access = useMemo(() => createApiAccess(apiUrl, persona.id), [apiUrl, persona.id])
-
-  useEffect(() => {
-    let cancelled = false
-    access
-      .runSpec('software.doc-coverage.v1')
-      .then((r: { rows: unknown[] }) => {
-        if (cancelled || !r.rows.length) return
-        const counts = new Map<string, number>()
-        for (const row of r.rows as unknown as { product_id: string; documents: number }[]) {
-          counts.set(row.product_id, Number(row.documents ?? 0))
-        }
-        setLive(counts)
-      })
-      .catch(() => {
-        /* declaration-only view; the banner says so */
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [access])
+  // WEB12: a declaration-only view when the read is loading, empty or failed —
+  // the banner says which, and no case here fabricates a count.
+  const coverage = useGraphQuery('software.doc-coverage.v1')
+  // WEB6: `documents` is declared `int` server-side and this page renders it as
+  // a count. The old cast asserted both columns and checked neither, so a spec
+  // returning a string would have produced `Number('')` = 0 — a coverage of zero
+  // that looks exactly like a real one. Checked, a mismatch reads as "no live
+  // counts" and the declaration-only view stands, which is the same degradation
+  // WEB12 already chose for loading and error here.
+  const checkedCoverage =
+    coverage.status === 'data' ? validateRows<CoverageRow>(coverage.data, COVERAGE_COLUMNS) : null
+  const live: Map<string, number> | null =
+    checkedCoverage?.ok === true
+      ? new Map(checkedCoverage.rows.map((row) => [row.product_id, Number(row.documents ?? 0)] as const))
+      : null
 
   const selected = PRODUCTS.find((p) => p.id === selectedId) ?? null
 

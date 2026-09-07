@@ -20,6 +20,8 @@
 // scripts/set_console_credential.py.
 
 import { createPublicApi, detailOf } from './apiClient'
+import * as storage from './storage'
+import delivery from '../../delivery.json'
 
 export type Role = 'user' | 'steward' | 'admin'
 
@@ -93,9 +95,21 @@ export function canAccessIntake(persona: Persona): boolean {
   return persona.id === SME_PERSONA_ID || persona.role !== 'user'
 }
 
-/** The one place the API base URL is decided for auth calls. */
+/** The one place the API base is decided, and it is a PATH, not a URL (ADR 0020).
+ *  The console is same-origin with drydocs-api in every environment: a reverse
+ *  proxy (Vite's own in dev and preview, O72's in the Compose stack) forwards
+ *  `/api/...` on the page's origin to the API with the prefix stripped. So there
+ *  is no setting to be missing and no fallback to somebody's localhost - the
+ *  VITE_API_URL variable this used to read is retired, and a production bundle
+ *  carries no deployment coordinate at all (web/scripts/checkDistCoordinates.mjs).
+ *  The prefix comes from web/delivery.json, the same file vite.config.ts routes. */
 export function apiBaseUrl(): string {
-  return (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:8001'
+  return delivery.api.prefix
+}
+
+/** The agent server's base, by the same rule: `/agent/...` on this origin. */
+export function agentBaseUrl(): string {
+  return delivery.agent.prefix
 }
 
 export interface Session {
@@ -104,6 +118,11 @@ export interface Session {
   signedInAt: string
   /** The opaque bearer token. The server is the only thing that can read it. */
   token: string
+  /** The session's PUBLIC handle (ADR 0019). It names the session and
+   *  authorizes nothing: this is what the Ask spoke forwards to the agent so
+   *  the specs it registers resolve for this session, and the bearer never
+   *  leaves the browser. */
+  sessionId: string
   /** ISO-8601. The server enforces this; the client honours it so the shell
    *  does not render a signed-in console whose every call is about to 401. */
   expiresAt: string
@@ -141,6 +160,7 @@ export async function signIn(personaId: string, secret: string): Promise<Session
     role: persona.role,
     signedInAt: new Date().toISOString(),
     token: data.token,
+    sessionId: data.session_id,
     expiresAt: data.expires_at,
   }
   store(session)
@@ -149,7 +169,7 @@ export async function signIn(personaId: string, secret: string): Promise<Session
 
 function store(session: Session): void {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(session))
+    storage.writeJson(STORAGE_KEY, session)
   } catch {
     // A console that cannot persist still works for this tab; a reload signs
     // out. Failing the sign-in over it would be worse.
@@ -161,11 +181,11 @@ function store(session: Session): void {
  *  down, must not leave the user looking signed in. */
 export function signOut(): void {
   const session = currentSession()
-  try {
-    localStorage.removeItem(STORAGE_KEY)
-  } catch {
-    /* nothing to clear */
-  }
+  // WEB11 (b): clearAll, not removeItem. This used to drop the session token
+  // and leave seven other keys behind, two of which held QUERY RESULTS keyed by
+  // persona rather than by session — readable by whoever opened the browser
+  // next. lib/storage.ts holds the retention decision for every key.
+  storage.clearAll()
   if (!session) return
   // The token is passed explicitly: the local session is already gone, so the
   // authed client (which reads it) is the wrong tool here. Plain fetch, not the
@@ -184,7 +204,7 @@ export function signOut(): void {
 export function currentSession(): Session | null {
   let raw: string | null
   try {
-    raw = localStorage.getItem(STORAGE_KEY)
+    raw = storage.read(STORAGE_KEY)
   } catch {
     return null
   }
@@ -196,13 +216,17 @@ export function currentSession(): Session | null {
     return null
   }
   if (typeof parsed !== 'object' || parsed === null) return null
-  const { personaId, signedInAt, token, expiresAt } = parsed as {
+  const { personaId, signedInAt, token, sessionId, expiresAt } = parsed as {
     personaId?: unknown
     signedInAt?: unknown
     token?: unknown
+    sessionId?: unknown
     expiresAt?: unknown
   }
   if (typeof token !== 'string' || !token) return null
+  // A blob from before ADR 0019 has a token and no handle; it is signed out
+  // rather than patched, because the Ask handshake would have nothing to send.
+  if (typeof sessionId !== 'string' || !sessionId) return null
   // Role is re-derived from PERSONAS — the stored blob is untrusted, so a stale
   // or hand-edited value can never invent a role client-side, and the server
   // re-resolves it from the token regardless.
@@ -215,6 +239,7 @@ export function currentSession(): Session | null {
     role: persona.role,
     signedInAt: typeof signedInAt === 'string' ? signedInAt : '',
     token,
+    sessionId,
     expiresAt: expiry,
   }
 }
@@ -225,15 +250,20 @@ export function sessionToken(): string | null {
   return currentSession()?.token ?? null
 }
 
+/** The current session's public handle, or null (ADR 0019). The Ask spoke
+ *  reads this, never sessionToken(), to name the session to the agent. */
+export function sessionId(): string | null {
+  return currentSession()?.sessionId ?? null
+}
+
 /** Drop the local session because the server refused its token. Distinct from
  *  signOut(): there is no point telling the server to revoke a token it has
  *  already rejected, and the caller is mid-request. */
 export function sessionRejected(): void {
-  try {
-    localStorage.removeItem(STORAGE_KEY)
-  } catch {
-    /* nothing to clear */
-  }
+  // The same clearAll, and this is the path that matters MORE: it is the one
+  // taken when a session expires while a tab is open, which happens without
+  // anyone deciding to leave.
+  storage.clearAll()
   window.dispatchEvent(new CustomEvent(SESSION_REJECTED_EVENT))
 }
 

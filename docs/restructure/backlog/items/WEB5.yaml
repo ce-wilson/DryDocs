@@ -1,0 +1,80 @@
+id: WEB5
+epic: web-console
+title: An error boundary per route outlet, keyed on pathname - one render throw breaks one panel instead
+  of blanking the whole console
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- docs/reviews/modules/web-2026-09-05.md
+- web/src/App.tsx
+- web/src/layout/Aside.tsx
+acceptance: |
+  There is no ErrorBoundary and no componentDidCatch in web/src; React 19 unmounts the whole
+  tree on an uncaught render error, so one bad row produces a white page with no navigation and
+  no way back but a reload (S7).
+
+  (a) One error boundary per route outlet, keyed on pathname so navigation clears it; a render
+      throw in one route leaves the shell, the nav and every other route usable.
+  (b) The fallback panel shows the error message verbatim (the O63 honesty rule - the exact
+      string is what a reader pastes into a ticket) and a retry affordance; it never shows a
+      stack trace or any value from the data that threw.
+  (c) A vitest renders a route that throws and asserts the shell survives and the panel shows.
+notes: |
+  Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+  Covers S7 (rank 9). About twenty lines; worth more once WEB4 is on (the compiler catches the
+  nulls) and WEB6 lands (a failed cast becomes a message, not a throw) - but this is the floor
+  under both and is independent of them.
+
+  DONE 2026-09-05 (Lane B, laptop). One render throw breaks one panel.
+
+  (a) A pathless RouteErrorBoundary layout route wraps every route's outlet,
+  INSIDE WEB3's access gate and OUTSIDE every page. The nesting order is a
+  decision: outside the gate, a route the persona may not open would render a
+  boundary instead of redirecting, which turns an authorization decision into
+  what looks like a bug.
+
+  KEYED ON PATHNAME, and this is the part that is easy to leave out and makes the
+  boundary nearly useless without it. A React error boundary LATCHES: once it has
+  caught, it renders its fallback until its state is reset or it is remounted.
+  Unkeyed, navigating away from a broken route carries the broken panel to the
+  next route, and the console stays broken until a reload — the same outcome this
+  item exists to prevent, one layer down. The key makes moving away the recovery,
+  and it has its own test.
+
+  (b) THE MESSAGE IS VERBATIM, per the O63 honesty rule: the exact string is what
+  a reader pastes into a ticket, and a reworded one is a different string. No
+  stack trace and no value from the data that threw — a render error on a row of
+  INTERNAL data must not put that row on screen in the name of diagnosing it.
+  Asserted both ways: the message is present, and the panel contains no stack
+  frames and no <pre>.
+
+  THE RETRY REMOUNTS, and that is not incidental. Clearing the boundary's state
+  alone would re-render the same components over the same already-failed data and
+  throw again immediately — a button that looks like a retry and is not one. The
+  key carries a nonce the retry bumps, so the subtree remounts and the hooks run
+  again, which means the read actually happens again. Its test flips the failure
+  off and asserts recovery, so a state-only reset would fail it.
+
+  The component stack goes to console.error and nowhere else. The console has no
+  telemetry (S8), so that is the only record a developer gets; it is deliberately
+  not on screen, because a component stack is a developer artifact and the panel
+  is for the person using the page.
+
+  A class component, because React still has no hook for this — error boundaries
+  are the one place a class is the only mechanism, which is worth saying so the
+  next reader does not "modernise" it.
+
+  Ledger: RouteErrorBoundary registered, pin 91 -> 92, UNBOUND for the same reason
+  as RouteAccessGate — one boundary for every route.
+
+  Gates at close: poetry run pytest -q = 3360 passed, 12 skipped, 1 failed
+  (test_plan_roadmap - the expected Lane B close failure). ruff clean. In web/:
+  tsc -b exit 0, oxlint --max-warnings 0 exit 0, npm run test:coverage exit 0
+  (WEB13's floor holds with the six new tests), vitest 19 files / 231 tests.

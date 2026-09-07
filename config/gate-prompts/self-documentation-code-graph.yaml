@@ -63,6 +63,8 @@
 # is not re-derived later.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-09-02
+
 id: self-documentation-code-graph
 title: "SME Gate — Self-documentation: load the DryDocs code-dependency snapshot into `drydocs` under a Project root, binding the unused SWO terms"
 step: "Rules the node/edge contract for DryDocs' own code in the graph BEFORE a loader exists — the Project root shape, the file-vs-module grain, and the collision rule against the software registry"

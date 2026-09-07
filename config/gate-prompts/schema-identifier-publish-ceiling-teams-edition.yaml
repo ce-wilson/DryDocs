@@ -6,6 +6,8 @@
 # this company.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-09-01
+
 id: schema-identifier-publish-ceiling-teams-edition
 title: >-
   SME Gate — the signed grammar publishes a schema name when it is "established public

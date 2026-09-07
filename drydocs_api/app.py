@@ -66,6 +66,7 @@ from drydocs_api.intake import (
 from drydocs_api.intake import (
     transition as intake_transition,
 )
+from drydocs_api.log_estate import log_estate
 from drydocs_api.mappings import (
     ChangesetValidationError,
     MappingStore,
@@ -86,10 +87,27 @@ from drydocs_api.personas import UnknownPersonaError
 from drydocs_api.queries import NAMED_QUERIES, ParamValidationError, UnknownQueryError
 from drydocs_api.query_specs import UnknownSpecError
 from drydocs_api.schemas import (
+    AppCodeMigrationsOut,
+    ChangesetArtifactOut,
+    ConfigOut,
+    CorpusStatusOut,
+    CorrectionsReportOut,
+    DraftReceiptOut,
+    EphemeralRegisterOut,
     HealthOut,
+    IntakeEvidenceOut,
+    IntakeListOut,
+    IntakeRecordOut,
+    LogEstateOut,
     LoginOut,
+    MappingDomainsOut,
+    MappingGridOut,
+    MappingOptionsOut,
     NamedQueryOut,
     NamedRunOut,
+    OpenDraftsOut,
+    PendingCorrectionsReportOut,
+    PromotedDiffOut,
     SpecOut,
     SpecRunOut,
     StatusOut,
@@ -109,6 +127,20 @@ class LoginBody(BaseModel):
 
 class QueryBody(BaseModel):
     params: dict = {}
+
+
+class ExportBody(QueryBody):
+    """The export request: a spec run's params, plus API1 (c)'s raisable ceiling.
+
+    A separate model from ``QueryBody`` because the ceiling is an EXPORT
+    decision. Raising the limit on a grid read would change what is on screen;
+    raising it here changes what lands in a file that carries a manifest, and
+    those are different permissions to grant. Omitted (the default) keeps
+    today's behaviour exactly — the display limit the console echoes back — so
+    a caller that has not been updated is unaffected.
+    """
+
+    limit: int | None = None
 
 
 class RawBody(BaseModel):
@@ -138,7 +170,9 @@ class ThreadDecisionBody(BaseModel):
 
 
 class EphemeralRegisterBody(BaseModel):
-    owner_token: str
+    # ADR 0019: the owning session's PUBLIC handle, never its token. The agent
+    # authenticates itself with X-DryDocs-Agent-Key; this field only scopes.
+    owner_session: str
     cypher: str
     database: str
     params: dict = {}
@@ -229,44 +263,19 @@ def create_app(
     The default credential store RE-READS its file when it changes (O73), so
     adding or rotating a secret takes effect without restarting the server."""
     from fastapi import Depends, FastAPI, Header, HTTPException, Request, UploadFile
-    from fastapi.middleware.cors import CORSMiddleware
 
     app = FastAPI(
         title="drydocs-api", description="Thin read API over the knowledge graph (ADR 0005)"
     )
-    # The web console dev server is the only expected browser origin today.
-    # DRYDOCS_CORS_ORIGINS ADDS to this list and never replaces it, so unset means
-    # exactly the behaviour this line has always had. It exists because a hardcoded
-    # allowlist makes the console untestable on any other port, and the O80
-    # end-to-end suite needs its own so it never adopts or collides with a dev
-    # server somebody is already running.
-    #
-    # O85 — WHY 5199 IS IN THE BUILT-IN LIST, and why the ledger was not "fixed"
-    # instead. config/taxonomy/ui-tests.yaml cites `Vite :5199` in five `source`
-    # fields (O64, O65, O66), because five real verifications ran there: the
-    # standard port was taken by another dev server, so the fallback became the
-    # documented one and the allowlist never heard about it. Those source fields
-    # are a RECORD OF WHAT HAPPENED. Editing them to name a port the API already
-    # served would make a true record false to spare a config change, which is
-    # the wrong direction — so the config moved.
-    #
-    # AND NO `allow_origin_regex` FOR localhost, which is the tempting fix and is
-    # refused deliberately: "any port on this machine" is a materially wider trust
-    # boundary than "these named ports", it would be adopted here without a gate,
-    # and DRYDOCS_CORS_ORIGINS already covers the one-off case declaratively — the
-    # O80 suite and O59's live verification both used it rather than needing one.
-    extra_origins, _ = resolve_optional("DRYDOCS_CORS_ORIGINS", where="create_app()")
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=[
-            "http://localhost:5173",  # vite dev
-            "http://localhost:4173",  # vite preview
-            "http://localhost:5199",  # the ui-tests ledger's documented verification port
-            *[o.strip() for o in (extra_origins or "").split(",") if o.strip()],
-        ],
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+    # NO CORS MIDDLEWARE, on purpose (ADR 0020, WEB10). The console is same-origin
+    # with this API in every environment: a reverse proxy -- Vite's own in dev and
+    # preview, O72's in the Compose stack -- serves the page and forwards `/api/*`
+    # here with the prefix stripped, so no browser ever sends a cross-origin request
+    # and there is no allowlist to keep current. The allowlist that stood here from
+    # O69 drifted unobserved until 2026-08-30 (a documented verification port it
+    # never named); an allowlist that cannot drift is one that does not exist.
+    # DRYDOCS_CORS_ORIGINS is retired with it. A cross-origin caller is a deployment
+    # defect this API refuses by default rather than a case to configure for.
 
     sessions = store if store is not None else InMemorySessionStore()
     graph = runner if runner is not None else LiveRunner()
@@ -324,7 +333,7 @@ def create_app(
             path = getattr(route, "path", request.url.path)
             try:
                 with audit.observe(
-                    path, token=user.token, run_id=request.headers.get("x-drydocs-run-id")
+                    path, token=user.session_id, run_id=request.headers.get("x-drydocs-run-id")
                 ):
                     raise exc
             except Forbidden:
@@ -341,6 +350,15 @@ def create_app(
     @app.get("/health")
     def health() -> HealthOut:
         return HealthOut(status="ok")
+
+    # ADR 0020: the per-environment values the console needs at RUNTIME, served
+    # unauthenticated because none is a secret and the page has to read them
+    # before anyone signs in. This route is the only place a deployment fact
+    # reaches the bundle -- the build inlines none (the dist guard checks).
+    @app.get("/config")
+    def config() -> ConfigOut:
+        template, _ = resolve_optional("DRYDOCS_RUNTIME_VIEW_URL_TEMPLATE", where="GET /config")
+        return ConfigOut(runtime_view_url_template=template or None)
 
     # O58 — the doc-corpus reconciliation, as a NAMED SERVER-SIDE READ.
     #
@@ -363,7 +381,7 @@ def create_app(
     # is a delta against a declaration, and an end user reads "wrong-db" as
     # breakage rather than as the governance signal it is.
     @app.get("/docs-verify")
-    def get_docs_verify(user: CurrentUser) -> dict[str, object]:
+    def get_docs_verify(user: CurrentUser) -> CorpusStatusOut:
         # BOTH roles, because require_role is an exact membership test, not a
         # ranking — `require_role(user, "steward")` refuses an ADMIN, which is
         # never what an SME-surface gate means here. This is the server-side
@@ -420,7 +438,7 @@ def create_app(
     ) -> NamedRunOut:
         try:
             with audit.observe(
-                "/query/{query_id}", token=user.token, run_id=x_drydocs_run_id
+                "/query/{query_id}", token=user.session_id, run_id=x_drydocs_run_id
             ) as rec:
                 rec.query_id = query_id
                 rec.params = body.params
@@ -446,7 +464,9 @@ def create_app(
         x_drydocs_run_id: str | None = Header(default=None),
     ) -> NamedRunOut:
         try:
-            with audit.observe("/raw-cypher", token=user.token, run_id=x_drydocs_run_id) as rec:
+            with audit.observe(
+                "/raw-cypher", token=user.session_id, run_id=x_drydocs_run_id
+            ) as rec:
                 rec.cypher = body.cypher  # debug tier only; the api line cannot carry it
                 out = run_raw(body.cypher, user.token, sessions, graph)
                 rec.database = str(out["database"])
@@ -475,13 +495,15 @@ def create_app(
         body: EphemeralRegisterBody,
         x_drydocs_agent_key: str | None = Header(default=None),
         x_drydocs_run_id: str | None = Header(default=None),
-    ) -> dict[str, object]:
+    ) -> EphemeralRegisterOut:
         # Audited even though it executes nothing: the Cypher ENTERS the system
         # here, and it is the route the QA agent's run_id arrives on (ruling D).
-        # The actor is the OWNER session the ref is scoped to.
+        # The actor is the OWNER session the ref is scoped to -- its handle,
+        # which is what every other route records too (ADR 0019), so the
+        # registration and the later run/export join on one actor value.
         try:
             with audit.observe(
-                "/specs/ephemeral", token=body.owner_token, run_id=x_drydocs_run_id
+                "/specs/ephemeral", token=body.owner_session, run_id=x_drydocs_run_id
             ) as rec:
                 rec.cypher = body.cypher
                 rec.params = body.params
@@ -489,7 +511,7 @@ def create_app(
                 out = register_ephemeral(
                     x_drydocs_agent_key,
                     os.environ.get("DRYDOCS_AGENT_REG_KEY"),
-                    body.owner_token,
+                    body.owner_session,
                     body.cypher,
                     body.database,
                     body.params,
@@ -518,7 +540,7 @@ def create_app(
     ) -> SpecRunOut:
         try:
             with audit.observe(
-                "/specs/{spec_id}/run", token=user.token, run_id=x_drydocs_run_id
+                "/specs/{spec_id}/run", token=user.session_id, run_id=x_drydocs_run_id
             ) as rec:
                 rec.spec_id = spec_id
                 rec.params = body.params
@@ -536,7 +558,7 @@ def create_app(
     @app.post("/specs/{spec_id}/export")
     def post_spec_export(
         spec_id: str,
-        body: QueryBody,
+        body: ExportBody,
         user: CurrentUser,
         format: str = "csv",
         x_drydocs_run_id: str | None = Header(default=None),
@@ -549,7 +571,7 @@ def create_app(
             # MANIFEST's fact (it registers when the download completes). A
             # failure after streaming starts is the manifest's to reveal.
             with audit.observe(
-                "/specs/{spec_id}/export", token=user.token, run_id=x_drydocs_run_id
+                "/specs/{spec_id}/export", token=user.session_id, run_id=x_drydocs_run_id
             ) as rec:
                 rec.spec_id = spec_id
                 rec.params = body.params
@@ -562,9 +584,14 @@ def create_app(
                     graph,
                     export_ledger,
                     ephemerals=ephemerals,
+                    limit=body.limit,
                 )
                 rec.detail["export_id"] = job.export_id
                 rec.detail["format"] = format
+                if body.limit is not None:
+                    # A raised ceiling is a deliberate act on a governed
+                    # artifact; the audit line is where that belongs.
+                    rec.detail["limit"] = body.limit
         except InvalidTokenError:
             raise HTTPException(401, "invalid session") from None
         except UnknownSpecError:
@@ -627,7 +654,7 @@ def create_app(
             raise HTTPException(409, str(exc)) from None
 
     @app.post("/intake")
-    def post_intake(body: IntakeCreateBody, user: CurrentUser) -> dict[str, object]:
+    def post_intake(body: IntakeCreateBody, user: CurrentUser) -> IntakeRecordOut:
         return _intake_call(
             create_intake,
             body.context_type,
@@ -637,15 +664,15 @@ def create_app(
             sessions,
             intake_store,
             audit_route="/intake",
-            audit_token=user.token,
+            audit_token=user.session_id,
         )
 
     @app.get("/intake")
-    def get_intakes(user: CurrentUser) -> dict[str, object]:
+    def get_intakes(user: CurrentUser) -> IntakeListOut:
         return _intake_call(list_intakes, user.token, sessions, intake_store)
 
     @app.get("/intake/{intake_id}")
-    def get_one_intake(intake_id: str, user: CurrentUser) -> dict[str, object]:
+    def get_one_intake(intake_id: str, user: CurrentUser) -> IntakeRecordOut:
         return _intake_call(get_intake, intake_id, user.token, sessions, intake_store)
 
     @app.post("/intake/{intake_id}/evidence")
@@ -653,7 +680,7 @@ def create_app(
         intake_id: str,
         files: list[UploadFile],
         user: CurrentUser,
-    ) -> dict[str, object]:
+    ) -> IntakeEvidenceOut:
         out: dict[str, object] = {}
         for f in files:
             data = await f.read()
@@ -666,7 +693,7 @@ def create_app(
                 sessions,
                 intake_store,
                 audit_route="/intake/{intake_id}/evidence",
-                audit_token=user.token,
+                audit_token=user.session_id,
             )
         return out
 
@@ -675,7 +702,7 @@ def create_app(
         intake_id: str,
         body: IntakeTransitionBody,
         user: CurrentUser,
-    ) -> dict[str, object]:
+    ) -> IntakeRecordOut:
         return _intake_call(
             intake_transition,
             intake_id,
@@ -685,7 +712,7 @@ def create_app(
             sessions,
             intake_store,
             audit_route="/intake/{intake_id}/transition",
-            audit_token=user.token,
+            audit_token=user.session_id,
         )
 
     @app.post("/intake/{intake_id}/thread-decision")
@@ -693,7 +720,7 @@ def create_app(
         intake_id: str,
         body: ThreadDecisionBody,
         user: CurrentUser,
-    ) -> dict[str, object]:
+    ) -> IntakeRecordOut:
         return _intake_call(
             thread_decision,
             intake_id,
@@ -702,7 +729,7 @@ def create_app(
             sessions,
             intake_store,
             audit_route="/intake/{intake_id}/thread-decision",
-            audit_token=user.token,
+            audit_token=user.session_id,
         )
 
     # ── O13 mapping stewardship (plan M2) — reads from the mapping-store
@@ -731,19 +758,19 @@ def create_app(
             raise HTTPException(422, str(exc)) from None
 
     @app.get("/mappings/domains")
-    def get_domains(user: CurrentUser) -> dict[str, object]:
+    def get_domains(user: CurrentUser) -> MappingDomainsOut:
         return _mapping_call(list_domains, user.token, sessions)
 
     @app.get("/mappings/grid/{domain_id}")
-    def get_grid(domain_id: str, user: CurrentUser) -> dict[str, object]:
+    def get_grid(domain_id: str, user: CurrentUser) -> MappingGridOut:
         return _mapping_call(mapping_grid, domain_id, user.token, sessions, mapping_store)
 
     @app.get("/mappings/options")
-    def get_options(user: CurrentUser) -> dict[str, object]:
+    def get_options(user: CurrentUser) -> MappingOptionsOut:
         return _mapping_call(mapping_options, user.token, sessions, mapping_store)
 
     @app.post("/mappings/changeset")
-    def post_changeset(body: ChangesetBody, user: CurrentUser) -> dict[str, object]:
+    def post_changeset(body: ChangesetBody, user: CurrentUser) -> ChangesetArtifactOut:
         return _mapping_call(draft_changeset, body.entries, user.token, sessions, mapping_store)
 
     # ── O24 SEAL-contact overrides (ui-write-surface gate SME-3, M2 tier),
@@ -751,7 +778,7 @@ def create_app(
     # returns a receipt; promotion emits the diff to apply on a branch. The
     # server still writes no committed file — git is the only commit target. ──
     @app.post("/mappings/overrides/draft")
-    def post_override_draft(body: ChangesetBody, user: CurrentUser) -> dict[str, object]:
+    def post_override_draft(body: ChangesetBody, user: CurrentUser) -> DraftReceiptOut:
         return _mapping_call(
             draft_override,
             body.entries,
@@ -760,15 +787,15 @@ def create_app(
             mapping_store,
             draft_id=body.draft_id,
             audit_route="/mappings/overrides/draft",
-            audit_token=user.token,
+            audit_token=user.session_id,
         )
 
     @app.get("/mappings/drafts")
-    def get_drafts(user: CurrentUser, domain: str | None = None) -> dict[str, object]:
+    def get_drafts(user: CurrentUser, domain: str | None = None) -> OpenDraftsOut:
         return _mapping_call(list_drafts, user.token, sessions, mapping_store, domain)
 
     @app.post("/mappings/drafts/{draft_id}/promote")
-    def post_promote_draft(draft_id: str, user: CurrentUser) -> dict[str, object]:
+    def post_promote_draft(draft_id: str, user: CurrentUser) -> PromotedDiffOut:
         return _mapping_call(
             promote_draft,
             draft_id,
@@ -776,15 +803,15 @@ def create_app(
             sessions,
             mapping_store,
             audit_route="/mappings/drafts/{draft_id}/promote",
-            audit_token=user.token,
+            audit_token=user.session_id,
         )
 
     @app.get("/mappings/overrides/report")
-    def get_override_report(user: CurrentUser) -> dict[str, object]:
+    def get_override_report(user: CurrentUser) -> CorrectionsReportOut:
         return _mapping_call(source_corrections_report, user.token, sessions, mapping_store)
 
     @app.get("/mappings/pending/report")
-    def get_pending_report(user: CurrentUser) -> dict[str, object]:
+    def get_pending_report(user: CurrentUser) -> PendingCorrectionsReportOut:
         # N14: the union report. The email rider count is a GRAPH read
         # (docs.email-unassigned.v1, Q21); the report itself must render with
         # no graph in reach, so an unreachable graph degrades to the explicit
@@ -814,7 +841,7 @@ def create_app(
     # artifact is the COMPLETE updated committed file. Server writes nothing;
     # the K8 loader stays the only graph writer (§E3). ──
     @app.post("/mappings/app-code/draft")
-    def post_app_code_draft(body: ChangesetBody, user: CurrentUser) -> dict[str, object]:
+    def post_app_code_draft(body: ChangesetBody, user: CurrentUser) -> DraftReceiptOut:
         return _mapping_call(
             draft_app_code_mapping,
             body.entries,
@@ -822,7 +849,7 @@ def create_app(
             sessions,
             mapping_store,
             audit_route="/mappings/app-code/draft",
-            audit_token=user.token,
+            audit_token=user.session_id,
         )
 
     # K7 §B2 tier-3 readback (lifted from wip/k9-laptop at J30): dual-coded was
@@ -831,8 +858,23 @@ def create_app(
     @app.get("/mappings/app-code/migrations")
     def get_app_code_migrations(
         user: CurrentUser,
-    ) -> dict[str, object]:
+    ) -> AppCodeMigrationsOut:
         return _mapping_call(app_code_migration_report, user.token, sessions, mapping_store)
+
+    # O68: the log estate — per declared kind and zone, the directory, the file
+    # count, the size and the declared retention. ADMIN ONLY: it names real
+    # paths on the host's disk, which is operational detail and not something a
+    # user-tier persona is asking for. The payload is shaped in
+    # drydocs_api/log_estate.py and COMPUTED in drydocs_core — clause (b) puts
+    # the byte sum in core so a second walker cannot disagree with the first.
+    #
+    # It reports the api-debug kind's size and retention like any other kind's
+    # and cannot return its CONTENTS: there is no parameter here that names a
+    # file, because capturing Cypher text is ruled (ADR 0014 clause 6) and
+    # surfacing it is not (clause c).
+    @app.get("/admin/log-estate")
+    def get_log_estate(user: AdminUser) -> LogEstateOut:
+        return log_estate()
 
     # Dev-mode demo page (same-origin, so no CORS surface): the live-data twin
     # of docs/design/ui-exploration/wf-mapping-01.html until the O8 React shell exists.

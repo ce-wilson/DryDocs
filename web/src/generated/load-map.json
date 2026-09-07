@@ -371,6 +371,27 @@
       "taxonomy_captures": [
         "config/taxonomy/server-location.yaml"
       ]
+    },
+    {
+      "id": "mfts",
+      "name": "MFTS (managed file transfer platform; Axway SecureTransport)",
+      "layer": "technology",
+      "classification": "Internal",
+      "taxonomy_captures": []
+    },
+    {
+      "id": "filemover",
+      "name": "FileMover (legacy file-transfer surface; replaced by OneMFT)",
+      "layer": "technology",
+      "classification": "Internal",
+      "taxonomy_captures": []
+    },
+    {
+      "id": "onemft",
+      "name": "OneMFT (current file-transfer surface; FileMover's successor)",
+      "layer": "technology",
+      "classification": "Internal",
+      "taxonomy_captures": []
     }
   ],
   "sources": [

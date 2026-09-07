@@ -26,6 +26,9 @@
 # If you need a real id/name to make a point, the file belongs in internal/.
 # =============================================================================
 
+schema: drydocs.business-application.v1
+updated: 2026-08-26
+
 taxonomy: business-application
 domain: business
 taxonomy_path_root: business/application

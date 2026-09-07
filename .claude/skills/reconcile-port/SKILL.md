@@ -71,9 +71,23 @@ the accumulated lessons from prior ports. Read both.
    reason it stays behind. Exit 2 = a side could not be read, which is a FAILURE and
    never "no difference": the tombstone `docs/restructure/backlog.yaml` has no
    `items` key, so a check aimed there would compare two empty sets and pass for
-   being wrong. Paste the printed block into the port report. This covers the UNION
+   being wrong. Paste the printed block into the port report, INCLUDING the command
+   line with its `--producer-ref <tag>`: on the 0902 apply this step was skipped (or run
+   against a stale ref) and nothing in the report showed it, so 99 prior-port items went
+   missing until the 0905 apply's union check found them. A report whose union block
+   does not name the ref it ran against has not run the union. This covers the UNION
    half only — the status-regression half is the J16 before/after guard above.
-6. **Don't push.** Write a port report (template below) and stop.
+6. **CHECK THE VENUE EDITS (PLAN4).** Producer entries get EDITED at a company apply (and
+   company entries at a back-flow), and the rule for an entry the running venue does not own is
+   additive-and-stamped: the old text survives verbatim as a prefix, additions carry
+   `[<venue> YYYY-MM-DD]`, the inbox state token is the owner's (a non-owner appends a stamped
+   `proposed: closed - <why>; see <ref>` line). Item-file `status` is venue-local and out of scope.
+   Run it from this repo against the base you ported from:
+   `python .claude/skills/groom-backlog/validate.py --check-venue-edits --base <previous port base>`
+   Exit 0 = every touched foreign entry is a stamped append. Exit 1 names each REWRITE, UNSTAMPED
+   append and STATE FLIP; restore the old text as the prefix and stamp what you added. The venue is
+   read from `config/dev-environment.yaml` `edition:` (yours), so the check knows which side it is on.
+7. **Don't push.** Write a port report (template below) and stop.
 
 ## Encoding trap (company send-back, PORT-REPORT-ae21ee4, 2026-08-10)
 
@@ -331,7 +345,48 @@ stay skipped — confirm with the operator if a new one appears.
   governance, `pat_product_owners`, and the `products` step-2a supplement fields — all ride
   C27's trigger.
 
+## Apply rules from the company's 2026-09-05 close-out (port-base-20260902)
+
+Three mistakes the company made and caught on the 2026-09-02..05 apply, kept here as
+rules because each cost a revert (their words, lightly shortened):
+
+1. **A per-entry file is never a wholesale take.** `config/taxonomy/software-registry.yaml`
+   taken whole dropped a company-owned row; the manifest's per-entry row and its
+   `entry_rule` are the take. Read the row before touching the file.
+2. **Run the affected suites BEFORE a package-level take.** A take of
+   `drydocs_api/{app,handlers,sessions,personas}` moved the suite from 21 failures to 102
+   and was reverted. `drydocs_api/**` is `default_ok` - "hand-merge on collision" - and
+   that is not "take the package".
+3. **For a themed sweep, apply the DELTA; take whole files only from the certified tag.**
+   Extracting whole files from a mid-range commit (the acronym sweep) regressed
+   `PORT-MANIFEST.yaml` past a later manifest commit, dropped a `.gitignore` entry, and
+   pulled in an unrelated gate-bound map row. A mid-range commit's file is the tree at
+   that commit and carries every earlier commit with it.
+
+**Acceptance is a set-compare, never a count.** The method that closed the range: run
+`pytest tests/unit --lf -q --tb=no` on the branch; `git worktree add --detach <tmp>
+<main-sha>` and run the same suite there with the MAIN repo's interpreter (the worktree
+has no venv of its own); compare the two failure lists as SETS (`Compare-Object` on
+PowerShell, `comm -3` on sorted lists elsewhere). Identical sets close the range; a
+matching COUNT proves nothing - 16 matched 16 on the software registry with a different
+row standing in (seventeenth postscript). Name any order-dependent test that moves the
+full-run count.
+
 ## Track-1 acceptance (the contract)
+
+**Two lines the PORT-REPORT must carry verbatim, or the range is not closed (2026-09-05):**
+
+1. the backlog-union block (step 5) **with the command line that produced it**, so the
+   report shows `--producer-ref port-base-YYYYMMDD` — the tag this range was ported from,
+   not an older one and not `HEAD`;
+2. the before-dir line from `scripts/reconcile_before.py --describe <before-dir>` — the
+   `BASE.sha`, its date, and how many commits behind `HEAD` it sits — taken AFTER the
+   guard run in step 3, so it describes the before-dir the guards actually read.
+
+Both exist because a skipped step used to leave NO trace: the 0902 apply's report had a
+union result with no ref named (99 items missing, found one apply later) and a guard run
+against a before-dir nobody could date (a phantom 22nd baseline failure). A blank where
+one of these lines belongs is now visible as a blank.
 
 Run as a SINGLE line (multi-line `\` continuations break in some agent shells):
 
@@ -364,29 +419,31 @@ entries, gate-log append-only. Use them to PROVE the merge respected the rules
 instead of eyeballing:
 
 ```
-# 1. BEFORE applying the port — snapshot the consumer copies.
-# The one-liners below use chr(10), not a backslash-n literal: an escaped newline inside a -c string
-# was rendered as a real line break once (2026-09-02, the company's chunk-1 apply) and the
-# two J51 lines failed as written. tests/unit/test_reconcile_port_skill_snapshot.py runs
-# every one of them, so a mangled line fails here before it fails at the consumer.
+# 1. BEFORE applying the port, on a CLEAN checkout - ONE call writes every snapshot AND the stamp.
+# It writes the four mandatory files (the S5 registries as their MERGED documents, the ADR 0013
+# backlog as its ASSEMBLED document, gate-log.md byte-for-byte), the two optional J51 lists where
+# their modules import, and BASE.sha: the commit this tree was at. It REFUSES a dirty source - a
+# stamp over an uncommitted edit names a commit the snapshot is not. Until 2026-09-05 this step was
+# six one-liners; a partly-run step 1 was a partly armed guard, and nothing said which half ran.
+# tests/unit/test_reconcile_port_skill_snapshot.py runs this exact line, so it cannot go stale here
+# before it fails at the consumer.
 # $env:TEMP is fine for a same-day apply; a MULTI-DAY apply (the chunked workplan) should
-# point TEMP at a directory that survives a reboot, because the before-state cannot be
+# point it at a directory that survives a reboot, because the before-state cannot be
 # re-taken after a slice lands.
-mkdir "$env:TEMP/reconcile-before"
-cp config/gate-log.md "$env:TEMP/reconcile-before/"
-# ADR 0013: the backlog is a sharded TREE — snapshot the ASSEMBLED document under the old name:
-poetry run python -c "from pathlib import Path; import os; from drydocs_core.backlog_store import dump_document; (Path(os.environ['TEMP'])/'reconcile-before'/'backlog.yaml').write_text(dump_document(), encoding='utf-8')"
-# J51 (optional, arms two no-drop guards): the list-shaped per-entry files — detector ids and exemption keys
-poetry run python -c "import os; from pathlib import Path; from drydocs_remediation import detect; d=Path(os.environ['TEMP'])/'reconcile-before'; (d/'detect-rule-ids.txt').write_text(chr(10).join(detect.CONFORMANCE_RULE_IDS), encoding='utf-8')"
-poetry run python -c "import os, importlib; from pathlib import Path; m=importlib.import_module('tests.unit.test_runbook_currency'); d=Path(os.environ['TEMP'])/'reconcile-before'; (d/'runbook-exemption-keys.txt').write_text(chr(10).join(f'{t}:{k}' for t in ('HISTORICAL_PATHS','FOREIGN_PATHS','DEFERRED_VERBS') for k in sorted(getattr(m,t,{}) or {})), encoding='utf-8')"
-# S5: the two registries are fragment DIRECTORIES — snapshot the MERGED documents:
-poetry run python -c "from pathlib import Path; import os; from drydocs_core import yaml_fragments as yf; d = Path(os.environ['TEMP'])/'reconcile-before'; (d/'relationship_vocabulary.yaml').write_text(yf.merged_text('drydocs_core/ontology/relationship_vocabulary'), encoding='utf-8'); (d/'taxonomy-ontology-map.yaml').write_text(yf.merged_text('config/taxonomy-ontology-map'), encoding='utf-8')"
+poetry run python scripts/reconcile_before.py "$env:TEMP/reconcile-before"
 
 # 2. apply the range / resolve collisions as usual
 
-# 3. AFTER — the guards fail on any downgrade, dropped entry, or audit truncation
+# 3. AFTER — the guards fail on any downgrade, dropped entry, or audit truncation, and FIRST
+# on a before-dir that cannot prove it describes this tree: no BASE.sha, a sha that does not
+# resolve here, one that is not an ancestor of HEAD, a gate-log.md that differs from
+# `git show <sha>:config/gate-log.md`, or a sha that is not where this branch left main
+# (the 2026-09-05 case - a before-dir from the EARLIER apply outlived a skipped step 4 and
+# produced a 22nd baseline failure that was the instrument, not the subject; J76).
 $env:RECONCILE_BEFORE_DIR = "$env:TEMP/reconcile-before"
 poetry run pytest tests/unit/test_port_reconcile_guards.py -q
+# ...and the line the PORT-REPORT carries (sha, date, commits behind HEAD) - paste it verbatim:
+poetry run python scripts/reconcile_before.py --describe "$env:TEMP/reconcile-before"
 
 # 4. TEARDOWN — clear the variable and drop the snapshot. Do not skip this.
 Remove-Item Env:RECONCILE_BEFORE_DIR
@@ -402,7 +459,8 @@ the cheap fix is still to not leave it set.
 
 With `RECONCILE_BEFORE_DIR` **unset** the live checks skip and only the
 fixture-driven mechanics run — so the file is safe in every CI. **Set but
-unusable** (missing dir, or a snapshot short of all four files) FAILS rather than
+unusable** (missing dir, a snapshot short of all four files, or a snapshot whose
+`BASE.sha` cannot vouch for it) FAILS rather than
 skips, deliberately: a set variable claims the port's safety check is armed, and
 silently skipping it would report green on an unchecked merge. The pyproject
 version-string rule is asserted separately in `test_port_manifest.py` (keep the
@@ -447,7 +505,8 @@ Port Report: cewilson/main -> <company>/main
 - What conflicted + resolution: <per collision ledger>
 - What was skipped: <commits + why>
 - Track-1 result: <N passed, 3 skipped, 0 failed>
-- Backlog union (J42): <paste the scripts/port_backlog_union.py block — producer/consumer counts, missing ids, accepted differences, PASS|FAIL>
+- Backlog union (J42): <paste the scripts/port_backlog_union.py block WITH its command line — the --producer-ref <tag> it ran against, producer/consumer counts, missing ids, accepted differences, PASS|FAIL>
+- Reconcile guards (J7): <paste `scripts/reconcile_before.py --describe <before-dir>` — BASE.sha, date, commits behind HEAD — and the guard run's pass/fail>
 - Track-2 status: <ran/blocked + CM_DEF_SETVAR_VW finding>
 - State: branch ahead of <company>/main by N; NOT pushed; backup tag pre-cewilson-port
 - New divergences observed: <add to the ledger if any>

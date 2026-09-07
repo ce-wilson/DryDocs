@@ -12,12 +12,20 @@ import os
 import neo4j
 from dotenv import dotenv_values, load_dotenv
 
+from common.env_merge import apply_fallbacks, drop_blank_placeholders
+
 _AGENTS_ENV = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".env"))
 _ROOT_ENV = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".env"))
+
+# G131: agents/.env first, repo-root .env as the fallback — with the blank-line
+# trap removed rather than commented. A blank `NEO4J_PASSWORD=` in agents/.env
+# used to SET that name to the empty string, and the fallback only survived it
+# because `not ""` is true; writing that guard as the membership test it looks
+# like would have given the whole tier an empty password, silently. The rules
+# live in common/env_merge.py with the reason attached to each.
 load_dotenv(_AGENTS_ENV)
-for _name, _value in dotenv_values(_ROOT_ENV).items():
-    if _value and not os.getenv(_name):
-        os.environ[_name] = _value
+drop_blank_placeholders(dotenv_values(_AGENTS_ENV), os.environ)
+apply_fallbacks(dotenv_values(_ROOT_ENV), os.environ)
 
 _driver: neo4j.Driver | None = None
 

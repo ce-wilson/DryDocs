@@ -24,6 +24,8 @@
 # 2025 edition as corroboration where checked.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-27
+
 id: business-layer-org-structure
 title: "SME Gate — the business-layer org structure: what class a segment is, whether a re-org is a node, and one dating idiom instead of two"
 step: "The business-layer experiment (2026-08-08) proved the W3C ORG ontology produces a coherent org view from public sources alone — org units, an effective-dated reorg, a legal-entity split the prose blurs. G98 then signed the corporate backbone (Company, two dated segment edges). This page puts the four questions that remain OPEN after both: the segment's ORG class, reifying the reorg event, converging on one as-of idiom, and the legal-entity layer. Location is explicitly out of scope — it rides Z2."

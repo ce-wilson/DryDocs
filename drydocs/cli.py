@@ -132,6 +132,7 @@ from .cli_shared import (
     chain_steps,
     console,
     load_profile,
+    register_loaders,
     step_profiles,
     step_sources,
     unchained_loaders,
@@ -165,6 +166,7 @@ __all__ = [
     "COMMAND_LOADERS",
     "AD_HOC_COMMANDS",
     "UNCHAINED_LOADER_EXCLUSIONS",
+    "register_loaders",
     "GENERATED_SAMPLE_FILES",
     "LoadStep",
     "DERIVED",
@@ -415,6 +417,402 @@ def lineage_review(
     console.print(f"coverage: {coverage.summary()}")
 
 
+#: LIN1 (b), tightened at the review: each hop's explicit input must sit inside THAT
+#: hop's declared zone, not merely inside some read zone - a jobs CSV under dpl-mac/
+#: is a misfiled file, not an acquisition route. Keyed by the option name; the
+#: values are zone ids from config/data-zones.yaml and the source registry.
+LINEAGE_INPUT_ZONES: dict[str, tuple[str, ...]] = {
+    "jobs": ("controlm-exports",),
+    "variables": ("controlm-exports",),
+    "mac-root": ("dpl-mac",),
+    "registry-root": ("dpl:pipeline-registry", "dpl:dataset-registry"),
+    "glue": ("glue-inventory",),
+}
+
+
+def _zoned_or_refuse(path: Path | None, *, what: str) -> Path | None:
+    """LIN1 (b): an explicit lineage input resolves inside ITS hop's declared READ zone
+    or the run refuses (G81/G121) - no override flag, because a side door here is the
+    undeclared acquisition route those two items closed. ``None`` passes through:
+    the caller resolves the declared default for that hop."""
+    if path is None:
+        return None
+    from drydocs_core.data_zones import read_zone_containing
+
+    expected = LINEAGE_INPUT_ZONES[what]
+    try:
+        zone = read_zone_containing(path)
+    except DataRootNotSetError as exc:
+        console.print(f"[red]{exc}[/]")
+        raise typer.Exit(2) from None
+    if zone is None or zone.id not in expected:
+        where = (
+            f"inside read zone {zone.id!r}, which is not this hop's"
+            if zone is not None
+            else "outside every declared read zone"
+        )
+        console.print(
+            f"[red]REFUSED: --{what} {path} is {where}.[/] "
+            f"An acquisition route is declared or it does not run (G121): --{what} reads "
+            f"from {' or '.join(expected)} (`drydocs landing-zones` shows where that is on "
+            "this machine). Land the file there, or declare a zone in config/data-zones.yaml."
+        )
+        raise typer.Exit(2)
+    return path
+
+
+def _declared_default(helper) -> Path | None:
+    """The declared zone a hop reads when no path is given. Returned whether or not
+    the directory exists: the staging records the path and says absent, so the
+    artifact shows the hop was ASKED and had nothing (G11, one level up)."""
+    try:
+        return helper()
+    except DataRootNotSetError:
+        return None
+
+
+@app.command(name="lineage-extract")
+def lineage_extract(
+    jobs: Path | None = typer.Option(
+        None,
+        "--jobs",
+        help=(
+            "Control-M jobs CSV export (or a directory holding one). Must sit inside a "
+            "declared read zone. Default: the bundled package samples - a dev run."
+        ),
+    ),
+    variables: Path | None = typer.Option(
+        None,
+        "--variables",
+        help="Control-M variables CSV (PRECMD/POSTCMD shell text, G60). Default: beside --jobs, "
+        "or the bundled sample with the default jobs.",
+    ),
+    mac_root: Path | None = typer.Option(
+        None,
+        "--mac-root",
+        help="DPL Metadata-As-Code root (promotion-repo clone or staged sets). Default: the "
+        "declared dpl-mac/ zone; skipped and counted when empty.",
+    ),
+    registry_root: Path | None = typer.Option(
+        None,
+        "--registry-root",
+        help="DPL registry landing zone (per-SEAL Swagger JSON). Default: the declared "
+        "dpl-registry/ zone; skipped and counted when empty.",
+    ),
+    glue: Path | None = typer.Option(
+        None,
+        "--glue",
+        help="AWS Glue base-table inventory CSV. Default: the declared glue-inventory/ zone; "
+        "skipped and counted when empty.",
+    ),
+    out_dir: Path | None = typer.Option(
+        None,
+        "--out-dir",
+        help="Where the staged artifact lands. Default: the declared lineage/staged/ write "
+        "zone under DRYDOCS_DATA_ROOT.",
+    ),
+    keep: int = typer.Option(
+        10,
+        "--keep",
+        help="Retention of the staged zone (LIN2): after a successful write keep the newest "
+        "N artifacts and prune the rest; 0 keeps everything. The load never deletes.",
+    ),
+) -> None:
+    """Run the lineage chain's extractors and stage ONE artifact (LIN1).
+
+    Hop 1 (job -> ETL tool: DPL pipeline id, Ab Initio pset; INVOKES / USES_ARTIFACT
+    and the CMD_LINE file ops) is required; hop 2a (DPL MAC + registry) and hop 3
+    (Glue placements) run when their declared zone holds something and are skipped
+    AND COUNTED when it does not. Every explicit path must sit inside a declared
+    read zone (G121) - there is no override. The artifact is what `lineage-load`
+    and `lineage-review` read; nothing here touches the graph.
+    """
+    from drydocs_core.data_root import (
+        dpl_mac_dir,
+        dpl_registry_dir,
+        glue_inventory_dir,
+        lineage_staged_dir,
+    )
+    from drydocs_lineage.staging import (
+        StagingError,
+        prune_staged,
+        stage_chain,
+        write_artifact,
+    )
+
+    acquisition: dict[str, str] = {}
+    if jobs is None:
+        jobs = DEFAULT_SAMPLES_DIR / "controlm_jobs__sample.csv"
+        acquisition["jobs"] = "bundled-samples"
+        if variables is None:
+            # The variables sample is MACHINE-LOCAL (drydocs/data/ is ignored; only the
+            # named samples are force-tracked, and this one is not), so a fresh checkout
+            # runs hop 1 without PRECMD/POSTCMD text. The staging records it absent.
+            variables = DEFAULT_SAMPLES_DIR / "controlm_variables__sample.csv"
+            acquisition["variables"] = (
+                "bundled-samples" if variables.exists() else "bundled-samples-absent"
+            )
+    else:
+        jobs = _zoned_or_refuse(jobs, what="jobs")
+        acquisition["jobs"] = "declared-zone"
+    variables = (
+        _zoned_or_refuse(variables, what="variables")
+        if "variables" not in acquisition
+        else variables
+    )
+    mac_root = _zoned_or_refuse(mac_root, what="mac-root") or _declared_default(dpl_mac_dir)
+    registry_root = _zoned_or_refuse(registry_root, what="registry-root") or _declared_default(
+        dpl_registry_dir
+    )
+    glue = _zoned_or_refuse(glue, what="glue") or _declared_default(glue_inventory_dir)
+
+    try:
+        out = out_dir if out_dir is not None else lineage_staged_dir(create=True)
+    except DataRootNotSetError as exc:
+        console.print(f"[red]{exc}[/]")
+        raise typer.Exit(2) from None
+    except ReadZoneWriteError as exc:
+        console.print(f"[red]{exc}[/]")
+        raise typer.Exit(2) from None
+    if out_dir is not None:
+        try:
+            from drydocs_core.data_root import refuse_write_into_read_zone
+
+            refuse_write_into_read_zone(out, action="write the lineage artifact")
+        except DataRootNotSetError:
+            pass  # an explicit --out-dir with no data root: nothing declared to collide with
+        except ReadZoneWriteError as exc:
+            console.print(f"[red]{exc}[/]")
+            raise typer.Exit(2) from None
+        out.mkdir(parents=True, exist_ok=True)
+
+    run_id = str(uuid.uuid4())
+    run_log = LoaderRunLog(
+        "lineage_extract.v1",
+        run_id,
+        source=str(jobs),
+        target=str(out),
+        meta={"acquisition": ", ".join(f"{k}={v}" for k, v in acquisition.items())},
+    )
+    run_log.open()
+    run_log.attach()
+    try:
+        staged = stage_chain(
+            jobs=jobs,
+            variables=variables,
+            mac_root=mac_root,
+            registry_root=registry_root,
+            glue_inventory=glue,
+        )
+        path = write_artifact(staged, out, run_id=run_id, acquisition=acquisition)
+    except StagingError as exc:
+        run_log.close(error=exc)
+        console.print(f"[red]{exc}[/]")
+        raise typer.Exit(2) from None
+    except Exception as exc:
+        run_log.close(error=exc)
+        raise
+    run_log.close(
+        summary={"sources": [s.as_dict() for s in staged.sources], "coverage": staged.coverage}
+    )
+    for line in staged.summary_lines():
+        console.print(line)
+    console.print(f"[green]wrote {path}[/] (run {run_id})")
+    pruned = prune_staged(out, keep=keep)
+    if pruned:
+        console.print(f"pruned {len(pruned)} older artifact(s) (--keep {keep})")
+
+
+@app.command(name="lineage-load")
+def lineage_load(
+    artifact: Path | None = typer.Argument(
+        None,
+        help="A staged lineage artifact (lineage-extract's output). Default: the NEWEST in "
+        "the declared lineage/staged/ zone.",
+    ),
+    confirmed: Path | None = typer.Option(
+        None,
+        "--confirmed",
+        help="The decisions file the lineage-review page exported "
+        "(drydocs.lineage-decisions.v1). Without it nothing is confirmed and nothing is "
+        "written: curation is the gate.",
+    ),
+    write: bool = typer.Option(
+        False,
+        "--write",
+        help="Run the plan against the ground-truth database (drydocs). Default: print the "
+        "plan and stop.",
+    ),
+) -> None:
+    """Plan - and with --write, load - the curated lineage into ground truth (LIN2).
+
+    Reads ONE staged artifact (the newest by default: the UTC stamp leads the file
+    name, so no file is opened to find it), rebuilds the LineageGraph, takes the
+    CONFIRMED rels from the review page's decisions file, runs the writer's
+    plan_curated and prints the plan: nodes by class, rels by label, the labels a
+    live load would refuse because the vocabulary is still planned, and the file-op
+    candidates that would drop. That is the default; it needs no database.
+
+    --write runs write_curated for the ACTIVE labels (scheduler_invokes,
+    scheduler_uses_artifact, scheduler_reads_from, scheduler_writes_to - gate
+    rua-load-shapes, G55). A planned label (scheduler_triggers) is refused by the
+    writer and the refusal is printed. The load names its extract: every node and
+    rel written carries the artifact's run id and code commit, and the :JobRun
+    carries the artifact's sources block (what the extractor actually read).
+    """
+    from drydocs_core.data_root import lineage_staged_dir
+    from drydocs_lineage.curation import DecisionsError, load_decisions
+    from drydocs_lineage.staging import is_dirty_commit, newest_artifact, read_artifact
+    from drydocs_lineage.writer import (
+        ExtractProvenance,
+        GateBoundVocabularyError,
+        TrustBoundaryError,
+        gate_bound_labels,
+        plan_curated,
+        unresolved_file_op_candidates,
+        write_curated,
+    )
+
+    if artifact is None:
+        try:
+            staged_dir = lineage_staged_dir()
+        except DataRootNotSetError as exc:
+            console.print(f"[red]{exc}[/]")
+            raise typer.Exit(2) from None
+        artifact = newest_artifact(staged_dir)
+        if artifact is None:
+            console.print(
+                f"[red]no staged lineage artifact in {staged_dir}[/] - run "
+                "`drydocs lineage-extract` first, or name an artifact."
+            )
+            raise typer.Exit(2)
+    if not artifact.is_file():
+        console.print(f"[red]artifact not found: {artifact}[/]")
+        raise typer.Exit(2)
+    try:
+        graph, header = read_artifact(artifact)
+    except (ValueError, KeyError, OSError) as exc:
+        console.print(f"[red]cannot read {artifact}: {exc}[/]")
+        raise typer.Exit(2) from None
+    provenance = ExtractProvenance.from_header(header, artifact=str(artifact))
+
+    # -- the extract this load names ---------------------------------------------
+    console.print(f"artifact  {artifact}")
+    console.print(f"extract   run {provenance.run_id}  captured {provenance.captured_at}")
+    dirty = (
+        "  [yellow]DIRTY TREE - staged from uncommitted code[/]"
+        if is_dirty_commit(provenance.code_commit)
+        else ""
+    )
+    console.print(f"code      {provenance.code_commit}{dirty}")
+    for src in header.get("sources") or []:
+        state = "present" if src.get("present") else "absent"
+        note = f"  ({src['note']})" if src.get("note") else ""
+        console.print(f"  {src.get('hop', '?'):<18} {state:<8} {src.get('path', '')}{note}")
+    st = graph.stats()
+    console.print(
+        f"graph     {st['processes']} processes, {st['data_assets']} data assets, "
+        f"{st['rels']} candidate rels"
+    )
+
+    # -- curation: the gate, not a flag -------------------------------------------
+    if confirmed is None:
+        confirmed_rels: set[tuple[str, str, str]] = set()
+        console.print(
+            "[yellow]no --confirmed decisions file: the confirmed set is EMPTY[/] - nothing "
+            "reaches ground truth uncurated. Export decisions from the lineage-review page."
+        )
+    else:
+        try:
+            decisions = load_decisions(confirmed)
+        except DecisionsError as exc:
+            console.print(f"[red]{exc}[/]")
+            raise typer.Exit(2) from None
+        stale = decisions.missing_from(graph.rels)
+        if stale:
+            console.print(
+                f"[red]{len(stale)} decision(s) name a rel this artifact does not carry[/] - "
+                "the page was rendered from another extract; re-render lineage-review from "
+                f"this artifact's sources and decide again. First: {stale[0]}"
+            )
+            raise typer.Exit(2)
+        confirmed_rels = set(decisions.confirmed)
+        console.print(
+            f"decisions {confirmed}: {len(decisions.confirmed)} confirmed, "
+            f"{len(decisions.rejected)} rejected, {len(decisions.proposed)} undecided; "
+            f"{len(graph.rels) - decisions.total} candidate(s) never decided"
+        )
+
+    # -- the plan ------------------------------------------------------------------
+    load_run_id = str(uuid.uuid4())
+    try:
+        plan = plan_curated(graph, confirmed_rels, provenance=provenance, load_run_id=load_run_id)
+    except ValueError as exc:
+        console.print(f"[red]cannot plan: {exc}[/]")
+        raise typer.Exit(2) from None
+    by_label: dict[str, int] = {}
+    for _src, rel_type, _dst in confirmed_rels:
+        by_label[rel_type] = by_label.get(rel_type, 0) + 1
+    console.print(
+        f"plan      nodes: {plan.scripts} Script, {plan.etl_processes} ETLProcess, "
+        f"{plan.assets} DataAsset; rels: {plan.rels} confirmed"
+        + ("".join(f", {n} {label}" for label, n in sorted(by_label.items())) or " (none)")
+    )
+    if plan.launchers or plan.payloads:
+        console.print(
+            f"          script roles: {plan.launchers} launcher, {plan.payloads} payload, "
+            f"{plan.scripts_unroled} unroled; {plan.uses_artifact_rels} USES_ARTIFACT"
+        )
+    refusals = gate_bound_labels(plan.rel_types)
+    for label, vid, status in refusals:
+        console.print(
+            f"[red]GATE-BOUND: {label} ({vid}) is {status}, not active[/] - a live load "
+            "refuses this label until the HITL gate flips it"
+        )
+    would_drop = unresolved_file_op_candidates(graph)
+    if plan.unresolved_file_ops or would_drop:
+        console.print(
+            f"[yellow]unresolved file-op candidates: {plan.unresolved_file_ops} in this plan, "
+            f"{len(would_drop)} in the artifact[/] (script-sourced READS_FROM/WRITES_TO with "
+            "no owning job - dropped and counted, never written)"
+        )
+    console.print(f"          {len(plan.statements)} statement(s) (load run {load_run_id})")
+
+    if not write:
+        console.print("[green]plan only[/] - pass --write to load against drydocs.")
+        return
+
+    # -- the load ------------------------------------------------------------------
+    if not confirmed_rels:
+        console.print("[yellow]nothing confirmed - nothing to write.[/]")
+        return
+    try:
+        with _client("drydocs") as client:
+            written = write_curated(
+                graph,
+                confirmed_rels,
+                client,
+                provenance=provenance,
+                run_id=load_run_id,
+            )
+    except GateBoundVocabularyError as exc:
+        console.print(f"[red]REFUSED: {exc}[/]")
+        raise typer.Exit(2) from None
+    except TrustBoundaryError as exc:
+        console.print(f"[red]REFUSED: {exc}[/]")
+        raise typer.Exit(2) from None
+    console.print(
+        f"[green]wrote {written} rel(s) to drydocs[/] (load run {load_run_id}; extract run "
+        f"{provenance.run_id})"
+    )
+    if written < len(confirmed_rels):
+        console.print(
+            f"[yellow]{len(confirmed_rels) - written} confirmed rel(s) not written[/] - a "
+            "ControlMJob endpoint is not in the graph (the M3 load owns those; run it first) "
+            "or a file-op candidate had no owning job (see the plan's unresolved count)."
+        )
+
+
 def _column_map(spec: str, *, required: tuple[str, ...], what: str) -> dict[str, str]:
     """Parse `role=HEADER,role=HEADER` into {role: header}.
 
@@ -648,7 +1046,8 @@ def profile_folder_set(
 # modules import drydocs.cli_shared (never this module at module scope), and
 # this root imports both — so any CLI module works as the first import of a
 # fresh interpreter (guarded by tests/unit/test_cli_import_order.py). The three
-# verbs above (resolve-cmdline-staging, lineage-review, fid-census) stay here
+# verbs above (resolve-cmdline-staging, lineage-review, lineage-extract, lineage-load,
+# fid-census) stay here
 # because they wire another component (drydocs_lineage, drydocs.review.fid_census) —
 # the composition root is the only module exempt from the component-import
 # invariant (ENTRYPOINT_MODULES); S8 added no new exemption and S13 removes

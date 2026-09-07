@@ -59,6 +59,31 @@ def test_product_required_fields_and_enums() -> None:
         assert isinstance(product.get("versions", []), list)
 
 
+def test_a_white_labelled_product_names_its_vendor_and_its_internal_name() -> None:
+    """C43 (2026-09-03): the white-label case. MFTS is Axway SecureTransport, and
+    internal branding erased the vendor from every documentation surface — so the
+    registry carries the vendor the way controlm carries bmc, PLUS `white_label`
+    with the internal name, and a reader learns the vendor here rather than from
+    a User-Agent header (SME rider, gate ontology-domain-registry-and-edition-grain
+    section B5). The version is the research's established fact, in the
+    registry's own slot. `white_label` is optional on every other row and a
+    non-empty string wherever present."""
+    doc = _doc()
+    mfts = next(p for p in doc["products"] if p["id"] == "mfts")
+    assert mfts["vendor"] == "axway"
+    assert mfts["name"] == "Axway SecureTransport"
+    assert mfts["white_label"] == "MFTS"
+    assert mfts["versions"] == ["6.0.3"]
+    assert mfts["seal_id"] == "[seal-id]", "the placeholder, never a value (publish boundary)"
+    axway = next(v for v in doc["vendors"] if v["id"] == "axway")
+    assert axway["publisher_url"].startswith("https://www.axway.com")
+    for product in doc["products"]:
+        if "white_label" in product:
+            assert isinstance(product["white_label"], str) and product["white_label"].strip()
+    # the siblings stay out until their vendor is evidenced (C43 clause d)
+    assert not {"filemover", "onemft"} & {p["id"] for p in doc["products"]}
+
+
 # Vendors with no public publisher page. An internally-built product has no
 # vendor site, and pointing the field at a company URL would put an internal
 # host into an Internal-Public file — so the field is omitted rather than

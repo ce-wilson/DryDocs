@@ -174,3 +174,72 @@ def test_describes_product_names_a_real_software_registry_product() -> None:
     assert (
         not unknown
     ), f"describes_product names ids that are not software-registry products: {unknown}"
+
+
+# --------------------------------------------------------------------------- #
+# G134 — the capture rung: the METHOD behind the trust verdict
+# --------------------------------------------------------------------------- #
+
+#: The rungs at which VERBATIM is a coherent claim. A layout extraction (4) or a
+#: transcription (5) is not the served bytes, so VERBATIM there fails; GROUNDED at
+#: 1-2 is allowed (a spec can be transcribed badly) — one-directional on purpose.
+VERBATIM_RUNGS = {1, 2, 3, "unprobed"}
+
+#: Rows whose ladder has never been walked, PINNED so the finding stays counted:
+#: `unprobed` reads as a task, and a row joining this set does so on purpose.
+KNOWN_UNPROBED = {"seal-pat-scrape", "mwaa-implementation-docs"}
+
+
+def _ladder() -> dict:
+    return _registry()["capture_ladder"]
+
+
+def test_the_capture_ladder_is_declared_once_as_data_and_ordered_best_to_worst() -> None:
+    ladder = _ladder()
+    rungs = [k for k in ladder if k != "unprobed"]
+    assert rungs == [1, 2, 3, 4, 5], "the ladder is the five rungs, best to worst, plus unprobed"
+    assert "unprobed" in ladder
+    for key, rung in ladder.items():
+        assert rung.get("name"), f"rung {key} has no name"
+        assert isinstance(rung.get("yields"), list), f"rung {key} declares no yields"
+        assert set(rung["yields"]) <= TRUSTS
+    assert "VERBATIM" in ladder[1]["yields"] and "VERBATIM" in ladder[2]["yields"]
+    assert ladder[5].get("lossy") is True
+    assert ladder["unprobed"]["yields"] == []
+
+
+def test_every_corpus_records_the_rung_it_reached() -> None:
+    """Required and closed, like every other field on this ledger. `unprobed` is a
+    value, not an omission: it says the ladder was never walked, which is a task."""
+    vocabulary = set(_ladder())
+    failures = [
+        f"[{src.get('id')}] capture_rung {src.get('capture_rung')!r} not in {sorted(map(str, vocabulary))}"
+        for src in _registry().get("sources", [])
+        if src.get("capture_rung") not in vocabulary
+    ]
+    assert not failures, "\n".join(failures)
+
+
+def test_verbatim_never_sits_on_a_layout_extraction_or_a_transcription() -> None:
+    """The one-directional pairing: VERBATIM at rung 4 or 5 is a contradiction —
+    those rungs cannot produce the served bytes. GROUNDED anywhere is allowed."""
+    failures = [
+        f"[{src.get('id')}] trust_default VERBATIM at capture_rung {src.get('capture_rung')} — "
+        "a layout extraction or a transcription is not the served bytes"
+        for src in _registry().get("sources", [])
+        if src.get("trust_default") == "VERBATIM" and src.get("capture_rung") not in VERBATIM_RUNGS
+    ]
+    assert not failures, "\n".join(failures)
+
+
+def test_the_unprobed_rows_are_pinned_so_the_task_stays_visible() -> None:
+    """A GROUNDED row at `unprobed` is the finding G134 exists to make visible;
+    the set is pinned so a new one is added deliberately and an old one leaves
+    when its ladder is walked."""
+    unprobed = {
+        src["id"] for src in _registry().get("sources", []) if src.get("capture_rung") == "unprobed"
+    }
+    assert unprobed == KNOWN_UNPROBED, (
+        f"unprobed rows changed: {sorted(unprobed ^ KNOWN_UNPROBED)} — walk the ladder or "
+        "update the pin, and say which in the row"
+    )

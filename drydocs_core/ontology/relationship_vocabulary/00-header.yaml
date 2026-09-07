@@ -71,21 +71,19 @@
 #   note          plain-English description + any gotchas
 #   supplement    schema file where LocalRelationship is declared (null = base PROV-O)
 #   loader        cypher file that writes this relationship
-#   domain        scheduler | business_application | catalog | architecture |
-#                 registry | docs | quality | context | all | human | corporate |
-#                 itsm | infrastructure
-#                 (`infrastructure` registered at gate server-location-ontology
-#                 (Z2, 2026-08-19) for physical placement/geography — neither
-#                 scheduler (tool-agnostic scheduling semantics) nor
-#                 architecture (app/code/team ownership flow).)
-#                 (renamed from controlm/seal at gate
-#                 vocabulary-domains-and-id-policy §A1/§A2, 2026-08-12; the
-#                 scheduler partition is tool-agnostic — AutoSys/Airflow edges
-#                 file there via the BMC-baseline crosswalk. `human` is
-#                 registered (§A3) for people/org edges; no entries moved at
-#                 registration. This is a file/loader PARTITION — not
-#                 rdfs:domain (from_node/to_node carry that) and not the BDAT
-#                 layer on source-registry SYSTEM rows.)
+#   domain        a REGISTERED domain id — see config/taxonomy/domains.yaml,
+#                 the domain registry (gate ontology-domain-registry-and-
+#                 edition-grain §B1, CFG1 2026-09-04). The list used to live
+#                 HERE as a comment and in the schema enum; now the registry is
+#                 the source, the enum is its render, and
+#                 tests/unit/test_domain_registry.py holds them equal. A domain
+#                 is a file/loader PARTITION — the fragment that holds the
+#                 entry (`4x-local-<domain>.yaml`) — not rdfs:domain
+#                 (from_node/to_node carry that) and not the BDAT layer on
+#                 source-registry SYSTEM rows. Each row carries the gate that
+#                 registered it; a new domain is MINTED through that gate's
+#                 §B2 protocol (a base mints, an instance requests), never by
+#                 editing this comment.
 #   status        planned | active | deprecated | removed
 #
 # EXPERIMENTAL / early adoption: SOSA/SSN (domain: context) terms are W3C but

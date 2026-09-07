@@ -66,6 +66,13 @@ def _session(store: InMemorySessionStore) -> str:
     return store.issue("mouse").token
 
 
+def _session_pair(store: InMemorySessionStore) -> tuple[str, str]:
+    """(session_id, token): the store is keyed by the public handle (ADR 0019),
+    run/export authenticate with the bearer. Tests that need both take both."""
+    session = store.issue("mouse")
+    return session.session_id, session.token
+
+
 # ── store: hashing, ownership, TTL, capacity ─────────────────────────────────
 
 
@@ -149,8 +156,8 @@ def test_registration_rejects_graph_internal_element_ids():
 
 def test_register_handler_requires_the_agent_key():
     sessions, ephemerals = InMemorySessionStore(), EphemeralSpecStore()
-    token = _session(sessions)
-    args = (token, CYPHER, "drydocs", {}, "", (), sessions, ephemerals)
+    owner, _token = _session_pair(sessions)
+    args = (owner, CYPHER, "drydocs", {}, "", (), sessions, ephemerals)
     with pytest.raises(Forbidden):  # no key configured server-side: disabled
         register_ephemeral("some-key", None, *args)
     with pytest.raises(Forbidden):  # no key presented
@@ -161,7 +168,7 @@ def test_register_handler_requires_the_agent_key():
         register_ephemeral(
             "server-key",
             "server-key",
-            "dead-token",
+            "dead-session-id",
             CYPHER,
             "drydocs",
             {},
@@ -174,11 +181,11 @@ def test_register_handler_requires_the_agent_key():
 
 def test_register_handler_payload():
     sessions, ephemerals = InMemorySessionStore(), EphemeralSpecStore()
-    token = _session(sessions)
+    owner, _token = _session_pair(sessions)
     out = register_ephemeral(
         "k",
         "k",
-        token,
+        owner,
         "MATCH (n:Uncertain) RETURN n.run_id AS job_name LIMIT $limit",
         "drydocs",
         {"limit": 5},
@@ -198,8 +205,8 @@ def test_register_handler_payload():
 
 def test_run_spec_replays_the_frozen_execution():
     sessions, ephemerals, runner = InMemorySessionStore(), EphemeralSpecStore(), FakeRunner()
-    token = _session(sessions)
-    ref = ephemerals.register(token, CYPHER, "drydocs", params={"limit": 5}).ref
+    owner, token = _session_pair(sessions)
+    ref = ephemerals.register(owner, CYPHER, "drydocs", params={"limit": 5}).ref
     out = run_spec(ref, {}, token, sessions, runner, ephemerals)
     assert out["spec_id"] == ref and out["ephemeral"] is True
     assert out["classification"] == EPHEMERAL_CLASSIFICATION
@@ -209,8 +216,8 @@ def test_run_spec_replays_the_frozen_execution():
 
 def test_run_spec_params_fail_closed_and_ownership_holds():
     sessions, ephemerals, runner = InMemorySessionStore(), EphemeralSpecStore(), FakeRunner()
-    token = _session(sessions)
-    ref = ephemerals.register(token, CYPHER, "drydocs").ref
+    owner, token = _session_pair(sessions)
+    ref = ephemerals.register(owner, CYPHER, "drydocs").ref
     with pytest.raises(ParamValidationError):  # frozen params: none accepted
         run_spec(ref, {"limit": 10}, token, sessions, runner, ephemerals)
     other = _session(sessions)
@@ -231,8 +238,8 @@ def test_permanent_specs_are_unchanged_with_the_store_present():
 def test_export_manifest_matches_permanent_spec_provenance():
     sessions, ephemerals, ledger = InMemorySessionStore(), EphemeralSpecStore(), ExportLedger()
     runner = FakeRunner()
-    token = _session(sessions)
-    eph = ephemerals.register(token, CYPHER, "drydocs", params={"limit": 5})
+    owner, token = _session_pair(sessions)
+    eph = ephemerals.register(owner, CYPHER, "drydocs", params={"limit": 5})
     job = export_spec(eph.ref, {}, "csv", token, sessions, runner, ledger, ephemerals=ephemerals)
     assert job.filename == f"INTERNAL__{eph.ref}.csv"
     chunks = list(job.chunks)  # exhausting the stream registers the manifest
@@ -270,10 +277,12 @@ def test_ephemeral_wiring_end_to_end(monkeypatch):
     for identity in ("mouse", "trinity"):
         creds.set(identity, secret)
     client = TestClient(create_app(runner=FakeRunner(), store=store, credentials=creds))
-    token = client.post("/login", json={"persona_id": "mouse", "secret": secret}).json()["token"]
+    login = client.post("/login", json={"persona_id": "mouse", "secret": secret}).json()
+    token, owner = login["token"], login["session_id"]
 
-    # a browser bearer token alone can never register Cypher
-    body = {"owner_token": token, "cypher": CYPHER, "database": "drydocs"}
+    # ADR 0019: the registration names its owner by the public handle, never the
+    # token -- and a handle alone (no agent key) can never register Cypher
+    body = {"owner_session": owner, "cypher": CYPHER, "database": "drydocs"}
     assert client.post("/specs/ephemeral", json=body).status_code == 403
     assert (
         client.post(
@@ -311,7 +320,7 @@ def test_ephemeral_wiring_end_to_end(monkeypatch):
     # write-shaped registration is rejected before anything is stored
     evil = client.post(
         "/specs/ephemeral",
-        json={"owner_token": token, "cypher": "CREATE (n)", "database": "drydocs"},
+        json={"owner_session": owner, "cypher": "CREATE (n)", "database": "drydocs"},
         headers={"X-DryDocs-Agent-Key": "wiring-test-key"},
     )
     assert evil.status_code == 400

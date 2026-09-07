@@ -505,70 +505,122 @@ def test_run_as_bind_is_upper_cased_but_the_column_is_not() -> None:
 #: The extract family the data-center bind joins (G115 clause a). Conditions
 #: and the dependency anchor are deliberately not in this list — the item
 #: scoped the bind to the five extracts named here.
-DC_BOUND_SQL = [
-    "controlm_folders.sql",
-    "controlm_jobs.sql",
-    "controlm_variables.sql",
-    "controlm_hosts.sql",
-    "controlm_avg_run.sql",
-]
+#: LOAD2: the family splits by which VALUE DOMAIN each table's DATA_CENTER column
+#: carries. CM_DEF_VTAB (folders, and the folder-joined jobs and variables extracts)
+#: carries the SHORT server code; CM_HOSTS and CM_AVG_RUN carry the LONG-form name.
+#: The statement binds the one its own column speaks — binding the wrong one is not a
+#: type error, it is ZERO ROWS that read as an empty data center.
+DC_BOUND_SQL = {
+    "controlm_folders.sql": "data_center_code",
+    "controlm_jobs.sql": "data_center_code",
+    "controlm_variables.sql": "data_center_code",
+    "controlm_hosts.sql": "data_center_filter",
+    "controlm_avg_run.sql": "data_center_filter",
+}
 
 
-@pytest.mark.parametrize("name", DC_BOUND_SQL)
-def test_data_center_bind_joins_the_extract_family(name: str) -> None:
-    """Every extract in the family carries the optional :data_center_filter
-    bind (G115), NULL-guarded exactly like the other scope binds so an absent
-    value means all data centers. Code lines only — a header comment naming
+@pytest.mark.parametrize(("name", "bind"), sorted(DC_BOUND_SQL.items()))
+def test_data_center_bind_joins_the_extract_family(name: str, bind: str) -> None:
+    """Every extract in the family carries its own optional data-center bind (G115,
+    re-domained at LOAD2), NULL-guarded exactly like the other scope binds so an
+    absent value means all data centers. Code lines only — a header comment naming
     the bind must not false-pass this."""
     code = _sql_code(name)
-    assert ":data_center_filter" in code, f"{name}: missing the data-center bind"
+    assert f":{bind}" in code, f"{name}: missing the data-center bind :{bind}"
     assert re.search(
-        r":data_center_filter\s+IS\s+NULL\s+OR\s+\w+\.DATA_CENTER\s+LIKE\s+:data_center_filter",
+        rf":{bind}\s+IS\s+NULL\s+OR\s+\w+\.DATA_CENTER\s+LIKE\s+:{bind}",
         code,
     ), f"{name}: the data-center predicate must be NULL-guarded (absent means all)"
+    other = "data_center_filter" if bind == "data_center_code" else "data_center_code"
+    assert f":{other}" not in code, (
+        f"{name}: binds BOTH domains — this column carries one spelling, and binding "
+        f"the other silently selects nothing (LOAD2)"
+    )
 
 
 def test_scope_binds_data_center_both_states() -> None:
-    """The bind in both states (G115 clause d). Absent: None flows through so
-    the SQL guard short-circuits and every data center is read — the state
-    every pre-G115 invocation runs in. Set: the operator's LIKE pattern passes
-    through untouched (same rule as folder_filter; the long-form spelling used
-    here is the bundled hosts sample's own publishable value, so the fixture
-    corpus and this contract stay on one spelling)."""
+    """The bind in its states (G115 clause d, re-domained at LOAD2). Absent: both
+    binds are None so every SQL guard short-circuits and all data centers are read —
+    the state every pre-G115 invocation runs in. Set: ONE operator value is resolved
+    through the declared registry into BOTH spellings, so each statement binds the one
+    its own column carries. A LIKE pattern passes through to both, untouched (same
+    rule as folder_filter) — a pattern is the operator's own instrument and the
+    registry has nothing to say about it."""
     import csv
 
     from drydocs.cli import DEFAULT_SAMPLES_DIR, _scope_binds
 
     absent = _scope_binds()
     assert absent["data_center_filter"] is None
-    # the existing four dimensions are untouched by the fifth joining
+    assert absent["data_center_code"] is None
+    # the existing four dimensions are untouched by the two data-center binds
     assert set(absent) == {
         "folder_filter",
         "run_as",
         "developer_sid",
         "row_cap",
         "data_center_filter",
+        "data_center_code",
     }
 
-    dc = "T012-E0700-SYN"  # a data_center value carried by controlm_hosts__sample.csv
-    scope = _scope_binds("CCB_AUTO_%", None, None, 100, data_center=dc)
-    assert scope["data_center_filter"] == dc
-    assert scope["folder_filter"] == "CCB_AUTO_%"
-    # the bundled samples carry the dimension in both value states the bind
-    # sees: the hosts sample holds long-form names, and a set filter selects
-    # a strict subset of its rows while an absent one selects them all
-    # resolved through the importable declaration, the same object fixture
-    # mode itself reads (these samples are committed, not local-only assets)
+    # ONE value, either spelling, reaches both families. The pair is the bundled
+    # corpus's own: the short code is in controlm_folders__sample.csv and the long
+    # name in controlm_hosts__sample.csv, which is what makes this testable here.
+    for given in ("P12", "T012-E0700-SYN"):
+        scope = _scope_binds("CCB_AUTO_%", None, None, 100, data_center=given)
+        assert scope["data_center_code"] == "P12", given
+        assert scope["data_center_filter"] == "T012-E0700-SYN", given
+        assert scope["folder_filter"] == "CCB_AUTO_%"
+
+    # a LIKE pattern is not a name: passed through to both binds as given
+    pattern = _scope_binds(data_center="T012%")
+    assert pattern["data_center_filter"] == "T012%"
+    assert pattern["data_center_code"] == "T012%"
+
+    # the folders sample carries the SHORT domain, so a long-form value bound there
+    # would have selected nothing — the failure LOAD2 removes, measured on the corpus
+    folders = DEFAULT_SAMPLES_DIR / "controlm_folders__sample.csv"
+    with folders.open(encoding="utf-8-sig", newline="") as fh:
+        folder_rows = list(csv.DictReader(fh))
+    folder_dcs = {r["data_center"] for r in folder_rows}
+    assert "P12" in folder_dcs, "the folders sample must carry the short code"
+    assert "T012-E0700-SYN" not in folder_dcs, (
+        "the folders sample must NOT carry a long-form name — if it did, the two "
+        "value domains would not be distinguishable on the bundled corpus"
+    )
+    # and the hosts sample carries the LONG domain, so the resolved long-form value
+    # selects real rows there — one option value, both families, measured on the
+    # committed corpus rather than asserted about it
     sample = DEFAULT_SAMPLES_DIR / "controlm_hosts__sample.csv"
     with sample.open(encoding="utf-8", newline="") as fh:
         rows = list(csv.DictReader(fh))
     assert rows, "hosts sample is empty"
-    matched = [r for r in rows if r["data_center"] == dc]
-    assert matched, "the tested pattern must select sample rows (set state)"
+    matched = [r for r in rows if r["data_center"] == "T012-E0700-SYN"]
+    assert matched, "the resolved long form must select sample rows (set state)"
+    assert "P12" not in {r["data_center"] for r in rows}, (
+        "the hosts sample must NOT carry the short code — the two domains are only "
+        "distinguishable on the corpus if each sample carries exactly one of them"
+    )
     assert len({r["data_center"] for r in rows}) >= 2, (
         "the hosts sample must span more than one data center so the set and "
         "absent states of the bind are distinguishable on the fixture corpus"
     )
+
+
+def test_a_data_center_in_neither_domain_is_refused_at_the_helper() -> None:
+    """LOAD2 (c): a value in neither spelling REFUSES, exit 2, naming both domains.
+
+    Passing it through is what produced the silent zero-row result, so the helper turns
+    the registry's refusal into a CLI exit rather than binding an unknown string. The
+    message is the reader's - asserted here because this is the operator-facing surface
+    where it is actually read."""
+    import typer
+
+    from drydocs.cli import _scope_binds
+
+    with pytest.raises(typer.Exit) as exc:
+        _scope_binds(data_center="NOT-A-DATA-CENTER")
+    assert exc.value.exit_code == 2
 
 
 def test_data_center_option_is_registered_on_the_commands() -> None:

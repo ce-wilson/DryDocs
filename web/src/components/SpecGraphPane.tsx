@@ -1,6 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 
-import type { GraphAccess, SpecResult } from '../lib/graph'
 import {
   CANVAS_SURFACES,
   canvasRoutePath,
@@ -10,6 +9,8 @@ import {
 import GraphCanvas from './GraphCanvas'
 import EmptyState from './ui/EmptyState'
 import { IdChip } from './ui/IdChip'
+import { useLiveOrDemo } from '../data/provenance'
+import ProvenanceNotice from './ProvenanceNotice'
 
 // A QuerySpec-bound GRAPH frame (O81 step 4) — the canvas's sibling to SpecGrid.
 // SpecGrid renders a reviewed spec's rows as a table; this renders the SAME
@@ -29,7 +30,6 @@ import { IdChip } from './ui/IdChip'
 // glance. So this frame reports the error and draws nothing.
 
 export interface SpecGraphPaneProps {
-  access: GraphAccess
   specId: CanvasSpecId
   title: string
   badge?: string
@@ -42,7 +42,6 @@ export interface SpecGraphPaneProps {
 }
 
 export default function SpecGraphPane({
-  access,
   specId,
   title,
   badge,
@@ -50,37 +49,29 @@ export default function SpecGraphPane({
   onSelect,
   fullPage = false,
 }: SpecGraphPaneProps) {
-  const [result, setResult] = useState<SpecResult | null>(null)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    let cancelled = false
-    setResult(null)
-    setError(null)
-    access
-      .runSpec(specId)
-      .then((r) => {
-        if (!cancelled) setResult(r)
-      })
-      .catch((e: Error) => {
-        if (!cancelled) setError(e.message)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [access, specId])
+  // WEB12: one read, one state. The pane used to clear its own result on every
+  // spec change to avoid drawing the previous surface's graph under the new
+  // title; the hook resets to `loading` on a key change, so that is structural.
+  // WEB1: through the seam with NO demo. This pane refuses to draw rather than
+  // drawing something that is not the graph, and passing `null` is how that
+  // policy is now DECLARED instead of implemented per-pane.
+  const provenance = useLiveOrDemo(specId, null)
+  const result = provenance.status === 'live' || provenance.status === 'empty' ? provenance.data : null
 
   const graph = useMemo(() => {
     if (!result) return null
     return CANVAS_SURFACES[specId](result.rows)
   }, [result, specId])
 
-  if (error) {
+  if (provenance.status === 'error') {
     return (
-      <EmptyState
-        title="The graph could not be loaded"
-        hint={`${specId} — ${error}. Nothing is drawn rather than drawing something that is not the graph.`}
-      />
+      <div className="flex h-full min-h-0 flex-col gap-2 p-2">
+        <ProvenanceNotice state={provenance} specId={specId} />
+        <EmptyState
+          title="The graph could not be loaded"
+          hint="Nothing is drawn rather than drawing something that is not the graph."
+        />
+      </div>
     )
   }
   if (!graph) return <EmptyState title="Loading the graph…" hint={specId} />
@@ -95,6 +86,14 @@ export default function SpecGraphPane({
           title={title}
           badge={badge ?? result?.classification?.toUpperCase()}
           fullPageHref={fullPage ? undefined : canvasRoutePath(specId)}
+          // WEB2: the canvas caps NODES; the server had already capped ROWS
+          // before this pane ever called the mapper. Only this component holds
+          // both facts, so only it can hand the second one down — otherwise a
+          // capped result that happens to draw under NODE_CEILING renders with
+          // no notice at all, on the surface whose whole comment is that a
+          // quietly-cropped picture makes a false claim.
+          rowsTruncated={result?.truncated}
+          rowLimit={result?.limit}
         />
       </div>
       {selected && <SelectedNodeDetail node={selected} onClose={() => onSelect(null)} />}

@@ -57,6 +57,18 @@ FAMILIES: dict[str, tuple[str, list[Path]]] = {
         "relationship-vocabulary.schema.json",
         sorted((REPO / "drydocs_core" / "ontology" / "relationship_vocabulary").glob("*.yaml")),
     ),
+    "domains": (
+        "domains.schema.json",
+        [REPO / "config" / "taxonomy" / "domains.yaml"],
+    ),
+    "editions": (
+        "editions.schema.json",
+        [REPO / "config" / "taxonomy" / "editions.yaml"],
+    ),
+    "data-centers": (
+        "data-centers.schema.json",
+        [REPO / "config" / "taxonomy" / "data-centers.yaml"],
+    ),
 }
 
 
@@ -80,12 +92,31 @@ def test_every_family_has_a_valid_schema() -> None:
         assert files, f"{family}: the live-file glob matched nothing — the family moved?"
 
 
+#: Schemas that govern something OTHER than one family's file shape, each with
+#: the guard that owns it. A schema here is still claimed — by a test rather
+#: than by a file glob — so the stray check below stays a real tripwire.
+CROSS_CUTTING: dict[str, str] = {
+    # J58: the identity header (schema/source/classification/updated) is shared
+    # BY every governed family rather than owned by one, so it has no live-file
+    # glob of its own. Its files are chosen by file CLASS, and that map plus the
+    # validation live in tests/unit/test_config_identity_header.py.
+    "identity-header.schema.json": "tests/unit/test_config_identity_header.py",
+}
+
+
 def test_no_stray_schema_files() -> None:
     """Every schema on disk is claimed by a family — an unclaimed schema is
     either a rename leftover or an unguarded new family."""
-    claimed = {name for name, _ in FAMILIES.values()}
+    claimed = {name for name, _ in FAMILIES.values()} | set(CROSS_CUTTING)
     on_disk = {p.name for p in SCHEMAS.glob("*.schema.json")}
     assert on_disk == claimed, f"unclaimed/missing schemas: {on_disk ^ claimed}"
+
+
+def test_cross_cutting_schemas_are_valid_and_their_guard_exists() -> None:
+    """A cross-cutting schema is claimed by a TEST, so that test has to be there."""
+    for name, guard in CROSS_CUTTING.items():
+        Draft202012Validator.check_schema(_schema(name))
+        assert (REPO / guard).is_file(), f"{name} names {guard} as its guard, which is missing"
 
 
 # --------------------------------------------------------------------------- #
@@ -160,6 +191,54 @@ _MALFORMED: dict[str, tuple[dict | list, str]] = {
         [{"id": "x_edge", "neo4j_label": "X_EDGE", "from_node": "A", "to_node": "B"}],
         "$[0]",
     ),
+    # domain registry: a row with no vocabulary_fragment (REQUIRED, gate sB3)
+    "domains": (
+        {
+            "schema": "drydocs.domains.v1",
+            "classification": "Internal-Public",
+            "updated": "2026-09-04",
+            "domains": [
+                {
+                    "id": "topic",
+                    "title": "T",
+                    "minted_by": "producer",
+                    "registered_at": "2026-09-04",
+                    "authority": "x",
+                    "status": "active",
+                }
+            ],
+        },
+        "$.domains[0]",
+    ),
+    # edition registry: a lowercase code (the segment is 2-5 UPPERCASE letters, sC1)
+    "editions": (
+        {
+            "schema": "drydocs.editions.v1",
+            "classification": "Internal",
+            "updated": "2026-09-04",
+            "editions": [
+                {
+                    "code": "xmpl",
+                    "title": "T",
+                    "area_product_id": "AP",
+                    "minted_by": "producer",
+                    "registered_at": "2026-09-04",
+                    "authority": "x",
+                }
+            ],
+        },
+        "$.editions[0].code",
+    ),
+    # data-center registry: a row with only one spelling (the PAIRING is the fact)
+    "data-centers": (
+        {
+            "schema": "drydocs.data-centers.v1",
+            "classification": "Internal",
+            "updated": "2026-09-04",
+            "data_centers": [{"code": "P12"}],
+        },
+        "$.data_centers[0]",
+    ),
 }
 
 
@@ -208,7 +287,7 @@ def test_schemas_validate_without_importing_drydocs_core(tmp_path: Path) -> None
             str(REPO / "config" / "precedence.yaml"),
         ],
         capture_output=True,
-        text=True,
+        encoding="utf-8",
         cwd=tmp_path,  # not the repo root — no accidental package resolution
     )
     assert res.returncode == 0, res.stderr

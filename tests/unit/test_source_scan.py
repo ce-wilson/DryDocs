@@ -22,9 +22,13 @@ from tests.source_scan import (
     ALL,
     ATTRIBUTE,
     KINDS,
+    MISSING,
     NAME,
+    NOT_CONSTANT,
+    call_sites,
     called_names,
     code_only,
+    comment_lines,
     imported_modules,
     source_text,
 )
@@ -238,6 +242,53 @@ def test_the_helper_holds_three_verbs_and_one_convenience() -> None:
     # Against __all__, not against vars(): a module's namespace also holds what it
     # IMPORTS (Path, Final), so the first version of this test failed on its own
     # imports rather than on any new verb.
-    assert set(module.__all__) == {"code_only", "imported_modules", "called_names", "source_text"}
+    assert set(module.__all__) == {
+        "code_only",
+        "imported_modules",
+        "called_names",
+        "call_sites",
+        "comment_lines",
+        "source_text",
+        "CallSite",
+        "MISSING",
+        "NOT_CONSTANT",
+    }
+    sentinels = {"MISSING", "NOT_CONSTANT"}
     for name in module.__all__:
-        assert callable(getattr(module, name))
+        if name not in sentinels:
+            assert callable(getattr(module, name))
+
+
+# ---- call_sites: the fourth verb (J76) ------------------------------------------------
+
+
+def test_call_sites_reports_keywords_with_constant_values_and_marks_the_rest() -> None:
+    src = (
+        "import subprocess\n"
+        "flag = True\n"
+        "subprocess.run(['git'], capture_output=True, text=True)\n"
+        "run(['x'], text=flag, encoding='utf-8')\n"
+        "other(text=True)\n"
+    )
+    sites = call_sites(src, ["run"])
+    assert [s.lineno for s in sites] == [3, 4]
+    assert sites[0].keywords == {"capture_output": True, "text": True}
+    assert sites[0].constant("encoding") is MISSING
+    assert sites[1].keywords["text"] is NOT_CONSTANT
+    assert sites[1].constant("encoding") == "utf-8"
+
+
+def test_a_call_named_only_in_a_comment_or_string_has_no_call_site() -> None:
+    src = "# subprocess.run(text=True) is the pattern this forbids\nx = 'run(text=True)'\n"
+    assert call_sites(src, ["run"]) == []
+
+
+def test_call_sites_span_the_whole_call_so_a_marker_inside_it_is_findable() -> None:
+    src = "run(\n    ['git'],\n    text=True,\n)\n"
+    (site,) = call_sites(src, ["run"])
+    assert (site.lineno, site.end_lineno) == (1, 4)
+
+
+def test_comment_lines_reads_exactly_the_comments_by_line() -> None:
+    src = "x = 1  # first\ny = 'not # a comment'\n# whole line\n"
+    assert comment_lines(src) == {1: "# first", 3: "# whole line"}

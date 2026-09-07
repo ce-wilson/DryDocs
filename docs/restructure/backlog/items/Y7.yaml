@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: fable
 priority: p1
-status: todo
+status: done
 depends_on: []
 inputs:
 - docs/restructure/backlog/items/O26.yaml
@@ -76,3 +76,26 @@ notes: |
   item until then. That hold lives in free prose inside acceptance, where no derivation can read
   it, and G64 stays out of next_ready today only because G22 and G25 are not done. When they
   close, it becomes O26 again. Any blessed-field design must be able to express this one too.
+
+  DONE 2026-09-07 (desktop, Lane A). (a) drydocs.backlog.v3 gains an optional top-level
+  hold: mapping - since and reason required, by and until (the releasing EVENT, never a date)
+  optional; allowed on todo/blocked only; release = delete the key and record the ruling in
+  notes. is_held / hold_errors live in drydocs_core.backlog_store beside the schema comment
+  that states the (b) constraint: only this key holds, annotations never do. A malformed hold
+  still HOLDS (fails closed) and is reported. (c) ONE derivation: derive_summary excludes a
+  held item from next_ready and adds a derived held list; plan_board._ready_ids used to carry
+  its own copy of the readiness test and now delegates, so the board strip, the card accent
+  and validate.py cannot disagree - validate.py also runs hold_errors per item and prints
+  held= on its derived line; both read next_ready=90 held=2 at close. (d) The card wears a
+  HELD badge and shows the hold text OUTSIDE the collapsed detail; a Held strip sits beside
+  Ready to pull with the same card anchors (drive-by: the ready-strip anchors pointed at
+  #<id> and the cards are id=card-<id>, so they never resolved; fixed). (e) CLAUDE.md pull
+  rule amended in this commit. (f) O26 converted, text verbatim, and G64 declared too (its
+  acceptance sentence left as written). (g) test_backlog.py: held-excluded, held-rendered,
+  unblessed-annotation-does-not-hold, shape guard fails closed, every committed hold well-
+  formed and O26+G64 present; test_derived_summary_is_consistent now models the hold. ADR
+  0013 records the addition as a dated Clause 3a - the item lists it at docs/adr/, its real
+  path is docs/decisions/0013-backlog-sharding.md. hold joins status and annotations in the
+  validator's venue-local set: whether THIS venue may pull an item is its own ruling, not an
+  edit. Note for Lane B: O26 is on its queue and is now HELD - do not pull it while the
+  hold stands.

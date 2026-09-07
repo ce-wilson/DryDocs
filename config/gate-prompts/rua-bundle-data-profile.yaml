@@ -8,6 +8,8 @@
 # contract; real hosts/paths/users stay company-side (PUBLISH-BOUNDARY.md).
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-07
+
 id: rua-bundle-data-profile
 title: "SME Gate — rua bundle data profile: name the load population (HITL, Internal), profile it (agent, staged-only), then admit it to the G23 curated load"
 step: "Follows rua-load-shapes (G22, signed 2026-08-07) and the G23 curated-load build. The registry row exec-hosts:rua-bundle is confirmed: true — authority to load — but the ruled shapes were walked on samples plus two captured production bundles, and the live bundle population may have grown. No population loads before this page walks it."

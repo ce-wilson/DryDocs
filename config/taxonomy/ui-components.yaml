@@ -82,15 +82,25 @@ components:
   - { id: App,                     area: entry,        path: App.tsx }
   - { id: main,                    area: entry,        path: main.tsx }
 
-  # --- layout (6) ---
+  # --- layout (11) ---
   - { id: Aside,                   area: layout,       path: layout/Aside.tsx }
   - { id: Header,                  area: layout,       path: layout/Header.tsx }
   - { id: ModuleToolbar,           area: layout,       path: layout/ModuleToolbar.tsx }
   - { id: RightSidebarSlot,        area: layout,       path: layout/RightSidebarSlot.tsx }
+  # WEB3: the one route gate, derived from modules/registry.ts — a layout
+  # component because it is a pathless layout route, not a page.
+  - { id: GraphAccessProvider,     area: layout,       path: data/GraphAccessProvider.tsx }
+  - { id: RouteAccessGate,         area: layout,       path: layout/RouteAccessGate.tsx }
+  # WEB5: one render throw breaks one panel, not the console.
+  - { id: RouteErrorBoundary,      area: layout,       path: layout/RouteErrorBoundary.tsx }
   - { id: Shell,                   area: layout,       path: layout/Shell.tsx }
+  # WEB1: readiness + the fallback count, in the shell so the signal sits
+  # OUTSIDE the surfaces doing the fabricating.
+  - { id: SystemBanner,            area: layout,       path: layout/SystemBanner.tsx }
   - { id: rightSidebarContext,     area: layout,       path: layout/rightSidebarContext.tsx }
+  - { id: FeedbackLayer,           area: layout,       path: feedback/FeedbackLayer.tsx }   # O89 the L5 screen loop: an annotate control per anchored block, mounted beside main
 
-  # --- route (24) ---
+  # --- route (25) ---
   - { id: AdminConfigRoute,        area: route,        path: routes/AdminConfigRoute.tsx }
   - { id: AppCodeCascadePane,      area: route,        path: routes/AppCodeCascadePane.tsx }
   - { id: AskRoute,                area: route,        path: routes/AskRoute.tsx,                         module: ask,        module_evidence: route-name }
@@ -119,9 +129,11 @@ components:
   - { id: ExplorerLiveRoute,       area: route,        path: routes/explorer/ExplorerLiveRoute.tsx,       module: explorer,   module_evidence: route-dir }
   - { id: ExplorerRoute,           area: route,        path: routes/explorer/ExplorerRoute.tsx,           module: explorer,   module_evidence: route-name }
   - { id: ExplorerTowerRoute,      area: route,        path: routes/explorer/ExplorerTowerRoute.tsx,      module: explorer,   module_evidence: route-dir }
+  - { id: LogEstatePanel,          area: route,        path: routes/LogEstatePanel.tsx }   # O68 the log estate, a PANEL on the O12 admin page rather than a route of its own
 
-  # --- ui-primitive (8) ---
+  # --- ui-primitive (10) ---
   - { id: EmptyState,              area: ui-primitive, path: components/ui/EmptyState.tsx }
+  - { id: EpistemicBadge,          area: ui-primitive, path: components/ui/EpistemicBadge.tsx }   # R15 one epistemic vocabulary: exact | lower-bound, rendered as the server graded it; null renders nothing
   - { id: IdChip,                  area: ui-primitive, path: components/ui/IdChip.tsx }
   - { id: Meter,                   area: ui-primitive, path: components/ui/Meter.tsx }
   - { id: ResizableSplit,          area: ui-primitive, path: components/ui/ResizableSplit.tsx }
@@ -129,6 +141,7 @@ components:
   - { id: StatusItems,             area: ui-primitive, path: components/ui/StatusItems.tsx }   # O28 node-status envelope (also exports HealthGlyph)
   - { id: tableControls,           area: ui-primitive, path: components/ui/tableControls.tsx }   # filter/sort/group/CSV, extracted from DomainGridTable
   - { id: Tabs,                    area: ui-primitive, path: components/ui/Tabs.tsx }
+  - { id: TruncationBadge,         area: ui-primitive, path: components/ui/TruncationBadge.tsx }   # WEB2 one completeness vocabulary: the canvas's node ceiling and the grid's row ceiling
 
   # --- component (19) ---
   - { id: BrandMark,               area: component,    path: components/BrandMark.tsx }
@@ -163,14 +176,14 @@ components:
   - { id: StatTiles,               area: component,    path: components/StatTiles.tsx }
   - { id: ThemeToggle,             area: component,    path: components/ThemeToggle.tsx }
   - { id: TowerDrill,              area: component,    path: components/TowerDrill.tsx }
-  - { id: TowerIcon,               area: component,    path: components/TowerIcon.tsx }
+  - { id: ProvenanceNotice,        area: component,    path: components/ProvenanceNotice.tsx }
   - { id: TrustLegend,             area: component,    path: components/TrustLegend.tsx }
 
   # --- icon (2) ---
   - { id: MapGlyphs,               area: icon,         path: components/map/MapGlyphs.tsx }
   - { id: HubGlyphs,               area: icon,         path: components/icons/HubGlyphs.tsx }
 
-  # --- ask (2) ---
+  # --- ask (3) ---
   # R6 Tier-2 task graph. Renders the agent's IN-PROCESS working memory (R1
   # ruling A) — deliberately its own visual language so it is never mistaken
   # for the knowledge graph, though it shares lib/forceLayout.ts.
@@ -179,6 +192,10 @@ components:
   # spec that accepts a search term, which is what lets 'not found' mean
   # something rather than being an empty slice of a full listing.
   - { id: FileReport,              area: ask,          path: ask/FileReport.tsx,                          module: ask,        module_evidence: directory }
+  # R19: the clarification card. Renders the agent's structured request for an
+  # unresolved acronym or label as choices the person makes; composes the next
+  # turn's clarifications and never picks a near match for them.
+  - { id: ClarificationCard,       area: ask,          path: ask/ClarificationCard.tsx,                   module: ask,        module_evidence: directory }
 
   # --- explorer (4) ---
   - { id: DataFrame,               area: explorer,     path: explorer/DataFrame.tsx,                      module: explorer,   module_evidence: directory }

@@ -46,8 +46,9 @@ things share the word *port* — never conflate them:
   `IDEAS.md` is the inbox, groomed into item files via the **`groom-backlog` skill**.
   `backlog.yaml` is a tombstone.
 - **Pull rule (give this to a sub-agent verbatim):** *"Take the next `status: todo` item in
-  `docs/restructure/backlog/items/` whose every `depends_on` is `done` (the board's Ready-to-pull
-  strip lists them); **commit and push** `status: in_progress` in that one item file
+  `docs/restructure/backlog/items/` whose every `depends_on` is `done` and that carries no
+  `hold:` (the board's Ready-to-pull strip lists exactly these — a held item is excluded from
+  it and shown under **Held** with its reason, Y7); **commit and push** `status: in_progress` in that one item file
   **before starting work** — a claim ships NO render (Y5: the roadmap guard tolerates
   status-only drift, so the claim sha stays green; renders catch up at session close); do exactly that item, staying inside your layer; meet its
   `acceptance`; set it `done`."* Anything ambiguous → the HITL
@@ -87,7 +88,7 @@ things share the word *port* — never conflate them:
 python .claude/skills/groom-backlog/validate.py --next-id --module drydocs-load   # a backlog item: the series IS the module (LOAD12)
 python .claude/skills/groom-backlog/validate.py --next-id Idea                    # the idea inbox
 ```
-The 27 legacy letters (A..Z, GN, MM) were FROZEN on 2026-09-02 — a letter recorded when a phase opened, not what an item is about — and the allocator refuses them; a new id always carries its module code. Then **mint, push the stub, and only then write the body** — the mechanism that already works for ADR numbering, where a committed, pushed index line reserves a number for a draft that does not exist yet. **The stub carries the FINAL title**, because the collision guard compares titles and not bodies: refine a title between the stub push and the body push and the guard reads local-vs-trunk as two machines minting one number, and goes red until the body lands (observed on J66, 2026-08-30). Settle the title before the stub; everything else can follow. **And the stub commit carries the refreshed board and roadmap** (`poetry run python scripts/render_board.py`), because the Y5 tolerance that lets a CLAIM ship no render is for STATUS-ONLY drift and a new item is beyond it: without the render, `test_committed_roadmap_page_matches_its_sources` fails and the trunk is red for the whole window between the two pushes (observed on G132/G133, 2026-08-30). Rendering in the stub commit costs nothing and keeps the guard doing its job. This has failed six times without the protocol, most recently O69 on 2026-08-29: one machine's id was already pushed on a feature branch and the other never looked past its own working tree. The allocator BANDS (producer 1–9999, company 10000+) are a different rule and unchanged — they separate the two repos, never the two machines.
+The 27 legacy letters (A..Z, GN, MM) were FROZEN on 2026-09-02 — a letter recorded when a phase opened, not what an item is about — and the allocator refuses them; a new id always carries its module code. **The venue is an edition segment (PLAN2, 2026-09-05):** the grammar is `[<EDITION>-]<MODULE><n>` and `[<EDITION>-]Idea-<n>`, edition first, the base unprefixed, and which edition a checkout mints into is DECLARED in `config/dev-environment.yaml` `edition:` (`base` here) — never inferred. `--edition <code>` mints downward only, for a code declared in `config/taxonomy/editions.yaml`. The 2026-07-20 DD reserve and the 2026-08-18 number band (1–9999 / 10000+) RETIRED forward-only (gate `ontology-domain-registry-and-edition-grain` §C4): no new mint uses them, every id they produced stays, and a venue with no `edition:` key mints no item — the refusal names the key (it may still capture an idea, band-shaped, until it declares; rider `idea-series-grammar` C1). Then **mint, push the stub, and only then write the body** — the mechanism that already works for ADR numbering, where a committed, pushed index line reserves a number for a draft that does not exist yet. **The stub carries the FINAL title**, because the collision guard compares titles and not bodies: refine a title between the stub push and the body push and the guard reads local-vs-trunk as two machines minting one number, and goes red until the body lands (observed on J66, 2026-08-30). Settle the title before the stub; everything else can follow. **And the stub commit carries the refreshed board and roadmap** (`poetry run python scripts/render_board.py`), because the Y5 tolerance that lets a CLAIM ship no render is for STATUS-ONLY drift and a new item is beyond it: without the render, `test_committed_roadmap_page_matches_its_sources` fails and the trunk is red for the whole window between the two pushes (observed on G132/G133, 2026-08-30). Rendering in the stub commit costs nothing and keeps the guard doing its job. This has failed six times without the protocol, most recently O69 on 2026-08-29: one machine's id was already pushed on a feature branch and the other never looked past its own working tree. The old allocator BANDS (producer 1–9999, company 10000+) separated the two repos, never the two machines, and are retired as above; the machine-vs-machine collision is what the push-the-stub protocol here is for.
 
 **Session ritual (keeps every platform aligned):**
 1. **Start:** `git pull` → read this file → open the board's Ready-to-pull strip (or run
@@ -116,6 +117,14 @@ The 27 legacy letters (A..Z, GN, MM) were FROZEN on 2026-09-02 — a letter reco
    means green at *what you pushed*, never green at somebody else's older commit. It is
    **warn-only** and never blocks the snapshot: recording repo structure and passing a lint
    gate are unrelated jobs, and the failure being fixed here is nobody *looking*.
+   **The check has three outcomes, not two (J78):** green at HEAD, red at HEAD, or **no
+   verdict at HEAD**, which it prints as `UNVERIFIED`. A run GitHub cancelled (the usual
+   cause: your next push superseded it) has a matching sha and no result, and so does a
+   sha with no run at all — neither is green and neither is red. UNVERIFIED means this
+   commit was never checked, and the next push that does run will attribute any failure
+   to whoever made it; if you are about to stop, push something that runs, or say in the
+   handoff that HEAD is unverified. Both of 2026-08-31's first two pushes were cancelled
+   this way and the old check called them RED.
    *Stale-render check (renders are deterministic):* re-render, then `git diff --quiet docs/plan/board.html`
    (and the `docs/design/*.html`, `web/src/generated/gates.json`, `web/src/generated/enforcement-matrix.json`,
    `web/src/generated/load-map.json`, and `docs/plan/load-map.html` — a default-paths `render_board.py` run
@@ -273,7 +282,11 @@ units from `docs/restructure/backlog/items/`. Each backlog item names its agent 
   same commit. A backlog item's `module:` field names the target component; the map says which
   directory that is.
 - **Verify before asserting.** A recalled fact or stale doc that names a file/flag/column may
-  be wrong — confirm it exists before relying on it.
+  be wrong — confirm it exists before relying on it. And when a measurement contradicts an
+  expectation, **check the instrument before the subject** (J76): read the raw exit code before
+  parsing, decode explicitly, reconstruct a fixture from the incident at its real values — three
+  instruments failed *into* "clean" on 2026-09-01 and were acted on
+  ([`docs/style/review-provenance.md`](docs/style/review-provenance.md), "Check the instrument").
 - **Live-verification claims name their venue (J18).** A "verified live" claim names the
   machine/container/database it ran on (e.g. "desktop, `neo4jtest`, `drydocs` DB") — the two
   machines hold independent graphs, so an untagged claim reads as a defect from the other

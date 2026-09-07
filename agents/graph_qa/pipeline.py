@@ -34,6 +34,16 @@ from graph_qa.envelope import (
     sha256_text,
 )
 from graph_qa.schema_context import build_schema_prompt, load_vocabulary
+from graph_qa.term_resolution import (
+    Clarification,
+    ResolutionIndex,
+    build_clarification,
+    clarification_clause,
+    declined_note,
+    detect_terms,
+    load_glossary_senses,
+    parse_clarifications,
+)
 from graph_qa.tier2 import DEFAULT_TOKEN_BUDGET, run_tier2
 
 MAX_FIX_RETRIES = 2  # R2 acceptance: fix loop capped at 2
@@ -72,8 +82,25 @@ ANSWER_SYSTEM = (
     "You answer questions about the DryDocs knowledge graph from query "
     "results ONLY. Be concise and concrete; cite counts and names from the "
     "rows. If the rows cannot answer the question, say exactly what is "
-    "missing — never invent data."
+    "missing — never invent data. When the rows carry 'epistemic: lower-bound', "
+    "say so in those words and name the causes: the rows are a floor, not the "
+    "whole answer, and zero rows then means 'not visible to this walk', never "
+    "'none exist'."
 )
+
+
+def _epistemic_clause(envelope: Envelope) -> str:
+    """R15: the label the answering spec step earned, as given, for the answer
+    prompt — so a zero-row lower-bound answer is written as "nothing found,
+    and the walk could not have found it" and never as "there is nothing".
+    Empty when the answering tier was not a graded spec."""
+    if envelope.tier != "spec":
+        return ""
+    for step in reversed(envelope.steps):
+        if step.kind == "spec" and step.epistemic is not None:
+            named = ", ".join(str(c.get("detail", c.get("cause"))) for c in step.causes)
+            return f"; epistemic: {step.epistemic}" + (f" (causes: {named})" if named else "")
+    return ""
 
 
 def _extract_json(text: str) -> dict:
@@ -97,6 +124,7 @@ class GraphQaPipeline:
         ledger=None,
         on_step: Callable | None = None,
         token_budget: int = DEFAULT_TOKEN_BUDGET,
+        glossary_loader: Callable = load_glossary_senses,
     ) -> None:
         self.provider = provider
         self.run_read = run_read
@@ -120,6 +148,10 @@ class GraphQaPipeline:
         # R6: per-question Tier-2 exploration budget (see tier2.py — it bounds
         # exploration, not the one terminating answer call).
         self.token_budget = token_budget
+        # R19: the glossary senses the clarification step may OFFER (approved
+        # senses also resolve a term). Injected so the unit suite runs without
+        # the repo's glossary files.
+        self.glossary_loader = glossary_loader
 
     def _push_step(self, envelope: Envelope, step: StepRecord) -> None:
         envelope.steps.append(step)
@@ -228,6 +260,13 @@ class GraphQaPipeline:
         step.rows, step.truncated, step.ms = result.row_count, result.truncated, result.ms
         step.notifications = list(getattr(result, "notifications", []) or [])
         step.explore_ref = self._explore_ref(spec.cypher, spec.database, resolved)
+        # R15: grade the walk against the same database the rows came from. The
+        # probes are the API's own (one count each), so the agent and the console
+        # cannot disagree about what bounded an answer.
+        step.epistemic, step.causes = specs_catalog.grade(
+            spec,
+            lambda c, p, d: self.run_read(c, params=p, database=d, row_cap=1).records,
+        )
         self._push_step(envelope, step)
         timings["retrieve"] += step.ms
         # G102: the trust signal is the spec's own declaration, not its database
@@ -344,6 +383,68 @@ class GraphQaPipeline:
         )
         return outcome
 
+    # -- R19 clarification -----------------------------------------------------
+    def _clarify(
+        self,
+        envelope: Envelope,
+        question: str,
+        clarifications: list[Clarification],
+        timings: dict,
+    ) -> bool:
+        """True when the question carries a term the pipeline cannot resolve
+        and the person has not yet clarified it: the envelope then IS the
+        clarification request (tier 'clarification') and nothing is routed.
+
+        Detection runs first and the index is built only when it finds
+        something, so an ordinary lower-case question pays nothing and makes
+        no extra schema call. If the schema cannot be read the check is
+        skipped — the old single pass runs and its own steps report the
+        failure."""
+        if not detect_terms(question):
+            return False
+        started = self.clock()
+        try:
+            index = ResolutionIndex(
+                specs=specs_catalog.QUERY_SPECS.values(),
+                vocab_rows=self.vocabulary_loader(),
+                live_schema=self.graph_schema(),
+                glossary=self.glossary_loader(),
+            )
+        except Exception:
+            return False
+        request = build_clarification(question, index, clarifications)
+        for c in clarifications:
+            self._push_step(
+                envelope,
+                StepRecord(
+                    i=len(envelope.steps) + 1,
+                    kind="clarified",
+                    spec_id=f"clarified:{c.term}",
+                    note=(
+                        "declined: no clarification given"
+                        if c.declined or not c.resolution
+                        else c.resolution
+                    ),
+                ),
+            )
+        if request is None:
+            return False
+        terms = ", ".join(t.term for t in request.terms)
+        envelope.tier = "clarification"
+        envelope.clarification = request.to_dict()
+        envelope.answer = request.prompt
+        self._push_step(
+            envelope,
+            StepRecord(
+                i=len(envelope.steps) + 1,
+                kind="clarify",
+                spec_id=f"clarify:{terms}",
+                ms=int((self.clock() - started) * 1000),
+                note=request.prompt,
+            ),
+        )
+        return True
+
     # -- entry point ----------------------------------------------------------
     def answer(
         self,
@@ -353,8 +454,13 @@ class GraphQaPipeline:
         memory_events: int = 0,
         memory_chars: int = 0,
         user_id: str = "",
+        clarifications: list[dict] | None = None,
     ) -> Envelope:
         total_started = self.clock()
+        # R19: what the person already said their terms mean, from the console's
+        # control part. Never re-asked; carried into every prompt below as a
+        # clause on the question. The envelope hashes the ORIGINAL question.
+        clarified = parse_clarifications(clarifications)
         timings = {"routing": 0, "retrieve": 0, "llm": 0}
         envelope = Envelope(
             run_id=run_id,
@@ -394,7 +500,21 @@ class GraphQaPipeline:
             }
             return envelope
 
-        spec_id, params = self._route(envelope, question, timings)
+        # R19: a term that resolves to none of the four sources is asked about
+        # before anything routes — a near match is a choice the person makes,
+        # never one the router makes for them.
+        if self._clarify(envelope, question, clarified, timings):
+            envelope.metrics.iterations = 1
+            envelope.metrics.budget["tokens_limit"] = self.token_budget
+            envelope.metrics.budget["tokens_used"] = envelope.metrics.tokens.total
+            envelope.metrics.response_ms = {
+                "total": int((self.clock() - total_started) * 1000),
+                **timings,
+            }
+            return envelope
+        prompt_question = question + clarification_clause(clarified)
+
+        spec_id, params = self._route(envelope, prompt_question, timings)
         result = self._run_spec(envelope, spec_id, params, timings) if spec_id else None
         if result is not None:
             envelope.tier = "spec"
@@ -403,7 +523,7 @@ class GraphQaPipeline:
             # tiering) — a mis-routed or not-yet-loaded spec must not become an
             # empty answer when text2cypher can ground one. The spec step stays
             # in the envelope either way; tier reports what actually answered.
-            t2c_result = self._run_text2cypher(envelope, question, timings)
+            t2c_result = self._run_text2cypher(envelope, prompt_question, timings)
             if t2c_result is not None and (result is None or t2c_result.row_count > 0):
                 result = t2c_result
                 envelope.tier = "text2cypher"
@@ -418,8 +538,9 @@ class GraphQaPipeline:
             envelope.answer = self._llm(
                 envelope,
                 ANSWER_SYSTEM,
-                f"Question: {question}\n\nRows ({result.row_count}"
-                f"{', truncated' if result.truncated else ''}):\n{rows_json}",
+                f"Question: {prompt_question}\n\nRows ({result.row_count}"
+                f"{', truncated' if result.truncated else ''}"
+                f"{_epistemic_clause(envelope)}):\n{rows_json}",
                 timings,
                 step="answer",
             )
@@ -431,9 +552,14 @@ class GraphQaPipeline:
             # Tier-1 context was insufficient — this, and only this, is where
             # Tier 2 engages (ADR 0007 tiering). A run that answered above never
             # reaches the loop, so the common question never pays for it.
-            outcome = self._run_tier2(envelope, question, timings)
+            outcome = self._run_tier2(envelope, prompt_question, timings)
             envelope.answer = outcome.answer or ""
             envelope.tier = "tier2" if outcome.answered else "unanswered"
+
+        # R19 (c): a DECLINED clarification is stated on the answer itself, so a
+        # zero-row near match is never presented as a finding about the graph.
+        if envelope.answer or envelope.tier == "unanswered":
+            envelope.answer = declined_note(clarified) + envelope.answer
 
         if not envelope.metrics.iterations:
             envelope.metrics.iterations = 1  # tiers 0/1 are a single pass

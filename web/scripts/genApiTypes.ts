@@ -12,6 +12,7 @@
 //   poetry run python scripts/dump_openapi.py && (cd web && npm run api:types)
 
 import openapiTS, { astToString } from 'openapi-typescript'
+import ts from 'typescript'
 
 export const BANNER = [
   '// GENERATED from src/generated/openapi.json by scripts/genApiTypes.ts (O70).',
@@ -28,6 +29,27 @@ export async function generate(schema: unknown): Promise<string> {
     // the honest type for a route the server has not modelled yet.
     alphabetize: true,
     exportType: true,
+    // WEB6: A BINARY FIELD IS A Blob IN A BROWSER, NOT A STRING. FastAPI
+    // declares the evidence upload's `files` as binary and the default mapping
+    // made it `string[]`, so the one call site that sends real File objects
+    // needed a double cast to get past its own generated type — the compiler
+    // switched off at a seam whose whole purpose is to be checked.
+    //
+    // BOTH SPELLINGS, because the server's is not the one the recipe names.
+    // OpenAPI 3.0 says `format: "binary"`; 3.1 says
+    // `contentMediaType: "application/octet-stream"`, and drydocs_api emits 3.1
+    // (Pydantic v2). A transform written for `format` alone changed NOTHING
+    // here and would have read as a working fix — the regenerated file was
+    // byte-identical, which is the only reason it was caught.
+    transform(schemaObject) {
+      const binary =
+        schemaObject.format === 'binary' ||
+        (schemaObject as { contentMediaType?: string }).contentMediaType ===
+          'application/octet-stream'
+      return binary
+        ? ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('Blob'))
+        : undefined
+    },
   })
   return BANNER + astToString(ast)
 }

@@ -378,6 +378,62 @@ UNCHAINED_LOADER_EXCLUSIONS: dict[str, str] = {
 }
 
 
+def _rederive_loader_views() -> None:
+    """Recompute every view DERIVED from LOADER_REGISTRY, in place.
+
+    In place, because the composition root re-exports these dicts by object and a
+    consumer's `load` verb reads them at call time - rebinding the name here would
+    leave every earlier import holding the stale one.
+    """
+    LOADER_SOURCE.clear()
+    LOADER_SOURCE.update(
+        {
+            cli_name: cls.source_id
+            for cli_name, cls in LOADER_REGISTRY.items()
+            if cls.source_id is not None
+        }
+    )
+
+
+def register_loaders(
+    registry: dict[str, type],
+    *,
+    chains: dict[str, tuple[type, ...]] | None = None,
+    unchained_exclusions: dict[str, str] | None = None,
+) -> None:
+    """The DECLARATION half of the consumer seam (S16 gave the verb half).
+
+    A consumer's command module (``drydocs.cli_consumer``, imported LAST by the
+    root) registers its loaders ONCE, at import, through this function - never by
+    mutating ``LOADER_REGISTRY`` directly, because ``LOADER_SOURCE`` and the
+    unchained set are DERIVED from it and would go stale; the eleven ties
+    ``tests/unit/test_load_map_declarations.py`` guards read the composed root, so
+    they hold over the union. Found at the company's chunk-4 S8 take (2026-09-03):
+    seventeen company loaders vanished from the ad-hoc ``load`` path because the
+    monolith's registry was replaced and nothing declared them back.
+
+    ``registry``: cli name -> loader class, each declaring ``source_id`` (the
+    ``load`` verb gates on it). ``chains``: the consumer's own command -> loaders,
+    for its verbs. ``unchained_exclusions``: cli name -> written reason for any
+    consumer loader outside every chain (G80 - the omission is a decision on record).
+    A name that already binds a DIFFERENT producer class is refused: a consumer
+    extends the registry, it never shadows it.
+    """
+    for name, cls in registry.items():
+        bound = LOADER_REGISTRY.get(name)
+        if bound is not None and bound is not cls:
+            raise ValueError(
+                f"register_loaders: {name!r} already binds {bound.__name__}; a consumer "
+                "extends LOADER_REGISTRY and never shadows a producer loader"
+            )
+    LOADER_REGISTRY.update(registry)
+    if chains:
+        COMMAND_LOADERS.update(chains)
+    if unchained_exclusions:
+        UNCHAINED_LOADER_EXCLUSIONS.update(unchained_exclusions)
+    _rederive_loader_views()
+
+
 def unchained_registry_loaders() -> tuple[tuple[str, type], ...]:
     """Every LOADER_REGISTRY ``(name, class)`` no COMMAND_LOADERS command runs.
 
@@ -805,13 +861,49 @@ def _scope_binds(
                           start with a lowercase letter; a SID ending in lowercase
                           'p' is the automation release process, not a person.
       row_cap             unordered ROWNUM sample cap
-      data_center_filter  data-center name LIKE pattern (G115). One value domain
-                          across the family: the DC value-domain probe
-                          (drydocs/loaders/sql/adhoc/profile_cm_avg_run.sql,
-                          answered 2026-07-22) confirmed the long-form name is
-                          the key everywhere, so the full long-form spelling is
-                          an exact match and a prefix pattern also works. The
-                          pattern passes through untouched, like folder_filter.
+      data_center_filter  LONG-form data-center name - CM_HOSTS.DATA_CENTER and
+                          CM_AVG_RUN.DATA_CENTER (G115).
+      data_center_code    SHORT Control-M server code - CM_DEF_VTAB.DATA_CENTER,
+                          so folders and the folder-joined jobs and variables
+                          extracts (LOAD2).
+
+                          TWO VALUE DOMAINS, TWO BINDS, ONE OPTION. The operator
+                          passes ONE --data-center value in either spelling and
+                          both binds are emitted; each statement binds the one
+                          its own column carries, and python-oracledb drops the
+                          named bind a statement does not use, so the full dict
+                          stays safe everywhere. Before LOAD2 there was one bind
+                          and one value domain: a long-form value against the
+                          VTAB family returned ZERO ROWS and read as an empty
+                          data center rather than as an error, which is the
+                          failure this closes.
+
+                          THE PAIRING IS DECLARED, NEVER DERIVED
+                          (config/taxonomy/data-centers.yaml, read through
+                          drydocs_core.data_centers; the internal twin holds the
+                          real inventory). The reason is the VENDOR BASELINE and
+                          not a parsing rule of ours: BMC defines no format for
+                          the data-center name, so a Control-M/Server name is
+                          free-form as far as the product is concerned and
+                          nothing in a short code determines a long one - the
+                          zero-padding merely LOOKS derivable. The E#### time
+                          reading is an INTERNAL convention (precedence tier 2,
+                          SME-asserted and mutable) and may not be present at
+                          all, so no code may require it. A value in NEITHER
+                          domain is refused with both spellings named.
+
+                          A LIKE PATTERN still passes through untouched, like
+                          folder_filter: a value carrying '%' or '_' is not a
+                          data-center name, so it is bound to BOTH binds as
+                          given and the operator's pattern does the work. That is
+                          the one case where the two binds carry the same string.
+
+                          The 2026-07-22 probe
+                          (drydocs/loaders/sql/adhoc/profile_cm_avg_run.sql)
+                          profiled CM_AVG_RUN alone, so its "long-form" answer
+                          was true of that table and was over-generalized to the
+                          family; the company's P6 work on the live replica
+                          found it (2026-09-03, RELAY-25).
 
     Operational employee identity (who *ran* actions, vs who authored the
     definition) is separate and not here — it lives in psgmgr.CM_AUD_ACTS;
@@ -829,13 +921,43 @@ def _scope_binds(
     Case-folding the DIRECTORY side is a separate matter and does not belong in
     this bind (gate fid-identity-and-scope §Q6).
     """
+    dc_long, dc_short = _data_center_binds(data_center)
     return {
         "folder_filter": folder,
         "run_as": run_as.upper() if run_as else run_as,
         "developer_sid": developer_sid,
         "row_cap": row_cap,
-        "data_center_filter": data_center,
+        "data_center_filter": dc_long,
+        "data_center_code": dc_short,
     }
+
+
+#: LIKE metacharacters: a value carrying one is an operator PATTERN, not a name.
+_LIKE_CHARS = ("%", "_")
+
+
+def _data_center_binds(value: str | None) -> tuple[str | None, str | None]:
+    """``(long, short)`` for one ``--data-center`` value (LOAD2 b/c).
+
+    ``None`` means no filter on that dimension and both binds stay NULL. A LIKE
+    PATTERN passes through to both binds unchanged - the operator's pattern is doing
+    the work and the registry has nothing to say about it. Anything else is resolved
+    through the declared registry, so one value reaches the table that speaks each
+    domain; a value in neither domain is refused with both spellings named, because
+    passing it through is the silent zero-row result this item exists to remove.
+    """
+    if value is None:
+        return None, None
+    if any(ch in value for ch in _LIKE_CHARS):
+        return value, value
+    from drydocs_core.data_centers import DataCenterError, resolve
+
+    try:
+        dc = resolve(value)
+    except DataCenterError as exc:
+        console.print(f"[red]{exc}[/]")
+        raise typer.Exit(2) from None
+    return dc.name, dc.code
 
 
 # Reusable scope CLI options — attach to any command that runs a psgmgr extract.
@@ -873,7 +995,11 @@ def _data_center_opt():
         None,
         "--data-center",
         help=(
-            "Data-center name LIKE pattern (long-form, e.g. 'T032-E0700-DMA' or 'T032%'). "
-            f"{_SCOPE_HELP}"
+            "Data center, in EITHER spelling: the short server code (e.g. 'T32', what "
+            "CM_DEF_VTAB carries) or the long-form name (e.g. 'T032-E0700-DMA', what "
+            "CM_HOSTS and CM_AVG_RUN carry). One value reaches every table in the domain "
+            "that table speaks - the pairing is declared in config/taxonomy/"
+            "data-centers.yaml. A LIKE pattern ('T032%') is passed through to both "
+            f"columns as given. {_SCOPE_HELP}"
         ),
     )

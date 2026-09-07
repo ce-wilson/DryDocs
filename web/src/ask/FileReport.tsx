@@ -1,9 +1,9 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 
-import { apiBaseUrl } from '../lib/auth'
-import { createApiAccess } from '../lib/graphApi'
 import type { SpecResult } from '../lib/graph'
 import EmptyState from '../components/ui/EmptyState'
+import { useGraphAccess } from '../data/graphAccess'
+import { validateRows, type RowShape } from '../data/rowShape'
 
 // The Ask file-name REPORT (O62): search a file, get the application, the
 // process, and who to escalate to.
@@ -40,6 +40,18 @@ interface ReportRow {
   dev_team: string
 }
 
+const REPORT_COLUMNS: RowShape<ReportRow> = [
+  'asset',
+  'asset_kind',
+  'hop',
+  'activity',
+  'activity_type',
+  'folder',
+  'app_id',
+  'application',
+  'dev_team',
+]
+
 const SPEC_ID = 'ask.file-search.v1'
 
 /** Which source system asserted each column — the legend the captured example
@@ -66,13 +78,13 @@ const LEGS: readonly { key: keyof ReportRow | 'repo'; label: string; modelled: b
 const TH = 'border-b border-edge px-2.5 py-1.5 text-left font-semibold text-muted'
 const TD = 'border-b border-edge-soft px-2.5 py-1.5 align-top text-text'
 
-export default function FileReport({ personaId }: { personaId: string }) {
+export default function FileReport() {
   const [term, setTerm] = useState('')
   const [rows, setRows] = useState<ReportRow[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
-  const access = useMemo(() => createApiAccess(apiBaseUrl(), personaId), [personaId])
+  const { access } = useGraphAccess()
 
   async function run(e: React.FormEvent) {
     e.preventDefault()
@@ -83,7 +95,15 @@ export default function FileReport({ personaId }: { personaId: string }) {
     setRows(null)
     try {
       const res: SpecResult = await access.runSpec(SPEC_ID, { term: q })
-      setRows(res.rows as unknown as ReportRow[])
+      // WEB6: this pane already has an error channel, so a column mismatch uses
+      // it rather than rendering a table of blanks. The spec is a registry one
+      // and not ephemeral, so its declared types are real and get checked too.
+      const checked = validateRows<ReportRow>(res, REPORT_COLUMNS)
+      if (!checked.ok) {
+        setError(checked.message)
+        return
+      }
+      setRows(checked.rows)
     } catch (err) {
       setError((err as Error).message)
     } finally {

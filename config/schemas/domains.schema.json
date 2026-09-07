@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "drydocs:config/schemas/domains.schema.json",
+  "title": "config/taxonomy/domains.yaml (drydocs.domains.v1)",
+  "description": "Shape only (S6): the domain registry, one row per ontology domain (gate ontology-domain-registry-and-edition-grain sB1-sB3, CFG1). vocabulary_fragment is REQUIRED (sB3). Semantics -- fragment exists on disk, every vocabulary entry's domain is registered and active, the base-owned rule for edition rows, the authority resolves in gate-log.md -- live in drydocs_core/ontology/domain_registry.py and tests/unit/test_domain_registry.py.",
+  "type": "object",
+  "required": [
+    "schema",
+    "classification",
+    "updated",
+    "domains"
+  ],
+  "properties": {
+    "schema": {
+      "const": "drydocs.domains.v1"
+    },
+    "classification": {
+      "type": "string"
+    },
+    "classification_only": {
+      "type": "boolean"
+    },
+    "updated": {
+      "description": "date or string (YAML parses bare dates)"
+    },
+    "domains": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/domain"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "domain": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "vocabulary_fragment",
+        "minted_by",
+        "registered_at",
+        "authority",
+        "status"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "description": "the join key every vocabulary entry's domain: carries; never renamed"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "vocabulary_fragment": {
+          "type": "string",
+          "pattern": "^[0-9]{2}-local-[a-z0-9-]+\\.yaml$",
+          "description": "REQUIRED (sB3): the 4x-local-*.yaml fragment that holds this domain's entries"
+        },
+        "minted_by": {
+          "type": "string",
+          "minLength": 1,
+          "description": "producer | company (a BASE) | an edition code (config/taxonomy/editions.yaml)"
+        },
+        "registered_at": {
+          "description": "date or string (YAML parses bare dates)"
+        },
+        "authority": {
+          "type": "string",
+          "minLength": 1,
+          "description": "the gate id (a config/gate-log.md heading) or ADR that ruled it"
+        },
+        "authority_status": {
+          "enum": [
+            "signed",
+            "pending"
+          ]
+        },
+        "status": {
+          "enum": [
+            "active",
+            "deprecated"
+          ]
+        },
+        "superseded_by": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "note": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

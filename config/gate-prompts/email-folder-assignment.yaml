@@ -3,6 +3,8 @@
 # without it — unassigned is a valid resting state, and that is the design.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-19
+
 id: email-folder-assignment
 title: "SME Gate — the email assignment edge: what CONCERNS means, who may assert it, and the fence between aboutness and attribution"
 step: "ops-email-extracts loads as the ACTIVE lexical shape (Document→Chunk, covering-gate reuse); docs_email_concerns is registered status: planned and email_extracts.cypher is test-guarded against ever writing it before this page signs"

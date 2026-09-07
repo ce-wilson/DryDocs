@@ -1,6 +1,10 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
-import type { GraphAccess, SpecResult } from '../lib/graph'
+import { useMemo, useState, type ReactNode } from 'react'
+import { useGraphAccess } from '../data/graphAccess'
+import { useLiveOrDemo } from '../data/provenance'
+import ProvenanceNotice from '../components/ProvenanceNotice'
 import EmptyState from '../components/ui/EmptyState'
+import TruncationBadge from '../components/ui/TruncationBadge'
+import EpistemicBadge from '../components/ui/EpistemicBadge'
 
 // A QuerySpec-bound data frame (O11, site-plan §4): renders ONLY registry
 // results — the UI never invents Cypher. Ships both export paths:
@@ -14,12 +18,37 @@ import EmptyState from '../components/ui/EmptyState'
 //
 // On load failure (api down, DB empty) the frame falls back to the SYNTHESIZED
 // demo grid passed as `fallback` — with a visible notice, never silently.
+//
+// WEB2 — THE ROW CEILING IS NOW VISIBLE, AND THE EXPORT STOPS CLAIMING "full".
+// Every spec carries `limit`, default 500. A 900-row answer arrived as 500 rows
+// and rendered `500/500 · drydocs · LIVE`, indistinguishable from a complete
+// one; then the button labelled "⬇ CSV (full)" replayed the echoed params —
+// which contain that same limit — and filed a governance manifest with
+// `row_count: 500` and nothing saying the extract was partial. The canvas next
+// door had solved exactly this for its node ceiling since O81. So the badge is
+// the canvas's badge (components/ui/TruncationBadge), the label states the
+// ceiling instead of claiming completeness, and the ceiling is raisable where
+// API1 made it raisable.
+//
+// COMPLETENESS IS READ, NEVER INFERRED. `result.truncated` comes from the
+// server's limit+1 probe; `rows.length === limit` is a guess that is wrong in
+// both directions — a result of exactly 500 rows is complete about as often as
+// not, and a filtered view has a different length again.
 
 interface SpecGridProps {
-  access: GraphAccess
   specId: string
   fallback: ReactNode
 }
+
+// WEB12 dropped the `access` prop. Sixteen call sites passed a GraphAccess
+// their route had built, which is how the per-route client became a per-route
+// obligation; the frame reads the session's one client from context instead.
+
+// This frame's demo data is a ReactNode prop, not rows, so the seam is handed a
+// non-empty marker: it decides PROVENANCE, and the node itself is rendered here.
+// (SpecGrid is the one consumer shaped this way; every other call site passes
+// its real demo rows.)
+const DEMO_PRESENT: readonly Record<string, unknown>[] = []
 
 function download(filename: string, content: Blob | string, type = 'text/plain') {
   const blob = typeof content === 'string' ? new Blob([content], { type }) : content
@@ -39,75 +68,129 @@ function toCsv(keys: string[], rows: Record<string, unknown>[]): string {
   return [keys.join(','), ...rows.map((r) => keys.map((k) => esc(r[k])).join(','))].join('\n') + '\n'
 }
 
-export default function SpecGrid({ access, specId, fallback }: SpecGridProps) {
-  const [result, setResult] = useState<SpecResult | null>(null)
-  const [error, setError] = useState<string | null>(null)
+/** A manifest field, when the manifest really carries it as that type.
+ *
+ *  The export manifest stays a free object across the seam (SpecExport) because
+ *  it is a ledger record, not a typed payload — so the status line narrows in
+ *  place rather than the seam pretending to a shape the schema does not
+ *  declare. A manifest without `truncated` is an OLDER manifest, and the status
+ *  line then says only what that manifest actually says. */
+function manifestNumber(m: Record<string, unknown>, key: string): number | null {
+  const v = m[key]
+  return typeof v === 'number' ? v : null
+}
+
+/** The hover text for the two server-export buttons. The old one said only
+ *  "re-runs the spec, streams + manifest", which is true and was the problem:
+ *  it described the mechanism while the label made a claim about the content. */
+function serverExportTitle(truncated: boolean, ceiling: number | null): string {
+  const base = 'Server export — re-runs the spec, streams + manifest'
+  if (!truncated) return `${base}. The result fits under the ceiling, so this is every row.`
+  return ceiling === null
+    ? `${base}. The result is capped, so this is a PARTIAL extract and the manifest records that.`
+    : `${base}. Capped at ${ceiling} rows — a PARTIAL extract, and the manifest records the cap.`
+}
+
+/** Clause (b)'s second half: after the export, say what was exported — and, if
+ *  it was capped, say so with the ceiling. The manifest is the authority here
+ *  rather than the run result, because the manifest is the artifact that gets
+ *  filed alongside the data and it is the one the reader can re-check. */
+function exportSummary(manifest: Record<string, unknown>): string {
+  const rows = manifestNumber(manifest, 'row_count')
+  const count = rows === null ? 'the' : `${rows}`
+  const truncated = manifest.truncated
+  if (typeof truncated !== 'boolean') return `exported ${count} rows`
+  const limit = manifestNumber(manifest, 'limit')
+  if (!truncated) return `exported ${count} rows — complete`
+  return limit === null
+    ? `exported ${count} rows — CAPPED; the result has more`
+    : `exported ${count} rows — CAPPED at ${limit}; the result has more`
+}
+
+export default function SpecGrid({ specId, fallback }: SpecGridProps) {
+  const { access } = useGraphAccess()
   const [filter, setFilter] = useState('')
   const [status, setStatus] = useState('')
+  // API1 clause (c)'s raisable ceiling, as typed. Held as the raw string so the
+  // field can be empty (= "use the display ceiling") and so a half-typed number
+  // is never sent; parsed at the call.
+  const [raiseTo, setRaiseTo] = useState('')
 
-  useEffect(() => {
-    let cancelled = false
-    access
-      .runSpec(specId)
-      .then((r) => {
-        if (!cancelled) setResult(r)
-      })
-      .catch((e: Error) => {
-        if (!cancelled) setError(e.message)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [access, specId])
+  // WEB1: the ONE provenance seam. `fallback` is this frame's synthetic demo
+  // node, so the seam is told there IS a demo and reports `demo` rather than
+  // `empty`/`error` — the same policy this frame already had, now stated once
+  // and counted where an operator can see it.
+  const provenance = useLiveOrDemo<Record<string, unknown>>(specId, DEMO_PRESENT)
+  // Nullable only for the filter memo, which runs before the guards below (a
+  // hook cannot be called conditionally). Past the guards the result is live.
+  const loaded = provenance.status === 'live' ? provenance.data : null
 
   const visible = useMemo(() => {
-    if (!result) return []
-    if (!filter) return result.rows
+    if (!loaded) return []
+    if (!filter) return loaded.rows
     const needle = filter.toLowerCase()
-    return result.rows.filter((r) =>
-      result.keys.some((k) => String(r[k] ?? '').toLowerCase().includes(needle)),
+    return loaded.rows.filter((r) =>
+      loaded.keys.some((k) => String(r[k] ?? '').toLowerCase().includes(needle)),
     )
-  }, [result, filter])
+  }, [loaded, filter])
 
-  if (error) {
+  if (provenance.status === 'loading') {
+    return <EmptyState title="Loading…" hint={`Running QuerySpec ${specId} via drydocs-api.`} />
+  }
+  if (provenance.status !== 'live') {
     return (
       <div className="flex h-full min-h-0 flex-col gap-2">
-        <p className="shrink-0 rounded border border-yellow/50 bg-yellow/10 px-2 py-1 text-[11px] text-yellow">
-          Live QuerySpec <code className="font-mono">{specId}</code> unavailable ({error.split('—')[0].trim()}) —
-          showing the SYNTHESIZED demo frame instead.
-        </p>
-        <div className="min-h-0 flex-1">{fallback}</div>
+        <ProvenanceNotice state={provenance} specId={specId} />
+        {provenance.status === 'demo' && <div className="min-h-0 flex-1">{fallback}</div>}
       </div>
     )
   }
-  if (!result) return <EmptyState title="Loading…" hint={`Running QuerySpec ${specId} via drydocs-api.`} />
 
-  // An EMPTY live result (graph not loaded yet) keeps the demo frame visible —
-  // with a notice, never silently. The LIVE grid takes over once rows exist.
-  if (result.rows.length === 0) {
-    return (
-      <div className="flex h-full min-h-0 flex-col gap-2">
-        <p className="shrink-0 rounded border border-edge bg-panel-2 px-2 py-1 text-[11px] text-muted">
-          QuerySpec <code className="font-mono">{specId}</code> ran against <code className="font-mono">{result.database}</code> and
-          returned no rows (graph not loaded) — showing the SYNTHESIZED demo frame.
-        </p>
-        <div className="min-h-0 flex-1">{fallback}</div>
-      </div>
-    )
-  }
+  const result = provenance.data
 
   // `internal` is the most restrictive level in the vocabulary — J23 collapsed
   // the former fourth tier into it (2026-07-31).
   const isInternal = result.classification === 'internal'
 
+  // The ceiling that governed the rows on screen. Null only for a spec with no
+  // limit at all, which is also a spec that cannot be truncated.
+  const displayLimit = result.limit ?? null
+  // R4: an ephemeral spec replays params frozen at registration, so the server
+  // refuses to re-ceiling it. The seam carries the server's own answer; the
+  // console does not re-derive the rule from the id.
+  const canRaise = result.truncated && !result.ephemeral
+  const raised = canRaise && /^\d+$/.test(raiseTo) && Number(raiseTo) > 0 ? Number(raiseTo) : null
+  // What the next export will be capped at, as far as the console can know.
+  const exportCeiling = raised ?? displayLimit
+
+  /** Clause (b): the button never says "full" unless the result on screen says
+   *  it is complete. Where it is not, the label states the ceiling — a number
+   *  the reader can check against the file they get — rather than a promise. */
+  function exportLabel(format: 'CSV' | 'JSONL'): string {
+    if (!result.truncated) return `⬇ ${format} (full)`
+    return exportCeiling === null
+      ? `⬇ ${format} (capped)`
+      : `⬇ ${format} (first ${exportCeiling} rows)`
+  }
+
   async function serverExport(format: 'csv' | 'jsonl') {
     setStatus(`exporting ${format}…`)
     try {
-      const { filename, blob, manifest } = await access.exportSpec(specId, result!.params, format)
+      // `raised` and not `exportCeiling`: omitting the field asks for the
+      // server's default, which IS the display ceiling. Sending it back
+      // explicitly would turn every export into a raise request, and the server
+      // rejects a raise on an ephemeral spec — so the untouched case would
+      // start failing on the surface it never applied to.
+      const { filename, blob, manifest } = await access.exportSpec(specId, result.params, format, {
+        limit: raised,
+      })
       download(filename, blob)
       download(`${filename}.manifest.json`, JSON.stringify(manifest, null, 2), 'application/json')
-      setStatus(`exported ${manifest.row_count} rows`)
+      setStatus(exportSummary(manifest))
     } catch (e) {
+      // The server's refusal verbatim — it names its own ceiling and its own
+      // R4 rule, and a second copy of either in the browser would be a second
+      // source of truth for a server decision.
       setStatus(`export failed: ${(e as Error).message}`)
     }
   }
@@ -130,6 +213,17 @@ export default function SpecGrid({ access, specId, fallback }: SpecGridProps) {
           classification: r.classification,
           row_count: visible.length,
           scope: 'client-view (current grid state — filtered rows only)',
+          // The client sidecar is a governance artifact too, and it was the
+          // one place the cap could hide completely: a filtered view of a
+          // capped result is twice removed from the answer, and its row_count
+          // says nothing about either. These name the RESULT the view was cut
+          // from, which is why they are not called row_count.
+          truncated: r.truncated,
+          limit: r.limit ?? null,
+          // R15: and the epistemic label, as given — a filtered view of a
+          // lower-bound answer is still a lower bound.
+          epistemic: r.epistemic ?? null,
+          causes: r.causes ?? [],
           trust_tiers_present: r.watermarked ? ['SYNTHESIZED'] : [],
           exported_at: new Date().toISOString(),
         },
@@ -141,7 +235,7 @@ export default function SpecGrid({ access, specId, fallback }: SpecGridProps) {
   }
 
   function copyAsCypher() {
-    const text = `// QuerySpec ${result!.spec_id} · database ${result!.database}\n// params: ${JSON.stringify(result!.params)}\n${result!.cypher}\n`
+    const text = `// QuerySpec ${result!.spec_id} · database ${result!.database}\n// params: ${JSON.stringify(result.params)}\n${result!.cypher}\n`
     navigator.clipboard.writeText(text).then(
       () => setStatus('Cypher copied'),
       () => setStatus('clipboard unavailable'),
@@ -168,11 +262,67 @@ export default function SpecGrid({ access, specId, fallback }: SpecGridProps) {
         <span className="font-mono text-[10px] text-faint">
           {visible.length}/{result.rows.length} · {result.database} · LIVE
         </span>
+        {/* Clause (a): the canvas's badge, beside the canvas's count line, in
+            the canvas's words. `total` is null because the grid genuinely does
+            not know N — the server probed one row past the ceiling, which
+            answers "there is more" and not "how much more". */}
+        {result.truncated && (
+          <TruncationBadge
+            shown={result.rows.length}
+            total={null}
+            unit="rows"
+            title={
+              displayLimit === null
+                ? 'This result was capped by the server; there are more rows than are on screen.'
+                : `Capped at ${displayLimit} rows; there are more. The count above is of what arrived, not of what exists.`
+            }
+          />
+        )}
+        {/* R15: the epistemic label the server put on the answer, as given.
+            Renders nothing for an ungraded spec — see EpistemicBadge. */}
+        <EpistemicBadge epistemic={result.epistemic} causes={result.causes} />
+        {canRaise && (
+          // Clause (c): where API1 made the ceiling raisable, offer it — and
+          // let the SERVER refuse a value it will not honour. The console holds
+          // no copy of EXPORT_LIMIT_CEILING, so the two cannot drift.
+          <label className="flex items-center gap-1 font-mono text-[10px] text-muted">
+            export up to
+            <input
+              type="number"
+              min={1}
+              step={1}
+              value={raiseTo}
+              onChange={(e) => setRaiseTo(e.target.value)}
+              placeholder={displayLimit === null ? '' : String(displayLimit)}
+              aria-label="Export row ceiling"
+              title="Raise the ceiling for the server export only — the rows on screen are unaffected. The server refuses a value above its own limit and says what that limit is."
+              className="w-24 text-xs"
+            />
+          </label>
+        )}
+        {result.truncated && result.ephemeral && (
+          // Clause (c)'s other half: say WHY it cannot be raised rather than
+          // offering a control that will 422.
+          <span
+            className="font-mono text-[10px] text-yellow"
+            title="R4: an ephemeral spec is registered by the agent with its params frozen, which is what makes the answer replayable. Rewriting its ceiling would change the query the transcript cites."
+          >
+            ceiling frozen at registration (R4)
+          </span>
+        )}
         <span className="ml-auto flex items-center gap-1">
           <GridButton label="CSV" title="Client export — current grid state" onClick={() => clientExport('csv')} />
           <GridButton label="JSON" title="Client export — current grid state" onClick={() => clientExport('json')} />
-          <GridButton label="⬇ CSV (full)" title="Server export — re-runs the spec, streams + manifest" onClick={() => serverExport('csv')} />
-          <GridButton label="⬇ JSONL (full)" title="Server export — re-runs the spec, streams + manifest" onClick={() => serverExport('jsonl')} />
+          <GridButton
+            label={exportLabel('CSV')}
+            title={serverExportTitle(result.truncated, exportCeiling)}
+            onClick={() => serverExport('csv')}
+          />
+          <GridButton
+            label={exportLabel('JSONL')}
+            title={serverExportTitle(result.truncated, exportCeiling)}
+            onClick={() => serverExport('jsonl')}
+          />
           <GridButton label="Copy as Cypher" title="The spec's exact query + params" onClick={copyAsCypher} />
         </span>
       </div>

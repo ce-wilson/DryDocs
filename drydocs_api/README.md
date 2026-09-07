@@ -71,7 +71,8 @@ poetry run python -m drydocs_api.agent_query run <spec-id> -p limit=20   # execu
 ```
 
 - **One envelope.** `run` prints exactly what `POST /specs/{id}/run` returns
-  (`exports.execute_spec` — the ten-key `SpecRunOut` shape), so an agent reading
+  (`exports.execute_spec` — the fourteen-key `SpecRunOut` shape, `truncated`/`limit`
+  joined at API1 and `epistemic`/`causes` at R15), so an agent reading
   the CLI and the console reading the API see the same thing. `list` and
   `describe` print the `GET /specs` rows. No third shape.
 - **Typed params from strings.** `-p` values are converted to the declared
@@ -89,6 +90,37 @@ poetry run python -m drydocs_api.agent_query run <spec-id> -p limit=20   # execu
   `run` executes. The unit suite injects a fake runner through `main(argv,
   runner=...)`; `tests/unit/test_agent_query.py` pins the envelope, the
   refusals, the exit codes and the import property.
-- **MCP** (`mcp-neo4j-cypher`) is the richer later option and is deliberately
-  out of scope: it adds a config surface and a write-risk surface this command
-  does not have. Recorded on backlog item R9.
+- **MCP.** The generic `neo4j-drydocs` MCP server (free Cypher) sits beside this
+  command, unchanged. Exposing the R16 verbs below as MCP tools is configuration
+  that calls `main(["verb", ...])`, not a component of this package.
+
+### Agent verbs (R16) — impact, context, trace
+
+Three named tools over REVIEWED specs, for the questions an agent asks at the
+estate's grain. Each verb IS one registry row — `verb.impact.v1`,
+`verb.context.v1`, `verb.trace.v1` — and `drydocs_api/verbs.py` binds the name
+to the row; `verb <name>` then takes exactly the `run` path (same validation,
+`execute_spec`, envelope), so read-only, exposed Cypher and the R15 epistemic
+label are inherited, not re-implemented. There is still no Cypher operand. R4's
+ephemeral specs remain the escape hatch for a question no verb asks.
+
+```powershell
+poetry run python -m drydocs_api.agent_query verbs                                   # the three: params, row shape, spec
+poetry run python -m drydocs_api.agent_query verb impact  -p job=<JOB_NAME>          # blast radius over the WAS_INFORMED_BY chain
+poetry run python -m drydocs_api.agent_query verb context -p job=<JOB_NAME>          # folder, data center, app, team, flags, neighbors
+poetry run python -m drydocs_api.agent_query verb trace   -p from_job=<A> -p to_job=<B>   # shortest chain path, one row per hop
+```
+
+| Verb | Asks about | Rows | Grain notes |
+|---|---|---|---|
+| `impact` | one job (`job`) | every downstream job within `VERB_CHAIN_HOPS` (12) hops: folder, distance, gating condition, shortest chain as text | downstream = informed by the seed, directly or transitively, over the derived `WAS_INFORMED_BY` edge (condition pairs only) |
+| `context` | one job (`job`) | one row per folder defining that name: data center, application and developing team (through the `seal_app_ref` attribution), cyclic/critical/active, direct upstream/downstream, IN/OUT conditions | `job_name` is indexed, not unique — two rows means two folders |
+| `trace` | two jobs (`from_job`, `to_job`) | one row per hop of the shortest path in either direction: step, endpoints, direction, condition | folders on both ends; no rows = no condition-derived path within the ceiling |
+
+All three declare `CHAIN_WALK` (`epistemics.py`): the chain is blind to a
+hand-off that is not a condition (a delivered file — `scheduler_depends_on_file`,
+planned, no loader) and to jobs whose command line went unparsed or unresolved,
+so the label is `lower-bound` while those causes stand, with the causes listed.
+The API reaches the same rows at `POST /specs/verb.<name>.v1/run`; no route was
+added. `tests/unit/test_agent_verbs.py` pins the binding, the inherited guards,
+the envelope, the grade and the no-Cypher property.

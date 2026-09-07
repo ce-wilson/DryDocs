@@ -69,13 +69,13 @@ RITUAL_SUBJECT_PATTERNS: tuple[re.Pattern[str], ...] = (
     # A claim scoped to the ITEM rather than to `backlog`: `chore(Z5): claim`,
     # `chore(O63): release claim`. Narrow on purpose -- the subject must OPEN with
     # claim or release claim, so substantive work cannot inherit the exemption.
-    re.compile(r"^chore\([A-Za-z][A-Za-z0-9]*\):\s*(?:release\s+(?:the\s+)?)?claim\b", re.I),
+    re.compile(r"^chore\([A-Za-z][A-Za-z0-9-]*\):\s*(?:release\s+(?:the\s+)?)?claim\b", re.I),
     # The same claim under a `backlog(<ID>):` TYPE rather than a chore scope —
     # `backlog(G125): claim in_progress (desktop)`. Three commits in the
     # port-base-20260829 range. Still anchored on `claim` immediately after the
     # colon, so `backlog(O60): the BDAT layers become a second lane basis` stays
     # substantive, which it is.
-    re.compile(r"^backlog\([A-Za-z][A-Za-z0-9]*\):\s*(?:release\s+(?:the\s+)?)?claim\b", re.I),
+    re.compile(r"^backlog\([A-Za-z][A-Za-z0-9-]*\):\s*(?:release\s+(?:the\s+)?)?claim\b", re.I),
     #
     # DELIBERATELY NOT WIDENED (2026-09-01), for the same reason `close` is not:
     # `chore(<ID>): mint ...` and `feat(backlog): <ID> body ...`. A MINT is not in
@@ -85,7 +85,11 @@ RITUAL_SUBJECT_PATTERNS: tuple[re.Pattern[str], ...] = (
     # IDEAS.md captures are. Exempting them would be a policy change, and it is
     # the user's to make, not this module's.
     # The same claim spelled as the status it writes: `chore(backlog): O69 in_progress`.
-    re.compile(r"^chore\(backlog\):\s*[A-Za-z]+[0-9]+\s+in_progress\b", re.I),
+    # The id may carry an edition segment (`XMPL-LOAD1`, PLAN2 - the seventh id-shape
+    # site the 2026-09-02 review found): without the optional `<CODE>-` an edition
+    # claim stopped being a claim and the coverage guard counted it as substantive.
+    # The two `(<ID>):` scopes above admit the hyphen for the same reason.
+    re.compile(r"^chore\(backlog\):\s*(?:[A-Za-z]+-)?[A-Za-z]+[0-9]+\s+in_progress\b", re.I),
     # The ledger roll itself, and it is not a convenience exemption — without it
     # the check cannot terminate. The commit that WRITES the citations can never
     # be among them, so every roll would mint a fresh uncited commit and the next

@@ -136,3 +136,31 @@ body { min-height: 100svh; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }
 }
+
+/* O89 screen HITL — the annotate controls, ported from design_doc.py's
+   _FEEDBACK_CSS rather than designed anew, because reviewers move between the
+   design docs and the console and a second interaction to learn is a cost with
+   no benefit. Console tokens rather than the doc renderer's palette (its
+   --link/--line/--faint are its own), but the same three rules that matter: a
+   small unobtrusive button, a full-width note box, and a left rule on an
+   annotated block so a reviewer sees at a glance what they have marked.
+
+   HERE AND NOT IN print.css, which was the first attempt and which
+   test_console_print_gutter.py refused: apart from the screen-side hide line
+   and @page, nothing in that sheet may sit outside @media print, because an
+   unlayered selector there beats Tailwind's layered utilities on screen
+   (TC-SHELL-01's lesson). print.css hides these three classes on paper; this is
+   where they are defined. */
+.dd-note-btn {
+  border: 1px solid var(--edge); background: var(--bg-2); color: var(--muted);
+  cursor: pointer; font-size: 11px; line-height: 1; padding: 1px 5px;
+  border-radius: var(--radius-sm); margin-right: 6px; vertical-align: middle;
+}
+.dd-note-btn:hover { color: var(--text); border-color: var(--faint); }
+.dd-note-box { margin: 6px 0 10px; }
+.dd-note-box textarea {
+  width: 100%; min-height: 56px; font: 12px/1.4 inherit; color: var(--text);
+  background: var(--panel-2); border: 1px solid var(--edge);
+  border-radius: var(--radius-sm); padding: 8px; resize: vertical;
+}
+.dd-annotated { box-shadow: -3px 0 0 var(--yellow); padding-left: 8px; }

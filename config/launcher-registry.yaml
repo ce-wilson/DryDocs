@@ -28,6 +28,8 @@
 # =============================================================================
 
 schema: drydocs.launcher-registry.v1
+classification: Internal-Public
+
 updated: 2026-07-27
 
 rules:

@@ -7,13 +7,17 @@
     "paper": "node scripts/captureRoutes.mjs",
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "oxlint",
+    "lint": "oxlint --max-warnings 0",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install --with-deps chromium",
-    "api:types": "node scripts/writeApiTypes.mjs"
+    "api:types": "node scripts/writeApiTypes.mjs",
+    "test:coverage": "vitest run --coverage --coverage.thresholds.statements=9.8 --coverage.thresholds.branches=70 --coverage.thresholds.functions=50",
+    "bundle:check": "node scripts/checkBundleSize.mjs",
+    "dist:check": "node scripts/checkDistCoordinates.mjs",
+    "audit:high": "npm audit --audit-level=high"
   },
   "overrides": {
     "openapi-typescript": {
@@ -26,7 +30,6 @@
     "@neo4j-nvl/base": "^1.2.1",
     "@neo4j-nvl/react": "^1.2.1",
     "@xyflow/react": "^12.11.2",
-    "clsx": "^2.1.1",
     "d3-force": "^3.0.0",
     "neo4j-driver": "^6.2.0",
     "openapi-fetch": "^0.17.0",

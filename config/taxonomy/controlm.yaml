@@ -12,6 +12,9 @@
 # Faithful to source: counts/values reflect the CSVs as-is, not normalized.
 # =============================================================================
 
+schema: drydocs.controlm.v1
+updated: 2026-08-04
+
 taxonomy: controlm
 domain: technology
 taxonomy_path_root: technology/orchestration/control-m

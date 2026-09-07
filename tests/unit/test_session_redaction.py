@@ -188,6 +188,18 @@ def test_a_resumed_turn_degrades_to_no_control_rather_than_a_wrong_one() -> None
         ("a part that is not JSON", (QUESTION, "not json")),
         ("JSON without the control key", (QUESTION, '{"other": 1}')),
         ("control with no secret field", (QUESTION, json.dumps({CONTROL_KEY: {"api_url": "u"}}))),
+        # ADR 0019: the current console sends the session's PUBLIC handle, and
+        # a stored trace that shows it is a trace that joins to the API audit.
+        (
+            "the current control shape (session_id only; ADR 0019, then 0020)",
+            (QUESTION, json.dumps({CONTROL_KEY: {"session_id": "sess-1"}})),
+        ),
+        # A stale console that still sends the retired api_url field (ADR 0020):
+        # non-secret, so stored as sent, and the agent ignores it.
+        (
+            "a stale console shape (session_id + the retired api_url)",
+            (QUESTION, json.dumps({CONTROL_KEY: {"session_id": "sess-1", "api_url": "u"}})),
+        ),
         ("an empty part", (QUESTION, None)),
     ],
 )

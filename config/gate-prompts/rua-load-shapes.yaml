@@ -18,6 +18,8 @@
 # collector convergence), never this gate.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-07
+
 id: rua-load-shapes
 title: "SME Gate — rua load shapes: which planned edges activate, the new edge meanings the bundles imply, ONE script identity across three sources, source precedence, classification on load, GUID-vs-URN, and the three-signal usage ruling"
 step: "The activation gate for everything the rua chain staged: G18 collector v2 bundles (scripts.tsv + sha256 + meta.txt), G20 bundle extractor, G21 code-operations facts, G24 code-repo seam (server/repo corroboration on content hash), G25 dpl-registry (per-SEAL GUIDs + active flag) — all candidate-side today, none graph-resident"

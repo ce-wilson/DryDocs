@@ -8,7 +8,7 @@ phase: 15
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: done
 depends_on: []
 inputs:
 - docs/reviews/gitnexus-depgraph-comparison.md
@@ -19,3 +19,34 @@ acceptance: |
   (a) THREE VERBS, DEFINED AT THE ESTATE's GRAIN rather than a code repo's: `impact` (blast radius over job chains and conditions), `context` (one job / asset / series with its owners, schedule and upstream-downstream neighbours), `trace` (the path between two estate nodes). (b) EACH VERB IS A REVIEWED QuerySpec, never new free Cypher: the verbs are a naming and exposure layer over drydocs_api's existing spec paths, so the read-only guarantee and the every-executed-Cypher-is-exposed property are INHERITED rather than re-implemented. R4's ephemeral session-scoped specs remain the escape hatch for everything the verbs do not cover. (c) The generic neo4j-drydocs MCP server stays available and unchanged for exploration -- this adds a surface, it removes nothing. (d) THE SEAM WITH R15: if R15 has landed, the verbs carry its epistemic field; if it has not, the verbs must not invent a second wording for the same idea -- the field arrives with R15. (e) Tests: each verb's spec is reviewed and read-only, each returns its documented shape, and no verb accepts caller-supplied Cypher.
 notes: |
   Groomed 2026-08-19 from Idea-125 (R2 of the gitnexus comparison). The review's evidence for it is the whole point: the VERB surface, not the graph, is what makes agents actually use a knowledge graph. Dependency-free deliberately -- it pairs with R15 but does not need it (clause (d) is the seam), and R2 and R4 are both done, so the router and the spec execution paths already exist. Module drydocs-api because the specs and their read-only execution boundary live there; MCP registration is configuration beside it, not a new component.
+  DONE 2026-09-06 (desktop, Lane A). Built on wip/R16-desktop (J31, pushed at the first edit) and
+  merged --no-ff as one unit (feat 629622c7, merge 544e4230). (a) Three verbs at the estate's grain,
+  each asked about a JOB by name: impact (every downstream job over the derived WAS_INFORMED_BY chain,
+  with folder, distance, gating condition and shortest chain), context (one job with folder, data
+  center, application and team via the seal_app_ref port, cyclic/critical/active, direct upstream and
+  downstream, IN/OUT conditions - one row per folder that defines the name, because job_name is indexed
+  and not unique), trace (shortestPath between two jobs, one row per hop with direction and the
+  condition it rides, from_folder/to_folder so ambiguous endpoints stay distinguishable). (b) Each verb
+  IS a registry row - verb.impact.v1, verb.context.v1, verb.trace.v1 in drydocs_api/query_specs.py -
+  so ensure_read_only, ensure_no_element_ids, the SchemaMeta/Uncertain rewrite and every registry guard
+  review it at import; drydocs_api/verbs.py is a name bound to a spec id and nothing else (Verb,
+  VERBS, verb(), list_verbs()). agent_query gains verbs and verb <name> -p K=V, which resolve the id
+  and take the unchanged validate_params -> execute_spec path, so the fourteen-key envelope is the
+  same object run verb.impact.v1 prints. No new route: the API reaches a verb as /specs/verb.<n>.v1/run.
+  (c) .mcp.json and the neo4j-drydocs server are untouched; R4 ephemeral specs stay the escape hatch.
+  (d) R15 had landed (b1527e8c), so the verbs declare CHAIN_WALK (drydocs_api/epistemics.py): both
+  measurable probes plus scheduler_depends_on_file, the one planned edge a job chain would take;
+  scheduler_invokes_utility is deliberately excluded as a data hop. One wording, graded by the spec.
+  (e) tests/unit/test_agent_verbs.py (14): exactly three verbs, params are job names or limit, spec
+  binding by id grammar, read-only + element-id-free + Uncertain-scoped, runner receives the spec
+  Cypher verbatim and only R15 probes beside it, envelope == execute_spec (14 keys), no verb route,
+  CHAIN_WALK on all three, grade carried unchanged (lower-bound with counts, lower-bound on the planned
+  edge alone), verbs listing == list_verbs, folder beside job_name, unknown verb = JSON exit 2 naming
+  the set, params validated before the runner (a cypher= param is bad-param and never runs), verb
+  sub-parser dests == help/verb_name/param. Finding worth keeping: registry ORDER is the graph_qa
+  router's few-shot order under a character budget (agents/graph_qa/schema_context.py), so the three
+  long chain specs sit LAST in the tuple with a comment - placed first they clipped the few-shot
+  section and test_tier1_prompt_is_grounded_and_bounded failed. Live check: desktop, container
+  neo4jtest, drydocs DB - impact 1 row at distance 1, context 2 rows across two folders, trace 2 pairs
+  x 2 hops. Full suite 3440 passed / 13 skipped / 18 deselected (floor 3426); ruff clean; OpenAPI dump
+  unchanged. Next roll's relay names the verb layer, the three specs and CHAIN_WALK.

@@ -9,6 +9,8 @@
 # and connector names stay company-side (PUBLISH-BOUNDARY.md).
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-31
+
 id: dpl-dataset-identity-zone
 title: "SME Gate — the DPL dataset identity rider: `zone` names a storage technology, not a medallion layer, so a GUID-only key makes one pipeline read and write the same DataAsset"
 step: "Decision rider from G136 on rua-load-shapes §G1 (SIGNED 2026-08-07), which ruled managed assets key on the GUID alone with `version` and `zone` as properties. It decides what identifies a MAC dataset endpoint, and therefore whether the G17 READS_FROM / WRITES_TO candidates can carry a raw-to-trusted-to-refined chain at all."

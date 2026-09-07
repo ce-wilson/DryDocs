@@ -103,26 +103,44 @@ def test_run_prints_exactly_the_api_envelope(capsys):
         "rows",
         "watermarked",
         "ephemeral",
+        # API1: completeness is part of the read contract, and the CLI envelope
+        # is the SAME dict the API returns — so the agent tier inherits it too.
+        "truncated",
+        "limit",
+        # R15: so does the epistemic label - an agent filing a lower-bound
+        # lineage answer as the answer is the same defect API1 named.
+        "epistemic",
+        "causes",
     }
     assert "ok" not in payload  # a success IS the envelope; only failures carry ok
 
 
 def test_run_hands_the_runner_the_spec_verbatim_and_typed_params(capsys):
+    """API1 changed one half of this and left the other exactly as it was.
+
+    The DRIVER now receives `limit + 1` — the probe row that answers "was there
+    more?" — while the ECHOED params still say 10. That split is the contract:
+    the console feeds `result.params` straight back into the export path, so an
+    echoed 11 would silently widen every subsequent export by one row.
+    """
     spec = _spec_with_optional_int_limit()
     fake = FakeRunner()
-    rc, _ = _run(["run", spec.id, "-p", "limit=10"], runner=fake, capsys=capsys)
+    rc, payload = _run(["run", spec.id, "-p", "limit=10"], runner=fake, capsys=capsys)
     assert rc == agent_query.EXIT_OK
     (cypher, params, database), *_ = fake.calls
     assert cypher == spec.cypher and database == spec.database
-    assert params["limit"] == 10 and isinstance(params["limit"], int)
+    assert params["limit"] == 11 and isinstance(params["limit"], int)
+    assert payload["params"]["limit"] == 10
+    assert payload["limit"] == 10
 
 
 def test_run_applies_declared_defaults_when_no_params_are_given(capsys):
     spec = _spec_with_optional_int_limit()
     fake = FakeRunner()
-    _run(["run", spec.id], runner=fake, capsys=capsys)
+    _, payload = _run(["run", spec.id], runner=fake, capsys=capsys)
     default = next(p.default for p in spec.params if p.name == "limit")
-    assert fake.calls[0][1]["limit"] == default
+    assert fake.calls[0][1]["limit"] == default + 1  # the declared default, plus the probe row
+    assert payload["params"]["limit"] == default
 
 
 def test_same_input_yields_identical_bytes(capsys):
@@ -209,7 +227,7 @@ def test_no_option_accepts_cypher():
         for a in sub.choices.values()
         for a in a._actions
     }
-    assert dests <= {"help", "spec_id", "param"}
+    assert dests <= {"help", "spec_id", "param", "verb_name"}  # verb_name: R16, a NAME
 
 
 # ---- the runner's failure is an outcome, not a traceback ----------------------------
@@ -239,6 +257,6 @@ def test_import_pulls_neither_the_framework_nor_the_wiring_module():
         "print(sorted(m for m in ('fastapi', 'uvicorn', 'drydocs_api.app') if m in sys.modules))"
     )
     out = subprocess.run(
-        [sys.executable, "-c", code], capture_output=True, text=True, check=True
+        [sys.executable, "-c", code], capture_output=True, encoding="utf-8", check=True
     ).stdout.strip()
     assert out == "[]", f"agent_query import dragged in: {out}"

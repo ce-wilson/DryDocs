@@ -9,21 +9,36 @@ the bounded graph-of-thoughts loop.
 
 **Message parts (R5):** part 0 is the question; an optional later part is
 the `drydocs_control` JSON (`control.py`) carrying the console session's
-drydocs-api token + url — the R4 owner-token handshake that lets the agent
-register ephemeral specs the ASKING session can run/export. Control parts
-never reach the LLM — **and since R23 the token never reaches the session
-store either.** ADK persists every part of the user message as given, so the
-launcher (`serve.py`) wraps the session service and writes a redacted copy:
-`api_token` is stored as a fixed placeholder, `api_url` is kept, and the live
-value exists only in the turn's in-memory `user_content`. The stored event
-still shows a handshake happened; a resumed invocation, which recovers its
-content from stored history, degrades to "no control" exactly as a malformed
-part does.
+drydocs-api session by its PUBLIC handle (`session_id`, ADR 0019) — the R4
+handshake that lets the agent register ephemeral specs the ASKING session
+can run/export. The bearer token never rides in a part (ADR 0019) and
+neither does the api url (ADR 0020 — the agent's own deployment fact).
+Control parts never reach the LLM, with **one documented exception (R19):
+`clarifications`**, a list of `{term, resolution, declined}` the person
+supplied after a turn came back as a clarification request — their own
+words about their own terms, appended to the question as a clause for the
+router and text2cypher prompts, and deliberately NOT a secret (a stored
+trace should show what the person said a term meant). The R23 seam stays as
+defence in depth: ADK persists every part of the user message as given, so
+the launcher (`serve.py`) wraps the session service and writes a redacted
+copy in which any `api_token` a stale console still sends is stored as a
+fixed placeholder. A resumed invocation, which recovers its content from
+stored history, degrades to "no control" exactly as a malformed part does.
 
 ## The tiers
 
 | Tier | What runs | Cypher shown |
 |---|---|---|
+| — | **Clarification (R19), before anything routes:** an acronym or label-shaped
+term in the question that resolves to no registered QuerySpec, no active
+vocabulary row, no live label/property and no approved glossary sense
+(`term_resolution.py`; `drydocs_core/glossary.py`) stops the run at
+`tier: "clarification"` with a structured request — the term, its candidate
+senses/labels, and the choices — instead of a silently chosen near match. The
+next turn carries the person's answer in the control part and is never
+re-asked; a declined term is stated on the answer, so a zero-row near match is
+never presented as a finding. A lower-case question detects nothing and pays
+nothing — the single pass is unchanged | none — nothing ran |
 | 0 | Router matches the question onto a registered QuerySpec (`drydocs_api/query_specs.py`, imported — the agent defines **no named Cypher of its own**) | the spec's Cypher, **verbatim** |
 | 1 | Schema-grounded text2cypher: prompt = active `relationship_vocabulary.yaml` rows + live `graph_schema()` + few-shot spec examples (**never whole-graph state**); fix loop ≤ 2 | the generated Cypher + fix history |
 | 2 | **Only when Tier 1's context is insufficient** (`tier2.py`): a bounded enhance/solve loop — iterations ≤ 2, next-step decision by majority of 3 independent votes, Tier-1's ≤ 2 fix loop inherited, and a per-question token budget that stops exploration. Always terminates | every sub-question's Cypher, same as Tier 1 |
@@ -49,9 +64,10 @@ transaction timeout 15 s.
 
 ```json
 {
-  "status": "success",
+  "status": "success | clarification",
   "run_id": "qa-20260723-104512-3f9c2a",
-  "session_id": "…", "tier": "spec | text2cypher | tier2 | unanswered",
+  "session_id": "…",
+  "tier": "declared | clarification | spec | text2cypher | tier2 | unanswered",
   "question_sha256": "…", "question_chars": 42,
   "answer": "…",
   "model": "…", "provider": "anthropic | azure",
@@ -59,7 +75,8 @@ transaction timeout 15 s.
     { "i": 1, "kind": "router", "spec_id": "explorer.jobs.v2", "ms": 480 },
     { "i": 2, "kind": "spec", "spec_id": "explorer.jobs.v2",
       "cypher": "MATCH …", "database": "drydocs", "rows": 42,
-      "truncated": false, "fix_retries": 0, "error": null, "explore_ref": null },
+      "truncated": false, "fix_retries": 0, "error": null, "explore_ref": null,
+      "epistemic": null, "causes": [], "note": null },
     { "i": 3, "kind": "answer", "ms": 1210 }
   ],
   "sources": [ { "document": "spec:explorer.jobs.v2", "trust": "CONFIRMED",
@@ -74,9 +91,19 @@ transaction timeout 15 s.
     "budget": { "tokens_limit": 12000, "tokens_used": 3340, "exhausted": false },
     "tier2": { "engaged": false, "votes": [], "forced_solve": false }
   },
-  "task_graph": []
+  "task_graph": [],
+  "clarification": null
 }
 ```
+
+R19 adds two fields. `steps[].note` is free text a step wants the trace to
+show — the clarification prompt on a `clarify` step, the person's own
+resolution (or `declined: ...`) on a `clarified` step; `null` on every other
+kind. `clarification` is set ONLY at `tier: "clarification"` (and
+`status: "clarification"`), shaped `{terms: [{term, kind, candidates,
+choices}], prompt}`, with `answer` carrying the same prompt as text so a
+consumer that knows nothing of R19 still shows a sentence. The two fixed
+choice ids are `__free_text__` and `__proceed__` (answer anyway).
 
 Notes on honesty markers: `question_sha256`/`question_chars` only — full
 question text belongs to the local ledger (R3), never a persistable payload.

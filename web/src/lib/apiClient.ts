@@ -1,7 +1,7 @@
 import createClient from 'openapi-fetch'
 
 import type { components, paths } from '../generated/api'
-import { diagnoseNetworkFailure } from './reachability'
+import { diagnoseNetworkFailure, isUpstreamDown, upstreamDownMessage } from './reachability'
 
 // O70. The console's HTTP layer: openapi-fetch over the GENERATED `paths` type
 // (src/generated/api.d.ts, from drydocs-api's own OpenAPI schema), so every
@@ -17,8 +17,10 @@ import { diagnoseNetworkFailure } from './reachability'
 //            the END of that session (O69: a client that can re-authenticate
 //            itself out of a rejection is a client for which the rejection
 //            means nothing). It must never fall back to bolt silently.
-// Both route a network failure through the O85 probe, because a dead server and
-// a blocked origin are the same TypeError to fetch and the message must say which.
+// Both tell a failure's two causes apart by the RESPONSE (reachability.ts, ADR
+// 0020): a thrown fetch is the page's own server not answering; a 502/503/504
+// is the reverse proxy answering for a drydocs-api that is not there. The
+// console is same-origin with the API everywhere, so there is no third cause.
 //
 // The session hooks are INJECTED rather than imported from lib/auth so that
 // auth.ts can use the public client for /login without a module cycle.
@@ -31,17 +33,24 @@ export type { paths }
 export interface SessionHooks {
   /** the held bearer token, or null when signed out */
   token(): string | null
+  /** the session's public handle (ADR 0019), or null when signed out */
+  sessionId(): string | null
   /** the server (or the absence of a token) ended the session: drop it, tell the app */
   rejected(): void
 }
 
 function diagnosingFetch(baseUrl: string): (request: Request) => Promise<Response> {
   return async (request) => {
+    let response: Response
     try {
-      return await globalThis.fetch(request)
+      response = await globalThis.fetch(request)
     } catch {
       throw new Error((await diagnoseNetworkFailure(baseUrl)).message)
     }
+    if (isUpstreamDown(response.status)) {
+      throw new Error(upstreamDownMessage(response.status, baseUrl))
+    }
+    return response
   }
 }
 
@@ -61,6 +70,18 @@ export function requireToken(session: SessionHooks, personaId?: string): string 
     throw new Error(`not signed in${who} — the console session has ended`)
   }
   return token
+}
+
+/** The session's public handle (ADR 0019), with the same "no session ends the
+ *  session" rule as requireToken — a missing handle IS a missing session. */
+export function requireSessionId(session: SessionHooks, personaId?: string): string {
+  const id = session.sessionId()
+  if (!id) {
+    session.rejected()
+    const who = personaId ? ` as ${personaId}` : ''
+    throw new Error(`not signed in${who} — the console session has ended`)
+  }
+  return id
 }
 
 /** A client that sends the session's bearer token and ends the session on 401. */
@@ -102,15 +123,4 @@ export function unwrap<T>(result: { data?: T; error?: unknown; response: Respons
     throw new Error(`${what} failed (${result.response.status}): ${detailOf(result.error, result.response)}`)
   }
   return result.data as T
-}
-
-/** `unwrap` for a route the server still declares as a FREE OBJECT. The type
- *  the caller names is a claim the console makes about the wire, not one the
- *  schema backs — which is why this is a separate function with a separate
- *  name: every call site of it is a route drydocs_api.schemas has not modelled
- *  yet, and the list of them is the follow-up O70 left. When the server
- *  declares the shape, the call becomes a plain `unwrap` and the hand type an
- *  alias of the schema. */
-export function unwrapAs<T>(result: { data?: unknown; error?: unknown; response: Response }, what: string): T {
-  return unwrap(result, what) as T
 }

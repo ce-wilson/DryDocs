@@ -8,11 +8,11 @@ phase: 12
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: in_progress
 depends_on: []
 inputs:
 - web/src/routes/AskRoute.tsx
-- web/src/ask/askApi.ts
+- web/src/lib/askApi.ts
 - web/src/lib/adk.ts
 - web/src/routes/AdminConfigRoute.tsx
 - drydocs_api/app.py
@@ -112,3 +112,23 @@ notes: |
 
   NOT gate-bound: nothing here touches edge semantics, the ontology, or a graph write. The page
   stays read-only (O20).
+
+  PRE-BUILD CHECK 2026-09-06 (desktop, Lane A, at the WEB8 merge c541b858) - READ BEFORE CLAIMING.
+  Two clauses were written before ADR 0020 (WEB10, ACCEPTED 2026-09-05) and name things that no
+  longer exist; build to the ADR, not to the clause text:
+  * (c) says the console pings the agent server at VITE_ADK_URL, default http://localhost:8000.
+    VITE_ADK_URL is RETIRED (ADR 0020 D2). The agent base is the PATH `/agent` on the page's own
+    origin; `GET /agent/list-apps` is the liveness call and the `graph_qa`-in-the-list assertion
+    stands. web/src/lib/adk.ts already reads the base this way.
+  * (f) names the ports (:8001, :8000) as the strip's labels. A production bundle must not carry a
+    port or host (web/scripts/checkDistCoordinates.mjs - `npm run dist:check` fails on it, and
+    WEB10's guard is what Lane B just met on its own machine). Label the services by NAME
+    (drydocs-api, graph, agent server, provider); the ports may appear only in DEV-guarded text.
+  * Rule 2's transport-down case is no longer a failed fetch to :8000. Same-origin, the proxy
+    answers 502/503/504 when the agent upstream is down, and web/src/lib/reachability.ts already
+    tells `unreachable` (this page's own origin) from `upstream-down` (the proxy answered) for the
+    API. Reuse that module for the `/agent` prefix rather than writing a second probe - "one
+    implementation, two surfaces" (f) then also means one implementation across the two upstreams.
+    reachability.ts is a natural input; proposed here, not added.
+  The acceptance TEXT is left as written - amending it is the item author's call, and the notes
+  above are enough for the builder to meet its intent under the ADR.

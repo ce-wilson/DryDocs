@@ -31,10 +31,21 @@ def _registry() -> dict:
     return yaml.safe_load(SOFTWARE_REGISTRY.read_text(encoding="utf-8"))
 
 
+#: Vitest's own file pattern (web/vitest.config.ts: `src/**/*.{test,spec}.{ts,tsx}`).
+#: A `.test.tsx` beside a component is a TEST of it, not a component: it renders
+#: nothing on any route and needs no ledger row. O87 (2026-09-03) added the first
+#: one (SignIn.test.tsx) and this scan counted it as an unregistered component.
+_TEST_FILE_SUFFIXES = (".test", ".spec")
+
+
 def _on_disk(ledger: dict) -> set[str]:
     root = REPO / ledger["root"]
     ext = ledger["extension"]
-    return {f.relative_to(root).as_posix() for f in root.rglob(f"*{ext}")}
+    return {
+        f.relative_to(root).as_posix()
+        for f in root.rglob(f"*{ext}")
+        if not f.name[: -len(ext)].endswith(_TEST_FILE_SUFFIXES)
+    }
 
 
 # --------------------------------------------------------------------------- #
@@ -338,10 +349,59 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     evidence rule asks for. Their pure helpers -- profileData.ts,
     findingClasses.ts, slotShapes.ts -- are .ts and stay outside the scan
     boundary for the same reason nvl-mapping.ts does.
+    88 -> 89 at WEB3 (2026-09-05): RouteAccessGate, deliberately UNBOUND, so the
+    total moves and bound stays at 40. It is the ONE route gate for the whole
+    console -- a pathless layout route that reads modules/registry.ts and admits
+    or redirects whatever path is current -- so binding it to a module would name
+    one of the twelve it serves, the same misstatement TrustLegend and StatusItems
+    are unbound to avoid. That it is unbindable is the point of the component.
+    89 -> 90 at WEB12 (2026-09-05): GraphAccessProvider, also UNBOUND, bound stays
+    40. It is the session's single GraphAccess, mounted above every route, so it
+    belongs to all twelve modules for the same reason RouteAccessGate does. Its
+    sibling data/graphAccess.ts (the context, the hook, the dedupe) is .ts and
+    stays outside the scan boundary, like nvl-mapping.ts and loadMapModel.ts.
+    90 -> 92 at WEB1 (2026-09-05): SystemBanner and ProvenanceNotice, both
+    UNBOUND, bound stays 40. SystemBanner reports readiness and the fallback
+    count for the whole console, and ProvenanceNotice renders the same trust
+    signal on every surface that can fall back -- binding either to one module
+    would name one of the twelve it serves. Their seam, data/provenance.ts, is
+    .ts and outside the scan boundary.
+    92 -> 91 at WEB13 (2026-09-05): TowerIcon.tsx DELETED. Nineteen lines, zero
+    importers, and noUnusedLocals cannot see an unused MODULE -- which is the
+    tech-debt pass's point about it, and the reason the ledger is where a dead
+    component shows up at all.
+    91 -> 92 at WEB5 (2026-09-05): RouteErrorBoundary, UNBOUND for the same
+    reason as RouteAccessGate -- one boundary for every route.
+    94 -> 95 at O68 (2026-09-05): LogEstatePanel, UNBOUND, bound stays 40. It is
+    filed `route` because it lives beside the route components and renders as a
+    tab of one, but it binds to no module: the admin page is not a registry
+    module (it is a GATED_SURFACE), so a binding would have to invent one -- the
+    same reason AdminConfigRoute itself carries none.
+    93 -> 94 at O89 (2026-09-05): FeedbackLayer, UNBOUND, bound stays 40. It is
+    the L5 screen loop mounted beside `main` for every route the paper capture
+    covers, so it belongs to those three and to no module in particular -- the
+    same reason RouteErrorBoundary and RouteAccessGate are unbound. Filed under
+    `layout` rather than a `feedback` area of its own: one component does not
+    make an area, and it renders as shell chrome does.
+    92 -> 93 at WEB2 (2026-09-05): TruncationBadge, UNBOUND, bound stays 40. It
+    is the ONE way a capped result says so -- the canvas's node ceiling and the
+    grid's row ceiling render the same badge in the same words -- so binding it
+    to `explorer` would name the first of the surfaces that use it as its owner.
+    Same rule as RelEdge and TrustLegend, and the reason the component exists at
+    all: two surfaces that must not drift apart need one place to edit.
+    95 -> 96 at R15 (2026-09-06): EpistemicBadge, UNBOUND, bound stays 40. The
+    ONE way a graded answer says exact or lower-bound -- the grid, the Ask step
+    line and the provenance notice all render the server's label through it --
+    so it is TruncationBadge's rule again: a primitive shared so three surfaces
+    cannot drift belongs to none of them. Its hover-text helper, lib/epistemics.ts,
+    is .ts and outside the scan boundary.
+    96 -> 97 at R19 (2026-09-06): ClarificationCard, BOUND to `ask` by directory
+    evidence -- it lives under ask/ and serves exactly the one route that renders
+    it. Both counts move by one.
     """
     comps = _ui()["components"]
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
-        40,
-        88,
+        41,
+        97,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"

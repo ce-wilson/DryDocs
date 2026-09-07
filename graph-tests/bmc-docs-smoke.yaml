@@ -4,6 +4,8 @@
 # classification: Internal-Public (no internal counts/IDs — safe to publish).
 classification: Internal-Public
 schema: drydocs.graph-tests.v1
+updated: 2026-07-20
+
 suite: bmc-docs-smoke
 description: >
   Baseline structural invariants for a Control-M load: folders and jobs exist and

@@ -1,0 +1,144 @@
+id: WEB8
+epic: web-console
+title: The typed-client guarantee has no holes - the mappings, intake and corpus routes are modelled in
+  drydocs_api.schemas so the fifteen unwrapAs sites retire, and the ADK agent calls get a typed contract
+  instead of raw fetch
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on:
+- WEB4
+inputs:
+- docs/reviews/modules/web-2026-09-05.md
+- web/src/lib/apiClient.ts
+- web/src/lib/mappingsApi.ts
+- web/src/lib/intakeApi.ts
+- web/src/lib/corpusStatus.ts
+- web/src/lib/adk.ts
+- web/src/ask/askApi.ts
+- drydocs_api/schemas.py
+- tests/unit/test_openapi_client.py
+acceptance: |
+  The O70 guarantee has two holes. `unwrapAs` in lib/apiClient.ts marks every route
+  drydocs_api.schemas has not modelled - fifteen sites outside tests, eight of them in
+  mappingsApi (domains, grid, options, changeset, drafts, open drafts, promoted diff,
+  corrections), two in intakeApi, one in corpusStatus - and mappings is the one module with
+  WRITE surfaces, so a drifted route writes wrong rather than renders wrong (T3). Separately,
+  lib/adk.ts talks raw fetch to the agent server with no schema behind it (A2).
+
+  (a) The mappings, intake and corpus-status routes are modelled in `drydocs_api.schemas`; the
+      OpenAPI schema and web/src/generated/api.d.ts regenerate; every `unwrapAs` site retires
+      and the helper is deleted or its call count asserted at zero by a test.
+  (b) The ADK calls get a typed contract: either a schema the agent server publishes and a
+      generated client on the same pattern, or a hand-declared TypeScript contract in one
+      module with a drift test against a recorded fixture of the server's responses - the
+      builder chooses and records why. `askApi.ts` moves from src/ask to src/lib with the other
+      API wrappers.
+  (c) The drift tests at both ends of the chain (tests/unit/test_openapi_client.py,
+      web/src/generated/api.test.ts) pass on the regenerated artifacts.
+notes: |
+  Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+  Covers T3 (rank 12) and A2. O70 (done) left the `unwrapAs` list as its named follow-up; this
+  is that follow-up with a closure date. Depends on WEB4 so the new types are enforced when
+  they land.
+
+  ── CLOSED 2026-09-06, Lane B (laptop), branch wip/WEB8-laptop from main at e53c020e ──
+
+  INVENTORY RE-MEASURED AT 21837abe, and it had moved since bcae4d02. Thirteen
+  `unwrapAs` CALL sites, not fifteen, across FOUR modules not three: mappingsApi 9
+  (not 8), intakeApi 2, corpusStatus 1, and logEstate 1. The fourth module is the
+  finding: /admin/log-estate arrived with O68, AFTER O70 drew up the follow-up list,
+  so it opened the same hole a second time and no test noticed - logEstate.ts said so
+  in a comment naming WEB8 as its owner. All four are closed, plus /specs/ephemeral,
+  which O70's own list named and which nothing else was going to pick up.
+
+  (a) DONE. Twenty route handlers traded `-> dict[str, object]` for a declared model.
+  29 of the API's 32 operations now answer with a model ref; the three that do not are
+  /demo (HTML), the streamed export, and the export manifest (open by design), each
+  recorded in an UNMODELLED table with its reason. `unwrapAs` and its two tests are
+  DELETED rather than asserted at zero - `tsc -b --force` is the guard now.
+
+  (b) DONE, hand-declared + recorded fixture. The reason, which the acceptance asks
+  for, is in adk.ts's header: the agent server is Google's `get_fast_api_app`, so a
+  generated client would commit a VENDOR surface and re-churn per ADK upgrade; and
+  google-adk lives in agents/.venv, not the repo interpreter, so no CI job here could
+  drift-check a dump - the determinism argument corpus_status.py already used. What was
+  missing was never a schema: `AdkEvent` carried an index signature and `asJson`
+  returned `any`, so three functions claimed types nothing checked. `isAdkEvent` now
+  ties the declarations to the recorded stream, and the four `as never` casts in
+  stubStream.test.ts are gone. askApi.ts + its two tests moved to src/lib by git mv.
+
+  (c) DONE. test_openapi_client.py 35 passed; web/src/generated/api.test.ts 2 passed.
+
+  ── WHAT THE MODELLING FOUND (three wire facts, none of them cosmetic) ──
+
+  1. GET /intake HAS NEVER SENT `evidence`. `list_intakes` serializes each record and
+     attaches its legal transitions, and never reads the evidence table - one query per
+     page instead of one per row. The console declared the list as `IntakeRecord[]`, the
+     same type a single record uses, so it promised an always-present
+     `evidence: EvidenceRow[]`. Nothing broke, because no page reads it: a full typecheck
+     after splitting the types found zero consumers. It was a claim with nothing behind
+     it, which is the defect O70 existed to remove. Now IntakeRow / IntakeRecord.
+  2. THE EVIDENCE UPLOAD RETURNS A THIRD SHAPE. `_evidence_out` adds `evidence_id` on top
+     of what `get_intake` returns. Under `extra='forbid'` a model that missed it would
+     have turned every SUCCESSFUL upload into a 500.
+  3. A WIRE CHANGE THIS ITEM MADE, pinned in the test rather than left to be found: the
+     two optional `legal_transitions` thread fields are attached by the handler only to a
+     flagged draft, but a response model serializes DEFAULTS, so they are now present on
+     every record. Harmless - both console consumers test truthiness, not presence - and
+     openapi-typescript types a defaulted field as required for exactly this reason.
+
+  ── THE GUARD WAS INVERTED, NOT EXTENDED ──
+
+  test_openapi_client's "these routes are still free objects" test asserted a NON-EMPTY
+  follow-up list and told the next builder to promote routes out of it. Emptying it
+  retires it, so it now runs the other way: every JSON operation must declare a model.
+  The old direction only guarded routes it already knew about, which is precisely how
+  /admin/log-estate reopened the hole after O70 - found by re-measuring, not by a test.
+  CONSOLE_ROUTES is also re-keyed by (path, method): /intake answers GET and POST with
+  different shapes and a path-keyed table could only ever pin one.
+
+  ── A REAL GAP IN THE SUITE, NOW CLOSED ──
+
+  Nothing in the repo sent an HTTP request at /mappings/* or /intake/*.
+  test_mapping_api.py - 48 tests over the only surface here with WRITE routes - calls the
+  handler functions directly, so twenty freshly declared models would have been guarded
+  by the schema alone, which cannot prove a handler still returns what its model says.
+  tests/unit/test_response_models.py drives all 28 declared operations through FastAPI
+  once each; a paired test keeps its driven set and CONSOLE_ROUTES in step by name.
+
+  ── HANDED BACK TO LANE A (not fixable inside this item) ──
+
+  * REQUEST bodies are still unmodelled, and one hand-declared type is already STALE:
+    `DraftEntry` in mappingsApi.ts describes the job-grain changeset retired at K7 §A1,
+    while POST /mappings/changeset requires app_code + app_id per entry. Found by driving
+    the route - the first thing in the suite ever to send it a request. WEB8 declares
+    RESPONSES; `ChangesetBody.entries` is a free `list` server-side, so no generated type
+    covers an entry and correcting the interface alone would swap one unguarded
+    hand-declaration for another. Worth an item: model the request bodies the same way.
+  * WRITERS TO RUN AT MERGE if the source moved: `poetry run python scripts/dump_openapi.py`
+    and `npm run api:types` in web/. render_board.py does not own these two artifacts.
+  * TWO LIVE PATHS WENT STALE with the askApi.ts move, neither of them mine to edit.
+    `docs/restructure/backlog/items/O63.yaml` lists `web/src/ask/askApi.ts` as an input
+    (O63 is queue item 2 on this lane, so it is the next thing to trip over it), and ADR
+    0020's implementation checklist has an OPEN line 278 against the same path - the `adr`
+    pen is Lane A's. Both now read `web/src/lib/askApi.ts`. Everything else that names the
+    old path is a RECORD of what was true then - closed items R5/R12/R23/WEB9, ADR 0019's
+    completed checklist, the board and ideas renders, IDEAS.md, the depgraph snapshot -
+    and was deliberately left alone: rewriting a closed note or a signed ADR to match a
+    later move falsifies the record rather than maintaining it.
+  * The `[ 72%]` progress marker was misread as a test count in the two wip commit
+    messages ca50288e and 481d12d2; the real figure is 48, corrected in the test's own
+    docstring. Commits are landed, so this is the correction.
+
+  VERIFIED on this laptop (J18): full pytest suite green, ruff check + ruff format clean,
+  tsc -b --force clean, oxlint 0, vite build ok, 367 vitest passing, bundle:check ok,
+  test:coverage 14.77/78.67/57.8 against floors 9.8/70/50. `npm run dist:check` fails HERE
+  and passes in CI - my web/.env.local sets VITE_NEO4J_URI and VITE_ADK_URL and Vite
+  inlines them into the bundle, which WEB10's guard correctly reports; parking the file and
+  rebuilding gives exit 0. Not a defect, not this branch, and main is green.

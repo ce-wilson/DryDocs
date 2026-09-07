@@ -5,6 +5,8 @@
 # page signs — nothing in this file is applied by writing it.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-21
+
 id: registry-wiring-readiness
 title: "SME Gate — one flag, two facts: does a source-registry row need a WIRED field separate from `confirmed`?"
 step: "config/source-registry.yaml v2 is live with a single boolean `confirmed` per DATASET row. It is the runtime load gate (require_confirmed -> exit 2) AND the record that an SME gate signed the row's meaning. Nine producer rows sit false today for at least four different reasons. Nothing changes before this page signs."

@@ -1,0 +1,89 @@
+id: WEB14
+epic: web-console
+title: A token-parity test holds the hand-frozen custom properties in public/landing.html and public/agent-test.html
+  to src/styles/tokens.css, on the repo's generated-artifact drift-test habit
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p3
+status: done
+depends_on: []
+inputs:
+- docs/reviews/modules/web-2026-09-05.md
+- web/src/styles/tokens.css
+- web/public/landing.html
+- web/public/agent-test.html
+acceptance: |
+  tokens.css is the source (152 lines, light and dark). Two shipped pages carry hand-frozen
+  copies - landing.html (48 custom properties, self-contained by design under the no-CDN
+  intranet rule) and agent-test.html (39, SME-re-ruled independent on 2026-07-29). The pages
+  are deliberate; the frozen copy is the debt, and nothing detects the day they stop agreeing
+  (T4).
+
+  (a) A vitest reads the `:root` and `.dark` custom properties from tokens.css and the
+      properties declared in each page, and asserts every shared key has an equal value.
+  (b) Keys deliberately different (if any) are listed in the test with the reason, so a
+      divergence is a recorded decision, not a silent one.
+  (c) The pages stay self-contained; the test is the drift guard, on the repo's
+      generated-artifact drift-test habit, not a generator.
+notes: |
+  Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+  Covers T4 (rank 13). About thirty lines.
+
+  DONE 2026-09-05 (Lane B, laptop). The frozen token sheets have a guard.
+
+  (a) src/styles/tokenParity.test.ts reads the custom properties declared in
+  tokens.css's `:root` and `:root.dark` blocks and in each page's `:root`, and
+  asserts every SHARED key has an equal value. A page may declare tokens of its
+  own; those are ignored, because the parity question is about the overlap.
+
+  BOTH PAGES FROZE THE DARK SHEET, and that was checked rather than assumed.
+  agent-test.html says so in its own header. landing.html says nothing, and the
+  item's framing ("landing.html, self-contained by design") does not say which —
+  but its `--bg` is #0d1520, which is `:root.dark`'s value and not the #f4f6f9 of
+  `:root`. Pairing landing.html with the light sheet, as a first pass did, reports
+  every colour as drifted and the guard reads as broken on the day it lands. The
+  pairing is DECLARED in the test with that evidence.
+
+  THE PARSER HAD TO BE BRACE-MATCHED, and the first draft was not. Stopping at the
+  first `}` read the blocks as a handful of properties each, and the counts test
+  is the only reason that surfaced. A parser that silently under-reads makes a
+  drift guard pass on a page it never really looked at — the same vacuous-pass
+  failure this burst hit twice in source scans, in a third disguise.
+
+  COUNTS, recorded rather than reconciled: this reads 22 declarations in `:root`,
+  20 in `:root.dark`, 16 in landing.html and 18 in agent-test.html. The review
+  reports 48 and 39 for the two pages. The difference is what is being counted —
+  every `--x:` occurrence in the page, declarations and usages alike, versus
+  declarations inside the `:root` block. The guard needs declarations.
+
+  (b) DELIBERATE_DIVERGENCE is EMPTY, and that is a finding rather than an
+  oversight: the pages and the sheet agree on every shared property today. That is
+  exactly the right moment to install the guard — it starts from a true baseline
+  instead of from a list of exceptions nobody can audit. A test asserts every
+  waiver names a key that really is shared and carries a reason, so the list
+  cannot grow into a place to hide drift.
+
+  (c) THE PAGES STAY SELF-CONTAINED, and there is a test for that too — because
+  the obvious "fix" for duplication is to link the sheet, and both pages exist
+  precisely because they must not. landing.html is a drop-in swap slot under a
+  no-CDN intranet rule; agent-test.html was SME-re-ruled independent on
+  2026-07-29. The guard asserts neither page links tokens.css and both keep their
+  inline style block. T4 is explicit that the pages are not the debt; the frozen
+  copy is.
+
+  Two more assertions keep the check from going vacuous: the source sheets must
+  parse to a plausible size and must DIFFER from each other (otherwise pairing a
+  page with either would pass), and each page must share enough keys for the
+  comparison to mean something.
+
+  Mutation-proven: changing --blue in landing.html fails with the key, both
+  values and the sheet named; restored, it passes.
+
+  Gates at close: poetry run pytest -q = 3360 passed, 12 skipped, 1 failed
+  (test_plan_roadmap - the expected Lane B close failure). ruff clean. In web/:
+  tsc -b exit 0, npm run build exit 0, oxlint --max-warnings 0 exit 0,
+  npm run test:coverage exit 0, vitest 22 files / 261 tests.

@@ -1,13 +1,25 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import ModuleToolbar from '../layout/ModuleToolbar'
 import EmptyState from '../components/ui/EmptyState'
+import EpistemicBadge from '../components/ui/EpistemicBadge'
 import SpecGrid from '../explorer/SpecGrid'
 import { createPublicApi } from '../lib/apiClient'
-import { createApiAccess, createApiClient } from '../lib/graphApi'
-import { ask, controlPart, type AskEnvelope, type AskSource, type AskStep } from '../ask/askApi'
+import {
+  ask,
+  AskStopped,
+  clarificationPart,
+  controlPart,
+  type AskEnvelope,
+  type AskSource,
+  type AskStep,
+  type Clarification,
+} from '../lib/askApi'
+import ClarificationCard from '../ask/ClarificationCard'
 import TaskGraphPane from '../ask/TaskGraphPane'
 import FileReport from '../ask/FileReport'
-import type { Persona } from '../lib/auth'
+import { agentBaseUrl, type Persona } from '../lib/auth'
+import { useGraphAccess } from '../data/graphAccess'
+import * as storage from '../lib/storage'
 
 // The Ask spoke (R5 / ADR 0007): free-text Q&A over the knowledge graph for
 // EVERY persona — the agent tier does the reasoning, the server does the
@@ -25,6 +37,15 @@ interface Turn {
   envelope: AskEnvelope | null
   error: string | null
   running: boolean
+  /** WEB12 (c): the person ended this turn. Rendered as stopped — never as an
+   *  answer, and never as an error, because neither is what happened. */
+  stopped?: boolean
+  /** R19: what the person said their terms mean, when this turn is the
+   *  re-ask of a clarification request. Shown beside the question. */
+  clarifications?: Clarification[]
+  /** R19 (c): the person cancelled the clarification. The request stays
+   *  visible as text, the card is gone, nothing was sent. */
+  dismissed?: boolean
 }
 
 // O64: ONE completed turn per persona survives navigation, in browser-local
@@ -42,7 +63,7 @@ function lastTurnKey(personaId: string): string {
 
 function loadLastTurn(personaId: string): Turn[] {
   try {
-    const raw = localStorage.getItem(lastTurnKey(personaId))
+    const raw = storage.read(lastTurnKey(personaId))
     if (!raw) return []
     const turn = JSON.parse(raw) as Turn
     if (!turn || typeof turn.question !== 'string' || !turn.envelope) return []
@@ -57,37 +78,42 @@ function loadLastTurn(personaId: string): Turn[] {
 }
 
 const STEP_LABEL: Record<string, string> = {
+  declared: 'Answered from a declared source',
+  clarify: 'Asking for clarification',
+  clarified: 'Applying your clarification',
   router: 'Routing onto a registered QuerySpec',
   spec: 'Running registered QuerySpec',
   text2cypher: 'Schema-grounded text2cypher',
   answer: 'Composing the answer',
+  tier2: 'Tier-2 exploration',
 }
 
 export default function AskRoute({ persona }: { persona: Persona }) {
-  const apiUrl = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:8001'
-  const adkUrl = (import.meta.env.VITE_ADK_URL as string | undefined) ?? 'http://localhost:8000'
+  // The agent server is `/agent` on this origin (ADR 0020) - a path, decided in
+  // one place, with no build-time variable to be missing.
+  const adkUrl = agentBaseUrl()
 
-  // ONE shared client: the token handed to the agent (the R4 owner token) and
-  // the runSpec/exportSpec calls must belong to the SAME api session, or the
-  // agent-registered explore_refs would 404 for this page.
-  const client = useMemo(() => createApiClient(apiUrl, persona.id), [apiUrl, persona.id])
-  const access = useMemo(() => createApiAccess(apiUrl, persona.id, client), [apiUrl, persona.id, client])
+  // ONE shared client, now the SESSION's: the handle handed to the agent (the
+  // owner of the specs it registers, ADR 0019) and the runSpec/exportSpec calls
+  // must belong to the SAME api session, or the agent-registered explore_refs
+  // would 404 for this page. WEB12 moved that client to the provider, so this
+  // page shares it with every other surface instead of holding the only
+  // correct copy of the rule.
+  const { apiUrl, getSessionId } = useGraphAccess()
 
   // spec id -> classification, for citation chips ('spec:<id>' sources).
   const [specClass, setSpecClass] = useState<Record<string, string>>({})
   useEffect(() => {
-    let cancelled = false
+    const ctl = new AbortController()
     // O70: the public typed client — the list is unauthenticated and its rows
     // are SpecOut, the server's declaration, so `classification` is not assumed.
     createPublicApi(apiUrl)
-      .GET('/specs')
+      .GET('/specs', { signal: ctl.signal })
       .then(({ data }) => {
-        if (!cancelled && data) setSpecClass(Object.fromEntries(data.map((s) => [s.id, s.classification])))
+        if (data) setSpecClass(Object.fromEntries(data.map((s) => [s.id, s.classification])))
       })
       .catch(() => undefined)
-    return () => {
-      cancelled = true
-    }
+    return () => ctl.abort()
   }, [apiUrl])
 
   const sessionId = useMemo(
@@ -111,25 +137,56 @@ export default function AskRoute({ persona }: { persona: Persona }) {
     setTurns(loadLastTurn(persona.id))
   }
   const running = turns.some((t) => t.running)
+  // One controller per in-flight turn, so Stop ends THIS turn and the ref is
+  // cleared the moment it settles.
+  const inFlight = useRef<AbortController | null>(null)
 
-  async function onAsk() {
-    const q = question.trim()
+  function onStop() {
+    inFlight.current?.abort()
+  }
+
+  // R19: the form calls this with no arguments (the input is the question);
+  // the clarification card calls it with the SAME question plus the
+  // person's clarifications, which ride in the control part of the next
+  // turn - the question text itself is not rewritten.
+  async function onAsk(reask?: { question: string; clarifications: Clarification[] }) {
+    const q = (reask?.question ?? question).trim()
     if (!q || running) return
-    setQuestion('')
+    if (!reask) setQuestion('')
     const id = nextId.current++
-    setTurns((prev) => [...prev, { id, question: q, steps: [], envelope: null, error: null, running: true }])
+    setTurns((prev) => [
+      ...prev,
+      {
+        id,
+        question: q,
+        steps: [],
+        envelope: null,
+        error: null,
+        running: true,
+        clarifications: reask?.clarifications,
+      },
+    ])
     const patch = (fn: (t: Turn) => Turn) =>
       setTurns((prev) => prev.map((t) => (t.id === id ? fn(t) : t)))
+    const ctl = new AbortController()
+    inFlight.current = ctl
 
-    // R4 handshake: forward this session's api token so the agent can register
-    // ephemeral specs WE own. If drydocs-api is down the question still runs —
-    // steps simply carry no explore_ref (honest degradation, matching the agent).
+    // R4 handshake: forward this session's PUBLIC handle so the agent can
+    // register ephemeral specs WE own (ADR 0019: the bearer token stays here).
+    // If drydocs-api is down the question still runs — steps simply carry no
+    // explore_ref (honest degradation, matching the agent).
+    // R19: on a re-ask the clarifications MUST travel even when the handle
+    // cannot be fetched - the question was already asked once; asking it
+    // again unclarified would loop the card.
     let control: ReturnType<typeof controlPart> | undefined
+    let handle = ''
     try {
-      control = controlPart(await client.getToken(), apiUrl)
+      handle = await getSessionId()
+      control = controlPart(handle)
     } catch {
       control = undefined
     }
+    if (reask) control = clarificationPart(handle, reask.clarifications)
 
     try {
       const envelope = await ask({
@@ -140,9 +197,15 @@ export default function AskRoute({ persona }: { persona: Persona }) {
         question: q,
         control,
         onStep: (step) => patch((t) => ({ ...t, steps: [...t.steps.filter((s) => s.i !== step.i), step] })),
+        signal: ctl.signal,
       })
       if (envelope.status === 'error') {
         patch((t) => ({ ...t, error: envelope.error ?? 'agent error', running: false }))
+      } else if (envelope.status === 'clarification' || envelope.clarification) {
+        // R19 (b): a clarification request is rendered as a question on this
+        // turn and is NOT persisted - it is a pending question, not an answer,
+        // and a reload should not resurrect a card whose session is gone.
+        patch((t) => ({ ...t, envelope, steps: envelope.steps ?? t.steps, running: false }))
       } else {
         // the final envelope's steps are authoritative (streamed ones were live previews)
         const completed: Turn = {
@@ -155,12 +218,18 @@ export default function AskRoute({ persona }: { persona: Persona }) {
         }
         // O64: the ONLY persistence write — success envelopes, nothing else
         try {
-          localStorage.setItem(lastTurnKey(persona.id), JSON.stringify(completed))
+          storage.writeJson(lastTurnKey(persona.id), completed)
         } catch {}
         patch((t) => ({ ...t, envelope, steps: envelope.steps ?? t.steps, running: false }))
       }
     } catch (e) {
-      patch((t) => ({ ...t, error: (e as Error).message, running: false }))
+      if (e instanceof AskStopped) {
+        patch((t) => ({ ...t, running: false, stopped: true }))
+      } else {
+        patch((t) => ({ ...t, error: (e as Error).message, running: false }))
+      }
+    } finally {
+      if (inFlight.current === ctl) inFlight.current = null
     }
   }
 
@@ -184,7 +253,7 @@ export default function AskRoute({ persona }: { persona: Persona }) {
               </span>
             </summary>
             <div className="border-t border-edge p-3">
-              <FileReport personaId={persona.id} />
+              <FileReport />
             </div>
           </details>
           <header>
@@ -206,7 +275,18 @@ export default function AskRoute({ persona }: { persona: Persona }) {
           )}
 
           {turns.map((turn) => (
-            <TurnCard key={turn.id} turn={turn} access={access} specClass={specClass} />
+            <TurnCard
+              key={turn.id}
+              turn={turn}
+              specClass={specClass}
+              busy={running}
+              onClarify={(clarifications) =>
+                void onAsk({ question: turn.question, clarifications })
+              }
+              onDismiss={() =>
+                setTurns((prev) => prev.map((t) => (t.id === turn.id ? { ...t, dismissed: true } : t)))
+              }
+            />
           ))}
 
           <form
@@ -232,6 +312,18 @@ export default function AskRoute({ persona }: { persona: Persona }) {
             >
               Ask
             </button>
+            {/* WEB12 (c). Before this the UI offered only `disabled={running}`,
+                so an agent looping until its token budget ran out held the
+                surface for the whole run with no way out but a reload. */}
+            {running && (
+              <button
+                type="button"
+                onClick={onStop}
+                className="rounded-md border border-edge bg-bg-2 px-3 py-1 text-sm font-medium text-text"
+              >
+                Stop
+              </button>
+            )}
           </form>
         </div>
       </div>
@@ -241,18 +333,43 @@ export default function AskRoute({ persona }: { persona: Persona }) {
 
 function TurnCard({
   turn,
-  access,
   specClass,
+  busy,
+  onClarify,
+  onDismiss,
 }: {
   turn: Turn
-  access: ReturnType<typeof createApiAccess>
   specClass: Record<string, string>
+  busy: boolean
+  onClarify: (clarifications: Clarification[]) => void
+  onDismiss: () => void
 }) {
   const envelope = turn.envelope
   const watermarked = (envelope?.sources ?? []).some((s) => s.trust === 'SYNTHESIZED')
+  // R19: a clarification envelope is a QUESTION back to the person - the
+  // card renders in place of the answer block until they act on it.
+  const clarification = envelope?.clarification ?? null
   return (
     <section className="rounded-lg border border-edge bg-panel-2/40 p-3">
       <p className="text-sm font-medium text-text">“{turn.question}”</p>
+      {(turn.clarifications?.length ?? 0) > 0 && (
+        <ul className="mt-1 flex flex-wrap gap-1.5" aria-label="Your clarifications">
+          {turn.clarifications!.map((c) => (
+            <li
+              key={c.term}
+              className="rounded-full border border-edge bg-bg-2 px-2 py-0.5 font-mono text-[10px] text-muted"
+            >
+              {c.term}: {c.declined || !c.resolution ? 'answer anyway' : c.resolution}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {turn.stopped && (
+        <p className="mt-2 rounded border border-edge bg-panel-2 px-2 py-1 text-[11px] text-muted">
+          Stopped — the steps below are what had arrived; there is no answer for this turn.
+        </p>
+      )}
 
       {/* streamed agent steps — live while running, then the envelope's record */}
       <ol className="mt-2 flex flex-col gap-1" aria-label="Agent steps">
@@ -273,7 +390,22 @@ function TurnCard({
         </p>
       )}
 
-      {envelope && (
+      {envelope && clarification && !turn.dismissed && (
+        <ClarificationCard
+          clarification={clarification}
+          disabled={busy}
+          onSubmit={onClarify}
+          onDismiss={onDismiss}
+        />
+      )}
+      {envelope && clarification && turn.dismissed && (
+        <p className="mt-3 whitespace-pre-wrap rounded border border-edge bg-panel-2 px-2 py-1 text-xs text-muted">
+          {envelope.answer}
+          {'\n\n'}Cancelled - nothing was sent; the terms stay unresolved.
+        </p>
+      )}
+
+      {envelope && !clarification && (
         <div className="mt-3 flex flex-col gap-2">
           {watermarked && (
             <p className="rounded border border-yellow/50 bg-yellow/10 px-2 py-1 font-mono text-[10px] text-yellow">
@@ -305,7 +437,7 @@ function TurnCard({
             </summary>
             <div className="mt-2 flex flex-col gap-2">
               {(envelope.steps ?? []).map((step) => (
-                <StepDetail key={step.i} step={step} access={access} />
+                <StepDetail key={step.i} step={step} />
               ))}
             </div>
           </details>
@@ -333,11 +465,18 @@ function StepLine({ step }: { step: AskStep }) {
         {step.error ? '△' : '✓'} {label}
       </span>
       {detail && <code className="font-mono text-[10px] text-faint">{detail}</code>}
+      {/* R19: the clarification prompt / the person's resolution, as given */}
+      {step.note && (step.kind === 'clarify' || step.kind === 'clarified') && (
+        <span className="text-[10px] text-muted">{step.note}</span>
+      )}
       {step.rows !== null && step.rows !== undefined && (
         <span className="font-mono text-[10px] text-faint">
           {step.rows} rows · {step.database} · {step.ms} ms
         </span>
       )}
+      {/* R15: the walk's epistemic label beside its row count, as the agent
+          received it from the grader — never re-worded here. */}
+      <EpistemicBadge epistemic={step.epistemic} causes={step.causes} />
     </li>
   )
 }
@@ -398,7 +537,7 @@ function MetricsChip({ envelope }: { envelope: AskEnvelope }) {
   )
 }
 
-function StepDetail({ step, access }: { step: AskStep; access: ReturnType<typeof createApiAccess> }) {
+function StepDetail({ step }: { step: AskStep }) {
   const [open, setOpen] = useState(false)
   const [copied, setCopied] = useState<string | null>(null)
 
@@ -453,6 +592,9 @@ function StepDetail({ step, access }: { step: AskStep; access: ReturnType<typeof
           </button>
         )}
       </div>
+      {step.note && (
+        <p className="mt-1 whitespace-pre-wrap text-[11px] text-muted">{step.note}</p>
+      )}
       {step.error && (
         <p className="mt-1 font-mono text-[10px] text-yellow">
           {step.error}
@@ -486,9 +628,7 @@ function StepDetail({ step, access }: { step: AskStep; access: ReturnType<typeof
           {/* the R4 payoff: the SAME SpecGrid the Explorer uses, pointed at the
               ephemeral ref — run + both export paths + manifest, zero raw Cypher
               leaving the browser. */}
-          <SpecGrid
-            access={access}
-            specId={step.explore_ref}
+          <SpecGrid specId={step.explore_ref}
             fallback={
               <EmptyState
                 title="Ephemeral spec unavailable"

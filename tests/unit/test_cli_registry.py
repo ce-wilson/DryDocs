@@ -26,8 +26,39 @@ import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
+#: A CONSUMER tree ships drydocs/cli_consumer.py (canonical-company); the producer never
+#: does. The fixture probes below put a fake module on drydocs.__path__, and that only
+#: works where no real one exists - the package directory wins the import, so on a
+#: consumer tree every fixture probe would silently exercise the REAL module (the
+#: company found this at its 2026-09-03 chunk-4 apply). So: the fixture probes run on
+#: the producer; on a consumer tree the same properties are asserted against the real
+#: module, and the two producer-only facts skip by name.
+REAL_CONSUMER = REPO_ROOT / "drydocs" / "cli_consumer.py"
+IS_CONSUMER_TREE = REAL_CONSUMER.exists()
+producer_only = pytest.mark.skipif(
+    IS_CONSUMER_TREE, reason="a consumer tree ships drydocs/cli_consumer.py; producer-only fact"
+)
+
 FIXTURE_MODULE = '''"""A consumer command module, on the S8 shape - fixture only."""
 import typer
+
+from drydocs.cli_shared import register_loaders
+from drydocs.loaders.base import BaseLoader
+
+
+class ConsumerProbeLoader(BaseLoader):
+    """A loader the producer does not ship."""
+
+    source_id = "controlm-xml-export"
+
+    def load(self, *a, **k):  # pragma: no cover - never run
+        raise NotImplementedError
+
+
+register_loaders(
+    {"consumer_probe": ConsumerProbeLoader},
+    chains={"consumer-probe": (ConsumerProbeLoader,)},
+)
 
 app = typer.Typer()
 
@@ -56,6 +87,7 @@ def consumer_dir(tmp_path: Path) -> Path:
     return tmp_path
 
 
+@producer_only
 def test_the_producer_ships_no_consumer_module() -> None:
     assert not (REPO_ROOT / "drydocs" / "cli_consumer.py").exists(), (
         "drydocs/cli_consumer.py is the CONSUMER's file (canonical-company); the producer "
@@ -63,6 +95,7 @@ def test_the_producer_ships_no_consumer_module() -> None:
     )
 
 
+@producer_only
 def test_absent_module_is_silent() -> None:
     result = _probe(
         "import drydocs.cli as c; "
@@ -77,6 +110,20 @@ def test_absent_module_is_silent() -> None:
 
 
 def test_present_module_registers_its_verbs_last(consumer_dir: Path) -> None:
+    """On the producer the fixture module is the consumer; on a consumer tree the real
+    module is, and its own verbs must be the ones registered last."""
+    if IS_CONSUMER_TREE:
+        code = (
+            "import drydocs.cli as c, drydocs.cli_consumer as k; "
+            "names=[x.name for x in c.app.registered_commands]; "
+            "mine=[x.name for x in k.app.registered_commands]; "
+            "assert mine, 'the consumer module registers no verbs'; "
+            "assert names[-len(mine):] == mine, (names[-len(mine):], mine); "
+            "print(names[-1])"
+        )
+        result = _probe(code)
+        assert result.returncode == 0, result.stderr
+        return
     code = (
         "import drydocs; "
         f"drydocs.__path__.append({str(consumer_dir)!r}); "
@@ -96,14 +143,49 @@ def test_present_module_registers_its_verbs_last(consumer_dir: Path) -> None:
 def test_importing_the_consumer_module_first_does_not_execute_the_root(
     consumer_dir: Path,
 ) -> None:
+    """Holds for the real module on a consumer tree exactly as for the fixture."""
+    path_line = "" if IS_CONSUMER_TREE else f"drydocs.__path__.append({str(consumer_dir)!r}); "
     code = (
         "import sys, drydocs; "
-        f"drydocs.__path__.append({str(consumer_dir)!r}); "
+        f"{path_line}"
         "import drydocs.cli_consumer; "
         "assert 'drydocs.cli' not in sys.modules, 'consumer module dragged in the root'"
     )
     result = _probe(code)
     assert result.returncode == 0, result.stderr
+
+
+@producer_only
+def test_present_module_registers_its_loaders_and_the_views_follow(consumer_dir: Path) -> None:
+    """The DECLARATION half: a consumer loader registered at import is in the composed
+    root's LOADER_REGISTRY, LOADER_SOURCE is re-derived (the D3 gate reads it), and
+    the chain it declares is visible - the seventeen-loaders case, in miniature."""
+    code = (
+        "import drydocs; "
+        f"drydocs.__path__.append({str(consumer_dir)!r}); "
+        "import drydocs.cli as c; "
+        "assert 'consumer_probe' in c.LOADER_REGISTRY; "
+        "assert c.LOADER_SOURCE['consumer_probe'] == 'controlm-xml-export'; "
+        "assert 'consumer-probe' in c.COMMAND_LOADERS; "
+        "assert 'consumer_probe' not in c.unchained_loaders(); "
+        "print('ok')"
+    )
+    result = _probe(code)
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.strip() == "ok"
+
+
+def test_a_consumer_cannot_shadow_a_producer_loader() -> None:
+    from drydocs.cli_shared import LOADER_REGISTRY, register_loaders
+
+    name, cls = next(iter(LOADER_REGISTRY.items()))
+
+    class Other(cls):  # type: ignore[misc,valid-type]
+        pass
+
+    with pytest.raises(ValueError, match="never shadows"):
+        register_loaders({name: Other})
+    assert LOADER_REGISTRY[name] is cls, "a refused registration must change nothing"
 
 
 def test_the_root_names_the_seam_once() -> None:

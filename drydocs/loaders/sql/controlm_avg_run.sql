@@ -30,6 +30,10 @@
 --
 -- Scope binds (optional, NULL = no filter): :folder_filter (A.SCHED_TABLE
 -- LIKE — same bind the other five extracts use), :row_cap (ROWNUM cap),
+-- LOAD2 (2026-09-04): this column carries the LONG-form data-center name, so
+-- this statement binds :data_center_filter. The CM_DEF_VTAB family (folders,
+-- jobs, variables) carries the SHORT server code and binds :data_center_code;
+-- one --data-center value emits both binds and each statement uses its own.
 -- :data_center_filter (A.DATA_CENTER LIKE — G115; long-form, and the DC
 -- value-domain probe in adhoc/profile_cm_avg_run.sql, answered 2026-07-22,
 -- confirmed the long-form value domain matches CM_DEF_VTAB, so one pattern

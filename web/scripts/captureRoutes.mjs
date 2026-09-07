@@ -42,6 +42,7 @@ import { chromium } from 'playwright'
 import { JSDOM } from 'jsdom'
 
 import { assemblePaperDocument, externalReferences, routeSlug } from '../src/lib/paperForm.ts'
+import { FEEDBACK_ROUTES } from '../src/feedback/consoleFeedback.ts'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const REPO_ROOT = resolve(HERE, '..', '..')
@@ -51,7 +52,11 @@ const REPO_ROOT = resolve(HERE, '..', '..')
 // capturable on any machine, and exactly the pages FB-03 says get reviewed.
 // Graph-backed routes are opt-in via --routes and are only as good as the graph
 // behind the API at capture time; the footer's commit and time say which moment.
-const DEFAULT_ROUTES = ['/gates', '/software', '/load-map']
+//
+// IMPORTED, NOT RESTATED (O89 clause e). The screen half offers its annotate
+// control on exactly these routes, and two lists would drift into a printout
+// whose gutter names ids no screen offers.
+const DEFAULT_ROUTES = [...FEEDBACK_ROUTES]
 
 function usage(message) {
   if (message) console.error(`captureRoutes: ${message}`)
@@ -303,7 +308,7 @@ async function main() {
       const { css, html } = await inlineAndCollect(page)
       const provenance = { route, commit, capturedAt, api: manifest.api, persona: opts.persona, browser: browserLabel }
       const dom = new JSDOM(html)
-      const tags = assemblePaperDocument(dom.window.document, { css, provenance })
+      const anchors = assemblePaperDocument(dom.window.document, { css, provenance })
       const text = `<!doctype html>\n${dom.window.document.documentElement.outerHTML}\n`
       const leftovers = externalReferences(text)
       const file = join(outDir, `${routeSlug(route)}.html`)
@@ -312,7 +317,11 @@ async function main() {
         route,
         file,
         captured_at: capturedAt,
-        margin_tags: tags,
+        margin_tags: anchors.length,
+        // O89 clause (c): the ANCHORS, not just how many. A feedback note names
+        // one of these, and tests/unit/test_console_feedback.py reports a note
+        // whose anchor is not in this list rather than letting it vanish.
+        anchors,
         bytes: Buffer.byteLength(text, 'utf8'),
         sha256: createHash('sha256').update(text).digest('hex'),
         self_contained: leftovers.length === 0,
@@ -321,7 +330,7 @@ async function main() {
       if (opts.verifyPrint) entry.print_media = await verifyPrintGutter(browser, file)
       manifest.routes.push(entry)
       console.log(
-        `${route} -> ${file} (${tags} tags, ${entry.bytes} bytes${leftovers.length ? `, ${leftovers.length} EXTERNAL REFERENCES` : ''})`,
+        `${route} -> ${file} (${anchors.length} tags, ${entry.bytes} bytes${leftovers.length ? `, ${leftovers.length} EXTERNAL REFERENCES` : ''})`,
       )
     }
   } finally {

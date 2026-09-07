@@ -2,6 +2,40 @@
 // Do not edit: regenerate with `poetry run python scripts/dump_openapi.py`
 // (repo root) then `npm run api:types`. src/generated/api.test.ts guards drift.
 export type paths = {
+    "/admin/log-estate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Log Estate */
+        get: operations["get_log_estate_admin_log_estate_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/config": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Config */
+        get: operations["config_config_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/demo": {
         parameters: {
             query?: never;
@@ -500,10 +534,64 @@ export type paths = {
 export type webhooks = Record<string, never>;
 export type components = {
     schemas: {
+        /**
+         * AppCodeMigrationsOut
+         * @description GET /mappings/app-code/migrations — the K7 §B2 tier-3 readback, so a
+         *     declared end state has a reader and "temporarily dual-coded" cannot quietly
+         *     become the permanent state nobody re-opens. A row is ``SELECT *`` over
+         *     ``v_dual_coded_migrations``, so the row shape is the view's.
+         */
+        AppCodeMigrationsOut: {
+            /** Count */
+            count: number;
+            /** Migrations */
+            migrations: {
+                [key: string]: unknown;
+            }[];
+        };
         /** Body_post_intake_evidence_intake__intake_id__evidence_post */
         Body_post_intake_evidence_intake__intake_id__evidence_post: {
             /** Files */
-            files: string[];
+            files: Blob[];
+        };
+        /**
+         * CauseOut
+         * @description R15: one cause that limited a walk. `cause` is the DryDocs cause class
+         *     (`unparsed-cmd-line` | `unresolved-invocation` | `gate-pending-edge`),
+         *     `detail` names the concrete thing (the probe class, or the planned
+         *     vocabulary entry id for a gate-pending edge), `count` is the measurement
+         *     when one was taken and null when it could not be (a probe that returned no
+         *     count) or does not apply (a gate-pending edge has no count until it exists).
+         */
+        CauseOut: {
+            /** Cause */
+            cause: string;
+            /** Count */
+            count?: number | null;
+            /** Detail */
+            detail: string;
+        };
+        /**
+         * ChangesetArtifactOut
+         * @description POST /mappings/changeset. An ARTIFACT, not a write: the server produces
+         *     CSV text and a manifest snippet and writes nothing at all — the loader stays
+         *     the only graph writer (wf-mapping-01's one rule). ``lifecycle`` and ``note``
+         *     carry that instruction to the operator, which is why they are on the wire
+         *     and not in the page.
+         */
+        ChangesetArtifactOut: {
+            /** Csv */
+            csv: string;
+            /** Entries */
+            entries: number;
+            /** Filename */
+            filename: string;
+            /** Lifecycle */
+            lifecycle: string;
+            /** Manifest Snippet */
+            manifest_snippet: string;
+            /** Note */
+            note: string;
         };
         /** ChangesetBody */
         ChangesetBody: {
@@ -524,6 +612,96 @@ export type components = {
             /** Type */
             type: string;
         };
+        /**
+         * ConfigOut
+         * @description GET /config (ADR 0020): the non-secret, per-environment values the console
+         *     reads at boot instead of having them inlined at build time. Nothing here may
+         *     be a credential or a coordinate the page could not already reach.
+         */
+        ConfigOut: {
+            /** Runtime View Url Template */
+            runtime_view_url_template: string | null;
+        };
+        /**
+         * CorpusRowOut
+         * @description One declared corpus, reconciled against the graph.
+         */
+        CorpusRowOut: {
+            /** Chunks */
+            chunks: number;
+            /** Corpus Id */
+            corpus_id: string;
+            /** Detail */
+            detail: string;
+            /** Documents */
+            documents: number;
+            /** Ok */
+            ok: boolean;
+            /** Status */
+            status: string;
+            /** Target Db */
+            target_db: string;
+        };
+        /**
+         * CorpusStatusOut
+         * @description GET /docs-verify. ``databases_queried`` is carried beside
+         *     ``databases_swept`` because the surface's honesty rule turns on the
+         *     difference: a database that was not queried renders "not queried", never 0
+         *     (the O56 rule), and the rows alone cannot tell those apart. ``statuses`` is
+         *     the whole vocabulary, sent with the payload so the page renders the real set
+         *     instead of a hand-copied one.
+         */
+        CorpusStatusOut: {
+            /** Classification */
+            classification: string;
+            /** Databases Queried */
+            databases_queried: string[];
+            /** Databases Swept */
+            databases_swept: string[];
+            /** Rows */
+            rows: components["schemas"]["CorpusRowOut"][];
+            /** Statuses */
+            statuses: string[];
+        };
+        /**
+         * CorrectionsReportOut
+         * @description GET /mappings/overrides/report — the AO-facing source-corrections
+         *     artifact, rendered as markdown the steward can send on.
+         */
+        CorrectionsReportOut: {
+            /** Count */
+            count: number;
+            /** Filename */
+            filename: string;
+            /** Generated By */
+            generated_by: string;
+            /** Generated On */
+            generated_on: string;
+            /** Markdown */
+            markdown: string;
+        };
+        /**
+         * DraftReceiptOut
+         * @description POST /mappings/overrides/draft and /mappings/app-code/draft (S4, ADR 0009
+         *     rule 5). Drafting writes ROWS to the mapping.db buffer and hands back this
+         *     receipt. The shape it replaced returned a whole replacement file, which
+         *     could not survive two editors: each held a full file built from the same
+         *     base, so whichever was committed last erased the other.
+         */
+        DraftReceiptOut: {
+            /** Committed Rows */
+            committed_rows: number;
+            /** Domain */
+            domain: string;
+            /** Draft Id */
+            draft_id: string;
+            /** Entries */
+            entries: number;
+            /** Note */
+            note: string;
+            /** Pending */
+            pending: number;
+        };
         /** EphemeralRegisterBody */
         EphemeralRegisterBody: {
             /**
@@ -540,8 +718,86 @@ export type components = {
              * @default
              */
             description: string;
-            /** Owner Token */
-            owner_token: string;
+            /** Owner Session */
+            owner_session: string;
+            /**
+             * Params
+             * @default {}
+             */
+            params: {
+                [key: string]: unknown;
+            };
+        };
+        /**
+         * EphemeralRegisterOut
+         * @description POST /specs/ephemeral. The console never calls this one — the QA agent
+         *     registers Cypher here and receives a REF, then runs and exports through the
+         *     same reviewed seam every other caller uses, so the Cypher itself is never a
+         *     query parameter. Modelled with the rest because O70 named it in the same
+         *     list, and because the agent tier is a client with the same claim on a
+         *     declared response as the browser has.
+         */
+        EphemeralRegisterOut: {
+            /** Classification */
+            classification: string;
+            /** Database */
+            database: string;
+            /** Expires At */
+            expires_at: string;
+            /** Explore Ref */
+            explore_ref: string;
+            /** Watermarked */
+            watermarked: boolean;
+        };
+        /**
+         * EvidenceOut
+         * @description One uploaded evidence file. ``kind`` is the extension with its dot
+         *     stripped, and the upload path admits exactly three (``ALLOWED_EXTENSIONS``),
+         *     so the wire declares the three rather than a bare string.
+         */
+        EvidenceOut: {
+            /** Evidence Id */
+            evidence_id: string;
+            /** Filename */
+            filename: string;
+            /** Intake Id */
+            intake_id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "msg" | "json" | "txt";
+            /** Pair Key */
+            pair_key: string;
+            /** Preview */
+            preview: {
+                [key: string]: unknown;
+            } | null;
+            /** Rel Key */
+            rel_key: string;
+            /** Sha256 */
+            sha256: string;
+            /** Size */
+            size: number;
+            /** Superseded */
+            superseded: boolean;
+            /** Uploaded At */
+            uploaded_at: string;
+        };
+        /**
+         * ExportBody
+         * @description The export request: a spec run's params, plus API1 (c)'s raisable ceiling.
+         *
+         *     A separate model from ``QueryBody`` because the ceiling is an EXPORT
+         *     decision. Raising the limit on a grid read would change what is on screen;
+         *     raising it here changes what lands in a file that carries a manifest, and
+         *     those are different permissions to grant. Omitted (the default) keeps
+         *     today's behaviour exactly — the display limit the console echoes back — so
+         *     a caller that has not been updated is unaffected.
+         */
+        ExportBody: {
+            /** Limit */
+            limit?: number | null;
             /**
              * Params
              * @default {}
@@ -577,6 +833,138 @@ export type components = {
              */
             note: string;
         };
+        /**
+         * IntakeEvidenceOut
+         * @description POST /intake/{intake_id}/evidence: the whole record, plus the id of the
+         *     file just stored. ``_evidence_out`` adds that one key to what ``get_intake``
+         *     returns, which makes it a THIRD shape on this surface — and under
+         *     ``extra='forbid'`` a model that overlooked it would turn every SUCCESSFUL
+         *     upload into a response-validation 500.
+         */
+        IntakeEvidenceOut: {
+            /** Area */
+            area: {
+                [key: string]: string | null;
+            };
+            /** Classification */
+            classification: string;
+            /** Context Type */
+            context_type: string;
+            /** Created At */
+            created_at: string;
+            /** Created By */
+            created_by: string;
+            /** Evidence */
+            evidence: components["schemas"]["EvidenceOut"][];
+            /** Evidence Id */
+            evidence_id: string;
+            /** Intake Id */
+            intake_id: string;
+            legal_transitions: components["schemas"]["LegalTransitionsOut"];
+            /** Note */
+            note: string;
+            /** Origin */
+            origin: string;
+            /** Review Payload */
+            review_payload: string | null;
+            /** Status */
+            status: string;
+            /** Thread Decision */
+            thread_decision: ("adds-value" | "no-new-value") | null;
+            /** Thread Flagged */
+            thread_flagged: boolean;
+            /** Thread Of */
+            thread_of: string[];
+        };
+        /** IntakeListOut */
+        IntakeListOut: {
+            /** Intakes */
+            intakes: components["schemas"]["IntakeListRowOut"][];
+        };
+        /**
+         * IntakeListRowOut
+         * @description An intake as the QUEUE lists it.
+         *
+         *     NO ``evidence`` FIELD — and that is the list's real shape, not an omission
+         *     here. ``list_intakes`` serializes each record and attaches its legal
+         *     transitions; it never reads the evidence table, which is one query for the
+         *     page instead of one per row. The console declared the list as
+         *     ``IntakeRecord[]`` — the same type it uses for a single record — so it has
+         *     been claiming an always-present ``evidence: EvidenceRow[]`` that the list
+         *     endpoint has never sent. Modelling the two shapes apart is what surfaced
+         *     that, and keeping them apart is what stops it coming back.
+         */
+        IntakeListRowOut: {
+            /** Area */
+            area: {
+                [key: string]: string | null;
+            };
+            /** Classification */
+            classification: string;
+            /** Context Type */
+            context_type: string;
+            /** Created At */
+            created_at: string;
+            /** Created By */
+            created_by: string;
+            /** Intake Id */
+            intake_id: string;
+            legal_transitions: components["schemas"]["LegalTransitionsOut"];
+            /** Note */
+            note: string;
+            /** Origin */
+            origin: string;
+            /** Review Payload */
+            review_payload: string | null;
+            /** Status */
+            status: string;
+            /** Thread Decision */
+            thread_decision: ("adds-value" | "no-new-value") | null;
+            /** Thread Flagged */
+            thread_flagged: boolean;
+            /** Thread Of */
+            thread_of: string[];
+        };
+        /**
+         * IntakeRecordOut
+         * @description One intake read whole: the list row, plus the evidence ``get_intake``
+         *     attaches. Every single-record route on this surface returns this shape,
+         *     because create, transition and thread-decision all end by re-reading the
+         *     record through ``get_intake``.
+         */
+        IntakeRecordOut: {
+            /** Area */
+            area: {
+                [key: string]: string | null;
+            };
+            /** Classification */
+            classification: string;
+            /** Context Type */
+            context_type: string;
+            /** Created At */
+            created_at: string;
+            /** Created By */
+            created_by: string;
+            /** Evidence */
+            evidence: components["schemas"]["EvidenceOut"][];
+            /** Intake Id */
+            intake_id: string;
+            legal_transitions: components["schemas"]["LegalTransitionsOut"];
+            /** Note */
+            note: string;
+            /** Origin */
+            origin: string;
+            /** Review Payload */
+            review_payload: string | null;
+            /** Status */
+            status: string;
+            /** Thread Decision */
+            thread_decision: ("adds-value" | "no-new-value") | null;
+            /** Thread Flagged */
+            thread_flagged: boolean;
+            /** Thread Of */
+            thread_of: string[];
+        };
         /** IntakeTransitionBody */
         IntakeTransitionBody: {
             /**
@@ -586,6 +974,59 @@ export type components = {
             note: string;
             /** To */
             to: string;
+        };
+        /** LegalTransitionOut */
+        LegalTransitionOut: {
+            /** Action */
+            action: string;
+            /** To */
+            to: string;
+        };
+        /**
+         * LegalTransitionsOut
+         * @description The per-record, per-ROLE transition map the UI renders its buttons from —
+         *     the server owns the machine (the IntakeStepper decision, 2026-08-06), so the
+         *     button set is a server answer and never a client rule.
+         *
+         *     The two thread fields carry defaults where nothing else here does, because
+         *     the handler only attaches them to a flagged draft that still owes its
+         *     decision. A default keeps them out of the schema's ``required`` list, which
+         *     is what makes the generated client declare them optional — matching the
+         *     handler instead of over-promising for it.
+         */
+        LegalTransitionsOut: {
+            /** Status */
+            status: string;
+            /** Terminal */
+            terminal: boolean;
+            /**
+             * Thread Decision Required
+             * @default false
+             */
+            thread_decision_required: boolean;
+            /**
+             * Thread Decisions
+             * @default []
+             */
+            thread_decisions: string[];
+            /** Transitions */
+            transitions: components["schemas"]["LegalTransitionOut"][];
+            /** Waiting On Gate */
+            waiting_on_gate: boolean;
+        };
+        /**
+         * LogEstateOut
+         * @description GET /admin/log-estate. Both halves ride in one payload because the SME's
+         *     question spans them. Note what is absent and stays absent: a kind's
+         *     CONTENTS. ADR 0014 clause 6 rules that the verbose debug tier is captured;
+         *     SURFACING it is a different risk and is not ruled, so there is no field here
+         *     through which a log line could travel.
+         */
+        LogEstateOut: {
+            /** Kinds */
+            kinds: components["schemas"]["LogKindOut"][];
+            /** Zones */
+            zones: components["schemas"]["LogZoneOut"][];
         };
         /** LoginBody */
         LoginBody: {
@@ -597,6 +1038,10 @@ export type components = {
         /**
          * LoginOut
          * @description The session the browser holds. Never the secret (O69).
+         *
+         *     ``session_id`` (ADR 0019) is the public handle: the console passes it to the
+         *     graph_qa agent in the control part so the agent can register ephemeral specs
+         *     for THIS session without ever holding the token. It authorizes nothing.
          */
         LoginOut: {
             /** Expires At */
@@ -605,8 +1050,126 @@ export type components = {
             persona_id: string;
             /** Role */
             role: string;
+            /** Session Id */
+            session_id: string;
             /** Token */
             token: string;
+        };
+        /**
+         * LogKindOut
+         * @description One declared log kind, beside what is actually on the host's disk.
+         *
+         *     ``dir`` and ``oldest_days`` are nullable but always PRESENT: a kind with no
+         *     files has no oldest file, and that is a different fact from a kind whose age
+         *     was never measured.
+         */
+        LogKindOut: {
+            /** Dir */
+            dir: string | null;
+            /** Exists */
+            exists: boolean;
+            /** File Count */
+            file_count: number;
+            /** Format */
+            format: string;
+            /** Id */
+            id: string;
+            /** Level */
+            level: string;
+            /** Oldest Days */
+            oldest_days: number | null;
+            /** Over Retention */
+            over_retention: boolean;
+            /** Path */
+            path: string;
+            /** Retention Days */
+            retention_days: number;
+            /** Rotation */
+            rotation: string;
+            /** Status */
+            status: string;
+            /** Total Bytes */
+            total_bytes: number;
+        };
+        /**
+         * LogZoneOut
+         * @description One declared data zone (G109), inventoried the same way.
+         */
+        LogZoneOut: {
+            /** Empty */
+            empty: boolean;
+            /** Exists */
+            exists: boolean;
+            /** File Count */
+            file_count: number;
+            /** Id */
+            id: string;
+            /** Mode */
+            mode: string | null;
+            /** Path */
+            path: string;
+            /** Total Bytes */
+            total_bytes: number;
+        };
+        /**
+         * MappingDomainOut
+         * @description One mapping domain the console can offer. ``available`` is false for a
+         *     domain whose reconciler table is not built yet — declared so the page can
+         *     render it greyed rather than omit it.
+         */
+        MappingDomainOut: {
+            /** Available */
+            available: boolean;
+            /** Id */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "quintuple" | "manual" | "override" | "defined";
+            /** Source */
+            source: string;
+            /** Tier */
+            tier: number | null;
+            /** Title */
+            title: string;
+        };
+        /** MappingDomainsOut */
+        MappingDomainsOut: {
+            /** Domains */
+            domains: components["schemas"]["MappingDomainOut"][];
+        };
+        /**
+         * MappingGridOut
+         * @description GET /mappings/grid/{domain_id}. ``keys`` names the columns for THIS
+         *     domain and ``rows`` carries them — see the note above on why the row shape
+         *     stays open.
+         */
+        MappingGridOut: {
+            /** Domain */
+            domain: string;
+            /** Keys */
+            keys: string[];
+            /** Rows */
+            rows: {
+                [key: string]: unknown;
+            }[];
+        };
+        /**
+         * MappingOptionsOut
+         * @description GET /mappings/options — the vocabulary the authoring cascade offers.
+         */
+        MappingOptionsOut: {
+            /** Labels */
+            labels: {
+                [key: string]: unknown;
+            }[];
+            /** Relationships */
+            relationships: {
+                [key: string]: unknown;
+            }[];
+            /** Status Summary */
+            status_summary: components["schemas"]["StatusSummaryOut"][];
         };
         /** NamedQueryOut */
         NamedQueryOut: {
@@ -639,6 +1202,24 @@ export type components = {
                 [key: string]: unknown;
             }[];
         };
+        /** OpenDraftOut */
+        OpenDraftOut: {
+            /** Authored By */
+            authored_by: string;
+            /** Authored On */
+            authored_on: string;
+            /** Domain */
+            domain: string;
+            /** Draft Id */
+            draft_id: string;
+            /** Entries */
+            entries: number;
+        };
+        /** OpenDraftsOut */
+        OpenDraftsOut: {
+            /** Drafts */
+            drafts: components["schemas"]["OpenDraftOut"][];
+        };
         /**
          * ParamOut
          * @description One declared parameter of a named query or a QuerySpec.
@@ -652,6 +1233,59 @@ export type components = {
             required: boolean;
             /** Type */
             type: string;
+        };
+        /**
+         * PendingCorrectionsReportOut
+         * @description GET /mappings/pending/report — the N14 union report, which is the
+         *     corrections report plus the per-domain counts behind its total.
+         */
+        PendingCorrectionsReportOut: {
+            /** Count */
+            count: number;
+            counts: components["schemas"]["PendingCountsOut"];
+            /** Filename */
+            filename: string;
+            /** Generated By */
+            generated_by: string;
+            /** Generated On */
+            generated_on: string;
+            /** Markdown */
+            markdown: string;
+        };
+        /**
+         * PendingCountsOut
+         * @description N14 §D2. ``email_unassigned`` is null when the graph could not be reached
+         *     — a rendered state ("read it at the spec"), never an error and never a
+         *     silent zero.
+         */
+        PendingCountsOut: {
+            /** Email Unassigned */
+            email_unassigned: number | null;
+            /** Manual Sources */
+            manual_sources: number;
+            /** Overrides */
+            overrides: number;
+        };
+        /**
+         * PromotedDiffOut
+         * @description POST /mappings/drafts/{draft_id}/promote — the unified diff to apply on a
+         *     branch. The server still writes nothing; git is the only commit target.
+         */
+        PromotedDiffOut: {
+            /** Diff */
+            diff: string;
+            /** Domain */
+            domain: string;
+            /** Draft Id */
+            draft_id: string;
+            /** Entries */
+            entries: number;
+            /** Filename */
+            filename: string;
+            /** Note */
+            note: string;
+            /** Path */
+            path: string;
         };
         /** QueryBody */
         QueryBody: {
@@ -699,6 +1333,11 @@ export type components = {
          *     the server-side twin of the console's ``SpecResult`` seam type.
          */
         SpecRunOut: {
+            /**
+             * Causes
+             * @default []
+             */
+            causes: components["schemas"]["CauseOut"][];
             /** Classification */
             classification: string;
             /** Columns */
@@ -709,8 +1348,12 @@ export type components = {
             database: string;
             /** Ephemeral */
             ephemeral: boolean;
+            /** Epistemic */
+            epistemic?: ("exact" | "lower-bound") | null;
             /** Keys */
             keys: string[];
+            /** Limit */
+            limit?: number | null;
             /** Params */
             params: {
                 [key: string]: unknown;
@@ -721,11 +1364,20 @@ export type components = {
             }[];
             /** Spec Id */
             spec_id: string;
+            /** Truncated */
+            truncated: boolean;
             /** Watermarked */
             watermarked: boolean;
         };
         /** StatusOut */
         StatusOut: {
+            /** Status */
+            status: string;
+        };
+        /** StatusSummaryOut */
+        StatusSummaryOut: {
+            /** N */
+            n: number;
             /** Status */
             status: string;
         };
@@ -756,6 +1408,57 @@ export type components = {
 };
 export type $defs = Record<string, never>;
 export interface operations {
+    get_log_estate_admin_log_estate_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LogEstateOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    config_config_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConfigOut"];
+                };
+            };
+        };
+    };
     get_demo_demo_get: {
         parameters: {
             query?: never;
@@ -793,9 +1496,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["CorpusStatusOut"];
                 };
             };
             /** @description Validation Error */
@@ -881,9 +1582,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["IntakeListOut"];
                 };
             };
             /** @description Validation Error */
@@ -918,9 +1617,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["IntakeRecordOut"];
                 };
             };
             /** @description Validation Error */
@@ -953,9 +1650,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["IntakeRecordOut"];
                 };
             };
             /** @description Validation Error */
@@ -992,9 +1687,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["IntakeEvidenceOut"];
                 };
             };
             /** @description Validation Error */
@@ -1031,9 +1724,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["IntakeRecordOut"];
                 };
             };
             /** @description Validation Error */
@@ -1070,9 +1761,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["IntakeRecordOut"];
                 };
             };
             /** @description Validation Error */
@@ -1171,9 +1860,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["DraftReceiptOut"];
                 };
             };
             /** @description Validation Error */
@@ -1204,9 +1891,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["AppCodeMigrationsOut"];
                 };
             };
             /** @description Validation Error */
@@ -1241,9 +1926,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["ChangesetArtifactOut"];
                 };
             };
             /** @description Validation Error */
@@ -1274,9 +1957,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["MappingDomainsOut"];
                 };
             };
             /** @description Validation Error */
@@ -1309,9 +1990,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["OpenDraftsOut"];
                 };
             };
             /** @description Validation Error */
@@ -1344,9 +2023,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["PromotedDiffOut"];
                 };
             };
             /** @description Validation Error */
@@ -1379,9 +2056,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["MappingGridOut"];
                 };
             };
             /** @description Validation Error */
@@ -1412,9 +2087,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["MappingOptionsOut"];
                 };
             };
             /** @description Validation Error */
@@ -1449,9 +2122,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["DraftReceiptOut"];
                 };
             };
             /** @description Validation Error */
@@ -1482,9 +2153,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["CorrectionsReportOut"];
                 };
             };
             /** @description Validation Error */
@@ -1515,9 +2184,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["PendingCorrectionsReportOut"];
                 };
             };
             /** @description Validation Error */
@@ -1661,7 +2328,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["QueryBody"];
+                "application/json": components["schemas"]["ExportBody"];
             };
         };
         responses: {
@@ -1745,9 +2412,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["EphemeralRegisterOut"];
                 };
             };
             /** @description Validation Error */

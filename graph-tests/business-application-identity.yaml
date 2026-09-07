@@ -25,6 +25,8 @@
 # looks like once it has set).
 classification: Internal-Public
 schema: drydocs.graph-tests.v1
+updated: 2026-08-22
+
 suite: business-application-identity
 description: >
   Identity invariants for the canonical :BusinessApplication node after the

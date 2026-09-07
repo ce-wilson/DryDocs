@@ -11,6 +11,8 @@
 # Mechanism-only: property names and CURIEs; no data values.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-04
+
 id: envelope-property-terms
 title: "SME Gate — standard-term bindings for the four audit-envelope properties (dct:/prov:), and where property-term bindings live"
 step: "Doc 06 ontology follow-through (M4) — binds source_created_by/_at, source_updated_by/_at to standard vocabulary terms and creates the registry home for property-level bindings; documentation-grade only, no graph write, no edge change, no loader change"

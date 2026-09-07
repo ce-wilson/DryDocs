@@ -24,6 +24,8 @@
 # already running on.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-25
+
 id: script-provenance-gaps
 title: "SME Gate — Script provenance gaps: the not-in-source-control flag, and path-keyed identity where no pipeline id exists"
 step: "The FW-really-API live case surfaced two gaps the signed anti-pattern does not cover: a payload script that RUNS on the execution host but cannot be found in source control (the code search finds only the XML variable reference), and Script identity for non-DPL jobs, which carry no pipeline-id key at all. Both are keying/meaning decisions, so they route through this gate rather than through a build. G97 and G56 (closed 2026-08-25) made both questions concrete: the GUID-vs-path boundary now operates in the payload build, and mount capture makes shared-vs-local storage a derived fact."

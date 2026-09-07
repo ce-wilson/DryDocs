@@ -10,6 +10,8 @@
 # (PUBLISH-BOUNDARY.md).
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-26
+
 id: etlprocess-kind-enum
 title: "SME Gate — the ETLProcess kind vocabulary: admit MAC subType values (provisioning) as governed kind values, or hold the closed 3-set and add a second discriminator property"
 step: "Decision rider from G17(c) — decides what the lineage writer stamps for MAC rider-path nodes (a pipeline.json subType with no enum mapping; the known live case is provisioning = a DB load with no transform)"

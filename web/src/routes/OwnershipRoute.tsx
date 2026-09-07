@@ -1,6 +1,5 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import type { Persona } from '../lib/auth'
-import { createApiAccess } from '../lib/graphApi'
 import { MODULES } from '../modules/registry'
 import ModuleTemplate from './ModuleTemplate'
 import SpecGrid from '../explorer/SpecGrid'
@@ -27,8 +26,6 @@ const ownershipModule = MODULES.find((m) => m.id === 'ownership')!
 
 export default function OwnershipRoute({ persona }: { persona: Persona }) {
   const [selection, setSelection] = useState<OwnershipSelection | null>(null)
-  const apiUrl = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:8001'
-  const access = useMemo(() => createApiAccess(apiUrl, persona.id), [apiUrl, persona.id])
 
   const frameProps = { selection, onSelect: setSelection }
 
@@ -53,16 +50,12 @@ export default function OwnershipRoute({ persona }: { persona: Persona }) {
         // relationship, so there is nothing here for a QuerySpec to return.
         'Product roll-up': <ProductRollup />,
         Teams: (
-          <SpecGrid
-            access={access}
-            specId="ownership.teams.v1"
+          <SpecGrid specId="ownership.teams.v1"
             fallback={<OwnershipDemoFrame frame={TEAMS_FRAME} {...frameProps} />}
           />
         ),
         Attributions: (
-          <SpecGrid
-            access={access}
-            specId="ownership.attributions.v1"
+          <SpecGrid specId="ownership.attributions.v1"
             fallback={<OwnershipDemoFrame frame={ATTRIBUTIONS_FRAME} {...frameProps} />}
           />
         ),
@@ -79,9 +72,7 @@ export default function OwnershipRoute({ persona }: { persona: Persona }) {
               one and stops — it cannot see geography / coverage-window gaps.
             </p>
             <div className="min-h-0 flex-1">
-              <SpecGrid
-                access={access}
-                specId="ownership.required-contact-gaps.v1"
+              <SpecGrid specId="ownership.required-contact-gaps.v1"
                 fallback={<OwnershipDemoFrame frame={REQUIRED_CONTACT_GAPS_FRAME} {...frameProps} />}
               />
             </div>
@@ -94,18 +85,14 @@ export default function OwnershipRoute({ persona }: { persona: Persona }) {
               response is a capture fix, not a contact chase.
             </p>
             <div className="min-h-0 flex-1">
-              <SpecGrid
-                access={access}
-                specId="ownership.capture-gaps.v1"
+              <SpecGrid specId="ownership.capture-gaps.v1"
                 fallback={<OwnershipDemoFrame frame={CAPTURE_GAPS_FRAME} {...frameProps} />}
               />
             </div>
           </div>
         ),
         'Escalation routing': (
-          <SpecGrid
-            access={access}
-            specId="ownership.escalation-routing.v1"
+          <SpecGrid specId="ownership.escalation-routing.v1"
             fallback={<OwnershipDemoFrame frame={ESCALATION_FRAME} {...frameProps} />}
           />
         ),

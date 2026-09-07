@@ -16,6 +16,7 @@ import type { ModuleDef } from '../modules/registry'
 import { useRightSidebar } from '../layout/rightSidebarContext'
 import ModuleTemplate from './ModuleTemplate'
 import EmptyState from '../components/ui/EmptyState'
+import LogEstatePanel from './LogEstatePanel'
 import matrix from '../generated/enforcement-matrix.json'
 
 // /admin/config (O12): the config-as-code TRACEABILITY LENS. NO edit controls
@@ -29,7 +30,13 @@ interface Surface {
   id: string
   title: string
   file: string
+  /** O54: WHERE the config lives (a module, not a config file) — a fact about
+   *  residency, carried beside `status` and never deciding it. A guarded
+   *  declaration in code is enforced by the same mechanism as a guarded YAML
+   *  file: a test that fails when it drifts. */
   code_resident: boolean
+  /** the module-level declarations a code-resident row IS (its content) */
+  symbols: string[]
   consumers: string[]
   guard_tests: string[]
   gate_ref: string | null
@@ -93,8 +100,10 @@ function chainGraph(s: Surface): { nodes: ChainRFNode[]; edges: Edge[] } {
     position: { x: 0, y: 40 },
     data: {
       label: s.file,
-      role: s.code_resident ? 'code-resident (the migration argument)' : 'config file',
-      token: s.code_resident ? '--red' : '--blue',
+      // O54: residency is WHERE, not WHETHER — the guard column, not this node,
+      // says if the surface is tested. Red belongs to "no guard test" only.
+      role: s.code_resident ? `code-resident: ${(s.symbols ?? []).join(', ')}` : 'config file',
+      token: s.code_resident ? '--yellow' : '--blue',
     },
   })
   s.consumers.forEach((c, i) => {
@@ -147,7 +156,7 @@ export default function AdminConfigRoute() {
   useEffect(() => {
     sidebar.set(<SurfaceInspector s={selected} />)
     return () => sidebar.clear()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, [selected])
 
   const gateLog = SURFACES.find((s) => s.id === 'gate-record')?.extra_contents['config/gate-log.md']
@@ -192,6 +201,11 @@ export default function AdminConfigRoute() {
         </div>
       }
       tabContent={{
+        // O68: the log estate, a PANEL on this page rather than a new one — the
+        // SME's own placement. It reads the host's disk through
+        // /admin/log-estate, which is why it sits behind the admin gate this
+        // page already is.
+        'Log estate': <LogEstatePanel />,
         'Enforcement matrix': (
           <div className="flex h-full min-h-0 flex-col gap-1.5">
             <p className="shrink-0 rounded border border-edge bg-panel-2 px-2 py-1 text-[11px] text-muted">
@@ -223,7 +237,7 @@ export default function AdminConfigRoute() {
                     >
                       <td className="border-b border-edge-soft px-2.5 py-1.5 font-medium text-text">{s.title}</td>
                       <td className="border-b border-edge-soft px-2.5 py-1.5 font-mono text-[10px] text-muted">
-                        {s.code_resident ? `${s.file} (code-resident)` : s.file}
+                        {s.code_resident ? `${s.file} · code-resident: ${(s.symbols ?? []).join(', ')}` : s.file}
                       </td>
                       <td className="border-b border-edge-soft px-2.5 py-1.5 font-mono text-[10px] text-muted">
                         {s.consumers.join(', ')}

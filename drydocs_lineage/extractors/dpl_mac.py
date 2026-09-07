@@ -189,12 +189,26 @@ class MacCoverage:
     clone_ambiguous_folders: int = 0  # mixed-casing name#guid dirs — review, not guessed
     clone_sets_missing: int = 0  # pipeline folders with no pipeline.json yet
     clone_missing_set_guids: list[str] = field(default_factory=list)  # the fetch work list
+    clone_pipeline_guids: list[str] = field(default_factory=list)  # every pipeline folder parsed
     clone_guid_mismatch: int = 0  # folder GUID != pipeline.json pipelineId (json wins)
     clone_names_applied: int = 0  # mac_clone_name stamped from a folder name
     dataset_names_from_clone: int = 0  # dataset_name filled from a dataset folder name
 
     def as_dict(self) -> dict:
-        return asdict(self)
+        """The serialized coverage — a HEADER, so an unbounded list never rides in it.
+
+        ``clone_pipeline_guids`` is every pipeline folder the clone walk parsed: staging
+        reads it live for the registry cross-check, and at estate scale it is one line
+        per pipeline folder inside a block meant to be read (Idea-254; the LIN1 verify
+        pass at 93f4d832). The COUNT is what a reader of the artifact can act on, so the
+        list is replaced by ``clone_pipeline_guids_distinct`` here and kept on the object.
+        ``clone_missing_set_guids`` stays a list on purpose: it is the fetch WORK LIST,
+        the finding itself, and it is bounded by what is missing rather than by the
+        estate.
+        """
+        out = asdict(self)
+        out["clone_pipeline_guids_distinct"] = len(out.pop("clone_pipeline_guids"))
+        return out
 
     def summary(self) -> str:
         return (
@@ -254,6 +268,8 @@ class DplMacExtractor:
             if parsed.kind == "pipeline":
                 coverage.clone_pipeline_folders += 1
                 pipeline_dirs[clone_dir] = parsed
+                if parsed.guid not in coverage.clone_pipeline_guids:
+                    coverage.clone_pipeline_guids.append(parsed.guid)
             elif parsed.kind == "dataset":
                 coverage.clone_dataset_folders += 1
                 dataset_names.setdefault(parsed.guid, parsed.name)

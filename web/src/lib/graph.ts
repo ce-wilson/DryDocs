@@ -30,6 +30,31 @@ export interface SpecResult extends GraphResult {
   cypher: string
   params: Record<string, unknown>
   watermarked: boolean
+  /** WEB2/API1: did the row ceiling bite? The server probes at `limit + 1` and
+   *  answers this directly, so no surface has to guess from `rows.length` —
+   *  which is the guess that made a 500-row extract indistinguishable from a
+   *  complete one (review 2026-09-05, S1). */
+  truncated: boolean
+  /** The ceiling that applied, or null/absent when the spec has none. Optional
+   *  because the server declares it optional; a required field here would stop
+   *  `SpecRunOutCoversSpecResult` compiling. */
+  limit?: number | null
+  /** R15: the epistemic label on the ANSWER — 'exact' | 'lower-bound' | null.
+   *  Null means the spec declares no walk and is ungraded; it is NOT exact,
+   *  and no surface may render it as such. Optional for the same reason as
+   *  `limit`: the server declares it optional. */
+  epistemic?: string | null
+  /** R15: what limited the walk, as the server named it — cause class,
+   *  concrete detail (a planned vocabulary entry id, a probe class), and the
+   *  count when one was measured. Empty for an exact answer. Rendered as
+   *  given; the console invents no wording of its own for it. */
+  causes?: { cause: string; detail: string; count?: number | null }[]
+  /** R4: an ephemeral (agent-registered) spec replays params frozen at
+   *  registration, so its ceiling CANNOT be raised. The seam carries the
+   *  server's own answer rather than letting the console re-derive it from the
+   *  `eph.` id prefix — a second source of truth for a server policy is exactly
+   *  what this item exists to remove. */
+  ephemeral: boolean
 }
 
 /** A completed server-side export: the streamed data plus its provenance
@@ -40,20 +65,55 @@ export interface SpecExport {
   manifest: Record<string, unknown>
 }
 
+/** Per-call transport options (WEB12).
+ *
+ * One optional bag rather than a trailing `signal` argument on four methods:
+ * a deadline, a cancel and anything later (a caller-raised export ceiling —
+ * API1 clause (c) — is the obvious next one) all belong to the REQUEST, not to
+ * the query, and adding them positionally would rewrite every call site again.
+ *
+ * `signal` is honoured by the `api` adapter and ignored by `bolt`, which fails
+ * loud on every method that would need it. */
+export interface RequestOptions {
+  signal?: AbortSignal
+}
+
+/** Export-only options (WEB2, from API1 clause (c)).
+ *
+ * The ceiling rides in the options bag rather than as a fifth positional
+ * argument — the direction `RequestOptions` above already names. It does NOT
+ * ride in `RequestOptions` itself: three of the four seam methods have no
+ * ceiling to raise, and a field they would silently ignore is a worse seam than
+ * one extra type. Raising a GRID read's limit would change what is on screen;
+ * raising an EXPORT's changes what lands in a file that carries a manifest, and
+ * the server treats those as different permissions (ExportBody). */
+export interface ExportOptions extends RequestOptions {
+  /** Omitted (the default) keeps the display ceiling the run already applied.
+   *  The server 422s a value it will not honour — over its own ceiling, or on
+   *  an ephemeral spec — and the console surfaces that message rather than
+   *  holding its own copy of the rule. */
+  limit?: number | null
+}
+
 export interface GraphAccess {
   readonly kind: 'bolt' | 'api'
   /** Read-only query execution. Raw Cypher is a dev/admin affordance only. */
-  runRead(query: string): Promise<GraphResult>
+  runRead(query: string, opts?: RequestOptions): Promise<GraphResult>
   /** Named view query (ADR 0005 decision 2): payload shaping lives server-side
    *  in drydocs-api's query registry — never duplicated in the browser. The
    *  api adapter POSTs /query/{id}; bolt has no registry and fails loud. */
-  runNamed(queryId: string, params?: Record<string, unknown>): Promise<NamedResult>
+  runNamed(queryId: string, params?: Record<string, unknown>, opts?: RequestOptions): Promise<NamedResult>
   /** QuerySpec run (O11): the data-frame read path. Registry results only —
    *  api adapter POSTs /specs/{id}/run; bolt fails loud (no registry). */
-  runSpec(specId: string, params?: Record<string, unknown>): Promise<SpecResult>
+  runSpec(specId: string, params?: Record<string, unknown>, opts?: RequestOptions): Promise<SpecResult>
   /** Server-side export (O11 path b): re-runs the spec server-side, streams
    *  csv/jsonl, then fetches the provenance manifest for the sidecar file. */
-  exportSpec(specId: string, params: Record<string, unknown>, format: 'csv' | 'jsonl'): Promise<SpecExport>
+  exportSpec(
+    specId: string,
+    params: Record<string, unknown>,
+    format: 'csv' | 'jsonl',
+    opts?: ExportOptions,
+  ): Promise<SpecExport>
 }
 
 // The explicit dev flag + role gate for the bolt adapter (ADR 0005 decision 4):

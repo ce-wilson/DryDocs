@@ -47,7 +47,7 @@ def main() -> int:
 
     if args.tag:
         existing = subprocess.run(
-            ["git", "tag"], cwd=str(REPO_ROOT), capture_output=True, text=True, check=False
+            ["git", "tag"], cwd=str(REPO_ROOT), capture_output=True, encoding="utf-8", check=False
         ).stdout.split()
         today = args.today or _dt.date.today().strftime("%Y%m%d")
         tag = next_base_tag(existing, today)

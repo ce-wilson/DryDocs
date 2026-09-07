@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: done
 depends_on: []
 inputs:
 - config/source-mappings/design-docs.yaml
@@ -36,3 +36,21 @@ notes: |
   Epic release-infrastructure / module config / phase 8 follows J55, the nearest precedent (also `module: config`, also a repo-wide convention given an enforcement point). Model sonnet: the acceptance is written and mechanical.
 
   The Python-side half of the original entry (module docstring standards) is J60, not this item — different language, different enforcement mechanism, and the persona review's answer there was "use a lint rule the toolchain already ships" rather than "write a guard".
+
+  CLOSED 2026-09-05 (laptop, Lane B, wip/J58-laptop).
+
+  (c) BASELINE RE-MEASURED AT PULL TIME, AND IT HAD DRIFTED, which the clause anticipated. FOUND: 156 non-backlog tracked YAMLs (not 138), of which 16 carried no `schema:` (not 32) and 100 carried no `updated:` (not 104) — plus 18 that are not YAML mappings at all, a category the original measurement did not separate and which turns out to matter, because a list-rooted file cannot hold a header no matter what class it is in. CLOSED: 0 and 0 across every class that requires them. 93 files gained a key; 60 of those were gate prompts gaining `updated:`.
+
+  (a) ONE SCHEMA: config/schemas/identity-header.schema.json, the tenth in a directory that had nine. Every guard validates against it — the acceptance rules out N bespoke per-family assertions and this is what avoids them.
+
+  A CORRECTION THE TREE FORCED, AND IT IS THE MAIN FINDING. The block is four keys but the REQUIRED set is three of them, plus `source` on the family that exists to name one. This is not a softening: config/schemas/data-centers.schema.json, domains.schema.json and editions.schema.json are CLOSED at the top level (additionalProperties: false) and each independently lists exactly schema + classification + updated. Three reviewed family schemas had already settled the question. Requiring `source` universally would have either broken those three outright or forced a fabricated value into ~40 files that have no upstream extract to name — in a repo whose whole discipline is not inventing data. So `source` is REQUIRED on config/source-mappings/** (a field ledger with no source describes nothing) and PERMITTED everywhere else. The reasoning is written into the schema's own prose, with the three closed schemas cited, so nobody re-opens it from the acceptance text alone.
+
+  (b) EIGHT CLASSES, each enumerated in the guard with its reason, DEFAULT-DENY: required · source-describing · gate-prompt · template (updated FORBIDDEN) · fragment · tooling · generated · fixture. Longest-prefix-wins, so a single file can carve itself out of its directory. The default-deny assertion is the part that keeps working after this item closes — a new governed YAML in no class fails as UNCLASSIFIED on arrival, exactly the way test_module_boundary.py treats a new module, so adding the row and deciding whether the file needs a header are the same act. Classes worth naming: FRAGMENT covers the 17 relationship-vocabulary and 7 taxonomy-ontology-map pieces, several of which are YAML LISTS at the root and could never carry a mapping key; TOOLING covers .github/workflows/ci.yml and .pre-commit-config.yaml, whose schemas belong to GitHub and to pre-commit; TEMPLATE is the four *.template.yaml files under the research-probe-discipline skill, and it is the ADR 0015 D4 seam the acceptance names — a session copies them before filling them in, so a date there conflicts on every three-way merge and was never the template's to hold; GENERATED covers the HITL feedback exports and docs/restructure/backlog.yaml, the pre-ADR-0013 TOMBSTONE, where a header claiming currency is the one thing the file must not say.
+
+  (d) THE 60 GATE PROMPTS gained `updated:` and the assertion lives in test_gate_pages.py, NOT in the new guard — one enforcement point per directory, which the clause asks for in as many words and which stops two guards half-enforcing one rule between them.
+
+  (e) PRESENCE AND SHAPE ONLY: nothing compares `updated:` to anything. Freshness is J59's. Worth recording, because it decided the VALUES: every date came from `git log -1 --format=%as` on that file, never from today. A header addition is metadata, not a content change, and stamping 93 files with today's date would have manufactured exactly the lying dates J59 exists to catch. `schema:` values follow the convention every compliant sibling already uses (drydocs.<stem>.v1) and `classification:` comes straight off PUBLISH-BOUNDARY.md's table — Internal under internal/, Internal-Public elsewhere.
+
+  (f) GREEN ON THE TREE AS LEFT. Full suite 3300+ passed, 0 failed except the roadmap render guard, the expected Lane B close failure. ruff clean both ways. Two adjacent guards moved with it: test_config_schemas.py's stray-schema check gained a CROSS_CUTTING map, because a schema shared BY every family has no live-file glob of its own and would otherwise read as an unguarded stray — it is claimed by a TEST instead, and a second assertion checks that named test exists. And web/src/generated/enforcement-matrix.json is regenerated, since it embeds the content of guarded surfaces and a new guard changes it; its writer is scripts/render_enforcement_matrix.py, flagged for Lane A.
+
+  ONE THING HANDED BACK: config/precedence.yaml and relationship-vocabulary.schema.json are the two remaining family schemas with no top-level additionalProperties, so they would accept any stray key. Closing them is a small separate chore and not this item's business.

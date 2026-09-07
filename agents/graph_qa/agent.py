@@ -1,8 +1,9 @@
 """graph_qa — the tiered read-only Q&A agent (Epic R / ADR 0007, items R2-R5).
 
 A custom ADK agent: the user message is a free-text question (part 0; an
-optional control part carries the console's drydocs-api session token — see
-control.py); the reply is a stream of step events while the pipeline runs
+optional control part carries the console's drydocs-api session handle and,
+on a second turn, the person's term clarifications — see control.py); the
+reply is a stream of step events while the pipeline runs
 (R5: the Ask spoke renders them live) followed by one JSON envelope (answer
 + per-step Cypher + metrics — the contract in README.md). The pipeline is
 pure and injected; this wrapper adapts ADK in/out, bridges the synchronous
@@ -52,17 +53,20 @@ def _get_provider() -> LiteLlmProvider:
 def _build_pipeline(control: dict, on_step, run_id: str | None = None) -> GraphQaPipeline:
     """Per-request pipeline: the provider (and its connection pool) is the
     singleton; the R4 registrar is per-request because the ephemeral specs it
-    mints are owned by the ASKING console session's token — which is also why
-    the run_id can close over it (G108 ruling D: the API audit's correlation
-    key back to this run's ledger lines)."""
+    mints are owned by the ASKING console session — named by its public
+    ``session_id`` handle (ADR 0019), never its token — which is also why the
+    run_id can close over it (G108 ruling D: the API audit's correlation key
+    back to this run's ledger lines)."""
     return GraphQaPipeline(
         provider=_get_provider(),
         run_read=run_read,
         graph_schema=graph_schema_detailed,
         ledger=_ledger,
         register_cypher=make_register(
-            owner_token=control.get("api_token"),
-            api_url=control.get("api_url"),
+            owner_session=control.get("session_id"),
+            # api_url is NOT read from the control part (ADR 0020): which
+            # drydocs-api this tier calls is its own deployment fact,
+            # DRYDOCS_API_URL, resolved inside make_register.
             run_id=run_id,
         ),
         on_step=on_step,
@@ -146,6 +150,9 @@ class GraphQaAgent(BaseAgent):
                     memory_events=events,
                     memory_chars=chars,
                     user_id=user_id,
+                    # R19: the person's own words about their own terms, the
+                    # one control field the pipeline carries into a prompt.
+                    clarifications=control.get("clarifications"),
                 )
             )
             while True:
@@ -163,7 +170,10 @@ class GraphQaAgent(BaseAgent):
 
             envelope = answer_task.result()  # re-raises pipeline exceptions
             _record_run(envelope, question, user_id)
-            payload = {"status": "success", **envelope.to_dict()}
+            # R19: a clarification request is a well-formed outcome, not an
+            # answer — its own status, so the console asks instead of rendering.
+            status = "clarification" if envelope.tier == "clarification" else "success"
+            payload = {"status": status, **envelope.to_dict()}
         except ProviderConfigError as exc:
             payload = {"status": "error", "error": str(exc)}
         except Exception as exc:  # never let a question 500 the server

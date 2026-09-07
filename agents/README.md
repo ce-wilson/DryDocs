@@ -35,12 +35,27 @@ envelope on stdout, exit 0/1/2. `graph_query` above is the raw-Cypher counterpar
 ```powershell
 cd agents
 .venv\Scripts\Activate.ps1          # first time: python -m venv .venv; pip install -r requirements.txt
-Copy-Item .env.example .env          # fill NEO4J_PASSWORD (+ GOOGLE_API_KEY for the LLM apps)
+Copy-Item .env.example .env          # see below — usually nothing to fill in
 .venv\Scripts\python serve.py --allow_origins http://localhost:5173
 ```
 
 Serves http://localhost:8000 — `GET /list-apps`, `POST /apps/{app}/users/{u}/sessions/{s}`,
 `POST /run`. Swagger at `/docs`. (`adk web` gives the ADK dev UI instead.)
+
+**The env file, and why the copy step no longer says "fill NEO4J_PASSWORD" (G131).**
+`agents/.env` is read FIRST and the repo-root `.env` is the fallback, so a name declared
+here with no value is not unset — it is set to the empty string, and it shadows the root
+value. The old instruction produced exactly that: copy the example, don't fill it, and
+`NEO4J_PASSWORD=` sits blank in `agents/.env` for every agent in the tier. It kept working
+only because the fallback treated `""` as absent, which is a coincidence a tidying rewrite
+would have removed (`common/env_merge.py` now says so, and drops the placeholders before
+the fallback runs so both spellings agree).
+
+So the Neo4j and API-key lines in `.env.example` ship **commented out**: on a machine with
+one graph, the root `.env` answers and there is nothing to fill in. Uncomment and fill a
+line only to point the agents at a *different* graph or key from the rest of the repo —
+then it is a real override and reads as one. `agents/.env` stays gitignored either way; no
+secret belongs in a commit.
 
 **Why `serve.py` and not `adk api_server` (R14, 2026-08-21).** `adk api_server` uses ADK's flat
 `AgentLoader`, whose `/list-apps` returns every non-hidden subdirectory — so the shared-tools

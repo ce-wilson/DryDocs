@@ -277,6 +277,20 @@ FORCE_COLOR / Idea-101 findings that motivated J41.)
 > ref.** That fallback is the one failure guardrail 1 exists to prevent, and it cost a
 > cycle of "the producer tracker says…" answers that were two days stale.
 
+- **Producer base `port-base-20260902` (`df0b0437`)**, applied company-side as
+  **PORT-REPORT-port-base-20260902** (2026-09-05) — range
+  `port-base-20260826..port-base-20260902` = **433 commits / 738 changed paths, COMPLETE
+  at company `main` `4d9ddba7`**, applied in nine carve-outs (6 `d9bd3a6d`, 7 `d110acd1`,
+  the 09-05 renumber `2961720f`, 8 `71f181fe`, 9 `a23204fd`, 8-tail `4d9ddba7`; the
+  earlier five closed chunks 0–3 and 4). Acceptance by SET-COMPARE, not count: 21
+  failures on the branch against 21 at the company's own main, identical sets, the one
+  order-dependent test named. The report was reviewed producer-side on 2026-09-05
+  (EIGHTEENTH POSTSCRIPT: one SME finding accepted — the ui-components hold retired; two
+  producer claims withdrawn — `internal/**` crosses, it never PUBLISHES; the company's
+  three apply mistakes are now reconcile-port skill rules). **NEXT-PORT BASE:
+  `port-base-20260905`** — the sixth roll, `port-base-20260902..port-base-20260905`, 186
+  commits / 323 changed paths, steps 313–333, RELAY-26; Lane B's three in-flight `wip/`
+  branches (API1, WEB3, WEB4) land in the range after this one.
 - **Producer base `port-base-20260826` (`9ef606b4`)**, applied company-side as
   **PORT-REPORT-e33f8d02** (2026-08-26) — range
   `port-base-20260825..port-base-20260826` = **44 commits / 46 files
@@ -1021,6 +1035,32 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
 - `[COMPANY-CONFIRMED]` — came back in a PORT-REPORT. The ONLY tag that may assert
   company state.
 `scripts/port_preflight.py` fails the port if any live relay lacks one.
+
+**A STRUCTURAL REFACTOR OF AN EVALUATE PATH IS A MANDATORY RELAY (J73, 2026-09-07).**
+A commit whose subject begins `refactor(` and touches a path whose manifest disposition
+is `evaluate` — an explicit `evaluate` row, or no row at all so the path falls to an
+evaluate-on-collision default — gets a relay in this section at the roll that carries
+it, written by the session that made the refactor, while it still knows why. The relay
+names three things and no more: **the file**, **the new shape**, and **where your
+content goes in that shape**. One paragraph. It is not a change log and not a merge
+guide; the ledger step already holds the reasoning and the manifest row already holds
+the merge rule. **What an evaluate note cannot say, and why this exists:** an evaluate
+note tells you how to merge CONTENT, and no wording of it can say "the producer
+changed the SHAPE of this file — take the shape and re-home your content". **The
+case that wrote this rule:** S8 (2026-08-21, `f5e7229d`, subject `refactor(S8): split
+cli.py (3184 lines) into a thin composition root + six per-domain command modules`)
+shipped under a `drydocs/cli.py` row that read "composition root; both sides add
+commands — merge per collision ledger". No relay was written. TWO ports walked past
+it: the row was followed literally and producer verbs were merged INTO the consumer
+monolith, twice, while the six modules it should have imported sat orphaned beside it
+(RELAY-24 is the relay S8 should have carried, written twelve days late). **Scope:**
+the trigger is the conjunction — `refactor(` subject AND evaluate path. A refactor of
+a `canonical-producer` path needs none (you take the file whole; the shape comes with
+it). A content change to an evaluate path needs none (the row already says how to
+merge it). Nothing checks the trigger for you: `port_preflight.py` fails a live relay
+without a basis tag, and does not know a refactor from a fix. That is deliberate —
+the producer author is the one party who knows which of their commits changed a
+shape, and whether to mechanise the trigger is a separate question, not proposed here.
 
 - **RELAY-1 (was R1) — AIS acronym expansion: transplant the VALUE across files**
   `[VERIFIED-PRODUCER]` (standing
@@ -1847,6 +1887,13 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   **AND THE ONE THING THAT IS NOT A RENAME:** `internal/**` is company-side
   Internal content and never crosses. Rename your own directory if you hold one;
   do not take the producer's six transcripts.
+  **CORRECTED 2026-09-05 (your carve-out 9 found it):** "never crosses" was wrong;
+  the word is "never PUBLISHES". `internal/**` is `default_ok`, and its manifest
+  reason says the private company remote is exactly where Internal content
+  belongs - a private remote is not a public mirror. So the transcripts cross, they
+  stay as captured (the file-scoped rule below), and `internal/cdo-reference/
+  README.md` reached you as a clean-add carrying its own RENAMED note. See the
+  EIGHTEENTH POSTSCRIPT.
   **CORRECTION (2026-09-02, from your own apply) — THE SWEEP IS REQUIRED, AND THE
   RELAY ABOVE SAID THE OPPOSITE.** "Use that list rather than a token sweep" was
   wrong, and the guard caught it on your side: `tests/unit/
@@ -2090,7 +2137,10 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   chunk 7's wipe).
   **YOUR SEVEN QUESTIONS - the mechanism half:** Q1 answered above. Q2: yes, the company
   authors its own RENAMED note (one sentence naming the former directory) - the guard's
-  regex reads `internal/<token>-reference/`, and (5) makes its absence a failure. Q3 and Q5
+  regex reads `internal/<token>-reference/`, and (5) makes its absence a failure.
+  [CORRECTED 2026-09-05: the premise was wrong on both sides - the README crossed as a
+  clean-add under the `internal/**` default_ok row, so nobody authors a second note; your
+  close-out's Q2 strike-through is the answer of record. EIGHTEENTH POSTSCRIPT.] Q3 and Q5
   are company housekeeping - the `never-port` row on `docs/company-prompts/` protects the
   directory from producer DELETIONS; moving your own flat stragglers into it is your call
   and nothing here objects; the one orphan left under your `docs/Product/` after the S14 move likewise (it is a company-only file; move it beside the rest under `knowledge/org/`, delete it, or give it a row). Q4: the
@@ -2125,6 +2175,463 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   Take the producer's test by name past the tag and drop your divergence; the
   `test_plan_ideas.py` revert was right - its subject `drydocs/docgen/plan_ideas.py`
   arrives with carve-out 2 (RELAY-23 content first), so the test goes with that.
+  **THIRD POSTSCRIPT (carve-out 2, the retired stub's third guard):** same defect class,
+  same fix. `test_runbook_currency.py` read `docs/port/port-prompt.md` unconditionally
+  through `EXTRA_DOCS`, so all four of its tests failed on your tree, and you emptied
+  `EXTRA_DOCS` as a divergence - which drops the three routing docs (CLAUDE.md,
+  MODULE_MAP.md, git-readme.md) from the currency guard on your side. The producer's
+  test now carries `NEVER_PORT_ZONE_OF`: an entry under a never-port zone is skipped by
+  name when the zone directory is absent, and still required when it is present. Take
+  the test by name past the tag and restore `EXTRA_DOCS` whole. Your observation stands
+  and is recorded: one retired stub broke three separate guards, and only the full-suite
+  baseline diff caught the last two - that is why the baseline diff is part of the ritual.
+  Your second finding is applied too: the zone check reads TRACKED content (`git ls-files`),
+  not `is_dir()`, so your `docs/port/` holding only the gitignored `port-dispositions.md`
+  reads as absent. Take the test by name again, at or after this commit - and one
+  correction to that instruction, both times I gave it: `test_runbook_currency.py` is
+  PER-ENTRY (its manifest row, J51): the GUARD code crosses whole - `EXTRA_DOCS`,
+  `NEVER_PORT_ZONE_OF` and the checks are mechanism - while the three EXEMPTION tables
+  are per-side data, union by key, your reasons kept verbatim. So `docs/plan/load-map.html`
+  (derived, deferred on your side under T19) goes in YOUR `HISTORICAL_PATHS` beside the
+  four T19 entries you already hold, not in a producer table. Two more from your
+  currency findings: `git-readme.md` is DEFAULT (evaluate), deliberately uncovered - the
+  row says both sides may hold their own copy - so a take is a legitimate evaluate
+  outcome only after a diff shows your copy carries nothing but the 21 stale paths; and
+  `MODULE_MAP.md` is per-entry as you read it - the three `controlm/*` rows resolve
+  against the merged map, and a company-only row that cites a path that no longer
+  exists is stale on your side, not protected by the rule.
+  **FOURTH POSTSCRIPT (carve-out 2 closing):** two rulings on what you reported. (1) The
+  eleven producer exemptions you retired because their only citer is the never-port
+  ledger: that is now the row's own rule (`test_runbook_currency.py` entry_rule - a
+  producer entry cited only from under a never-port zone is dropped by the consumer),
+  so the next union does not bring them back. (2) Reordering the S8 take to be the next
+  carve-out is allowed by the red-only-when-next-fixes-it rule, on one condition the
+  workplan gave for deferring it in the first place: the eight S8 files import EIGHT
+  `drydocs_core` modules that are in this range - `data_root`, `data_zones`,
+  `docs_verify`, `env_doctor`, `env_refs`, `mapping_store`, `schema/supplements`,
+  `source_bindings` (you already hold the last two; `drydocs.loaders.vendor_docs` and
+  `drydocs.chain_inputs` are imported too but are NOT in this range, so they are already
+  yours). Take those WITH the eight, one commit, and the guard is
+  chunk 0's: `python -c "import drydocs.cli"`, `test_cli_import_order.py`,
+  `test_cli_registry.py`, and `drydocs --help` listing your `cli_consumer` verbs last.
+  Your monolithic `cli.py` is replaced by the take; every verb of yours must already be
+  in `cli_consumer.py` before that commit, or it is gone.
+  **FIFTH POSTSCRIPT:** the row you flagged as owed is added - `tests/unit/test_source_bindings.py`
+  is `evaluate` on the `test_schema.py` shape (keep your automated-dataset count, take
+  the drift-guard logic). Your binding outcome is the right one: a carrier is what the
+  dataset's `system` field says, an origin that reaches the graph through a replica is
+  not a carrier, and a system with no automated dataset needs no profile - the flag you
+  left on the one real unbound carrier is the honest state, not a gap.
+  **SIXTH POSTSCRIPT - your two chunk-4 questions, answered producer-side:**
+  (1) *The seventeen dropped loader registrations.* Your option D was right - S16 gave
+  `cli_consumer` a VERB seam and no DECLARATION seam, and `LOADER_REGISTRY.update()` from
+  your side would have left `LOADER_SOURCE` and the unchained set stale exactly as you said.
+  The seam now exists: `drydocs.cli_shared.register_loaders(registry, chains=..., unchained_exclusions=...)`,
+  re-exported from the root, re-derives the views IN PLACE (the root re-exports the dict
+  objects, so a rebind would strand every earlier import), refuses a name that would shadow
+  a producer loader, and is proven by `test_cli_registry.py` in a subprocess with a fixture
+  consumer. Call it ONCE at the top of `cli_consumer.py`, before your `app`, with your
+  seventeen loaders and your own chains; `test_load_map_declarations` reads the composed
+  root, so it holds over the union. Take `cli_shared.py`, `cli.py` and the test by name past
+  the tag (or carry your option B until the next roll - it is a one-call swap either way).
+  (2) *`:data_center` -> `:data_center_filter`.* Confirmed, behavior-preserving. And the
+  contradiction you left standing is resolved in your favor: P6 is right, the G115 docstring
+  was wrong - CM_DEF_VTAB carries the SHORT server code, CM_HOSTS / CM_AVG_RUN the LONG form,
+  and the producer's own `controlm_folders.sql` comment agreed with you all along; the
+  2026-07-22 probe profiled CM_AVG_RUN alone. Docstring and option help are corrected
+  producer-side; the mechanism (a second bind carrying the short code from the DECLARED
+  inventory, never derived from the string) is LOAD2. Until it lands, one `--data-center`
+  value serves one family per run: short code for folders/jobs/variables, long form for
+  hosts/avg-run - a long-form value against the VTAB family returns zero rows and reads as
+  an empty data center, which is the failure to warn your operators about. Your per-DC
+  shards were not silently empty by luck: P6 (the collision probe) still blocks the first
+  multi-data-center load on both sides.
+  **SEVENTH POSTSCRIPT - your two named debts after the S8 carve-out, both closed
+  producer-side:** (1) `test_cli_registry.py` on a consumer tree: right, the fixture probes
+  appended a fake module to `drydocs.__path__`, and where a REAL `cli_consumer.py` exists
+  the package directory wins the import, so every probe silently exercised your module.
+  The test now branches on whether `drydocs/cli_consumer.py` exists: the two producer-only
+  facts (the producer ships none; absence is silent) and the fixture loader probe SKIP by
+  name with the reason, and the two properties that hold for any consumer are asserted
+  against the REAL module - its verbs are the last registered, and importing it first
+  does not execute the root. Proven here by simulating a consumer tree (4 passed,
+  3 skipped) and on the producer (7 passed). Take it by name. (2) The manifest row pinning
+  `test_source_bindings.py`'s count landed at `02580f2c` (evaluate, the `test_schema.py`
+  shape - keep your 17, take the drift-guard logic): the fifth postscript above. Nothing
+  else from your report is outstanding on this side.
+
+  **EIGHTH POSTSCRIPT - carve-out 6, three producer corrections (2026-09-04; your report
+  is transcribed and verified in
+  `docs/reviews/company-carve-out-6-readiness-review-2026-09-04.md` §6):** (1) The
+  brackets at steps 305 and 308 called `tests/unit/test_backlog.py` canonical-producer.
+  Its manifest row says per-entry and has since 2026-08-24; the brackets are corrected
+  in place above and the row now names the split by NAME: the freeze block
+  (FROZEN_SERIES / FROZEN_BAND, `_frozen_strays`, the agreement guards) is mechanism and
+  crosses whole; the band block stays yours, in your spelling. Your
+  `PRODUCER_BAND_CEILING = COMPANY_BAND_FLOOR - 1` is that rule applied exactly, and it
+  diffs clean next roll. One forward note rides with it: COMPANY_BAND_FLOOR retires with
+  the band rule (gate §C4, when PLAN2 ports) and `_frozen_strays` does not, so when the
+  constant goes, pin PRODUCER_BAND_CEILING to a literal 9999 with the reason, or the
+  freeze guard's band arm goes with it. (2) The step 305 addendum that every company-only
+  module needs a `series:` code had no subject: `docmeta-acquire` is a component GROUP in
+  `component_map.py` mapped to the already-registered `drydocs-docmeta` module, and your
+  `modules.yaml` equals the producer's at 20 and 20. The rule stands for any FUTURE
+  company-only module; the measurement retires the caution. (3) ITEM FILES ARE TAKEN AT
+  THE TAG. "At `<sha>` or later" is a mechanism idiom — a guard or a module that changed
+  past the tag is the same guard, newer — and it does not survive contact with a file
+  whose `status` is data: CFG1 and CFG2 taken from HEAD arrive `done` while every
+  artifact their acceptance names landed past the tag and outside your range (a board
+  that lies), and PLAN2 taken from HEAD names a second gate prompt you cannot hold and
+  turns a guard red. So: `docs/restructure/backlog/items/*.yaml` at `port-base-20260902`,
+  always; a sha only where a postscript rules a take-by-name, and then for the named
+  mechanism file alone. Your 642 baseline is the producer's item count at the tag to the
+  id, so your range discipline already reads tag-pinned; this writes the rule where the
+  next work order will read it. Also verified from your report: the two red tests
+  (`KeyError: CFG2`) were slice closure — PLAN2 depends on CFG2 depends on CFG1 — and
+  taking the transitive closure as clean-adds was the right move; that is the workplan's
+  G5 firing for the second time, and its test (P2) is producer debt, not yours.
+
+  **NINTH POSTSCRIPT - THE PRODUCER MUST NEVER PREDICT ONE OF YOUR IDS, AND TWICE NOW IT
+  HAS (2026-09-04, from your carve-out 7):** a producer document said "`Idea-10018` next"
+  and your allocator returned `Idea-10022`, because `Idea-10018`-`10021` were already
+  taken in your history. You asked the tool instead of trusting the instruction and no
+  duplicate was minted - which is exactly the I6 collision class, caught by the mechanism
+  built for it. The defect is the producer's and it is a CLASS, not a typo: the producer
+  holds no transcript of your inbox, so any producer sentence naming your next number is
+  a guess dressed as an instruction, and a work order derived from it inherits the guess.
+  **The rule, both directions: an id is obtained from `validate.py --next-id <series>` on
+  the tree that will hold it, never read off a document.** Where a producer note needs to
+  refer to your ids at all it cites ones you have REPORTED, by number, in the past tense.
+  If a future work order names a specific next id, treat it as the error it is and run the
+  allocator.
+
+  **TENTH POSTSCRIPT - THE TWO CARVE-OUTS THAT REMAIN, AND THE ONE TRAP IN EACH
+  (2026-09-04, written here rather than into a work order because a work order is where
+  the `Idea-10018` prediction came from - the ledger is the channel):**
+
+  **`web/**` - the trap is that a `derived` row sits INSIDE a canonical-producer tree.**
+  `web/**` is canonical-producer, but `web/src/generated/**` is `derived` and its row
+  comes FIRST (first match wins), so the generated subtree is REGENERATED on your side
+  and never carried as bytes. This matters more than a usual derived row because
+  `gates.json` carries GATE STATE: take it as a file and you import the producer's gate
+  status into a surface your own console reads. Regenerate with `poetry run python
+  scripts/render_board.py` (default paths refresh `gates.json`,
+  `enforcement-matrix.json`, `load-map.json` and both load-map surfaces together), and
+  run it AFTER every source it reads is merged, in one pass - the order the workplan
+  already sets for renderers. Then `git diff --quiet` on the generated paths: a diff
+  means a source did not land, not that the renderer is wrong. Your own chunk-1 report
+  already found this class from the other end (the seven `web/src/generated/**`
+  re-dispositions that moved `derived` 4 -> 11); this is the same fact at apply time.
+
+  **The acronym sweep - the trap is a file class, not a string.** Two things the sweep
+  must not do. (1) `config/gate-prompts/**` is **canonical-company**: your gate specs
+  win and the producer's never cross. The producer's `cdo-crosswalk.yaml` reads SIGNED
+  OFF 2026-08-05 with 13 confirmations by name; your twin reads DRAFT with a session
+  pending. A sweep that rewrites that file from the producer's copy fabricates a company
+  ratification that never happened, inside the file class `config/gate-log.md` cites as
+  authority - and a dropped field is merely absent while a fabricated sign-off is
+  present and confident. T24 (2) records that a partial application already imported a
+  gate signature once; carve it out by hand. (2) The J55 guard derives the retired token
+  at TEST TIME from `internal/cdo-reference/README.md`'s RENAMED sentence and never
+  writes it, so on your tree that note must exist or the guard FAILS CLOSED - by design,
+  and the design is yours: it was hardened on 2026-09-03 from your own chunk-1 report,
+  where the README existed without the note and the guard skipped green on the tree that
+  publishes. If `internal/` is absent entirely it SKIPS and says the skip proves nothing;
+  if `internal/` is present the note is required. Authoring one sentence is the fix, and
+  it is cheaper than reading a green skip as a pass.
+
+  **Sequencing, unchanged and worth restating because it is counter-intuitive:** T24 (2)
+  is DEFERRED out of the range and runs BEFORE the wipe-reload, not after - the wipe is
+  precisely when the new names must already be in place.
+
+  **ELEVENTH POSTSCRIPT - THE IDEA-SERIES RENUMBER PASS: LEAVE `Idea-10018`-`10021`
+  WHERE THEY ARE (2026-09-05; from your research-tooling landing report, which found
+  the collision and correctly did not execute the repair):**
+
+  Your `feat/dd_lineage` branch appended `Idea-10006`-`10021`; your main independently
+  minted `Idea-10009`-`10017` for different content, so twelve of the branch's ids
+  collide and must move. Your own count says `10018`-`10021` are FREE on main. Do not
+  move those four. "A single allocator pass from 10022" renumbers all sixteen and
+  breaks a citation the producer cannot follow: **`Idea-10021` (F-1, the Control-M QR
+  for jobs using MFTS 6) is cited by number here** - in a backlog item's acceptance
+  (`C44`: "F-1 ... is company-band Idea-10021 and stays theirs"), in the `Idea-236`
+  inbox entry, and in the transcribed `JOB-MFTS-MM-research.md`, the same document your
+  branch-side inventory lists as `(10021)`. The citation channel is ONE-WAY by the
+  standing rule - the producer cites your ids as reported and never renames them - so if
+  `10021` moves, a producer item points at whatever you allocate there next. Renumber
+  only `10006`-`10017`, keep the `(renumbered from ...)` marker on each moved entry (the
+  shape your own `Idea-10009` already carries), and leave `10018`-`10021` untouched.
+
+  The same inventory confirms the producer's OTHER company-band citations are safe:
+  `10012` / `10015` / `10016` / `10017` are your main-native 09-03 mints and do not move;
+  `10018` here is the prediction already recorded as wrong; `10022` is your allocator's
+  own answer. `10021` is the producer's whole exposure.
+
+  Two of your other conclusions are adopted producer-side rather than argued with. (1)
+  Per-file by authorship, not a blanket rewrite: the main-native citations
+  (`G116.yaml:21` "from Idea-10010", `G117.yaml:21` "from Idea-10011", `roadmap.yaml:93`,
+  `cli_consumer.py:131`) are correct today and a `+13` sweep would break them while
+  repairing the two files whose join keys point into the branch's numbering. (2) The
+  pending-file pen: a research session writes candidate ideas to a per-branch pending
+  file and the landing session mints them into `IDEAS.md` in one allocator pass. That
+  removes the race rather than asking two sessions to be careful, and it is the shape
+  the path-scoped extraction already handles as a clean-add. It is being minted here as
+  the groom-backlog venue-and-band item, alongside the allocator gap your collision
+  exposed on this side: the Idea path computes `highest + 1` and never consults the band
+  ceiling that the item path enforces (`validate.py:363`), so the allocator that "refuses
+  the company band by itself" does so for items only. Nothing is asked back.
+
+  **TWELFTH POSTSCRIPT - THE RENUMBER PASS LANDED, AND THE PRODUCER'S RECORDS OF IT
+  WERE ONE OFF (2026-09-05, from your report of `fix/idea-series-renumber` at
+  `8c3541ee`, pushed and unmerged at the time of the report):**
+
+  What landed, by your report and in the past tense: `Idea-10006`-`10017` moved to
+  **`10023`-`10034`**, each with a `(renumbered 2026-09-05 from ...)` marker in the shape
+  your `Idea-10009` already carried; `10018`-`10021` untouched and unmarked, so the
+  producer's one citation (`Idea-10021`, C44 / Idea-236) stands; the band contiguous
+  `10009`-`10034` with zero duplicates; per-file by authorship, so the main-native
+  citations (`G116`, `G117`, `PLAN2.yaml`, `roadmap.yaml`, `cli_consumer.py`) were left
+  as they were, correctly. Branched off carve-out 7 rather than main, which is why the
+  numbers came out contiguous: carve-out 7 had minted `Idea-10022` and edited `IDEAS.md`,
+  so a branch off main would have collided at the append point AND taken a number already
+  spoken for.
+
+  The producer's records said `10022`-`10033`. That was the range the plan implied before
+  `10022` was counted as already taken, and it went into the `idea-series-grammar` record
+  (signed 9/9 the same morning) and its prompt header as "by report". Both now carry a
+  dated CORRECTION postscript; no clause moves, because C1 rules the SHAPE of a band idea
+  from an undeclared venue and the shape is the same at `10023` as at `10022`. This is the
+  NINTH POSTSCRIPT's class again in a milder form - not a predicted next id, but a
+  predicted RANGE, written from a plan instead of a landing. The rule that follows is the
+  same one: the producer records your ids after they land, from your report, never from
+  the plan that preceded it.
+
+  Two things you told your own port thread are recorded here only so this ledger does not
+  contradict them: your next free idea id was `10035` at the report, and the order that
+  keeps the numbering monotonic is 6 -> 7 -> the renumber branch -> 8 -> 9. Both are yours
+  to run, and the number is already stale by the time anyone reads it - an id is obtained
+  from `validate.py --next-id Idea` on the tree that will hold it (NINTH POSTSCRIPT).
+  Nothing is asked back.
+
+  **THIRTEENTH POSTSCRIPT - ONE MANIFEST ROW, ADDED BETWEEN THE RANGE AND THE NEXT ROLL
+  (2026-09-05):** `config/taxonomy/data-centers.yaml` (LOAD2, the short-code / long-name
+  data-center spelling registry) now has a `per-entry` row on the `lob-product-team.yaml`
+  shape - rows keyed by `code`, your real rows stay, the producer's `sample: true` rows
+  never overwrite them, header / schema / field list cross whole. Without it the file fell
+  through to the `config/**` canonical-producer default, the third instance of the class
+  that dropped `lob-product-team.yaml` rows once and drove `test_source_registry` 1 -> 7.
+  It does not reach carve-outs 8 or 9 (neither takes the manifest), and the file itself is
+  after `port-base-20260902`, so at the next roll it arrives as a clean-add and the row
+  first does work the roll after, when your real rows exist. `editions.yaml` and
+  `domains.yaml` already had their rows. Nothing is asked back.
+
+  **FOURTEENTH POSTSCRIPT - CARVE-OUT 8 IS WIDER THAN `web/**`, AND THE TENTH POSTSCRIPT
+  UNDERSTATED THE RENDER CHAIN (2026-09-05, from your carve-out 8 scoping report; the
+  widened scope is CONFIRMED):** `web/src/generated/**` is `derived`, and three of its
+  seven changed artifacts are written by renderers that live OUTSIDE `web/**`:
+  `scripts/render_gazetteer.py` (reads `config/taxonomy/location-gazetteer.yaml`,
+  classification External), `scripts/render_remediation_profile.py` (self-contained) and
+  `scripts/render_world_map.py` (reads `external/geo/world-atlas/countries-110m.json`).
+  Each has a drift guard that REGENERATES and compares (`test_location_gazetteer`,
+  `test_remediation_profile_json`, `test_world_map_generated`), so taking the bytes without
+  the renderers leaves three guards red with no way to green them - the renderers are what
+  the disposition means. All are clean-adds in the range (`scripts/**` is evaluate, which
+  is moot for a file you do not have; take `external/geo/**` as a directory, its
+  `SOURCE-MANIFEST.md` and `LICENSE` ride with the data). Two corrections to the tenth:
+  (1) **take `scripts/render_board.py` too.** At the port base it already chains
+  `render_gazetteer`, `render_remediation_diff` and `render_remediation_profile`
+  (`render_board.py:59-90`); yours "writes five of seven" because your copy is behind the
+  base, and it will stay behind on every future render until it crosses (hand-merge if you
+  edited it, wholesale otherwise). (2) **`world-map.ts` is deliberately NOT in that
+  chain** (`:76-78`: its input is vendored data that changes only when someone moves
+  editions) - run `poetry run python scripts/render_world_map.py` separately. So the pass
+  is: `web/**` minus generated (wholesale) -> the three renderers + `render_board.py` ->
+  the two inputs -> `render_board.py` AND `render_world_map.py` -> `git diff --quiet` on
+  all seven generated paths -> the three drift guards green. Nothing is asked back.
+
+  **FIFTEENTH POSTSCRIPT - WHEN PLAN2 PORTS, YOUR ALLOCATOR ASKS FOR YOUR EDITION
+  (2026-09-05; PLAN2 built, not yet in a port range):** `.claude/**` is canonical-producer,
+  so `validate.py` becomes the PLAN2 allocator on your side at the next roll. It reads
+  `config/dev-environment.yaml` `edition:` - your copy, canonical-company, never overwritten
+  by a port - to know which edition it mints into. Until that key names the code your own
+  edition gate mints into `config/taxonomy/editions.yaml`, `--next-id --module <m>` REFUSES,
+  and the refusal names the key and both files: that is §C4 as signed ("the company mints
+  nothing new until it has minted its edition code"), not a defect. `--next-id Idea` still
+  answers, band-shaped above 9999 - the shape `Idea-10009`-`10034` already have - until the
+  key is set (rider idea-series-grammar C1). The number band and the DD reserve retired
+  forward-only; nothing you hold moves, and `G10001`-`G10003` / `DD10001`-`DD10003` stay
+  legal under FROZEN_BAND. Once the key is set, your items mint `<code>-<MODULE><n>` and
+  your ideas `<code>-Idea-<n>`, counting from 1 in your own inbox of numbers. The producer
+  cannot name your code (CFG2 c) and does not. Nothing is asked back.
+
+  **SIXTEENTH POSTSCRIPT - "TAKE `render_board.py` TOO" MEANT ITS WHOLE CHAIN, AND TWO OF
+  THE CHAIN'S INPUTS ARE PER-ENTRY (2026-09-05, from your carve-out 8 apply notes):** at
+  the base `scripts/render_board.py` imports and runs TEN renderers - `render_gates`,
+  `render_enforcement_matrix`, `render_load_map`, `render_software_registry`,
+  `render_context_types`, `render_gazetteer`, `render_remediation_diff`,
+  `render_remediation_profile`, `render_ideas`, `render_roadmap` - so taking it means each
+  renderer at the base AND each renderer's input at its manifest ROW, not wholesale. The
+  fourteenth named the two `web/**` inputs and stopped there; that is the sentence that
+  left you finding the rest by running the chain. Two of those inputs are per-entry, and
+  you hit both: (1) `docs/restructure/roadmap.yaml` HAS a per-entry row (structure from the
+  producer and any module you lack; YOUR stage / built / remaining / estimate judgments and
+  your `drydocs-libs` / `drydocs-port` modules stay on collision) - the wholesale take was
+  a misread of the manifest, not a gap in it, and what you then did (restore your file,
+  sweep only the acronym) IS the row's rule. (2) `config/taxonomy/software-registry.yaml`
+  had NO row and fell through to the config/** default - the producer's omission, the same
+  class as source-registry at the 2026-09-01 apply - so the wholesale take that dropped
+  your `servicenow` vendor and product rows was the manifest working as written, and
+  wrong. A per-entry row exists now (rows keyed by `id` union; a row one side holds stays;
+  `seal_id`, `drydocs_application_id` and `used_by_drydocs` are yours; `acronyms` is the
+  producer's authoritative home at the O68 (d) shape, which is also why the render broke on
+  your pre-O68 copy). Carve-out 8 does not take the manifest, so the row reaches you at the
+  next roll; your restore is what it prescribes. ONE COUNT TO RE-READ: at
+  `port-base-20260902` the producer's registry is 14 vendors / 16 products; the `axway` /
+  `mfts` rows are C43, 2026-09-03, OUTSIDE the range. 15 / 17 reconciles as 14 + servicenow
+  and 16 + servicenow only with axway ABSENT - so either your file has no axway and "the
+  producer added the Axway/MFTS row" misattributed the seventeenth product (the numbers
+  are right, the explanation was not), or it has axway, the input was taken past the base,
+  and one servicenow row is still missing (16 / 18 is then the target). The file says
+  which; `grep -c "id: axway"` settles it. The backlog items swept acronym-only with your
+  status intact is the items row's Clause 4 rule, correctly applied. Nothing is asked back.
+
+  **SEVENTEENTH POSTSCRIPT - THE COUNT CHECK WAS ANSWERED, AND THE ANSWER SHOWS WHY A COUNT
+  IS NOT A COMPOSITION (2026-09-05, from your carve-out 8 close report):** `id: axway` -> 0,
+  so the first branch held: your numbers were right and the Axway attribution was not. But
+  the render you then reported - **15 vendors / 16 products, "the company's original"** - is
+  the PRE-RANGE file grafted back, and the range is not empty for this file: O81 (2026-08-31,
+  inside port-base-20260826..20260902) added the `neo4j-nvl` product row, 15 -> 16 at the
+  producer. Your original was 15 + `servicenow` = 16; the per-entry rule (a row one side
+  holds stays) makes the landed target **15 / 17**, and 16 matches the producer's base count
+  only by coincidence - `servicenow` standing where `neo4j-nvl` should. A count cannot see
+  that; `grep -c "id: neo4j-nvl" config/taxonomy/software-registry.yaml` can, and 1 is the
+  answer. It is not cosmetic: `test_software_registry.py::
+  test_web_console_stack_matches_the_locked_site_plan` at the base asserts `neo4j-nvl` in the
+  web-console stack, and `test_docs_coverage.py`'s 16/14 pin passes on your file for the
+  wrong reason. Add the row from the base (`git show port-base-20260902:config/taxonomy/
+  software-registry.yaml`, the `neo4j-nvl` block under `products`), keep `servicenow`.
+  **The gap you found is real and the fourteenth caused it:** it named the three drift
+  guards as bare stems in parentheses, and the paste repeated them, so they read as test
+  functions when they are FILES - `tests/unit/test_location_gazetteer.py`,
+  `test_remediation_profile.py`, `test_remediation_profile_json.py`,
+  `test_world_map_generated.py` - in the tree since 2026-08-22 / 08-25 / 08-31 and never
+  listed as part of the carve-out. `tests/**` is evaluate-on-collision, which is moot for
+  a file you do not have: clean-adds, taken at the base, as you did (45 passed). One
+  wording correction to your report, so the ledger does not carry it: the guards had "no
+  guard on either side" is not so - they existed producer-side with their artifacts; they
+  were absent on yours because the scope note left them out. Everything else on the list
+  closed as written. Nothing is asked back.
+
+  **EIGHTEENTH POSTSCRIPT - THE CLOSE-OUT IS READ, THE RANGE IS CLOSED, AND TWO PRODUCER
+  CLAIMS ARE WITHDRAWN (2026-09-05, from your PORT-REPORT on `port-base-20260902`,
+  COMPLETE at your `4d9ddba7`):** `[SME-REPORTED]` for what your report measured;
+  `[VERIFIED-PRODUCER]` for what changed here. Your acceptance method is the right one and
+  is now the skill's method: `--lf` on the branch, a detached worktree at your main sha run
+  with the MAIN repo's interpreter, and a set-compare of the two failure lists - 21 against
+  21, identical, the one order-dependent test named. A COUNT of failures proves nothing
+  (the seventeenth postscript said why for rows; it holds for tests); a set-compare does.
+  **THE FINDING FOR THE SME - accepted, and the manifest row is rewritten
+  [VERIFIED-PRODUCER]:** the K7-K15 hold on `AppCodeCascadePane` was stale. Your tree
+  carried the route row and the route file before carve-out 8 began, and honoring
+  "producer MINUS the held row" would have failed three guards on your side at once. The
+  `config/taxonomy/ui-components.yaml` entry_rule now reads rows-union, counts tracked per
+  side, hold retired. The hold's subject was always the LOAD (`m3_belongs_to_application`
+  stays planned your side, T23 family), never the taxonomy row - a component that exists
+  is classification, and classification is not gated. Your 40/88 is the producer's 40/88
+  at `08af6985`. Nothing to do on your side; the row reaches you at the next roll and
+  describes what you already hold. The row also records why it went stale: an entry_rule
+  may describe the producer's tree, and one that describes the CONSUMER's ("company =
+  producer minus X") is stale the moment the consumer moves - and only the consumer can
+  see that it did.
+  **THE PREMISE CORRECTION - accepted, and three producer sentences are corrected in
+  place [VERIFIED-PRODUCER]:** `internal/**` is `default_ok`, and its recorded reason says
+  the private company remote is exactly where Internal content belongs. So
+  `internal/cdo-reference/README.md` reached you as a clean-add carrying its own RENAMED
+  note, J55 reads it, and nobody authors a second one. RELAY-21's "`internal/**` ... never
+  crosses", RELAY-25's Q2 answer, and step 303's note on the two `internal/research/` logs
+  were wrong for one reason: they read "never publishes" (true - never to a public mirror)
+  as "never crosses" (false - a private remote is not a mirror). Each now carries a dated
+  correction beside the original. The J55 docstring says "never publishes" and was right
+  all along.
+  **YOUR THREE MISTAKES ARE THE SKILL'S RULES NOW [VERIFIED-PRODUCER]:** the reconcile-port
+  skill carries them in your words. (2) Run the affected suites BEFORE a package-level
+  take: `drydocs_api/**` is `default_ok`, and "hand-merge on collision" is not "take the
+  package". (3) For a themed sweep, apply the DELTA to the company file and take whole
+  files only from the certified tag: a mid-range commit's file is the tree at that commit
+  and carries every earlier commit with it. (1) was already the software-registry
+  per-entry row and the seventeenth postscript. On the `script-scm-status` row you backed
+  out: it is G61 (2026-08-25, gate `script-provenance-gaps`, proposed and unsigned) and
+  predates the range - a gate-bound map row your own gate rules on, so backing it out of
+  an acronym sweep was right.
+  **THE PERSONAS RESOLUTION** - one user-tier seat, the two producer demo rows dropped, the
+  SME persona relabeled, the O69 mechanism kept whole - is a relabel under the
+  `drydocs_api/**` hand-merge rule and is yours; the producer's roster is its demo roster
+  and nothing here revisits it. **YOUR SEVEN QUESTIONS** were answered in RELAY-25; your
+  Q2 strike-through supersedes that relay's Q2, as above, and Q1's cypher is the chunk-4
+  union clean-add RELAY-25 already names. Nothing is asked back.
+
+- **RELAY-26 — THE SIXTH ROLL, `port-base-20260902..port-base-20260905`: WHAT IT CARRIES
+  FOR YOU, AND THE FOUR DECLARATIONS ONLY YOU CAN MAKE** (new 2026-09-05, at the roll).
+  `[VERIFIED-PRODUCER]` throughout — every sha here is on the producer's `main` under the
+  new tag, and nothing here restates a ruling that is yours.
+  **THE RANGE:** 186 commits at the tag, 132 of them in ledger steps 313–333 (the rest are the ritual
+  patterns `port_preflight.py` already recognizes); **323 changed paths across 8 classes**,
+  the table is in the disposition section above. Your `port-base-20260902` apply is
+  COMPLETE at your `4d9ddba7` (EIGHTEENTH POSTSCRIPT), so this is one range, tag..tag,
+  with no parked apply behind it and nothing hand-carried. Lane B's three in-flight
+  branches (API1, WEB3, WEB4) are NOT in it — their claims are, their work lands next roll.
+  **THE PROMISED FIXES ARE IN IT (step 328):** the publishing shim that aliases every
+  submodule, the seven `drydocs/cli_*.py` canonical-producer rows, J55 fail-closed
+  (`40d2461d`), the software-registry per-entry row (`0003ea28`), the data-centers
+  per-entry row (`f2ec87db`), the ui-components row rewritten as rows-union with the hold
+  retired (`920a4107`), and `drydocs.cli_consumer` as an ENTRYPOINT in `component_map.py`
+  (`30d2e870`). Each one describes something you already did by hand during carve-outs
+  6–9; taking it retires the hand edit and nothing else.
+  **FOUR DECLARATIONS ONLY YOU CAN MAKE** — each is per-side DATA inside a mechanism that
+  crosses whole, and none of them is written for you by any file in this range:
+  (1) `edition:` in your `config/dev-environment.yaml` (PLAN2, step 332; the file is
+  canonical-company). Since `43fd345c` a venue with no `edition:` key mints NO item and
+  the refusal names the key; your idea channel stays open meanwhile (the gate's C1, the
+  shape your 09-05 renumber already has). Your code is yours to choose.
+  (2) Your rows in `config/taxonomy/editions.yaml` (CFG2, step 332; per-entry) — replace
+  the two `sample: true` rows with your real editions keyed to `area_product_id`; the
+  collision check and the `:AreaProduct` resolution are pure functions your suite drives
+  with your inputs.
+  (3) Your `CEILING` in `tests/unit/test_publish_boundary_history_ceiling.py` (J74, step
+  326; per-entry, row added this roll). The producer's 34 was measured on the producer's
+  2,057 commits; your history is disjoint. Run the test's own log command, set your
+  number with the recorded reason, take the mechanism whole.
+  (4) Your company-only YAML files in `CLASSES` of `tests/unit/test_config_identity_header.py`
+  (J58, step 327; per-entry, row added this roll). The walk is default-deny over EVERY
+  tracked YAML, so it goes red on arrival by design; each entry is a path prefix, a class,
+  and a reason. The two new manifest rows exist so that the `tests/**` default cannot
+  revert (3) and (4) at the port after this one — the `test_backlog.py` shape.
+  **YOUR OWN CARRY-FORWARD, IN THIS RANGE'S TERMS:** `PRODUCER_BASELINE` in
+  `tests/unit/test_backlog.py` becomes `port-base-20260905` and
+  `tests/unit/producer_backlog_ids.txt` regenerates from it in the same commit, as a STEP
+  of the apply, not a fix after it; `scripts/port_backlog_union.py --producer-ref
+  port-base-20260905` exits 0 before any per-entry class begins; `RECONCILE_BEFORE_DIR`
+  armed for the reconcile tests; items are taken AT THE TAG, never "or later" (EIGHTH
+  POSTSCRIPT); workplan references re-pointed to the new tag. T24 (1) — the vocabulary
+  fragments — stays the G87 add-new + deprecate shape you used in chunk 5.
+  **TWO GATE PROMPTS ARRIVE DRAFT** into your canonical-company directory as clean-adds:
+  `idea-series-grammar` (SIGNED 9/9 producer-side on `de8159eb`; the gate-log record
+  union-appends, the prompt reads DRAFT on your tree — as `cdo-crosswalk` did, TENTH
+  POSTSCRIPT) and `controlm-folder-identity-grain` (`863c6733`, DRAFT on both). Your
+  sessions rule them; producer sign-off is not company sign-off.
+  **THE LINEAGE CLUSTER GREW (steps 325, 330):** LIN1/LIN2 (`drydocs lineage-extract` /
+  `lineage-load`, `drydocs_lineage/staging.py`, a `curated` zone in `data_root.py`) and Z4
+  (`drydocs_lineage/extractors/lb_resolution.py`) are the largest additions since the 2026-08-26
+  continue-defer. They are the adoption dossier's next chapter, not a take, and nothing in
+  this relay changes that strategy — the call is yours.
+  **YOUR PERSONAS RELABEL MEETS THREE PRODUCER CHANGES UNDER `drydocs_api/**`:** O70
+  (`schemas.py` new, `app.py` reshaped for the generated client, step 316), R9
+  (`agent_query.py` new, `execute_spec` extracted, step 317), and the O87 SME-seat badge
+  in the console reads `SME_PERSONA_ID` from the roster, so your `sme` id is what it shows
+  (step 320). Hand-merge on collision, never take the package — your rule 2, now the
+  skill's. The generated `web/src/generated/openapi.json` and `api.d.ts` are DERIVED:
+  regenerate from your `drydocs_api`, never carry the producer's.
+  Nothing is asked back.
 
 OWED COMPANY-SIDE:
 
@@ -2482,6 +2989,22 @@ canonical-producer 89, per-entry 56, canonical-company 18, union-append 12, eval
 derived 6, never-port 3. Measured at the roll commit's parent with the roll's own manifest
 rows in place; the roll commit adds no path the range had not already touched.
 
+**MEASURED FOR THE SIXTH ROLL (2026-09-05)** — the range you apply next is
+`port-base-20260902..port-base-20260905`, tag..tag, one range with no parked apply behind
+it (your `port-base-20260902` apply is COMPLETE at `4d9ddba7`): **323 changed paths across
+8 classes** — default_ok 102, canonical-producer 67, canonical-company 67, per-entry 62,
+never-port 10, derived 10, union-append 3, evaluate 2. Measured at the roll commit's
+parent with the roll's two new rows in place (`tests/unit/test_config_identity_header.py`
+and `tests/unit/test_publish_boundary_history_ceiling.py`, per-entry — they move two paths
+out of default_ok, and the reason is in RELAY-26). The 67 canonical-company paths are
+mostly `config/gate-prompts/**` and `graph-tests/**` touched by the J58 header
+normalization (step 327) — NO ACTION by rule; the header block is the same shape on your
+files, add it yourself. The 102 default_ok are dominated by `docs/reviews/**` records
+(read, never edit), `docs/decisions/`, and `drydocs_lineage/**` + `drydocs_api/**` +
+`tests/**` (hand-merge on collision — steps 316, 317, 330). Run
+`PYTHONPATH=. python scripts/render_port_dispositions.py port-base-20260902` on your
+tree with HEAD at `port-base-20260905` and the table you get is the work plan.
+
 **THE STEP LEDGER IS NOT REPLACED BY THIS AND IS NOT SUMMARIZED BY IT.** It stays
 below, entire, and it is where the reasoning lives — why a change was made, what it
 cost, what it did NOT authorize. The disposition table tells you the ORDER and the
@@ -2500,7 +3023,7 @@ depgraph snapshots in the range are ritual — per-entry backlog union, derived
 regeneration, never-port outputs — and get no step. **Steps 273–296 are the
 2026-09-01 (fourth) roll**, covering `port-base-20260829..port-base-20260901`;
 steps 241–272 remain live below them because that base was certified and never
-applied, so the two rolls are one range for the consumer. **Steps 297–312 are the 2026-09-02 (fifth) roll**, covering `port-base-20260901..port-base-20260902`, rolled BEFORE the company's retry so that the retry applies ONE range, `port-base-20260826..port-base-20260902`, with all seven live relays inside it and nothing hand-carried (RELAY-24; the 20260901 apply is parked unmerged).
+applied, so the two rolls are one range for the consumer. **Steps 297–312 are the 2026-09-02 (fifth) roll**, covering `port-base-20260901..port-base-20260902`, rolled BEFORE the company's retry so that the retry applies ONE range, `port-base-20260826..port-base-20260902`, with all seven live relays inside it and nothing hand-carried (RELAY-24; the 20260901 apply is parked unmerged). **Steps 313–333 are the 2026-09-05 (sixth) roll**, covering `port-base-20260902..port-base-20260905` — 186 commits at the tag, 132 cited, the first roll since 2026-08-26 to start from a range the company had already applied COMPLETE (its `4d9ddba7`), so nothing is parked and nothing is hand-carried; RELAY-26 is its one relay.
 
 124. LOCAL-INFRA CHORES + ONE ADR [venue-pinned / docs] (`8c4ee1e` G49, `5a6208e`
     G50, `3304666` G49 follow-up, `034eb70` G53). G49/G50 are DESKTOP-VENUE facts —
@@ -4986,14 +5509,19 @@ construction. It is recorded here only because those refs are now visible on
     transcribed and attributed to an unmerged research branch; `9d0d2171` + `756e4989`
     Idea-236; `0b02a61d` + `303b27be` Idea-238). The skills cross whole. The two logs
     under `internal/research/` are Internal and never cross — they are named here so the
-    range's `internal/**` additions read as deliberate, not as a leak.
+    range's `internal/**` additions read as deliberate, not as a leak. [CORRECTED
+    2026-09-05: they never PUBLISH; they do cross - `internal/**` is `default_ok` and the
+    private company remote is not a mirror. The point of naming them stands: deliberate,
+    not a leak. EIGHTEENTH POSTSCRIPT.]
 
 304. CI ON NODE 24 [.github evaluate — keep your workflows, adapt] (`10dcd15b`). Every
     action moved to the Node 24 runtime and the web app builds on 24; GHE runners are
     yours, so this is a note for your workflow, not a take.
 
-305. PLAN1 — THE SERIES IS THE MODULE; THE 27 LETTERS ARE FROZEN [allocator + guards
-    canonical-producer; modules.yaml per-entry; CLAUDE.md canonical-producer] (`100f018b`
+305. PLAN1 — THE SERIES IS THE MODULE; THE 27 LETTERS ARE FROZEN [validate.py
+    canonical-producer; test_backlog.py PER-ENTRY by its row — bracket corrected 2026-09-04,
+    EIGHTH POSTSCRIPT; modules.yaml per-entry; CLAUDE.md canonical-producer; item files at
+    `port-base-20260902`] (`100f018b`
     eighteen groom mints, `375dd962` PLAN1, `169a7a58` the ruling recorded and C41
     re-pointed, `8abcb359` an Idea header repaired, `6f2b91bc` a trunk merge, `664bca4a`
     CLAUDE.md gains ONE PEN PER SURFACE — the working agreement the 2026-09-02 collisions
@@ -5009,7 +5537,8 @@ construction. It is recorded here only because those refs are now visible on
 306. C41 — GATE `ontology-domain-registry-and-edition-grain` SIGNED 14/14, EIGHT ITEMS
     MINTED, ONT2'S STORE RULED [config/gate-prompts canonical-company: the SIGNED prompt
     is the PRODUCER'S signature and never overwrites your DRAFT or absent file;
-    gate-log union-append; items per-entry] (`2978230e` C41 mint, `c1a883a5` the draft,
+    gate-log union-append; items per-entry, at `port-base-20260902`] (`2978230e` C41 mint,
+    `c1a883a5` the draft,
     `39b90843` SIGNED OFF, `12ec1b3c` the seven E1 bodies + the B5 rider, `6828e102` +
     `fb310c06` ONT2 — acronyms get their own store, the software-registry block was a
     holding place). The rulings that reach your tree as MECHANISM: domains.yaml comes
@@ -5029,8 +5558,10 @@ construction. It is recorded here only because those refs are now visible on
     and RELAY-24 are the reason this range is being rolled before your retry rather than
     hand-carried.
 
-308. PLAN3 — FROZEN_BAND, SO THE FREEZE CAN PORT GREEN [validate.py + test_backlog.py
-    canonical-producer] (`5fa37ea7` mint, `e7dc4153` build). `FROZEN_SERIES` was measured
+308. PLAN3 — FROZEN_BAND, SO THE FREEZE CAN PORT GREEN [validate.py canonical-producer;
+    test_backlog.py PER-ENTRY by its row — the freeze block crosses whole, the band block
+    stays yours (bracket corrected 2026-09-04, EIGHTH POSTSCRIPT); PLAN3.yaml at
+    `port-base-20260902`] (`5fa37ea7` mint, `e7dc4153` build). `FROZEN_SERIES` was measured
     on the producer's tree (G tops out at 136); YOUR `G10001–G10003` and `DD10001–DD10003`
     were legal when minted under the band rule. `FROZEN_BAND = {G: 10003, DD: 10003}`
     judges a band-shaped number against the band's own max, a letter-shaped one against
@@ -5062,12 +5593,42 @@ construction. It is recorded here only because those refs are now visible on
     four in a subprocess against a tmp TEMP. Your heredocs were right; the skill is now
     right too. The block also says a multi-day apply should not snapshot into TEMP.
 
-311. THE lane-handoff SKILL [.claude/skills canonical-producer; its `*-workspace/` is
-    never-port — step 300] (`fe120bf9`). The producer's two machines split a burst by a
-    generated, self-retiring handoff file with a validated queue and a surface fence.
-    Not a company mechanism; it crosses because `.claude/**` crosses, and it is harmless
-    on your side. The eval workspace under it (a 1,325-line review page of run
-    transcripts) does not cross — the row is in this roll.
+311. THE lane-handoff SKILL [**never-port at the manifest sha below** — a SPECIFIC row
+    above the `.claude/**` glob, first match wins; its `*-workspace/` and the generated
+    `docs/lane-*-handoff.md` have their own never-port rows — step 300] (`fe120bf9`).
+    The producer's two machines split a burst by a generated, self-retiring handoff file
+    with a validated queue and a surface fence.
+    **CORRECTION 2026-09-04 — THIS STEP AS FIRST WRITTEN SAID THE SKILL CROSSES, AND AT
+    THE TAG IT DID.** The roll described the tree at `port-base-20260902`, where the
+    skill sat under the `.claude/**` canonical-producer default and only its workspace
+    was carved out. The user's producer-only ruling landed after the tag (`b1c0b782`),
+    and `fe4df356` — the sha the paragraph below tells you to take — carries the row that
+    makes `.claude/skills/lane-handoff/**` never-port. **So at that manifest the skill
+    does NOT cross: do not take it.** The reason is in the row: lanes split a burst
+    across two producer machines for throughput, and the company port is the opposite
+    need — one pen, methodical, accuracy over speed — so a two-lane split tool is the
+    wrong instrument on your side. Read the ROW, not this prose, wherever the two
+    disagree; the manifest is the single source of disposition truth, and this
+    correction exists because a path-by-path walk reads the ledger entry while it works.
+    Note what this does to a count: some of the producer-only paths in a `.claude/**`
+    diff are producer-only ON PURPOSE, so "N producer-only" is never "take N".
+    **TAKE `PORT-MANIFEST.yaml` AT `fe4df356` — that sha exactly, not "or later"
+    (corrected 2026-09-04 after your carve-out 7 said so, and you were right):** this
+    skill's never-port row (`b1c0b782`) and the `row_may_match_nothing` entry that goes
+    with it (`fe4df356`) are both PAST `port-base-20260902` and therefore outside the
+    range you are applying. An out-of-range take is an EXCEPTION, and an exception is
+    sized to the thing it excuses: "or later" would silently widen it to whatever the
+    producer's HEAD happened to be on the day you ran, which is the same defect as the
+    item-file "or later" the EIGHTH POSTSCRIPT retired, one level up. Take the file at
+    `fe4df356`; anything the producer added to it after that sha arrives in a later
+    range, in the ordinary way. Take the
+    `.claude/**` tree with an older manifest and
+    `test_no_manifest_row_matches_nothing` reports a hole for a row that is doing its
+    job — the generated `docs/lane-<x>-handoff.md` and the eval workspace match nothing
+    on your tree BY DESIGN, because both are producer-machine artifacts. Same commit
+    carries `drydocs_core/component_map.py`'s per-entry row, which the ADR 0018 step
+    above needs for the same reason. This is a take-by-name on ONE mechanism file, which
+    is the only case the tag rule (EIGHTH POSTSCRIPT) admits.
 
 312. S16 — THE COMPOSITION ROOT DISCOVERS `drydocs/cli_consumer.py`; `cli.py` IS
     CANONICAL-PRODUCER; RELAY-24 SAYS HOW TO ADOPT S8 [canonical-producer + the manifest
@@ -5098,6 +5659,250 @@ under the existing patterns (snapshots, claims, renders, groom); no spelling dri
 roll, so `port_preflight.py`'s patterns are untouched. The two RECORD_PREFIXES it gains
 (`docs/history/`, `internal/research/`) are the cited-paths check learning two document
 classes whose paths are facts about the tree they described, not a policy change.
+
+**SIXTH ROLL — `port-base-20260902..port-base-20260905` (2026-09-05).** 186 commits at the
+tag (183 when the ledger was written, plus the roll commit, its ritual follow-up and one Lane B
+claim that landed between them), 132 cited below in steps 313–333; the rest are the ritual patterns. The range was cut from
+`origin/main` at `7a56f6f1` with Lane B's three `wip/` branches deliberately excluded (their
+claims are in the range as status-only item commits; their work is the next range). Every
+producer-owned surface the company hand-edited during carve-outs 6–9 now has the producer
+change behind it (step 328), so this is the first roll since 2026-08-26 with nothing
+hand-carried and nothing parked.
+
+313. THE LANE MODEL RAN THREE BURSTS, AND THE HANDOFF FILE NEVER CROSSES [`docs/lane-*-handoff.md`
+    never-port; `.claude/skills/lane-handoff/**` never-port; merges ritual] (`0f765355`,
+    `f109280f`, `0aeba6fc`, `dc12fb16`, `6c51618e` the generated handoff files — five
+    generations, each retired when its queue emptied; `ea90c4d9`, `ebb6f03e` the queue
+    closes, the first of which also carried the `.pre-commit-config.yaml`
+    canonical-producer row; `780a6d45` the skill carries the burst's three findings, and
+    `config/dev-environment.yaml` names the runtime UTF-8 environment — that file is
+    canonical-company, so read the producer's two lines and write your own; `9546268a` the
+    second rebase hunk resolved and manifest rows deduplicated against `df0b0437`; the
+    `--no-ff` merges `47e00ea1` `2467d992` `8f585a46` `163fad99` `b1821f10` `22742cff`
+    `dc121d93` `8d495289` `4def9bda` `33ff9fa5` `8f150ea3` `548e0725` `52b849ea`
+    `aee4e835` `75a45d07` `dfc3ad0f` `883fa5fc` `f6e2b4f7`, two of which resolved a
+    collision (`b1821f10` web/package.json + README, `883fa5fc` config/taxonomy) and none
+    of which carries content of its own; `6743ee9d` the review-branch merge). Nothing here
+    is a take; what the bursts produced is steps 314–333.
+
+314. O92 — TC-SHELL-08 AUTOMATED [`web/**` canonical-producer; `config/taxonomy/ui-components.yaml`
+    per-entry] (`5bb80ec8` `web/src/modules/registry.test.ts`, `d618c3a3` close: the
+    automated share 16/39 → 17/40 in the ui-components row). The role × designation matrix
+    over the real module registry. The ui-components row it touches is rows-union under the
+    rewritten entry_rule (EIGHTEENTH POSTSCRIPT).
+
+315. G133 — THE JSON CHANNEL CARRIES EXIT 4 [`drydocs_core/adapters/**` default;
+    `API-CALLS.md` canonical-producer] (`da267aaa`, `a7b82434` close). A tool the host
+    cannot start returns exit 4 through the JSON channel, not a traceback; `API-CALLS.md`
+    records both folder-export transports.
+
+316. O70 — THE CONSOLE'S API CLIENT IS GENERATED FROM `drydocs_api`'s OPENAPI SCHEMA
+    [`drydocs_api/**` default_ok — HAND-MERGE, never take the package; `scripts/dump_openapi.py`
+    + `web/scripts/**` canonical-producer; `web/src/generated/**` DERIVED; `.github/**`
+    evaluate] (`19537a17`, `be4e1195` the multipart proof, `abe7f90a` close). Two committed
+    artifacts with drift guards, `web/src/generated/openapi.json` and `api.d.ts` — derived,
+    regenerate from YOUR `drydocs_api`, never carry (the TENTH POSTSCRIPT's rule, two more
+    files). `drydocs_api/schemas.py` is new and `app.py` changed: your personas relabel
+    lives in that package, so hand-merge (your rule 2). CI gains a type-check step —
+    `.github` is evaluate, adapt.
+
+317. R9 — `drydocs_api.agent_query` [`drydocs_api/**` default_ok, hand-merge; `agents/README.md`]
+    (`2ae6b2a2`, `94898659` close). Read-only deterministic QuerySpec navigation;
+    `execute_spec` extracted so the CLI and `/specs/{id}/run` share one envelope.
+
+318. O88 — THE CONSOLE'S PAPER FORM [`web/**` + `run-drydocs-console` skill canonical-producer;
+    `tests/unit/test_console_print_gutter.py` default] (`e726824f`, `041006d9`). Headless
+    Edge captures executed routes to printable HTML with the L6 gutter and a provenance
+    footer (`web/scripts/captureRoutes.mjs`, `web/src/lib/paperForm.ts`). The browser is a
+    machine tool — a venue fact, not a dependency.
+
+319. J62 — PRE-COMMIT HOOKS FOR THE TWO COMMANDS CI BLOCKS ON [`.pre-commit-config.yaml`
+    canonical-producer (row at `ea90c4d9`); `CLAUDE.md` canonical-producer;
+    `tests/unit/test_precommit_config.py`] (`04f632df`, `0ccd3cac`). The hook rev is pinned
+    to pyproject's ruff and the guard keeps them together. `pre-commit install` once per
+    clone; deliberately not installed for anyone.
+
+320. Z9 + O87 — TWO CONSOLE FIXES AND THE SME SEAT BADGE [`web/**`; `tests/unit`]
+    (`2a905614`, `4a6341b1` Z9 — Synthetica's country through the alias fallback;
+    `45b6ebdd`, `c21f113c`, `64536bf4` O87 — the persona picker marks the SME seat from
+    `SME_PERSONA_ID`, derived from the roster constant and never a named id, so your `sme`
+    relabel is what it shows; the ui-components ledger scan skips `*.test.tsx` /
+    `*.spec.tsx`).
+
+321. J76 — CHECK THE INSTRUMENT BEFORE THE SUBJECT [`CLAUDE.md`, `docs/style/**`
+    canonical-producer; `scripts/**`; `tests/source_scan.py`;
+    `tests/unit/test_subprocess_encoding.py`] (`d189ee36`, `b3632e71`). Every subprocess
+    capture in `scripts/` and `tests/` decodes with an explicit encoding; the guard; the
+    other two failure modes named in `review-provenance.md`. `scripts/port_preflight.py`
+    and `render_port_dispositions.py` are among the fixed callers.
+
+322. G134 — THE CAPTURE RUNG BEHIND EACH TRUST VERDICT [`config/doc-source-registry.yaml`
+    PER-ENTRY] (`a6453ec1`, `e6bf8bf4`). The ladder declared once as data, `capture_rung`
+    on every row with `unprobed` as an honest value, a one-directional VERBATIM guard.
+    Per-entry: add the ladder and the field to YOUR rows; their rung values are yours.
+    Two findings raised and left open in the close note — read it before setting a rung.
+
+323. O54 — WHERE CONFIG LIVES vs WHETHER IT IS GUARDED [`scripts/render_enforcement_matrix.py`
+    canonical-producer; `web/src/generated/enforcement-matrix.json` DERIVED] (`9f44aa51`,
+    `3b21ac3e`). The matrix separates the two questions; the canonical load sequence joins
+    as a code-resident row. Regenerate the matrix on your tree.
+
+324. C43 — MFTS IS AXWAY SECURETRANSPORT 6.0.3, AND THE ROW A WHOLESALE TAKE WOULD LOSE
+    [`config/taxonomy/software-registry.yaml` PER-ENTRY (`0003ea28`, SEVENTEENTH POSTSCRIPT);
+    `scripts/render_software_registry.py`] (`530f5757`, `341a6fe9`). A white-label row,
+    vendor beside product the way `controlm` carries `bmc`, `white_label` carrying the
+    internal name. Your rows stay; the count is tracked per side.
+
+325. Z8 + Z7 + Z4 — THE BUNDLED DEMO INTERLOCKS, THE TEAMS DIMENSION LIGHTS UP, AND
+    LOAD-BALANCER NAMES RESOLVE [`tests/fixtures/**` default; `drydocs/data/**` NEVER-PORT;
+    `drydocs_lineage/**` default — your continue-defer cluster] (`15f0b18e`, `0c377528`,
+    `7f465b7c` Z8; `83f4efa5`, `8ae03bf1` Z7; `14d26b3f` Z4). Z8: a gazetteer row, aligned
+    host names, an application the graph carries,
+    `tests/unit/test_bundled_demo_interlock.py`, and a real skip guard where J8's file-level
+    rule misreads a tracked sample. Z7: a fact feed under `drydocs/data/` (never-port — the
+    bundled samples are the producer's demo, yours are yours) and
+    `tests/fixtures/attribution/stg_app_fact__bundled-samples.csv`. Z4:
+    `drydocs_lineage/extractors/lb_resolution.py` + `drydocs_lineage/collect/lb_resolve.sh` +
+    `drydocs_lineage/collect/LB-RESOLVE.md` + synthetic nslookup fixtures under
+    `tests/fixtures/lineage/lb_resolve/` — classified by outcome, never by name; a clean-add
+    into a package you hold differently.
+
+326. J74 — A CEILING GUARD FOR THE RETIRED ACRONYM IN COMMIT MESSAGES
+    [`tests/unit/test_publish_boundary_history_ceiling.py` PER-ENTRY — new row this roll;
+    `PUBLISH-BOUNDARY.md` canonical-producer] (`74cd5990`, `b65626fe`). `CEILING = 34` was
+    MEASURED on the producer's history (34 of 2,057 commits) under the ruling that a push
+    CARRIES history, so the 34 are accepted and the number may never rise. Your history is
+    disjoint and your count is yours: measure it with the test's own log command, set YOUR
+    ceiling with the recorded reason, take the mechanism whole. The token is read from
+    `internal/cdo-reference/README.md`, which you hold (EIGHTEENTH POSTSCRIPT), and like
+    J55 the test fails closed when it cannot read it.
+
+327. J58 — ONE JSON SCHEMA FOR THE IDENTITY HEADER, DEFAULT-DENY BY FILE CLASS
+    [`config/schemas/identity-header.schema.json` canonical-producer;
+    `tests/unit/test_config_identity_header.py` PER-ENTRY — new row this roll;
+    `config/gate-prompts/**` + `graph-tests/**` canonical-company; `internal/**` default_ok;
+    `knowledge/upgrade-plans/**`, `docs/restructure/**`] (`182523e7` — one commit, about
+    forty files: the schema, the test, and the header normalized across every class).
+    `test_every_tracked_yaml_has_a_declared_class` walks EVERY tracked YAML and fails on one
+    in no class — so every company-only YAML goes red on arrival, by design. The `CLASSES`
+    dict in the test is the declaration: add your files with their class and reason, take
+    the rest of the test whole — the `test_backlog.py` shape, and the manifest row says so.
+    Your canonical-company files get the same header block, added by you.
+
+328. THE PORT PEN'S OWN COMMITS — EVERY ONE ALREADY IN RELAY-25 OR ITS POSTSCRIPTS
+    [`docs/port/**` never-port; `PORT-MANIFEST.yaml` canonical-producer; `tests/unit/test_port_*.py`
+    + `test_reconcile_*.py`; `drydocs_core/component_map.py` per-entry;
+    `.claude/skills/reconcile-port/**` canonical-producer] (`30d2e870` S16's
+    `drydocs.cli_consumer` is an ENTRYPOINT in `component_map.py` — the line RELAY-24's
+    addendum told you to add locally; `40d2461d` RELAY-25's five corrections — the
+    publishing shim aliases every submodule, the seven `cli_*` rows, J55 fail-closed;
+    `dd2bb7b2` the totality companion skips by name; `20449d47` the fence canary pins
+    `docs/style`; `84ef2d97` + `af9194c4` the runbook-currency and never-port zone guards
+    read tracked content and skip by name; `15a106d4` RELAY-25 itself; `c88261e0` fourth
+    postscript; `02580f2c` the `test_source_bindings.py` evaluate row + fifth; `0f893f86`
+    the consumer-seam probes hold on a tree with a real `cli_consumer.py` + seventh;
+    `9e201135` eighth; `f74ad5b9` + `a5ff4a84` step 311's sha and its correction;
+    `a060f8be` the overlay duplicate guard reads all three blocks + two carve-out-7
+    corrections; `4dd7c8e1` tenth; `6af36e4c` eleventh; `f9c8605b` twelfth, which stamps a
+    `config/gate-log.md` record (union-append); `f2ec87db` the data-centers per-entry row;
+    `aa7c20b5` fourteenth; `9beb68d0` seventeenth; `0003ea28` the software-registry
+    per-entry row; `920a4107` eighteenth + the ui-components row rewritten + the
+    reconcile-port skill's three apply rules). These are the fixes promised "at the next
+    roll"; the guards they changed are what made your chunk-2 FileNotFoundError and your
+    chunk-1 Q5 unrepeatable.
+
+329. `register_loaders` — THE DECLARATION HALF OF THE CONSUMER SEAM [`drydocs/cli.py` +
+    `cli_shared.py` canonical-producer] (`f338097d`; LOAD2 minted in it — a citation, not a
+    step, I6; RELAY-25 sixth postscript). Your loaders register through it at the S8 take;
+    the data-center bind docstring states its two value domains, which is LOAD2's subject
+    (step 331).
+
+330. LIN1 + LIN2 — THE LINEAGE CHAIN EXTRACTS IN HOP ORDER AND LOADS PLAN-ONLY BY DEFAULT
+    [`drydocs_lineage/**` default — your continue-defer cluster; `drydocs/cli.py`
+    canonical-producer; `config/data-zones.yaml` canonical-producer; `MODULE_MAP.md`
+    per-entry; `tests/integration/test_lineage_load_e2e.py`] (`da45a91f` the epic, the pair
+    and the workplan review; `5c429f05` `drydocs lineage-extract`; `0170ed2c` the variables
+    sample is machine-local so the default run treats it as optional; `93f4d832` the lane
+    review applied — `code_commit` in the header, per-hop zone checks, LIN2 acceptance
+    settled; `9fcce1fc` `drydocs lineage-load` — `plan_curated` over a staged artifact,
+    `--write` for the active labels; `d94e4588` done, venue-tagged proof (desktop,
+    `neo4jtest`, `drydocs`); `aba1ef21` Idea-254 — coverage serializes the distinct
+    COUNT). `drydocs_core/data_root.py` gains a zone; `drydocs_lineage/staging.py` is new,
+    `curation.py`, `review.py`, `writer.py` reshaped. The lineage cluster has been
+    company-divergent since the 2026-08-26 continue-defer; this is the largest addition
+    since, and it is the adoption dossier's next chapter, not a take.
+
+331. LOAD2 — ONE `--data-center` VALUE REACHES THE TABLE THAT SPEAKS EACH SPELLING
+    [`config/taxonomy/data-centers.yaml` PER-ENTRY (`f2ec87db`);
+    `config/schemas/data-centers.schema.json` canonical-producer; `drydocs_core/data_centers.py`;
+    `cli_shared.py` + loaders canonical-producer] (`3e211932`, `11c5993b` done, `b309a0d9`
+    the non-derivability argument is the VENDOR BASELINE, not a time segment). The taxonomy
+    file pairs both value domains per data center; the producer's rows are synthetic and
+    yours are your production data centers — per-entry, rows keyed by id, the twin-aware
+    reader. Plus `863c6733` the DRAFT gate prompt `controlm-folder-identity-grain` —
+    canonical-company directory, clean-add, DRAFT and unsigned on your tree until your own
+    session.
+
+332. THE RESTRUCTURE CHAIN — PLAN2, THE `idea-series-grammar` GATE, CFG1, CFG2, DOC1, PLAN4
+    [`.claude/skills/groom-backlog/validate.py` + `drydocs_core/backlog_store.py` + `CLAUDE.md`
+    canonical-producer; `config/dev-environment.yaml` canonical-company;
+    `config/taxonomy/domains.yaml` + `editions.yaml` PER-ENTRY; `config/gate-log.md`
+    union-append; `config/gate-prompts/**` canonical-company; `docs/decisions/**` default;
+    `git-readme.md` evaluate; `docs/restructure/ideas/README.md` canonical-producer;
+    `docs/restructure/ideas/pending-*.md` never-port].
+    PLAN2 (`fc4f7af7` the Idea series has no edition grammar yet — your Idea-10012;
+    `43fd345c` the edition segment: `[<EDITION>-]<MODULE><n>` and `[<EDITION>-]Idea-<n>`,
+    the edition DECLARED in `config/dev-environment.yaml` `edition:`, both partition rules
+    retired forward-only, git-readme's "NEVER allocates" sentence retired, `drydocs/port`'s
+    union reads the segment). Your action: declare `edition:` in YOUR `dev-environment.yaml`
+    — the file is canonical-company, nothing here writes it, and a venue with no key mints
+    no item (RELAY-26 (1)).
+    The gate `idea-series-grammar` (`bf1a6f86` draft, `f071194f` pre-session refresh,
+    `de8159eb` SIGNED OFF 9/9 producer-side) — union-append the gate-log record; the prompt
+    lands in your canonical-company directory as a clean-add that reads DRAFT on your side.
+    C1 is the carve-out that keeps your idea channel open before you declare, and your
+    09-05 renumber (TWELFTH POSTSCRIPT) is recorded there as C1's shape.
+    CFG1 (`2c744212`) `config/taxonomy/domains.yaml` + `drydocs_core/ontology/domain_registry.py`
+    + `config/schemas/domains.schema.json`: the 13 domains with their REAL rulings;
+    per-entry — your mints stay, mechanism crosses; the reader enforces base-owned minting.
+    CFG2 (`df0c49de`, `ba7f7920`) `config/taxonomy/editions.yaml` +
+    `drydocs_core/edition_registry.py` + `config/schemas/editions.schema.json`: Internal,
+    two SYNTHETIC rows marked `sample: true`, your code unnamed; per-entry — replace the
+    samples with your real rows keyed to `area_product_id` (RELAY-26 (2)).
+    DOC1 (`5803d091`) ADR 0015 amended by dated section — D2 thin instance-owned backlog,
+    D6 `--scope`, C1–C3 the edition as a declared segment. ADR text; default class.
+    PLAN4 (`13333546` mint, `f1825cc9` body, `e1c82161` build, `70d6e14b` newline fix) —
+    venue-aware grooming, the edit side: `--check-venue-edits` (REWRITE / UNSTAMPED /
+    STATE FLIP), the pending file `docs/restructure/ideas/pending-*.md` and
+    `--mint-pending`; `0e33826e` Idea-258..264 landed through it. `dbd13170` DOC2 /
+    Idea-250 — producer records say "the company", never "their".
+
+333. REVIEWS, THE MODULE SWEEP, AND THE SIXTEEN WEB ITEMS [`docs/reviews/**` default_ok
+    records, J63-stamped — read, never edit; items per-entry AT THE TAG `port-base-20260905`]
+    (`0cc996cf` the job-to-ETL binding second pass, `0015fcfa` its review, `1b615dc7` R8b,
+    `33c058c5` APPLY, `796841f7` R7 narrowed; `127e6b4c` the second-review protocol between
+    lanes; `2f9ebfc7` + `e1e72e86` the Ideas-to-Backlog intake review; `170e12ff` +
+    `d62ac0e8` + `b35938e6` carve-out 6 readiness / R1 / VERIFY — the producer's review of
+    YOUR carve-out 6, which records that two of its own findings were wrong and yours were
+    right; `e44cc5b4` + `5f02599f` the module review sweep plan and its secondary review,
+    slot 9 the web report at `docs/reviews/modules/web-2026-09-05.md`; `1e17651d` +
+    `bcae4d02` + `be83296f` DOC4; `a1f2dad8` + `3014b7d8` WEB1–WEB15 + API1 minted with
+    final titles and bodies; `7f60d26c` Idea-256, the five-tier naming formula reviewed).
+    The three Lane B claims at the tag (API1, WEB3, WEB4 `in_progress`) are claims, not
+    work — the work arrives in the next range.
+
+    LEDGER COVERAGE FOOTNOTE (2026-09-05, SIXTH ROLL). 186 commits in
+    `port-base-20260902..port-base-20260905` (`git rev-list --count` at the tag); 54 read as
+    ritual under the existing patterns (snapshots, claims, renders, grooms); 132 are cited in
+    steps 313–333 — the 131 the ledger was written against plus the roll commit itself. The
+    counts were 183 / 52 / 131 when written and are corrected here at the tag, after the fact. No pattern
+    spelling drifted this roll, so `port_preflight.py` is untouched. The roll commit
+    (`7f676ce9`, subject `docs(port):` — outside the `chore(port): roll` ritual pattern, so
+    it is cited here rather than exempted) touches `docs/port/port-prompt.md`,
+    `PORT-MANIFEST.yaml` (the two per-entry rows named in RELAY-26) and the plan renders —
+    no path the range had not already touched. The tag sits on the `chore(port): roll`
+    follow-up that re-renders the board after Lane B's WEB12 claim (`3919f5a0`) landed
+    between the roll's pull and its push.
 
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):

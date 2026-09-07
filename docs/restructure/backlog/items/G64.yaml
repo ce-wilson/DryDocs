@@ -29,6 +29,14 @@ notes: |
   MERGED 2026-09-02 (groom, from Idea-236 gap 4). The idea offered the finding as a rider on this item or as its own item, conditional on whether G64 had moved; it has not (status todo here), so it is folded in rather than minted.
 
   HOUSEKEEPING FLAG from the same source, recorded rather than acted on: the company's research log describes this gate as CONVENED and section B as run, while G64 reads status todo on both sides. One of the two is stale and the next port session is the venue to settle which - a producer-side status flip on a company-side claim would be the J63 defect in reverse.
+hold:
+  since: 2026-09-07
+  by: user
+  until: the SME convenes the dpl-pipeline-registry-contract session
+  reason: 'USER-GATED START — the SME convenes the session; the pull loop SKIPS this item until then.
+    Declared here at Y7 (2026-09-07) from the opening sentence of acceptance, which is left as written:
+    until this field existed the hold was prose no derivation could read, and the item stayed out of
+    next_ready only because G22 and G25 were not done.'
 annotations:
   inputs[]:
   - 'config/audit-fields.yaml — path corrected 2026-08-12 (groom): the ledger is a FILE, never a directory'

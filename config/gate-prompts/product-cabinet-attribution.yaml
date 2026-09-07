@@ -18,6 +18,8 @@
 # vocab entries stay planned until the K6 supplement lands (honest-lifecycle).
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-07-20
+
 id: product-cabinet-attribution
 title: "SME Gate — Product Cabinet attribution model (Area Product Owner, Product Owner, Product Architect, Tech Partner, Data Owner, Data Certifier, Analytics Lead)"
 step: "Pre-activation gate for backlog K5 — resolves the Product Cabinet role-holder attribution family split out of the 2026-07-10 BusinessApplication entity-reshape gate (§B)"

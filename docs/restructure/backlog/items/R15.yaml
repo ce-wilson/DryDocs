@@ -8,7 +8,7 @@ phase: 15
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: done
 depends_on: []
 inputs:
 - docs/reviews/gitnexus-depgraph-comparison.md
@@ -19,3 +19,37 @@ acceptance: |
   (a) Lineage- and impact-style QuerySpec responses carry `epistemic: exact | lower-bound` plus a machine-readable `causes` list naming what the walk could NOT see. The DryDocs cause classes are concrete, not generic: unparsed cmd_line values, unresolved invocations, and gate-pending (status: planned) edges. (b) THE DOCTRINE IS IN THE CONTRACT, not only in prose: an empty result set is not evidence of absence when the causes say the walk could not see. A consumer must be able to distinguish a lower-bound answer with zero rows from an exact answer with zero rows. (c) ONTOLOGY-CHEAP BY CONSTRUCTION: this is a property on the ANSWER, never on the graph -- no node, property or edge expresses epistemic state -- so no gate is needed. If a later proposal wants it graph-side, that is a RELATIONSHIP_GUIDE proposal with its own gate. (d) CONSUMERS RE-READ ONE FIELD: the Ask spoke (R5) and any exported spec render the label as given rather than inventing their own wording for it. (e) Tests cover an exact answer, a lower-bound answer for each cause class, and the zero-rows-but-lower-bound case that clause (b) exists for.
 notes: |
   Groomed 2026-08-19 from Idea-124 -- R1, the top-ranked adoption recommendation of docs/reviews/gitnexus-depgraph-comparison.md. It extends the trust axis (VERBATIM/GROUNDED/SYNTHESIZED, which grades the SOURCE) to the ANSWER, which nothing grades today. PRIORITY, recorded because it differs from the capture: the entry proposed High; filed p2 because nothing blocks on it and the whole of phase 15's tail is todo. Raise it when the console's answers start being quoted outward. The trial that came with this review is this item's best argument: Idea-128 RAN GitNexus on this repo and was rejected, and the verdict was that its method-grain `impact` claimed `epistemic: "exact"` while missing receiver-annotated call sites that grep finds. A label is only worth having if the causes are honest.
+  DONE 2026-09-06 (desktop, Lane A). Built on wip/R15-desktop (J31, pushed at the first edit) and
+  merged --no-ff as one unit (b1527e8c). (a) drydocs_api/epistemics.py: a QuerySpec declares a
+  WalkDeclaration (walk=) naming the run-time probes it is bounded by and the planned vocabulary
+  entries whose edges it would traverse; grade() runs one read-only count per probe against the
+  spec's own database, drops zero-count causes, keeps a probe that returns no count AS a cause
+  with count null (J76 - the instrument never fails into clean), and answers exact iff nothing
+  remains. Cause classes are the three the acceptance names: unparsed-cmd-line (a job with a
+  cmd_line and no INVOKES/USES_ARTIFACT/READS_FROM/WRITES_TO edge), unresolved-invocation (an
+  INVOKES to a ProcessNode of kind unknown), gate-pending-edge (keyed by vocabulary ENTRY id, not
+  relationship type, because INVOKES is both an active and a planned entry). LINEAGE_WALK is on
+  lineage.hops.v1 and lineage.data-assets.v1; the schema dump, the inventories and every
+  ephemeral spec stay UNGRADED (epistemic null), never defaulted to exact - the GitNexus failure
+  this item was groomed from. (b) The envelope has fourteen keys: epistemic and causes join
+  truncated and limit in execute_spec (so the agent CLI inherits them) and in the export
+  manifest; SpecRunOut declares them (Literal exact | lower-bound | None, CauseOut cause/detail/
+  count) and the OpenAPI + api.d.ts are regenerated. (c) No node, property or edge; the
+  gate_pending list is guarded to name only planned-only entries so it must shrink when an entry
+  activates (the R20 planned_terms pattern). (d) The Ask spoke grades each spec step with the
+  API's own probes (specs_catalog re-exports grade; StepRecord carries the two fields) and the
+  answer prompt appends the label and causes so the model says lower-bound in those words; the
+  console renders through ONE EpistemicBadge (ui-primitive, unbound like TruncationBadge) on the
+  grid, the Ask step line and the provenance notice - the string in is the string out, null
+  renders nothing - and the client-side manifest carries the two fields too. The demo-on-empty
+  provenance state now carries the empty live result so the zero-row notice says why it has
+  zero. (e) tests/unit/test_epistemics.py (17): exact, lower-bound per class, no-count probe,
+  declaration order, ungraded null, zero rows lower-bound vs zero rows exact, envelope key set ==
+  SpecRunOut fields, export manifest, static guards on the probes and the planned list;
+  test_graph_qa step label + ungraded-is-null; web: EpistemicBadge unit + one-vocabulary scan
+  (data-epistemic declared once, no consumer hard-codes the label), SpecGrid six cases incl.
+  zero-rows-lower-bound on the notice. Not done, on purpose: the probes are whole-graph counts,
+  not per-answer reachability - a lower-bound label says the WALK is bounded, not that THIS
+  answer lost a row. Per-answer causes would need the traversal to report what it skipped, which
+  is a QuerySpec-shape change; inboxed as an idea if a consumer asks for it. RELAY-27 (next
+  roll): the two envelope keys, the walk field, epistemics.py.

@@ -158,7 +158,11 @@ jobs:
       - name: Install web dependencies
         run: npm ci
 
-      - name: Lint (oxlint)
+      # WEB13 (b): `--max-warnings 0` lives in the npm script, so a local run and
+      # a CI run gate identically. Ten fast-refresh advisories existed when this
+      # landed; five files carry a scoped waiver in .oxlintrc.json and the count
+      # is zero, so any NEW warning is a red build.
+      - name: Lint (oxlint, --max-warnings 0)
         run: npm run lint
 
       # O70: the generated client's whole promise is that an API change the
@@ -168,8 +172,39 @@ jobs:
       - name: Typecheck and build (tsc -b, vite build)
         run: npm run build
 
-      - name: Unit tests (vitest)
-        run: npm test
+      # WEB7 (b): the initial chunk is what EVERY persona downloads before
+      # anything renders, and until this step nothing measured it — so it grew
+      # from nobody deciding to (S8). The number and the ratchet rule live in
+      # web/scripts/checkBundleSize.mjs, one place, with the date it was
+      # measured; raising it requires writing down what arrived and why it
+      # belongs in the entry chunk. This BLOCKS, unlike the advisory step below:
+      # a bundle that quietly reacquires 1.2 MB of role-gated code has undone
+      # the authorization-boundary split, and a warning would not stop it.
+      - name: Initial-chunk size ceiling
+        run: npm run bundle:check
+
+      # WEB10 (b): one build for every environment (ADR 0020). The bundle names
+      # no host and no port - the console calls the PATHS in web/delivery.json on
+      # its own origin and a reverse proxy does the rest. Before this, an unset
+      # VITE_API_URL pointed every browser at the user's own machine, silently.
+      - name: No deployment coordinate in dist
+        run: npm run dist:check
+
+      # WEB13 (a): the ratchet. @vitest/coverage-v8 was declared and never read —
+      # the instrument was bought and the numbers went unlooked-at. The floor is
+      # 9.8% statements, measured 2026-09-05 (9.89 on the tree that set it), and
+      # it only goes UP. Growing the number is O43's seed suites; this is the
+      # gate, not the tests.
+      - name: Unit tests with the coverage floor (vitest)
+        run: npm run test:coverage
+
+      # WEB13 (d): WARN-ONLY, deliberately, and the same posture the snapshot
+      # ritual takes with its lint check — report, never block. The finding this
+      # closes is not the CVEs (five high, one root, none of them reaching
+      # dist/): it is that the count was recorded as three at O34, is five now,
+      # and nothing noticed because nothing looked.
+      - name: Dependency advisories (npm audit, warn-only)
+        run: npm run audit:high || echo "::warning::npm audit reported advisories at high or above — see the log"
 
       - name: Install Chromium
         run: npx playwright install --with-deps chromium

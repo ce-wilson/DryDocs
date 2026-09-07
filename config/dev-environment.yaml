@@ -9,6 +9,24 @@
 # Contains NO company data and NO secrets (names/ports only; passwords live in
 # gitignored .env files, never in a committed file).
 schema: drydocs.dev-environment.v1
+classification: Internal-Public
+updated: 2026-09-05
+
+
+# WHICH EDITION THIS CHECKOUT RUNS AS (PLAN2 b, 2026-09-05; gate
+# ontology-domain-registry-and-edition-grain §C1/§C4). The id allocator
+# (.claude/skills/groom-backlog/validate.py) reads THIS key and nothing else to decide
+# which edition a new id belongs to: `base` mints unprefixed ids (`LOAD12`, `Idea-258`);
+# a code declared in config/taxonomy/editions.yaml mints prefixed ones
+# (`<code>-LOAD1`, `<code>-Idea-1`). It is DECLARED, never inferred from a hostname or
+# from the ids already in the tree - the inference is what let a session on the wrong
+# side mint the other side's next number. This file is canonical-company in
+# PORT-MANIFEST.yaml, so the company's copy carries the company's own code (minted at
+# its own edition gate, CFG2) and a port never overwrites it - the same reason
+# `capability_assert` below lives here. A copy with NO `edition:` key mints no item id
+# (the allocator's refusal names this key) and may still capture ideas, band-shaped,
+# until it declares (rider idea-series-grammar C1). The producer is the base.
+edition: base
 
 neo4j:
   # Local Neo4j Enterprise container (EE required — ADR 0002 multi-DB + composite;
@@ -65,8 +83,8 @@ neo4j:
 
 services:
   # Local dev servers the web UI expects (see web/.env.example).
-  adk_api: 8000           # agents ADK server (VITE_ADK_URL)
-  drydocs_api: 8001       # thin read API, ADR 0005 (VITE_API_URL)
+  adk_api: 8000           # agents ADK server; the console reaches it as /agent via the proxy (DRYDOCS_AGENT_UPSTREAM, ADR 0020)
+  drydocs_api: 8001       # thin read API, ADR 0005; the console reaches it as /api via the proxy (DRYDOCS_API_UPSTREAM)
 
 data:
   # WHERE SOURCE PAYLOADS AND OUTPUTS LIVE. Every drop zone and every output the

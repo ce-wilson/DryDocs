@@ -19,19 +19,27 @@ Three rules:
 
 Consumer-side usage during reconcile-port (documented in that skill):
 
-    1. BEFORE applying the port, snapshot the consumer copies — ALL FOUR; each
-       live check below reads one, and a missing file fails the run:
-         mkdir %TEMP%/reconcile-before
-         python -c "from pathlib import Path; from drydocs_core import backlog_store, yaml_fragments as yf; \
-            Path('<before-dir>/relationship_vocabulary.yaml').write_text(yf.merged_text('drydocs_core/ontology/relationship_vocabulary'), encoding='utf-8'); \
-            Path('<before-dir>/taxonomy-ontology-map.yaml').write_text(yf.merged_text('config/taxonomy-ontology-map'), encoding='utf-8')"
-         poetry run python -c "from drydocs_core.backlog_store import dump_document as d; print(d(), end='')" > <before-dir>/backlog.yaml
-         cp config/gate-log.md  <before-dir>/
-       (S5: both registries are fragment DIRECTORIES now — the snapshot is the
-       MERGED document, so the before/after comparison stays file-shaped.)
+    1. BEFORE applying the port, on a CLEAN checkout, snapshot the consumer copies
+       with ONE call — every file the live checks read, plus the stamp:
+         poetry run python scripts/reconcile_before.py <before-dir>
+       It writes the four mandatory snapshots (the S5 registries as their MERGED
+       documents, the ADR 0013 backlog as its ASSEMBLED document, gate-log.md
+       byte-for-byte), the two optional J51 lists where their modules import, and
+       BASE.sha — the commit the tree was at. It REFUSES a dirty source, because a
+       stamp over an uncommitted edit names a commit the snapshot is not.
     2. Apply the port range / resolve collisions.
     3. RECONCILE_BEFORE_DIR=<before-dir> pytest tests/unit/test_port_reconcile_guards.py -q
-       → FAILS on any downgrade / dropped entry / audit truncation the merge introduced.
+       → FAILS on any downgrade / dropped entry / audit truncation the merge introduced,
+       and FIRST on a before-dir that cannot describe the tree under comparison
+       (``test_reconcile_before_dir_stamp_describes_this_tree_live``): no BASE.sha,
+       a sha that does not resolve here, one that is not an ancestor of HEAD, a
+       gate-log.md that differs from ``git show <sha>:config/gate-log.md``, or a sha
+       that is not where the apply branch left main. That last one is the 2026-09-05
+       case: a before-dir from an EARLIER apply outlived a skipped step 4 and produced
+       a 22nd baseline failure that was the instrument, not the subject (J76).
+       Then paste ``scripts/reconcile_before.py --describe <before-dir>`` into the
+       PORT-REPORT — sha, date, commits behind HEAD — so the report shows what the
+       guards ran against.
     4. AFTER the reconcile, CLEAR the variable and drop the snapshot dir. Nothing
        else does — and the variable outliving its before-dir is what makes the
        next unrelated run in that shell report four broken-looking failures.
@@ -46,12 +54,13 @@ from __future__ import annotations
 import os
 import re
 import subprocess
-from collections.abc import Iterable, Mapping
+from collections.abc import Callable, Iterable, Mapping
 from pathlib import Path
 from typing import Any
 
 import pytest
 
+from drydocs.port import reconcile_before
 from drydocs_core import backlog_store, yaml_fragments
 
 yaml = pytest.importorskip("yaml")
@@ -611,6 +620,168 @@ def test_reconcile_runbook_exemptions_no_drop_live() -> None:
     assert not dropped, f"test_runbook_currency exemption keys DROPPED by the merge: {dropped}"
 
 
+# --- the stamp (2026-09-05): a before-dir says which commit it describes ------------
+# The five live checks above trust <before-dir> to be the tree the apply started
+# from. Nothing checked that until the company's 2026-09-05 apply ran the guards
+# against a before-dir left over from the PREVIOUS apply (step 4 skipped) and
+# spent its time on a phantom failure. scripts/reconcile_before.py now writes
+# BASE.sha beside the snapshots, and this guard refuses a before-dir that cannot
+# prove it describes this tree — the instrument is checked before the subject (J76).
+
+
+@_needs_before
+def test_reconcile_before_dir_stamp_describes_this_tree_live() -> None:
+    before_dir = Path(os.environ[BEFORE_DIR_ENV])
+    if not before_dir.is_dir():
+        before_text("gate-log.md")  # fails with the re-snapshot-or-clear wording
+    problems = reconcile_before.check_stamp(before_dir, REPO)
+    assert not problems, "\n".join(
+        [
+            f"{BEFORE_DIR_ENV} cannot be trusted; {reconcile_before.describe(before_dir, REPO)}",
+            *problems,
+        ]
+    )
+
+
+def test_stamp_parses_one_full_sha_and_nothing_else() -> None:
+    sha = "a" * 40
+    assert reconcile_before.parse_stamp(sha + "\n") == sha
+    assert reconcile_before.parse_stamp(None) is None, "absent file = no stamp"
+    assert reconcile_before.parse_stamp("") is None
+    assert reconcile_before.parse_stamp("fc57826f\n") is None, "an abbreviated sha protects nothing"
+    assert reconcile_before.parse_stamp("not a sha") is None
+
+
+def test_stamp_problems_name_each_way_a_before_dir_can_lie() -> None:
+    """The wording is the contract: each failure names its cause AND the fix."""
+    sha, other = "a" * 40, "b" * 40
+    ok = dict(resolves=True, is_ancestor=True, gate_log_matches=True)
+    assert reconcile_before.stamp_problems(sha, **ok) == []
+    assert reconcile_before.stamp_problems(sha, **ok, fork_point=sha) == []
+
+    (missing,) = reconcile_before.stamp_problems(None, **ok)
+    assert "predates the stamp or was hand-built" in missing
+    (foreign,) = reconcile_before.stamp_problems(sha, **{**ok, "resolves": False})
+    assert "another checkout" in foreign
+    (not_anc,) = reconcile_before.stamp_problems(sha, **{**ok, "is_ancestor": False})
+    assert "not an ancestor of HEAD" in not_anc
+    (edited,) = reconcile_before.stamp_problems(sha, **{**ok, "gate_log_matches": False})
+    assert "git show aaaaaaaa:config/gate-log.md" in edited
+    (stale,) = reconcile_before.stamp_problems(sha, **ok, fork_point=other)
+    assert "EARLIER apply outlived its teardown" in stale
+    for problem in (missing, foreign, not_anc, edited, stale):
+        assert "Re-snapshot" in problem, problem
+
+
+def test_snapshot_written_here_passes_its_own_stamp_check(tmp_path: Path) -> None:
+    """Round trip on THIS checkout: the writer's output satisfies the reader.
+
+    Skips when the four sources are dirty in the working tree (the writer refuses
+    them by design, and a developer's half-edited gate-log is not a test failure).
+    Also skips on a branch that has moved past its fork point: the writer stamps
+    HEAD and the reader compares the stamp to where the branch left main, so a
+    round trip at HEAD only means something AT the branch base - which is where
+    the runbook takes the snapshot, before any apply commit. A J31 wip branch
+    with one commit on it is the everyday case (2026-09-06, wip/WEB9-desktop);
+    the guard was right there and the test's precondition was not met.
+    """
+    if reconcile_before.dirty_sources(REPO):
+        pytest.skip("snapshot sources are dirty in this checkout; the writer refuses by design")
+    fork = reconcile_before.fork_point(REPO)
+    if fork is not None and fork != reconcile_before.head_sha(REPO):
+        pytest.skip("HEAD is past its fork point; the round trip is only meaningful at the base")
+    before = tmp_path / "before"
+    report = reconcile_before.write_snapshot(before, REPO)
+    assert set(BEFORE_SNAPSHOTS) <= set(report.written)
+    assert reconcile_before.STAMP_FILE in report.written
+    assert reconcile_before.read_stamp(before) == reconcile_before.head_sha(REPO)
+    assert reconcile_before.check_stamp(before, REPO) == []
+    line = reconcile_before.describe(before, REPO)
+    assert "0 commits behind HEAD" in line and "MISSING" not in line
+    # The tampered-snapshot case is the one this checkout can always prove (the
+    # stale fork-point case needs a branch and a main ref; stamp_problems covers
+    # its wording above):
+    (before / "gate-log.md").write_text("tampered\n", encoding="utf-8")
+    (problem,) = reconcile_before.check_stamp(before, REPO)
+    assert "differs from git show" in problem
+
+
+def _tiny_repo(path: Path) -> tuple[Path, Callable[..., str]]:
+    """A one-file repo on ``main`` with a fake ``origin/main`` at its first commit.
+
+    Returns the path AND the git runner: every later git call goes through it, because
+    it carries the identity env. A bare ``subprocess.run(["git", "commit", ...])`` passed
+    here and exited 128 on the CI runner, which has no global ``user.name`` (2026-09-06).
+    """
+    path.mkdir()
+    env = {
+        "GIT_AUTHOR_NAME": "t",
+        "GIT_AUTHOR_EMAIL": "t@t",
+        "GIT_COMMITTER_NAME": "t",
+        "GIT_COMMITTER_EMAIL": "t@t",
+    }
+
+    def run(*args: str) -> str:
+        proc = subprocess.run(
+            ["git", *args],
+            cwd=path,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            env={**os.environ, **env},
+        )
+        assert proc.returncode == 0, proc.stderr
+        return proc.stdout.strip()
+
+    run("init", "-q", "-b", "main")
+    (path / "f.txt").write_text("1\n", encoding="utf-8")
+    run("add", "f.txt")
+    run("commit", "-q", "-m", "c1")
+    run("update-ref", "refs/remotes/origin/main", run("rev-parse", "HEAD"))
+    return path, run
+
+
+def test_fork_point_is_none_on_main_even_when_main_is_ahead_of_origin(tmp_path: Path) -> None:
+    """The 2026-09-06 shape: eight unpushed merges on main, a stamp written at HEAD.
+
+    The old code read "HEAD IS main" as "HEAD equals the origin/main tip", so a
+    producer checkout with unpushed trunk commits saw its own fresh stamp as an
+    earlier apply's leftover. The checked-out branch being ``main`` is the fact.
+    """
+    repo, run = _tiny_repo(tmp_path / "repo")
+    (repo / "f.txt").write_text("2\n", encoding="utf-8")
+    run("commit", "-q", "-am", "c2")
+    assert (
+        reconcile_before.git(repo, "rev-parse", "origin/main").stdout
+        != reconcile_before.git(repo, "rev-parse", "HEAD").stdout
+    ), "the fixture must put main AHEAD of origin/main, or it proves nothing"
+    assert reconcile_before.fork_point(repo) is None
+
+
+def test_fork_point_on_a_branch_is_where_it_left_main(tmp_path: Path) -> None:
+    """The consumer's shape, which the fix must not loosen: on an apply branch the
+    fork point is the merge-base with main, and a stamp anywhere else is stale."""
+    repo, run = _tiny_repo(tmp_path / "repo")
+    base = reconcile_before.head_sha(repo)
+    run("checkout", "-q", "-b", "port/x")
+    (repo / "f.txt").write_text("2\n", encoding="utf-8")
+    run("commit", "-q", "-am", "c2")
+    assert reconcile_before.fork_point(repo) == base
+    assert reconcile_before.fork_point(repo) != reconcile_before.head_sha(repo)
+
+
+def test_writer_refuses_a_dirty_source(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(reconcile_before, "dirty_sources", lambda repo: [" M config/gate-log.md"])
+    with pytest.raises(reconcile_before.ReconcileBeforeError, match="uncommitted changes"):
+        reconcile_before.write_snapshot(tmp_path / "before", REPO)
+    assert not (tmp_path / "before").exists(), "a refusal writes nothing"
+
+
+def test_describe_names_a_missing_or_unstamped_dir(tmp_path: Path) -> None:
+    assert "MISSING" in reconcile_before.describe(tmp_path / "nope", REPO)
+    assert f"NO {reconcile_before.STAMP_FILE}" in reconcile_before.describe(tmp_path, REPO)
+
+
 # --- before_text mechanics (run everywhere; these are what UNSET-vs-BROKEN means) --
 
 
@@ -706,6 +877,14 @@ def _compiled(entries: Iterable[Mapping[str, Any]]) -> list[tuple[str, re.Patter
     return [(e["path"], glob_to_regex(e["path"])) for e in entries]
 
 
+#: The manifest blocks an overlay may contribute to — the ONE list
+#: :func:`union_overlays` merges and ``test_live_overlay_declaration_is_well_formed``
+#: checks for duplicates. Adding a block here is what makes both do their job on it
+#: (company carve-out 7, their Idea-10022: the duplicate check read `rows` alone while
+#: the union merged three blocks, so duplicates in the other two were invisible).
+UNIONED_BLOCKS: tuple[str, ...] = ("rows", "default_ok", "row_may_match_nothing")
+
+
 def union_overlays(manifest: dict, repo: Path = REPO) -> dict:
     """The J34 overlay seam: union each declared, EXISTING side-local overlay
     into the manifest view the guards run against.
@@ -721,20 +900,14 @@ def union_overlays(manifest: dict, repo: Path = REPO) -> dict:
     (PORT-REPORT-a14a8028: 89 company-only default_ok paths dropped by a
     wholesale take).
     """
-    view = {
-        **manifest,
-        "rows": list(manifest.get("rows", [])),
-        "default_ok": list(manifest.get("default_ok", [])),
-        "row_may_match_nothing": list(manifest.get("row_may_match_nothing", [])),
-    }
+    view = {**manifest, **{b: list(manifest.get(b, [])) for b in UNIONED_BLOCKS}}
     for declared in (manifest.get("overlay") or {}).get("files", []):
         overlay_file = repo / declared["path"]
         if not overlay_file.exists():
             continue  # the other side's slot — absent here by design
         overlay = yaml.safe_load(overlay_file.read_text(encoding="utf-8")) or {}
-        view["rows"].extend(overlay.get("rows", []))
-        view["default_ok"].extend(overlay.get("default_ok", []))
-        view["row_may_match_nothing"].extend(overlay.get("row_may_match_nothing", []))
+        for block in UNIONED_BLOCKS:
+            view[block].extend(overlay.get(block, []))
     return view
 
 
@@ -749,7 +922,7 @@ def _git_files(*extra_args: str) -> list[str]:
             ["git", "ls-files", *extra_args],
             cwd=REPO,
             capture_output=True,
-            text=True,
+            encoding="utf-8",
             check=True,
         ).stdout
     except (OSError, subprocess.CalledProcessError):  # pragma: no cover
@@ -1052,9 +1225,21 @@ def test_missing_overlay_is_a_clean_noop() -> None:
 def test_live_overlay_declaration_is_well_formed(manifest: dict) -> None:
     """The real manifest declares BOTH side slots (Idea-41: the grammar must be
     able to express a producer-local file), each overlay path is itself covered
-    by a never-port row, and no live overlay row duplicates a manifest row
+    by a never-port row, and no live overlay entry duplicates a manifest entry
     (a duplicate silently loses to first-match-wins — a guard error, not a
-    quiet loser)."""
+    quiet loser).
+
+    THE DUPLICATE CHECK COVERS EVERY UNIONED BLOCK, not just ``rows`` (company
+    carve-out 7, their Idea-10022, 2026-09-04). :func:`union_overlays` unions
+    THREE blocks — ``rows``, ``default_ok`` and ``row_may_match_nothing`` — and
+    this check read only the first, so a duplicate in either of the other two was
+    invisible. Measured on their tree, where it cost the guard its meaning: both
+    of their live duplicates (`.claude/skills/lane-handoff/**` and
+    `docs/next-internal-session.md`) sat in ``row_may_match_nothing`` while their
+    overlay's ``rows:`` was ``[]`` — so the assertion ran over an empty list and
+    passed for as long as it existed. A guard that cannot fail is not a guard;
+    the blocks the union merges and the blocks this checks are now ONE list, so
+    adding a fourth unioned block cannot silently escape it."""
     raw = yaml.safe_load(MANIFEST_FILE.read_text(encoding="utf-8"))
     declared = (raw.get("overlay") or {}).get("files", [])
     assert {d["side"] for d in declared} == {"company", "producer"}
@@ -1066,9 +1251,51 @@ def test_live_overlay_declaration_is_well_formed(manifest: dict) -> None:
             "side-local files never cross the boundary"
         )
 
-    # duplicate-path check across the union (the manifest fixture IS the union)
-    paths = [r["path"] for r in manifest["rows"]]
+    # duplicate-path check across the union (the manifest fixture IS the union),
+    # per block: a path may legitimately appear in two DIFFERENT blocks (a row and
+    # its row_may_match_nothing excuse are the normal pair), so each block is
+    # checked against itself.
+    for block in UNIONED_BLOCKS:
+        paths = [e["path"] for e in manifest.get(block, [])]
+        dupes = sorted({p for p in paths if paths.count(p) > 1})
+        assert not dupes, (
+            f"overlay entr(ies) duplicate a manifest entry in `{block}` — "
+            f"first-match-wins hides them: {dupes}"
+        )
+
+
+@pytest.mark.parametrize("block", UNIONED_BLOCKS)
+def test_the_duplicate_check_catches_an_injected_duplicate_in_every_unioned_block(
+    block: str,
+) -> None:
+    """Replay the failure, per block — a guard that cannot reproduce the bug proves
+    nothing, and this one silently could not for two of its three blocks (company
+    carve-out 7, their Idea-10022).
+
+    Injects a duplicate into ONE unioned block of a synthetic manifest and asserts the
+    same expression the guard runs finds it. Parametrized over ``UNIONED_BLOCKS`` so a
+    block added to the union without being added to the check fails HERE, at the seam,
+    rather than years later on somebody's tree.
+    """
+    view = {block: [{"path": "some/duplicated/path"}, {"path": "some/duplicated/path"}]}
+    paths = [e["path"] for e in view.get(block, [])]
     dupes = sorted({p for p in paths if paths.count(p) > 1})
-    assert (
-        not dupes
-    ), f"overlay row(s) duplicate a manifest row — first-match-wins hides them: {dupes}"
+    assert dupes == ["some/duplicated/path"], f"the check is blind to duplicates in `{block}`"
+
+
+def test_the_union_and_the_duplicate_check_read_the_same_block_list() -> None:
+    """The bug was a DIVERGENCE: `union_overlays` merged three blocks and the duplicate
+    check read one. Both now read `UNIONED_BLOCKS`, and this pins that the union really
+    does carry every block named there — measured by unioning a synthetic overlay rather
+    than by reading the function's source (J37: the object, not the render)."""
+    manifest = {
+        "overlay": {"files": [{"side": "producer", "path": "PORT-MANIFEST.producer.yaml"}]},
+        **{b: [{"path": f"canonical/{b}"}] for b in UNIONED_BLOCKS},
+    }
+    # no overlay FILE on disk here, so the union returns the manifest's own entries —
+    # the property under test is that every named block survives the view unchanged
+    view = union_overlays(manifest, repo=REPO)
+    for b in UNIONED_BLOCKS:
+        assert [e["path"] for e in view[b]] == [
+            f"canonical/{b}"
+        ], f"`{b}` is named in UNIONED_BLOCKS but union_overlays did not carry it"

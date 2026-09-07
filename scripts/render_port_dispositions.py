@@ -61,7 +61,7 @@ APPLY_ORDER: tuple[tuple[str, str], ...] = (
 def _git(*args: str) -> str:
     try:
         return subprocess.run(
-            ["git", *args], cwd=REPO, capture_output=True, text=True, check=True
+            ["git", *args], cwd=REPO, capture_output=True, encoding="utf-8", check=True
         ).stdout
     except (subprocess.CalledProcessError, FileNotFoundError):
         return ""

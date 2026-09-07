@@ -8,7 +8,7 @@ phase: 15
 agent: main
 model: sonnet
 priority: p3
-status: todo
+status: done
 depends_on: []
 inputs:
 - web/src/lib/adk.ts
@@ -19,3 +19,102 @@ acceptance: |
   The stub-ADK harness (FastAPI serving /run_sse SSE with control-part handling and REAL ephemeral-spec registration against drydocs-api) is a committed, reusable fixture — placement decided and recorded (tests/ integration vs a dev-fixture script) — with a documented invocation. A repeatable check (integration test, or a documented manual flow if live services are required) drives the Ask-spoke wiring against it end to end with NO LLM key. Full suite green; the stub never ships in web/dist.
 notes: |
   Groomed 2026-07-30 from the R5 follow-up [idea]: the R5 session's scratchpad stub proved the wiring live without an agents venv — worth owning instead of re-inventing per session. Re-author from the R5 session record if the scratchpad copy is gone; the design (SSE shape + control part + registration) is documented in the R5 close note.
+
+  DONE 2026-09-05 (Lane B, laptop). The Ask wiring is checkable with no LLM key.
+
+  RE-AUTHORED, as the notes anticipated: the R5 scratchpad stub was gone. It was
+  rebuilt from the contract as the code states it - lib/adk.ts (the four
+  endpoints, runBody, the SSE reader loop), askApi.ts (controlPart, parseAdkEvent,
+  the envelope types) and drydocs_api's /specs/ephemeral - not from the R5 close
+  note's prose. J37's direction: the importable objects are the contract, and the
+  prose describes them.
+
+  PLACEMENT, decided and recorded (the acceptance asks for the decision, not just
+  the file): tests/stub_adk.py, at the tests root beside source_scan.py, which is
+  the same shape - importable helper code that is not itself a test. Three things
+  that buys over tests/integration/:
+    * the integration test imports create_stub_adk and drives it in process - no
+      ports, no sleep-and-poll, no flake;
+    * `python -m tests.stub_adk` serves the SAME code for a real browser check, so
+      nobody can verify against a stub that has drifted from the tested one;
+    * it is under tests/, outside every shipped package and outside the Vite root.
+
+  WHAT IT IS AND IS NOT. It serves the four endpoints the console calls and
+  answers a FIXED envelope. It does not evaluate a question, choose a spec or
+  write Cypher - stubbing that would produce a test that passes while the agent is
+  broken. What it DOES do for real is the half with consequences: the control part
+  carries this browser session's drydocs-api token and the stub uses it to
+  register a real ephemeral spec against a real drydocs-api. A stub that invented
+  an explore_ref would verify nothing about R4.
+
+  THE CHECK RUNS AT BOTH ENDS, WITH ONE ARTIFACT BETWEEN THEM.
+    * tests/integration/test_stub_adk_ask_wiring.py (9 tests) drives the stub
+      against create_app() over an in-process TestClient. The one that matters:
+      the ref the console would render RESOLVES through /specs/{ref}/run for the
+      owning session and 404s (not 403 - no existence leak) for another. Also: /run
+      and /run_sse must describe the SAME turn, since askApi falls back to /run and
+      a stub whose two endpoints disagreed would hide a real drift; a FAILED
+      registration reaches the step's `error` rather than vanishing as a null ref;
+      and a turn with no control part still answers, because askApi makes it
+      optional.
+    * web/src/ask/stubStream.test.ts (6 tests) parses the recorded stream with the
+      console's REAL parseAdkEvent. The frame splitting is deliberately duplicated
+      from lib/adk.ts rather than shared: sharing it would make the test agree with
+      adk.ts by construction, and the question is whether the format the stub
+      WRITES is the format the console READS.
+    * tests/fixtures/adk/stub-run-sse.txt is the artifact, asserted byte for byte
+      against what the stub emits. Neither end can drift without the other going
+      red. Mutation-proven: changing one field name in the stub fails the python
+      guard with the regeneration command in the message.
+
+  "THE STUB NEVER SHIPS IN web/dist" IS ASSERTED, not argued. The stub is Python
+  under tests/ and could not reach a bundle, but the FIXTURE is a repo file a
+  component could import - and an imported file is entry-reachable from main.tsx
+  and therefore bundled. A source scan (test files excluded by construction) says
+  no shippable source names it.
+
+  TWO THINGS THE ENVIRONMENT MADE THIS TEACH, both recorded in the code because
+  both cost real time:
+    1. `from __future__ import annotations` BREAKS A FASTAPI ROUTE whose types are
+       imported inside a factory. FastAPI resolves handler annotations at
+       decoration time; as strings it cannot resolve `Request`, so it treats the
+       parameter as a QUERY field and every /run_sse call answers 422 "Field
+       required" - a 422 that looks like a bad request body and is not. The future
+       import is deliberately absent, with that reason beside it.
+    2. httpx.ASGITransport is ASYNC-ONLY as of httpx 0.28, so a synchronous test
+       cannot use it. starlette's TestClient is the sync equivalent and is
+       httpx-shaped, which is exactly the duck type EphemeralRegistrar takes - so
+       the stub is handed the same interface in the test that a live httpx.Client
+       gives it under `python -m`.
+
+  AND ONE THAT IS A REAL PROPERTY OF THE API: O75 made authenticate() re-check on
+  every request that the session's account still EXISTS, against a machine-local
+  credential file. A fresh clone does not have one, so every bearer token reads as
+  "invalid session" for reasons unrelated to what is under test. The fixture
+  injects a CredentialChecker - which is why create_app takes one - and the test
+  is venue-independent as a result (J18).
+
+  A THIRD ENVIRONMENT FACT, caught only because the guard was tightened. The
+  fixture records a WIRE FORMAT whose frame delimiter is a blank line, and the
+  first version of the drift guard compared it with read_text() - which
+  translates CRLF to LF on the way in. So a fixture that had been
+  eol-normalised (Python's text-mode write produces CRLF on Windows, and it
+  did) compared EQUAL on the python side while the vitest read different bytes
+  off the same file. The vitest passed anyway, by luck: splitting CRLF on the
+  single newline leaves the next segment starting at `data:`, so the count came
+  out right for the wrong reason. Fixed at all three points - the guard reads
+  BYTES, .gitattributes marks the path `-text`, and scripts/
+  regen_stub_sse_fixture.py writes bytes - so "byte for byte" now means bytes
+  on every platform. The lesson generalises past this item: a recorded wire
+  format is not a text file, and a comparison that normalises is not a
+  byte comparison.
+
+  Lane B pen note: R12's inputs overlap Lane A's queue (web/src/ask with R19/R15,
+  adk.ts with WEB9, query_specs.py with R19) as READS. This lane wrote none of
+  them: the new files are tests/stub_adk.py, tests/integration/
+  test_stub_adk_ask_wiring.py, tests/fixtures/adk/stub-run-sse.txt and
+  web/src/ask/stubStream.test.ts.
+
+  Gates at close: poetry run pytest -q, ruff check, ruff format --check. In web/:
+  tsc -b --force exit 0, oxlint --max-warnings 0 exit 0, npm run build exit 0,
+  npm run bundle:check exit 0, vitest 26 files / 312 tests.

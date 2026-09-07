@@ -116,7 +116,7 @@ def _tracked_markdown() -> list[Path]:
 
     root = DOCS_ROOT.parent
     out = subprocess.run(
-        ["git", "ls-files", "*.md"], cwd=root, capture_output=True, text=True, check=True
+        ["git", "ls-files", "*.md"], cwd=root, capture_output=True, encoding="utf-8", check=True
     ).stdout
     return [root / line for line in out.splitlines() if line.endswith(".md")]
 

@@ -1,6 +1,30 @@
 {
   "components": {
     "schemas": {
+      "AppCodeMigrationsOut": {
+        "additionalProperties": false,
+        "description": "GET /mappings/app-code/migrations \u2014 the K7 \u00a7B2 tier-3 readback, so a\ndeclared end state has a reader and \"temporarily dual-coded\" cannot quietly\nbecome the permanent state nobody re-opens. A row is ``SELECT *`` over\n``v_dual_coded_migrations``, so the row shape is the view's.",
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "migrations": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Migrations",
+            "type": "array"
+          }
+        },
+        "required": [
+          "migrations",
+          "count"
+        ],
+        "title": "AppCodeMigrationsOut",
+        "type": "object"
+      },
       "Body_post_intake_evidence_intake__intake_id__evidence_post": {
         "properties": {
           "files": {
@@ -16,6 +40,77 @@
           "files"
         ],
         "title": "Body_post_intake_evidence_intake__intake_id__evidence_post",
+        "type": "object"
+      },
+      "CauseOut": {
+        "additionalProperties": false,
+        "description": "R15: one cause that limited a walk. `cause` is the DryDocs cause class\n(`unparsed-cmd-line` | `unresolved-invocation` | `gate-pending-edge`),\n`detail` names the concrete thing (the probe class, or the planned\nvocabulary entry id for a gate-pending edge), `count` is the measurement\nwhen one was taken and null when it could not be (a probe that returned no\ncount) or does not apply (a gate-pending edge has no count until it exists).",
+        "properties": {
+          "cause": {
+            "title": "Cause",
+            "type": "string"
+          },
+          "count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Count"
+          },
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          }
+        },
+        "required": [
+          "cause",
+          "detail"
+        ],
+        "title": "CauseOut",
+        "type": "object"
+      },
+      "ChangesetArtifactOut": {
+        "additionalProperties": false,
+        "description": "POST /mappings/changeset. An ARTIFACT, not a write: the server produces\nCSV text and a manifest snippet and writes nothing at all \u2014 the loader stays\nthe only graph writer (wf-mapping-01's one rule). ``lifecycle`` and ``note``\ncarry that instruction to the operator, which is why they are on the wire\nand not in the page.",
+        "properties": {
+          "csv": {
+            "title": "Csv",
+            "type": "string"
+          },
+          "entries": {
+            "title": "Entries",
+            "type": "integer"
+          },
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "lifecycle": {
+            "title": "Lifecycle",
+            "type": "string"
+          },
+          "manifest_snippet": {
+            "title": "Manifest Snippet",
+            "type": "string"
+          },
+          "note": {
+            "title": "Note",
+            "type": "string"
+          }
+        },
+        "required": [
+          "filename",
+          "csv",
+          "manifest_snippet",
+          "entries",
+          "lifecycle",
+          "note"
+        ],
+        "title": "ChangesetArtifactOut",
         "type": "object"
       },
       "ChangesetBody": {
@@ -65,6 +160,195 @@
         "title": "ColumnOut",
         "type": "object"
       },
+      "ConfigOut": {
+        "additionalProperties": false,
+        "description": "GET /config (ADR 0020): the non-secret, per-environment values the console\nreads at boot instead of having them inlined at build time. Nothing here may\nbe a credential or a coordinate the page could not already reach.",
+        "properties": {
+          "runtime_view_url_template": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Runtime View Url Template"
+          }
+        },
+        "required": [
+          "runtime_view_url_template"
+        ],
+        "title": "ConfigOut",
+        "type": "object"
+      },
+      "CorpusRowOut": {
+        "additionalProperties": false,
+        "description": "One declared corpus, reconciled against the graph.",
+        "properties": {
+          "chunks": {
+            "title": "Chunks",
+            "type": "integer"
+          },
+          "corpus_id": {
+            "title": "Corpus Id",
+            "type": "string"
+          },
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          },
+          "documents": {
+            "title": "Documents",
+            "type": "integer"
+          },
+          "ok": {
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "target_db": {
+            "title": "Target Db",
+            "type": "string"
+          }
+        },
+        "required": [
+          "corpus_id",
+          "target_db",
+          "status",
+          "documents",
+          "chunks",
+          "detail",
+          "ok"
+        ],
+        "title": "CorpusRowOut",
+        "type": "object"
+      },
+      "CorpusStatusOut": {
+        "additionalProperties": false,
+        "description": "GET /docs-verify. ``databases_queried`` is carried beside\n``databases_swept`` because the surface's honesty rule turns on the\ndifference: a database that was not queried renders \"not queried\", never 0\n(the O56 rule), and the rows alone cannot tell those apart. ``statuses`` is\nthe whole vocabulary, sent with the payload so the page renders the real set\ninstead of a hand-copied one.",
+        "properties": {
+          "classification": {
+            "title": "Classification",
+            "type": "string"
+          },
+          "databases_queried": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Databases Queried",
+            "type": "array"
+          },
+          "databases_swept": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Databases Swept",
+            "type": "array"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/CorpusRowOut"
+            },
+            "title": "Rows",
+            "type": "array"
+          },
+          "statuses": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Statuses",
+            "type": "array"
+          }
+        },
+        "required": [
+          "classification",
+          "databases_swept",
+          "databases_queried",
+          "statuses",
+          "rows"
+        ],
+        "title": "CorpusStatusOut",
+        "type": "object"
+      },
+      "CorrectionsReportOut": {
+        "additionalProperties": false,
+        "description": "GET /mappings/overrides/report \u2014 the AO-facing source-corrections\nartifact, rendered as markdown the steward can send on.",
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "generated_by": {
+            "title": "Generated By",
+            "type": "string"
+          },
+          "generated_on": {
+            "title": "Generated On",
+            "type": "string"
+          },
+          "markdown": {
+            "title": "Markdown",
+            "type": "string"
+          }
+        },
+        "required": [
+          "filename",
+          "markdown",
+          "count",
+          "generated_on",
+          "generated_by"
+        ],
+        "title": "CorrectionsReportOut",
+        "type": "object"
+      },
+      "DraftReceiptOut": {
+        "additionalProperties": false,
+        "description": "POST /mappings/overrides/draft and /mappings/app-code/draft (S4, ADR 0009\nrule 5). Drafting writes ROWS to the mapping.db buffer and hands back this\nreceipt. The shape it replaced returned a whole replacement file, which\ncould not survive two editors: each held a full file built from the same\nbase, so whichever was committed last erased the other.",
+        "properties": {
+          "committed_rows": {
+            "title": "Committed Rows",
+            "type": "integer"
+          },
+          "domain": {
+            "title": "Domain",
+            "type": "string"
+          },
+          "draft_id": {
+            "title": "Draft Id",
+            "type": "string"
+          },
+          "entries": {
+            "title": "Entries",
+            "type": "integer"
+          },
+          "note": {
+            "title": "Note",
+            "type": "string"
+          },
+          "pending": {
+            "title": "Pending",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "draft_id",
+          "domain",
+          "entries",
+          "pending",
+          "committed_rows",
+          "note"
+        ],
+        "title": "DraftReceiptOut",
+        "type": "object"
+      },
       "EphemeralRegisterBody": {
         "properties": {
           "columns": {
@@ -86,8 +370,8 @@
             "title": "Description",
             "type": "string"
           },
-          "owner_token": {
-            "title": "Owner Token",
+          "owner_session": {
+            "title": "Owner Session",
             "type": "string"
           },
           "params": {
@@ -98,11 +382,148 @@
           }
         },
         "required": [
-          "owner_token",
+          "owner_session",
           "cypher",
           "database"
         ],
         "title": "EphemeralRegisterBody",
+        "type": "object"
+      },
+      "EphemeralRegisterOut": {
+        "additionalProperties": false,
+        "description": "POST /specs/ephemeral. The console never calls this one \u2014 the QA agent\nregisters Cypher here and receives a REF, then runs and exports through the\nsame reviewed seam every other caller uses, so the Cypher itself is never a\nquery parameter. Modelled with the rest because O70 named it in the same\nlist, and because the agent tier is a client with the same claim on a\ndeclared response as the browser has.",
+        "properties": {
+          "classification": {
+            "title": "Classification",
+            "type": "string"
+          },
+          "database": {
+            "title": "Database",
+            "type": "string"
+          },
+          "expires_at": {
+            "title": "Expires At",
+            "type": "string"
+          },
+          "explore_ref": {
+            "title": "Explore Ref",
+            "type": "string"
+          },
+          "watermarked": {
+            "title": "Watermarked",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "explore_ref",
+          "database",
+          "classification",
+          "watermarked",
+          "expires_at"
+        ],
+        "title": "EphemeralRegisterOut",
+        "type": "object"
+      },
+      "EvidenceOut": {
+        "additionalProperties": false,
+        "description": "One uploaded evidence file. ``kind`` is the extension with its dot\nstripped, and the upload path admits exactly three (``ALLOWED_EXTENSIONS``),\nso the wire declares the three rather than a bare string.",
+        "properties": {
+          "evidence_id": {
+            "title": "Evidence Id",
+            "type": "string"
+          },
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "intake_id": {
+            "title": "Intake Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "msg",
+              "json",
+              "txt"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "pair_key": {
+            "title": "Pair Key",
+            "type": "string"
+          },
+          "preview": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preview"
+          },
+          "rel_key": {
+            "title": "Rel Key",
+            "type": "string"
+          },
+          "sha256": {
+            "title": "Sha256",
+            "type": "string"
+          },
+          "size": {
+            "title": "Size",
+            "type": "integer"
+          },
+          "superseded": {
+            "title": "Superseded",
+            "type": "boolean"
+          },
+          "uploaded_at": {
+            "title": "Uploaded At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "evidence_id",
+          "intake_id",
+          "filename",
+          "rel_key",
+          "sha256",
+          "size",
+          "kind",
+          "pair_key",
+          "preview",
+          "uploaded_at",
+          "superseded"
+        ],
+        "title": "EvidenceOut",
+        "type": "object"
+      },
+      "ExportBody": {
+        "description": "The export request: a spec run's params, plus API1 (c)'s raisable ceiling.\n\nA separate model from ``QueryBody`` because the ceiling is an EXPORT\ndecision. Raising the limit on a grid read would change what is on screen;\nraising it here changes what lands in a file that carries a manifest, and\nthose are different permissions to grant. Omitted (the default) keeps\ntoday's behaviour exactly \u2014 the display limit the console echoes back \u2014 so\na caller that has not been updated is unaffected.",
+        "properties": {
+          "limit": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Limit"
+          },
+          "params": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Params",
+            "type": "object"
+          }
+        },
+        "title": "ExportBody",
         "type": "object"
       },
       "HTTPValidationError": {
@@ -156,6 +577,374 @@
         "title": "IntakeCreateBody",
         "type": "object"
       },
+      "IntakeEvidenceOut": {
+        "additionalProperties": false,
+        "description": "POST /intake/{intake_id}/evidence: the whole record, plus the id of the\nfile just stored. ``_evidence_out`` adds that one key to what ``get_intake``\nreturns, which makes it a THIRD shape on this surface \u2014 and under\n``extra='forbid'`` a model that overlooked it would turn every SUCCESSFUL\nupload into a response-validation 500.",
+        "properties": {
+          "area": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Area",
+            "type": "object"
+          },
+          "classification": {
+            "title": "Classification",
+            "type": "string"
+          },
+          "context_type": {
+            "title": "Context Type",
+            "type": "string"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "created_by": {
+            "title": "Created By",
+            "type": "string"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceOut"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "evidence_id": {
+            "title": "Evidence Id",
+            "type": "string"
+          },
+          "intake_id": {
+            "title": "Intake Id",
+            "type": "string"
+          },
+          "legal_transitions": {
+            "$ref": "#/components/schemas/LegalTransitionsOut"
+          },
+          "note": {
+            "title": "Note",
+            "type": "string"
+          },
+          "origin": {
+            "title": "Origin",
+            "type": "string"
+          },
+          "review_payload": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Review Payload"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "thread_decision": {
+            "anyOf": [
+              {
+                "enum": [
+                  "adds-value",
+                  "no-new-value"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thread Decision"
+          },
+          "thread_flagged": {
+            "title": "Thread Flagged",
+            "type": "boolean"
+          },
+          "thread_of": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Thread Of",
+            "type": "array"
+          }
+        },
+        "required": [
+          "intake_id",
+          "created_at",
+          "created_by",
+          "origin",
+          "classification",
+          "context_type",
+          "note",
+          "status",
+          "review_payload",
+          "area",
+          "thread_of",
+          "thread_flagged",
+          "thread_decision",
+          "legal_transitions",
+          "evidence",
+          "evidence_id"
+        ],
+        "title": "IntakeEvidenceOut",
+        "type": "object"
+      },
+      "IntakeListOut": {
+        "additionalProperties": false,
+        "properties": {
+          "intakes": {
+            "items": {
+              "$ref": "#/components/schemas/IntakeListRowOut"
+            },
+            "title": "Intakes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "intakes"
+        ],
+        "title": "IntakeListOut",
+        "type": "object"
+      },
+      "IntakeListRowOut": {
+        "additionalProperties": false,
+        "description": "An intake as the QUEUE lists it.\n\nNO ``evidence`` FIELD \u2014 and that is the list's real shape, not an omission\nhere. ``list_intakes`` serializes each record and attaches its legal\ntransitions; it never reads the evidence table, which is one query for the\npage instead of one per row. The console declared the list as\n``IntakeRecord[]`` \u2014 the same type it uses for a single record \u2014 so it has\nbeen claiming an always-present ``evidence: EvidenceRow[]`` that the list\nendpoint has never sent. Modelling the two shapes apart is what surfaced\nthat, and keeping them apart is what stops it coming back.",
+        "properties": {
+          "area": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Area",
+            "type": "object"
+          },
+          "classification": {
+            "title": "Classification",
+            "type": "string"
+          },
+          "context_type": {
+            "title": "Context Type",
+            "type": "string"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "created_by": {
+            "title": "Created By",
+            "type": "string"
+          },
+          "intake_id": {
+            "title": "Intake Id",
+            "type": "string"
+          },
+          "legal_transitions": {
+            "$ref": "#/components/schemas/LegalTransitionsOut"
+          },
+          "note": {
+            "title": "Note",
+            "type": "string"
+          },
+          "origin": {
+            "title": "Origin",
+            "type": "string"
+          },
+          "review_payload": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Review Payload"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "thread_decision": {
+            "anyOf": [
+              {
+                "enum": [
+                  "adds-value",
+                  "no-new-value"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thread Decision"
+          },
+          "thread_flagged": {
+            "title": "Thread Flagged",
+            "type": "boolean"
+          },
+          "thread_of": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Thread Of",
+            "type": "array"
+          }
+        },
+        "required": [
+          "intake_id",
+          "created_at",
+          "created_by",
+          "origin",
+          "classification",
+          "context_type",
+          "note",
+          "status",
+          "review_payload",
+          "area",
+          "thread_of",
+          "thread_flagged",
+          "thread_decision",
+          "legal_transitions"
+        ],
+        "title": "IntakeListRowOut",
+        "type": "object"
+      },
+      "IntakeRecordOut": {
+        "additionalProperties": false,
+        "description": "One intake read whole: the list row, plus the evidence ``get_intake``\nattaches. Every single-record route on this surface returns this shape,\nbecause create, transition and thread-decision all end by re-reading the\nrecord through ``get_intake``.",
+        "properties": {
+          "area": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Area",
+            "type": "object"
+          },
+          "classification": {
+            "title": "Classification",
+            "type": "string"
+          },
+          "context_type": {
+            "title": "Context Type",
+            "type": "string"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "created_by": {
+            "title": "Created By",
+            "type": "string"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceOut"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "intake_id": {
+            "title": "Intake Id",
+            "type": "string"
+          },
+          "legal_transitions": {
+            "$ref": "#/components/schemas/LegalTransitionsOut"
+          },
+          "note": {
+            "title": "Note",
+            "type": "string"
+          },
+          "origin": {
+            "title": "Origin",
+            "type": "string"
+          },
+          "review_payload": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Review Payload"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "thread_decision": {
+            "anyOf": [
+              {
+                "enum": [
+                  "adds-value",
+                  "no-new-value"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thread Decision"
+          },
+          "thread_flagged": {
+            "title": "Thread Flagged",
+            "type": "boolean"
+          },
+          "thread_of": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Thread Of",
+            "type": "array"
+          }
+        },
+        "required": [
+          "intake_id",
+          "created_at",
+          "created_by",
+          "origin",
+          "classification",
+          "context_type",
+          "note",
+          "status",
+          "review_payload",
+          "area",
+          "thread_of",
+          "thread_flagged",
+          "thread_decision",
+          "legal_transitions",
+          "evidence"
+        ],
+        "title": "IntakeRecordOut",
+        "type": "object"
+      },
       "IntakeTransitionBody": {
         "properties": {
           "note": {
@@ -172,6 +961,238 @@
           "to"
         ],
         "title": "IntakeTransitionBody",
+        "type": "object"
+      },
+      "LegalTransitionOut": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "title": "Action",
+            "type": "string"
+          },
+          "to": {
+            "title": "To",
+            "type": "string"
+          }
+        },
+        "required": [
+          "to",
+          "action"
+        ],
+        "title": "LegalTransitionOut",
+        "type": "object"
+      },
+      "LegalTransitionsOut": {
+        "additionalProperties": false,
+        "description": "The per-record, per-ROLE transition map the UI renders its buttons from \u2014\nthe server owns the machine (the IntakeStepper decision, 2026-08-06), so the\nbutton set is a server answer and never a client rule.\n\nThe two thread fields carry defaults where nothing else here does, because\nthe handler only attaches them to a flagged draft that still owes its\ndecision. A default keeps them out of the schema's ``required`` list, which\nis what makes the generated client declare them optional \u2014 matching the\nhandler instead of over-promising for it.",
+        "properties": {
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "terminal": {
+            "title": "Terminal",
+            "type": "boolean"
+          },
+          "thread_decision_required": {
+            "default": false,
+            "title": "Thread Decision Required",
+            "type": "boolean"
+          },
+          "thread_decisions": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Thread Decisions",
+            "type": "array"
+          },
+          "transitions": {
+            "items": {
+              "$ref": "#/components/schemas/LegalTransitionOut"
+            },
+            "title": "Transitions",
+            "type": "array"
+          },
+          "waiting_on_gate": {
+            "title": "Waiting On Gate",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "status",
+          "transitions",
+          "waiting_on_gate",
+          "terminal"
+        ],
+        "title": "LegalTransitionsOut",
+        "type": "object"
+      },
+      "LogEstateOut": {
+        "additionalProperties": false,
+        "description": "GET /admin/log-estate. Both halves ride in one payload because the SME's\nquestion spans them. Note what is absent and stays absent: a kind's\nCONTENTS. ADR 0014 clause 6 rules that the verbose debug tier is captured;\nSURFACING it is a different risk and is not ruled, so there is no field here\nthrough which a log line could travel.",
+        "properties": {
+          "kinds": {
+            "items": {
+              "$ref": "#/components/schemas/LogKindOut"
+            },
+            "title": "Kinds",
+            "type": "array"
+          },
+          "zones": {
+            "items": {
+              "$ref": "#/components/schemas/LogZoneOut"
+            },
+            "title": "Zones",
+            "type": "array"
+          }
+        },
+        "required": [
+          "kinds",
+          "zones"
+        ],
+        "title": "LogEstateOut",
+        "type": "object"
+      },
+      "LogKindOut": {
+        "additionalProperties": false,
+        "description": "One declared log kind, beside what is actually on the host's disk.\n\n``dir`` and ``oldest_days`` are nullable but always PRESENT: a kind with no\nfiles has no oldest file, and that is a different fact from a kind whose age\nwas never measured.",
+        "properties": {
+          "dir": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dir"
+          },
+          "exists": {
+            "title": "Exists",
+            "type": "boolean"
+          },
+          "file_count": {
+            "title": "File Count",
+            "type": "integer"
+          },
+          "format": {
+            "title": "Format",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "level": {
+            "title": "Level",
+            "type": "string"
+          },
+          "oldest_days": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Oldest Days"
+          },
+          "over_retention": {
+            "title": "Over Retention",
+            "type": "boolean"
+          },
+          "path": {
+            "title": "Path",
+            "type": "string"
+          },
+          "retention_days": {
+            "title": "Retention Days",
+            "type": "integer"
+          },
+          "rotation": {
+            "title": "Rotation",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "total_bytes": {
+            "title": "Total Bytes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "level",
+          "retention_days",
+          "rotation",
+          "format",
+          "status",
+          "dir",
+          "path",
+          "exists",
+          "file_count",
+          "total_bytes",
+          "oldest_days",
+          "over_retention"
+        ],
+        "title": "LogKindOut",
+        "type": "object"
+      },
+      "LogZoneOut": {
+        "additionalProperties": false,
+        "description": "One declared data zone (G109), inventoried the same way.",
+        "properties": {
+          "empty": {
+            "title": "Empty",
+            "type": "boolean"
+          },
+          "exists": {
+            "title": "Exists",
+            "type": "boolean"
+          },
+          "file_count": {
+            "title": "File Count",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "mode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mode"
+          },
+          "path": {
+            "title": "Path",
+            "type": "string"
+          },
+          "total_bytes": {
+            "title": "Total Bytes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "path",
+          "mode",
+          "exists",
+          "file_count",
+          "total_bytes",
+          "empty"
+        ],
+        "title": "LogZoneOut",
         "type": "object"
       },
       "LoginBody": {
@@ -194,7 +1215,7 @@
       },
       "LoginOut": {
         "additionalProperties": false,
-        "description": "The session the browser holds. Never the secret (O69).",
+        "description": "The session the browser holds. Never the secret (O69).\n\n``session_id`` (ADR 0019) is the public handle: the console passes it to the\ngraph_qa agent in the control part so the agent can register ephemeral specs\nfor THIS session without ever holding the token. It authorizes nothing.",
         "properties": {
           "expires_at": {
             "title": "Expires At",
@@ -208,6 +1229,10 @@
             "title": "Role",
             "type": "string"
           },
+          "session_id": {
+            "title": "Session Id",
+            "type": "string"
+          },
           "token": {
             "title": "Token",
             "type": "string"
@@ -215,11 +1240,150 @@
         },
         "required": [
           "token",
+          "session_id",
           "persona_id",
           "role",
           "expires_at"
         ],
         "title": "LoginOut",
+        "type": "object"
+      },
+      "MappingDomainOut": {
+        "additionalProperties": false,
+        "description": "One mapping domain the console can offer. ``available`` is false for a\ndomain whose reconciler table is not built yet \u2014 declared so the page can\nrender it greyed rather than omit it.",
+        "properties": {
+          "available": {
+            "title": "Available",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "quintuple",
+              "manual",
+              "override",
+              "defined"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "tier": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tier"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "kind",
+          "source",
+          "tier",
+          "available"
+        ],
+        "title": "MappingDomainOut",
+        "type": "object"
+      },
+      "MappingDomainsOut": {
+        "additionalProperties": false,
+        "properties": {
+          "domains": {
+            "items": {
+              "$ref": "#/components/schemas/MappingDomainOut"
+            },
+            "title": "Domains",
+            "type": "array"
+          }
+        },
+        "required": [
+          "domains"
+        ],
+        "title": "MappingDomainsOut",
+        "type": "object"
+      },
+      "MappingGridOut": {
+        "additionalProperties": false,
+        "description": "GET /mappings/grid/{domain_id}. ``keys`` names the columns for THIS\ndomain and ``rows`` carries them \u2014 see the note above on why the row shape\nstays open.",
+        "properties": {
+          "domain": {
+            "title": "Domain",
+            "type": "string"
+          },
+          "keys": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Keys",
+            "type": "array"
+          },
+          "rows": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Rows",
+            "type": "array"
+          }
+        },
+        "required": [
+          "domain",
+          "keys",
+          "rows"
+        ],
+        "title": "MappingGridOut",
+        "type": "object"
+      },
+      "MappingOptionsOut": {
+        "additionalProperties": false,
+        "description": "GET /mappings/options \u2014 the vocabulary the authoring cascade offers.",
+        "properties": {
+          "labels": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Labels",
+            "type": "array"
+          },
+          "relationships": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Relationships",
+            "type": "array"
+          },
+          "status_summary": {
+            "items": {
+              "$ref": "#/components/schemas/StatusSummaryOut"
+            },
+            "title": "Status Summary",
+            "type": "array"
+          }
+        },
+        "required": [
+          "labels",
+          "relationships",
+          "status_summary"
+        ],
+        "title": "MappingOptionsOut",
         "type": "object"
       },
       "NamedQueryOut": {
@@ -292,6 +1456,57 @@
         "title": "NamedRunOut",
         "type": "object"
       },
+      "OpenDraftOut": {
+        "additionalProperties": false,
+        "properties": {
+          "authored_by": {
+            "title": "Authored By",
+            "type": "string"
+          },
+          "authored_on": {
+            "title": "Authored On",
+            "type": "string"
+          },
+          "domain": {
+            "title": "Domain",
+            "type": "string"
+          },
+          "draft_id": {
+            "title": "Draft Id",
+            "type": "string"
+          },
+          "entries": {
+            "title": "Entries",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "draft_id",
+          "domain",
+          "entries",
+          "authored_by",
+          "authored_on"
+        ],
+        "title": "OpenDraftOut",
+        "type": "object"
+      },
+      "OpenDraftsOut": {
+        "additionalProperties": false,
+        "properties": {
+          "drafts": {
+            "items": {
+              "$ref": "#/components/schemas/OpenDraftOut"
+            },
+            "title": "Drafts",
+            "type": "array"
+          }
+        },
+        "required": [
+          "drafts"
+        ],
+        "title": "OpenDraftsOut",
+        "type": "object"
+      },
       "ParamOut": {
         "additionalProperties": false,
         "description": "One declared parameter of a named query or a QuerySpec.",
@@ -318,6 +1533,122 @@
           "required"
         ],
         "title": "ParamOut",
+        "type": "object"
+      },
+      "PendingCorrectionsReportOut": {
+        "additionalProperties": false,
+        "description": "GET /mappings/pending/report \u2014 the N14 union report, which is the\ncorrections report plus the per-domain counts behind its total.",
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "counts": {
+            "$ref": "#/components/schemas/PendingCountsOut"
+          },
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "generated_by": {
+            "title": "Generated By",
+            "type": "string"
+          },
+          "generated_on": {
+            "title": "Generated On",
+            "type": "string"
+          },
+          "markdown": {
+            "title": "Markdown",
+            "type": "string"
+          }
+        },
+        "required": [
+          "filename",
+          "markdown",
+          "count",
+          "generated_on",
+          "generated_by",
+          "counts"
+        ],
+        "title": "PendingCorrectionsReportOut",
+        "type": "object"
+      },
+      "PendingCountsOut": {
+        "additionalProperties": false,
+        "description": "N14 \u00a7D2. ``email_unassigned`` is null when the graph could not be reached\n\u2014 a rendered state (\"read it at the spec\"), never an error and never a\nsilent zero.",
+        "properties": {
+          "email_unassigned": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email Unassigned"
+          },
+          "manual_sources": {
+            "title": "Manual Sources",
+            "type": "integer"
+          },
+          "overrides": {
+            "title": "Overrides",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "overrides",
+          "manual_sources",
+          "email_unassigned"
+        ],
+        "title": "PendingCountsOut",
+        "type": "object"
+      },
+      "PromotedDiffOut": {
+        "additionalProperties": false,
+        "description": "POST /mappings/drafts/{draft_id}/promote \u2014 the unified diff to apply on a\nbranch. The server still writes nothing; git is the only commit target.",
+        "properties": {
+          "diff": {
+            "title": "Diff",
+            "type": "string"
+          },
+          "domain": {
+            "title": "Domain",
+            "type": "string"
+          },
+          "draft_id": {
+            "title": "Draft Id",
+            "type": "string"
+          },
+          "entries": {
+            "title": "Entries",
+            "type": "integer"
+          },
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "note": {
+            "title": "Note",
+            "type": "string"
+          },
+          "path": {
+            "title": "Path",
+            "type": "string"
+          }
+        },
+        "required": [
+          "draft_id",
+          "domain",
+          "path",
+          "filename",
+          "diff",
+          "entries",
+          "note"
+        ],
+        "title": "PromotedDiffOut",
         "type": "object"
       },
       "QueryBody": {
@@ -405,6 +1736,14 @@
         "additionalProperties": false,
         "description": "A QuerySpec run (O11): the registry echoes the spec's contract back\nwith the rows, so the UI renders the classification banner and the\nSYNTHESIZED watermark without holding its own query definitions. This is\nthe server-side twin of the console's ``SpecResult`` seam type.",
         "properties": {
+          "causes": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/CauseOut"
+            },
+            "title": "Causes",
+            "type": "array"
+          },
           "classification": {
             "title": "Classification",
             "type": "string"
@@ -428,12 +1767,38 @@
             "title": "Ephemeral",
             "type": "boolean"
           },
+          "epistemic": {
+            "anyOf": [
+              {
+                "enum": [
+                  "exact",
+                  "lower-bound"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Epistemic"
+          },
           "keys": {
             "items": {
               "type": "string"
             },
             "title": "Keys",
             "type": "array"
+          },
+          "limit": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Limit"
           },
           "params": {
             "additionalProperties": true,
@@ -452,6 +1817,10 @@
             "title": "Spec Id",
             "type": "string"
           },
+          "truncated": {
+            "title": "Truncated",
+            "type": "boolean"
+          },
           "watermarked": {
             "title": "Watermarked",
             "type": "boolean"
@@ -467,7 +1836,8 @@
           "keys",
           "rows",
           "watermarked",
-          "ephemeral"
+          "ephemeral",
+          "truncated"
         ],
         "title": "SpecRunOut",
         "type": "object"
@@ -484,6 +1854,25 @@
           "status"
         ],
         "title": "StatusOut",
+        "type": "object"
+      },
+      "StatusSummaryOut": {
+        "additionalProperties": false,
+        "properties": {
+          "n": {
+            "title": "N",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "n"
+        ],
+        "title": "StatusSummaryOut",
         "type": "object"
       },
       "ThreadDecisionBody": {
@@ -548,6 +1937,70 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/admin/log-estate": {
+      "get": {
+        "operationId": "get_log_estate_admin_log_estate_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogEstateOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Log Estate"
+      }
+    },
+    "/config": {
+      "get": {
+        "operationId": "config_config_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfigOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Config"
+      }
+    },
     "/demo": {
       "get": {
         "operationId": "get_demo_demo_get",
@@ -590,9 +2043,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Get Docs Verify Docs Verify Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/CorpusStatusOut"
                 }
               }
             },
@@ -713,9 +2164,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Get Intakes Intake Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/IntakeListOut"
                 }
               }
             },
@@ -769,9 +2218,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Post Intake Intake Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/IntakeRecordOut"
                 }
               }
             },
@@ -826,9 +2273,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Get One Intake Intake  Intake Id  Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/IntakeRecordOut"
                 }
               }
             },
@@ -893,9 +2338,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Post Intake Evidence Intake  Intake Id  Evidence Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/IntakeEvidenceOut"
                 }
               }
             },
@@ -960,9 +2403,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Post Thread Decision Intake  Intake Id  Thread Decision Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/IntakeRecordOut"
                 }
               }
             },
@@ -1027,9 +2468,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Post Intake Transition Intake  Intake Id  Transition Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/IntakeRecordOut"
                 }
               }
             },
@@ -1169,9 +2608,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Post App Code Draft Mappings App Code Draft Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/DraftReceiptOut"
                 }
               }
             },
@@ -1217,9 +2654,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Get App Code Migrations Mappings App Code Migrations Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/AppCodeMigrationsOut"
                 }
               }
             },
@@ -1275,9 +2710,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Post Changeset Mappings Changeset Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ChangesetArtifactOut"
                 }
               }
             },
@@ -1323,9 +2756,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Get Domains Mappings Domains Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/MappingDomainsOut"
                 }
               }
             },
@@ -1387,9 +2818,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Get Drafts Mappings Drafts Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/OpenDraftsOut"
                 }
               }
             },
@@ -1444,9 +2873,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Post Promote Draft Mappings Drafts  Draft Id  Promote Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/PromotedDiffOut"
                 }
               }
             },
@@ -1501,9 +2928,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Get Grid Mappings Grid  Domain Id  Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/MappingGridOut"
                 }
               }
             },
@@ -1549,9 +2974,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Get Options Mappings Options Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/MappingOptionsOut"
                 }
               }
             },
@@ -1607,9 +3030,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Post Override Draft Mappings Overrides Draft Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/DraftReceiptOut"
                 }
               }
             },
@@ -1655,9 +3076,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Get Override Report Mappings Overrides Report Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/CorrectionsReportOut"
                 }
               }
             },
@@ -1703,9 +3122,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Get Pending Report Mappings Pending Report Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/PendingCorrectionsReportOut"
                 }
               }
             },
@@ -1974,9 +3391,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Post Ephemeral Register Specs Ephemeral Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/EphemeralRegisterOut"
                 }
               }
             },
@@ -2056,7 +3471,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/QueryBody"
+                "$ref": "#/components/schemas/ExportBody"
               }
             }
           },

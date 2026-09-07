@@ -40,6 +40,8 @@
 # classification: Internal-Public (shape only — no counts, no real ids).
 classification: Internal-Public
 schema: drydocs.graph-tests.v1
+updated: 2026-08-27
+
 suite: tom-required-contacts
 description: >
   G71: every application a feed covered carries at least one holder for every

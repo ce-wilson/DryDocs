@@ -47,7 +47,7 @@ as `- [tag] one line. (why/where seen)` with tag ∈ idea | bug | doc | source |
 
 | Field | How to choose |
 |---|---|
-| `id` | **Ask the allocator — do not read it off the tree** (I6): `python .claude/skills/groom-backlog/validate.py --next-id --module <module>`. **The series IS the module** (ruling 2026-09-02): the allocator derives the code from `modules.yaml` `series:` — `drydocs-load` → `LOAD12` — and you never pick a letter. The 27 legacy letters (A..Z, GN, MM) are FROZEN at their 2026-09-02 max; the allocator refuses them and so does `test_backlog.py` (the company's six legacy band ids, `G10001-G10003` / `DD10001-DD10003`, are frozen at the band's own max by `FROZEN_BAND` — PLAN3 — and read as legacy, not strays). Free in YOUR tree is not free: it unions the local items, every remote ref's tree listing, and every id ever added in history, then returns max+1 (a gap is usually a BURNED id, not a free one). It refuses the DD-series and the company band by itself. A new MODULE (not a new theme) is a `modules.yaml` edit — name + series code together. Then **mint the way a pull is claimed: write the stub, commit and PUSH it, then write the body** — and give the stub its **FINAL title**, because the collision guard compares titles, so a title refined between the two pushes reads as two machines minting one number and reds the guard until the body lands. The stub commit also carries the refreshed board and roadmap: Y5 tolerates status-only drift, not a new item, so a render-less stub reds the roadmap guard until the body lands. |
+| `id` | **Ask the allocator — do not read it off the tree** (I6): `python .claude/skills/groom-backlog/validate.py --next-id --module <module>`. **The series IS the module** (ruling 2026-09-02): the allocator derives the code from `modules.yaml` `series:` — `drydocs-load` → `LOAD12` — and you never pick a letter. The 27 legacy letters (A..Z, GN, MM) are FROZEN at their 2026-09-02 max; the allocator refuses them and so does `test_backlog.py` (the company's six legacy band ids, `G10001-G10003` / `DD10001-DD10003`, are frozen at the band's own max by `FROZEN_BAND` — PLAN3 — and read as legacy, not strays). Free in YOUR tree is not free: it unions the local items, every remote ref's tree listing, and every id ever added in history, then returns max+1 (a gap is usually a BURNED id, not a free one). **The venue is an edition segment, not a number band** (PLAN2, 2026-09-05): the grammar is `[<EDITION>-]<MODULE><n>`, and which edition a new id belongs to is read from `config/dev-environment.yaml` `edition:` — `base` on the producer (unprefixed ids), a code from `config/taxonomy/editions.yaml` on an edition (`<code>-LOAD1`) — never inferred. `--edition <code>` mints downward only (a base for an edition it hosts; never an instance for its base or a sibling). It refuses the frozen letters, the DD-series (frozen; the company reserve retired as a partition rule at gate `ontology-domain-registry-and-edition-grain` §C4), an undeclared segment (a typo, not a tenant), a band-shaped base number, and — for ITEM ids — a venue with no `edition:` key, naming the key to set. The same rules run the Idea path (`--next-id Idea [--edition <code>]`, `next_idea_id()`), with one carve-out: an undeclared venue may still capture an idea, band-shaped, until it declares (rider `idea-series-grammar` C1). A new MODULE (not a new theme) is a `modules.yaml` edit — name + series code together. Then **mint the way a pull is claimed: write the stub, commit and PUSH it, then write the body** — and give the stub its **FINAL title**, because the collision guard compares titles, so a title refined between the two pushes reads as two machines minting one number and reds the guard until the body lands. The stub commit also carries the refreshed board and roadmap: Y5 tolerates status-only drift, not a new item, so a render-less stub reds the roadmap guard until the body lands. |
 | `title` | Plain English, understandable in 6 months with zero context. Never rely on codenames. |
 | `type` | `requirement` (future capability ask) / `task` (concrete work) / `chore` (hygiene, docs, renames) / `bug` (defect). |
 | `module` | From `docs/restructure/backlog/modules.yaml`. Code work → the MODULE_MAP component; non-code → a work area (taxonomy/ontology/config/reference/graph-infra/docs). |
@@ -68,6 +68,32 @@ as `- [tag] one line. (why/where seen)` with tag ∈ idea | bug | doc | source |
 - **Never groom an ontology/relationship-semantics decision into a done deal.** Anything
   touching edge meaning routes through the HITL gate (`docs/restructure/03-hitl-sme-flow.md`)
   — the item's acceptance must say "via the gate", and the mapping stays `planned` until confirmed.
+
+## Editing an entry another venue owns (PLAN4, 2026-09-05)
+
+Two venues groom this one inbox and one item set, so an entry you did not mint is one you may ADD TO
+and never rewrite. The rule, and the detector that reads it (`validate.py --check-venue-edits --base
+<ref>`; fixtures in `tests/unit/test_backlog.py`): the existing text survives VERBATIM as a prefix of
+the new text; anything you add is a block stamped `[<venue> <YYYY-MM-DD>]` (`[base 2026-09-05]` here);
+the inbox state token (`open|parked|groomed|merged|closed`) is the OWNER's - when you have the answer,
+append `[base <date>] proposed: closed - <why>; see <ref>` and the owner flips it at its next groom.
+Ownership is `owner_of(id)` in validate.py, keyed to the edition segment: a segment names its edition;
+no segment at or below 9999 is the base; no segment above it is the undeclared venue's band. Item-file
+`status` is venue-local (the company legitimately sets `done` on producer items it builds) and is out
+of scope; `acceptance` and `notes` follow the append rule; any other field changing on a foreign item
+is a REWRITE. Why: two sides appending to one entry union-merge by construction; two sides editing
+one token is the conflict IDEAS.md is already the proven site for, three times.
+
+## Capturing on a branch: the pending file (PLAN4 d)
+
+A session on a branch or in a worktree does NOT mint into IDEAS.md (the inbox top is where two
+machines collide in one burst). It appends candidates to `docs/restructure/ideas/pending-<branch>.md`
+in the header shape with `Idea-?` for the number - the file never carries a real id (guarded by
+`tests/unit/test_plan_ideas.py`). At landing, `validate.py --mint-pending <file>` allocates every
+candidate consecutively in ONE allocator pass through `next_idea_id()`, writes the headers into the
+inbox (top, newest first) and empties the file; top of the pending file = oldest capture = lowest
+number. This removes the allocator race instead of asking two sessions to be careful, and the
+path-scoped extraction already treats such a file as a clean-add across a merge. Never-port.
 
 ## Mechanics of a groom run (in order)
 

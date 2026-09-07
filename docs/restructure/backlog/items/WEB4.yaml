@@ -1,0 +1,99 @@
+id: WEB4
+epic: web-console
+title: TypeScript strict on in web/ - strictNullChecks and noImplicitAny enforced so the generated api.d.ts
+  optional fields the O70 client declares are checked by the compiler and not asserted past
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p1
+status: done
+depends_on: []
+inputs:
+- docs/reviews/modules/web-2026-09-05.md
+- web/tsconfig.app.json
+- web/tsconfig.node.json
+- web/src/generated/api.d.ts
+acceptance: |
+  Neither tsconfig sets `strict`, `strictNullChecks` or `noImplicitAny`; the Vite React-TS
+  template ships strict true, so this was removed or written out (A3). The O70 architecture's
+  central claim - a server change the console has not caught up with is a tsc error - is only
+  partly cashed while optional fields in the generated api.d.ts are not enforced.
+
+  (a) `strict: true` in both tsconfigs; `tsc -b` and `npm run build` pass on the whole of
+      web/src with no `@ts-expect-error` or `@ts-ignore` added to get there (a source scan
+      asserts the count of those directives does not rise from today's baseline).
+  (b) Every error the flag surfaces is fixed at its site, not silenced by a cast; where a fix
+      needs the row-shape validator (WEB6) the site is listed in this item's done-note and WEB6
+      picks it up, so nothing is left half-typed and unrecorded.
+  (c) The web CI job runs the same `tsc -b` it runs today, so the setting is enforced from the
+      commit that lands it.
+notes: |
+  Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+  Covers A3 (rank 5, shared with T2 and T5 as one root). Build this BEFORE WEB6 and WEB8 - a
+  validator and a typed client mean nothing while the compiler is off.
+
+  DONE 2026-09-05 (Lane B, laptop). `strict: true` in both tsconfigs, plus
+  tests/unit/test_web_typescript_strict.py.
+
+  CLAUSE (b) HAS AN EMPTY LIST, AND THAT IS THE FINDING. Turning strict on
+  surfaced ZERO errors: `npx tsc -b --force` exits 0 on the whole of web/src with
+  the flag set, and `npm run build` (tsc -b + vite build) exits 0. So no site was
+  fixed, no site was cast past, and there is NOTHING to hand to WEB6 from this
+  item - WEB6's row-shape validator still has its own case (the 21 `as unknown as`
+  double casts at the spec-result seam, T5), but it is not inheriting a half-typed
+  site list from here.
+
+  THE PASS WAS INSTRUMENT-CHECKED BEFORE IT WAS BELIEVED (J76). A clean pass under
+  a flag that was just turned on is exactly the shape of a flag that is not
+  actually applying, so: a throwaway `src/__strictprobe.ts` containing
+  `export function probe(x?: string) { return x.length }` was compiled by the same
+  `npx tsc -b --force` invocation and failed with `TS18048: 'x' is possibly
+  'undefined'`, exit 2. The enforcement is real; the tree was simply already
+  strict-clean, which is consistent with the review's own measurements (zero
+  `any`, zero TODO/FIXME markers in 22,715 lines).
+
+  BASELINES, MEASURED AT PULL (2026-09-05, on main at 6c51618e, before the flag
+  flipped): `@ts-expect-error` + `@ts-ignore` under web/src = 0. Unchanged at
+  close, and pinned as DIRECTIVE_BASELINE = 0 in the guard. The guard also counts
+  `@ts-nocheck`, which the acceptance does not name but which is the same class
+  and the widest of the three.
+
+  THE GUARD HAS TWO HALVES BECAUSE EITHER ALONE IS DEFEATABLE. (1) The setting:
+  `strict: true` in both files AND no strict sub-flag set back to `false`
+  underneath it - `{"strict": true, "strictNullChecks": false}` type-checks like
+  the flag was never set, and a guard reading only `strict` would call that
+  compliant. (2) The escape hatch: the directive count. Both halves were
+  mutation-probed - each fails when its rule is broken and passes when restored -
+  because a guard that has never been seen to fail is not evidence.
+
+  Its docstring records the J66 exception explicitly: the rule's subject IS a
+  comment (`// @ts-expect-error`), so `code_only()` would strip the very text
+  being counted. It reads raw source on purpose. It cannot count itself - it
+  lives under tests/unit/ and the scan glob is web/src only.
+
+  CLAUSE (c) VERIFIED, NOT ASSUMED: .github/workflows/ci.yml's web job runs
+  `npm run lint`, then `npm run build` (= `tsc -b && vite build`), then vitest and
+  playwright, with `working-directory: web`. So the setting is enforced by CI from
+  this commit; no CI change was needed.
+
+  FINDING FOR THE INBOX - FOUR TypeScript FILES ARE OUTSIDE EVERY `tsc`
+  INVOCATION, AND THEY WOULD PASS TODAY. tsconfig.app.json includes `src`;
+  tsconfig.node.json includes `vite.config.ts` and nothing else. So
+  `e2e/console.spec.ts`, `playwright.config.ts`, `scripts/genApiTypes.ts` and
+  `vitest.config.ts` are type-checked by nothing, in CI or locally. This item did
+  NOT widen the include, because clause (a) scopes the acceptance to "the whole of
+  web/src" and widening coverage is a different change from turning strictness on
+  (it would newly subject the playwright and vitest configs to `noUnusedLocals`
+  and to every future toolchain bump). It is a one-line follow-up and the evidence
+  is here so nobody has to re-derive it: a throwaway tsconfig extending
+  tsconfig.node.json with all five files in `include` compiles clean, exit 0, on
+  this tree. Lane A's call whether to mint it.
+
+  Gates at close: poetry run pytest -q = 3335 passed, 12 skipped; ruff check =
+  clean; ruff format --check = 545 files already formatted; in web/ - tsc -b exit
+  0, npm run build exit 0, vitest 13 files / 147 tests passed, oxlint 0 errors (10
+  pre-existing fast-refresh warnings, which are WEB13's `--max-warnings 0` clause,
+  not this item's).

@@ -11,6 +11,8 @@
 # OpenLineage spec); no internal URLs/org names. classification: Internal-Public.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-26
+
 id: cdo-crosswalk
 title: "SME Gate — CDO vocabulary crosswalk (DryDocs terms to the firmwide framework terms)"
 step: "ALIGNMENT-PLAN Phase 1 (internal/cdo-reference/ALIGNMENT-PLAN.md) — crosswalk confirmation, before any Phase-2 activation"

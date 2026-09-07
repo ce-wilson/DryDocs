@@ -1,0 +1,121 @@
+id: DOC4
+epic: doc-infrastructure
+title: Standing module review sweep - ten sized slots on a two-day cadence, /system-design + /tech-debt per firing, reports accumulating on review/module-sweep with slot state derived not stored
+type: task
+module: docs
+phase: 10
+agent: main
+model: opus
+priority: p2
+status: in_progress
+depends_on: []
+inputs:
+- docs/reviews/module-review-sweep-plan.md
+- docs/reviews/architecture-structure-review-2026-07-25.md
+- .claude/skills/system-design/SKILL.md
+- .claude/skills/tech-debt/SKILL.md
+- drydocs_core/component_map.py
+acceptance: |
+  A standing, rotating two-lens review of every first-party module, fenced as a third
+  writer beside the two lanes. Built 2026-09-05; the item closes when the first slot
+  report has landed and proved the protocol.
+
+  (a) THE PLAN is committed at docs/reviews/module-review-sweep-plan.md and defines,
+  in one place: the ten-slot rotation, the two lenses and what each asks, the
+  per-firing protocol, the finding quality bar, the isolation fence and the publish
+  boundary. It is the durable half - any session on any machine can run a slot from
+  it with no dependence on a scheduler having fired.
+
+  (b) SLOTS ARE SIZED, NOT FLAT. The largest module is forty times the smallest
+  (drydocs-web 22,715 lines against drydocs-libs 553), so a flat per-module rotation
+  spends one firing on 553 lines and the next on 22,715. Ten slots: core; load;
+  lineage; api; remediation; review+agents; port+docgen+docmeta;
+  plan+deepdoc+libs; web; and cross-module seams. Sizes are measured, recorded with
+  their exclusions (.venv, node_modules, dist, __pycache__) and re-measured rather
+  than trusted.
+
+  (c) SLOT 10 IS NOT A MODULE. It reviews the boundary itself - whether the import
+  invariant holds against drydocs_core.component_map, whether two modules disagree
+  about a shared contract, whether a finding in one slot has a twin in another. The
+  web review's strongest conclusion (one root cause recurring across eight findings)
+  was of exactly this kind and was not reachable from inside a single lens.
+
+  (d) SLOT STATE IS DERIVED, NEVER STORED. No cursor file: each firing lists
+  docs/reviews/modules/, finds the most recent report per family and takes the
+  oldest or missing one, breaking ties by slot number - the same reason the board
+  derives next_ready. A missed firing desynchronises nothing and a half-dead firing
+  is finished by the next one rather than duplicated.
+
+  (e) BUILT FOR AUTOCOMPACT. The report file is opened, stamped and COMMITTED before
+  any module code is read; findings are written into it as they are established;
+  every section boundary is a commit. The file on disk is the durable memory, not
+  the conversation. A firing that dies after lens 1 leaves lens 1 landed and pushed
+  (J31). After a compaction the session re-reads the report file and resumes from
+  it rather than reconstructing from the summary, and re-verifies anything the
+  summary asserts.
+
+  (f) THE FENCE HOLDS. Pen review:sweep. All work in worktree
+  .claude/worktrees/review-sweep on branch review/module-sweep, writing only
+  docs/reviews/modules/ and the plan. No firing touches main, a lane branch,
+  another worktree, docs/restructure/backlog/, a governed render (board, roadmap,
+  design HTML, web/src/generated), module code, config or tests. No git stash in
+  any form - the stack is shared. No auto-merge: the branch accumulates and a human
+  merges when the findings are wanted in trunk.
+
+  (g) REPORTS RESPECT THE PUBLISH BOUNDARY. Under docs/, so the ceiling is
+  Internal-Public: a report describing a module that reads internal/ or
+  internal-local/ states mechanism, never values, and says so when a finding cannot
+  be stated without a protected value.
+
+  (h) THE SWEEP MINTS NOTHING. Findings worth items are NAMED in each report's
+  grooming-candidates section and groomed by a human through groom-backlog. The
+  sweep allocates no id, writes no item file, renders no board and authors no ADR.
+
+  (i) PROVED: at least one slot report has landed under docs/reviews/modules/
+  following the template with its J63 stamp, demonstrating (d) and (e) in a real
+  firing. This is the remaining clause.
+notes: |
+  Minted 2026-09-05 (desktop main; the desktop session was stopped and handed the
+  backlog pen over for this window). Stub pushed before the body per the mint rule.
+
+  ORIGIN: the three-pass lens review of web/ run the same day - /architecture,
+  /system-design, /tech-debt at reviewed_commit 738028d7, with a compaction between
+  passes. It found eight structural issues, eight system-design issues and eight
+  debt items in a module nobody thought was in trouble, including a governance
+  export labelled "full" that streams a capped 500 rows and files a provenance
+  manifest recording the cap as the answer. The lens scoping, the finding bar and
+  the compaction mechanism in the plan are all distilled from what worked and what
+  nearly failed in that run.
+
+  PRECEDENT: Epic S was itself born from a scored /architecture + /tech-debt pass
+  (docs/reviews/architecture-structure-review-2026-07-25.md). The difference is
+  cadence - that was one review that produced one epic; this is a standing rotation
+  that produces a series, so a second pass over a module can say what moved.
+
+  BUILT AT MINT: the plan (e44cc5b4 on review/module-sweep), the isolated worktree
+  and branch, and the schedule. Clauses (a) through (h) are met; (i) waits on the
+  first firing, which is why this is in_progress and not done.
+
+  THE SCHEDULER IS THE WEAK HALF, on purpose. CronCreate jobs here are session-only
+  - held in one session's memory, gone when it exits, auto-expiring after seven
+  days, and firing only while that REPL is idle. At a two-day cadence that is about
+  three firings per arming, which cannot carry a twenty-day rotation. The plan is
+  therefore written so the cron is a convenience and nothing depends on it: any
+  session runs a slot by reading section 4. A durable trigger is a separate
+  question and deliberately not in this item - the alternative considered and
+  rejected at mint was a line in CLAUDE.md's session ritual, because a routing file
+  should not grow a re-arm step for a convenience.
+
+  Standing schedule when armed: 47 6 */2 * * (06:47 on odd days). That gives a
+  two-day gap all month and a one-day gap across the 31st-to-1st boundary; the
+  irregularity is recorded rather than corrected.
+
+  FIRST CYCLE ORDER puts drydocs-web last (slot 9) because it was reviewed at mint;
+  the sweep covers unreviewed ground before returning to it.
+
+  LANE REVIEW 2026-09-05 (Lane A, desktop; docs/reviews/module-review-sweep-plan-review-2026-09-05.md):
+  clauses (a)-(h) hold. One defect, closed: the plan this item names as its first input lived
+  only on review/module-sweep, so the input did not resolve on main - fixed by the --no-ff
+  merge 6743ee9d (docs-only). The plan itself took six fixes at 5f02599f (slug key, scope read
+  from component_map, merge not rebase, resume a partial report, no trunk close ritual or
+  snapshot in a firing, slot 9 report landed). Clause (i) still waits on the first firing.

@@ -1,6 +1,6 @@
 id: O68
 epic: web-console
-title: 'The admin page should show the log estate: directory, path, size and capacity per kind â€” and
+title: 'The admin page should show the log estate: directory, path, size and capacity per kind — and
   must not render debug-tier Cypher until that display is reviewed'
 type: task
 module: drydocs-web
@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: done
 depends_on:
 - G111
 inputs:
@@ -17,20 +17,137 @@ inputs:
 - drydocs_core/log_kinds.py
 - config/log-kinds.yaml
 acceptance: |
-  (a) THE PANEL. The admin configuration page (O12) gains a log-estate panel: per declared kind and per declared zone, the directory, the resolved path, the file count, the total size, and the declared retention. It is a PANEL on that existing surface, not a new page â€” the SME placed it there rather than in a new epic.
+  (a) THE PANEL. The admin configuration page (O12) gains a log-estate panel: per declared kind and per declared zone, the directory, the resolved path, the file count, the total size, and the declared retention. It is a PANEL on that existing surface, not a new page — the SME placed it there rather than in a new epic.
 
-  (b) THE DATA MOSTLY EXISTS, SO MOST OF THIS IS WIRING. G109 shipped a zone inventory returning present/absent plus a file count per declared zone, and the landing-zones command already emits manual and declared zones as one document with path, mode, base, in-repo, exists, file count and empty. The panel needs a read endpoint over that, not new collection. The ONE genuinely missing field is capacity â€” the inventory counts files and does not sum bytes â€” so a total-bytes value is added beside the count in CORE, not computed in the API and not in the browser.
+  (b) THE DATA MOSTLY EXISTS, SO MOST OF THIS IS WIRING. G109 shipped a zone inventory returning present/absent plus a file count per declared zone, and the landing-zones command already emits manual and declared zones as one document with path, mode, base, in-repo, exists, file count and empty. The panel needs a read endpoint over that, not new collection. The ONE genuinely missing field is capacity — the inventory counts files and does not sum bytes — so a total-bytes value is added beside the count in CORE, not computed in the API and not in the browser.
 
-  (c) THE DEBUG TIER IS REPORTED, NEVER RENDERED. ADR 0014 clause 6 as ruled splits the lean, longer-retention API log from a verbose short-retention debug log that carries Cypher text and request detail. CAPTURING that text is ruled; SURFACING it in a console is NOT, and they are different risks â€” a short-lived file on an operator's disk versus a rendered page. This panel may report the debug kind's SIZE and RETENTION like any other kind and MUST NOT render its contents. Anything that would display it is blocked on the SME review, which is a separate ruling and not this item's to make.
+  (c) THE DEBUG TIER IS REPORTED, NEVER RENDERED. ADR 0014 clause 6 as ruled splits the lean, longer-retention API log from a verbose short-retention debug log that carries Cypher text and request detail. CAPTURING that text is ruled; SURFACING it in a console is NOT, and they are different risks — a short-lived file on an operator's disk versus a rendered page. This panel may report the debug kind's SIZE and RETENTION like any other kind and MUST NOT render its contents. Anything that would display it is blocked on the SME review, which is a separate ruling and not this item's to make.
 
   (d) IT DOES NOT SHIP A KNOWN-WRONG ROW. G111 is a hard dependency, not a courtesy: today the run-logs zone resolves to the default whenever the log-directory variable is set, so a panel built before that fix would confidently show the wrong directory for exactly the kind the SME most wants to see.
 
-  (e) WHY A PANEL AND NOT JUST THE CLI, stated in the panel's own copy or its PR note: the command exists so "my extracts are gone" is a one-command answer, and the person most likely to ask is on a machine where the CLI is not the habitual surface. Post-retention it answers the same question for logs â€” days declared against days actually on disk.
+  (e) WHY A PANEL AND NOT JUST THE CLI, stated in the panel's own copy or its PR note: the command exists so "my extracts are gone" is a one-command answer, and the person most likely to ask is on a machine where the CLI is not the habitual surface. Post-retention it answers the same question for logs — days declared against days actually on disk.
 notes: |
   Groomed 2026-08-26 from Idea-172 (SME direction 2026-08-25, given alongside the ADR 0014 retention rulings). Epic O and the admin page are the SME's own placement.
 
-  Module `drydocs-web` recorded as a choice: the item spans three modules â€” the total-bytes field is core, the read endpoint is api, the panel is web â€” and it is filed against the surface the SME asked for. Whoever takes it should keep the core slice in core (clause b) rather than letting a byte sum drift into the API layer, which is the seam the module boundary exists to protect.
+  Module `drydocs-web` recorded as a choice: the item spans three modules — the total-bytes field is core, the read endpoint is api, the panel is web — and it is filed against the surface the SME asked for. Whoever takes it should keep the core slice in core (clause b) rather than letting a byte sum drift into the API layer, which is the seam the module boundary exists to protect.
 
   The Cypher-display question in clause (c) is an SME review, parked as a question in the inbox at this groom and named in the groom report; the item is complete without it and stays blocked on it for that one behaviour only.
 
   p2/sonnet: the data exists, the acceptance names the one new field, and the single hard rule (no debug content) is stated in the negative so it is testable.
+
+  DONE 2026-09-05 (Lane B, laptop). The log estate is a panel, and the debug
+  tier's contents are unreachable by construction.
+
+  (a) A TAB ON THE ADMIN PAGE, not a route. The SME's own placement, and a route
+  would also have needed a registry entry, a gate and a nav item for a surface
+  that is one question about one page. Asserted: App.tsx does NOT name the panel.
+
+  (b) THE BYTE SUM IS IN CORE, which the item's note asks for explicitly and for a
+  reason worth restating: the walk that knows a file count is the only walk that
+  should also be stating a size, and a sum computed in the API would be a second
+  answer free to disagree with the count standing beside it. So:
+    * ZoneState gains total_bytes, summed by the walk that was already counting.
+    * drydocs_core/log_estate.py joins the KINDS to what is on disk for each -
+      directory, resolved path, exists, file count, bytes, and the age of the
+      oldest file.
+    * drydocs_api/log_estate.py SHAPES that for the wire and computes nothing.
+
+  KINDS ARE COUNTED BY FILENAME, because that is what the declaration says they
+  are. All seven currently declare `dir: null` and share one root, so a kind's
+  files are the `<kind>.`-prefixed ones - the naming rule config/log-kinds.yaml
+  DERIVES rather than asserts. Without the filter every kind would report every
+  other kind's bytes, which on a panel about per-kind size is the whole answer
+  wrong. A kind that later declares its own `dir` owns everything in it, and both
+  cases are one code path because LogKind.path() already answers the question.
+
+  THE AGE COLUMN IS THE HALF THE DECLARATION CANNOT ANSWER. `retention_days` says
+  what is meant to happen; `oldest_days` says what has. A row is flagged when they
+  disagree - REPORTED, never acted on: a sweeper is a different decision with a
+  different blast radius, and the test asserts the file is still there afterwards.
+
+  (c) "NEVER RENDERED" IS STRUCTURAL, NOT A PROMISE, and that is the whole of this
+  clause. A comment saying the debug log's contents are not returned is worth
+  nothing; what makes it true is that NOTHING IN THE PATH CAN OPEN A FILE. Core
+  stats, the API shapes, the client fetches one bare endpoint, the panel renders.
+  Three guards, and the second is the one that will still be doing work in a year:
+    * behavioural - a file with distinctive Cypher text in it, and the text
+      appears nowhere in what estate() returns, while its LENGTH does (measured,
+      not read);
+    * structural - a code scan (comments stripped, J66: all three modules explain
+      the rule in their own headers and a raw scan would fail on the explanation)
+      asserting neither core nor api module contains open/read_text/read_bytes;
+    * the web half - the client's ONLY call is the bare endpoint with no
+      arguments, and neither it nor the panel names `contents`, `body:`, `tail` or
+      `preview`. That is how this rule would actually be lost: not by someone
+      deciding to render a log, but by a `?path=` parameter that looked harmless.
+  Mutation-proven: adding `open(...)` to the API module fails the scan by name.
+  And the scans have their own instrument check, because an absence assertion over
+  a pattern that never matches is a pass that means nothing.
+
+  api-debug appears in the panel with its size, its 7-day retention and its age,
+  exactly like every other kind. Reporting it was always allowed; only surfacing
+  its text is blocked, and that block is now a property of the code rather than a
+  line in an acceptance.
+
+  (d) G111 IS LANDED (status done at claim time), so the run-logs zone resolves
+  correctly and the panel does not ship the known-wrong row the clause names.
+
+  (e) THE REASON IS IN THE PANEL'S OWN COPY, as the clause offers: the CLI answers
+  the same question, and the person asking "where did my logs go" is usually not
+  at a terminal. Two assertions pin that the copy still says it, and that it still
+  says contents are never shown.
+
+  NOT THROUGH THE QuerySpec SEAM, deliberately. That seam reads the GRAPH and its
+  provenance vocabulary - live / empty / demo - is about what the graph answered.
+  This reads the HOST'S DISK. Routing it through useGraphQuery would attach a
+  claim ("live from the graph") that is false, on a page whose entire subject is
+  where things actually are. It goes through createAuthedApi instead, so it still
+  inherits the token, the 401-ends-the-session rule and the O85 diagnosis.
+
+  `unwrapAs`, AND SAYING SO. The response type is hand-declared because
+  /admin/log-estate returns a free dict server-side until drydocs_api.schemas
+  models it - which is WEB8's list, not this item's. unwrapAs is precisely the
+  marker for that, so this adds one entry to a list somebody is already keeping
+  rather than a hidden exception.
+
+  PEN NOTE, and it needs Lane A's attention at merge. The item is filed
+  drydocs-web and reaches all three modules, as its own note says. Lane A's R15
+  and R16 name drydocs_api/ WHOLESALE, so the API slice was kept as small as it
+  can be: one handler in a module of its own, and 16 lines in app.py (an import
+  and one route at the end of the table). Merge that consciously.
+
+  WRITERS for Lane A at merge, both already run here and committed:
+    poetry run python scripts/dump_openapi.py   (needs DRYDOCS_DATA_ROOT)
+    cd web && npm run api:types
+  The schema MOVED this time - a new route - so unlike WEB6 both are needed. Both
+  drift guards (tests/unit/test_openapi_client.py, src/generated/api.test.ts) pass
+  on the regenerated artifacts, clause (c) of WEB8's chain.
+
+  THE ENDPOINT IS EXERCISED, not merely registered. test_openapi_client proves
+  the route EXISTS; three TestClient cases prove it ANSWERS - 200 for an admin
+  with the real dependency chain resolving the log root and the zones from the
+  environment (a tmp tree, not this machine's logs), 403 for a user-tier
+  persona, 401 unauthenticated. Added at close review after noticing the
+  distinction; "registered" and "working" are different claims and only one of
+  them was covered. The 200 case also asserts the response text contains neither
+  `contents` nor `tail`, which is clause (c) checked on the wire rather than only
+  in the source.
+
+  Also dropped a defensive `getattr(zone, "mode", None)` for the plain attribute:
+  DataZone declares `mode`, so the getattr was guarding against a shape that
+  cannot occur and would have silently returned None if the field were ever
+  renamed - a fallback that hides the thing it is meant to survive.
+
+  NOT VERIFIED IN A BROWSER. The panel is asserted by typecheck, build and source;
+  whether the two tables read well against a real estate is a person's call. The
+  CORE walk is verified against real fixtures on disk (tmp trees, not this
+  machine's log directory - a test that reported on the developer's real logs
+  would be unrepeatable and rude).
+
+  Ledger: LogEstatePanel (route area, UNBOUND - the admin page is a GATED_SURFACE
+  and not a registry module, so a binding would invent one, same as
+  AdminConfigRoute), pin 94 -> 95.
+
+  Gates at close: poetry run pytest -q, ruff check, ruff format --check. In web/:
+  tsc -b --force exit 0, oxlint --max-warnings 0 exit 0, npm run build exit 0,
+  npm run bundle:check exit 0.

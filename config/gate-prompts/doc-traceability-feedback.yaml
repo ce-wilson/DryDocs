@@ -28,6 +28,8 @@
 # docs/design/feedback/drydocs-startup-refresh-runbook-rev1.yaml) — no confidential data.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-09-02
+
 id: doc-traceability-feedback
 title: "SME Gate — Design-doc traceability matrix + anchor-keyed feedback model (DesignDoc / DocSection / Requirement / Component / TestCase / FeedbackNote)"
 step: "Pre-activation gate for backlog L7 — models the TDD requirements traceability matrix (docs/design/templates/tdd.outline.yaml) and the anchor-keyed SME feedback loop (docs/design/feedback/README.md) as DryDocs graph edges"

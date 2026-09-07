@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "drydocs:config/schemas/editions.schema.json",
+  "title": "config/taxonomy/editions.yaml (drydocs.editions.v1)",
+  "description": "Shape only (S6): the edition registry, one row per declared edition -- the id segment (2-5 uppercase letters) keyed to an Area Product (gate ontology-domain-registry-and-edition-grain sC1-sC4, CFG2). Semantics -- a code is never a module series or a frozen letter, DD is refused, producer-side rows are samples, a real row's area_product_id resolves in the graph -- live in drydocs_core/edition_registry.py and tests/unit/test_edition_registry.py.",
+  "type": "object",
+  "required": [
+    "schema",
+    "classification",
+    "updated",
+    "editions"
+  ],
+  "properties": {
+    "schema": {
+      "const": "drydocs.editions.v1"
+    },
+    "classification": {
+      "type": "string"
+    },
+    "classification_only": {
+      "type": "boolean"
+    },
+    "updated": {
+      "description": "date or string (YAML parses bare dates)"
+    },
+    "editions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/edition"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "edition": {
+      "type": "object",
+      "required": [
+        "code",
+        "title",
+        "area_product_id",
+        "minted_by",
+        "registered_at",
+        "authority"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "pattern": "^[A-Z]{2,5}$",
+          "description": "the id segment; unique, never a module code, never a frozen letter, never DD"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "area_product_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "the :AreaProduct key (K5 sB) the edition is cut at"
+        },
+        "minted_by": {
+          "enum": [
+            "producer",
+            "company"
+          ],
+          "description": "the BASE that declared it (sB2: a base mints, an instance requests)"
+        },
+        "registered_at": {
+          "description": "date or string (YAML parses bare dates)"
+        },
+        "authority": {
+          "type": "string",
+          "minLength": 1
+        },
+        "legacy_band": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "the numeric band this edition's ids used before it had a code; history only"
+        },
+        "sample": {
+          "type": "boolean",
+          "description": "true on a synthetic row; the producer's file carries samples only"
+        },
+        "note": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

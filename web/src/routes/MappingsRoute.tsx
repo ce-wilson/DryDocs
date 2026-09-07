@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { Persona } from '../lib/auth'
-import { createApiAccess } from '../lib/graphApi'
 import {
   createMappingsApi,
   type MappingDomain,
@@ -9,12 +8,13 @@ import {
   type MappingsApi,
   type OverrideEntry,
 } from '../lib/mappingsApi'
-import type { SpecResult } from '../lib/graph'
 import { DEMO_OVERRIDE_GRID, type OverrideGridRow } from '../data/mappingsDemo'
 import ModuleToolbar from '../layout/ModuleToolbar'
 import EmptyState from '../components/ui/EmptyState'
 import AppCodeCascadePane from './AppCodeCascadePane'
 import DomainGridTable from './DomainGridTable'
+import { isResolved, useGraphAccess, useGraphQuery } from '../data/graphAccess'
+import { validateRows, validateRowsOf, type RowShape } from '../data/rowShape'
 
 // /mappings — the O13 manual-mapping stewardship screen (wf-mapping-01).
 // Steward + admin only (server-enforced too — /mappings/* returns 403 below
@@ -60,9 +60,10 @@ function download(filename: string, content: string, type = 'text/plain') {
 }
 
 export default function MappingsRoute({ persona }: { persona: Persona }) {
-  const apiUrl = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:8001'
+  // The O13 mappings client is a different surface with its own API; it takes
+  // the base URL from the session rather than re-deriving it.
+  const { apiUrl } = useGraphAccess()
   const mappings = useMemo(() => createMappingsApi(apiUrl, persona.id), [apiUrl, persona.id])
-  const access = useMemo(() => createApiAccess(apiUrl, persona.id), [apiUrl, persona.id])
 
   const [apiDown, setApiDown] = useState<string | null>(null)
   const [domains, setDomains] = useState<MappingDomain[]>(FALLBACK_DOMAINS)
@@ -79,46 +80,42 @@ export default function MappingsRoute({ persona }: { persona: Persona }) {
   const [domainGrid, setDomainGrid] = useState<MappingGrid | null>(null)
 
   useEffect(() => {
-    let cancelled = false
+    const ctl = new AbortController()
     mappings
       .domains()
       .then((d) => {
-        if (cancelled) return
+        if (ctl.signal.aborted) return
         setDomains(d)
         setApiDown(null)
       })
       .catch((e: Error) => {
-        if (!cancelled) setApiDown(e.message)
+        if (!ctl.signal.aborted) setApiDown(e.message)
       })
     mappings
       .options()
       .then((o) => {
-        if (!cancelled) setOptions(o)
+        if (!ctl.signal.aborted) setOptions(o)
       })
       .catch(() => {
         /* options footer just stays empty — the apiDown notice already shows */
       })
-    return () => {
-      cancelled = true
-    }
+    return () => ctl.abort()
   }, [mappings])
 
   useEffect(() => {
-    let cancelled = false
+    const ctl = new AbortController()
     setDomainGrid(null)
     const available = domains.find((d) => d.id === activeDomain)?.available
     if (!available) return
     mappings
       .grid(activeDomain)
       .then((g) => {
-        if (!cancelled) setDomainGrid(g)
+        if (!ctl.signal.aborted) setDomainGrid(g)
       })
       .catch(() => {
         /* grid stays null → its section shows the api-down hint */
       })
-    return () => {
-      cancelled = true
-    }
+    return () => ctl.abort()
   }, [mappings, activeDomain, domains])
 
   const activeDef = domains.find((d) => d.id === activeDomain)
@@ -190,14 +187,12 @@ export default function MappingsRoute({ persona }: { persona: Persona }) {
           {activeDomain === 'seal-contact-override' ? (
             <SealOverridePane
               mappings={mappings}
-              access={access}
               grid={domainGrid}
               apiDown={apiDown}
             />
           ) : activeDomain === 'app-code-mapping' ? (
             <AppCodeCascadePane
               mappings={mappings}
-              access={access}
               grid={domainGrid}
               apiDown={apiDown}
               personaId={persona.id}
@@ -241,6 +236,22 @@ export default function MappingsRoute({ persona }: { persona: Persona }) {
 
 const SEAL_ROLES_SPEC = 'mappings.seal-contact-roles.v1'
 
+/** The nine columns the seal-contact-override grid returns. Verified against
+ *  the server's own SELECT (drydocs_api/mappings.py, `seal-contact-override`),
+ *  which aliases app_seal_id AS app_id and emits the other eight verbatim — so
+ *  this is the full row, not a subset chosen to make the check pass. */
+const OVERRIDE_GRID_COLUMNS: RowShape<OverrideGridRow> = [
+  'app_id',
+  'role_name',
+  'origin',
+  'holder_sid',
+  'holder_name',
+  'rationale',
+  'authored_by',
+  'authored_on',
+  'status',
+]
+
 interface SealRoleRow {
   app_id: string
   application: string | null
@@ -250,46 +261,84 @@ interface SealRoleRow {
   holder_name: string | null
 }
 
+/** WEB6: the columns SealRoleRow requires, checked at runtime. Names only —
+ *  their TYPES come from the result's own column declarations, so this is not a
+ *  second copy of the server's contract. `keyof SealRoleRow` means a rename of a
+ *  field here is a compile error, not a silently unchecked column. */
+const SEAL_ROLE_COLUMNS: RowShape<SealRoleRow> = [
+  'app_id',
+  'application',
+  'role_name',
+  'level',
+  'holder_sid',
+  'holder_name',
+]
+
 function SealOverridePane({
   mappings,
-  access,
   grid,
   apiDown,
 }: {
   mappings: MappingsApi
-  access: ReturnType<typeof createApiAccess>
   grid: MappingGrid | null
   apiDown: string | null
 }) {
-  // live SEAL attributions from the graph (the origin='source' rows the
-  // committed list may not have captured yet)
-  const [liveSource, setLiveSource] = useState<SealRoleRow[] | null>(null)
   const [drafts, setDrafts] = useState<OverrideEntry[]>([])
   const [dialogSeed, setDialogSeed] = useState<Partial<OverrideEntry> | null>(null)
   const [status, setStatus] = useState('')
 
-  useEffect(() => {
-    let cancelled = false
-    access
-      .runSpec(SEAL_ROLES_SPEC)
-      .then((r: SpecResult) => {
-        if (!cancelled) setLiveSource(r.rows as unknown as SealRoleRow[])
-      })
-      .catch(() => {
-        if (!cancelled) setLiveSource([])
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [access])
+  // live SEAL attributions from the graph (the origin='source' rows the
+  // committed list may not have captured yet)
+  const sealRoles = useGraphQuery(SEAL_ROLES_SPEC)
+  // Memoised on the query STATE, whose identity changes only when the read
+  // does: the rows feed a useMemo below, and a fresh array every render would
+  // rebuild the whole override grid on every keystroke.
+  // WEB6: the columns this pane needs, checked against the server's own
+  // declarations. A spec that renamed `holder_sid` used to render a column of
+  // blanks; it now names the column. ONE call, memoised on the query state —
+  // the rows and the problem are two faces of one check, and computing them
+  // separately would let them disagree.
+  const live = useMemo(() => {
+    if (!isResolved(sealRoles)) return { rows: null, problem: null }
+    const checked = validateRows<SealRoleRow>(sealRoles.data, SEAL_ROLE_COLUMNS)
+    return checked.ok
+      ? { rows: checked.rows, problem: null }
+      : { rows: [] as SealRoleRow[], problem: checked.message }
+  }, [sealRoles])
+  // A shape failure reads as "no live rows" HERE rather than blanking the pane:
+  // the committed grid below is a real answer that does not depend on this read,
+  // so hiding it would cost the operator more than the mismatch does. The
+  // message rides on the pane's own status line instead.
+  const liveSource: SealRoleRow[] | null = useMemo(
+    () => (sealRoles.status === 'error' ? [] : live.rows),
+    [sealRoles.status, live],
+  )
 
   // one origin-flagged row list: committed grid rows (store) + live graph
   // attributions not already captured as a source row for that (app, role)
+  // WEB6: the O13 mappings grid declares KEYS and rows and no column types, so
+  // the same check runs presence-only over it — which is the half that catches a
+  // renamed column, and the half this cast was hiding.
+  const gridChecked = useMemo(
+    () =>
+      validateRowsOf<OverrideGridRow>(
+        { source: `mappings grid '${grid?.domain ?? 'override'}'`, keys: grid?.keys ?? [], rows: grid?.rows ?? [] },
+        OVERRIDE_GRID_COLUMNS,
+      ),
+    [grid],
+  )
+  // Part of the memo above rather than derived after it: a fresh `[]` on every
+  // render is a new identity, and the row memo below takes it as a dependency.
+  const gridRows: OverrideGridRow[] = useMemo(
+    () => (gridChecked.ok ? gridChecked.rows : []),
+    [gridChecked],
+  )
+
   const rows: OverrideGridRow[] = useMemo(() => {
     const isDemo = apiDown !== null && grid === null
     const stored: OverrideGridRow[] = isDemo
       ? [...DEMO_OVERRIDE_GRID]
-      : ((grid?.rows ?? []) as unknown as OverrideGridRow[])
+      : gridRows
     const covered = new Set(
       stored.filter((r) => r.origin === 'source').map((r) => `${r.app_id}|${r.role_name}`),
     )
@@ -312,7 +361,7 @@ function SealOverridePane({
         a.role_name.localeCompare(b.role_name) ||
         (a.origin === b.origin ? 0 : a.origin === 'source' ? -1 : 1),
     )
-  }, [grid, apiDown, liveSource])
+  }, [grid, apiDown, liveSource, gridRows])
 
   const demo = apiDown !== null && grid === null
 
@@ -462,6 +511,14 @@ function SealOverridePane({
             clear
           </button>
         </div>
+      )}
+      {live.problem && (
+        // WEB6 clause (c): said in place of the rows it would have rendered,
+        // and never mixed into the transient action status above it.
+        <p className="shrink-0 rounded border border-red/50 bg-red/10 px-2 py-1 text-[11px] text-red">
+          <b>Column mismatch.</b> {live.problem} Live SEAL attributions are not shown; the committed
+          grid below is unaffected.
+        </p>
       )}
       {status && <p className="shrink-0 font-mono text-[10px] text-muted">{status}</p>}
 

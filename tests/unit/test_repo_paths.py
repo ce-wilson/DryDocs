@@ -389,7 +389,7 @@ def test_swept_defaults_resolve_inside_a_real_worktree(tmp_path):
             [sys.executable, str(probe)],
             cwd=worktree,
             capture_output=True,
-            text=True,
+            encoding="utf-8",
             env=env,
         )
         assert result.returncode == 0, f"probe failed:\n{result.stdout}\n{result.stderr}"
@@ -448,7 +448,7 @@ def test_a_worktree_render_does_not_touch_the_main_tree(tmp_path):
             [sys.executable, str(worktree / "scripts" / "render_board.py")],
             cwd=worktree,
             capture_output=True,
-            text=True,
+            encoding="utf-8",
             env=env,
         )
         assert result.returncode == 0, f"render failed:\n{result.stdout}\n{result.stderr}"

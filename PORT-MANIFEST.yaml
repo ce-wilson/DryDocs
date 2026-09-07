@@ -48,12 +48,12 @@
 # =============================================================================
 schema: drydocs.port-manifest.v1
 classification: Internal-Public
-updated: 2026-08-20   # 2026-08-20 (J51): six PER-ENTRY rows for canonical-producer paths the
+updated: 2026-09-05   # 2026-08-20 (J51): six PER-ENTRY rows for canonical-producer paths the
                       # company legitimately EXTENDS (Idea-142's class): description_tokens
                       # (per function), detect.py + __init__ (per detector id), test_runbook_
                       # currency (per exemption table, retirement trigger named), email-dl-
                       # contact-point (company keeps the file, producer SME intent crosses by
-                      # section), ui-components (the K7-K15 hold IS the rule), doc-source-
+                      # section), ui-components (rows union; the K7-K15 hold WAS the rule until 2026-09-05), doc-source-
                       # registry (field split: company owns graph_locator/captured_at/manifest/
                       # source; confirmed is per-repo). Same day: the backlog rows for the
                       # Y2 shard (ADR 0013) and the F4 per-repo-status ruling.
@@ -280,6 +280,20 @@ rows:
   - path: "config/gate-log.md"
     disposition: union-append
     note: "chronological union of both sides' gate records; dropping either side's entries is an audit violation"
+  - path: "docs/restructure/ideas/pending-*.md"
+    disposition: never-port
+    note: >
+      PLAN4 (d) (2026-09-05): a branch session's idea CANDIDATES, minted into IDEAS.md at
+      landing by one allocator pass and emptied. Transient and venue-local by
+      construction - a candidate that crossed would be minted into the other venue's
+      inbox as that venue's own thought. `*` does not span separators, so this row is
+      the one directory level and nothing below it.
+  - path: "docs/restructure/ideas/README.md"
+    disposition: canonical-producer
+    note: >
+      The pending-file shape and the landing command (PLAN4 d). Mechanism prose only.
+      The sharded inbox R6 may one day put in this directory is not this row: it gets
+      its own union-append rows when it lands, on the IDEAS.md shape below.
   - path: "docs/restructure/IDEAS.md"
     disposition: union-append
     note: "inbox + audit trail; both sides append — merge is the union (proven conflict site, 3x on 2026-07-09)"
@@ -644,13 +658,39 @@ rows:
   - path: "tests/unit/test_variable_*.py"
     disposition: canonical-producer
     note: "carry the sample skipif guards — re-deriving them caused divergence in a prior port"
+  - path: "drydocs_core/component_map.py"
+    disposition: per-entry
+    entry_rule: >
+      COMPONENT_GROUPS / COMPONENT_MODULE / SURFACE_OWNERS entries UNION by key.
+      The mechanism is producer-canonical: CORE_PREFIXES, ENTRYPOINT_MODULES,
+      DECLARED_COMPONENT_IMPORTS and every ruling comment cross whole. Company-only
+      GROUPS stay (docmeta-acquire — drydocs.docmeta, drydocs.scrapers — and any
+      group the company adds for a package the producer does not hold), exactly as
+      `tests/unit/test_module_boundary.py` keeps them: since ADR 0018 D1 the guard
+      IMPORTS this file, so a wholesale take of the map drops the company's groups
+      through the guard's own import and the default-deny check fails on their
+      first module. MOVES WITH `tests/unit/test_module_boundary.py` and
+      `MODULE_MAP.md`, ALWAYS — three files, one classification: this one is THE
+      declaration (ADR 0018 D1), the guard reads it, the map's component tables are
+      rendered from it (`scripts/render_module_map.py`; re-render after the merge,
+      never hand-edit the tables).
+    note: >
+      2026-09-04, on the company's chunk-5 apply of port-base-20260902 (their idea
+      inbox; the producer holds no transcript). The file was born 2026-09-02 (ADR
+      0018 D1) without a row and fell through to the `drydocs_core/**`
+      evaluate-on-collision default — the third member of the J68 pair with no
+      seat at the table. Guarded by `test_every_declaration_names_the_guard_that_reads_it`,
+      which now carries the triple.
   - path: "tests/unit/test_module_boundary.py"
     disposition: per-entry
     entry_rule: >
       Module-group entries UNION: the boundary mechanism (ENTRYPOINT_MODULES
       exemption + default-deny) is producer-canonical; company-only groups
       (docmeta-acquire — drydocs.docmeta, drydocs.scrapers — at
-      PORT-REPORT-5417ef10) are never dropped by a port.
+      PORT-REPORT-5417ef10) are never dropped by a port. Since ADR 0018 D1 the
+      groups live in `drydocs_core/component_map.py` (its own per-entry row
+      above) and this file imports them; the union happens THERE, and this
+      file's own diff is mechanism.
     note: "was canonical-producer until Relay #2 of PORT-REPORT-5417ef10 — taking it wholesale failed the company guard on their extended groups"
   - path: "tests/unit/test_plan_ideas.py"
     disposition: per-entry
@@ -675,7 +715,12 @@ rows:
       sequence surfaces), FOREIGN_PATHS (emptied company-side — every producer
       entry exists there), and the company's DEFERRED_VERBS (T22: sweep-removed,
       load-essential-graphrag, with its still-cited guard). Union by KEY, keep each
-      side's reasons verbatim. RETIREMENT TRIGGER, and the row's own exit: when
+      side's reasons verbatim - EXCEPT a producer entry whose only citer is a
+      document under a never-port zone (docs/port/port-prompt.md cites eleven:
+      three historical, seven foreign, one generated), which the consumer DROPS
+      by rule, because the still-cited guard would otherwise fail on an entry
+      nothing on that side can cite (found at the 2026-09-03 chunk-2 apply).
+      RETIREMENT TRIGGER, and the row's own exit: when
       T19 / T22 land company-side the exemptions go and this row reverts to the
       tests/** default. Shrink-only guard semantics stay — an entry is removed
       when its subject is gone, never to silence the test.
@@ -685,10 +730,53 @@ rows:
     entry_rule: >
       Schema/rollup/next_ready guards are producer-canonical. The ALLOCATOR-BAND
       block is per-side for the same reason as test_plan_ideas.py — producer
-      asserts <= 9999, the company asserts >= 10000, and each keeps its own
-      PORTED_COMPANY_IDS. This file's own entry_rule above already records why:
-      "both sides run their own plan against OVERLAPPING ids". The bands remove
-      the id collision; that rule still governs genuinely shared items.
+      asserts <= 9999, the company asserts >= 10000, and each side keeps its own
+      band NAMES and id set (the producer's PRODUCER_BAND_CEILING /
+      PORTED_COMPANY_IDS; the company's COMPANY_BAND_FLOOR / PRE_PARTITION_COMPANY_IDS
+      since its 2026-08-24 polarity rework — the row describes the split, never
+      the other side's spelling). THE FREEZE BLOCK IS MECHANISM AND CROSSES WHOLE
+      (PLAN1 + PLAN3, 2026-09-03): FROZEN_SERIES / FROZEN_BAND, `_frozen_strays`
+      and the agreement guards read the allocator's own tables and judge a
+      band-shaped id against the band's max, so they are the same test on both
+      trees; `_frozen_strays` reads PRODUCER_BAND_CEILING by name, and a side
+      that spells the boundary differently defines that name from its own
+      constant (COMPANY_BAND_FLOOR - 1) rather than editing the function — and
+      pins it to a literal 9999 when the band rule retires (gate §C4), because
+      the freeze guard outlives the band. This file's own entry_rule above
+      already records why: "both sides run their own plan against OVERLAPPING
+      ids". The bands remove the id collision; that rule still governs genuinely
+      shared items.
+  - path: "tests/unit/test_config_identity_header.py"
+    disposition: per-entry
+    entry_rule: >
+      The J58 guard (2026-09-05): one JSON Schema for the identity header, and a
+      DEFAULT-DENY walk over every tracked YAML - a file in no declared class
+      fails. The walk, the schema binding and the header assertions are
+      mechanism and cross whole. The CLASSES dict is per-side DATA on the
+      test_backlog.py shape: it declares which tracked YAML files carry which
+      header class and why, and a company-only YAML (its own taxonomy rows,
+      gate prompts, source registries) is in no producer class by construction,
+      so the guard goes red on arrival BY DESIGN and the company adds its own
+      entries with their reason. Take the test whole; keep every company-only
+      CLASSES entry; never delete an entry because the producer has no such
+      file. The schema it binds (config/schemas/identity-header.schema.json) is
+      canonical-producer by the config/** default.
+    note: "J58 (2026-09-05, 182523e7). Row added at the sixth roll so the tests/** default cannot revert the company's CLASSES entries at the next port."
+  - path: "tests/unit/test_publish_boundary_history_ceiling.py"
+    disposition: per-entry
+    entry_rule: >
+      The J74 guard (2026-09-05): the retired acronym may not appear in a NEW
+      commit message, enforced as a ceiling over the whole history - the count
+      may never rise above the number recorded. The mechanism (the log walk, the
+      token read from internal/cdo-reference/README.md, fail-closed when the
+      README is absent, exactly like J55) crosses whole. CEILING is per-side
+      DATA: the producer MEASURED its 34 on its own 2,057-commit history and
+      ruled that a push carries history, so the 34 are accepted and frozen. The
+      company's history is disjoint and its count is its own - measure it with
+      the test's own log command, set the company CEILING with the recorded
+      reason, and keep it. A port never copies the producer's number over the
+      company's; the number is what the guard protects, not what it ships.
+    note: "J74 (2026-09-05, 74cd5990 + b65626fe). Row added at the sixth roll for the same reason as test_config_identity_header.py."
   - path: "tests/unit/test_taxonomy_ontology_map.py"
     disposition: canonical-producer
     note: "the map guard (2026-07-09); consumer's map content differs, the guard is content-agnostic"
@@ -812,6 +900,52 @@ rows:
       reference material. Lived at repo-root `docs/design/ui-exploration/**` until S9 (2026-08-21) moved it here;
       the row stays ABOVE the `docs/design/**` evaluate row on purpose, because this material is
       producer-authored reference the consumer never finalizes."
+  - path: "config/taxonomy/data-centers.yaml"
+    disposition: per-entry
+    entry_rule: >
+      Rows in `data_centers` keyed by `code` UNION, on the lob-product-team shape:
+      the company's REAL rows (its Control-M/Server codes paired with their long
+      data-center names, `sample` absent or false) are estate data and stay; the
+      producer's rows are the SYNTHETIC sample (`sample: true`, the bundled
+      corpus's own P12/P14/P32/P33/P41) and never overwrite or shadow them.
+      `default_time` and `suffix` are OPTIONAL per-row metadata (LOAD2: the E####
+      time is an internal, mutable tier-2 convention, never required) and are the
+      row owner's. Producer-owned MECHANISM crosses whole: the header comment,
+      `schema`, `classification`, `classification_only`, `updated` and the field
+      list. The reader prefers the J13 twin (`internal/controlm-config/
+      data-centers.yaml`, never ported) when present, so a company that keeps its
+      real rows in the twin still needs this row: a wholesale take would replace
+      whatever it holds here with the sample and the reader would report `.source`
+      as the sample on a tree that has real data.
+    note: >
+      LOAD2 (c) (2026-09-04), row added 2026-09-05 on the SME's call. Without it the
+      file fell through to the config/** canonical-producer default - the THIRD
+      instance of that class (lob-product-team.yaml at the 2026-08-20 apply,
+      source-registry.yaml at the 2026-09-01 apply, which drove test_source_registry
+      1 -> 7 failures). Added between the in-flight range and the next roll on
+      purpose: carve-outs 8 and 9 do not take the manifest, so the row cannot reach
+      them, and the file itself is post-port-base-20260902 and arrives company-side
+      as a clean-add at the next roll - disposition first matters the roll after,
+      once real rows exist. Classification Internal on both sides (real rows name
+      production data centers, J23 handling).
+  - path: "config/taxonomy/editions.yaml"
+    disposition: per-entry
+    entry_rule: >
+      Rows keyed by `code` UNION, on the lob-product-team shape exactly: the
+      company's REAL rows (its own code and every Area-Product edition it cuts,
+      each minted at ITS OWN gate — §C3) are estate data and stay; the producer's
+      rows are the SYNTHETIC sample (`sample: true`, invented codes and
+      area_product_ids) and never overwrite or shadow them. `legacy_band` on a
+      company row is the company's reading of its own history and is never set by
+      the producer. Producer-owned MECHANISM crosses whole: the header comment,
+      `schema`, `classification`, `updated` and the field list. UNNAMED FIELDS:
+      the producer owns them on sample rows, the company owns them on its own.
+    note: >
+      CFG2 (2026-09-04). Classification Internal on both sides (real rows name
+      Area Products). drydocs_core/edition_registry.py reads it; the code
+      collision check (module series, frozen letters, DD) is a pure function the
+      company's suite runs against ITS OWN modules.yaml, and the :AreaProduct
+      resolution check runs for real only where real rows live (J18).
   - path: "config/taxonomy/lob-product-team.yaml"
     disposition: per-entry
     entry_rule: >
@@ -829,6 +963,65 @@ rows:
       wholesale take would have dropped the company's LOB rows. The same class as
       the six rows above; the row lands producer-side and reaches the company at
       the next port, their PORT-REPORT census is the record of the gap.
+  - path: "config/taxonomy/domains.yaml"
+    disposition: per-entry
+    entry_rule: >
+      Rows keyed by `id` UNION (gate ontology-domain-registry-and-edition-grain
+      §B2: a base mints, an instance requests; the company base mints ITS OWN
+      domains at ITS OWN gate). Each base's own mints stay: a row whose
+      `minted_by` is `company` (or a company-declared edition code) is estate
+      truth the producer never sees and is never dropped or re-ruled by a port;
+      a producer-NEW row unions in by id. On an id BOTH sides hold, `status`,
+      `superseded_by`, `authority` and `authority_status` are gate-ruled facts on
+      whichever side rules them — never merged, never "synced" (the
+      tom-role-vocabulary shape). Producer-owned MECHANISM crosses whole: the
+      header comment, `schema`, `classification`, `updated` and the field list.
+      UNNAMED FIELDS: the producer owns them on producer-minted rows, the company
+      owns them on its own.
+    note: >
+      CFG1 (2026-09-04). The registry is the ONE surface the vocabulary's domain
+      axis defers to; drydocs_core/ontology/domain_registry.py reads it and
+      tests/unit/test_domain_registry.py holds the schema enum, the fragments on
+      disk and every entry's `domain:` equal to it. The base-owned guard (§B5
+      rider: an edition never reuses or deprecates a base id) is in the reader,
+      so a bad union fails at load on either side.
+  - path: "config/taxonomy/software-registry.yaml"
+    disposition: per-entry
+    entry_rule: >
+      `vendors[]` and `products[]` are keyed by `id` and UNION: a row only one side
+      holds stays - the company ingests from ServiceNow and carries a `servicenow`
+      vendor and product the producer never will; the producer carries `axway` /
+      `mfts` from C43 (2026-09-03, after port-base-20260902). On a shared id the
+      PRODUCER's row wins, because the rows are vendor facts (`name`,
+      `publisher_url`, `icon`, `vendor`, `type`, `category`, `role`, `stack`,
+      `components`, `versions`, `documentation`, `license_note`, `white_label`,
+      `evidence`) governed by ADR 0004's vocabulary - with three exceptions the
+      file's own header names as reconciled company-side at port and which stay
+      the company's: `seal_id` (placeholder here, the registration id there),
+      `drydocs_application_id` (the same pattern, top level) and `used_by_drydocs`
+      (an estate fact per side). `acronyms` is a mapping, not a row set, and is the
+      producer's AUTHORITATIVE HOME by SME ruling (2026-07-21, header): take it
+      whole, at the O68 (d) shape - `scripts/render_software_registry.py` at the
+      base reads that shape and a pre-O68 input breaks the whole render_board.py
+      chain, which is how this row was found. `invocation_patterns`, `schema`,
+      `classification`, `adr` and the header comment are producer mechanism and
+      cross whole; `updated` is the row owner's. UNNAMED FIELDS: on a vendor or
+      product row belong to whichever side owns the row under the id rule above;
+      a new top-level key is the producer's.
+    note: >
+      Row added 2026-09-05 from the company's carve-out 8 apply notes: without it the
+      file fell through to the config/** canonical-producer default, and a wholesale
+      take dropped the company-only `servicenow` vendor and product rows (vendors
+      15 -> 14), restored by hand. Joins dev-environment (2026-07-28), source-bindings,
+      lob-product-team (2026-08-20), source-registry (2026-09-01) and data-centers
+      (2026-09-05) in the config/** fall-through class. The J68 pair guard cannot see
+      this one: the file's guard (test_software_registry.py) reads the file's SHAPE
+      and the loader contract, not its rows, so there is no declaration/guard pair to
+      hold to one disposition - the row has to be written. The J71 totality guard
+      does cover it, from the same commit (ENTRY_FILES in test_port_manifest.py).
+      Carve-out 8 does not take the manifest, so the row reaches the company at the
+      next roll; the FOURTEENTH postscript's "take render_board.py too" is what made
+      this input cross early, and the SIXTEENTH says what that sentence left out.
   - path: "config/taxonomy/tom-role-vocabulary.yaml"
     disposition: per-entry
     entry_rule: >
@@ -852,13 +1045,22 @@ rows:
   - path: "config/taxonomy/ui-components.yaml"
     disposition: per-entry
     entry_rule: >
-      components[] keyed by id. The K7-K15 Tier-B HOLD is the entry_rule: the
-      company = the producer MINUS the held AppCodeCascadePane route row (the
-      m3_belongs_to_application tier stays planned there). Take every producer
-      entry except those under a named hold; keep company-only entries. The
-      counts are TRACKED (company 68/29 vs producer 69/29 at caa0406), never
-      asserted equal — test_ui_components.py's assertion is per-side.
-    note: "J51 (2026-08-20). Resolved to config/** canonical-producer by omission; caa0406 kept the hold by hand."
+      components[] keyed by id; rows UNION - take every producer row, keep every
+      company-only row. The K7-K15 Tier-B HOLD is NO LONGER the rule (retired
+      2026-09-05): the company's carve-out 8 apply found its tree already
+      carrying both the AppCodeCascadePane route row and the route file, and
+      honoring "producer MINUS the held row" would have failed three guards on
+      its side at once (test_ui_components.py's per-side (bound, total) pin,
+      the route-file evidence check, the drift test). The hold's subject was
+      always the LOAD - m3_belongs_to_application stays planned company-side,
+      T23 family - never the taxonomy row: a component that exists is
+      classification, and classification is not gated. The counts are TRACKED
+      per side, never asserted equal (producer 40/88 at 08af6985; the company
+      reported 31/72 -> 40/88 at its 4d9ddba7). The lesson is one row up: an
+      entry_rule may describe the PRODUCER's tree; one that describes the
+      consumer's ("company = producer minus X") goes stale the moment the
+      consumer moves, and only the consumer can see that it did.
+    note: "J51 (2026-08-20). Resolved to config/** canonical-producer by omission; caa0406 kept the hold by hand. Hold retired 2026-09-05 (the company's close-out on port-base-20260902, its one finding for the SME)."
   - path: "config/doc-source-registry.yaml"
     disposition: per-entry
     entry_rule: >
@@ -1017,6 +1219,16 @@ rows:
   - path: "drydocs_core/models/controlm.py"
     disposition: evaluate
     note: "keep consumer-only rows (e.g. ControlMQuantitativeRow), add producer rows (path moved in Phase B)"
+  - path: "tests/unit/test_source_bindings.py"
+    disposition: evaluate
+    note: >
+      test_reports_cover_every_automated_dataset pins the automated-dataset COUNT
+      (producer 15; consumer 17 at the 2026-09-03 chunk-2 apply, the two extra
+      being company-only rows in the per-entry source-registry). Same shape as
+      test_schema.py: keep the consumer count, take the producer's drift-guard
+      logic. Without this row the tests/** default would revert 17 -> 15 at
+      every port - the company flagged it and did not add the row itself,
+      correctly: the manifest is producer-owned.
   - path: "tests/unit/test_schema.py"
     disposition: evaluate
     note: "consumer EXPECTED_CONSTRAINTS is ahead (superset: base + snow-support supplements). Producer was 47 at the step-45 head and is 49 at 78ba7fd (+2 from the P3 hosts loader, step 46e). Counts drift EVERY port — trust the live test files over this note (66acea8 lesson); keep consumer count, take producer drift-guard logic, and raise the consumer number only for genuinely new active edges that ship their own supplement block"
@@ -1385,6 +1597,19 @@ row_may_match_nothing:
     reason: >
       J40: same as drydocs/docmeta/** — company-only capability, row exists to protect,
       matches nothing producer-side by construction.
+  - path: ".claude/skills/lane-handoff/**"
+    reason: >
+      never-port producer-only tooling (user ruling 2026-09-02): the skill never
+      crosses, so on the COMPANY side the row matches nothing by construction — the
+      row is the carve-out from the `.claude/**` canonical-producer default doing
+      its job, not a dead row. Producer-side it always matches. Added 2026-09-04
+      from the company's chunk-5 apply of port-base-20260902 (their idea inbox).
+  - path: "docs/restructure/ideas/pending-*.md"
+    reason: >
+      PLAN4 (d): a pending file exists only between a branch capture and its landing pass,
+      which empties it and normally deletes it before merge; on a clean trunk the glob
+      matches nothing BY DESIGN, and the row exists so that one caught mid-flight never
+      crosses as a clean-add and gets minted as the other venue's thought.
   - path: "docs/lane-*-handoff.md"
     reason: >
       the per-burst handoff retires itself when its queue empties (lane-handoff, 2026-09-02),

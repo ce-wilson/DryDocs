@@ -97,9 +97,50 @@ export interface Acronym {
 export const ACRONYMS = (softwareData.acronyms ?? []) as Acronym[]
 export const DRYDOCS_APPLICATION_ID = softwareData.drydocs_application_id as string | undefined
 
-export const CORPORA = (loadMapData.sources as unknown as (Corpus & { home?: string })[]).filter(
+/** A TYPE PREDICATE, not a cast (WEB6).
+ *
+ *  `Corpus` describes the doc-registry variant of a `load-map.json` source —
+ *  `tier`, `curation`, `connector` and the rest exist on no other row — so the
+ *  declared type and the file's inferred element type do not overlap, which is
+ *  what the double cast was for. A predicate that actually looks at the row
+ *  removes the cast rather than hiding it, and turns a renamed generator key
+ *  into a dropped row with a count instead of a page of undefined cells. */
+function isCorpus(row: unknown): row is Corpus & { home?: string } {
+  if (typeof row !== 'object' || row === null) return false
+  const r = row as Record<string, unknown>
+  return CORPUS_REQUIRED_KEYS.every((k) => k in r)
+}
+
+/** The keys `Corpus` cannot do without. `keyof Corpus` so a rename of the type
+ *  is a compile error here, not a silently weaker check. */
+const CORPUS_REQUIRED_KEYS: readonly (keyof Corpus)[] = [
+  'id',
+  'classification',
+  'confirmed',
+  'ledger',
+  'tier',
+  'curation',
+  'connector',
+  'target_db',
+  'trust_default',
+  'graph_locator',
+  'taxonomy_path',
+  'loaders',
+  'ontology_mappings',
+]
+
+const DOC_REGISTRY_ROWS = (loadMapData.sources as { home?: string }[]).filter(
   (s) => s.home === 'doc-registry',
 )
+
+export const CORPORA: (Corpus & { home?: string })[] = DOC_REGISTRY_ROWS.filter(isCorpus)
+
+/** Doc-registry rows the predicate REFUSED. Exported and asserted zero by
+ *  softwareModel.test.ts rather than surfaced on the page, because this file is
+ *  a build artifact bundled at compile time: a mismatch is a fact about the
+ *  commit, catchable in CI before it can reach anyone, and a runtime banner
+ *  would be reporting it far too late to be the right instrument. */
+export const CORPORA_REJECTED = DOC_REGISTRY_ROWS.length - CORPORA.length
 
 const CORPUS_BY_ID = new Map(CORPORA.map((c) => [c.id, c]))
 

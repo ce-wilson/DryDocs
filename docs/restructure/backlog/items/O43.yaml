@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: done
 depends_on: []
 inputs:
 - config/taxonomy/ui-tests.yaml
@@ -18,3 +18,83 @@ acceptance: |
   (a) Each of the 9 declared-but-empty suites (explorer, lineage, ownership, runbooks, remediation, docs, gates, ask, underhood) gains at least one case, and every case cites a `source` — a close note, screenshot check or SME observation recording behaviour someone actually watched work. A case with no source is not acceptable: that is how a checklist becomes fiction. Seed a suite when its module is next worked on rather than in one sitting. (b) A recorded decision on whether the console gets an automated runner (Vitest/Playwright) or stays manual. If automated, cases gain `automated_by` and `execution` moves per case, never per file; if manual, the reason is written down. The coverage pin in tests/unit/test_ui_tests_ledger.py updates with each seeding.
 notes: |
   User directive 2026-07-31: the Process/Testing domains of the uploaded Miller process model were admitted for INTERNAL use — "if this framework works internally use it… it may help me when I'm testing the UI" — with the standing reason that the source projects lack good test cases, which is why Jira is not yet a feed. BUILT ALREADY (same session): config/taxonomy/ui-tests.yaml with the TestSuite -> Feature join realized as suite.module -> web/src/modules/registry.ts, 2 of 11 suites seeded from verified close notes (O36/O35/O37 shell, O40/O41 loads), and a guard that exercises the real payoff — component -> module -> suite -> cases — rather than only checking the file parses. KNOWN LIMITATION, pinned by a test rather than left to be discovered: the 36 unbound components (shell, ui primitives, shared) resolve to NO cases. StatTiles is the sharp example — TC-LOADS-01 exercises it, but it lives in the shared folder so no evidence-based module binding exists, and the lookup returns empty. Closing that needs import edges, i.e. O42's TS resolver. Until then "no cases" means "unknown", not "none". The Process half of the model (CheckIn/Release -> affected features) is deliberately NOT adopted yet: its value depends on that same complete component->module mapping, so it would answer confidently and wrongly.
+
+  DONE 2026-09-05 (Lane B, laptop). 13 of 13 suites seeded.
+
+  THE ITEM'S OWN NUMBER WAS STALE, and per J63 that is recorded rather than
+  silently worked around. The acceptance names "9 declared-but-empty suites
+  (explorer, lineage, ownership, runbooks, remediation, docs, gates, ask,
+  underhood)". EIGHT of those nine were seeded between the mint (2026-07-31) and
+  this tree - by O80, O81, O58, O59, O60, O64, O66, O85, O86, O92 as they went -
+  each following clause (a)'s own instruction to "seed a suite when its module is
+  next worked on rather than in one sitting". That instruction worked; the
+  acceptance text is what did not keep up. ONE suite was empty here: TS-UNDERHOOD.
+
+  (a) TS-UNDERHOOD SEEDED, with three cases and three real sources. Why it went
+  last is worth stating rather than apologising for: the page renders a fixed,
+  committed benchmark and reads no graph, so almost nothing about it changes
+  between sessions and almost nothing about it had been observed and written
+  down. These are the three claims actually worth re-running, not three invented
+  to close a gap:
+
+    TC-UNDERHOOD-01  the scoreboard and strategy cards render and the layout holds
+                     source: O91's browser verification 2026-09-02 (desktop,
+                     localhost:5173, live API + drydocs graph) - "/under-the-hood
+                     with the scoreboard and strategy cards ... Layout intact
+                     everywhere, nothing reflowed". MANUAL on purpose: the claim
+                     is about what a reader sees at a real viewport, and a unit
+                     test over the same data would only re-assert its own fixture.
+
+    TC-UNDERHOOD-02  every number is the transcribed verdict, not an invented one
+                     source: O31 close 2026-08-21 - render_benchmark_data.py reads
+                     the REAL harness run (the 2026-07-16 live results) plus a
+                     machine-readable verdict ledger.
+                     automated_by tests/unit/test_benchmark_data.py, which also
+                     holds that the totals are DERIVED from the cells rather than
+                     typed - a typed total would look identical and mean nothing,
+                     and the page's whole authority is that the numbers came from
+                     a run someone did.
+
+    TC-UNDERHOOD-03  the page's 24 KB is not in the initial bundle
+                     source: WEB7 close 2026-09-05 (laptop), measured -
+                     UnderTheHoodRoute 24.33 kB split out.
+                     automated_by web/src/modules/lazyRoutes.test.ts for the build
+                     half; the third step (open it as an sme persona and confirm it
+                     still renders) is the half a person confirms, because a chunk
+                     that builds and a page that renders are different claims.
+
+  (b) THE RUNNER DECISION WAS ALREADY MADE AND RECORDED - by O80 (2026-08-31), and
+  the ledger header states it in the shape this clause asks for: `execution: mixed`,
+  PER CASE via `automated_by`, never per file, with both runners named so a case
+  can cite one and the guard can check the file exists. So this item does not
+  re-decide it; it confirms the record is there and correct, and adds two more
+  automated cases under the same rule. Re-opening a decision that has been made,
+  written down and used for a month would be the wrong kind of thoroughness.
+
+  PINS UPDATED, all three, and one assertion had to change SHAPE rather than
+  number:
+    * coverage 12/13 -> 13/13. The pin's JOB changes here and the test says so:
+      it has meant "the gap is a visible number" since the file was written, and
+      at 13/13 the gap is zero, so from now on it guards the other direction - a
+      new module adds a suite, and this pin is what stops that suite arriving
+      empty and unnoticed. Same number, opposite duty.
+    * automated 17/40 -> 19/43.
+    * test_which_cases_should_i_run_after_changing_a_component asserted that a
+      component in a declared-but-UNSEEDED suite resolves to nothing yet, using
+      HallucinationSpotlight (moved there at O60 when TS-LINEAGE was seeded). With
+      TS-UNDERHOOD seeded there is no third example to move to, and inventing an
+      empty suite to keep the assertion alive would be writing fiction to satisfy
+      a test. So it now asserts the POSITIVE half of the same join, with the
+      reasoning recorded at the line. The honest-emptiness property is NOT lost:
+      test_shared_components_resolve_to_nothing_and_that_is_honest still holds it
+      over the 36 unbound components, which is a different and still-live instance.
+
+  AND THE HEADER SAYS WHAT 13/13 DOES NOT MEAN. A number that reads "complete"
+  invites exactly the wrong conclusion, so the file now states it: every suite has
+  at least one case someone watched work; no suite has all its cases; most cases
+  are manual; and the 36 unbound components still resolve to NO cases, where "no
+  cases" means unknown rather than none. Closing that needs O42's TS resolver.
+  A reader who takes 13/13 as "the console is tested" has read the wrong number.
+
+  Gates at close: poetry run pytest -q, ruff check, ruff format --check.
+  tests/unit/test_ui_tests_ledger.py 11 passed.

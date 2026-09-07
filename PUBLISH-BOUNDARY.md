@@ -8,6 +8,23 @@ classification** ([`config/classification.yaml`](config/classification.yaml)), n
 alone. The directory layout aligns with it, but the per-source `classification` label is
 authoritative.
 
+**The public push CARRIES GIT HISTORY, not just a tip** (ruled 2026-09-05, J74 clause (a)).
+Everything below therefore applies to **commit messages** as well as to files. History ships
+because the published tree cites shas throughout — `reviewed_commit` stamps on every review
+artifact, the shas inside SIGNED records in [`config/gate-log.md`](config/gate-log.md),
+`port-base-*` tags, PORT-REPORT pins — and in a tip-only push every one of those citations
+would dangle for a public reader. The repo's provenance discipline is the thing being
+published; it has to resolve.
+
+*The consequence, recorded rather than discovered later:* **34** commit messages predate the
+2026-08-26 org-acronym rename and still carry the retired token. They are an **accepted
+class**, not an oversight — the token there names an ORG UNIT, never a person, host or
+credential, which puts it below the CLAUDE.md §3 line — and they are held at a ceiling by
+[`tests/unit/test_publish_boundary_history_ceiling.py`](tests/unit/test_publish_boundary_history_ceiling.py)
+so a NEW one fails while the historical ones do not. **The number is watched, never driven
+down:** rewriting history to reach zero would invalidate every sha citation named above, which
+trades a load-bearing property for a cosmetic one.
+
 | Classification | Publishable? | Typical home |
 |----------------|--------------|--------------|
 | **External** | ✅ yes | `reference/`, `external/` |

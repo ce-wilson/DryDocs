@@ -1,0 +1,94 @@
+id: WEB11
+epic: web-console
+title: One storage module owns every console localStorage key with a prefix and a version, and both sign-out
+  and session rejection call its clearAll so query results do not outlive the session on a shared desktop
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- docs/reviews/modules/web-2026-09-05.md
+- web/src/lib/auth.ts
+- web/src/routes/AskRoute.tsx
+- web/src/lib/theme.ts
+- web/src/routes/AppCodeCascadePane.tsx
+acceptance: |
+  `signOut()` removes `drydocs.session.v2` and revokes the token; seven other localStorage
+  writers stay - the Ask last completed turn (answer, executed Cypher, per-step row counts,
+  task graph; per persona), the app-code tray (per persona), onboarding progress, aside
+  collapsed, theme, split-pane position, grid column widths. The first two are query results
+  readable after sign-out by whoever opens the browser next, under a console that renders an
+  INTERNAL banner over the same data on screen. `sessionRejected()` has the same gap (S4).
+
+  (a) One storage module owns every console key: a prefix, a version, typed get/set, and a
+      `clearAll()`. No `localStorage.` call exists outside it (source scan, J66 style).
+  (b) Both `signOut()` and `sessionRejected()` call `clearAll()`.
+  (c) Keys worth keeping across sign-outs (theme, aside collapsed, column widths) OPT OUT
+      explicitly in the module, so the retention decision is visible in one place; the Ask turn
+      and the tray do not opt out. O64's design - the last completed turn survives navigation
+      within a session - is preserved exactly; it is sign-out, not navigation, that clears it.
+  (d) A test signs out with every key populated and asserts only the opted-out keys remain;
+      another does the same through `sessionRejected()`.
+notes: |
+  Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+  Covers S4 (rank 6). O64 (done) chose per-persona persistence of the Ask turn for a good
+  reason (loss on navigation); this item respects that choice and bounds it at the session.
+
+  DONE 2026-09-05 (Lane B, laptop). Sign-out clears what a session wrote.
+
+  (a) lib/storage.ts owns every key. Zero `localStorage.` calls remain outside it
+  (source scan; the instrument check asserts the scan can SEE a real call, because
+  twice earlier in this burst a scan was written against the wrong stripper and
+  passed vacuously — `localStorage.` is a code shape, so codeOnly is right here
+  and that is stated rather than assumed).
+
+  THE RETENTION DECISION IS THE DELIVERABLE, not the plumbing. STORAGE_KEYS
+  declares, per key, whether it survives a sign-out and WHY. Before this the
+  answer was "whatever nobody remembered to remove", which is not a decision.
+
+  (c) FOUR OPT OUT, and each says why in one sentence: theme and aside-collapsed
+  (device display preferences that reveal nothing and that everyone expects to
+  persist), split-pane positions and grid column widths (layout, not content).
+  FOUR DO NOT: the session token; the Ask last-turn envelope; the app-code tray;
+  onboarding progress. The first three are session state or query results. The
+  fourth is a judgement call recorded as one — onboarding progress is about the
+  PERSON, not the browser, so it goes with them.
+
+  O64's design is preserved exactly, and the item is right to insist on it: the
+  last completed Ask turn still survives NAVIGATION within a session. It is
+  sign-out that clears it, which is the boundary O64 never had.
+
+  (b) BOTH paths call clearAll. `sessionRejected()` is the one that matters more
+  and is easy to treat as the afterthought: nobody DECIDES to have their session
+  expire, so on a shared support desktop that is the path actually taken.
+
+  TWO DESIGN POINTS WORTH THE WORDS:
+
+    * clearAll sweeps by PREFIX, not by the table. A key someone adds and forgets
+      to declare is still cleared. The table decides what STAYS; the prefix
+      decides what is ours. `survivesSignOut` is default-deny for the same reason —
+      that is the safe direction to be wrong in.
+    * The keys are per-persona (`drydocs.ask.last-turn.<id>`), so clearing cannot
+      work from a fixed list at all. A second persona's leftovers on the same
+      browser go too, and that has its own test.
+
+  Every accessor is wrapped: storage throws outright in some contexts (a browser
+  set to block site data, a sandboxed frame), and a console that will not render
+  because it could not read a saved column width is worse than one that forgets
+  the width.
+
+  (d) The tests populate ALL EIGHT keys at their real spellings before clearing,
+  because "did it clear?" is only answerable against a full store — a test that
+  clears an empty store passes and proves nothing. Three of them: clearAll
+  directly, through signOut, and through sessionRejected. One more asserts another
+  application's keys are left alone.
+
+  Gates at close: poetry run pytest -q = 3360 passed, 12 skipped, 1 failed
+  (test_plan_roadmap - the expected Lane B close failure). ruff clean. In web/:
+  tsc -b exit 0, oxlint --max-warnings 0 exit 0, npm run test:coverage exit 0,
+  vitest 20 files / 242 tests.

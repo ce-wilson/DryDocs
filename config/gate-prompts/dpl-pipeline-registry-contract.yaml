@@ -9,6 +9,8 @@
 # nothing. Mechanism-only: GUIDs, SEAL ids and registry URLs stay company-side.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
+updated: 2026-08-07
+
 id: dpl-pipeline-registry-contract
 title: "SME Gate — dpl pipeline-registry contract: identify a real export (HITL, Internal), profile it against the ASSUMED contract (agent), then close or re-scope T13 and the audit stubs"
 step: "Follows rua-load-shapes (G22, signed 2026-08-07). The registry row dpl:pipeline-registry is confirmed: true — §G ruled GUID-vs-URN, §H ruled the three-signal usage discipline — but its envelope entry is a ruled STUB because the field contract (tracker T13) is assumed: claiming createdBy/lastModifiedBy exist, or that they do not, is a guess until a real export parses."

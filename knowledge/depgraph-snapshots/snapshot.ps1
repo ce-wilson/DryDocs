@@ -240,11 +240,24 @@ function Get-CiVerdict {
   if (@($Runs).Count -eq 0) {
     return @{ Color = "DarkGray"; Text = "ci: no runs readable (gh not authenticated?) - check skipped" }
   }
+  # J78 (2026-09-06): three outcomes, not two. The sha match added after
+  # Idea-111 catches STALE GREEN - a green run that belongs to an older
+  # commit. A CANCELLED run (GitHub cancels a push run when the next push
+  # supersedes it) has a MATCHING sha and NO result, so the sha match sees
+  # nothing wrong and the old two-way split filed it under RED - which it is
+  # not. Different failure, same channel: the commit was never checked, and
+  # the next push that does run will attribute any failure to whoever made
+  # it. So no verdict is reported AS no verdict - UNVERIFIED, by name - and
+  # a MISSING run for HEAD is the same state whatever the reason (not yet
+  # scheduled, workflow skipped, run deleted). Still warn-only.
+  $unverified = "ci: UNVERIFIED at HEAD {0} - {1}. This commit has not been checked; the next push that runs will attribute its failure to whoever made it."
   $mine = @($Runs | Where-Object { $_.headSha -eq $Head })
   if ($mine.Count -eq 0) {
     $newest = @($Runs)[0]
-    return @{ Color = "Yellow"; Text = ("ci: no run yet for HEAD {0} - newest on main is {1} ({2})" -f `
-      $short, [string]$newest.conclusion, [string]$newest.displayTitle) }
+    $newestState = [string]$newest.conclusion
+    if ([string]::IsNullOrEmpty($newestState)) { $newestState = [string]$newest.status }
+    return @{ Color = "Yellow"; Text = ($unverified -f $short, ("no run exists for it; newest on main is {0} ({1})" -f `
+      $newestState, [string]$newest.displayTitle)) }
   }
   # U24 (2026-08-21): the 2026-08-19 snapshot printed `ci: System.Object[] AT
   # HEAD ...` - PS 5.1 member enumeration stringified a nested property as an
@@ -260,6 +273,10 @@ function Get-CiVerdict {
   if ($conclusion -eq "success") {
     return @{ Color = "Green"; Text = ("ci: GREEN at HEAD {0}" -f $short) }
   }
+  if ($conclusion -eq "cancelled" -or $conclusion -eq "skipped" -or [string]::IsNullOrEmpty($conclusion)) {
+    $reason = if ([string]::IsNullOrEmpty($conclusion)) { "the run completed with no conclusion" } else { "the run was " + $conclusion }
+    return @{ Color = "Yellow"; Text = ($unverified -f $short, $reason) }
+  }
   return @{ Color = "Red"; Text = ("ci: {0} AT HEAD {1} - main is RED. Run 'gh run view --log-failed' before you stop." -f `
     $conclusion.ToUpper(), $short) }
 }
@@ -273,7 +290,9 @@ function Get-CiVerdict {
 # while sessions kept pushing past it. It stayed invisible because the unit suite
 # passed the whole time, so nothing LOCAL ever looked wrong. The ritual now asks.
 # It matches on HEAD's sha, so "green" always means green AT WHAT YOU PUSHED,
-# never green at somebody else's older commit.
+# never green at somebody else's older commit. Three outcomes (J78): GREEN at
+# HEAD, RED at HEAD, or NO VERDICT at HEAD - printed as UNVERIFIED, never as
+# either of the other two.
 try {
   $ghCmd = $null
   try { $ghCmd = Get-Command gh -ErrorAction Stop } catch { }

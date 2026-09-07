@@ -1,9 +1,11 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { createAuthedApi, createPublicApi, detailOf, requireToken, type SessionHooks, unwrap, unwrapAs } from './apiClient'
+import { createAuthedApi, createPublicApi, detailOf, requireToken, type SessionHooks, unwrap } from './apiClient'
 
 vi.mock('./reachability', () => ({
   diagnoseNetworkFailure: async (baseUrl: string) => ({ message: `diagnosed: nothing answered at ${baseUrl}` }),
+  isUpstreamDown: (status: number) => status === 502 || status === 503 || status === 504,
+  upstreamDownMessage: (status: number, where: string) => `diagnosed: upstream ${status} behind ${where}`,
 }))
 
 // O70. The transport policies the hand-written wrappers used to carry one copy
@@ -32,6 +34,7 @@ function hooks(token: string | null): SessionHooks & { rejections: number } {
   const h = {
     rejections: 0,
     token: () => token,
+    sessionId: () => (token ? `sid-${token}` : null),
     rejected() {
       h.rejections += 1
     },
@@ -80,6 +83,13 @@ describe('the authed client', () => {
     )
     await expect(createAuthedApi(BASE, hooks('tok')).GET('/health')).rejects.toThrow(
       `diagnosed: nothing answered at ${BASE}`,
+    )
+  })
+
+  it('reads a proxy 502 as the upstream being down, not as an API answer (ADR 0020)', async () => {
+    fakeFetch(502, 'upstream not answering')
+    await expect(createAuthedApi(BASE, hooks('tok')).GET('/health')).rejects.toThrow(
+      `diagnosed: upstream 502 behind ${BASE}`,
     )
   })
 
@@ -156,10 +166,5 @@ describe('unwrap', () => {
     expect(detailOf('plain refusal', res(500))).toBe('plain refusal')
     expect(detailOf(undefined, res(502, 'Bad Gateway'))).toBe('Bad Gateway')
     expect(() => unwrap({ response: res(500, 'Server Error') }, 'z')).toThrow('z failed (500): Server Error')
-  })
-
-  it('unwrapAs is the same check with a claimed type', () => {
-    expect(unwrapAs<{ n: number }>({ data: { n: 2 }, response: res(200) }, 'x').n).toBe(2)
-    expect(() => unwrapAs<{ n: number }>({ error: 'no', response: res(403) }, 'x')).toThrow('x failed (403): no')
   })
 })

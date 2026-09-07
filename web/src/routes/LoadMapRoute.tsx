@@ -30,7 +30,14 @@ import {
   toCsv,
   useTableControls,
   useTableView,
+  type RowGroup,
 } from '../components/ui/tableControls'
+
+/** The source row as this page renders it: the registry row plus the joined
+ *  taxonomy path the table sorts and filters on. Named once (WEB6) so the
+ *  three functions that pass it around agree by construction rather than by
+ *  four casts that each restated it. */
+type SourceViewRow = LoadMapSource & { taxonomy: string }
 
 // /load-map (O57) — the console lens on web/src/generated/load-map.json.
 //
@@ -118,13 +125,13 @@ export default function LoadMapRoute() {
     () => shown.map((s) => ({ ...s, taxonomy: s.taxonomy_captures.join(', ') })),
     [shown],
   )
-  const srcView = useTableView(srcDecorated as unknown as Record<string, unknown>[], {
+  const srcView = useTableView(srcDecorated, {
     filter: srcCtl.filter,
     searchKeys: SOURCE_SEARCH_KEYS,
     sort: srcCtl.sort,
     groupKey: srcCtl.grouped ? 'system' : null,
   })
-  const srcRows = srcView.rows as unknown as (LoadMapSource & { taxonomy: string })[]
+  const srcRows = srcView.rows
 
   const banner = (
     <p className="shrink-0 rounded border border-edge bg-panel-2 px-2 py-1 text-xs text-muted">
@@ -182,7 +189,7 @@ export default function LoadMapRoute() {
 
   // One row renderer, used flat and inside groups — a second copy for the
   // grouped view is how the two drift.
-  function renderSourceRows(rows: (LoadMapSource & { taxonomy: string })[], offset = 0) {
+  function renderSourceRows(rows: SourceViewRow[], offset = 0) {
     return rows.map((s, idx) => {
       const i = idx + offset
             const reach = pipelineReach(s)
@@ -245,7 +252,7 @@ export default function LoadMapRoute() {
   // scan over this file, so naming the method in its call form fails on the
   // comment explaining it — the J66 trap, which has no code_only equivalent for
   // TSX yet.)
-  function renderGroupedSourceRows(groups: { key: string; label: string; rows: Record<string, unknown>[] }[]) {
+  function renderGroupedSourceRows(groups: RowGroup<SourceViewRow>[]) {
     let offset = 0
     return groups.flatMap((g) => {
       const before = offset
@@ -262,7 +269,7 @@ export default function LoadMapRoute() {
             <span className="ml-2 font-normal text-faint">{g.rows.length}</span>
           </td>
         </tr>,
-        ...renderSourceRows(g.rows as unknown as (LoadMapSource & { taxonomy: string })[], before),
+        ...renderSourceRows(g.rows, before),
       ]
     })
   }
@@ -309,8 +316,8 @@ export default function LoadMapRoute() {
           download(
             'load-map-sources.csv',
             toCsv(
-              SOURCE_SEARCH_KEYS as unknown as string[],
-              srcRows as unknown as Record<string, unknown>[],
+              SOURCE_SEARCH_KEYS,
+              srcRows,
             ),
           )
         }
@@ -368,7 +375,7 @@ export default function LoadMapRoute() {
             <td className={`${TD} text-muted`}>{step.mode}</td>
             <td className={`${TD} font-mono text-sm text-muted`}>{step.profiles.join(', ') || '—'}</td>
             <td className={`${TD} font-mono text-sm text-muted`}>
-              {step.loaders.map((l) => l.cli_name ?? l.name).join(', ') || '—'}
+              {step.loaders.join(', ') || '—'}
             </td>
             <td className={`${TD} text-muted`}>{step.note ?? '—'}</td>
           </tr>

@@ -15,6 +15,7 @@ relates_to:
   - MODULE_MAP.md                          # the boundary the cherry-pick is cut along
   - PORT-MANIFEST.yaml                     # disposition vocabulary reused as template file classes
   - docs/design/deepdoc-data-flow-overview.md   # the investigation that stated the support gap
+  - config/gate-log.md                          # 2026-09-02 ontology-domain-registry-and-edition-grain, whose §D1 amends D2/D6 (dated section below)
 trigger: >
   The drydocs_deepdoc research (one production deep-dive, 2026-08-20) exposed a
   support gap: the data applications are SECONDARY reporting products whose
@@ -23,6 +24,16 @@ trigger: >
   trusting run-time state over what a repo or config declares. 5–10 such teams
   exist. One DryDocs cannot serve them all at the depth one warehouse needs.
 ```
+
+> **AMENDED 2026-09-04 — gate `ontology-domain-registry-and-edition-grain` (C41), SIGNED
+> 14/14 on 2026-09-02, §D1 with §C1–§C3 and the §B5 rider; built at DOC1.** D2's Cut row and
+> D6's skill cut are amended: Team Edition ships a THIN, INSTANCE-OWNED backlog, inbox and
+> per-instance board, and `groom-backlog` ships with a mandatory `--scope`. D3's tenancy
+> paragraph and the id grammar now say the same thing (an edition is a declared segment keyed
+> to an Area Product), and D4's frozen ontology carries its reason. The original text of D2,
+> D3, D4 and D6 is left as written; the dated section
+> [Amendment 2026-09-04](#amendment-2026-09-04--an-instance-owned-backlog-the-edition-as-a-declared-segment-and-why-the-ontology-is-frozen)
+> under Decision records what changed and why, and one question it leaves open.
 
 ## What this is, and is not
 
@@ -262,6 +273,88 @@ library as replaceable behind that shape. The schema is the adoption; the
 package is a dependency like any other, watched per the Sources register
 below.
 
+### Amendment 2026-09-04 — an instance-owned backlog, the edition as a declared segment, and why the ontology is frozen
+
+**Authority.** Gate `ontology-domain-registry-and-edition-grain` (backlog C41 clause e),
+SIGNED OFF 14/14 on 2026-09-02, `config/gate-log.md` — §D1 ("amend for an instance-owned
+backlog", the SME's words), §C1–§C3 (the edition grammar and grain), and the §B5 rider (the
+ontology is common and base-owned). Built at DOC1. This is a dated section and not an edit
+of the decisions above, because the ADR is PROPOSED and the record of what moved, when, and
+on whose ruling is the point; a reader of D2 or D6 as first written must find the change
+here rather than discover it in a diff.
+
+**What was wrong with D2 and D6 as written.** D2's Cut row removes
+`plan_board`/`plan_ideas`/`plan_roadmap` and `backlog_store` from Team Edition — "Plan/port/
+backlog are the producer's own project management" — and D6 follows it ("`groom-backlog` →
+backlog machinery … producer-only"). D1 of this same ADR makes the completeness ledger
+GENERATE per-team work. Generated work needs a place to land, and an instance that ships no
+backlog, no inbox and no groomer has none: it either writes into the base's frozen
+`items/` (a build failure under D4) or keeps its work somewhere the ledger cannot see. The
+Cut row was right about the PORT machinery and wrong about the backlog.
+
+**A1 — D2 amended: a thin, instance-owned backlog.** Team Edition ships items, an inbox
+and a per-instance board under the `instance-owned` file class D4 already defines. The
+BASE backlog stays `canonical-template`, frozen: an instance never writes under base
+`items/`, and `copier update` never touches an instance's own. `backlog_store` leaves the
+Cut row and joins the kept set with a SCOPE filter — one reader, two scopes, so the base
+and an instance run the same code over different trees. `plan_board`/`plan_ideas`/
+`plan_roadmap` follow it as the per-instance renders; `port_preflight`/`port_backlog_union`
+stay cut (the port is the producer's, and a copier-generated instance has no port).
+
+**A2 — D6 amended: `groom-backlog` ships, with a mandatory `--scope <edition>`.** The
+skill follows its module out of the cut, on the same rule that cut it. The scope is
+mandatory, not defaulted: a groom with no scope is the two-machines-minting-one-number
+failure the I6 mint rule exists for, one level up. The aggregate (all-editions) board is
+something only a base renders — and see the open question below before reading that as a
+mechanism.
+
+**A3 — D3 and the id grammar say the same thing (§C1–§C3).** D3 rules tenancy "an alias
+plus a URN segment … declared, not inferred." The gate rules the backlog id the same way:
+`[<EDITION>-]<MODULE><n>`, edition first, base edition unprefixed, and the EDITION is a
+declared row in `config/taxonomy/editions.yaml` (CFG2) keyed to `area_product_id` — the
+Product Catalog's own key, already unique on `:AreaProduct` (K5 §B). The grain is the
+Area Product, with the SME's definition as the ruling of record: *where two or three
+applications are delivering on the same business topic.* So the questionnaire's "URN
+tenant segment" and the backlog's edition code name one tenant identically, and the
+company base is itself an edition that mints its own code at its own gate — the producer
+never names it. The numeric band (producer 1–9999, company 10000+) retires forward-only
+(§C4); nothing renumbers. The Idea series' segment is a rider still to sign
+(`idea-series-grammar`), and until it does an undeclared venue may still capture an idea.
+
+**A4 — D4 strengthened: WHY the ontology is frozen, in the SME's words.** D4 says
+vocabulary change happens in the base, through the base's gate. The §B5 rider says why:
+*"declared/standardized ontology needs to be at the base of everything, a common ontology
+in order to have the aggregate rollup and query across using declared ontology."* The rule
+protects the AGGREGATE QUERY — the one thing `ddestate` exists for and the one thing ten
+divergent vocabularies would make impossible. An edition therefore EXTENDS the ontology
+(its own domain rows in `config/taxonomy/domains.yaml`, `minted_by` its code, its own
+authority) and never overrides a base row. CFG1 built that as a guard in the registry's
+reader: an edition row may not reuse a base id, and a base row is never deprecated by an
+edition — proven on a synthetic edition, because no real one exists in the producer's
+tree and a guard with no positive case first runs unobserved elsewhere.
+
+**A5 — Guards the amendment names, built by their own items when TE builds.** (1) An
+instance item carries its edition segment (PLAN2). (2) `depends_on` may point instance →
+base, never base → instance — the base cannot wait on work it cannot see. (3) An instance
+never commits an aggregate render. (4) An edition vocabulary row never reuses a base id
+(CFG1, built). None of the four is a copier feature; each is a test in the frozen class.
+
+**Open question, recorded as open (review F8,
+`docs/reviews/restructure-design-review-2026-09-02.md`).** A2 says the aggregate board is
+something only a base renders. Instances are copier-generated repositories, and the base
+has no declared way to read N instance backlogs — no fetch topology, no rail. The graph
+side already has its answer: the `ddestate` composite (D3), where cross-instance identity
+rides the proxy-node pattern. A backlog roll-up would most naturally ride the same rail —
+items loaded as nodes, rendered from the composite — rather than a multi-repo file read.
+That is a Team Edition design question for the follow-up list (row 3a below), and it is
+recorded here so this amendment does not read as though the roll-up exists. Until it is
+ruled, "aggregate board" names a need, not a mechanism.
+
+**What this amendment does not do.** No code moves: the ADR still awaits its own Phase 0
+gate (the URN shared-vs-owned question), and the module cut is applied at Phase 1. The
+Consequences section's second trade-off (the frozen class as a governance cost) stands
+and now carries its reason.
+
 ## Options Considered
 
 ### Distribution shape
@@ -394,6 +487,7 @@ change.
 | **1** | Carve the base — subtraction only, no new code | Suite green, boundary guard passes on the reduced module set |
 | **2** | Templatize (copier.yml, questionnaire, file classes, checksum guard, agent layer per D6) + generate instance #2 | A second LOB loads from the template — two instances prove a template; one does not — and its seeded `CLAUDE.local.md` speaks that LOB's terms |
 | **3** | `ddestate` composite | One cross-team query works; one shared table resolves to one node from two instances |
+| **3a** | The aggregate backlog roll-up — OPEN (Amendment 2026-09-04, review F8): decide the rail — items as nodes rendered from the composite, or a declared fetch topology — before any base claims to render an all-editions board | Ruled at a gate; until then no surface claims the roll-up exists |
 | **4** | Coverage ledger (generalized `docs_coverage`) | Per-app completeness is a number with a named residual |
 | **5** | Data-flow overview record | The three grains reconcile to one persisted identity; Output-tab enrichment pass lands |
 | **6** | Requirements chain | commit→author→issue→epic→justification loadable, `:Uncertain`-stamped, promotable through the gate |

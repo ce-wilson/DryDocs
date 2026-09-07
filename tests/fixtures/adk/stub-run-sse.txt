@@ -1,0 +1,6 @@
+data: {"author": "graph_qa", "content": {"role": "model", "parts": [{"text": "{\"kind\": \"step\", \"step\": {\"i\": 1, \"kind\": \"router\", \"ms\": 1}}"}]}}
+
+data: {"author": "graph_qa", "content": {"role": "model", "parts": [{"text": "{\"kind\": \"step\", \"step\": {\"i\": 2, \"kind\": \"spec\", \"ms\": 2, \"database\": \"drydocs\", \"cypher\": \"MATCH (a:BusinessApplication) RETURN a.app_id AS app_id LIMIT 5\", \"rows\": 0, \"explore_ref\": null, \"error\": null}}"}]}}
+
+data: {"author": "graph_qa", "content": {"role": "model", "parts": [{"text": "{\"status\": \"ok\", \"run_id\": \"stub-run\", \"tier\": \"1\", \"answer\": \"Stub answer. No model was called and nothing was reasoned about.\", \"model\": null, \"steps\": [{\"i\": 1, \"kind\": \"router\", \"ms\": 1}, {\"i\": 2, \"kind\": \"spec\", \"ms\": 2, \"database\": \"drydocs\", \"cypher\": \"MATCH (a:BusinessApplication) RETURN a.app_id AS app_id LIMIT 5\", \"rows\": 0, \"explore_ref\": null}], \"sources\": [{\"document\": \"spec:stub\", \"trust\": \"SYNTHESIZED\"}], \"metrics\": {\"iterations\": 1, \"llm_calls\": 0, \"tokens\": {\"prompt\": 0, \"completion\": 0, \"total\": 0}, \"context\": {}, \"memory\": {}, \"response_ms\": {\"total\": 3}}}"}]}}
+

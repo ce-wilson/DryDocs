@@ -1,0 +1,93 @@
+id: WEB15
+epic: web-console
+title: web/README.md states the security model the code implements - the DEV-only ?as= affordance, twelve
+  modules not nine, the five sme-access modules and the gated routes, and the six retired-name personas
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- docs/reviews/modules/web-2026-09-05.md
+- web/README.md
+- web/src/App.tsx
+- web/src/modules/registry.ts
+- web/src/lib/auth.ts
+acceptance: |
+  web/README.md is materially wrong on the security model in four places (A8): it says there
+  is no `?as=` parameter (App.tsx has one, DEV-only, requiring VITE_DEV_CONSOLE_SECRET); it says
+  nine module routes (registry.ts declares twelve); it says all modules are open to every
+  signed-in persona and only /console is role-gated (five modules carry access 'sme' and
+  App.tsx gates six routes plus /console, /admin/config and /intake); and its persona table
+  carries the three SID-shaped names auth.ts retired on 2026-08-28 for publish-boundary
+  reasons. A doc that understates the authorization surface is the doc a company-side reader
+  reaches first.
+
+  (a) The README states the model the code implements: the DEV-only `?as=` affordance and its
+      secret gate; the module count and each module's access level, read from registry.ts; the
+      route gates; the six personas by their current names and roles.
+  (b) Where WEB3 lands first, the README describes the derived gate; where it has not, the
+      README says the two expressions exist and cites WEB3 - it never describes a state the
+      code is not in.
+  (c) A test keeps the module count and access table in the README equal to registry.ts
+      (rendered from the importable object, J37 style), so the fourth drift does not happen.
+notes: |
+  Minted 2026-09-05 by the secondary review of the slot 9 web report (docs/reviews/module-review-sweep-plan-review-2026-09-05.md, part B), from the three-pass lens review of web/ run the same day (report: docs/reviews/modules/web-2026-09-05.md). Every count below was re-measured on main at bcae4d02 before this item was written.
+
+  Covers A8 (rank 14). Point 3 - understating the authorization surface - is why this is p2
+  and not p3.
+
+  DONE 2026-09-05 (Lane B, laptop). The README states the model the code implements.
+
+  ALL FOUR CORRECTIONS, and the third is the one that made this p2:
+
+    1. `?as=` EXISTS. The section said outright "there is no ?as=". It is a
+       DEV-ONLY affordance, baked out of production bundles by the
+       import.meta.env.DEV constant — the same build-time construction that makes
+       the bolt adapter unreachable in production — and it is a real sign-in
+       needing VITE_DEV_CONSOLE_SECRET, with no default and no fallback. A reader
+       auditing authentication needs to know it is there; the README told them the
+       opposite.
+    2. TWELVE modules, not nine. Heading and body both.
+    3. FIVE OF THE TWELVE ARE NOT OPEN to a user-role persona
+       (remediation, software, gates, load-map, under-the-hood), and the README
+       said every module was open and only /console was gated. A doc that
+       UNDERSTATES the authorization surface is worse than no doc, and it is the
+       doc a company-side reader reaches first. There is now a table of the gated
+       modules with their paths and levels, the three gated non-module surfaces
+       (/mappings, /admin/config, /console), and /intake named as the one
+       persona-scoped exception with the reason it cannot use the role vocabulary.
+    4. SIX personas by their CURRENT names. The three SID-shaped display names
+       were retired from auth.ts on 2026-08-28 for publish-boundary reasons and
+       should not have outlived it here; the table now carries the ids and seats
+       auth.ts actually declares.
+
+  (b) WEB3 LANDED FIRST IN THIS SAME BURST, so the README describes the derived
+  gate as built rather than citing the item as pending — which is what clause (b)
+  asks for in that branch. It names RouteAccessGate, canAccessPath, the O59 bug
+  that the two expressions caused, and the source scan that now refuses a new
+  predicate outside the registry.
+
+  (c) THE GUARD READS THE IMPORTABLE OBJECT AND LOOKS FOR IT IN THE PROSE — MODULES,
+  GATED_SURFACES, PERSONA_SCOPED_PATHS and PERSONAS — rather than parsing the
+  README into a model. That is J37's direction of travel: the declaration is the
+  source and the render must agree with it, not the other way round. Ten
+  assertions, and two of them are shaped to catch the specific drift that
+  happened: the README may not claim every module is open, and it may not deny
+  `?as=`.
+
+  The retired-name check is a PATTERN, not the three literals — an initial, a dot,
+  a capitalised surname inside a table cell — so a FOURTH one cannot be added
+  either. Writing the three retired names into a test to forbid them would have
+  put them back in the tree, which is the opposite of why they were retired.
+
+  Mutation-proven: 12 -> 9 in the heading fails the count test; flipping one
+  persona's role in the table fails the persona test; both pass restored.
+
+  Gates at close: poetry run pytest -q = 3360 passed, 12 skipped, 1 failed
+  (test_plan_roadmap - the expected Lane B close failure). ruff clean. In web/:
+  tsc -b exit 0, oxlint --max-warnings 0 exit 0, npm run test:coverage exit 0,
+  vitest 21 files / 252 tests.

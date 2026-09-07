@@ -37,7 +37,7 @@
 
 schema: drydocs.software-registry.v1
 classification: Internal-Public
-updated: 2026-07-21
+updated: 2026-09-03
 adr: docs/decisions/0004-software-registry-vendor-terminology.md
 
 # Historical company acronyms — THE AUTHORITATIVE HOME (SME ruling 2026-07-21
@@ -159,6 +159,16 @@ vendors:
     # later reader cannot tell a placeholder from a link that went stale.
     # tests/unit/test_software_registry.py now requires publisher_url of
     # third-party vendors only, with that reason recorded in the test.
+  # --- C43 (2026-09-03): the white-label vendor ------------------------------
+  - id: axway
+    name: Axway
+    publisher_url: https://www.axway.com/
+    # Recorded BECAUSE it was erased: internal branding removed this vendor from
+    # the platform's UI, portal, API-store entry and docs, and it surfaced only
+    # in a mandatory User-Agent header and an internal change record (the
+    # JOB-MFTS research, 2026-09-01). The row is what stops it being lost
+    # again. No icon in drydocs-icons/manifest.json yet — it is reported in
+    # vendors_without_icons by the soft link, never dropped.
 
 products:
   - id: neo4j
@@ -424,6 +434,38 @@ products:
                                          # a capture. Registered-unconfirmed: the coverage
                                          # rung is `ungated` until its doc-graph gate signs.
     used_by_drydocs: false          # crosswalk placeholder (airflow-mwaa source unconfirmed); flips if the source activates
+
+  # --- C43 (2026-09-03): the white-label case -------------------------------
+  # The managed-file-transfer platform the estate calls MFTS is Axway
+  # SecureTransport, and the vendor was erased by internal branding from every
+  # documentation surface (UI, portal, API-store entry, docs) — it surfaced only
+  # through implementation surfaces: a mandatory User-Agent header and an
+  # internal change record (the JOB-MFTS research, H93, 2026-09-01). The row
+  # carries the vendor the way controlm carries bmc, plus `white_label:` so a
+  # reader learns the vendor HERE and not from a header (SME rider 2026-09-02,
+  # gate ontology-domain-registry-and-edition-grain section B5). The TERM
+  # "MFTS" — its expansion, its tier — is an acronyms-domain entry (ONT2), not
+  # this row; the two link by name only.
+  #
+  # NOT DECIDED HERE, and not to be read as a precedent: whether Axway becomes
+  # a VENDOR BASELINE — a new external/file-transfer/ reference category and a
+  # second baseline rank in config/precedence.yaml beside BMC. That is a gate
+  # question. This row registers a product; it ranks nothing.
+  #
+  # SIBLINGS DELIBERATELY ABSENT: FileMover (legacy) and OneMFT (its successor)
+  # are DISTINCT platforms from MFTS, and the research establishes neither
+  # one's vendor — an unevidenced vendor row is worse than an absent one. Their
+  # SYSTEM-level registration is N27's, not this file's.
+  - id: mfts
+    vendor: axway
+    name: Axway SecureTransport
+    white_label: MFTS               # the internal name the estate uses for this product
+    category: Managed File Transfer
+    role: tool
+    type: commercial
+    versions: ["6.0.3"]             # established by the research (internal change record, H93); the registry's own version slot, so no note is needed
+    used_by_drydocs: false          # a platform DryDocs TRACES THROUGH (G14 command-line lineage), not one it is built on or ingests from — yet
+    seal_id: "[seal-id]"            # the deployed instance has a company registration; placeholder producer-side, reconciled at port (the controlm pattern)
 
   # --- C25 prerequisite rows (2026-08-09) -----------------------------------
   # Both registered as TAXONOMY CAPTURE: a product row says the product exists,

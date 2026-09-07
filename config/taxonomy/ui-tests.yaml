@@ -28,7 +28,7 @@
 # `automated_by` is run by that file in CI; a case without one is still a
 # checklist a human works through, and most of them are.
 #
-# WHAT THIS DOES NOT CLAIM. Seventeen cases are automated out of forty. The
+# WHAT THIS DOES NOT CLAIM. Nineteen cases are automated out of forty-three. The
 # ledger's job is unchanged — it stops implying every case is unautomatable, and
 # it must not start implying the opposite. The first four were chosen because
 # each had already escaped into main and been caught by a person looking (O80's
@@ -41,7 +41,12 @@
 # seventeenth is O92's: a claim about the REGISTRY — which module ids carry an
 # access designation and what each role's filter yields — so the unit runner
 # holds the whole of it, and the sign-in steps in the case are how a person
-# confirms the rendered nav agrees with the filter.
+# confirms the rendered nav agrees with the filter. The eighteenth and
+# nineteenth are O43's, on the LAST suite to be seeded: a claim about a
+# generated artifact (the benchmark data still regenerates identically from the
+# real harness run) and a claim about the build (the page's chunk is not in the
+# initial bundle). Its third case is the layout one and stays manual, because
+# "nothing reflowed" is about what a reader sees at a real viewport.
 #
 # SEEDED FROM VERIFIED BEHAVIOUR, NOT INVENTED. Every case below cites a
 # backlog close note recording something that was actually observed working.
@@ -49,14 +54,24 @@
 # cannot be re-run; this file is where they become durable. A case with no
 # `source` is a case nobody has ever seen pass.
 #
-# COVERAGE IS PARTIAL AND SAYS SO: 12 of 13 areas seeded (3 of 12 when this file
-# was written). The rest are declared with `cases: []` so the gap is a visible
-# number rather than an absence, and the guard pins it.
+# COVERAGE IS COMPLETE AS OF O43 (2026-09-05): 13 of 13 areas seeded, from 3 of
+# 12 when this file was written. Empty suites were declared with `cases: []` so
+# the gap was a visible number rather than an absence; there are none left, and
+# the guard's pin now does the opposite job — a NEW module adds a suite by the
+# every-module-has-a-suite rule, and the pin is what stops that suite arriving
+# empty and unnoticed.
+#
+# COMPLETE COVERAGE IS NOT COMPLETE TESTING, and the distinction matters more
+# now that the first number reads 13/13. Every suite has at least one case that
+# someone watched work; no suite has all its cases, most cases are manual, and
+# the 36 unbound components still resolve to NO cases at all — "no cases" there
+# means unknown, not none, and closing it needs O42's TS resolver. A reader who
+# takes 13/13 as "the console is tested" has read the wrong number.
 # =============================================================================
 
 schema: drydocs.ui-tests.v1
 classification: Internal-Public
-updated: 2026-08-31
+updated: 2026-09-05
 
 # --- joins -------------------------------------------------------------------
 component_ledger: config/taxonomy/ui-components.yaml   # component -> module
@@ -169,8 +184,8 @@ suites:
           ...", which sends the reader to start a server that is already running, and is
           how the allowlist and the ledger's own documented port stayed out of step from
           O69 with nobody noticing.
-        source: "O85 fix 2026-08-31 — desktop, Chrome vs the console on :5199 against drydocs-api :8002, DRYDOCS_CORS_ORIGINS unset; both diagnosis branches driven against real servers (a live no-CORS server on :8099 and a dead :8098)"
-        automated_by: tests/unit/test_console_origins.py
+        source: "O85 fix 2026-08-31 — desktop, Chrome vs the console on :5199 against drydocs-api :8002, DRYDOCS_CORS_ORIGINS unset; both diagnosis branches driven against real servers (a live no-CORS server on :8099 and a dead :8098). RETIRED CLASS 2026-09-06 (ADR 0020, WEB10): the console is same-origin with its API through a reverse proxy, so there is no allowlist, no port to be unserved and no blocked-origin branch; the automated guard now pins the delivery shape (path map, no CORS middleware, no coordinate in dist) and the e2e suite signs in through the proxy"
+        automated_by: tests/unit/test_console_delivery.py
 
       - id: TC-SHELL-08
         description: A module designated sme is absent from the nav and the Overview spokes for
@@ -683,7 +698,62 @@ suites:
           and only a page that stopped reading the artifact fails.
         source: "O80 build 2026-08-31 — desktop, Playwright/Chromium; 108 gates at the build"
         automated_by: web/e2e/console.spec.ts
-  - { id: TS-UNDERHOOD,   module: underhood,   description: "Benchmark showcase surfaces.", cases: [] }
+  # ---------------------------------------------------------------------------
+  - id: TS-UNDERHOOD
+    module: underhood
+    description: >
+      Benchmark showcase surfaces: the scoreboard, the strategy cards and the
+      12-question detail, all rendered from underhood/benchmarkData.ts.
+
+      Seeded at O43 (2026-09-05), LAST of the thirteen, and the delay is the
+      honest reason rather than an oversight: this page renders a fixed,
+      committed benchmark and does not read the graph, so almost nothing about
+      it changes between sessions and almost nothing about it had been observed
+      to write down. The three cases below are the three claims that ARE worth
+      re-running, and each cites something someone actually watched.
+    cases:
+      - id: TC-UNDERHOOD-01
+        description: The scoreboard and the strategy cards render, and the layout holds
+        steps:
+          - Sign in as a persona with sme or admin access (the module is access-gated).
+          - Open /under-the-hood from the module nav.
+          - Read the stat tiles, then scroll to the scoreboard and the strategy cards.
+        expect: >
+          All three sections render with content, and nothing reflows or
+          overlaps. This is a LAYOUT case and it stays manual on purpose: the
+          claim is about what a reader sees at a real viewport, and a unit test
+          over the same data would only re-assert the fixture it read.
+        source: "O91 browser verification 2026-09-02 — desktop, localhost:5173 against a live API and the drydocs graph: '/under-the-hood with the scoreboard and strategy cards ... Layout intact everywhere, nothing reflowed'"
+
+      - id: TC-UNDERHOOD-02
+        description: Every number on the page is the transcribed verdict, not an invented one
+        steps:
+          - Regenerate with `poetry run python scripts/render_benchmark_data.py`.
+          - Confirm web/src/underhood/benchmarkData.ts is unchanged.
+        expect: >
+          The committed data matches regeneration from the REAL harness run
+          (knowledge/upgrade-plans/p0-benchmark/benchmark_p0_results.json, the
+          2026-07-16 live run) plus the human verdict ledger, and the totals are
+          DERIVED from the cells rather than typed. The page's whole authority is
+          that the numbers came from a run someone did; a typed total would look
+          identical and mean nothing.
+        source: "O31 close 2026-08-21 (desktop) — the regeneration step reads the real harness results and a machine-readable verdict ledger"
+        automated_by: tests/unit/test_benchmark_data.py
+
+      - id: TC-UNDERHOOD-03
+        description: The page's 24 KB of benchmark code is not in the initial bundle
+        steps:
+          - Build the console.
+          - Confirm an UnderTheHoodRoute chunk exists separately from the entry chunk.
+          - Open /under-the-hood as an sme persona and confirm it still renders.
+        expect: >
+          The route loads on demand. A user-tier persona cannot open this module,
+          so it should not download it — the delivery half of the same
+          authorization decision the nav already makes. The first two steps are
+          machine-checked; the third is the half a person confirms, because a
+          chunk that builds and a page that renders are different claims.
+        source: "WEB7 close 2026-09-05 (laptop) — measured: UnderTheHoodRoute 24.33 kB split out, initial chunk 3,711,290 -> 2,430,851 bytes"
+        automated_by: web/src/modules/lazyRoutes.test.ts
 
   # ---------------------------------------------------------------------------
   - id: TS-ASK

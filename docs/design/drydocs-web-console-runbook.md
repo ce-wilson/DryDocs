@@ -5,7 +5,17 @@
   (V1 coverage rule, 2026-08-04). The `Module:` line is what
   `tests/unit/test_runbook_coverage.py` reads; coverage is a claim the document
   makes about itself, never inferred from the filename.
-- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 3, 2026-08-28
+- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 4, 2026-09-06
+  makes the console same-origin with its services (ADR 0020, backlog WEB10):** the
+  browser calls the PATHS `/api` and `/agent` on the page's own origin and a reverse
+  proxy forwards them — Vite's own dev and preview servers here, the Compose stack's
+  proxy in production. There is no CORS allowlist, no `DRYDOCS_CORS_ORIGINS`, no
+  `--allow_origins`, and no `VITE_API_URL` / `VITE_ADK_URL`: the bundle carries no
+  service coordinate at all (`npm run dist:check` guards that), so one build promotes
+  through every environment. Where the services live is a fact about the machine
+  running Vite, read from `DRYDOCS_API_UPSTREAM` / `DRYDOCS_AGENT_UPSTREAM` with the
+  ports below as defaults. The O39 deep-link template moved from a build-time variable
+  to `GET /api/config`. The Rev 3 procedure is otherwise unchanged. **Rev 3, 2026-08-28
   adds the credential step (backlog O69 and O73):** sign-in proves a secret to
   drydocs-api, sessions expire, a fresh clone has no accounts until
   `scripts/set_console_credential.py` runs, and the API re-reads that file on change
@@ -46,11 +56,14 @@ production build/preview; the mock-persona sign-in; verification of the frame/ex
 round-trip.
 
 **Which process serves which module.** Every module except Ask reads through
-drydocs-api on :8001. **Ask is the only module that dials :8000** — `AskRoute.tsx`
-reads a second base URL (`VITE_ADK_URL`) and posts the question to the `graph_qa` ADK
+drydocs-api, reached as `/api/*` on the console's own origin (the proxy forwards it to
+:8001, prefix stripped). **Ask is the only module that calls `/agent/*`** — forwarded
+to the ADK server on :8000 — where `AskRoute.tsx` posts the question to the `graph_qa`
 app. That asymmetry is the single most useful fact in this runbook: a console where
 every page works and only Ask fails is not a broken console, it is a missing fourth
-process.
+process. Since Rev 4 the page tells you so itself: the proxy answers 502 for a dead
+upstream and the console reads 502/503/504 as "the service behind this path is down,
+not this page".
 
 **Out of scope.** The graph itself — container startup, schema bootstrap, and ingest
 belong to the companion startup-refresh runbook. The console runs WITHOUT a live graph
@@ -160,7 +173,7 @@ From OFF to READY. Run from the repo root; each step states its success check.
 3. **ADK agent server (required for Ask, optional for everything else):**
    ```powershell
    cd agents
-   .venv\Scripts\python serve.py --allow_origins http://localhost:5173
+   .venv\Scripts\python serve.py
    ```
    *Success:* `Invoke-RestMethod http://localhost:8000/list-apps` returns exactly
    `controlm_fix, core_ingest, graph_qa, graph_query` — four apps, not five. A fifth
@@ -168,16 +181,20 @@ From OFF to READY. Run from the repo root; each step states its success check.
    use `serve.py`, which hands ADK its `NestedAgentLoader` (R14). Swagger at `/docs`.
    Note the launcher is `serve.py`, NOT `adk api_server`, and the interpreter is the
    AGENTS venv — `poetry run` will not find `google-adk`.
-   *Skip this step and every module still works except Ask*, which fails with a bare
-   `Failed to fetch` and nothing in the drydocs-api log, because the request never
-   reached :8001. Backlog **O63** exists to make the page diagnose that itself.
+   *Skip this step and every module still works except Ask*, which reports the server
+   behind `/agent` as not answering (the proxy's 502) with nothing in the drydocs-api
+   log, because the request never went to :8001. Before Rev 4 that was a bare `Failed
+   to fetch`; backlog **O63** adds the page-side check.
 4. **Web console (dev):**
    ```powershell
    npm run dev --prefix web
    ```
    *Success:* Vite prints `Local: http://localhost:5173/`; the sign-in screen renders
-   at that URL. The API's CORS allow-list is exactly `localhost:5173` (dev) and
-   `localhost:4173` (preview) — serve from those ports or frames will fail CORS.
+   at that URL. Any port works: the page calls `/api` and `/agent` on its own origin
+   and Vite's proxy (`web/vite.config.ts`, routes from `web/delivery.json`) forwards
+   them to the upstreams. If drydocs-api or the agent server is on a non-default port,
+   set `DRYDOCS_API_UPSTREAM` / `DRYDOCS_AGENT_UPSTREAM` in the shell that runs `npm
+   run dev` — these are read by the Vite PROCESS, never inlined into the bundle.
 5. **Sign in:** choose an account, then enter its secret. The identities are synthetic
    and committed (`web/src/lib/auth.ts` / `drydocs_api/personas.py`): `morpheus` (admin
    — raw-Cypher console + `/admin` surfaces), `trinity` (steward — `/mappings`), `neo`
@@ -203,7 +220,7 @@ From OFF to READY. Run from the repo root; each step states its success check.
    bundle):
    ```powershell
    npm run build --prefix web
-   npm run preview --prefix web        # serves dist/ on http://localhost:4173
+   npm run preview --prefix web        # serves dist/ on http://localhost:4173, same proxy
    ```
 
 <!-- anchor: refresh-ingest -->
@@ -235,14 +252,19 @@ differently:
 <!-- anchor: verify -->
 ## Verify
 
-1. **API contract:**
+1. **API contract** — direct, then through the proxy (the second is what the browser
+   does; a pass on the first and a fail on the second is a proxy or upstream setting,
+   not the API):
    ```powershell
    Invoke-RestMethod http://localhost:8001/health          # {"status":"ok"}
    Invoke-RestMethod http://localhost:8001/specs | % id    # 35 spec ids, versioned .vN
+   Invoke-RestMethod http://localhost:5173/api/health      # same body, via Vite's proxy
+   Invoke-RestMethod http://localhost:5173/api/config      # {"runtime_view_url_template": ...}
    ```
 2. **Agent contract (Ask only):**
    ```powershell
    Invoke-RestMethod http://localhost:8000/list-apps       # controlm_fix core_ingest graph_qa graph_query
+   Invoke-RestMethod http://localhost:5173/agent/list-apps # same list, via Vite's proxy
    ```
    `graph_qa` present is the check that matters — a server that is up but does not serve
    that app is not a green for the Ask page.
@@ -260,9 +282,10 @@ differently:
 5. **Ask round-trip (proves the fourth process):** sign in, go to `/ask`, ask a question
    the registry can answer (`which Control-M jobs exist?`). *Success:* the turn shows the
    tier-0 router picking a named spec, the row count, and a `SOURCES ... CONFIRMED` chip
-   naming the spec. A failure here is diagnosed by WHICH of the two it is: nothing
-   listening on :8000 (the service was never started) versus the service up and its
-   provider key unset (`ANTHROPIC_API_KEY` in `agents/.env`). They are different problems
+   naming the spec. A failure here is diagnosed by WHICH of the two it is: the server
+   behind `/agent` not answering (nothing listening on :8000 — the service was never
+   started) versus the service up and its provider key unset (`ANTHROPIC_API_KEY` in
+   `agents/.env`). They are different problems
    with different fixes and only the second is fixable by editing a file.
 
    Note the page restores the LAST COMPLETED TURN from browser storage (O64), so an
@@ -297,10 +320,11 @@ Symptom → diagnosis → fix; each grounded in a real incident this stack has p
 
 | Symptom | Diagnosis | Fix |
 |---|---|---|
-| Frames show "drydocs-api unreachable at http://localhost:8001" | API not running (the adapter fails loud by design — no silent bolt fallback) | Startup step 2 |
+| Frames show "the server behind /api is not answering (the page's own server returned 502 for it)" | drydocs-api not running behind the proxy (the adapter fails loud by design — no silent bolt fallback). The page's own server IS up — it wrote the 502 | Startup step 2; if the API is up on a non-default port, set `DRYDOCS_API_UPSTREAM` for the Vite shell |
+| Frames show "nothing answered at /api on this page's own origin" | The server that serves the PAGE is gone (Vite or the production proxy), so the fetch threw. Not an API fault | Restart Vite (step 4) or the proxy; a dead API never produces this message since Rev 4 |
 | `ModuleNotFoundError: fastapi` / `uvicorn not found` | api dependency group not installed | `poetry install --with api` |
 | `tsc: Cannot find module 'react-router-dom'` (or any dep) on build | `web/node_modules` missing/stale on this machine | `npm install --prefix web` |
-| Browser console CORS errors on frame fetch | Console served from a port outside the API allow-list | Use 5173 (dev) or 4173 (preview); other origins need an `app.py` CORS row (reviewed change) |
+| Browser console CORS errors on frame fetch | Should not occur since Rev 4 — every call is same-origin. If it does, something is fetching an absolute `http://host:port` URL instead of the `/api` path | `npm run dist:check --prefix web` names the bundle chunk carrying the coordinate; fix the call site to use `apiBaseUrl()` / `agentBaseUrl()` |
 | `/specs` missing a spec you just added | uvicorn serving the import-time registry (no `--reload`) | Restart uvicorn, or dev with `--reload` (2026-07-21 incident, twice) |
 | Sign-in refused with `no console credentials are configured on this machine` | Fresh clone or a new machine: the credential file does not exist yet, so there are no accounts | Prerequisite 6 — `poetry run python scripts/set_console_credential.py <persona-id>` |
 | Sign-in refused with `invalid credentials` | Wrong secret, or no secret stored for that account. The message is the same either way ON PURPOSE | `scripts/admin_demo_login.py` shows which accounts are ready and whether the API is up; `--check-login <account>` says which of the three layers is actually failing |
@@ -309,8 +333,8 @@ Symptom → diagnosis → fix; each grounded in a real incident this stack has p
 | `?as=<persona>` shows the sign-in screen instead of signing in | `VITE_DEV_CONSOLE_SECRET` is unset in the Vite shell, or does not match that account's stored secret | Set it in the shell running `npm run dev` and restart Vite (env is inlined at startup); the browser console carries the reason |
 | Tabs all show demo fallback despite a running graph | Graph is up but EMPTY (specs ran, 0 rows), or `.env` points at the wrong Bolt port | Companion runbook Refresh section; check `.env` `NEO4J_URI` against `docker port` |
 | Export downloads but manifest fetch 404s | Manifests register only when the stream COMPLETES; a cancelled download never registers | Re-export; a served manifest always describes a full file (by design) |
-| Port 8001/5173/8000 already in use | Orphaned server from a previous session — a killed `npm`/shell parent leaves the `node`/`python` CHILD listening, so the port looks taken by nothing | `Get-CimInstance Win32_Process -Filter "ProcessId=<pid from netstat -ano>" | Select CommandLine` to identify it, `Stop-Process -Id <pid> -Force`, then restart. Start Vite with `--strictPort` so it fails loudly instead of drifting to 5174, which is OUTSIDE the API's CORS allow-list |
-| **Ask says only "Failed to fetch"; every other module works; the drydocs-api log shows no error at all** | The ADK agent server on :8000 is not running. Ask is the ONLY module that dials :8000, so the request never reached :8001 and :8001 cannot log what it never received. The browser reports a refused TCP connection as this generic string | Startup step 3. Confirm first with `netstat -ano | findstr :8000` — no LISTENING row is the diagnosis (2026-08-20 and 2026-08-25 incidents; backlog **O63** makes the page do this itself) |
+| Port 8001/5173/8000 already in use | Orphaned server from a previous session — a killed `npm`/shell parent leaves the `node`/`python` CHILD listening, so the port looks taken by nothing | `Get-CimInstance Win32_Process -Filter "ProcessId=<pid from netstat -ano>" | Select CommandLine` to identify it, `Stop-Process -Id <pid> -Force`, then restart. Start Vite with `--strictPort` if a fixed port matters to you (the ui-tests ledger records the port a case ran on); since Rev 4 a drifted port still works, because nothing on the API side names it |
+| **Ask says the server behind `/agent` is not answering; every other module works; the drydocs-api log shows no error at all** | The ADK agent server on :8000 is not running. Ask is the ONLY module that calls `/agent`, so the request never went to :8001 and :8001 cannot log what it never received. Before Rev 4 this surfaced as a bare "Failed to fetch" | Startup step 3. Confirm first with `netstat -ano | findstr :8000` — no LISTENING row is the diagnosis (2026-08-20 and 2026-08-25 incidents; backlog **O63** makes the page do this itself) |
 | Ask reaches the agent but errors with `ANTHROPIC_API_KEY is not set (agents/.env)` | Transport is fine; the graph_qa provider is unconfigured. This is a DIFFERENT failure from the row above and has a different fix | Set `ANTHROPIC_API_KEY` in `agents/.env` (never the root `.env` if the agent should differ), then RESTART the agent server — env is read at import |
 | `/list-apps` returns five apps including `common` | Started with `adk api_server` (flat `AgentLoader`) instead of `serve.py` | Use `serve.py` (R14); `tests/unit/test_agents_app_discovery.py` pins the list to four |
 | Agent server: `ModuleNotFoundError: google.adk` | Ran under the poetry venv, not the agents venv — `agents/` is not part of the poetry package | `agents\.venv\Scripts\python serve.py ...` (Prerequisite 3) |
@@ -331,14 +355,18 @@ Symptom → diagnosis → fix; each grounded in a real incident this stack has p
 <!-- anchor: appendices -->
 ## Appendices
 
-**A. Ports & URLs (local defaults — all committed in code, none secret):**
+**A. Ports & URLs (local defaults — all committed in code, none secret; the BROWSER
+sees only the two paths, never the ports):**
 
 | Surface | URL | Source of the value |
 |---|---|---|
-| Web console (dev) | `http://localhost:5173` | Vite default; CORS row in `drydocs_api/app.py` |
-| Web console (preview) | `http://localhost:4173` | `vite preview` default; second CORS row |
-| drydocs-api | `http://localhost:8001` | `VITE_API_URL` fallback in the web adapters |
-| ADK agent server (Ask only) | `http://localhost:8000` | `VITE_ADK_URL` fallback in `AskRoute.tsx`; `serve.py --port` default |
+| Web console (dev) | `http://localhost:5173` | Vite default; any port works (same-origin, ADR 0020) |
+| Web console (preview) | `http://localhost:4173` | `vite preview` default; same proxy as dev |
+| drydocs-api, as the browser calls it | `/api/*` on the page's origin | `web/delivery.json` → `apiBaseUrl()`; the proxy strips the prefix |
+| drydocs-api, the process | `http://localhost:8001` | `DRYDOCS_API_UPSTREAM` default in `web/vite.config.ts`; `uvicorn --port` |
+| ADK agent server, as the browser calls it (Ask only) | `/agent/*` on the page's origin | `web/delivery.json` → `agentBaseUrl()` |
+| ADK agent server, the process | `http://localhost:8000` | `DRYDOCS_AGENT_UPSTREAM` default in `web/vite.config.ts`; `serve.py --port` default |
+| Runtime, non-secret config | `/api/config` | `drydocs_api/app.py`; serves `DRYDOCS_RUNTIME_VIEW_URL_TEMPLATE` (O39) |
 | Agent liveness / app list | `/list-apps` · `/docs` | `agents/serve.py` (ADK `get_fast_api_app`) |
 | API health / specs | `/health` · `/specs` | `drydocs_api/app.py` |
 | O13 mapping demo page | `http://localhost:8001/demo` | same-origin static page (pre-O13-screen) |
@@ -350,7 +378,7 @@ Appendix B for a live graph):
 poetry install --with api                                        # first time
 npm install --prefix web                                         # first time
 poetry run uvicorn drydocs_api.app:create_app --factory --port 8001
-npm run dev --prefix web
+npm run dev --prefix web                                         # proxies /api → :8001, /agent → :8000
 # browse http://localhost:5173 → sign in (morpheus / trinity / mouse)
 ```
 
@@ -362,8 +390,9 @@ cd agents
 python -m venv .venv                                             # first time
 .venv\Scripts\python -m pip install --only-binary :all: -r requirements.txt   # first time
 Copy-Item .env.example .env                                      # first time, then fill keys
-.venv\Scripts\python serve.py --allow_origins http://localhost:5173
+.venv\Scripts\python serve.py
 # check: Invoke-RestMethod http://localhost:8000/list-apps   → four apps incl. graph_qa
+# (no --allow_origins since Rev 4: the console reaches it as /agent on its own origin)
 ```
 
 **C. Console personas** (synthetic — `drydocs_api/personas.py`): `morpheus` admin ·

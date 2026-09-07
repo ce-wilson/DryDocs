@@ -1,6 +1,6 @@
 server_name,os_product,os_version,rack,data_center,city,state,country,designation,business_application
-srv-synth-01,RHEL,8.4,R-101,SYNTH-BLDG-A,Sampleville,SV,SYN,PROD,70055
-srv-synth-02,RHEL,8.4,R-102,SYNTH-BLDG-A,Sampleville,SV,SYN,PROD,70055
-srv-synth-03,RHEL,9.2,R-115,SYNTH-BLDG-A,Sampleville,SV,SYN,PROD,70055
-srv-synth-51,RHEL,8.4,R-901,SYNTH-BLDG-B,Modelton,MD2,SYN,DR,70055
-srv-synth-52,RHEL,9.2,R-902,SYNTH-BLDG-B,Modelton,MD2,SYN,DR,70055
+host-hldm-02,RHEL,8.4,R-101,SYNTH-BLDG-A,Sampleville,SV,SYN,PROD,70002
+host-hldm-03,RHEL,8.4,R-102,SYNTH-BLDG-A,Sampleville,SV,SYN,PROD,70002
+host-hldm-04,RHEL,9.2,R-115,SYNTH-BLDG-A,Sampleville,SV,SYN,PROD,70002
+host-hldm-51,RHEL,8.4,R-901,SYNTH-BLDG-B,Modelton,MD2,SYN,DR,70002
+host-hldm-52,RHEL,9.2,R-902,SYNTH-BLDG-B,Modelton,MD2,SYN,DR,70002
