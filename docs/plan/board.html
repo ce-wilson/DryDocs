@@ -79,7 +79,7 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 .capture-status{font-size:.78rem;color:#166534;margin:.3rem 0 0;min-height:1.1em}</style>
 </head><body>
 <h1>DryDocs — project board</h1>
-<p class="subtitle">Rendered from <code>docs/restructure/backlog/</code> 685 items &middot; 118 todo / 12 in progress / 1 blocked / 554 done. The repo is the system of record; this page is a working aid.</p>
+<p class="subtitle">Rendered from <code>docs/restructure/backlog/</code> 685 items &middot; 118 todo / 6 in progress / 1 blocked / 560 done. The repo is the system of record; this page is a working aid.</p>
 <p class="subtitle">Location: <code id="board-url"></code> <button type="button" id="board-url-copy">copy</button></p>
 <script>document.getElementById('board-url').textContent=window.location.href;document.getElementById('board-url-copy').onclick=function(){navigator.clipboard.writeText(window.location.href);};</script>
 <p class="subtitle"><a class="capture-link" href="roadmap.html">Module roadmap &rarr;</a> <a class="capture-link" href="ideas.html">Idea inbox &rarr;</a></p>
@@ -92,11 +92,11 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P5</span><span class="status-badge status-todo">todo</span></div><h3>Orchestrator expansion</h3><p class="goal">AutoSys + Airflow land as BMC-baseline concepts via confirmed crosswalks (Epic F).</p><div class="progress"><div class="progress-bar" style="width:40%"></div></div><p class="progress-text">2 / 5</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P6</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Modular architecture / component topology</h3><p class="goal">ADR 0002 — core extraction, multi-DB topology, component packages (Epic G).</p><div class="progress"><div class="progress-bar" style="width:89%"></div></div><p class="progress-text">133 / 149</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P7</span><span class="status-badge status-done">done</span></div><h3>Review toolkit back-flow</h3><p class="goal">Company SME-review/HITL toolkit reproduced generically, offline (Epic H).</p><div class="progress"><div class="progress-bar" style="width:88%"></div></div><p class="progress-text">7 / 8</p></div>
-<div class="phase-card"><div class="phase-head"><span class="phase-id">P8</span><span class="status-badge status-in_progress">in_progress</span><span class="release">v0.3.0</span></div><h3>Planning &amp; release infrastructure</h3><p class="goal">Repo-native project board + capture loop; groundwork for versioned releases (Epic I).</p><div class="progress"><div class="progress-bar" style="width:73%"></div></div><p class="progress-text">81 / 111</p></div>
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P8</span><span class="status-badge status-in_progress">in_progress</span><span class="release">v0.3.0</span></div><h3>Planning &amp; release infrastructure</h3><p class="goal">Repo-native project board + capture loop; groundwork for versioned releases (Epic I).</p><div class="progress"><div class="progress-bar" style="width:75%"></div></div><p class="progress-text">83 / 111</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P9</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Application attribution</h3><p class="goal">Jobs attributed to SEAL applications (seal_app_ref) end-to-end — gate-confirmed match policy, loader, verify coverage (Epic K).</p><div class="progress"><div class="progress-bar" style="width:89%"></div></div><p class="progress-text">34 / 38</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P10</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Documentation infrastructure</h3><p class="goal">Every design doc (TDD/Runbook/BRD) conforms to a canonical outline; deterministic md→HTML/PDF render; HITL markup loop (digital + pen/paper) re-attaches to a requirement-traceability backbone (Epic L).</p><div class="progress"><div class="progress-bar" style="width:68%"></div></div><p class="progress-text">30 / 44</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P11</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Source governance ledgers</h3><p class="goal">Per-source governance as test-enforced config: audit envelope + edge diet (doc 06, Epic M) and column-mapping ledgers (doc 08, Epic N); property-term bindings via the gate.</p><div class="progress"><div class="progress-bar" style="width:64%"></div></div><p class="progress-text">21 / 33</p></div>
-<div class="phase-card"><div class="phase-head"><span class="phase-id">P12</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Web console / graph visualization</h3><p class="goal">Browser front-end over the knowledge graph: navigable C4/graph views, with a decided browser↔Neo4j access path (bolt-from-browser vs a thin API).</p><div class="progress"><div class="progress-bar" style="width:87%"></div></div><p class="progress-text">103 / 119</p></div>
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P12</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Web console / graph visualization</h3><p class="goal">Browser front-end over the knowledge graph: navigable C4/graph views, with a decided browser↔Neo4j access path (bolt-from-browser vs a thin API).</p><div class="progress"><div class="progress-bar" style="width:90%"></div></div><p class="progress-text">107 / 119</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P13</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Runtime topology &amp; maintenance windows</h3><p class="goal">Control-M host topology (CM_HOSTS) + runtime-stats supplement (CM_AVG_RUN) loaded per their gates; the maintenance-window question (best patch window for a host/group) answerable from the graph (Epic P).</p><div class="progress"><div class="progress-bar" style="width:86%"></div></div><p class="progress-text">6 / 7</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P14</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Document ingestion &amp; doc-graph benchmarks</h3><p class="goal">Unstructured documents as graph corpora (docmeta): the P0 benchmark verdict (traversal vs manifest-routed md vs vector RAG) with its evidence experiments, and the landing zone for the docmeta component&#x27;s P1+ phases once the verdict + docmeta ADR gate them (Epic Q).</p><div class="progress"><div class="progress-bar" style="width:89%"></div></div><p class="progress-text">24 / 27</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P15</span><span class="status-badge status-todo">todo</span></div><h3>Agentic Q&amp;A console</h3><p class="goal">Free-text questions answered by a tiered read-only agent (QuerySpec router → schema-grounded text2cypher → bounded graph-of-thoughts loop) with every executed Cypher exposed via ephemeral specs, per-run question/context/memory/token telemetry, and stale-source rescrape (Epic R; ADR 0007).</p><div class="progress"><div class="progress-bar" style="width:78%"></div></div><p class="progress-text">18 / 23</p></div>
@@ -2988,57 +2988,10 @@ transcribed from seven company artifacts on an UNMERGED research branch and cite
 
 Related: MM2, MM3, MM6, MM10, MM12, R16, L28, G102, ADR 0007, ADR 0011, Idea-236.
 </p></div></div></div></div>
-<div class="column" data-status="in_progress"><div class="column-head"><h2>In progress</h2><span class="count" data-count-for="in_progress">12</span></div><div class="column-body"><div class="card" id="card-E1" data-id="E1" data-module="ontology" data-phase="4" data-epic="context-graph" data-type="task" data-status="in_progress" data-search="e1 register sosa/ssn observation terms via the gate" tabindex="0"><div class="card-head"><span class="card-id">E1</span><span class="card-title">Register SOSA/SSN observation terms via the gate</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P4</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / ontology-mapper</span></div><div class="epic">context-graph</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C1" data-target="card-C1">C1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> sosa:* terms present with IRIs; status planned-&gt;confirmed via gate</p><p class="notes"><strong>Notes:</strong> Registration step DONE (main, 2026-06-22): sosa/ssn prefixes in namespaces.py; terms seeded in drydocs_core/schema/sosa_experimental_supplement.cypher (opt-in `drydocs apply-sosa-supplement`, NOT in bootstrap; every term adoption:&quot;experimental&quot;); 4 context relationships in relationship_vocabulary.yaml (sosa_observes/has_result/ made_by_sensor/observed_property, status planned, domain context); README split into Declared-Adopted vs Experimental/Early-Adoption. REMAINING for ontology-mapper: take the `jobrun-observation` map entry through the HITL gate (resolve ControlMJobRun-as-Observation vs separate-Observation-node; run-history source), then planned-&gt;confirmed. GATE SESSION DEFERRED 2026-07-14 (SME: not ready yet) — page stays rendered/pending; nothing flips; re-present at a future session (see gate-log 2026-07-14 deferral note).
+<div class="column" data-status="in_progress"><div class="column-head"><h2>In progress</h2><span class="count" data-count-for="in_progress">6</span></div><div class="column-body"><div class="card" id="card-E1" data-id="E1" data-module="ontology" data-phase="4" data-epic="context-graph" data-type="task" data-status="in_progress" data-search="e1 register sosa/ssn observation terms via the gate" tabindex="0"><div class="card-head"><span class="card-id">E1</span><span class="card-title">Register SOSA/SSN observation terms via the gate</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P4</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / ontology-mapper</span></div><div class="epic">context-graph</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C1" data-target="card-C1">C1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> sosa:* terms present with IRIs; status planned-&gt;confirmed via gate</p><p class="notes"><strong>Notes:</strong> Registration step DONE (main, 2026-06-22): sosa/ssn prefixes in namespaces.py; terms seeded in drydocs_core/schema/sosa_experimental_supplement.cypher (opt-in `drydocs apply-sosa-supplement`, NOT in bootstrap; every term adoption:&quot;experimental&quot;); 4 context relationships in relationship_vocabulary.yaml (sosa_observes/has_result/ made_by_sensor/observed_property, status planned, domain context); README split into Declared-Adopted vs Experimental/Early-Adoption. REMAINING for ontology-mapper: take the `jobrun-observation` map entry through the HITL gate (resolve ControlMJobRun-as-Observation vs separate-Observation-node; run-history source), then planned-&gt;confirmed. GATE SESSION DEFERRED 2026-07-14 (SME: not ready yet) — page stays rendered/pending; nothing flips; re-present at a future session (see gate-log 2026-07-14 deferral note).
 </p></div></div>
 <div class="card" id="card-G62" data-id="G62" data-module="drydocs-lineage" data-phase="6" data-epic="component-topology" data-type="task" data-status="in_progress" data-search="g62 run the rua-bundle data-profile gate: the sme names the load population, the agent profiles it, and only the walked population enters the curated load" tabindex="0"><div class="card-head"><span class="card-id">G62</span><span class="card-title">Run the rua-bundle data-profile gate: the SME names the load population, the agent profiles it, and only the walked population enters the curated load</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-lineage</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">component-topology</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-G22" data-target="card-G22">G22</a> <a class="dep-link" href="#card-G23" data-target="card-G23">G23</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> USER-GATED START — the SME convenes the session; the pull loop SKIPS this item until then (the C12/J13 idiom). The drafted rua-bundle-data-profile page is walked in its ruled two-step order: section A the SME identifies the source data (which hosts&#x27; bundles, where they sit, which collector produced each — Internal, recorded company-side, never on the page), section B the agent profiles that population through the G20 extractor in STAGING with zero graph writes, and section C consumes the profile to admit or trim the population, dispose of the hash-absent and collision cases it counts, and clear the F1 sweep. Sign-off transcribed to config/gate-log.md; gates.json + the enforcement matrix regenerate. No population the page has not walked enters the G23 curated load.
 </p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-09 from Idea-85, which asked only for ids and scheduling — the four post-G22 data-profile prompts were drafted 2026-08-07 and unsigned, and an unsigned prompt with no backlog id is invisible to the pull loop. Sessions run COMPANY-SIDE because the identify-the-source-data step names real hosts and paths (Internal); what lands producer-side is the transcription and the regenerated gate surfaces. Model fable: the ruling decides what may be written to the graph.
-</p></div></div>
-<div class="card" id="card-CFG3" data-id="CFG3" data-module="config" data-phase="8" data-epic="release-infrastructure" data-type="chore" data-status="in_progress" data-search="cfg3 precedence.schema.json and relationship-vocabulary.schema.json accept any stray key - close them at the top level" tabindex="0"><div class="card-head"><span class="card-id">CFG3</span><span class="card-title">precedence.schema.json and relationship-vocabulary.schema.json accept any stray key - close them at the top level</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / main</span></div><div class="epic">release-infrastructure</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> precedence.schema.json and relationship-vocabulary.schema.json have no top-level
-additionalProperties: false, so either accepts any stray key silently. Three sibling family
-schemas (data-centers, domains, editions) are closed at the top level, and that closure is
-what settled the identity-header profile split (J58); these two are the open ones left.
-
-(a) Both schemas are closed at the top level - one line each.
-(b) Before closing: check that nothing in the tree already relies on a stray key. If something
-    does, the key is either declared or removed, and the item says which.
-(c) The existing validation over both config files still passes, and a deliberately stray key
-    now FAILS - proven, not asserted.
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-07 from IDEAS.md Idea-263 (Lane B close report, laptop, 2026-09-05, J58).
-
-The files are under config/schemas/ (verified on this tree); the entry names them by bare
-filename.
-
-haiku: two lines and a check, with the existing closed schemas as the pattern to copy.
-</p></div></div>
-<div class="card" id="card-CORE2" data-id="CORE2" data-module="drydocs-core" data-phase="8" data-epic="release-infrastructure" data-type="task" data-status="in_progress" data-search="core2 a source-scan absence guard needs a positive control - six of six absence scans were vacuous on first write because the stripper did not match the subject" tabindex="0"><div class="card-head"><span class="card-id">CORE2</span><span class="card-title">A source-scan absence guard needs a positive control - six of six absence scans were vacuous on first write because the stripper did not match the subject</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-core</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">release-infrastructure</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Six of six absence scans across two Lane B bursts were VACUOUS on first write. Each was
-the same mistake: code_only strips string literals, so a guard asserting that a LITERAL is
-absent runs its pattern over a scan the literal was already removed from and passes on
-nothing. without_comments is the stripper for a literal subject. J66 says which helper to
-use; nothing today makes the wrong choice fail, and two of the six were caught only by
-breaking the thing the guard claimed to catch. One case had a comment saying without_comments
-beside code calling code_only.
-
-(a) tests/source_scan.py grows an absence helper that takes a POSITIVE CONTROL:
-    absent(pattern, files, *, positive_control=&lt;snippet&gt;). It runs the chosen stripper over
-    the control FIRST and refuses (fails, with a message naming the stripper and the subject)
-    when the pattern no longer matches the control - the mutation probe, built in, so a
-    stripper/subject mismatch fails on the control and never silently on the tree.
-(b) The refusal is proven by a test that supplies a literal subject with code_only and asserts
-    the helper fails on the control, not on the tree.
-(c) Every existing absence guard in tests/unit/ is swept onto the helper. Any that cannot
-    supply a control says why, in a comment, next to the call.
-(d) A guard over the guards: an absence-style scan that does not go through the helper is
-    listed, so the sweep does not silently un-sweep. Read the code, never the prose (J66) -
-    this guard&#x27;s own explanation must not trip it, which is the failure J66 exists for.
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-07 from IDEAS.md Idea-273 (Lane B close report, laptop, 2026-09-06,
-process findings). Instances cited there: WEB7&#x27;s path= literal and O89&#x27;s route literal
-(twice) in the 2026-09-06 burst, three more in the 2026-09-05 burst.
-
-p1 because it is the only entry in this groom whose defect class is &#x27;a guard that reports
-green while checking nothing&#x27;, and it has now recurred six times in two days.
-
-Epic release-infrastructure / phase 8 follows J66, which is where the source_scan rule was
-established; module is drydocs-core per the entry, though the file itself is tests/.
 </p></div></div>
 <div class="card" id="card-DOC4" data-id="DOC4" data-module="docs" data-phase="10" data-epic="doc-infrastructure" data-type="task" data-status="in_progress" data-search="doc4 standing module review sweep - ten sized slots on a two-day cadence, /system-design + /tech-debt per firing, reports accumulating on review/module-sweep with slot state derived not stored" tabindex="0"><div class="card-head"><span class="card-id">DOC4</span><span class="card-title">Standing module review sweep - ten sized slots on a two-day cadence, /system-design + /tech-debt per firing, reports accumulating on review/module-sweep with slot state derived not stored</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P10</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">doc-infrastructure</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> A standing, rotating two-lens review of every first-party module, fenced as a third
 writer beside the two lanes. Built 2026-09-05; the item closes when the first slot
@@ -3168,74 +3121,6 @@ run_named; a graph-unavailable answer degrades to the named read path, never an 
 or a silent zero. 7 tests in test_mapping_api.py; full suite 2590 passed / ruff check +
 format clean (venue: worktree of origin/main on MSI desktop). Console pane = follow-on.
 </p></div></div>
-<div class="card" id="card-API2" data-id="API2" data-module="drydocs-api" data-phase="12" data-epic="web-console" data-type="bug" data-status="in_progress" data-search="api2 columndef carries no list type, so two server columns that return lists are declared string - extend the vocabulary and delete the client-side exemption" tabindex="0"><div class="card-head"><span class="card-id">API2</span><span class="card-title">ColumnDef carries no list type, so two server columns that return lists are declared string - extend the vocabulary and delete the client-side exemption</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-api</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">bug</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> ColumnDef.type is &#x27;string&#x27; | &#x27;int&#x27; only, so two server columns that return LISTS are
-declared string: runbooks.series.v1 &#x27;lands&#x27; (collect(DISTINCT d.assetId)) and
-lineage.schema-definition.v1 &#x27;properties&#x27; (a Cypher list comprehension). Verified at
-drydocs_api/query_specs.py:73 (the vocabulary), :1003 and :1213 (the two declarations).
-WEB6&#x27;s client-side row-shape validator found them and exempts exactly those two by spec id,
-with a bidirectional guard in rowShape.test.ts that fails when the server is fixed AND when a
-third one appears - so this is not a two-string edit.
-
-(a) ColumnDef grows a LIST column type, and the OpenAPI shape moves with it
-    (web/src/generated/openapi.json and api.d.ts are regenerated, not hand-edited).
-(b) The two declarations move onto the new type.
-(c) The client validator learns the new type and the two-spec exemption in
-    web/src/data/rowShape.ts is DELETED; rowShape.test.ts is updated in the same commit, since
-    it is written to fail exactly when this item lands.
-(d) A server-side guard reads the SPEC OBJECT (J37 - never a render, never the source text)
-    and fails when a column whose Cypher collects or comprehends is declared scalar. That is
-    the clause that stops a third one appearing.
-(e) The read contract&#x27;s consumers still pass: the API tests, the web type-check and the
-    generated-artifact drift tests.
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-07 from IDEAS.md Idea-270 (Lane B close report, laptop, 2026-09-06,
-hand-back api).
-
-R15/R16 own the api package and are both DONE, so the entry&#x27;s sequencing constraint (&#x27;land it
-with or right after them, not before&#x27;) is already satisfied - depends_on is empty for that
-reason, not by oversight.
-
-Filed web-console / phase 12 with API1, because it is the read contract this console
-consumes; R15/R16 sit in agentic-qa / 15 and either filing would have been readable.
-
-Model fable: this changes a published contract (the column vocabulary and its OpenAPI shape),
-which is the boundary case the matrix reserves the top tier for.
-</p></div></div>
-<div class="card" id="card-API3" data-id="API3" data-module="drydocs-api" data-phase="12" data-epic="web-console" data-type="bug" data-status="in_progress" data-search="api3 scripts/dump_openapi.py opens the committed openapi.json before it renders, so a render failure leaves a zero-byte artifact" tabindex="0"><div class="card-head"><span class="card-id">API3</span><span class="card-title">scripts/dump_openapi.py opens the committed openapi.json before it renders, so a render failure leaves a zero-byte artifact</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-api</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">bug</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> scripts/dump_openapi.py opens web/src/generated/openapi.json for WRITING before it calls
-render_schema(), so a render failure truncates the committed artifact to zero bytes. The
-result reads as a corrupt commit rather than a failed run, and npm run api:types then fails on
-an empty document one step later with no pointer back to the cause.
-
-(a) Render to a string FIRST, then open and write - the artifact is never opened until there
-    is content to put in it.
-(b) The script exits non-zero with the exception named, so the failing step says what failed.
-(c) The test that pins the writer grows the failure case: a render that raises leaves the
-    existing artifact BYTE-IDENTICAL and the process exits non-zero.
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-07 from IDEAS.md Idea-268 (Lane B close report, laptop, 2026-09-05,
-API1 hand-back one).
-
-Two lines of fix and a test; the test is the point, since the same open-then-render shape is
-easy to reintroduce.
-</p></div></div>
-<div class="card" id="card-O51" data-id="O51" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="requirement" data-status="in_progress" data-search="o51 reviewer-quality signals + admin block: auto-accept / too-fast / admin-return rates over a rolling window, limits flag, admin blocks" tabindex="0"><div class="card-head"><span class="card-id">O51</span><span class="card-title">Reviewer-quality signals + admin block: auto-accept / too-fast / admin-return rates over a rolling window, limits flag, admin blocks</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">requirement</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-O46" data-target="card-O46">O46</a> <a class="dep-link" href="#card-O50" data-target="card-O50">O50</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Per-SME quality signals derive from intake records the store already holds — no new data entry: submissions in a rolling window, auto-accept rate (agent candidates accepted with zero modification), too-fast rate (confirm faster than a floor scaled to evidence size), and admin-return rate. Limits live in config/review-quality.yaml (admin-editable via the AdminConfig surface, versioned, unit-guarded). Crossing a limit FLAGS the SME on the admin queue&#x27;s quality rail with the metric that tripped (Meter + StatusChip); the ADMIN — never the machine — can block the persona from submitting: drafts survive, the block records who/when/why, and unblock requires a note. No auto-block exists in any code path. The admin-only per-user panel (submissions, auto-accept rate, return rate, median review time) uses the StatTiles/Meter patterns. The store keeps PER-DECISION detail (accepted/modified fields, durations), not just rollups — the future confirmation-weight trust model needs it.
-</p><p class="notes"><strong>Notes:</strong> Slice 7 (plan §8). User requirement 2026-08-06: recalled as a backlog item ranking auto-acceptance from a QA-testing session — searched backlog/IDEAS/gates/git history, never captured (closest neighbors: R8 answer-evaluation, FB-04 agent test), so the intake plan §8 + this item are now the requirement&#x27;s home. Measure-then-decide posture throughout: thresholds are tripwires, the human is the judge.
-</p></div></div>
-<div class="card" id="card-WEB16" data-id="WEB16" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="chore" data-status="in_progress" data-search="web16 npm run api:types needs drydocs_data_root and says so only as a python traceback buried in a node stack" tabindex="0"><div class="card-head"><span class="card-id">WEB16</span><span class="card-title">npm run api:types needs DRYDOCS_DATA_ROOT and says so only as a Python traceback buried in a Node stack</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> npm run api:types needs DRYDOCS_DATA_ROOT set and says so only as a Python traceback
-buried inside a Node stack: the script shells out to scripts/dump_openapi.py, which imports
-settings that resolve the data root, so an unset root surfaces three layers down. The same
-wall was hit twice - once on API1 and again at the Lane A merge.
-
-(a) ONE of: the npm script checks the variable first and prints the one-line requirement, or
-    the web README&#x27;s generated-artifacts section names the variable beside the command (it
-    names the command today and not the precondition). The first is preferred because it
-    fires at the moment of failure.
-(b) Whichever is chosen, an unset DRYDOCS_DATA_ROOT produces a message that names the
-    variable, before any traceback.
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-07 from IDEAS.md Idea-267 (Lane B close report, laptop, 2026-09-05,
-API1 hand-back two).
-
-Small and mechanical, so haiku. API3 (Idea-268) is the other API1 hand-back and touches the
-same script for a different reason; they can land together or apart.
-</p></div></div>
 <div class="card" id="card-MM7" data-id="MM7" data-module="drydocs-lineage" data-phase="17" data-epic="mind-map" data-type="task" data-status="in_progress" data-search="mm7 control-m output-tab log extractor — launcher job kind, resolved arguments, placement handoff pair, landing prefix, compute target — joined onto :etlprocess by pipeline guid, dpl_mac-shaped, every skip counted" tabindex="0"><div class="card-head"><span class="card-id">MM7</span><span class="card-title">Control-M Output-tab log extractor — launcher job KIND, resolved arguments, placement handoff pair, landing prefix, compute target — joined onto :ETLProcess by pipeline GUID, dpl_mac-shaped, every skip counted</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-lineage</span><span class="chip" data-kind="phase">P17</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">mind-map</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-G17" data-target="card-G17">G17</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> drydocs_lineage/extractors/controlm_output.py takes (source, into: LineageGraph) like every extractor, reads Output text per &lt;job, order-id, run&gt; from a NAMED sysout file — the modern wrapper writes no identity into the body, so job name / order id / run stamp are parsed from the FILE NAME (tolerant scan, site-pinnable pattern override, name-derived date kept as run_date and never merged into the launcher&#x27;s -od) and a detached text blob is rejected with a counted reason — and joins onto already-staged DPL processes on the pipeline GUID (falling back to &lt;job, run&gt; when the command line carried a variable), returning an OutputCoverage dataclass with a counted reason for every skip (no_launcher_banner, kind_unknown, guid_mismatch_vs_cmdline, truncated_json, token_redacted, identity_not_in_filename, no_order_id_in_filename). It sets PROPERTIES only — launcher_kind (from the `Identified &#x27;&lt;KIND&gt;&#x27; Job` line), compute_target, provenance_guid (placement response) and the -proId of the ingestion consuming that placement, recorded as a run-scoped PAIR whose scope is those two jobs and which never keys an edge, landing_prefix, submission_cluster, image_digest, compute_profile_ref — and creates no edge (m3_* stay as they are). A synthetic mechanism-only fixture under tests/fixtures/ reproduces the four kinds seen (PLACEMENT, INGESTION, TRANSFORM, PROVISION), a placement handoff across exactly two jobs, a transform that logs no provenance id (expected-absent, counted, never reported as a break), and a line that carries a bearer token — which the extractor REDACTS before any field and counts. The source row is registered in config/source-registry.yaml with classification and an acquisition path per Idea-133 (mode, via). A chained run (inventory → mac → output) exists as one CLI invocation and curation.py&#x27;s stub docstring names it as the cadence hook; the Output read is described in the design doc §3 as an INPUT to deepdoc, not a deepdoc feature.</p><p class="notes"><strong>Notes:</strong> Iteration 2 of the launcher contract. Genuine greenfield: no code, item or idea in the repo ingests Control-M sysout today. The log is authoritative where CMDLINE carries a %%variable and it asserts the job kind G12 wanted. Iteration 3 (run-history join via the P4 tables) is named in the doc and not minted until this lands.
 
 POC 2026-08-21 (user direction: a proof of concept frames the implementation before the
@@ -3286,7 +3171,7 @@ relay -- guessing spellings is the defect this item exists to prevent. The (d) s
 guard (fixture headers drawn from the recorded list, not the module constant) also waits
 on that list; a guard against nothing would be decoration.
 </p></div></div></div></div>
-<div class="column" data-status="done"><div class="column-head"><h2>Done</h2><span class="count" data-count-for="done">554</span></div><div class="column-body"><div class="card" id="card-A1" data-id="A1" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a1 audit reference registry paths for staleness" tabindex="0"><div class="card-head"><span class="card-id">A1</span><span class="card-title">Audit reference registry paths for staleness</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every entry marked ok/stale; stale paths fixed or flagged</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All local mirrors + platform/standard doc paths resolve; no stale entries. verified: 2026-06-21 in REGISTRY.yaml.</p></div></div>
+<div class="column" data-status="done"><div class="column-head"><h2>Done</h2><span class="count" data-count-for="done">560</span></div><div class="column-body"><div class="card" id="card-A1" data-id="A1" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a1 audit reference registry paths for staleness" tabindex="0"><div class="card-head"><span class="card-id">A1</span><span class="card-title">Audit reference registry paths for staleness</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every entry marked ok/stale; stale paths fixed or flagged</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All local mirrors + platform/standard doc paths resolve; no stale entries. verified: 2026-06-21 in REGISTRY.yaml.</p></div></div>
 <div class="card" id="card-A2" data-id="A2" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a2 account for every bmc doc in the source manifest" tabindex="0"><div class="card-head"><span class="card-id">A2</span><span class="card-title">Account for every BMC doc in the source manifest</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every .md in bmc-controlm/ accounted for in the manifest</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All 26 bmc-controlm .md files are referenced in SOURCE-MANIFEST.md (0 uncovered).</p></div></div>
 <div class="card" id="card-A3" data-id="A3" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a3 seed the research index with linked rationale" tabindex="0"><div class="card-head"><span class="card-id">A3</span><span class="card-title">Seed the research index with linked rationale</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> &gt;=5 rows, each with a working link and a &#x27;why it matters&#x27;</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. 7 rows with working links (3 Neo4j blogs + PROV-O/SOSA/ORG/agent-memory) + why-it-matters.</p></div></div>
 <div class="card" id="card-A4" data-id="A4" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a4 registry.yaml points the dcat row at a per-standard readme that was never written" tabindex="0"><div class="card-head"><span class="card-id">A4</span><span class="card-title">REGISTRY.yaml points the dcat row at a per-standard README that was never written</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> reference/REGISTRY.yaml&#x27;s dcat row no longer cites a path that does not exist. Exactly one of two resolutions, and the choice is recorded in the close note: (a) write reference/standards/dcat/README.md following the dcmi-terms pattern from M4 — namespace, what we use it for, the specific terms we reference, source_url — or (b) re-point the row&#x27;s `docs:` at reference/standards/README.md the way the skos row already does. Nothing else in the registry changes.
@@ -7411,6 +7296,251 @@ fixtures agree, `SMPL` carries a legacy_band so the field&#x27;s shape is exerci
 (d) held: no real row here, so no transcription file was needed; the header says a
 real row cites the named machine-local file, never an image.
 </p></div></div>
+<div class="card" id="card-CFG3" data-id="CFG3" data-module="config" data-phase="8" data-epic="release-infrastructure" data-type="chore" data-status="done" data-search="cfg3 precedence.schema.json and relationship-vocabulary.schema.json accept any stray key - close them at the top level" tabindex="0"><div class="card-head"><span class="card-id">CFG3</span><span class="card-title">precedence.schema.json and relationship-vocabulary.schema.json accept any stray key - close them at the top level</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / main</span></div><div class="epic">release-infrastructure</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> precedence.schema.json and relationship-vocabulary.schema.json have no top-level
+additionalProperties: false, so either accepts any stray key silently. Three sibling family
+schemas (data-centers, domains, editions) are closed at the top level, and that closure is
+what settled the identity-header profile split (J58); these two are the open ones left.
+
+(a) Both schemas are closed at the top level - one line each.
+(b) Before closing: check that nothing in the tree already relies on a stray key. If something
+    does, the key is either declared or removed, and the item says which.
+(c) The existing validation over both config files still passes, and a deliberately stray key
+    now FAILS - proven, not asserted.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-07 from IDEAS.md Idea-263 (Lane B close report, laptop, 2026-09-05, J58).
+
+The files are under config/schemas/ (verified on this tree); the entry names them by bare
+filename.
+
+haiku: two lines and a check, with the existing closed schemas as the pattern to copy.
+
+-- CLOSED 2026-09-07, Lane B (laptop), branch wip/CFG3-laptop from main at c74b2ad0 --
+
+ALL THREE CLAUSES MET, and clause (b) -- &quot;check that nothing already relies on a stray
+key&quot; -- earned its place: it found something in EACH file, and both findings changed what
+clause (a) had to be.
+
+-- FINDING ONE: precedence.yaml carries an undeclared key, and it is the identity header --
+
+`classification` is live at the top level of config/precedence.yaml and was declared by no
+schema. Closing the schema without declaring it would have failed the very file the schema
+governs. So it is DECLARED (with the three-level enum the J23 collapse left, matching
+identity-header.schema.json) rather than removed -- the header is required on this file
+class and removing it would break a different guard.
+
+That is the whole argument for closing a schema, arriving in one key: an open schema
+accepts a real key and a misspelled one in exactly the same silence, so nobody learns
+which they typed. `source` is declared too, optional, so the header profile stays
+satisfiable on a file that names no upstream extract.
+
+-- FINDING TWO: the second schema was already closed where the item says to close it --
+
+relationship-vocabulary.schema.json is a `oneOf` over three fragment shapes, and its
+MAPPING branch already carried `additionalProperties: false`. The top-level closure the
+item asks for was a no-op there, and doing only that would have delivered nothing for this
+file while reporting the item done.
+
+The hole is one level down: `local_relationship`, the ENTRY, accepted any key. That is
+where the keys that matter live -- a misspelled `superseded_by` on a deprecated
+relationship passed in silence, and the id is the join key across the taxonomy-ontology
+map, the generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+
+Closing it required declaring SIX keys the live fragments use and no schema named:
+deprecated_at, deprecation_note, superseded_by (the G87 add-new + deprecate-old trio),
+skos_maps_to and sosa_maps_to (standards mappings sitting beside the already-declared
+prov_maps_to), and join_key. Every one was found by scanning the fragments; none was
+invented to make validation pass, and a test asserts exactly that -- if a fragment stops
+using one, the declaration is reported rather than left as something nobody can account
+for.
+
+`deprecated_at` is deliberately left UNTYPED: a bare YAML date parses to a Python date
+object, not a string, and this family&#x27;s validator does not normalize dates the way the
+identity-header guard does. It is the same treatment `updated` already gets in the sibling
+family schemas, and typing it `string` would have failed eight live fragments.
+
+-- (c) PROVEN, INCLUDING THE PROOF ITSELF --
+
+Each closed schema is shown to ACCEPT a valid minimal document and REFUSE a realistic typo
+(`conflict_polcy`, `supersed_by`) -- both halves in one test, because a schema that
+refuses everything would also refuse the stray key and would look like a pass.
+
+Then the closures were removed, one at a time, and the tests confirmed RED both times.
+`additionalProperties: false` is one line, and one line is exactly what gets dropped in a
+merge without anyone noticing; a test that would still pass without it is not a guard.
+
+-- STILL OPEN, NAMED RATHER THAN SWEPT IN --
+
+precedence.schema.json&#x27;s `conflict_policy` is `type: object` with no properties (live
+keys: winner, loser_disposition, never, require_sme_confirmation), and its `order[]` items
+accept extra keys (no strays live today -- surveyed). Both are the same defect one level
+down. CFG3&#x27;s acceptance is scoped to the top level, and widening it would be the puller&#x27;s
+call rather than mine; the survey is done, so whoever takes it starts from a list and not
+from a scan.
+
+-- HANDED BACK TO LANE A --
+
+1. NO NEW TRACKED PATHS: two schemas edited, one test file extended. No manifest row, no
+   ledger movement, no generated artifact.
+2. THE `conflict_policy` / `order[]` FOLLOW-UP above, if it is worth an idea. It is the
+   same one-line fix each, and the live keys are listed here so it needs no re-survey.
+3. NOTHING GATE-BOUND WAS TOUCHED. The relationship-vocabulary schema is SHAPE only (S6);
+   activation semantics live in the accessor and its writers, and this change adds no
+   enum, no status and no rule about what an entry MEANS.
+
+VERIFIED on this laptop (J18): full unit suite 3561 passed / 14 skipped / 0 failed, ruff
+check and ruff format --check clean. Both closures mutation-checked by removal. No web
+build -- this item touches no TypeScript.
+
+EXPECTED RED, per the Lane B handoff: test_committed_roadmap_page_matches_its_sources
+fails on this close commit -- a close writes notes and Lane B does not render (Y5&#x27;s
+tolerance covers a CLAIM, not a close). Lane A renders once at merge.
+</p></div></div>
+<div class="card" id="card-CORE2" data-id="CORE2" data-module="drydocs-core" data-phase="8" data-epic="release-infrastructure" data-type="task" data-status="done" data-search="core2 a source-scan absence guard needs a positive control - six of six absence scans were vacuous on first write because the stripper did not match the subject" tabindex="0"><div class="card-head"><span class="card-id">CORE2</span><span class="card-title">A source-scan absence guard needs a positive control - six of six absence scans were vacuous on first write because the stripper did not match the subject</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-core</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">release-infrastructure</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Six of six absence scans across two Lane B bursts were VACUOUS on first write. Each was
+the same mistake: code_only strips string literals, so a guard asserting that a LITERAL is
+absent runs its pattern over a scan the literal was already removed from and passes on
+nothing. without_comments is the stripper for a literal subject. J66 says which helper to
+use; nothing today makes the wrong choice fail, and two of the six were caught only by
+breaking the thing the guard claimed to catch. One case had a comment saying without_comments
+beside code calling code_only.
+
+(a) tests/source_scan.py grows an absence helper that takes a POSITIVE CONTROL:
+    absent(pattern, files, *, positive_control=&lt;snippet&gt;). It runs the chosen stripper over
+    the control FIRST and refuses (fails, with a message naming the stripper and the subject)
+    when the pattern no longer matches the control - the mutation probe, built in, so a
+    stripper/subject mismatch fails on the control and never silently on the tree.
+(b) The refusal is proven by a test that supplies a literal subject with code_only and asserts
+    the helper fails on the control, not on the tree.
+(c) Every existing absence guard in tests/unit/ is swept onto the helper. Any that cannot
+    supply a control says why, in a comment, next to the call.
+(d) A guard over the guards: an absence-style scan that does not go through the helper is
+    listed, so the sweep does not silently un-sweep. Read the code, never the prose (J66) -
+    this guard&#x27;s own explanation must not trip it, which is the failure J66 exists for.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-07 from IDEAS.md Idea-273 (Lane B close report, laptop, 2026-09-06,
+process findings). Instances cited there: WEB7&#x27;s path= literal and O89&#x27;s route literal
+(twice) in the 2026-09-06 burst, three more in the 2026-09-05 burst.
+
+p1 because it is the only entry in this groom whose defect class is &#x27;a guard that reports
+green while checking nothing&#x27;, and it has now recurred six times in two days.
+
+Epic release-infrastructure / phase 8 follows J66, which is where the source_scan rule was
+established; module is drydocs-core per the entry, though the file itself is tests/.
+
+-- CLOSED 2026-09-07, Lane B (laptop), branch wip/CORE2-laptop from main at f06ff632 --
+
+ALL FOUR CLAUSES MET. The sweep found THREE LIVE VACUOUS GUARDS in the Python tree, so
+this was a fix and not only a prevention -- which was the open question at the start,
+because the six instances the item cites are all TypeScript. Detail below.
+
+-- WHAT WAS ACTUALLY BROKEN, verified by instrument (J76) before anything was written --
+
+Each candidate&#x27;s pattern was run through code_only over a realistic snippet to see
+whether it could match at all. Three could not:
+
+* test_spec_promotion.py: &quot;query_specs.py&quot; over code_only. A file path appears in a
+  module only inside a string literal -- the one thing code_only removes. Written R8,
+  2026-09-06, one day before this item; it never went red and never could have.
+* test_constraint_drift.py: &quot;DROP CONSTRAINT&quot; over code_only. A drop EXECUTES as Cypher,
+  so it is likewise a literal. The safety property of the whole drift path was asserted
+  by a scan that could not see it.
+* test_env_refs_migration.py: &quot;:-&quot; over code_only. Wrong in BOTH directions at once --
+  it could not see a bash default (a literal) and it COULD fire on the negative slice
+  items[:-1], failing a module for a list operation.
+
+A SECOND VACUITY MECHANISM turned up that the item does not name and that no choice of
+stripper fixes: code_only joins tokens with single spaces, so a dotted subject never
+survives it intact. &quot;query_specs.py&quot; cannot appear in code_only output even when the
+module imports it. Two guards in test_env_refs_migration were already working around it
+with .replace(&quot; &quot;, &quot;&quot;) on the result. The control catches this class for free, which is
+why absent() has no separate rule about it.
+
+-- (a) THE HELPER, and the one design decision inside it --
+
+absent(pattern, sources, *, positive_control, stripper=code_only, normalize=None,
+root=None, because=&quot;&quot;) in tests/source_scan.py. The control goes through THE SAME
+pipeline as the tree -- one _apply(), not two -- because a control that skipped the
+caller&#x27;s post-processing would prove the pattern matches text no scan ever produces.
+On mismatch it raises VacuousScanError (an AssertionError subclass, so pytest reports it
+as the failure it is, and a distinct type so clause (b) can name what it caught) with the
+stripper, the subject, and the control&#x27;s SCANNED text, which is what makes the message
+diagnostic rather than an accusation.
+
+An EMPTY source set is refused too, not passed. Scanning zero files is the other way an
+absence guard reports green while checking nothing -- a glob that stopped matching, a
+list emptied by a refactor -- and it costs one branch to close.
+
+WHAT IT STILL CANNOT DO, written in the docstring rather than left implied: it cannot
+tell whether the control resembles the REAL violation. A control shaped like the wrong
+violation clears the probe. What the shape buys is that a control now EXISTS, in the
+call, where a reviewer reads it, and that a stripper/subject mismatch is impossible.
+
+-- without_prose, and why it is not called without_comments --
+
+The acceptance names without_comments as &quot;the stripper for a literal subject&quot;. That verb
+exists in web/src/test/sourceScan.ts and NOT in Python, so this added it -- but named it
+without_prose, because in Python prose is comments AND DOCSTRINGS and a comments-only
+stripper could not be used by the guards that need it: spec_promotion&#x27;s docstring names
+every symbol it forbids (the house style, and the right style), so the sweep would have
+turned three vacuous guards into three guards failing on their own explanation. That is
+J66&#x27;s failure arriving from the other side. TypeScript has no docstring, so there the two
+names mean the same thing; here they do not, and the name says which.
+
+It also blanks prose IN PLACE rather than re-joining tokens, so the original layout, the
+dotted names and every data literal survive character-for-character, and line numbers
+still line up with the file.
+
+-- (c) THE SWEEP, and its boundary --
+
+Seven assertions in three files, all mutation-checked against the REAL tree afterwards:
+clean passes, injected violation fires, for all six guard families including the
+inspect.getsource one. No guard needed the &quot;cannot supply a control&quot; escape hatch.
+
+THE BOUNDARY, stated because it is a judgment and not a discovery: &quot;absence guard&quot; here
+means an absence scan that routes through a source_scan STRIPPER. tests/unit also holds
+roughly a hundred `assert X not in text` assertions over raw .cypher and .sql files and
+over API responses; those have no stripper and are not this defect class. Two neighbours
+that look like candidates and are not: test_console_delivery&#x27;s _ts_code is a TypeScript
+comment stripper that deliberately KEEPS literals because its subjects are literals (it
+is already correct), and test_vocabulary_endpoints&#x27; Cypher stripper is the one the
+source_scan docstring already rules a different thing.
+
+-- (d) THE GUARD OVER THE GUARDS --
+
+test_every_absence_scan_over_a_stripper_goes_through_the_helper walks the whole tests
+tree -- not tests/unit alone, since a guard watching only the directory where the six
+failures happened would be the next hole -- and lists file and line for any
+`&lt;pattern&gt; not in &lt;stripper output&gt;` that does not go through absent(). It reads the AST,
+tracking names bound to a stripper call and through passthrough string methods, so its
+own explanation (which names both strippers) cannot trip it. Run against the PRE-sweep
+tree at 65f7e378 it lists exactly the seven swept lines; against HEAD it lists none.
+
+ONE EXEMPTION, file-level: test_source_scan.py itself, whose absence scans assert what
+the strippers REMOVE -- the one place such a scan is the subject rather than the
+instrument. A file-level exemption is a real hole and is named as one, with its reason
+asserted to be longer than a phrase.
+
+-- HANDED BACK TO LANE A --
+
+1. THE TYPESCRIPT TWIN IS NOT CORE2, and it is where the six cited instances actually
+   live. web/src/test/sourceScan.ts has codeOnly and withoutComments and no absent();
+   there are 24 stripper call sites across 8 files, with hand-rolled positive controls
+   already written out longhand in at least two (intakeReviewQueue.noGraphWrite.test.ts
+   lines 65-69, routeAccess.test.ts lines 156-159) -- which is the same fix, invented
+   twice, exactly as J66 records for the Python side. This item&#x27;s inputs name Python
+   files only, so building the twin here would be widening the pull; it wants a WEB-series
+   item. Note the twin does NOT need the docstring half: TypeScript has no docstring.
+2. NO PORT-MANIFEST ROW IS NEEDED. No new tracked path -- every change is inside files
+   that already exist.
+3. NOTHING FOR THE RENDERS. No .tsx, so the O42 component ledger is untouched, and no
+   generated artifact moved.
+
+VERIFIED on this laptop (J18): full unit suite 3566 passed / 15 skipped / 0 failed,
+ruff check and ruff format --check clean over tests/. No live graph and no web build --
+this item touches neither. Clause (d)&#x27;s pre-sweep replay is the evidence for the sweep
+being complete rather than merely done.
+
+EXPECTED RED, per the Lane B handoff: test_committed_roadmap_page_matches_its_sources
+fails on this close commit -- a close writes notes and Lane B does not render (Y5&#x27;s
+tolerance covers a CLAIM, not a close). Lane A renders once at merge.
+</p></div></div>
 <div class="card" id="card-DOC1" data-id="DOC1" data-module="docs" data-phase="8" data-epic="release-infrastructure" data-type="task" data-status="done" data-search="doc1 amend adr 0015 d2/d6 - team edition ships a thin instance-owned backlog, inbox and board; the base backlog stays canonical-template; groom-backlog ships with a mandatory --scope" tabindex="0"><div class="card-head"><span class="card-id">DOC1</span><span class="card-title">Amend ADR 0015 D2/D6 - Team Edition ships a thin instance-owned backlog, inbox and board; the base backlog stays canonical-template; groom-backlog ships with a mandatory --scope</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">release-infrastructure</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Gate ontology-domain-registry-and-edition-grain §D1 (SIGNED OFF 2026-09-02). ADR 0015 D2 (line 119, Cut row) removes
 plan_board/plan_ideas/plan_roadmap and backlog_store from Team Edition - &quot;Plan/port/backlog
 are the producer&#x27;s own project management&quot; - and D6 follows it (groom-backlog
@@ -9933,6 +10063,235 @@ Found by review before merge, not by a test — nothing in the suite exercised a
 ephemeral spec through the completeness path, because the tests were written
 against the rule as understood. The four above close that.
 </p></div></div>
+<div class="card" id="card-API2" data-id="API2" data-module="drydocs-api" data-phase="12" data-epic="web-console" data-type="bug" data-status="done" data-search="api2 columndef carries no list type, so two server columns that return lists are declared string - extend the vocabulary and delete the client-side exemption" tabindex="0"><div class="card-head"><span class="card-id">API2</span><span class="card-title">ColumnDef carries no list type, so two server columns that return lists are declared string - extend the vocabulary and delete the client-side exemption</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-api</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">bug</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> ColumnDef.type is &#x27;string&#x27; | &#x27;int&#x27; only, so two server columns that return LISTS are
+declared string: runbooks.series.v1 &#x27;lands&#x27; (collect(DISTINCT d.assetId)) and
+lineage.schema-definition.v1 &#x27;properties&#x27; (a Cypher list comprehension). Verified at
+drydocs_api/query_specs.py:73 (the vocabulary), :1003 and :1213 (the two declarations).
+WEB6&#x27;s client-side row-shape validator found them and exempts exactly those two by spec id,
+with a bidirectional guard in rowShape.test.ts that fails when the server is fixed AND when a
+third one appears - so this is not a two-string edit.
+
+(a) ColumnDef grows a LIST column type, and the OpenAPI shape moves with it
+    (web/src/generated/openapi.json and api.d.ts are regenerated, not hand-edited).
+(b) The two declarations move onto the new type.
+(c) The client validator learns the new type and the two-spec exemption in
+    web/src/data/rowShape.ts is DELETED; rowShape.test.ts is updated in the same commit, since
+    it is written to fail exactly when this item lands.
+(d) A server-side guard reads the SPEC OBJECT (J37 - never a render, never the source text)
+    and fails when a column whose Cypher collects or comprehends is declared scalar. That is
+    the clause that stops a third one appearing.
+(e) The read contract&#x27;s consumers still pass: the API tests, the web type-check and the
+    generated-artifact drift tests.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-07 from IDEAS.md Idea-270 (Lane B close report, laptop, 2026-09-06,
+hand-back api).
+
+R15/R16 own the api package and are both DONE, so the entry&#x27;s sequencing constraint (&#x27;land it
+with or right after them, not before&#x27;) is already satisfied - depends_on is empty for that
+reason, not by oversight.
+
+Filed web-console / phase 12 with API1, because it is the read contract this console
+consumes; R15/R16 sit in agentic-qa / 15 and either filing would have been readable.
+
+Model fable: this changes a published contract (the column vocabulary and its OpenAPI shape),
+which is the boundary case the matrix reserves the top tier for.
+
+-- CLOSED 2026-09-07, Lane B (laptop), branch wip/API2-laptop from main at 7585fb27 --
+
+ALL FIVE CLAUSES MET, in ONE commit rather than five, because (b), (c) and (d) each
+break the others&#x27; guards in isolation: the old python guard fails the moment the two
+declarations change, and rowShape.test.ts fails the moment the exemption map empties.
+Split across pushes that would have put three red CI tips on the branch for reasons that
+are not the roadmap guard.
+
+-- (a) THE VOCABULARY IS NOW A THING, not a comment --
+
+ColumnDef.type was documented as &quot;&#x27;string&#x27; | &#x27;int&#x27;&quot; in a trailing comment, which is why
+it could be wrong twice without anything noticing. It is now COLUMN_TYPES, a named
+frozenset, asserted per column by _validate_registry AT IMPORT -- so a bad type is an
+ImportError on the API package rather than a wrong render.
+
+ColumnOut.type became a Literal, which is what makes clause (a)&#x27;s &quot;the OpenAPI shape
+moves with it&quot; true rather than a no-op: with `type: str` the document would not have
+changed by one character. openapi.json gains the enum and api.d.ts gains
+`&quot;string&quot; | &quot;int&quot; | &quot;list&quot;`. Both REGENERATED (scripts/dump_openapi.py, then
+`npm run api:types`), never hand-edited.
+
+THAT MAKES THE VOCABULARY EXIST TWICE, because pydantic needs static values in a
+Literal. Left alone, two copies drift and the generated client quietly stops offering a
+type the server sends. So test_column_types.py compares them with get_args -- the exact
+arrangement CLASSIFICATIONS already has with config/classification.yaml, and guarded for
+the reason that one is: J23&#x27;s collapse to three levels sat unnoticed in this file for a
+day because nothing compared the copies.
+
+ONE JUDGMENT, recorded rather than left implicit: `list` declares no ELEMENT type. Both
+specs return lists of strings, but the contract being fixed is &quot;this is a list, not a
+scalar&quot;, and an element type nothing enforces is a second declaration to keep true.
+Likewise web/src/lib/graph.ts&#x27;s hand-written SpecResult still says `type: string` and not
+the union: it is the console&#x27;s forward-compatible seam, the generated union already
+satisfies it (SpecRunOutCoversSpecResult still compiles), and tightening it would couple
+the seam to the generated file for no check it does not already have.
+
+-- (c) THE EXEMPTION AND ITS PLUMBING BOTH GO, and the second half is beyond the ask --
+
+DECLARED_TYPE_EXCEPTIONS is deleted as the clause requires. The generic `exempt` field on
+RowSource and the two lines that read it are deleted too, which the clause does not say:
+after the map goes it has no producer, and the retired guard&#x27;s own docstring is the
+argument -- &quot;an exemption nobody re-checks is how a workaround outlives its cause&quot;. A
+never-populated escape hatch is that, waiting. Flagged here because it is a deletion
+nobody asked for; it is one field and reversible.
+
+satisfies() KEEPS its unknown-type-passes fallthrough even though the contract is now a
+closed union, and the comment now says why instead of merely stating the behaviour: a
+declared vocabulary and a forward-compatible runtime are different guarantees, and a
+console that rejected a type it had not heard of would break on the next one the server
+adds. The module header&#x27;s note 3 (&quot;TWO SERVER DECLARATIONS ARE WRONG TODAY&quot;) is rewritten
+rather than deleted -- it was about to become false prose sitting in a file whose other
+notes are all still true.
+
+The two exemption tests in rowShape.test.ts are replaced by two real ones: a scalar
+arriving under a `list` declaration is now CAUGHT (which is precisely the difference
+between a declared type and an exempted one), and null still satisfies `list` as it does
+every other type -- note 1 restated for the new type rather than assumed to carry over.
+
+-- (d) THE GUARD, and the accuracy it now needs --
+
+tests/unit/test_row_shape_exceptions.py is retired and replaced by
+tests/unit/test_column_types.py. The half that parsed the console&#x27;s TypeScript is gone
+with the map it read; the half that reads the registry is rewritten.
+
+THE OLD SCAN WAS ACCIDENTALLY RIGHT. It matched `collect(` ... `AS name` within one LINE
+(`[^\n]*?`), and found exactly the two real cases only because this registry happens to
+write each alias on the line of its own collect. Removing the line anchor, as a
+reasonable-looking edit would, makes it report six columns that are not lists. It is
+replaced by a forward parse: split on clause keywords, split the projection list on
+top-level commas, take each item&#x27;s own `AS name`. An alias is then tied to its own
+expression whatever the whitespace does.
+
+AND ONLY AN OUTERMOST collect OR comprehension COUNTS. `size(collect(x)) AS n` returns an
+integer and is correctly declared `int`; a scan matching `collect(` anywhere would fail
+the registry for a correct declaration -- and there is no exemption left to absorb it,
+which is exactly why the accuracy matters more now than it did before. Both cases are
+pinned as controls beside the parser test. The registry has no such expression today;
+this is a guard against the next one, not a fix for a live case.
+
+The instrument check (J76) NAMES THE TWO COLUMNS rather than asserting a non-empty set,
+so retiring a spec makes this test say so instead of letting the guard go green over
+nothing -- the vacuous-scan failure CORE2 closed one item earlier in this same lane.
+
+-- HANDED BACK TO LANE A --
+
+1. TWO GENERATED ARTIFACTS RIDE WITH THIS ITEM and neither is refreshed by
+   render_board.py: web/src/generated/openapi.json (scripts/dump_openapi.py) and
+   web/src/generated/api.d.ts (`cd web &amp;&amp; npm run api:types`). If the merge moves either
+   source, re-run both writers rather than resolving them by hand -- and export
+   DRYDOCS_DATA_ROOT before dump_openapi.py: it imports create_app, which resolves the
+   root at import, and it TRUNCATES the committed file before it fails without one.
+2. A FILE WAS DELETED AND A FILE WAS ADDED under tests/unit/, which is an existing
+   tracked directory -- no PORT-MANIFEST row is needed. Anyone searching for
+   test_row_shape_exceptions.py after the merge wants test_column_types.py.
+3. NO LEDGER MOVEMENT. No .tsx added, so the O42 component ledger is untouched; no
+   ui-tests.yaml case names rowShape, so the automated-share pin does not move; the two
+   replaced web tests are net zero (460 vitest before and after).
+
+VERIFIED on this laptop (J18): full unit suite 3557 passed / 14 skipped / 0 failed, ruff
+check and ruff format --check clean over the repo, tsc -b --force clean, 460 vitest
+passing (41 files), vite build, bundle:check 98.0% of ceiling. No live graph -- this item
+reads the registry as an imported object and needs no database.
+
+EXPECTED RED, per the Lane B handoff: test_committed_roadmap_page_matches_its_sources
+fails on this close commit -- a close writes notes and Lane B does not render (Y5&#x27;s
+tolerance covers a CLAIM, not a close). Lane A renders once at merge.
+</p></div></div>
+<div class="card" id="card-API3" data-id="API3" data-module="drydocs-api" data-phase="12" data-epic="web-console" data-type="bug" data-status="done" data-search="api3 scripts/dump_openapi.py opens the committed openapi.json before it renders, so a render failure leaves a zero-byte artifact" tabindex="0"><div class="card-head"><span class="card-id">API3</span><span class="card-title">scripts/dump_openapi.py opens the committed openapi.json before it renders, so a render failure leaves a zero-byte artifact</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-api</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">bug</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> scripts/dump_openapi.py opens web/src/generated/openapi.json for WRITING before it calls
+render_schema(), so a render failure truncates the committed artifact to zero bytes. The
+result reads as a corrupt commit rather than a failed run, and npm run api:types then fails on
+an empty document one step later with no pointer back to the cause.
+
+(a) Render to a string FIRST, then open and write - the artifact is never opened until there
+    is content to put in it.
+(b) The script exits non-zero with the exception named, so the failing step says what failed.
+(c) The test that pins the writer grows the failure case: a render that raises leaves the
+    existing artifact BYTE-IDENTICAL and the process exits non-zero.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-07 from IDEAS.md Idea-268 (Lane B close report, laptop, 2026-09-05,
+API1 hand-back one).
+
+Two lines of fix and a test; the test is the point, since the same open-then-render shape is
+easy to reintroduce.
+
+-- CLOSED 2026-09-07, Lane B (laptop), branch wip/API3-laptop from main at 55c2a204 --
+
+ALL THREE CLAUSES MET. Two lines of fix, as the entry predicted, and the test that pins
+them turned out to be the part with a decision in it.
+
+-- (a) THE ORDER --
+
+`write_schema` renders in full, then `_write` opens. `open(&quot;w&quot;)` TRUNCATES at the moment
+it is called, so rendering inside the `with` emptied the committed artifact BEFORE
+`create_app()` ran. The failure that actually happens is an unset DRYDOCS_DATA_ROOT
+(G81), which `create_app()` raises at import because it builds the intake store -- so the
+script most likely to fail is the one whose failure was most destructive.
+
+-- (b) THE REPORT --
+
+`main` attempts the render on its own and reports it rather than letting a traceback
+become the next step&#x27;s problem: exit 1, the exception&#x27;s TYPE and MESSAGE on stderr, and
+the sentence &quot;&lt;path&gt; was NOT modified&quot;. That sentence is worth a line: &quot;did this just
+corrupt my working tree&quot; is the first question a failed dump raises, the answer used to
+be yes, and it is now no by construction rather than by luck. An ImportError additionally
+names the optional api group, since that is the other way this script fails on a fresh
+clone.
+
+`--check` goes through the same path. It is the mode CI runs, where a traceback is
+furthest from anyone who can act on it.
+
+TWO SMALL THINGS THE REWRITE PAID FOR:
+* `_relative()` -- the old code called `Path.relative_to(REPO)` in the message, which
+  RAISES for an `--out` outside the repo. Every new test passes a tmp_path, so the
+  reporting path would have crashed while reporting. A crash inside the error handler is
+  how the real cause gets lost.
+* `_matches()` -- `main` already holds a rendered schema by the time it reaches --check
+  and must not render a second one, but two callers each deciding what &quot;matches&quot; means is
+  how two answers to one question start to disagree. One comparison, two callers.
+
+-- (c) THE TEST, and the decision inside it --
+
+THE ORDERING TEST HAD TO BE AT THE LIBRARY BOUNDARY, and that is a finding rather than a
+preference. Mutation-checked by reintroducing the defect: the three CLI tests STILL PASS,
+because `main` now renders before it calls `_write` and is safe whatever `write_schema`
+does internally. Only `test_a_failed_render_leaves_the_artifact_byte_identical` goes red,
+with b&#x27;&#x27; against the original bytes. A clause-(c) test written only against the CLI would
+have been green on the exact defect it was written for -- the vacuous-guard shape CORE2
+closed two items earlier in this lane, arriving from a different direction.
+
+NO SOURCE GUARD WAS ADDED, deliberately. The behavioural test IS the guard: put the
+render back inside the `with` and it goes red. A scan asserting the two calls are not
+nested would be a weaker statement of the same thing -- it would pass on any rewrite that
+kept the order wrong in a shape the pattern did not anticipate.
+
+A POSITIVE CONTROL RIDES WITH THE FOUR FAILURE TESTS (`a_successful_run_still_writes`):
+four tests that all assert on a failure path would every one of them be satisfied by a
+`main` that returned 1 unconditionally.
+
+-- HANDED BACK TO LANE A --
+
+1. NOTHING GENERATED MOVED. openapi.json is untouched by this item -- the script that
+   writes it changed, not the schema. (API2, earlier in this lane, does move it.)
+2. NO PORT-MANIFEST ROW. No new tracked path; both files already exist.
+3. WEB16, LATER IN THIS QUEUE, IS THE OTHER HALF OF THE SAME REPORT: this makes the
+   python side say what failed, and WEB16 makes `npm run api:types` stop burying it in a
+   Node stack. They are independent -- neither waits on the other -- but a reader of
+   either should know the other exists.
+
+VERIFIED on this laptop (J18): full unit suite 3560 passed / 14 skipped / 0 failed, ruff
+check and ruff format --check clean over the repo. The real failure was exercised end to
+end rather than only simulated: with DRYDOCS_DATA_ROOT unset the script exits 1, names
+DataRootNotSetError with its remediation, and web/src/generated/openapi.json is unchanged
+at 102,283 bytes. No web build -- this item adds no TypeScript.
+
+EXPECTED RED, per the Lane B handoff: test_committed_roadmap_page_matches_its_sources
+fails on this close commit -- a close writes notes and Lane B does not render (Y5&#x27;s
+tolerance covers a CLAIM, not a close). Lane A renders once at merge.
+</p></div></div>
 <div class="card" id="card-O1" data-id="O1" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="requirement" data-status="done" data-search="o1 web console design pass: wireframes, a real c4/graph rendering, and the browser↔neo4j access decision" tabindex="0"><div class="card-head"><span class="card-id">O1</span><span class="card-title">Web console design pass: wireframes, a real C4/graph rendering, and the browser↔Neo4j access decision</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">requirement</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The web/ front-end leaves its throwaway-test-page state: wireframes committed; a decision recorded (ADR or design doc) on the browser↔Neo4j access path — bolt-from- browser vs a thin API — with rationale; the console renders a REAL C4 / graph view of the knowledge graph (NVL or an agraph-successor in web/, against the local EE DB) rather than the test page; drydocs-web&#x27;s build/run is documented. No secrets in web/ (publish boundary).
 </p><p class="notes"><strong>Notes:</strong> Groomed 2026-07-09 from the 2026-07-03 IDEAS note (updated 2026-07-09 with the active branches). Marked in_progress: a design pass is actively in flight (branches feature/ui-dark-landing-myapps + origin/feat/web-console-design-pass, untracked docs/design/ui-exploration/). Plan change (user-approved): created module drydocs-web + phase 12. The architecture is still open — the bolt-vs-thin-API call is the crux of this item. MERGED 2026-07-13 (groom, IDEAS 2026-07-12 artifact-design review sub-item 2): the design pass applies the artifact-design skill&#x27;s &quot;UI, not a document&quot; checklist + its AI-default-looks list as the review lens over the docs/design/ui-exploration/ mockups. RE-TIERED opus -&gt; fable on this groom touch (the G3 groom-touch policy; the bolt-vs-thin-API call is a boundary decision, the matrix top slot).
 </p></div></div>
@@ -10279,6 +10638,162 @@ EXPECTED RED, per the Lane B handoff:
 test_committed_roadmap_page_matches_its_sources fails on this commit — a close
 writes notes and Lane B does not render (Y5&#x27;s tolerance covers a CLAIM, not a
 close). Lane A renders once at merge.
+</p></div></div>
+<div class="card" id="card-O51" data-id="O51" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="requirement" data-status="done" data-search="o51 reviewer-quality signals + admin block: auto-accept / too-fast / admin-return rates over a rolling window, limits flag, admin blocks" tabindex="0"><div class="card-head"><span class="card-id">O51</span><span class="card-title">Reviewer-quality signals + admin block: auto-accept / too-fast / admin-return rates over a rolling window, limits flag, admin blocks</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">requirement</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-O46" data-target="card-O46">O46</a> <a class="dep-link" href="#card-O50" data-target="card-O50">O50</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Per-SME quality signals derive from intake records the store already holds — no new data entry: submissions in a rolling window, auto-accept rate (agent candidates accepted with zero modification), too-fast rate (confirm faster than a floor scaled to evidence size), and admin-return rate. Limits live in config/review-quality.yaml (admin-editable via the AdminConfig surface, versioned, unit-guarded). Crossing a limit FLAGS the SME on the admin queue&#x27;s quality rail with the metric that tripped (Meter + StatusChip); the ADMIN — never the machine — can block the persona from submitting: drafts survive, the block records who/when/why, and unblock requires a note. No auto-block exists in any code path. The admin-only per-user panel (submissions, auto-accept rate, return rate, median review time) uses the StatTiles/Meter patterns. The store keeps PER-DECISION detail (accepted/modified fields, durations), not just rollups — the future confirmation-weight trust model needs it.
+</p><p class="notes"><strong>Notes:</strong> Slice 7 (plan §8). User requirement 2026-08-06: recalled as a backlog item ranking auto-acceptance from a QA-testing session — searched backlog/IDEAS/gates/git history, never captured (closest neighbors: R8 answer-evaluation, FB-04 agent test), so the intake plan §8 + this item are now the requirement&#x27;s home. Measure-then-decide posture throughout: thresholds are tripwires, the human is the judge.
+
+-- CLOSED 2026-09-07, Lane B (laptop), branch wip/O51-laptop from main at 4b6ea02d --
+
+MET, with ONE METRIC DECLARED UNAVAILABLE rather than invented. Detail below, and the
+unavailable one is the first thing because it is the decision the rest hangs on.
+
+-- AUTO-ACCEPT HAS NO SOURCE, AND IS NULL RATHER THAN ZERO --
+
+&quot;Agent candidates accepted with zero modification&quot; needs the candidate-binding set to
+compare a confirmation against. That set is the intake plan&#x27;s section 4 and lands with
+O48; the O46 store has no column for it, which is the same seam O50 found from the other
+side and reported as NO_PROPOSED_BINDINGS.
+
+So the metric is `None`, at every layer, with `auto_accept_unavailable_because` carrying
+the reason beside it -- and it CANNOT trip a flag. A zero here would be the worst
+available default: 0% auto-accept reads as a reviewer who modifies every candidate, which
+is the best possible score, manufactured out of no data (O56). The panel prints the
+sentence rather than an em-dash, because a bare dash reads as a display bug. Guarded three
+ways: the summarizer never emits an auto_accept flag, the console&#x27;s FLAGGABLE_METRICS list
+excludes it (that list is where someone would first put it back), and ratePercent is
+tested to keep null and 0 apart.
+
+-- NO NEW DATA ENTRY TURNED OUT TO BE LITERAL --
+
+Every transition already writes an `event` row (intake_id, at, actor, action) and every
+upload an `evidence` row with its byte size. So submissions, too-fast and admin-return
+needed NO schema change at all: they are a different question asked of rows the store has
+kept since O46. The only new table is `persona_block`, which is the decision, not a
+measurement.
+
+PER-DECISION DETAIL, as the clause asks, comes out of that: `Decision` carries the intake,
+the persona, the from-status, the hand-over moment, the measured review seconds, the
+evidence bytes, this record&#x27;s own floor, and whether an admin later returned it. Durations
+are DERIVED rather than stored, which is stronger than storing them -- a stored duration
+can disagree with the timestamps it came from. `modified_fields` exists and is empty
+everywhere: the O48-shaped hole, with a place already made for it.
+
+-- WHAT &quot;REVIEW TIME&quot; MEANS -- A RULING, AND THE ONE MOST WORTH OVERTURNING --
+
+The floor is compared against the time the reviewer had the record IN FRONT OF THEM, which
+starts at the last hand-over: the most recent evidence upload or admin return before the
+submit, whichever is later. The obvious implementation -- time since the previous event --
+is wrong in both directions: an admin&#x27;s return three days ago makes every re-confirm look
+slow, and a re-upload makes a careful review look instant. Stated in the module docstring
+and asserted by a test that names the reasoning, so it can be overturned somewhere visible.
+
+THE FLOOR SCALES WITH EVIDENCE and then stops:
+floor = min(min_review_seconds + seconds_per_kb * KB, max_review_seconds). The cap is not
+tidiness -- an uncapped floor would make every large record &quot;too fast&quot; forever, since
+nobody reads a 10 MB attachment line by line.
+
+UNKNOWN IS NOT FAST. A decision with no hand-over moment (an intake predating the event
+log) has no measurable review time and is not counted as a violation. Otherwise the first
+run would flag people for the deployment date.
+
+-- LIMITS FLAG. A PERSON BLOCKS. --
+
+config/review-quality.yaml holds window, floor and three rate limits, is schema-validated
+and loaded per request (an edited threshold takes effect on the next refresh, not the next
+restart). It holds NOTHING that could act, and a test asserts that absence rather than
+trusting it.
+
+ONE KEY BEYOND THE PLAN&#x27;S FOUR: `min_decisions_for_flag`. Below it, rates are REPORTED and
+nothing is FLAGGED -- one return out of two submissions is a 50% return rate and is not
+evidence about a person. Suppressing a flag is not the same as hiding data, so the panel
+shows the numbers and says why they carry no flag. The plan&#x27;s four keys are all present;
+this is the fifth, and it is the one that keeps the feature from being unfair on its first
+day. `too_fast_rate_max` is likewise named here though the plan lists only
+`min_review_seconds`: a signal with no limit cannot flag anything.
+
+THE SEPARATION IS STRUCTURAL AND ASSERTED BY READING CODE:
+* review_quality.py imports nothing from intake and calls neither block function -- it
+  cannot block anyone because it cannot reach the code that does;
+* exactly two handlers reach the block, and both declare `AdminUser`, which IS the check
+  -- read off app.py&#x27;s AST;
+* outside intake.py and app.py, no module in drydocs_api calls either function.
+The AST walk skips nested scopes on purpose: every route is defined inside `create_app`,
+so a plain `ast.walk` reported the factory as a referencing handler, and the factory takes
+no AdminUser. That guard carries its own positive control -- the FIRST version looked for
+`ast.Call` and found nothing at all, because the functions are passed to `_intake_call` as
+values. It would have passed on any tree. Caught by CORE2&#x27;s habit, one lane earlier.
+
+THE BLOCK STOPS SUBMITTING, NOT WORKING. Enforced at `to == &quot;sme-confirmed&quot;` and nowhere
+else, so drafts, evidence uploads and every transition below it still run. Both paths into
+that status are guarded -- guarding only `correlated -&gt;` would leave the returned-record
+path open, which is the path a flagged reviewer is most likely to be on. The refusal names
+who blocked them, when, and why, and says the drafts are unaffected.
+
+APPEND-ONLY: an unblock CLOSES the row with its note rather than deleting it. A judgment
+about a person that can be erased is not a record, and the pair (why it was placed, what
+changed) is the whole of what makes it reviewable. Both the reason and the unblock note
+are required; a second open block on one persona is refused rather than stacked.
+
+-- THE SURFACE --
+
+Three components, all UNBOUND (reviewer quality is not a registry module), and the split
+is the separation made physical: QualityRail flags and selects, ReviewerQualityPanel holds
+the block behind a required reason, ReviewQualityTab is the only one that fetches. The
+rail has no block control at all. Numbers first, then flags with their limits, then the
+block last -- a block button above the numbers would invite the decision before the
+reading.
+
+ORDERED BY PERSONA ID, never worst-first, on both sides of the wire. The plan&#x27;s words are
+&quot;coaching and triage, not a leaderboard&quot;, and a list sorted by the worst number is a
+leaderboard whatever the heading says. Asserted in both suites.
+
+THE CONSOLE HOLDS NO COPY OF THE THRESHOLDS. Every limit arrives in the payload beside the
+metric it applies to, so a console can never disagree with the server about what &quot;too
+fast&quot; means.
+
+-- WHAT WAS NOT BUILT, and why --
+
+NO CONFIG EDITOR. The acceptance says the limits are &quot;admin-editable via the AdminConfig
+surface&quot;. That surface is READ-ONLY today -- it renders panels and grids and has no write
+path to any config file -- and building the console&#x27;s first config-editing surface inside
+a reviewer-quality item would be a much larger decision than this item is. The file is the
+seam the admin edits, in git, versioned and reviewable, which is what the plan&#x27;s own
+parenthesis says (&quot;versioned in git like every config&quot;). Flagged rather than assumed: if
+the intent was a real editor, it is a follow-up item and a bigger one.
+
+-- HANDED BACK TO LANE A --
+
+1. TWO GENERATED ARTIFACTS RIDE WITH THIS ITEM and neither is a render_board.py output:
+   web/src/generated/openapi.json (scripts/dump_openapi.py) and api.d.ts
+   (`cd web &amp;&amp; npm run api:types`), because three routes were added. Export
+   DRYDOCS_DATA_ROOT before the first (API3, this same lane, is why it no longer truncates
+   the file when you forget).
+2. web/src/generated/enforcement-matrix.json IS refreshed on this branch, deliberately and
+   as the ONE exception to Lane B not rendering: config/review-quality.yaml needs a surface
+   row, and without the regenerated matrix FIVE tests go red instead of the one expected
+   roadmap guard -- including the worktree-render test, whose failure message would point
+   at the config file rather than at the lane protocol. docs/plan/* is untouched.
+3. LEDGER: ui-components component (24) -&gt; (26) and route (25) -&gt; (26), pin (42, 103) -&gt;
+   (42, 106), with the narrative paragraph added. No ui-tests case: AdminConfigRoute is
+   unbound to a registry module, so there is no suite for one to join -- the same gap R8
+   and O50 both recorded, and the same ledger-policy fix.
+4. NO PORT-MANIFEST ROW NEEDED. Checked, not assumed: config/review-quality.yaml and
+   config/schemas/review-quality.schema.json resolve to the `config/**` canonical-producer
+   row, the three .tsx to `web/**`, and drydocs_api/review_quality.py to the
+   `drydocs_api/**` default_ok entry.
+5. THE REVIEW-TIME RULING (hand-over, not previous event) and MIN_DECISIONS_FOR_FLAG are
+   the two judgments in this item that a reader might have made differently. Both are
+   visible: one in a docstring with its test, one in the config with its comment.
+
+VERIFIED on this laptop (J18): full unit suite 3585 passed / 15 skipped / 0 failed, ruff
+check and ruff format --check clean, tsc -b --force clean, oxlint 0, 476 vitest passing
+(43 files), vite build and bundle:check green earlier in the lane and unaffected by this
+item&#x27;s size. No live graph -- nothing here touches Neo4j, which is the intake module&#x27;s
+standing rule and this item inherits it unchanged.
+
+EXPECTED RED, per the Lane B handoff: test_committed_roadmap_page_matches_its_sources
+fails on this close commit -- a close writes notes and Lane B does not render (Y5&#x27;s
+tolerance covers a CLAIM, not a close). Lane A renders once at merge.
 </p></div></div>
 <div class="card" id="card-O52" data-id="O52" data-module="drydocs-api" data-phase="12" data-epic="web-console" data-type="bug" data-status="done" data-search="o52 ownership.attributions.v1 returns an always-null holder_sid column (e.sid is never written; every site keys employee_id)" tabindex="0"><div class="card-head"><span class="card-id">O52</span><span class="card-title">ownership.attributions.v1 returns an always-null holder_sid column (e.sid is never written; every site keys employee_id)</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-api</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">bug</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The QuerySpec ends employee_id-based (e.employee_id AS holder_sid, matching mappings.seal-contact-roles.v1); a regression guard keeps the two specs&#x27; holder_sid expressions agreeing so the typo class cannot recur silently; the K4 attribution review surface&#x27;s Holder SID column populates on a loaded graph.
 </p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-07 from Idea-71. The larger class (a QuerySpec naming a property no loader writes stays green in every unit test) is the J26 promise-vs-assertion family — recorded here, scoped out; the one-word fix plus the pairwise guard is this item. DONE 2026-08-09 (desktop): one-word fix + TWO guards. `ownership.attributions.v1` now returns `e.employee_id AS holder_sid`, matching `mappings.seal-contact-roles.v1`. Verified against the loader rather than assumed: `seal_contacts.cypher:31` MERGEs `(:Employee {employee_id: row.employee_sid})`, and a tree-wide grep found NO writer of a `sid` property anywhere in drydocs/loaders/cypher/ or drydocs_core/schema/ — so the column was always null on any loaded graph, exactly as the item said. Root cause named for the record: the SOURCE column is `employee_sid` and the GRAPH property is `employee_id`; the spec author carried the source spelling across the MERGE. Guards: (1) pairwise — both holder_sid-bearing specs must carry the identical expression, so a future edit to one announces itself; (2) registry-wide — no spec may read a `&lt;alias&gt;.sid` property at all, which is the rule rather than today&#x27;s instance. Both guards were PROVEN to fail on the reintroduced defect before being trusted (the J26 promise-vs-assertion discipline). Suite: test_query_specs 24-&gt;26 passed; full unit 1759 passed / 5 skipped with the one standing desktop bootstrap-guard failure (pre-existing, unrelated, reproduces without this change). NOT changed, recorded instead: the ownership spec&#x27;s OPTIONAL MATCH leaves `(e)` unlabeled where the sibling uses `(e:Employee)` — harmless (HAS_AGENT has one endpoint class) and outside the item&#x27;s stated one-word scope.
@@ -14359,6 +14874,111 @@ Gates at close: poetry run pytest -q = 3360 passed, 12 skipped, 1 failed
 (test_plan_roadmap - the expected Lane B close failure). ruff clean. In web/:
 tsc -b exit 0, oxlint --max-warnings 0 exit 0, npm run test:coverage exit 0,
 vitest 21 files / 252 tests.
+</p></div></div>
+<div class="card" id="card-WEB16" data-id="WEB16" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="chore" data-status="done" data-search="web16 npm run api:types needs drydocs_data_root and says so only as a python traceback buried in a node stack" tabindex="0"><div class="card-head"><span class="card-id">WEB16</span><span class="card-title">npm run api:types needs DRYDOCS_DATA_ROOT and says so only as a Python traceback buried in a Node stack</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> npm run api:types needs DRYDOCS_DATA_ROOT set and says so only as a Python traceback
+buried inside a Node stack: the script shells out to scripts/dump_openapi.py, which imports
+settings that resolve the data root, so an unset root surfaces three layers down. The same
+wall was hit twice - once on API1 and again at the Lane A merge.
+
+(a) ONE of: the npm script checks the variable first and prints the one-line requirement, or
+    the web README&#x27;s generated-artifacts section names the variable beside the command (it
+    names the command today and not the precondition). The first is preferred because it
+    fires at the moment of failure.
+(b) Whichever is chosen, an unset DRYDOCS_DATA_ROOT produces a message that names the
+    variable, before any traceback.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-07 from IDEAS.md Idea-267 (Lane B close report, laptop, 2026-09-05,
+API1 hand-back two).
+
+Small and mechanical, so haiku. API3 (Idea-268) is the other API1 hand-back and touches the
+same script for a different reason; they can land together or apart.
+
+-- CLOSED 2026-09-07, Lane B (laptop), branch wip/WEB16-laptop from main at ecb48877 --
+
+BOTH CLAUSES MET, AND BOTH OPTIONS TAKEN rather than the &quot;ONE of&quot; the acceptance allows --
+but the premise underneath them needed correcting first, and the correction is what shaped
+the fix.
+
+-- THE PREMISE, CHECKED BEFORE IT WAS ACTED ON (J76) --
+
+The entry says `npm run api:types` &quot;shells out to scripts/dump_openapi.py&quot;. IT DOES NOT.
+`web/package.json` runs one Node script that reads the COMMITTED
+`src/generated/openapi.json` and writes `api.d.ts`. It touches no python, no settings and
+no environment variable, and it works perfectly well with DRYDOCS_DATA_ROOT unset.
+
+What people actually hit is the CHAIN -- the README one-liner that runs the python dump
+and then this script. The python half fails on an unset data root (it imports
+`create_app`, which resolves the root at import; G81), and before API3 -- earlier in this
+same lane -- that failure TRUNCATED openapi.json on its way out. So this step then failed
+on an empty document, with a JSON parse error at position 0 standing in for a cause three
+layers away. That is the &quot;buried traceback&quot; both times it was met.
+
+-- WHY CLAUSE (a) IS A MESSAGE AND NOT A CHECK --
+
+The acceptance prefers &quot;the npm script checks the variable first, because it fires at the
+moment of failure&quot;. Implemented literally that would assert a precondition THIS SCRIPT
+DOES NOT HAVE, and would refuse a run that would have succeeded -- someone regenerating
+types from a schema already on disk, which is most of the time. A guard that is wrong
+about what it guards is worse than the traceback it replaces.
+
+So the script distinguishes what can actually be wrong with the file it reads --
+unreadable, EMPTY, not JSON, or parsed-but-not-an-OpenAPI-document -- and every one of
+those prints the chain that produces the file and says, in words, that DRYDOCS_DATA_ROOT
+is required by THAT script and not by this one. The empty case is called EMPTY and named
+as an interrupted dump, which is exactly the state a pre-API3 failure left behind. Clause
+(b) is met on every path: the variable is named before any traceback, because there is no
+longer a traceback.
+
+The README&#x27;s second option is taken TOO, not instead: the generated-artifacts table row
+and the one-liner both carry the variable now, and the one-liner says which of its two
+commands owns it.
+
+-- TWO THINGS THAT CAME WITH IT, both worth stating because neither was asked for --
+
+1. THE DIAGNOSTIC IS EXPORTED AND TESTED. A diagnostic nobody exercises drifts into being
+   wrong, and this one exists because the diagnostic it replaces was wrong in exactly that
+   way -- one parse error covering three causes. `schemaProblem` and `failureText` are
+   pure and unit-tested (6 tests).
+2. THE FILE MOVED .mjs -&gt; .ts AND ITS I/O MOVED BEHIND AN ENTRY-POINT GUARD, and the
+   second came out of the first: importing the script to test it RAN its top-level I/O and
+   rewrote a committed artifact during test collection. Caught by watching the file&#x27;s
+   mtime rather than by trusting the run, which is the only way that particular failure is
+   visible -- a regenerated-identically artifact leaves no diff. Node 24 runs .ts natively
+   (genApiTypes.ts already relied on it), and the rename is what lets a typed test import
+   the module without `tsc` failing at the call site.
+
+-- ONE THING FOUND AND NOT FIXED HERE --
+
+`web/src/generated/api.test.ts` -- a HAND-WRITTEN test -- sits under
+`web/src/generated/**`, which PORT-MANIFEST.yaml gives the `derived` disposition: the
+company side regenerates that directory. A hand-written file inside a regenerated tree is
+a file that can vanish on a port. My own new test was going there for the same reason
+(vitest collects `src/**` only, and api.test.ts is the neighbour) and was moved to
+`src/lib/`, where it classifies canonical-producer. The existing one is not this item&#x27;s to
+move -- it is a port-pen judgment -- but it is the same shape and it is now the only one
+left in that position.
+
+-- HANDED BACK TO LANE A --
+
+1. `web/package.json` changed one line: `node scripts/writeApiTypes.mjs` -&gt;
+   `node scripts/writeApiTypes.ts`. If any other surface names the .mjs, it is stale --
+   the three that did (the README table, genApiTypes.ts&#x27;s header, package.json) are
+   updated here.
+2. NO NEW MANIFEST ROW. Checked with scripts/render_port_dispositions.py, not assumed:
+   `web/scripts/writeApiTypes.ts` and `web/src/lib/apiTypesDiagnostic.test.ts` both
+   resolve to the `web/**` canonical-producer row.
+3. THE api.test.ts DISPOSITION above, if you want it as an idea.
+4. NO LEDGER MOVEMENT: no .tsx added, so ui-components is untouched, and the new test adds
+   no TC case.
+
+VERIFIED on this laptop (J18): full unit suite 3554 passed / 15 skipped / 0 failed, ruff
+clean, tsc -b --force clean, oxlint 0, 466 vitest passing (42 files). All four failure
+paths were exercised for real against the working tree -- missing file, empty file,
+malformed JSON, and a valid non-OpenAPI document -- and `api.d.ts` is byte-identical
+afterwards.
+
+EXPECTED RED, per the Lane B handoff: test_committed_roadmap_page_matches_its_sources
+fails on this close commit -- a close writes notes and Lane B does not render (Y5&#x27;s
+tolerance covers a CLAIM, not a close). Lane A renders once at merge.
 </p></div></div>
 <div class="card" id="card-P1" data-id="P1" data-module="config" data-phase="13" data-epic="runtime-topology" data-type="task" data-status="done" data-search="p1 run the cm_hosts + cm_avg_run profiling probes internally; record conclusions + the dc scope call" tabindex="0"><div class="card-head"><span class="card-id">P1</span><span class="card-title">Run the CM_HOSTS + CM_AVG_RUN profiling probes internally; record conclusions + the DC scope call</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P13</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">haiku / main</span></div><div class="epic">runtime-topology</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Conclusions (counts/domains/match rates only — never result rows) recorded for cm_hosts P1–P5 and cm_avg_run P0–P8 (P4s scoped smoke test BEFORE the estate-wide join, per the user&#x27;s performance flag) in the two gate specs&#x27; provenance blocks + the ledger via fields; the 22-DC-vs-production scope call appended to config/gate-log.md as the controlm-hosts-topology residual resolution.
 </p><p class="notes"><strong>Notes:</strong> User-run on the internal network (no producer-side psgmgr access); agent transcribes.</p></div></div>
