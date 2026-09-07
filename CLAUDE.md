@@ -116,6 +116,14 @@ The 27 legacy letters (A..Z, GN, MM) were FROZEN on 2026-09-02 — a letter reco
    means green at *what you pushed*, never green at somebody else's older commit. It is
    **warn-only** and never blocks the snapshot: recording repo structure and passing a lint
    gate are unrelated jobs, and the failure being fixed here is nobody *looking*.
+   **The check has three outcomes, not two (J78):** green at HEAD, red at HEAD, or **no
+   verdict at HEAD**, which it prints as `UNVERIFIED`. A run GitHub cancelled (the usual
+   cause: your next push superseded it) has a matching sha and no result, and so does a
+   sha with no run at all — neither is green and neither is red. UNVERIFIED means this
+   commit was never checked, and the next push that does run will attribute any failure
+   to whoever made it; if you are about to stop, push something that runs, or say in the
+   handoff that HEAD is unverified. Both of 2026-08-31's first two pushes were cancelled
+   this way and the old check called them RED.
    *Stale-render check (renders are deterministic):* re-render, then `git diff --quiet docs/plan/board.html`
    (and the `docs/design/*.html`, `web/src/generated/gates.json`, `web/src/generated/enforcement-matrix.json`,
    `web/src/generated/load-map.json`, and `docs/plan/load-map.html` — a default-paths `render_board.py` run

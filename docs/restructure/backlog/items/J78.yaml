@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - knowledge/depgraph-snapshots/snapshot.ps1
@@ -50,3 +50,26 @@ notes: |
   2026-08-31 run 33401557831 failed all three jobs in 2-3 seconds on a GitHub billing block,
   executing nothing. The user raised the spending limit the same day and the re-run started
   normally. Account-side, no repo change, and NOT part of this item.
+
+  DONE 2026-09-06 (Lane A, desktop). One commit, both halves.
+  (a) Get-CiVerdict in snapshot.ps1 gains one branch after the success test: a completed run
+  whose conclusion is cancelled, skipped, or empty returns UNVERIFIED (Yellow). The function
+  stays a pure (runs, head) map and the caller is unchanged, so it stays warn-only and the
+  snapshot still writes. (b) One shared message template, $unverified, carries the
+  consequence verbatim: "This commit has not been checked; the next push that runs will
+  attribute its failure to whoever made it." The missing-run branch now uses the same
+  template (its old text said "no run yet", which read as a wait, not a state), and names the
+  newest run's status when that run has no conclusion yet instead of printing a blank.
+  (c) The comment above the branch states why the sha match cannot see it: it catches STALE
+  GREEN; a cancelled run has a MATCHING sha and no result - different failure, same channel.
+  (d) CLAUDE.md section 0 CI-check paragraph names the third outcome in the same commit.
+  (e) VERIFIED on PowerShell 5.1.26100 by dot-sourcing the function against live gh output
+  (desktop): cancelled shas 6e6d35f (this item's own claim commit, cancelled when the next
+  push superseded it) and c41a654 report UNVERIFIED; green sha 7f4b48d reports GREEN,
+  unchanged; an unknown sha reports UNVERIFIED with the missing-run reason; an in-progress
+  HEAD still reports the re-check line; an empty run list still reports check-skipped; a
+  fixture run with an empty conclusion reports UNVERIFIED. The close-of-session snapshot run
+  is the "still writes" check. CORRECTION to the pre-build reading: 470315a2's run was
+  success; the cancelled run that day (34060346823) belonged to c41a654, its claim commit.
+  Same shape as this item's own claim - a claim push is nearly always superseded within
+  minutes, so claim commits are the population that lands UNVERIFIED.
