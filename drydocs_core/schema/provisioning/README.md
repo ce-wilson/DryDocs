@@ -11,7 +11,8 @@ on a **Neo4j Enterprise** DBMS. Authoring + structure only — **no data load** 
 
 > **`ddlineage` was retired 2026-08-04** (ADR 0002 X1 amendment, superseding the G30
 > "provisioned but not live" disposition). Curated lineage writes land in `drydocs` per
-> ADR 0002 D1/D2; nothing ever wrote or read `ddlineage`, and empty-but-provisioned is
+> ADR 0002 D1/D2; nothing ever wrote or read the retired `ddlineage`, and
+> empty-but-provisioned is
 > the gap the G28/G30 drift classes grew in. On a host that still carries it, drop it
 > per the Epic X items, behind a zero-node emptiness probe. (Those items also said
 > "alias out of `ddall` first" — no longer a step, since `ddall` retired 2026-08-18.)
@@ -19,7 +20,8 @@ on a **Neo4j Enterprise** DBMS. Authoring + structure only — **no data load** 
 | `02_proxy_constraints.cypher` | — (RETIRED at G31/G102, 2026-08-18) | tombstone — the cross-db charter died with the fold; both keys live in `constraints.cypher` (`drydocs bootstrap`) |
 | `smoke_drydocs_all.cypher` | — (RETIRED with `ddall`; file DELETED at the G38 close, 2026-08-19 — recover via git history) | the federated smoke had nothing left to federate |
 
-> **`ddschema` is in the topology but in neither the proxy-constraint pass nor `ddall`**
+> **`ddschema` is in the topology but was in neither the proxy-constraint pass
+> nor the retired `ddall`**
 > (G51, 2026-08-03). It holds the schema meta-graph written by `drydocs
 > bootstrap-schema-graph`, where exemplar nodes carry a real label beside `:SchemaMeta`.
 > Two consequences, both deliberate: the `drydocs` NODE KEYs would reject those exemplars,
@@ -37,8 +39,8 @@ on a **Neo4j Enterprise** DBMS. Authoring + structure only — **no data load** 
 ```
 
 Idempotent (`IF NOT EXISTS` throughout). Success is `SHOW DATABASES` listing `drydocs`
-and `ddschema` online. (The federated smoke this section used to describe retired with
-`ddall` at the fold.)
+and `ddschema` online. (The federated smoke this section used to describe went
+with the retired `ddall` at the fold.)
 
 **Docker-only host? Nothing to do — the script handles it (G54, fixed 2026-08-04).**
 `cypher-shell` ships inside the image at `/var/lib/neo4j/bin/cypher-shell`, so a machine
@@ -115,13 +117,14 @@ covered path.
 ## Why these keys (no identity invented)
 
 > **RETIRED MECHANISM, KEPT FOR ITS REASONING (G102, 2026-08-18).** There is no
-> composite and no cross-database join any more — `ddcontext` folded into `drydocs`
+> composite and no cross-database join any more — the retired `ddcontext` folded
+> into `drydocs`
 > and `ddall` retired with it. This section is kept because the KEYS it chose did not
 > retire: they are the ones `constraints.cypher` still enforces, and the argument for
 > choosing a business key over an internal id is the same argument whether or not two
 > databases are involved. Read the mechanism below in the past tense.
 
-The composite joined `ddcontext` → `drydocs` by **business key** (proxy-node
+The composite joined the retired `ddcontext` → `drydocs` by **business key** (proxy-node
 pattern), never internal node id — so context records survive every `drydocs`
 rebuild and re-link automatically. Keys are the **existing canonical** ones
 (ADR 0001: "identity is always a business key"): `DataAsset.assetId` (the URN) and
@@ -136,7 +139,8 @@ gate — out of scope for G1.
   target — procurement/ops gate, not code). G1 is authored + validated on a **local**
   Enterprise instance.
 - **`drydocs` is the one content database** since the G32/G102 fold (2026-08-18). The
-  `ddcontext → drydocs` promotion path this section used to describe is GONE with its
+  retired `ddcontext → drydocs` promotion path this section used to describe is GONE
+  with its
   source: uncertain content lives in `drydocs` behind the `:Uncertain` LABEL, so there
   is nothing to promote and no paused rollout state. Keying trust on which database a
   row sat in was the root cause the gate's §B named.
