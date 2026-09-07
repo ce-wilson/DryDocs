@@ -11,6 +11,7 @@ import {
 } from '../lib/intakeReview'
 import IdChip from './ui/IdChip'
 import StatusChip from './ui/StatusChip'
+import IntakeStepper from './IntakeStepper'
 import ThreadDiff from './ThreadDiff'
 
 // O50 — section 7 of docs/design/ui-exploration/sme-intake-page-plan.md: the
@@ -209,6 +210,17 @@ export default function IntakeReviewQueue({ api }: { api: IntakeApi }) {
         {!record && <p className="text-xs text-faint">Select a record to review it.</p>}
         {record && sides && (
           <div className="flex flex-col gap-3">
+            {/* The full machine, rendered for CONTEXT — the acceptance asks for
+                it in the ui-conventions StatusChip vocabulary, and the stepper
+                is where that vocabulary already lives. Its action row is off:
+                the Decision section below owns the buttons, because Send-back
+                carries the note rule. Both read the same server map. */}
+            <IntakeStepper
+              status={record.status}
+              legal={record.legal_transitions}
+              busy={busy}
+              showActions={false}
+            />
             <div className="grid gap-3 md:grid-cols-2">
               <section className="rounded border border-edge-soft p-2">
                 <h3 className="mb-1 text-xs font-semibold">What the SME confirmed</h3>

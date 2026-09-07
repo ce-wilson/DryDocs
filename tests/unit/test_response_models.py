@@ -29,6 +29,7 @@ import pytest
 pytest.importorskip("fastapi", reason="optional api group (poetry install --with api)")
 
 from drydocs_api.audit import ApiAuditLog  # noqa: E402
+from drydocs_api.intake import STATUSES  # noqa: E402
 
 SECRET = "a-test-console-secret"
 
@@ -352,6 +353,66 @@ def test_thread_decision_validates_and_carries_the_optional_transition_fields(ap
         "POST /intake/{id}/thread-decision",
     )
     assert decided["thread_decision"] == "adds-value"
+
+
+def test_a_blank_return_note_is_a_422_and_the_reason_reaches_the_caller(api):
+    """O50: the admin queue's Send-back button is convenience; THIS is the rule.
+
+    ``test_intake_api.test_return_requires_a_note`` already pins the store's
+    refusal, and pinning it again would be a second copy. What is new here is
+    the WIRE: the console disables the button until a note is typed, and if that
+    client check ever diverges from the server's, the admin has to read the
+    SERVER's sentence — so the status code and the message both have to survive
+    the HTTP boundary. A 500, or a 422 with FastAPI's generic body, would leave
+    the queue printing a shrug.
+    """
+    client, token, _ = api
+    created = _ok(
+        client.post(
+            "/intake",
+            json={"context_type": "other", "area": {}, "note": "o50 return-note test"},
+            headers=_auth(token),
+        ),
+        "POST /intake",
+    )
+    intake_id = created["intake_id"]
+    # Walk to sme-confirmed by following the server's own map at each hop —
+    # never a hard-coded path, which would be the machine written down twice.
+    for _ in range(len(STATUSES)):
+        record = _ok(client.get(f"/intake/{intake_id}", headers=_auth(token)), "GET /intake/{id}")
+        if record["status"] == "sme-confirmed":
+            break
+        forward = record["legal_transitions"]["transitions"][0]["to"]
+        _ok(
+            client.post(
+                f"/intake/{intake_id}/transition",
+                json={"to": forward, "note": ""},
+                headers=_auth(token),
+            ),
+            "POST /intake/{id}/transition",
+        )
+    else:  # pragma: no cover - only reachable if the machine grows a cycle
+        raise AssertionError("never reached sme-confirmed following the legal map")
+
+    refused = client.post(
+        f"/intake/{intake_id}/transition",
+        json={"to": "admin-returned", "note": "   "},
+        headers=_auth(token),
+    )
+    assert refused.status_code == 422, refused.text
+    assert refused.json()["detail"] == (
+        "a return goes back with a note — the SME needs the why"
+    ), "the console prints this verbatim; a paraphrase here is a second copy of the rule"
+
+    accepted = _ok(
+        client.post(
+            f"/intake/{intake_id}/transition",
+            json={"to": "admin-returned", "note": "bindings look wrong"},
+            headers=_auth(token),
+        ),
+        "POST /intake/{id}/transition",
+    )
+    assert accepted["status"] == "admin-returned"
 
 
 def test_every_console_route_in_the_schema_guard_was_driven_here() -> None:

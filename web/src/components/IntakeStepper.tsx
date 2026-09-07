@@ -35,11 +35,17 @@ export default function IntakeStepper({
   legal,
   busy,
   onTransition,
+  showActions = true,
 }: {
   status: string
   legal: LegalTransitions
   busy: boolean
-  onTransition: (to: string) => void
+  onTransition?: (to: string) => void
+  /** O50: the admin review panel renders the machine for CONTEXT and owns the
+   *  buttons itself, because its Send-back carries the note rule. Two button
+   *  rows off one map would be two rows to keep in step; the map still decides
+   *  what the one row holds. */
+  showActions?: boolean
 }) {
   // admin-returned re-queues to the front; no-new-value dead-ends where it was.
   const currentIdx =
@@ -89,23 +95,25 @@ export default function IntakeStepper({
           {WAITING_ON.map((w) => `${w.what} — ${w.gate}`).join('; ')}.
         </p>
       )}
-      <div className="mt-2 flex flex-wrap gap-2">
-        {legal.transitions.map((t) => (
-          <button
-            key={t.to}
-            type="button"
-            disabled={busy}
-            onClick={() => onTransition(t.to)}
-            className="rounded border border-edge-soft bg-panel px-2 py-1 text-xs hover:border-blue-bright disabled:opacity-50"
-            title={`→ ${t.to}`}
-          >
-            {t.action}
-          </button>
-        ))}
-        {legal.transitions.length === 0 && !legal.terminal && !legal.thread_decision_required && (
-          <span className="text-xs text-faint">No actions for your role at this stage.</span>
-        )}
-      </div>
+      {showActions && (
+        <div className="mt-2 flex flex-wrap gap-2">
+          {legal.transitions.map((t) => (
+            <button
+              key={t.to}
+              type="button"
+              disabled={busy}
+              onClick={() => onTransition?.(t.to)}
+              className="rounded border border-edge-soft bg-panel px-2 py-1 text-xs hover:border-blue-bright disabled:opacity-50"
+              title={`→ ${t.to}`}
+            >
+              {t.action}
+            </button>
+          ))}
+          {legal.transitions.length === 0 && !legal.terminal && !legal.thread_decision_required && (
+            <span className="text-xs text-faint">No actions for your role at this stage.</span>
+          )}
+        </div>
+      )}
     </div>
   )
 }

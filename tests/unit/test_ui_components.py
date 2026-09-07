@@ -398,10 +398,21 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     96 -> 97 at R19 (2026-09-06): ClarificationCard, BOUND to `ask` by directory
     evidence -- it lives under ask/ and serves exactly the one route that renders
     it. Both counts move by one.
+    97 -> 99 at O50 (2026-09-06): IntakeReviewQueue and ThreadDiff, both UNBOUND,
+    bound stays 41. Same reason as O47's pair above and not a new one -- `intake`
+    is not a registry module, so a binding would invent one. ThreadDiff is the
+    more interesting of the two: it did not arrive, it MOVED, out of IntakeRoute
+    and into its own file the moment it gained a second consumer. The admin
+    review panel has to show the delta exactly as the SME saw it (the plan's
+    VERBATIM discipline for this surface), and two copies of a renderer are two
+    things that can disagree about what was shown -- TrustLegend's rule, reached
+    by a different road. A move is invisible to the scan, which counts files on
+    disk, so it reads here as a plain +1 and this sentence is the only place the
+    difference is recorded.
     """
     comps = _ui()["components"]
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
         41,
-        97,
+        99,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"

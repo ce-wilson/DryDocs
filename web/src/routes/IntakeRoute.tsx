@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { SpecResult } from '../lib/graph'
-import type { Persona } from '../lib/auth'
+import { canReviewIntake, type Persona } from '../lib/auth'
 import { createIntakeApi, type IntakeRecord } from '../lib/intakeApi'
 import contextTypesData from '../generated/context-types.json'
 import ModuleToolbar from '../layout/ModuleToolbar'
@@ -514,7 +514,7 @@ export default function IntakeRoute({ persona }: { persona: Persona }) {
         <PlaceholderSection n={6} title="Agent first-pass correlation" slice="O49" />
         <section className="rounded border border-edge-soft p-4">
           <SectionHeader n={7} title="Confirm → admin review → (gated) load" />
-          {persona.role === 'admin' ? (
+          {canReviewIntake(persona) ? (
             <IntakeReviewQueue api={intakeApi} />
           ) : (
             // Not a placeholder and not a hidden section: the rail exists, it
