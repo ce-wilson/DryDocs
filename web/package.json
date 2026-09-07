@@ -13,7 +13,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install --with-deps chromium",
-    "api:types": "node scripts/writeApiTypes.mjs",
+    "api:types": "node scripts/writeApiTypes.ts",
     "test:coverage": "vitest run --coverage --coverage.thresholds.statements=9.8 --coverage.thresholds.branches=70 --coverage.thresholds.functions=50",
     "bundle:check": "node scripts/checkBundleSize.mjs",
     "dist:check": "node scripts/checkDistCoordinates.mjs",

@@ -288,15 +288,21 @@ not written by hand. Two committed artifacts, one chain, guarded at every link:
 
 | Artifact | Written by | Guarded by |
 |---|---|---|
-| `src/generated/openapi.json` | `poetry run python scripts/dump_openapi.py` (repo root; reads `create_app().openapi()`, the importable object) | `tests/unit/test_openapi_client.py`, and `scripts/dump_openapi.py --check` in the CI `web` job |
-| `src/generated/api.d.ts` | `npm run api:types` (`scripts/writeApiTypes.mjs` → `scripts/genApiTypes.ts`) | `src/generated/api.test.ts` regenerates in memory and compares |
+| `src/generated/openapi.json` | `poetry run python scripts/dump_openapi.py` (repo root; reads `create_app().openapi()`, the importable object) — **needs `DRYDOCS_DATA_ROOT` set**: `create_app()` resolves the data root at import and there is no default (G81) | `tests/unit/test_openapi_client.py`, and `scripts/dump_openapi.py --check` in the CI `web` job |
+| `src/generated/api.d.ts` | `npm run api:types` (`scripts/writeApiTypes.ts` → `scripts/genApiTypes.ts`) | `src/generated/api.test.ts` regenerates in memory and compares |
 | every call site | `src/lib/apiClient.ts` — `openapi-fetch` over the generated `paths` | `npm run build` (`tsc -b`), a CI step since O70 |
 
 **After any `drydocs_api` change, regenerate in that order and commit both files**:
 
 ```sh
-poetry run python scripts/dump_openapi.py && (cd web && npm run api:types)
+DRYDOCS_DATA_ROOT="$HOME/data/DryDocs" poetry run python scripts/dump_openapi.py   && (cd web && npm run api:types)
 ```
+
+`DRYDOCS_DATA_ROOT` belongs to the FIRST command only — `npm run api:types` reads a
+committed JSON file and needs nothing from the environment. Unset, the first command now
+exits 1 naming the variable and leaves `openapi.json` untouched (API3); if you reach the
+second command with a missing or empty schema anyway, it says so and points back here
+rather than failing on a JSON parse error three layers from the cause (WEB16).
 
 What the generation buys: a path, path/query parameter or JSON body the schema
 does not declare does not compile, and a response is typed wherever the server

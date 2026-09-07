@@ -7,7 +7,7 @@ phase: 12
 agent: main
 model: haiku
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - web/package.json
@@ -31,3 +31,91 @@ notes: |
 
   Small and mechanical, so haiku. API3 (Idea-268) is the other API1 hand-back and touches the
   same script for a different reason; they can land together or apart.
+
+  -- CLOSED 2026-09-07, Lane B (laptop), branch wip/WEB16-laptop from main at ecb48877 --
+
+  BOTH CLAUSES MET, AND BOTH OPTIONS TAKEN rather than the "ONE of" the acceptance allows --
+  but the premise underneath them needed correcting first, and the correction is what shaped
+  the fix.
+
+  -- THE PREMISE, CHECKED BEFORE IT WAS ACTED ON (J76) --
+
+  The entry says `npm run api:types` "shells out to scripts/dump_openapi.py". IT DOES NOT.
+  `web/package.json` runs one Node script that reads the COMMITTED
+  `src/generated/openapi.json` and writes `api.d.ts`. It touches no python, no settings and
+  no environment variable, and it works perfectly well with DRYDOCS_DATA_ROOT unset.
+
+  What people actually hit is the CHAIN -- the README one-liner that runs the python dump
+  and then this script. The python half fails on an unset data root (it imports
+  `create_app`, which resolves the root at import; G81), and before API3 -- earlier in this
+  same lane -- that failure TRUNCATED openapi.json on its way out. So this step then failed
+  on an empty document, with a JSON parse error at position 0 standing in for a cause three
+  layers away. That is the "buried traceback" both times it was met.
+
+  -- WHY CLAUSE (a) IS A MESSAGE AND NOT A CHECK --
+
+  The acceptance prefers "the npm script checks the variable first, because it fires at the
+  moment of failure". Implemented literally that would assert a precondition THIS SCRIPT
+  DOES NOT HAVE, and would refuse a run that would have succeeded -- someone regenerating
+  types from a schema already on disk, which is most of the time. A guard that is wrong
+  about what it guards is worse than the traceback it replaces.
+
+  So the script distinguishes what can actually be wrong with the file it reads --
+  unreadable, EMPTY, not JSON, or parsed-but-not-an-OpenAPI-document -- and every one of
+  those prints the chain that produces the file and says, in words, that DRYDOCS_DATA_ROOT
+  is required by THAT script and not by this one. The empty case is called EMPTY and named
+  as an interrupted dump, which is exactly the state a pre-API3 failure left behind. Clause
+  (b) is met on every path: the variable is named before any traceback, because there is no
+  longer a traceback.
+
+  The README's second option is taken TOO, not instead: the generated-artifacts table row
+  and the one-liner both carry the variable now, and the one-liner says which of its two
+  commands owns it.
+
+  -- TWO THINGS THAT CAME WITH IT, both worth stating because neither was asked for --
+
+  1. THE DIAGNOSTIC IS EXPORTED AND TESTED. A diagnostic nobody exercises drifts into being
+     wrong, and this one exists because the diagnostic it replaces was wrong in exactly that
+     way -- one parse error covering three causes. `schemaProblem` and `failureText` are
+     pure and unit-tested (6 tests).
+  2. THE FILE MOVED .mjs -> .ts AND ITS I/O MOVED BEHIND AN ENTRY-POINT GUARD, and the
+     second came out of the first: importing the script to test it RAN its top-level I/O and
+     rewrote a committed artifact during test collection. Caught by watching the file's
+     mtime rather than by trusting the run, which is the only way that particular failure is
+     visible -- a regenerated-identically artifact leaves no diff. Node 24 runs .ts natively
+     (genApiTypes.ts already relied on it), and the rename is what lets a typed test import
+     the module without `tsc` failing at the call site.
+
+  -- ONE THING FOUND AND NOT FIXED HERE --
+
+  `web/src/generated/api.test.ts` -- a HAND-WRITTEN test -- sits under
+  `web/src/generated/**`, which PORT-MANIFEST.yaml gives the `derived` disposition: the
+  company side regenerates that directory. A hand-written file inside a regenerated tree is
+  a file that can vanish on a port. My own new test was going there for the same reason
+  (vitest collects `src/**` only, and api.test.ts is the neighbour) and was moved to
+  `src/lib/`, where it classifies canonical-producer. The existing one is not this item's to
+  move -- it is a port-pen judgment -- but it is the same shape and it is now the only one
+  left in that position.
+
+  -- HANDED BACK TO LANE A --
+
+  1. `web/package.json` changed one line: `node scripts/writeApiTypes.mjs` ->
+     `node scripts/writeApiTypes.ts`. If any other surface names the .mjs, it is stale --
+     the three that did (the README table, genApiTypes.ts's header, package.json) are
+     updated here.
+  2. NO NEW MANIFEST ROW. Checked with scripts/render_port_dispositions.py, not assumed:
+     `web/scripts/writeApiTypes.ts` and `web/src/lib/apiTypesDiagnostic.test.ts` both
+     resolve to the `web/**` canonical-producer row.
+  3. THE api.test.ts DISPOSITION above, if you want it as an idea.
+  4. NO LEDGER MOVEMENT: no .tsx added, so ui-components is untouched, and the new test adds
+     no TC case.
+
+  VERIFIED on this laptop (J18): full unit suite 3554 passed / 15 skipped / 0 failed, ruff
+  clean, tsc -b --force clean, oxlint 0, 466 vitest passing (42 files). All four failure
+  paths were exercised for real against the working tree -- missing file, empty file,
+  malformed JSON, and a valid non-OpenAPI document -- and `api.d.ts` is byte-identical
+  afterwards.
+
+  EXPECTED RED, per the Lane B handoff: test_committed_roadmap_page_matches_its_sources
+  fails on this close commit -- a close writes notes and Lane B does not render (Y5's
+  tolerance covers a CLAIM, not a close). Lane A renders once at merge.
