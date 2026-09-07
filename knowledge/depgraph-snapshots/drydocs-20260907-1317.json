@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-07T11:13:47",
+    "captured_at": "2026-09-07T13:18:05",
     "date": "20260907",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "472001dc",
-      "full": "472001dc1e03b8933bc1cfdaef5a631ffc93cd90",
+      "commit": "36788976",
+      "full": "36788976fe7cf1f32b7d8e578179b51d36580a9e",
       "branch": "main",
-      "describe": "port-base-20260905-148-g472001dc",
-      "subject": "docs(adr-0019): the cited path is web/src/lib/askApi.ts - the ask client never lived under web/src/ask/ (preflight: cited paths resolve)",
+      "describe": "port-base-20260905-172-g36788976",
+      "subject": "chore(plan): render after the four Lane B merges (R8, Z6, O50, O63 done) and format one unioned test file",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -6020,6 +6020,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/agents/common/answer_eval.py",
+      "name": "answer_eval.py",
+      "extension": ".py",
+      "rel_path": "agents/common/answer_eval.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/agents/common/cap_tuning.py",
+      "name": "cap_tuning.py",
+      "extension": ".py",
+      "rel_path": "agents/common/cap_tuning.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/agents/common/env_merge.py",
       "name": "env_merge.py",
       "extension": ".py",
@@ -6047,6 +6065,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/agents/common/ledger_read.py",
+      "name": "ledger_read.py",
+      "extension": ".py",
+      "rel_path": "agents/common/ledger_read.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/agents/common/llm_ledger.py",
       "name": "llm_ledger.py",
       "extension": ".py",
@@ -6069,6 +6096,15 @@
       "name": "session_redaction.py",
       "extension": ".py",
       "rel_path": "agents/common/session_redaction.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/agents/common/spec_promotion.py",
+      "name": "spec_promotion.py",
+      "extension": ".py",
+      "rel_path": "agents/common/spec_promotion.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -9170,15 +9206,6 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/docs/lane-a-handoff.md",
-      "name": "lane-a-handoff.md",
-      "extension": ".md",
-      "rel_path": "docs/lane-a-handoff.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
       "file_id": "drydocs/docs/lane-b-handoff.md",
       "name": "lane-b-handoff.md",
       "extension": ".md",
@@ -9872,6 +9899,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/API2.yaml",
+      "name": "API2.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/API2.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/API3.yaml",
+      "name": "API3.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/API3.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/B1.yaml",
       "name": "B1.yaml",
       "extension": ".yaml",
@@ -10331,10 +10376,46 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/CFG3.yaml",
+      "name": "CFG3.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/CFG3.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/CORE1.yaml",
       "name": "CORE1.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/CORE1.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/CORE2.yaml",
+      "name": "CORE2.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/CORE2.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/CORE3.yaml",
+      "name": "CORE3.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/CORE3.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/CORE4.yaml",
+      "name": "CORE4.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/CORE4.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -10470,6 +10551,24 @@
       "name": "DOC4.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/DOC4.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/DOC5.yaml",
+      "name": "DOC5.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/DOC5.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/DOC6.yaml",
+      "name": "DOC6.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/DOC6.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -13130,6 +13229,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/LIN3.yaml",
+      "name": "LIN3.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/LIN3.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/LOAD1.yaml",
       "name": "LOAD1.yaml",
       "extension": ".yaml",
@@ -13143,6 +13251,24 @@
       "name": "LOAD2.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/LOAD2.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/LOAD3.yaml",
+      "name": "LOAD3.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/LOAD3.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/LOAD4.yaml",
+      "name": "LOAD4.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/LOAD4.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -14408,6 +14534,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/ONT3.yaml",
+      "name": "ONT3.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/ONT3.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/P1.yaml",
       "name": "P1.yaml",
       "extension": ".yaml",
@@ -14493,6 +14628,69 @@
       "name": "PLAN4.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/PLAN4.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/PLAN5.yaml",
+      "name": "PLAN5.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/PLAN5.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/PLAN6.yaml",
+      "name": "PLAN6.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/PLAN6.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/PORT1.yaml",
+      "name": "PORT1.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/PORT1.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/PORT2.yaml",
+      "name": "PORT2.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/PORT2.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/PORT3.yaml",
+      "name": "PORT3.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/PORT3.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/PORT4.yaml",
+      "name": "PORT4.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/PORT4.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/PORT5.yaml",
+      "name": "PORT5.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/PORT5.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -15537,6 +15735,24 @@
       "name": "WEB15.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/WEB15.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/WEB16.yaml",
+      "name": "WEB16.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/WEB16.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/WEB17.yaml",
+      "name": "WEB17.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/WEB17.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -22472,10 +22688,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260906-2204.json",
-      "name": "drydocs-20260906-2204.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260907.json",
+      "name": "drydocs-20260907.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260906-2204.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260907.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -24272,6 +24488,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_answer_eval.py",
+      "name": "test_answer_eval.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_answer_eval.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_api_audit.py",
       "name": "test_api_audit.py",
       "extension": ".py",
@@ -24384,6 +24609,15 @@
       "name": "test_business_key_backbone.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_business_key_backbone.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_cap_tuning.py",
+      "name": "test_cap_tuning.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_cap_tuning.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -26045,6 +26279,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_service_probe.py",
+      "name": "test_service_probe.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_service_probe.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_session_redaction.py",
       "name": "test_session_redaction.py",
       "extension": ".py",
@@ -26139,6 +26382,15 @@
       "name": "test_source_scan.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_source_scan.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_spec_promotion.py",
+      "name": "test_spec_promotion.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_spec_promotion.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -26729,6 +26981,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/ask/FailureLadder.test.tsx",
+      "name": "FailureLadder.test.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/ask/FailureLadder.test.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/ask/FailureLadder.tsx",
+      "name": "FailureLadder.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/ask/FailureLadder.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/ask/FileReport.tsx",
       "name": "FileReport.tsx",
       "extension": ".tsx",
@@ -26837,6 +27107,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/components/IntakeReviewQueue.test.tsx",
+      "name": "IntakeReviewQueue.test.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/components/IntakeReviewQueue.test.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/components/IntakeReviewQueue.tsx",
+      "name": "IntakeReviewQueue.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/components/IntakeReviewQueue.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/components/IntakeStepper.tsx",
       "name": "IntakeStepper.tsx",
       "extension": ".tsx",
@@ -26900,6 +27188,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/components/ServiceStatusStrip.test.tsx",
+      "name": "ServiceStatusStrip.test.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/components/ServiceStatusStrip.test.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/components/ServiceStatusStrip.tsx",
+      "name": "ServiceStatusStrip.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/components/ServiceStatusStrip.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/components/SignIn.test.tsx",
       "name": "SignIn.test.tsx",
       "extension": ".tsx",
@@ -26945,6 +27251,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/components/ThreadDiff.tsx",
+      "name": "ThreadDiff.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/components/ThreadDiff.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/components/TowerDrill.tsx",
       "name": "TowerDrill.tsx",
       "extension": ".tsx",
@@ -26981,6 +27296,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/components/intakeReviewQueue.noGraphWrite.test.ts",
+      "name": "intakeReviewQueue.noGraphWrite.test.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/components/intakeReviewQueue.noGraphWrite.test.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/components/map",
       "name": "map",
       "extension": "",
@@ -27003,6 +27327,33 @@
       "name": "MapGlyphs.tsx",
       "extension": ".tsx",
       "rel_path": "web/src/components/map/MapGlyphs.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/components/map/RuntimeSpanMap.test.tsx",
+      "name": "RuntimeSpanMap.test.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/components/map/RuntimeSpanMap.test.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/components/map/RuntimeSpanMap.tsx",
+      "name": "RuntimeSpanMap.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/components/map/RuntimeSpanMap.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/components/map/RuntimeSpanPanel.tsx",
+      "name": "RuntimeSpanPanel.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/components/map/RuntimeSpanPanel.tsx",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -27719,6 +28070,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/lib/askLadder.test.ts",
+      "name": "askLadder.test.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lib/askLadder.test.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/lib/askLadder.ts",
+      "name": "askLadder.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lib/askLadder.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/lib/auth.ts",
       "name": "auth.ts",
       "extension": ".ts",
@@ -27764,6 +28133,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/lib/dataCentersApi.ts",
+      "name": "dataCentersApi.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lib/dataCentersApi.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/lib/epistemics.ts",
       "name": "epistemics.ts",
       "extension": ".ts",
@@ -27804,6 +28182,24 @@
       "name": "intakeApi.ts",
       "extension": ".ts",
       "rel_path": "web/src/lib/intakeApi.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/lib/intakeReview.test.ts",
+      "name": "intakeReview.test.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lib/intakeReview.test.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/lib/intakeReview.ts",
+      "name": "intakeReview.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lib/intakeReview.ts",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -27890,6 +28286,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/lib/runtimeSpan.test.ts",
+      "name": "runtimeSpan.test.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lib/runtimeSpan.test.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/lib/runtimeSpan.ts",
+      "name": "runtimeSpan.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lib/runtimeSpan.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/lib/runtimeView.test.ts",
       "name": "runtimeView.test.ts",
       "extension": ".ts",
@@ -27903,6 +28317,24 @@
       "name": "runtimeView.ts",
       "extension": ".ts",
       "rel_path": "web/src/lib/runtimeView.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/lib/serviceProbe.test.ts",
+      "name": "serviceProbe.test.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lib/serviceProbe.test.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/lib/serviceProbe.ts",
+      "name": "serviceProbe.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lib/serviceProbe.ts",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -28883,12 +29315,28 @@
       "drydocs/agents/common/neo4j_tool.py"
     ],
     [
+      "drydocs/agents/common/answer_eval.py",
+      "drydocs/agents/common/ledger_read.py"
+    ],
+    [
+      "drydocs/agents/common/cap_tuning.py",
+      "drydocs/agents/common/ledger_read.py"
+    ],
+    [
+      "drydocs/agents/common/cap_tuning.py",
+      "drydocs/agents/graph_qa/pipeline.py"
+    ],
+    [
       "drydocs/agents/common/graph_read.py",
       "drydocs/agents/common/neo4j_tool.py"
     ],
     [
       "drydocs/agents/common/graph_read.py",
       "drydocs/drydocs_core/notifications.py"
+    ],
+    [
+      "drydocs/agents/common/ledger_read.py",
+      "drydocs/drydocs_core/run_log.py"
     ],
     [
       "drydocs/agents/common/llm_ledger.py",
@@ -28901,6 +29349,14 @@
     [
       "drydocs/agents/common/neo4j_tool.py",
       "drydocs/agents/common/env_merge.py"
+    ],
+    [
+      "drydocs/agents/common/spec_promotion.py",
+      "drydocs/agents/common/ledger_read.py"
+    ],
+    [
+      "drydocs/agents/common/spec_promotion.py",
+      "drydocs/drydocs_core/run_log.py"
     ],
     [
       "drydocs/agents/common/specs_catalog.py",
@@ -29020,11 +29476,19 @@
     ],
     [
       "drydocs/agents/serve.py",
+      "drydocs/agents/common/neo4j_tool.py"
+    ],
+    [
+      "drydocs/agents/serve.py",
       "drydocs/agents/common/session_redaction.py"
     ],
     [
       "drydocs/agents/serve.py",
       "drydocs/agents/graph_qa/control.py"
+    ],
+    [
+      "drydocs/agents/serve.py",
+      "drydocs/agents/graph_qa/providers.py"
     ],
     [
       "drydocs/drydocs/chain_inputs.py",
@@ -30249,6 +30713,10 @@
     [
       "drydocs/drydocs_api/app.py",
       "drydocs/drydocs_core/config.py"
+    ],
+    [
+      "drydocs/drydocs_api/app.py",
+      "drydocs/drydocs_core/data_centers.py"
     ],
     [
       "drydocs/drydocs_api/app.py",
@@ -31557,6 +32025,10 @@
     [
       "drydocs/tests/unit/test_agent_verbs.py",
       "drydocs/drydocs_api/verbs.py"
+    ],
+    [
+      "drydocs/tests/unit/test_answer_eval.py",
+      "drydocs/tests/source_scan.py"
     ],
     [
       "drydocs/tests/unit/test_api_audit.py",
@@ -33308,6 +33780,10 @@
     ],
     [
       "drydocs/tests/unit/test_response_models.py",
+      "drydocs/drydocs_api/intake.py"
+    ],
+    [
+      "drydocs/tests/unit/test_response_models.py",
       "drydocs/drydocs_api/sessions.py"
     ],
     [
@@ -33491,6 +33967,30 @@
       "drydocs/drydocs_core/models/__init__.py"
     ],
     [
+      "drydocs/tests/unit/test_service_probe.py",
+      "drydocs/drydocs_api/app.py"
+    ],
+    [
+      "drydocs/tests/unit/test_service_probe.py",
+      "drydocs/drydocs_api/credentials.py"
+    ],
+    [
+      "drydocs/tests/unit/test_service_probe.py",
+      "drydocs/drydocs_api/query_specs.py"
+    ],
+    [
+      "drydocs/tests/unit/test_service_probe.py",
+      "drydocs/drydocs_api/sessions.py"
+    ],
+    [
+      "drydocs/tests/unit/test_service_probe.py",
+      "drydocs/tests/source_scan.py"
+    ],
+    [
+      "drydocs/tests/unit/test_service_probe.py",
+      "drydocs/tests/stub_adk.py"
+    ],
+    [
       "drydocs/tests/unit/test_sme_notes.py",
       "drydocs/drydocs/review/sme_notes.py"
     ],
@@ -33576,6 +34076,10 @@
     ],
     [
       "drydocs/tests/unit/test_source_scan.py",
+      "drydocs/tests/source_scan.py"
+    ],
+    [
+      "drydocs/tests/unit/test_spec_promotion.py",
       "drydocs/tests/source_scan.py"
     ],
     [
@@ -33907,6 +34411,22 @@
       "drydocs/web/src/lib/askApi.ts"
     ],
     [
+      "drydocs/web/src/ask/FailureLadder.test.tsx",
+      "drydocs/web/src/ask/FailureLadder.tsx"
+    ],
+    [
+      "drydocs/web/src/ask/FailureLadder.test.tsx",
+      "drydocs/web/src/lib/serviceProbe.ts"
+    ],
+    [
+      "drydocs/web/src/ask/FailureLadder.tsx",
+      "drydocs/web/src/lib/askLadder.ts"
+    ],
+    [
+      "drydocs/web/src/ask/FailureLadder.tsx",
+      "drydocs/web/src/lib/serviceProbe.ts"
+    ],
+    [
       "drydocs/web/src/ask/FileReport.tsx",
       "drydocs/web/src/components/ui/EmptyState.tsx"
     ],
@@ -33983,8 +34503,48 @@
       "drydocs/web/src/data/towers.ts"
     ],
     [
+      "drydocs/web/src/components/IntakeReviewQueue.test.tsx",
+      "drydocs/web/src/components/IntakeReviewQueue.tsx"
+    ],
+    [
+      "drydocs/web/src/components/IntakeReviewQueue.test.tsx",
+      "drydocs/web/src/lib/intakeApi.ts"
+    ],
+    [
+      "drydocs/web/src/components/IntakeReviewQueue.test.tsx",
+      "drydocs/web/src/lib/intakeReview.ts"
+    ],
+    [
+      "drydocs/web/src/components/IntakeReviewQueue.tsx",
+      "drydocs/web/src/components/IntakeStepper.tsx"
+    ],
+    [
+      "drydocs/web/src/components/IntakeReviewQueue.tsx",
+      "drydocs/web/src/components/ThreadDiff.tsx"
+    ],
+    [
+      "drydocs/web/src/components/IntakeReviewQueue.tsx",
+      "drydocs/web/src/components/ui/IdChip.tsx"
+    ],
+    [
+      "drydocs/web/src/components/IntakeReviewQueue.tsx",
+      "drydocs/web/src/components/ui/StatusChip.tsx"
+    ],
+    [
+      "drydocs/web/src/components/IntakeReviewQueue.tsx",
+      "drydocs/web/src/lib/intakeApi.ts"
+    ],
+    [
+      "drydocs/web/src/components/IntakeReviewQueue.tsx",
+      "drydocs/web/src/lib/intakeReview.ts"
+    ],
+    [
       "drydocs/web/src/components/IntakeStepper.tsx",
       "drydocs/web/src/lib/intakeApi.ts"
+    ],
+    [
+      "drydocs/web/src/components/IntakeStepper.tsx",
+      "drydocs/web/src/lib/intakeReview.ts"
     ],
     [
       "drydocs/web/src/components/MiniDag.tsx",
@@ -34021,6 +34581,18 @@
     [
       "drydocs/web/src/components/ProvenanceNotice.tsx",
       "drydocs/web/src/data/provenance.ts"
+    ],
+    [
+      "drydocs/web/src/components/ServiceStatusStrip.test.tsx",
+      "drydocs/web/src/components/ServiceStatusStrip.tsx"
+    ],
+    [
+      "drydocs/web/src/components/ServiceStatusStrip.test.tsx",
+      "drydocs/web/src/lib/serviceProbe.ts"
+    ],
+    [
+      "drydocs/web/src/components/ServiceStatusStrip.tsx",
+      "drydocs/web/src/lib/serviceProbe.ts"
     ],
     [
       "drydocs/web/src/components/SignIn.test.tsx",
@@ -34071,6 +34643,10 @@
       "drydocs/web/src/data/towers.ts"
     ],
     [
+      "drydocs/web/src/components/intakeReviewQueue.noGraphWrite.test.ts",
+      "drydocs/web/src/test/sourceScan.ts"
+    ],
+    [
       "drydocs/web/src/components/map/LocationMap.tsx",
       "drydocs/web/src/components/map/MapGlyphs.tsx"
     ],
@@ -34093,6 +34669,58 @@
     [
       "drydocs/web/src/components/map/LocationMap.tsx",
       "drydocs/web/src/lib/graph.ts"
+    ],
+    [
+      "drydocs/web/src/components/map/RuntimeSpanMap.test.tsx",
+      "drydocs/web/src/components/map/RuntimeSpanMap.tsx"
+    ],
+    [
+      "drydocs/web/src/components/map/RuntimeSpanMap.test.tsx",
+      "drydocs/web/src/lib/dataCentersApi.ts"
+    ],
+    [
+      "drydocs/web/src/components/map/RuntimeSpanMap.test.tsx",
+      "drydocs/web/src/lib/graph.ts"
+    ],
+    [
+      "drydocs/web/src/components/map/RuntimeSpanMap.tsx",
+      "drydocs/web/src/components/map/projection.ts"
+    ],
+    [
+      "drydocs/web/src/components/map/RuntimeSpanMap.tsx",
+      "drydocs/web/src/components/map/resolve.ts"
+    ],
+    [
+      "drydocs/web/src/components/map/RuntimeSpanMap.tsx",
+      "drydocs/web/src/data/rowShape.ts"
+    ],
+    [
+      "drydocs/web/src/components/map/RuntimeSpanMap.tsx",
+      "drydocs/web/src/generated/world-map.ts"
+    ],
+    [
+      "drydocs/web/src/components/map/RuntimeSpanMap.tsx",
+      "drydocs/web/src/lib/dataCentersApi.ts"
+    ],
+    [
+      "drydocs/web/src/components/map/RuntimeSpanMap.tsx",
+      "drydocs/web/src/lib/graph.ts"
+    ],
+    [
+      "drydocs/web/src/components/map/RuntimeSpanMap.tsx",
+      "drydocs/web/src/lib/runtimeSpan.ts"
+    ],
+    [
+      "drydocs/web/src/components/map/RuntimeSpanPanel.tsx",
+      "drydocs/web/src/components/map/RuntimeSpanMap.tsx"
+    ],
+    [
+      "drydocs/web/src/components/map/RuntimeSpanPanel.tsx",
+      "drydocs/web/src/data/graphAccess.ts"
+    ],
+    [
+      "drydocs/web/src/components/map/RuntimeSpanPanel.tsx",
+      "drydocs/web/src/lib/dataCentersApi.ts"
     ],
     [
       "drydocs/web/src/components/map/projection.ts",
@@ -34192,11 +34820,7 @@
     ],
     [
       "drydocs/web/src/data/readiness.ts",
-      "drydocs/web/src/lib/apiClient.ts"
-    ],
-    [
-      "drydocs/web/src/data/readiness.ts",
-      "drydocs/web/src/lib/reachability.ts"
+      "drydocs/web/src/lib/serviceProbe.ts"
     ],
     [
       "drydocs/web/src/data/rowShape.test.ts",
@@ -34523,6 +35147,18 @@
       "drydocs/web/src/lib/adk.ts"
     ],
     [
+      "drydocs/web/src/lib/askLadder.test.ts",
+      "drydocs/web/src/lib/askLadder.ts"
+    ],
+    [
+      "drydocs/web/src/lib/askLadder.test.ts",
+      "drydocs/web/src/lib/serviceProbe.ts"
+    ],
+    [
+      "drydocs/web/src/lib/askLadder.ts",
+      "drydocs/web/src/lib/serviceProbe.ts"
+    ],
+    [
       "drydocs/web/src/lib/auth.ts",
       "drydocs/web/src/lib/apiClient.ts"
     ],
@@ -34551,6 +35187,14 @@
       "drydocs/web/src/lib/cypher-labels.ts"
     ],
     [
+      "drydocs/web/src/lib/dataCentersApi.ts",
+      "drydocs/web/src/lib/apiClient.ts"
+    ],
+    [
+      "drydocs/web/src/lib/dataCentersApi.ts",
+      "drydocs/web/src/lib/auth.ts"
+    ],
+    [
       "drydocs/web/src/lib/graph.ts",
       "drydocs/web/src/lib/auth.ts"
     ],
@@ -34573,6 +35217,18 @@
     [
       "drydocs/web/src/lib/intakeApi.ts",
       "drydocs/web/src/lib/graphApi.ts"
+    ],
+    [
+      "drydocs/web/src/lib/intakeReview.test.ts",
+      "drydocs/web/src/lib/intakeApi.ts"
+    ],
+    [
+      "drydocs/web/src/lib/intakeReview.test.ts",
+      "drydocs/web/src/lib/intakeReview.ts"
+    ],
+    [
+      "drydocs/web/src/lib/intakeReview.ts",
+      "drydocs/web/src/lib/intakeApi.ts"
     ],
     [
       "drydocs/web/src/lib/logEstate.ts",
@@ -34611,12 +35267,32 @@
       "drydocs/web/src/lib/reachability.ts"
     ],
     [
+      "drydocs/web/src/lib/runtimeSpan.test.ts",
+      "drydocs/web/src/lib/runtimeSpan.ts"
+    ],
+    [
       "drydocs/web/src/lib/runtimeView.test.ts",
       "drydocs/web/src/lib/runtimeView.ts"
     ],
     [
       "drydocs/web/src/lib/runtimeView.ts",
       "drydocs/web/src/lib/apiClient.ts"
+    ],
+    [
+      "drydocs/web/src/lib/serviceProbe.test.ts",
+      "drydocs/web/src/lib/serviceProbe.ts"
+    ],
+    [
+      "drydocs/web/src/lib/serviceProbe.ts",
+      "drydocs/web/src/lib/apiClient.ts"
+    ],
+    [
+      "drydocs/web/src/lib/serviceProbe.ts",
+      "drydocs/web/src/lib/auth.ts"
+    ],
+    [
+      "drydocs/web/src/lib/serviceProbe.ts",
+      "drydocs/web/src/lib/reachability.ts"
     ],
     [
       "drydocs/web/src/lib/storage.test.ts",
@@ -34816,7 +35492,15 @@
     ],
     [
       "drydocs/web/src/routes/AdminConfigRoute.tsx",
+      "drydocs/web/src/components/ServiceStatusStrip.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/AdminConfigRoute.tsx",
       "drydocs/web/src/components/ui/EmptyState.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/AdminConfigRoute.tsx",
+      "drydocs/web/src/explorer/SpecGrid.tsx"
     ],
     [
       "drydocs/web/src/routes/AdminConfigRoute.tsx",
@@ -34861,6 +35545,10 @@
     [
       "drydocs/web/src/routes/AskRoute.tsx",
       "drydocs/web/src/ask/ClarificationCard.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/AskRoute.tsx",
+      "drydocs/web/src/ask/FailureLadder.tsx"
     ],
     [
       "drydocs/web/src/routes/AskRoute.tsx",
@@ -35008,7 +35696,15 @@
     ],
     [
       "drydocs/web/src/routes/IntakeRoute.tsx",
+      "drydocs/web/src/components/IntakeReviewQueue.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/IntakeRoute.tsx",
       "drydocs/web/src/components/IntakeStepper.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/IntakeRoute.tsx",
+      "drydocs/web/src/components/ThreadDiff.tsx"
     ],
     [
       "drydocs/web/src/routes/IntakeRoute.tsx",
@@ -35433,6 +36129,10 @@
     [
       "drydocs/web/src/routes/explorer/ExplorerRoute.tsx",
       "drydocs/web/src/components/map/LocationMap.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/explorer/ExplorerRoute.tsx",
+      "drydocs/web/src/components/map/RuntimeSpanPanel.tsx"
     ],
     [
       "drydocs/web/src/routes/explorer/ExplorerRoute.tsx",
@@ -39035,6 +39735,16 @@
     [
       "drydocs/agents/common",
       "CONTAINS",
+      "drydocs/agents/common/answer_eval.py"
+    ],
+    [
+      "drydocs/agents/common",
+      "CONTAINS",
+      "drydocs/agents/common/cap_tuning.py"
+    ],
+    [
+      "drydocs/agents/common",
+      "CONTAINS",
       "drydocs/agents/common/env_merge.py"
     ],
     [
@@ -39050,6 +39760,11 @@
     [
       "drydocs/agents/common",
       "CONTAINS",
+      "drydocs/agents/common/ledger_read.py"
+    ],
+    [
+      "drydocs/agents/common",
+      "CONTAINS",
       "drydocs/agents/common/llm_ledger.py"
     ],
     [
@@ -39061,6 +39776,11 @@
       "drydocs/agents/common",
       "CONTAINS",
       "drydocs/agents/common/session_redaction.py"
+    ],
+    [
+      "drydocs/agents/common",
+      "CONTAINS",
+      "drydocs/agents/common/spec_promotion.py"
     ],
     [
       "drydocs/agents/common",
@@ -39876,11 +40596,6 @@
       "drydocs/docs",
       "CONTAINS",
       "drydocs/docs/history"
-    ],
-    [
-      "drydocs/docs",
-      "CONTAINS",
-      "drydocs/docs/lane-a-handoff.md"
     ],
     [
       "drydocs/docs",
@@ -41180,6 +41895,16 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/API2.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/API3.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/B1.yaml"
     ],
     [
@@ -41435,7 +42160,27 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/CFG3.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/CORE1.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/CORE2.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/CORE3.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/CORE4.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -41511,6 +42256,16 @@
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
       "drydocs/docs/restructure/backlog/items/DOC4.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/DOC5.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/DOC6.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -42990,12 +43745,27 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/LIN3.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/LOAD1.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
       "drydocs/docs/restructure/backlog/items/LOAD2.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/LOAD3.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/LOAD4.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -43700,6 +44470,11 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/ONT3.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/P1.yaml"
     ],
     [
@@ -43746,6 +44521,41 @@
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
       "drydocs/docs/restructure/backlog/items/PLAN4.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/PLAN5.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/PLAN6.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/PORT1.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/PORT2.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/PORT3.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/PORT4.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/PORT5.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -44326,6 +45136,16 @@
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
       "drydocs/docs/restructure/backlog/items/WEB15.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/WEB16.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/WEB17.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -48105,7 +48925,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260906-2204.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260907.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -49035,6 +49855,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_answer_eval.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_api_audit.py"
     ],
     [
@@ -49096,6 +49921,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_business_key_backbone.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_cap_tuning.py"
     ],
     [
       "drydocs/tests/unit",
@@ -50020,6 +50850,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_service_probe.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_session_redaction.py"
     ],
     [
@@ -50071,6 +50906,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_source_scan.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_spec_promotion.py"
     ],
     [
       "drydocs/tests/unit",
@@ -50540,6 +51380,16 @@
     [
       "drydocs/web/src/ask",
       "CONTAINS",
+      "drydocs/web/src/ask/FailureLadder.test.tsx"
+    ],
+    [
+      "drydocs/web/src/ask",
+      "CONTAINS",
+      "drydocs/web/src/ask/FailureLadder.tsx"
+    ],
+    [
+      "drydocs/web/src/ask",
+      "CONTAINS",
       "drydocs/web/src/ask/FileReport.tsx"
     ],
     [
@@ -50590,6 +51440,16 @@
     [
       "drydocs/web/src/components",
       "CONTAINS",
+      "drydocs/web/src/components/IntakeReviewQueue.test.tsx"
+    ],
+    [
+      "drydocs/web/src/components",
+      "CONTAINS",
+      "drydocs/web/src/components/IntakeReviewQueue.tsx"
+    ],
+    [
+      "drydocs/web/src/components",
+      "CONTAINS",
       "drydocs/web/src/components/IntakeStepper.tsx"
     ],
     [
@@ -50625,6 +51485,16 @@
     [
       "drydocs/web/src/components",
       "CONTAINS",
+      "drydocs/web/src/components/ServiceStatusStrip.test.tsx"
+    ],
+    [
+      "drydocs/web/src/components",
+      "CONTAINS",
+      "drydocs/web/src/components/ServiceStatusStrip.tsx"
+    ],
+    [
+      "drydocs/web/src/components",
+      "CONTAINS",
       "drydocs/web/src/components/SignIn.test.tsx"
     ],
     [
@@ -50650,6 +51520,11 @@
     [
       "drydocs/web/src/components",
       "CONTAINS",
+      "drydocs/web/src/components/ThreadDiff.tsx"
+    ],
+    [
+      "drydocs/web/src/components",
+      "CONTAINS",
       "drydocs/web/src/components/TowerDrill.tsx"
     ],
     [
@@ -50661,6 +51536,11 @@
       "drydocs/web/src/components",
       "CONTAINS",
       "drydocs/web/src/components/icons"
+    ],
+    [
+      "drydocs/web/src/components",
+      "CONTAINS",
+      "drydocs/web/src/components/intakeReviewQueue.noGraphWrite.test.ts"
     ],
     [
       "drydocs/web/src/components",
@@ -50686,6 +51566,21 @@
       "drydocs/web/src/components/map",
       "CONTAINS",
       "drydocs/web/src/components/map/MapGlyphs.tsx"
+    ],
+    [
+      "drydocs/web/src/components/map",
+      "CONTAINS",
+      "drydocs/web/src/components/map/RuntimeSpanMap.test.tsx"
+    ],
+    [
+      "drydocs/web/src/components/map",
+      "CONTAINS",
+      "drydocs/web/src/components/map/RuntimeSpanMap.tsx"
+    ],
+    [
+      "drydocs/web/src/components/map",
+      "CONTAINS",
+      "drydocs/web/src/components/map/RuntimeSpanPanel.tsx"
     ],
     [
       "drydocs/web/src/components/map",
@@ -51035,6 +51930,16 @@
     [
       "drydocs/web/src/lib",
       "CONTAINS",
+      "drydocs/web/src/lib/askLadder.test.ts"
+    ],
+    [
+      "drydocs/web/src/lib",
+      "CONTAINS",
+      "drydocs/web/src/lib/askLadder.ts"
+    ],
+    [
+      "drydocs/web/src/lib",
+      "CONTAINS",
       "drydocs/web/src/lib/auth.ts"
     ],
     [
@@ -51060,6 +51965,11 @@
     [
       "drydocs/web/src/lib",
       "CONTAINS",
+      "drydocs/web/src/lib/dataCentersApi.ts"
+    ],
+    [
+      "drydocs/web/src/lib",
+      "CONTAINS",
       "drydocs/web/src/lib/epistemics.ts"
     ],
     [
@@ -51081,6 +51991,16 @@
       "drydocs/web/src/lib",
       "CONTAINS",
       "drydocs/web/src/lib/intakeApi.ts"
+    ],
+    [
+      "drydocs/web/src/lib",
+      "CONTAINS",
+      "drydocs/web/src/lib/intakeReview.test.ts"
+    ],
+    [
+      "drydocs/web/src/lib",
+      "CONTAINS",
+      "drydocs/web/src/lib/intakeReview.ts"
     ],
     [
       "drydocs/web/src/lib",
@@ -51130,12 +52050,32 @@
     [
       "drydocs/web/src/lib",
       "CONTAINS",
+      "drydocs/web/src/lib/runtimeSpan.test.ts"
+    ],
+    [
+      "drydocs/web/src/lib",
+      "CONTAINS",
+      "drydocs/web/src/lib/runtimeSpan.ts"
+    ],
+    [
+      "drydocs/web/src/lib",
+      "CONTAINS",
       "drydocs/web/src/lib/runtimeView.test.ts"
     ],
     [
       "drydocs/web/src/lib",
       "CONTAINS",
       "drydocs/web/src/lib/runtimeView.ts"
+    ],
+    [
+      "drydocs/web/src/lib",
+      "CONTAINS",
+      "drydocs/web/src/lib/serviceProbe.test.ts"
+    ],
+    [
+      "drydocs/web/src/lib",
+      "CONTAINS",
+      "drydocs/web/src/lib/serviceProbe.ts"
     ],
     [
       "drydocs/web/src/lib",
@@ -51537,13 +52477,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2875,
-    "edges": 1695,
+    "files": 2923,
+    "edges": 1762,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 3193,
+    "rels": 3241,
     "directories": 319
   }
 }
