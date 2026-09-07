@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-06T22:04:52",
-    "date": "20260906",
+    "captured_at": "2026-09-07T11:13:47",
+    "date": "20260907",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "76cba80c",
-      "full": "76cba80cfac0458ac1dd6132c971dfc084cb7795",
+      "commit": "472001dc",
+      "full": "472001dc1e03b8933bc1cfdaef5a631ffc93cd90",
       "branch": "main",
-      "describe": "port-base-20260905-141-g76cba80c",
-      "subject": "fix(J78): a cancelled CI run is neither green nor red - the snapshot check now says UNVERIFIED",
+      "describe": "port-base-20260905-148-g472001dc",
+      "subject": "docs(adr-0019): the cited path is web/src/lib/askApi.ts - the ask client never lived under web/src/ask/ (preflight: cited paths resolve)",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -22472,10 +22472,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260906.json",
-      "name": "drydocs-20260906.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260906-2204.json",
+      "name": "drydocs-20260906-2204.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260906.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260906-2204.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -31617,6 +31617,10 @@
     [
       "drydocs/tests/unit/test_audit_fields.py",
       "drydocs/drydocs_core/yaml_fragments.py"
+    ],
+    [
+      "drydocs/tests/unit/test_backlog.py",
+      "drydocs/drydocs/plan/plan_board.py"
     ],
     [
       "drydocs/tests/unit/test_backlog.py",
@@ -48101,7 +48105,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260906.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260906-2204.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -51534,7 +51538,7 @@
       "drydocs"
     ],
     "files": 2875,
-    "edges": 1694,
+    "edges": 1695,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
