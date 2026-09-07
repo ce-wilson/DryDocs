@@ -2228,6 +2228,26 @@ This item makes forgetting it cheap to diagnose rather than preventing the forge
 
 NOT gate-bound: nothing here touches edge semantics, the ontology, or a graph write. The page
 stays read-only (O20).
+
+PRE-BUILD CHECK 2026-09-06 (desktop, Lane A, at the WEB8 merge c541b858) - READ BEFORE CLAIMING.
+Two clauses were written before ADR 0020 (WEB10, ACCEPTED 2026-09-05) and name things that no
+longer exist; build to the ADR, not to the clause text:
+* (c) says the console pings the agent server at VITE_ADK_URL, default http://localhost:8000.
+  VITE_ADK_URL is RETIRED (ADR 0020 D2). The agent base is the PATH `/agent` on the page&#x27;s own
+  origin; `GET /agent/list-apps` is the liveness call and the `graph_qa`-in-the-list assertion
+  stands. web/src/lib/adk.ts already reads the base this way.
+* (f) names the ports (:8001, :8000) as the strip&#x27;s labels. A production bundle must not carry a
+  port or host (web/scripts/checkDistCoordinates.mjs - `npm run dist:check` fails on it, and
+  WEB10&#x27;s guard is what Lane B just met on its own machine). Label the services by NAME
+  (drydocs-api, graph, agent server, provider); the ports may appear only in DEV-guarded text.
+* Rule 2&#x27;s transport-down case is no longer a failed fetch to :8000. Same-origin, the proxy
+  answers 502/503/504 when the agent upstream is down, and web/src/lib/reachability.ts already
+  tells `unreachable` (this page&#x27;s own origin) from `upstream-down` (the proxy answered) for the
+  API. Reuse that module for the `/agent` prefix rather than writing a second probe - &quot;one
+  implementation, two surfaces&quot; (f) then also means one implementation across the two upstreams.
+  reachability.ts is a natural input; proposed here, not added.
+The acceptance TEXT is left as written - amending it is the item author&#x27;s call, and the notes
+above are enough for the builder to meet its intent under the ADR.
 </p></div></div>
 <div class="card ready" id="card-O72" data-id="O72" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="o72 one-command local stack: compose the four processes the runbook starts by hand, with its success checks expressed as health checks" tabindex="0"><div class="card-head"><span class="card-id">O72</span><span class="card-title">One-command local stack: Compose the four processes the runbook starts by hand, with its success checks expressed as health checks</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> A committed Compose file brings up the console stack in one command: Neo4j, drydocs-api on 8001, the ADK agent server on 8000, and the Vite dev server on 5173. Each service declares a health check that is the runbook&#x27;s own success test for that step - the API is healthy when /health answers ok, the agent server when it lists exactly its four apps, and Vite when it serves the page - so a broken dependency surfaces as an unhealthy service instead of a browser error three layers away. Ports stay exactly as they are, because the API&#x27;s CORS allow-list names 5173 and 4173 specifically and a drifted port fails as a CORS error that reads like an API fault. The runbook&#x27;s Startup section is updated to offer the one-command path alongside the per-process one, and keeps the per-process path, since debugging a single service is a real need. No credential is baked into the Compose file.
 </p><p class="notes"><strong>Notes:</strong> Raised 2026-08-27 from the web-scaffolding review. The reviewed FastAPI template uses
