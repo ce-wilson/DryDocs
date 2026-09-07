@@ -36,6 +36,23 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/data-centers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Data Centers */
+        get: operations["get_data_centers_data_centers_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/demo": {
         parameters: {
             query?: never;
@@ -679,6 +696,49 @@ export type components = {
             generated_on: string;
             /** Markdown */
             markdown: string;
+        };
+        /**
+         * DataCenterOut
+         * @description One row of the data-center spelling registry (LOAD2), as the console reads
+         *     it for Z6's runtime map.
+         *
+         *     ``default_time`` and ``suffix`` are OPTIONAL BY RULE and not by accident: the
+         *     ``E####``-as-default-time reading comes from an internal standard whose own
+         *     open items include "confirm E is always Eastern", so a name that carries no
+         *     time segment registers exactly like one that does. They are declared here as
+         *     plain strings that may be empty for that reason — a null would suggest the
+         *     lookup failed, and nothing failed.
+         */
+        DataCenterOut: {
+            /** Code */
+            code: string;
+            /** Default Time */
+            default_time: string;
+            /** Name */
+            name: string;
+            /** Note */
+            note: string;
+            /** Sample */
+            sample: boolean;
+            /** Suffix */
+            suffix: string;
+        };
+        /**
+         * DataCentersOut
+         * @description GET /data-centers.
+         *
+         *     ``source`` names the venue the rows came from (J18): the machine-local
+         *     internal twin, or the publishable synthetic sample. A console that showed a
+         *     default time without saying which file it read would make a producer-side
+         *     demo look like a statement about production.
+         */
+        DataCentersOut: {
+            /** Data Centers */
+            data_centers: components["schemas"]["DataCenterOut"][];
+            /** Source */
+            source: string;
+            /** Updated */
+            updated: string;
         };
         /**
          * DraftReceiptOut
@@ -1455,6 +1515,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ConfigOut"];
+                };
+            };
+        };
+    };
+    get_data_centers_data_centers_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataCentersOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

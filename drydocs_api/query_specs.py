@@ -1410,6 +1410,65 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             params=_LIMIT,
         ),
         QuerySpec(
+            id="map.runtime-spans.v1",
+            database="drydocs",
+            description=(
+                "Z6 runtime map: each Control-M job with the timing the graph holds and "
+                "the PHYSICAL place its host resolves to, so a run window can be read "
+                "against the world clock. "
+                "THE TWO DCs NEVER CROSSWALK BY NAME and this spec is where that fence "
+                "shows on the wire (gate server-location-ontology B4, the Z2 acceptance's "
+                "named requirement): `scheduling_dc` is the Control-M server name — the "
+                "T032-E0700-DMA default-run-time grammar, a SCHEDULING fact — while "
+                "`data_center` is the :DataCenter the host is physically in. Two columns, "
+                "two concepts, never joined here. Any association between them is its own "
+                "SME-mapped decision. "
+                "Timing comes from the P4 supplement properties (gate "
+                "controlm-avg-run-supplement) in the order patch_window.py already reads "
+                "them: job-level avg_start_time + avg_run_time first, else the folder's "
+                "window_start/window_end rollup. Both are returned so the CONSUMER can say "
+                "which one it used rather than the server silently picking; a job with "
+                "neither is returned with nulls, because the count of jobs with no timing "
+                "is the answer to a real question and dropping them would hide it."
+            ),
+            cypher=(
+                "MATCH (f:ControlMFolder)-[:CONTAINS_JOB]->(j:ControlMJob) "
+                "WHERE NOT f:SchemaMeta AND NOT j:SchemaMeta "
+                "OPTIONAL MATCH (f)-[:SCHEDULED_ON]->(cs:ControlMServer) WHERE NOT cs:SchemaMeta "
+                "OPTIONAL MATCH (j)-[:RUNS_ON]->(t) WHERE NOT t:SchemaMeta "
+                "OPTIONAL MATCH (t)-[:CONTAINS_HOST]->(m:ExecutionHost) WHERE NOT m:SchemaMeta "
+                "WITH f, j, cs, CASE WHEN t:ExecutionHost THEN t ELSE m END AS h "
+                "OPTIONAL MATCH (h)-[:RESOLVES_TO_SERVER]->(s:Server)-[:LOCATED_IN]->(dc:DataCenter) "
+                "WHERE NOT s:SchemaMeta AND NOT dc:SchemaMeta "
+                "RETURN DISTINCT j.job_name AS origin, 'job' AS origin_kind, "
+                "f.sched_table AS folder, cs.name AS scheduling_dc, "
+                "j.avg_start_time AS avg_start_time, j.avg_run_time AS avg_run_time, "
+                "j.start_next_day AS start_next_day, "
+                "f.window_start AS window_start, f.window_end AS window_end, "
+                "dc.name AS data_center, dc.city AS city, dc.state AS state, "
+                "dc.country AS country, dc.location_grain AS location_grain "
+                "ORDER BY origin LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("origin", "string", "Job"),
+                ColumnDef("origin_kind", "string", "Kind"),
+                ColumnDef("folder", "string", "Folder"),
+                ColumnDef("scheduling_dc", "string", "Control-M DC (scheduling)"),
+                ColumnDef("avg_start_time", "string", "Avg start (job)"),
+                ColumnDef("avg_run_time", "string", "Avg run seconds (job)"),
+                ColumnDef("start_next_day", "string", "Starts next day"),
+                ColumnDef("window_start", "string", "Window start (folder)"),
+                ColumnDef("window_end", "string", "Window end (folder)"),
+                ColumnDef("data_center", "string", "Data center (physical)"),
+                ColumnDef("city", "string", "City"),
+                ColumnDef("state", "string", "State"),
+                ColumnDef("country", "string", "Country"),
+                ColumnDef("location_grain", "string", "Declared grain"),
+            ),
+            classification="internal",
+            params=_LIMIT,
+        ),
+        QuerySpec(
             id="console.agent-runs.v1",
             database="drydocs",  # G102 fold (2026-08-18): the R1 ruling's substance ("never in ground truth") survives as :Uncertain on the write; uncertain=True below is the watermark trigger
             description=(

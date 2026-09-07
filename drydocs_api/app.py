@@ -92,6 +92,8 @@ from drydocs_api.schemas import (
     ConfigOut,
     CorpusStatusOut,
     CorrectionsReportOut,
+    DataCenterOut,
+    DataCentersOut,
     DraftReceiptOut,
     EphemeralRegisterOut,
     HealthOut,
@@ -114,6 +116,7 @@ from drydocs_api.schemas import (
 )
 from drydocs_api.sessions import InMemorySessionStore, InvalidTokenError, Session
 from drydocs_core.config import Neo4jSettings
+from drydocs_core.data_centers import load_registry as load_data_center_registry
 from drydocs_core.env_refs import resolve_optional
 from drydocs_core.notifications import from_summary, to_payload
 
@@ -359,6 +362,39 @@ def create_app(
     def config() -> ConfigOut:
         template, _ = resolve_optional("DRYDOCS_RUNTIME_VIEW_URL_TEMPLATE", where="GET /config")
         return ConfigOut(runtime_view_url_template=template or None)
+
+    # Z6 — the data-center spelling registry, read as CONFIG.
+    #
+    # AUTHENTICATED, unlike /config above, and the difference is the file: this
+    # reader prefers the machine-local internal twin when it is present (J13), so
+    # the rows can be the real inventory. /config serves values that are not
+    # secrets and must be readable before sign-in; this one is neither.
+    #
+    # It is not a QuerySpec and cannot be: the pairing is a DECLARED fact in
+    # config/taxonomy/data-centers.yaml, not a graph edge, and the reason it is
+    # declared rather than derived is the vendor baseline — BMC defines no format
+    # for the data-center name, so nothing in a short code determines a long one.
+    # The console needs it because the E#### default-time seed for a folder with
+    # no explicit time is reachable only through the short -> long pairing.
+    @app.get("/data-centers")
+    def get_data_centers(user: CurrentUser) -> DataCentersOut:
+        _ = user  # any authenticated persona; the registry is not role-scoped
+        registry = load_data_center_registry()
+        return DataCentersOut(
+            data_centers=[
+                DataCenterOut(
+                    code=d.code,
+                    name=d.name,
+                    default_time=d.default_time,
+                    suffix=d.suffix,
+                    sample=d.sample,
+                    note=d.note,
+                )
+                for d in registry.data_centers
+            ],
+            source=registry.source,
+            updated=registry.updated,
+        )
 
     # O58 — the doc-corpus reconciliation, as a NAMED SERVER-SIDE READ.
     #
