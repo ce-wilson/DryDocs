@@ -207,12 +207,22 @@ def test_the_automated_share_is_pinned_so_it_cannot_drift_up_quietly() -> None:
     three is the highest share of any suite here and it is not evidence of
     backfilling: it is what happens when a page's load-bearing claims are about
     a committed artifact and a bundle rather than about pixels.
+
+    19/43 -> 20/44 at Z6 (2026-09-06): TC-EXPLORER-02, automated by
+    web/src/components/map/RuntimeSpanMap.test.tsx. What the runner holds is the
+    whole of the claim -- which label a span carries, and that a job with no
+    timing draws no bar -- because the surface is fed an injected spec result and
+    an injected viewer zone. What it does NOT hold, and the case's `source` says
+    so, is the observed branch against real data: the producer graph carries no P4
+    supplement properties (that loader is company-side), so no job on this side
+    has an observed runtime to render. The share moved up because the claim is
+    about rendered strings over a pure model, not because anything was backfilled.
     """
     cases = [c for s in _tests()["suites"] for c in s["cases"]]
     automated = [c for c in cases if c.get("automated_by")]
     assert (len(automated), len(cases)) == (
-        19,
-        43,
+        20,
+        44,
     ), f"automated case count changed: {len(automated)}/{len(cases)} — update the pin"
 
 

@@ -54,6 +54,38 @@ class ConfigOut(_Declared):
     runtime_view_url_template: str | None
 
 
+class DataCenterOut(_Declared):
+    """One row of the data-center spelling registry (LOAD2), as the console reads
+    it for Z6's runtime map.
+
+    ``default_time`` and ``suffix`` are OPTIONAL BY RULE and not by accident: the
+    ``E####``-as-default-time reading comes from an internal standard whose own
+    open items include "confirm E is always Eastern", so a name that carries no
+    time segment registers exactly like one that does. They are declared here as
+    plain strings that may be empty for that reason — a null would suggest the
+    lookup failed, and nothing failed."""
+
+    code: str
+    name: str
+    default_time: str
+    suffix: str
+    sample: bool
+    note: str
+
+
+class DataCentersOut(_Declared):
+    """GET /data-centers.
+
+    ``source`` names the venue the rows came from (J18): the machine-local
+    internal twin, or the publishable synthetic sample. A console that showed a
+    default time without saying which file it read would make a producer-side
+    demo look like a statement about production."""
+
+    data_centers: list[DataCenterOut]
+    source: str
+    updated: str
+
+
 class StatusOut(_Declared):
     status: str
 
