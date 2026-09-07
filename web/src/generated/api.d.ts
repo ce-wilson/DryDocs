@@ -643,8 +643,11 @@ export type components = {
             label: string;
             /** Name */
             name: string;
-            /** Type */
-            type: string;
+            /**
+             * Type
+             * @enum {string}
+             */
+            type: "string" | "int" | "list";
         };
         /**
          * ConfigOut

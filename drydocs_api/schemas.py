@@ -133,8 +133,17 @@ class NamedRunOut(_Declared):
 
 
 class ColumnOut(_Declared):
+    #: API2: a LITERAL, so the column vocabulary reaches the OpenAPI document and
+    #: the generated client as a closed union rather than as `string`. It is a
+    #: second copy of `query_specs.COLUMN_TYPES` — pydantic needs static values —
+    #: and the two are asserted to agree by tests/unit/test_column_types.py, the
+    #: same arrangement CLASSIFICATIONS has with config/classification.yaml.
+    #: `list` is deliberately untyped in its ELEMENTS: the two specs that return
+    #: one return lists of strings, but the contract being fixed here is "this is
+    #: a list, not a scalar", and inventing an element type nothing enforces
+    #: would be a second declaration to keep true.
     name: str
-    type: str
+    type: Literal["string", "int", "list"]
     label: str
 
 

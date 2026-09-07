@@ -68,10 +68,21 @@ CLASSIFICATIONS: frozenset[str] = frozenset({"external", "internal-public", "int
 _SPEC_ID_RE = re.compile(r"^[a-z0-9-]+(\.[a-z0-9-]+)+\.v\d+$")
 
 
+# The column type vocabulary, and the reason it is a NAMED set rather than a
+# comment. `list` arrived with API2 (2026-09-07): two specs returned a collected
+# list under `type: "string"` because there was no list type to declare, and the
+# console carried a two-spec exemption to render them at all. A vocabulary that
+# lives only in a comment cannot be validated, so this is asserted at import by
+# `_validate_registry` and mirrored — as a Literal, so it reaches OpenAPI — by
+# `ColumnOut` in schemas.py. The two copies are held together by
+# tests/unit/test_column_types.py, the same shape CLASSIFICATIONS above uses.
+COLUMN_TYPES: frozenset[str] = frozenset({"string", "int", "list"})
+
+
 @dataclass(frozen=True)
 class ColumnDef:
     name: str
-    type: str  # 'string' | 'int'
+    type: str  # one of COLUMN_TYPES
     label: str | None = None
 
 
@@ -1027,7 +1038,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
                 ColumnDef("trigger_job", "string", "Trigger job"),
                 ColumnDef("process", "string", "ETL process"),
                 ColumnDef("kind", "string", "Kind"),
-                ColumnDef("lands", "string", "Lands (assets)"),
+                ColumnDef("lands", "list", "Lands (assets)"),
             ),
             classification="internal",
             params=_LIMIT,
@@ -1239,7 +1250,7 @@ QUERY_SPECS: dict[str, QuerySpec] = {
             columns=(
                 ColumnDef("asset_id", "string", "Data asset"),
                 ColumnDef("kind", "string", "Kind"),
-                ColumnDef("properties", "string", "Properties present"),
+                ColumnDef("properties", "list", "Properties present"),
                 ColumnDef("created_at", "string", "First seen"),
             ),
             classification="internal",
@@ -1822,6 +1833,11 @@ def _validate_registry() -> None:
             spec.classification in CLASSIFICATIONS
         ), f"spec '{spec.id}': classification '{spec.classification}' unknown"
         assert spec.columns, f"spec '{spec.id}' declares no columns"
+        for column in spec.columns:
+            assert column.type in COLUMN_TYPES, (
+                f"spec '{spec.id}': column '{column.name}' declares type "
+                f"'{column.type}', which is not in the vocabulary {sorted(COLUMN_TYPES)}"
+            )
         ensure_read_only(spec.cypher)  # raises WriteRejected on a write-shaped spec
         ensure_no_element_ids(spec.cypher, f"spec '{spec.id}'")  # O27 rule 3
 
