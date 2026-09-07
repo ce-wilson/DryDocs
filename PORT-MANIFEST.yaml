@@ -420,7 +420,25 @@ rows:
       company prompt.
   - path: "config/gate-prompts/**"
     disposition: canonical-company
-    note: "consumer's real gate specs win; producer specs are prep/templates — new producer specs that don't collide are clean-adds"
+    entry_rule: >
+      The consumer's real gate specs WIN and are never overwritten. A producer
+      spec whose slug the consumer does not hold is a CLEAN-ADD, taken whole:
+      every slug an item's `gates:` names must resolve to a prompt file
+      (tests/unit/test_backlog.py::test_declared_gates_are_lists_of_known_prompt_slugs)
+      and gates.json is DERIVED from the files present, so a missing prompt is
+      a red guard and a gate page that cannot render. Enumerate, do not browse:
+      the slugs named by any item's `gates:` plus the slugs config/gate-log.md
+      cites, minus the slugs on disk, is the list; a rider (a prompt whose
+      title says it rides another gate) crosses the same way and renders no
+      page of its own. Report the count the COMMIT contains (`git show
+      --name-only`), not the count the enumeration produced - the 2026-09-05
+      apply (carve-out D, 2026-09-07) took one prompt on a direct ruling, then
+      nine more from its enumeration, and reported nine. Promoted from a note
+      to a rule the same day: that apply crossed ten files into a
+      canonical-company row on the strength of the note alone and had to flag
+      the take as its own inference. A rule the apply must read is an
+      entry_rule; a note explains, it does not authorize.
+    note: "consumer's real gate specs win; producer specs are prep/templates — a colliding slug is the consumer's, a non-colliding producer slug crosses whole (entry_rule)"
   - path: "config/dev-environment.yaml"
     disposition: canonical-company
     entry_rule: >
