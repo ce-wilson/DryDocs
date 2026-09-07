@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-07T13:18:05",
+    "captured_at": "2026-09-07T13:31:15",
     "date": "20260907",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "36788976",
-      "full": "36788976fe7cf1f32b7d8e578179b51d36580a9e",
+      "commit": "eee64ce3",
+      "full": "eee64ce3b4498cd31340f2ef26871371cc0f1a85",
       "branch": "main",
-      "describe": "port-base-20260905-172-g36788976",
-      "subject": "chore(plan): render after the four Lane B merges (R8, Z6, O50, O63 done) and format one unioned test file",
+      "describe": "port-base-20260905-174-geee64ce3",
+      "subject": "fix(port): render_port_dispositions takes the consumer's <pre-apply-tag> <base-tag> range",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -22688,10 +22688,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260907.json",
-      "name": "drydocs-20260907.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260907-1317.json",
+      "name": "drydocs-20260907-1317.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260907.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260907-1317.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -48925,7 +48925,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260907.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260907-1317.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
