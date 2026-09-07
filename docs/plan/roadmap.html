@@ -1,6 +1,6 @@
 <!doctype html>
 <html><head><meta charset="utf-8">
-<!-- sources-fingerprint: 589326ea967c2863fcff4db62a11f72fbb5a282223eced6933896741d0211188 -->
+<!-- sources-fingerprint: 19e553d077728f1980f6883fd868169fea78d5e24ecd9f3b0ad5ffcc241643ac -->
 <title>DryDocs — module roadmap</title>
 <style>:root{color-scheme:light}
 body{font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#1a1a1a;
@@ -57,7 +57,7 @@ h2{font-size:1.1rem;margin:0}
 <p class="subtitle"><strong>INTERNAL</strong> — idea summaries ride along (PUBLISH-BOUNDARY.md).</p>
 <dl class="legend"><strong>Stages:</strong> <dt>mature</dt><dd>built out; changes are refinements</dd><dt>active</dt><dd>under active build-out</dd><dt>early</dt><dd>core exists; maturation ahead</dd><dt>steady</dt><dd>steady-state; grows additively</dd><dt>parked</dt><dd>deliberately paused on a named trigger</dd><br><strong>Idea sizes:</strong> <dt>S</dt><dd>one focused session</dd><dt>M</dt><dd>a few sessions, one backlog item</dd><dt>L</dt><dd>an epic slice — multiple sessions, usually a HITL gate</dd><dt>XL</dt><dd>a multi-epic program</dd></dl>
 <section class="module" id="module-drydocs-core"><div class="module-head"><h2>drydocs-core</h2><span class="stage stage-mature">mature</span><span class="counts">28 done &middot; 3 open</span></div><div class="progress"><div class="progress-bar" style="width:90%"></div></div><p class="prose"><strong>Built:</strong> The shared foundation is complete and quiet: graph schema and constraints, database provisioning, the ontology-supplement chain as data (G29) with the chain-exclusions guard (G59), the per-domain relationship-vocabulary registry (S5), and the shared models and Cypher tooling every loader builds on.</p><p class="prose"><strong>Remaining:</strong> No open items. Changes arrive through gates — vocabulary and supplement edits ride ontology items, never direct edits here.</p><ul class="open-items">
-<li><a class="item-link" href="board.html#card-CORE2">CORE2</a> <span class="status-badge status-todo">todo</span> A source-scan absence guard needs a positive control - six of six absence scans were vacuous on first write because the stripper did not match the subject</li>
+<li><a class="item-link" href="board.html#card-CORE2">CORE2</a> <span class="status-badge status-in_progress">in_progress</span> A source-scan absence guard needs a positive control - six of six absence scans were vacuous on first write because the stripper did not match the subject</li>
 <li><a class="item-link" href="board.html#card-CORE3">CORE3</a> <span class="status-badge status-todo">todo</span> CI clones shallow, so the commit-message ceiling guard skips instead of measuring - decide fetch-depth and record the reason in the workflow</li>
 <li><a class="item-link" href="board.html#card-CORE4">CORE4</a> <span class="status-badge status-todo">todo</span> The skip-guard policy calls every drydocs/data/ reference gitignored, but the sample CSVs under it are tracked - ask git rather than pattern-match the directory</li>
 </ul></section>
