@@ -1,0 +1,17 @@
+id: PLAN7
+epic: project-board
+title: "An eval case that pins a sha does not say which of its sections are sha-sensitive, so a re-check cannot tell a perished claim from a standing one"
+type: chore
+module: drydocs-plan
+phase: 8
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs: []
+acceptance: |
+  STUB - minted 2026-09-07, body follows in the next commit (I6: the stub carries the
+  final title, is pushed, and only then is the body written).
+notes: |
+  STUB.

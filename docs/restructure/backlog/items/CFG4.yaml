@@ -1,0 +1,17 @@
+id: CFG4
+epic: ontology-mapping
+title: "The software-registry has no schema slot for a governance status on its own dependencies, only on the estate it documents"
+type: task
+module: config
+phase: 2
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs: []
+acceptance: |
+  STUB - minted 2026-09-07, body follows in the next commit (I6: the stub carries the
+  final title, is pushed, and only then is the body written).
+notes: |
+  STUB.

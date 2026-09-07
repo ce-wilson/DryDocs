@@ -1,0 +1,17 @@
+id: PLAN8
+epic: project-board
+title: "A synonym to canonical-term to home ledger for Control-M knowledge, filled into the research-terms shell that already exists"
+type: task
+module: drydocs-plan
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs: []
+acceptance: |
+  STUB - minted 2026-09-07, body follows in the next commit (I6: the stub carries the
+  final title, is pushed, and only then is the body written).
+notes: |
+  STUB.

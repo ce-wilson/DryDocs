@@ -1,0 +1,17 @@
+id: REM1
+epic: component-topology
+title: "Registry rule ids and backlog ids collide on the same strings (R1, R10), so cite a rules-registry rule as 'registry R10' on first use"
+type: chore
+module: drydocs-remediation
+phase: 6
+agent: main
+model: haiku
+priority: p3
+status: todo
+depends_on: []
+inputs: []
+acceptance: |
+  STUB - minted 2026-09-07, body follows in the next commit (I6: the stub carries the
+  final title, is pushed, and only then is the body written).
+notes: |
+  STUB.
