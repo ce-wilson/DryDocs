@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "drydocs:config/schemas/relationship-vocabulary.schema.json",
   "title": "drydocs_core/ontology/relationship_vocabulary/*.yaml fragments",
-  "description": "Shape only (S6), fragment-aware: a fragment is either a mapping carrying one or more sections (node_classifications / property_terms / prov_matrix / local_relationships), a bare list of local-relationship entries (the 4x-local domain files), or the comment-only header (empty document). Gate-bound activation semantics live in the vocabulary accessor + writers.",
+  "description": "Shape only (S6), fragment-aware: a fragment is either a mapping carrying one or more sections (node_classifications / property_terms / prov_matrix / local_relationships), a bare list of local-relationship entries (the 4x-local domain files), or the comment-only header (empty document). Gate-bound activation semantics live in the vocabulary accessor + writers.\n\nCLOSED AT THE ENTRY LEVEL (CFG3, 2026-09-07). The mapping branch was ALREADY closed, so the top-level closure this item asks for was a no-op here -- the hole was one level down, on `local_relationship`, where a misspelled key on an entry passed in silence. Closing it required declaring six keys the live fragments use and no schema named: deprecated_at, deprecation_note, superseded_by (the G87 deprecation trio), skos_maps_to and sosa_maps_to (standards mappings beside the declared prov_maps_to), and join_key. Every one was already in the tree; none was invented to make the schema pass.",
   "oneOf": [
     {
       "type": "null"
@@ -113,8 +113,44 @@
         },
         "note": {
           "type": "string"
+        },
+        "deprecated_at": {
+          "description": "Date the entry was superseded \u2014 a bare YAML date parses to a date object, so this is left untyped exactly as `updated` is in the sibling family schemas. G87's add-new + deprecate-old rule; never a rename in place, because the id is the join key across the map, the generated Cypher, the SQLite mirror and the gate log."
+        },
+        "deprecation_note": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "superseded_by": {
+          "description": "The id that replaces this one.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "skos_maps_to": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sosa_maps_to": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "join_key": {
+          "description": "The identifier the two ends are joined on where the edge is derived from a keyed extract rather than from structure.",
+          "type": [
+            "string",
+            "null"
+          ]
         }
-      }
+      },
+      "additionalProperties": false
     }
   }
 }
