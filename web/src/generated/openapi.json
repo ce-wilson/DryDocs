@@ -148,6 +148,11 @@
             "type": "string"
           },
           "type": {
+            "enum": [
+              "string",
+              "int",
+              "list"
+            ],
             "title": "Type",
             "type": "string"
           }

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { SpecResult } from '../lib/graph'
 import { codeOnly, filesMatching, readFileSync, withoutComments } from '../test/sourceScan'
-import { DECLARED_TYPE_EXCEPTIONS, TYPE_CHECK_ROWS, validateRows, validateRowsOf } from './rowShape'
+import { TYPE_CHECK_ROWS, validateRows, validateRowsOf } from './rowShape'
 import type { RowShape } from './rowShape'
 
 // WEB6 — the seam check, and the guard that keeps the seam from re-growing.
@@ -167,12 +167,16 @@ describe('what real results actually look like', () => {
     expect(validateRows<AppRow>(short, APP_COLUMNS).ok).toBe(false)
   })
 
-  it('the two known-wrong SERVER declarations are exempt from the type check only', () => {
+  it('a list column is checked as a list, not exempted from the check', () => {
+    // API2: `runbooks.series.v1` declares `lands` as `list` now. Before it, this
+    // module carried a two-spec exemption and the column was checked for
+    // PRESENCE only — the workaround for a server that had no list type to
+    // declare. The exemption is gone; the check is real.
     const series: SpecResult = result({
       spec_id: 'runbooks.series.v1',
       columns: [
         { name: 'trigger_job', type: 'string', label: 'Trigger job' },
-        { name: 'lands', type: 'string', label: 'Lands' },
+        { name: 'lands', type: 'list', label: 'Lands' },
       ],
       keys: ['trigger_job', 'lands'],
       rows: [{ trigger_job: 'J1', lands: ['asset-1', 'asset-2'] }],
@@ -183,22 +187,36 @@ describe('what real results actually look like', () => {
     }
     const shape: RowShape<SeriesRow> = ['trigger_job', 'lands']
     expect(validateRows<SeriesRow>(series, shape).ok).toBe(true)
-    // the PRESENCE check still applies to an exempt column
+
+    // and a scalar arriving under a `list` declaration is now CAUGHT, which is
+    // the whole difference between a declared type and an exempted one
+    const scalar = { ...series, rows: [{ trigger_job: 'J1', lands: 'asset-1' }] }
+    const bad = validateRows<SeriesRow>(scalar, shape)
+    expect(bad.ok).toBe(false)
+    if (!bad.ok) {
+      expect(bad.message).toContain("column 'lands' is declared list")
+      expect(bad.message).toContain('row 0 carries string')
+    }
+
+    // the PRESENCE check is unchanged
     const missing = { ...series, keys: ['trigger_job'], columns: series.columns.slice(0, 1) }
     expect(validateRows<SeriesRow>(missing, shape).ok).toBe(false)
   })
 
-  it('every exception names a spec and at least one column', () => {
-    // A dead entry here is an exemption nobody can audit. The live check that
-    // the server declaration is STILL wrong is a python guard
-    // (tests/unit/test_row_shape_exceptions.py) — only that side can import the
-    // registry, which is J37's rule, not a convenience.
-    const entries = Object.entries(DECLARED_TYPE_EXCEPTIONS)
-    expect(entries.length).toBeGreaterThan(0)
-    for (const [specId, columns] of entries) {
-      expect(specId).toMatch(/^[a-z0-9-]+(\.[a-z0-9-]+)+\.v\d+$/)
-      expect(columns.length).toBeGreaterThan(0)
-    }
+  it('null still satisfies a list declaration, as it does every other type', () => {
+    // Note 1 in the module header, restated for the new type rather than assumed
+    // to carry over: an OPTIONAL MATCH that collects nothing is correct data.
+    const series: SpecResult = result({
+      spec_id: 'runbooks.series.v1',
+      columns: [
+        { name: 'trigger_job', type: 'string', label: 'Trigger job' },
+        { name: 'lands', type: 'list', label: 'Lands' },
+      ],
+      keys: ['trigger_job', 'lands'],
+      rows: [{ trigger_job: 'J1', lands: null }],
+    })
+    const shape: RowShape<{ trigger_job: string; lands: unknown[] }> = ['trigger_job', 'lands']
+    expect(validateRows<{ trigger_job: string; lands: unknown[] }>(series, shape).ok).toBe(true)
   })
 })
 
