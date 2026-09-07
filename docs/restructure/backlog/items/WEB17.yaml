@@ -7,7 +7,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - web/tsconfig.json
@@ -32,3 +32,45 @@ notes: |
 
   Kept as one item rather than two because both are one-line edits in the same build config and
   neither is worth a card of its own; the two clauses close independently.
+
+  CLOSED 2026-09-07 (Lane B, laptop, wip/WEB17-laptop). Both clauses closed; venue for the
+  build runs is the laptop checkout, node_modules installed, no Neo4j involved (J18).
+
+  (a) The widening went into `web/tsconfig.node.json`, not `tsconfig.app.json`. That choice is
+      the only real decision in the clause: the app project is DOM-side (`lib: [ES2023, DOM]`,
+      `types: [vite/client]`) and widening IT would pull Node globals into browser code, while
+      the node project already carries `types: [node]` and the same `strict` block. Include went
+      from `["vite.config.ts"]` to `["vite.config.ts", "vitest.config.ts", "playwright.config.ts",
+      "scripts/*.ts"]`. The glob is there on purpose: `scripts/genApiTypes.ts` and
+      `scripts/writeApiTypes.ts` were unchecked for the same reason the two config files were,
+      and a named list would have to be re-read every time a build script lands.
+
+      FALLOUT: NONE. `tsc -p tsconfig.node.json --noEmit` is clean over all five files. A zero
+      result is the one that needs its instrument checked (J76), so both directions were run:
+      `--listFiles` names all five inside the project, and a deliberate `const _probe: number =
+      "not a number"` appended to `vitest.config.ts` produced `TS2322` at exit 2, then was
+      reverted. The compiler is genuinely pointed at these files and they genuinely pass.
+
+      Beyond the one-liner, and flagged as such: `tests/unit/test_web_typescript_strict.py` gains
+      a third clause, `test_every_ts_file_outside_src_is_inside_some_project`. Narrowing an
+      `include` is a SILENT regression - it removes errors rather than producing them, so the
+      build goes greener as coverage shrinks, which is exactly how WEB4 shipped this. That is the
+      drift the file's own docstring already says it exists to stop; without the guard the fix
+      lasts until the next edit. Negative control run: reverting the include to `["vite.config.ts"]`
+      fails it naming all four orphans.
+
+  (b) DECISION: the coverage HTML is DELIBERATELY NOT PUBLISHED. Recorded where it will be found
+      - a comment on the `coverage` line in `web/.gitignore`, beside the WEB13 line that put it
+      there - rather than only here, because the person who re-opens this will be someone looking
+      at 184 untracked files, not someone reading a closed item. The reasoning: CI enforces the
+      statements floor in the `test:coverage` script and a red floor prints its own numbers in the
+      log, so the HTML only answers WHICH LINES, which a local `npm run test:coverage` answers
+      faster than downloading an artifact. The contrast that settles it is the Playwright report,
+      which IS uploaded on failure: a browser failure is not reproducible from the log, so its
+      artifact buys something this one does not. Publishing would mean a Pages surface or a badge
+      - a new outward-facing render, with a classification to decide, that nothing consumes.
+
+  Gates at close: `pytest -q` 3613 passed / 14 skipped; `ruff check .` and `ruff format --check .`
+  clean; `npm run build` (tsc -b + vite build), `npm run lint`, `npm test` (482) all green. No new
+  tracked path, so no PORT-MANIFEST row to hand back, and no new `.tsx`, so no
+  `config/taxonomy/ui-components.yaml` row.

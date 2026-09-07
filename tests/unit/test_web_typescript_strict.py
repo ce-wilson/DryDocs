@@ -1,6 +1,6 @@
 """WEB4 — TypeScript `strict` stays on in web/, and nothing is asserted past it.
 
-Two halves of one rule, because either half alone is defeatable:
+Three halves of one rule, because any one alone is defeatable:
 
 * **The setting.** Both `web/tsconfig*.json` set `strict: true`, and neither turns
   one of strict's sub-flags back off underneath it. `strict` is a bundle, so
@@ -10,6 +10,14 @@ Two halves of one rule, because either half alone is defeatable:
   `web/src` do not rise above the baseline measured when this landed. The
   compiler being on is worth nothing if the errors it finds are commented away,
   which is exactly what clause (a) of the item forbids.
+* **The reach** (WEB17). Every `.ts` file in `web/` that is not under `src` — the
+  three config files and the two `scripts/` entry points — falls inside some
+  project's `include`. A strict compiler that is not pointed at a file is worth
+  exactly as much as a disabled one, and pointing it at fewer files is silent:
+  narrowing `include` removes errors instead of producing them, so the build goes
+  GREENER as coverage shrinks. That is how WEB4 shipped with `tsconfig.node.json`
+  reading `["vite.config.ts"]` while `vitest.config.ts` and `playwright.config.ts`
+  sat beside it unchecked.
 
 The baseline is **zero**, measured on 2026-09-05 on the tree that turned the flag
 on: strict went on and `tsc -b` passed with no suppression added anywhere. So the
@@ -60,6 +68,12 @@ STRICT_SUBFLAGS = (
     "strictPropertyInitialization",
     "useUnknownInCatchVariables",
 )
+
+#: The `.ts` files outside `web/src` that some project must include (WEB17). Each
+#: glob is relative to `web/` and is deliberately a glob, not a list of names: a
+#: config or script file added later is covered the day it lands, which is the
+#: failure mode — nobody re-reads a tsconfig when adding a build script.
+UNCHECKED_CANDIDATES = ("*.ts", "scripts/*.ts")
 
 _BLOCK_COMMENT = re.compile(r"/\*.*?\*/", re.DOTALL)
 _LINE_COMMENT = re.compile(r"(?m)^\s*//.*$")
@@ -123,6 +137,62 @@ def test_suppression_directives_do_not_rise_above_the_baseline() -> None:
         f"{DIRECTIVE_BASELINE}. Fix the site or raise DIRECTIVE_BASELINE in the same "
         "commit with the reason:\n  " + "\n  ".join(hits)
     )
+
+
+def _included_files() -> set[Path]:
+    """Every file the two projects' `include` patterns reach, as absolute paths.
+
+    TypeScript's `include` grammar, reduced to the two forms these configs use: a
+    bare path with no wildcard names a file if it is one and a whole directory
+    tree if it is one (that is how `"src"` covers `web/src/**`), and anything with
+    a wildcard is an ordinary glob. `Path.glob` implements the second directly.
+    """
+    reached: set[Path] = set()
+    for name in TSCONFIGS:
+        for pattern in _load_jsonc(WEB / name).get("include", []):
+            target = WEB / pattern
+            if not any(ch in pattern for ch in "*?") and target.is_dir():
+                reached.update(p for p in target.rglob("*") if p.is_file())
+            else:
+                reached.update(p for p in WEB.glob(pattern) if p.is_file())
+    return reached
+
+
+def _candidates() -> list[Path]:
+    return sorted(
+        p
+        for pattern in UNCHECKED_CANDIDATES
+        for p in WEB.glob(pattern)
+        if "node_modules" not in p.parts
+    )
+
+
+def test_every_ts_file_outside_src_is_inside_some_project() -> None:
+    reached = _included_files()
+    orphans = [p.relative_to(WEB).as_posix() for p in _candidates() if p not in reached]
+    assert not orphans, (
+        f"{orphans} are TypeScript but no tsconfig `include` reaches them, so `tsc -b` "
+        "never compiles them and `strict` buys nothing there. Add the file (or its glob) "
+        "to `web/tsconfig.node.json`'s include — the Node-side project, which carries "
+        "`types: [node]`; the app project is DOM-side and would drag Node globals into "
+        "browser code."
+    )
+
+
+def test_the_include_scan_resolves_the_files_it_claims_to() -> None:
+    """Instrument check (J76): both halves fail INTO 'clean'.
+
+    An `include` reader that resolves nothing reports every file as an orphan
+    (loud); a candidate glob that matches nothing reports none (silent, and the
+    one that matters). Pin a known member of each set so a refactor that moves
+    `web/` breaks the guard instead of quietly passing it.
+    """
+    candidates = {p.relative_to(WEB).as_posix() for p in _candidates()}
+    assert (
+        {"vite.config.ts", "vitest.config.ts", "playwright.config.ts"} <= candidates
+    ), f"the three web config files are not in the candidate set: {sorted(candidates)}"
+    reached = {p.relative_to(WEB).as_posix() for p in _included_files()}
+    assert "src/App.tsx" in reached, "the include reader did not resolve src/ — glob broken?"
 
 
 def test_the_scan_actually_reads_the_web_sources() -> None:
