@@ -326,6 +326,29 @@
       "extra_contents": {}
     },
     {
+      "id": "review-quality",
+      "title": "Reviewer-quality limits",
+      "file": "config/review-quality.yaml",
+      "code_resident": false,
+      "symbols": [],
+      "consumers": [
+        "drydocs_api/review_quality.py"
+      ],
+      "guard_tests": [
+        "test_review_quality.py",
+        "test_config_schemas.py"
+      ],
+      "gate_ref": null,
+      "status": "enforced",
+      "pending_entries": 0,
+      "env_refs": [],
+      "files": [
+        "config/review-quality.yaml"
+      ],
+      "content": "# =============================================================================\n# config/review-quality.yaml — reviewer-quality limits (O51, plan §8).\n#\n# THE LIMITS FLAG. THEY NEVER ACT. Crossing one puts an SME on the admin\n# queue's quality rail with the metric that tripped; the ADMIN decides whether\n# to block. There is no auto-block in any code path and there is no key here\n# that could turn one on — a threshold is a tripwire, not a judge. That is the\n# same measure-then-decide posture as every other HITL surface in this repo,\n# and it is the reason this file holds only numbers.\n#\n# WHY A FILE AND NOT CONSTANTS. Limits are a judgment that will be revised once\n# there is a term of real data, by the admin who reads the numbers rather than\n# by whoever is editing python that week. Versioned in git like every other\n# config, so a change to what counts as \"too fast\" is reviewable and dated.\n# The AdminConfig surface RENDERS these (it is read-only today); editing them\n# is a commit.\n#\n# classification: Internal-Public — thresholds, no personal data. The metrics\n# these limits are compared against are derived per persona at request time and\n# are never written to this file or to any other tracked path.\n# =============================================================================\nclassification: Internal-Public\nschema: drydocs.review-quality.v1\nupdated: 2026-09-07\n\n# The rolling window every rate is computed over. Days, counted back from the\n# request. A window shorter than a work cycle would flag someone for one bad\n# afternoon; a window longer than a quarter would hide a change in behaviour\n# behind months of history.\nwindow_days: 30\n\n# Below this many decisions in the window, rates are reported but NOTHING is\n# flagged: one return out of two submissions is a 50% return rate and means\n# nothing at all. The floor is the difference between a signal and an accident.\nmin_decisions_for_flag: 5\n\nlimits:\n  # Share of agent candidates confirmed with zero modification. NOT COMPUTABLE\n  # TODAY: the candidate-binding set is the intake plan's section 4, which O48\n  # builds, so this limit is declared and unused rather than silently reading\n  # zero. A reviewer who modifies nothing because there is nothing to modify is\n  # not the reviewer this metric is looking for.\n  auto_accept_rate_max: 0.90\n\n  # Share of a reviewer's submissions that an admin sent back. The strongest of\n  # the four, because it is another human's judgment rather than a heuristic —\n  # so its limit is the tightest.\n  admin_return_rate_max: 0.25\n\n  # Share of confirms that came in under their own review floor.\n  too_fast_rate_max: 0.30\n\n# The review floor, per decision. Evidence takes time to read, so the floor\n# SCALES with it rather than being one number for a two-line email and a\n# forty-page export:\n#\n#     floor = min(min_review_seconds + seconds_per_kb * KB, max_review_seconds)\n#\n# The cap exists because the scaling cannot be trusted past a point: nobody\n# reads a 10 MB attachment line by line, and a floor of six hours would make\n# every large record \"too fast\" forever.\nreview_floor:\n  min_review_seconds: 60\n  seconds_per_kb: 2.0\n  max_review_seconds: 900\n",
+      "extra_contents": {}
+    },
+    {
       "id": "glossary",
       "title": "Business glossary (schema half)",
       "file": "config/glossary/",
@@ -679,6 +702,7 @@
         "config/schemas/identity-header.schema.json",
         "config/schemas/precedence.schema.json",
         "config/schemas/relationship-vocabulary.schema.json",
+        "config/schemas/review-quality.schema.json",
         "config/schemas/source-mapping.schema.json",
         "config/schemas/source-registry.schema.json",
         "config/schemas/taxonomy-ontology-map.schema.json"

@@ -429,10 +429,18 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     which is ClarificationCard's rule applied unchanged. Both counts move by
     one. Note the pair added by this item split on exactly the stated test:
     the ladder has directory evidence and the strip does not.
+    103 -> 106 at O51 (2026-09-07): QualityRail, ReviewerQualityPanel and
+    ReviewQualityTab, all three UNBOUND, bound stays 42. Reviewer quality is not
+    a registry module, so a binding would invent one -- O47's rule for `intake`,
+    unchanged. The THREE is the item's own separation made physical rather than
+    a file per screenful: the rail flags, the panel holds the block behind a
+    required reason, and the tab is the only one of them that fetches. A rail
+    that could block would put a decision about a person one click from a
+    measurement, and keeping them in one file is how that ends up happening.
     """
     comps = _ui()["components"]
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
         42,
-        103,
+        106,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"

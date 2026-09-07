@@ -45,6 +45,10 @@ FAMILIES: dict[str, tuple[str, list[Path]]] = {
         "classification.schema.json",
         [REPO / "config" / "classification.yaml"],
     ),
+    "review-quality": (
+        "review-quality.schema.json",
+        [REPO / "config" / "review-quality.yaml"],
+    ),
     "source-mapping": (
         "source-mapping.schema.json",
         sorted((REPO / "config" / "source-mappings").glob("*.yaml")),

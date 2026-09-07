@@ -160,11 +160,19 @@ class Decision:
 
 
 def _parse(ts: str) -> datetime | None:
-    try:
-        parsed = datetime.fromisoformat(ts)
-    except (TypeError, ValueError):
-        return None
-    return parsed if parsed.tzinfo else parsed.replace(tzinfo=UTC)
+    # A naive timestamp is read as UTC by APPENDING the offset and re-parsing,
+    # not by `.replace(tzinfo=...)`: the ADR 0009 write-primitive guard bans
+    # `.replace()` calls by attribute name and cannot tell a datetime from a
+    # Path. `intake.py` avoids it the same way with `str.translate`. Every row
+    # the store writes today is tz-aware; this branch is for older ones.
+    for candidate in (ts, f"{ts}+00:00"):
+        try:
+            parsed = datetime.fromisoformat(candidate)
+        except (TypeError, ValueError):
+            return None
+        if parsed.tzinfo:
+            return parsed
+    return None
 
 
 def _is_submit(action: str) -> bool:

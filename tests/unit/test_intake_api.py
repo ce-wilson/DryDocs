@@ -27,12 +27,16 @@ from drydocs_api.intake import (
     IntakeValidationError,
     UnknownIntakeError,
     add_evidence,
+    block_history,
+    block_persona,
+    blocked_personas,
     create_intake,
     get_intake,
     list_intakes,
     normalized_subject,
     thread_decision,
     transition,
+    unblock_persona,
 )
 from drydocs_api.sessions import InMemorySessionStore
 
@@ -425,3 +429,124 @@ def test_records_reference_the_data_root_seam():
 
     assert default_intake_root() == context_intake_dir()
     assert not str(default_intake_root()).startswith(str(REPO))
+
+
+# ── O51: the submit block — an admin decision, never a threshold's ───────────
+
+
+def _to_correlated(sessions, store, token, iid):
+    transition(iid, "ontology-reviewed", "", token, sessions, store)
+    transition(iid, "correlated", "", token, sessions, store)
+
+
+def test_a_block_is_admin_only_and_records_who_when_why(sessions, store):
+    token = _token(sessions, "mouse")
+    with pytest.raises(Forbidden):
+        block_persona("mouse", "rubber-stamping", token, sessions, store)
+    assert blocked_personas(store) == {}
+
+    admin = _token(sessions, "morpheus")
+    row = block_persona("mouse", "rubber-stamping", admin, sessions, store)
+    assert row["persona_id"] == "mouse"
+    assert row["blocked_by"] == "morpheus"
+    assert row["reason"] == "rubber-stamping"
+    assert row["blocked_at"]
+    assert set(blocked_personas(store)) == {"mouse"}
+
+
+def test_a_block_without_a_reason_is_refused(sessions, store):
+    """The reviewer is told the reason and the next admin reads it. A block with
+    no reason is a decision nobody can review later, which is the same failure
+    an unreviewable exemption is."""
+    admin = _token(sessions, "morpheus")
+    with pytest.raises(IntakeValidationError):
+        block_persona("mouse", "   ", admin, sessions, store)
+
+
+def test_a_blocked_reviewer_cannot_submit_but_keeps_working(sessions, store):
+    """ "Their drafts survive" is the clause, and this is what it means in the
+    status machine: everything below sme-confirmed still runs, and only the
+    submit is refused."""
+    token, rec = _intake(sessions, store, token=_token(sessions, "mouse"))
+    iid = rec["intake_id"]
+    admin = _token(sessions, "morpheus")
+    block_persona("mouse", "rubber-stamping", admin, sessions, store)
+
+    # the draft-side transitions still run
+    _to_correlated(sessions, store, token, iid)
+    assert get_intake(iid, token, sessions, store)["status"] == "correlated"
+
+    with pytest.raises(Forbidden) as info:
+        transition(iid, "sme-confirmed", "", token, sessions, store)
+    message = str(info.value)
+    assert "rubber-stamping" in message, "the reviewer is told WHY, not just refused"
+    assert "morpheus" in message and "Drafts and evidence are unaffected" in message
+
+
+def test_the_block_stops_the_re_confirm_path_too(sessions, store):
+    """Both paths into sme-confirmed are submits. Guarding only the first would
+    leave the returned-record path open, which is the path a flagged reviewer is
+    most likely to be on."""
+    token, rec = _intake(sessions, store, token=_token(sessions, "mouse"))
+    iid = rec["intake_id"]
+    admin = _token(sessions, "morpheus")
+    _to_correlated(sessions, store, token, iid)
+    transition(iid, "sme-confirmed", "", token, sessions, store)
+    transition(iid, "admin-returned", "look again", admin, sessions, store)
+
+    block_persona("mouse", "rubber-stamping", admin, sessions, store)
+    with pytest.raises(Forbidden):
+        transition(iid, "sme-confirmed", "", token, sessions, store)
+
+
+def test_another_reviewer_is_unaffected_by_someone_else_s_block(sessions, store):
+    admin = _token(sessions, "morpheus")
+    block_persona("mouse", "rubber-stamping", admin, sessions, store)
+    other = _token(sessions, "trinity")
+    _, rec = _intake(sessions, store, token=other)
+    iid = rec["intake_id"]
+    _to_correlated(sessions, store, other, iid)
+    assert transition(iid, "sme-confirmed", "", other, sessions, store)["status"] == "sme-confirmed"
+
+
+def test_an_unblock_needs_a_note_and_leaves_the_record_behind(sessions, store):
+    """Append-only: the lift CLOSES the row rather than deleting it. A judgment
+    about a person that can be erased is not a record, and the pair (why it was
+    placed, what changed) is what makes it reviewable at all."""
+    admin = _token(sessions, "morpheus")
+    block_persona("mouse", "rubber-stamping", admin, sessions, store)
+
+    with pytest.raises(IntakeValidationError):
+        unblock_persona("mouse", "  ", admin, sessions, store)
+    mouse = _token(sessions, "mouse")
+    with pytest.raises(Forbidden):
+        unblock_persona("mouse", "looks better", mouse, sessions, store)
+
+    lifted = unblock_persona("mouse", "coached, rates back down", admin, sessions, store)
+    assert lifted["unblocked_by"] == "morpheus"
+    assert lifted["unblock_note"] == "coached, rates back down"
+    assert blocked_personas(store) == {}
+
+    history = block_history(store, "mouse")
+    assert len(history) == 1, "the lift closed the row rather than deleting it"
+    assert history[0]["reason"] == "rubber-stamping"
+
+
+def test_unblocking_lets_the_reviewer_submit_again(sessions, store):
+    token, rec = _intake(sessions, store, token=_token(sessions, "mouse"))
+    iid = rec["intake_id"]
+    admin = _token(sessions, "morpheus")
+    _to_correlated(sessions, store, token, iid)
+    block_persona("mouse", "rubber-stamping", admin, sessions, store)
+    unblock_persona("mouse", "coached", admin, sessions, store)
+    assert transition(iid, "sme-confirmed", "", token, sessions, store)["status"] == "sme-confirmed"
+
+
+def test_blocking_twice_is_refused_rather_than_stacking_rows(sessions, store):
+    """Two open blocks on one persona would make "who blocked them" ambiguous
+    and "lift the block" a guess about which one."""
+    admin = _token(sessions, "morpheus")
+    block_persona("mouse", "rubber-stamping", admin, sessions, store)
+    with pytest.raises(IntakeValidationError) as info:
+        block_persona("mouse", "again", admin, sessions, store)
+    assert "already blocked" in str(info.value)
