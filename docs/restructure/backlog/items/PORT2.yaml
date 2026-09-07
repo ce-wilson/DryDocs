@@ -1,0 +1,18 @@
+id: PORT2
+epic: release-infrastructure
+title: "A feedback capture whose rev1 and rev11 normalize to one anchor set is either an unfilled template or a normalizer that discards the payload - find out which"
+type: bug
+module: drydocs-port
+phase: 8
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs: []
+acceptance: |
+  STUB - minted 2026-09-07 by the groom of Idea-251; the body lands in the next
+  commit of the same groom run (the I6 mint protocol: final title first, pushed,
+  then the body).
+notes: |
+  Minted 2026-09-07 from docs/restructure/IDEAS.md Idea-251.

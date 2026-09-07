@@ -1,0 +1,18 @@
+id: LOAD3
+epic: runtime-topology
+title: "Ten CM_DEF_VTAB folder rows share a TABLE_ID inside one data center - probe what a duplicate folder row means before the staging composite key rejects them"
+type: task
+module: drydocs-load
+phase: 13
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs: []
+acceptance: |
+  STUB - minted 2026-09-07 by the groom of Idea-274; the body lands in the next
+  commit of the same groom run (the I6 mint protocol: final title first, pushed,
+  then the body).
+notes: |
+  Minted 2026-09-07 from docs/restructure/IDEAS.md Idea-274.

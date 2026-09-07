@@ -1,0 +1,18 @@
+id: LIN3
+epic: doc-infrastructure
+title: "Console feedback resolves to nothing because no loader writes :DocSection rows for a console.* origin - close the graph side of the O89 loop"
+type: task
+module: drydocs-lineage
+phase: 10
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on: []
+inputs: []
+acceptance: |
+  STUB - minted 2026-09-07 by the groom of Idea-271; the body lands in the next
+  commit of the same groom run (the I6 mint protocol: final title first, pushed,
+  then the body).
+notes: |
+  Minted 2026-09-07 from docs/restructure/IDEAS.md Idea-271.

@@ -1,0 +1,18 @@
+id: PLAN5
+epic: project-board
+title: "lane-handoff --suggest compares a lane's items against the other lane's pens and never against its queue - fold in the input-overlap check that found seven collisions"
+type: task
+module: drydocs-plan
+phase: 8
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on: []
+inputs: []
+acceptance: |
+  STUB - minted 2026-09-07 by the groom of Idea-269; the body lands in the next
+  commit of the same groom run (the I6 mint protocol: final title first, pushed,
+  then the body).
+notes: |
+  Minted 2026-09-07 from docs/restructure/IDEAS.md Idea-269.

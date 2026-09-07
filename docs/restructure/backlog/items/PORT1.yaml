@@ -1,0 +1,18 @@
+id: PORT1
+epic: release-infrastructure
+title: "Three back-flow adoptions from the company's chunk-1 apply, plus the rule that a workplan naming a script names the commit it needs"
+type: task
+module: drydocs-port
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs: []
+acceptance: |
+  STUB - minted 2026-09-07 by the groom of Idea-250; the body lands in the next
+  commit of the same groom run (the I6 mint protocol: final title first, pushed,
+  then the body).
+notes: |
+  Minted 2026-09-07 from docs/restructure/IDEAS.md Idea-250.

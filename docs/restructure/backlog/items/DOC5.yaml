@@ -1,0 +1,18 @@
+id: DOC5
+epic: web-console
+title: "ADR - the code-splitting boundary follows the authorization boundary, and the lazy route set is derived from the gated route set rather than kept as a second list"
+type: task
+module: docs
+phase: 12
+agent: main
+model: fable
+priority: p3
+status: todo
+depends_on: []
+inputs: []
+acceptance: |
+  STUB - minted 2026-09-07 by the groom of Idea-272; the body lands in the next
+  commit of the same groom run (the I6 mint protocol: final title first, pushed,
+  then the body).
+notes: |
+  Minted 2026-09-07 from docs/restructure/IDEAS.md Idea-272.

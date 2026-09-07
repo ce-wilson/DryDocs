@@ -1,0 +1,18 @@
+id: PLAN6
+epic: project-board
+title: "A venue wall written in acceptance prose is invisible to lane-handoff --suggest - give items a declared venue the check can read"
+type: task
+module: drydocs-plan
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs: []
+acceptance: |
+  STUB - minted 2026-09-07 by the groom of Idea-264; the body lands in the next
+  commit of the same groom run (the I6 mint protocol: final title first, pushed,
+  then the body).
+notes: |
+  Minted 2026-09-07 from docs/restructure/IDEAS.md Idea-264.

@@ -1,0 +1,18 @@
+id: API2
+epic: web-console
+title: "ColumnDef carries no list type, so two server columns that return lists are declared string - extend the vocabulary and delete the client-side exemption"
+type: bug
+module: drydocs-api
+phase: 12
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on: []
+inputs: []
+acceptance: |
+  STUB - minted 2026-09-07 by the groom of Idea-270; the body lands in the next
+  commit of the same groom run (the I6 mint protocol: final title first, pushed,
+  then the body).
+notes: |
+  Minted 2026-09-07 from docs/restructure/IDEAS.md Idea-270.

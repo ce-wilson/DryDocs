@@ -1,0 +1,18 @@
+id: DOC6
+epic: doc-infrastructure
+title: "Write the bundled demo's verb sequence down - which commands, in which order, against which database - in internal/repo-README.md"
+type: chore
+module: docs
+phase: 10
+agent: main
+model: haiku
+priority: p3
+status: todo
+depends_on: []
+inputs: []
+acceptance: |
+  STUB - minted 2026-09-07 by the groom of Idea-260; the body lands in the next
+  commit of the same groom run (the I6 mint protocol: final title first, pushed,
+  then the body).
+notes: |
+  Minted 2026-09-07 from docs/restructure/IDEAS.md Idea-260.
