@@ -618,7 +618,7 @@
       "prompt_files": [
         "config/gate-prompts/email-dl-contact-point.yaml"
       ],
-      "log_ref": "config/gate-log.md:2550",
+      "log_ref": "config/gate-log.md:2566",
       "unblocks": [
         "C36",
         "C44"
@@ -632,7 +632,7 @@
       "prompt_files": [
         "config/gate-prompts/tom-roles-enumeration-and-cardinality.yaml"
       ],
-      "log_ref": "config/gate-log.md:2578",
+      "log_ref": "config/gate-log.md:2594",
       "unblocks": []
     },
     {
@@ -643,7 +643,7 @@
       "prompt_files": [
         "config/gate-prompts/tom-roles-enumeration-and-cardinality.yaml"
       ],
-      "log_ref": "config/gate-log.md:2648",
+      "log_ref": "config/gate-log.md:2664",
       "unblocks": []
     },
     {
@@ -656,7 +656,7 @@
         "config/gate-prompts/seal-tom-attribution-reshape.yaml",
         "config/gate-prompts/tom-roles-enumeration-and-cardinality.yaml"
       ],
-      "log_ref": "config/gate-log.md:2747",
+      "log_ref": "config/gate-log.md:2763",
       "unblocks": [
         "G70",
         "G71",
@@ -672,7 +672,7 @@
       "prompt_files": [
         "config/gate-prompts/tom-roles-enumeration-and-cardinality.yaml"
       ],
-      "log_ref": "config/gate-log.md:2819",
+      "log_ref": "config/gate-log.md:2835",
       "unblocks": []
     },
     {
@@ -683,7 +683,7 @@
       "prompt_files": [
         "config/gate-prompts/tom-roles-enumeration-and-cardinality.yaml"
       ],
-      "log_ref": "config/gate-log.md:2881",
+      "log_ref": "config/gate-log.md:2897",
       "unblocks": []
     },
     {
@@ -694,7 +694,7 @@
       "prompt_files": [
         "config/gate-prompts/tom-roles-enumeration-and-cardinality.yaml"
       ],
-      "log_ref": "config/gate-log.md:2909",
+      "log_ref": "config/gate-log.md:2925",
       "unblocks": []
     },
     {
@@ -705,7 +705,7 @@
       "prompt_files": [
         "config/gate-prompts/source-registry-v2.yaml"
       ],
-      "log_ref": "config/gate-log.md:2944",
+      "log_ref": "config/gate-log.md:2960",
       "unblocks": []
     },
     {
@@ -719,7 +719,7 @@
         "config/gate-prompts/software-version-context.yaml",
         "config/gate-prompts/vocabulary-domains-and-id-policy.yaml"
       ],
-      "log_ref": "config/gate-log.md:2995",
+      "log_ref": "config/gate-log.md:3011",
       "unblocks": []
     },
     {
@@ -732,7 +732,7 @@
         "config/gate-prompts/envelope-property-terms.yaml",
         "config/gate-prompts/remediation-fix-tracking.yaml"
       ],
-      "log_ref": "config/gate-log.md:3060",
+      "log_ref": "config/gate-log.md:3076",
       "unblocks": [
         "G90"
       ]
@@ -745,7 +745,7 @@
       "prompt_files": [
         "config/gate-prompts/rua-bundle-data-profile.yaml"
       ],
-      "log_ref": "config/gate-log.md:3095",
+      "log_ref": "config/gate-log.md:3111",
       "unblocks": [
         "G62"
       ]
@@ -758,7 +758,7 @@
       "prompt_files": [
         "config/gate-prompts/corporate-backbone-vocabulary.yaml"
       ],
-      "log_ref": "config/gate-log.md:3138",
+      "log_ref": "config/gate-log.md:3154",
       "unblocks": []
     },
     {
@@ -771,7 +771,7 @@
         "config/gate-prompts/rua-load-shapes.yaml",
         "config/gate-prompts/vocabulary-domains-and-id-policy.yaml"
       ],
-      "log_ref": "config/gate-log.md:3184",
+      "log_ref": "config/gate-log.md:3200",
       "unblocks": []
     },
     {
@@ -785,7 +785,7 @@
         "config/gate-prompts/rua-load-shapes.yaml",
         "config/gate-prompts/vocabulary-domains-and-id-policy.yaml"
       ],
-      "log_ref": "config/gate-log.md:3260",
+      "log_ref": "config/gate-log.md:3276",
       "unblocks": []
     },
     {
@@ -796,7 +796,7 @@
       "prompt_files": [
         "config/gate-prompts/vocabulary-domains-and-id-policy.yaml"
       ],
-      "log_ref": "config/gate-log.md:3332",
+      "log_ref": "config/gate-log.md:3348",
       "unblocks": []
     },
     {
@@ -805,7 +805,7 @@
       "title": "RECORD: the :Employee creation policy — STUB-AND-ENRICH (SME direction in-chat; G74 clause 2 owns the formal transcription)",
       "status": "recorded",
       "prompt_files": [],
-      "log_ref": "config/gate-log.md:3387",
+      "log_ref": "config/gate-log.md:3403",
       "unblocks": []
     },
     {
@@ -816,7 +816,7 @@
       "prompt_files": [
         "config/gate-prompts/pending-source-correction.yaml"
       ],
-      "log_ref": "config/gate-log.md:3418",
+      "log_ref": "config/gate-log.md:3434",
       "unblocks": [
         "N14",
         "N15",
@@ -831,7 +831,7 @@
       "prompt_files": [
         "config/gate-prompts/document-content-topology.yaml"
       ],
-      "log_ref": "config/gate-log.md:3463",
+      "log_ref": "config/gate-log.md:3479",
       "unblocks": []
     },
     {
@@ -842,7 +842,7 @@
       "prompt_files": [
         "config/gate-prompts/document-content-topology.yaml"
       ],
-      "log_ref": "config/gate-log.md:3531",
+      "log_ref": "config/gate-log.md:3547",
       "unblocks": []
     },
     {
@@ -851,7 +851,7 @@
       "title": "RECORD: the Essential GraphRAG re-file — VENDOR documentation for Neo4j (Q9; ADR 0006 §2 amendment)",
       "status": "recorded",
       "prompt_files": [],
-      "log_ref": "config/gate-log.md:3561",
+      "log_ref": "config/gate-log.md:3577",
       "unblocks": []
     },
     {
@@ -863,7 +863,7 @@
         "config/gate-prompts/email-folder-assignment.yaml",
         "config/gate-prompts/pending-source-correction.yaml"
       ],
-      "log_ref": "config/gate-log.md:3585",
+      "log_ref": "config/gate-log.md:3601",
       "unblocks": [
         "Q21",
         "Q22"
@@ -877,7 +877,7 @@
       "prompt_files": [
         "config/gate-prompts/medallion-stage-vocabulary.yaml"
       ],
-      "log_ref": "config/gate-log.md:3635",
+      "log_ref": "config/gate-log.md:3651",
       "unblocks": []
     },
     {
@@ -889,7 +889,7 @@
         "config/gate-prompts/rua-load-shapes.yaml",
         "config/gate-prompts/server-location-ontology.yaml"
       ],
-      "log_ref": "config/gate-log.md:3679",
+      "log_ref": "config/gate-log.md:3695",
       "unblocks": []
     },
     {
@@ -900,7 +900,7 @@
       "prompt_files": [
         "config/gate-prompts/fid-identity-and-scope.yaml"
       ],
-      "log_ref": "config/gate-log.md:3775",
+      "log_ref": "config/gate-log.md:3791",
       "unblocks": [
         "K26"
       ]
@@ -913,7 +913,7 @@
       "prompt_files": [
         "config/gate-prompts/fid-identity-and-scope.yaml"
       ],
-      "log_ref": "config/gate-log.md:3834",
+      "log_ref": "config/gate-log.md:3850",
       "unblocks": [
         "K26"
       ]
@@ -926,7 +926,7 @@
       "prompt_files": [
         "config/gate-prompts/fid-identity-and-scope.yaml"
       ],
-      "log_ref": "config/gate-log.md:3866",
+      "log_ref": "config/gate-log.md:3882",
       "unblocks": [
         "K26"
       ]
@@ -939,7 +939,7 @@
       "prompt_files": [
         "config/gate-prompts/fid-identity-and-scope.yaml"
       ],
-      "log_ref": "config/gate-log.md:3898",
+      "log_ref": "config/gate-log.md:3914",
       "unblocks": [
         "K26"
       ]
@@ -954,7 +954,7 @@
         "config/gate-prompts/seal-attribution-match-policy.yaml",
         "config/gate-prompts/software-version-context.yaml"
       ],
-      "log_ref": "config/gate-log.md:3918",
+      "log_ref": "config/gate-log.md:3934",
       "unblocks": [
         "K26"
       ]
@@ -968,7 +968,7 @@
         "config/gate-prompts/fid-identity-and-scope.yaml",
         "config/gate-prompts/seal-attribution-match-policy.yaml"
       ],
-      "log_ref": "config/gate-log.md:3969",
+      "log_ref": "config/gate-log.md:3985",
       "unblocks": [
         "K26"
       ]
@@ -981,7 +981,7 @@
       "prompt_files": [
         "config/gate-prompts/email-folder-assignment.yaml"
       ],
-      "log_ref": "config/gate-log.md:3990",
+      "log_ref": "config/gate-log.md:4006",
       "unblocks": []
     },
     {
@@ -993,7 +993,7 @@
         "config/gate-prompts/source-registry-v2.yaml",
         "config/gate-prompts/vendor-docs-entity-core.yaml"
       ],
-      "log_ref": "config/gate-log.md:4065",
+      "log_ref": "config/gate-log.md:4081",
       "unblocks": []
     },
     {
@@ -1002,7 +1002,7 @@
       "title": "RULING: catalog Sub-LoB label — `CatalogSubLOB` (C27 item (b); SME, Option 1)",
       "status": "recorded",
       "prompt_files": [],
-      "log_ref": "config/gate-log.md:4086",
+      "log_ref": "config/gate-log.md:4102",
       "unblocks": []
     },
     {
@@ -1014,7 +1014,7 @@
         "config/gate-prompts/etlprocess-kind-enum.yaml",
         "config/gate-prompts/standard-identity-and-carrier.yaml"
       ],
-      "log_ref": "config/gate-log.md:4124",
+      "log_ref": "config/gate-log.md:4140",
       "unblocks": [
         "G116"
       ]
@@ -1027,7 +1027,7 @@
       "prompt_files": [
         "config/gate-prompts/tech-partner-attach-level.yaml"
       ],
-      "log_ref": "config/gate-log.md:4155",
+      "log_ref": "config/gate-log.md:4171",
       "unblocks": [
         "K20",
         "K29"
@@ -1041,7 +1041,7 @@
       "prompt_files": [
         "config/gate-prompts/cdo-crosswalk.yaml"
       ],
-      "log_ref": "config/gate-log.md:4179",
+      "log_ref": "config/gate-log.md:4195",
       "unblocks": []
     },
     {
@@ -1052,7 +1052,7 @@
       "prompt_files": [
         "config/gate-prompts/tech-partner-attach-level.yaml"
       ],
-      "log_ref": "config/gate-log.md:4197",
+      "log_ref": "config/gate-log.md:4213",
       "unblocks": []
     },
     {
@@ -1063,7 +1063,7 @@
       "prompt_files": [
         "config/gate-prompts/source-connection-and-run-identity.yaml"
       ],
-      "log_ref": "config/gate-log.md:4218",
+      "log_ref": "config/gate-log.md:4234",
       "unblocks": [
         "N19",
         "N20",
@@ -1078,7 +1078,7 @@
       "prompt_files": [
         "config/gate-prompts/replica-derivation-edge.yaml"
       ],
-      "log_ref": "config/gate-log.md:4240",
+      "log_ref": "config/gate-log.md:4256",
       "unblocks": []
     },
     {
@@ -1090,7 +1090,7 @@
         "config/gate-prompts/schema-identifier-publish-ceiling-teams-edition.yaml",
         "config/gate-prompts/source-registry-v2.yaml"
       ],
-      "log_ref": "config/gate-log.md:4267",
+      "log_ref": "config/gate-log.md:4283",
       "unblocks": [
         "J70"
       ]
@@ -1103,7 +1103,7 @@
       "prompt_files": [
         "config/gate-prompts/schema-identifier-publish-ceiling-teams-edition.yaml"
       ],
-      "log_ref": "config/gate-log.md:4309",
+      "log_ref": "config/gate-log.md:4325",
       "unblocks": []
     },
     {
@@ -1114,7 +1114,7 @@
       "prompt_files": [
         "config/gate-prompts/ontology-domain-registry-and-edition-grain.yaml"
       ],
-      "log_ref": "config/gate-log.md:4349",
+      "log_ref": "config/gate-log.md:4365",
       "unblocks": [
         "REF1",
         "C41",
@@ -1137,7 +1137,7 @@
         "config/gate-prompts/idea-series-grammar.yaml",
         "config/gate-prompts/ontology-domain-registry-and-edition-grain.yaml"
       ],
-      "log_ref": "config/gate-log.md:4440",
+      "log_ref": "config/gate-log.md:4456",
       "unblocks": [
         "PLAN2"
       ]
@@ -1152,7 +1152,7 @@
         "config/gate-prompts/dcat-theme-subject-scheme.yaml",
         "config/gate-prompts/snowflake-data-catalog.yaml"
       ],
-      "log_ref": "config/gate-log.md:4504",
+      "log_ref": "config/gate-log.md:4520",
       "unblocks": [
         "C35",
         "C37",

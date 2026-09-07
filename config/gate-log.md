@@ -2546,6 +2546,22 @@ that any application uses it or at what version.
   company-side on 2026-08-07 and stopped so the two would match; this entry is the producer-side
   half. The relay is NOT written into `docs/port-prompt.md` yet because a port is in flight
   against a fetched head and that file is a hand-merge surface — add it once that port merges.
+- **RECORD 2026-09-07 — §Q3 RULED (desktop, SME in session; C33 unblocked).** The SME's
+  sentence: *each row is identified by the census row itself, `{source, as_of, fid,
+  install_path}`; if a later census lists the same install at a different path, that is a
+  new dated row, not an update of the old one.* This SHARPENS B2 rather than re-keying it:
+  `fid` was already an endpoint of the edge and `as_of` was already carried by the dated
+  `source` (E1), so the signed key's implied members become explicit and nothing signed
+  moves. The symlink question is thereby closed WITHOUT being answered: a re-pointed path
+  only matters on a re-run against the same `source`, and a one-shot dated census cannot
+  produce one — a second census is a second batch by design. Two `as_of` values stay two
+  fields: the census date (the email's sent date, B4) rides the edge; a governance-catalog
+  read date is company-side registry enrichment and never enters this loader. The ruling
+  is stated once for EVERY adhoc version census corpus, not only the Ab Initio one
+  (Idea-275), so the other ETL platform's future census does not reopen it. Producer-side
+  C33 builds against a synthetic fixture (70001-band values); the `:Document` citation's
+  sent date and digest exist only company-side, so the company runs the loader against the
+  real thread and its `done` names that venue. Q4 and Q5 remain open and block nothing here.
 
 ## 2026-08-12 — RECORD: the downstream consumer contact attaches to a `:Port`, not to job/folder (email-dl-contact-point §G5; SME direction in-chat, 2026-08-12)
 

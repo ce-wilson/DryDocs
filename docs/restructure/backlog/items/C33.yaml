@@ -8,7 +8,7 @@ phase: 2
 agent: main
 model: fable
 priority: p2
-status: blocked
+status: todo
 depends_on: []
 gates: [software-version-context]
 inputs:
@@ -58,3 +58,8 @@ notes: |
   Idea-276. Which source was asked and what it did not answer is the N24 clause (f)/(g)
   case in the wild: the research question, the server that was read for it, and the
   outcome (irrelevant to Q3, per the probe vocabulary) belong on the record, not inferred.
+  UNBLOCKED 2026-09-07 (desktop, SME in session): Q3 ruled as the census key
+  {source, as_of, fid, install_path} - RECORD appended under the software-version-context
+  gate in config/gate-log.md. B2 sharpened, not re-keyed; the MERGE key may now be written.
+  The build follows the acceptance as written; the synthetic-fixture / company-venue split
+  for the :Document citation is in the RECORD.
