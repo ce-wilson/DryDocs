@@ -25,7 +25,7 @@ from drydocs_core.schema.constraints import (
     declared_constraint_names_in_tree,
     undeclared_constraints,
 )
-from tests.source_scan import ATTRIBUTE, called_names, code_only
+from tests.source_scan import ATTRIBUTE, absent, called_names, without_prose
 
 REPO = Path(__file__).resolve().parents[2]
 SCHEMA_DIR = REPO / "drydocs_core" / "schema"
@@ -144,10 +144,22 @@ def test_nothing_in_the_drift_path_can_drop_a_constraint() -> None:
 
     source = inspect.getsource(_report_undeclared_constraints)
     # Two different questions, so two different reads (J66). "does it DROP" is
-    # about behaviour and goes through the helper -- otherwise this very
-    # function's explanation of why it never drops would fail it. "does the
-    # OUTPUT say so" is about the prose, so it reads the raw source on purpose.
-    assert "DROP CONSTRAINT" not in code_only(source).upper()
+    # about behaviour; "does the OUTPUT say so" is about the prose, so the second
+    # one reads the raw source on purpose.
+    #
+    # CORE2: the first read used `code_only`, and a DROP is executed as Cypher —
+    # a string literal, the one thing `code_only` removes. The guard could not
+    # have caught a drop and passed on nothing from the day it was written.
+    # `without_prose` keeps the literal and drops this function's docstring,
+    # which is what let the old shape reach for `code_only` in the first place.
+    absent(
+        "DROP CONSTRAINT",
+        {"cli_schema._report_undeclared_constraints": source},
+        positive_control='session.run("DROP CONSTRAINT job_pk IF EXISTS")',
+        stripper=without_prose,
+        normalize=str.upper,
+        because="the drift path can drop a constraint",
+    )
     assert "drops NOTHING" in source, "the output must say so, not just be so"
 
 

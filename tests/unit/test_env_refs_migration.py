@@ -11,13 +11,23 @@ migration needs that test relaxed, stop and say why").
 from __future__ import annotations
 
 import inspect
+import re
 from pathlib import Path
 
 import pytest
 import yaml
 
 from drydocs_core import data_root, env_refs, log_kinds
-from tests.source_scan import code_only, source_text
+from tests.source_scan import absent, code_only, source_text, without_prose
+
+
+def _despace(text: str) -> str:
+    """`code_only` joins tokens with single spaces, so `os.environ` arrives as
+    `os . environ`. Removing every space is how this file has always read a
+    DOTTED subject out of that output; as a `normalize` it now runs over the
+    positive control too, which is what makes the control meaningful."""
+    return text.replace(" ", "")
+
 
 REPO = Path(__file__).resolve().parents[2]
 
@@ -69,13 +79,18 @@ def test_the_migrated_resolvers_no_longer_read_the_environment_directly() -> Non
     ``log_kinds.resolve_env_override`` deliberately keeps its own
     ``os.environ`` read and is excluded — see the rationale test below.
     """
-    for rel in MIGRATED:
-        source = code_only(source_text(rel, REPO))
-        assert "os.environ" not in source.replace(" ", ""), (
-            f"{rel} still reads os.environ directly. The whole of G125 clause (c) "
-            "is that one function does the lookup, so seven private ones cannot "
+    absent(
+        "os.environ",
+        MIGRATED,
+        root=REPO,
+        positive_control="v = os.environ.get('DRYDOCS_DATA_ROOT')",
+        normalize=_despace,
+        because=(
+            "it still reads os.environ directly. The whole of G125 clause (c) is "
+            "that one function does the lookup, so seven private ones cannot "
             "disagree about what 'unset' means."
-        )
+        ),
+    )
 
 
 def test_every_migrated_module_uses_the_declared_accessor() -> None:
@@ -94,9 +109,23 @@ def test_mapping_store_itself_never_read_the_environment() -> None:
     sites (``manual_loads``, ``seal_contacts``, ``drydocs_api/mappings``), which
     is where the migration went.
     """
-    code = code_only(source_text("drydocs_core/mapping_store.py", REPO)).replace(" ", "")
-    assert "os.environ" not in code
-    assert "importos" not in code
+    store = ("drydocs_core/mapping_store.py",)
+    absent(
+        "os.environ",
+        store,
+        root=REPO,
+        positive_control="v = os.environ.get('X')",
+        normalize=_despace,
+        because="the store reads the environment",
+    )
+    absent(
+        "importos",
+        store,
+        root=REPO,
+        positive_control="import os",
+        normalize=_despace,
+        because="the store imports os at all",
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -123,13 +152,29 @@ def test_a_whitespace_only_data_root_is_unset(monkeypatch) -> None:
 
 
 def test_no_default_operator_entered_at_any_layer() -> None:
-    """The expander refuses bash defaults; the migration must not smuggle one in."""
-    for rel in (*MIGRATED, "drydocs_core/env_refs.py", "drydocs_core/log_kinds.py"):
-        code = code_only(source_text(rel, REPO))
-        assert ":-" not in code.replace(" ", ""), (
-            f"{rel} appears to use a bash default operator in CODE (its prose may "
-            "name one -- env_refs documents the operator it refuses)"
-        )
+    """The expander refuses bash defaults; the migration must not smuggle one in.
+
+    TWO CORRECTIONS FROM CORE2'S SWEEP, and the old shape was wrong in both
+    directions at once. It scanned `code_only` for `":-"`, and a bash default is
+    written INSIDE a string literal — the one thing `code_only` removes — so it
+    could not have caught the operator it names. What it could catch was
+    `items[:-1]`: a negative slice despaces to `[:-1]` and would have failed a
+    module for a list operation. The subject is a literal, so the stripper is
+    `without_prose`, and the pattern is the operator's actual SHAPE rather than
+    two characters that occur in ordinary code.
+    """
+    scanned = (*MIGRATED, "drydocs_core/env_refs.py", "drydocs_core/log_kinds.py")
+    absent(
+        re.compile(r"\$\{[^}]*:-"),
+        scanned,
+        root=REPO,
+        positive_control='REF = "${DRYDOCS_LOGDIR:-/tmp/logs}"',
+        stripper=without_prose,
+        because=(
+            "it uses a bash default operator in CODE (its prose may name one -- "
+            "env_refs documents the operator it refuses)"
+        ),
+    )
 
 
 def test_the_log_root_order_is_unchanged(monkeypatch, tmp_path) -> None:

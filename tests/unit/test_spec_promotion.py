@@ -25,7 +25,13 @@ from common.spec_promotion import (  # noqa: E402
     write_candidates,
 )
 
-from tests.source_scan import called_names, code_only, imported_modules, source_text  # noqa: E402
+from tests.source_scan import (  # noqa: E402
+    absent,
+    called_names,
+    imported_modules,
+    source_text,
+    without_prose,
+)
 
 MODULE = REPO_ROOT / "agents" / "common" / "spec_promotion.py"
 
@@ -164,11 +170,17 @@ def test_writing_the_artifact_round_trips(tmp_path):
 def test_the_feed_cannot_reach_the_spec_registry():
     """Gate-bound, asserted. Source-scanned over `code_only` (J66) because the
     module's own docstring names every symbol it must not touch — a raw
-    substring scan would fail on the explanation."""
+    substring scan would fail on the explanation. Each subject is an IDENTIFIER,
+    which is what makes `code_only` the right stripper here; the control in each
+    call is what proves it (CORE2)."""
     source = source_text(MODULE)
-    code = code_only(source)
     for forbidden in ("QUERY_SPECS", "QuerySpec", "EphemeralSpecStore", "register_spec"):
-        assert forbidden not in code, f"the promotion feed reaches {forbidden}"
+        absent(
+            forbidden,
+            {str(MODULE): source},
+            positive_control=f"x = {forbidden}",
+            because="the promotion feed reaches the spec registry",
+        )
     imported = imported_modules(source)
     assert not any("query_specs" in m for m in imported), imported
     assert not any(m.startswith("drydocs_api") for m in imported), (
@@ -179,8 +191,19 @@ def test_the_feed_cannot_reach_the_spec_registry():
 
 def test_the_feed_writes_exactly_one_kind_of_thing():
     """It may write its artifact and nothing else — in particular never
-    query_specs.py, which is where a 'helpful' auto-registration would land."""
-    code = code_only(source_text(MODULE))
-    assert "query_specs.py" not in code
+    query_specs.py, which is where a 'helpful' auto-registration would land.
+
+    `without_prose`, not `code_only`: the subject is a FILE PATH, so in this
+    module it can only ever appear inside a string literal — exactly what
+    `code_only` removes. This scan was vacuous from the day it was written (R8,
+    2026-09-06) and was found by CORE2's sweep, not by it ever going red.
+    """
+    absent(
+        "query_specs.py",
+        {str(MODULE): source_text(MODULE)},
+        positive_control='Path("drydocs_api/query_specs.py").write_text(x)',
+        stripper=without_prose,
+        because="the feed names the registry file it must never write",
+    )
     called = called_names(source_text(MODULE))
     assert "write_text" in called, "the artifact writer is the one write"
