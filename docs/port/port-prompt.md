@@ -1036,6 +1036,32 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   company state.
 `scripts/port_preflight.py` fails the port if any live relay lacks one.
 
+**A STRUCTURAL REFACTOR OF AN EVALUATE PATH IS A MANDATORY RELAY (J73, 2026-09-07).**
+A commit whose subject begins `refactor(` and touches a path whose manifest disposition
+is `evaluate` — an explicit `evaluate` row, or no row at all so the path falls to an
+evaluate-on-collision default — gets a relay in this section at the roll that carries
+it, written by the session that made the refactor, while it still knows why. The relay
+names three things and no more: **the file**, **the new shape**, and **where your
+content goes in that shape**. One paragraph. It is not a change log and not a merge
+guide; the ledger step already holds the reasoning and the manifest row already holds
+the merge rule. **What an evaluate note cannot say, and why this exists:** an evaluate
+note tells you how to merge CONTENT, and no wording of it can say "the producer
+changed the SHAPE of this file — take the shape and re-home your content". **The
+case that wrote this rule:** S8 (2026-08-21, `f5e7229d`, subject `refactor(S8): split
+cli.py (3184 lines) into a thin composition root + six per-domain command modules`)
+shipped under a `drydocs/cli.py` row that read "composition root; both sides add
+commands — merge per collision ledger". No relay was written. TWO ports walked past
+it: the row was followed literally and producer verbs were merged INTO the consumer
+monolith, twice, while the six modules it should have imported sat orphaned beside it
+(RELAY-24 is the relay S8 should have carried, written twelve days late). **Scope:**
+the trigger is the conjunction — `refactor(` subject AND evaluate path. A refactor of
+a `canonical-producer` path needs none (you take the file whole; the shape comes with
+it). A content change to an evaluate path needs none (the row already says how to
+merge it). Nothing checks the trigger for you: `port_preflight.py` fails a live relay
+without a basis tag, and does not know a refactor from a fix. That is deliberate —
+the producer author is the one party who knows which of their commits changed a
+shape, and whether to mechanise the trigger is a separate question, not proposed here.
+
 - **RELAY-1 (was R1) — AIS acronym expansion: transplant the VALUE across files**
   `[VERIFIED-PRODUCER]` (standing
   since 2026-07-21; re-verified at the 2026-08-09 roll). Producer's

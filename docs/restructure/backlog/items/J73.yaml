@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - docs/port/port-prompt.md
@@ -52,3 +52,19 @@ notes: |
   DELIBERATELY NOT PROPOSED HERE: automating the trigger (a CI check over commit subjects
   against the manifest's evaluate paths). It is a real option and it is a different item -
   this one is the rule and its example, which is what a port session actually reads.
+
+  DONE 2026-09-07 (desktop, Lane A). The rule sits in the STANDING RELAYS header of
+  docs/port/port-prompt.md, directly under the basis-tag rule it extends, so it is read at
+  every port and not only at the roll that first carries it. (a) refactor( subject AND an
+  evaluate path (explicit row, or no row falling to an evaluate-on-collision default - the
+  six cli_*.py fell that way) = a mandatory relay at the roll that carries it, one paragraph,
+  by the session that made the refactor, naming exactly the file, the new shape and where
+  consumer content goes. (b) The one sentence an evaluate note cannot say is in the rule.
+  (c) The worked example is S8 at f5e7229d - subject, line count and the row text verified
+  against git and the manifest before writing; RELAY-24 is named as the relay S8 should
+  have carried. (d) Scope stated as the conjunction, with the two non-triggers spelled out.
+  (e) Not mechanised, and the rule says so and why. Guards: test_port_preflight,
+  test_port_dispositions, test_markdown_fences, test_repo_paths pass (130); port_preflight
+  --skip-tests fails only its expected mid-roll checks (uncited commits since the base, dirty
+  tree, no tag) plus one pre-existing unresolved citation in ADR 0019 (web/src/ask/askApi.ts,
+  the file is web/src/lib/askApi.ts) - fixed in the next commit, not this item's.
