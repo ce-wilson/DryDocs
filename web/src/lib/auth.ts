@@ -95,6 +95,19 @@ export function canAccessIntake(persona: Persona): boolean {
   return persona.id === SME_PERSONA_ID || persona.role !== 'user'
 }
 
+/** May this persona work the admin review queue — section 7's rail (O50)?
+ *
+ *  A DISPLAY decision, and deliberately not a second gate: the server already
+ *  refuses (TRANSITIONS puts accept and send-back behind `_ADMIN`, and the
+ *  legal-transitions map a non-admin gets back is empty). What this picks is
+ *  whether the section draws the rail or says whose it is. It lives here rather
+ *  than inline in the route for the reason WEB3's clause-(c) guard exists — the
+ *  page's persona rules belong in ONE file, beside `canAccessIntake`, where the
+ *  next reader finds both. */
+export function canReviewIntake(persona: Persona): boolean {
+  return persona.role === 'admin'
+}
+
 /** The one place the API base is decided, and it is a PATH, not a URL (ADR 0020).
  *  The console is same-origin with drydocs-api in every environment: a reverse
  *  proxy (Vite's own in dev and preview, O72's in the Compose stack) forwards
