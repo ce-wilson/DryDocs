@@ -7,7 +7,7 @@ phase: 2
 agent: main
 model: fable
 priority: p2
-status: todo
+status: done
 depends_on: [C29]
 gates: [email-dl-contact-point]
 inputs:
@@ -33,3 +33,9 @@ notes: |
   closes done and the session is never scheduled. Drafting item C29 closed done when the prompt landed; nobody owned the RUN.
   This item is the sign-off session's claim surface; the session itself is
   HITL (agent: main).
+  DONE 2026-09-07 (desktop, Lane A) - FOLDED INTO C44 (user ruling in-chat); nothing here is
+  signed. C44 convenes the MFTS route ruling at this same gate and already re-poses the G5
+  RECORD as explicit clauses, so two items owned one session; C44's acceptance gained clause
+  (h) at this close - the session is HELD and its outcome recorded, the exact clause this item
+  carried. The 2026-08-12 G5 RECORD stays a RECORD until that session signs it. C29 (the
+  drafting item) is unchanged.

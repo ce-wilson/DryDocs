@@ -1122,7 +1122,7 @@ list in `config/source-registry.yaml` refuses every old id from here on.
 | `controlm-xml-export` | `controlm:deftable-xml-export` | (unconfirmed — open precedence ruling stands) |
 | `rua-inventory` | `exec-hosts:rua-bundle` | (unconfirmed — G22 pending) |
 | `dpl-registry` | `dpl:pipeline-registry` + `dpl:dataset-registry` | (unconfirmed — G22 f/g) |
-| `snowflake-data-catalog` | `catalog@[db].[schema].datasets_v` + `distributions_v` | (unconfirmed — gate prompt not drafted) |
+| `snowflake-data-catalog` | `catalog@[db].[schema].datasets_v` + `distributions_v` | (unconfirmed — gate prompt not drafted) CORRECTION 2026-09-07: the prompt IS drafted (`config/gate-prompts/snowflake-data-catalog.yaml`); the reading was stale when G119 was groomed on 2026-08-27. Session SME-DEFERRED 2026-09-07, see that entry. |
 | `code-repo` | `bitbucket:repo-objects-manifest` | (unconfirmed — G22) |
 | `oracle-schemas` / `snowflake` | `oracle:schema-inventory` / `snowflake:schema-inventory` | (unconfirmed placeholders) |
 | `bmc-docs` / `essential-graphrag` / `cdo-frameworks` | NOT renamed — pipeline twins dropped; ids stay live in `config/doc-source-registry.yaml` (one home), which now carries their `confirmed:` state | bmc-docs-lexical-load 2026-07-08 (covers essential-graphrag per the Q2 groom) |
@@ -4496,3 +4496,42 @@ POSTSCRIPT asked, so the producer's one citation (`Idea-10021`) stands; band con
 did, and A2 rules nothing about the range. Recorded here rather than edited into the
 clauses because the record is signed. Same-day note: the prompt header carries the same
 correction; the Counts line's 25 becomes 26 by the same report.
+
+## 2026-09-07 — DEFERRED: business-layer-org-structure, dcat-theme-subject-scheme and snowflake-data-catalog — re-arm at the Logical Container gate (C35, C37, G119; user ruling, in-chat)
+
+- **What this records:** three drafted-unsigned gate sessions are SME-DEFERRED with ONE
+  named re-arm trigger — the Logical Container gate signs (ONT3 drafts its prompt; the SME's
+  five-tier naming formula of 2026-09-04 proposes a data-product tier between the Area Product
+  and the application that the declared taxonomy has no home for). User ruling, producer
+  desktop, in-chat, 2026-09-07. The three pages stay on disk unchanged; no ruling on any of
+  them is made or reopened.
+- **Why one trigger for three pages:** each page rules something about the org/catalog
+  hierarchy that the tier question re-cuts. `business-layer-org-structure` asks the segment's
+  ORG class, reorg reification, the dating idiom and the legal-entity layer — corporate
+  questions above a hierarchy whose lower tiers are moving (edition grain SIGNED 2026-09-02,
+  the Logical Container proposed 2026-09-04). `dcat-theme-subject-scheme` rules the dcat:theme
+  edge over the `lob-product-team` skos:ConceptScheme — the scheme the new tier would join;
+  its section B question is carried into ONT3's prompt as clause (e) so the new tier is asked
+  the same question in the same session. `snowflake-data-catalog` asks what a curated data
+  product is in this graph, which is the Logical Container question by another name (DPROD/
+  EKGF is the candidate on both pages); its already-logged rulings and citations stand.
+- **Re-arm mechanics:** when the trigger fires, each session is re-owned by a NEW run item
+  minted at the re-arm (module ontology, on the 2026-08-27 sweep shape), after the
+  stale-premise sweep of its page against the signed tier set; the closed items C35, C37 and
+  G119 are not reopened. ONT3's prompt says, per deferred page, whether it recommends re-run
+  or fold.
+- **Two folds ruled in the same breath, recorded here so the trail is in one place, and
+  NOT gate outcomes:** C36 (run the email-dl gate) is folded into C44, which convenes the MFTS
+  route ruling at that same gate and now carries the session as its clause (h); the 2026-08-12
+  G5 RECORD stays a RECORD until that session signs it. D9 (the two-level internal precedence
+  tier) is folded into D11 as section D of the definition-precedence prompt — one SME sitting on
+  one `precedence.yaml`; the prompt's 'stays separate' line carries a dated postscript, not an
+  edit. N22 is sequenced behind N23 (a dataset id minted before the id-grammar gate would be
+  re-minted after it). No id moves; every closing note names the item that now carries the
+  substance.
+- **On the queue (C39):** this entry is ABOUT the three gates by heading, so gates.json reads
+  them `deferred` and they leave the prompt-only open list on purpose — the trigger is named
+  above, which is what C39 says a deferred gate must carry to be allowed off the owed list.
+- **Registry-table correction, same day:** the `snowflake-data-catalog` row in the 2026-07-31
+  registry table read 'gate prompt not drafted'; the prompt exists, and the row now carries a
+  dated correction in place (G119's stale-record clause, done rather than deferred).

@@ -1143,6 +1143,23 @@
       ]
     },
     {
+      "kind": "log-entry",
+      "date": "2026-09-07",
+      "title": "DEFERRED: business-layer-org-structure, dcat-theme-subject-scheme and snowflake-data-catalog — re-arm at the Logical Container gate (C35, C37, G119; user ruling, in-chat)",
+      "status": "deferred",
+      "prompt_files": [
+        "config/gate-prompts/business-layer-org-structure.yaml",
+        "config/gate-prompts/dcat-theme-subject-scheme.yaml",
+        "config/gate-prompts/snowflake-data-catalog.yaml"
+      ],
+      "log_ref": "config/gate-log.md:4500",
+      "unblocks": [
+        "C35",
+        "C37",
+        "G119"
+      ]
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "bmc-docs-example (gate page rendered — session not yet run)",
@@ -1153,19 +1170,6 @@
       "log_ref": null,
       "unblocks": [
         "J56"
-      ]
-    },
-    {
-      "kind": "prompt-only",
-      "date": null,
-      "title": "business-layer-org-structure (gate page rendered — session not yet run)",
-      "status": "open",
-      "prompt_files": [
-        "config/gate-prompts/business-layer-org-structure.yaml"
-      ],
-      "log_ref": null,
-      "unblocks": [
-        "C35"
       ]
     },
     {
@@ -1232,19 +1236,6 @@
         "MM10",
         "MM11",
         "MM13"
-      ]
-    },
-    {
-      "kind": "prompt-only",
-      "date": null,
-      "title": "dcat-theme-subject-scheme (gate page rendered — session not yet run)",
-      "status": "open",
-      "prompt_files": [
-        "config/gate-prompts/dcat-theme-subject-scheme.yaml"
-      ],
-      "log_ref": null,
-      "unblocks": [
-        "C37"
       ]
     },
     {
@@ -1364,19 +1355,6 @@
       ],
       "log_ref": null,
       "unblocks": []
-    },
-    {
-      "kind": "prompt-only",
-      "date": null,
-      "title": "snowflake-data-catalog (rulings/citations logged — gate sign-off not recorded)",
-      "status": "open",
-      "prompt_files": [
-        "config/gate-prompts/snowflake-data-catalog.yaml"
-      ],
-      "log_ref": null,
-      "unblocks": [
-        "G119"
-      ]
     },
     {
       "kind": "prompt-only",

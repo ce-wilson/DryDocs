@@ -7,7 +7,7 @@ phase: 2
 agent: main
 model: fable
 priority: p2
-status: todo
+status: done
 depends_on: [C28]
 gates: [business-layer-org-structure]
 inputs:
@@ -34,3 +34,15 @@ notes: |
   closes done and the session is never scheduled. Drafting item C28 closed done when the prompt landed; nobody owned the RUN.
   This item is the sign-off session's claim surface; the session itself is
   HITL (agent: main).
+  DONE 2026-09-07 (desktop, Lane A) - SME-DEFERRED, the second of the three outcomes the
+  acceptance names; user ruling in-chat, recorded in config/gate-log.md (2026-09-07 DEFERRED
+  entry). RE-ARM TRIGGER: the Logical Container gate signs (ONT3 drafts the prompt; the SME's five-tier formula of
+  2026-09-04 proposes a tier the declared taxonomy has no home for, and the org hierarchy is
+  ruled once, top to bottom, before this page is run against it). WHY DEFER RATHER THAN RUN:
+  the page's four questions (segment ORG class, reorg reification, dating idiom, legal-entity
+  layer) are corporate-hierarchy questions, and the edition-grain ruling of 2026-09-02 plus the
+  five-tier formula are re-cutting the hierarchy below the segment; running a 2026-08-27 page
+  before those settle is the moved-premise case this acceptance's own sweep clause warns about
+  (C28/K20). NOTHING IS DROPPED: the drafted page stays on disk, G98's corporate backbone
+  stands, and when the trigger fires the session is re-owned by a new run item minted at the
+  re-arm, not by reopening this one.

@@ -7,7 +7,7 @@ phase: 2
 agent: main
 model: fable
 priority: p2
-status: todo
+status: done
 depends_on: [C34]
 gates: [dcat-theme-subject-scheme]
 inputs:
@@ -30,3 +30,14 @@ notes: |
   closes done and the session is never scheduled. Drafting item C34 closed done when the prompt landed; nobody owned the RUN.
   This item is the sign-off session's claim surface; the session itself is
   HITL (agent: main).
+  DONE 2026-09-07 (desktop, Lane A) - SME-DEFERRED (user ruling in-chat; config/gate-log.md
+  2026-09-07 DEFERRED entry). RE-ARM TRIGGER: the Logical Container gate signs (ONT3 drafts the prompt; the SME's five-tier formula of
+  2026-09-04 proposes a tier the declared taxonomy has no home for, and the org hierarchy is
+  ruled once, top to bottom, before this page is run against it). WHY: the
+  dcat:theme ruling is over the lob-product-team skos:ConceptScheme, and ONT3 proposes
+  inserting a tier (the Logical Container) into exactly that hierarchy; ruling annotation
+  depth and 'is a Product a Concept or does it HAVE one' before the tier set is settled would
+  be re-ruled at the next gate. The page's section B question is CARRIED, not lost: ONT3's
+  acceptance gained clause (e) at this close, so the new tier is asked the same question in
+  the same session, and the deferred page is re-run (or folded) once that gate signs. The
+  drafted page stays on disk; HAS_THEME stays planned.
