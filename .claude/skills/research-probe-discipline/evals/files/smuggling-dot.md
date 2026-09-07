@@ -5,6 +5,15 @@ transcribed: 2026-09-03, from the producer's own working notes on Control-M vari
   written while parsing `CMD_LINE` with SQL. The verbatim record is machine-local:
   `internal-local/research/2025-04-28-controlm-variables-onenote-transcript.md` (desktop). Cite the file, never the capture.
 checked_against: origin/main `dbd13170`; live graph = desktop, container `neo4jtest`, database `drydocs`.
+re-verified: 2026-09-07 at `6be9be06` on `feat/cyclic-type-test-case` (which carries origin/main
+  `78277d1c`), venue desktop MSI. All six named sources in section 2 still resolve, and section 4's
+  resolver table was re-run rather than re-read — `resolve_command_line` still emits
+  `<pfx>{ODATE}.txt`, `<pfx>_{OYEAR}{OMONTH}...txt` and `<pfx>{ODATE}..txt` for the three shapes, so the
+  B1 evidence is reproducible. Section 3's console arm re-run against the LIVE graph the same day, same
+  venue (`neo4jtest`, `drydocs`): still exactly three chunks mentioning concatenation, all in
+  `controlm-variables` (seq 7, 8, 12), all at `trust_default` GROUNDED with `tier_rule:
+  manifest-default-v1` — no chunk-level override, so the file's own SYNTHESIZED banner still does not
+  reach the loaded chunk. The console arm still cannot answer this case.
 exercises: the context search itself — getting from the words a human has ("period", "dot", "the value is just `.`")
   to the concept the repo and the vendor already name; research-probe-discipline §6 (read the terms ledger before
   decoding); CLAUDE.md §2 (consult the platform reference before writing code).

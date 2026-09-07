@@ -5,6 +5,14 @@ transcribed: 2026-09-02, from a company-side research session (PEX lineage trace
   The verbatim record is machine-local: `internal-local/research/2026-09-02-cyclic-type-trap-transcript.md`
   (desktop). Cite the file, never the captures.
 checked_against: origin/main `dbd13170`; live graph = desktop, container `neo4jtest`, database `drydocs`.
+re-verified: 2026-09-07 at `6be9be06` on `feat/cyclic-type-test-case` (which carries origin/main
+  `78277d1c`), venue desktop MSI. Tree claims re-checked and holding: LoadPlanV3's `:Condition` key and
+  its stated rationale, the disabled predicate, both vendor pages. Section 6 re-run against the LIVE
+  graph the same day, same venue (`neo4jtest`, `drydocs`): 27 `:Document`; the same six chunks carry
+  `CYCLIC_TYPE` (ctmdeffolder seq 5, 8; ctmdefine seq 1, 6, 9, 10); `trust_default` GROUNDED with every
+  chunk at `tier_rule: manifest-default-v1` — still no chunk-level override, and the hazard banner is
+  still isolated in seq 1 while the illustrative enum sits in 6/9/10. So the trust defect stands as
+  written. Section 2's "guarded by" claim became TRUE at LOAD5 (`e15d319a`) — see the note there.
 exercises: research-probe-discipline §4 (the rules that are not about absence) — verify before asserting;
   CLAUDE.md §2 (consult the platform's reference before writing code) and §6 (verify before asserting).
 
