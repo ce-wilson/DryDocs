@@ -1,6 +1,6 @@
 // The one generator for src/generated/api.d.ts (O70) — pure, so the vitest drift
 // guard (src/generated/api.test.ts) can import it under the app's tsconfig and
-// regenerate in memory. The file WRITER is scripts/writeApiTypes.mjs (needs
+// regenerate in memory. The file WRITER is scripts/writeApiTypes.ts (needs
 // node:fs, which the app config deliberately has no types for); `npm run
 // api:types` runs it. The openapi-typescript CLI is not used anywhere: it
 // prepends a banner the programmatic API does not, so a file written by the CLI
