@@ -130,6 +130,16 @@ CREATE CONSTRAINT controlmapplication_name IF NOT EXISTS FOR (a:ControlMApplicat
 // Drop the JobFolder-era constraint name, then create against the renamed
 // label (ADR 0003: BMC labels take the ControlM prefix). Both idempotent.
 DROP CONSTRAINT folder_id IF EXISTS;
+// INVARIANT (P6, established 2026-09-07): a Control-M folder id (TABLE_ID) is unique
+// ACROSS data centers, so folder_id alone is a safe key even when more than one data
+// center is loaded. Established by drydocs/loaders/sql/adhoc/probe_dc_table_id_collision.sql
+// run by the SME on the psgmgr replica (SQL Developer, 2026-09-07): P6.0 saw 24 data
+// centers over 76,753 folder rows; P6.1 returned colliding_table_ids = 0, max_dc_per_id = 0;
+// P6.3 jobs_under_colliding_ids = 0. Counts are transcribed in the P6 item file. The
+// staging DDL keys defensively by (DATA_CENTER, TABLE_ID) and may keep doing so; this
+// key does not need the data center. If a future probe returns ANY rows, the fix is an
+// IDENTITY change (data center joins the folder and job keys) and it goes through the
+// HITL gate, never an edit here (P6 clause c).
 CREATE CONSTRAINT controlmfolder_id   IF NOT EXISTS FOR (f:ControlMFolder)      REQUIRE f.folder_id IS UNIQUE;
 
 // Drop old versioned key (included version_serial in earlier M3 drafts) then
