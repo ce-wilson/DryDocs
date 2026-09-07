@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-06T17:34:32",
+    "captured_at": "2026-09-06T19:12:32",
     "date": "20260906",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "2b99e4d3",
-      "full": "2b99e4d34d7e679fc615fe25e5d117b3d5e0dbc1",
+      "commit": "5511a571",
+      "full": "5511a5712eea1d852925fb96df85f60b80a46dc9",
       "branch": "main",
-      "describe": "port-base-20260905-127-g2b99e4d3",
-      "subject": "chore(N27): done - three file-transfer platforms registered; (b) met by pointer, the un-redaction question stays with N23",
+      "describe": "port-base-20260905-136-g5511a571",
+      "subject": "docs(O63): pre-build check - clauses (c) and (f) predate ADR 0020; build to the path map, not the retired VITE_ADK_URL or the ports",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -22472,10 +22472,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260906.json",
-      "name": "drydocs-20260906.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260906-1734.json",
+      "name": "drydocs-20260906-1734.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260906.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260906-1734.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -25883,6 +25883,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_response_models.py",
+      "name": "test_response_models.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_response_models.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_result_completeness.py",
       "name": "test_result_completeness.py",
       "extension": ".py",
@@ -26733,33 +26742,6 @@
       "name": "TaskGraphPane.tsx",
       "extension": ".tsx",
       "rel_path": "web/src/ask/TaskGraphPane.tsx",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/web/src/ask/askApi.test.ts",
-      "name": "askApi.test.ts",
-      "extension": ".ts",
-      "rel_path": "web/src/ask/askApi.test.ts",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/web/src/ask/askApi.ts",
-      "name": "askApi.ts",
-      "extension": ".ts",
-      "rel_path": "web/src/ask/askApi.ts",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/web/src/ask/stubStream.test.ts",
-      "name": "stubStream.test.ts",
-      "extension": ".ts",
-      "rel_path": "web/src/ask/stubStream.test.ts",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -27719,6 +27701,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/lib/askApi.test.ts",
+      "name": "askApi.test.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lib/askApi.test.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/lib/askApi.ts",
+      "name": "askApi.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lib/askApi.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/lib/auth.ts",
       "name": "auth.ts",
       "extension": ".ts",
@@ -27930,6 +27930,15 @@
       "name": "storage.ts",
       "extension": ".ts",
       "rel_path": "web/src/lib/storage.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/lib/stubStream.test.ts",
+      "name": "stubStream.test.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lib/stubStream.test.ts",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -33282,6 +33291,26 @@
       "drydocs/drydocs_core/repo_paths.py"
     ],
     [
+      "drydocs/tests/unit/test_response_models.py",
+      "drydocs/drydocs_api/app.py"
+    ],
+    [
+      "drydocs/tests/unit/test_response_models.py",
+      "drydocs/drydocs_api/audit.py"
+    ],
+    [
+      "drydocs/tests/unit/test_response_models.py",
+      "drydocs/drydocs_api/credentials.py"
+    ],
+    [
+      "drydocs/tests/unit/test_response_models.py",
+      "drydocs/drydocs_api/sessions.py"
+    ],
+    [
+      "drydocs/tests/unit/test_response_models.py",
+      "drydocs/tests/unit/test_openapi_client.py"
+    ],
+    [
       "drydocs/tests/unit/test_result_completeness.py",
       "drydocs/drydocs_api/ephemeral_specs.py"
     ],
@@ -33867,11 +33896,11 @@
     ],
     [
       "drydocs/web/src/ask/ClarificationCard.test.tsx",
-      "drydocs/web/src/ask/askApi.ts"
+      "drydocs/web/src/lib/askApi.ts"
     ],
     [
       "drydocs/web/src/ask/ClarificationCard.tsx",
-      "drydocs/web/src/ask/askApi.ts"
+      "drydocs/web/src/lib/askApi.ts"
     ],
     [
       "drydocs/web/src/ask/FileReport.tsx",
@@ -33891,27 +33920,11 @@
     ],
     [
       "drydocs/web/src/ask/TaskGraphPane.tsx",
-      "drydocs/web/src/ask/askApi.ts"
+      "drydocs/web/src/lib/askApi.ts"
     ],
     [
       "drydocs/web/src/ask/TaskGraphPane.tsx",
       "drydocs/web/src/lib/forceLayout.ts"
-    ],
-    [
-      "drydocs/web/src/ask/askApi.test.ts",
-      "drydocs/web/src/ask/askApi.ts"
-    ],
-    [
-      "drydocs/web/src/ask/askApi.ts",
-      "drydocs/web/src/lib/adk.ts"
-    ],
-    [
-      "drydocs/web/src/ask/stubStream.test.ts",
-      "drydocs/web/src/ask/askApi.ts"
-    ],
-    [
-      "drydocs/web/src/ask/stubStream.test.ts",
-      "drydocs/web/src/test/sourceScan.ts"
     ],
     [
       "drydocs/web/src/components/BrandMark.tsx",
@@ -34498,6 +34511,14 @@
       "drydocs/web/src/lib/reachability.ts"
     ],
     [
+      "drydocs/web/src/lib/askApi.test.ts",
+      "drydocs/web/src/lib/askApi.ts"
+    ],
+    [
+      "drydocs/web/src/lib/askApi.ts",
+      "drydocs/web/src/lib/adk.ts"
+    ],
+    [
       "drydocs/web/src/lib/auth.ts",
       "drydocs/web/src/lib/apiClient.ts"
     ],
@@ -34603,6 +34624,18 @@
     ],
     [
       "drydocs/web/src/lib/storage.test.ts",
+      "drydocs/web/src/test/sourceScan.ts"
+    ],
+    [
+      "drydocs/web/src/lib/stubStream.test.ts",
+      "drydocs/web/src/lib/adk.ts"
+    ],
+    [
+      "drydocs/web/src/lib/stubStream.test.ts",
+      "drydocs/web/src/lib/askApi.ts"
+    ],
+    [
+      "drydocs/web/src/lib/stubStream.test.ts",
       "drydocs/web/src/test/sourceScan.ts"
     ],
     [
@@ -34835,10 +34868,6 @@
     ],
     [
       "drydocs/web/src/routes/AskRoute.tsx",
-      "drydocs/web/src/ask/askApi.ts"
-    ],
-    [
-      "drydocs/web/src/routes/AskRoute.tsx",
       "drydocs/web/src/components/ui/EmptyState.tsx"
     ],
     [
@@ -34860,6 +34889,10 @@
     [
       "drydocs/web/src/routes/AskRoute.tsx",
       "drydocs/web/src/lib/apiClient.ts"
+    ],
+    [
+      "drydocs/web/src/routes/AskRoute.tsx",
+      "drydocs/web/src/lib/askApi.ts"
     ],
     [
       "drydocs/web/src/routes/AskRoute.tsx",
@@ -48068,7 +48101,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260906.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260906-1734.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -49893,6 +49926,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_response_models.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_result_completeness.py"
     ],
     [
@@ -50506,21 +50544,6 @@
       "drydocs/web/src/ask/TaskGraphPane.tsx"
     ],
     [
-      "drydocs/web/src/ask",
-      "CONTAINS",
-      "drydocs/web/src/ask/askApi.test.ts"
-    ],
-    [
-      "drydocs/web/src/ask",
-      "CONTAINS",
-      "drydocs/web/src/ask/askApi.ts"
-    ],
-    [
-      "drydocs/web/src/ask",
-      "CONTAINS",
-      "drydocs/web/src/ask/stubStream.test.ts"
-    ],
-    [
       "drydocs/web/src/assets",
       "CONTAINS",
       "drydocs/web/src/assets/hero.png"
@@ -50998,6 +51021,16 @@
     [
       "drydocs/web/src/lib",
       "CONTAINS",
+      "drydocs/web/src/lib/askApi.test.ts"
+    ],
+    [
+      "drydocs/web/src/lib",
+      "CONTAINS",
+      "drydocs/web/src/lib/askApi.ts"
+    ],
+    [
+      "drydocs/web/src/lib",
+      "CONTAINS",
       "drydocs/web/src/lib/auth.ts"
     ],
     [
@@ -51114,6 +51147,11 @@
       "drydocs/web/src/lib",
       "CONTAINS",
       "drydocs/web/src/lib/storage.ts"
+    ],
+    [
+      "drydocs/web/src/lib",
+      "CONTAINS",
+      "drydocs/web/src/lib/stubStream.test.ts"
     ],
     [
       "drydocs/web/src/lib",
@@ -51495,13 +51533,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2874,
-    "edges": 1688,
+    "files": 2875,
+    "edges": 1694,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 3192,
+    "rels": 3193,
     "directories": 319
   }
 }
