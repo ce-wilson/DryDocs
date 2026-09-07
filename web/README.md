@@ -110,6 +110,39 @@ canonical container/ports live in `config/dev-environment.yaml`; bolt is
 `bolt://localhost:7687` on the `neo4jtest` EE container), then
 `npm install && npm run dev`.
 
+## The `js-cookie` override — do not remove it because it looks unnecessary
+
+`package.json` pins `"overrides": { "js-cookie": "^3.0.8" }`. It has no direct
+dependent here, so it reads as dead weight. It is not.
+
+`@neo4j-nvl/react` -> `@neo4j-nvl/base` -> `@segment/analytics-next@1.81.1` ->
+`js-cookie@3.0.1`, which is **GHSA-qjx8-664m-686j** (high; per-instance prototype
+hijack in `assign()` enabling cookie-attribute injection). npm reports it five
+times — once per link in the chain — but it is one defect. The override resolves
+`js-cookie` to 3.0.8, which is fixed, and `npm run audit:high` (the CI gate) goes
+from five high findings to zero.
+
+Three things worth knowing before touching it:
+
+- **`npm audit fix --force` is wrong here.** It proposes `@neo4j-nvl/base@1.0.0`,
+  a DOWNGRADE from the 1.2.1 we run, and calls it a breaking change. It would cost
+  the graph canvas. NVL 1.2.1 is already the latest published, and it pins Segment
+  at an exact `1.81.1`, so there is no upstream release to move to instead.
+- **The vulnerable code never shipped.** NVL gates Segment behind
+  `init(apiKey)` and nothing here supplies a key; `AnalyticsBrowser` appears zero
+  times in NVL's browser build; and a production `npm run build` contains no
+  `js-cookie`, `withAttributes`, `analytics-next` or `cdn.segment` (NVL itself is
+  present, so the check is not vacuous). Tree-shaking drops the chain. The override
+  is hygiene and a green audit gate, not an incident fix.
+- **Why the narrow pin.** `@segment/analytics-next@1.84.1` also clears the
+  advisory (it covers `<=1.84.0`), but that is a three-minor jump in a package we
+  never execute. Overriding the leaf is the smaller blast radius; 3.0.1 -> 3.0.8 is
+  patch-level on a tiny stable API.
+
+Retire the override when NVL ships a release that no longer depends on a
+vulnerable `@segment/analytics-next` — check with
+`npm view @neo4j-nvl/base@latest dependencies`.
+
 ## Tests (O80)
 
 Two runners, both blocking in CI's `web` job the way `ruff` is in `gates`:

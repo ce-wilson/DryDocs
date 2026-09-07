@@ -22,7 +22,8 @@
   "overrides": {
     "openapi-typescript": {
       "typescript": "$typescript"
-    }
+    },
+    "js-cookie": "^3.0.8"
   },
   "dependencies": {
     "@fontsource/ibm-plex-mono": "^5.2.5",
