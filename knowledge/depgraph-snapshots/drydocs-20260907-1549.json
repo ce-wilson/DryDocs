@@ -1,17 +1,17 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-07T14:20:53",
+    "captured_at": "2026-09-07T15:49:32",
     "date": "20260907",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "f06ff632",
-      "full": "f06ff632e7c83415af960a710078619e3c75238d",
+      "commit": "013b93d5",
+      "full": "013b93d56237d11a0b0aa82fd852dfa0c7bfab7b",
       "branch": "main",
-      "describe": "port-base-20260905-179-gf06ff632",
-      "subject": "docs(plan): Lane B handoff - build-lane queue for the laptop session (CORE2, API2, API3, O51, WEB16, CFG3)",
-      "dirty": false,
+      "describe": "port-base-20260905-190-g013b93d5",
+      "subject": "docs(port): RELAY-28 and RELAY-29 - the -fork tag that does not exist, and classification as the consumer's field",
+      "dirty": true,
       "untracked_present": false,
       "pr": null
     },
@@ -21761,10 +21761,10 @@
       "kind": "dir"
     },
     {
-      "file_id": "drydocs/internal/agent-platform/smartsdk-3-adr0007-compatibility.md",
-      "name": "smartsdk-3-adr0007-compatibility.md",
+      "file_id": "drydocs/internal/agent-platform/company-sdk-3-adr0007-compatibility.md",
+      "name": "company-sdk-3-adr0007-compatibility.md",
       "extension": ".md",
-      "rel_path": "internal/agent-platform/smartsdk-3-adr0007-compatibility.md",
+      "rel_path": "internal/agent-platform/company-sdk-3-adr0007-compatibility.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -22526,6 +22526,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/internal/research/_registry",
+      "name": "_registry",
+      "extension": "",
+      "rel_path": "internal/research/_registry",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/internal/research/_registry/source-whitelist.yaml",
+      "name": "source-whitelist.yaml",
+      "extension": ".yaml",
+      "rel_path": "internal/research/_registry/source-whitelist.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/internal/research/mm-aar-research.md",
       "name": "mm-aar-research.md",
       "extension": ".md",
@@ -22688,10 +22706,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260907-1346.json",
-      "name": "drydocs-20260907-1346.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260907.json",
+      "name": "drydocs-20260907.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260907-1346.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260907.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -48475,7 +48493,7 @@
     [
       "drydocs/internal/agent-platform",
       "CONTAINS",
-      "drydocs/internal/agent-platform/smartsdk-3-adr0007-compatibility.md"
+      "drydocs/internal/agent-platform/company-sdk-3-adr0007-compatibility.md"
     ],
     [
       "drydocs/internal/airflow-reference",
@@ -48815,12 +48833,22 @@
     [
       "drydocs/internal/research",
       "CONTAINS",
+      "drydocs/internal/research/_registry"
+    ],
+    [
+      "drydocs/internal/research",
+      "CONTAINS",
       "drydocs/internal/research/mm-aar-research.md"
     ],
     [
       "drydocs/internal/research",
       "CONTAINS",
       "drydocs/internal/research/triage-bootstrap-2026-08-28.md"
+    ],
+    [
+      "drydocs/internal/research/_registry",
+      "CONTAINS",
+      "drydocs/internal/research/_registry/source-whitelist.yaml"
     ],
     [
       "drydocs/internal/server-inventory",
@@ -48925,7 +48953,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260907-1346.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260907.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -52477,13 +52505,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2923,
+    "files": 2924,
     "edges": 1762,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 3241,
-    "directories": 319
+    "rels": 3243,
+    "directories": 320
   }
 }
