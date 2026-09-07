@@ -1,17 +1,17 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-07T15:49:32",
+    "captured_at": "2026-09-07T17:35:09",
     "date": "20260907",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "013b93d5",
-      "full": "013b93d56237d11a0b0aa82fd852dfa0c7bfab7b",
+      "commit": "a15bb43e",
+      "full": "a15bb43e471aeb79a1ea66d92f879e6a18283ad2",
       "branch": "main",
-      "describe": "port-base-20260905-190-g013b93d5",
-      "subject": "docs(port): RELAY-28 and RELAY-29 - the -fork tag that does not exist, and classification as the consumer's field",
-      "dirty": true,
+      "describe": "port-base-20260905-220-ga15bb43e",
+      "subject": "docs(plan): Lane B handoff - build-lane queue for the laptop session (WEB17, O72, CORE3, I8, G127, V10)",
+      "dirty": false,
       "untracked_present": false,
       "pr": null
     },
@@ -7154,6 +7154,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/config/review-quality.yaml",
+      "name": "review-quality.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/review-quality.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/config/schemas",
       "name": "schemas",
       "extension": "",
@@ -7221,6 +7230,15 @@
       "name": "relationship-vocabulary.schema.json",
       "extension": ".json",
       "rel_path": "config/schemas/relationship-vocabulary.schema.json",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/schemas/review-quality.schema.json",
+      "name": "review-quality.schema.json",
+      "extension": ".json",
+      "rel_path": "config/schemas/review-quality.schema.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -13269,6 +13287,15 @@
       "name": "LOAD4.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/LOAD4.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/LOAD5.yaml",
+      "name": "LOAD5.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/LOAD5.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -19601,6 +19628,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs_api/review_quality.py",
+      "name": "review_quality.py",
+      "extension": ".py",
+      "rel_path": "drydocs_api/review_quality.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs_api/routing.py",
       "name": "routing.py",
       "extension": ".py",
@@ -22706,10 +22742,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260907.json",
-      "name": "drydocs-20260907.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260907-1549.json",
+      "name": "drydocs-20260907-1549.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260907.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260907-1549.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -24767,6 +24803,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_column_types.py",
+      "name": "test_column_types.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_column_types.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_command_parser.py",
       "name": "test_command_parser.py",
       "extension": ".py",
@@ -26162,19 +26207,19 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/tests/unit/test_row_checksum.py",
-      "name": "test_row_checksum.py",
+      "file_id": "drydocs/tests/unit/test_review_quality.py",
+      "name": "test_review_quality.py",
       "extension": ".py",
-      "rel_path": "tests/unit/test_row_checksum.py",
+      "rel_path": "tests/unit/test_review_quality.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
     },
     {
-      "file_id": "drydocs/tests/unit/test_row_shape_exceptions.py",
-      "name": "test_row_shape_exceptions.py",
+      "file_id": "drydocs/tests/unit/test_row_checksum.py",
+      "name": "test_row_checksum.py",
       "extension": ".py",
-      "rel_path": "tests/unit/test_row_shape_exceptions.py",
+      "rel_path": "tests/unit/test_row_checksum.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -26936,10 +26981,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/web/scripts/writeApiTypes.mjs",
-      "name": "writeApiTypes.mjs",
-      "extension": ".mjs",
-      "rel_path": "web/scripts/writeApiTypes.mjs",
+      "file_id": "drydocs/web/scripts/writeApiTypes.ts",
+      "name": "writeApiTypes.ts",
+      "extension": ".ts",
+      "rel_path": "web/scripts/writeApiTypes.ts",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -27197,10 +27242,37 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/components/QualityRail.tsx",
+      "name": "QualityRail.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/components/QualityRail.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/components/RelEdge.tsx",
       "name": "RelEdge.tsx",
       "extension": ".tsx",
       "rel_path": "web/src/components/RelEdge.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/components/ReviewerQualityPanel.test.tsx",
+      "name": "ReviewerQualityPanel.test.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/components/ReviewerQualityPanel.test.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/components/ReviewerQualityPanel.tsx",
+      "name": "ReviewerQualityPanel.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/components/ReviewerQualityPanel.tsx",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -28070,6 +28142,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/lib/apiTypesDiagnostic.test.ts",
+      "name": "apiTypesDiagnostic.test.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lib/apiTypesDiagnostic.test.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/lib/askApi.test.ts",
       "name": "askApi.test.ts",
       "extension": ".ts",
@@ -28299,6 +28380,24 @@
       "name": "reachability.ts",
       "extension": ".ts",
       "rel_path": "web/src/lib/reachability.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/lib/reviewQuality.test.ts",
+      "name": "reviewQuality.test.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lib/reviewQuality.test.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/lib/reviewQuality.ts",
+      "name": "reviewQuality.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lib/reviewQuality.ts",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -28929,6 +29028,15 @@
       "name": "RemediationRoute.tsx",
       "extension": ".tsx",
       "rel_path": "web/src/routes/RemediationRoute.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/routes/ReviewQualityTab.tsx",
+      "name": "ReviewQualityTab.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/routes/ReviewQualityTab.tsx",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -30722,6 +30830,10 @@
     ],
     [
       "drydocs/drydocs_api/app.py",
+      "drydocs/drydocs_api/review_quality.py"
+    ],
+    [
+      "drydocs/drydocs_api/app.py",
       "drydocs/drydocs_api/schemas.py"
     ],
     [
@@ -30907,6 +31019,10 @@
     [
       "drydocs/drydocs_api/query_specs.py",
       "drydocs/drydocs_api/queries.py"
+    ],
+    [
+      "drydocs/drydocs_api/review_quality.py",
+      "drydocs/drydocs_core/repo_paths.py"
     ],
     [
       "drydocs/drydocs_api/sessions.py",
@@ -32311,6 +32427,14 @@
     [
       "drydocs/tests/unit/test_code_snapshot_retraction.py",
       "drydocs/drydocs/loaders/code_snapshot.py"
+    ],
+    [
+      "drydocs/tests/unit/test_column_types.py",
+      "drydocs/drydocs_api/query_specs.py"
+    ],
+    [
+      "drydocs/tests/unit/test_column_types.py",
+      "drydocs/drydocs_api/schemas.py"
     ],
     [
       "drydocs/tests/unit/test_command_parser.py",
@@ -33833,6 +33957,14 @@
       "drydocs/drydocs/review/review_labels.py"
     ],
     [
+      "drydocs/tests/unit/test_review_quality.py",
+      "drydocs/drydocs_api/review_quality.py"
+    ],
+    [
+      "drydocs/tests/unit/test_review_quality.py",
+      "drydocs/tests/source_scan.py"
+    ],
+    [
       "drydocs/tests/unit/test_row_checksum.py",
       "drydocs/drydocs/loaders/base.py"
     ],
@@ -33855,10 +33987,6 @@
     [
       "drydocs/tests/unit/test_row_checksum.py",
       "drydocs/drydocs_core/models/__init__.py"
-    ],
-    [
-      "drydocs/tests/unit/test_row_shape_exceptions.py",
-      "drydocs/drydocs_api/query_specs.py"
     ],
     [
       "drydocs/tests/unit/test_run_as_detect.py",
@@ -34309,6 +34437,10 @@
       "drydocs/scripts/set_console_credential.py"
     ],
     [
+      "drydocs/web/scripts/writeApiTypes.ts",
+      "drydocs/web/scripts/genApiTypes.ts"
+    ],
+    [
       "drydocs/web/src/App.tsx",
       "drydocs/web/src/components/SignIn.tsx"
     ],
@@ -34599,6 +34731,46 @@
     [
       "drydocs/web/src/components/ProvenanceNotice.tsx",
       "drydocs/web/src/data/provenance.ts"
+    ],
+    [
+      "drydocs/web/src/components/QualityRail.tsx",
+      "drydocs/web/src/components/ui/Meter.tsx"
+    ],
+    [
+      "drydocs/web/src/components/QualityRail.tsx",
+      "drydocs/web/src/components/ui/StatusChip.tsx"
+    ],
+    [
+      "drydocs/web/src/components/QualityRail.tsx",
+      "drydocs/web/src/lib/reviewQuality.ts"
+    ],
+    [
+      "drydocs/web/src/components/ReviewerQualityPanel.test.tsx",
+      "drydocs/web/src/components/QualityRail.tsx"
+    ],
+    [
+      "drydocs/web/src/components/ReviewerQualityPanel.test.tsx",
+      "drydocs/web/src/components/ReviewerQualityPanel.tsx"
+    ],
+    [
+      "drydocs/web/src/components/ReviewerQualityPanel.test.tsx",
+      "drydocs/web/src/lib/reviewQuality.ts"
+    ],
+    [
+      "drydocs/web/src/components/ReviewerQualityPanel.tsx",
+      "drydocs/web/src/components/StatTiles.tsx"
+    ],
+    [
+      "drydocs/web/src/components/ReviewerQualityPanel.tsx",
+      "drydocs/web/src/components/ui/Meter.tsx"
+    ],
+    [
+      "drydocs/web/src/components/ReviewerQualityPanel.tsx",
+      "drydocs/web/src/components/ui/StatusChip.tsx"
+    ],
+    [
+      "drydocs/web/src/components/ReviewerQualityPanel.tsx",
+      "drydocs/web/src/lib/reviewQuality.ts"
     ],
     [
       "drydocs/web/src/components/ServiceStatusStrip.test.tsx",
@@ -35157,6 +35329,10 @@
       "drydocs/web/src/lib/reachability.ts"
     ],
     [
+      "drydocs/web/src/lib/apiTypesDiagnostic.test.ts",
+      "drydocs/web/scripts/writeApiTypes.ts"
+    ],
+    [
       "drydocs/web/src/lib/askApi.test.ts",
       "drydocs/web/src/lib/askApi.ts"
     ],
@@ -35283,6 +35459,18 @@
     [
       "drydocs/web/src/lib/reachability.test.ts",
       "drydocs/web/src/lib/reachability.ts"
+    ],
+    [
+      "drydocs/web/src/lib/reviewQuality.test.ts",
+      "drydocs/web/src/lib/reviewQuality.ts"
+    ],
+    [
+      "drydocs/web/src/lib/reviewQuality.ts",
+      "drydocs/web/src/lib/apiClient.ts"
+    ],
+    [
+      "drydocs/web/src/lib/reviewQuality.ts",
+      "drydocs/web/src/lib/auth.ts"
     ],
     [
       "drydocs/web/src/lib/runtimeSpan.test.ts",
@@ -35535,6 +35723,10 @@
     [
       "drydocs/web/src/routes/AdminConfigRoute.tsx",
       "drydocs/web/src/routes/ModuleTemplate.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/AdminConfigRoute.tsx",
+      "drydocs/web/src/routes/ReviewQualityTab.tsx"
     ],
     [
       "drydocs/web/src/routes/AppCodeCascadePane.tsx",
@@ -36019,6 +36211,26 @@
     [
       "drydocs/web/src/routes/RemediationRoute.tsx",
       "drydocs/web/src/routes/ModuleTemplate.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/ReviewQualityTab.tsx",
+      "drydocs/web/src/components/QualityRail.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/ReviewQualityTab.tsx",
+      "drydocs/web/src/components/ReviewerQualityPanel.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/ReviewQualityTab.tsx",
+      "drydocs/web/src/components/ui/EmptyState.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/ReviewQualityTab.tsx",
+      "drydocs/web/src/data/graphAccess.ts"
+    ],
+    [
+      "drydocs/web/src/routes/ReviewQualityTab.tsx",
+      "drydocs/web/src/lib/reviewQuality.ts"
     ],
     [
       "drydocs/web/src/routes/RunbooksRoute.tsx",
@@ -39988,6 +40200,11 @@
     [
       "drydocs/config",
       "CONTAINS",
+      "drydocs/config/review-quality.yaml"
+    ],
+    [
+      "drydocs/config",
+      "CONTAINS",
       "drydocs/config/schemas"
     ],
     [
@@ -40409,6 +40626,11 @@
       "drydocs/config/schemas",
       "CONTAINS",
       "drydocs/config/schemas/relationship-vocabulary.schema.json"
+    ],
+    [
+      "drydocs/config/schemas",
+      "CONTAINS",
+      "drydocs/config/schemas/review-quality.schema.json"
     ],
     [
       "drydocs/config/schemas",
@@ -43784,6 +44006,11 @@
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
       "drydocs/docs/restructure/backlog/items/LOAD4.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/LOAD5.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -47243,6 +47470,11 @@
     [
       "drydocs/drydocs_api",
       "CONTAINS",
+      "drydocs/drydocs_api/review_quality.py"
+    ],
+    [
+      "drydocs/drydocs_api",
+      "CONTAINS",
       "drydocs/drydocs_api/routing.py"
     ],
     [
@@ -48953,7 +49185,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260907.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260907-1549.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -50028,6 +50260,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_column_types.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_command_parser.py"
     ],
     [
@@ -50803,12 +51040,12 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
-      "drydocs/tests/unit/test_row_checksum.py"
+      "drydocs/tests/unit/test_review_quality.py"
     ],
     [
       "drydocs/tests/unit",
       "CONTAINS",
-      "drydocs/tests/unit/test_row_shape_exceptions.py"
+      "drydocs/tests/unit/test_row_checksum.py"
     ],
     [
       "drydocs/tests/unit",
@@ -51258,7 +51495,7 @@
     [
       "drydocs/web/scripts",
       "CONTAINS",
-      "drydocs/web/scripts/writeApiTypes.mjs"
+      "drydocs/web/scripts/writeApiTypes.ts"
     ],
     [
       "drydocs/web/src",
@@ -51508,7 +51745,22 @@
     [
       "drydocs/web/src/components",
       "CONTAINS",
+      "drydocs/web/src/components/QualityRail.tsx"
+    ],
+    [
+      "drydocs/web/src/components",
+      "CONTAINS",
       "drydocs/web/src/components/RelEdge.tsx"
+    ],
+    [
+      "drydocs/web/src/components",
+      "CONTAINS",
+      "drydocs/web/src/components/ReviewerQualityPanel.test.tsx"
+    ],
+    [
+      "drydocs/web/src/components",
+      "CONTAINS",
+      "drydocs/web/src/components/ReviewerQualityPanel.tsx"
     ],
     [
       "drydocs/web/src/components",
@@ -51948,6 +52200,11 @@
     [
       "drydocs/web/src/lib",
       "CONTAINS",
+      "drydocs/web/src/lib/apiTypesDiagnostic.test.ts"
+    ],
+    [
+      "drydocs/web/src/lib",
+      "CONTAINS",
       "drydocs/web/src/lib/askApi.test.ts"
     ],
     [
@@ -52074,6 +52331,16 @@
       "drydocs/web/src/lib",
       "CONTAINS",
       "drydocs/web/src/lib/reachability.ts"
+    ],
+    [
+      "drydocs/web/src/lib",
+      "CONTAINS",
+      "drydocs/web/src/lib/reviewQuality.test.ts"
+    ],
+    [
+      "drydocs/web/src/lib",
+      "CONTAINS",
+      "drydocs/web/src/lib/reviewQuality.ts"
     ],
     [
       "drydocs/web/src/lib",
@@ -52388,6 +52655,11 @@
     [
       "drydocs/web/src/routes",
       "CONTAINS",
+      "drydocs/web/src/routes/ReviewQualityTab.tsx"
+    ],
+    [
+      "drydocs/web/src/routes",
+      "CONTAINS",
       "drydocs/web/src/routes/RunbooksRoute.tsx"
     ],
     [
@@ -52505,13 +52777,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2924,
-    "edges": 1762,
+    "files": 2936,
+    "edges": 1788,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 3243,
+    "rels": 3255,
     "directories": 320
   }
 }
