@@ -144,7 +144,7 @@ ledger.** Concretely:
    environment-split providers** — the producer/local runtime uses the
    **Anthropic API key** (root `.env`); the company runtime uses **Azure
    OpenAI**. Gemini is NOT the runtime default — this supersedes the
-   2026-07-03 IDEAS assumption that Fusion-SmartSDK-on-ADK implied
+   2026-07-03 IDEAS assumption that company-SDK-on-ADK implied
    Gemini-shaped (`GOOGLE_API_KEY` remains only for the pre-existing demo
    agents until R2 rewires them). Consequences: the ADK model binding goes
    through a provider adapter (LiteLLM-style) in BOTH environments; the
@@ -196,7 +196,7 @@ fallbacks, the per-call cost ledger, and per-iteration snapshots.
 | Cost/question | Scales with difficulty; capped by budget + forced-solve |
 
 Also considered under C: **hosting the agent inside `drydocs_api`** instead of
-ADK. Rejected — the company shape is Fusion SmartSDK on ADK, the ADK service
+ADK. Rejected — the company shape is its internal SDK on ADK, the ADK service
 already exists with read-only graph tools, and ADR 0005 deliberately kept the
 thin API small. The drift risk (two Cypher homes) is closed by the agent
 *consuming* the QuerySpec registry rather than growing its own named queries.
@@ -227,7 +227,7 @@ would re-open the boundary ADR 0005 closed.
   any soak (memory-size telemetry doubles as the verification); composite-DB
   (`ddall`) questions need explicit routing (default: single routed DB per
   question, multi-DB as multi-step plans).
-- **Revisit if:** the company Fusion SmartSDK diverges from OSS ADK in a way
+- **Revisit if:** the company SDK diverges from OSS ADK in a way
   that breaks the app shape; or Tier-2 usage data shows the loop is either
   never reached (delete it) or dominates cost (raise Tier-1 quality instead);
   or per-user Neo4j entitlements ever arrive (reopens parts of ADR 0005, not
@@ -237,7 +237,7 @@ would re-open the boundary ADR 0005 closed.
     the wrapper layers retired), so the app shape stands; ADK 2.0 Workflow
     primitives become R6's build substrate and the Azure OpenAI V1 binding
     confirms the R1 provider ruling. Detailed review (internal names, never
-    public): `internal/agent-platform/smartsdk-3-adr0007-compatibility.md`.
+    public): `internal/agent-platform/company-sdk-3-adr0007-compatibility.md`.
     The trigger itself stays live for the next major.
 
 ## Action items

@@ -792,7 +792,7 @@ SME-supplied PAT screenshots held OUT of the repo — Internal-Confidential).
     amendment).
   - **C — LLM key strategy: environment-split providers.** Producer/local runtime =
     **Anthropic API key** (root .env); company runtime = **Azure OpenAI**. Gemini is NOT
-    the runtime default — supersedes the 2026-07-03 IDEAS assumption (Fusion-SmartSDK-
+    the runtime default — supersedes the 2026-07-03 IDEAS assumption (company-SDK-
     on-ADK implied Gemini-shaped); GOOGLE_API_KEY survives only for the pre-existing
     demo agents until R2 rewires them. Both environments bind models through a provider
     adapter (LiteLLM-style); the usage-extractor seam normalizes Anthropic + Azure
@@ -800,6 +800,10 @@ SME-supplied PAT screenshots held OUT of the repo — Internal-Confidential).
 - **Effect:** R1 done; R2 (graph_qa Tier-0/1) becomes next_ready. Build follow-ups stay
   groomed as R2–R8 — nothing built at the gate itself. O20 (UI zero graph writes)
   reconfirmed standing for the whole epic.
+- **POSTSCRIPT 2026-09-07 (desktop):** the company agent SDK's product name, quoted in
+  clause C above, is redacted in place to "company SDK" — it is a company-internal system
+  name and belongs in `internal/` only (CLAUDE.md §3). No ruling changed; the same sweep
+  renamed the ADR 0007 revisit-check file under `internal/agent-platform/`.
 
 ## 2026-07-23 — Folder property diet · naming-convention decode OFF nodes — RULED (in-session)
 

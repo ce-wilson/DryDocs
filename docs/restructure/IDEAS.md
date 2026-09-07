@@ -2399,8 +2399,8 @@ question a 1,000-line file with the trail at the bottom could not answer.
     (`PORT-MANIFEST.yaml:151-155`), so the group itself would land cleanly — but `poetry.lock`
     carries "re-lock after the merge instead" (`:679-681`), which would oblige the company side
     to resolve `google-adk` and `litellm` on its internal index at every port. Today that choice
-    is quarantined inside `agents/**`. ADK is only "the OSS base of the company-internal Fusion
-    SmartSDK" (`agents/README.md:4`) — the consumer may not install `google-adk` at all, and
+    is quarantined inside `agents/**`. ADK is only "the OSS base of the company-internal agent
+    SDK" (`agents/README.md:4`) — the consumer may not install `google-adk` at all, and
     whether it can reach it is unanswerable from this repo.
   - **Three resolver hazards, if anyone revisits.** Optional groups are not separate resolution
     universes — `poetry lock` solves all groups into one lock. (1) `click = ">=8.0,<8.2"`
@@ -2430,7 +2430,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
     unpinned and unreproducible — pin it where it already lives, no group needed; same for
     `litellm`, whose known-good version is recorded in README prose but nowhere a tool reads.
   - **Open questions that would flip this to recommend:** does the company side install
-    `google-adk` or SmartSDK, and can it reach those distributions? Is the agent runtime meant
+    `google-adk` or the company SDK, and can it reach those distributions? Is the agent runtime meant
     to stay on neo4j driver 6.x (if yes, the group is impossible without loosening
     `neo4j = "^5.20"` repo-wide)? Is "one machine holds the only agents venv" permanent, or is
     broad agent-dev access the goal?

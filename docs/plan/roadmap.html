@@ -1,6 +1,6 @@
 <!doctype html>
 <html><head><meta charset="utf-8">
-<!-- sources-fingerprint: 19e553d077728f1980f6883fd868169fea78d5e24ecd9f3b0ad5ffcc241643ac -->
+<!-- sources-fingerprint: fd843aaf6e2882526b96d8941482331b2df0b94a88bb816f0791d821b701e794 -->
 <title>DryDocs — module roadmap</title>
 <style>:root{color-scheme:light}
 body{font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#1a1a1a;
@@ -142,8 +142,8 @@ h2{font-size:1.1rem;margin:0}
 <tr><td><a class="idea-link" href="ideas.html">Idea-74</a></td><td><span class="est est-M">M</span></td><td>ServiceNow queue/assignment-group export ingestion, producer-side or company-side — user decision, blocks O44 column 3.</td></tr>
 </tbody></table></section>
 <section class="module" id="module-drydocs-api"><div class="module-head"><h2>drydocs-api</h2><span class="stage stage-active">active</span><span class="counts">23 done &middot; 6 open</span></div><div class="progress"><div class="progress-bar" style="width:79%"></div></div><p class="prose"><strong>Built:</strong> The read-only QuerySpec API with the O33 guard, mappings and intake endpoints, and the ownership/attribution query family — the contract both the console and the agent tier consume.</p><p class="prose"><strong>Remaining:</strong> Six open items: Q15 doc-backbone navigation QuerySpecs, G38 federated-read proof (ddall), O48 review-for-ontology extraction, O49 related-nodes panel, O52 the always-null holder_sid fix, and R9 the agent query command.</p><ul class="open-items">
+<li><a class="item-link" href="board.html#card-API2">API2</a> <span class="status-badge status-in_progress">in_progress</span> ColumnDef carries no list type, so two server columns that return lists are declared string - extend the vocabulary and delete the client-side exemption</li>
 <li><a class="item-link" href="board.html#card-N14">N14</a> <span class="status-badge status-in_progress">in_progress</span> The pending-source-correction UNION REPORT: one age-ordered list of every live placeholder — the override rows awaiting a source fix and the registry rows still hand-fed</li>
-<li><a class="item-link" href="board.html#card-API2">API2</a> <span class="status-badge status-todo">todo</span> ColumnDef carries no list type, so two server columns that return lists are declared string - extend the vocabulary and delete the client-side exemption</li>
 <li><a class="item-link" href="board.html#card-API3">API3</a> <span class="status-badge status-todo">todo</span> scripts/dump_openapi.py opens the committed openapi.json before it renders, so a render failure leaves a zero-byte artifact</li>
 <li><a class="item-link" href="board.html#card-O48">O48</a> <span class="status-badge status-todo">todo</span> Review-for-ontology pass: extraction over uploaded evidence → proposed-bindings panel the SME confirms (the CDO-style review)</li>
 <li><a class="item-link" href="board.html#card-O49">O49</a> <span class="status-badge status-todo">todo</span> Related-nodes QuerySpec panel + agent first-pass correlation with accept / modify / stay-unassigned</li>
