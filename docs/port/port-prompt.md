@@ -2684,6 +2684,57 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   (`[Environment]::SetEnvironmentVariable('RECONCILE_BEFORE_DIR', $null, 'User')` beside
   `Remove-Item Env:`), taken from your report. Nothing is asked back.
 
+- **RELAY-28 — THERE IS NO `-fork` TAG, AND THE DISPOSITION RENDERER NOW REFUSES A REF THAT
+  DOES NOT RESOLVE INSTEAD OF WRITING "0 PATHS"** (new 2026-09-07, mid-apply; acts at the
+  NEXT roll, nothing here changes the range you are in). `[SME-REPORTED]` — your carve-out D
+  plan named `port-base-20260905-fork` as the render base; your Phase 0 check found no
+  `-fork` tag of any date and STOPPED before applying; you tabled what the tree holds (your
+  pre-apply branch point, `port-base-20260902`, `port-base-20260905`), measured the candidate
+  ranges (323 = producer delta this roll; 1511 = full divergence since your branch point; 211
+  = already applied by A/B/C/C2) and chose the 323 range. That choice is right, and so was the
+  method. The producer cuts ONE tag per roll, `port-base-<date>`, and never a `-fork`; the
+  other end of a consumer range is YOUR ref — the pre-apply branch point your own tag marks
+  — which the producer cannot name because it does not exist here. The 1511 range is the
+  STANDING divergence, worked as dispositions across rolls and never an apply range; the
+  range a roll brings is `<previous port-base>..<this port-base>`.
+  `[VERIFIED-PRODUCER]` — the same plan exposed a producer defect: on the producer tree at
+  `55c2a204`, `scripts/render_port_dispositions.py port-base-20260905-fork port-base-20260905`
+  wrote the dispositions file with `0 paths` and exited 0, because `_git` swallows a failed
+  `git diff` into an empty string — the instrument failing into clean (J76). Fixed at
+  `df7a57c3`: both refs are checked with `git rev-parse --verify` before the diff; a ref
+  that does not resolve is named on stderr, exit 1, nothing written. Pinned by
+  `test_a_ref_that_does_not_resolve_is_refused_by_name_not_rendered_empty` in
+  `tests/unit/test_port_dispositions.py`. When the seventh roll lands, the two-argument
+  consumer form you already use (`<your pre-apply ref> <port-base tag>`, see step 333)
+  refuses a typo'd ref for you; your Phase-0 table is still the right thing to keep doing,
+  because the renderer checks that the refs EXIST, not that they are the right two. Nothing is
+  asked back.
+
+- **RELAY-29 — `classification:` IS A SIDE-LOCAL JUDGMENT, AND THE J58 HEADER MADE IT A FIELD
+  A PER-ENTRY TAKE CAN CARRY: ON EVERY per-entry ROW THE VALUE IS YOURS** (new 2026-09-07,
+  mid-apply; acts at the NEXT roll — at D you have already ruled it correctly).
+  `[SME-REPORTED]` — your merge of `docs/restructure/roadmap.yaml` first took the producer's
+  new `classification: Internal-Public` verbatim, beside your own header comment reading
+  Internal; your reviewer caught it and the session fixed it to Internal with the reason
+  inline, then audited `config/source-bindings.yaml` and the vocabulary `00-header.yaml`
+  and kept both Internal-Public on a content-not-path test: real firm data (production DC
+  names, rosters, real object names) → Internal; mechanism-only → Internal-Public. That
+  discriminator is the producer's too, so those two are consistent, not a second exception.
+  `[VERIFIED-PRODUCER]` — J58 (`182523e7`, 2026-09-05) added the `schema` /
+  `classification` / `updated` triple to every governed YAML. Before that no manifest row
+  had to say who owns `classification`, because a comment does not cross on a per-entry
+  take; a field does. One row said the wrong thing: `config/taxonomy/software-registry.yaml`'s
+  entry_rule listed `classification` among the producer mechanism that crosses whole.
+  Corrected at `df7a57c3`, and the rule is written once on that row for every per-entry
+  YAML: **`schema` is the producer's (mechanism), `classification` is the consumer's
+  (judgment about what THIS tree's rows hold), `updated` is the row owner's.** The
+  producer's repo is outside the firm, so its Internal-Public means "publishable from the
+  producer's public mirror" and says nothing about the same file on your tree. The same
+  commit fixed the producer's own `docs/restructure/roadmap.yaml`, where the 2026-08-07
+  header comment read Internal beside the 2026-09-05 field reading Internal-Public — the
+  contradiction you found inside one file was on the producer's tree first, and there the
+  FIELD is the one that is right (the file is in the public push). Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
