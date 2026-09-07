@@ -87,6 +87,23 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/graph-status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Graph Status */
+        get: operations["get_graph_status_graph_status_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -805,6 +822,37 @@ export type components = {
             params: {
                 [key: string]: unknown;
             };
+        };
+        /**
+         * GraphStatusOut
+         * @description GET /graph-status. Is the graph the console reads actually reachable, and
+         *     which database is it?
+         *
+         *     WHY A ROUTE AND NOT A QuerySpec, the same question /docs-verify answered and
+         *     the same answer: this takes NO parameters and the Cypher is chosen entirely
+         *     server-side (a bare ``RETURN 1``), which is the property ADR 0005 protects.
+         *     A spec would also be the wrong instrument — a spec run that fails tells you
+         *     the spec failed, and the whole point here is to separate "the graph is not
+         *     there" from "your question was bad".
+         *
+         *     ``database`` is the reviewed READ database, taken from ``SPEC_DATABASES``
+         *     rather than from ``Neo4jSettings.database`` (which is nullable and is the
+         *     driver's default, not the console's). If the reviewed set ever gains a
+         *     second name that is a deliberate edit, and this follows it.
+         *
+         *     ``detail`` carries the EXCEPTION CLASS when a probe fails - never the URI,
+         *     the user or anything from the settings. A page that can name the host it
+         *     could not reach is a page carrying a deployment coordinate (ADR 0020), and
+         *     the class name is what actually distinguishes an auth failure from a
+         *     refused connection.
+         */
+        GraphStatusOut: {
+            /** Database */
+            database: string;
+            /** Detail */
+            detail: string | null;
+            /** Reachable */
+            reachable: boolean;
         };
         /** HealthOut */
         HealthOut: {
@@ -1532,6 +1580,37 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_graph_status_graph_status_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GraphStatusOut"];
                 };
             };
             /** @description Validation Error */

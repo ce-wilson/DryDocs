@@ -522,3 +522,33 @@ class EphemeralRegisterOut(_Declared):
     classification: str
     watermarked: bool
     expires_at: str
+
+
+# ── /graph-status (O63) ──────────────────────────────────────────────────────
+
+
+class GraphStatusOut(_Declared):
+    """GET /graph-status. Is the graph the console reads actually reachable, and
+    which database is it?
+
+    WHY A ROUTE AND NOT A QuerySpec, the same question /docs-verify answered and
+    the same answer: this takes NO parameters and the Cypher is chosen entirely
+    server-side (a bare ``RETURN 1``), which is the property ADR 0005 protects.
+    A spec would also be the wrong instrument — a spec run that fails tells you
+    the spec failed, and the whole point here is to separate "the graph is not
+    there" from "your question was bad".
+
+    ``database`` is the reviewed READ database, taken from ``SPEC_DATABASES``
+    rather than from ``Neo4jSettings.database`` (which is nullable and is the
+    driver's default, not the console's). If the reviewed set ever gains a
+    second name that is a deliberate edit, and this follows it.
+
+    ``detail`` carries the EXCEPTION CLASS when a probe fails - never the URI,
+    the user or anything from the settings. A page that can name the host it
+    could not reach is a page carrying a deployment coordinate (ADR 0020), and
+    the class name is what actually distinguishes an auth failure from a
+    refused connection."""
+
+    reachable: bool
+    database: str
+    detail: str | None

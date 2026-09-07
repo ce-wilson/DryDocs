@@ -85,7 +85,7 @@ from drydocs_api.mappings import (
 )
 from drydocs_api.personas import UnknownPersonaError
 from drydocs_api.queries import NAMED_QUERIES, ParamValidationError, UnknownQueryError
-from drydocs_api.query_specs import UnknownSpecError
+from drydocs_api.query_specs import SPEC_DATABASES, UnknownSpecError
 from drydocs_api.schemas import (
     AppCodeMigrationsOut,
     ChangesetArtifactOut,
@@ -94,6 +94,7 @@ from drydocs_api.schemas import (
     CorrectionsReportOut,
     DraftReceiptOut,
     EphemeralRegisterOut,
+    GraphStatusOut,
     HealthOut,
     IntakeEvidenceOut,
     IntakeListOut,
@@ -395,6 +396,38 @@ def create_app(
 
         registry = yaml.safe_load(DOC_REGISTRY_PATH.read_text(encoding="utf-8"))
         return corpus_status(registry.get("sources", []), graph)
+
+    # O63: is the graph the console reads actually there? The service-status
+    # strip and the Ask ladder both need this separated from "drydocs-api is
+    # up" — the API answers /health perfectly well with no graph behind it,
+    # which is exactly the state that used to present as a broken page.
+    #
+    # Steward+admin, matching /docs-verify: it names an infrastructure fact, and
+    # the two roles are the ones asking. The Cypher is a bare RETURN 1 chosen
+    # here, no parameters, so ADR 0005's property holds the same way it does for
+    # the corpus sweep.
+    @app.get("/graph-status")
+    def get_graph_status(user: CurrentUser) -> GraphStatusOut:
+        try:
+            require_role(user, "steward", "admin")
+        except Forbidden as exc:
+            raise HTTPException(403, str(exc)) from None
+        # The reviewed READ database, not Neo4jSettings.database — the latter is
+        # nullable and is the driver's default, while this is where the console's
+        # specs actually go. One name since the G102 fold; sorted so a second
+        # would be deterministic rather than arbitrary.
+        database = sorted(SPEC_DATABASES)[0]
+        try:
+            graph.run("RETURN 1 AS ok", {}, database)
+        except Exception as exc:
+            # THE CLASS, NEVER THE MESSAGE. A driver's message quotes the URI it
+            # dialled, and a page must carry no host or port (ADR 0020) — while
+            # the class is what actually separates an auth failure from a
+            # refused connection. LiveRunner is lazy, so a wrong NEO4J_URI first
+            # throws HERE rather than at server start; that is a reachable=false,
+            # not a 500.
+            return GraphStatusOut(reachable=False, database=database, detail=type(exc).__name__)
+        return GraphStatusOut(reachable=True, database=database, detail=None)
 
     @app.get("/queries")
     def queries() -> list[NamedQueryOut]:

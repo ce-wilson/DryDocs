@@ -91,6 +91,7 @@ CONSOLE_ROUTES = {
     ("/specs/{spec_id}/run", "post"): ("SpecRunOut", False),
     # ── WEB8: O70's recorded follow-up, now declared ──────────────────────
     ("/docs-verify", "get"): ("CorpusStatusOut", False),
+    ("/graph-status", "get"): ("GraphStatusOut", False),  # O63
     ("/admin/log-estate", "get"): ("LogEstateOut", False),
     ("/specs/ephemeral", "post"): ("EphemeralRegisterOut", False),
     ("/intake", "get"): ("IntakeListOut", False),
