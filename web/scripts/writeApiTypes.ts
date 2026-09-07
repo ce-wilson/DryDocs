@@ -46,7 +46,7 @@ const HOW_TO_MAKE_IT = [
 /** What is wrong with this schema text, or null when nothing is.
  *
  *  Split out from the I/O so the MESSAGES are testable
- *  (`src/generated/apiTypesDiagnostic.test.ts`). A diagnostic nobody exercises drifts into
+ *  (`src/lib/apiTypesDiagnostic.test.ts`). A diagnostic nobody exercises drifts into
  *  being wrong, and this one exists precisely because the diagnostic it
  *  replaces was a JSON parse error standing in for three different causes. */
 export function schemaProblem(raw: string | null | undefined): string | null {

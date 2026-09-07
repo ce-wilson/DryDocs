@@ -2,10 +2,11 @@ import { describe, expect, it } from 'vitest'
 
 import { failureText, schemaProblem } from '../../scripts/writeApiTypes'
 
-// Lives beside api.test.ts, which imports scripts/genApiTypes for the same
-// reason: vitest collects `src/**` only, and the chain these two guard runs from
-// scripts/ into src/generated/. Splitting them apart to satisfy a directory
-// convention would put each test further from what it checks.
+// UNDER src/lib/ RATHER THAN BESIDE api.test.ts, and the reason is the port
+// manifest and not taste: `web/src/generated/**` carries the `derived`
+// disposition — the company side REGENERATES that directory — so a hand-written
+// test placed there would be a hand-written file inside a regenerated tree. It
+// still has to live under src/ because vitest collects `src/**` only.
 //
 // WEB16 — the diagnostic, tested, because a diagnostic nobody exercises drifts
 // into being wrong. The one this replaces was a JSON parse error standing in
