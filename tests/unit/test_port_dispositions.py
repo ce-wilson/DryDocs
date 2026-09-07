@@ -85,6 +85,31 @@ def test_render_buckets_by_class_and_never_invents_one() -> None:
     assert "union-append" not in text, "a class with no paths must not print a section"
 
 
+def test_main_passes_a_second_argument_through_as_the_head(tmp_path, monkeypatch) -> None:
+    """The consumer's range is `<pre-apply-tag> <base-tag>`. Until 2026-09-07 `main`
+    read argv[0] only, so the two-argument form rendered `<pre-apply-tag>..HEAD` — the
+    paths the apply branch had ALREADY taken — under a plausible 'wrote N paths' line.
+    Pin: the head reaches `changed_paths` and the header names the real range; a
+    third argument is refused, not dropped."""
+    module = _renderer()
+    seen: list[tuple[str, str]] = []
+    monkeypatch.setattr(
+        module, "changed_paths", lambda b, h="HEAD": seen.append((b, h)) or ["x.py"]
+    )
+    manifest = tmp_path / "m.yaml"
+    manifest.write_text(
+        'rows:\n  - path: "**"\n    disposition: evaluate\ndefault_ok: []\n', encoding="utf-8"
+    )
+    monkeypatch.setattr(module, "MANIFEST", manifest)
+    monkeypatch.setattr(module, "OUT", tmp_path / "out.md")
+    monkeypatch.setattr(module, "REPO", tmp_path)
+    assert module.main(["pre-apply-tag", "port-base-x"]) == 0
+    assert seen == [("pre-apply-tag", "port-base-x")]
+    assert "Range `pre-apply-tag..port-base-x`" in (tmp_path / "out.md").read_text(encoding="utf-8")
+    assert module.main(["a", "b", "c"]) == 2, "a third argument is a mistake, refused not ignored"
+    assert module.main(["only-base"]) == 0 and seen[-1] == ("only-base", "HEAD")
+
+
 def test_every_disposition_the_manifest_uses_has_an_apply_rule() -> None:
     """APPLY_ORDER is the operator-facing half of the disposition vocabulary. A class
     the manifest can emit but the renderer has no rule for would print as
