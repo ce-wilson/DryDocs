@@ -1,4 +1,5 @@
 import type { LegalTransitions } from '../lib/intakeApi'
+import { WAITING_ON, WAITING_ON_SUMMARY } from '../lib/intakeReview'
 
 // The O47 intake status machine, rendered — adapted from LoadsTimeline's
 // dot-and-rail (ordered stage array, one status dot per stage, ui-conventions
@@ -79,7 +80,14 @@ export default function IntakeStepper({
         </p>
       )}
       {legal.waiting_on_gate && (
-        <p className="mt-1 text-xs text-faint">Waiting on the gated load (O50 slice — parked).</p>
+        // O50: the park, named. ui-conventions §1 puts "queued, not yet moving"
+        // at --yellow, which is what this is — an accepted record is neither
+        // done (--green) nor broken (--status-fail-soft), and reading it as
+        // either is the confusion the plan calls the load boundary.
+        <p className="mt-1 text-xs" style={{ color: 'var(--yellow)' }}>
+          {WAITING_ON_SUMMARY}{' '}
+          {WAITING_ON.map((w) => `${w.what} — ${w.gate}`).join('; ')}.
+        </p>
       )}
       <div className="mt-2 flex flex-wrap gap-2">
         {legal.transitions.map((t) => (
