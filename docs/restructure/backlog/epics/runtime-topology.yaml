@@ -19,3 +19,8 @@ groom_log:
     conclusions, never rows). Its any-rows branch is an IDENTITY change and routes through the
     HITL gate rather than being decided in the item.
   attached_at: P6
+- date: '2026-09-07'
+  note: '2026-09-07 groom: LOAD3 is the question P6 left beside the one it answered - ten CM_DEF_VTAB folder rows
+      share a TABLE_ID inside one data center, the staging composite key would reject them, and what a duplicate
+      folder row MEANS has never been asked. Probe first, counts only; the dedupe rule is the SME''s.'
+  attached_at: LOAD3

@@ -91,6 +91,7 @@ CONSOLE_ROUTES = {
     ("/specs/{spec_id}/run", "post"): ("SpecRunOut", False),
     # ── WEB8: O70's recorded follow-up, now declared ──────────────────────
     ("/docs-verify", "get"): ("CorpusStatusOut", False),
+    ("/graph-status", "get"): ("GraphStatusOut", False),  # O63
     ("/admin/log-estate", "get"): ("LogEstateOut", False),
     ("/specs/ephemeral", "post"): ("EphemeralRegisterOut", False),
     ("/intake", "get"): ("IntakeListOut", False),
@@ -110,6 +111,8 @@ CONSOLE_ROUTES = {
     ("/mappings/drafts/{draft_id}/promote", "post"): ("PromotedDiffOut", False),
     ("/mappings/app-code/draft", "post"): ("DraftReceiptOut", False),
     ("/mappings/app-code/migrations", "get"): ("AppCodeMigrationsOut", False),
+    # ── Z6: the data-center spelling registry, read as config ─────────────
+    ("/data-centers", "get"): ("DataCentersOut", False),
 }
 
 

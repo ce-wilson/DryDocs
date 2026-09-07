@@ -2633,6 +2633,57 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   regenerate from your `drydocs_api`, never carry the producer's.
   Nothing is asked back.
 
+- **RELAY-27 — `scripts/reconcile_before.py` EXISTS ON BOTH SIDES WITH TWO SHAPES, AND
+  YOUR DURABLE BEFORE-DIR NEEDS ONE FILE BEFORE THE SEVENTH ROLL'S GUARDS READ IT** (new
+  2026-09-07, mid-apply; acts at the NEXT roll, nothing here changes the range you are in).
+  `[VERIFIED-PRODUCER]` — the producer built `scripts/reconcile_before.py` over
+  `drydocs/port/reconcile_before.py` at `2aa90898` on 2026-09-05, AFTER `port-base-20260905`
+  (`5cad5653`) was cut: the tag holds neither file and its `.claude/skills/reconcile-port/SKILL.md` never
+  names the script, so nothing in your current range mentions it. The producer shape: ONE
+  call writes the four mandatory before-files the J7/J16 guards read
+  (`relationship_vocabulary.yaml`, `taxonomy-ontology-map.yaml`, `backlog.yaml`,
+  `gate-log.md`), the two optional J51 lists when their modules import, and a one-line stamp
+  **`BASE.sha`** — the full 40-hex sha of the commit snapshotted. It refuses a dirty source.
+  `tests/unit/test_port_reconcile_guards.py` (`77cae33a`) runs
+  `test_reconcile_before_dir_stamp_describes_this_tree_live` FIRST and fails BY NAME on a
+  before-dir with no `BASE.sha`, a sha that does not resolve, one that is not an ancestor of
+  `HEAD`, a `gate-log.md` that differs from `git show <sha>:config/gate-log.md`, or a sha
+  that is not where the apply branch left `main` (J76 — the phantom 22nd baseline failure of
+  2026-09-05 was a before-dir from the EARLIER apply that outlived a skipped teardown).
+  `--describe` prints the line the PORT-REPORT carries.
+  `[SME-REPORTED]` — during this apply you wrote your own `scripts/reconcile_before.py`
+  (`--repo <tree> --dest <dir>`, a `SNAPSHOT-META.txt` with taken_at / head sha / describe
+  / subject; commit `a4603b7e` on your apply branch), took a durable before-dir OUTSIDE your
+  data root, verified all six files SHA256-identical to your pre-apply tag's tree, and set
+  `RECONCILE_BEFORE_DIR` at **User** scope so it survives a reboot. If none of that is on
+  your branch, this relay's second and third paragraphs do not apply and the first is a
+  clean-add at the next roll; nothing else changes.
+  **WHAT HAPPENS AT THE SEVENTH ROLL IF NOTHING IS DONE:** `scripts/**` is `evaluate`, so
+  the two `scripts/reconcile_before.py` files COLLIDE and hand-merge (your rule; the
+  producer's is a 61-line wrapper over the `drydocs/port/` module, which arrives as a
+  clean-add). `tests/**` is DEFAULT, so the guard arrives as written — and your durable
+  before-dir has NO `BASE.sha`, so the stamp test fails by name against a snapshot you
+  cannot retake, because the apply has moved the tree. That failure would be the
+  INSTRUMENT, not the subject (J76).
+  **THE ONE-FILE FIX, YOURS TO APPLY WHEN THE SEVENTH ROLL LANDS (not before — the guard is
+  not on your tree yet):** write your pre-apply commit's FULL 40-hex sha, one line, no
+  newline required, to `BASE.sha` inside the durable before-dir. That commit is the one
+  your `pre-cewilson-port-20260905`-shaped tag points at — the tree your six files were
+  verified against. Then every one of the five checks passes on that dir: the sha
+  resolves, it is an ancestor of your branch's `HEAD`, it is where the branch left `main`,
+  and the `gate-log.md` you already proved byte-identical equals `git show <sha>:config/
+  gate-log.md` by construction. Keep `SNAPSHOT-META.txt` beside it — the producer's
+  `write_snapshot` ignores files it did not write and the guards read only what they name.
+  When the two scripts hand-merge, keep the producer's stamp and refusals (the guards
+  import `drydocs.port.reconcile_before`, so the module's contract is the one that
+  matters) and carry your `--repo` argument and your META file forward if you want them;
+  they are additive.
+  **THE TEARDOWN CONSEQUENCE, WHICH YOU FOUND FIRST:** a User-scope `RECONCILE_BEFORE_DIR`
+  outlives its directory far more easily than a process-scope one, and the guards then
+  FAIL on set-but-unusable, they do not skip. The producer skill's step 4 now says so
+  (`[Environment]::SetEnvironmentVariable('RECONCILE_BEFORE_DIR', $null, 'User')` beside
+  `Remove-Item Env:`), taken from your report. Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has

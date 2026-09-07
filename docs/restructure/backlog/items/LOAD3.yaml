@@ -1,0 +1,52 @@
+id: LOAD3
+epic: runtime-topology
+title: "Ten CM_DEF_VTAB folder rows share a TABLE_ID inside one data center - probe what a duplicate folder row means before the staging composite key rejects them"
+type: task
+module: drydocs-load
+phase: 13
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- docs/restructure/backlog/items/P6.yaml
+- docs/restructure/IDEAS.md
+- config/taxonomy/data-centers.yaml
+acceptance: |
+  P6 settled the CROSS-data-center question (no TABLE_ID spans two data centers, so
+  folder_id is a safe graph key) and left the question beside it unasked: P6.0 read 76,753
+  folder rows in CM_DEF_VTAB against 76,743 distinct table ids, so ten rows are same-id,
+  same-data-center duplicates, and the staging DDL's composite (DATA_CENTER, TABLE_ID) key
+  would reject every one of them.
+
+  (a) PROBE FIRST, COUNTS ONLY, on the P6 shape and in the same venue (the psgmgr replica -
+      name the venue in the finding, J18). Group by (DATA_CENTER, TABLE_ID) having count > 1;
+      for each group count distinct SCHED_TABLE and VERSION_SERIAL (or whatever version-ish
+      column the view actually exposes - read the view, do not assume the column exists); and
+      report whether the rows differ at all outside the key. No values leave the host beyond
+      counts, per the P6 precedent.
+  (b) The probe output classifies each of the ten groups into one of three readings, or
+      reports that the data does not distinguish them: a folder VERSION (the view carries
+      more than one version serial), a deleted-and-recreated folder that kept its number, or
+      an artifact of the view definition.
+  (c) The RULING is the SME's, not the loader's: which rows the staging load keeps is a HITL
+      question routed through docs/restructure/03-hitl-sme-flow.md, because each reading has a
+      different consequence (newest-wins, live-wins, or fix the view). The item delivers the
+      counts and the three candidate rules; it does not pick one and it does not ship a
+      dedupe default.
+  (d) Once ruled, ONE of: the staging load dedupes by the confirmed rule, or the composite key
+      is loosened - and the staging DDL section that asked the P6 question carries this
+      question and its answer beside it.
+notes: |
+  Minted 2026-09-07 from docs/restructure/IDEAS.md Idea-274 (captured the same day off
+  the P6 probe run).
+
+  MODULE / PHASE CHOICE, recorded because the groom picked it rather than reading it off the
+  entry: the entry says "Module drydocs-load (staging DDL)", so module is drydocs-load even
+  though P6 itself is filed under module config; epic and phase follow P6 (runtime-topology,
+  phase 13) because this is the second half of the same probe.
+
+  NOT A KEY REDESIGN. folder_id stays a safe graph key - that is what P6 established and this
+  item does not reopen it. What is open is only what a duplicate ROW means and which of them
+  the staging load keeps.

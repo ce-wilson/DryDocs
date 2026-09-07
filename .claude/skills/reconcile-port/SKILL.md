@@ -429,7 +429,12 @@ instead of eyeballing:
 # before it fails at the consumer.
 # $env:TEMP is fine for a same-day apply; a MULTI-DAY apply (the chunked workplan) should
 # point it at a directory that survives a reboot, because the before-state cannot be
-# re-taken after a slice lands.
+# re-taken after a slice lands. Put it OUTSIDE DRYDOCS_DATA_ROOT (port state inside the
+# pipeline data root is visible to zone walkers), and if you make RECONCILE_BEFORE_DIR
+# survive the reboot too - [Environment]::SetEnvironmentVariable(..., 'User') - step 4
+# below has a second line for it: a User-scope variable outlives its directory far more
+# easily than a process-scope one, and the guards FAIL on set-but-unusable, they do not
+# skip (the company found this on the 2026-09-05..07 apply; RELAY-27).
 poetry run python scripts/reconcile_before.py "$env:TEMP/reconcile-before"
 
 # 2. apply the range / resolve collisions as usual
@@ -445,8 +450,12 @@ poetry run pytest tests/unit/test_port_reconcile_guards.py -q
 # ...and the line the PORT-REPORT carries (sha, date, commits behind HEAD) - paste it verbatim:
 poetry run python scripts/reconcile_before.py --describe "$env:TEMP/reconcile-before"
 
-# 4. TEARDOWN — clear the variable and drop the snapshot. Do not skip this.
-Remove-Item Env:RECONCILE_BEFORE_DIR
+# 4. TEARDOWN — clear the variable AT EVERY SCOPE IT WAS SET, then drop the snapshot. Do
+# not skip this: skipping it is how a two-day-old before-dir produced the phantom 22nd
+# baseline failure on 2026-09-05. The second line is a no-op when the variable was never
+# set at User scope, so run both every time.
+Remove-Item Env:RECONCILE_BEFORE_DIR -ErrorAction SilentlyContinue
+[Environment]::SetEnvironmentVariable('RECONCILE_BEFORE_DIR', $null, 'User')
 Remove-Item -Recurse -Force "$env:TEMP/reconcile-before"
 ```
 

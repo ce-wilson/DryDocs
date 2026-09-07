@@ -1,0 +1,39 @@
+id: CORE3
+epic: release-infrastructure
+title: "CI clones shallow, so the commit-message ceiling guard skips instead of measuring - decide fetch-depth and record the reason in the workflow"
+type: chore
+module: drydocs-core
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- .github/workflows/ci.yml
+- docs/restructure/backlog/items/J74.yaml
+acceptance: |
+  actions/checkout runs with no fetch-depth, so CI has a shallow clone; the J74
+  commit-message ceiling guard detects the shallow history and skips loudly rather than
+  measure a false zero. The guard is therefore correct and inert in the one place it would run
+  on every push.
+
+  (a) The decision is MADE and RECORDED, not left implicit: either fetch-depth: 0 on the job
+      that runs the guard - so it measures where it matters - or a written statement in the
+      workflow comment that the guard is desk-only and why. One or the other, in the workflow
+      file itself.
+  (b) If fetch-depth: 0 is chosen, the cost is stated with its measurement (the repo is about
+      2,057 commits as of 2026-09-05), and the change is scoped to the job that needs full
+      history rather than applied to every job by reflex.
+  (c) A CI run after the change shows the guard MEASURING (its own output says so), not
+      skipping - the acceptance is the guard's verdict line, not the absence of a failure.
+notes: |
+  Minted 2026-09-07 from IDEAS.md Idea-262 (Lane B close report, laptop, 2026-09-05,
+  J74 clause d).
+
+  Module drydocs-core per the entry ('drydocs-core (CI)'); the sibling CI items in this epic
+  sit under config and graph-infra, so the module here is the entry's call and is recorded
+  rather than silently normalized.
+
+  Clause (a) is deliberately two-sided: the entry frames this as 'decide once', and a guard
+  that is desk-only by decision is a different state from one that is desk-only by accident.

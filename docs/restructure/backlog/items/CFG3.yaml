@@ -1,0 +1,33 @@
+id: CFG3
+epic: release-infrastructure
+title: "precedence.schema.json and relationship-vocabulary.schema.json accept any stray key - close them at the top level"
+type: chore
+module: config
+phase: 8
+agent: main
+model: haiku
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- config/schemas/precedence.schema.json
+- config/schemas/relationship-vocabulary.schema.json
+- config/schemas/data-centers.schema.json
+acceptance: |
+  precedence.schema.json and relationship-vocabulary.schema.json have no top-level
+  additionalProperties: false, so either accepts any stray key silently. Three sibling family
+  schemas (data-centers, domains, editions) are closed at the top level, and that closure is
+  what settled the identity-header profile split (J58); these two are the open ones left.
+
+  (a) Both schemas are closed at the top level - one line each.
+  (b) Before closing: check that nothing in the tree already relies on a stray key. If something
+      does, the key is either declared or removed, and the item says which.
+  (c) The existing validation over both config files still passes, and a deliberately stray key
+      now FAILS - proven, not asserted.
+notes: |
+  Minted 2026-09-07 from IDEAS.md Idea-263 (Lane B close report, laptop, 2026-09-05, J58).
+
+  The files are under config/schemas/ (verified on this tree); the entry names them by bare
+  filename.
+
+  haiku: two lines and a check, with the existing closed schemas as the pattern to copy.

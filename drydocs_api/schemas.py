@@ -54,6 +54,38 @@ class ConfigOut(_Declared):
     runtime_view_url_template: str | None
 
 
+class DataCenterOut(_Declared):
+    """One row of the data-center spelling registry (LOAD2), as the console reads
+    it for Z6's runtime map.
+
+    ``default_time`` and ``suffix`` are OPTIONAL BY RULE and not by accident: the
+    ``E####``-as-default-time reading comes from an internal standard whose own
+    open items include "confirm E is always Eastern", so a name that carries no
+    time segment registers exactly like one that does. They are declared here as
+    plain strings that may be empty for that reason — a null would suggest the
+    lookup failed, and nothing failed."""
+
+    code: str
+    name: str
+    default_time: str
+    suffix: str
+    sample: bool
+    note: str
+
+
+class DataCentersOut(_Declared):
+    """GET /data-centers.
+
+    ``source`` names the venue the rows came from (J18): the machine-local
+    internal twin, or the publishable synthetic sample. A console that showed a
+    default time without saying which file it read would make a producer-side
+    demo look like a statement about production."""
+
+    data_centers: list[DataCenterOut]
+    source: str
+    updated: str
+
+
 class StatusOut(_Declared):
     status: str
 
@@ -522,3 +554,33 @@ class EphemeralRegisterOut(_Declared):
     classification: str
     watermarked: bool
     expires_at: str
+
+
+# ── /graph-status (O63) ──────────────────────────────────────────────────────
+
+
+class GraphStatusOut(_Declared):
+    """GET /graph-status. Is the graph the console reads actually reachable, and
+    which database is it?
+
+    WHY A ROUTE AND NOT A QuerySpec, the same question /docs-verify answered and
+    the same answer: this takes NO parameters and the Cypher is chosen entirely
+    server-side (a bare ``RETURN 1``), which is the property ADR 0005 protects.
+    A spec would also be the wrong instrument — a spec run that fails tells you
+    the spec failed, and the whole point here is to separate "the graph is not
+    there" from "your question was bad".
+
+    ``database`` is the reviewed READ database, taken from ``SPEC_DATABASES``
+    rather than from ``Neo4jSettings.database`` (which is nullable and is the
+    driver's default, not the console's). If the reviewed set ever gains a
+    second name that is a deliberate edit, and this follows it.
+
+    ``detail`` carries the EXCEPTION CLASS when a probe fails - never the URI,
+    the user or anything from the settings. A page that can name the host it
+    could not reach is a page carrying a deployment coordinate (ADR 0020), and
+    the class name is what actually distinguishes an auth failure from a
+    refused connection."""
+
+    reachable: bool
+    database: str
+    detail: str | None

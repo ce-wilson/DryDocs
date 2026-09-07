@@ -85,15 +85,18 @@ from drydocs_api.mappings import (
 )
 from drydocs_api.personas import UnknownPersonaError
 from drydocs_api.queries import NAMED_QUERIES, ParamValidationError, UnknownQueryError
-from drydocs_api.query_specs import UnknownSpecError
+from drydocs_api.query_specs import SPEC_DATABASES, UnknownSpecError
 from drydocs_api.schemas import (
     AppCodeMigrationsOut,
     ChangesetArtifactOut,
     ConfigOut,
     CorpusStatusOut,
     CorrectionsReportOut,
+    DataCenterOut,
+    DataCentersOut,
     DraftReceiptOut,
     EphemeralRegisterOut,
+    GraphStatusOut,
     HealthOut,
     IntakeEvidenceOut,
     IntakeListOut,
@@ -114,6 +117,7 @@ from drydocs_api.schemas import (
 )
 from drydocs_api.sessions import InMemorySessionStore, InvalidTokenError, Session
 from drydocs_core.config import Neo4jSettings
+from drydocs_core.data_centers import load_registry as load_data_center_registry
 from drydocs_core.env_refs import resolve_optional
 from drydocs_core.notifications import from_summary, to_payload
 
@@ -360,6 +364,39 @@ def create_app(
         template, _ = resolve_optional("DRYDOCS_RUNTIME_VIEW_URL_TEMPLATE", where="GET /config")
         return ConfigOut(runtime_view_url_template=template or None)
 
+    # Z6 — the data-center spelling registry, read as CONFIG.
+    #
+    # AUTHENTICATED, unlike /config above, and the difference is the file: this
+    # reader prefers the machine-local internal twin when it is present (J13), so
+    # the rows can be the real inventory. /config serves values that are not
+    # secrets and must be readable before sign-in; this one is neither.
+    #
+    # It is not a QuerySpec and cannot be: the pairing is a DECLARED fact in
+    # config/taxonomy/data-centers.yaml, not a graph edge, and the reason it is
+    # declared rather than derived is the vendor baseline — BMC defines no format
+    # for the data-center name, so nothing in a short code determines a long one.
+    # The console needs it because the E#### default-time seed for a folder with
+    # no explicit time is reachable only through the short -> long pairing.
+    @app.get("/data-centers")
+    def get_data_centers(user: CurrentUser) -> DataCentersOut:
+        _ = user  # any authenticated persona; the registry is not role-scoped
+        registry = load_data_center_registry()
+        return DataCentersOut(
+            data_centers=[
+                DataCenterOut(
+                    code=d.code,
+                    name=d.name,
+                    default_time=d.default_time,
+                    suffix=d.suffix,
+                    sample=d.sample,
+                    note=d.note,
+                )
+                for d in registry.data_centers
+            ],
+            source=registry.source,
+            updated=registry.updated,
+        )
+
     # O58 — the doc-corpus reconciliation, as a NAMED SERVER-SIDE READ.
     #
     # Not a QuerySpec, and it cannot be one: the sweep visits MORE THAN ONE
@@ -395,6 +432,38 @@ def create_app(
 
         registry = yaml.safe_load(DOC_REGISTRY_PATH.read_text(encoding="utf-8"))
         return corpus_status(registry.get("sources", []), graph)
+
+    # O63: is the graph the console reads actually there? The service-status
+    # strip and the Ask ladder both need this separated from "drydocs-api is
+    # up" — the API answers /health perfectly well with no graph behind it,
+    # which is exactly the state that used to present as a broken page.
+    #
+    # Steward+admin, matching /docs-verify: it names an infrastructure fact, and
+    # the two roles are the ones asking. The Cypher is a bare RETURN 1 chosen
+    # here, no parameters, so ADR 0005's property holds the same way it does for
+    # the corpus sweep.
+    @app.get("/graph-status")
+    def get_graph_status(user: CurrentUser) -> GraphStatusOut:
+        try:
+            require_role(user, "steward", "admin")
+        except Forbidden as exc:
+            raise HTTPException(403, str(exc)) from None
+        # The reviewed READ database, not Neo4jSettings.database — the latter is
+        # nullable and is the driver's default, while this is where the console's
+        # specs actually go. One name since the G102 fold; sorted so a second
+        # would be deterministic rather than arbitrary.
+        database = sorted(SPEC_DATABASES)[0]
+        try:
+            graph.run("RETURN 1 AS ok", {}, database)
+        except Exception as exc:
+            # THE CLASS, NEVER THE MESSAGE. A driver's message quotes the URI it
+            # dialled, and a page must carry no host or port (ADR 0020) — while
+            # the class is what actually separates an auth failure from a
+            # refused connection. LiveRunner is lazy, so a wrong NEO4J_URI first
+            # throws HERE rather than at server start; that is a reachable=false,
+            # not a 500.
+            return GraphStatusOut(reachable=False, database=database, detail=type(exc).__name__)
+        return GraphStatusOut(reachable=True, database=database, detail=None)
 
     @app.get("/queries")
     def queries() -> list[NamedQueryOut]:

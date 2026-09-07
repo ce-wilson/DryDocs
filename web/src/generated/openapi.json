@@ -309,6 +309,74 @@
         "title": "CorrectionsReportOut",
         "type": "object"
       },
+      "DataCenterOut": {
+        "additionalProperties": false,
+        "description": "One row of the data-center spelling registry (LOAD2), as the console reads\nit for Z6's runtime map.\n\n``default_time`` and ``suffix`` are OPTIONAL BY RULE and not by accident: the\n``E####``-as-default-time reading comes from an internal standard whose own\nopen items include \"confirm E is always Eastern\", so a name that carries no\ntime segment registers exactly like one that does. They are declared here as\nplain strings that may be empty for that reason \u2014 a null would suggest the\nlookup failed, and nothing failed.",
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "default_time": {
+            "title": "Default Time",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "note": {
+            "title": "Note",
+            "type": "string"
+          },
+          "sample": {
+            "title": "Sample",
+            "type": "boolean"
+          },
+          "suffix": {
+            "title": "Suffix",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "name",
+          "default_time",
+          "suffix",
+          "sample",
+          "note"
+        ],
+        "title": "DataCenterOut",
+        "type": "object"
+      },
+      "DataCentersOut": {
+        "additionalProperties": false,
+        "description": "GET /data-centers.\n\n``source`` names the venue the rows came from (J18): the machine-local\ninternal twin, or the publishable synthetic sample. A console that showed a\ndefault time without saying which file it read would make a producer-side\ndemo look like a statement about production.",
+        "properties": {
+          "data_centers": {
+            "items": {
+              "$ref": "#/components/schemas/DataCenterOut"
+            },
+            "title": "Data Centers",
+            "type": "array"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "updated": {
+            "title": "Updated",
+            "type": "string"
+          }
+        },
+        "required": [
+          "data_centers",
+          "source",
+          "updated"
+        ],
+        "title": "DataCentersOut",
+        "type": "object"
+      },
       "DraftReceiptOut": {
         "additionalProperties": false,
         "description": "POST /mappings/overrides/draft and /mappings/app-code/draft (S4, ADR 0009\nrule 5). Drafting writes ROWS to the mapping.db buffer and hands back this\nreceipt. The shape it replaced returned a whole replacement file, which\ncould not survive two editors: each held a full file built from the same\nbase, so whichever was committed last erased the other.",
@@ -524,6 +592,38 @@
           }
         },
         "title": "ExportBody",
+        "type": "object"
+      },
+      "GraphStatusOut": {
+        "additionalProperties": false,
+        "description": "GET /graph-status. Is the graph the console reads actually reachable, and\nwhich database is it?\n\nWHY A ROUTE AND NOT A QuerySpec, the same question /docs-verify answered and\nthe same answer: this takes NO parameters and the Cypher is chosen entirely\nserver-side (a bare ``RETURN 1``), which is the property ADR 0005 protects.\nA spec would also be the wrong instrument \u2014 a spec run that fails tells you\nthe spec failed, and the whole point here is to separate \"the graph is not\nthere\" from \"your question was bad\".\n\n``database`` is the reviewed READ database, taken from ``SPEC_DATABASES``\nrather than from ``Neo4jSettings.database`` (which is nullable and is the\ndriver's default, not the console's). If the reviewed set ever gains a\nsecond name that is a deliberate edit, and this follows it.\n\n``detail`` carries the EXCEPTION CLASS when a probe fails - never the URI,\nthe user or anything from the settings. A page that can name the host it\ncould not reach is a page carrying a deployment coordinate (ADR 0020), and\nthe class name is what actually distinguishes an auth failure from a\nrefused connection.",
+        "properties": {
+          "database": {
+            "title": "Database",
+            "type": "string"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "reachable": {
+            "title": "Reachable",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "reachable",
+          "database",
+          "detail"
+        ],
+        "title": "GraphStatusOut",
         "type": "object"
       },
       "HTTPValidationError": {
@@ -2001,6 +2101,52 @@
         "summary": "Config"
       }
     },
+    "/data-centers": {
+      "get": {
+        "operationId": "get_data_centers_data_centers_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataCentersOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Data Centers"
+      }
+    },
     "/demo": {
       "get": {
         "operationId": "get_demo_demo_get",
@@ -2118,6 +2264,52 @@
           }
         },
         "summary": "Get Export Manifest"
+      }
+    },
+    "/graph-status": {
+      "get": {
+        "operationId": "get_graph_status_graph_status_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GraphStatusOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Graph Status"
       }
     },
     "/health": {

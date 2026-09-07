@@ -8,7 +8,7 @@ phase: 15
 agent: main
 model: sonnet
 priority: p3
-status: in_progress
+status: done
 depends_on:
 - R3
 - R5
@@ -19,3 +19,161 @@ acceptance: |
   Evaluation (faithfulness / answer-relevancy style) runs on demand from the stored question/context/answer triple — never inline in the answer path; an admin view lists runs from console.agent-runs.v1 with cost and latency; the promotion feed ranks recurring Tier-1 Cypher by frequency and emits spec CANDIDATES for review — gate-bound, never auto-registered as permanent specs; loop caps re-tuned from ledger data with the change recorded in notes.
 notes: |
   Ties into the /under-the-hood retrieval-benchmark narrative (Q3 verdict) — the evaluation harness should reuse its question set where possible.
+  ── CLOSED 2026-09-06, Lane B (laptop), branch wip/R8-laptop from main at df97514d ──
+
+  THREE CLAUSES MET IN FULL, ONE MET AS MECHANISM ONLY, and the fourth is a
+  declared partial rather than a discovery: the data it needs does not exist on
+  this machine and no amount of building here creates it. Detail below.
+
+  THE LEDGER HAD ONLY EVER BEEN WRITTEN. R3 built two telemetry sinks; the graph
+  one is read by console.agent-runs.v1 and the JSONL one by nobody. All three of
+  R8's data-driven clauses are reads of it, so common/ledger_read.py lands once
+  rather than three times inside three consumers. A corrupt line is skipped and
+  COUNTED, never fatal — the writer is best-effort by design, so a half-written
+  line at the end of a day-file is a normal state of the world, and a reader that
+  raised on one would make the whole day unreadable.
+
+  ── CLAUSE 1: evaluation on demand, never inline ────────────────────────────────
+
+  A RULING WAS REQUIRED FIRST, and it is written in llm_ledger's docstring beside
+  the code that acts on it. R3's rule: full QUESTION text lives in the local JSONL
+  and nowhere else; the :AgentRun node carries sha256 + length. R8 needs the
+  question/context/answer TRIPLE, and a triple assembled at answer time and thrown
+  away cannot be scored on demand. So the run line now also carries `answer`,
+  `context` and `cypher_steps`.
+
+  WHAT IT REFUSES, and this is the load-bearing half:
+  * NOTHING reaches the :AgentRun node. The graph side is untouched and
+    agent_run_writer.py is not edited. A test asserts the answer is absent from
+    agent_run_props by KEY and by VALUE.
+  * `context` carries row COUNTS and step IDENTITIES, never retrieved VALUES. A
+    retrieved row holds folder names, host names and SEAL ids; copying those into
+    a log under a rule written for a question a person typed is a different act.
+    The test retrieves a distinctively-shaped folder-and-SEAL value and asserts it
+    appears nowhere in the ledger file — over the WHOLE file, because a leak
+    through some other field is just as much a leak.
+
+  HANDED BACK: whether the ANSWER text belongs there at all. It is the agent's own
+  words rather than the graph's, and the file is already the one home for full
+  text, so it is written under that rule — but the rule was ruled for a question,
+  and extending it silently is not this build's call.
+
+  NEVER INLINE is asserted as a fact about imports, not a promise in a docstring:
+  test_the_answer_path_imports_none_of_the_evaluation_modules reads pipeline.py's
+  own imports. An evaluation reached from the answer path would put a model call,
+  its latency and its cost on every question a person asks.
+
+  NO INVENTED METRICS, which is the other decision this clause forced.
+  * GROUNDEDNESS is deterministic and runs here: did the answer come back with
+    retrieved rows behind it, or none. It is labelled a FLOOR and not a grade, in
+    the returned reason and not only in a comment, because an answer built on rows
+    can still misread them.
+  * FAITHFULNESS and ANSWER-RELEVANCY are LLM-judged — that is what those words
+    mean in the RAGAS vocabulary the acceptance borrows. LlmJudge RAISES, naming
+    the provider it needs. A token-overlap number labelled "answer relevancy"
+    would be indistinguishable from a judged one to every caller, which is the
+    whole reason there is no fallback. The summary prints, every time, that those
+    two metrics are NOT in the report.
+
+  ── CLAUSE 2: the agent-runs admin view ─────────────────────────────────────────
+
+  MET. A SpecGrid over console.agent-runs.v1 as an "Agent runs" tab on
+  /admin-config. The spec already returns cost, latency and the R21 warning
+  columns, so a hand-built table would be a second reading of one contract. It
+  sits on that page because :AgentRun rows carry the question as sha256 only and
+  are :Uncertain (the G102 fold) — operator data, not reader data.
+
+  ONE SHARED-COMPONENT CHANGE CAME WITH IT. SpecGrid's `fallback` is now OPTIONAL,
+  and omitting it is a CLAIM: this spec has no synthetic demo. SpecGrid previously
+  handed the provenance seam a non-null marker unconditionally, so an empty result
+  always reported `demo`. On telemetry that would put a "showing demo data" badge
+  over invented cost and latency numbers. Every existing caller passes a fallback
+  and is unaffected.
+
+  ── CLAUSE 3: the promotion feed ────────────────────────────────────────────────
+
+  MET. common/spec_promotion.py ranks recurring Tier-1 Cypher by frequency and
+  writes an artifact of CANDIDATES.
+
+  NORMALIZATION IS THE WHOLE RANKING. Two runs of one question differ in
+  whitespace, in an inlined limit and in whichever literal the model matched on.
+  Ranked raw they are two candidates of one each and nothing ever recurs;
+  normalized they are one candidate of two, which is the number the clause asks
+  for. Comments strip FIRST — a comment containing an apostrophe would otherwise
+  eat the rest of the line, the same mis-tokenisation web/src/test/sourceScan.ts
+  records, met again in Cypher.
+
+  REGISTERS NOTHING, asserted rather than promised. The module reaches neither
+  QUERY_SPECS, QuerySpec, EphemeralSpecStore nor query_specs.py, scanned over
+  code_only (J66 — its own docstring names every symbol it forbids). A `spec` step
+  is never a candidate: it already ran REVIEWED Cypher, so promoting one would
+  propose a spec that exists. A query that recurred and returned zero EVERY time
+  is flagged `always_empty` — that is a query failing repeatedly, the opposite of
+  a promotion case, and a reviewer must not have to infer it from a zero.
+
+  The artifact writes beside the ledger in the run-log directory, NOT into the
+  repo: `runs_read` is a fact about one machine, and a committed copy would read
+  as a statement about the project.
+
+  ── CLAUSE 4: caps re-tuned from ledger data — PARTIAL, and here is the line ────
+
+  THE MECHANISM IS BUILT AND WAS RUN. THE CAPS WERE NOT CHANGED, because no
+  distribution was observed.
+
+  VERIFIED BY INSTRUMENT (J76), not recalled: `MATCH (r:AgentRun) RETURN count(r)`
+  on this laptop's `drydocs` database returns 0, and no qa.graph_qa*.jsonl exists
+  anywhere under ~/logs/DryDocs. The agent stack does not run here (O63), so the
+  laptop produces no telemetry to tune from.
+
+  Run for real at close: 0 files, 0 runs. The tuner returns MAX_FIX_RETRIES
+  UNCHANGED at 2 with `confident: False`, naming the 20-run threshold it did not
+  meet. It refuses by design and the refusal is the first thing its suite tests —
+  a tuner that answered "2" from an empty ledger would be indistinguishable from
+  one that answered "2" from a thousand runs, and only the second is worth having.
+  `pipeline.MAX_FIX_RETRIES` is untouched. Editing a constant from no evidence
+  would be exactly the failure the pipeline's own comment warns against: caps
+  "tunable from data rather than from opinion".
+
+  The tuner also states an ambiguity rather than resolving it: from the ledger
+  alone, a step that USED the cap and a step that was CUT OFF by it look
+  identical. Telling them apart needs the step's error field, which is a richer
+  read than a cap proposal should require, and guessing would be the manufactured
+  answer this whole item is written against.
+
+  ── HANDED BACK TO LANE A ───────────────────────────────────────────────────────
+
+  1. THE CAP RE-TUNE IS NOT A LAPTOP TASK. It needs a machine that has answered
+     questions — the desktop with the agent stack, or company-side. The mechanism,
+     its threshold and its report are in place; someone runs
+     `python -m common.cap_tuning`-shaped code there and edits the constant in a
+     commit that can be read. Nothing here should be re-attempted on this machine.
+  2. THE TRIPLE-PERSISTENCE RULING needs confirming: does the ANSWER text belong
+     in the local ledger? R3 ruled the question does. The context summary's refusal
+     to carry retrieved values is NOT part of that question — that one is settled
+     and guarded.
+  3. THE LLM JUDGE needs a machine with a provider. LlmJudge is a declared seam
+     with the prompt pair's home marked; implementing it is a build on a machine
+     where `graph_qa.providers` resolves, not a design question.
+  4. NO LEDGER ROWS AND NO ui-tests CASE for the Agent runs tab. It adds no .tsx,
+     so the component ledger is untouched — which is why R8 is the ONE item in this
+     lane that will not conflict with the other three at merge. AdminConfigRoute is
+     unbound to a registry module, so there is no suite for a case to join; same
+     gap the O50 notes record for the intake page, and the same ledger-policy fix.
+  5. R8 IS THE LAST QUEUE ITEM AND THE HANDOFF FILE STILL CANNOT RETIRE.
+     `handoff.py --check docs/lane-b-handoff.md` will report O26 as `todo` (a live,
+     undischarged SME HOLD — not built, and not buildable until it is discharged)
+     and O63 / O50 / Z6 as `in_progress`, which they read as only because their
+     `done` is on unmerged wip branches. The file retires when Lane A has merged
+     those three and ruled on O26.
+
+  VERIFIED on this laptop (J18): full pytest suite, ruff check + ruff format,
+  tsc -b --force, oxlint 0, vite build, 367 vitest passing (32 files — R8 adds no
+  web tests; its web half is one tab and one optional prop), bundle:check 97.5% of
+  ceiling, test:coverage 14.79/78.57/57.8 against floors 9.8/70/50. The three new
+  Python suites are 38 tests. No live agent stack and no live graph read beyond the
+  two count queries above.
+
+  EXPECTED RED, per the Lane B handoff:
+  test_committed_roadmap_page_matches_its_sources fails on this commit — a close
+  writes notes and Lane B does not render (Y5's tolerance covers a CLAIM, not a
+  close). Lane A renders once at merge.

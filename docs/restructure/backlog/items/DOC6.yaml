@@ -1,0 +1,38 @@
+id: DOC6
+epic: doc-infrastructure
+title: "Write the bundled demo's verb sequence down - which commands, in which order, against which database - in internal/repo-README.md"
+type: chore
+module: docs
+phase: 10
+agent: main
+model: haiku
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- internal/repo-README.md
+- docs/restructure/backlog/items/Z7.yaml
+- docs/restructure/backlog/items/Z8.yaml
+acceptance: |
+  The bundled demo's verb sequence - which commands, in which order, against which
+  database - is written down nowhere a newcomer would find it. Reproducing Z8/Z7 live on a
+  fresh database meant reconstructing the chain out of item notes.
+
+  (a) internal/repo-README.md's runnable-pipeline section carries the demo sequence end to
+      end: the commands in order, the database each runs against, and how the database is
+      created.
+  (b) The sequence is RUN as written, on a fresh database, before it is committed - a
+      transcribed-from-memory sequence is the thing this item exists to replace.
+  (c) It states its expected output at the end (the coverage counters and the deliberate gaps),
+      so a reader can tell a working run from a broken one.
+  (d) Because it is sample-reproducible, it doubles as the J18 evidence recipe: a later claim
+      can say 'this sequence on the bundled samples reproduces X' instead of naming a machine.
+notes: |
+  Minted 2026-09-07 from IDEAS.md Idea-260 (Lane B close report, laptop, 2026-09-05).
+
+  internal/repo-README.md is the right home rather than a new doc: CLAUDE.md already routes
+  readers there for the runnable pipeline, and a second location for the same thing is the
+  shape this repo's guards spend their time preventing.
+
+  Note the file is under internal/ and therefore outside the publish boundary - the sequence
+  names commands and a local database name, no connection coordinates.

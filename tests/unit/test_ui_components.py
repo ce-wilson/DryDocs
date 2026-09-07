@@ -398,10 +398,41 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     96 -> 97 at R19 (2026-09-06): ClarificationCard, BOUND to `ask` by directory
     evidence -- it lives under ask/ and serves exactly the one route that renders
     it. Both counts move by one.
+    97 -> 99 at Z6 (2026-09-06): RuntimeSpanMap and RuntimeSpanPanel, both UNBOUND,
+    bound stays 41. LocationMap's rule and not a new one: the Z5 directive is
+    "module first, pages second", so the map takes its access and its registry as
+    props and the Explorer tab is only its first consumer. The SPLIT between the
+    two is worth the second row rather than being one file -- the map renders and
+    the panel fetches, which is what lets the map be driven against fixtures with
+    no server, and every clause Z6 has to meet is a claim about what it renders.
+    99 -> 101 at O50 (2026-09-06): IntakeReviewQueue and ThreadDiff, both UNBOUND,
+    bound stays 41. Same reason as O47's pair above and not a new one -- `intake`
+    is not a registry module, so a binding would invent one. ThreadDiff is the
+    more interesting of the two: it did not arrive, it MOVED, out of IntakeRoute
+    and into its own file the moment it gained a second consumer. The admin
+    review panel has to show the delta exactly as the SME saw it (the plan's
+    VERBATIM discipline for this surface), and two copies of a renderer are two
+    things that can disagree about what was shown -- TrustLegend's rule, reached
+    by a different road. A move is invisible to the scan, which counts files on
+    disk, so it reads here as a plain +1 and this sentence is the only place the
+    difference is recorded.
+    101 -> 102 at O63 (2026-09-06): ServiceStatusStrip, UNBOUND, bound stays 41.
+    It has exactly one consumer today (the O12 admin page), which looks like
+    binding evidence and is not: it lives in components/ rather than under a
+    route directory, so there is no directory evidence, and LogEstatePanel --
+    the same shape, a panel on the same page from O68 -- is unbound for the same
+    reason. What it renders is also not admin's: lib/serviceProbe.ts is the one
+    implementation Ask's ladder reads too, so the SHARED thing here is the probe,
+    and that is a .ts outside this ledger's scan boundary.
+    102 -> 103 at O63 (2026-09-06): FailureLadder, BOUND to `ask` by directory
+    evidence -- it lives under ask/ and serves the one route that renders it,
+    which is ClarificationCard's rule applied unchanged. Both counts move by
+    one. Note the pair added by this item split on exactly the stated test:
+    the ladder has directory evidence and the strip does not.
     """
     comps = _ui()["components"]
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
-        41,
-        97,
+        42,
+        103,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"

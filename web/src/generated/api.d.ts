@@ -36,6 +36,23 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/data-centers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Data Centers */
+        get: operations["get_data_centers_data_centers_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/demo": {
         parameters: {
             query?: never;
@@ -79,6 +96,23 @@ export type paths = {
         };
         /** Get Export Manifest */
         get: operations["get_export_manifest_exports__export_id__manifest_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/graph-status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Graph Status */
+        get: operations["get_graph_status_graph_status_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -681,6 +715,49 @@ export type components = {
             markdown: string;
         };
         /**
+         * DataCenterOut
+         * @description One row of the data-center spelling registry (LOAD2), as the console reads
+         *     it for Z6's runtime map.
+         *
+         *     ``default_time`` and ``suffix`` are OPTIONAL BY RULE and not by accident: the
+         *     ``E####``-as-default-time reading comes from an internal standard whose own
+         *     open items include "confirm E is always Eastern", so a name that carries no
+         *     time segment registers exactly like one that does. They are declared here as
+         *     plain strings that may be empty for that reason — a null would suggest the
+         *     lookup failed, and nothing failed.
+         */
+        DataCenterOut: {
+            /** Code */
+            code: string;
+            /** Default Time */
+            default_time: string;
+            /** Name */
+            name: string;
+            /** Note */
+            note: string;
+            /** Sample */
+            sample: boolean;
+            /** Suffix */
+            suffix: string;
+        };
+        /**
+         * DataCentersOut
+         * @description GET /data-centers.
+         *
+         *     ``source`` names the venue the rows came from (J18): the machine-local
+         *     internal twin, or the publishable synthetic sample. A console that showed a
+         *     default time without saying which file it read would make a producer-side
+         *     demo look like a statement about production.
+         */
+        DataCentersOut: {
+            /** Data Centers */
+            data_centers: components["schemas"]["DataCenterOut"][];
+            /** Source */
+            source: string;
+            /** Updated */
+            updated: string;
+        };
+        /**
          * DraftReceiptOut
          * @description POST /mappings/overrides/draft and /mappings/app-code/draft (S4, ADR 0009
          *     rule 5). Drafting writes ROWS to the mapping.db buffer and hands back this
@@ -805,6 +882,37 @@ export type components = {
             params: {
                 [key: string]: unknown;
             };
+        };
+        /**
+         * GraphStatusOut
+         * @description GET /graph-status. Is the graph the console reads actually reachable, and
+         *     which database is it?
+         *
+         *     WHY A ROUTE AND NOT A QuerySpec, the same question /docs-verify answered and
+         *     the same answer: this takes NO parameters and the Cypher is chosen entirely
+         *     server-side (a bare ``RETURN 1``), which is the property ADR 0005 protects.
+         *     A spec would also be the wrong instrument — a spec run that fails tells you
+         *     the spec failed, and the whole point here is to separate "the graph is not
+         *     there" from "your question was bad".
+         *
+         *     ``database`` is the reviewed READ database, taken from ``SPEC_DATABASES``
+         *     rather than from ``Neo4jSettings.database`` (which is nullable and is the
+         *     driver's default, not the console's). If the reviewed set ever gains a
+         *     second name that is a deliberate edit, and this follows it.
+         *
+         *     ``detail`` carries the EXCEPTION CLASS when a probe fails - never the URI,
+         *     the user or anything from the settings. A page that can name the host it
+         *     could not reach is a page carrying a deployment coordinate (ADR 0020), and
+         *     the class name is what actually distinguishes an auth failure from a
+         *     refused connection.
+         */
+        GraphStatusOut: {
+            /** Database */
+            database: string;
+            /** Detail */
+            detail: string | null;
+            /** Reachable */
+            reachable: boolean;
         };
         /** HealthOut */
         HealthOut: {
@@ -1459,6 +1567,37 @@ export interface operations {
             };
         };
     };
+    get_data_centers_data_centers_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataCentersOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_demo_demo_get: {
         parameters: {
             query?: never;
@@ -1532,6 +1671,37 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_graph_status_graph_status_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GraphStatusOut"];
                 };
             };
             /** @description Validation Error */

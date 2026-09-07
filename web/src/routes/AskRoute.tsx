@@ -15,6 +15,7 @@ import {
   type Clarification,
 } from '../lib/askApi'
 import ClarificationCard from '../ask/ClarificationCard'
+import FailureLadder from '../ask/FailureLadder'
 import TaskGraphPane from '../ask/TaskGraphPane'
 import FileReport from '../ask/FileReport'
 import { agentBaseUrl, type Persona } from '../lib/auth'
@@ -384,11 +385,12 @@ function TurnCard({
         )}
       </ol>
 
-      {turn.error && (
-        <p className="mt-2 rounded border border-red/60 bg-red/10 px-2 py-1 text-xs text-brand-soft">
-          {turn.error}
-        </p>
-      )}
+      {/* O63: the single red line this replaces was true and nearly useless -
+          it could not tell an unstarted agent server from a misconfigured
+          provider, and only one of those is fixable by editing a file. The
+          error itself still renders first and verbatim; the ladder adds what
+          the console can simply go and ask. */}
+      {turn.error && <FailureLadder error={turn.error} />}
 
       {envelope && clarification && !turn.dismissed && (
         <ClarificationCard

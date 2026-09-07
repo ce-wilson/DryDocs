@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 
-import { createPublicApi } from '../lib/apiClient'
-import { diagnoseNetworkFailure, isUpstreamDown, upstreamDownMessage } from '../lib/reachability'
+import { probeHealth, type Readiness } from '../lib/serviceProbe'
+
+export { probeHealth }
+export type { Readiness }
 
 // WEB1 (d) — ONE readiness probe, at shell mount.
 //
@@ -20,32 +22,13 @@ import { diagnoseNetworkFailure, isUpstreamDown, upstreamDownMessage } from '../
 // absent behind it, so the message says what was OBSERVED instead of
 // asserting a cause.
 
-export type Readiness =
-  | { state: 'unchecked' }
-  | { state: 'checking' }
-  | { state: 'up' }
-  | { state: 'down'; message: string }
-
-export async function probeHealth(apiUrl: string, signal?: AbortSignal): Promise<Readiness> {
-  try {
-    const res = await createPublicApi(apiUrl).GET('/health', { signal })
-    if (res.response.ok) return { state: 'up' }
-    if (isUpstreamDown(res.response.status)) {
-      return { state: 'down', message: upstreamDownMessage(res.response.status, apiUrl) }
-    }
-    return { state: 'down', message: `the API answered ${res.response.status} on /health` }
-  } catch (err) {
-    if (signal?.aborted) return { state: 'unchecked' }
-    // The thrown message is already the diagnosis when the typed client's
-    // diagnosing fetch produced it; the direct call is the belt-and-braces path
-    // for a failure that arrived some other way.
-    const message = err instanceof Error ? err.message : String(err)
-    if (message.includes('nothing answered') || message.includes('not answering')) {
-      return { state: 'down', message }
-    }
-    return { state: 'down', message: (await diagnoseNetworkFailure(apiUrl)).message }
-  }
-}
+// O63: `Readiness` and `probeHealth` MOVED to lib/serviceProbe.ts and are
+// re-exported above so this module's callers did not have to move. The reason is
+// the "one implementation, two surfaces" clause taken seriously: the service
+// probe needs exactly this API check, and a second copy of it is how the banner
+// and the strip would come to disagree about whether drydocs-api is up. It went
+// DOWN a layer rather than the probe reaching up one - data/ already depends on
+// lib/, and lib/ importing back out of data/ would invert that.
 
 /** The shell's probe. One call at mount; re-probes when the base URL changes. */
 export function useReadiness(apiUrl: string): Readiness {

@@ -1,0 +1,34 @@
+id: WEB17
+epic: web-console
+title: "Two web build follow-ups - the strict tsconfig type-checks neither config file, and the coverage report needs a publishing decision"
+type: chore
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- web/tsconfig.json
+- web/.gitignore
+- docs/restructure/backlog/items/WEB4.yaml
+- docs/restructure/backlog/items/WEB13.yaml
+acceptance: |
+  Two web build follow-ups from the Lane B stack, both one-liners with a decision attached.
+
+  (a) WEB4's strict tsconfig excludes the playwright and vitest config files from include, so
+      they are type-checked by nothing. Widening include is one line; do it, and fix whatever
+      the newly type-checked files then report - that fallout, not the one line, is the work.
+  (b) WEB13's test:coverage writes web/coverage/ and nothing ignored it: 184 report files rode
+      into the WEB13 feat commit and were untracked at the merge with a coverage line added to
+      web/.gitignore (aa7e5836). Nothing is left to DO here unless the coverage HTML should be
+      published somewhere - which is the decision this clause exists to force. Record the answer
+      (published where, or deliberately not published) and close the clause either way.
+notes: |
+  Minted 2026-09-07 from IDEAS.md Idea-266 (Lane B close reports, laptop, 2026-09-05, and
+  the Lane A merge). The WEB4 close note explicitly left (a) to Lane A to mint or drop; this
+  groom mints it.
+
+  Kept as one item rather than two because both are one-line edits in the same build config and
+  neither is worth a card of its own; the two clauses close independently.
