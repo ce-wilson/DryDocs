@@ -32,9 +32,19 @@ twice before this case was written:
 - `docs/history/LoadPlanV3.md` keys `:Condition` on `(folder_id, name, cyclic_type)` "because cyclic
   jobs only depend within the same cyclic type".
 - The canonical recursive dependency SQL joined on `CYCLIC_IN = CYCLIC_OUT`. The predicate is disabled
-  in `drydocs/loaders/sql/controlm_dependencies_recursive.sql` (the `intentionally disabled` line, guarded
-  by `tests/unit/test_controlm_cypher.py::test_recursive_sql_cyclic_type_disabled`). This case is why it
-  must stay disabled.
+  in `drydocs/loaders/sql/controlm_dependencies_recursive.sql`, and
+  `tests/unit/test_controlm_cypher.py::test_recursive_sql_cyclic_type_disabled` holds it that way. This
+  case is why it must stay disabled.
+
+  **LOAD5 (2026-09-07) is what made that last sentence true.** Until then the guard asserted only that
+  the phrase `intentionally disabled` appeared in the raw file — a comment-presence check, not a
+  contract on the join. Both failure directions were reproduced before it was changed: reword the marker
+  with the join still off and it went red; restore the predicate with the phrase left anywhere in the
+  file and it stayed green. The guard now asserts the COMPARISON is absent from `_sql_code(...)` (`--`
+  tails stripped, J66), with the raw file as a positive control so the absence is demonstrably the
+  stripper's work and not a vacuous scan; the marker survives as a presence-only documentation pin. The
+  pattern matches the join rather than the bare token, because `JOB_CYCLIC_IN` and `JOB_CYCLIC_OUT` are
+  live SELECT aliases in the same file — a bare-token assertion would fail against correct code.
 
 ## 3. The required behavior
 
