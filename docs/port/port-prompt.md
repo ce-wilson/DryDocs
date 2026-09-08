@@ -2890,7 +2890,8 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   canonical-company rows, expected EMPTY, and every path that survives is either written
   into the roll's deferral list by name or applied. Third, `[VERIFIED-PRODUCER]` the
   lineage revert re-found T24 (2026-09-01): `drydocs_lineage/writer.py` and
-  `extractors/controlm_inventory.py` were ruled deferred behind the vocabulary migration,
+  `drydocs_lineage/extractors/controlm_inventory.py` were ruled deferred behind the
+  vocabulary migration,
   and `model.py`'s two gates — the `scheduler_*` ids and the kind constant — are two rolls
   old (2026-08-21 and 2026-08-25) and live in the same deferred file. Carve-out G's note
   that I would close the lineage failures contradicted T24; carve-out I corrected it back.
