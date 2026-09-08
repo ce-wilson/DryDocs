@@ -118,5 +118,13 @@ defect", on a guess, without reading the parent commit — and had to withdraw i
 stale read, one unread commit, the same rule, opposite errors. The cost is symmetrical and worth
 naming: a stale instrument retracts true findings, and an unchecked one manufactures false ones.
 
+**And it is not new — the port ledger has carried a single-case version of it since 2026-08-06.**
+The FETCH RESOLVED note above `## Last completed port` in `docs/port/port-prompt.md` exists
+because a failed producer fetch "degraded silently into answering from a cached `5f79d145`,
+**which reads exactly like a current answer**", and it already carries the STOP rule for that one
+instrument: read at producer HEAD, never fall back to a cached ref. That is this mode, written
+for fetch alone, two weeks before it cost a retracted finding on a source file. What changes here
+is only the scope — every instrument has a vintage, not just the one that goes over the network.
+
 No guard is proposed. A test cannot know which revision of a file the reader had open, and the
 three-mode paragraph above already says why reaching for one here would be the disease.
