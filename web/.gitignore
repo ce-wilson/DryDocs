@@ -24,4 +24,15 @@ dist-ssr
 *.sw?
 
 # vitest coverage report (WEB13 test:coverage writes it; the floor is the artifact, not the HTML)
+#
+# WEB17 (b) — DELIBERATELY NOT PUBLISHED, and this line is the record so the
+# question is not re-opened by the next person who notices 184 untracked files.
+# The number CI enforces is the statements floor in the `test:coverage` script,
+# and a red floor prints its own numbers in the log; the HTML only answers WHICH
+# LINES, which you get faster by running `npm run test:coverage` locally than by
+# downloading an artifact. Contrast the Playwright report, which IS uploaded (on
+# failure only): a browser failure is not reproducible from the log, so its
+# artifact buys something this one does not. Publishing this would mean a Pages
+# surface or a badge — a new outward-facing render, with a classification to
+# decide, that nothing currently consumes.
 coverage
