@@ -7,7 +7,7 @@ phase: 8
 agent: main
 model: fable
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - .claude/skills/lane-handoff/scripts/overlap_prototype.py
@@ -57,3 +57,23 @@ notes: |
 
   PLAN6 (Idea-264) is the sibling gap in the same check, kept separate because it is a
   different missing signal (venue, not overlap) and either can land first.
+
+  DONE 2026-09-08 (desktop, Lane A). (b) RULED by the user, 2026-09-08: exclude provenance
+  by convention - inputs under docs/reviews/ are the review that spawned an item, read-only,
+  and are skipped by the overlap check; no outputs: field joins the v3 schema. The
+  convention is one named constant, PROVENANCE_PREFIXES, in handoff.py, pinned by a test.
+  (a) input_overlaps / covers / format_overlap in handoff.py: every queued item's inputs
+  against every --other-queue item's inputs, normalized and slash-stripped, symmetric prefix
+  rule; one row per collision naming both items, the shared prefix and whose input was the
+  coarse one (or "both name" for the same path). --suggest takes --other-queue and adds an O
+  mark plus the rows; generate carries the rows as an overlap FLAG (needs --allow-flagged,
+  the author's call, as Lane B's knowing R12/O68 take was) and in the Notes column. (c) the
+  front matter gains an additive other_queue: line; --check re-runs the comparison over the
+  items still open on both sides, and a file without the line prints that it predates PLAN5
+  and skips that part (docs/lane-b-handoff.md and docs/lane-a-handoff.md both do, this
+  burst). (d) tests/unit/test_lane_handoff.py: coarse-prefix case both ways, same path after
+  normalization, provenance exclusion, unknown/self/disjoint ids, check_queue flag + render
+  line, --check with and without other_queue, and the prototype's retirement.
+  overlap_prototype.py deleted; SKILL.md names the check and the ruling. Smoke: --suggest
+  --other-queue R18,AGENT1,API4,WEB18,V9 against the live Ready strip marks V4, V5, V9, V11,
+  R11, R13, O48, R17 and G106 with O, each row naming the coarse side.
