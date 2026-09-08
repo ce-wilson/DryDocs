@@ -1,0 +1,16 @@
+id: DOC7
+epic: doc-infrastructure
+title: "The J31 wip-branch rule says when the LOCAL branch is deleted, in CLAUDE.md and in the lane-handoff close"
+type: chore
+module: docs
+phase: 10
+agent: main
+model: haiku
+priority: p3
+status: todo
+depends_on: []
+inputs: []
+acceptance: |
+  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).
+notes: |
+  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).

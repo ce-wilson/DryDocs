@@ -1,0 +1,16 @@
+id: DOC9
+epic: doc-infrastructure
+title: "The committed docs/design/*.html renders get a committed-vs-source guard on the roadmap guard's shape, comparing renderer bytes rather than a normalized form"
+type: task
+module: docs
+phase: 10
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs: []
+acceptance: |
+  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).
+notes: |
+  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).

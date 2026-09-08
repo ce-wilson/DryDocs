@@ -1,0 +1,16 @@
+id: CFG6
+epic: release-infrastructure
+title: "Every behaviour switch in config/dev-environment.yaml has a non-test consumer or a stated reason it has none, enforced by an allow-list guard that reads code and not prose"
+type: task
+module: config
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs: []
+acceptance: |
+  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).
+notes: |
+  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).

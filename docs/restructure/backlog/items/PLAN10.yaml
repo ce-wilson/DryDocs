@@ -1,0 +1,16 @@
+id: PLAN10
+epic: project-board
+title: "render_gates.py emits a row for a self-declared gate prompt that has no accounting log entry, so a signed gate whose record never crossed a port is visible instead of silently skipped"
+type: bug
+module: drydocs-plan
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs: []
+acceptance: |
+  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).
+notes: |
+  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).

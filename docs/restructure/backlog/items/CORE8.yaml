@@ -1,0 +1,16 @@
+id: CORE8
+epic: source-column-mappings
+title: "The source registry names the application that PRODUCED a dataset, not only the subject domain its origin label carries - the carrier-of-carrier chain ruled via the gate"
+type: task
+module: drydocs-core
+phase: 11
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on: []
+inputs: []
+acceptance: |
+  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).
+notes: |
+  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).

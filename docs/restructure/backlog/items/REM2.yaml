@@ -1,0 +1,16 @@
+id: REM2
+epic: sme-runbooks
+title: "A synthetic Control-M folder-set export ships beside the other samples so the remediation runbook's one verb can be demonstrated in a clone"
+type: task
+module: drydocs-remediation
+phase: 10
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs: []
+acceptance: |
+  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).
+notes: |
+  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).

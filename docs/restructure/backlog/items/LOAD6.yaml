@@ -1,0 +1,16 @@
+id: LOAD6
+epic: server-location
+title: "One ACTIVE data center per load-balancer alias: what makes a data center active for a job is ruled via the server-location gate before the Z4 evidence is wired into the server-resolution pass"
+type: task
+module: drydocs-load
+phase: 6
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on: []
+inputs: []
+acceptance: |
+  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).
+notes: |
+  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).

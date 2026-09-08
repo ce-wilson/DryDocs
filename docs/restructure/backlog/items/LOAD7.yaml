@@ -1,0 +1,16 @@
+id: LOAD7
+epic: seal-attribution
+title: "test_pat_projection stops skipping on a tracked sample fixture - a missing PAT product-mapping sample fails the test loudly"
+type: bug
+module: drydocs-load
+phase: 9
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs: []
+acceptance: |
+  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).
+notes: |
+  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).

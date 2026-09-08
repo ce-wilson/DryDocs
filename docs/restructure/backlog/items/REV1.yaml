@@ -1,0 +1,16 @@
+id: REV1
+epic: drydocs-review-backflow
+title: "A script that prints a verdict prints its J63 provenance triple first - a review_provenance helper, the style rule, and a source-scan guard"
+type: task
+module: drydocs-review
+phase: 7
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs: []
+acceptance: |
+  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).
+notes: |
+  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).

@@ -1,0 +1,16 @@
+id: DOC8
+epic: release-infrastructure
+title: "The 3.14 advisory leg's warnings are read once: each class is fixed or filtered by name with its reason, and the 3.12 baseline with it"
+type: chore
+module: docs
+phase: 8
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs: []
+acceptance: |
+  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).
+notes: |
+  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).

@@ -1,0 +1,16 @@
+id: PLAN11
+epic: project-board
+title: "Every unsigned gate prompt is cited by at least one not-done item's gates list, guarded against the backlog store and the gate-log parser"
+type: task
+module: drydocs-plan
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs: []
+acceptance: |
+  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).
+notes: |
+  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).

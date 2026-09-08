@@ -1,0 +1,16 @@
+id: CORE9
+epic: release-infrastructure
+title: "Delete the five skip guards the rewritten skip-guard policy no longer asks for, so every remaining skip is one the policy would refuse to drop"
+type: chore
+module: drydocs-core
+phase: 8
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs: []
+acceptance: |
+  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).
+notes: |
+  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).
