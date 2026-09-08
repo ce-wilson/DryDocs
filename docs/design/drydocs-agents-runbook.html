@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Runbook — operate drydocs-agents: the ADK service behind Ask</title>
+<style>
+:root { color-scheme: light dark; --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+@media (prefers-color-scheme: dark) { :root { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; } }
+:root[data-theme="dark"] { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; }
+:root[data-theme="light"] { --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+* { box-sizing: border-box; }
+body { font: 15px/1.6 "Segoe UI", system-ui, Arial, sans-serif; color: var(--ink); background: var(--bg); margin: 0; }
+main { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+h1 { font-size: 28px; margin: 0 0 6px; letter-spacing:-0.3px; }
+h2 { font-size: 20px; margin: 34px 0 10px; padding-bottom:5px; border-bottom: 2px solid var(--ink); }
+h3 { font-size: 16px; margin: 22px 0 8px; }
+h4,h5,h6 { font-size: 14px; margin: 16px 0 6px; }
+p { margin: 10px 0; } strong { font-weight: 700; }
+a { color: var(--link); } a:hover { text-decoration: underline; }
+code { font-family: "Cascadia Mono","Consolas",monospace; font-size: 0.88em; background: var(--faint); padding: 1px 4px; border-radius: 3px; }
+pre { font-family: "Cascadia Mono","Consolas",monospace; font-size: 12.5px; line-height:1.45; border:1px solid var(--line); background: var(--faint); padding: 12px 14px; border-radius: 6px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 14px 0; font-size: 13.5px; display:block; overflow-x:auto; }
+th,td { border:1px solid var(--line); padding: 6px 9px; text-align:left; vertical-align: top; }
+th { background: var(--faint); font-weight:700; }
+blockquote { margin: 14px 0; padding: 2px 16px; border-left: 4px solid var(--line); color: var(--mid); }
+ul,ol { margin: 10px 0; padding-left: 26px; } li { margin: 4px 0; }
+hr { border:none; border-top:1px solid var(--line); margin: 26px 0; }
+:target { scroll-margin-top: 12px; } :target > :first-child, h2:target, h3:target { outline: 2px solid var(--link); outline-offset: 4px; }
+.dd-margin-tag, .dd-print-footer { display: none; }
+
+.dd-note-btn { border:1px solid var(--line); background:var(--bg); color:var(--mid); cursor:pointer; font-size:12px; line-height:1; padding:2px 6px; border-radius:5px; margin-right:6px; }
+.dd-note-btn:hover { color:var(--link); border-color:var(--link); }
+.dd-note-box { margin:6px 0 10px; }
+.dd-note-box textarea { width:100%; min-height:56px; font:13px/1.4 "Segoe UI",system-ui,sans-serif; color:var(--ink); background:var(--faint); border:1px solid var(--line); border-radius:6px; padding:8px; resize:vertical; }
+.dd-annotated { box-shadow:-3px 0 0 var(--link); padding-left:8px; }
+.dd-fb-bar { position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:6px; align-items:stretch; background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:8px 12px; box-shadow:0 2px 10px rgba(0,0,0,.15); font-size:13px; z-index:50; }
+.dd-fb-row { display:flex; gap:8px; align-items:center; justify-content:space-between; }
+.dd-fb-bar button { cursor:pointer; border:1px solid var(--link); background:var(--link); color:#fff; border-radius:6px; padding:5px 10px; font-size:13px; }
+.dd-fb-bar .dd-badge { font-weight:700; }
+.dd-fb-file { cursor:pointer; font-size:11px; color:var(--mid); white-space:nowrap; }
+.dd-fb-file code { font-size:11px; }
+.dd-fb-file:hover code { color:var(--link); }
+.dd-toast { position:fixed; right:16px; bottom:64px; background:var(--ink); color:var(--bg); padding:8px 12px; border-radius:8px; font-size:13px; z-index:60; opacity:0; transition:opacity .2s; }
+.dd-toast.show { opacity:1; }
+.dd-sme-feedback ol li { margin: 6px 0; }
+@media print { .dd-note-btn, .dd-note-box, .dd-fb-bar, .dd-toast, .dd-sme-feedback, .dd-sme-divider { display:none !important; } }
+@page { size: Letter; margin: 0.6in 0.62in 0.55in 0.62in; }
+@media print {
+:root, :root[data-theme="dark"], :root[data-theme="light"] { color-scheme: light; --ink:#1a1a1a; --mid:#555; --line:#bdbdbd; --fill:#eee; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { font: 10.5px/1.45 "Segoe UI", system-ui, Arial, sans-serif; }
+main { max-width: 7.2in; margin: 0 auto; padding: 0 0 0 0.62in; position: relative; }
+h1 { font-size: 21px; margin: 0 0 2px; letter-spacing:-0.2px; }
+h2 { font-size: 14px; margin: 16px 0 8px; padding-bottom:4px; border-bottom: 2px solid var(--ink); text-transform: uppercase; letter-spacing: 0.6px; }
+h3 { font-size: 11.5px; margin: 13px 0 5px; padding-bottom:2px; border-bottom:1px solid var(--line); }
+h4,h5,h6 { font-size: 10.5px; margin: 9px 0 4px; }
+p { margin: 6px 0; }
+a { color: inherit; text-decoration: underline; }
+code { font-size: 9.2px; padding: 0 2px; border-radius: 2px; }
+table { display: table; width:100%; margin: 7px 0; font-size: 9.1px; overflow-x: visible; }
+th, td { padding: 3px 5px; }
+th { background: var(--fill); }
+td code, th code { background: transparent; padding: 0; }
+pre { font-size: 8.4px; line-height: 1.35; padding: 7px 9px; margin: 7px 0; white-space: pre; overflow: hidden; border-radius: 3px; }
+pre.sql { background:#fbfbfb; }
+blockquote { margin: 7px 0; padding: 2px 10px; border-left: 3px solid var(--line); break-inside: avoid; }
+ul,ol { margin: 6px 0 6px 16px; padding: 0; } li { margin: 3px 0; }
+hr { margin: 10px 0; }
+h2, h3, table, pre { break-inside: avoid; }
+
+/* L6 paper HITL: each anchored block sits in the left gutter (main's own padding-left,
+   reserved above) so a printed page carries the anchor id beside its section — no @page
+   margin-box support required, so headless Chromium print-to-pdf renders it reliably. */
+h1, h2, h3, h4, h5, h6, p, table, pre, ul, ol, blockquote { position: relative; }
+.dd-margin-tag {
+  display: block; position: absolute; left: -0.6in; top: 0.1em; width: 0.54in;
+  font: 6.2px/1.15 "Cascadia Mono","Consolas",monospace; text-align: right;
+  color: var(--mid); letter-spacing: 0.1px; word-break: break-word;
+}
+/* Rev/commit footer: `position: fixed` repeats on every printed page in Chromium's
+   headless print-to-pdf (the standard running-footer technique) without needing CSS
+   Paged-Media margin-box content(), which Chromium supports only partially. */
+.dd-print-footer {
+  display: block; position: fixed; left: 0.62in; right: 0.62in; bottom: 0.12in;
+  font-size: 8px; color: var(--mid); text-align: center;
+  border-top: 1px solid var(--line); padding-top: 3px;
+}
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Runbook — operate <code>drydocs-agents</code>: the ADK service behind Ask</h1>
+<ul id="front-matter"><span class="dd-margin-tag" aria-hidden="true">front-matter</span><li><strong>Module:</strong> drydocs-agents — this runbook IS the module runbook for drydocs-agents (V1 coverage rule). It covers the whole operate surface: the module&#x27;s own venv, the service, the console wiring, the read-only contract, and a smoke check per registered app.</li><li><strong>Status:</strong> DESCRIPTIVE — documents the working procedure. <strong>Rev 1, 2026-09-08</strong>, authored at commit <code>adecd387</code>. Every version, command and output below was RUN on the <strong>laptop</strong> (<code>NewThinkpad</code>, <code>agents/.venv</code>, Neo4j <code>neo4jtest</code>) and is transcribed from what came back, not read off the source. Where a step was NOT run here, it says so and says why (J18: a live claim names its venue, because the two machines hold independent graphs and independent venvs).</li><li><strong>Classification:</strong> Internal-Public (mechanism only — every credential below is named and none is quoted; no graph content, no model output, no real identity)</li><li><strong>Audience:</strong> anyone asked to start, check or debug the agent service behind the console&#x27;s <strong>Ask</strong> page — including the person who has just been told &quot;Ask says failed to fetch&quot; and does not yet know which of four processes is down</li><li><strong>Companion:</strong> <a href="../../agents/README.md"><code>agents/README.md</code></a> (the module&#x27;s own orientation and app table), <a href="../../agents/graph_qa/README.md"><code>agents/graph_qa/README.md</code></a> (<strong>the answer-envelope contract, and it wins on conflict</strong> — this page is procedure, not a second specification), <a href="../decisions/0007-agentic-qa-architecture.md">ADR 0007</a> (the tiering, the read-only ruling and the telemetry sinks), and <a href="drydocs-web-console-runbook.md"><code>docs/design/drydocs-web-console-runbook.md</code></a> (the console this service sits behind).</li></ul>
+<h2 id="purpose-scope"><span class="dd-margin-tag" aria-hidden="true">purpose-scope</span>Purpose &amp; scope</h2>
+<p><strong>Purpose.</strong> Operate the ADK service that answers questions on the console&#x27;s Ask page — and, more often, work out which of the four processes in that chain is actually down.</p>
+<h3>The chain, because most of this runbook is about locating a failure in it</h3>
+<pre><code>browser  -&gt;  console (Vite / the deployed page)
+             |  /api/*    -&gt; drydocs-api        (port 8001)  -&gt; Neo4j
+             |  /agent/*  -&gt; THIS service       (port 8000)  -&gt; Neo4j
+                                                             -&gt; the LLM provider</code></pre>
+<p>Four processes, one page. The Ask surface can fail because any of them is down, and three of those failures used to print the same red line. That is the reason the console has a staged failure ladder rather than an error string, and the reason this runbook leads with <em>verify</em> rather than <em>startup</em>.</p>
+<p><strong>In scope.</strong> The <code>agents/</code> module: its own virtualenv, the four registered ADK apps, the service launcher, the console wiring, the read-only contract the agent&#x27;s Cypher runs under, and the smoke checks that separate &quot;the service is up&quot; from &quot;the service can answer&quot;.</p>
+<p><strong>Out of scope.</strong> Neo4j provisioning and the load chain (that is <a href="drydocs-startup-refresh-runbook.md"><code>drydocs-startup-refresh-runbook.md</code></a> and <a href="drydocs-load-runbook.md"><code>drydocs-load-runbook.md</code></a>); the console itself (<a href="drydocs-web-console-runbook.md"><code>drydocs-web-console-runbook.md</code></a>); <code>drydocs-api</code> (<a href="drydocs-api-runbook.md"><code>drydocs-api-runbook.md</code></a>). <strong>The provider account and its spend</strong> — this runbook names the environment variables and never a value, and it does not tell you which model to buy. And the ANSWER: whether a given reply is <em>correct</em> is not an operational question, and nothing here grades one.</p>
+<h2 id="prerequisites"><span class="dd-margin-tag" aria-hidden="true">prerequisites</span>Prerequisites</h2>
+<p><strong>1. The module has its OWN virtualenv, and that is a design decision rather than an accident.</strong> <code>agents/</code> is not part of the poetry package: it has its own interpreter so the agent runtime can be profiled and leak-tested in isolation, and so the ADK&#x27;s dependency tree never constrains the loaders&#x27;. Two consequences bite in practice — <code>poetry run</code> cannot start this service, and a <code>pip list</code> in the repo venv tells you nothing about it.</p>
+<pre class="powershell"><code>cd agents
+python -m venv .venv
+.venv\Scripts\pip install -r requirements.txt</code></pre>
+<blockquote><p><strong>Install gotcha (Windows).</strong> Recent <code>litellm</code> sdists want a Rust toolchain. Install wheels only: <code>.venv\Scripts\pip install --only-binary :all: litellm</code>.</p></blockquote>
+<p><strong>2. What is actually installed here.</strong> Measured on the laptop venv, 2026-09-08 — these are transcribed from <code>importlib.metadata.version</code>, not from <code>requirements.txt</code>:</p>
+<table><thead><tr><th>Package</th><th>Declared in <code>requirements.txt</code></th><th>Measured here</th></tr></thead><tbody><tr><td>python</td><td>—</td><td>3.12.10</td></tr><tr><td><code>google-adk</code></td><td><code>&gt;=2,&lt;3</code></td><td><strong>2.3.0</strong></td></tr><tr><td><code>neo4j</code></td><td><code>&gt;=6.2,&lt;7</code></td><td>6.2.0</td></tr><tr><td><code>python-dotenv</code></td><td><code>&gt;=1.2,&lt;2</code></td><td>1.2.2</td></tr><tr><td><code>litellm</code></td><td><code>&gt;=1.97,&lt;2</code></td><td><strong>1.91.4</strong></td></tr><tr><td><code>pyyaml</code></td><td><code>&gt;=6.0,&lt;7</code></td><td>6.0.3</td></tr></tbody></table>
+<p>Two rows disagree with the declaration and both are worth knowing before you debug anything. <code>litellm</code> is BELOW its declared floor, because the Windows install gotcha above pins the known-good wheel; and <code>google-adk</code> 2.3.0 is what a bare resolve produces today, which is <strong>the version the launcher does not start on</strong> — see <em>Troubleshooting</em>, first entry, before you conclude your install is broken.</p>
+<p><strong>3. Credentials, by NAME only.</strong> Two files are read, <code>agents/.env</code> first and the repo root <code>.env</code> as fallback (that precedence is G131&#x27;s, and it is why a probe that reads only one of them can report a key unset on a machine where a real turn succeeds):</p>
+<table><thead><tr><th>Variable</th><th>Read by</th><th>Needed for</th></tr></thead><tbody><tr><td><code>GRAPHQA_PROVIDER</code></td><td><code>agents/graph_qa/providers.py</code></td><td><code>anthropic</code> (local/producer) or <code>azure</code> (company) — the R1 ruling, and the adapter refuses anything else</td></tr><tr><td><code>GRAPHQA_MODEL</code></td><td><code>agents/graph_qa/providers.py</code></td><td>the model id. <strong>No default, on purpose</strong> — model ids live in config, never code</td></tr><tr><td><code>ANTHROPIC_API_KEY</code></td><td>provider adapter</td><td>the <code>anthropic</code> provider</td></tr><tr><td><code>AZURE_API_KEY</code> / <code>AZURE_API_BASE</code></td><td>provider adapter</td><td>the <code>azure</code> provider</td></tr><tr><td><code>NEO4J_URI</code> / <code>NEO4J_USER</code> / <code>NEO4J_PASSWORD</code></td><td><code>agents/common/neo4j_tool.py</code></td><td>every app that reads the graph</td></tr><tr><td><code>DRYDOCS_AGENT_REG_KEY</code>, <code>DRYDOCS_API_URL</code></td><td><code>agents/common/ephemeral_client.py</code></td><td>registering executed Cypher as an ephemeral spec (R4) — without them an answer still works and its steps simply carry no <code>explore_ref</code></td></tr><tr><td><code>DRYDOCS_LOGDIR</code></td><td><code>drydocs_core.run_log</code></td><td>where the telemetry lands. Optional: it keeps a default, unlike <code>DRYDOCS_DATA_ROOT</code></td></tr></tbody></table>
+<p><strong>4. Neo4j reachable from THIS interpreter.</strong> Not from the poetry env — the agents venv has its own driver major (6.x against the repo&#x27;s 5.x). The one-line check is in <em>Verify</em>.</p>
+<h2 id="startup"><span class="dd-margin-tag" aria-hidden="true">startup</span>Startup</h2>
+<p><strong>Step 1 — start the service.</strong></p>
+<pre class="powershell"><code>cd agents
+.venv\Scripts\python serve.py            # defaults: --host 127.0.0.1 --port 8000</code></pre>
+<p><code>serve.py</code> is the ruled entry point rather than <code>adk api_server</code>, and it is not a convenience wrapper. It does two things the vendor command does not:</p>
+<ul><li><strong>R14 app discovery.</strong> <code>adk api_server</code> lists every non-hidden subdirectory of <code>agents/</code> as an app, so the shared-tools package <code>common/</code> appears beside the four real ones. <code>serve.py</code> hands the app factory a loader that lists a directory only when it holds an <code>agent.py</code>.</li><li><strong>R23 control redaction.</strong> ADK persists every part of a user message to its session store as given. <code>serve.py</code> wraps the session service so the control part is redacted on the way to disk, and it <strong>refuses to start</strong> if that seam is missing rather than serving unredacted.</li></ul>
+<p><em>Success looks like:</em> uvicorn logging <code>Uvicorn running on http://127.0.0.1:8000</code>. <strong>If it exits with a <code>ModuleNotFoundError</code> instead, go to Troubleshooting — that is a known break on <code>google-adk</code> 2.3.0 and not a mistake you made.</strong></p>
+<p><strong>Step 2 — wire the console.</strong> Nothing to set. The console reaches this service as <code>/agent/*</code> <strong>on its own origin</strong>, through the same reverse proxy that serves the page — Vite&#x27;s in dev, the Compose stack&#x27;s in deployment. The prefix comes from <a href="../../web/delivery.json"><code>web/delivery.json</code></a>:</p>
+<pre class="json"><code>{ &quot;api&quot;: { &quot;prefix&quot;: &quot;/api&quot; }, &quot;agent&quot;: { &quot;prefix&quot;: &quot;/agent&quot; } }</code></pre>
+<blockquote><p><strong>A stale instruction you may still find:</strong> older notes (and V9&#x27;s own acceptance text) say to set <code>VITE_ADK_URL</code> and to start the server with <code>--allow_origins http://localhost:5173</code>. <strong>Both are retired</strong> (ADR 0020, WEB10). A production bundle carries no deployment coordinate at all, and because no browser request is cross-origin there is no allowlist to configure — a cross-origin caller is a deployment defect, not a case to configure for. <code>agents/README.md</code>&#x27;s Run block still shows the old flag; the flag is inert, not harmful.</p></blockquote>
+<p><strong>Step 3 — confirm the page can reach it.</strong> Start the console and drydocs-api per <a href="drydocs-web-console-runbook.md"><code>drydocs-web-console-runbook.md</code></a>, then open Ask.</p>
+<h2 id="refresh-ingest"><span class="dd-margin-tag" aria-hidden="true">refresh-ingest</span>Refresh / ingest</h2>
+<p><strong>N/A for the service — this module ingests nothing.</strong> It is a read path over a graph other modules load, and it holds no state of its own that a refresh would rebuild. What follows is the maintenance that <em>does</em> recur here, because &quot;nothing to ingest&quot; is not the same as &quot;nothing to keep current&quot;.</p>
+<p><strong>The session store grows.</strong> ADK persists sessions to <code>agents/graph_qa/.adk/session.db</code>. It is not swept, and it is the file R13 is about; it is also where the R23 redaction proves itself, so do not delete it to &quot;clean up&quot; without knowing that a redaction check reads it.</p>
+<p><strong>The telemetry files are the durable record.</strong> In <code>DRYDOCS_LOGDIR</code>:</p>
+<table><thead><tr><th>File</th><th>Kind</th><th>Retention</th><th>What it is</th></tr></thead><tbody><tr><td><code>qa.graph_qa.&lt;YYYYmmdd&gt;.jsonl</code></td><td><code>qa</code></td><td>90 days</td><td>one line per LLM call, one per answered question. <strong>The only place a question&#x27;s full text lands</strong> — the <code>:AgentRun</code> graph node carries sha256 + length</td></tr><tr><td><code>qa-debug.graph_qa.&lt;YYYYmmdd&gt;.jsonl</code></td><td><code>qa-debug</code></td><td>7 days</td><td>the R18 decision trace. <strong>Written only when <code>config/log-kinds.yaml</code> declares the kind at <code>level: DEBUG</code></strong>, which the shipped declaration does not</td></tr></tbody></table>
+<p>Sweeping the <code>qa</code> file destroys the only record that turns a question hash back into words. That consequence is deliberate and stated in the kind&#x27;s declaration; it is not an oversight to be tidied.</p>
+<p><strong>After a graph reload,</strong> nothing here needs regenerating — the agent reads the live schema on every text2cypher call. What DOES change is the answer: a spec that returned rows yesterday returns zero today if the load did not land, and the console reports that honestly rather than hiding it. Diagnose it as a LOAD problem, in the load runbook.</p>
+<h2 id="verify"><span class="dd-margin-tag" aria-hidden="true">verify</span>Verify</h2>
+<p>Four checks, in the order that isolates a failure fastest — each answers a question the one before it cannot.</p>
+<p><strong>V1 — can this interpreter reach Neo4j?</strong> (No service needed.)</p>
+<pre class="powershell"><code>cd agents
+.venv\Scripts\python -c &quot;import sys; sys.path.insert(0,&#x27;.&#x27;); from common.neo4j_tool import graph_schema_detailed as g; s=g(); print(len(s[&#x27;labels&#x27;]), len(s[&#x27;relationshipTypes&#x27;]), len(s[&#x27;propertyKeys&#x27;]))&quot;</code></pre>
+<p>Expected: three counts. Run here 2026-09-08 (laptop, <code>neo4jtest</code>): <code>76 35 232</code>. <strong>Those numbers are this machine&#x27;s graph and are not a target</strong> — what passes is <em>three numbers instead of an exception</em>. A <code>ServiceUnavailable</code> or <code>AuthError</code> here is a Neo4j or <code>.env</code> problem and no amount of agent debugging will move it.</p>
+<p><strong>V2 — is the server up and serving the right apps?</strong></p>
+<pre class="powershell"><code>curl http://127.0.0.1:8000/list-apps</code></pre>
+<p>Expected, exactly four names:</p>
+<pre class="json"><code>[&quot;controlm_fix&quot;,&quot;core_ingest&quot;,&quot;graph_qa&quot;,&quot;graph_query&quot;]</code></pre>
+<p><strong>A fifth entry, <code>common</code>, means R14&#x27;s loader is not in effect</strong> — you are on the vendor path (see Troubleshooting). Harmless to answering, and a reliable signal that <code>serve.py</code> did not start.</p>
+<p><strong>V3 — can the agent reach a model?</strong> This is the second failure, and it is a different one from V2:</p>
+<pre class="powershell"><code>curl http://127.0.0.1:8000/drydocs-health</code></pre>
+<p>Expected when configured: <code>{&quot;configured&quot;: true, &quot;detail&quot;: null}</code>. When not: <code>{&quot;configured&quot;: false, &quot;detail&quot;: &quot;GRAPHQA_MODEL is not set (agents/.env) — model ids live in config, never code&quot;}</code>. The <code>detail</code> names a KEY and a FILE and never a value — a probe that leaked one would be worse than no probe. This endpoint is deliberately not <code>/health</code>: that one is ADK&#x27;s own and answers for the SERVER, which is the question V2 already asked.</p>
+<p><strong>V4 — a smoke check per app.</strong> <code>graph_query</code> is the one that needs no key and is therefore the honest first target: it proves browser → ADK → Neo4j with nothing else in the chain.</p>
+<pre class="powershell"><code># create a session, then run one turn
+curl -X POST http://127.0.0.1:8000/apps/graph_query/users/u1/sessions/s1 -H &quot;Content-Type: application/json&quot; -d &quot;{}&quot;
+curl -X POST http://127.0.0.1:8000/run -H &quot;Content-Type: application/json&quot; ^
+  -d &quot;{\&quot;appName\&quot;:\&quot;graph_query\&quot;,\&quot;userId\&quot;:\&quot;u1\&quot;,\&quot;sessionId\&quot;:\&quot;s1\&quot;,\&quot;newMessage\&quot;:{\&quot;role\&quot;:\&quot;user\&quot;,\&quot;parts\&quot;:[{\&quot;text\&quot;:\&quot;MATCH (n:BusinessApplication) RETURN count(n) AS apps\&quot;}]},\&quot;streaming\&quot;:false}&quot;</code></pre>
+<p>Expected output SHAPE — run here 2026-09-08 (laptop, <code>neo4jtest</code>), transcribed from the last event&#x27;s text part:</p>
+<pre class="json"><code>{
+  &quot;query&quot;: &quot;MATCH (n:BusinessApplication) RETURN count(n) AS apps&quot;,
+  &quot;status&quot;: &quot;success&quot;,
+  &quot;rowCount&quot;: 1,
+  &quot;keys&quot;: [&quot;apps&quot;],
+  &quot;records&quot;: [{ &quot;apps&quot;: 4 }]
+}</code></pre>
+<p>The <code>4</code> is this machine&#x27;s graph. <strong>The shape is the check</strong>: <code>status</code>, <code>rowCount</code>, <code>keys</code>, <code>records</code>. A <code>status</code> of anything but <code>success</code> carries the reason.</p>
+<table><thead><tr><th>App</th><th>Key needed</th><th>Smoke input</th><th>Expected shape</th></tr></thead><tbody><tr><td><code>graph_query</code></td><td>no</td><td>a read-only Cypher string (empty = the default component query)</td><td>the envelope above</td></tr><tr><td><code>graph_qa</code></td><td><strong>yes</strong></td><td>a free-text question</td><td>the ADR 0007 answer envelope: <code>status</code>, <code>run_id</code>, <code>tier</code>, <code>answer</code>, <code>steps[]</code> with per-step Cypher, <code>sources[]</code>, <code>metrics</code> — the contract is <code>agents/graph_qa/README.md</code> and it is the authority</td></tr><tr><td><code>core_ingest</code></td><td>yes (Gemini, legacy demo)</td><td>free text</td><td>an LLM reply; these two are demo agents and are not on the Ask path</td></tr><tr><td><code>controlm_fix</code></td><td>yes (Gemini, legacy demo)</td><td>free text</td><td>an LLM reply</td></tr></tbody></table>
+<p><strong>Only <code>graph_query</code> was executed here.</strong> The other three spend a provider call, and running someone&#x27;s key to produce a runbook example is not a decision this document makes for you. Their shapes above are the declared contracts, and <code>graph_qa</code>&#x27;s is the one under test in the repo suite.</p>
+<p><strong>V5 — the read-only contract, and why you do not have to take it on trust.</strong> The agent&#x27;s Cypher runs in <strong>READ access mode server-side</strong>, so Neo4j itself rejects a write; the string guard in the pre-flight is a fast fail, explicitly <em>not</em> the boundary (it cannot see <code>CALL apoc.*</code> writes). Row caps and a transaction timeout apply. <code>tests/integration/test_graph_qa_read_mode.py</code> proves it against a live database. The one component in this module that opens a WRITE session is the <code>:AgentRun</code> telemetry writer, which is a dedicated boundary that refuses any database but the ruled one.</p>
+<h2 id="rollback"><span class="dd-margin-tag" aria-hidden="true">rollback</span>Rollback</h2>
+<p><strong>Nothing this service does needs undoing, and that is a property rather than a convenience.</strong> It writes no ground truth (ADR 0007 decision 2, O20). Three things it <em>does</em> write, and what &quot;back to known-good&quot; means for each:</p>
+<table><thead><tr><th>What</th><th>Where</th><th>Reverting it</th></tr></thead><tbody><tr><td><code>:AgentRun</code> telemetry</td><td>the <code>drydocs</code> database, carrying <code>:Uncertain</code></td><td>One node per answered question, MERGEd on <code>run_id</code>. Deleting them is safe and affects no ground truth; nothing reads them but the admin frame</td></tr><tr><td>Ephemeral specs (R4)</td><td>drydocs-api, session-scoped</td><td>TTL-bounded and session-owned; they expire. Restarting drydocs-api drops them</td></tr><tr><td>The session store</td><td><code>agents/graph_qa/.adk/session.db</code></td><td>Deleting it loses conversation history and nothing else. See the note in <em>Refresh</em> first</td></tr></tbody></table>
+<p><strong>To roll the SERVICE back:</strong> stop it. There is no drain, no queue and no half-written state — a turn either completed and returned an envelope or it did not.</p>
+<p><strong>To roll the VENV back:</strong> delete <code>agents/.venv</code> and rebuild it from <code>requirements.txt</code>. That is the destructive last resort and its blast radius is exactly one directory; nothing outside <code>agents/</code> depends on it.</p>
+<h2 id="troubleshooting"><span class="dd-margin-tag" aria-hidden="true">troubleshooting</span>Troubleshooting</h2>
+<p><strong>Symptom — <code>serve.py</code> exits immediately with <code>ModuleNotFoundError: No module named &#x27;google.adk.cli.utils._nested_agent_loader&#x27;</code>.</strong></p>
+<p><em>Diagnosis.</em> Measured on this laptop, 2026-09-08, <code>google-adk</code> <strong>2.3.0</strong>: that module is gone. <code>google.adk.cli.utils.agent_loader</code> now offers <code>AgentLoader</code> and <code>BaseAgentLoader</code> only, and the nested loader R14 uses to hide <code>common/</code> is not among them. The declaration is <code>google-adk&gt;=2,&lt;3</code>, so a fresh resolve lands on 2.3.0 and the launcher does not start. The R23 redaction seam is a separate question and is <strong>fine</strong> — <code>fast_api.create_session_service_from_options</code> is still present at 2.3.0, so this is an app-discovery break and not a redaction break.</p>
+<p><em>Fix.</em> Not one this runbook can hand you: re-pointing R14 at whatever 2.3.0 offers is a code change with a design question inside it, and it is filed as a handback on V9. What you can do meanwhile is start the server on the vendor loader, accepting the cosmetic regression:</p>
+<pre class="powershell"><code>cd agents
+.venv\Scripts\python -c &quot;import sys; sys.path.insert(0,&#x27;.&#x27;); import uvicorn; from google.adk.cli.fast_api import get_fast_api_app; from google.adk.cli.utils.agent_loader import AgentLoader; uvicorn.run(get_fast_api_app(agents_dir=&#x27;.&#x27;, agent_loader=AgentLoader(&#x27;.&#x27;), web=False, host=&#x27;127.0.0.1&#x27;, port=8000), host=&#x27;127.0.0.1&#x27;, port=8000)&quot;</code></pre>
+<p><code>/list-apps</code> then answers <code>[&quot;common&quot;,&quot;controlm_fix&quot;,&quot;core_ingest&quot;,&quot;graph_qa&quot;,&quot;graph_query&quot;]</code> — verified here, and <code>common</code> in that list is precisely the defect R14 exists to prevent. <strong>This workaround also skips the R23 redaction</strong>, so do not run it against a console session whose token you care about.</p>
+<p><strong>Symptom — Ask says &quot;Failed to fetch&quot; and the console is otherwise green.</strong></p>
+<p><em>Diagnosis.</em> This is the incident the console&#x27;s failure ladder was built for: everything looked green because the fourth process was never started. Do not read the red line — read the ladder underneath it, which probes the services and then reinterprets the original error against what it found.</p>
+<p><em>Fix.</em> Work V2 then V3. The two states the ladder separates are &quot;the agent server is not running&quot; and &quot;the agent server is running and cannot reach a model&quot;, and they have different fixes.</p>
+<blockquote><p><strong>What the console does NOT do, corrected here because V9&#x27;s own acceptance says otherwise.</strong> The acceptance (written 2026-07-29) describes an ADK-unreachable fallback as a &quot;SYNTHESIZED demo trace + banner&quot;. <strong>That is not the behaviour today.</strong> An unreachable agent renders the O63 <strong>failure ladder</strong>; there is no demo trace and no fallback answer. The SYNTHESIZED banner is a real surface but a different one — it fires when an ANSWER&#x27;s sources are watermarked, and says so about the data rather than about the transport. Read as of commit <code>adecd387</code>; the acceptance predates O63.</p></blockquote>
+<p><strong>Symptom — an answer arrives but every step&#x27;s <code>explore_ref</code> is null.</strong></p>
+<p><em>Diagnosis.</em> The R4 registration surface is not configured — <code>DRYDOCS_AGENT_REG_KEY</code> or <code>DRYDOCS_API_URL</code> is unset, or drydocs-api is down. This is honest degradation by design: a registration failure never kills an answer.</p>
+<p><em>Fix.</em> Set both, and confirm drydocs-api answers. Open-in-Explorer and Export need them; the answer does not.</p>
+<p><strong>Symptom — <code>ProviderConfigError: GRAPHQA_MODEL is not set (agents/.env)</code> on a machine where the file plainly sets it.</strong></p>
+<p><em>Diagnosis.</em> Import order. <code>providers.py</code> merges only the repo-root <code>.env</code> at import; <code>agents/.env</code> is merged by <code>common/neo4j_tool</code> at ITS import. Anything that reaches the provider without going through the agent&#x27;s own import path reads a half-loaded environment. <code>serve.py</code>&#x27;s probe imports <code>common.neo4j_tool</code> first for exactly this reason.</p>
+<p><em>Fix.</em> If it is your own script, import <code>common.neo4j_tool</code> before <code>graph_qa.providers</code>. If it is the probe, it already does.</p>
+<p><strong>Symptom — the answer says a document is not ingested when you can see it in the graph.</strong></p>
+<p><em>Diagnosis.</em> A routing problem, not a load problem, and R18&#x27;s evidence is three live runs of exactly this: two of them read the same subject as an operational question and generated a valid traversal against the wrong domain, while a third routed correctly and found the document. Nothing in the ordinary telemetry says WHY.</p>
+<p><em>Fix.</em> Turn on the decision trace — declare <code>qa-debug</code> at <code>level: DEBUG</code> in <code>config/log-kinds.yaml</code>, restart the service (enablement is read once at import, and is settings-level on purpose: an HTTP request has no <code>--verbose</code>), reproduce, then read <code>qa-debug.graph_qa.&lt;day&gt;.jsonl</code> or fetch it by run id from <code>/admin/qa-trace</code>. It records the router&#x27;s candidates and its stated reason, the schema prompt, every generated Cypher and its fix attempts. Turn it back off afterwards: it carries prompt text at 7-day retention.</p>
+<h2 id="contacts-escalation"><span class="dd-margin-tag" aria-hidden="true">contacts-escalation</span>Contacts &amp; escalation</h2>
+<p><strong>Owner.</strong> The DryDocs producer session that holds the <code>code:drydocs-agents</code> pen. The module has no separate on-call.</p>
+<p><strong>Decide-vs-escalate, the line that matters here.</strong> Everything in this runbook is operational and reversible. What is NOT this runbook&#x27;s to decide:</p>
+<ul><li><strong>Anything that changes what an edge MEANS.</strong> The agent reads the ontology vocabulary and never extends it. A new relationship type goes through <a href="../RELATIONSHIP_GUIDE.md"><code>docs/RELATIONSHIP_GUIDE.md</code></a> and the HITL gate (<a href="../restructure/03-hitl-sme-flow.md"><code>docs/restructure/03-hitl-sme-flow.md</code></a>) as <code>status: planned</code> first.</li><li><strong>Binding a console term to a graph concept.</strong> If a question makes you want to declare that Tower <em>is</em> some label, that is the gate&#x27;s ruling and not a fix.</li><li><strong>The provider and the model id.</strong> The R1 gate ruled environment-split providers (local/producer anthropic, company azure). Changing that is an ADR 0007 amendment.</li><li><strong>Turning the debug trace on in a shared deployment.</strong> It captures prompt text. The retention is short by design; the decision to capture at all is the operator&#x27;s to make deliberately.</li></ul>
+<p><strong>Escalation route.</strong> A defect goes to the backlog (<a href="../restructure/backlog/"><code>docs/restructure/backlog/items/</code></a>) as an item naming its module; anything ambiguous goes to the HITL gate rather than being auto-decided. A gate-bound question never ships from a runbook.</p>
+<h2 id="appendices"><span class="dd-margin-tag" aria-hidden="true">appendices</span>Appendices</h2>
+<h3 id="appendices--a-the-four-apps-and">A — the four apps, and the convention that makes them apps</h3>
+<p>One directory = one ADK app, and <strong>a directory is an app exactly when it holds an <code>agent.py</code></strong>. <code>common/</code> has none and is therefore a shared package rather than an app — which is the whole of R14, and the reason <code>/list-apps</code> returning five names is a signal rather than a curiosity.</p>
+<h3 id="appendices--b-what-a-graph-qa-answer">B — what a <code>graph_qa</code> answer carries</h3>
+<p>Not restated here on purpose. The envelope is specified in <a href="../../agents/graph_qa/README.md"><code>agents/graph_qa/README.md</code></a> and a second copy would drift from it. What an operator needs from it is three fields: <code>tier</code> (which tier answered), <code>steps[].cypher</code> (what actually ran), and <code>metrics.response_ms</code> (where the time went).</p>
+<h3 id="appendices--c-the-three-telemetry-sinks">C — the three telemetry sinks, and which question each answers</h3>
+<table><thead><tr><th>Sink</th><th>Answers</th></tr></thead><tbody><tr><td><code>qa</code> JSONL ledger</td><td>what did this run cost, and what were the words of the question</td></tr><tr><td><code>:AgentRun</code> node</td><td>how does this run compare to the others, queryable next to load telemetry</td></tr><tr><td><code>qa-debug</code> trace (off by default)</td><td><strong>why</strong> did the router choose what it chose</td></tr></tbody></table>
+<p>The third exists because the first two cannot answer it: the router&#x27;s reply was reduced to a spec id and discarded, so there was nothing to read.</p>
+<hr class="dd-sme-divider">
+<section class="dd-sme-feedback" aria-label="SME - Feedback">
+<h2>SME - Feedback</h2>
+<p>How to return your notes on this document:</p>
+<ol>
+<li>Click the <strong>✎</strong> button beside any section (or numbered step) and type your note — notes save in your browser as you type.</li>
+<li>When finished, click <strong>Copy feedback</strong> in the bottom-right toolbar. Your notes are copied as anchor-keyed YAML.</li>
+<li>Create the feedback file (it is YAML, <em>not</em> markdown) — <strong>Copy To:</strong> <code>docs/design/feedback/</code> · <strong>File Name:</strong> <code>drydocs-agents-runbook-rev1.yaml</code></li>
+<li>Paste the copied block into that file, save, and commit (or send the file back to the team).</li>
+</ol>
+</section>
+</main>
+<footer class="dd-print-footer">Rev 1 · commit adecd387</footer>
+<script>
+
+(function(){
+  var DOC="drydocs-agents-runbook", FILE="drydocs-agents-runbook-rev1.yaml", DIR="docs/design/feedback/", KEY="drydocs-doc-feedback:"+DOC;
+  function load(){ try{return JSON.parse(localStorage.getItem(KEY)||"{}");}catch(e){return {};} }
+  function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+  var state=load(), badge;
+  function count(){ return Object.keys(state).filter(function(k){return (state[k]||"").trim();}).length; }
+  function refresh(){ if(badge) badge.textContent=count(); }
+  function toast(msg){ var t=document.createElement("div"); t.className="dd-toast"; t.textContent=msg; document.body.appendChild(t); requestAnimationFrame(function(){t.classList.add("show");}); setTimeout(function(){t.classList.remove("show"); setTimeout(function(){t.remove();},250);},1600); }
+  function exportYaml(){
+    var lines=["# design-doc feedback — paste into docs/design/feedback/"+DOC+"-rev<N>.yaml","doc: "+DOC,"notes:"];
+    Object.keys(state).forEach(function(a){
+      var note=(state[a]||"").replace(/\r/g,""); if(!note.trim()) return;
+      lines.push("  - anchor: "+a); lines.push("    note: |");
+      note.split("\n").forEach(function(l){ lines.push("      "+l); });
+    });
+    return lines.join("\n")+"\n";
+  }
+  function attach(el){
+    var id=el.id;
+    var btn=document.createElement("button"); btn.className="dd-note-btn"; btn.type="button"; btn.textContent="✎"; btn.title="Annotate #"+id;
+    var box=document.createElement("div"); box.className="dd-note-box"; box.style.display=(state[id]||"").trim()?"block":"none";
+    var ta=document.createElement("textarea"); ta.value=state[id]||""; ta.setAttribute("placeholder","note for #"+id+" …");
+    ta.addEventListener("input",function(){ state[id]=ta.value; save(); refresh(); el.classList.toggle("dd-annotated", !!ta.value.trim()); });
+    if((state[id]||"").trim()) el.classList.add("dd-annotated");
+    box.appendChild(ta);
+    btn.addEventListener("click",function(){ box.style.display=box.style.display==="none"?"block":"none"; if(box.style.display==="block") ta.focus(); });
+    if(el.tagName==="LI"){ el.insertAdjacentElement("afterbegin", btn); el.appendChild(box); }
+    else { el.insertAdjacentElement("afterend", box); el.insertAdjacentElement("beforebegin", btn); }
+  }
+  function copyText(txt, ok){
+    var done=function(){toast(ok);};
+    var fallback=function(){ var t=document.createElement("textarea"); t.value=txt; document.body.appendChild(t); t.select(); try{document.execCommand("copy"); toast(ok);}catch(e){toast("copy failed — select the box");} t.remove(); };
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done,fallback); } else { fallback(); }
+  }
+  function fileLine(label, value){
+    var d=document.createElement("div"); d.className="dd-fb-file"; d.title="click to copy";
+    var c=document.createElement("code"); c.textContent=value;
+    d.appendChild(document.createTextNode(label+" ")); d.appendChild(c);
+    d.addEventListener("click",function(){ copyText(value, label.replace(":","")+" copied"); });
+    return d;
+  }
+  document.addEventListener("DOMContentLoaded",function(){
+    document.querySelectorAll("main [id]").forEach(attach);
+    var bar=document.createElement("div"); bar.className="dd-fb-bar";
+    var row=document.createElement("div"); row.className="dd-fb-row";
+    var lbl=document.createElement("span"); lbl.innerHTML='notes <span class="dd-badge">0</span>'; badge=lbl.querySelector(".dd-badge");
+    var ex=document.createElement("button"); ex.type="button"; ex.textContent="Copy feedback";
+    ex.addEventListener("click",function(){ copyText(exportYaml(), "feedback copied — create "+DIR+FILE); });
+    row.appendChild(lbl); row.appendChild(ex);
+    bar.appendChild(row);
+    bar.appendChild(fileLine("file:", FILE));
+    bar.appendChild(fileLine("path:", DIR+FILE));
+    document.body.appendChild(bar); refresh();
+  });
+})();
+
+</script>
+</body>
+</html>

@@ -7,7 +7,7 @@ phase: 10
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on:
 - V1
 inputs:
@@ -15,4 +15,69 @@ inputs:
 - docs/design/templates/runbook.outline.yaml
 acceptance: |
   docs/design/drydocs-agents-runbook.md (outline-conformant, rendered, stale-render-clean), drydocs-agents off RUNBOOK_PENDING. Covers: the module's own venv (pinned google-adk per R10), starting the service, wiring the console to it (VITE_ADK_URL, names only), the read-only contract, and a smoke check per registered app with expected output shape — including the ADK-unreachable fallback behaviour the console surfaces (SYNTHESIZED demo trace + banner).
-notes: Groomed 2026-07-29 (Epic V).
+notes: |
+  Groomed 2026-07-29 (Epic V).
+
+  BUILT 2026-09-08 (Lane B, laptop `NewThinkpad`, wip/v9-laptop). Chained onto
+  wip/web18-laptop and therefore onto the whole lane; MERGE ORDER: r18, agent1, api4,
+  web18, v9. Chained deliberately: V9 documents the agents service that R18, AGENT1 and
+  API4 changed, and a runbook written against main would describe a pipeline with no scope
+  hint, no decision trace and no chunk search — stale the moment Lane A merged them.
+
+  docs/design/drydocs-agents-runbook.md, rendered, outline-conformant; drydocs-agents is
+  off RUNBOOK_PENDING with its RUNBOOK_DISPOSITION entry.
+
+  EVERY VERSION, COMMAND AND OUTPUT IN IT WAS RUN, on the laptop against `neo4jtest`, and
+  the ones that were NOT run say so and say why — the three key-spending apps, because
+  running someone's provider key to produce a runbook example is not a decision a document
+  makes for you. `graph_query` needs no key, so it was smoked end to end and its envelope
+  is transcribed from what came back.
+
+  THE RUNBOOK FOUND A LIVE DEFECT, which is the part worth reading. `agents/serve.py`
+  DOES NOT START on this venv: `google.adk.cli.utils._nested_agent_loader` does not exist
+  in google-adk 2.3.0, and the loader R14 uses to hide `common/` from /list-apps is not
+  among what 2.3.0 offers (`AgentLoader` and `BaseAgentLoader` only). The declaration is
+  `google-adk>=2,<3`, so a fresh resolve lands on 2.3.0 and the ruled entry point is dead.
+  Scoped precisely rather than alarmingly: the R23 redaction seam is FINE
+  (`fast_api.create_session_service_from_options` is still present at 2.3.0), so this is
+  an app-discovery break, not a redaction break. Verified by starting the server on the
+  vendor loader instead, where /list-apps answers with five names including `common` —
+  which is exactly the defect R14 exists to prevent, reproduced.
+  NOT FIXED HERE: V9's module is `docs`, and re-pointing R14 at 2.3.0 is a
+  drydocs-agents code change with a design question inside it. It is handback 1.
+
+  TWO ACCEPTANCE DETAILS ARE STALE AND THE RUNBOOK CORRECTS THEM IN PLACE, because a
+  runbook that repeated them would send an operator to configure things that no longer
+  exist:
+  1. "VITE_ADK_URL" — retired at ADR 0020 / WEB10. The console reaches this service as
+     `/agent/*` on its OWN origin through the same proxy that serves the page, and the
+     prefix comes from web/delivery.json. There is nothing to set. `--allow_origins` is
+     retired for the same reason and `agents/README.md`'s Run block still shows it.
+  2. "the ADK-unreachable fallback the console surfaces (SYNTHESIZED demo trace +
+     banner)" — THAT IS NOT THE BEHAVIOUR. An unreachable agent renders the O63 FAILURE
+     LADDER; there is no demo trace and no fallback answer anywhere in AskRoute. The
+     SYNTHESIZED banner is real but a different surface: it fires on an ANSWER whose
+     sources are watermarked, so it is a claim about the data, not about the transport.
+     The acceptance was written 2026-07-29 and O63 landed after it.
+
+  ALSO MEASURED AND WORTH KEEPING: two installed versions disagree with requirements.txt
+  on this machine. `litellm` is 1.91.4, BELOW its declared `>=1.97` floor, because the
+  Windows wheels-only gotcha pins the known-good build; `google-adk` is 2.3.0, which is
+  the version the launcher does not start on. Both are in the runbook's prerequisites
+  table so the next person does not conclude their install is broken.
+
+  SURFACES: docs/design/drydocs-agents-runbook.md + its render,
+  tests/unit/test_runbook_coverage.py (off RUNBOOK_PENDING, into RUNBOOK_DISPOSITION).
+
+  HANDBACKS FOR LANE A:
+  1. `backlog` — MINT AN ITEM: `agents/serve.py` does not start on google-adk 2.3.0. The
+     R14 nested loader is gone; re-point it at what 2.3.0 offers, or pin the dependency
+     to the last version that has it, or drop R14 and accept `common` in /list-apps. That
+     is a real choice and not a mechanical fix. Module drydocs-agents. The workaround and
+     its cost (it also skips the R23 redaction) are in the runbook's troubleshooting.
+  2. `backlog` — a smaller one: `agents/README.md`'s Run block still shows
+     `--allow_origins http://localhost:5173`, retired at ADR 0020. Inert, not harmful,
+     but it is the first thing a new operator copies.
+  3. The three key-spending apps have no executed smoke output in the runbook. If that
+     matters, it is a deliberate spend and someone should decide to make it rather than
+     have a document make it for them.
