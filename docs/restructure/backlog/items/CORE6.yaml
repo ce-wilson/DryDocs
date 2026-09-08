@@ -1,0 +1,16 @@
+id: CORE6
+epic: release-infrastructure
+title: "The publish-boundary value sweep excludes non-id tokens by shape (leading zero, URL path segment) instead of allowlisting them by file, and re-sweeps the publishable tree at the full seven-digit width once"
+type: task
+module: drydocs-core
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs: []
+acceptance: |
+  Stub - minted 2026-09-07 under the I6 protocol; the body follows in the next push.
+notes: |
+  Minted 2026-09-07 from IDEAS.md (desktop, Lane A). Title is final; acceptance and inputs land in the body commit.

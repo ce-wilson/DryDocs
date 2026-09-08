@@ -1,0 +1,16 @@
+id: PORT6
+epic: release-infrastructure
+title: "A roll close proves the clean-add class complete: a completeness check reads PORT-MANIFEST through the disposition classifier, lists every base-tag path absent from the consumer tree, and refuses COMPLETE unless the survivors are deferred by path"
+type: task
+module: drydocs-port
+phase: 8
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on: []
+inputs: []
+acceptance: |
+  Stub - minted 2026-09-07 under the I6 protocol; the body follows in the next push.
+notes: |
+  Minted 2026-09-07 from IDEAS.md (desktop, Lane A). Title is final; acceptance and inputs land in the body commit.

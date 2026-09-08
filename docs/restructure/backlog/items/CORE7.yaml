@@ -1,0 +1,16 @@
+id: CORE7
+epic: release-infrastructure
+title: "test_swept_defaults_resolve_inside_a_real_worktree skips with a named reason when pytest itself runs from a linked worktree, and a fixture proves the skip fires only there"
+type: bug
+module: drydocs-core
+phase: 8
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs: []
+acceptance: |
+  Stub - minted 2026-09-07 under the I6 protocol; the body follows in the next push.
+notes: |
+  Minted 2026-09-07 from IDEAS.md (desktop, Lane A). Title is final; acceptance and inputs land in the body commit.

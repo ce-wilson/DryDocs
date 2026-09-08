@@ -1,0 +1,16 @@
+id: PLAN9
+epic: project-board
+title: "Census pins are venue data: the coverage-census tuple in test_docs_coverage moves to a venue-owned config block the test reads, after a survey of the other pins of the same shape"
+type: task
+module: drydocs-plan
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs: []
+acceptance: |
+  Stub - minted 2026-09-07 under the I6 protocol; the body follows in the next push.
+notes: |
+  Minted 2026-09-07 from IDEAS.md (desktop, Lane A). Title is final; acceptance and inputs land in the body commit.
