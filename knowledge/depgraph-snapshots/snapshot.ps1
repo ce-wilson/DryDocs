@@ -235,10 +235,18 @@ if ($designDocs) {
 # without a network — the reporting half is the part that rots, and a check that
 # only ever prints GREEN on the machine that wrote it is how this got missed.
 function Get-CiVerdict {
-  param($Runs, [string]$Head)
+  param($Runs, [string]$Head, [int]$GhExit = 0)
   $short = $Head.Substring(0, 7)
+  # Two empty-list cases, two different facts (J76, 2026-09-08). The old single
+  # message guessed a cause - "gh not authenticated?" - and on a remote whose
+  # workflow is registered but has NEVER executed (zero runs, ever: the company
+  # remote at its 2026-09-08 close-out) it named a cause that was false while the
+  # real one went unreported. Report the measurement; list the causes; pick none.
+  if ($GhExit -ne 0) {
+    return @{ Color = "DarkGray"; Text = ("ci: gh run list exited {0} - the run list could not be read (authentication, network, or no GitHub remote; 'gh auth status' tells which) - check skipped" -f $GhExit) }
+  }
   if (@($Runs).Count -eq 0) {
-    return @{ Color = "DarkGray"; Text = "ci: no runs readable (gh not authenticated?) - check skipped" }
+    return @{ Color = "Yellow"; Text = ("ci: UNVERIFIED at HEAD {0} - the remote reports ZERO runs on main. The workflow has never executed there (a fresh remote, or a workflow that is registered but has never triggered); nothing pushed to it has been checked." -f $short) }
   }
   # J78 (2026-09-06): three outcomes, not two. The sha match added after
   # Idea-111 catches STALE GREEN - a green run that belongs to an older
@@ -307,9 +315,10 @@ try {
     Push-Location $repo
     $head = (& git rev-parse HEAD).Trim()
     $raw = & gh run list --branch main --limit 10 --json headSha,conclusion,status,displayTitle
+    $ghExit = $LASTEXITCODE
     Pop-Location
     $runs = @()
-    if ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrWhiteSpace($raw)) {
+    if ($ghExit -eq 0 -and -not [string]::IsNullOrWhiteSpace($raw)) {
       # PS 5.1 trap (false GREEN, 2026-08-20): ConvertFrom-Json emits a JSON
       # array as ONE PSObject-wrapped item (argument form included), so the
       # verdict's scalar tests become member-enumeration FILTERS - '-eq
@@ -317,7 +326,7 @@ try {
       # did. Enumerating the parsed object is what actually unrolls it here.
       $runs = @((ConvertFrom-Json ($raw -join "`n")) | ForEach-Object { $_ })
     }
-    $verdict = Get-CiVerdict -Runs $runs -Head $head
+    $verdict = Get-CiVerdict -Runs $runs -Head $head -GhExit $ghExit
     Write-Host $verdict.Text -ForegroundColor $verdict.Color
   }
 } catch {
@@ -380,6 +389,14 @@ $dep  = (Resolve-Path $depCandidate).Path
 # stale — the 2026-08-04 bump found exactly that inside the refusal text.
 $expCommit = $null
 $expBranch = $null
+# depgraph.capability_assert (2026-09-08): the same key tests/unit/test_probe_instrument.py
+# has honoured since PORT-REPORT-94132c80 - FALSE means the configured scanner is
+# separately owned and a missing capability is an owed action THERE, so the live
+# test skips. Until today this script never read it and refused unconditionally,
+# so the two halves of one mechanism disagreed: the guard said "recorded
+# divergence", the ritual said "defect, fix your checkout". Default TRUE when the
+# key is unreadable - failing loudly is the producer default and the safe one.
+$capAssert = $true
 try {
   $cfg = Get-Content (Join-Path $repo "config\dev-environment.yaml") -Raw
   # Scoped to the `depgraph:` block. A top-level key ends the block, so a
@@ -388,6 +405,7 @@ try {
     $block = $Matches[1]
     if ($block -match '(?m)^\s+expected_commit:\s*(\S+)') { $expCommit = $Matches[1] }
     if ($block -match '(?m)^\s+expected_branch:\s*(\S+)') { $expBranch = $Matches[1] }
+    if ($block -match '(?m)^\s+capability_assert:\s*(\S+)') { $capAssert = ($Matches[1] -ne 'false') }
   }
 } catch {
   # Leave both null. The currency block below reports that it could not run,
@@ -433,7 +451,40 @@ if ($absent.Count -gt 0) {
     tree       = "``scan --tree`` walks the full file tree (-Tree snapshots)"
   }
   $lines = $absent | ForEach-Object { "    - {0}: {1}" -f $_, $why[$_] }
-  throw @"
+  # Is the checkout AT the pin? Measured, not guessed (J76, 2026-09-08). The old
+  # text ended "a checkout stranded on an older revision is the likely cause",
+  # and the first time it fired on a checkout that matched its pin exactly, that
+  # sentence pointed the operator at a fix that could not help: when the pinned
+  # revision itself lacks the capability, the fork or the pin is what is wrong,
+  # never the checkout.
+  if ($expCommit -and $depFull.StartsWith($expCommit)) {
+    $pinRead = "checkout MATCHES the pin - the pinned revision itself lacks the capability, so the fork (or the pin) is the gap, not this checkout; a checkout/pull cannot fix it"
+  } elseif ($expCommit) {
+    $pinRead = "checkout DIFFERS from the pin - either stranded behind it or ahead of it; the currency check below would say which, and moving to the pin is the first thing to try"
+  } else {
+    $pinRead = "pin unreadable - cannot say whether this checkout is the intended revision"
+  }
+  if (-not $capAssert) {
+    # Recorded divergence, not a defect here. The meta header carries the gap
+    # (capability_assert=false plus the absent list), so the snapshot describes
+    # its own degradation and a reader comparing edge counts is told why.
+    Write-Warning @"
+depgraph capability gap RECORDED, not refused - config/dev-environment.yaml sets
+depgraph.capability_assert: false (separately-owned scanner; the gap is an owed
+action there, the same reading tests/unit/test_probe_instrument.py skips on).
+
+  instrument : $dep
+               $depBranch @ $depCommit$depStateTxt
+  missing    :
+$($lines -join "`n")
+  pin        : $pinDesc; $pinRead
+
+The snapshot written below is DEGRADED for the capabilities listed and its meta
+header says so (depgraph.capability_assert=false, depgraph.capability_gap). Do
+not compare its edge counts against an undegraded snapshot without reading that.
+"@
+  } else {
+    throw @"
 Refusing to scan — the checked-out depgraph cannot do what this run needs.
 
   instrument : $dep
@@ -442,13 +493,18 @@ Refusing to scan — the checked-out depgraph cannot do what this run needs.
 $($lines -join "`n")
 
   Expected branch/commit are recorded in config/dev-environment.yaml ($pinDesc).
-  Fix: git -C "$dep" fetch && git -C "$dep" checkout main && git -C "$dep" pull.
-  main has carried every capability since the fork was consolidated 2026-07-28;
-  a checkout stranded on an older revision is the likely cause.
+  Measured : $pinRead
+  If the checkout differs from the pin:
+    git -C "$dep" fetch && git -C "$dep" checkout main && git -C "$dep" pull
+  If it matches, the pin (or the fork it points at) is what to look at; and a
+  consumer whose fork is separately owned records that by setting
+  depgraph.capability_assert: false, which makes this a warning and a degraded,
+  self-describing snapshot instead of a refusal.
 
 A snapshot written by a regressed scanner is worse than no snapshot: it is
 plausible, diffable, and wrong (the 105-edge near-commit of 2026-07-28).
 "@
+  }
 }
 
 # --- instrument CURRENCY: compare against the pin and WARN (ruled 2026-08-04) --
@@ -567,7 +623,7 @@ $meta = [ordered]@{
   git         = [ordered]@{ commit=$commit; full=$full; branch=$branch; describe=$describe; subject=$subject; dirty=$dirty; untracked_present=$untracked; pr=$pr }
   # WHICH INSTRUMENT PRODUCED THIS (U7). Without it a scanner regression is
   # invisible in the artifact and shows up only as numbers nobody questions.
-  depgraph    = [ordered]@{ commit=$depCommit; full=$depFull; branch=$depBranch; dirty=$depDirty; untracked_present=$depUntracked; version=$caps.version; capabilities=[ordered]@{ multi_root=[bool]$caps.multi_root; tree=[bool]$caps.tree; ts_imports=[bool]$caps.ts_imports } }
+  depgraph    = [ordered]@{ commit=$depCommit; full=$depFull; branch=$depBranch; dirty=$depDirty; untracked_present=$depUntracked; version=$caps.version; capabilities=[ordered]@{ multi_root=[bool]$caps.multi_root; tree=[bool]$caps.tree; ts_imports=[bool]$caps.ts_imports }; capability_assert=[bool]$capAssert; capability_gap=@($absent) }
 }
 $metaJson = ($meta | ConvertTo-Json -Depth 6 -Compress)
 $raw = Get-Content $tmp -Raw

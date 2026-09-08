@@ -254,3 +254,55 @@ def test_powershell_keeps_non_ascii_out_of_quoted_strings() -> None:
         "the whole script's parse. Use ASCII there, or move the text into a here-string:\n"
         + "\n".join(offenders)
     )
+
+
+# --- capability_assert is read by the ritual, not only by the test (2026-09-08) --
+
+
+def test_capability_refusal_honours_capability_assert() -> None:
+    """Two halves of one mechanism must agree.
+
+    ``depgraph.capability_assert: false`` has made ``test_probe_instrument``
+    SKIP a missing capability since PORT-REPORT-94132c80 (separately-owned
+    scanner; the gap is owed there). ``snapshot.ps1`` never read the key and
+    refused unconditionally, so on the consumer's checkout the guard said
+    "recorded divergence" and the ritual said "defect" about the same fact
+    (found at the consumer's 2026-09-08 close-out). The script must read the
+    flag, warn-and-record when it is false, and refuse only when it is true.
+    """
+    script = _script()
+    assert "capability_assert" in script, "snapshot.ps1 does not read depgraph.capability_assert"
+    start = script.index("$absent = @(")
+    end = script.index("--- instrument CURRENCY")
+    block = script[start:end]
+    assert (
+        "if (-not $capAssert)" in block and "Write-Warning" in block
+    ), "the capability gap must WARN and proceed when capability_assert is false"
+    assert "throw" in block, "the refusal for capability_assert: true must remain a throw"
+    assert (
+        "capability_gap" in script and "capability_assert=[bool]$capAssert" in script
+    ), "a degraded snapshot must record the flag and the absent list in its meta header"
+
+
+def test_refusal_and_ci_messages_report_the_measurement_not_a_guess() -> None:
+    """J76 — two messages guessed a cause and both guesses were wrong the first
+    time they fired for real (consumer close-out, 2026-09-08): the refusal said
+    "stranded on an older revision" for a checkout that matched its pin exactly,
+    and the CI check said "gh not authenticated?" for a remote whose workflow
+    had simply never run. Report what was measured; list causes; pick none."""
+    # Code, not the comments that explain the change (J66): the script's own
+    # comment quotes the retired sentences to say why they went.
+    code = chr(10).join(ln for ln in _script().splitlines() if not ln.lstrip().startswith("#"))
+    script = _script()
+    assert "stranded on an older revision is the likely cause" not in code
+    assert "gh not authenticated?" not in code
+    assert (
+        "$depFull.StartsWith($expCommit)" in script
+    ), "the refusal must MEASURE whether the checkout is at the pin before saying anything about it"
+    assert "ZERO runs" in script, (
+        "an empty run list with gh exit 0 is a remote whose workflow never ran - say so, "
+        "distinct from a gh failure"
+    )
+    assert (
+        "[int]$GhExit" in script
+    ), "gh's exit code must reach the verdict so the two empty cases stay distinct"

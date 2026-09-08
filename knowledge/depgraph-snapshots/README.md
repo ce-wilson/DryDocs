@@ -34,9 +34,19 @@ header** so each snapshot is self-identifying:
            "dirty": false, "untracked_present": false, "pr": <num|null> },
   "depgraph": { "commit": "<short>", "full": "...", "branch": "main",
                 "dirty": false, "untracked_present": false, "version": "0.1.0",
-                "capabilities": { "multi_root": true, "tree": true } }
+                "capabilities": { "multi_root": true, "tree": true },
+                "capability_assert": true, "capability_gap": [] }
 }
 ```
+
+`capability_assert` / `capability_gap` (2026-09-08): the script reads
+`depgraph.capability_assert` from `config/dev-environment.yaml` — the same key
+`tests/unit/test_probe_instrument.py` has skipped on since the consumer's separately-owned
+fork was recorded. `true` (producer default): a missing capability REFUSES the scan.
+`false`: the scan proceeds with a warning and the header carries the absent list in
+`capability_gap`, so a degraded snapshot describes its own degradation. Until then the
+script never read the flag and refused unconditionally, so the guard and the ritual
+disagreed about the same fact.
 
 **`dirty` counts TRACKED changes only; untracked paths are reported separately** (U15).
 The two answer different questions. `dirty` is the provenance one — do tracked files differ
