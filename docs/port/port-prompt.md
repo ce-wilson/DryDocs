@@ -2779,6 +2779,61 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   edition-absent count goes from two to zero — your edition gate then owes nothing to the
   suite, only to the allocator. Nothing is asked back.
 
+- **RELAY-32 — A NEVER-PORT SKILL'S TEST IS NEVER-PORT TOO, AND `domain:` ON A SHARED
+  VOCABULARY ENTRY IS THE PARTITION KEY** (new 2026-09-07, mid-apply; acts at the NEXT
+  roll — at G you already did the right thing). `[SME-REPORTED]` — your carve-out G dropped
+  `tests/unit/test_lane_handoff.py` rather than naming it, because its subject
+  `.claude/skills/lane-handoff/scripts/handoff.py` is `never-port` while the test fell to
+  the `tests/**` default_ok, and you named the contradiction: two rows disagree and nothing
+  catches it. You also declined an overlay `row_may_match_nothing` entry because
+  `tests/**` matches plenty. `[VERIFIED-PRODUCER]` — both readings are right, and the fix
+  is producer-side: `PORT-MANIFEST.yaml` now carries a `never-port` row for
+  `tests/unit/test_lane_handoff.py` beside the skill's row, with its own
+  `row_may_match_nothing` entry (company-side the test never exists, by construction — the
+  skill's own shape), and `test_port_manifest.py` holds the invariant as
+  `test_no_test_is_more_portable_than_its_never_port_subject`: for every never-port row
+  under `.claude/skills/<x>/`, no tracked `tests/unit/test_<x>*.py` may resolve to a
+  portable disposition. It was the first test in the tree whose subject is never-port.
+  Second, `test_domain_registry` (3 red) is NOT a rename that slipped through D.
+  `controlm -> scheduler` and `seal -> business-application` are real producer renames at
+  `496aa268` (2026-08-12, `port-base-20260817`, four rolls ago); `corporate`, `itsm`,
+  `infrastructure` and `human` were ADDED, never renamed from anything; and the producer has
+  never had a `company` or `snow` domain — those two are YOUR domain values on YOUR
+  entries. The vocabulary row's `entry_rule` never said who owns `domain:` on a shared id,
+  so a per-entry merge that kept `domain: controlm` for four rolls followed the rule as
+  written; it now says `domain:` is the partition key, a gate-ruled rename travels with the
+  entry, and a domain only one side has registered in `config/taxonomy/domains.yaml` is
+  that side's mint. Which makes your three reds a RULING your own manifest already
+  describes (`domains.yaml`, per-entry: the company base mints ITS OWN domains at ITS OWN
+  gate): register `company` and `snow` as `minted_by: company` rows, or adopt
+  `corporate` / `itsm` through your own vocabulary-domains gate — never rename the fragments
+  to the producer's names to make the test pass, because that re-rules a domain without a
+  gate. The `scheduler` / `business_application` half takes the producer's `domain:` with
+  the entry at the next roll under the amended rule. Nothing is asked back.
+
+- **RELAY-33 — THREE POINTERS FROM THE G CLOSE: THE INTERLOCK TEST HAS A PRODUCER TWIN, THE
+  `ideas.html` OVERLAY ENTRY WENT STALE AT E, AND A WORKTREE BASELINE MOVES ONE TEST** (new
+  2026-09-07, mid-apply; nothing here waits for the roll). `[SME-REPORTED]` —
+  `test_bundled_demo_interlock` (Z7) is red because your PAT sample's teams own no
+  application any folder runs for; the sample is `never-port` and yours to fix, deferred.
+  `[VERIFIED-PRODUCER]` — the producer's bundled samples fail the same contract the other
+  way round (the SEAL capture declares three applications, the sample folders carry seven
+  other ids, one folder attributes) and that is backlog item LOAD4, in build this week; the
+  test's expectation — the bundled samples must reference EACH OTHER — is the contract,
+  and each side fixes its own fixture under `drydocs/data/**` never-port. Second,
+  `[SME-REPORTED]` your overlay's `row_may_match_nothing` entry for `docs/plan/ideas.html`
+  says you do not render that surface, yet E's `render_board.py` run moved it.
+  `[VERIFIED-PRODUCER]` — a default-paths `scripts/render_board.py` run imports and runs
+  `render_ideas.main()` and the producer row for the page is `derived`; the entry stopped
+  being true the moment the renderer ran, and retiring it is overlay housekeeping on your
+  side. Third, `[SME-REPORTED]` a fourth "turned green" at G was
+  `test_repo_paths::test_swept_defaults_resolve_inside_a_real_worktree`, and you recorded
+  it as a venue artifact because the baseline ran inside a worktree. `[VERIFIED-PRODUCER]` —
+  that test spends a real `git worktree add` (J48 (b)) and is venue-sensitive to running
+  inside one; the reconcile-port skill's set-compare step now names it: exclude it by name
+  or take the baseline from a plain checkout. Your refusal to bank it was correct. Nothing
+  is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has

@@ -370,7 +370,12 @@ has no venv of its own); compare the two failure lists as SETS (`Compare-Object`
 PowerShell, `comm -3` on sorted lists elsewhere). Identical sets close the range; a
 matching COUNT proves nothing - 16 matched 16 on the software registry with a different
 row standing in (seventeenth postscript). Name any order-dependent test that moves the
-full-run count.
+full-run count. **And name the one test the worktree itself moves:**
+`test_repo_paths.py::test_swept_defaults_resolve_inside_a_real_worktree` (J48 (b)) spends a
+real `git worktree add` and behaves differently when the baseline is ITSELF run inside a
+worktree - the company's carve-out G (2026-09-07) saw it "turn green" for that reason alone
+and correctly refused to bank it. A worktree baseline is not venue-neutral for that test:
+exclude it from the set-compare by name, or take the baseline from a plain checkout.
 
 ## Track-1 acceptance (the contract)
 
