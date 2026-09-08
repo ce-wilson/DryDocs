@@ -7,7 +7,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - .github/workflows/ci.yml
@@ -37,3 +37,55 @@ notes: |
 
   Clause (a) is deliberately two-sided: the entry frames this as 'decide once', and a guard
   that is desk-only by decision is a different state from one that is desk-only by accident.
+
+  CLOSED 2026-09-07 (Lane B, laptop, wip/CORE3-laptop).
+
+  (a) THE DECISION: fetch-depth: 0, on the gates job, recorded in .github/workflows/ci.yml
+      itself as the acceptance requires. The case for the other side is real and is in the
+      guard's own docstring - a commit message can only be corrected before it leaves the
+      machine that wrote it, so the desk IS the enforcement point. What decided it against
+      desk-only is that the desk run is a HABIT and CI is a MECHANISM, and this repo has
+      the Idea-111 record of what happens to a check nobody is obliged to look at: CI ran
+      red for 100+ consecutive runs while sessions kept pushing past it. CI catching a bad
+      message after the push does not let you amend it, but it tells you the same day, at
+      the one moment the ceiling could still be re-recorded honestly rather than discovered
+      months later as an unexplained rise.
+
+  (b) THE COST, MEASURED on this laptop rather than estimated: main carries 2,321 commits
+      (the acceptance's ~2,057 figure is from 2026-09-05 - it has grown, and saying so is
+      the point of measuring again). Cloned from a local file:// URL with --no-hardlinks so
+      the byte counts are real: `--depth 1` produces a 34 MB .git, a full clone 48 MB. The
+      delta is ~14 MB per run of this one job. SCOPED to gates: the web and snyk jobs check
+      out the same tree and read no history, and giving all three fetch-depth: 0 by reflex
+      would triple the cost for no second reader. The comment in the workflow says so, so
+      the next person adding a job knows the rule is "add it where a guard needs it".
+
+  (c) THE GUARD MEASURING IN CI, which is the acceptance and not the absence of a failure.
+      Run 34170083699 (branch wip/CORE3-laptop, 2026-09-07T23:31Z), step "Commit-message
+      history ceiling (J74)":
+
+        [J74] MEASURED on a full clone: 34 of 2322 commit messages carry the retired
+        token; recorded ceiling 34.
+        ..
+        2 passed in 0.28s
+
+      Two tests passed and NEITHER skipped - before this change both skipped on the shallow
+      clone. All three jobs green (gates, web, snyk).
+
+  WHAT MADE THAT LINE POSSIBLE, and it is the part worth keeping: a SKIP and a PASS are the
+  same non-failure in a CI log, so "the guard runs in CI now" was not observable from the
+  outside. The guard therefore prints what it measured - count, total, ceiling - and CI runs
+  it as its own named step with `-s` (so the line reaches the log) and `-rs` (so a skip
+  prints its reason instead of vanishing). The step's output now always says which of the
+  two happened. That is also why the count is useful beyond this item: it is the number
+  `test_the_ceiling_is_not_stale_by_a_wide_margin` exists to watch, and it is now visible
+  on every push rather than only to whoever ran the suite verbosely.
+
+  The measured count is 34 of 2322 - exactly at the recorded ceiling, which is the ceiling
+  behaving: the repo grew by 506 commits since J74 recorded 34 of 1,816 and the count did
+  not move.
+
+  Gates at close: pytest -q 3612 passed / 14 skipped; ruff check and ruff format --check
+  clean. Expected red on this tip: the roadmap fingerprint only, because this note and the
+  status change the item file and Lane B does not render. No new tracked path, so no
+  PORT-MANIFEST row to hand back.
