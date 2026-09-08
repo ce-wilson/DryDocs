@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-08T14:55:19",
+    "captured_at": "2026-09-08T16:38:42",
     "date": "20260908",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "e8600cd6",
-      "full": "e8600cd6d1f3425561f5c9137973713b002c61df",
+      "commit": "588f98d5",
+      "full": "588f98d5955906017f3d3251f57f1bb3d2e754a5",
       "branch": "main",
-      "describe": "port-base-20260905-401-ge8600cd6",
-      "subject": "fix(PORT2): a revision series is not a rename - the 1.00 score was containment reading a superset",
+      "describe": "port-base-20260908-1-g588f98d5",
+      "subject": "chore(port): ledger - the seventh footnote counts the range at the tag, 407 not 405",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -7835,6 +7835,15 @@
       "name": "port-ais-supplement-company-prompt.md",
       "extension": ".md",
       "rel_path": "docs/company-prompts/port-ais-supplement-company-prompt.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/company-prompts/port-base-20260905-closeout-company-prompt.md",
+      "name": "port-base-20260905-closeout-company-prompt.md",
+      "extension": ".md",
+      "rel_path": "docs/company-prompts/port-base-20260905-closeout-company-prompt.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -23185,10 +23194,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260908.json",
-      "name": "drydocs-20260908.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260908-1455.json",
+      "name": "drydocs-20260908-1455.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260908.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260908-1455.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -41802,6 +41811,11 @@
     [
       "drydocs/docs/company-prompts",
       "CONTAINS",
+      "drydocs/docs/company-prompts/port-base-20260905-closeout-company-prompt.md"
+    ],
+    [
+      "drydocs/docs/company-prompts",
+      "CONTAINS",
       "drydocs/docs/company-prompts/profiling-sync-packet-template.md"
     ],
     [
@@ -50217,7 +50231,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260908.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260908-1455.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -53889,13 +53903,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2998,
+    "files": 2999,
     "edges": 1838,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 3320,
+    "rels": 3321,
     "directories": 323
   }
 }
