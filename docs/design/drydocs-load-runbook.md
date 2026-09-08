@@ -112,9 +112,15 @@ This module has no service. "Startup" is running a single loader deliberately.
    passed — and that override is recorded in the run record and the disk log, never
    silently (G121):
    ```powershell
-   poetry run drydocs load catalog_lobs --csv "$env:DRYDOCS_DATA_ROOT/catalog/catalog_lobs.csv"  # a CSV loader: one file, from a declared zone
-   poetry run drydocs ingest-controlm --use-oracle --folder "PATTERN_%"                          # the Control-M chain, Oracle-scoped
+   poetry run drydocs load catalog_lobs --csv drydocs/data/samples/catalog_lobs__sample.csv --allow-unzoned  # runnable in any clone
+   poetry run drydocs load catalog_lobs --csv "$env:DRYDOCS_DATA_ROOT/pat/catalog_lobs.csv"                  # the real drop, once you have one
+   poetry run drydocs ingest-controlm --use-oracle --folder "PATTERN_%"                                      # the Control-M chain, Oracle-scoped
    ```
+   The first line is the one to try. The bundled samples ship in the repo TREE, not under
+   `DRYDOCS_DATA_ROOT`, so they sit outside every declared zone by design — `--allow-unzoned`
+   is the honest way to read one, and it exercises on the safest possible file the override
+   this step just described. The second line is the shape a real drop takes: `pat/` is where
+   `pat:product-catalog`, which is `catalog_lobs`' source, actually lands.
    Success: the run envelope printed at close, with `'status': 'OK'`.
 
 4. **Read the envelope before moving on.** It is the whole point of the run:
