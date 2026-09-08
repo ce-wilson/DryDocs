@@ -287,6 +287,10 @@ units from `docs/restructure/backlog/items/`. Each backlog item names its agent 
   parsing, decode explicitly, reconstruct a fixture from the incident at its real values — three
   instruments failed *into* "clean" on 2026-09-01 and were acted on
   ([`docs/style/review-provenance.md`](docs/style/review-provenance.md), "Check the instrument").
+  **And check which VERSION of the instrument you are holding (added 2026-09-08):** a superseded
+  function reads exactly like a current one, so reading the source passes every check above —
+  `git log -1 -- <file>` against your base is the one that does not. It cost a correct finding
+  its retraction company-side and a guessed fence producer-side, on the same guard, the same day.
 - **Live-verification claims name their venue (J18).** A "verified live" claim names the
   machine/container/database it ran on (e.g. "desktop, `neo4jtest`, `drydocs` DB") — the two
   machines hold independent graphs, so an untagged claim reads as a defect from the other

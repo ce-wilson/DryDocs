@@ -2,7 +2,7 @@
 
 classification: Internal-Public. Mechanism only — every folder, job and id below is a placeholder shape.
 transcribed: 2026-09-02, from a company-side research session (PEX lineage trace, open question OQ-9).
-  The verbatim record is machine-local: `internal-local/research/2026-09-02-cyclic-type-trap-transcript.md`
+  The verbatim record is machine-local: internal-local/research/2026-09-02-cyclic-type-trap-transcript.md
   (desktop). Cite the file, never the captures.
 checked_against: origin/main `dbd13170`; live graph = desktop, container `neo4jtest`, database `drydocs`.
 re-verified: 2026-09-07 at `6be9be06` on `feat/cyclic-type-test-case` (which carries origin/main

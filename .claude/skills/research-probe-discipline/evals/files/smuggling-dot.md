@@ -3,7 +3,7 @@
 classification: Internal-Public. Mechanism only — the prefixes, teams and file names below are placeholder shapes.
 transcribed: 2026-09-03, from the producer's own working notes on Control-M variables (page dated 2025-04-28),
   written while parsing `CMD_LINE` with SQL. The verbatim record is machine-local:
-  `internal-local/research/2025-04-28-controlm-variables-onenote-transcript.md` (desktop). Cite the file, never the capture.
+  internal-local/research/2025-04-28-controlm-variables-onenote-transcript.md (desktop). Cite the file, never the capture.
 checked_against: origin/main `dbd13170`; live graph = desktop, container `neo4jtest`, database `drydocs`.
 re-verified: 2026-09-07 at `6be9be06` on `feat/cyclic-type-test-case` (which carries origin/main
   `78277d1c`), venue desktop MSI. All six named sources in section 2 still resolve, and section 4's

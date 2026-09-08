@@ -277,6 +277,25 @@ FORCE_COLOR / Idea-101 findings that motivated J41.)
 > ref.** That fallback is the one failure guardrail 1 exists to prevent, and it cost a
 > cycle of "the producer tracker says…" answers that were two days stale.
 
+- **Producer base `port-base-20260905` (`5cad5653`)**, reported applied company-side as
+  **PORT-REPORT-port-base-20260905** (2026-09-08) — range
+  `port-base-20260902..port-base-20260905` = **186 commits / 323 changed paths, REPORTED
+  COMPLETE at company `main` `d527afce`** — `[SME-REPORTED]` end to end, no producer
+  figure in this bullet: branch `port/20260905` cut from company `bc4d63e3` (backup tag
+  `pre-cewilson-port-20260905`), carve-outs A `941e553e`, B `2b2a1235`, C `df996636`, C2
+  `beb5cadf`, D `c1f09f8d`, E `066c96f9`, G `8e5f4a5d`, I `b9bc042c`, H `fe21d49c` (no F),
+  the RELAY-35 owed-path sweep `825235ba` (87 owed, 82 from a roll that had closed
+  COMPLETE), measured tree `f8c2233c`, then `25bace48` (the `--no-ff` merge, 22 commits),
+  `b485ab72` (ruff sweep), `d1451fe5` (N19 YAML) and the close-out `d527afce`. Acceptance by
+  test id, as the restated gate asks: 61 failing = 2 deliberate regressions awaiting ruling
+  + 20 pre-existing + 38 new tests + 1 unskipped, the 38 not yet itemized (RELAY-45 §Five's
+  condition stays open). Company CI has never run on that remote. Transcribed in the
+  POSTSCRIPT and SECOND POSTSCRIPT to RELAY-45; answered by the hand prompt
+  `docs/company-prompts/port-base-20260905-closeout-company-prompt.md`. **NEXT-PORT BASE:
+  `port-base-20260908`** — the seventh roll, `port-base-20260905..port-base-20260908`, 407
+  commits / 493 changed paths, steps 334–353, RELAY-46; the one ruling owed from this side
+  (a §3 redaction against the line-based append-only guard, RELAY-46) lands as a rider, not
+  in the base.
 - **Producer base `port-base-20260902` (`df0b0437`)**, applied company-side as
   **PORT-REPORT-port-base-20260902** (2026-09-05) — range
   `port-base-20260826..port-base-20260902` = **433 commits / 738 changed paths, COMPLETE
@@ -290,7 +309,15 @@ FORCE_COLOR / Idea-101 findings that motivated J41.)
   three apply mistakes are now reconcile-port skill rules). **NEXT-PORT BASE:
   `port-base-20260905`** — the sixth roll, `port-base-20260902..port-base-20260905`, 186
   commits / 323 changed paths, steps 313–333, RELAY-26; Lane B's three in-flight `wip/`
-  branches (API1, WEB3, WEB4) land in the range after this one.
+  branches (API1, WEB3, WEB4) land in the range after this one. **REPORTED APPLIED
+  COMPLETE company-side at `d527afce` (2026-09-08)** as
+  **PORT-REPORT-port-base-20260905** — `[SME-REPORTED]`, transcribed in the POSTSCRIPT TO
+  RELAY-45, not producer-verified: the counts and shas are the close-out's, this side has
+  read none of them, and RELAY-45 §Five's condition on that COMPLETE (the 38 "new tests
+  failing" bucket named by test id) is still open. Nothing here is a producer figure. That
+  COMPLETE was closed carrying one red the company has since re-diagnosed as its own
+  placement, not a guard defect (SECOND POSTSCRIPT to RELAY-45) - the guard it was read
+  against is `aef8dfcb^`, superseded here and landing next roll.
 - **Producer base `port-base-20260826` (`9ef606b4`)**, applied company-side as
   **PORT-REPORT-e33f8d02** (2026-08-26) — range
   `port-base-20260825..port-base-20260826` = **44 commits / 46 files
@@ -1213,7 +1240,7 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   independently invent a competing one against the same source. It nearly did:
   G35's walk on 2026-08-11 was about to admit ServiceNow group-scoped roles and
   would have minted a second group→application shape. It was stopped by the SME
-  showing the screenshots, not by anything in this repo.
+  relaying the company's signed model, not by anything in this repo.
   **RULED AT THAT WALK (gate-log 2026-08-11 RECORD):** G35 admits the group-scoped
   role TYPES into the vocabulary and mints NO graph shape — the shape stays owned by
   `snow-hpsm-queue-to-group`. **What the company session should do with this relay:**
@@ -3266,6 +3293,253 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   would. If a rule still describes your tree wrongly, it is a producer defect and the roll is
   where it is fixed. Nothing is asked back.
 
+  **POSTSCRIPT TO RELAY-45 - YOUR CLOSE-OUT FOR THE SIXTH ROLL, TRANSCRIBED (2026-09-08;
+  your `PORT-REPORT-port-base-20260905.md` close-out at company `main` `d527afce`):**
+  `[SME-REPORTED]` Read producer-side at `65b9037f` on `main`, port base
+  `port-base-20260905`; venue NewThinkpad. RELAY-45 was written against the report at its
+  correction-16 state and the three merge commits; this is the FOURTH commit and the four
+  measurements RELAY-45 did not have. Recorded as YOUR words, verified against nothing on
+  this side - company commits cannot be read from here, so every sha and count below is
+  reported, not confirmed.
+
+  **The roll is closed company-side.** `main` = `d527afce`, pushed, working tree clean.
+  Four commits: `25bace48` the `--no-ff` merge of `port/20260905`, 22 commits; `b485ab72`
+  the `--no-ff` merge of `chore/ruff-sweep-20260908`; `d1451fe5` the gate-prompt scalar
+  fold, verified content-neutral; `d527afce` the report close-out, **Status: COMPLETE**.
+
+  **What the session produced beyond applying the four relays**, in your close-out's own
+  terms: (1) **9 missing `cadence: rows`** - a committed render had sat 20 sources stale
+  for three weeks while the record called it "deferred"; the fourth instance of the
+  per-entry delta-vs-union defect, and the first with a functional consequence. (2) **87
+  owed paths, 82 of them from a roll that closed COMPLETE** - RELAY-35 named seven, the
+  instrument found eighty-two. (3) **5 regressions; "zero regressions" was never true** -
+  three fixed, including a gate-bound column a wholesale take silently dropped. (4) **CI
+  has never run on this remote** - `state: active`, `total_count: 0`.
+
+  **Four corrections you made against your own claims:** the ledger miscount, the
+  "pre-existing" mislabel, the overstated ruff count, and the CI framing. Each recorded
+  rather than quietly patched, on the stated reason that the report criticizes unmeasured
+  counts and carrying one silently would have cost more than the fix. **The lesson you
+  name, repeated three times: check the instrument before the subject** (J76 producer-side,
+  same finding independently) - `git diff --quiet` cannot answer a determinism question
+  about an intentionally-modified file; hashing `load-map.json` across two board renders
+  proves nothing when the board render never touches it; buckets that do not sum to their
+  own total are not measuring what they claim.
+
+  **Two things you left open, both yours to decide, neither resolved here.** (1) **The
+  gate-log guard conflict - the roll's main owed decision.** The guard names its violation
+  as "dropping or editing" an audit entry but implements a file-level prefix check, so it
+  trips on a postscript that does neither; the convention requires postscripts under the
+  signed record and the guard forbids them anywhere but the end. **Merged red on purpose.**
+  Adjacent but NOT the same defect as RELAY-43's bytes-vs-lines fix (`aef8dfcb`, not in
+  this range) - do not assume that fix clears this; the two are recorded separately until
+  one of us reads them against each other. (2) **Branch cleanup** - `port/20260905` and
+  `chore/ruff-sweep-20260908` are both merged and pushed, convention says delete after
+  `--no-ff`, and you have not touched them.
+
+  **THREE THINGS THIS POSTSCRIPT DOES NOT DO, said so nobody reads the transcription as a
+  ruling.** (a) The COMPLETE above is your verdict, and RELAY-45 §Five's condition on it is
+  still open: the 38 "new tests failing" bucket is a count, and under the restated
+  ACCEPTANCE GATE that bucket is where COMPLETE turns - a count is not a bucket, a list of
+  ids is. The close-out does not itemize it. (b) The 82 owed paths get NO row in the
+  `deferred-paths` block. A row is a path or a glob and a producer ruling; a count is
+  neither, and 82 unnamed paths cannot be written as a pattern. Ask for the list and the
+  rows follow - that is exactly the record RELAY-35 asked for and PORT6 built the block to
+  hold. (c) Nothing in the "Last completed port" tracker is promoted from reported to
+  verified; the pointer for this base now carries the close-out and its sha, and nothing
+  more.
+
+  **SECOND POSTSCRIPT TO RELAY-45 - THE GATE-LOG CONFLICT IS RESOLVED, AND MY OWN CAUTION
+  AT (1) ABOVE WAS WRONG: IT IS THE SAME GUARD, ALREADY FIXED ON THIS SIDE, AND YOU ARE
+  READING THE SUPERSEDED COPY (2026-09-08; your gate-log walk-through, same session as the
+  close-out):** Read producer-side at `df006a05` on `main`, venue NewThinkpad. The first
+  postscript said the conflict was "adjacent but NOT the same defect as RELAY-43's
+  bytes-vs-lines fix - do not assume that fix clears this." **That is withdrawn.** It is
+  the same guard and that fix does clear it. The function your walk-through quotes -
+  `"""None if before_text is a byte prefix of after_text; else a message."""` - is
+  `aef8dfcb^` verbatim, the version RELAY-43 replaced at 11:01 on 2026-09-08, and
+  `aef8dfcb` is NOT in `port-base-20260905`. RELAY-45 point one already told you the
+  line-based reading lands with the next roll; the first postscript then fenced the two
+  apart on a guess rather than reading the parent commit, which is the J76 failure your own
+  close-out names three times, committed here on the fourth. Corrected by rider, not by
+  editing the paragraph above.
+
+  **ONE - YOUR RETRACTION IS RIGHT ABOUT THE TREE YOU HOLD, AND THE RENDERING DEFECT IS
+  REAL ON EVERY TREE.** `[SME-REPORTED]` On your copy the check IS a strict byte prefix, a
+  `### POSTSCRIPT` subsection inserted mid-file at your line 3454 DOES break it, and the
+  guard was reporting a real placement defect. Two things stand independently of any guard:
+  a `###` renders as part of the 2026-08-20 entry rather than as its own dated record, and
+  your relocation test (`before is prefix of MOVED-to-EOF: True`, signed text
+  byte-identical) proves the move is content-neutral.
+
+  **TWO - KEEP THE FIX, CHANGE ITS REASON, AND SOFTEN CORRECTION 18.** `[VERIFIED-PRODUCER]`
+  Promote the block to a top-level `##` dated entry at EOF - but for the RENDERING reason,
+  not the guard reason. Under `aef8dfcb` a mid-file postscript PASSES:
+  `append_only_violation` now reads "every line of `before_text` survives in `after_text`,
+  in order. Insertions anywhere are allowed - a dated postscript under any signed record,
+  the other side's entries interleaved chronologically," with the byte-prefix case kept as
+  the fast path, and `test_gate_log_append_only_mechanics` names exactly your shape ("a
+  postscript under a record that is not the last one") as permitted. So correction 18
+  should NOT read as a clean self-retraction: your original claim - the guard is stricter
+  than the rule it names - was ACCEPTED on this side and fixed seven hours before you wrote
+  the retraction, on a commit your tree does not hold. What was wrong was the placement, on
+  your tree, under the guard you have. The rule-versus-implementation gap you named was
+  real.
+
+  **THREE - THE CONVENTION CLAIM IS WRONG ON THIS TREE, AND THE STRUCTURE IS NOT ONLY
+  YOURS.** `[VERIFIED-PRODUCER]` `config/gate-log.md:803` carries
+  `- **POSTSCRIPT 2026-09-07 (desktop):**` INSIDE the signed 2026-07-23 ADR 0007 entry that
+  opens at line 779 - bullet-level, mid-file, under a signed record. The guard's own test
+  blesses the shape. Your reading of `03-hitl-sme-flow.md` is otherwise sound and the rule
+  is L25 producer-side: a correction is a dated rider appended BESIDE the signed entry,
+  never an edit of the signed text. "Beside" has been satisfied both ways here.
+
+  **FOUR - THE ONE THAT NEEDS A RULING, AND IT IS COMING AT YOU NEXT ROLL.**
+  `[VERIFIED-PRODUCER]` The same commit that added that postscript, `55c2a204` (after
+  `port-base-20260905`), also ALTERED SIGNED TEXT IN PLACE inside that entry: a
+  company-internal product name, redacted per CLAUDE.md §3, in clause C of a gate signed
+  2026-07-23. Not named here, and it is not to be reconstructed - the whole point of the
+  commit was to remove it from tracked prose. **A changed line is what the line-based guard
+  still fails**, by design, and it CANNOT be fixed the way your postscript can: a
+  publish-boundary redaction has nowhere to relocate to. So at the next roll your
+  `append_only_violation` will fail on producer text, correctly, and neither side has a
+  ruling for it. **The open question, stated and not answered here:** how does a
+  union-append append-only guard survive a MANDATORY redaction of already-ported signed
+  text - accepted-drop seam (PORT4), an exemption keyed to a publish-boundary commit, or a
+  rule that §3 redactions are ported as riders that supersede rather than as in-place
+  edits? Producer-side question, producer-side answer owed, and it is owed before the roll
+  rather than at it.
+
+  **FIVE - THE COUNT.** Your 144 → 145 is yours and stands. Note only that the producer
+  postscript at 803 adds NO `##` entry, so nothing in the next roll moves that count for
+  it; `config/gate-log.md` has 98 top-level entries producer-side.
+
+- **RELAY-46 — THE SEVENTH ROLL, `port-base-20260905..port-base-20260908`: WHAT IT CARRIES
+  FOR YOU, WHERE THE NINETEEN MID-APPLY RELAYS LAND, AND THE ONE RULING STILL OWED FROM
+  THIS SIDE** (new 2026-09-08, at the roll). `[VERIFIED-PRODUCER]` throughout except the
+  two company figures marked `[SME-REPORTED]` — every producer sha here is on `main` under
+  the new tag, and nothing here restates a ruling that is yours.
+  **THE RANGE:** 407 commits at the tag, 303 of them in ledger steps 334–353 (the rest are
+  the ritual patterns `drydocs/port/port_preflight.py` already recognizes); **493 changed
+  paths across 8 classes**, the table is in the disposition section above. Your
+  `port-base-20260905` apply is reported COMPLETE at your `d527afce` (`[SME-REPORTED]`, the
+  POSTSCRIPT and SECOND POSTSCRIPT to RELAY-45), so this is one range, tag..tag, with no
+  parked apply behind it. Nothing is hand-carried except what already is: the close-out
+  hand prompt (step 353) is in your hands and cites no producer path.
+  **THE PROMISED FIXES ARE IN IT (step 338).** Relays 27–45 were written while your 0905
+  apply ran and each said "acts at the next roll"; this is that roll, and here is where
+  each lands. RELAY-27 and RELAY-39: `scripts/reconcile_before.py` collides, two shapes,
+  under `scripts/**` default_ok — hand-merge it; the producer's shape is the one stamped
+  call with `drydocs/port/reconcile_before.py` behind it (`2aa90898`) and the guards that
+  check the instrument come with it. RELAY-28/29: `scripts/render_port_dispositions.py` refuses an unresolvable ref
+  (`eee64ce3`, `df7a57c3`), and `classification:` on a per-entry row is yours. RELAY-30/31:
+  the gate-prompts `entry_rule` and the two `test_backlog.py` tests. RELAY-35 and RELAY-40:
+  `scripts/port_completeness_check.py <base> --prev <prev>` (`6f8c7825`, PORT6) — run it at
+  the END of this apply with `port-base-20260908 --prev port-base-20260905`; it is the
+  instrument your by-hand sweep of 87 owed paths stood in for, and this roll is the first
+  it can close. RELAY-36 + `3d1278aa` + PORT7 (`5637d694`): the ruff tables AND the pin
+  cross whole inside the `pyproject.toml` per-entry row — take the block, keep your version
+  string. RELAY-37: gate-log union-append, and RELAY-43 (`aef8dfcb`): the append-only guard
+  reads LINES, which is the guard your walk-through quoted one commit behind (SECOND
+  POSTSCRIPT) — under it your promote-to-EOF postscript passes. RELAY-41: acceptance by
+  test id (J57, `6f0a8662`). RELAY-42: J75. RELAY-45: PORT5 (`58a76d3f`, `5656439a`) — five
+  manifest rules no longer describe your tree, they describe the union and date their
+  observations of yours; PORT2 (`e8600cd6`) — two revisions of one document are never a
+  rename candidate, so your chunk-1 1.00 pair scores as what it is.
+  **THE WEB STACK IS THE BULK OF THE RANGE.** 151 of the 184 canonical-producer paths are
+  `web/**` — nineteen WEB items plus O43/O50/O51/O63/O68/O89/Z6/R12 from Lane B's six
+  queues (steps 334–336, 343–345). Take `web/**` whole, regenerate `web/src/generated/**`
+  (derived — `scripts/dump_openapi.py` renders before opening and a failed dump leaves
+  `web/src/generated/openapi.json` byte-identical, API3), take the `js-cookie` override
+  (`6be9be06`) and let your lockfile resolve it, and take the coverage-report ignore rule
+  (`aa7e5836`) — 184 generated files rode in under WEB13 before it existed. TypeScript
+  strict is ON with a guard (WEB4); a local `any` you carry will fail the build, and the
+  build is the contract.
+  **THE STACK SHAPE.** ADR 0019 (credentials to the agent tier, option C) and ADR 0020
+  (the console's delivery shape, one path-routed reverse proxy, same-origin) both land
+  ACCEPTED (step 340) — records, default class, the producer's rulings on the producer's
+  stack. `compose.yaml` is canonical-company: take the SHAPE by hand (O72's five services,
+  `deploy/render_proxy_config.mjs` under `deploy/**` canonical-producer), the values are
+  yours. Your own console shape is your own ruling; nothing here changes it.
+  **TWO THINGS YOUR OWN RECORD STILL LACKS**, for your own report and no one else's: the 38
+  "new tests failing" bucket as a list of test ids (RELAY-45 §Five's condition on your
+  COMPLETE, still open in the close-out), and the 82 owed paths AS A LIST — a
+  deferred-paths row is a path or a glob, and a count cannot be written as a pattern, so
+  no row exists for them on this side until they are names. Both are in the hand prompt's
+  section 5; both are yours to record where you record things.
+  **THE ONE RULING OWED FROM THIS SIDE, STATED AND NOT YET ANSWERED.** `55c2a204` (step
+  352) redacted a company-internal product name IN PLACE inside a signed `config/gate-log.md`
+  entry, per CLAUDE.md §3. A changed line is what the line-based append-only guard fails, by
+  design, and a publish-boundary redaction has nowhere to relocate to — so at this roll your
+  `append_only_violation` will fail on that one producer line, correctly, and neither side
+  yet has a rule for it. The question is producer-side and the answer is owed producer-side;
+  it was raised before this roll (SECOND POSTSCRIPT, §Four) and the roll was cut with it
+  open, deliberately, so that the base does not wait on a ruling and the ruling does not
+  get made by a roll. It lands as a dated rider to this relay or as RELAY-47. Until it does:
+  when the guard fails on that line, stop, name it in your report, invent no local
+  exemption, and do NOT reconstruct the redacted name — removing it from tracked prose was
+  the point of the commit. The hand prompt's section 4 says the same in your own terms.
+  **NEVER-PORT THIS ROLL, so you do not go looking:** the lane handoff file under `docs/`
+  and the `lane-handoff` skill with its test `tests/unit/test_lane_handoff.py` (producer
+  two-machine coordination, step 337), `docs/company-prompts/**` (hand-carried by
+  definition), `docs/port/port-prompt.md` (this file), and the depgraph snapshot JSON.
+  Seven paths; the table names them.
+  Nothing is asked back.
+
+  **POSTSCRIPT TO RELAY-46 - THREE OF ITS FIGURES ARE SUPERSEDED, AND THE OWED PATHS ARE
+  ALREADY A LIST (2026-09-08, after the roll; your hand-carried carve-out review and your
+  landing report, plus the producer's review of the first):** Read producer-side at
+  `05e365dd` on `main`, port base `port-base-20260908`; venue desktop. The relay above was
+  written at the roll and stands as written (L25: a rider, never an edit); this postscript
+  says what moved after it. **One - your `main` is `b73fd9d1`, not `d527afce`**
+  `[SME-REPORTED]`: all five of the hand-carried fixes landed, both working branches are
+  deleted local and remote, and the "2 deliberate regressions" in RELAY-46 and in the sixth
+  base's bullet under `## Last completed port` are now ONE.
+  `test_reconcile_gate_log_append_only_live` went green with the signed 2026-08-20 text
+  byte-identical - so it was never a regression of the record, only of the guard's copy
+  (SECOND POSTSCRIPT TO RELAY-45, its opening paragraph).
+  `test_reconcile_runbook_exemptions_no_drop_live` remains, and remains correctly: it
+  reports the two `HISTORICAL_PATHS` rows the T19 ruling
+  dropped, which is the guard doing its job on a ruled drop, not a defect. Of the 38 "new
+  tests failing", 30 sit in T24 and the vocabulary rename `[SME-REPORTED]`, unchecked from
+  here. **Two - RELAY-46 said the 82 owed paths were owed AS A LIST. They already are one.**
+  Your `sme-path-carveout-review.md` and its `.csv` twin, produced against section 5 of
+  `docs/company-prompts/port-base-20260905-closeout-company-prompt.md`, name 87 paths; the
+  relay was written before that document was carried over, and its "a count cannot be
+  written as a pattern" stands only as history. `[VERIFIED-PRODUCER]` The producer read that
+  list with its own classifier - `drydocs.port.dispositions.classify` against
+  `PORT-MANIFEST.yaml`, the importable object (J37), never a render - and the result is
+  `docs/reviews/company-owed-path-review-2026-09-08.md` (`775248a7`, amended `fcf3c00b`):
+  **the manifest already rules 73 of the 87.** Five are canonical-producer, seven are
+  per-entry (blocked on T24, not on a ruling), three are derived (regenerate, never carry),
+  and 51 are `default_ok` - every one of them matched an explicit J16 row with a `reason:`,
+  none fell through to the bare default, so the decision for those 51 IS recorded and the
+  review's §3 says where. **Fourteen need the SME**: the 13 `docs/design/**` rows the
+  manifest classes `evaluate`, and `graph-tests/tom-required-contacts.yaml`, whose
+  canonical-company row carries a note and no rule. **The one item with a clock is not among
+  the fourteen:** seven of the eight canonical-company rows are `config/gate-prompts/**`
+  specs, and that row's entry_rule already rules them - a producer spec whose slug the
+  consumer does not hold is a CLEAN-ADD, taken whole. They wait on nobody, and a missing
+  prompt is a gate page that cannot render (review §2). One reading correction to your own
+  document, for your own record: the summary table's canonical-company cells are transposed
+  (the `1 | 7` cells should read `7 | 1`; review §4). No `deferred-paths` row is written on this
+  side for any of the 87: a row is a producer ruling, only 14 are needed, and the 14 are the
+  SME's to make. **Three - the pointer, which is what this postscript is for.** Your fetch
+  of the producer works now (guardrail 1: read at producer HEAD, not at the ref you last
+  fetched), so this relay is a pointer and not a payload: **read producer `main` at
+  `05e365dd`** - `git show 05e365dd:<path>` from the fetched ref reads a file without
+  applying it, and `docs/port/**` stays never-port whether or not you read it. Three files
+  are worth naming. The review above. The hand prompt named above, whose section 4 is the
+  standing instruction for the §3-redaction line until the ruling lands. And
+  `docs/style/review-provenance.md`, which since `fcf3c00b` and `05e365dd` carries J76's
+  fourth failure mode - the instrument is correct and read correctly and is STALE, a
+  superseded function under the same name, signature and docstring; the check is
+  `git log -1 -- <file>` against your base, and the 2026-08-06 FETCH RESOLVED note (a failed
+  producer fetch degrading silently to a cached `5f79d145`) was its single-case form. That
+  is the shape the SECOND POSTSCRIPT TO RELAY-45 found on this side by hand. **RELAY-47 stays
+  reserved for the §3-redaction ruling**; nothing in this postscript is that ruling.
+  Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
@@ -3644,6 +3918,40 @@ files, add it yourself. The 102 default_ok are dominated by `docs/reviews/**` re
 `PYTHONPATH=. python scripts/render_port_dispositions.py port-base-20260902` on your
 tree with HEAD at `port-base-20260905` and the table you get is the work plan.
 
+**MEASURED FOR THE SEVENTH ROLL (2026-09-08)** — the range you apply next is
+`port-base-20260905..port-base-20260908`, tag..tag, one range with no parked apply behind
+it (your `port-base-20260905` apply is reported COMPLETE at `d527afce`, `[SME-REPORTED]`):
+**493 changed paths across 8 classes** — canonical-producer 184, per-entry 130, default_ok
+127, evaluate 19, derived 10, union-append 9, canonical-company 7, never-port 7. Measured at
+the roll commit's parent; the roll adds NO manifest row, because the table needed none —
+every path resolved to a row or to an intentional default, and the one known collision
+(`scripts/reconcile_before.py`, two shapes, RELAY-39) sits under `scripts/**` default_ok
+where hand-merge is the rule. The 184 canonical-producer paths are 151 `web/**` (take whole,
+regenerate `web/src/generated/**`), 7 `.claude/**` (three research-probe-discipline eval
+files, the `reconcile-port`, `run-drydocs-console` and `controlm-db` skill files, and
+`.claude/skills/groom-backlog/validate.py`), 8 `config/**`, 4 `deploy/**`, three
+non-JSON files under `knowledge/depgraph-snapshots/**`, two under `drydocs/loaders/**`, and
+one each of `PORT-MANIFEST.yaml`, `CLAUDE.md`, `.dockerignore`,
+`docs/restructure/backlog/README.md`, `drydocs/cli_schema.py`, `drydocs_core/schema/**`,
+`drydocs_remediation/**`, `internal/remediation/**` and `tests/unit/test_port_manifest.py`.
+The 130 per-entry are 117 `docs/restructure/backlog/items/*.yaml` plus `MODULE_MAP.md`,
+`config/source-registry.yaml`, `config/source-bindings.yaml`,
+`config/taxonomy/ui-components.yaml`, `docs/restructure/roadmap.yaml`,
+`drydocs_core/component_map.py`, `drydocs_core/schema/constraints.cypher`, `pyproject.toml`,
+`scripts/render_enforcement_matrix.py` and four tests — union by key, your rows stay. The 127
+default_ok are `tests/**` 58, `agents/**` 20, `drydocs_api/**` 16, `scripts/**` 8,
+`drydocs_core/**` 7, `drydocs/**` 6, `docs/decisions/**` 5, `docs/reviews/**` 3 (read, never
+edit), `internal/**` 2, `.env.example`, `.gitattributes` — hand-merge on collision. The 19
+evaluate are 17 `docs/design/**` sources and renders, `.github/workflows/ci.yml` and
+`tests/unit/test_controlm_cypher.py`. The 9 union-append are `config/gate-log.md`,
+`docs/restructure/IDEAS.md` and seven epic files. The 7 canonical-company are `compose.yaml`,
+`config/dev-environment.yaml` and five `config/gate-prompts/**` — NO ACTION by rule; the
+producer's edits to unsigned prompts are dated PROPOSED clauses you accept or not. Run
+`PYTHONPATH=. python scripts/render_port_dispositions.py port-base-20260905` on your tree
+with HEAD at `port-base-20260908` and the table you get is the work plan; run
+`scripts/port_completeness_check.py port-base-20260908 --prev port-base-20260905` when you
+think you are done, and the clean-add class closes on a measurement for the first time.
+
 **THE STEP LEDGER IS NOT REPLACED BY THIS AND IS NOT SUMMARIZED BY IT.** It stays
 below, entire, and it is where the reasoning lives — why a change was made, what it
 cost, what it did NOT authorize. The disposition table tells you the ORDER and the
@@ -3687,7 +3995,7 @@ depgraph snapshots in the range are ritual — per-entry backlog union, derived
 regeneration, never-port outputs — and get no step. **Steps 273–296 are the
 2026-09-01 (fourth) roll**, covering `port-base-20260829..port-base-20260901`;
 steps 241–272 remain live below them because that base was certified and never
-applied, so the two rolls are one range for the consumer. **Steps 297–312 are the 2026-09-02 (fifth) roll**, covering `port-base-20260901..port-base-20260902`, rolled BEFORE the company's retry so that the retry applies ONE range, `port-base-20260826..port-base-20260902`, with all seven live relays inside it and nothing hand-carried (RELAY-24; the 20260901 apply is parked unmerged). **Steps 313–333 are the 2026-09-05 (sixth) roll**, covering `port-base-20260902..port-base-20260905` — 186 commits at the tag, 132 cited, the first roll since 2026-08-26 to start from a range the company had already applied COMPLETE (its `4d9ddba7`), so nothing is parked and nothing is hand-carried; RELAY-26 is its one relay.
+applied, so the two rolls are one range for the consumer. **Steps 297–312 are the 2026-09-02 (fifth) roll**, covering `port-base-20260901..port-base-20260902`, rolled BEFORE the company's retry so that the retry applies ONE range, `port-base-20260826..port-base-20260902`, with all seven live relays inside it and nothing hand-carried (RELAY-24; the 20260901 apply is parked unmerged). **Steps 313–333 are the 2026-09-05 (sixth) roll**, covering `port-base-20260902..port-base-20260905` — 186 commits at the tag, 132 cited, the first roll since 2026-08-26 to start from a range the company had already applied COMPLETE (its `4d9ddba7`), so nothing is parked and nothing is hand-carried; RELAY-26 is its one relay. **Steps 334–353 are the 2026-09-08 (seventh) roll**, covering `port-base-20260905..port-base-20260908` — 407 commits at the tag, 303 cited, one range again because the company reported the 0905 apply COMPLETE at its `d527afce` (`[SME-REPORTED]`); the nineteen relays written during that apply (27–45) all act in this range, RELAY-46 says where each lands, and it is the roll's one new relay.
 
 124. LOCAL-INFRA CHORES + ONE ADR [venue-pinned / docs] (`8c4ee1e` G49, `5a6208e`
     G50, `3304666` G49 follow-up, `034eb70` G53). G49/G50 are DESKTOP-VENUE facts —
@@ -6567,6 +6875,314 @@ hand-carried and nothing parked.
     no path the range had not already touched. The tag sits on the `chore(port): roll`
     follow-up that re-renders the board after Lane B's WEB12 claim (`3919f5a0`) landed
     between the roll's pull and its push.
+
+334. LANE B'S FIRST WEB STACK — STRICT TYPES, RESULT COMPLETENESS, ROUTE AUTHORIZATION,
+    THE DATA LAYER [`web/**` canonical-producer, 151 paths this roll; `web/src/generated/**`
+    derived — regenerate, never merge; items per-entry] (`e6fdd0e5` + `8565b29e` WEB4 —
+    TypeScript strict on in `web/`, with a guard that keeps it on; `95c89328` + `1555a411` +
+    `cf4d45c7` + `047c8877` API1 — result completeness is part of the read contract, the
+    server declares whether a page is exact or truncated; `139cee4e` + `67a8734e` + `00f39a5a`
+    WEB3 — route authorization derives from the module registry, no hand-kept route list;
+    `d3a64c9e` + `624508da` + `ccbb75a8` + `ac9415fd` WEB12 — the data layer: provider,
+    `useGraphQuery` and the shared scanner; `a545b3b0`, `63ed6ddb`, `93162325` the `--no-ff`
+    stack merges). The four were the `wip/` branches the 0905 bullet said would land in this
+    range; they did, as one chain, each merged after the one below it.
+
+335. LANE B'S SECOND WEB STACK — PROVENANCE, THE CI RATCHET, ERROR BOUNDARIES, STORAGE,
+    THE SECURITY MODEL, TOKEN PARITY [`web/**` canonical-producer; items per-entry]
+    (`7afe9f13` + `c8c17551` WEB1 — provenance of rendered data is a typed union; `ebf9ca7d`
+    WEB13 — the web CI ratchet and a correction to the review; `452e7557` WEB5 — an error
+    boundary per route outlet, keyed on pathname; `452b5583` WEB11 — one storage module, both
+    sign-out paths clear it; `4f5712ed` WEB15 — the README states the security model the code
+    implements; `6559f364` WEB14 — a token-parity guard for the two frozen sheets; `778d242d`,
+    `e113e0ae`, `65db25e2`, `df5953e7`, `8fdc313b`, `fa23aed3`, `facd84f0` the stack merges;
+    `aa7e5836` untracks the vitest coverage report — 184 generated files rode in with WEB13's
+    `test:coverage` and nothing ignored them, so the ignore rule is the change to take;
+    `c87e7cca` repairs cp1252 double-encoding in five item files — 47 mojibake em dashes and
+    quotes read back as the characters they were; take the repaired bytes, the per-entry union
+    keys on id and the content is the producer's).
+
+336. LANE B'S THIRD QUEUE — THE ROW CEILING, THE ROW-SHAPE CHECK, CODE SPLITTING, THE
+    STUB-ADK FIXTURE, THE LOG ESTATE [`web/**` canonical-producer; `agents/**` default_ok;
+    `tests/fixtures/adk/stub-run-sse.txt` default_ok; items per-entry] (`4fcc0096` +
+    `7810333a` WEB2 — the row ceiling is visible and the export stops claiming "full";
+    `f38ba655` + `f04840db` WEB6 — one runtime row-shape check retires every double cast;
+    `f3b61c57` WEB7 — code splitting follows the authorization boundary; `940325da` +
+    `a622eb56` R12 — the stub-ADK harness is a committed fixture (`tests/stub_adk.py`);
+    `805af17d` O43 — the last UI suite is seeded, 13 of 13; `b200d445` G131 — the agents' env
+    fallback stops depending on `""` being falsy; `274e4b21` + `721abcd0` O89 — console anchors
+    become content-derived; `56f4cab4` O68 — the log estate, with the debug tier unreachable by
+    construction (`drydocs_core/log_estate.py`, `drydocs_api/log_estate.py`,
+    `config/log-kinds.yaml`); `35ff19b3` O89 seeds drafts after a navigation and O68 exercises
+    its endpoint; `fbf15b3d`, `17fa3199`, `4c99b802`, `ebacfe1a`, `8acd7be7`, `eab78418`,
+    `8b1f660b`, `f07ce3fc` the merges).
+
+337. THE LANE HANDOFFS, AND THE SKILL THAT GENERATES THEM [`docs/lane-*-handoff.md` and
+    `.claude/skills/lane-handoff/**` never-port — the files are producer session
+    coordination and retire themselves; `tests/unit/test_lane_handoff.py` never-port with
+    them] (`5f5acab9`, `f9ac45b7`, `46e39327`, `21837abe`, `f06ff632`, `a15bb43e`, `e8b7200c`,
+    `45f4723d` the handoff files written for each two-machine burst; `dae01ce0`, `c949f672`,
+    `fe9ff979`, `d86954d9`, `afa3120c` their retirements at each burst's close, with the
+    `--no-ff` merges of the laptop's `wip/` branches and the render catch-up; `04f72b5b` the
+    Lane B hand-backs inboxed as Idea-266..268; `fc57826f` PLAN4's rule that a module-owned
+    surface rides with the code pen — `config/taxonomy/ui-components.yaml` renders under
+    `code:drydocs-web`; `cfc650eb` PLAN5 — the skill compares a queue's inputs against the
+    OTHER queue's inputs, not only its pens; `de0e5b7c` PLAN6 — an item declares the venue it
+    needs and the skill flags a machine that lacks it; `e89a66ca` + `47383aae` + `a8e7d2b5`
+    Lane B's inputs-vs-inputs prototype preserved and pointed at from Idea-269). Nothing here
+    crosses — the skill is the mechanism CLAUDE.md §0 names for a planned two-machine burst,
+    and the company applies a port with one pen.
+
+338. THE PORT INSTRUMENTS — RECONCILE-BEFORE, THE FORK POINT, THE DISPOSITION RENDERER,
+    COMPLETENESS, AND THE FOUR CONSUMER-CORRECTION FIXES [`drydocs/port/**`, `scripts/**`,
+    `tests/**` default_ok — take them, they are what the consumer runs; `PORT-MANIFEST.yaml`
+    canonical-producer] (`2aa90898` `drydocs/port/reconcile_before.py` + the
+    `scripts/reconcile_before.py` shim — the pre-apply reconciliation the consumer runs on
+    its own tree; `90b93445` + `adb03f43` the fork point is measured from the two trees, never
+    assumed from a tag; `eee64ce3` + `df7a57c3` `drydocs/port/dispositions.py` is the ONE
+    reading of the manifest — `scripts/render_port_dispositions.py` imports it and the
+    renderer refuses an unresolvable ref instead of rendering an empty table (RELAY-28);
+    `6f8c7825` PORT6 — `drydocs/port/port_completeness.py` +
+    `scripts/port_completeness_check.py <base> --prev <prev>`: every base-tag path absent
+    from the consumer tree, by disposition, so a roll closes on the clean-add class and not
+    only on the collision classes — two rolls closed without it and the consumer's by-hand
+    sweep found 113 survivors at 0905 (RELAY-40); `b8a9be7d` + `a8f8bc4d` the completeness
+    check covers union-append and the preflight's cited-path check reads real paths;
+    `aef8dfcb` the gate-log union guard reads LINES, and `drydocs/loaders/sql/controlm_jobs.sql`
+    gets its per-entry row (RELAY-43); `3d1278aa` the `pyproject.toml` row: the three ruff
+    tables cross whole (RELAY-36); `6f0a8662` J57 — acceptance by test id, never by total;
+    `70fdbfd6` J75 — a review that finds nothing says what it looked at; `5637d694` +
+    `c15c29ba` PORT7 — the ruff PIN crosses whole with the tables, pinned by
+    `tests/unit/test_port_manifest.py`; `84c042bd` + `58a76d3f` + `5656439a` PORT5 — a
+    manifest rule describes the PRODUCER's tree, never the consumer's: five rows rewritten
+    from "company = producer minus X" and bare consumer counts to dated observations, and a
+    guard that reads the data and not the file's prose; `65b9037f` + `e8600cd6` PORT2 — two
+    revisions of one document are never a rename candidate, `revision_siblings` in
+    `drydocs/port/port_rename_detect.py`, measured on the consumer's real 1.00 pair). Every
+    fix in this step answers a correction from the 0905 report; RELAY-46 lists them by relay
+    number.
+
+339. THE MID-APPLY RELAYS — WRITTEN AS THE 0905 REPORT ARRIVED [`docs/port/port-prompt.md`
+    never-port; cited so the ledger accounts for the commits] (`f3bbac6f` + `ef5a9a36`
+    RELAY-27 — the `BASE.sha` one-file fix and the `scripts/reconcile_before.py` hand-merge;
+    `013b93d5` RELAY-28/29 — the renderer refuses an unresolvable ref, `classification:` is
+    the consumer's on per-entry rows; `40fdc48e` RELAY-34; `ac5a6476` + `61dfe4c2` RELAY-35 —
+    per-entry accumulation, deferrals by path, T24; `f2f59346` RELAY-36; `eb45a26d` RELAY-37 —
+    gate-log union-append; `9fd73651` RELAY-38; `609aec91` RELAY-39; `f14c059c` RELAY-44 —
+    G65/G64; `42338d48` RELAY-45 — the report read, the acceptance gate restated, the PORT5
+    sweep; `9f86e3fc` J73). RELAY-46 below is this roll's one relay and it supersedes none of
+    these — they said "acts at the next roll", and this is that roll.
+
+340. ADR 0019 AND ADR 0020 — CREDENTIALS TO THE AGENT TIER, THE CONSOLE'S DELIVERY SHAPE,
+    AND THE ORIGIN 403 [`docs/decisions/**` default_ok; `deploy/**` canonical-producer;
+    `compose.yaml` canonical-company — the shape is the producer's, the values are yours;
+    `web/**` canonical-producer] (`41ab34cf` ADR 0019 PROPOSED, `e755274b` ACCEPTED — option C,
+    the agent names the session by its public handle and never by its token
+    (`docs/decisions/0019-credential-propagation-to-the-agent-tier.md`); `d8b36d8e` +
+    `77cae33a` + `de6cb614` + `7cc61842` WEB9 built and closed on it; `472001dc` the ADR's
+    cited path is `web/src/lib/askApi.ts`; `c3d3b54f` ADR 0020 PROPOSED, `617cca63` ACCEPTED —
+    option C, one path-routed reverse proxy, `/api` and `/agent` same-origin, no CORS
+    (`docs/decisions/0020-console-delivery-shape.md`); `e2dc1223` + `08639e6a` + `96111884` +
+    `a317dd36` WEB10 built and closed — the operator surfaces learn the same-origin shape,
+    `docs/design/drydocs-web-console-runbook.md` Rev 4, `deploy/render_proxy_config.mjs`;
+    `242fd6ad` + `ae846600` the ADR 0020 amendment — the proxy owns the request it presents;
+    `f74d6d0c` + `ee97a351` neither proxy forwards the browser's Origin to an upstream — the
+    console's Ask answered 403 on every question until this; `5605b6c5` + `dc73c4fa` U.S.
+    English on the `/explorer` canvas labels and the ADK origin check described as
+    same-origin-only). Two ADRs land as ACCEPTED in one range; both are the producer's
+    rulings on the producer's stack and cross as records — the company's own console shape
+    is its own ruling.
+
+341. THE AGENT TIER, PART ONE — EPISTEMIC LABELS, THE THREE VERBS, THE GLOSSARY [`agents/**`
+    default_ok; `drydocs_api/**` default_ok; `drydocs_core/**` default_ok; `web/**`
+    canonical-producer] (`4d188307` + `169300ba` + `b1527e8c` + `887e859f` R15 — epistemic
+    labeling on query answers, exact versus lower-bound with the causes named
+    (`drydocs_api/epistemics.py`); `629622c7` + `544e4230` + `e067e2cf` R16 — the agent verbs
+    impact, context and trace as names over reviewed QuerySpecs; `58666348` + `7e95a670` +
+    `d8642a9d` + `7db46bf4` + `f3a05b92` + `2578155c` R19 — the glossary read surface and the
+    term resolution index (`drydocs_core/glossary.py`)).
+
+342. THE AGENT TIER, PART TWO — THE LEDGER READER, THE DECISION TRACE, THE ANSWER
+    EVALUATOR, AND THE LANE B CHAIN [`agents/**`, `drydocs_api/**`, `tests/**` default_ok;
+    `config/review-quality.yaml` canonical-producer] (`2004a01a` + `a61fc56a` + `7a3a6e7c` +
+    `72aa868c` R8 — the ledger reader, the four on-demand tools and the agent-run grid;
+    `3d159a59` + `cb25c85c` R18 — the qa-debug decision trace: writer, pipeline seams, admin
+    read; `c0abab0f` + `066bd4b5` + `31b9905c` AGENT1 — the answer evaluator
+    (`agents/common/answer_eval.py`) and `agents/graph_qa/control.py`; `ce18a957` + `ef3d3793`
+    API4 — review quality (`drydocs_api/review_quality.py`); `3d16e9ac` + `14ea39fa` WEB18;
+    `364d4bc8` + `ef309c81` V9; `0b20cdef` the `--no-ff` merge of the whole chain from
+    `wip/v9-laptop`).
+
+343. THE CONSOLE ITEMS — THE FREE ROUTES, THE INTAKE, THE ADMIN REVIEW QUEUE, THE REGISTRY
+    CLOCK [`web/**` canonical-producer; `drydocs_api/**` default_ok; items per-entry]
+    (`481d12d2` + `ca50288e` + `5cbde5b6` + `39614f82` + `2f8ea8b8` + `9a39ec2c` + `c541b858`
+    WEB8 — the server declares the routes O70 left free; `5511a571` + `686cea65` + `c8c6b5dc`
+    + `e57d7d5f` + `614d4374` O63 — built to ADR 0020's path map, not the retired
+    `VITE_ADK_URL` or the ports, with `drydocs_api/intake.py`; `0924fdb8` + `f408b93e` +
+    `7717d7f5` + `a9aea166` O50 — section 7 goes live, the admin review queue; `a6b53c1c` +
+    `14f4b673` + `9fff5e57` + `7715ff16` Z6 — the spec, the registry route and the clock
+    arithmetic).
+
+344. LANE B'S FOURTH QUEUE — PROSE-FREE ASSERTIONS, THE LIST COLUMN, THE ATOMIC DUMP, THE
+    LIMITS FILE, THE TYPES WRITER, TWO CLOSED SCHEMAS [`drydocs_core/**`, `drydocs_api/**`,
+    `scripts/**`, `tests/**` default_ok; `web/**` canonical-producer; `config/**`
+    canonical-producer] (`d364eb4c` + `30d06602` + `d2da9cbb` + `67fc7e6f` CORE2 —
+    `tests/source_scan.py` gains `without_prose` and `absent()` with a mandatory positive
+    control; `0c1aab8f` + `918ebd6d` + `4fa41e1d` API2 — `ColumnDef` grows a list type and the
+    console exemption goes; `64319518` + `8bbae32c` + `6e351b7b` API3 — `scripts/dump_openapi.py`
+    renders before opening, a failed dump leaves `web/src/generated/openapi.json`
+    byte-identical; `d63f9ccc` + `359febaf` + `b19af3b5` + `0d978a91` O51 — the limits file,
+    the derived signals, the admin block, three routes; `b905b892` + `edfab998` + `4a774d8f`
+    WEB16 — `api:types` names the file, the writer and the variable the writer needs
+    (`web/src/generated/api.d.ts`); `f2fc42e3` + `c3d8d730` + `a8bc0496` CFG3 — both schemas
+    closed and clause (b) found something in each; `6be9be06` + `78277d1c` the js-cookie
+    override to `^3.0.8` — clears the advisory and the five high audit findings without
+    downgrading NVL; take the override, your lockfile is yours).
+
+345. LANE B'S FIFTH QUEUE — THE STRICT TSCONFIG, THE CONSOLE STACK AS COMPOSE, FULL-HISTORY
+    GATES, DEPENDENCY CURRENCY, THE NEVER-PORT ZONE IN A GUARD, THE VERSION CENSUS
+    [`web/**` canonical-producer; `compose.yaml` canonical-company; `deploy/**`
+    canonical-producer; `.github/workflows/ci.yml` evaluate; `tests/**` default_ok]
+    (`4b2e7e94` + `058c0625` WEB17 — the strict tsconfig reaches every `.ts` outside `src`
+    and the coverage HTML is ruled unpublished; `e8ff9285` + `03d28704` O72 — the console
+    stack as Compose, its acceptance settled against ADR 0020; the manifest rows for
+    `compose.yaml` (canonical-company) and `deploy/**` landed with the Lane A close in step
+    337; `1dbbb668` + `7faddba8` + `ad65607d` + `2e94c00c` CORE3 — the gates job clones full
+    history so the J74 ceiling guard measures instead of skipping; `3dacd5c3` + `445c4660` I8
+    — a dependency committed more recently than its dependent is flagged, one mechanical
+    question put to git, because `depends_on` is a scheduling edge and carries no currency
+    claim; `8187e8f9` + `12c5a079` + `0178c126` G127 — a canonical-producer test that reads a
+    never-port document mirrors `test_runbook_currency.py`'s never-port-zone idiom, so it does
+    not fail on your tree as BROKEN when it means NOT HERE — this is J63's shape and the
+    2026-09-03 apply hit it; `7a5e38ff` + `9ad272ab` + `ec09ce73` V10).
+
+346. LANE B'S SIXTH QUEUE — THE SEAL WIDTH, THE SKIP-GUARD POLICY, THE BUNDLED FOLDER
+    CAPTURE, THE PYTHON MATRIX, TWO RUNBOOKS, THE R10 CITATION [`drydocs_core/**`,
+    `drydocs/**`, `tests/**` default_ok; `docs/design/**` evaluate; `.github/workflows/ci.yml`
+    evaluate; `internal/remediation/standards-rules-registry.md` — `internal/**` crosses to
+    the private company remote by rule, it never PUBLISHES] (`f0681b92` + `d45dcdf4` +
+    `518baa1f` CORE5 — `drydocs_core/entity_extract.py`: the application-id width is 4 to 7
+    digits with a floor, not exactly five, sourced from the tracked mapping and not relayed;
+    `3871c0a6` + `e50076a2` + `f64e7b4d` CORE4 — `tests/unit/test_skip_guard_policy.py` asks
+    "is this path in a fresh clone?" of `git ls-files`, so a force-tracked sample is not
+    flagged like a machine-local extract; `41ed6d5e` + `7f6a52c3` + `4d59cb5e` LOAD4 — the
+    synthetic SEAL capture grows to cover the seven bundled folder ids, the folder names are
+    untouched; `4069c736` + `97f3e814` + `86e68b1b` J67 — the CI matrix proves more than one
+    interpreter inside the declared range, and the comment that said both machines ran one
+    version is gone; `5a1b5950` + `0418cb8a` L29 — the load runbook's CSV example is runnable;
+    `9c33efb4` + `1dd55c92` V7 — `docs/design/drydocs-remediation-runbook.md`; `7072f54a` +
+    `b77db824` REM1 — "registry R10" is the citation and the tree obeys it).
+
+347. THE DESKTOP ITEMS — THE REGISTRY VIEW, THREE MFT SYSTEMS, THE COLLISION PROBE, THE
+    TEAM REPORT PROFILE, THE HOLD KEY, THE CYCLIC-TYPE GUARD [`config/source-registry.yaml`
+    per-entry — rows union by id, yours stay; `drydocs_core/**`, `drydocs/**` default_ok;
+    `docs/plan/load-map.html` and `web/src/generated/load-map.json` derived; items and
+    `config/taxonomy/ui-components.yaml` per-entry] (`b2445a63` + `d8540f58` + `3a9dea28` +
+    `064415dc` N26 — `drydocs_core/registry_view.py`: one derivation feeds the load-map's
+    By-class section, the web route's class view and `drydocs registry <loader> [--json]`;
+    replica-ness is four states, never a boolean; `5c11aaea` + `2b99e4d3` N27 — three SYSTEM
+    rows for the managed-file-transfer platforms, registered by pointer never by value, each
+    row disambiguating the other two; `470315a2` + `fa8cf8ff` P6 — the data-center collision
+    probe as `drydocs/loaders/sql/adhoc/probe_dc_table_id_collision.sql`, counts only;
+    `3af331ba` K30 — the team-report header profile read against the tree, and the (f) fence
+    that keeps estate volumetrics out of the tracked tree; `3f63961d` + `26afe5d5` Y7 —
+    `drydocs.backlog.v3` gains the declared `hold:` key, the board's Held strip, and
+    `derive_summary` excludes a held item from `next_ready` (ADR 0013 clause 3a); `697822dd`
+    + `e15d319a` LOAD5 — the cyclic-type guard asserts the join is absent from executable
+    SQL (`drydocs/loaders/sql/controlm_dependencies_recursive.sql`), not that a comment
+    phrase is present).
+
+348. THE CYCLIC-TYPE TRAP AND THE SMUGGLED DOT AS SKILL EVALS [`.claude/**`
+    canonical-producer] (`2d45d693` the CYCLIC_TYPE trap as a research-probe-discipline
+    eval — a letter that reads as cyclic and is not
+    (`.claude/skills/research-probe-discipline/evals/files/cyclic-type-trap.md`); `72e86a8d`
+    the smuggled dot — a value of `.` with no name a human would search for; `e0c0f4d0` the
+    case's "guarded by" claim re-stated as true as of LOAD5; `2d2f96be` both cases re-verified
+    at the current tree so they do not land carrying a 370-commit-stale pin; `639d841d`,
+    `845bb67b`, `738028d7`, `ce1ce5fc`, `839eab1f`, `51a21690` the branch's trunk merges;
+    `d31c7982` the `--no-ff` merge).
+
+349. THE MODULE REVIEW SWEEP — CORE, LOAD, LINEAGE [`docs/reviews/**` default_ok records,
+    J63-stamped — read, never edit] (`54ac5c9c` + `1ddb0781` + `2116257f` + `a53cd1c0` +
+    `9fc44844` slot 1, `docs/reviews/modules/core-2026-09-07.md` — core owns the driver seam
+    and it is the weakest, eight grooming candidates; `46b9970c` + `49e196cd` + `0c04fe2b` +
+    `8fb4359e` + `a8a1c2f8` slot 2, `docs/reviews/modules/load-2026-09-08.md` — two findings
+    that compound and a load path that does not truncate; `47f0cfc5` + `c6f52c18` +
+    `fd5abe94` + `1871958d` + `3471ac73` slot 3, `docs/reviews/modules/lineage-2026-09-08.md`
+    — a counted tier with no writer beside the strongest write boundary in the sweep;
+    `f8c4953a` + `80078c7a` candidate 1 is two items, the gate rider then the build;
+    `c2045ebe` the branch's trunk merge; `0813992d` the `--no-ff` merge, docs-only).
+
+350. GATES AND CLOSES [`config/gate-log.md` union-append; `config/gate-prompts/**`
+    canonical-company — the producer's edits to unsigned prompts are dated PROPOSED clauses,
+    yours to accept or not; items per-entry] (`dd599680` K16 done on the K25 status call, the
+    APPL_TYPE projection rehomed to K26; `e17dbad1` the older org/catalog gate sessions closed
+    out — C35, C37, G119 SME-deferred to the Logical Container gate, C36 folded into C44;
+    `f4f0b882` + `e2043d2a` C33 — Q3 ruled as the census key, a RECORD under
+    software-version-context; `ecc1622c` G65 B3 restated on the registry's real zone axis
+    plus proposal rows; `2f7f9485` four clauses the G64 session needs before it convenes, and
+    three stale premises corrected on unsigned DPL prompts (RELAY-44 carried both);
+    `7b4a4d09` four text defects from the 2026-09-08 transcription review closed, N14 done,
+    Idea-305 minted).
+
+351. MINTS AND IDEAS [`items/*.yaml` per-entry; `IDEAS.md` union-append] (`7067bfda` 21
+    groom stubs, `051e781c` eight ids, `d7be63eb` 13 ids, `4e074c16` + `8977d0c7` Idea-277..283
+    — the UI session's eval-case review; `8bd19f2a` + `d846951b` Idea-306 — a switch only a
+    test reads; `3695a044` + `e0f2b799` CFG5, the runner item for the
+    controlm-folder-identity-grain gate (`860c1d8f` corrects the second's message and carries
+    the bodies for CORE6, CORE7, PORT6, PLAN9); `243992d2` Idea-269..273 — the Lane B close's
+    five hand-backs; `05ac0ab8` Idea-286..290; `f59c1e56` Idea-302 — the `pyproject.toml`
+    per-entry row covered dependencies and not the ruff block, the finding PORT7 closed;
+    `e2260b84` Idea-303 + PORT6 (f); `5b8e2238` Idea-304 — one active data center per LB
+    alias, a ruling before an edge; `69ff309f` Idea-305 — the registry's origin label is a
+    domain, not a producer). Every id here minted through the allocator and pushed as a stub
+    before its body (I6); the per-entry union keys on id, so a company id in the same series
+    is not a collision.
+
+352. THE PUBLISH BOUNDARY AND THE SNAPSHOT INSTRUMENT [`internal/**` crosses to the private
+    company remote by rule; `agents/README.md` default_ok; `config/gate-log.md` union-append;
+    `knowledge/depgraph-snapshots/**` canonical-producer; `CLAUDE.md` canonical-producer]
+    (`b3ed74f2` the source-whitelist ledger instantiated with its first probed source —
+    `internal/research/_registry/source-whitelist.yaml`, schema `drydocs.source-whitelist.v1`,
+    no validator yet; `55c2a204` the company agent SDK's product name redacted from tracked
+    prose — `agents/README.md`, `config/gate-log.md`, ADR 0007 and the renders; on your tree
+    the name is yours to keep, this is the producer's publish boundary and not a correction
+    of yours; `1a5d30b0` `knowledge/depgraph-snapshots/snapshot.ps1` honors
+    `depgraph.capability_assert` and reports the measurement instead of guessing the cause —
+    the fix for the capability gap your 0905 report recorded when the snapshot refused;
+    `76cba80c` J78 — a cancelled CI run is neither green nor red, the snapshot check now says
+    UNVERIFIED, `CLAUDE.md` §0 carries the three outcomes).
+
+353. THE 0905 CLOSE-OUT, TRANSCRIBED — AND THE HAND PROMPT THAT ANSWERS IT
+    [`docs/port/port-prompt.md` never-port; `docs/company-prompts/**` never-port — a hand
+    prompt is hand-carried, by design self-contained, and cites no producer path]
+    (`d8a52dc0` the company's port-base-20260905 close-out transcribed as the POSTSCRIPT TO
+    RELAY-45 — `[SME-REPORTED]`, main = `d527afce`, four measurements RELAY-45 did not have,
+    and three things the postscript refuses to do: COMPLETE stays the company's verdict, the
+    82 owed paths get no deferred-paths row until they are a list, and the gate-log conflict
+    is recorded adjacent to RELAY-43; `08f5113d` the SECOND POSTSCRIPT — that last caution
+    withdrawn by rider: it IS the same guard, `aef8dfcb^` verbatim, and RELAY-43's fix clears
+    it; keep the promote-to-EOF fix for the RENDERING reason; and the one question this side
+    still owes, stated and not answered — how a union-append append-only guard survives a
+    mandatory §3 redaction of already-ported signed text (the redaction in step 352); `42789fd6`
+    the hand prompt, `docs/company-prompts/port-base-20260905-closeout-company-prompt.md`,
+    six sections, asks for the 38-test bucket by id and the 82 owed paths as a list, nothing
+    else). Laptop session, `pen: port`, pushed 2026-09-08 between this roll's pull and its
+    write; the roll took them in rather than cutting the base under them.
+
+    LEDGER COVERAGE FOOTNOTE (2026-09-08, SEVENTH ROLL). 407 commits in
+    `port-base-20260905..port-base-20260908` (`git rev-list --count` at the tag); 104 read as
+    ritual under the existing patterns (snapshots, claims, renders, grooms); 303 are cited in
+    steps 334–353 — the 302 the ledger was written against plus the roll commit itself. No
+    pattern spelling drifted this roll, so `drydocs/port/port_preflight.py` is untouched. The
+    roll commit (`98270a44`, subject `docs(port):` — outside the `chore(port): roll` ritual
+    pattern, so it is cited here rather than exempted) touches `docs/port/port-prompt.md`, the
+    plan renders, and two research-probe-discipline eval fixtures whose machine-local
+    transcript paths lost their backticks — preflight check 4 resolves every backticked path
+    in the range, and a path that exists on one machine only is named plain (J71) — no
+    manifest row changed, because the disposition table at the roll's parent needed none
+    (RELAY-46 says why). The tag sits on the `chore(port): roll` follow-up
+    that writes this sha in.
 
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
