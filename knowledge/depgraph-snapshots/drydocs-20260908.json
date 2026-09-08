@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-07T23:37:23",
-    "date": "20260907",
+    "captured_at": "2026-09-08T00:25:04",
+    "date": "20260908",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "860c1d8f",
-      "full": "860c1d8fbce935e563ee267e024e8e9fab2ad0c9",
+      "commit": "f59c1e56",
+      "full": "f59c1e56c60bdf65ac265e2a5336834b6862203b",
       "branch": "main",
-      "describe": "port-base-20260905-305-g860c1d8f",
-      "subject": "docs(backlog): bodies for CORE6, CORE7, PORT6, PLAN9; Idea-291..294 marked groomed; corrects e0f2b799's message",
+      "describe": "port-base-20260905-308-gf59c1e56",
+      "subject": "docs(ideas): Idea-302 - the pyproject per-entry row covers dependencies and not the ruff block",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -22976,10 +22976,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260907.json",
-      "name": "drydocs-20260907.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260907-2337.json",
+      "name": "drydocs-20260907-2337.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260907.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260907-2337.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -49574,7 +49574,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260907.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260907-2337.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
