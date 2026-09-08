@@ -7,7 +7,7 @@ phase: 9
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs_core/entity_extract.py
@@ -60,3 +60,98 @@ notes: |
   p1, not p2: this is a silent miss, not a visible failure. Nothing errors when a six-digit
   id is dropped - the extraction is simply empty, and every downstream consumer reads that
   as "no application id in this document".
+
+  CLOSED 2026-09-07 (laptop / NewThinkpad, Lane B, branch wip/core5-laptop; docs/lane-b-handoff.md
+  queue item 1). All five clauses done.
+
+  PROFILE SOURCE, and the venue fact that goes with it (J18): the machine-local transcription
+  the item's notes cite - internal-local/company-backflow/k30-team-details-report-header-list-
+  2026-09-07.md - IS NOT PRESENT ON THIS MACHINE; internal-local/ has no company-backflow
+  directory here. It did not need to be. The profile had already landed in the tree as a
+  TRACKED, citable record when K30 closed: the `Seal IDs` row of
+  config/source-mappings/pat-team-report.yaml carries "token width is 4 to 7 digits, never
+  assume 5 or 6 (profile SME-reported 2026-09-07, K30 close note)". That ledger row is the
+  width source every edit below cites, in the code itself, not in this note. This is the
+  transcribe-once-then-cite-the-tracked-record shape working as intended - the relay rule
+  K30 (b) insisted on was "never from a chat summary", and a committed ledger row is not one.
+
+  (a) DONE. _APP_ID_RE is 4 to 7 digits; the module docstring's class list, the
+  "does not do: guess" paragraph and the synthetic-values paragraph all rewritten. The
+  same five-digit belief lived in a SECOND place inside the extractor and the item did not
+  know it: the folder-name pass tested `len(seg) == 5` and then hard-coded `offset + 5` for
+  the span, so any other width would have been mis-spanned as well as mostly missed. Both
+  now go through named constants (_APP_ID_BARE_MIN_WIDTH / _APP_ID_MAX_WIDTH) so the two
+  sites cannot drift apart again, which is how this defect was born.
+
+  (b) DONE, and the design decision it forced is the real content of this item. Widening a
+  bare-digit pattern to four buys every year, clock time, port and small count in the corpus -
+  and since the class is emitted with cued as a FLAG rather than as a filter, all of it would
+  reach the caller's novelty score. So the rule is ONE sentence: the bare floor is five, and
+  a four-digit run is emitted only when the text names it (seal / app_id / application, or a
+  /raw/ landing prefix). Stated in the docstring as a candidate SHAPE decided before any match
+  exists - the same standing as the issue-key pass requiring an upper-case project key - so it
+  does not quietly contradict the module's no-suppression contract, which is spelled out there
+  too. Regression cases carry 4, 6 and 7 digit ids through cued; 5, 6 and 7 through bare; and
+  the negatives are a bare year, a row count, a port and a small count. The CONSEQUENCE is
+  asserted rather than left to be discovered: a six-digit row count IS emitted, uncued, because
+  above the floor the cue is the only discriminator and suppressing that shape would hide a real
+  six-digit id behind it. 49 tests in the module.
+
+  The folder pass keeps the FIVE floor even though it marks cued=True, and the comment says
+  why: it scans every segment instead of reading position 3, where the naming convention
+  actually puts the id, so "a numeric segment somewhere in a folder name" is a weaker claim
+  than "the prose said seal". Enforce the position and four can come back.
+
+  (c) DONE, both bullets - and the count was wrong in this item's own notes. The five-digit
+  belief was written in FOUR places, not three, and the three scans inside
+  test_publish_boundary_values.py disagreed with EACH OTHER: _SEAL_PAIR already used the
+  correct 4-7, Scan A used 5-6, Scan B used 5-6.
+    - Scan A (_BARE_ID) now goes to 7 and STOPS AT 5 deliberately, with the reasoning in a
+      comment: up is free, down would match every year in config/taxonomy, the sample CSVs and
+      knowledge/, so the scan would fail on prose and be silenced within a week. The 4-digit
+      real id therefore stays invisible to it - recorded, not fixed, with the cue/allow-list
+      shape that would close it (the shape _SEAL_PAIR already uses), because no 4-digit id is
+      known to be in the tree and a guard built for a value nobody has cannot be tested.
+    - Scan B takes the full 4-7 via a named _FOLDER_SEGMENT_WIDTHS: a folder segment sits in a
+      positional grammar rather than in prose, so the year problem does not arise there.
+    - The interlock's _FOLDER_APP_ID stays at five and now SAYS SO: five is the SYNTHETIC
+      width (the 70001-70099 block is five digits by construction), exact for its subject, and
+      widening it would only let a non-block value through unnoticed.
+
+  A FINDING FELL OUT OF WIDENING SCAN A, and it is the reason the widening was worth doing
+  beyond the extractor: six 7-digit values in knowledge/ that the old 5-6 range could not see.
+  Both files inspected before any disposition - knowledge/upgrade-plans/servicenow-cmdb-
+  analysis.md carries five ServiceNow doc-set ASSET numbers (asset 0003948 etc; leading zeros,
+  which a SEAL id does not have) and generic-terminology-research.md carries the thread id at
+  the tail of a public servicenow.com community URL. Vendor and public, neither an identifier
+  of ours, so allowlisted with those reasons rather than reswept. Nothing sensitive was found;
+  the point is that the tree had never been swept at that width at all.
+
+  (d) CONFIRMED UNAFFECTED AND LEFT ALONE, at file:line: drydocs/loaders/catalog.py:374-381
+  (_normalize_seal_ids replaces ';' with ',' and does nothing else) and
+  drydocs/loaders/cypher/pat_product_mapping.cypher:62 (split on ',' with a trim() non-empty
+  filter). No width rule on either side, so the PAT path always carried the full population and
+  only the prose extractor was narrow. No edit.
+
+  (e) DONE, both halves the clause allows - a comment AND a test. The comment sits exactly
+  where project_rows does its exact string membership (drydocs/pat_projection.py) and names
+  the trap in full: Team ID is a dense integer surrogate key whose values are SEAL-shaped and
+  it is the FIRST of the 43 columns while Seal IDs is 42 later, so a discovery that matches on
+  VALUE SHAPE picks the wrong column every time, silently, and writes team ids as application
+  ids on the ACTIVE arch_develops edge. It is the SHAPE sibling of the Team Type Name decoy,
+  which decoys on MEANING - the test is named and placed next to that one to make the pair
+  visible. The test reads the positional hazard from the recorded ledger list rather than
+  asserting it from memory (RAW_HEADERS[0] == "Team ID", and Seal IDs strictly after it) and
+  drives a SEAL-shaped Team ID through the projection.
+
+  Gates, all on this branch: full suite 3652 passed / 15 skipped / 18 deselected, `ruff check .`
+  clean, `ruff format --check .` clean (578 files), `import drydocs.cli` and `drydocs --help`
+  both exit 0. NO RENDER and no snapshot - Lane B pens (CLAUDE.md §0; the board and roadmap are
+  Lane A's, which is also why this close commit is expected red on
+  test_committed_roadmap_page_matches_its_sources until Lane A renders at merge).
+
+  ONE EDIT OUTSIDE ANY DECLARED PEN, flagged for Lane A rather than assumed: MODULE_MAP.md's
+  row for entity_extract.py described the class as "always reported", which the floor makes
+  false. One clause corrected in that one row. Neither lane declared MODULE_MAP.md, so it is
+  named here and in the close report; a stale map row that contradicts the code it maps was
+  the worse of the two options.

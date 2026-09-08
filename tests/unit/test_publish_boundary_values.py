@@ -120,11 +120,58 @@ ALLOWLIST: dict[str, tuple[frozenset[str], str]] = {
         CTM_FOLDER_KEYS,
         "sample-family folder table keys",
     ),
+    # Surfaced by CORE5 widening Scan A to 7 digits — invisible to the old 5-6
+    # range, and both benign on inspection. Recorded here rather than reswept
+    # because neither is an id at all.
+    "knowledge/upgrade-plans/servicenow-cmdb-analysis.md": (
+        frozenset({"0001261", "0001397", "0002024", "0003551", "0003948"}),
+        "ServiceNow's own doc-set ASSET numbers for the vendor PDFs/PPTX/DOCX the "
+        "file summarizes (`asset 0003948` etc.) — vendor material, not company "
+        "data, and the vendor doc set itself stays local per external/ServiceNow. "
+        "Leading zeros; a SEAL id has none",
+    ),
+    "knowledge/upgrade-plans/generic-terminology-research.md": (
+        frozenset({"2845942"}),
+        "the thread id at the tail of a PUBLIC servicenow.com community URL "
+        "(.../td-p/2845942) in the Sources list — a citation, not an identifier "
+        "of anything of ours",
+    ),
+    "tests/unit/test_entity_extract.py": (
+        frozenset({"7001", "700011", "7000111", "123456"}),
+        "CORE5 width fixtures. The reserved block 70001-70099 is five digits by "
+        "construction, so the 4-, 6- and 7-digit cases the extractor must now "
+        "handle have no in-block value to use; they extend the same `700` prefix, "
+        "and two of them (700011, 7001) sit inside folder-shaped tokens, which is "
+        "what brings them into Scan B's reach. `123456` is the negative case — a "
+        "six-digit ROW COUNT, there to pin that the extractor reports it uncued "
+        "rather than suppressing it. None is an id",
+    ),
 }
 
-_BARE_ID = re.compile(r"\b\d{5,6}\b")
+# WIDTH, MEASURED (CORE5, 2026-09-07). The live SEAL population is 4 to 7 digits
+# wide, not 5 to 6 (config/source-mappings/pat-team-report.yaml, the `Seal IDs`
+# row: "token width is 4 to 7 digits, never assume 5 or 6"; profile SME-reported,
+# cited by the K30 close note). `_SEAL_PAIR` below already knew that; these two
+# did not, and the three scans disagreed with each other in the same file.
+#
+# Scan A goes to 7 and STOPS AT 5 ON PURPOSE. Up is free: a bare 7-digit run in
+# an identity-bearing family is worth a look, and nothing in the tree tripped it.
+# Down is not: `\b\d{4}\b` matches every year, every clock time and every small
+# count in config/taxonomy, the sample CSVs and knowledge/, so the scan would
+# fail on prose and be silenced within a week. A 4-digit real id in those
+# families is therefore still invisible to this scan, deliberately — catching it
+# needs a CUE ("seal 7001") or an allow-list of known 4-digit ids, which is the
+# same shape `_SEAL_PAIR` already uses and is the honest way to get that width
+# back. Recorded rather than done: no 4-digit id is known to be in the tree, and
+# a guard built for a value nobody has is a guard nobody can test.
+_BARE_ID = re.compile(r"\b\d{5,7}\b")
 # Candidate Control-M folder-name tokens: 6-letter prefix + >=2 dash segments.
 _FOLDER_TOKEN = re.compile(r"\b[A-Z]{6}(?:-[A-Z0-9]{2,20}){2,}\b")
+#: The width Scan B accepts inside a folder name. A numeric segment sits in a
+#: positional grammar rather than in prose, so the year problem above does not
+#: arise and the full measured range applies — this is the one of the three that
+#: can safely take the 4-digit floor.
+_FOLDER_SEGMENT_WIDTHS = range(4, 8)
 _SEAL_PAIR = re.compile(r"%%SEAL\b[^0-9\n]{0,40}(\d{4,7})")
 
 
@@ -199,7 +246,7 @@ def test_folder_name_numeric_segments_are_synthetic_everywhere() -> None:
             for seg in parsed.segments:
                 if (
                     seg.isdigit()
-                    and 5 <= len(seg) <= 6
+                    and len(seg) in _FOLDER_SEGMENT_WIDTHS
                     and not _in_block(seg)
                     and not _allowed(rel, seg)
                 ):

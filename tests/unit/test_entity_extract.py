@@ -3,6 +3,14 @@
 Every string here is synthetic. 5-digit ids sit in the reserved block
 70001-70099 (test_publish_boundary_values sweeps every tracked file for any
 other), domains are ``.invalid``, project keys and schema names are plain words.
+
+CORE5 widened the class to the measured 4-to-7-digit range, and those widths have
+no reserved block. The values below extend the same ``700`` prefix (``7001``,
+``700011``, ``7000111``) so they still read as block-family. Which sweep can see
+them: Scan A (bare 5-6 digit ids) is scoped to config/taxonomy, the sample CSVs
+and knowledge/, so it does not reach this file at all; Scan B reads numeric
+segments out of folder-shaped tokens in EVERY tracked file, so ``_FOLDER_WIDE``
+below carries an allowlist row in test_publish_boundary_values.py with its reason.
 """
 
 from __future__ import annotations
@@ -14,6 +22,18 @@ from drydocs_core.entity_extract import EntityMatch, extract_entities, values
 
 _GUID = "3f2504e0-4f89-11d3-9a0c-0305e82c3301"
 _FOLDER = "PRARAG-HLDM-70002-PEX-RFND-DLY"
+
+# The measured widths the 70001-70099 block cannot express (see the docstring).
+_ID_4 = "7001"
+_ID_6 = "700011"
+_ID_7 = "7000111"
+#: The same folder shape carrying a SIX-digit id segment — an ordinary width in
+#: the live population that the pre-CORE5 `len(seg) == 5` test dropped silently.
+_FOLDER_WIDE = "PRARAG-HLDM-700011-PEX-RFND-DLY"
+#: ... and a FOUR-digit segment, which stays out: this pass scans every segment
+#: rather than reading position 3, so at four digits a segment is as likely a
+#: year or a sequence number as an id.
+_FOLDER_NARROW = "PRARAG-HLDM-7001-PEX-RFND-DLY"
 
 
 def _kinds(text: str) -> list[tuple[str, str]]:
@@ -45,9 +65,11 @@ def _kinds(text: str) -> list[tuple[str, str]]:
         ),
         ("page DL_ops_tier2 first", [(ex.DISTRIBUTION_LIST, "DL_ops_tier2")]),
         ("the DL is on the thread", []),
-        # application id — exactly five digits, standalone
+        # application id — a standalone 4-to-7-digit run (CORE5), reported bare
+        # only from 5 up. `700041` is an order number, not an id: at six digits
+        # it IS a candidate and IS reported, uncued, for the caller to rank down.
         ("seal 70004", [(ex.APPLICATION_ID, "70004")]),
-        ("order 700041 rejected", []),
+        ("order 700041 rejected", [(ex.APPLICATION_ID, "700041")]),
         ("run 4 of 12", []),
         # nothing at all
         ("", []),
@@ -128,6 +150,80 @@ def test_application_id_is_always_reported_and_marked_when_cued(
     apps = [m for m in extract_entities(text) if m.kind == ex.APPLICATION_ID]
     assert len(apps) == 1
     assert (apps[0].value, apps[0].cued, apps[0].attribute("cue")) == ("70005", cued, cue)
+
+
+# ---- the measured width, and the floor that keeps it precise (CORE5) ----------
+#
+# The width is the ledger's, not a guess: config/source-mappings/pat-team-report.yaml,
+# the `Seal IDs` row — "token width is 4 to 7 digits, never assume 5 or 6"
+# (profile SME-reported 2026-09-07, cited by the K30 close note). The rule the
+# extractor implements on top of it is ONE sentence: the bare floor is five, and
+# four digits are reported only when the text names the token. These cases are
+# that sentence, both halves, because widening a bare-digit pattern buys false
+# positives and the cue is the only thing that pays for them.
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        # (b) four, six and seven digits carried through, cued by each cue shape
+        (f"seal {_ID_4}", [_ID_4]),
+        (f"-seal {_ID_6} -i", [_ID_6]),
+        (f'"APP_ID": "{_ID_7}"', [_ID_7]),
+        (f"application {_ID_6}", [_ID_6]),
+        (f"{_ID_7}/raw/flow-name/x.csv", [_ID_7]),
+        # ... and five, six and seven come through BARE as well — the page-title
+        # signal the class exists for. Six is the width the old `\d{5}` dropped.
+        ("70005 - Ingestion design", ["70005"]),
+        (f"{_ID_6} - Ingestion design", [_ID_6]),
+        (f"{_ID_7} - Ingestion design", [_ID_7]),
+        # (b) the negative: what the wider pattern must NOT swallow. Every one is
+        # four digits and uncued — a year, a row count, a port, a small count.
+        # This is the entire cost of widening, and the floor is what avoids it.
+        ("the 2026 refresh moved the window", []),
+        ("processed 1200 rows", []),
+        ("the dev server is listening on 5173", []),
+        ("run 4 of 12", []),
+        (f"{_ID_4} rows rejected", []),
+        # ... and the consequence, asserted rather than left to be discovered: a
+        # SIX-digit row count is a candidate and IS emitted, uncued. Above the
+        # floor the cue is the only discriminator; suppressing it would hide a
+        # real six-digit id behind the same shape. The caller ranks.
+        ("processed 123456 rows", ["123456"]),
+    ],
+)
+def test_the_measured_width_and_the_floor_that_keeps_it_precise(
+    text: str, expected: list[str]
+) -> None:
+    assert [m.value for m in extract_entities(text) if m.kind == ex.APPLICATION_ID] == expected
+
+
+def test_a_four_digit_id_needs_the_text_to_name_it() -> None:
+    """The floor stated as the pair it is: same token, cue and no cue."""
+    assert [m.value for m in extract_entities(f"seal {_ID_4}")] == [_ID_4]
+    assert extract_entities(f"{_ID_4} - Ingestion design") == ()
+    cued = extract_entities(f"seal {_ID_4}")[0]
+    assert (cued.cued, cued.attribute("cue")) == (True, "keyword")
+
+
+def test_a_wide_folder_segment_is_an_application_id_and_its_span_is_its_own_width() -> None:
+    """The folder pass carried the same five-digit belief, plus a hard-coded
+    ``offset + 5`` that would have mis-spanned any other width."""
+    text = f"folder {_FOLDER_WIDE} failed"
+    apps = [m for m in extract_entities(text) if m.kind == ex.APPLICATION_ID]
+    assert [(m.value, m.cued, m.attribute("cue")) for m in apps] == [
+        (_ID_6, True, "folder-segment")
+    ]
+    assert text[apps[0].start : apps[0].end] == _ID_6
+
+
+def test_a_four_digit_folder_segment_is_not_read_as_an_application_id() -> None:
+    """Position 3 is where the convention puts the id, and this pass does not
+    check position — so four digits stays out here even though a cued four-digit
+    token in prose comes through. Enforce the position and it can come back."""
+    matches = extract_entities(f"folder {_FOLDER_NARROW} failed")
+    assert ex.FOLDER_NAME in {m.kind for m in matches}
+    assert ex.APPLICATION_ID not in {m.kind for m in matches}
 
 
 def test_guid_carries_the_flag_that_named_it() -> None:

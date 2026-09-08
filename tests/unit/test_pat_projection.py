@@ -123,6 +123,36 @@ def test_relationship_type_feeds_team_type_and_the_decoy_never_does():
     assert "Team Type Name" in KNOWN_DROPPED
 
 
+def test_the_seal_column_is_found_by_name_and_the_shape_decoy_never_wins():
+    """CORE5 (e) — the SHAPE decoy, sibling of the discipline decoy above.
+
+    `Team ID` is a dense integer surrogate key whose values are SEAL-SHAPED, and
+    it is the FIRST column of the 43 while `Seal IDs` is 42 columns later. So any
+    discovery of "the seal column" that matches on VALUE SHAPE instead of on
+    header name picks `Team ID` before it ever reaches the real one — and writes
+    team ids as application ids on the ACTIVE arch_develops edge, silently.
+    Exact string membership in `project_rows` is what makes that impossible; this
+    test is the reason it must keep being exact.
+
+    The width widening in CORE5 is what makes the decoy worth pinning NOW: with
+    the extractor's application-id class at the measured 4-to-7 digits, a
+    dense-integer team key is inside the id shape at every width it occurs in.
+    """
+    # the hazard is positional as well as shaped — read from the recorded list
+    assert RAW_HEADERS[0] == "Team ID"
+    assert RAW_HEADERS.index("Seal IDs") > RAW_HEADERS.index("Team ID")
+
+    raw = [_row(**{"Team ID": "700051", "Seal IDs": "70061; 70062"})]
+    _, mappings, _ = project_rows(raw, RAW_HEADERS)
+    pat = PatProductMappingRow.model_validate(mappings[0])
+
+    # the SEAL ids came from `Seal IDs`, by name ...
+    assert pat.seal_ids == "70061, 70062"
+    # ... and the SEAL-shaped team key never leaked into them
+    assert "700051" not in (pat.seal_ids or "")
+    assert pat.team_id == "700051"
+
+
 def test_missing_key_header_is_refused_not_guessed():
     headers = [h for h in RAW_HEADERS if h != "Product ID"]
     with pytest.raises(ProjectionError, match="product_id .*'Product ID'"):
