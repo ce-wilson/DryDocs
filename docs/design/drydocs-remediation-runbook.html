@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Runbook — operate drydocs-remediation: detect, propose, prove, hand off</title>
+<style>
+:root { color-scheme: light dark; --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+@media (prefers-color-scheme: dark) { :root { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; } }
+:root[data-theme="dark"] { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; }
+:root[data-theme="light"] { --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+* { box-sizing: border-box; }
+body { font: 15px/1.6 "Segoe UI", system-ui, Arial, sans-serif; color: var(--ink); background: var(--bg); margin: 0; }
+main { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+h1 { font-size: 28px; margin: 0 0 6px; letter-spacing:-0.3px; }
+h2 { font-size: 20px; margin: 34px 0 10px; padding-bottom:5px; border-bottom: 2px solid var(--ink); }
+h3 { font-size: 16px; margin: 22px 0 8px; }
+h4,h5,h6 { font-size: 14px; margin: 16px 0 6px; }
+p { margin: 10px 0; } strong { font-weight: 700; }
+a { color: var(--link); } a:hover { text-decoration: underline; }
+code { font-family: "Cascadia Mono","Consolas",monospace; font-size: 0.88em; background: var(--faint); padding: 1px 4px; border-radius: 3px; }
+pre { font-family: "Cascadia Mono","Consolas",monospace; font-size: 12.5px; line-height:1.45; border:1px solid var(--line); background: var(--faint); padding: 12px 14px; border-radius: 6px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 14px 0; font-size: 13.5px; display:block; overflow-x:auto; }
+th,td { border:1px solid var(--line); padding: 6px 9px; text-align:left; vertical-align: top; }
+th { background: var(--faint); font-weight:700; }
+blockquote { margin: 14px 0; padding: 2px 16px; border-left: 4px solid var(--line); color: var(--mid); }
+ul,ol { margin: 10px 0; padding-left: 26px; } li { margin: 4px 0; }
+hr { border:none; border-top:1px solid var(--line); margin: 26px 0; }
+:target { scroll-margin-top: 12px; } :target > :first-child, h2:target, h3:target { outline: 2px solid var(--link); outline-offset: 4px; }
+.dd-margin-tag, .dd-print-footer { display: none; }
+
+.dd-note-btn { border:1px solid var(--line); background:var(--bg); color:var(--mid); cursor:pointer; font-size:12px; line-height:1; padding:2px 6px; border-radius:5px; margin-right:6px; }
+.dd-note-btn:hover { color:var(--link); border-color:var(--link); }
+.dd-note-box { margin:6px 0 10px; }
+.dd-note-box textarea { width:100%; min-height:56px; font:13px/1.4 "Segoe UI",system-ui,sans-serif; color:var(--ink); background:var(--faint); border:1px solid var(--line); border-radius:6px; padding:8px; resize:vertical; }
+.dd-annotated { box-shadow:-3px 0 0 var(--link); padding-left:8px; }
+.dd-fb-bar { position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:6px; align-items:stretch; background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:8px 12px; box-shadow:0 2px 10px rgba(0,0,0,.15); font-size:13px; z-index:50; }
+.dd-fb-row { display:flex; gap:8px; align-items:center; justify-content:space-between; }
+.dd-fb-bar button { cursor:pointer; border:1px solid var(--link); background:var(--link); color:#fff; border-radius:6px; padding:5px 10px; font-size:13px; }
+.dd-fb-bar .dd-badge { font-weight:700; }
+.dd-fb-file { cursor:pointer; font-size:11px; color:var(--mid); white-space:nowrap; }
+.dd-fb-file code { font-size:11px; }
+.dd-fb-file:hover code { color:var(--link); }
+.dd-toast { position:fixed; right:16px; bottom:64px; background:var(--ink); color:var(--bg); padding:8px 12px; border-radius:8px; font-size:13px; z-index:60; opacity:0; transition:opacity .2s; }
+.dd-toast.show { opacity:1; }
+.dd-sme-feedback ol li { margin: 6px 0; }
+@media print { .dd-note-btn, .dd-note-box, .dd-fb-bar, .dd-toast, .dd-sme-feedback, .dd-sme-divider { display:none !important; } }
+@page { size: Letter; margin: 0.6in 0.62in 0.55in 0.62in; }
+@media print {
+:root, :root[data-theme="dark"], :root[data-theme="light"] { color-scheme: light; --ink:#1a1a1a; --mid:#555; --line:#bdbdbd; --fill:#eee; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { font: 10.5px/1.45 "Segoe UI", system-ui, Arial, sans-serif; }
+main { max-width: 7.2in; margin: 0 auto; padding: 0 0 0 0.62in; position: relative; }
+h1 { font-size: 21px; margin: 0 0 2px; letter-spacing:-0.2px; }
+h2 { font-size: 14px; margin: 16px 0 8px; padding-bottom:4px; border-bottom: 2px solid var(--ink); text-transform: uppercase; letter-spacing: 0.6px; }
+h3 { font-size: 11.5px; margin: 13px 0 5px; padding-bottom:2px; border-bottom:1px solid var(--line); }
+h4,h5,h6 { font-size: 10.5px; margin: 9px 0 4px; }
+p { margin: 6px 0; }
+a { color: inherit; text-decoration: underline; }
+code { font-size: 9.2px; padding: 0 2px; border-radius: 2px; }
+table { display: table; width:100%; margin: 7px 0; font-size: 9.1px; overflow-x: visible; }
+th, td { padding: 3px 5px; }
+th { background: var(--fill); }
+td code, th code { background: transparent; padding: 0; }
+pre { font-size: 8.4px; line-height: 1.35; padding: 7px 9px; margin: 7px 0; white-space: pre; overflow: hidden; border-radius: 3px; }
+pre.sql { background:#fbfbfb; }
+blockquote { margin: 7px 0; padding: 2px 10px; border-left: 3px solid var(--line); break-inside: avoid; }
+ul,ol { margin: 6px 0 6px 16px; padding: 0; } li { margin: 3px 0; }
+hr { margin: 10px 0; }
+h2, h3, table, pre { break-inside: avoid; }
+
+/* L6 paper HITL: each anchored block sits in the left gutter (main's own padding-left,
+   reserved above) so a printed page carries the anchor id beside its section — no @page
+   margin-box support required, so headless Chromium print-to-pdf renders it reliably. */
+h1, h2, h3, h4, h5, h6, p, table, pre, ul, ol, blockquote { position: relative; }
+.dd-margin-tag {
+  display: block; position: absolute; left: -0.6in; top: 0.1em; width: 0.54in;
+  font: 6.2px/1.15 "Cascadia Mono","Consolas",monospace; text-align: right;
+  color: var(--mid); letter-spacing: 0.1px; word-break: break-word;
+}
+/* Rev/commit footer: `position: fixed` repeats on every printed page in Chromium's
+   headless print-to-pdf (the standard running-footer technique) without needing CSS
+   Paged-Media margin-box content(), which Chromium supports only partially. */
+.dd-print-footer {
+  display: block; position: fixed; left: 0.62in; right: 0.62in; bottom: 0.12in;
+  font-size: 8px; color: var(--mid); text-align: center;
+  border-top: 1px solid var(--line); padding-top: 3px;
+}
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Runbook — operate <code>drydocs-remediation</code>: detect, propose, prove, hand off</h1>
+<ul id="front-matter"><span class="dd-margin-tag" aria-hidden="true">front-matter</span><li><strong>Module:</strong> drydocs-remediation — this runbook IS the module runbook for drydocs-remediation (V1 coverage rule). It covers the whole operate surface: the detectors, the Tier-1 transform engine, corroboration, and the Jira handoff.</li><li><strong>Status:</strong> DESCRIPTIVE — documents the working procedure. <strong>Rev 1, 2026-09-07</strong>, authored at commit <code>d0de5cd9</code>. Every command and every number below was RUN on this tree against the tracked synthetic fixture, not transcribed from the source.</li><li><strong>Classification:</strong> Internal-Public (mechanism only — the rule <em>values</em>, the real name maps, the real registry ids and their ratification state are company-side and injected by the caller. This runbook names rule ids and mechanism; it quotes no real definition, no real job name and no registry content)</li><li><strong>Audience:</strong> anyone asked to look at a Control-M folder export and say what is wrong with it, what may be corrected, and what a developer is being asked to implement</li><li><strong>Companion:</strong> <code>docs/design/drydocs-remediation-tdd.md</code> — <strong>the contract, and it wins on conflict</strong>; this page is procedure, not a second specification, so every design claim below is one sentence and a pointer into it. Also <code>drydocs_remediation/overview_readme.md</code> (the governance walk-through), <code>drydocs_remediation/module-requirements.md</code> (what is installed, what is not acquired, and why), and <code>.claude/skills/controlm-runbook-automation/references/fix-package.md</code> (the fix-package shape this module produces).</li></ul>
+<h2 id="purpose-scope"><span class="dd-margin-tag" aria-hidden="true">purpose-scope</span>Purpose &amp; scope</h2>
+<p><strong>Purpose.</strong> Operate the module that answers <em>&quot;may we change this?&quot;</em> about a Control-M definition — and the answer is never the detector&#x27;s to give.</p>
+<h3>The one rule to know before running anything</h3>
+<blockquote><p><strong>Only ✅-ratified rules may change a definition. Everything else is WARN-only.</strong></p></blockquote>
+<p>This is enforced in code, not by convention: <code>transform.propose_greenfield</code> skips an unratified rule and reports it in <code>skipped_unratified</code>. An unratified rule is not &quot;a rule nobody got around to&quot; — it is structurally incapable of touching a job.</p>
+<p>Each rule carries a status in the rules registry: <strong>❓ open</strong> (needs an SME decision), <strong>🟡 provisional</strong> (observed and believed, not signed off), <strong>✅ ratified</strong> (signed off at the HITL gate, and only now may it drive a change). <strong>Status is independent of severity</strong> — a rule can be must-fix and provisional at once, because <em>how bad is it</em> and <em>may we act unilaterally</em> are different questions. Collapsing them is how a linter starts editing production (<code>overview_readme.md</code>, &quot;The status ladder&quot;).</p>
+<h3>The separation of duties, in one line</h3>
+<p><strong>We analyze and package; developers implement.</strong> Nothing in this module applies a change to a live Control-M environment. Its terminal artifact is a handoff a developer acts on, and the handoff says so on its face — the rendered package&#x27;s &quot;Requested by&quot; line reads <em>&quot;Production Support (analysis pre-validated; implementation only)&quot;</em>.</p>
+<p><strong>In scope.</strong> Reading an export into a <code>DefinitionSet</code>; running the detectors; proposing a Tier-1 greenfield; proving the proposal equivalent; corroborating against a second source; assembling and rendering the handoff; the census verb <code>profile-folder-set</code>.</p>
+<p><strong>Out of scope.</strong> The graph — this module <strong>writes none</strong>, by construction (TDD §4, NFR-REM-1), and the one read path refuses a write clause at runtime. The rule VALUES and the registry&#x27;s ratification state (company-side). What a finding MEANS for a specific application — that is the SME&#x27;s, at the gate. Applying anything to a live environment.</p>
+<h2 id="prerequisites"><span class="dd-margin-tag" aria-hidden="true">prerequisites</span>Prerequisites</h2>
+<ul><li><strong><code>poetry install</code></strong> — the default group is enough for everything in Startup, Refresh and Verify below. The module&#x27;s own dependency page is <code>drydocs_remediation/module-requirements.md</code>.</li><li><strong><code>poetry install --with remediation</code></strong> — ONLY for the optional <code>lxml</code>, and <code>lxml</code> is a <strong>validator, never the emitter</strong>. Emission is byte-splicing in <code>xml_io.write</code>, because every DOM serializer rebuilds a start tag from an attribute dict and collapses the multi-line attribute wrapping a real <code>exportdeftable</code> JOB element carries — producing the 100%-diff file no developer can review, which <code>fix-package.md</code> §XML rule 1 forbids. A guard keeps it out of the emitter (<code>test_xml_io_edits.py</code>).</li><li><strong>An export, if you are working on real definitions</strong>: a directory of Control-M definition XML from <code>exportdeftable</code>. Real exports are Internal and live under <code>DRYDOCS_DATA_ROOT</code>, never in this repo.</li><li><strong>Not required, and deliberately so</strong>: a Neo4j graph (nothing here writes one, and the procedures below need none), Oracle credentials, and the Control-M <code>.dtd</code>/<code>.xsd</code> schema artifacts. Those last are <strong>NOT ACQUIRED</strong> and are <strong>not a blocker for emission</strong> — <code>xml_io</code> splices the vendor&#x27;s own bytes and never authors XML. Their only role is the optional validation in Verify (<code>module-requirements.md</code> §2).</li><li><strong>The rules registry</strong> for anything beyond mechanism: <code>internal/remediation/</code> <code>standards-rules-registry.md</code>. It is the single source for both gates — validate reads the rules, design reads each rule&#x27;s greenfield action — so a rule tightens on both sides at once and they cannot disagree.</li></ul>
+<h2 id="startup"><span class="dd-margin-tag" aria-hidden="true">startup</span>Startup</h2>
+<p><strong>This module has no service.</strong> &quot;Startup&quot; is reading an export and finding out what you are holding.</p>
+<ol><li><strong>Confirm the module imports and the graph boundary is intact</strong> (cheap, and it is the check that proves the invariant this module rests on):<pre class="powershell"><code>poetry run python -c &quot;import drydocs_remediation.detect, drydocs_remediation.jira; print(&#x27;ok&#x27;)&quot;</code></pre>Success: <code>ok</code>.</li></ol>
+<ol><li><strong>Census the folder set</strong> — what the export SAYS, and what only a human can supply:<pre class="powershell"><code>poetry run drydocs profile-folder-set &lt;export-dir&gt; --out folder-set-profile.json</code></pre>Success: a summary, then <code>wrote folder-set-profile.json</code>. The artifact has two halves and the division is the point — five censuses of what the export carries (shape, identity, variables, contacts, invocation fan-out), then a <strong>substitution-slot</strong> list naming the facts the export does NOT carry. A slot with no value reports <code>not-supplied</code> with a null and <strong>never a default</strong>: inventing one is how a proposal becomes a wrong fact nobody re-checks. The verb prints those slots in yellow.</li></ol>
+<p>This is the module&#x27;s only CLI verb. It asserts nothing about meaning, and it writes no graph.</p>
+<ol><li><strong>If you have no export</strong>, use the tracked synthetic fixture — the whole procedure below runs on it in any clone, with no company data and no graph:<pre class="powershell"><code>poetry run python -c &quot;from drydocs_remediation.formats import TranscriptDefinitionFormat; d = TranscriptDefinitionFormat().load(&#x27;tests/fixtures/remediation/synthetic-legacy-transcript.yaml&#x27;); print(len(d.folders), &#x27;folder(s),&#x27;, len(d.jobs), &#x27;job(s)&#x27;)&quot;</code></pre>Success: <code>1 folder(s), 1 job(s)</code>.</li></ol>
+<h2 id="refresh-ingest"><span class="dd-margin-tag" aria-hidden="true">refresh-ingest</span>Refresh / ingest</h2>
+<p><strong>The recurring procedure is a BATCH, and it is driven from Python rather than from the CLI.</strong> Say that plainly rather than implying a verb exists: <code>profile-folder-set</code> is the only registered command, and the detect → transform → prove → hand off sequence is a library API. The batch entry point wraps itself in a run log (<code>run_remediation_batch</code>, G107), so a batch is recorded whether it succeeds or fails.</p>
+<p>The sequence, with the exact calls, in the order the TDD&#x27;s stages run (§3, Stages A–E):</p>
+<ol><li><strong>Acquire</strong> (Stage A) — an export through the <code>DefinitionFormat</code> seam:<pre class="python"><code>from drydocs_lineage.extractors import ControlMXmlDefsExtractor
+from drydocs_remediation.xml_bridge import to_definition_set
+definitions = to_definition_set(ControlMXmlDefsExtractor().extract(export_dir))</code></pre>The fixture path is <code>TranscriptDefinitionFormat().load(...)</code> instead; everything after this step is identical, which is what makes the procedure rehearsable.</li></ol>
+<ol><li><strong>Detect</strong> (Stage B) — <code>detect_all(definitions)</code> runs the dot-smuggling detector (<strong>registry R1</strong>) and the conformance rules, de-duplicated:<pre class="python"><code>from drydocs_remediation.detect import detect_all
+findings = detect_all(definitions)</code></pre>On the fixture: <strong>5 findings — registry R1 ×1, registry R32 ×4.</strong></li></ol>
+<ol><li><strong>Classify and propose</strong> (Stages C–D) — the governance gate, and the step to read carefully:<pre class="python"><code>from drydocs_remediation.transform import propose_greenfield
+result = propose_greenfield(definitions, rules)   # rules: Sequence[Tier1Rule]</code></pre>Every <code>Tier1Rule</code> carries <code>ratified: bool</code>. The unratified ones do not run and are named in <code>result.skipped_unratified</code>. On a two-rule demonstration (one ratified, one not) the fixture gives <code>applied: [&#x27;R-demo-ratified&#x27;]</code>, <code>skipped_unratified: [&#x27;R-demo-unratified&#x27;]</code> — the governance rule visible in the output rather than asserted in prose.</li></ol>
+<ol><li><strong>Emit, if a definition actually changed</strong> — <code>xml_io.write</code> splices bytes into the vendor&#x27;s own file, and <code>changedoc.render_change_doc</code> produces the before/after excerpt a reviewer reads. The reviewable diff IS the deliverable; see the <code>lxml</code> note in Prerequisites for why no DOM serializer may take this step.</li></ol>
+<ol><li><strong>Prove</strong> (Stage D) — offline equivalence between the legacy and greenfield sets:<pre class="python"><code>from drydocs_remediation.equivalence import prove_equivalence
+proof = prove_equivalence(definitions, result.greenfield)</code></pre></li></ol>
+<ol><li><strong>Corroborate</strong> — reconcile the definitions against a second source (the <code>psgmgr</code> staging extract, or a graph fetch through <code>ReadOnlyGraph</code>):<pre class="python"><code>from drydocs_remediation.corroborate import reconcile_variables
+report = reconcile_variables(definitions, extract)   # extract: {job_name: VariableDefs}</code></pre></li></ol>
+<ol><li><strong>Package and hand off</strong> (Stage E):<pre class="python"><code>from drydocs_remediation.jira import run_remediation_batch, render_handoff, emit_handoff
+package = run_remediation_batch(definitions, findings, proof, title=..., transform=result)
+text = render_handoff(package)          # review this before anything leaves
+ref = emit_handoff(package, submitter)  # submitter: your JiraSubmitter implementation</code></pre><code>run_remediation_batch</code> RECORDS the batch&#x27;s counts once, at the seam, and <code>render_handoff</code> reads them from the package rather than recomputing them — so the rendered numbers and the run log&#x27;s numbers cannot drift apart.</li></ol>
+<h2 id="verify"><span class="dd-margin-tag" aria-hidden="true">verify</span>Verify</h2>
+<p><strong>The proof surface is the run&#x27;s own output.</strong> Every value below was produced by running the sequence above against <code>tests/fixtures/remediation/synthetic-legacy-transcript.yaml</code> on this tree, so it is reproducible in any clone (no graph, no company data):</p>
+<table><thead><tr><th>Check</th><th>Where</th><th>Expected on the fixture</th></tr></thead><tbody><tr><td>The export parsed</td><td><code>len(d.folders)</code>, <code>len(d.jobs)</code></td><td><code>1</code>, <code>1</code></td></tr><tr><td>Detectors ran</td><td><code>len(detect_all(d))</code></td><td><code>5</code> (registry R1 ×1, registry R32 ×4)</td></tr><tr><td>Governance held</td><td><code>result.skipped_unratified</code></td><td>the unratified rule id, present</td></tr><tr><td>Equivalence proven</td><td><code>proof.equivalent</code> / <code>compared_jobs</code> / <code>proven_jobs</code> / <code>not_proven</code></td><td><code>True</code> / <code>1</code> / <code>1</code> / <code>0</code></td></tr><tr><td>Corroboration</td><td><code>report.consistent</code> / <code>checked_jobs</code></td><td><code>True</code> / <code>1</code></td></tr><tr><td>Batch coverage</td><td><code>package.coverage</code></td><td><code>objects_examined 2</code>, <code>objects_changed 0</code>, <code>findings_ratified 0</code>, <code>findings_unratified 5</code>, <code>skipped {&#x27;unratified (governance skip)&#x27;: 1}</code></td></tr></tbody></table>
+<p><strong>Read <code>equivalent</code> correctly.</strong> It is True only when every paired job is PROVEN — at least one surface compared and all compared surfaces equal. A job with nothing to compare lands in <code>not_proven</code> and BLOCKS the claim; it never passes by silence. <em>&quot;We did not prove this&quot;</em> is a different statement from <em>&quot;this is equivalent&quot;</em>, and the report keeps them apart on purpose.</p>
+<p><strong>Read the coverage counts as a governance readout, not a scorecard.</strong> On the fixture <code>findings_ratified</code> is 0 and <code>findings_unratified</code> is 5: five real findings, none of them authorized to change anything, which is the correct state for a registry whose rules are still provisional. <code>objects_changed: 0</code> follows from that, not from the detectors failing to find anything.</p>
+<p><strong>Validate the emitted XML, if you have the schema.</strong> With <code>--with remediation</code> installed and a <code>.dtd</code>/<code>.xsd</code> acquired, validate <code>&lt;folder&gt;.updated.xml</code> against it. This upgrades the honest residual claim — <em>&quot;the file differs from a Control-M-produced file by exactly the approved bytes&quot;</em> — to a schema-checked one. Without the schema, the byte-level self-check in <code>changedoc</code> is the available proof, and it is the reason the residual claim is phrased that way.</p>
+<h2 id="rollback"><span class="dd-margin-tag" aria-hidden="true">rollback</span>Rollback</h2>
+<p><strong>There is nothing to roll back in this repo&#x27;s data, by construction.</strong> The module writes no graph (the boundary is enforced, not merely intended — see Troubleshooting) and no change reaches a live Control-M environment from here. The artifacts a batch produces — the profile JSON, the change doc, the updated XML, the rendered handoff — are files you may delete and regenerate; the sequence is deterministic over the same input.</p>
+<p><strong>Rolling back an APPLIED change is the developer&#x27;s procedure, not this module&#x27;s</strong>, and the handoff says which one: <code>run_remediation_batch</code> carries the rollback line into every package, defaulting to <em>&quot;Restore prior version via Control-M Changes History.&quot;</em> Override it with the <code>rollback=</code> argument when a batch needs something more specific, so the instruction travels attached to the change rather than living in somebody&#x27;s memory.</p>
+<p><strong>If a proposal was wrong, the fix is upstream of the artifacts.</strong> Correct the rule in the registry (which is a gate decision, not an edit), re-run the batch, and let the new package supersede the old one. Editing an emitted artifact by hand breaks the one property the whole design rests on: that the file differs from the vendor&#x27;s by exactly the bytes a rule proposed.</p>
+<h2 id="troubleshooting"><span class="dd-margin-tag" aria-hidden="true">troubleshooting</span>Troubleshooting</h2>
+<p><strong><code>skipped_unratified</code> is non-empty and nothing changed.</strong> <em>Diagnosis:</em> the rule is not ✅-ratified. This is the design working, not a defect — <code>propose_greenfield</code> is structurally incapable of applying it. <em>Fix:</em> nothing in the code. The rule&#x27;s status is a registry entry and moving it is a HITL gate decision. If the rule has no registry entry at all, that is the real problem: a detector with no entry emits findings nothing can rank, nothing can turn into a fix, and nothing can sign off on — <strong>the entry is the thing that gets ratified</strong> (<code>overview_readme.md</code>).</p>
+<p><strong><code>UnprovenHandoffError</code> when emitting.</strong> <em>Diagnosis:</em> the package is being sent without a proof that covers it. The equivalence report is not decoration on the handoff; it is a precondition of it. <em>Fix:</em> run <code>prove_equivalence</code> and inspect <code>not_proven</code> before re-emitting. If jobs sit in <code>not_proven</code>, the honest answer is to say so — the claim narrows to the jobs actually proven, or the batch narrows to them.</p>
+<p><strong><code>GraphWriteAttemptError</code> from corroboration.</strong> <em>Diagnosis:</em> a write clause reached <code>ReadOnlyGraph.fetch</code>. This is a <strong>code bug, not a configuration problem</strong> — the component never writes a graph (NFR-REM-1), and the read-only wrapper is where that invariant is enforced at runtime. <em>Fix:</em> remove the write clause from the query. Do not route around the wrapper; it is the enforcement, and the exception names the clause it caught.</p>
+<p><strong>Substitution slots report <code>not-supplied</code>.</strong> <em>Diagnosis:</em> the export does not carry that fact — DEVX_KEY, the MFTS set and the contact DLs are the standing examples. The census is telling you the truth about the export. <em>Fix:</em> an SME supplies the value. Never a default: the whole point of the <code>not-supplied</code> sentinel is that a plausible invented value is indistinguishable from a real one three steps later.</p>
+<p><strong>The handoff&#x27;s owner reads <code>UNRESOLVED</code>.</strong> <em>Diagnosis:</em> ownership could not be resolved. The renderer surfaces this rather than guessing, and labels it as <em>itself a defect</em>. <em>Fix:</em> resolve ownership before the package goes out. An unowned change request is one nobody will act on, and a guessed owner is worse.</p>
+<p><strong>A reviewer says the diff is unreadable.</strong> <em>Diagnosis:</em> almost certainly a DOM serializer got into the emission path, collapsing multi-line attribute wrapping and producing a whole-file diff. <em>Fix:</em> emission is <code>xml_io.write</code> byte-splicing, always. <code>lxml</code> validates and inspects; it never serializes. The guard that keeps this true is <code>test_xml_io_edits.py::test_xml_io_imports_are_stdlib_core_and_formats_only</code>.</p>
+<h2 id="contacts-escalation"><span class="dd-margin-tag" aria-hidden="true">contacts-escalation</span>Contacts &amp; escalation</h2>
+<ul><li><strong>Rule ratification — the SME, at the HITL gate.</strong> Moving a rule ❓ → 🟡 → ✅ is a gate decision recorded in the rules registry, never a code change and never a runbook decision. The registry is <code>internal/remediation/standards-rules-registry.md</code>; this page cites it and quotes nothing from it.</li><li><strong>Anything about what a finding MEANS for a specific application</strong> — the SME, through <code>docs/restructure/03-hitl-sme-flow.md</code>. A detector reports a shape; whether that shape matters here is an ownership question.</li><li><strong>Implementation of an approved change</strong> — the developer or team who owns the folder. The separation of duties is not advisory: this module produces analysis and a package, and stops there.</li><li><strong>The contract, on any conflict with this page</strong> — <code>docs/design/drydocs-remediation-tdd.md</code> wins, and a disagreement between the two is a defect in this runbook to be fixed here.</li></ul>
+<h2 id="appendices"><span class="dd-margin-tag" aria-hidden="true">appendices</span>Appendices</h2>
+<h3>A. What the handoff looks like</h3>
+<p><code>render_handoff(package)</code> produces a plain-text package whose first lines carry the title, the owner, and the requester line that states the separation of duties. Then a findings block, one line per finding, each carrying its rule id, severity, <strong>ratification state</strong> and target; then a coverage block. On the fixture every finding renders as <code>UNRATIFIED (warn-only)</code>, which is what makes the governance state legible to a reader who never opens the registry.</p>
+<h3>B. Where each stage lives</h3>
+<table><thead><tr><th>Stage (TDD §3)</th><th>Module</th></tr></thead><tbody><tr><td>A — Acquire</td><td><code>formats.py</code> (the <code>DefinitionFormat</code> seam), <code>xml_bridge.py</code>, <code>xml_io.py</code></td></tr><tr><td>B — Detect</td><td><code>detect.py</code> (<code>detect_all</code>, registry R1 + the conformance rules)</td></tr><tr><td>C — Classify</td><td>the registry&#x27;s status ladder, read by <code>transform.py</code></td></tr><tr><td>D — Transform + prove</td><td><code>transform.py</code>, <code>equivalence.py</code>, <code>changedoc.py</code></td></tr><tr><td>E — Package + handoff</td><td><code>jira.py</code> (<code>run_remediation_batch</code>, <code>render_handoff</code>, <code>emit_handoff</code>)</td></tr><tr><td>(census)</td><td><code>profile.py</code>, reached by <code>drydocs profile-folder-set</code></td></tr><tr><td>(corroboration)</td><td><code>corroborate.py</code> (<code>ReadOnlyGraph</code>, <code>reconcile_variables</code>)</td></tr></tbody></table>
+<hr class="dd-sme-divider">
+<section class="dd-sme-feedback" aria-label="SME - Feedback">
+<h2>SME - Feedback</h2>
+<p>How to return your notes on this document:</p>
+<ol>
+<li>Click the <strong>✎</strong> button beside any section (or numbered step) and type your note — notes save in your browser as you type.</li>
+<li>When finished, click <strong>Copy feedback</strong> in the bottom-right toolbar. Your notes are copied as anchor-keyed YAML.</li>
+<li>Create the feedback file (it is YAML, <em>not</em> markdown) — <strong>Copy To:</strong> <code>docs/design/feedback/</code> · <strong>File Name:</strong> <code>drydocs-remediation-runbook-rev1.yaml</code></li>
+<li>Paste the copied block into that file, save, and commit (or send the file back to the team).</li>
+</ol>
+</section>
+</main>
+<footer class="dd-print-footer">Rev 1 · commit d0de5cd9</footer>
+<script>
+
+(function(){
+  var DOC="drydocs-remediation-runbook", FILE="drydocs-remediation-runbook-rev1.yaml", DIR="docs/design/feedback/", KEY="drydocs-doc-feedback:"+DOC;
+  function load(){ try{return JSON.parse(localStorage.getItem(KEY)||"{}");}catch(e){return {};} }
+  function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+  var state=load(), badge;
+  function count(){ return Object.keys(state).filter(function(k){return (state[k]||"").trim();}).length; }
+  function refresh(){ if(badge) badge.textContent=count(); }
+  function toast(msg){ var t=document.createElement("div"); t.className="dd-toast"; t.textContent=msg; document.body.appendChild(t); requestAnimationFrame(function(){t.classList.add("show");}); setTimeout(function(){t.classList.remove("show"); setTimeout(function(){t.remove();},250);},1600); }
+  function exportYaml(){
+    var lines=["# design-doc feedback — paste into docs/design/feedback/"+DOC+"-rev<N>.yaml","doc: "+DOC,"notes:"];
+    Object.keys(state).forEach(function(a){
+      var note=(state[a]||"").replace(/\r/g,""); if(!note.trim()) return;
+      lines.push("  - anchor: "+a); lines.push("    note: |");
+      note.split("\n").forEach(function(l){ lines.push("      "+l); });
+    });
+    return lines.join("\n")+"\n";
+  }
+  function attach(el){
+    var id=el.id;
+    var btn=document.createElement("button"); btn.className="dd-note-btn"; btn.type="button"; btn.textContent="✎"; btn.title="Annotate #"+id;
+    var box=document.createElement("div"); box.className="dd-note-box"; box.style.display=(state[id]||"").trim()?"block":"none";
+    var ta=document.createElement("textarea"); ta.value=state[id]||""; ta.setAttribute("placeholder","note for #"+id+" …");
+    ta.addEventListener("input",function(){ state[id]=ta.value; save(); refresh(); el.classList.toggle("dd-annotated", !!ta.value.trim()); });
+    if((state[id]||"").trim()) el.classList.add("dd-annotated");
+    box.appendChild(ta);
+    btn.addEventListener("click",function(){ box.style.display=box.style.display==="none"?"block":"none"; if(box.style.display==="block") ta.focus(); });
+    if(el.tagName==="LI"){ el.insertAdjacentElement("afterbegin", btn); el.appendChild(box); }
+    else { el.insertAdjacentElement("afterend", box); el.insertAdjacentElement("beforebegin", btn); }
+  }
+  function copyText(txt, ok){
+    var done=function(){toast(ok);};
+    var fallback=function(){ var t=document.createElement("textarea"); t.value=txt; document.body.appendChild(t); t.select(); try{document.execCommand("copy"); toast(ok);}catch(e){toast("copy failed — select the box");} t.remove(); };
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done,fallback); } else { fallback(); }
+  }
+  function fileLine(label, value){
+    var d=document.createElement("div"); d.className="dd-fb-file"; d.title="click to copy";
+    var c=document.createElement("code"); c.textContent=value;
+    d.appendChild(document.createTextNode(label+" ")); d.appendChild(c);
+    d.addEventListener("click",function(){ copyText(value, label.replace(":","")+" copied"); });
+    return d;
+  }
+  document.addEventListener("DOMContentLoaded",function(){
+    document.querySelectorAll("main [id]").forEach(attach);
+    var bar=document.createElement("div"); bar.className="dd-fb-bar";
+    var row=document.createElement("div"); row.className="dd-fb-row";
+    var lbl=document.createElement("span"); lbl.innerHTML='notes <span class="dd-badge">0</span>'; badge=lbl.querySelector(".dd-badge");
+    var ex=document.createElement("button"); ex.type="button"; ex.textContent="Copy feedback";
+    ex.addEventListener("click",function(){ copyText(exportYaml(), "feedback copied — create "+DIR+FILE); });
+    row.appendChild(lbl); row.appendChild(ex);
+    bar.appendChild(row);
+    bar.appendChild(fileLine("file:", FILE));
+    bar.appendChild(fileLine("path:", DIR+FILE));
+    document.body.appendChild(bar); refresh();
+  });
+})();
+
+</script>
+</body>
+</html>
