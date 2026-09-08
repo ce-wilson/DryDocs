@@ -123,6 +123,43 @@ def _epistemic_clause(envelope: Envelope) -> str:
     return ""
 
 
+#: API4 (b): the column whose presence in a returned row makes that row a piece
+#: of the document CORPUS rather than of the graph. Every corpus spec returns it
+#: (docs.chunks.v1, docs.chunk-search.v1, docs.trust-provenance.v1 aggregate
+#: aside), and no graph spec does — which is what lets the count be DERIVED from
+#: the rows instead of declared beside them.
+CHUNK_ROW_KEY = "chunk_id"
+
+
+def count_chunk_rows(records) -> int:
+    """How many of these rows are chunks — the honest source for
+    ``metrics.context['chunks']``, which was the literal ``0`` until API4.
+
+    IT IS DERIVED, NOT A PARAMETER, and that is the point. A request-level
+    "how many chunks" knob would be a number the caller asserts; this is a
+    number the RESULT proves — a spec returned N rows carrying a chunk id, so N
+    chunks grounded the answer. The default is 0 and it stays 0 for every graph
+    answer, which is most of them: not a placeholder any more, a true count of
+    the chunks that were there.
+
+    Counted DISTINCT because a spec may return one chunk on several rows (a
+    chunk joined to more than one document role), and the metric is "how much
+    corpus was in the context", not "how many rows mentioned one".
+    """
+    return len(chunk_row_ids(records))
+
+
+def chunk_row_ids(records) -> set:
+    """The distinct chunk ids in one result — the set behind the count, so a
+    multi-step tier can union across retrievals instead of adding counts that
+    double-count a chunk two subquestions both reached."""
+    return {
+        r.get(CHUNK_ROW_KEY)
+        for r in (records or [])
+        if isinstance(r, dict) and r.get(CHUNK_ROW_KEY)
+    }
+
+
 def _extract_json(text: str) -> dict:
     """Defensive JSON extraction — models wrap JSON in prose/fences often enough."""
     match = re.search(r"\{.*\}", text, re.DOTALL)
@@ -485,8 +522,18 @@ class GraphQaPipeline:
         def _llm(system: str, user: str, step: str = "tier2") -> str:
             return self._llm(envelope, system, user, timings, step=step)
 
+        # API4 (b): Tier 2 retrieves several times, so the chunk count is a
+        # UNION across its retrievals rather than a sum — two subquestions that
+        # reach the same chunk gathered one chunk, not two. Accumulated here
+        # because this closure is the only place the results are visible;
+        # tier2.py stays a pure loop that knows nothing about corpora.
+        chunk_ids: set = set()
+
         def _retrieve(subquestion: str):
-            return self._run_text2cypher(envelope, subquestion, timings)
+            result = self._run_text2cypher(envelope, subquestion, timings)
+            if result is not None:
+                chunk_ids.update(chunk_row_ids(result.records))
+            return result
 
         outcome = run_tier2(
             question,
@@ -500,7 +547,7 @@ class GraphQaPipeline:
         envelope.metrics.iterations = outcome.iterations
         envelope.metrics.context = {
             "rows": outcome.evidence_rows,
-            "chunks": 0,  # doc-chunk retrieval arrives with R7 corpora wiring
+            "chunks": len(chunk_ids),  # API4 (b): unioned across the loop's retrievals
             "tokens_est": est_tokens("x" * outcome.evidence_chars),
         }
         envelope.metrics.budget = {
@@ -699,7 +746,8 @@ class GraphQaPipeline:
             rows_json = json.dumps(result.records, default=str)[:ANSWER_CONTEXT_CHARS]
             envelope.metrics.context = {
                 "rows": result.row_count,
-                "chunks": 0,  # doc-chunk retrieval arrives with R7 corpora wiring
+                # API4 (b): counted from the rows that came back, not asserted.
+                "chunks": count_chunk_rows(result.records),
                 "tokens_est": est_tokens(rows_json),
             }
             envelope.answer = self._llm(

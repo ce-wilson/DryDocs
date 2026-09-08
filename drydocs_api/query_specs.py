@@ -137,6 +137,15 @@ DEFAULT_DISPLAY_LIMIT = 500
 
 _LIMIT = (ParamSpec(DISPLAY_LIMIT_PARAM, "int", required=False, default=DEFAULT_DISPLAY_LIMIT),)
 
+#: API4: the window docs.chunk-search.v1 returns around a body-text hit. Stated
+#: as a constant because it is a BOUND and a bound nobody can find is a bound
+#: nobody can tune. A chunk is a whole H2 section and can run to thousands of
+#: characters; a search result needs enough to judge relevance and no more,
+#: because the full chunk is one call away by chunk_id and returning it here
+#: would break the Q15 rule the docs family is built on (triage first, spend
+#: the chunk read second).
+SNIPPET_CHARS = 400
+
 
 def _with_ground_truth_exclusion(spec: QuerySpec) -> QuerySpec:
     """ADR 0011 clause 1 guard (a), applied at REGISTRY BUILD — never by hand.
@@ -974,6 +983,59 @@ QUERY_SPECS: dict[str, QuerySpec] = {
                 ColumnDef("source_url", "string", "Source URL"),
                 ColumnDef("doc_version", "string", "Doc version"),
                 ColumnDef("version_verified", "string", "Version verified?"),
+                ColumnDef("trust", "string", "Trust"),
+            ),
+            classification="internal",
+            params=(ParamSpec("q", "string"), *_LIMIT),
+        ),
+        # API4 (a): the first registered spec that searches chunk BODY TEXT.
+        #
+        # A NEW spec rather than a widening of docs.search.v1, and the reason is
+        # a contract rather than taste: that spec's description promises
+        # "Chunk-free; docs.chunks.v1 is the second step", and the Q15 note above
+        # states the same rule for the whole family — triage on abstract and
+        # page_role first, spend the chunk read second. Widening it would break
+        # a promise two other descriptions cite.
+        #
+        # IT RETURNS A SNIPPET, NEVER THE CHUNK. The same Q15 rule says chunk
+        # text is not returned by a navigation spec, and R8's boundary says a
+        # telemetry file gets counts rather than values; a bounded window around
+        # the hit is what a person needs to judge relevance, and the full chunk
+        # is one more call away by chunk_id. SNIPPET_CHARS states the bound.
+        QuerySpec(
+            id="docs.chunk-search.v1",
+            database="drydocs",
+            description=(
+                "Substring search over chunk BODY TEXT — a term that appears only "
+                "inside a document's body, never in its title or abstract, is "
+                "reachable ONLY here. docs.search.v1 is the title/abstract door and "
+                "says of itself that it is chunk-free, so the two are siblings, not "
+                "alternatives: use this one when the term is a phrase from the "
+                "content rather than a name. Every row is a MATCH, not a listing — "
+                "the server applies the filter, so zero rows means the term is not "
+                "in the loaded corpus, which is a real answer. Returns a bounded "
+                "snippet and the chunk_id; the full chunk is docs.chunks.v1."
+            ),
+            cypher=(
+                "MATCH (c:Chunk)-[:PART_OF]->(d:Document) "
+                "WHERE NOT c:SchemaMeta AND NOT d:SchemaMeta "
+                "AND toLower(coalesce(c.text, '')) CONTAINS toLower($q) "
+                "RETURN c.chunk_id AS chunk_id, d.doc_id AS doc_id, d.title AS title, "
+                "c.seq AS seq, c.heading AS heading, "
+                f"substring(coalesce(c.text, ''), 0, {SNIPPET_CHARS}) AS snippet, "
+                "d.source_url AS source_url, d.doc_version AS doc_version, "
+                "coalesce(c.trust, d.trust_default) AS trust "
+                "ORDER BY doc_id, seq LIMIT $limit"
+            ),
+            columns=(
+                ColumnDef("chunk_id", "string", "Chunk"),
+                ColumnDef("doc_id", "string", "Doc id"),
+                ColumnDef("title", "string", "Title"),
+                ColumnDef("seq", "int", "Seq"),
+                ColumnDef("heading", "string", "Heading"),
+                ColumnDef("snippet", "string", "Snippet"),
+                ColumnDef("source_url", "string", "Source URL"),
+                ColumnDef("doc_version", "string", "Doc version"),
                 ColumnDef("trust", "string", "Trust"),
             ),
             classification="internal",

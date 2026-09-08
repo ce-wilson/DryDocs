@@ -60,6 +60,12 @@ META_LABELS = frozenset({"SchemaMeta", "Uncertain"})
 #: of the ingested documents, which is the scope a person did not pick.
 CORPUS_ONLY_SPECS = frozenset(
     {
+        # API4: the first spec that searches chunk BODY TEXT. Corpus-only by
+        # construction, and the reason vendor-corpus was gated on API4 in the
+        # first place — this is the spec whose absence made that scope a label
+        # over a title search. Whether the scope now FLIPS to ready is AGENT1's
+        # re-evaluation, not this addition's.
+        "docs.chunk-search.v1",
         "docs.chunks.v1",
         "docs.documents.v1",
         "docs.email-unassigned.v1",
