@@ -2992,6 +2992,37 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   side rather than by date. The port report's gate-log line should then say ten appended and
   two headings renamed, not one. Nothing is asked back.
 
+- **RELAY-38 — `render_load_map.main()` IS IN `render_board.py`'S DEFAULT RUN, AND HAS BEEN AT
+  EVERY BASE TAG; AND A COMPARISON FIGURE IN A 0905 REPORT SHOULD COME FROM THE 0905 TAG** (new
+  2026-09-08, on the in-progress PORT-REPORT at your e7f70e20; two corrections, nothing waits
+  for the roll). First, `[VERIFIED-PRODUCER]` — the report's load-map section says
+  `render_load_map` is still not wired into `render_board`'s default run, so the drift guard
+  and not the session ritual keeps the two load-map surfaces current. On the producer tree
+  that has been false since N4 (`0b95a118`, 2026-07-29): `scripts/render_board.py` calls
+  `render_load_map.main()` in the default-paths branch, beside `render_gates.main()` and
+  `render_enforcement_matrix.main()`, and `git show <tag>:scripts/render_board.py` shows
+  the call at every `port-base-*` tag from 0810 through 0905; the file did not move in
+  0902..0905. If the sentence is true of YOUR tree, your `scripts/render_board.py` (class
+  `evaluate`, `scripts/**`, hand-merge on collision) lost the line in an earlier hand-merge —
+  which would also explain how your board renders kept succeeding from 2026-08-20 while
+  `render_load_map` could not run, since a wired `render_board.py` dies on
+  `CadenceDerivationError` at every render. Either way the consequence is the one you just
+  named: the next `render_board.py` run leaves `load-map.json` and `load-map.html` stale
+  again. The check is `grep -n "render_load_map.main()" scripts/render_board.py` on your
+  side; if it is absent, the producer's file at the base tag is the reference for the
+  default-paths block, and the report's sentence should then say the line was missing here
+  rather than unwired there. Second, `[VERIFIED-PRODUCER]` — "producer `gates.json` at
+  `2e71ede1` reads 114 gates / 21 open-deferred-pending" is right for the commit named,
+  and that commit is dated 2026-09-07, 228 commits past `port-base-20260905`; the report's
+  J63 block names 0905 as the reviewed base. At `port-base-20260905` the producer
+  `gates.json` reads 116 gates / 23 open-deferred-pending (19 open, 3 pending, 1
+  deferred). Cite the tag's figure, or say in the sentence why the comparison reaches past
+  the base; RELAY-36 was this class in the other direction. The rest of the report checks
+  out against the tree — the nine `cadence:` rows at 0901/0902/0905, the three DERIVED steps
+  of 21, the guard names and messages, the RUF002/RUF003 reframing, the `replaces` schema
+  reading, the `auth.ts` contradiction — and RELAY-37's gate-log append is the sixth
+  Outstanding item, not repeated here. Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
