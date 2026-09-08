@@ -22,6 +22,7 @@ import time
 from collections.abc import Callable
 
 from common import specs_catalog
+from common.scopes import resolve as resolve_scope
 from common.specs_catalog import ensure_read_only
 
 from graph_qa.declared_terms import answer_declared
@@ -293,9 +294,15 @@ class GraphQaPipeline:
         return reply.text
 
     # -- tiers ----------------------------------------------------------------
-    def _route(self, envelope: Envelope, question: str, timings: dict) -> tuple:
+    def _route(
+        self, envelope: Envelope, question: str, timings: dict, scope: str | None = None
+    ) -> tuple:
         started = self.clock()
-        catalog = "\n".join(specs_catalog.catalog_lines())
+        # AGENT1: the ONE place a scope acts. A scoped catalog is a SHORTER
+        # catalog, so a spec outside the scope is ABSENT from the prompt and
+        # cannot be chosen — a constraint the router cannot ignore, which
+        # "prefer specs about X" in the prompt would have been.
+        catalog = "\n".join(specs_catalog.catalog_lines(scope))
         raw = self._llm(
             envelope,
             ROUTER_SYSTEM,
@@ -304,6 +311,7 @@ class GraphQaPipeline:
             step="router",
         )
         spec_id, params, rationale, parse_error = None, {}, None, None
+        out_of_scope: str | None = None
         try:
             decision = _extract_json(raw)
             spec_id = decision.get("spec_id") or None
@@ -313,6 +321,15 @@ class GraphQaPipeline:
             # the instruction — both read as None rather than as empty text.
             reason = decision.get("reason")
             rationale = str(reason).strip()[:RATIONALE_CHARS] if reason else None
+            # AGENT1: the catalog is the constraint, and this is the LATCH on
+            # it. Shortening the prompt is not by itself "cannot be chosen":
+            # a dropped spec's id can still appear inside a SURVIVING spec's
+            # description (docs.utility-lookup.v1 names docs.search.v1 as its
+            # own fallback), so the router can read an id it was never offered.
+            # An out-of-scope id is then treated exactly as a hallucinated one
+            # — dropped, Tier 1 takes over — because that is what it is.
+            if spec_id is not None and not specs_catalog.in_scope(spec_id, scope):
+                out_of_scope, spec_id, params = spec_id, None, {}
         except (ValueError, json.JSONDecodeError) as exc:
             # Router noise never kills the question — it falls through to Tier 1.
             # R18 records WHICH it was: a fall-through after an unparseable reply
@@ -325,11 +342,22 @@ class GraphQaPipeline:
                 self.trace.router(
                     envelope.run_id,
                     envelope.session_id,
-                    candidates=sorted(specs_catalog.QUERY_SPECS),
+                    # AGENT1: the candidates the router actually SAW, which a
+                    # scoped run makes different from the registry. Recording
+                    # the full registry here would misreport the decision.
+                    candidates=sorted(
+                        s for s in specs_catalog.QUERY_SPECS if specs_catalog.in_scope(s, scope)
+                    ),
                     spec_id=spec_id,
                     params=params,
                     rationale=rationale,
-                    parse_error=parse_error,
+                    parse_error=parse_error
+                    or (
+                        f"router chose {out_of_scope!r}, outside scope {scope!r}; "
+                        "dropped and answered from Tier 1"
+                        if out_of_scope
+                        else None
+                    ),
                 )
             except Exception:
                 pass
@@ -568,6 +596,7 @@ class GraphQaPipeline:
         memory_chars: int = 0,
         user_id: str = "",
         clarifications: list[dict] | None = None,
+        scope: str | None = None,
     ) -> Envelope:
         total_started = self.clock()
         # R19: what the person already said their terms mean, from the console's
@@ -580,6 +609,12 @@ class GraphQaPipeline:
         # path uses which string is unchanged: the declared (R22) and
         # clarification (R19) tiers still work from the ORIGINAL question.
         prompt_question = question + clarification_clause(clarified)
+        # AGENT1: resolved ONCE, here, so everything below reads a scope that is
+        # both declared and ready, or reads None. An unknown or not-yet-ready
+        # scope degrades to unscoped and says why — _route's existing rule for a
+        # hallucinated spec_id, applied one level up: a hint never kills a
+        # question, and it must never quietly empty the catalog either.
+        scope, scope_note = resolve_scope(scope)
         timings = {"routing": 0, "retrieve": 0, "llm": 0}
         envelope = Envelope(
             run_id=run_id,
@@ -590,6 +625,8 @@ class GraphQaPipeline:
             answer="",
             provider=getattr(self.provider, "provider", None),
             metrics=Metrics(),
+            scope=scope,
+            scope_note=scope_note,
         )
         envelope.metrics.memory = {
             "events": memory_events,
@@ -644,7 +681,7 @@ class GraphQaPipeline:
             }
             return self._trace_close(envelope)
 
-        spec_id, params = self._route(envelope, prompt_question, timings)
+        spec_id, params = self._route(envelope, prompt_question, timings, scope)
         result = self._run_spec(envelope, spec_id, params, timings) if spec_id else None
         if result is not None:
             envelope.tier = "spec"

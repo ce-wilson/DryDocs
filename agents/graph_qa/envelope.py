@@ -141,6 +141,14 @@ class Envelope:
     # admin route is what serves one. False on every run of a server whose
     # declaration does not say level: DEBUG, which is every default server.
     debug_trace: bool = False
+    # AGENT1: the scope that actually RAN — the router hint that shortened the
+    # spec catalog, or None for an unscoped run, which is every run that asks
+    # for nothing. `scope_note` is why a REQUESTED scope was not honoured
+    # (unknown, or declared-but-not-ready): the request degrades to unscoped
+    # rather than to an error or an empty catalog, and a degradation nobody is
+    # told about is the one that gets read as a routing judgement.
+    scope: str | None = None
+    scope_note: str | None = None
 
     def to_dict(self) -> dict:
         return asdict(self)

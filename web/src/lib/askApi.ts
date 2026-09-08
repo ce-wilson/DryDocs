@@ -122,6 +122,14 @@ export interface AskEnvelope {
   // server whose declaration does not say level: DEBUG, which is the default.
   debug_trace?: boolean
   session_id?: string
+  // AGENT1: the scope that RAN — the router hint that shortened the spec
+  // catalog — or null/absent for an unscoped run, which is every run today
+  // because no console control sets one yet (the item's clause (d) split).
+  // `scope_note` is why a requested scope was not honoured: unknown, or
+  // declared but not yet ready. A refused scope still answers, unscoped, so
+  // this is the only place a consumer can tell the two apart.
+  scope?: string | null
+  scope_note?: string | null
 }
 
 /** The R5 control part: the session's PUBLIC handle, and nothing else.

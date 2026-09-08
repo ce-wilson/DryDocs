@@ -163,6 +163,11 @@ class GraphQaAgent(BaseAgent):
                     # R19: the person's own words about their own terms, the
                     # one control field the pipeline carries into a prompt.
                     clarifications=control.get("clarifications"),
+                    # AGENT1: the router hint. Unlike `clarifications` this
+                    # never reaches a prompt as text — it SHORTENS the spec
+                    # catalog the router is shown, so a bad value can only
+                    # widen the menu back to everything, never inject.
+                    scope=control.get("scope"),
                 )
             )
             while True:

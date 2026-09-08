@@ -94,7 +94,9 @@ transaction timeout 15 s.
   },
   "task_graph": [],
   "clarification": null,
-  "debug_trace": false
+  "debug_trace": false,
+  "scope": null,
+  "scope_note": null
 }
 ```
 
@@ -129,6 +131,26 @@ than an absent field, so a consumer can tell "no trace was recorded" from "this
 agent predates R18". Enablement is settings-level and never per request, for
 the reason `api-debug` gives: an Ask question arrives as an HTTP request, and a
 per-request switch would belong to whoever sent the request.
+
+AGENT1 adds `scope` and `scope_note`. A scope is a ROUTER HINT and nothing
+else: it SHORTENS the spec catalog joined into `ROUTER_SYSTEM`, so a spec
+outside it is never offered and, if the router names one anyway out of another
+spec's description, it is dropped exactly like a hallucinated id and Tier 1
+takes over. No new tier, no second backend, no separate index. The control part
+carries it (`{"drydocs_control": {"scope": "knowledge-graph"}}`); unlike
+`clarifications` it never reaches a prompt as text.
+
+`scope` reports what RAN, which is `null` on every unscoped run — and that is
+every run today, because no console control sets one yet (the item's clause (d)
+split: the filter and the envelope land first). `scope_note` is why a REQUESTED
+scope was not honoured, because readiness is per option and only one is ready:
+`knowledge-graph` is live; `vendor-corpus` is declared and refused until a spec
+searches chunk text (API4) — a control over a title-and-abstract search would
+claim the documents had been searched; `general-knowledge` is declared and
+refused because answers here come from query results only, so it needs a
+different answer contract and a ruling rather than an epistemic label. An
+unknown or unready scope answers UNSCOPED and says so; it never errors, and it
+never empties the catalog.
 
 Notes on honesty markers: `question_sha256`/`question_chars` only — full
 question text belongs to the local ledger (R3), never a persistable payload.
