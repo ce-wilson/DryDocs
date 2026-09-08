@@ -7,7 +7,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - PORT-MANIFEST.yaml
@@ -31,6 +31,28 @@ acceptance: |
   (d) Where a hold is REAL it belongs in the company's own divergence ledger, which the company
       maintains - the sweep moves it out of the manifest rather than deleting the fact.
 notes: |
+  Done 2026-09-08 (base venue, desktop), commits 58a76d3f and the RELAY-45 follow-up.
+  (a) The sweep read all 146 rows as data - 39 carry an entry_rule - matching a
+  consumer subject against a MINUS construction, a does-not-have, or a count. Six hits.
+  (b) Five rewritten as union rules with the per-side count left to its owner:
+  config/audit-fields.yaml, drydocs_core/component_map.py,
+  tests/unit/test_module_boundary.py, tests/unit/test_runbook_currency.py, MODULE_MAP.md.
+  Each keeps its reading of the other tree as a DATED OBSERVATION rather than deleting
+  the fact - a reader still learns the shape, the rule no longer asserts it. The sixth
+  hit is config/taxonomy/ui-components.yaml, which QUOTES the construction in order to
+  retire it and is correct as it stands.
+  (c) test_no_entry_rule_asserts_the_consumers_tree in tests/unit/test_port_manifest.py,
+  reading the manifest as data with quoted spans exempt (J66: the row that retires a bad
+  construction has to be able to name it). It ships with
+  test_the_consumer_tree_guard_catches_what_it_is_for, which replays both real bad shapes
+  and asserts the quoted retirement stays legal. It found a sixth instance on its first
+  run - the pyproject.toml row written the previous day, stating how many ignore entries
+  the consumer carries - which is the guard doing exactly its job.
+  (d) No REAL hold remains in the manifest: the only one was the K7-K15 ui-components
+  hold, retired 2026-09-05 when its subject turned out to be the LOAD and not the
+  taxonomy. So nothing needed moving to the consumer's divergence ledger. If one is
+  minted later, (d) says where it goes and this note is the precedent.
+
   Minted 2026-09-07 from IDEAS.md Idea-265 (the company's close-out on port-base-20260902,
   transcribed machine-local, 2026-09-05).
 

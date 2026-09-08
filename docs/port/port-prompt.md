@@ -3254,7 +3254,17 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   failing id bucketed by name. Your correction 14 built exactly that instrument and applied it
   correctly; the producer sentence lagged it. What this does NOT change: the reference figures
   stay producer figures, never your acceptance number, and a failure that is not bucketed is
-  still a failure. Nothing is asked back.
+  still a failure. **Seven - every `PORT-MANIFEST.yaml` entry_rule was swept for the shape your
+  carve-out 8 apply reported, and a guard now holds the line (PORT5, `58a76d3f`).** The rule
+  that cost you three guards said what YOUR tree contained; the sweep found five more rules
+  doing a milder version of the same thing - a count of your rows, a named set of your
+  company-only groups, a claim that one of your exemption tables was empty - and rewrote each
+  as what the UNION contains, with any reading of your tree marked as a dated observation of
+  one report on one day. Nothing about the take changes: the same rows cross, the same rows
+  stay. What changes is that a rule no longer goes stale when you move, and
+  `test_no_entry_rule_asserts_the_consumers_tree` fails the next author who writes one that
+  would. If a rule still describes your tree wrongly, it is a producer defect and the roll is
+  where it is fixed. Nothing is asked back.
 
 OWED COMPANY-SIDE:
 
