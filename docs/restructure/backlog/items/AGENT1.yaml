@@ -7,7 +7,7 @@ phase: 15
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - agents/graph_qa/pipeline.py
@@ -48,3 +48,82 @@ notes: |
 
   depends_on stays empty on purpose: the knowledge-graph scope is buildable today and the
   dependency is per-OPTION, carried in clause (c) rather than as a hold on the whole item.
+
+  BUILT 2026-09-08 (Lane B, laptop `NewThinkpad`, wip/agent1-laptop; offline - fakes, no
+  litellm, no driver, no ADK, no Neo4j). The branch is based on wip/r18-laptop rather than
+  on main: both items edit `Envelope` and `pipeline.py` in the same regions, and branching
+  sequentially was the alternative to handing Lane A a conflict. MERGE R18 FIRST.
+
+  THE FILTER NEEDED A LATCH, AND THE TEST IS WHAT FOUND IT. Clause (a) says an out-of-scope
+  spec is "absent from the router prompt and cannot be chosen", and those turn out to be two
+  requirements rather than one phrasing of the same. Dropping the catalog LINE does not make
+  the id absent from the PROMPT: a kept spec's description names a dropped one -
+  `docs.utility-lookup.v1` cites `docs.search.v1` as its own fallback - so the router can
+  read an id it was never offered. An out-of-scope `spec_id` is now dropped in `_route` and
+  Tier 1 takes over, which is exactly the existing treatment of a hallucinated id, because
+  that is what it is. The first version of the test asserted the id was absent from the raw
+  prompt and failed on that prose; the assertion moved to the CATALOG ENTRY and a second
+  test covers the latch, which is the honest split.
+
+  MEMBERSHIP IS A CONSTANT IN CODE AND A DERIVATION IN THE TEST. The evidence for which
+  specs read only the corpus is each spec's own Cypher, but a runtime regex over Cypher text
+  would be a string parse standing in for a declaration, and `QuerySpec` carries no scope
+  field - 47 spec definitions are the wrong layer to edit for a router hint. So
+  `agents/common/scopes.py` holds the sets and `tests/unit/test_ask_scopes.py` derives them
+  from the labels the registered Cypher touches and asserts the two agree. That is
+  `ColumnOut`'s arrangement with `query_specs.COLUMN_TYPES`: a second copy is allowed
+  exactly when a test makes disagreement impossible.
+  Counts, derived 2026-09-08 against 47 registered specs: 6 corpus-ONLY (dropped by the
+  knowledge-graph scope), 3 hybrids (KEPT - "which utility does this document describe" is a
+  graph question whose answer cites a document; dropping it would make the scope mean "specs
+  that never mention a document"), 38 graph-only. One derivation detail is load-bearing
+  rather than tidy: node labels are CamelCase and relationship types are UPPER_SNAKE, so
+  without the `isupper()` filter `:PART_OF` reads as a label named PART and two corpus-only
+  specs misclassify as hybrids. That was a real wrong answer before it was a comment.
+
+  CLAUSE (c), THE R19 CHECK, RECORDED RATHER THAN ASSUMED - the item asks for this first and
+  says the cheapest outcome is that the option should not exist. R19 covers HALF of it, and
+  covers that half well: `build_clarification` turns any term that resolves to none of the
+  four sources into a Tier-0 clarification request, before anything routes, which IS "the
+  person does not know the subject" asked back instead of guessed at. It does NOT cover the
+  other half: `detect_terms` fires on ACRONYM- and LABEL-SHAPED tokens, so a plain-prose
+  general question detects nothing and is never asked about.
+  But the blocker is not the missing detection and it is not an epistemic label.
+  `pipeline.ANSWER_SYSTEM` answers "from query results ONLY ... never invent data", so
+  general-knowledge needs a DIFFERENT ANSWER CONTRACT - a decision about whether this system
+  answers ungrounded at all, which is a gate question, not a dropdown entry. Recorded in
+  `scopes.GENERAL_KNOWLEDGE_FINDING` and pinned by a test so it cannot quietly become a
+  build. RECOMMENDATION: the option should not ship under this id.
+
+  VENDOR-CORPUS is DECLARED and REFUSED. Declared so the filter is testable and so API4 has
+  something to switch on; refused by `resolve()` so no answer can be produced under a label
+  claiming the documents were searched when only their titles were - O62's illusion promoted
+  to a feature, which is the exact thing the item exists to prevent.
+
+  DEGRADATION: an unknown or unready scope answers UNSCOPED and says why on
+  `envelope.scope_note`. Never an error, and never an empty catalog - a test walks every
+  input shape to prove the catalog is non-empty for each. The empty catalog is the worst of
+  the three outcomes because the router silently has nothing to choose from and the run
+  reads as a routing judgement.
+
+  CLAUSE (d) - WHICH HALF IS DONE. The filter and the envelope land; NO console control
+  ships. With vendor-corpus gated and general-knowledge blocked on a ruling, the dropdown
+  would carry one live option, which is a label rather than a control. `askApi.ts` types
+  `scope` and `scope_note` so the console can READ which scope ran; nothing sends one yet.
+
+  SURFACES: agents/common/scopes.py (new), agents/common/specs_catalog.py (the filter),
+  agents/graph_qa/{pipeline,envelope,agent,control}.py, web/src/lib/askApi.ts (types only),
+  agents/graph_qa/README.md (the envelope contract bump).
+  TESTS: tests/unit/test_ask_scopes.py (16).
+
+  HANDBACKS FOR LANE A:
+  1. `backlog` - the console control is a drydocs-web item to mint when a SECOND option is
+     ready; it is not worth minting before that, since a one-option dropdown is a label.
+  2. `backlog`/`gates` - general-knowledge needs a ruling on whether /ask ever answers
+     without rows. That is the blocker, not the R15 label the idea assumed, and it is a gate
+     question rather than a build.
+  3. No governed file maps a node LABEL to a scope. `config/taxonomy/domains.yaml`
+     partitions the relationship VOCABULARY (edges) rather than specs, and several corpus
+     specs traverse no edge at all (`docs.search.v1` matches a bare `:Document`), so it
+     cannot answer this as it stands. The constant-plus-derivation-test is the cheap answer;
+     a declared spec taxonomy would be the real one, if anything else ever needs it.
