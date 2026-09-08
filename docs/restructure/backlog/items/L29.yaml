@@ -8,7 +8,7 @@ phase: 10
 agent: main
 model: haiku
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - docs/design/drydocs-load-runbook.md
@@ -27,3 +27,66 @@ notes: |
   The line was touched at load-runbook Rev 3 (annotation only) and the path was not examined then, so a currency guard would not have caught it either — the path resolves to nothing rather than to something stale.
 
   Epic doc-infrastructure and module `docs`: the runbook is a design doc under the Epic L render chain.
+
+  CLOSED 2026-09-07 (laptop / NewThinkpad, Lane B, branch wip/l29-laptop; queue item 5 of
+  docs/lane-b-handoff.md). All four clauses done.
+
+  THE PREMISE HAD MOVED, AND SAYING SO IS THE FIRST FINDING (J63, applied to an item's own
+  acceptance rather than to a review). Idea-166 and this item's (a) describe the line as
+  `--csv internal/org/catalog/catalog_lobs.csv`. THAT LINE NO LONGER EXISTS: `git log -S`
+  shows commit 3f5b5769 (G121, the declared-acquisition-route work) rewrote it to
+  `--csv "$env:DRYDOCS_DATA_ROOT/catalog/catalog_lobs.csv"` as a side effect of teaching the
+  step about read zones. The literal defect groomed here was fixed incidentally three weeks
+  ago by a change that was not about it. Had this item been closed by matching the string, the
+  honest answer would have been "already fixed" and the runbook would have kept teaching a
+  wrong path.
+
+  BECAUSE THE SUCCESSOR IS WORSE IN ONE WAY: the old path pointed at a directory that had
+  never existed, which at least fails obviously. The new one points at
+  `DRYDOCS_DATA_ROOT/catalog/`, which IS a declared read zone (`catalog-exports`,
+  config/data-zones.yaml) - just not this loader's. That zone is the G42 Snowflake
+  data-catalog export drop; `catalog_lobs`' source is `pat:product-catalog`, whose
+  `acquisition.drop_dir` is `pat/` (config/source-registry.yaml). So the example named a real
+  zone for the wrong subject, which reads as correct to anyone who checks that the zone exists.
+
+  (a) FIXED BY REPOINTING, the clause's stated preference, and the choice is stated in the
+  runbook itself. The step now carries TWO lines instead of one: a bundled-sample invocation a
+  reader in any clone can execute, and the real-drop shape with the path corrected from
+  `catalog/` to `pat/`. Both are measured, not assumed - `drydocs load catalog_lobs --csv
+  drydocs/data/samples/catalog_lobs__sample.csv` was run on this machine and REFUSED with
+  exit 2 ("outside every declared read zone", G121), and the same command with
+  `--allow-unzoned` printed the recorded-override notice and proceeded to the graph (verified
+  against an unreachable bolt URI so no graph was written - the venue is the laptop and its
+  neo4jtest container was deliberately not used).
+
+  So the runnable line carries `--allow-unzoned`, and the prose says why rather than leaving
+  it as a magic flag: the bundled samples ship in the repo TREE, not under DRYDOCS_DATA_ROOT,
+  so they sit outside every zone BY DESIGN. The effect is that the step demonstrates, on the
+  safest possible file, the override it had just finished describing in the paragraph above.
+
+  (b) THE FORBIDDEN FIX WAS NOT TAKEN. No directory was created, in the tree or under the data
+  root. The only paths written into the doc are one that ships in the repo and one that names
+  a declared drop.
+
+  (c) THE NEIGHBOURS WERE SWEPT, and the sweep is now in two halves because the premise moved.
+  `internal/org/catalog/` - the idea's path - appears producer-side only in
+  reconcile-port/SKILL.md, C26 and the 2026-07-27 inbox line, every one a reference to the
+  COMPANY's 2026-06-25 catalog gate page; the runbook no longer mentions it at all, so nothing
+  there needed to change. `DRYDOCS_DATA_ROOT/catalog/` - the path actually removed - appears in
+  the G42 plan doc, the snowflake-data-catalog gate prompt, drydocs_core/data_root.py and
+  test_data_root.py, and every one of those correctly means the Snowflake export zone. This
+  change removes the single place that borrowed that zone for a loader belonging elsewhere, so
+  the surrounding prose is more consistent afterwards, not less.
+
+  (d) THE RENDER FOLLOWS, in the same commit: `poetry run python scripts/render_design_doc.py
+  docs/design/drydocs-load-runbook.md`, one file re-rendered rather than the whole `docs/design`
+  glob, so this branch touches no other governed render.
+
+  Gates: full suite 3637 passed / 14 skipped / 18 deselected; the 133 design-doc render and
+  currency guards green; `ruff check .` and `ruff format --check .` clean. No board render, no
+  snapshot - Lane A pens.
+
+  ONE PROCESS SLIP, RECORDED RATHER THAN HIDDEN: this item's CLAIM commit on main was made with
+  `git commit -m` and therefore carries no Co-Authored-By / Claude-Session trailer, unlike every
+  other commit in this lane. It is already pushed, and rewriting pushed trunk history to add a
+  trailer is worse than the omission, so it stands. Every other commit on this branch has it.
