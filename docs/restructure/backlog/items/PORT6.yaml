@@ -50,6 +50,15 @@ acceptance: |
       the whole point.
   (e) A relay tells the consumer the script exists and where the deferral section lives.
       Nothing is asked back.
+  (f) Added 2026-09-08 (twenty-second report; RELAY-37): the check covers the union-append
+      class too, by HEADING - every `## ` heading in a union-append file at the base tag
+      (`git show <tag>:<path>`) is present in the working-tree file, or the roll is not
+      COMPLETE. Per-entry rows by id, clean-add paths by name, union-append entries by
+      heading: one instrument, three classes. The incident it reconstructs (J76): the
+      consumer's config/gate-log.md held none of the ten producer entries owed by three
+      applied rolls, two of them closed COMPLETE, and the only guard that could see any of
+      it (tests/unit/test_gates_json.py) saw one, because scripts/render_gates.py hides a
+      self-declared prompt with no log entry - that half is Idea-303, not this item.
 notes: |
   Minted 2026-09-07 from IDEAS.md Idea-291 (desktop, Lane A); the stub shipped in e0f2b799
   under a stale CFG5 message - see CORE6's note. Source is the company's carve-out I close
