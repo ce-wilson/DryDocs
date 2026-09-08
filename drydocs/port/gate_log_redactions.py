@@ -37,7 +37,9 @@ from pathlib import Path
 
 import yaml
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+from drydocs_core.repo_paths import repo_root
+
+REPO_ROOT = repo_root(Path(__file__).resolve().parents[2])
 REDACTIONS_FILE = REPO_ROOT / "config" / "gate-log-redactions.yaml"
 SCHEMA = "drydocs.gate-log-redactions.v1"
 REQUIRED_FIELDS = ("commit", "date", "record", "replacement", "reason")
