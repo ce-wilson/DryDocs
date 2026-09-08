@@ -220,7 +220,83 @@ it.
 
 ## Ranked
 
-*(step 6 — the ranked list; its presence is what marks this report complete)*
+Three findings. The first is the most consequential thing this sweep has found; the other
+two are ordinary debt with unusually clear correction paths.
+
+1. **L1-1 — the acceptance runner cannot fail on an empty graph, in four of six suites.**
+   `evaluate` treats `empty` as `len(rows) == 0` with no precondition; 28 of 30 committed
+   assertions are negative; `folder-attribution-coverage.yaml` is 12 negative assertions
+   with no anchor. A green run means "conforms" or "nothing was loaded" and cannot say
+   which. Ranked first without hesitation: this is the gate the other checks report
+   through, so a false green here does not mislead a reader, it **ends the inspection**.
+   The fix is a per-suite anchor the runner asserts before evaluating, reporting NOT RUN
+   rather than PASS — testable offline, because loader and evaluator are already pure.
+2. **L2-1 — eighteen shims past a trigger that fired today, and the item that should
+   retire them was never minted.** Eight in this slot, ten in slots 7 and 8. Ranked second
+   because it is a scheduled action that silently did not happen, and because nothing in
+   the repo will ever raise its hand: the shims work.
+3. **L2-2 — nine copies of a `sys.path` preamble carrying a hard-coded `parents[2]`,
+   and the thirteen `E402` suppressions that exist to serve them.** Ranked third because
+   nothing is wrong today; the cost is that moving one file computes a wrong root and
+   reports it as a missing dependency.
+
+**Not ranked:** the strengths in L1-2 — the verifier that writes nothing and argues its
+own gate-exemption from behaviour, the classification boundary stated at the file that
+would breach it, and `unknown_targets` tying suites to the review backbone.
+
+## Cross-links
+
+**Between the lenses.** Lens 1 found a check that cannot fail; Lens 2 found a cleanup that
+cannot be noticed. Both are **absences that no instrument in the repo is watching** — the
+first because a vacuous pass looks like a pass, the second because a working shim looks
+like working code. This slot's character is that its debt is invisible to every tool
+pointed at it, which is precisely why a human-read sweep found it.
+
+**To slots 9, 2, 3, 4, 5 — the completeness pattern is now six for six, and this is its
+worst case.** Web truncated silently; load records no scope; lineage counts a tier with no
+writer; api declares its ceiling and the console reads it; remediation omits its rule
+denominator; and here **the tool that certifies the graph reports PASS against a graph
+that is not there**. Every previous instance produced a wrong answer to a question someone
+asked. This one produces a *right-looking* answer to the question "is the graph correct",
+which is the question the others' answers are checked against. If slot 10 ranks the
+recurrence anywhere, it ranks here.
+
+**To slot 5 (`remediation`) specifically.** That module's `equivalence.py` was repaired for
+this exact defect and named the remedy: three-valued, **not proven**, and *"no evidence is
+never evidence."* `graph_verify` needs the same third state and does not have it. The
+repo has now written the correct answer down twice (there, and in slot 3's `archival.py`
+*"no axis proves absence"*) without either becoming a convention other components adopt.
+
+**To slots 7 and 8, forward.** They own the other ten ADR 0018 shims. If L2-1 is groomed,
+it should be groomed once for all eighteen — and those slots should not re-report it.
+
+## Candidates for grooming
+
+Five. None minted — the backlog pen is Lane A's and this firing holds neither it nor an id.
+
+1. **Give `graph_verify` a per-suite precondition.** `drydocs-review`, p1. The suite
+   declares an anchor (a `nonempty` case, or a minimum row count on a named label); the
+   runner evaluates it FIRST and reports `NOT RUN` rather than `PASS` when it fails.
+   Acceptance should require the four unanchored committed suites to gain anchors in the
+   same change, or the mechanism ships without covering the cases that motivated it.
+2. **Mint the ADR 0018 shim-removal item — once, for all eighteen.** Cross-component
+   (`drydocs-review`, `drydocs-plan`, `drydocs-port`, `drydocs-docgen`). The ADR's own
+   action item 6 says to mint it when the relay rolls; it rolled twice. If removal should
+   wait, amend the trigger in the ADR **and** in the eighteen docstrings rather than
+   letting a stated expiry pass silently.
+3. **Retire the `agents` path preamble.** `drydocs-agents`, p3. Preferred: a path
+   dependency on the repo in `agents/.venv`, which deletes nine preambles and thirteen
+   suppressions. Fallback if the venvs must stay independent: one `_bootstrap` module so
+   the `parents[2]` depth exists once.
+4. **Decide whether "a result states the limits of its own method" is a convention.**
+   Cross-module, slot 10's framing — now with six instances and three independent
+   in-repo remedies (`equivalence.py`'s third state, `archival.py`'s coverage-on-itself,
+   `drydocs_api`'s declared `truncated`). The item is "write the convention down and name
+   the instrument", not "fix it again".
+5. **Re-measure the rotation's size table.** Slot 10 or the plan's own maintenance. Four
+   of six slots have come in over their plan-table size, this one by **+49%**. Either the
+   table is a dated snapshot and should say so in the plan, or the rotation is balanced
+   against numbers that no longer hold.
 
 ## Cross-links
 
