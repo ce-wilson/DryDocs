@@ -154,7 +154,7 @@ export function mapSeries(rows: readonly SpecRow[]): CanvasGraph {
   return b.build(rows.length)
 }
 
-/** `explorer.folder-applications.v1` -> the application neighbourhood.
+/** `explorer.folder-applications.v1` -> the application neighborhood.
  *
  *  The spec walks (f:ControlMFolder)-[:BELONGS_TO_APPLICATION {role:
  *  'seal_app_ref'}]->(:Port)<-[:HAS_PORT]-(a:BusinessApplication), with OPTIONAL
@@ -190,7 +190,7 @@ export function mapAppNeighbourhood(rows: readonly SpecRow[]): CanvasGraph {
     if (appId && folder) b.rel(folderId, appNodeId, 'BELONGS_TO_APPLICATION')
     if (dc) {
       const dcId = `server:${dc}`
-      b.node(dcId, 'ControlMServer', dc, { 'Data centre': dc })
+      b.node(dcId, 'ControlMServer', dc, { 'Data center': dc })
       if (folder) b.rel(folderId, dcId, 'SCHEDULED_ON')
     }
   }
@@ -228,7 +228,7 @@ export const CANVAS_ROUTES = {
   'runbooks.series.v1': { module: 'runbooks', title: 'Data-series provisioning graph' },
   'explorer.folder-applications.v1': {
     module: 'explorer',
-    title: 'Application neighbourhood',
+    title: 'Application neighborhood',
   },
 } as const satisfies Record<CanvasSpecId, CanvasRoute>
 
