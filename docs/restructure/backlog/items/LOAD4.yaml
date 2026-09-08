@@ -7,7 +7,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - docs/restructure/backlog/items/Z7.yaml
@@ -40,3 +40,83 @@ notes: |
 
   Clause (d) is the groom's addition: without it the same drift returns the next time either
   half of the fixture is edited, which is exactly how it arrived.
+
+  CLOSED 2026-09-07 (laptop / NewThinkpad, Lane B, branch wip/load4-laptop; queue item 3 of
+  docs/lane-b-handoff.md). All four clauses done.
+
+  ONE CORRECTION TO THE ACCEPTANCE'S CAUSAL STORY, found before any edit and worth stating
+  because it changed the work: attribution does not run off the folder NAMES at all. It runs
+  off the STG_APP_FACT feed, job by job, through the K2 fallback - and that feed carried TWO
+  rows, both for folder 161014. So aligning the ids alone would have moved the counters by
+  nothing. The name-vs-capture mismatch is what BLOCKED extending the feed, because a fact row
+  for folder 161015 could only have named 70001-70003 and would then have contradicted the
+  folder's own name. Both halves were needed; the item's (c) asks for "the new numbers", which
+  is the clause that would have caught this if the reading had not.
+
+  (a) DIRECTION: THE CAPTURE GREW, the folder names are untouched, and the reason is written
+  into config/taxonomy/business-application.yaml beside the new rows rather than left here.
+  Narrowing the folders onto 70001-70003 was sized first and rejected: about twenty files -
+  config/taxonomy/controlm.yaml's eight folder rows and its note, four sample CSVs,
+  server-location.yaml's worked comment, and the WORKED EXAMPLES of docs/design/controlm-
+  ingestion-tdd.md and drydocs-project-tdd.md, where `--folder 'PRARAG-HLDM-70011-PEX%'` is the
+  running illustration of prefix matching selecting BOTH 70011 folders. Those design pages are
+  governed renders whose re-render is Lane A's close ritual, and the example is ABOUT the id
+  being narrowed. Growing the capture is additive by comparison: five applications and five
+  membership blocks appended, the three G35 shapes (70001 FULL / 70002 WIDE / 70003 MINIMAL)
+  untouched byte for byte, and a header note saying the five are demo plumbing and not a fourth
+  shape to reason from.
+
+  The five carry exactly three roles each, and that is not an arbitrary minimum - it is
+  seal_samples.EMBEDDED_ROLES, the trio DECO_SEAL_APP_INFO carries inline (Application Owner /
+  Primary Information Owner / Chief Technology Officer). Learned by running the suite rather
+  than by reading it: the first draft used L2 Operate Manager as the third role and
+  test_seal_samples::test_every_application_row_carries_all_three_inline_contacts refused every
+  new row. Recorded in the fixture so the next person adding an application does not rediscover
+  it. The related fact that decided the direction at all: seal_samples.py builds application
+  rows FROM the memberships, so an application declared with no membership block is invisible
+  to the generated SEAL sample and would have fixed nothing.
+
+  (b) THE DELIBERATE GAPS SURVIVE, and are now named where a guard can see them - which is the
+  actual change, since before this the word "deliberate" was doing all the work. The 2 of 4
+  unresolved hosts are untouched (tests/unit/test_server_inventory_fixture.py green). TWO
+  folders stay unattributed, for two DIFFERENT reasons, which is more than the demo showed
+  before: 161020 names 70012, which the capture now DOES carry, and has no fact rows at all -
+  the "no evidence" case; and the retired folder (PRRPDG-RPD-70041-RISK-RETIRED, status=R,
+  empty user_daily) names 70041, which the capture deliberately does not declare - the
+  "application no longer in the registry" case.
+
+  (c) COVERAGE RE-MEASURED, AND THE CLAIM IS SAMPLE-REPRODUCIBLE (J18) RATHER THAN
+  MACHINE-PINNED. Before: 1 attributed, 7 unmatched, of which six could not have been fixed by
+  any evidence. After: eligible_folders 8, attributed 6, unmatched 2, conflicts 0, and the
+  coverage invariant reconciles. The six are 161014 -> 70002, 161015 -> 70011, 161016 -> 70011,
+  160500 -> 70021, 160501 -> 70022, 162001 -> 70031. These numbers are not from a graph run:
+  the new test drives FolderAttributionAdapter over the committed fixtures in-process with no
+  Neo4j, so they reproduce in any clone. The neo4jtest container on this laptop was deliberately
+  not used - a machine-pinned number is the thing J18 exists to stop.
+
+  (d) THE GUARD: test_every_folder_names_an_application_the_capture_carries asserts that the
+  set of folder-name ids absent from the capture EQUALS DELIBERATE_GAPS ({"161999": "70041"}) -
+  equality, not subset, so a new drifting id fails instead of joining the gap quietly, and
+  closing the gap deliberately also has to be a deliberate edit.
+
+  The fact feed grew from 2 rows to 15. Every (folder, job) pair is drawn from
+  controlm_jobs__sample.csv and every folder is unanimous - the two guards that already existed
+  and now have something to guard.
+
+  Also corrected: the interlock's own module docstring asserted "7 of the 8 folders are
+  deliberately unattributed and 2 of the 4 hosts deliberately unresolved". Only the second half
+  was ever true, and the first half is the rationalization that let a fixture defect read as a
+  design choice for as long as it did. It now says which gaps are deliberate and names the
+  guard for each.
+
+  Gates: full suite 3638 passed / 15 skipped / 18 deselected; `ruff check .` and `ruff format
+  --check .` clean; `import drydocs.cli` and `drydocs --help` exit 0. No render, no snapshot -
+  Lane A pens.
+
+  FOR LANE A AT MERGE - THREE WIP BRANCHES TOUCH tests/unit/test_bundled_demo_interlock.py, in
+  three disjoint regions, so the merges should auto-resolve but should be done knowingly and
+  the file's suite re-run after the last one: wip/core5-laptop edits the _FOLDER_APP_ID comment
+  (the five-digit belief), wip/core4-laptop rewrites _rows and drops the now-unused pytest
+  import, and this branch rewrites the module docstring and appends two tests. If CORE4 lands
+  after this one, note that the coverage test added here uses no skip guard and needs none -
+  every path it reads is tracked, which is exactly CORE4's rule.
