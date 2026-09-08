@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-08T10:04:48",
+    "captured_at": "2026-09-08T10:30:59",
     "date": "20260908",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "afa3120c",
-      "full": "afa3120c674ff2586609fe11d8c4bffc288193aa",
+      "commit": "0813992d",
+      "full": "0813992df4c973c7e659c780c973e6e8ea2e0157",
       "branch": "main",
-      "describe": "port-base-20260905-356-gafa3120c",
-      "subject": "chore(lanes): close Lane A and Lane B - both queues done, handoff files retired, renders refreshed; pen: backlog . port . adr . gates . snapshot (Lane A, desktop)",
+      "describe": "port-base-20260905-377-g0813992d",
+      "subject": "merge(review): module-review sweep slots 1 and 3 (core, lineage, load) from review/module-sweep, --no-ff, docs-only; pen: backlog (Lane A, desktop)",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -16973,6 +16973,33 @@
       "kind": "dir"
     },
     {
+      "file_id": "drydocs/docs/reviews/modules/core-2026-09-07.md",
+      "name": "core-2026-09-07.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/modules/core-2026-09-07.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/reviews/modules/lineage-2026-09-08.md",
+      "name": "lineage-2026-09-08.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/modules/lineage-2026-09-08.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/reviews/modules/load-2026-09-08.md",
+      "name": "load-2026-09-08.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/modules/load-2026-09-08.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/reviews/modules/web-2026-09-05.md",
       "name": "web-2026-09-05.md",
       "extension": ".md",
@@ -23039,10 +23066,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260908-0233.json",
-      "name": "drydocs-20260908-0233.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260908.json",
+      "name": "drydocs-20260908.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260908-0233.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260908.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -46781,6 +46808,21 @@
     [
       "drydocs/docs/reviews/modules",
       "CONTAINS",
+      "drydocs/docs/reviews/modules/core-2026-09-07.md"
+    ],
+    [
+      "drydocs/docs/reviews/modules",
+      "CONTAINS",
+      "drydocs/docs/reviews/modules/lineage-2026-09-08.md"
+    ],
+    [
+      "drydocs/docs/reviews/modules",
+      "CONTAINS",
+      "drydocs/docs/reviews/modules/load-2026-09-08.md"
+    ],
+    [
+      "drydocs/docs/reviews/modules",
+      "CONTAINS",
       "drydocs/docs/reviews/modules/web-2026-09-05.md"
     ],
     [
@@ -49991,7 +50033,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260908-0233.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260908.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -53663,13 +53705,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2982,
+    "files": 2985,
     "edges": 1838,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 3304,
+    "rels": 3307,
     "directories": 323
   }
 }
