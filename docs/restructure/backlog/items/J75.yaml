@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - PORT-MANIFEST.yaml
@@ -54,3 +54,25 @@ notes: |
   recorded here only so the story reads correctly: render_software_registry.py failed on
   datetime.date, fixed at O68 (6b43c850), inside the same range. Related: J68, J69, G125,
   N4, N5, Idea-240, Idea-241.
+
+  DONE 2026-09-08 (desktop, Lane A). Manifest and prompt only; no test, guard or CI change.
+  (a) PORT-MANIFEST.yaml names the triple on three rows the way J68 names pairs (each row
+  names the other members in its note): a NEW per-entry row for
+  scripts/render_enforcement_matrix.py (SURFACES union by id, company-only rows kept,
+  producer rows cross with their config surface, CONFIG_EXEMPT unioned, UNNAMED FIELDS
+  clause); the web/src/generated/** derived row gains THE THIRD MEMBER OF A TRIPLE; the
+  config/source-bindings.yaml row gains MOVES WITH ... ALWAYS as the first instance. The
+  renderer row enumerates every triple that exists today: 26 SURFACES rows, 24 under
+  config/, plus the two code-resident rows (relationship vocabulary, canonical load
+  sequence), and says the list is refreshed in the same commit a row is added.
+  (b) The renderer row states why tests/unit/test_enforcement_matrix.py cannot cover it:
+  on a tree the pair cannot separate; a slice is not a tree, the guard fires after the take,
+  and by then render_board.py exits 1 (render_enforcement_matrix.py raises SystemExit on an
+  unlisted config entry). (c) The failure is in the note: one missing SURFACES row made the
+  matrix unproducible, not stale, exposed the J55 acronym failure on the carried copies, and
+  cost a cleared slice and a red trunk. (d) port-prompt APPLY BY DISPOSITION gains the
+  one-sentence reading rule after the apply-order table; RELAY-42 tells the company and
+  asks nothing back. (e) Enumerated by importing scripts/render_enforcement_matrix.py and
+  reading SURFACES and CONFIG_EXEMPT (J37), in the patch script that wrote the row; the
+  header updated: key names J75. Before this row the renderer fell to the scripts/**
+  default_ok, which said nothing about what travels with it.

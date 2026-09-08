@@ -48,7 +48,9 @@
 # =============================================================================
 schema: drydocs.port-manifest.v1
 classification: Internal-Public
-updated: 2026-09-05   # 2026-08-20 (J51): six PER-ENTRY rows for canonical-producer paths the
+updated: 2026-09-08   # 2026-09-08 (J75): the config-surface / SURFACES-row / derived-artifact
+                      # triple named on three rows; scripts/render_enforcement_matrix.py per-entry.
+                      # 2026-08-20 (J51): six PER-ENTRY rows for canonical-producer paths the
                       # company legitimately EXTENDS (Idea-142's class): description_tokens
                       # (per function), detect.py + __init__ (per detector id), test_runbook_
                       # currency (per exemption table, retirement trigger named), email-dl-
@@ -974,6 +976,66 @@ rows:
       then pass on the consumer's own truth. Third instance of a file class sitting
       under a default it does not belong to (dev-environment.yaml 2026-07-28,
       source-registry.yaml 2026-09-01, this).
+      THE THIRD MEMBER OF A TRIPLE (J75, 2026-09-08): `enforcement-matrix.json` is
+      produced from a config surface AND that surface's row in
+      `scripts/render_enforcement_matrix.py` SURFACES. Regenerate works only when the
+      slice carried both: a config/ path that lands without its SURFACES row makes
+      this file UNPRODUCIBLE, not stale — the renderer refuses the unlisted entry and
+      render_board.py exits 1 — and the stale carried copies then fail the J55 acronym
+      guard on top. MOVES WITH the config surface and with its SURFACES row, ALWAYS;
+      the renderer row directly below enumerates the surfaces.
+  - path: "scripts/render_enforcement_matrix.py"
+    disposition: per-entry
+    entry_rule: >
+      `SURFACES` is a list of rows keyed by `id`; UNION by id. Producer rows cross on
+      take (a producer config surface arrives with its row, or the derived artifact
+      cannot be produced); company-only rows — a config surface the company added
+      to its own estate — are kept, never dropped by a take. `CONFIG_EXEMPT` is a
+      set: union it. The renderer's mechanism (the scan, the status decision, the
+      residency fact, the JSON shape) is producer-owned and crosses whole.
+      UNNAMED FIELDS: a field on a SURFACES row this rule does not name is producer
+      mechanism and crosses with the row; the company adds no fields of its own here.
+    note: >
+      J75 (2026-09-08). ONE COUPLING, THREE FILES: a config surface, its SURFACES row
+      here, and `web/src/generated/enforcement-matrix.json`. A port slice carries all
+      three or none — the same rule J68 wrote for declaration/guard pairs, one member
+      wider. WHY THE GUARD CANNOT COVER IT: `tests/unit/test_enforcement_matrix.py`
+      asserts every top-level config/ entry is in SURFACES or CONFIG_EXEMPT, so ON A
+      TREE the pair can never separate; a port slice is not a tree — the guard fires
+      only AFTER the take, and by then the derived artifact is unproducible because
+      render_board.py exits 1. This manifest is the only surface that can state a
+      constraint about a SLICE. THE FAILURE THIS PREVENTS, so nobody prices it as
+      bookkeeping: on the company's D-slice apply of port-base-20260826..20260901,
+      `config/source-bindings.yaml` (G125) had arrived in an earlier slice WITHOUT its
+      SURFACES row; the derived row's "regenerate, never carry" then made the matrix
+      UNPRODUCIBLE rather than merely stale, and the J55 acronym guard failed on the
+      stale carried copies — one missing row cost a cleared slice, an exposed second
+      failure and a red trunk. Without this row the file fell to the `scripts/**`
+      default_ok (evaluate on collision), which says nothing about what travels with it.
+      THE TRIPLES THAT EXIST TODAY (read from the SURFACES constant by import at
+      2026-09-08, never from a render — J37; 26 rows, 24 under
+      config/): source-registry = config/source-registry.yaml; loader-source-overlay =
+      config/loader-source-overlay.yaml; source-mappings = config/source-mappings/;
+      audit-fields = config/audit-fields.yaml; precedence = config/precedence.yaml;
+      classification = config/classification.yaml; taxonomy-ontology-map =
+      config/taxonomy-ontology-map/; relationship-vocabulary =
+      drydocs_core/ontology/relationship_vocabulary/; taxonomy-captures =
+      config/taxonomy/; manual-loads = config/manual-loads/; seal-contact-overrides =
+      config/overrides/; review-labels = config/review-labels.yaml; review-quality =
+      config/review-quality.yaml; glossary = config/glossary/; crosswalks =
+      config/crosswalks/; gate-record = config/gate-prompts/; doc-source-registry =
+      config/doc-source-registry.yaml; doc-capture = config/doc-capture.yaml; data-
+      zones = config/data-zones.yaml; source-bindings = config/source-bindings.yaml;
+      log-kinds = config/log-kinds.yaml; dev-environment = config/dev-
+      environment.yaml; launcher-registry = config/launcher-registry.yaml;
+      orchestrator-crosswalks = config/crosswalks/; config-schemas = config/schemas/;
+      canonical-load-sequence = drydocs/cli_shared.py. CONFIG_EXEMPT = README.md. The
+      two rows outside config/
+      (relationship-vocabulary = drydocs_core/ontology/relationship_vocabulary/;
+      canonical-load-sequence = drydocs/cli_shared.py) are code-resident surfaces and
+      follow the same coupling.
+      When SURFACES gains a row, this enumeration is refreshed in the same commit — a
+      list that drifts from the constant is the J68 typed-disposition defect again.
   - path: "web/**"
     disposition: canonical-producer
     note: "drydocs-web module (JS/TS, Epic O; step 31) — node_modules/dist gitignored; .env.example only, VITE_* values NEVER committed (Vite inlines them into the bundle)"
@@ -1213,6 +1275,11 @@ rows:
       configured are local facts. ADR 0017's reconciliation with ADR 0009 turns
       on the port test, and this row is what makes that test TRUE rather than
       assumed.
+      MOVES WITH its `source-bindings` row in `scripts/render_enforcement_matrix.py`
+      SURFACES and with `web/src/generated/enforcement-matrix.json`, ALWAYS (J75,
+      2026-09-08) — the first instance of the triple, because this is the file that
+      arrived without its row on the company's D-slice apply and made the matrix
+      unproducible.
   - path: "config/source-registry.yaml"
     disposition: per-entry
     entry_rule: >

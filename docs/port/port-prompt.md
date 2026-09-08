@@ -3112,6 +3112,24 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   and left alone: its verdict is CI's conclusion at HEAD's sha, an identity, not a count. No
   test, guard or CI stage changed. Nothing is asked back.
 
+- **RELAY-42 — A CONFIG SURFACE, ITS SURFACES ROW AND THE MATRIX IT FEEDS ARE ONE
+  COUPLING (2026-09-08, J75):** `[VERIFIED-PRODUCER]` Your D-slice apply of
+  port-base-20260826..20260901 found it: `config/source-bindings.yaml` had arrived in an
+  earlier slice without its row in `scripts/render_enforcement_matrix.py` SURFACES, so
+  "regenerate, never carry" made `web/src/generated/enforcement-matrix.json` UNPRODUCIBLE
+  rather than stale (the renderer refuses the unlisted entry; render_board.py exits 1), and
+  the J55 acronym guard then failed on the stale carried copies. `PORT-MANIFEST.yaml` now
+  names the triple the way J68 names declaration/guard pairs: a new per-entry row for
+  `scripts/render_enforcement_matrix.py` (SURFACES union by id, your company-only rows
+  kept, producer rows cross with their config surface) carries the enumeration of every
+  triple that exists today — 26 SURFACES rows, read from the constant by import, not from
+  a render — and the reason the tree guard `tests/unit/test_enforcement_matrix.py` cannot
+  cover it: a guard fires after the take, and a slice is not a tree. The
+  `web/src/generated/**` derived row and the `config/source-bindings.yaml` row each name
+  their other two members. The APPLY BY DISPOSITION section gains the one-sentence reading
+  rule: a slice touching a `config/` path is read with its SURFACES row and the matrix in
+  the same breath. No test, guard or CI stage changed. Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
@@ -3440,6 +3458,12 @@ a render you throw away.
 | 7 | DEFAULT | the manifest `default:` — clean-add when absent, evaluate when both sides have it |
 | 8 | `default_ok` | the default ON PURPOSE (J16) — the row exists to record that somebody thought about it |
 | 9 | `derived` | **regenerate, never carry** (J43) |
+
+**READ THE TRIPLE IN ONE BREATH (J75, 2026-09-08):** when a slice touches a `config/`
+path, check its row in `scripts/render_enforcement_matrix.py` SURFACES and
+`web/src/generated/enforcement-matrix.json` in the same breath — the three are one
+coupling in `PORT-MANIFEST.yaml`, and a slice that carries the surface without its row
+makes the derived file unproducible, not stale.
 
 **MEASURED AT THIS ROLL** (`port-base-20260826..HEAD`, the full span since your last
 applied base): **519 changed paths across 8 classes** — canonical-producer 129,
