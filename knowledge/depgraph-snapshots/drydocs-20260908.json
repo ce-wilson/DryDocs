@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-08T02:33:34",
+    "captured_at": "2026-09-08T10:04:48",
     "date": "20260908",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "dc73c4fa",
-      "full": "dc73c4fad4619075e097b37f1b58d129adab980a",
+      "commit": "afa3120c",
+      "full": "afa3120c674ff2586609fe11d8c4bffc288193aa",
       "branch": "main",
-      "describe": "port-base-20260905-323-gdc73c4fa",
-      "subject": "Merge branch fix/us-english-and-adk-wording - US-English on the /explorer canvas, and the ADK origin check described as same-origin-only",
+      "describe": "port-base-20260905-356-gafa3120c",
+      "subject": "chore(lanes): close Lane A and Lane B - both queues done, handoff files retired, renders refreshed; pen: backlog . port . adr . gates . snapshot (Lane A, desktop)",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -2190,15 +2190,6 @@
       "name": "handoff.py",
       "extension": ".py",
       "rel_path": ".claude/skills/lane-handoff/scripts/handoff.py",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/.claude/skills/lane-handoff/scripts/overlap_prototype.py",
-      "name": "overlap_prototype.py",
-      "extension": ".py",
-      "rel_path": ".claude/skills/lane-handoff/scripts/overlap_prototype.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -6146,6 +6137,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/agents/common/qa_trace.py",
+      "name": "qa_trace.py",
+      "extension": ".py",
+      "rel_path": "agents/common/qa_trace.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/agents/common/scopes.py",
+      "name": "scopes.py",
+      "extension": ".py",
+      "rel_path": "agents/common/scopes.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/agents/common/session_redaction.py",
       "name": "session_redaction.py",
       "extension": ".py",
@@ -8189,6 +8198,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/design/drydocs-agents-runbook.html",
+      "name": "drydocs-agents-runbook.html",
+      "extension": ".html",
+      "rel_path": "docs/design/drydocs-agents-runbook.html",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/drydocs-agents-runbook.md",
+      "name": "drydocs-agents-runbook.md",
+      "extension": ".md",
+      "rel_path": "docs/design/drydocs-agents-runbook.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/design/drydocs-api-runbook.html",
       "name": "drydocs-api-runbook.html",
       "extension": ".html",
@@ -9345,24 +9372,6 @@
       "name": "next-session-cron-prompt.md",
       "extension": ".md",
       "rel_path": "docs/history/next-session-cron-prompt.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/docs/lane-a-handoff.md",
-      "name": "lane-a-handoff.md",
-      "extension": ".md",
-      "rel_path": "docs/lane-a-handoff.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/docs/lane-b-handoff.md",
-      "name": "lane-b-handoff.md",
-      "extension": ".md",
-      "rel_path": "docs/lane-b-handoff.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -19394,10 +19403,28 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs/port/dispositions.py",
+      "name": "dispositions.py",
+      "extension": ".py",
+      "rel_path": "drydocs/port/dispositions.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs/port/port_backlog_union.py",
       "name": "port_backlog_union.py",
       "extension": ".py",
       "rel_path": "drydocs/port/port_backlog_union.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/port/port_completeness.py",
+      "name": "port_completeness.py",
+      "extension": ".py",
+      "rel_path": "drydocs/port/port_completeness.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -19857,6 +19884,15 @@
       "name": "personas.py",
       "extension": ".py",
       "rel_path": "drydocs_api/personas.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs_api/qa_trace_read.py",
+      "name": "qa_trace_read.py",
+      "extension": ".py",
+      "rel_path": "drydocs_api/qa_trace_read.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -20793,6 +20829,15 @@
       "name": "precedence.py",
       "extension": ".py",
       "rel_path": "drydocs_core/precedence.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs_core/registry_view.py",
+      "name": "registry_view.py",
+      "extension": ".py",
+      "rel_path": "drydocs_core/registry_view.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -22994,10 +23039,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260908.json",
-      "name": "drydocs-20260908.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260908-0233.json",
+      "name": "drydocs-20260908-0233.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260908.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260908-0233.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -24119,6 +24164,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/scripts/port_completeness_check.py",
+      "name": "port_completeness_check.py",
+      "extension": ".py",
+      "rel_path": "scripts/port_completeness_check.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/scripts/port_preflight.py",
       "name": "port_preflight.py",
       "extension": ".py",
@@ -24312,6 +24366,15 @@
       "name": "render_software_registry.py",
       "extension": ".py",
       "rel_path": "scripts/render_software_registry.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/scripts/render_ui_concepts.py",
+      "name": "render_ui_concepts.py",
+      "extension": ".py",
+      "rel_path": "scripts/render_ui_concepts.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -24830,6 +24893,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_ask_scopes.py",
+      "name": "test_ask_scopes.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_ask_scopes.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_attribution_surfaces.py",
       "name": "test_attribution_surfaces.py",
       "extension": ".py",
@@ -24960,6 +25032,15 @@
       "name": "test_chain_inputs.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_chain_inputs.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_chunk_search_spec.py",
+      "name": "test_chunk_search_spec.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_chunk_search_spec.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -26153,6 +26234,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_port_completeness.py",
+      "name": "test_port_completeness.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_port_completeness.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_port_dispositions.py",
       "name": "test_port_dispositions.py",
       "extension": ".py",
@@ -26270,6 +26360,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_qa_trace.py",
+      "name": "test_qa_trace.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_qa_trace.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_query_spec_vocabulary.py",
       "name": "test_query_spec_vocabulary.py",
       "extension": ".py",
@@ -26292,6 +26391,15 @@
       "name": "test_reconcile_port_skill_snapshot.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_reconcile_port_skill_snapshot.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_registry_view.py",
+      "name": "test_registry_view.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_registry_view.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -26837,6 +26945,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_ui_concepts_json.py",
+      "name": "test_ui_concepts_json.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_ui_concepts_json.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_ui_tests_ledger.py",
       "name": "test_ui_tests_ledger.py",
       "extension": ".py",
@@ -27341,6 +27458,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/ask/TraceLink.test.tsx",
+      "name": "TraceLink.test.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/ask/TraceLink.test.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/ask/TraceLink.tsx",
+      "name": "TraceLink.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/ask/TraceLink.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/assets",
       "name": "assets",
       "extension": "",
@@ -27827,6 +27962,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/components/ui/TaglineWithProvenance.test.tsx",
+      "name": "TaglineWithProvenance.test.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/components/ui/TaglineWithProvenance.test.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/components/ui/TaglineWithProvenance.tsx",
+      "name": "TaglineWithProvenance.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/components/ui/TaglineWithProvenance.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/components/ui/TruncationBadge.tsx",
       "name": "TruncationBadge.tsx",
       "extension": ".tsx",
@@ -28218,6 +28371,15 @@
       "name": "software-registry.json",
       "extension": ".json",
       "rel_path": "web/src/generated/software-registry.json",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/generated/ui-concepts.json",
+      "name": "ui-concepts.json",
+      "extension": ".json",
+      "rel_path": "web/src/generated/ui-concepts.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -28628,6 +28790,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/lib/qaTrace.ts",
+      "name": "qaTrace.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lib/qaTrace.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/lib/reachability.test.ts",
       "name": "reachability.test.ts",
       "extension": ".ts",
@@ -28758,6 +28929,15 @@
       "name": "theme.ts",
       "extension": ".ts",
       "rel_path": "web/src/lib/theme.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/lib/uiConcepts.ts",
+      "name": "uiConcepts.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/lib/uiConcepts.ts",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -29738,12 +29918,24 @@
       "drydocs/agents/common/env_merge.py"
     ],
     [
+      "drydocs/agents/common/qa_trace.py",
+      "drydocs/drydocs_core/log_kinds.py"
+    ],
+    [
+      "drydocs/agents/common/qa_trace.py",
+      "drydocs/drydocs_core/run_log.py"
+    ],
+    [
       "drydocs/agents/common/spec_promotion.py",
       "drydocs/agents/common/ledger_read.py"
     ],
     [
       "drydocs/agents/common/spec_promotion.py",
       "drydocs/drydocs_core/run_log.py"
+    ],
+    [
+      "drydocs/agents/common/specs_catalog.py",
+      "drydocs/agents/common/scopes.py"
     ],
     [
       "drydocs/agents/common/specs_catalog.py",
@@ -29787,6 +29979,10 @@
     ],
     [
       "drydocs/agents/graph_qa/agent.py",
+      "drydocs/agents/common/qa_trace.py"
+    ],
+    [
+      "drydocs/agents/graph_qa/agent.py",
       "drydocs/agents/graph_qa/control.py"
     ],
     [
@@ -29812,6 +30008,10 @@
     [
       "drydocs/agents/graph_qa/pipeline.py",
       "drydocs/agents/common/__init__.py"
+    ],
+    [
+      "drydocs/agents/graph_qa/pipeline.py",
+      "drydocs/agents/common/scopes.py"
     ],
     [
       "drydocs/agents/graph_qa/pipeline.py",
@@ -30147,6 +30347,10 @@
     ],
     [
       "drydocs/drydocs/cli_schema.py",
+      "drydocs/drydocs_core/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/cli_schema.py",
       "drydocs/drydocs_core/data_zones.py"
     ],
     [
@@ -30163,11 +30367,19 @@
     ],
     [
       "drydocs/drydocs/cli_schema.py",
+      "drydocs/drydocs_core/registry_view.py"
+    ],
+    [
+      "drydocs/drydocs/cli_schema.py",
       "drydocs/drydocs_core/schema/constraints.py"
     ],
     [
       "drydocs/drydocs/cli_schema.py",
       "drydocs/drydocs_core/source_bindings.py"
+    ],
+    [
+      "drydocs/drydocs/cli_schema.py",
+      "drydocs/drydocs_core/source_registry.py"
     ],
     [
       "drydocs/drydocs/cli_shared.py",
@@ -30842,6 +31054,10 @@
       "drydocs/drydocs_core/backlog_store.py"
     ],
     [
+      "drydocs/drydocs/port/port_completeness.py",
+      "drydocs/drydocs/port/dispositions.py"
+    ],
+    [
       "drydocs/drydocs/port/port_preflight.py",
       "drydocs/drydocs_core/repo_paths.py"
     ],
@@ -31083,6 +31299,10 @@
     ],
     [
       "drydocs/drydocs_api/app.py",
+      "drydocs/drydocs_api/qa_trace_read.py"
+    ],
+    [
+      "drydocs/drydocs_api/app.py",
       "drydocs/drydocs_api/queries.py"
     ],
     [
@@ -31268,6 +31488,14 @@
     [
       "drydocs/drydocs_api/mappings.py",
       "drydocs/drydocs_core/source_registry.py"
+    ],
+    [
+      "drydocs/drydocs_api/qa_trace_read.py",
+      "drydocs/drydocs_core/log_kinds.py"
+    ],
+    [
+      "drydocs/drydocs_api/qa_trace_read.py",
+      "drydocs/drydocs_core/run_log.py"
     ],
     [
       "drydocs/drydocs_api/query_specs.py",
@@ -31616,6 +31844,18 @@
     [
       "drydocs/drydocs_core/precedence.py",
       "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
+      "drydocs/drydocs_core/registry_view.py",
+      "drydocs/drydocs_core/__init__.py"
+    ],
+    [
+      "drydocs/drydocs_core/registry_view.py",
+      "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
+      "drydocs/drydocs_core/registry_view.py",
+      "drydocs/drydocs_core/yaml_fragments.py"
     ],
     [
       "drydocs/drydocs_core/run_log.py",
@@ -32110,6 +32350,10 @@
       "drydocs/drydocs/port/port_preflight.py"
     ],
     [
+      "drydocs/scripts/port_completeness_check.py",
+      "drydocs/drydocs/port/port_completeness.py"
+    ],
+    [
       "drydocs/scripts/port_preflight.py",
       "drydocs/drydocs/port/port_preflight.py"
     ],
@@ -32182,6 +32426,10 @@
       "drydocs/scripts/render_software_registry.py"
     ],
     [
+      "drydocs/scripts/render_board.py",
+      "drydocs/scripts/render_ui_concepts.py"
+    ],
+    [
       "drydocs/scripts/render_design_doc.py",
       "drydocs/drydocs/docgen/design_doc.py"
     ],
@@ -32211,6 +32459,10 @@
     ],
     [
       "drydocs/scripts/render_load_map.py",
+      "drydocs/drydocs_core/registry_view.py"
+    ],
+    [
+      "drydocs/scripts/render_load_map.py",
       "drydocs/drydocs_core/yaml_fragments.py"
     ],
     [
@@ -32219,11 +32471,11 @@
     ],
     [
       "drydocs/scripts/render_port_dispositions.py",
-      "drydocs/drydocs_core/repo_paths.py"
+      "drydocs/drydocs/port/dispositions.py"
     ],
     [
       "drydocs/scripts/render_port_dispositions.py",
-      "drydocs/tests/unit/test_port_reconcile_guards.py"
+      "drydocs/drydocs_core/repo_paths.py"
     ],
     [
       "drydocs/scripts/render_remediation_diff.py",
@@ -32470,6 +32722,10 @@
       "drydocs/drydocs_api/query_specs.py"
     ],
     [
+      "drydocs/tests/unit/test_ask_scopes.py",
+      "drydocs/drydocs_api/query_specs.py"
+    ],
+    [
       "drydocs/tests/unit/test_attribution_surfaces.py",
       "drydocs/drydocs_core/precedence.py"
     ],
@@ -32620,6 +32876,10 @@
     [
       "drydocs/tests/unit/test_chain_inputs.py",
       "drydocs/drydocs_core/source_registry.py"
+    ],
+    [
+      "drydocs/tests/unit/test_chunk_search_spec.py",
+      "drydocs/drydocs_api/query_specs.py"
     ],
     [
       "drydocs/tests/unit/test_classification.py",
@@ -33922,6 +34182,26 @@
       "drydocs/drydocs/port/port_backlog_union.py"
     ],
     [
+      "drydocs/tests/unit/test_port_completeness.py",
+      "drydocs/drydocs/port/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_port_completeness.py",
+      "drydocs/drydocs/port/dispositions.py"
+    ],
+    [
+      "drydocs/tests/unit/test_port_completeness.py",
+      "drydocs/drydocs/port/port_completeness.py"
+    ],
+    [
+      "drydocs/tests/unit/test_port_dispositions.py",
+      "drydocs/drydocs/port/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_port_dispositions.py",
+      "drydocs/drydocs/port/dispositions.py"
+    ],
+    [
       "drydocs/tests/unit/test_port_manifest.py",
       "drydocs/tests/unit/test_port_reconcile_guards.py"
     ],
@@ -33932,6 +34212,10 @@
     [
       "drydocs/tests/unit/test_port_reconcile_guards.py",
       "drydocs/drydocs/port/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_port_reconcile_guards.py",
+      "drydocs/drydocs/port/dispositions.py"
     ],
     [
       "drydocs/tests/unit/test_port_reconcile_guards.py",
@@ -33982,6 +34266,18 @@
       "drydocs/drydocs/review/publishing/publisher.py"
     ],
     [
+      "drydocs/tests/unit/test_qa_trace.py",
+      "drydocs/drydocs_api/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_qa_trace.py",
+      "drydocs/drydocs_api/app.py"
+    ],
+    [
+      "drydocs/tests/unit/test_qa_trace.py",
+      "drydocs/drydocs_api/qa_trace_read.py"
+    ],
+    [
       "drydocs/tests/unit/test_query_spec_vocabulary.py",
       "drydocs/drydocs_api/query_specs.py"
     ],
@@ -34020,6 +34316,26 @@
     [
       "drydocs/tests/unit/test_query_specs.py",
       "drydocs/drydocs_api/sessions.py"
+    ],
+    [
+      "drydocs/tests/unit/test_registry_view.py",
+      "drydocs/drydocs/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_registry_view.py",
+      "drydocs/drydocs/cli.py"
+    ],
+    [
+      "drydocs/tests/unit/test_registry_view.py",
+      "drydocs/drydocs/cli_shared.py"
+    ],
+    [
+      "drydocs/tests/unit/test_registry_view.py",
+      "drydocs/drydocs_core/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_registry_view.py",
+      "drydocs/drydocs_core/registry_view.py"
     ],
     [
       "drydocs/tests/unit/test_remediation_changedoc.py",
@@ -34878,6 +35194,26 @@
       "drydocs/web/src/lib/forceLayout.ts"
     ],
     [
+      "drydocs/web/src/ask/TraceLink.test.tsx",
+      "drydocs/web/src/ask/TraceLink.tsx"
+    ],
+    [
+      "drydocs/web/src/ask/TraceLink.test.tsx",
+      "drydocs/web/src/components/ui/tableControls.tsx"
+    ],
+    [
+      "drydocs/web/src/ask/TraceLink.test.tsx",
+      "drydocs/web/src/lib/qaTrace.ts"
+    ],
+    [
+      "drydocs/web/src/ask/TraceLink.tsx",
+      "drydocs/web/src/components/ui/tableControls.tsx"
+    ],
+    [
+      "drydocs/web/src/ask/TraceLink.tsx",
+      "drydocs/web/src/lib/qaTrace.ts"
+    ],
+    [
       "drydocs/web/src/components/BrandMark.tsx",
       "drydocs/web/src/components/icons/HubGlyphs.tsx"
     ],
@@ -35228,6 +35564,18 @@
     [
       "drydocs/web/src/components/ui/StatusItems.tsx",
       "drydocs/web/src/lib/status.ts"
+    ],
+    [
+      "drydocs/web/src/components/ui/TaglineWithProvenance.test.tsx",
+      "drydocs/web/src/components/ui/TaglineWithProvenance.tsx"
+    ],
+    [
+      "drydocs/web/src/components/ui/TaglineWithProvenance.test.tsx",
+      "drydocs/web/src/lib/uiConcepts.ts"
+    ],
+    [
+      "drydocs/web/src/components/ui/TaglineWithProvenance.tsx",
+      "drydocs/web/src/lib/uiConcepts.ts"
     ],
     [
       "drydocs/web/src/data/GraphAccessProvider.tsx",
@@ -35734,6 +36082,14 @@
       "drydocs/web/src/lib/paperForm.ts"
     ],
     [
+      "drydocs/web/src/lib/qaTrace.ts",
+      "drydocs/web/src/lib/apiClient.ts"
+    ],
+    [
+      "drydocs/web/src/lib/qaTrace.ts",
+      "drydocs/web/src/lib/auth.ts"
+    ],
+    [
       "drydocs/web/src/lib/reachability.test.ts",
       "drydocs/web/src/lib/reachability.ts"
     ],
@@ -36044,6 +36400,10 @@
     [
       "drydocs/web/src/routes/AskRoute.tsx",
       "drydocs/web/src/ask/TaskGraphPane.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/AskRoute.tsx",
+      "drydocs/web/src/ask/TraceLink.tsx"
     ],
     [
       "drydocs/web/src/routes/AskRoute.tsx",
@@ -36368,6 +36728,10 @@
     [
       "drydocs/web/src/routes/ModuleTemplate.tsx",
       "drydocs/web/src/components/ui/Tabs.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/ModuleTemplate.tsx",
+      "drydocs/web/src/components/ui/TaglineWithProvenance.tsx"
     ],
     [
       "drydocs/web/src/routes/ModuleTemplate.tsx",
@@ -38298,11 +38662,6 @@
       "drydocs/.claude/skills/lane-handoff/scripts",
       "CONTAINS",
       "drydocs/.claude/skills/lane-handoff/scripts/handoff.py"
-    ],
-    [
-      "drydocs/.claude/skills/lane-handoff/scripts",
-      "CONTAINS",
-      "drydocs/.claude/skills/lane-handoff/scripts/overlap_prototype.py"
     ],
     [
       "drydocs/.claude/skills/oracle-db",
@@ -40322,6 +40681,16 @@
     [
       "drydocs/agents/common",
       "CONTAINS",
+      "drydocs/agents/common/qa_trace.py"
+    ],
+    [
+      "drydocs/agents/common",
+      "CONTAINS",
+      "drydocs/agents/common/scopes.py"
+    ],
+    [
+      "drydocs/agents/common",
+      "CONTAINS",
       "drydocs/agents/common/session_redaction.py"
     ],
     [
@@ -41177,16 +41546,6 @@
     [
       "drydocs/docs",
       "CONTAINS",
-      "drydocs/docs/lane-a-handoff.md"
-    ],
-    [
-      "drydocs/docs",
-      "CONTAINS",
-      "drydocs/docs/lane-b-handoff.md"
-    ],
-    [
-      "drydocs/docs",
-      "CONTAINS",
       "drydocs/docs/next-session-handoff.md"
     ],
     [
@@ -41478,6 +41837,16 @@
       "drydocs/docs/design",
       "CONTAINS",
       "drydocs/docs/design/deepdoc-data-flow-overview.md"
+    ],
+    [
+      "drydocs/docs/design",
+      "CONTAINS",
+      "drydocs/docs/design/drydocs-agents-runbook.html"
+    ],
+    [
+      "drydocs/docs/design",
+      "CONTAINS",
+      "drydocs/docs/design/drydocs-agents-runbook.md"
     ],
     [
       "drydocs/docs/design",
@@ -47682,7 +48051,17 @@
     [
       "drydocs/drydocs/port",
       "CONTAINS",
+      "drydocs/drydocs/port/dispositions.py"
+    ],
+    [
+      "drydocs/drydocs/port",
+      "CONTAINS",
       "drydocs/drydocs/port/port_backlog_union.py"
+    ],
+    [
+      "drydocs/drydocs/port",
+      "CONTAINS",
+      "drydocs/drydocs/port/port_completeness.py"
     ],
     [
       "drydocs/drydocs/port",
@@ -47877,6 +48256,11 @@
     [
       "drydocs/drydocs_api",
       "CONTAINS",
+      "drydocs/drydocs_api/qa_trace_read.py"
+    ],
+    [
+      "drydocs/drydocs_api",
+      "CONTAINS",
       "drydocs/drydocs_api/queries.py"
     ],
     [
@@ -48058,6 +48442,11 @@
       "drydocs/drydocs_core",
       "CONTAINS",
       "drydocs/drydocs_core/precedence.py"
+    ],
+    [
+      "drydocs/drydocs_core",
+      "CONTAINS",
+      "drydocs/drydocs_core/registry_view.py"
     ],
     [
       "drydocs/drydocs_core",
@@ -49602,7 +49991,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260908.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260908-0233.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -50062,6 +50451,11 @@
     [
       "drydocs/scripts",
       "CONTAINS",
+      "drydocs/scripts/port_completeness_check.py"
+    ],
+    [
+      "drydocs/scripts",
+      "CONTAINS",
       "drydocs/scripts/port_preflight.py"
     ],
     [
@@ -50168,6 +50562,11 @@
       "drydocs/scripts",
       "CONTAINS",
       "drydocs/scripts/render_software_registry.py"
+    ],
+    [
+      "drydocs/scripts",
+      "CONTAINS",
+      "drydocs/scripts/render_ui_concepts.py"
     ],
     [
       "drydocs/scripts",
@@ -50552,6 +50951,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_ask_scopes.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_attribution_surfaces.py"
     ],
     [
@@ -50623,6 +51027,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_chain_inputs.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_chunk_search_spec.py"
     ],
     [
       "drydocs/tests/unit",
@@ -51287,6 +51696,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_port_completeness.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_port_dispositions.py"
     ],
     [
@@ -51352,6 +51766,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_qa_trace.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_query_spec_vocabulary.py"
     ],
     [
@@ -51363,6 +51782,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_reconcile_port_skill_snapshot.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_registry_view.py"
     ],
     [
       "drydocs/tests/unit",
@@ -51663,6 +52087,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_ui_concepts.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_ui_concepts_json.py"
     ],
     [
       "drydocs/tests/unit",
@@ -52085,6 +52514,16 @@
       "drydocs/web/src/ask/TaskGraphPane.tsx"
     ],
     [
+      "drydocs/web/src/ask",
+      "CONTAINS",
+      "drydocs/web/src/ask/TraceLink.test.tsx"
+    ],
+    [
+      "drydocs/web/src/ask",
+      "CONTAINS",
+      "drydocs/web/src/ask/TraceLink.tsx"
+    ],
+    [
       "drydocs/web/src/assets",
       "CONTAINS",
       "drydocs/web/src/assets/hero.png"
@@ -52347,6 +52786,16 @@
     [
       "drydocs/web/src/components/ui",
       "CONTAINS",
+      "drydocs/web/src/components/ui/TaglineWithProvenance.test.tsx"
+    ],
+    [
+      "drydocs/web/src/components/ui",
+      "CONTAINS",
+      "drydocs/web/src/components/ui/TaglineWithProvenance.tsx"
+    ],
+    [
+      "drydocs/web/src/components/ui",
+      "CONTAINS",
       "drydocs/web/src/components/ui/TruncationBadge.tsx"
     ],
     [
@@ -52533,6 +52982,11 @@
       "drydocs/web/src/generated",
       "CONTAINS",
       "drydocs/web/src/generated/software-registry.json"
+    ],
+    [
+      "drydocs/web/src/generated",
+      "CONTAINS",
+      "drydocs/web/src/generated/ui-concepts.json"
     ],
     [
       "drydocs/web/src/generated",
@@ -52747,6 +53201,11 @@
     [
       "drydocs/web/src/lib",
       "CONTAINS",
+      "drydocs/web/src/lib/qaTrace.ts"
+    ],
+    [
+      "drydocs/web/src/lib",
+      "CONTAINS",
       "drydocs/web/src/lib/reachability.test.ts"
     ],
     [
@@ -52818,6 +53277,11 @@
       "drydocs/web/src/lib",
       "CONTAINS",
       "drydocs/web/src/lib/theme.ts"
+    ],
+    [
+      "drydocs/web/src/lib",
+      "CONTAINS",
+      "drydocs/web/src/lib/uiConcepts.ts"
     ],
     [
       "drydocs/web/src/lib",
@@ -53199,13 +53663,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2962,
-    "edges": 1792,
+    "files": 2982,
+    "edges": 1838,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 3284,
+    "rels": 3304,
     "directories": 323
   }
 }
