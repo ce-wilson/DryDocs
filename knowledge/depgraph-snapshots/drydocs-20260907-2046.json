@@ -1,17 +1,17 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-07T20:07:52",
+    "captured_at": "2026-09-07T20:46:32",
     "date": "20260907",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "fe9ff979",
-      "full": "fe9ff979fed2874143d25f9cd0f04d7fdca1e341",
+      "commit": "a8f8bc4d",
+      "full": "a8f8bc4de258231ad72332900e1fdf386a45eb32",
       "branch": "main",
-      "describe": "port-base-20260905-262-gfe9ff979",
-      "subject": "chore(lane-a): Lane B queue closed - the O72 manifest rows, Idea-285, one render, the handoff retired",
-      "dirty": false,
+      "describe": "port-base-20260905-266-ga8f8bc4d",
+      "subject": "port(manifest): a never-port skill's test is never-port too, domain: is the partition key, RELAY-32/33",
+      "dirty": true,
       "untracked_present": false,
       "pr": null
     },
@@ -9327,6 +9327,15 @@
       "name": "next-session-cron-prompt.md",
       "extension": ".md",
       "rel_path": "docs/history/next-session-cron-prompt.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/lane-b-handoff.md",
+      "name": "lane-b-handoff.md",
+      "extension": ".md",
+      "rel_path": "docs/lane-b-handoff.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -22913,10 +22922,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260907-1852.json",
-      "name": "drydocs-20260907-1852.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260907.json",
+      "name": "drydocs-20260907.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260907-1852.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260907.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -41080,6 +41089,11 @@
     [
       "drydocs/docs",
       "CONTAINS",
+      "drydocs/docs/lane-b-handoff.md"
+    ],
+    [
+      "drydocs/docs",
+      "CONTAINS",
       "drydocs/docs/next-session-handoff.md"
     ],
     [
@@ -49460,7 +49474,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260907-1852.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260907.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -53057,13 +53071,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2953,
+    "files": 2954,
     "edges": 1788,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 3275,
+    "rels": 3276,
     "directories": 323
   }
 }
