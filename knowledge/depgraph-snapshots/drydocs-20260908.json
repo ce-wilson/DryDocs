@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-08T12:42:08",
+    "captured_at": "2026-09-08T13:54:35",
     "date": "20260908",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "f14c059c",
-      "full": "f14c059c50080c9a3f4fbf96b2d4e28dbbd30601",
+      "commit": "d846951b",
+      "full": "d846951bea2491879d6434cb7af21ea52b7a0d81",
       "branch": "main",
-      "describe": "port-base-20260905-384-gf14c059c",
-      "subject": "docs(port): RELAY-44 - the G65 B3 restatement is past the base, the G64 page grew four clauses, and one commit to check on the company side",
+      "describe": "port-base-20260905-390-gd846951b",
+      "subject": "docs(Idea-306): the body - a switch only a test reads is a mechanism whose guard and behavior disagree",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -26,7 +26,9 @@
         "multi_root": true,
         "tree": true,
         "ts_imports": true
-      }
+      },
+      "capability_assert": true,
+      "capability_gap": []
     }
   },
   "schema": "depgraph-machine-first/v2",
@@ -23066,10 +23068,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260908.json",
-      "name": "drydocs-20260908.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260908-1241.json",
+      "name": "drydocs-20260908-1241.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260908.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260908-1241.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -50033,7 +50035,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260908.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260908-1241.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
