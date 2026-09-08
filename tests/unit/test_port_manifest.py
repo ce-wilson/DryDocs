@@ -192,6 +192,127 @@ def test_pyproject_row_carries_the_shared_ruff_contract(manifest: dict) -> None:
     assert "pin" in rule, "the ruff pin must be named as crossing whole too: " + rule
 
 
+# ---- PORT5: a rule may describe the PRODUCER's tree, never the CONSUMER's ----
+# The manifest is written on one side and read on the other. A rule that states
+# what the consumer HAS ("company = producer minus the held row", "nine entries",
+# "emptied company-side") is stale the moment that side moves, and only that side
+# can see that it did. It cost a real apply: the ui-components row encoded the
+# K7-K15 hold as "producer MINUS the AppCodeCascadePane row" while the consumer
+# had carried that row since before carve-out 8, and honoring the rule would have
+# failed three of its guards at once (2026-09-05).
+#
+# So a rule says what the UNION contains and leaves every per-side COUNT to the
+# side that owns it. An observation about the other tree is still useful — it is
+# how a reader learns the shape — but it must be dated and marked as a reading of
+# one report on one day, not stated as the rule.
+#
+# Two J66 subtleties, and both are why this reads DATA and not the file's prose:
+# the ui-components row must be able to QUOTE the forbidden construction in order
+# to retire it, and the never-port zone below keeps this guard's own explanation
+# out of scope. A quoted span is exempt; a bare one is not.
+
+_MINUS_RE = re.compile(
+    r"\b(?:compan(?:y|ies)|consumer|their\s+tree)\b[^.;]{0,40}?" r"\bminus\b|\bproducer\s+MINUS\b",
+    re.IGNORECASE,
+)
+_COUNT_RE = re.compile(
+    r"\b(?:company|consumer|their|they)\b[^.;]{0,90}?"
+    r"\b(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\s+"
+    r"(?:of\s+them\b|rows?\b|entries\b|groups?\b|classes\b|components?\b|reasons\b|"
+    r"surfaces\b|paths\b|items\b)",
+    re.IGNORECASE,
+)
+_DATED = re.compile(r"PORT-REPORT-[0-9a-f]{6,}|\b20\d\d-\d\d-\d\d\b", re.IGNORECASE)
+_OBSERVED = re.compile(r"\bobserv(?:ed|ation)\b|\bas a reading\b", re.IGNORECASE)
+
+
+def _unquoted(text: str) -> str:
+    """The rule text with every quoted span blanked out.
+
+    A rule that RETIRES a bad construction has to be able to name it, so a span
+    inside double quotes, typographic quotes or backticks is the row talking ABOUT
+    the words rather than instructing with them. Blanking rather than dropping
+    keeps offsets honest for the error message."""
+    return re.sub(r'"[^"]*"|“[^”]*”|`[^`]*`', lambda m: " " * len(m.group(0)), text)
+
+
+def test_no_entry_rule_asserts_the_consumers_tree(manifest: dict) -> None:
+    """PORT5 (c): no entry_rule states what the consumer's tree contains.
+
+    Forbidden: a 'producer MINUS x' construction outside quotes, and a count of the
+    other side's rows that is not marked as a dated observation."""
+    minus_hits, count_hits = [], []
+    for row in manifest["rows"]:
+        rule = row.get("entry_rule")
+        if not rule:
+            continue
+        bare = _unquoted(" ".join(rule.split()))
+        if _MINUS_RE.search(bare):
+            minus_hits.append((row["path"], _MINUS_RE.search(bare).group(0)))
+        for sentence in re.split(r"(?<=[.;])\s+", bare):
+            hit = _COUNT_RE.search(sentence)
+            if hit and not (_DATED.search(sentence) and _OBSERVED.search(sentence)):
+                count_hits.append((row["path"], hit.group(0)))
+    assert not minus_hits, (
+        "an entry_rule describes the consumer's tree as the producer's MINUS something; "
+        "state the union instead and let the consumer track its own rows: " + repr(minus_hits)
+    )
+    assert not count_hits, (
+        "an entry_rule counts the consumer's rows without dating the reading; a count of the "
+        "other tree is an observation ('OBSERVED at PORT-REPORT-x'), never a rule: "
+        + repr(count_hits)
+    )
+
+
+def test_the_consumer_tree_guard_catches_what_it_is_for() -> None:
+    """The guard must reproduce the bug it exists for, or it proves nothing.
+
+    Both shapes below are real: the first is the ui-components rule as it stood
+    before 2026-09-05, the second is the audit-fields count as it stood before
+    PORT5. The third is the quoted retirement that must stay legal."""
+    bad_minus = {
+        "rows": [
+            {
+                "path": "x",
+                "entry_rule": "components[] keyed by id; company = producer minus the held row.",
+            }
+        ]
+    }
+    with pytest.raises(AssertionError, match="MINUS something"):
+        test_no_entry_rule_asserts_the_consumers_tree(bad_minus)
+
+    bad_count = {
+        "rows": [
+            {
+                "path": "x",
+                "entry_rule": "UNION: producer additions + company-only entries (9 of them).",
+            }
+        ]
+    }
+    with pytest.raises(AssertionError, match="without dating the reading"):
+        test_no_entry_rule_asserts_the_consumers_tree(bad_count)
+
+    quoted_ok = {
+        "rows": [
+            {
+                "path": "x",
+                "entry_rule": (
+                    'rows UNION. The hold is retired: a rule that says "company = producer minus X" '
+                    "goes stale the moment the consumer moves."
+                ),
+            },
+            {
+                "path": "y",
+                "entry_rule": (
+                    "rows UNION; the count is the consumer's (nine entries were OBSERVED at "
+                    "PORT-REPORT-5417ef10)."
+                ),
+            },
+        ]
+    }
+    test_no_entry_rule_asserts_the_consumers_tree(quoted_ok)
+
+
 # ---- J68: a declaration and its guard must find each other -------------------
 # A DECLARATION file (MODULE_MAP.md, source-registry.yaml, 01_databases.cypher)
 # and the GUARD that reads it encode ONE fact in two languages. Take one without

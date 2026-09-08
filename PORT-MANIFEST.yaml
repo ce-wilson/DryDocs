@@ -198,8 +198,9 @@ rows:
       [tool.ruff.format] tables cross WHOLE, producer text verbatim - they are the
       SHARED contract the file's own comment declares (J10 stage 0: same tool, same
       pin, same config, each side formats its own tree), and a per-entry union of
-      their lists is what let the `ignore` list diverge (2026-09-08: the consumer
-      carried two entries where the producer carried four, so fifteen RUF002/RUF003
+      their lists is what let the `ignore` list diverge (OBSERVED at the consumer's
+      2026-09-08 apply, a reading of that report and not a rule: its `ignore` list
+      held two of the four entries this side carries, so fifteen RUF002/RUF003
       findings stood on one side only and read as a producer defect until reframed
       as configuration divergence; consumer correction 4 / RELAY-36). A consumer
       that needs a ruff exception the producer does not carry asks for it as a
@@ -313,8 +314,11 @@ rows:
     disposition: per-entry
     entry_rule: >
       Keyed by source id. UNION: producer additions + company-only
-      confirmed-source entries (9 of them at PORT-REPORT-5417ef10) — company
-      entries never come from, or are removed by, a port. Mechanism/policy
+      confirmed-source entries — company
+      entries never come from, or are removed by, a port, and HOW MANY of them
+      there are is the consumer's number, tracked on the consumer's side (nine
+      were OBSERVED at PORT-REPORT-5417ef10; that is a reading of one report on
+      one day, never a count this rule asserts, and this side cannot see it move). Mechanism/policy
       prose is producer-canonical.
       UNNAMED FIELDS: producer-owned by default, because this file is a policy
       declaration and its fields describe the POLICY rather than either estate —
@@ -769,8 +773,10 @@ rows:
       COMPONENT_GROUPS / COMPONENT_MODULE / SURFACE_OWNERS entries UNION by key.
       The mechanism is producer-canonical: CORE_PREFIXES, ENTRYPOINT_MODULES,
       DECLARED_COMPONENT_IMPORTS and every ruling comment cross whole. Company-only
-      GROUPS stay (docmeta-acquire — drydocs.docmeta, drydocs.scrapers — and any
-      group the company adds for a package the producer does not hold), exactly as
+      GROUPS stay — every group the company adds for a package the producer does not
+      hold, whatever they are (docmeta-acquire — drydocs.docmeta, drydocs.scrapers —
+      was OBSERVED at PORT-REPORT-5417ef10 and is named as an EXAMPLE of the shape,
+      never as the set a take should expect to find), exactly as
       `tests/unit/test_module_boundary.py` keeps them: since ADR 0018 D1 the guard
       IMPORTS this file, so a wholesale take of the map drops the company's groups
       through the guard's own import and the default-deny check fails on their
@@ -790,9 +796,10 @@ rows:
     disposition: per-entry
     entry_rule: >
       Module-group entries UNION: the boundary mechanism (ENTRYPOINT_MODULES
-      exemption + default-deny) is producer-canonical; company-only groups
-      (docmeta-acquire — drydocs.docmeta, drydocs.scrapers — at
-      PORT-REPORT-5417ef10) are never dropped by a port. Since ADR 0018 D1 the
+      exemption + default-deny) is producer-canonical; company-only groups are
+      never dropped by a port, whatever the set is on the day (docmeta-acquire —
+      drydocs.docmeta, drydocs.scrapers — was OBSERVED at PORT-REPORT-5417ef10, an
+      EXAMPLE of the shape and not the set). Since ADR 0018 D1 the
       groups live in `drydocs_core/component_map.py` (its own per-entry row
       above) and this file imports them; the union happens THERE, and this
       file's own diff is mechanism.
@@ -815,11 +822,15 @@ rows:
   - path: "tests/unit/test_runbook_currency.py"
     disposition: per-entry
     entry_rule: >
-      The GUARD is producer-canonical; the three EXEMPTION tables are per-side data:
-      HISTORICAL_PATHS (company carries T19 reasons for the four load-map/load-
-      sequence surfaces), FOREIGN_PATHS (emptied company-side — every producer
-      entry exists there), and the company's DEFERRED_VERBS (T22: sweep-removed,
-      load-essential-graphrag, with its still-cited guard). Union by KEY, keep each
+      The GUARD is producer-canonical; the three EXEMPTION tables — HISTORICAL_PATHS,
+      FOREIGN_PATHS and DEFERRED_VERBS — are PER-SIDE DATA, and what each holds is
+      the holder's to maintain: a path is historical, foreign or deferred with
+      respect to ONE tree, so neither side can state the other's table and neither
+      should try. (Observed at the 2026-09-03 apply, as a reading and not a rule:
+      the consumer carried T19 reasons for the load-map and load- sequence surfaces,
+      its FOREIGN_PATHS was empty because every producer entry existed on that tree,
+      and its DEFERRED_VERBS carried the T22 pair. All three move as those deferrals
+      resolve, and only that side sees them move.) Union by KEY, keep each
       side's reasons verbatim - EXCEPT a producer entry whose only citer is a
       document under a never-port zone (docs/port/port-prompt.md cites eleven:
       three historical, seven foreign, one generated), which the consumer DROPS
@@ -930,9 +941,11 @@ rows:
       Module rows keyed by module name. Producer-owned MECHANISM crosses whole:
       the header, the placement test (ADR 0002-A section 2), the core-imports-nothing
       invariant, the S7 directory-name rule and the CORE_PREFIXES / COMPONENT_GROUP
-      vocabulary. Company-only MODULE ROWS stay — `drydocs.scrapers.*`,
-      `drydocs.docmeta.*`, `drydocs.seal_projection` are company packages the
-      producer does not have and cannot classify.
+      vocabulary. Company-only MODULE ROWS stay: a package the producer does not
+      have is a package the producer cannot classify, so its row is the consumer's
+      and a take never drops it (`drydocs.scrapers.*`, `drydocs.docmeta.*` and
+      `drydocs.seal_projection` were OBSERVED at PORT-REPORT-5417ef10 — an EXAMPLE
+      of the shape, never the set).
       MOVES WITH `tests/unit/test_module_boundary.py`, ALWAYS. The map classifies
       every module and that guard is DEFAULT-DENY over the classification, so the
       two encode one fact in two languages and a module the map loses is a module
