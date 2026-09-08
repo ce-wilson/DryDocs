@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-08T10:30:59",
+    "captured_at": "2026-09-08T11:10:35",
     "date": "20260908",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "0813992d",
-      "full": "0813992df4c973c7e659c780c973e6e8ea2e0157",
+      "commit": "aef8dfcb",
+      "full": "aef8dfcba833ba936b7e8d0690f9d5866d567d35",
       "branch": "main",
-      "describe": "port-base-20260905-377-g0813992d",
-      "subject": "merge(review): module-review sweep slots 1 and 3 (core, lineage, load) from review/module-sweep, --no-ff, docs-only; pen: backlog (Lane A, desktop)",
+      "describe": "port-base-20260905-379-gaef8dfcb",
+      "subject": "fix(port): gate-log append-only guard reads lines not bytes; controlm_jobs.sql per-entry row; currency message names what moved (RELAY-43)",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -23066,10 +23066,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260908.json",
-      "name": "drydocs-20260908.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260908-1030.json",
+      "name": "drydocs-20260908-1030.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260908.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260908-1030.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -50033,7 +50033,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260908.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260908-1030.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
