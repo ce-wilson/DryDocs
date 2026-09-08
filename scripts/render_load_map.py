@@ -68,12 +68,8 @@ OUT_HTML = REPO / "docs" / "plan" / "load-map.html"
 
 # What the render READS. The provenance stamp hashes exactly these (directories
 # expand to their *.yaml), so `provenance.digest` changes iff an input changes.
-INPUTS = (
-    "config/source-registry.yaml",
-    "config/doc-source-registry.yaml",
-    "config/taxonomy",
-    "config/taxonomy-ontology-map",
-)
+# Shared with the `drydocs registry <loader>` verb so both stamp the same content.
+INPUTS = registry_view.LOAD_MAP_INPUTS
 
 
 def _ledger_state(entry: dict) -> dict:
@@ -152,11 +148,7 @@ def build_load_map() -> dict:
     registry_ids = {e["id"] for e in dataset_entries} | {e["id"] for e in doc_entries}
     for m in map_entries:
         source = (m.get("taxonomy") or {}).get("source")
-        row = {
-            "id": m.get("id"),
-            "status": m.get("status"),
-            "label": (m.get("ontology") or {}).get("neo4j_label"),
-        }
+        row = registry_view.map_row(m)
         if source in registry_ids:
             mappings_by_source.setdefault(source, []).append(row)
         else:

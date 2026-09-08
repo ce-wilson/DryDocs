@@ -56,9 +56,28 @@ two surfaces join on it.
 from __future__ import annotations
 
 import hashlib
+import subprocess
 from collections.abc import Iterable, Mapping
 from pathlib import Path
 from typing import Any
+
+from drydocs_core import yaml_fragments
+from drydocs_core.repo_paths import repo_root
+
+_REPO_ROOT = repo_root(Path(__file__).resolve().parent.parent)
+
+# What the load map READS, and therefore what its provenance stamp hashes
+# (directories expand to their *.yaml). ONE tuple, shared by the render
+# (scripts/render_load_map.py) and the verb (`drydocs registry <loader>`), so
+# the digest each prints names the same content — two tuples would drift the
+# first time an input is added to one of them.
+LOAD_MAP_INPUTS = (
+    "config/source-registry.yaml",
+    "config/doc-source-registry.yaml",
+    "config/taxonomy",
+    "config/taxonomy-ontology-map",
+)
+ONTOLOGY_MAP_DIR = "config/taxonomy-ontology-map"
 
 UNCLASSIFIED = "UNCLASSIFIED"
 RULED_STATUSES: frozenset[str] = frozenset({"applied", "confirmed"})
@@ -130,23 +149,39 @@ def acquisition_summary(dataset: Mapping[str, Any]) -> dict[str, Any]:
 def ontology_class(map_rows: Iterable[Mapping[str, Any]]) -> dict[str, Any]:
     """The ruled ontology class(es) of a dataset from its map entries.
 
-    `map_rows` are the load-map's per-source mapping rows (`id`, `status`,
-    `label`). Only RULED statuses classify; `proposed` is counted, `rejected`
-    is neither. No ruled entry → UNCLASSIFIED, with the reason spelled out."""
+    `map_rows` are the per-source mapping rows (`id`, `status`, `label`,
+    `from_node`, `to_node`). The CLASS is the node label(s) a ruled entry
+    touches — `from_node` / `to_node` — because every map entry is edge-shaped
+    and its `label` is the relationship type (CONTAINS_FOLDER is not a class of
+    anything). The edge types ride along as `relationships`. Only RULED statuses
+    classify; `proposed` is counted, `rejected` is neither. No ruled entry →
+    UNCLASSIFIED, with the reason spelled out."""
     rows = list(map_rows)
-    classes = sorted(
-        {r["label"] for r in rows if r.get("status") in RULED_STATUSES and r.get("label")}
-    )
+    ruled = [r for r in rows if r.get("status") in RULED_STATUSES]
+    classes = sorted({r[k] for r in ruled for k in ("from_node", "to_node") if r.get(k)})
+    relationships = sorted({r["label"] for r in ruled if r.get("label")})
     pending = sum(1 for r in rows if r.get("status") == "proposed")
     if classes:
-        return {"state": "classified", "classes": classes, "pending": pending, "reason": None}
+        return {
+            "state": "classified",
+            "classes": classes,
+            "relationships": relationships,
+            "pending": pending,
+            "reason": None,
+        }
     if pending:
         reason = f"{pending} map entr{'y' if pending == 1 else 'ies'} proposed, none ruled"
     elif rows:
         reason = "map entries exist but none is applied or confirmed"
     else:
         reason = "no map entry - asset_type default only"
-    return {"state": UNCLASSIFIED, "classes": [], "pending": pending, "reason": reason}
+    return {
+        "state": UNCLASSIFIED,
+        "classes": [],
+        "relationships": relationships,
+        "pending": pending,
+        "reason": reason,
+    }
 
 
 # ---- the matrix ---------------------------------------------------------------
@@ -431,4 +466,59 @@ def input_provenance(root: Path, inputs: Iterable[str]) -> dict[str, Any]:
         "inputs": rows,
         "digest": digest.hexdigest(),
         "how_to_resolve": "git log --find-object=<blob> names the commits that carry an input",
+    }
+
+
+def map_rows_by_source(root: Path = _REPO_ROOT) -> dict[str, list[dict[str, Any]]]:
+    """The taxonomy-ontology map reduced to what `ontology_class` reads, keyed
+    by `taxonomy.source`. The render performs the same reduction through
+    `map_row`, so the verb and the view classify alike."""
+    doc = yaml_fragments.load_yaml_source(root / ONTOLOGY_MAP_DIR) or {}
+    rows: dict[str, list[dict[str, Any]]] = {}
+    for m in doc.get("mappings") or []:
+        source = (m.get("taxonomy") or {}).get("source")
+        if source is None:
+            continue
+        rows.setdefault(source, []).append(map_row(m))
+    return rows
+
+
+def map_row(entry: Mapping[str, Any]) -> dict[str, Any]:
+    """One taxonomy-ontology map entry reduced to the fields the view reads."""
+    onto = entry.get("ontology") or {}
+    return {
+        "id": entry.get("id"),
+        "status": entry.get("status"),
+        "label": onto.get("neo4j_label"),
+        "from_node": onto.get("from_node"),
+        "to_node": onto.get("to_node"),
+    }
+
+
+def _git(root: Path, *args: str) -> str | None:
+    """git at `root`; None on any failure. UTF-8 explicitly — the locale codec
+    is cp1252 on the machines this runs on (the I6 allocator defect)."""
+    try:
+        out = subprocess.run(
+            ["git", *args],
+            cwd=str(root),
+            capture_output=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=30,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+    return out.stdout.strip() if out.returncode == 0 else None
+
+
+def tree_stamp(root: Path = _REPO_ROOT) -> dict[str, Any]:
+    """Which tree the verb read: HEAD, branch, and whether the working tree
+    carried uncommitted edits (J63 — a reading names the tree it ran against).
+    `dirty` is None when git could not answer, never a guess."""
+    status = _git(root, "status", "--porcelain")
+    return {
+        "commit": _git(root, "rev-parse", "HEAD"),
+        "branch": _git(root, "branch", "--show-current"),
+        "dirty": None if status is None else bool(status),
     }

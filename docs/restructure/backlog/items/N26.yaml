@@ -9,7 +9,7 @@ phase: 11
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - config/source-registry.yaml
@@ -75,3 +75,55 @@ notes: |
 
   Clause (g) is deliberately narrow. The general rule - every review surface names its commit and
   its port base - is J63, and this item must not re-solve it.
+
+  DONE 2026-09-08 (desktop, Lane A). NO NEW REGISTRY FIELD - every indicator is derived. One
+  generator, drydocs_core/registry_view.py (core: pure derivation over config facts, loader facts
+  handed in as dicts, writes no graph; MODULE_MAP row added), feeds three surfaces: the By-class
+  section of docs/plan/load-map.html, the class_view / layer_category_matrix / provenance keys of
+  web/src/generated/load-map.json with a By class tab in the web route, and the verb
+  drydocs registry <loader> [--json] in drydocs/cli_schema.py.
+
+  (a) class_view(): BDAT layer -> system (business application) -> application id with its state
+  (placeholder / declared / absent) -> ontology class -> dataset rows; loaders demoted to a count.
+  UNCLASSIFIED sorts last within a system, "no layer" last among layers (doc-ledger corpora and any
+  dataset whose system carries no layer). Re-measured at close: business 2 systems, data 5,
+  technology 12, no-layer 1 group.
+
+  (b) The ontology class is the NODE classes (from_node / to_node) of applied|confirmed map entries,
+  not the edge type: every one of the 50 map entries is edge-shaped and neo4j_label is a
+  relationship (CONTAINS_FOLDER is not a class of anything), so the first cut that read the label
+  as the class was wrong on its face and was corrected before merge; the edge types ride along as
+  relationships. The constant asset_type (dcat:Dataset, 30 of 30) is a probe on the view header,
+  and a row with no ruled entry renders UNCLASSIFIED with the reason (no entry / N proposed, none
+  ruled / entries exist, none ruled). Re-measured: classified 16, UNCLASSIFIED 24 of 40 sources.
+
+  (c) taxonomy_category, acquisition (five fixed keys, mode defaults undeclared) and replica-ness
+  each have a consumer. Replica-ness is FOUR states, never a boolean: original 27, replica 12
+  (origin distinct from carrier, corroborated by authority ADS), replica-uncorroborated 1
+  (drydocs_stg.stg_app_fact), ADS-without-distinct-origin 0.
+
+  (d) The DPL row is visibly odd through a DERIVED predicate, not a typed flag: a singleton cell
+  (layer x category holding one dataset) whose category has a home of two or more rows under
+  another layer is "displaced". Four rows today: dpl:dataset-registry (Data Asset under technology,
+  home data 4), seal:app-extract, cm_hosts, stg_app_fact. Singletons alone flagged 9 of 30 and
+  were not "visibly odd", which is why the home condition exists. The matrix renders below the
+  class view with displaced cells highlighted; the value itself is N25's to correct.
+
+  (e) The verb reads LOADER_REGISTRY, COMMAND_LOADERS, SourceRegistry.effective_source_id (the D2
+  overlay) and the map fragments, through the same registry_view functions as the render (J37);
+  prints declared vs effective id, overlay_applied, dataset state (registered / unregistered /
+  sourceless), the derived block, the system and application id, other loaders bound to the same
+  id, the commands that run it; exit 2 on an unknown loader; --json is one document.
+
+  (f) tests/unit/test_registry_view.py registers a fixture third loader through register_loaders
+  on a dataset two producer loaders already bind and asserts it appears on both reports (registry
+  restored after). The live tree already has the shape: doc_sections, doc_feedback and
+  doc_traceability bind one dataset id.
+
+  (g) Two stamps, each honest about what it can know. The VIEW is a committed render, so it cannot
+  know its own commit; it stamps CONTENT identity - the git blob id of each input (CRLF-normalized,
+  27 files under LOAD_MAP_INPUTS) and one digest over them, resolvable to commits with
+  git log --find-object=<blob>. The VERB stamps the tree (HEAD, branch, dirty) plus the same digest,
+  so a verb reading and a rendered page can be matched or told apart. The input tuple is ONE object
+  imported by both (a test asserts identity), and the drift test asserts the committed digest equals
+  the live one. J63's general rule is untouched.

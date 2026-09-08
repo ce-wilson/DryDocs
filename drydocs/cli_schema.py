@@ -1,4 +1,4 @@
-"""Schema / environment commands: check, landing-zones, bootstrap, bootstrap-schema-graph, verify, reset, sweep-removed.
+"""Schema / environment commands: check, landing-zones, bootstrap, bootstrap-schema-graph, verify, reset, sweep-removed, env-doctor, registry.
 
 S8 (2026-08-21): split out of drydocs/cli.py. The root stays the composition
 root and the only module that may wire other components; this module holds
@@ -379,6 +379,122 @@ def _report_undeclared_constraints(cli) -> int:
         "a human decision, and that is the standard it keeps.[/]"
     )
     return len(extra)
+
+
+@app.command(name="registry")
+def registry_cmd(
+    loader: str = typer.Argument(..., help="a loader name, as LOADER_REGISTRY spells it"),
+    as_json: bool = typer.Option(False, "--json", help="machine-readable"),
+) -> None:
+    """What one loader writes, the way the confirmed-gate resolves it — and what
+    the registry says about that dataset.
+
+    Declared source id, the EFFECTIVE id after the per-side overlay (D2), the
+    system and its application id, the derived facts the load map's By-class view
+    carries (layer, category, acquisition, replica-ness, ontology class), every
+    other loader bound to the same dataset, and the commands that run this one.
+    Everything comes from the importable objects (LOADER_REGISTRY, COMMAND_LOADERS,
+    the SourceRegistry, the map fragments) through the same generator as the load
+    map (drydocs_core.registry_view) — never from a render (J37). The report ends
+    with the tree it read: HEAD, branch, dirty, and the inputs digest the load map
+    prints, so a reading here and a rendered page can be told apart or matched.
+    """
+    from rich.markup import escape
+
+    from drydocs.cli_shared import COMMAND_LOADERS, LOADER_REGISTRY, _source_registry
+    from drydocs_core import registry_view
+    from drydocs_core.source_registry import UnknownSourceError
+
+    cls = LOADER_REGISTRY.get(loader)
+    if cls is None:
+        console.print(
+            f"[red]Unknown loader {loader!r}.[/] Known: {', '.join(sorted(LOADER_REGISTRY))}"
+        )
+        raise typer.Exit(2)
+
+    registry = _source_registry()
+    bound = {
+        name: registry.effective_source_id(name, c.source_id) for name, c in LOADER_REGISTRY.items()
+    }
+    effective = bound[loader]
+    dataset = system = None
+    dataset_state = "sourceless" if effective is None else "registered"
+    if effective is not None:
+        try:
+            src = registry.get(effective)
+        except UnknownSourceError:
+            dataset_state = "unregistered"
+        else:
+            dataset = {"id": src.id, "confirmed": src.confirmed, **src.data}
+            sys_id = src.data.get("system")
+            if sys_id and sys_id in registry.system_ids():
+                system = {"id": sys_id, **registry.get_system(sys_id).data}
+    map_rows = registry_view.map_rows_by_source().get(effective or "", [])
+    binding = registry_view.loader_binding(
+        loader,
+        declared=cls.source_id,
+        effective=effective,
+        bound_loaders=bound,
+        dataset=dataset,
+        system=system,
+        map_rows=map_rows,
+    )
+    binding["dataset_state"] = dataset_state
+    binding["confirmed"] = None if dataset is None else dataset["confirmed"]
+    binding["commands"] = sorted(cmd for cmd, run in COMMAND_LOADERS.items() if cls in run)
+    binding["tree"] = registry_view.tree_stamp()
+    binding["inputs_digest"] = registry_view.input_provenance(
+        registry_view._REPO_ROOT, registry_view.LOAD_MAP_INPUTS
+    )["digest"]
+
+    if as_json:
+        console.print_json(data=binding)
+        return
+
+    t = Table(title=f"registry — loader {loader}")
+    t.add_column("fact", overflow="fold")
+    t.add_column("value", overflow="fold")
+    t.add_row("declared source id", escape(str(binding["declared_source_id"])))
+    t.add_row(
+        "effective source id",
+        escape(str(binding["effective_source_id"]))
+        + (" [yellow](overlay applied)[/]" if binding["overlay_applied"] else ""),
+    )
+    t.add_row("dataset", dataset_state)
+    if binding["dataset"] is not None:
+        d = binding["dataset"]
+        oc = d["ontology_class"]
+        t.add_row("confirmed", "yes" if binding["confirmed"] else "no")
+        t.add_row("layer", str(d["layer"]))
+        t.add_row("taxonomy category", str(d["taxonomy_category"]))
+        t.add_row(
+            "acquisition", f"{d['acquisition']['mode']} / authority {dataset.get('authority')}"
+        )
+        rp = d["replica"]
+        t.add_row(
+            "replica", rp["state"] + (f" — {rp['corroboration']}" if rp["corroboration"] else "")
+        )
+        t.add_row(
+            "ontology class",
+            ", ".join(oc["classes"]) if oc["classes"] else f"{oc['state']} — {oc['reason']}",
+        )
+        if oc["relationships"]:
+            t.add_row("relationships", ", ".join(oc["relationships"]))
+    if binding["system"] is not None:
+        s = binding["system"]
+        t.add_row("system", escape(f"{s['id']} — {s['name']}"))
+        t.add_row("application id", escape(f"{s['application_id']} ({s['application_id_state']})"))
+    t.add_row(
+        "other loaders bound here",
+        ", ".join(binding["other_loaders_bound_here"]) or "[dim]none[/]",
+    )
+    t.add_row("run by", ", ".join(binding["commands"]) or "[dim]no command[/]")
+    console.print(t)
+    tree = binding["tree"]
+    console.print(
+        f"[dim]tree {tree['commit']} on {tree['branch']}"
+        f"{' (dirty)' if tree['dirty'] else ''} — inputs digest {binding['inputs_digest']}[/]"
+    )
 
 
 @app.command()

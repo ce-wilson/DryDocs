@@ -82,6 +82,7 @@ export interface LoadMapSystem {
  *  block flattened, the replica predicate with its corroboration, and the ruled
  *  ontology class or UNCLASSIFIED. */
 export interface OntologyClass {
+  relationships: string[]
   state: 'classified' | 'UNCLASSIFIED'
   classes: string[]
   pending: number
