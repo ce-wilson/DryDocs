@@ -1,0 +1,97 @@
+id: REM1
+epic: component-topology
+title: "Registry rule ids and backlog ids collide on the same strings (R1, R10), so cite a rules-registry rule as 'registry R10' on first use"
+type: chore
+module: drydocs-remediation
+phase: 6
+agent: main
+model: haiku
+priority: p3
+status: done
+depends_on: []
+inputs:
+- internal/remediation/standards-rules-registry.md
+- docs/restructure/backlog/items/R10.yaml
+- docs/restructure/backlog/items/R1.yaml
+acceptance: |
+  R10 names two unrelated things: a remediation rules-registry rule (concatenation-dot
+  correctness, internal/remediation/standards-rules-registry.md:57) and a backlog item
+  (docs/restructure/backlog/items/R10.yaml, an unrelated closed chore about pinning an agent
+  dependency). R1 collides the same way - the dot-smuggling rule id in the remediation
+  detector against backlog R1. Prose that says "Rule R10 in the registry" is precise, but a
+  search for R10 alone lands on the wrong artifact.
+
+  (a) The standards-rules registry's header states the convention: a rules-registry rule is
+      cited as "registry R10" on first use in any prose.
+  (b) NO RENUMBERING of either series. The R letter was frozen with the other 26 on
+      2026-09-02, and backlog ids are stable join keys. This is a citation convention and
+      nothing else.
+  (c) The row is offered to PLAN8's term ledger when that exists: the string R10, two homes.
+notes: |
+  Minted 2026-09-07 from IDEAS.md Idea-280 (the UI session's eval-case review, reviewed at
+  839eab1f on feat/cyclic-type-test-case), finding D.
+
+  First id in the REM series. phase 6 / component-topology, where the drydocs-remediation
+  items live. haiku and p3: one header line, no code, no renaming.
+
+  CLOSED 2026-09-07 (laptop / NewThinkpad, Lane B, branch wip/rem1-laptop; queue item 7, the
+  last, of docs/lane-b-handoff.md). All three clauses done.
+
+  (a) DONE. internal/remediation/standards-rules-registry.md's header now carries the
+  convention: write "registry R10" on first use in any prose OUTSIDE that file, then plain
+  R10 for the rest of the passage. The header states the reason rather than the rule alone,
+  because the reason is what makes it stick: "Rule R10 in the registry" is already precise
+  prose and still fails the thing people actually do, which is search for R10 and land on
+  the wrong artifact. The qualifier puts the disambiguating word INSIDE the searchable
+  string, which is the only version a search engine can help with.
+
+  It also rules the inside-the-file case explicitly, because the registry would otherwise
+  violate its own new rule on the line immediately below it: R1's greenfield action cites
+  "the dot rule (R10)" bare, and that is correct as written - the document is already the
+  scope. A convention that made its own home file non-conformant would be edited back out
+  by the first person who noticed.
+
+  (b) HELD. Nothing renumbered in either series, and the header says so with both reasons -
+  the R letter was frozen with the other 26 on 2026-09-02, and backlog ids are stable join
+  keys other files cite.
+
+  THE CONVENTION WAS MADE TRUE, NOT ONLY DECLARED. A rule added to a header while the tree
+  still contradicts it is how a belief survives its own correction. Swept producer prose for
+  bare registry-rule citations and fixed the two that existed: drydocs_remediation/
+  overview_readme.md:139 and the FR-REM-2 row of docs/design/drydocs-remediation-tdd.md,
+  whose single .html was re-rendered in the same commit. Both now read "registry R1".
+
+  A third site needed nothing: docs/design/drydocs-remediation-runbook.md, authored one item
+  earlier in this same lane (V7), already writes "registry R1" and "registry R32" on first
+  use - the convention was pre-adopted there deliberately so this sweep would not have to
+  edit a page published an hour before it.
+
+  (c) THE ROW IS READY, AND PLAN8 ALREADY CARRIES THE POINTER TO IT. PLAN8 is status: todo,
+  so the term ledger does not exist yet and there is nothing to write into; its notes
+  already say "REM1 contributes a row on its own: the string R10 has two homes", so the
+  offer is recorded where its author will find it. PLAN8.yaml was deliberately NOT edited -
+  it is another item's file and the backlog surface is Lane A's pen; the row content is
+  recorded HERE instead, for whoever pulls PLAN8:
+
+    term: "R10" (and "R1", the same shape)
+    kind: collision - one string, two homes, no renaming available
+    home 1: internal/remediation/standards-rules-registry.md - a standards rule
+            (R10 = concatenation-dot correctness; R1 = dot-smuggling)
+    home 2: docs/restructure/backlog/items/R10.yaml - a backlog item, unrelated
+            (a closed chore about pinning an agent dependency; R1.yaml likewise its own)
+    canonical citation: "registry R10" for the rule; the bare id for the backlog item
+    verified: 2026-09-07, both files present in this tree
+
+  Note for PLAN8's puller: this is a different SHAPE from PLAN8's own three seed rows. Those
+  are synonym-to-canonical-term ("period"/"dot" -> the concatenation delimiter); this one is
+  one string with two homes, which the ledger's schema needs a place for. Worth confirming
+  the schema carries it before writing the row - the same confirm-before-writing step
+  PLAN8 (b) already asks for.
+
+  Gates: full suite 3637 passed / 14 skipped / 18 deselected; `ruff check .` and `ruff format
+  --check .` clean; the TDD re-rendered (one file, not the docs/design glob). No board
+  render, no snapshot - Lane A pens.
+
+  The registry edit is inside internal/ (Internal classification, excluded from the public
+  push). It adds a citation convention and no data of any kind, so the publish boundary is
+  unchanged by it.

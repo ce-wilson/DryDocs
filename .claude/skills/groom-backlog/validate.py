@@ -270,6 +270,95 @@ def fetch_remotes() -> bool:
     return ok
 
 
+# ---------------------------------------------------------------------------
+# I8 -- DEPENDENCY CURRENCY. A WARNING AT GROOM TIME, NEVER A GATE.
+#
+# `depends_on` is a SCHEDULING edge: it decides what enters next_ready and
+# nothing else, so it carries no claim that the dependent is still CURRENT with
+# what it depends on. An amended dependency and an untouched dependent are
+# indistinguishable from a dependency that never changed. That is how O59 came
+# to say G68 renders four censuses while G68 had grown a fifth eight days after
+# O59 was written -- the information was not missing (G68's own notes say MERGED
+# in plain words), it just had no route to the item depending on it.
+#
+# WHAT THIS IS NOT: a check on the PROSE. No validator can tell a stale
+# acceptance from a fine one by comparing text, and the value of a wrong guess
+# here is negative. This asks git one mechanical question -- was the dependency's
+# file committed more recently than the dependent's? -- and reports the answer.
+#
+# WARN-ONLY, and the exit code is unchanged. Most dependency edits are irrelevant
+# to the dependent, so a FAILING check would be noise inside a week and would
+# train people to scroll past it, which costs more than the check is worth. The
+# value is a short list somebody SCANS at groom time.
+# ---------------------------------------------------------------------------
+
+#: The statuses whose acceptance can still be acted on. `done` is excluded
+#: DELIBERATELY: a closed item's acceptance describing an older dependency is a
+#: HISTORICAL RECORD and is correct as written. Re-opening those would make
+#: verified records retrospectively false -- the same argument the 2026-08-28
+#: groom used when it filed O77 fresh rather than reopening O66.
+CURRENCY_STATUSES = ("todo", "in_progress")
+
+#: Record separator for the batched log. A control character cannot occur in a
+#: path, so a commit that touched many files cannot be misread as several
+#: commits -- the same reasoning tests/unit/test_publish_boundary_history_ceiling.py
+#: gives for its separators.
+_TIME_RECORD = "\x1e"
+
+
+def item_commit_times() -> dict[str, int]:
+    """``{item id: unix time of the commit that last touched its file}``.
+
+    ONE git call for the whole directory, not one per dependency edge. At
+    600-plus items with several edges each, per-edge subprocesses would make
+    validate.py slow enough that people stop running it -- and an unrun
+    validator is the failure this whole file exists to avoid.
+
+    `git log` is newest-first, so the FIRST time a path appears is its latest
+    commit; later appearances are older and are ignored.
+    """
+    out = _git(
+        "log",
+        f"--format={_TIME_RECORD}%ct",
+        "--name-only",
+        "--",
+        ITEMS_REL,
+    )
+    times: dict[str, int] = {}
+    for chunk in out.split(_TIME_RECORD):
+        head, _, paths = chunk.partition("\n")
+        if not head.strip().isdigit():
+            continue
+        when = int(head.strip())
+        for line in paths.splitlines():
+            name = line.strip().rsplit("/", 1)[-1]
+            if name.endswith(".yaml"):
+                times.setdefault(name[: -len(".yaml")], when)
+    return times
+
+
+def dependency_currency_warnings(items: list[dict], times: dict[str, int]) -> list[tuple[str, str]]:
+    """``(item id, dependency id)`` pairs where the dependency is the newer file.
+
+    Pure, and separated from :func:`item_commit_times` for exactly that reason:
+    the guard in tests/unit/test_backlog.py asserts THIS with a hand-built map,
+    so it tests the mechanism and never the CONTENT of the live list -- which
+    changes with every commit and would make the test a diary.
+    """
+    warnings: list[tuple[str, str]] = []
+    for item in items:
+        if item.get("status") not in CURRENCY_STATUSES:
+            continue
+        own = times.get(item.get("id"))
+        if own is None:
+            continue  # never committed: nothing to compare against
+        for dep in item.get("depends_on") or []:
+            theirs = times.get(dep)
+            if theirs is not None and theirs > own:
+                warnings.append((item["id"], dep))
+    return warnings
+
+
 def _ids_from_names(blob: str) -> set[str]:
     return {m.group("id") for line in blob.splitlines() if (m := _FILE_RE.search(line.strip()))}
 
@@ -727,7 +816,9 @@ _STATE_RE = re.compile(r"\*\*(open|parked|groomed|merged|closed)\b[^*]*\*\*")
 _ENTRY_HEAD_RE = re.compile(rf"^- \*\*`(?P<id>{_EDITION_SEGMENT}Idea-\d+[a-z]?)`\*\* ·")
 
 #: Item-file fields that are venue-local (never a venue-edit finding) or bookkeeping.
-_ITEM_FIELDS_OUT_OF_SCOPE = frozenset({"status", "annotations"})
+#: `hold` rides with `status` (Y7): both say whether THIS venue may pull the item, and a
+#: venue holding an item it did not mint is a ruling on its own pull, not an edit.
+_ITEM_FIELDS_OUT_OF_SCOPE = frozenset({"status", "annotations", "hold"})
 #: Item-file fields the append rule governs; everything else is a REWRITE if it changes.
 _ITEM_APPEND_FIELDS = ("acceptance", "notes")
 
@@ -1035,7 +1126,7 @@ def _pending_header(stem: str) -> str:
 def main() -> int:
     fails: list[str] = []
     sys.path.insert(0, str(REPO_ROOT))
-    from drydocs_core.backlog_store import derive_summary, load_backlog_document
+    from drydocs_core.backlog_store import derive_summary, hold_errors, load_backlog_document
 
     doc = load_backlog_document(BACKLOG)
 
@@ -1083,6 +1174,9 @@ def main() -> int:
         ):
             if not ok:
                 fails.append(f"[{iid}] bad {msg}")
+        # Y7: a hold is a declared shape, checked by the same function the unit guard
+        # uses; the derivation below already excludes a held item from next_ready.
+        fails.extend(hold_errors(it))
 
     for iid, it in by_id.items():
         for dep in it.get("depends_on", []):
@@ -1121,10 +1215,27 @@ def main() -> int:
     print(
         "derived: "
         + " ".join(f"{k}={derived[k]}" for k in ("todo", "in_progress", "blocked", "done"))
-        + f" next_ready={len(derived['next_ready'])}"
+        + f" next_ready={len(derived['next_ready'])} held={len(derived['held'])}"
     )
 
     print(f"items={len(items)} phases={len(phases)} modules={len(modules)}")
+
+    # I8: dependency currency. Printed beside the derived counts so a groom sees
+    # it without a second command, and appended to NOTHING -- these never join
+    # `fails`, so the exit code is untouched whether the list is empty or long.
+    # The heading says "warning" and says why, because a list a reader mistakes
+    # for a gate is a list they will eventually silence.
+    stale = dependency_currency_warnings(items, item_commit_times())
+    if stale:
+        print(f"WARNING -- dependency currency ({len(stale)}), NOT a gate:")
+        print(
+            "  Each dependency below was committed more recently than the item that "
+            "depends on it, so the item's acceptance MAY describe an older version of "
+            "it. Most such edits are irrelevant; this is a list to scan, not to clear."
+        )
+        for item_id, dep in stale:
+            print(f"  - {item_id} depends on {dep}, which is the newer file")
+
     if fails:
         print(f"FAIL ({len(fails)}):")
         for f in fails:

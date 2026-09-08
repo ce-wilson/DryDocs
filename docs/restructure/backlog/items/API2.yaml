@@ -1,0 +1,156 @@
+id: API2
+epic: web-console
+title: "ColumnDef carries no list type, so two server columns that return lists are declared string - extend the vocabulary and delete the client-side exemption"
+type: bug
+module: drydocs-api
+phase: 12
+agent: main
+model: fable
+priority: p2
+status: done
+depends_on: []
+inputs:
+- drydocs_api/query_specs.py
+- web/src/data/rowShape.ts
+- web/src/data/rowShape.test.ts
+- web/src/generated/openapi.json
+acceptance: |
+  ColumnDef.type is 'string' | 'int' only, so two server columns that return LISTS are
+  declared string: runbooks.series.v1 'lands' (collect(DISTINCT d.assetId)) and
+  lineage.schema-definition.v1 'properties' (a Cypher list comprehension). Verified at
+  drydocs_api/query_specs.py:73 (the vocabulary), :1003 and :1213 (the two declarations).
+  WEB6's client-side row-shape validator found them and exempts exactly those two by spec id,
+  with a bidirectional guard in rowShape.test.ts that fails when the server is fixed AND when a
+  third one appears - so this is not a two-string edit.
+
+  (a) ColumnDef grows a LIST column type, and the OpenAPI shape moves with it
+      (web/src/generated/openapi.json and api.d.ts are regenerated, not hand-edited).
+  (b) The two declarations move onto the new type.
+  (c) The client validator learns the new type and the two-spec exemption in
+      web/src/data/rowShape.ts is DELETED; rowShape.test.ts is updated in the same commit, since
+      it is written to fail exactly when this item lands.
+  (d) A server-side guard reads the SPEC OBJECT (J37 - never a render, never the source text)
+      and fails when a column whose Cypher collects or comprehends is declared scalar. That is
+      the clause that stops a third one appearing.
+  (e) The read contract's consumers still pass: the API tests, the web type-check and the
+      generated-artifact drift tests.
+notes: |
+  Minted 2026-09-07 from IDEAS.md Idea-270 (Lane B close report, laptop, 2026-09-06,
+  hand-back api).
+
+  R15/R16 own the api package and are both DONE, so the entry's sequencing constraint ('land it
+  with or right after them, not before') is already satisfied - depends_on is empty for that
+  reason, not by oversight.
+
+  Filed web-console / phase 12 with API1, because it is the read contract this console
+  consumes; R15/R16 sit in agentic-qa / 15 and either filing would have been readable.
+
+  Model fable: this changes a published contract (the column vocabulary and its OpenAPI shape),
+  which is the boundary case the matrix reserves the top tier for.
+
+  -- CLOSED 2026-09-07, Lane B (laptop), branch wip/API2-laptop from main at 7585fb27 --
+
+  ALL FIVE CLAUSES MET, in ONE commit rather than five, because (b), (c) and (d) each
+  break the others' guards in isolation: the old python guard fails the moment the two
+  declarations change, and rowShape.test.ts fails the moment the exemption map empties.
+  Split across pushes that would have put three red CI tips on the branch for reasons that
+  are not the roadmap guard.
+
+  -- (a) THE VOCABULARY IS NOW A THING, not a comment --
+
+  ColumnDef.type was documented as "'string' | 'int'" in a trailing comment, which is why
+  it could be wrong twice without anything noticing. It is now COLUMN_TYPES, a named
+  frozenset, asserted per column by _validate_registry AT IMPORT -- so a bad type is an
+  ImportError on the API package rather than a wrong render.
+
+  ColumnOut.type became a Literal, which is what makes clause (a)'s "the OpenAPI shape
+  moves with it" true rather than a no-op: with `type: str` the document would not have
+  changed by one character. openapi.json gains the enum and api.d.ts gains
+  `"string" | "int" | "list"`. Both REGENERATED (scripts/dump_openapi.py, then
+  `npm run api:types`), never hand-edited.
+
+  THAT MAKES THE VOCABULARY EXIST TWICE, because pydantic needs static values in a
+  Literal. Left alone, two copies drift and the generated client quietly stops offering a
+  type the server sends. So test_column_types.py compares them with get_args -- the exact
+  arrangement CLASSIFICATIONS already has with config/classification.yaml, and guarded for
+  the reason that one is: J23's collapse to three levels sat unnoticed in this file for a
+  day because nothing compared the copies.
+
+  ONE JUDGMENT, recorded rather than left implicit: `list` declares no ELEMENT type. Both
+  specs return lists of strings, but the contract being fixed is "this is a list, not a
+  scalar", and an element type nothing enforces is a second declaration to keep true.
+  Likewise web/src/lib/graph.ts's hand-written SpecResult still says `type: string` and not
+  the union: it is the console's forward-compatible seam, the generated union already
+  satisfies it (SpecRunOutCoversSpecResult still compiles), and tightening it would couple
+  the seam to the generated file for no check it does not already have.
+
+  -- (c) THE EXEMPTION AND ITS PLUMBING BOTH GO, and the second half is beyond the ask --
+
+  DECLARED_TYPE_EXCEPTIONS is deleted as the clause requires. The generic `exempt` field on
+  RowSource and the two lines that read it are deleted too, which the clause does not say:
+  after the map goes it has no producer, and the retired guard's own docstring is the
+  argument -- "an exemption nobody re-checks is how a workaround outlives its cause". A
+  never-populated escape hatch is that, waiting. Flagged here because it is a deletion
+  nobody asked for; it is one field and reversible.
+
+  satisfies() KEEPS its unknown-type-passes fallthrough even though the contract is now a
+  closed union, and the comment now says why instead of merely stating the behaviour: a
+  declared vocabulary and a forward-compatible runtime are different guarantees, and a
+  console that rejected a type it had not heard of would break on the next one the server
+  adds. The module header's note 3 ("TWO SERVER DECLARATIONS ARE WRONG TODAY") is rewritten
+  rather than deleted -- it was about to become false prose sitting in a file whose other
+  notes are all still true.
+
+  The two exemption tests in rowShape.test.ts are replaced by two real ones: a scalar
+  arriving under a `list` declaration is now CAUGHT (which is precisely the difference
+  between a declared type and an exempted one), and null still satisfies `list` as it does
+  every other type -- note 1 restated for the new type rather than assumed to carry over.
+
+  -- (d) THE GUARD, and the accuracy it now needs --
+
+  tests/unit/test_row_shape_exceptions.py is retired and replaced by
+  tests/unit/test_column_types.py. The half that parsed the console's TypeScript is gone
+  with the map it read; the half that reads the registry is rewritten.
+
+  THE OLD SCAN WAS ACCIDENTALLY RIGHT. It matched `collect(` ... `AS name` within one LINE
+  (`[^\n]*?`), and found exactly the two real cases only because this registry happens to
+  write each alias on the line of its own collect. Removing the line anchor, as a
+  reasonable-looking edit would, makes it report six columns that are not lists. It is
+  replaced by a forward parse: split on clause keywords, split the projection list on
+  top-level commas, take each item's own `AS name`. An alias is then tied to its own
+  expression whatever the whitespace does.
+
+  AND ONLY AN OUTERMOST collect OR comprehension COUNTS. `size(collect(x)) AS n` returns an
+  integer and is correctly declared `int`; a scan matching `collect(` anywhere would fail
+  the registry for a correct declaration -- and there is no exemption left to absorb it,
+  which is exactly why the accuracy matters more now than it did before. Both cases are
+  pinned as controls beside the parser test. The registry has no such expression today;
+  this is a guard against the next one, not a fix for a live case.
+
+  The instrument check (J76) NAMES THE TWO COLUMNS rather than asserting a non-empty set,
+  so retiring a spec makes this test say so instead of letting the guard go green over
+  nothing -- the vacuous-scan failure CORE2 closed one item earlier in this same lane.
+
+  -- HANDED BACK TO LANE A --
+
+  1. TWO GENERATED ARTIFACTS RIDE WITH THIS ITEM and neither is refreshed by
+     render_board.py: web/src/generated/openapi.json (scripts/dump_openapi.py) and
+     web/src/generated/api.d.ts (`cd web && npm run api:types`). If the merge moves either
+     source, re-run both writers rather than resolving them by hand -- and export
+     DRYDOCS_DATA_ROOT before dump_openapi.py: it imports create_app, which resolves the
+     root at import, and it TRUNCATES the committed file before it fails without one.
+  2. A FILE WAS DELETED AND A FILE WAS ADDED under tests/unit/, which is an existing
+     tracked directory -- no PORT-MANIFEST row is needed. Anyone searching for
+     test_row_shape_exceptions.py after the merge wants test_column_types.py.
+  3. NO LEDGER MOVEMENT. No .tsx added, so the O42 component ledger is untouched; no
+     ui-tests.yaml case names rowShape, so the automated-share pin does not move; the two
+     replaced web tests are net zero (460 vitest before and after).
+
+  VERIFIED on this laptop (J18): full unit suite 3557 passed / 14 skipped / 0 failed, ruff
+  check and ruff format --check clean over the repo, tsc -b --force clean, 460 vitest
+  passing (41 files), vite build, bundle:check 98.0% of ceiling. No live graph -- this item
+  reads the registry as an imported object and needs no database.
+
+  EXPECTED RED, per the Lane B handoff: test_committed_roadmap_page_matches_its_sources
+  fails on this close commit -- a close writes notes and Lane B does not render (Y5's
+  tolerance covers a CLAIM, not a close). Lane A renders once at merge.

@@ -1,0 +1,162 @@
+id: CORE2
+epic: release-infrastructure
+title: "A source-scan absence guard needs a positive control - six of six absence scans were vacuous on first write because the stripper did not match the subject"
+type: task
+module: drydocs-core
+phase: 8
+agent: main
+model: sonnet
+priority: p1
+status: done
+depends_on: []
+inputs:
+- tests/source_scan.py
+- tests/unit/test_source_scan.py
+acceptance: |
+  Six of six absence scans across two Lane B bursts were VACUOUS on first write. Each was
+  the same mistake: code_only strips string literals, so a guard asserting that a LITERAL is
+  absent runs its pattern over a scan the literal was already removed from and passes on
+  nothing. without_comments is the stripper for a literal subject. J66 says which helper to
+  use; nothing today makes the wrong choice fail, and two of the six were caught only by
+  breaking the thing the guard claimed to catch. One case had a comment saying without_comments
+  beside code calling code_only.
+
+  (a) tests/source_scan.py grows an absence helper that takes a POSITIVE CONTROL:
+      absent(pattern, files, *, positive_control=<snippet>). It runs the chosen stripper over
+      the control FIRST and refuses (fails, with a message naming the stripper and the subject)
+      when the pattern no longer matches the control - the mutation probe, built in, so a
+      stripper/subject mismatch fails on the control and never silently on the tree.
+  (b) The refusal is proven by a test that supplies a literal subject with code_only and asserts
+      the helper fails on the control, not on the tree.
+  (c) Every existing absence guard in tests/unit/ is swept onto the helper. Any that cannot
+      supply a control says why, in a comment, next to the call.
+  (d) A guard over the guards: an absence-style scan that does not go through the helper is
+      listed, so the sweep does not silently un-sweep. Read the code, never the prose (J66) -
+      this guard's own explanation must not trip it, which is the failure J66 exists for.
+notes: |
+  Minted 2026-09-07 from IDEAS.md Idea-273 (Lane B close report, laptop, 2026-09-06,
+  process findings). Instances cited there: WEB7's path= literal and O89's route literal
+  (twice) in the 2026-09-06 burst, three more in the 2026-09-05 burst.
+
+  p1 because it is the only entry in this groom whose defect class is 'a guard that reports
+  green while checking nothing', and it has now recurred six times in two days.
+
+  Epic release-infrastructure / phase 8 follows J66, which is where the source_scan rule was
+  established; module is drydocs-core per the entry, though the file itself is tests/.
+
+  -- CLOSED 2026-09-07, Lane B (laptop), branch wip/CORE2-laptop from main at f06ff632 --
+
+  ALL FOUR CLAUSES MET. The sweep found THREE LIVE VACUOUS GUARDS in the Python tree, so
+  this was a fix and not only a prevention -- which was the open question at the start,
+  because the six instances the item cites are all TypeScript. Detail below.
+
+  -- WHAT WAS ACTUALLY BROKEN, verified by instrument (J76) before anything was written --
+
+  Each candidate's pattern was run through code_only over a realistic snippet to see
+  whether it could match at all. Three could not:
+
+  * test_spec_promotion.py: "query_specs.py" over code_only. A file path appears in a
+    module only inside a string literal -- the one thing code_only removes. Written R8,
+    2026-09-06, one day before this item; it never went red and never could have.
+  * test_constraint_drift.py: "DROP CONSTRAINT" over code_only. A drop EXECUTES as Cypher,
+    so it is likewise a literal. The safety property of the whole drift path was asserted
+    by a scan that could not see it.
+  * test_env_refs_migration.py: ":-" over code_only. Wrong in BOTH directions at once --
+    it could not see a bash default (a literal) and it COULD fire on the negative slice
+    items[:-1], failing a module for a list operation.
+
+  A SECOND VACUITY MECHANISM turned up that the item does not name and that no choice of
+  stripper fixes: code_only joins tokens with single spaces, so a dotted subject never
+  survives it intact. "query_specs.py" cannot appear in code_only output even when the
+  module imports it. Two guards in test_env_refs_migration were already working around it
+  with .replace(" ", "") on the result. The control catches this class for free, which is
+  why absent() has no separate rule about it.
+
+  -- (a) THE HELPER, and the one design decision inside it --
+
+  absent(pattern, sources, *, positive_control, stripper=code_only, normalize=None,
+  root=None, because="") in tests/source_scan.py. The control goes through THE SAME
+  pipeline as the tree -- one _apply(), not two -- because a control that skipped the
+  caller's post-processing would prove the pattern matches text no scan ever produces.
+  On mismatch it raises VacuousScanError (an AssertionError subclass, so pytest reports it
+  as the failure it is, and a distinct type so clause (b) can name what it caught) with the
+  stripper, the subject, and the control's SCANNED text, which is what makes the message
+  diagnostic rather than an accusation.
+
+  An EMPTY source set is refused too, not passed. Scanning zero files is the other way an
+  absence guard reports green while checking nothing -- a glob that stopped matching, a
+  list emptied by a refactor -- and it costs one branch to close.
+
+  WHAT IT STILL CANNOT DO, written in the docstring rather than left implied: it cannot
+  tell whether the control resembles the REAL violation. A control shaped like the wrong
+  violation clears the probe. What the shape buys is that a control now EXISTS, in the
+  call, where a reviewer reads it, and that a stripper/subject mismatch is impossible.
+
+  -- without_prose, and why it is not called without_comments --
+
+  The acceptance names without_comments as "the stripper for a literal subject". That verb
+  exists in web/src/test/sourceScan.ts and NOT in Python, so this added it -- but named it
+  without_prose, because in Python prose is comments AND DOCSTRINGS and a comments-only
+  stripper could not be used by the guards that need it: spec_promotion's docstring names
+  every symbol it forbids (the house style, and the right style), so the sweep would have
+  turned three vacuous guards into three guards failing on their own explanation. That is
+  J66's failure arriving from the other side. TypeScript has no docstring, so there the two
+  names mean the same thing; here they do not, and the name says which.
+
+  It also blanks prose IN PLACE rather than re-joining tokens, so the original layout, the
+  dotted names and every data literal survive character-for-character, and line numbers
+  still line up with the file.
+
+  -- (c) THE SWEEP, and its boundary --
+
+  Seven assertions in three files, all mutation-checked against the REAL tree afterwards:
+  clean passes, injected violation fires, for all six guard families including the
+  inspect.getsource one. No guard needed the "cannot supply a control" escape hatch.
+
+  THE BOUNDARY, stated because it is a judgment and not a discovery: "absence guard" here
+  means an absence scan that routes through a source_scan STRIPPER. tests/unit also holds
+  roughly a hundred `assert X not in text` assertions over raw .cypher and .sql files and
+  over API responses; those have no stripper and are not this defect class. Two neighbours
+  that look like candidates and are not: test_console_delivery's _ts_code is a TypeScript
+  comment stripper that deliberately KEEPS literals because its subjects are literals (it
+  is already correct), and test_vocabulary_endpoints' Cypher stripper is the one the
+  source_scan docstring already rules a different thing.
+
+  -- (d) THE GUARD OVER THE GUARDS --
+
+  test_every_absence_scan_over_a_stripper_goes_through_the_helper walks the whole tests
+  tree -- not tests/unit alone, since a guard watching only the directory where the six
+  failures happened would be the next hole -- and lists file and line for any
+  `<pattern> not in <stripper output>` that does not go through absent(). It reads the AST,
+  tracking names bound to a stripper call and through passthrough string methods, so its
+  own explanation (which names both strippers) cannot trip it. Run against the PRE-sweep
+  tree at 65f7e378 it lists exactly the seven swept lines; against HEAD it lists none.
+
+  ONE EXEMPTION, file-level: test_source_scan.py itself, whose absence scans assert what
+  the strippers REMOVE -- the one place such a scan is the subject rather than the
+  instrument. A file-level exemption is a real hole and is named as one, with its reason
+  asserted to be longer than a phrase.
+
+  -- HANDED BACK TO LANE A --
+
+  1. THE TYPESCRIPT TWIN IS NOT CORE2, and it is where the six cited instances actually
+     live. web/src/test/sourceScan.ts has codeOnly and withoutComments and no absent();
+     there are 24 stripper call sites across 8 files, with hand-rolled positive controls
+     already written out longhand in at least two (intakeReviewQueue.noGraphWrite.test.ts
+     lines 65-69, routeAccess.test.ts lines 156-159) -- which is the same fix, invented
+     twice, exactly as J66 records for the Python side. This item's inputs name Python
+     files only, so building the twin here would be widening the pull; it wants a WEB-series
+     item. Note the twin does NOT need the docstring half: TypeScript has no docstring.
+  2. NO PORT-MANIFEST ROW IS NEEDED. No new tracked path -- every change is inside files
+     that already exist.
+  3. NOTHING FOR THE RENDERS. No .tsx, so the O42 component ledger is untouched, and no
+     generated artifact moved.
+
+  VERIFIED on this laptop (J18): full unit suite 3566 passed / 15 skipped / 0 failed,
+  ruff check and ruff format --check clean over tests/. No live graph and no web build --
+  this item touches neither. Clause (d)'s pre-sweep replay is the evidence for the sweep
+  being complete rather than merely done.
+
+  EXPECTED RED, per the Lane B handoff: test_committed_roadmap_page_matches_its_sources
+  fails on this close commit -- a close writes notes and Lane B does not render (Y5's
+  tolerance covers a CLAIM, not a close). Lane A renders once at merge.

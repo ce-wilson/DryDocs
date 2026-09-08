@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: done
 depends_on: []
 inputs:
 - .claude/skills/groom-backlog/validate.py
@@ -64,3 +64,60 @@ notes: |
   Filed in epic project-board (module drydocs-plan, phase 8) beside I6's allocator rather than in
   Y: this is groom-time TOOLING, where Y7 is the schema and the derivation. Related: Y7, I6, G68,
   O59, Idea-140.
+
+  CLOSED 2026-09-07 (Lane B, laptop, wip/I8-laptop). Venue: laptop checkout, git history only -
+  no Neo4j, no network.
+
+  (a) THE CHECK is one question asked of git: was the dependency's file committed more recently
+      than the dependent's? Two functions in .claude/skills/groom-backlog/validate.py -
+      item_commit_times(), which reads git, and dependency_currency_warnings(), which is pure.
+      They are separate so the guard can test the second with a hand-built map, which is what
+      clause (d) asks for. No prose diffing anywhere, as the acceptance forbids.
+
+  (b) WARN-ONLY. The list prints under a heading that says "NOT a gate" and explains itself in
+      the next line - "Most such edits are irrelevant; this is a list to scan, not to clear."
+      Nothing joins `fails`, so the exit code is untouched: validate.py exits 0 with 16 warnings
+      present, and still prints ALL CHECKS PASS. The reason is in the module comment: a FAILING
+      check here would be noise within a week and would train people to scroll past it, which
+      costs more than the check is worth.
+
+  (c) done IS EXCLUDED, and the exclusion is both commented (CURRENCY_STATUSES) and ASSERTED
+      (test_a_done_item_is_excluded_however_stale_its_dependency_is). A closed item's acceptance
+      describing an older dependency is a historical record and correct as written.
+
+  (d) WHERE IT RUNS: validate.py, printed immediately after the derived counts, so a groom sees
+      it without a second command. The mirror in tests/unit/test_backlog.py is six tests, all on
+      the MECHANISM: a stale pair is reported, a current one is not, done and blocked are
+      excluded, an uncommitted item or an unknown dependency is skipped rather than raising
+      KeyError, and equal timestamps are not stale (one commit touching both files is the
+      ordinary case for an item minted with its dependency, or for a bulk status sweep - so the
+      rule is strictly-newer). The sixth is an instrument check (J76) and it is the one that
+      matters most: every other test would pass unchanged against a time map that is always
+      empty, which is exactly what a broken git call produces - silently, because the warning
+      list would simply be empty and read as "nothing stale". That test asks the real reader for
+      the real tree and asserts it mapped 100+ files.
+
+  (e) PERFORMANCE, measured on this laptop over the live 685-item tree with 334 dependency edges:
+        item_commit_times()               99 ms   (best of 5; one git log for the whole directory)
+        dependency_currency_warnings()   0.1 ms   (pure, 685 items / 334 edges)
+      Against the per-edge alternative the acceptance warns about: one `git log -1` subprocess
+      measures 39 ms here, so 334 of them would be ~13.1 s - nearly triple validate.py's entire
+      6.9 s runtime, for the same answer. The batched call is ~1.4% of the run.
+
+  (f) O59/G68 DOES NOT QUALIFY, and it fails to on BOTH counts rather than one, which is worth
+      recording because either alone would be enough:
+        - O59 is `status: done` (closed 2026-08-27), so clause (c) excludes it by design; and
+        - O59's file is the NEWER of the two anyway - O59 last committed 1788187596, G68
+          1787719538, about five days apart - because closing O59 wrote its own close note.
+      The incident is exactly the shape this reports, but it is only visible in the window
+      between the dependency's amendment and the dependent's next edit. That window is the thing
+      being watched, and it has closed for this pair. The check is not retrospective and should
+      not be: the whole argument of clause (c) is that finished work stays finished.
+
+      What it DOES report today is 16 pairs, none of them investigated here - reading them is a
+      groom's job, not this item's, and the acceptance is explicit that the guard never asserts
+      the content of the list.
+
+  Gates at close: pytest -q 3618 passed / 14 skipped (51 in test_backlog.py, up from 45); ruff
+  check and ruff format --check clean; validate.py exits 0. No new tracked path, so no
+  PORT-MANIFEST row to hand back. Expected red on this tip: the roadmap fingerprint only.

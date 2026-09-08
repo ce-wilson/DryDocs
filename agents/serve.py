@@ -81,19 +81,72 @@ def _install_control_redaction() -> None:
     setattr(fast_api, _ADK_SESSION_FACTORY, redacting_factory)
 
 
+#: The O63 probe's path. ADK's api_server registers /, /health, /version,
+#: /list-apps, /run, /run_sse, /dev-ui* and /apps/* — checked against the
+#: installed vendor file, not assumed — so this name is ours and collides with
+#: nothing. It is deliberately NOT /health: that one is ADK's own and answers
+#: for the SERVER, which is a different question from the one below.
+PROVIDER_PROBE_PATH = "/drydocs-health"
+
+
+def provider_check() -> dict[str, object]:
+    """Is the agent's LLM provider configured? (O63 clause f.)
+
+    CHEAP AND SAFE TO CALL: ``provider_from_env`` reads environment variables and
+    raises ``ProviderConfigError`` with a fixable message. It contacts no model
+    and spends nothing, so a page-load probe can ask it.
+
+    THE IMPORT ORDER BELOW IS THE POINT, and it is a real trap rather than
+    ceremony. ``providers.py`` merges only the REPO-ROOT ``.env`` at import;
+    ``agents/.env`` — the file every ProviderConfigError message names — is
+    merged by ``common.neo4j_tool`` at ITS import (G131's precedence: agents
+    first, root as fallback). So a probe that imported ``providers`` alone would
+    read a half-loaded environment and report ANTHROPIC_API_KEY unset on a
+    machine where a real turn succeeds. Importing the same module the agent's
+    own path imports is what makes this probe answer the question the operator
+    is actually asking. A false red here is worse than no probe: it sends
+    somebody to edit a file that is already correct.
+
+    NO SECRET CROSSES (clause 3): every ProviderConfigError names a KEY and a
+    FILE and never a value, and ``detail`` is that message unaltered.
+    """
+    import common.neo4j_tool  # noqa: F401 — imported for its agents/.env merge
+    from graph_qa.providers import ProviderConfigError, provider_from_env
+
+    try:
+        provider_from_env()
+    except ProviderConfigError as exc:
+        return {"configured": False, "detail": str(exc)}
+    return {"configured": True, "detail": None}
+
+
 def build_app(host: str, port: int):
     from google.adk.cli.fast_api import get_fast_api_app
     from google.adk.cli.utils._nested_agent_loader import NestedAgentLoader
 
     _install_control_redaction()
 
-    return get_fast_api_app(
+    app = get_fast_api_app(
         agents_dir=str(AGENTS_DIR),
         agent_loader=NestedAgentLoader(str(AGENTS_DIR)),
         web=False,  # the API server, exactly as `adk api_server` — only the loader differs
         host=host,
         port=port,
     )
+
+    # O63: the one question about this server that ADK cannot answer. /list-apps
+    # proves the server is up and serving graph_qa; it says nothing about whether
+    # the agent can reach a model, which is the SECOND failure the item exists to
+    # tell apart from the first. Added here rather than inside the agent because
+    # this launcher is already the place both halves are in scope (see the
+    # redaction note above), and because an agent that can answer has, by
+    # definition, already got past the thing being checked.
+    app.add_api_route(PROVIDER_PROBE_PATH, _provider_probe, methods=["GET"])
+    return app
+
+
+async def _provider_probe() -> dict[str, object]:
+    return provider_check()
 
 
 def main() -> int:

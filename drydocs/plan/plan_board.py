@@ -31,7 +31,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from drydocs_core.backlog_store import DEFAULT_BACKLOG_DIR, derive_summary, load_backlog_document
+from drydocs_core.backlog_store import (
+    DEFAULT_BACKLOG_DIR,
+    HOLD_FIELD,
+    derive_summary,
+    load_backlog_document,
+)
 from drydocs_core.repo_paths import repo_root
 
 # Resolve the checkout the CALLER is in, not the one this file was installed from —
@@ -79,6 +84,10 @@ class WorkItem:
     depends_on: tuple[str, ...] = ()
     acceptance: str = ""
     notes: str = ""
+    #: The blessed hold (Y7): ``{since, reason[, by, until]}`` or None. Carried whole so
+    #: the card can show the text; whether it HOLDS is derive_summary's call, not this
+    #: renderer's.
+    hold: dict[str, Any] | None = None
 
 
 @dataclass(frozen=True)
@@ -156,6 +165,7 @@ def backlog_from_dict(doc: dict[str, Any]) -> Backlog:
                 depends_on=tuple(str(d) for d in deps),
                 acceptance=str(raw.get("acceptance", "")),
                 notes=str(raw.get("notes", "") or ""),
+                hold=dict(raw[HOLD_FIELD]) if isinstance(raw.get(HOLD_FIELD), dict) else None,
             )
         )
 
@@ -176,14 +186,10 @@ def _phase_progress(phase: Phase, items: tuple[WorkItem, ...]) -> tuple[int, int
 
 
 def _ready_ids(items: tuple[WorkItem, ...]) -> frozenset[str]:
-    by_id = {it.id: it for it in items}
-    ready = set()
-    for it in items:
-        if it.status == "todo" and all(
-            dep in by_id and by_id[dep].status == "done" for dep in it.depends_on
-        ):
-            ready.add(it.id)
-    return frozenset(ready)
+    # ONE rule (Y7 c): this renderer used to carry its own copy of the readiness test,
+    # which is how a hold could be honoured by one surface and not another. The strip,
+    # the card accent and the validator's derived list all read derive_summary.
+    return frozenset(derive_summary({"items": [_item_dict(it) for it in items]})["next_ready"])
 
 
 def _chip(label: str, value: str) -> str:
@@ -215,6 +221,24 @@ def _render_item_card(item: WorkItem, ready_ids: frozenset[str]) -> str:
     classes = "card"
     if item.id in ready_ids:
         classes += " ready"
+    # HELD is rendered, never dropped (Y7 d): the badge sits in the card head and the
+    # hold text is OUTSIDE the collapsed detail, because an item that left the ready list
+    # with its reason folded away is the defect this field exists to fix.
+    held_badge = ""
+    hold_html = ""
+    if item.hold is not None:
+        classes += " held"
+        held_badge = '<span class="hold-badge">HELD</span>'
+        who = f" by {_esc(item.hold['by'])}" if item.hold.get("by") else ""
+        until = (
+            f' <span class="hold-until">until {_esc(item.hold["until"])}</span>'
+            if item.hold.get("until")
+            else ""
+        )
+        hold_html = (
+            f'<p class="hold"><strong>Hold</strong> (since {_esc(item.hold.get("since", ""))}{who}):'
+            f'{until} {_esc(item.hold.get("reason", ""))}</p>'
+        )
     dep_links = " ".join(
         f'<a class="dep-link" href="#card-{_esc(dep)}" data-target="card-{_esc(dep)}">'
         f"{_esc(dep)}</a>"
@@ -247,10 +271,11 @@ def _render_item_card(item: WorkItem, ready_ids: frozenset[str]) -> str:
         f'data-search="{_esc((item.id + " " + item.title).lower())}" '
         'tabindex="0">'
         f'<div class="card-head"><span class="card-id">{_esc(item.id)}</span>'
-        f'<span class="card-title">{_esc(item.title)}</span></div>'
+        f'{held_badge}<span class="card-title">{_esc(item.title)}</span></div>'
         f'<div class="chips">{chips}</div>'
         f"{epic_html}"
         f"{deps_html}"
+        f"{hold_html}"
         '<div class="detail">'
         f'<p class="acceptance"><strong>Acceptance:</strong> {_esc(item.acceptance)}</p>'
         f"{notes_html}"
@@ -317,6 +342,11 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 .count{background:#e5e7eb;border-radius:10px;padding:0 .5rem;font-size:.78rem}
 .ready-strip{margin:.6rem 0;padding:.5rem .8rem;border:1px dashed #a7f3d0;border-radius:8px;background:#f0fdf4;font-size:.85rem;line-height:1.9}
 .ready-id{text-decoration:none;margin-right:.15rem}
+.held-strip{margin:.6rem 0;padding:.5rem .8rem;border:1px dashed #fcd34d;border-radius:8px;background:#fffbeb;font-size:.85rem;line-height:1.9}
+.card.held{border-color:#d97706;box-shadow:0 0 0 1px #d97706 inset}
+.hold-badge{background:#fef3c7;color:#92400e;border:1px solid #d97706;border-radius:4px;padding:0 .35rem;font-size:.7rem;font-weight:600;letter-spacing:.02em}
+.hold{margin:.35rem 0 0;padding:.35rem .5rem;background:#fffbeb;border-left:3px solid #d97706;font-size:.8rem;white-space:pre-wrap}
+.hold-until{font-style:italic;color:#92400e}
 .column-body{padding:.5rem;display:flex;flex-direction:column;gap:.5rem}
 .card{border:1px solid #e2e2e2;border-radius:6px;padding:.5rem .6rem;background:#fff;cursor:pointer;
   font-size:.85rem}
@@ -354,7 +384,12 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 
 
 def _item_dict(it: WorkItem) -> dict[str, Any]:
-    return {"id": it.id, "status": it.status, "depends_on": list(it.depends_on)}
+    return {
+        "id": it.id,
+        "status": it.status,
+        "depends_on": list(it.depends_on),
+        HOLD_FIELD: it.hold,
+    }
 
 
 def render_board(backlog: Backlog) -> str:
@@ -380,10 +415,19 @@ def render_board(backlog: Backlog) -> str:
     summary = derive_summary({"items": [_item_dict(it) for it in backlog.items]})
     ready_strip = (
         " ".join(
-            f'<a class="ready-id" href="#{_esc(i)}"><code>{_esc(i)}</code></a>'
+            f'<a class="ready-id" href="#card-{_esc(i)}"><code>{_esc(i)}</code></a>'
             for i in summary["next_ready"]
         )
         or "<em>nothing is dependency-ready</em>"
+    )
+    # Y7 (d): what the ready list excluded on purpose, listed beside it with the same
+    # anchors, so a hold is one click from its reason and never a silent absence.
+    held_strip = (
+        " ".join(
+            f'<a class="ready-id" href="#card-{_esc(i)}"><code>{_esc(i)}</code></a>'
+            for i in summary["held"]
+        )
+        or "<em>none</em>"
     )
 
     js = r"""
@@ -551,8 +595,12 @@ document.addEventListener("DOMContentLoaded", () => {
         '<a class="capture-link" href="ideas.html">Idea inbox &rarr;</a></p>\n'
         f'<div class="roadmap">\n{roadmap}\n</div>\n'
         f'<div class="ready-strip"><strong>Ready to pull</strong> ({len(summary["next_ready"])}; '
-        "<code>todo</code> with every <code>depends_on</code> done &mdash; derived, never stored): "
+        "<code>todo</code> with every <code>depends_on</code> done and no <code>hold:</code> "
+        "&mdash; derived, never stored): "
         f"{ready_strip}</div>\n"
+        f'<div class="held-strip"><strong>Held</strong> ({len(summary["held"])}; '
+        "a <code>hold:</code> field a human placed &mdash; the card says why): "
+        f"{held_strip}</div>\n"
         '<div class="filters">\n'
         '  <label>Module<select id="f-module"><option value="">All</option>\n'
         f"{module_opts}\n</select></label>\n"

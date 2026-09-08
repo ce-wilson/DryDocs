@@ -10,11 +10,11 @@
 # use the registry's [db] grammar; no real SIDs, servers, or data values.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
-updated: 2026-08-20
+updated: 2026-09-07
 
 id: controlm-definition-precedence
 title: "SME Gate — Control-M definition precedence: when the deftable XML export and the psgmgr replica disagree about an object, which one is the definition source of record?"
-step: "Follows controlm-q1q3-phase1 (signed 2026-07-07 — the five psgmgr extracts are confirmed and loading) and the G46/G47/G48 cmd-line resolution build (closed 2026-07-29, ruling deliberately NOT made there). Blocks: the confirmed: false on registry row controlm:deftable-xml-export, and the D9 sibling ruling stays separate (two INTERNAL tiers — a different axis of the same precedence file)."
+step: "Follows controlm-q1q3-phase1 (signed 2026-07-07 — the five psgmgr extracts are confirmed and loading) and the G46/G47/G48 cmd-line resolution build (closed 2026-07-29, ruling deliberately NOT made there). Blocks: the confirmed: false on registry row controlm:deftable-xml-export, and the D9 sibling ruling stays separate (two INTERNAL tiers — a different axis of the same precedence file). POSTSCRIPT 2026-09-07: D9 is FOLDED HERE as section D (user ruling) — one SME sitting on one file; the axis is still a different one, which is why it is its own section and not a clause of A."
 summary: >
   Two feeds now describe the same Control-M definitions: the psgmgr CM_ replica
   (per-table rows, confirmed and loading since controlm-q1q3-phase1) and the
@@ -84,3 +84,9 @@ sections:
       - "C2: registry row controlm:deftable-xml-export flips confirmed only as this ruling admits it, and its authority: SOR claim is amended to match the ruling if the candidate is rejected. [confirm / amend]"
       - "C3 [T16 second path]: if the XML becomes the standing definition feed, the CM_DEF_VJOB_DETAIL retirement note (RETIREMENT_NOTE in drydocs/cmdline_staging.py; port tracker row T16 / step 49g) gains its second retirement path — the staging stand-in dies EITHER when a real job-detail table exists OR when the XML feed supersedes the need. Ruled here, recorded there by whoever next rolls the ledger — this page never edits the port ledger. [confirm / amend]"
       - "C4: safe to transcribe this ruling into config/gate-log.md; gates.json and the enforcement surfaces regenerate from the record. [confirm]"
+  - title: "D. Rider (D9, folded 2026-09-07) — the INTERNAL tier is two levels, not one: which internal standard wins when they disagree"
+    confirmations:
+      - "D1 [the chain]: config/precedence.yaml's single internal tier (tier 2) is expressed as two levels — the platform-team standard refining the vendor baseline, and the support-group standard refining the platform team's (the SME's own framing, Idea-64: Vendor -> Company/Platform team -> Lower support group; the refines: frontmatter chain under knowledge/standards is the evidence). [accept / amend / reject]"
+      - "D2 [conflict-wins]: where the two internal standards disagree — folder grammar, position-6 meaning, whether the app code carries the SEAL — the candidate is that the more specific level (support group) wins for the objects it governs and the platform-team standard wins elsewhere; the SME accepts or names a different rule. The file records the winner and aliases the loser; nothing is improvised in a loader. [accept / amend]"
+      - "D3 [position 6]: the publishable folder-naming standard's 'frequency = legacy' claim for position 6 is verified against both source standards BEFORE this session and corrected or annotated per-standard if still wrong; the session records which reading each standard takes. [confirm]"
+      - "D4 [edition reading]: the two internal levels are read against the edition axis (gate ontology-domain-registry-and-edition-grain, SIGNED 2026-09-02): a standard the base owns versus one an edition refines has the same shape as platform team versus support group, so the ruling says whether the two internal levels ARE the base/edition split or sit beside it. [ruled / deferred]"

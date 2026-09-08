@@ -1,0 +1,50 @@
+id: LIN3
+epic: doc-infrastructure
+title: "Console feedback resolves to nothing because no loader writes :DocSection rows for a console.* origin - close the graph side of the O89 loop"
+type: task
+module: drydocs-lineage
+phase: 10
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- docs/restructure/backlog/items/O89.yaml
+- docs/restructure/backlog/items/L17.yaml
+- web/captures/capture-manifest.json
+acceptance: |
+  O89 keys console feedback (console.<route>-revN.yaml) on content-derived anchors shared
+  by the screen and paper halves, and the feedback loader reports the unresolved case rather
+  than inventing rows - so it degrades honestly. But no loader writes :DocSection rows for a
+  console.* origin, so console feedback loads and resolves to nothing: the graph side of the
+  L5/L6 loop is open.
+
+  (a) THREE DECISIONS ARE MADE AND WRITTEN DOWN BEFORE ANY LOADER CHANGE, because each one is
+      a contract other work will key on: the origin string (console.<route-slug> is the
+      proposal); what a console SECTION is (the anchored block, identified by its anchor); and
+      which surface is the source of the row list.
+  (b) The row list comes from a TRACKED source. web/captures/capture-manifest.json is
+      machine-local and untracked, so it cannot be the source of a committed loader's input -
+      the committed route table is. Say so in the item's close note with the reason, because
+      the manifest is the obvious-looking wrong answer.
+  (c) The docs/lineage loader emits :DocSection rows for console routes the way it does for
+      design-doc sections, and a console feedback file's anchors then RESOLVE - proven on the
+      bundled sample, not on a machine (J18).
+  (d) Nothing here invents a relationship TYPE. If the loop turns out to need an edge the
+      vocabulary does not already carry, that is an ontology decision and goes through the HITL
+      gate (docs/restructure/03-hitl-sme-flow.md); the mapping stays planned until confirmed,
+      and this item stops at the node rows and the existing edge.
+  (e) The honest-degradation behaviour survives: an anchor that does not resolve is still
+      reported, never invented.
+notes: |
+  Minted 2026-09-07 from IDEAS.md Idea-271 (Lane B close report, laptop, 2026-09-06,
+  hand-back lineage).
+
+  FILED doc-infrastructure / phase 10 (the L-series feedback loop, following L17 which is the
+  loader half of the same loop) with module drydocs-lineage per the entry. The runner-up was
+  lineage-chain / phase 6; the loop, not the lineage chain, is what this closes.
+
+  Clause (d) is the groom's, and it is the reason this item is not a pure build: an
+  origin-string and section-identity decision is a contract, but it is not edge SEMANTICS - if
+  it turns into one, the gate owns it.

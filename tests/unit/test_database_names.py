@@ -31,6 +31,7 @@ from __future__ import annotations
 
 import ast
 import re
+import subprocess
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -64,6 +65,87 @@ SUPERSEDED_NAMES: frozenset[str] = frozenset(
     }
 )
 
+#: OPERATOR DOCS scanned for the same drift (G127). The package scan above never
+#: looked at prose outside .py files, so when the G32/G102 fold retired two
+#: databases the guarded surfaces followed and nine unguarded ones did not --
+#: G114 measured 18 offending lines across four of these five files while the
+#: suite stayed green. This is the clause that stops it recurring; the sweep
+#: alone would have been a one-off.
+#:
+#: OPERATOR DOCS ONLY, AND DELIBERATELY NOT HISTORY (G127 clause e). A line that
+#: was true when it was written stays -- changelogs, item notes, gate records and
+#: the port archive are dated records, and rewriting them to satisfy a guard would
+#: make the record false to protect a test. Do not widen this list into them. What
+#: belongs here is a document somebody READS TO OPERATE THE SYSTEM, where a dead
+#: database name is an instruction to do the wrong thing.
+#:
+#: Each entry carries its reason, and each must EXIST -- the same idiom
+#: test_runbook_currency.py's EXTRA_DOCS uses, and for the same reason: a doc
+#: renamed out from under the list would otherwise drop out of coverage silently.
+SCANNED_DOCS: dict[str, str] = {
+    "drydocs_core/schema/provisioning/README.md": (
+        "the provisioning procedure itself -- it explains which databases the topology "
+        "creates, so a retired name here is read as a database to expect"
+    ),
+    "docs/design/drydocs-startup-refresh-runbook.md": (
+        "the graph runbook: the document an operator follows from OFF to READY, and the "
+        "one that enumerates the topology by name"
+    ),
+    "docs/design/drydocs-core-runbook.md": (
+        "the drydocs-core module runbook -- it points at the canonical topology list and "
+        "has gone stale by copying it once already"
+    ),
+    "docs/design/drydocs-project-review.md": (
+        "the architecture narrative newcomers read first; it described the retired "
+        "ddcontext in the present tense until G127"
+    ),
+    "internal/repo-README.md": (
+        "the runnable-pipeline overview CLAUDE.md sends people to. Internal, so it never "
+        "publishes -- and still an operator doc, which is what decides its membership here"
+    ),
+}
+
+#: SCANNED_DOCS entries under a NEVER-PORT zone. This file is canonical-producer,
+#: so it runs on the company tree too -- where `internal/` cannot exist, because
+#: never-port is what `internal/` MEANS (PORT-MANIFEST.yaml; component_map calls it
+#: the publish-boundary twin). Without this map the entry below would fail there and
+#: read as BROKEN when it means NOT HERE, which is J63's shape and is not
+#: hypothetical: the company's 2026-09-03 apply hit exactly this in
+#: test_runbook_currency.py and emptied that file's EXTRA_DOCS as a "divergence",
+#: losing three routing docs from coverage. Same idiom, same reason, deliberately
+#: not a new one.
+#:
+#: The rule is two-sided, so a producer that MOVES the file still fails: when the
+#: zone has no tracked content here, the entry is skipped by name; when it does, the
+#: document must exist.
+NEVER_PORT_ZONE_OF: dict[str, str] = {
+    "internal/repo-README.md": "internal",
+}
+
+
+def _zone_has_tracked_content(zone: str) -> bool:
+    """TRACKED content, not a directory probe -- `is_dir()` answers "present" for a
+    zone holding only gitignored working state, which is how the same question was
+    got wrong once already (test_runbook_currency.py's note). Only git can answer it."""
+    try:
+        out = subprocess.run(
+            ["git", "ls-files", "--", zone],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            check=True,
+        ).stdout
+    except (OSError, subprocess.CalledProcessError):  # pragma: no cover - no git here
+        return (REPO_ROOT / zone).is_dir()
+    return bool(out.strip())
+
+
+def _absent_never_port_zone(rel: str) -> bool:
+    zone = NEVER_PORT_ZONE_OF.get(rel)
+    return zone is not None and not _zone_has_tracked_content(zone)
+
+
 #: A line may name a superseded database ONLY if it says so. This is the escape hatch
 #: for supersession notes and history, and it is deliberately the *only* one — you can
 #: mention the old name, but you have to admit it is old. ("retire" joined at X2 —
@@ -90,6 +172,39 @@ def _python_files() -> list[Path]:
         if root.is_dir():
             files.extend(p for p in root.rglob("*.py") if ".venv" not in p.parts)
     return files
+
+
+def _doc_files() -> list[Path]:
+    """The declared operator docs to scan on THIS tree.
+
+    A never-port zone that did not cross drops out by name; anything else that is
+    missing is a separate, loud failure (see the test below), so the scan never
+    silently shrinks.
+    """
+    return [
+        REPO_ROOT / rel
+        for rel in SCANNED_DOCS
+        if not _absent_never_port_zone(rel) and (REPO_ROOT / rel).is_file()
+    ]
+
+
+def _superseded_lines(paths: list[Path]) -> list[str]:
+    """``path:lineno: names superseded database 'x'`` for every un-escaped line.
+
+    One implementation for both surfaces (G127): the .py scan and the operator-doc
+    scan differ only in which files they are handed. A second copy of this loop is
+    how the two would come to disagree about what the escape wording is.
+    """
+    offenders: list[str] = []
+    for path in paths:
+        for lineno, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            if _ALLOWED_IN_LINE.search(line):
+                continue
+            for stale in SUPERSEDED_NAMES:
+                if stale in line:
+                    rel = path.relative_to(REPO_ROOT).as_posix()
+                    offenders.append(f"{rel}:{lineno}: names superseded database {stale!r}")
+    return offenders
 
 
 def _names_a_database(identifier: str) -> bool:
@@ -147,15 +262,7 @@ def test_no_source_file_names_a_superseded_database() -> None:
     so prose is in scope. The only way past this test is to say the name is
     superseded, which is exactly the sentence a reader needs anyway.
     """
-    offenders: list[str] = []
-    for path in _python_files():
-        for lineno, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
-            if _ALLOWED_IN_LINE.search(line):
-                continue
-            for stale in SUPERSEDED_NAMES:
-                if stale in line:
-                    rel = path.relative_to(REPO_ROOT)
-                    offenders.append(f"{rel}:{lineno}: names superseded database {stale!r}")
+    offenders = _superseded_lines(_python_files())
     assert not offenders, (
         "source names a database that no longer exists (say 'superseded' on the line if "
         "the mention is deliberately historical):\n" + "\n".join(offenders)
@@ -250,3 +357,57 @@ def test_superseded_names_are_really_superseded() -> None:
         f"provisioning creates {sorted(overlap)}, which this test calls superseded — "
         "one of the two is wrong"
     )
+
+
+def test_no_operator_doc_names_a_superseded_database() -> None:
+    """G127: the same rule, on the documents an operator actually follows.
+
+    A dead database name in a runbook is worse than one in a docstring: the
+    docstring misleads the next reader of that module, the runbook misleads
+    somebody typing commands. The escape is identical -- say on the line that the
+    name is retired, superseded, renamed or historical -- and saying so is the
+    sentence a reader needed anyway.
+    """
+    offenders = _superseded_lines(_doc_files())
+    assert not offenders, (
+        "an operator doc names a database that no longer exists (say 'retired' or "
+        "'superseded' on the line if the mention is deliberately historical):\n"
+        + "\n".join(offenders)
+    )
+
+
+def test_every_scanned_doc_exists_and_carries_a_reason() -> None:
+    """A path that moved would drop out of the scan in silence, which is the exact
+    failure mode this guard was extended to close -- so absence is a failure, not a
+    skip. The reason is required for the same purpose it serves in EXTRA_DOCS: it
+    tells the next person whether their document belongs on the list."""
+    for rel, why in SCANNED_DOCS.items():
+        assert _absent_never_port_zone(rel) or (REPO_ROOT / rel).is_file(), (
+            f"SCANNED_DOCS names {rel!r}, which does not exist -- it moved, and this "
+            "list is what keeps it in coverage. Re-path it rather than deleting the row."
+        )
+        assert len(why) > 30, f"SCANNED_DOCS[{rel!r}] needs a reason, not {why!r}"
+
+
+def test_the_never_port_zone_map_does_not_drift_from_what_it_joins() -> None:
+    """A skip list that stops matching stops skipping, silently. Every key is a
+    SCANNED_DOCS entry and lies under its own zone; and here -- the producer -- both
+    zones are present, so the documents must be too."""
+    for rel, zone in NEVER_PORT_ZONE_OF.items():
+        assert rel in SCANNED_DOCS, f"{rel!r} is in NEVER_PORT_ZONE_OF but not SCANNED_DOCS"
+        assert rel.startswith(zone + "/"), f"{rel!r} does not lie under its zone {zone!r}"
+        if _zone_has_tracked_content(zone):  # the producer tree
+            assert (REPO_ROOT / rel).is_file(), f"zone {zone!r} is here, so {rel!r} must be"
+
+
+def test_the_doc_scan_reads_the_files_it_claims_to() -> None:
+    """Instrument check (J76). An empty file list passes the scan vacuously, and
+    that is precisely the state this guard was in before G127 -- green, and looking
+    at nothing."""
+    paths = _doc_files()
+    expected = [rel for rel in SCANNED_DOCS if not _absent_never_port_zone(rel)]
+    assert len(paths) == len(expected), "a declared doc is missing from the scan"
+    assert any("startup-refresh-runbook" in p.name for p in paths)
+    assert (
+        sum(len(p.read_text(encoding="utf-8").splitlines()) for p in paths) > 1000
+    ), "the declared operator docs read as fewer than 1000 lines in total"

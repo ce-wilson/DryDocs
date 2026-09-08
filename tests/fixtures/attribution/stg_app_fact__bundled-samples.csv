@@ -1,3 +1,16 @@
 app_fact_sk,run_id,data_center,folder_id,job_id,fact_type,fact_value,environment,source_var
 1,sample-run,P12,161014,3,SEAL,70002,P,%%SEAL
 2,sample-run,P12,161014,5,SEAL,70002,P,%%SEAL
+3,sample-run,P12,161015,22,SEAL,70011,P,%%SEAL
+4,sample-run,P12,161015,23,SEAL,70011,P,%%SEAL
+5,sample-run,P12,161015,24,SEAL,70011,P,%%SEAL
+6,sample-run,P12,161015,25,SEAL,70011,P,%%SEAL
+7,sample-run,P12,161015,12,SEAL,70011,P,%%SEAL
+8,sample-run,P14,161016,22,SEAL,70011,P,%%SEAL
+9,sample-run,P14,161016,21,SEAL,70011,P,%%SEAL
+10,sample-run,P14,161016,13,SEAL,70011,P,%%SEAL
+11,sample-run,P12,160500,1,SEAL,70021,P,%%SEAL
+12,sample-run,P12,160500,2,SEAL,70021,P,%%SEAL
+13,sample-run,P12,160501,11,SEAL,70022,P,%%SEAL
+14,sample-run,P12,160501,12,SEAL,70022,P,%%SEAL
+15,sample-run,P33,162001,1,SEAL,70031,P,%%SEAL

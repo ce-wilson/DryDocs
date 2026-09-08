@@ -3,6 +3,7 @@
 ```yaml
 status: ACCEPTED        # drafted under WEB10 clause (a) and RULED option C by the user, both 2026-09-06 (desktop)
 date: 2026-09-06
+amended: 2026-09-08   # one Consequences bullet corrected, Decision clause 4 added, one Revisit trigger added - after fix/agent-origin-403 (f74d6d0c); the review note that proposed it retired with the amendment
 authored_by: the WEB10 draft, from the 2026-09-05 web module review finding S3 (docs/reviews/modules/web-2026-09-05.md)
 deciders: [chad.wilson]
 layer: cross-cutting    # the console (drydocs-web), drydocs-api and the agent tier (agents/) share one origin or do not
@@ -13,7 +14,9 @@ relates_to:
   - web/src/lib/auth.ts                        # apiBaseUrl(): the ONE definition of the API base (WEB12 collapsed 16 files to it)
   - web/src/lib/reachability.ts                # O85: the probe that tells "blocked origin" from "down" - the cost of cross-origin, in code
   - drydocs_api/app.py                         # create_app(): the CORS allowlist and DRYDOCS_CORS_ORIGINS
-  - agents/serve.py                            # --allow_origins: the SECOND allowlist, for the agent server
+  - agents/serve.py                            # --allow_origins: the SECOND allowlist, for the agent server (removed at the build; ADK's own same-origin check stays, clause 4)
+  - deploy/render_proxy_config.mjs             # the production proxy: clears Origin at every proxied prefix (clause 4)
+  - web/vite.config.ts                         # the dev and preview proxy: removes Origin on proxyReq (clause 4)
   - web/playwright.config.ts                   # the O80 suite: three dedicated ports, one of them an origin the allowlist must learn
 backlog: [WEB10, O72, WEB12]
 ```
@@ -131,13 +134,39 @@ path map; the upstreams are unchanged.
      behind the proxy" — a status code, not a TypeError, which is the diagnosis the
      probe existed to approximate.
 
-4. **A production bundle inlines NO deployment coordinate.** The invariant, guarded
+4. **The proxy owns the REQUEST it presents, not only the path map** (amended
+   2026-09-08). Same-origin holds at the browser: the page calls `/api` and `/agent` on
+   its own origin. It did not hold at the upstream, because both proxies rewrote `Host`
+   to the upstream and forwarded the browser's `Origin` untouched, so the ADK server
+   received `Origin: <the page's origin>` against a `Host` of its own port and read the
+   request as cross-origin — which, at that hop, it is. ADK installs its origin check
+   unconditionally; with no `--allow_origins` the check is not off, it is SAME-ORIGIN
+   ONLY (an `Origin`, when present, must equal the request's own scheme and host, plus
+   a loopback guard when the server is bound to loopback), so every console Ask
+   answered `403 Forbidden: origin not allowed` while `/api` — drydocs-api has no origin
+   check of its own — kept working. The ruling: **the request the proxy hands an
+   upstream carries NO `Origin`.** The production proxy sets `proxy_set_header Origin ""`
+   at every proxied prefix (`deploy/render_proxy_config.mjs`) and the Vite dev/preview
+   proxy removes the header on `proxyReq` (`web/vite.config.ts`), so dev and the Compose
+   stack present the same request and the upstream sees what the topology promises:
+   a same-origin call. What this is NOT: no `--allow_origins` on the ADK (that restores
+   the allowlist this ADR retired and the drift `test_console_delivery.py` exists to
+   prevent), no change to the topology, and no security downgrade claim — the CSRF and
+   DNS-rebinding signal ADK read from `Origin` was never the upstream's to read in this
+   shape, because the upstreams are not published; the proxy is the trust boundary
+   (clause 1, the proxy service of clause 8, and 0005's "SSO-terminable" front), and a browser-level guard
+   against a foreign page still applies at the proxy's own origin, where the browser
+   enforces it. Guarded by
+   `tests/unit/test_console_delivery.py::test_the_nginx_renderer_clears_origin_on_every_proxied_prefix`
+   and `::test_the_vite_proxy_removes_the_origin_header`.
+
+5. **A production bundle inlines NO deployment coordinate.** The invariant, guarded
    in CI beside `bundle:check`: the built `dist/` contains no `localhost:` and no
    absolute `http(s)://` service URL. The `VITE_*` variables that survive are the
    ones 0005 already scoped to the dev bench — the bolt adapter's URI/user/database
    and `VITE_DEV_CONSOLE_SECRET` — all baked out by `import.meta.env.DEV`.
 
-5. **Non-secret deployment settings that vary by environment are served at runtime.**
+6. **Non-secret deployment settings that vary by environment are served at runtime.**
    The one that exists today is the O39 runtime-view link template, a company
    hostname currently inlined at build. It moves to `GET /api/config` — a small,
    unauthenticated, non-secret JSON the console reads at boot — read by the API from
@@ -146,14 +175,14 @@ path map; the upstreams are unchanged.
    render, exactly as today. This is the `/config` endpoint clause (a) names; it
    carries the values that need it, and the API base is not one of them.
 
-6. **The agent resolves the API from its OWN environment.** The 0019 control part
+7. **The agent resolves the API from its OWN environment.** The 0019 control part
    carries `api_url` so the agent can register ephemeral specs against the API that
    issued the session. A relative base (`/api`) cannot be forwarded to a different
    process, so the console stops sending `api_url`; `agents/common/ephemeral_client.py`
    already reads `DRYDOCS_API_URL` and falls back to its default, and that becomes the
    only path. Server-to-server URLs are the server's configuration, not the browser's.
 
-7. **O72's Compose stack is where the shape is first exercised, and it is where the
+8. **O72's Compose stack is where the shape is first exercised, and it is where the
    proxy lives.** O72 composes the runbook's processes; this ADR adds the proxy as the
    fourth service (Neo4j stays optional) and makes the console a STATIC directory the
    proxy serves, so the Vite dev server is a dev-bench process and not part of the
@@ -163,7 +192,7 @@ path map; the upstreams are unchanged.
    `flush_interval -1`). The runbook's Startup gains the one-command path and keeps
    the per-process one, as O72 already says.
 
-8. **What this ADR does NOT rule.** TLS, certificates and the SSO integration at the
+9. **What this ADR does NOT rule.** TLS, certificates and the SSO integration at the
    proxy are company-side configuration on the shape (0005 Evidence); a Dockerfile for
    the API; any change to the API's route space or to the ADK server; and the O72
    health checks, which O72 owns. It also does not rule the choice between one proxy
@@ -248,8 +277,13 @@ already did.
 ## Consequences
 
 - **Easier:** one `npm run build` for every environment; `web/dist/` becomes an artifact
-  that something consumes; the API and agent servers lose their origin configuration
-  entirely; the e2e harness loses one of its three port stories; the O85 probe's
+  that something consumes; drydocs-api loses its origin configuration entirely, and
+  the agent server loses its `--allow_origins` flag while keeping ADK's own same-origin
+  check, which with no allowlist is STRICTER than none — so the proxy, not the
+  upstream, is what must never present a foreign origin (clause 4; amended
+  2026-09-08, this bullet had said both servers lost origin handling entirely, which
+  stated the opposite of the defect as a benefit); the e2e harness loses one of its
+  three port stories; the O85 probe's
   hardest branch (the one that had to say "likely" because it could not prove a
   diagnosis) is retired rather than made more careful.
 - **Harder:** the dev bench gains a process when run as the deployable stack (O72), and
@@ -262,7 +296,12 @@ already did.
   is injected and the API's `/login` becomes the dev-bench path; this ADR's topology is
   what that configuration is applied to. If a second console (the Team Edition
   instances, ADR 0015) needs a different path map, clause 1's single declaration is
-  what changes.
+  what changes. And (amended 2026-09-08) the day an upstream is PUBLISHED directly —
+  reachable by a browser other than through this proxy — clause 4's cleared `Origin`
+  stops being safe for that upstream, because the proxy is no longer the only trust
+  boundary in front of it; that upstream then needs a real allowlist, and the fix is
+  revisited rather than the ADR reworded. If a reader disagrees that the proxy is the
+  right boundary for the CSRF signal at all, that is a gate question, not an edit.
 
 ## Action items (the build — WEB10 clauses (b)–(d); after the ruling)
 

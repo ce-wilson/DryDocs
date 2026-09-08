@@ -1,0 +1,114 @@
+id: CFG3
+epic: release-infrastructure
+title: "precedence.schema.json and relationship-vocabulary.schema.json accept any stray key - close them at the top level"
+type: chore
+module: config
+phase: 8
+agent: main
+model: haiku
+priority: p3
+status: done
+depends_on: []
+inputs:
+- config/schemas/precedence.schema.json
+- config/schemas/relationship-vocabulary.schema.json
+- config/schemas/data-centers.schema.json
+acceptance: |
+  precedence.schema.json and relationship-vocabulary.schema.json have no top-level
+  additionalProperties: false, so either accepts any stray key silently. Three sibling family
+  schemas (data-centers, domains, editions) are closed at the top level, and that closure is
+  what settled the identity-header profile split (J58); these two are the open ones left.
+
+  (a) Both schemas are closed at the top level - one line each.
+  (b) Before closing: check that nothing in the tree already relies on a stray key. If something
+      does, the key is either declared or removed, and the item says which.
+  (c) The existing validation over both config files still passes, and a deliberately stray key
+      now FAILS - proven, not asserted.
+notes: |
+  Minted 2026-09-07 from IDEAS.md Idea-263 (Lane B close report, laptop, 2026-09-05, J58).
+
+  The files are under config/schemas/ (verified on this tree); the entry names them by bare
+  filename.
+
+  haiku: two lines and a check, with the existing closed schemas as the pattern to copy.
+
+  -- CLOSED 2026-09-07, Lane B (laptop), branch wip/CFG3-laptop from main at c74b2ad0 --
+
+  ALL THREE CLAUSES MET, and clause (b) -- "check that nothing already relies on a stray
+  key" -- earned its place: it found something in EACH file, and both findings changed what
+  clause (a) had to be.
+
+  -- FINDING ONE: precedence.yaml carries an undeclared key, and it is the identity header --
+
+  `classification` is live at the top level of config/precedence.yaml and was declared by no
+  schema. Closing the schema without declaring it would have failed the very file the schema
+  governs. So it is DECLARED (with the three-level enum the J23 collapse left, matching
+  identity-header.schema.json) rather than removed -- the header is required on this file
+  class and removing it would break a different guard.
+
+  That is the whole argument for closing a schema, arriving in one key: an open schema
+  accepts a real key and a misspelled one in exactly the same silence, so nobody learns
+  which they typed. `source` is declared too, optional, so the header profile stays
+  satisfiable on a file that names no upstream extract.
+
+  -- FINDING TWO: the second schema was already closed where the item says to close it --
+
+  relationship-vocabulary.schema.json is a `oneOf` over three fragment shapes, and its
+  MAPPING branch already carried `additionalProperties: false`. The top-level closure the
+  item asks for was a no-op there, and doing only that would have delivered nothing for this
+  file while reporting the item done.
+
+  The hole is one level down: `local_relationship`, the ENTRY, accepted any key. That is
+  where the keys that matter live -- a misspelled `superseded_by` on a deprecated
+  relationship passed in silence, and the id is the join key across the taxonomy-ontology
+  map, the generated schema_graph.cypher, the SQLite mirror and the append-only gate log.
+
+  Closing it required declaring SIX keys the live fragments use and no schema named:
+  deprecated_at, deprecation_note, superseded_by (the G87 add-new + deprecate-old trio),
+  skos_maps_to and sosa_maps_to (standards mappings sitting beside the already-declared
+  prov_maps_to), and join_key. Every one was found by scanning the fragments; none was
+  invented to make validation pass, and a test asserts exactly that -- if a fragment stops
+  using one, the declaration is reported rather than left as something nobody can account
+  for.
+
+  `deprecated_at` is deliberately left UNTYPED: a bare YAML date parses to a Python date
+  object, not a string, and this family's validator does not normalize dates the way the
+  identity-header guard does. It is the same treatment `updated` already gets in the sibling
+  family schemas, and typing it `string` would have failed eight live fragments.
+
+  -- (c) PROVEN, INCLUDING THE PROOF ITSELF --
+
+  Each closed schema is shown to ACCEPT a valid minimal document and REFUSE a realistic typo
+  (`conflict_polcy`, `supersed_by`) -- both halves in one test, because a schema that
+  refuses everything would also refuse the stray key and would look like a pass.
+
+  Then the closures were removed, one at a time, and the tests confirmed RED both times.
+  `additionalProperties: false` is one line, and one line is exactly what gets dropped in a
+  merge without anyone noticing; a test that would still pass without it is not a guard.
+
+  -- STILL OPEN, NAMED RATHER THAN SWEPT IN --
+
+  precedence.schema.json's `conflict_policy` is `type: object` with no properties (live
+  keys: winner, loser_disposition, never, require_sme_confirmation), and its `order[]` items
+  accept extra keys (no strays live today -- surveyed). Both are the same defect one level
+  down. CFG3's acceptance is scoped to the top level, and widening it would be the puller's
+  call rather than mine; the survey is done, so whoever takes it starts from a list and not
+  from a scan.
+
+  -- HANDED BACK TO LANE A --
+
+  1. NO NEW TRACKED PATHS: two schemas edited, one test file extended. No manifest row, no
+     ledger movement, no generated artifact.
+  2. THE `conflict_policy` / `order[]` FOLLOW-UP above, if it is worth an idea. It is the
+     same one-line fix each, and the live keys are listed here so it needs no re-survey.
+  3. NOTHING GATE-BOUND WAS TOUCHED. The relationship-vocabulary schema is SHAPE only (S6);
+     activation semantics live in the accessor and its writers, and this change adds no
+     enum, no status and no rule about what an entry MEANS.
+
+  VERIFIED on this laptop (J18): full unit suite 3561 passed / 14 skipped / 0 failed, ruff
+  check and ruff format --check clean. Both closures mutation-checked by removal. No web
+  build -- this item touches no TypeScript.
+
+  EXPECTED RED, per the Lane B handoff: test_committed_roadmap_page_matches_its_sources
+  fails on this close commit -- a close writes notes and Lane B does not render (Y5's
+  tolerance covers a CLAIM, not a close). Lane A renders once at merge.

@@ -221,7 +221,16 @@ def sse_body(events: list[dict[str, Any]]) -> str:
     return "".join(f"data: {json.dumps(e)}\n\n" for e in events)
 
 
-def create_stub_adk(registrar: EphemeralRegistrar | None = None):
+#: The O63 provider-probe path, mirroring agents/serve.PROVIDER_PROBE_PATH. Kept
+#: as a literal rather than imported: agents/ is a separate venv this interpreter
+#: cannot import, and tests/unit/test_service_probe.py asserts the two agree.
+PROVIDER_PROBE_PATH = "/drydocs-health"
+
+
+def create_stub_adk(
+    registrar: EphemeralRegistrar | None = None,
+    provider_detail: str | None = None,
+):
     """The stub app. Import is deferred so this module is importable without
     the optional ``api`` dependency group installed."""
     from fastapi import FastAPI, Request
@@ -232,6 +241,15 @@ def create_stub_adk(registrar: EphemeralRegistrar | None = None):
     @app.get("/list-apps")
     def list_apps() -> list[str]:
         return [STUB_APP]
+
+    # O63: the provider probe agents/serve.py adds to the real ADK app. The stub
+    # serves it for the same reason it serves the rest of this contract - it is
+    # what the BROWSER depends on, and the console's ladder cannot be tested
+    # against a route that only exists in a venv this interpreter does not have.
+    # `provider_detail` is the ProviderConfigError text to report; None = configured.
+    @app.get(PROVIDER_PROBE_PATH)
+    def provider_probe() -> dict[str, Any]:
+        return {"configured": provider_detail is None, "detail": provider_detail}
 
     @app.post("/apps/{app_name}/users/{user_id}/sessions/{session_id}")
     def create_session(app_name: str, user_id: str, session_id: str) -> dict[str, Any]:

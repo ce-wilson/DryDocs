@@ -124,9 +124,12 @@ PAT_PRODUCT_MAPPING_COLUMNS = (
     "sponsored_area_product_id",
 )
 
-#: logical field -> raw report header. SEE "HEADER BASIS" above: only the four
-#: marked PINNED are SME-confirmed spellings; the rest are transcribed beliefs
-#: that the first real run confirms or overrides via --header-map.
+#: logical field -> raw report header. SEE "HEADER BASIS" above. Every spelling
+#: here is a MEASURED column of the live 43-column export (census closed
+#: 2026-08-29; re-confirmed 2026-09-07 against the SME's transposed header sheet,
+#: K30 close note) — except `jira_board_id`, which names a column of a SIBLING
+#: export (ACKNOWLEDGED_ABSENT). A re-export that moves a spelling is re-pinned
+#: via --header-map and corrected here, saying which spelling it replaced.
 DEFAULT_HEADER_MAP: dict[str, str] = {
     "team_id": "Team ID",
     "team_name": "Team Name",
@@ -315,6 +318,20 @@ def project_rows(
 ) -> tuple[list[dict[str, str]], list[dict[str, str]], ProjectionReport]:
     """The projection proper — pure, so a test can drive it without files."""
     hmap = header_map or dict(DEFAULT_HEADER_MAP)
+    # EXACT STRING MEMBERSHIP, AND IT MUST STAY EXACT (CORE5 (e), 2026-09-07).
+    # The temptation, whenever a spelling moves, is to find the column by the
+    # shape of its VALUES instead — "the column full of 5-digit numbers is the
+    # SEAL column". That is unsafe in this report specifically: `Team ID` is a
+    # dense integer surrogate key whose values are SEAL-shaped, and it is the
+    # FIRST column of the 43, while `Seal IDs` is 42 columns later. A
+    # shape-matching discovery picks the wrong one every single time, silently,
+    # and writes team ids as application ids on the ACTIVE arch_develops edge.
+    # It is the same trap as `Team Type Name` (the discipline decoy that must
+    # never reach team_type) one layer down: that one decoys on MEANING, this one
+    # on SHAPE. A moved spelling is re-pinned with --header-map and the ledger
+    # corrected — never inferred from the data.
+    # Pinned by test_pat_projection.py::
+    #   test_the_seal_column_is_found_by_name_and_the_shape_decoy_never_wins
     present = set(raw_headers)
     missing_required = [f for f in REQUIRED_FIELDS if hmap[f] not in present]
     if missing_required:

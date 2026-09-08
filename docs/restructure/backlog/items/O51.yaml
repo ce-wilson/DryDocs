@@ -8,7 +8,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: done
 depends_on:
 - O46
 - O50
@@ -20,3 +20,156 @@ acceptance: |
   Per-SME quality signals derive from intake records the store already holds — no new data entry: submissions in a rolling window, auto-accept rate (agent candidates accepted with zero modification), too-fast rate (confirm faster than a floor scaled to evidence size), and admin-return rate. Limits live in config/review-quality.yaml (admin-editable via the AdminConfig surface, versioned, unit-guarded). Crossing a limit FLAGS the SME on the admin queue's quality rail with the metric that tripped (Meter + StatusChip); the ADMIN — never the machine — can block the persona from submitting: drafts survive, the block records who/when/why, and unblock requires a note. No auto-block exists in any code path. The admin-only per-user panel (submissions, auto-accept rate, return rate, median review time) uses the StatTiles/Meter patterns. The store keeps PER-DECISION detail (accepted/modified fields, durations), not just rollups — the future confirmation-weight trust model needs it.
 notes: |
   Slice 7 (plan §8). User requirement 2026-08-06: recalled as a backlog item ranking auto-acceptance from a QA-testing session — searched backlog/IDEAS/gates/git history, never captured (closest neighbors: R8 answer-evaluation, FB-04 agent test), so the intake plan §8 + this item are now the requirement's home. Measure-then-decide posture throughout: thresholds are tripwires, the human is the judge.
+
+  -- CLOSED 2026-09-07, Lane B (laptop), branch wip/O51-laptop from main at 4b6ea02d --
+
+  MET, with ONE METRIC DECLARED UNAVAILABLE rather than invented. Detail below, and the
+  unavailable one is the first thing because it is the decision the rest hangs on.
+
+  -- AUTO-ACCEPT HAS NO SOURCE, AND IS NULL RATHER THAN ZERO --
+
+  "Agent candidates accepted with zero modification" needs the candidate-binding set to
+  compare a confirmation against. That set is the intake plan's section 4 and lands with
+  O48; the O46 store has no column for it, which is the same seam O50 found from the other
+  side and reported as NO_PROPOSED_BINDINGS.
+
+  So the metric is `None`, at every layer, with `auto_accept_unavailable_because` carrying
+  the reason beside it -- and it CANNOT trip a flag. A zero here would be the worst
+  available default: 0% auto-accept reads as a reviewer who modifies every candidate, which
+  is the best possible score, manufactured out of no data (O56). The panel prints the
+  sentence rather than an em-dash, because a bare dash reads as a display bug. Guarded three
+  ways: the summarizer never emits an auto_accept flag, the console's FLAGGABLE_METRICS list
+  excludes it (that list is where someone would first put it back), and ratePercent is
+  tested to keep null and 0 apart.
+
+  -- NO NEW DATA ENTRY TURNED OUT TO BE LITERAL --
+
+  Every transition already writes an `event` row (intake_id, at, actor, action) and every
+  upload an `evidence` row with its byte size. So submissions, too-fast and admin-return
+  needed NO schema change at all: they are a different question asked of rows the store has
+  kept since O46. The only new table is `persona_block`, which is the decision, not a
+  measurement.
+
+  PER-DECISION DETAIL, as the clause asks, comes out of that: `Decision` carries the intake,
+  the persona, the from-status, the hand-over moment, the measured review seconds, the
+  evidence bytes, this record's own floor, and whether an admin later returned it. Durations
+  are DERIVED rather than stored, which is stronger than storing them -- a stored duration
+  can disagree with the timestamps it came from. `modified_fields` exists and is empty
+  everywhere: the O48-shaped hole, with a place already made for it.
+
+  -- WHAT "REVIEW TIME" MEANS -- A RULING, AND THE ONE MOST WORTH OVERTURNING --
+
+  The floor is compared against the time the reviewer had the record IN FRONT OF THEM, which
+  starts at the last hand-over: the most recent evidence upload or admin return before the
+  submit, whichever is later. The obvious implementation -- time since the previous event --
+  is wrong in both directions: an admin's return three days ago makes every re-confirm look
+  slow, and a re-upload makes a careful review look instant. Stated in the module docstring
+  and asserted by a test that names the reasoning, so it can be overturned somewhere visible.
+
+  THE FLOOR SCALES WITH EVIDENCE and then stops:
+  floor = min(min_review_seconds + seconds_per_kb * KB, max_review_seconds). The cap is not
+  tidiness -- an uncapped floor would make every large record "too fast" forever, since
+  nobody reads a 10 MB attachment line by line.
+
+  UNKNOWN IS NOT FAST. A decision with no hand-over moment (an intake predating the event
+  log) has no measurable review time and is not counted as a violation. Otherwise the first
+  run would flag people for the deployment date.
+
+  -- LIMITS FLAG. A PERSON BLOCKS. --
+
+  config/review-quality.yaml holds window, floor and three rate limits, is schema-validated
+  and loaded per request (an edited threshold takes effect on the next refresh, not the next
+  restart). It holds NOTHING that could act, and a test asserts that absence rather than
+  trusting it.
+
+  ONE KEY BEYOND THE PLAN'S FOUR: `min_decisions_for_flag`. Below it, rates are REPORTED and
+  nothing is FLAGGED -- one return out of two submissions is a 50% return rate and is not
+  evidence about a person. Suppressing a flag is not the same as hiding data, so the panel
+  shows the numbers and says why they carry no flag. The plan's four keys are all present;
+  this is the fifth, and it is the one that keeps the feature from being unfair on its first
+  day. `too_fast_rate_max` is likewise named here though the plan lists only
+  `min_review_seconds`: a signal with no limit cannot flag anything.
+
+  THE SEPARATION IS STRUCTURAL AND ASSERTED BY READING CODE:
+  * review_quality.py imports nothing from intake and calls neither block function -- it
+    cannot block anyone because it cannot reach the code that does;
+  * exactly two handlers reach the block, and both declare `AdminUser`, which IS the check
+    -- read off app.py's AST;
+  * outside intake.py and app.py, no module in drydocs_api calls either function.
+  The AST walk skips nested scopes on purpose: every route is defined inside `create_app`,
+  so a plain `ast.walk` reported the factory as a referencing handler, and the factory takes
+  no AdminUser. That guard carries its own positive control -- the FIRST version looked for
+  `ast.Call` and found nothing at all, because the functions are passed to `_intake_call` as
+  values. It would have passed on any tree. Caught by CORE2's habit, one lane earlier.
+
+  THE BLOCK STOPS SUBMITTING, NOT WORKING. Enforced at `to == "sme-confirmed"` and nowhere
+  else, so drafts, evidence uploads and every transition below it still run. Both paths into
+  that status are guarded -- guarding only `correlated ->` would leave the returned-record
+  path open, which is the path a flagged reviewer is most likely to be on. The refusal names
+  who blocked them, when, and why, and says the drafts are unaffected.
+
+  APPEND-ONLY: an unblock CLOSES the row with its note rather than deleting it. A judgment
+  about a person that can be erased is not a record, and the pair (why it was placed, what
+  changed) is the whole of what makes it reviewable. Both the reason and the unblock note
+  are required; a second open block on one persona is refused rather than stacked.
+
+  -- THE SURFACE --
+
+  Three components, all UNBOUND (reviewer quality is not a registry module), and the split
+  is the separation made physical: QualityRail flags and selects, ReviewerQualityPanel holds
+  the block behind a required reason, ReviewQualityTab is the only one that fetches. The
+  rail has no block control at all. Numbers first, then flags with their limits, then the
+  block last -- a block button above the numbers would invite the decision before the
+  reading.
+
+  ORDERED BY PERSONA ID, never worst-first, on both sides of the wire. The plan's words are
+  "coaching and triage, not a leaderboard", and a list sorted by the worst number is a
+  leaderboard whatever the heading says. Asserted in both suites.
+
+  THE CONSOLE HOLDS NO COPY OF THE THRESHOLDS. Every limit arrives in the payload beside the
+  metric it applies to, so a console can never disagree with the server about what "too
+  fast" means.
+
+  -- WHAT WAS NOT BUILT, and why --
+
+  NO CONFIG EDITOR. The acceptance says the limits are "admin-editable via the AdminConfig
+  surface". That surface is READ-ONLY today -- it renders panels and grids and has no write
+  path to any config file -- and building the console's first config-editing surface inside
+  a reviewer-quality item would be a much larger decision than this item is. The file is the
+  seam the admin edits, in git, versioned and reviewable, which is what the plan's own
+  parenthesis says ("versioned in git like every config"). Flagged rather than assumed: if
+  the intent was a real editor, it is a follow-up item and a bigger one.
+
+  -- HANDED BACK TO LANE A --
+
+  1. TWO GENERATED ARTIFACTS RIDE WITH THIS ITEM and neither is a render_board.py output:
+     web/src/generated/openapi.json (scripts/dump_openapi.py) and api.d.ts
+     (`cd web && npm run api:types`), because three routes were added. Export
+     DRYDOCS_DATA_ROOT before the first (API3, this same lane, is why it no longer truncates
+     the file when you forget).
+  2. web/src/generated/enforcement-matrix.json IS refreshed on this branch, deliberately and
+     as the ONE exception to Lane B not rendering: config/review-quality.yaml needs a surface
+     row, and without the regenerated matrix FIVE tests go red instead of the one expected
+     roadmap guard -- including the worktree-render test, whose failure message would point
+     at the config file rather than at the lane protocol. docs/plan/* is untouched.
+  3. LEDGER: ui-components component (24) -> (26) and route (25) -> (26), pin (42, 103) ->
+     (42, 106), with the narrative paragraph added. No ui-tests case: AdminConfigRoute is
+     unbound to a registry module, so there is no suite for one to join -- the same gap R8
+     and O50 both recorded, and the same ledger-policy fix.
+  4. NO PORT-MANIFEST ROW NEEDED. Checked, not assumed: config/review-quality.yaml and
+     config/schemas/review-quality.schema.json resolve to the `config/**` canonical-producer
+     row, the three .tsx to `web/**`, and drydocs_api/review_quality.py to the
+     `drydocs_api/**` default_ok entry.
+  5. THE REVIEW-TIME RULING (hand-over, not previous event) and MIN_DECISIONS_FOR_FLAG are
+     the two judgments in this item that a reader might have made differently. Both are
+     visible: one in a docstring with its test, one in the config with its comment.
+
+  VERIFIED on this laptop (J18): full unit suite 3585 passed / 15 skipped / 0 failed, ruff
+  check and ruff format --check clean, tsc -b --force clean, oxlint 0, 476 vitest passing
+  (43 files), vite build and bundle:check green earlier in the lane and unaffected by this
+  item's size. No live graph -- nothing here touches Neo4j, which is the intake module's
+  standing rule and this item inherits it unchanged.
+
+  EXPECTED RED, per the Lane B handoff: test_committed_roadmap_page_matches_its_sources
+  fails on this close commit -- a close writes notes and Lane B does not render (Y5's
+  tolerance covers a CLAIM, not a close). Lane A renders once at merge.

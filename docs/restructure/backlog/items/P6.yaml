@@ -8,7 +8,7 @@ phase: 13
 agent: main
 model: opus
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs/loaders/sql/ddl/controlm_staging_ddl.sql
@@ -30,3 +30,26 @@ notes: |
   The hard rule applies here in the open direction: clause (c) says the identity change goes through the gate. Nothing about folder or job identity is settled by this item.
 
   p1 because it blocks a load the user has already directed. opus because the reading of the result decides whether a constraint migration is owed.
+
+  DONE 2026-09-07 (desktop, Lane A; probe user-run on the psgmgr replica in SQL Developer,
+  2026-09-07, agent transcribed - the P1 arrangement). Probe file:
+  drydocs/loaders/sql/adhoc/probe_dc_table_id_collision.sql (committed 2026-09-06). Results,
+  counts only, as reported by the user:
+    P6.0  data_centers = 24, folder_rows = 76,753, distinct_table_ids = 76,743
+    P6.1  colliding_table_ids = 0, max_dc_per_id = 0
+    P6.2  same_name_mirrors = null, different_folders = null (no colliding ids, so the
+          inner set is empty; the nulls are the SUM over zero rows, not a failure)
+    P6.3  jobs_under_colliding_ids = 0
+  P6.0 is the denominator that makes P6.1 mean something: the replica holds 24 data centers,
+  so a zero is a real zero and not the one-data-center trivial case the probe header warns
+  about. VERDICT: clause (b), ZERO ROWS. The invariant is documented beside the constraint
+  that relies on it - the item lists drydocs_core/schema/controlm_folders.cypher, which does
+  not exist; the constraint is controlmfolder_id in drydocs_core/schema/constraints.cypher and
+  the note sits there, naming the probe, the venue and the date. No identity change is owed;
+  the (DATA_CENTER, TABLE_ID) staging key stays as the defensive choice it was. Multi-data-
+  center loads are safe to run on this point (clause d). One observation OUTSIDE this item's
+  question, inboxed as Idea-274: folder_rows exceeds distinct_table_ids by 10 while zero ids
+  span two data centers, so ten TABLE_ID values appear more than once WITHIN one data center -
+  the composite (DATA_CENTER, TABLE_ID) staging key would reject those rows, and what a
+  duplicate row in CM_DEF_VTAB means (a version, a deleted-and-recreated folder, a view
+  artifact) has not been asked.

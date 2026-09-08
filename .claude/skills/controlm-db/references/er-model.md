@@ -65,6 +65,15 @@ via a composite key: `(JOBNO, IF_NO, DO_NO, ROWORDER)`.
 | `CMS_SYSPRM` | `(JOBNO, ROWORDER, DO_NO, IF_NO)` | system / step parameters | `SYSTYPE`, `SYSOPT`, `SYSPRM` |
 | `CMS_CMNPRM` | `(COMPUTER, OPSYS, VERSION, CMVERSION)` | **common/config parameters** (see Config group) | server-wide config |
 
+**`CYCLIC` vs `CYCLIC_TYPE` — two columns, one trap (2026-09-02).** `CYCLIC` (`Y`/`N`) says WHETHER a
+job is cyclic. `CYCLIC_TYPE` says HOW a cyclic run repeats — `INTERVAL` / `INTERVAL_SEQUENCE` /
+`SPECIFIC_TIMES` per `external/orchestration/bmc-controlm/controlm-ctmdeffolder-utility.md` (Parameter
+Reference, GROUNDED); its companions are `RUN_TIMES` and `INTERVAL_SEQUENCE`. In the replica the
+column carries single letters (`C`, `S`), and a company-side census found `C` concentrated on the
+`*_DLY` folders and `S` on the `*_CYC` folders — the opposite of what "C for cyclic" predicts. Read
+the letter as a cycle type, never as a job type; the letter-to-enum map is unverified. The case:
+`.claude/skills/research-probe-discipline/evals/files/cyclic-type-trap.md`.
+
 ---
 
 ## §GRP-SECURITY — Security Definitions (CMS_)

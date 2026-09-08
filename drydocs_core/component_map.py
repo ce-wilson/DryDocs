@@ -286,6 +286,10 @@ NON_PYTHON_MODULES: frozenset[str] = frozenset(
 #: not repeated here.
 SURFACE_OWNERS: dict[str, str] = {
     "web": "drydocs-web",
+    # O72: the Compose stack's Dockerfiles and proxy renderer. Owned by
+    # drydocs-web because the stack exists to serve the console — the API and
+    # agent images are there as its upstreams, the way ADR 0020 has them.
+    "deploy": "drydocs-web",
     "agents": "drydocs-agents",
     "libs": "drydocs-libs",
     "graph-tests": "drydocs-review",  # graph_verify reads the TC suites; review's acceptance data

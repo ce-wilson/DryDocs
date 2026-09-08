@@ -20,6 +20,9 @@ import type { MapDimension } from '../../components/map/LocationMap'
 // fetch. Named in the item, and worth stating that it is NOT the authorization
 // rule above — /explorer is open to every role, and so is this tab.
 const LocationMap = lazy(() => import('../../components/map/LocationMap'))
+// Z6 rides the same delivery boundary for the same reason: it carries the world
+// outline too, and a reader who never opens the tab should not pay for it.
+const RuntimeSpanPanel = lazy(() => import('../../components/map/RuntimeSpanPanel'))
 import NodeInspector from '../../explorer/NodeInspector'
 import {
   APP_CODES_FRAME,
@@ -128,15 +131,15 @@ export default function ExplorerRoute({ persona }: { persona: Persona }) {
             fallback={<DataFrame cols={FOLDERS_FRAME.cols} rows={FOLDERS_FRAME.rows} {...frameProps} />}
           />
         ),
-        // O81 surface 2: the application neighbourhood, drawn from the same
+        // O81 surface 2: the application neighborhood, drawn from the same
         // reviewed spec the Folders tab tables — folder → application, folder →
-        // data centre. The :Port hop the spec traverses is deliberately NOT
+        // data center. The :Port hop the spec traverses is deliberately NOT
         // drawn: the rows carry no port identity, so a port node would be one
         // the console invented (see nvl-mapping.ts).
-        'App neighbourhood': (
+        'App neighborhood': (
           <SpecGraphPane
             specId="explorer.folder-applications.v1"
-            title="Application neighbourhood · folder → application · folder → data centre"
+            title="Application neighborhood · folder → application · folder → data center"
             selected={canvasNode}
             onSelect={setCanvasNode}
           />
@@ -168,6 +171,15 @@ export default function ExplorerRoute({ persona }: { persona: Persona }) {
           // chunk arrives. Here, only the panel says it is loading.
           <Suspense fallback={<EmptyState title="Loading the map…" hint="Fetching the world outline." />}>
             <LocationMap access={access} dimensions={LOCATION_DIMENSIONS} placeNoun="data centers" />
+          </Suspense>
+        ),
+        // Z6: the same map core, one axis added — a job's run window read
+        // against the world clock. Its own tab rather than a mode inside
+        // Locations, because the question is different: Locations answers
+        // "where", this answers "when, and what time is that there".
+        'Runtime clock': (
+          <Suspense fallback={<EmptyState title="Loading the map…" hint="Fetching the world outline." />}>
+            <RuntimeSpanPanel />
           </Suspense>
         ),
       }}

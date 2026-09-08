@@ -7,7 +7,7 @@ phase: 10
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: done
 depends_on:
 - V1
 inputs:
@@ -15,4 +15,71 @@ inputs:
 - docs/design/templates/runbook.outline.yaml
 acceptance: |
   docs/design/drydocs-remediation-runbook.md (outline-conformant, rendered, stale-render-clean), drydocs-remediation off RUNBOOK_PENDING. Covers: the two-tier fix model, running the R1 detector, the transform engine's before/after artifacts, corroboration, and the SoD boundary (we analyze, dev implements) at the Jira handoff. Mechanism-only — real instances stay internal/.
-notes: Groomed 2026-07-29 (Epic V).
+notes: |
+  Groomed 2026-07-29 (Epic V).
+
+  CLOSED 2026-09-07 (laptop / NewThinkpad, Lane B, branch wip/v7-laptop; queue item 6 of
+  docs/lane-b-handoff.md). Every acceptance element done.
+
+  DELIVERED: docs/design/drydocs-remediation-runbook.md, Rev 1 at commit d0de5cd9, all nine
+  required outline anchors plus appendices, rendered to the single .html in the same commit
+  and stale-render-clean. drydocs-remediation is OFF RUNBOOK_PENDING and has a
+  RUNBOOK_DISPOSITION row - both edits were required, not just the removal: the coverage
+  guard asserts every runbook on disk is dispositioned, and a module in two states or none
+  is the contradiction the census exists to refuse.
+
+  THE DOCUMENT'S ONE AWKWARD FACT, stated rather than smoothed over, because it shapes the
+  whole Refresh section: drydocs-remediation has EXACTLY ONE registered CLI verb
+  (`profile-folder-set`). Detect, transform, prove, corroborate and hand off are a library
+  API. So the recurring procedure is written as Python calls with the real function names,
+  and the runbook says plainly that this is the truth rather than implying a verb that does
+  not exist. That would have been the easier document and the wrong one - a runbook whose
+  commands do not exist is discovered by the first person who runs it.
+
+  EVERY NUMBER IN THE VERIFY SECTION WAS MEASURED, not transcribed from the source, and the
+  procedure is reproducible in any clone with no graph and no company data (J18). The whole
+  chain was driven end to end over the TRACKED synthetic fixture
+  tests/fixtures/remediation/synthetic-legacy-transcript.yaml: 1 folder / 1 job parsed;
+  detect_all -> 5 findings (registry R1 x1, registry R32 x4); propose_greenfield with one
+  ratified and one unratified rule -> applied the first, skipped_unratified names the
+  second; prove_equivalence -> equivalent True, 1 compared, 1 proven, 0 not_proven;
+  reconcile_variables -> consistent, 1 checked; run_remediation_batch coverage ->
+  objects_examined 2, objects_changed 0, findings_ratified 0, findings_unratified 5,
+  skipped {'unratified (governance skip)': 1}. That last readout is the governance rule
+  visible in output rather than asserted in prose, which is why it is in the doc.
+
+  Using the fixture is the L29 lesson applied one item later: there is NO synthetic
+  Control-M XML export fixture in this tree, so `profile-folder-set` has no example a
+  reader can run. Rather than write an unrunnable command and move on, Startup step 3 gives
+  the transcript-fixture path and says the rest of the procedure is identical after it -
+  which is what makes the batch rehearsable at all. The missing XML export fixture is
+  reported below rather than invented here.
+
+  THE FOUR ACCEPTANCE TOPICS, each with where it landed: the two-tier fix model and the
+  status ladder open Purpose & scope, because an operator has to know "only ratified rules
+  may change a definition" BEFORE running anything, not after; registry R1 is run in
+  Refresh step 2 and its count appears in Verify; the transform engine's before/after
+  artifacts are Refresh step 4 (xml_io byte-splicing, changedoc's excerpt) with the reason
+  no DOM serializer may take that step; corroboration is Refresh step 6 with ReadOnlyGraph;
+  and the SoD boundary is stated twice on purpose - once as a rule in Purpose & scope and
+  once as the fact that the rendered handoff carries it on its face ("Requested by:
+  Production Support (analysis pre-validated; implementation only)").
+
+  MECHANISM-ONLY HELD. No real definition, job name, rule value or registry content is
+  quoted; the registry is cited by path and never excerpted. Classification Internal-Public,
+  and test_classification.py is green with the new file in the tree.
+
+  REM1'S CONVENTION PRE-ADOPTED (the next item in this lane): every registry rule id is
+  written "registry R1" / "registry R32" on first use, so REM1's sweep finds this document
+  already conformant instead of editing a page published an hour earlier.
+
+  Gates: full suite 3637 passed / 14 skipped / 18 deselected; the outline, runbook-coverage
+  and classification guards 35 passed; `ruff check .` and `ruff format --check .` clean. The
+  new tracked paths need no PORT-MANIFEST row - `docs/design/**` is already a manifest entry
+  (line 1347), checked before writing rather than after the guard went red.
+
+  ONE THING REPORTED, NOT FIXED (Lane A / a future item): there is no synthetic Control-M
+  XML export fixture, so the module's only CLI verb cannot be demonstrated in a clone and
+  the XmlDefinitionFormat path is exercised only by unit tests with inline strings. A small
+  synthetic export directory would make Startup step 2 runnable and give the xml_io
+  byte-splice path a fixture of its own. It is a fixture-authoring item, not this runbook's.

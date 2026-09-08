@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on:
 - Z5
 inputs:
@@ -18,3 +18,130 @@ acceptance: |
   Reusing the Z5 map core: for a selected folder or job, its runtime span (start to end) renders across a global time-zone map, and the display converts to the viewing browser's local time zone (read from the browser, never hardcoded). Spans that cross midnight or span zones render without truncation. Runtime data comes from the temporal sources already ruled (the cm_avg_run dataset family) where available; where a folder has no explicit time, the Control-M DC-name default-time semantics (e.g. T032-E0700-DMA = default 07:00 EST) may seed the span ONLY if labeled as a default, never presented as an observed runtime.
 notes: |
   User directive 2026-08-08. This is where the two meanings of "DC" earn their keep in one view: the SCHEDULING default time comes from the Control-M DC name, the PHYSICAL place from the Z1 export — the map shows both without conflating them.
+  ── CLOSED 2026-09-06, Lane B (laptop), branch wip/Z6-laptop from main at df97514d ──
+
+  Explorer grows a "Runtime clock" tab: the Z5 map core with one axis added, a span
+  of CLOCK drawn across it. Its own tab rather than a mode inside Locations, because
+  the question is different — Locations answers "where", this answers "when, and
+  what time is that there".
+
+  BOTH GRAINS, as the acceptance names them. A job's span is its own average run
+  (avg_start_time + avg_run_time); a FOLDER's is the window_start/window_end rollup,
+  which the P4 contract defines as min member start .. max member end — an EXTENT,
+  never a sum. Folder grain deliberately does NOT pass the job columns: a member's
+  avg_start_time standing in for the folder would answer a different question under
+  a label that says otherwise. A test pins that a folder with two timed members
+  still reports the folder window.
+
+  THE TWO DCs STAY APART ON THE SCREEN, not only on the wire. `map.runtime-spans.v1`
+  returns `scheduling_dc` (the Control-M server name — the T032-E0700-DMA
+  default-run-time grammar) and `data_center` (the :DataCenter the host physically
+  resolves to) as two columns, and the panel renders them as two boxes under labels
+  that say which kind each is. Naming only one would be conflation BY OMISSION: a
+  reader who sees "DEFAULT from the DC name" beside a single data center reasonably
+  concludes that is the data center the name came from. Gate
+  server-location-ontology B4, which the Z2 acceptance requires by name. When the
+  host never resolved, the physical box says so rather than borrowing the
+  scheduling name.
+
+  THE DEFAULT IS LABELLED A DEFAULT, which is the clause the item exists to
+  protect. `spanFor` picks its source in patch_window.py's own order — job-level
+  observation, then folder window, then the DC default — and returns the source as
+  a FIELD, so a caller cannot obtain a span without obtaining what it came from.
+  The default-seeded bar carries a different colour AND a sentence saying the bar's
+  LENGTH means nothing: the E#### segment carries a start and no duration, so the
+  60 minutes drawn is an assumption stated in one named constant. A job with none
+  of the three reports "no runtime to draw" and draws no bar, because an invented
+  span is a worse answer than none.
+
+  NOTHING IS TRUNCATED AT MIDNIGHT. Spans come back as per-day SEGMENTS, so a run
+  from 22:00 to 04:00 is two bars of one span and the widths still total the whole
+  run. A bar clipped at the right edge of the day would read as a two-hour job that
+  ends at midnight — the acceptance forbids that by name, and the test asserts the
+  arithmetic rather than the picture.
+
+  A DECISION THE ITEM DID NOT MAKE, MADE HERE AND HANDED BACK.
+  knowledge/standards/technology/data-center-naming-convention.md says "all times
+  normalize to EST" and its own OPEN ITEM 4 is "Confirm E is always Eastern (SME
+  stated all times are EST)". The console has to read that as something. It reads
+  it as the IANA zone America/New_York and NOT a fixed UTC−5, because a Control-M
+  start time is a WALL CLOCK at the data center and a wall clock says 07:00 in July
+  as well as in January. The two readings differ by an hour for eight months of the
+  year. A test pins that January and July disagree, which is the whole reason for
+  the choice, and the surface prints the claim with its open item attached.
+
+  THE HOUR BANDS ARE SOLAR, NOT POLITICAL, and the footer says so. Real zones follow
+  borders — Spain keeps Berlin's clock while sitting on Greenwich's meridian, and a
+  test asserts exactly that disagreement. The gazetteer holds coordinates and no
+  zone ids, so a political zone would be one the console invented. The VIEWER's
+  conversion is not an approximation: that one goes through Intl with the browser's
+  real zone.
+
+  TWO THINGS THE BUILD FOUND.
+
+  * THE VIEWER ZONE HAD TO BECOME A PROP. `viewerZone()` reads Intl, and Intl
+    answers with the MACHINE's zone — this laptop is America/Chicago. The first
+    test run asserted UTC and failed; a version that had passed here would have
+    failed in CI looking like a bug in the conversion rather than in the test.
+    Default is the browser; production never passes it.
+  * A TEST THAT PASSED FOR THE WRONG REASON. The first "two DCs stay apart" test
+    asserted the two names never appeared adjacent — and passed because NEITHER was
+    rendered. Caught on review, replaced with positive assertions (both present,
+    each under its own label, neither under the other's). This is the J76 shape at
+    the test end: the instrument reported clean because it was measuring nothing.
+
+  GET /data-centers is new and is a CONFIG read, authenticated unlike /config
+  because the reader prefers the machine-local internal twin (J13). It cannot be a
+  QuerySpec: the short↔long pairing is a DECLARED fact in YAML, declared rather
+  than derived because BMC defines no format for a data-center name, and it is the
+  only route to the E#### seed. Its payload carries `source`, so the panel can say
+  which venue the rows came from — a default time shown without that would make a
+  producer-side sample read as a statement about production. The registry's
+  DECLARED default_time is preferred over re-parsing the long name: a declaration
+  beats a derivation, and the file may record a default for a name we would not
+  parse.
+
+  WHAT WAS NOT OBSERVED, said plainly. The producer graph carries no P4 supplement
+  properties — that loader is company-side only (patch_window.py's own header) —
+  so no job on this side has an observed runtime to render. Everything here was
+  driven through vitest over an injected spec result and an injected viewer zone.
+  The observed branch is exercised by fixture and not by data. TC-EXPLORER-02's
+  `source` says this rather than implying a browser run.
+
+  HANDED BACK TO LANE A.
+
+  1. MERGE ORDER AND THE THREE-WAY RESOLUTION. wip/O63-laptop, wip/O50-laptop and
+     wip/Z6-laptop all branch from near-identical bases and edit the same ledger
+     lines. Merge O63, then O50, then Z6, and resolve to:
+       `# --- component (24) ---`, `# --- ask (4) ---`,
+       test_ui_components pin `(42, 103)`, automated share `21/45`.
+     The O50 and Z6 narrative paragraphs must be RENUMBERED once O63's sits above
+     them — three paragraphs each claiming `97 -> 99` would be a false record.
+  2. DO NOT MERGE THE GENERATED API FILES TEXTUALLY. `web/src/generated/openapi.json`
+     and `api.d.ts` are touched by O63 (/graph-status) and Z6 (/data-centers). After
+     the merges, re-run `poetry run python scripts/dump_openapi.py` (needs
+     DRYDOCS_DATA_ROOT set) and `npm run api:types` in web/, and commit what they
+     write. `CONSOLE_ROUTES`, the `driven` set and the new test functions in
+     test_response_models.py are additive at the same anchors — a normal conflict,
+     keep all sides.
+  3. THE ZONE READING IS INPUT TO AN OPEN GATE ITEM, not just a UI caveat. The
+     naming-convention standard's open item 4 ("confirm E is always Eastern") now
+     has a console reading it a specific way. Worth carrying to whoever discharges
+     that item: if the answer is a fixed offset rather than a zone, SOURCE_ZONE and
+     its claim string are the one place to change, and every summer window on this
+     map moves an hour.
+  4. `map.runtime-spans.v1` returns nulls for jobs with no timing rather than
+     dropping them, on purpose — the count of jobs the map cannot draw is an answer
+     to a real question. If a future consumer wants only drawable rows, that is a
+     parameter, not a change to the spec's WHERE.
+
+  VERIFIED on this laptop (J18): full pytest suite, ruff check + ruff format,
+  tsc -b --force, oxlint 0, vite build, 399 vitest passing (34 files),
+  bundle:check 97.5% of ceiling, test:coverage 17.62/81.17/60.55 against floors
+  9.8/70/50. No live graph: the producer graph on this machine holds no P4
+  supplement properties, so nothing here is a live-verified claim.
+
+  EXPECTED RED, per the Lane B handoff:
+  test_committed_roadmap_page_matches_its_sources fails on this commit — a close
+  writes notes and Lane B does not render (Y5's tolerance covers a CLAIM, not a
+  close). Lane A renders once at merge.

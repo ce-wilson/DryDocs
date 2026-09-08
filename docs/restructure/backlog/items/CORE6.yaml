@@ -1,0 +1,57 @@
+id: CORE6
+epic: release-infrastructure
+title: "The publish-boundary value sweep excludes non-id tokens by shape (leading zero, URL path segment) instead of allowlisting them by file, and re-sweeps the publishable tree at the full seven-digit width once"
+type: task
+module: drydocs-core
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- tests/unit/test_publish_boundary_values.py
+- drydocs_core/entity_extract.py
+- tests/unit/test_entity_extract.py
+- knowledge/upgrade-plans/servicenow-cmdb-analysis.md
+- knowledge/upgrade-plans/generic-terminology-research.md
+- docs/restructure/backlog/items/CORE5.yaml
+acceptance: |
+  CORE5 (2026-09-07) widened the publish-boundary value sweep in
+  tests/unit/test_publish_boundary_values.py to seven digits and six values in knowledge/
+  surfaced that had never been swept at that width. Each was allowlisted BY FILE with a
+  reason: five vendor doc-set asset numbers with leading zeros in
+  knowledge/upgrade-plans/servicenow-cmdb-analysis.md, and one public forum thread id that is
+  a URL path segment in knowledge/upgrade-plans/generic-terminology-research.md. Every row is
+  a correct disposition and the allowlist is the wrong instrument for the class: none of the
+  six is id-shaped, so a shape rule excludes them once where the allowlist grows a row per
+  finding, each with a true reason, until nobody reads a new row critically.
+
+  (a) The sweep gains two value-class exclusions, stated in the test beside the pattern they
+      narrow: a token with a LEADING ZERO is not an application id, and a token that is a URL
+      path segment (immediately after a slash, or inside a URL) is not one either. Each
+      exclusion has a fixture that the sweep must NOT report (a leading-zero seven-digit
+      token; a seven-digit URL slug) and there is one bare seven-digit token in prose that it
+      MUST report, so the exclusions cannot be widened into silence (J76: the instrument gets
+      a fixture at the incident's real shape).
+  (b) The six knowledge/ allowlist rows are removed. The tests/unit/test_entity_extract.py row
+      stays: a test file that MUST carry id-shaped width fixtures is a third class and is
+      per-file by nature. The remaining allowlist is short enough to read, and the test's
+      comment says which class each surviving row is.
+  (c) The publishable tree is re-swept at the full width with the exclusions in place, and the
+      close note records the count of tokens the sweep saw, excluded by shape, and reported -
+      CORE5 was the first pass ever to look at seven digits, and this item is the first to
+      look with the shape rules on.
+  (d) The four-digit end stays unswept by design (CORE5 clause c: every year would match).
+      The close note says so in one line and says what would change it (a cue rule, not a
+      wider bare pattern); it is not widened here.
+notes: |
+  Minted 2026-09-07 from IDEAS.md Idea-294 (Lane B's CORE5 close report; desktop, Lane A).
+  The mint and the inbox entries went out in e0f2b799, which carries a stale CFG5 message -
+  the files in that commit are this stub, CORE7, PORT6, PLAN9 and Idea-294..301; CFG5 itself
+  was minted earlier in 3695a044. Pushed and shared, so not amended; recorded here instead.
+
+  module drydocs-core because the guard's subject is the extractor's width belief
+  (drydocs_core/entity_extract.py, CORE5) and the guard row sits beside it. p2: the six rows
+  are correct today, so nothing is leaking; what is at risk is the allowlist's legibility at
+  the next widening.

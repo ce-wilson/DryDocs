@@ -14,7 +14,7 @@ relates_to:
   - agents/common/ephemeral_client.py          # the agent's call back to drydocs-api — agent key + owner token
   - drydocs_api/ephemeral_specs.py             # register_ephemeral(agent_key, owner_token, ...); the store keyed (owner_token, ref)
   - drydocs_api/sessions.py                    # Session(token, persona_id) — a token and nothing else identifies a session
-  - web/src/ask/askApi.ts                      # controlPart(apiToken, apiUrl) — where the credential leaves the trust boundary
+  - web/src/lib/askApi.ts                      # controlPart(apiToken, apiUrl) — where the credential leaves the trust boundary
 backlog: [WEB9]
 ```
 
@@ -22,7 +22,7 @@ backlog: [WEB9]
 
 The Ask spoke (R5) sends two message parts to the ADK `api_server` on every turn:
 the question, and a control part built by `controlPart(apiToken, apiUrl)` in
-`web/src/ask/askApi.ts`:
+`web/src/lib/askApi.ts`:
 
 ```json
 { "text": "{\"drydocs_control\": {\"api_token\": \"<the browser's drydocs-api bearer token>\", \"api_url\": \"http://localhost:8001\"}}" }
@@ -214,6 +214,6 @@ on every future audit.
 1. [x] `drydocs_api/sessions.py`: `Session.session_id` minted at issue; `resolve_by_id`; login returns it.
 2. [x] `drydocs_api/ephemeral_specs.py` + `app.py`: `owner_session` replaces `owner_token` on registration; store keyed `(session_id, ref)`; run/export map bearer → `session_id`; audit actor = `session_id`.
 3. [x] `agents/common/ephemeral_client.py` + `graph_qa/agent.py`: send `owner_session`; `control.get("session_id")`.
-4. [x] `web/src/ask/askApi.ts` + `lib/auth.ts`: store `sessionId`; `controlPart(sessionId, apiUrl)`; the request-body-has-no-token test.
+4. [x] `web/src/lib/askApi.ts` + `lib/auth.ts`: store `sessionId`; `controlPart(sessionId, apiUrl)`; the request-body-has-no-token test.
 5. [x] `graph_qa/control.py`: docstring names `session_id` as the control field; `api_token` stays in `SECRET_CONTROL_FIELDS` with a one-line reason (stale builds).
 6. [x] `dump_openapi.py --check`, `npm run api:types`; ADR 0007 decision 4 gains a one-line pointer here.

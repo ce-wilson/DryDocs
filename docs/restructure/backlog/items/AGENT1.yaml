@@ -1,0 +1,50 @@
+id: AGENT1
+epic: agentic-qa
+title: "The /ask scope selector is a router hint that filters the spec catalog, and its vendor-corpus option must not ship until a spec searches chunk text"
+type: task
+module: drydocs-agents
+phase: 15
+agent: main
+model: sonnet
+priority: p2
+status: in_progress
+depends_on: []
+inputs:
+- agents/graph_qa/pipeline.py
+- drydocs_api/query_specs.py
+- docs/restructure/backlog/items/API4.yaml
+- docs/restructure/backlog/items/O62.yaml
+acceptance: |
+  The scope dropdown in front of "Ask the knowledge graph" is a ROUTER HINT, not a second
+  retrieval path: it constrains the spec catalog the LLM router already sees. No new tier,
+  no second backend.
+
+  (a) A scope filters specs_catalog.catalog_lines() BEFORE the join into the router system
+      prompt (agents/graph_qa/pipeline.py::_route). A test shows that with a scope set, a
+      spec outside it is absent from the router prompt and cannot be chosen.
+  (b) The request envelope carries the scope and the answer reports which scope ran, so an
+      answer can be read back against the catalog it was allowed to see.
+  (c) READINESS IS PER-OPTION, and this is the finding to hold on to - the three are not
+      equally ready and shipping the control does not ship them all:
+      - knowledge graph: ready (registered specs + text2cypher).
+      - vendor corpus: NOT ready and NOT shipped under this id. It is gated on API4; a
+        control labelled "vendor corpus" over a title-and-abstract search would turn O62's
+        illusion (a full listing read as a search hit by title similarity) into a feature.
+        The option is absent from the shipped control, or present and disabled with the
+        reason stated - never present and live.
+      - general knowledge: needs a distinct R15 epistemic label before it ships, and it
+        overlaps R19's clarification tier, which already handles "the user does not know the
+        subject" by asking. R19 is checked FIRST and the item records what it found, because
+        the cheapest outcome here is that this option should not exist.
+  (d) The console control (drydocs-web) and the pipeline filter are separable: the filter and
+      envelope may land first with no UI, and the item says which half is done.
+notes: |
+  Minted 2026-09-07 from IDEAS.md Idea-279 (the UI session's eval-case review, reviewed at
+  839eab1f on feat/cyclic-type-test-case), decision D1 - agreed in session, not built.
+
+  First id in the AGENT series. module drydocs-agents (the filter and the envelope); the
+  control itself is a drydocs-web surface and is clause (d), so the two pens can move
+  independently.
+
+  depends_on stays empty on purpose: the knowledge-graph scope is buildable today and the
+  dependency is per-OPTION, carried in clause (c) rather than as a hold on the whole item.

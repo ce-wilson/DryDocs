@@ -2,13 +2,13 @@
 handoff: drydocs.lane-handoff.v1
 lane: B
 machine: laptop
-generated: 2026-09-06
-generated_at: 1f2f2a80 (main)
-queue: [WEB8, O63, O26, O50, Z6, R8]
-pens: [code:drydocs-web, code:drydocs-agents]
+generated: 2026-09-08
+generated_at: 24076bc2 (main)
+queue: [R18, AGENT1, API4, WEB18, V9]
+pens: [code:drydocs-agents, code:drydocs-api, code:drydocs-web, code:docs]
 ---
 
-# Lane B handoff — laptop, 2026-09-06
+# Lane B handoff — laptop, 2026-09-08
 
 **From:** Lane A (desktop). **To:** the Lane B session on the laptop.
 **Lifecycle:** a working handoff, not a durable record — the item files are. When
@@ -21,7 +21,7 @@ Collisions come from two sessions writing the same surface, not from two session
 existing. Your first commit message (or your `wip/` branch name) names what you hold:
 
 ```text
-pen: code:drydocs-web · code:drydocs-agents
+pen: code:drydocs-agents · code:drydocs-api · code:drydocs-web · code:docs
 ```
 
 Lane A holds: `backlog · port · adr · gates · snapshot`. Anything not declared by either lane
@@ -40,7 +40,7 @@ is the pen for a SURFACE.
 4. Per-machine facts are yours to verify: `DRYDOCS_DATA_ROOT`, `DRYDOCS_LOGDIR`, the
    `.env`, and whether Neo4j is reachable here. Venue-stamp any live claim (J18).
 
-## Your queue, in order (6 items) — claim one at a time
+## Your queue, in order (5 items) — claim one at a time
 
 Every item below is `todo` with every dependency `done` at the generating commit — the
 same rule the board's Ready strip uses (`derive_summary`). Re-check on pull: the other
@@ -49,12 +49,26 @@ since PLAN1), so two lanes minting in disjoint series cannot collide on a number
 
 | # | Id | Title | Type / prio | Module | Model | Notes from the check |
 |---|---|---|---|---|---|---|
-| 1 | **WEB8** | The typed-client guarantee has no holes - the mappings, intake and corpus routes are modelled in drydocs_api.schemas so the fifteen unwrapAs sites retire, and the ADK agent calls get a typed contract instead of raw fetch (after WEB4) | task / p2 | `drydocs-web` | sonnet | clean |
-| 2 | **O63** | Service reachability, surfaced twice from one probe: Ask diagnoses its own failure instead of printing a bare "Failed to fetch", and the admin page carries a service-status strip at the top | task / p2 | `drydocs-web` | sonnet | clean |
-| 3 | **O26** | App-to-app path runbook view: Runbooks-page tab with source/target application pickers, shortest-path TECHNICAL/DATA lanes, and a generated runbook grid citing path nodes (after O11, O17) | task / p2 | `drydocs-web` | sonnet | clean |
-| 4 | **O50** | Admin review queue for intake records: diff view, accept / return with note, and the waiting-on-gate park (after O46, O47) | requirement / p2 | `drydocs-web` | sonnet | clean |
-| 5 | **Z6** | Global time-zone runtime map: folder/job start-to-end spans across a world time-zone view, rendered in the browser's local time zone (after Z5) | task / p2 | `drydocs-web` | sonnet | clean |
-| 6 | **R8** | Answer evaluation + cap tuning: on-demand answer metrics over stored question/context/answer, agent-runs admin view, promotion feed of recurring Tier-1 Cypher into gate-reviewed permanent specs (after R3, R5) | requirement / p3 | `drydocs-agents` | sonnet | clean |
+| 1 | **R18** | Ask debug trace: opt-in verbose decision log correlated to run_id and session_id (after R3, R5) | requirement / p1 | `drydocs-agents` | sonnet | input `docs/decisions/0007-agentic-qa-architecture.md` — pen `adr` (ADRs and their index) |
+| 2 | **AGENT1** | The /ask scope selector is a router hint that filters the spec catalog, and its vendor-corpus option must not ship until a spec searches chunk text | task / p2 | `drydocs-agents` | sonnet | input `docs/restructure/backlog/items/API4.yaml` — pen `backlog` (items, epics, plan — the board's sources); input `docs/restructure/backlog/items/O62.yaml` — pen `backlog` (items, epics, plan — the board's sources) |
+| 3 | **API4** | No registered spec searches chunk text and the pipeline hardcodes chunks: 0, so the doc corpus is unreachable by term from /ask | task / p2 | `drydocs-api` | sonnet | input `docs/restructure/backlog/items/O62.yaml` — pen `backlog` (items, epics, plan — the board's sources) |
+| 4 | **WEB18** | The Explorer header puts the word Tower beside 'backs onto drydocs' with no provenance - the console half of the R22 fix, sourced from ui-concepts.yaml | task / p2 | `drydocs-web` | sonnet | input `docs/restructure/backlog/items/R22.yaml` — pen `backlog` (items, epics, plan — the board's sources) |
+| 5 | **V9** | SME runbook: drydocs-agents — ADK service venv, run, console wiring, agent smoke checks (after V1) | task / p2 | `docs` | sonnet | clean |
+
+**Flags to rule before claiming** (the script flags; the author decides):
+
+- R18: input `docs/decisions/0007-agentic-qa-architecture.md` — pen `adr` (ADRs and their index) — Lane A's pen; coordinate before editing.
+- AGENT1: input `docs/restructure/backlog/items/API4.yaml` — pen `backlog` (items, epics, plan — the board's sources) — Lane A's pen; coordinate before editing.
+- AGENT1: input `docs/restructure/backlog/items/O62.yaml` — pen `backlog` (items, epics, plan — the board's sources) — Lane A's pen; coordinate before editing.
+- API4: input `docs/restructure/backlog/items/O62.yaml` — pen `backlog` (items, epics, plan — the board's sources) — Lane A's pen; coordinate before editing.
+- WEB18: input `docs/restructure/backlog/items/R22.yaml` — pen `backlog` (items, epics, plan — the board's sources) — Lane A's pen; coordinate before editing.
+
+**Ruled by the sender (2026-09-08):** every flag above is a READ. R18 reads ADR 0007
+for the trace's contract and does not edit it - if the build finds the ADR needs a line,
+that line goes in the close report and Lane A applies it under the `adr` pen. AGENT1,
+API4 and WEB18 read API4/O62/R22 as the items they build against; the only item file a
+lane writes is the one it has claimed. None of the five needs Neo4j; R18 and AGENT1
+need the agents venv (`agents/.venv`), which the laptop has. No flag blocks a claim.
 
 ## Surfaces — who holds which pen this burst
 
@@ -78,7 +92,7 @@ the change back through the sender.
 | `gates` (this skill's addition to §0) | `config/gate-log.md` | Lane A — the signed gate record |
 | `gates` (this skill's addition to §0) | `config/crosswalks/` | Lane A — orchestrator crosswalks — gate-bound config |
 | `snapshot` (this skill's addition to §0) | `knowledge/depgraph-snapshots/` | Lane A — the session snapshot — one writer per burst |
-| Lane A's queue | the items P6, N27 and their inputs | do not claim or edit |
+| Lane A's queue | the items PORT6, PLAN5, PLAN6, J57, J75, N26 and their inputs | do not claim or edit |
 | `code:<module>` | everything an item in YOUR queue names in `inputs` | this lane, claimed per item |
 | `code:drydocs-web` | `config/taxonomy/ui-components.yaml` | this lane, with the module — the O42 ledger guard fails on any new .tsx, so every web item adds its row here (the 2026-09-05 Lane B close: five items touched it, none named it) |
 | — | `docs/plan/*.html`, `web/src/generated/**`, `docs/design/*.html` | derived renders — Lane A regenerates once at close; nobody merges them by hand (J43) |
@@ -86,7 +100,7 @@ the change back through the sender.
 **About Lane A's queue, from the same check** (for the sender to rule — this lane
 does nothing with these):
 
-- P6: status is 'in_progress', a queue lists todo items only
+- PORT6: notes say machine-local
 
 **Lane B claims status-only and never renders.** A claim is one item file, pushed;
 Y5 tolerates it un-rendered, and Lane A renders once at close. **Lane B does not

@@ -1,0 +1,45 @@
+id: CFG5
+epic: runtime-topology
+title: 'Run the controlm-folder-identity-grain gate'
+type: task
+module: config
+phase: 13
+agent: main
+model: fable
+priority: p1
+status: todo
+depends_on: []
+gates: [controlm-folder-identity-grain]
+inputs:
+- config/gate-prompts/controlm-folder-identity-grain.yaml
+- config/gate-log.md
+- docs/restructure/backlog/items/P6.yaml
+acceptance: |
+  USER-GATED START (the SME sits company-side; this item is claimed only when the user
+  opens the session). A sign-off session for gate `controlm-folder-identity-grain` is HELD
+  and its outcome recorded in config/gate-log.md as SIGNED, SME-DEFERRED with a named
+  re-arm trigger, or BLOCKED with a named blocker -- silence is the one non-outcome.
+  BEFORE the session, the stale-premise sweep (the C28/K20 moved-premise model; restate
+  honestly, never re-ask a signed clause) with one premise already moved: the page's
+  PROBE-1 (does TABLE_ID collide across data centers) IS P6, run 2026-09-07 on the live
+  replica -- zero colliding ids across all data centers, counts in P6's done-note -- so
+  §D's "PROBE-1..4 readout" is one-quarter answered and the page's §B question is narrowed
+  to a constraint WIDENING, never a data migration. PROBE-2, PROBE-3, PROBE-4 and UI-1..8
+  are still owed and are the session's precondition (counts only, venue named, J18).
+  The SME direction of 2026-09-04 (two folders of the same name on two Control-M/Servers
+  are two folders) is NOT staled by P6's zero: P6 says the current key does not merge
+  anything TODAY; the direction is about what identity MEANS, and §A still asks for it.
+  AFTER: follow-up build items minted for every change the ruling authorizes (MERGE
+  pattern, extract-side predicate, migration cypher -- §C names all three), or an explicit
+  none-needed note in the sign-off entry. The multi-data-center load stays HELD until this
+  gate signs (§E).
+notes: |
+  Minted 2026-09-07 (desktop, Lane A) by the whole-set review of the lineage-workstream
+  transcription. The gate was drafted 2026-09-04 (863c6733), is in port-base-20260905, and
+  NO item owned its run -- the exact shape the 2026-08-27 run-the-gate sweep found on
+  thirteen gates and fixed by minting D11/N19/U10/MM11; this one was drafted eight days
+  after that sweep and fell into the same gap. A company-side sweep read the gate as
+  "does not exist" because its tree was behind the base (J63); it exists, it was unowned.
+  Epic runtime-topology and module `config` follow P6 and D11: a HITL session whose output
+  is a recorded ruling, not code. p1 because it holds the multi-data-center load the user
+  has already directed.

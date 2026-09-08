@@ -370,7 +370,12 @@ has no venv of its own); compare the two failure lists as SETS (`Compare-Object`
 PowerShell, `comm -3` on sorted lists elsewhere). Identical sets close the range; a
 matching COUNT proves nothing - 16 matched 16 on the software registry with a different
 row standing in (seventeenth postscript). Name any order-dependent test that moves the
-full-run count.
+full-run count. **And name the one test the worktree itself moves:**
+`test_repo_paths.py::test_swept_defaults_resolve_inside_a_real_worktree` (J48 (b)) spends a
+real `git worktree add` and behaves differently when the baseline is ITSELF run inside a
+worktree - the company's carve-out G (2026-09-07) saw it "turn green" for that reason alone
+and correctly refused to bank it. A worktree baseline is not venue-neutral for that test:
+exclude it from the set-compare by name, or take the baseline from a plain checkout.
 
 ## Track-1 acceptance (the contract)
 
@@ -429,7 +434,12 @@ instead of eyeballing:
 # before it fails at the consumer.
 # $env:TEMP is fine for a same-day apply; a MULTI-DAY apply (the chunked workplan) should
 # point it at a directory that survives a reboot, because the before-state cannot be
-# re-taken after a slice lands.
+# re-taken after a slice lands. Put it OUTSIDE DRYDOCS_DATA_ROOT (port state inside the
+# pipeline data root is visible to zone walkers), and if you make RECONCILE_BEFORE_DIR
+# survive the reboot too - [Environment]::SetEnvironmentVariable(..., 'User') - step 4
+# below has a second line for it: a User-scope variable outlives its directory far more
+# easily than a process-scope one, and the guards FAIL on set-but-unusable, they do not
+# skip (the company found this on the 2026-09-05..07 apply; RELAY-27).
 poetry run python scripts/reconcile_before.py "$env:TEMP/reconcile-before"
 
 # 2. apply the range / resolve collisions as usual
@@ -445,8 +455,26 @@ poetry run pytest tests/unit/test_port_reconcile_guards.py -q
 # ...and the line the PORT-REPORT carries (sha, date, commits behind HEAD) - paste it verbatim:
 poetry run python scripts/reconcile_before.py --describe "$env:TEMP/reconcile-before"
 
-# 4. TEARDOWN — clear the variable and drop the snapshot. Do not skip this.
-Remove-Item Env:RECONCILE_BEFORE_DIR
+# 3b. COMPLETENESS - two instruments at the close, and neither alone (PORT6, 2026-09-08).
+# `git diff --numstat <prev-base> <base> -- <path>` answers ATTRIBUTION: "did this roll touch
+# the path" - empty means not this roll. It prints the same empty line for a path the last
+# roll FORGOT as for one it deferred, which is how two rolls closed COMPLETE with paths owed
+# (2026-09-01, 2026-09-05; found afterwards as carve-outs). The completeness check answers
+# the other question - "was it EVER applied" - by listing every path at the base tag this
+# tree does not hold, by disposition, plus every `## ` heading a union-append markdown file
+# has at the tag and lacks here (the gate-log shape). Exit 0 = every survivor is in a
+# `deferred-paths` row (the producer's, read from the port-prompt AT THE TAG; or yours,
+# --deferrals FILE) or is canonical-company (a ruling band, listed, never owed). It is
+# PRESENCE only - a path present on both sides with different content is --numstat's and
+# the J7 guards' subject, not this one's. Paste its last line into the PORT-REPORT.
+poetry run python scripts/port_completeness_check.py <base-tag> --prev <previous-base-tag>
+
+# 4. TEARDOWN — clear the variable AT EVERY SCOPE IT WAS SET, then drop the snapshot. Do
+# not skip this: skipping it is how a two-day-old before-dir produced the phantom 22nd
+# baseline failure on 2026-09-05. The second line is a no-op when the variable was never
+# set at User scope, so run both every time.
+Remove-Item Env:RECONCILE_BEFORE_DIR -ErrorAction SilentlyContinue
+[Environment]::SetEnvironmentVariable('RECONCILE_BEFORE_DIR', $null, 'User')
 Remove-Item -Recurse -Force "$env:TEMP/reconcile-before"
 ```
 
@@ -507,6 +535,7 @@ Port Report: cewilson/main -> <company>/main
 - Track-1 result: <N passed, 3 skipped, 0 failed>
 - Backlog union (J42): <paste the scripts/port_backlog_union.py block WITH its command line — the --producer-ref <tag> it ran against, producer/consumer counts, missing ids, accepted differences, PASS|FAIL>
 - Reconcile guards (J7): <paste `scripts/reconcile_before.py --describe <before-dir>` — BASE.sha, date, commits behind HEAD — and the guard run's pass/fail>
+- Completeness (PORT6): <paste the last line of `scripts/port_completeness_check.py <base> --prev <prev>` — COMPLETE / NOT COMPLETE, owed paths, heading gaps — beside the `--numstat` attribution you used; the two answer different questions>
 - Track-2 status: <ran/blocked + CM_DEF_SETVAR_VW finding>
 - State: branch ahead of <company>/main by N; NOT pushed; backup tag pre-cewilson-port
 - New divergences observed: <add to the ledger if any>

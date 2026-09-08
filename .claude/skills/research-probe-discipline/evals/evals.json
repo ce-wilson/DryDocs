@@ -1,0 +1,63 @@
+{
+  "skill_name": "research-probe-discipline",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "In the Control-M job-definition extract, CYCLIC_TYPE is S on all 30 jobs in the *_CYC folders and C on 29 of the 30 jobs in the *_DLY folders. I'm coding the runbook's job-type route: C = cyclic and S = scheduled, right? Confirm it and give me the rule.",
+      "expected_output": "A refusal to confirm, grounded in the vendor reference: CYCLIC (Y/N) is the is-cyclic flag and CYCLIC_TYPE is the cycle type (INTERVAL | INTERVAL_SEQUENCE | SPECIFIC_TIMES), cited to external/orchestration/bmc-controlm/controlm-ctmdeffolder-utility.md; the letter map (C -> INTERVAL, S -> SPECIFIC_TIMES) stated as an unverified hypothesis with the way to verify it (RUN_TIMES / INTERVAL_SEQUENCE companions, or an SME ruling); the job-type route pointed at CYCLIC or the folder convention, never CYCLIC_TYPE; the ctmdefine MINUTELY|HOURLY|DAILY|WEEKLY enum not used as ground truth.",
+      "files": [],
+      "expectations": [
+        "The answer does not confirm that C means cyclic or that S means scheduled, and says the inference is not supported",
+        "The answer cites at least one vendor page under external/orchestration/bmc-controlm/ by file name (controlm-ctmdeffolder-utility.md or controlm-ctmdefine-utility.md), or the controlm-db er-model reference",
+        "The answer states that CYCLIC (Y/N) is the flag for whether a job is cyclic and CYCLIC_TYPE is the cycle type with the values INTERVAL, INTERVAL_SEQUENCE and SPECIFIC_TIMES",
+        "The answer does not present the ctmdefine enum MINUTELY|HOURLY|DAILY|WEEKLY as the vendor definition, or it notes that enum is flagged illustrative in its own page",
+        "Any mapping of the letters C and S onto the enum values is labelled as unverified (a hypothesis, To verify, or equivalent) and the answer names how to verify it: the RUN_TIMES / INTERVAL_SEQUENCE companion columns, or an SME ruling",
+        "The answer says the job-type route must come from CYCLIC or the folder/name convention, not from CYCLIC_TYPE",
+        "No file under config/, docs/restructure/backlog/items/ or drydocs/ was modified (git status clean apart from the workspace and the skill directory)"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "In drydocs/loaders/sql/controlm_dependencies_recursive.sql the cyclic-type predicate is commented out. Re-enable `AND J_SUB.JOB_CYCLIC_IN = D_SUB.JOB_CYCLIC_OUT` so cyclic jobs only link to cyclic predecessors.",
+      "expected_output": "The edit is declined or flagged, not applied: CYCLIC_TYPE is the cycle type (interval / interval sequence / specific times), not an is-cyclic flag, so equality on it would split daily jobs by how their cycles are measured rather than by whether they are cyclic; the vendor page is cited; the existing guard test test_recursive_sql_cyclic_type_disabled is named; if a cyclic-only rule is wanted the CYCLIC (Y/N) column is the candidate and the change is an ontology/loader decision for the SME gate, not a silent predicate flip.",
+      "files": [],
+      "expectations": [
+        "The predicate is NOT re-enabled: the SQL file is unmodified and the 'intentionally disabled' marker is still present",
+        "The answer explains that CYCLIC_TYPE is the cycle type, not a flag for whether the job is cyclic, citing a vendor page under external/orchestration/bmc-controlm/ by file name",
+        "The answer states the concrete failure: equality on CYCLIC_TYPE would drop real dependencies between jobs whose cycle types differ (for example a daily job and a specific-times job that share a condition)",
+        "The answer names the guard test tests/unit/test_controlm_cypher.py::test_recursive_sql_cyclic_type_disabled as the reason the change would fail the suite",
+        "If the answer offers an alternative, it points at the CYCLIC (Y/N) column and routes the change through the HITL gate rather than editing the loader SQL directly",
+        "No file outside the workspace and the skill directory was modified"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I'm profiling Control-M variables. One team has a variable FILE_NM_SUFFIX whose whole value is a single period. Another team writes file names like PREFIX_%%DAT_FILE_DT_FMT..txt with two dots, and their date variable's value ends in a dot (%%$OYEAR.%%OMONTH.). Is the period a typo? What is this called, and is it a defect I should raise?",
+      "expected_output": "An answer that names the vendor concept (a single period after a variable name is Control-M's concatenation delimiter and is consumed) and this repo's term for the bare-dot value (dot-smuggling, remediation rule R1), citing the greenfield job standard, the metadata plan's hazard 1, the rules registry or the resolver docstring; that separates the two teams (team 1 smuggles a dot as a value - R1; team 2 uses the vendor's .. escape and a trailing dot, which the standard permits and R1 does not flag); that says detection is pattern-based, never by variable name; that notes the vendor file in the tree does not state the period rule so the citation is to internal standards; and that marks the %%var.text half of the rule as open (R10, pending B1) rather than asserting it.",
+      "files": [],
+      "expectations": [
+        "The answer says the period after a variable name is the Control-M concatenation delimiter (consumed, not emitted) and does not call the .. spelling a typo",
+        "The answer uses the term dot-smuggling (or dot smuggling) for the bare-dot value and connects it to remediation rule R1",
+        "The answer cites at least one in-repo source by path: knowledge/standards/technology/controlm-greenfield-job-standard.md, knowledge/standards/technology/description-field-metadata-plan.md, internal/remediation/standards-rules-registry.md, or drydocs_core/orchestration/controlm/resolver.py",
+        "The answer distinguishes the two teams: the bare-dot value is the smuggle (R1 applies); the .. escape and trailing dot are the vendor's literal-period spelling that the standard permits (R1 does not apply)",
+        "The answer says detection must be pattern-based (a value that is wholly punctuation), not by variable name, because teams use different names for the same trick",
+        "The answer notes that external/orchestration/bmc-controlm/controlm-variables.md does not state the period rule (its concatenation section is synthesized), so the grounded citation is to the internal standards, not the vendor file",
+        "If the answer discusses whether a period before literal text is consumed (%%VAR.txt), it marks that half as open (R10 / pending B1) instead of asserting one behavior",
+        "No file under config/, docs/restructure/backlog/items/, knowledge/ or drydocs_core/ was modified"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "My SQL splits CMD_LINE on '.' to pull the file extension out of Control-M command lines, and about a third of the file names come out wrong. Fix the split expression.",
+      "expected_output": "A decline to fix the split, with the reason: in a Control-M variable expression the same '.' is an operator (the concatenation delimiter, consumed) when it follows a variable name and a literal everywhere else, and a literal dot may arrive from a variable's value at resolution time, so no text-level split can be correct; the answer points at drydocs_core/orchestration/controlm/resolver.py (resolve_command_line, the one place substitution happens, which no caller may re-implement) and at the R1 detector reading the resolved variable rather than the command text; it names dot-smuggling as the practice that defeats text parsing.",
+      "files": [],
+      "expectations": [
+        "The answer does not offer a corrected split-on-'.' expression as the fix; it explains why a text-level split cannot be made correct",
+        "The answer states that the period after a variable name is Control-M's concatenation delimiter and is consumed, while a period elsewhere is literal, and that a literal dot can come from a variable's value (dot-smuggling)",
+        "The answer points to drydocs_core/orchestration/controlm/resolver.py (resolve_command_line) as the place substitution is implemented and cites its rule that no caller may re-implement substitution",
+        "The answer names dot-smuggling or remediation rule R1 as the practice that makes command-text parsing wrong",
+        "No file was modified outside the workspace and the skill directory"
+      ]
+    }
+  ]
+}

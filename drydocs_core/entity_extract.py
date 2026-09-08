@@ -22,30 +22,53 @@ earlier pass claimed, so the folder wins and the issue-key reading never fires.
     1. guid               8-4-4-4-12 hex; the DPL pipeline / dataset / placement ids
     2. folder_name        the PRAOCG-coded Control-M folder name, decoded
                           positionally by drydocs_core.orchestration.controlm
-                          .parse_folder_name; a 5-digit segment inside it is ALSO
-                          emitted as an application_id, cued ``folder-segment``
+                          .parse_folder_name; a 5-to-7-digit segment inside it is
+                          ALSO emitted as an application_id, cued ``folder-segment``
     3. issue_key          ``<PROJECT>-<n>`` — an upper-case project key and a number
     4. table_name         ``SCHEMA.TABLE`` — an upper-case dotted pair (the Oracle
                           idiom); a ``TABLE.COLUMN`` pair has the same shape and
                           is reported the same way — the caller disambiguates
     5. distribution_list  a ``DL-``/``DL_``/``DL.``-prefixed mailbox name, with or
                           without its ``@domain``
-    6. application_id     a standalone 5-digit token. Emitted ALWAYS, with
+    6. application_id     a standalone run of 4 to 7 digits — the MEASURED width
+                          of the live SEAL population, not a believed one (the
+                          ledger's ``Seal IDs`` note in
+                          config/source-mappings/pat-team-report.yaml: "token width
+                          is 4 to 7 digits, never assume 5 or 6", profile
+                          SME-reported 2026-09-07, cited by the K30 close note).
                           ``cued=True`` when a cue precedes it (``-seal``, ``seal``,
                           ``app_id``, ``application``) or a landing-prefix ``/raw/``
-                          follows it. A bare 5-digit token in a page title is a
-                          real signal (design doc §5, plan C) and a bare 5-digit
-                          token in prose is usually noise; the extractor reports
-                          both and marks which, and the CALLER ranks.
+                          follows it.
+
+                          THE BARE FLOOR IS FIVE; FOUR NEEDS A CUE. A 5-, 6- or
+                          7-digit run is emitted bare as well as cued, because a
+                          bare id in a page title is a real signal (design doc §5,
+                          plan C) and a bare id in prose is usually noise — the
+                          extractor reports both, marks which, and the CALLER ranks.
+                          A 4-digit run is emitted ONLY when the text names it,
+                          because bare 4-digit runs are years, clock times, ports
+                          and small counts: at that width the class stops carrying
+                          information and every document in the corpus would
+                          contribute a handful of them to the novelty score.
 
 What this deliberately does not do: guess. No class is inferred from context
 beyond the cue flag, no token is normalized to a graph key, and no match is
 suppressed because it "looks wrong" — a suppressed token is invisible to the
 novelty score, and a wrong token that is visible can be ranked down.
 
+The width floor above is a CANDIDATE SHAPE, not an exception to that: it decides
+what is a candidate before any match exists, exactly as the issue-key pass
+requires an upper-case project key and the table pass an upper-case dotted pair.
+Once a token IS a candidate it is always reported. A six-digit row count is a
+candidate, is emitted uncued, and is ranked down by the caller — that is the
+design working, not a hole in it.
+
 Every value in the tests is synthetic: 5-digit ids sit in the reserved block
 70001-70099 (tests/unit/test_publish_boundary_values.py sweeps every tracked
 file for anything else), domains are ``.invalid``, project keys are plain words.
+The other widths have no reserved block, so the tests extend the same ``700``
+prefix (``7001``, ``700011``, ``7000111``) and the one sweep that can see them
+carries an allowlist row saying so.
 """
 
 from __future__ import annotations
@@ -132,11 +155,25 @@ _DL_RE = re.compile(
     r"(?:@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+)?"
 )
 
-_APP_ID_RE = re.compile(r"(?<![0-9A-Za-z_])\d{5}(?![0-9A-Za-z_])")
-#: What counts as a cue for a 5-digit token, read from the 24 characters before
-#: it: the launcher's `-seal` flag, the `seal`/`app_id`/`application` words the
-#: design doc's sources use (§2 `owner_app`), with up to four non-word
-#: characters between cue and value — `"APP_ID": "70005"` has exactly four.
+#: The candidate width, measured rather than believed: the live SEAL population
+#: runs 4 to 7 digits, with five AND six both common (the `Seal IDs` note in
+#: config/source-mappings/pat-team-report.yaml, profile SME-reported 2026-09-07,
+#: cited by the K30 close note). It was `\d{5}` until CORE5, which is why a
+#: six-digit id — an ordinary width in that column — was never emitted at all.
+_APP_ID_RE = re.compile(r"(?<![0-9A-Za-z_])\d{4,7}(?![0-9A-Za-z_])")
+#: The narrowest width that survives on its own. Below it a bare run of digits is
+#: a year, a clock time, a port or a small count far more often than an id, so a
+#: 4-digit candidate is emitted only when a cue names it (see the module
+#: docstring). This is the precision half of the widening: widening the floor as
+#: well as the ceiling would have put a `2026` into every document's matches.
+_APP_ID_BARE_MIN_WIDTH = 5
+#: The top of the measured range, kept as a name so the folder-segment pass and
+#: `_APP_ID_RE` cannot drift apart the way the five-digit belief did.
+_APP_ID_MAX_WIDTH = 7
+#: What counts as a cue, read from the 24 characters before the token: the
+#: launcher's `-seal` flag, the `seal`/`app_id`/`application` words the design
+#: doc's sources use (§2 `owner_app`), with up to four non-word characters
+#: between cue and value — `"APP_ID": "70005"` has exactly four.
 _APP_ID_CUE_BEFORE = re.compile(r"(?i)(?:seal|app[_ ]?id|application)\W{0,4}$")
 #: ... or the landing-prefix shape after it: `<APP_ID>/raw/<flow>/...` (§2).
 _APP_ID_CUE_AFTER = re.compile(r"^/raw/")
@@ -194,16 +231,25 @@ def extract_entities(text: str) -> tuple[EntityMatch, ...]:
         )
         take(EntityMatch(FOLDER_NAME, m.group(0), m.start(), m.end(), attributes=attrs))
         # The identifier decomposition of design doc §6 step 3: a folder name
-        # is a bundle of things to chase, and a 5-digit segment is one of them.
+        # is a bundle of things to chase, and a numeric segment is one of them.
+        #
+        # The width range is the bare one (>= _APP_ID_BARE_MIN_WIDTH), not the
+        # cued one, even though the match IS marked cued: this pass scans EVERY
+        # segment rather than reading position 3, which is where the naming
+        # convention actually puts the application id
+        # (knowledge/standards/technology/folder-naming-convention.md). "A numeric
+        # segment somewhere in a folder name" is a weaker claim than "the prose
+        # said seal", so a 4-digit segment here is a year or a sequence number as
+        # readily as an id. Enforce the position and 4 can come back.
         offset = m.start() + len(parsed.prefix) + 1
         for seg in parsed.segments:
-            if len(seg) == 5 and seg.isdigit():
+            if seg.isdigit() and _APP_ID_BARE_MIN_WIDTH <= len(seg) <= _APP_ID_MAX_WIDTH:
                 out.append(
                     EntityMatch(
                         APPLICATION_ID,
                         seg,
                         offset,
-                        offset + 5,
+                        offset + len(seg),
                         cued=True,
                         attributes=(("cue", "folder-segment"),),
                     )
@@ -241,6 +287,12 @@ def extract_entities(text: str) -> tuple[EntityMatch, ...]:
         before = text[max(0, m.start() - _CUE_WINDOW) : m.start()]
         after = text[m.end() : m.end() + 5]
         cued = bool(_APP_ID_CUE_BEFORE.search(before)) or bool(_APP_ID_CUE_AFTER.match(after))
+        # The floor, and the only place a candidate is dropped: an uncued run
+        # narrower than 5 digits is not reported. Not claimed either — a `2026`
+        # left unclaimed here is a `2026` a later pass could still read, and the
+        # bare pass is the last one, so the span simply stays free.
+        if not cued and len(m.group(0)) < _APP_ID_BARE_MIN_WIDTH:
+            continue
         attrs: tuple[tuple[str, str], ...] = ()
         if cued:
             attrs = (("cue", "landing-prefix" if _APP_ID_CUE_AFTER.match(after) else "keyword"),)

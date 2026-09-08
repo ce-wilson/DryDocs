@@ -156,8 +156,8 @@ Prints no secret — `password` is a `SecretStr` and is not in the output.
 SHOW DATABASES YIELD name, type, currentStatus;
 ```
 **Do not expect a list from this runbook — read the canonical one**, because the topology
-changes and a copy here goes stale (it did: this line named `ddlineage` for a few hours
-until the X1 amendment retired it):
+changes and a copy here goes stale (it did: this line named the now-retired `ddlineage`
+for a few hours until the X1 amendment removed it):
 
 ```powershell
 poetry run python -c "import yaml; print(yaml.safe_load(open('config/dev-environment.yaml'))['neo4j']['databases'])"

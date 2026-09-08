@@ -54,8 +54,101 @@ class ConfigOut(_Declared):
     runtime_view_url_template: str | None
 
 
+class DataCenterOut(_Declared):
+    """One row of the data-center spelling registry (LOAD2), as the console reads
+    it for Z6's runtime map.
+
+    ``default_time`` and ``suffix`` are OPTIONAL BY RULE and not by accident: the
+    ``E####``-as-default-time reading comes from an internal standard whose own
+    open items include "confirm E is always Eastern", so a name that carries no
+    time segment registers exactly like one that does. They are declared here as
+    plain strings that may be empty for that reason — a null would suggest the
+    lookup failed, and nothing failed."""
+
+    code: str
+    name: str
+    default_time: str
+    suffix: str
+    sample: bool
+    note: str
+
+
+class DataCentersOut(_Declared):
+    """GET /data-centers.
+
+    ``source`` names the venue the rows came from (J18): the machine-local
+    internal twin, or the publishable synthetic sample. A console that showed a
+    default time without saying which file it read would make a producer-side
+    demo look like a statement about production."""
+
+    data_centers: list[DataCenterOut]
+    source: str
+    updated: str
+
+
 class StatusOut(_Declared):
     status: str
+
+
+class QualityFlagOut(_Declared):
+    """One limit an SME crossed. The metric that tripped travels WITH the
+    number and the limit it was compared against, so the rail can say what
+    happened without the console holding a second copy of the thresholds."""
+
+    metric: str
+    value: float
+    limit: float
+    detail: str
+
+
+class PersonaQualityOut(_Declared):
+    """O51: one reviewer's signals over the rolling window.
+
+    ``auto_accept_rate`` is NULLABLE ON PURPOSE and is null everywhere today.
+    The metric needs the agent's candidate-binding set (O48) to compare a
+    confirmation against; reporting 0.0 would read as a reviewer who modifies
+    everything, which is the best possible score. The reason travels beside it
+    in ``auto_accept_unavailable_because`` so no consumer has to guess whether
+    null means zero, missing, or broken."""
+
+    persona_id: str
+    submissions: int
+    auto_accept_rate: float | None
+    auto_accept_unavailable_because: str
+    too_fast_rate: float
+    admin_return_rate: float
+    median_review_seconds: float | None
+    flags: list[QualityFlagOut]
+    blocked: bool
+
+
+class PersonaBlockOut(_Declared):
+    """A submit block, open or lifted. Append-only in the store: an unblock
+    fills the three ``unblock*`` fields rather than deleting the row, because a
+    judgment about a person that can be erased is not a record."""
+
+    block_id: str
+    persona_id: str
+    blocked_at: str
+    blocked_by: str
+    reason: str
+    unblocked_at: str | None = None
+    unblocked_by: str | None = None
+    unblock_note: str | None = None
+
+
+class ReviewQualityOut(_Declared):
+    """GET /review-quality (admin only).
+
+    ``limits`` rides along so the console renders the number a metric was
+    compared against instead of restating the thresholds in TypeScript — the
+    same reason a spec result carries its own column declarations."""
+
+    window_days: int
+    min_decisions_for_flag: int
+    limits: dict[str, Any]
+    personas: list[PersonaQualityOut]
+    blocks: list[PersonaBlockOut]
 
 
 class LoginOut(_Declared):
@@ -101,8 +194,17 @@ class NamedRunOut(_Declared):
 
 
 class ColumnOut(_Declared):
+    #: API2: a LITERAL, so the column vocabulary reaches the OpenAPI document and
+    #: the generated client as a closed union rather than as `string`. It is a
+    #: second copy of `query_specs.COLUMN_TYPES` — pydantic needs static values —
+    #: and the two are asserted to agree by tests/unit/test_column_types.py, the
+    #: same arrangement CLASSIFICATIONS has with config/classification.yaml.
+    #: `list` is deliberately untyped in its ELEMENTS: the two specs that return
+    #: one return lists of strings, but the contract being fixed here is "this is
+    #: a list, not a scalar", and inventing an element type nothing enforces
+    #: would be a second declaration to keep true.
     name: str
-    type: str
+    type: Literal["string", "int", "list"]
     label: str
 
 
@@ -522,3 +624,33 @@ class EphemeralRegisterOut(_Declared):
     classification: str
     watermarked: bool
     expires_at: str
+
+
+# ── /graph-status (O63) ──────────────────────────────────────────────────────
+
+
+class GraphStatusOut(_Declared):
+    """GET /graph-status. Is the graph the console reads actually reachable, and
+    which database is it?
+
+    WHY A ROUTE AND NOT A QuerySpec, the same question /docs-verify answered and
+    the same answer: this takes NO parameters and the Cypher is chosen entirely
+    server-side (a bare ``RETURN 1``), which is the property ADR 0005 protects.
+    A spec would also be the wrong instrument — a spec run that fails tells you
+    the spec failed, and the whole point here is to separate "the graph is not
+    there" from "your question was bad".
+
+    ``database`` is the reviewed READ database, taken from ``SPEC_DATABASES``
+    rather than from ``Neo4jSettings.database`` (which is nullable and is the
+    driver's default, not the console's). If the reviewed set ever gains a
+    second name that is a deliberate edit, and this follows it.
+
+    ``detail`` carries the EXCEPTION CLASS when a probe fails - never the URI,
+    the user or anything from the settings. A page that can name the host it
+    could not reach is a page carrying a deployment coordinate (ADR 0020), and
+    the class name is what actually distinguishes an auth failure from a
+    refused connection."""
+
+    reachable: bool
+    database: str
+    detail: str | None

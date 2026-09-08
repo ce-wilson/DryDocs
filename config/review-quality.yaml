@@ -1,0 +1,65 @@
+# =============================================================================
+# config/review-quality.yaml — reviewer-quality limits (O51, plan §8).
+#
+# THE LIMITS FLAG. THEY NEVER ACT. Crossing one puts an SME on the admin
+# queue's quality rail with the metric that tripped; the ADMIN decides whether
+# to block. There is no auto-block in any code path and there is no key here
+# that could turn one on — a threshold is a tripwire, not a judge. That is the
+# same measure-then-decide posture as every other HITL surface in this repo,
+# and it is the reason this file holds only numbers.
+#
+# WHY A FILE AND NOT CONSTANTS. Limits are a judgment that will be revised once
+# there is a term of real data, by the admin who reads the numbers rather than
+# by whoever is editing python that week. Versioned in git like every other
+# config, so a change to what counts as "too fast" is reviewable and dated.
+# The AdminConfig surface RENDERS these (it is read-only today); editing them
+# is a commit.
+#
+# classification: Internal-Public — thresholds, no personal data. The metrics
+# these limits are compared against are derived per persona at request time and
+# are never written to this file or to any other tracked path.
+# =============================================================================
+classification: Internal-Public
+schema: drydocs.review-quality.v1
+updated: 2026-09-07
+
+# The rolling window every rate is computed over. Days, counted back from the
+# request. A window shorter than a work cycle would flag someone for one bad
+# afternoon; a window longer than a quarter would hide a change in behaviour
+# behind months of history.
+window_days: 30
+
+# Below this many decisions in the window, rates are reported but NOTHING is
+# flagged: one return out of two submissions is a 50% return rate and means
+# nothing at all. The floor is the difference between a signal and an accident.
+min_decisions_for_flag: 5
+
+limits:
+  # Share of agent candidates confirmed with zero modification. NOT COMPUTABLE
+  # TODAY: the candidate-binding set is the intake plan's section 4, which O48
+  # builds, so this limit is declared and unused rather than silently reading
+  # zero. A reviewer who modifies nothing because there is nothing to modify is
+  # not the reviewer this metric is looking for.
+  auto_accept_rate_max: 0.90
+
+  # Share of a reviewer's submissions that an admin sent back. The strongest of
+  # the four, because it is another human's judgment rather than a heuristic —
+  # so its limit is the tightest.
+  admin_return_rate_max: 0.25
+
+  # Share of confirms that came in under their own review floor.
+  too_fast_rate_max: 0.30
+
+# The review floor, per decision. Evidence takes time to read, so the floor
+# SCALES with it rather than being one number for a two-line email and a
+# forty-page export:
+#
+#     floor = min(min_review_seconds + seconds_per_kb * KB, max_review_seconds)
+#
+# The cap exists because the scaling cannot be trusted past a point: nobody
+# reads a 10 MB attachment line by line, and a floor of six hours would make
+# every large record "too fast" forever.
+review_floor:
+  min_review_seconds: 60
+  seconds_per_kb: 2.0
+  max_review_seconds: 900

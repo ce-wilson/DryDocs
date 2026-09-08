@@ -17,9 +17,27 @@ constrains (tests/unit/test_server_inventory_fixture.py).
 
 WHAT THESE DO NOT ASSERT is that every gap is closed. Coverage gaps are the
 point of the coverage counters, and a demo with nothing unmatched would prove
-less, not more: 7 of the 8 folders are deliberately unattributed and 2 of the 4
-hosts deliberately unresolved. These tests assert that AT LEAST ONE path through
-each join is whole.
+less, not more. These tests assert that AT LEAST ONE path through each join is
+whole.
+
+WHICH GAPS ARE DELIBERATE, corrected 2026-09-07 (LOAD4). This paragraph used to
+say "7 of the 8 folders are deliberately unattributed and 2 of the 4 hosts
+deliberately unresolved", and only the second half was ever true. The folder
+number was a rationalization of a defect: the SEAL capture declared 70001-70003
+while the folder names carried 70002, 70011, 70012, 70021, 70022, 70031 and
+70041, so six folders could not have attributed whatever the evidence said. The
+ids were authored apart, nobody chose that, and calling it deliberate is how it
+survived. Corrected by growing the capture (see its own header for why that
+direction) and extending the fact feed. What is deliberate now, each named where
+a guard can see it:
+
+* folder 161020 has an application the capture DOES carry (70012) and no fact
+  rows at all — the "no evidence" unmatched case;
+* folder 161999 is retired and names 70041, which the capture deliberately does
+  not carry — the "application no longer in the registry" unmatched case, pinned
+  by ``DELIBERATE_GAPS`` below;
+* 2 of the 4 hosts stay unresolved (tests/unit/test_server_inventory_fixture.py),
+  untouched by LOAD4.
 """
 
 from __future__ import annotations
@@ -28,7 +46,6 @@ import csv
 import re
 from pathlib import Path
 
-import pytest
 import yaml
 
 REPO = Path(__file__).resolve().parents[2]
@@ -44,19 +61,44 @@ APPLICATIONS = REPO / "config" / "taxonomy" / "business-application.yaml"
 #: reads the id from a normalized variable, not from this name — but the sample
 #: folder names are where a reader sees which application a folder is for, and
 #: they are what these tests read to say the two sides agree.
+#:
+#: THE `\d{5}` HERE IS THE SYNTHETIC WIDTH, NOT A CLAIM ABOUT THE REAL ONE, and
+#: it is deliberately left at five (CORE5, 2026-09-07). The demo folder names are
+#: built from the reserved block 70001-70099, which is five digits by
+#: construction, so this pattern is exact for its subject and widening it would
+#: only let a non-block value through unnoticed. The LIVE population is 4 to 7
+#: digits (config/source-mappings/pat-team-report.yaml, the `Seal IDs` row) —
+#: which is why the prose extractor and the publish-boundary scans DID widen, and
+#: why this comment exists: the same five-digit belief was written in four places
+#: and only one of them was ever right. If the demo ever mints an id outside the
+#: block, this is the line that has to move with it.
 _FOLDER_APP_ID = re.compile(r"^[A-Z]+-[A-Z]+-(\d{5})-")
 
 
 def _rows(path: Path) -> list[dict[str, str]]:
-    """Read one sample, or skip if it is not in this clone.
+    """Read one sample. Absence is a FAILURE here, not a skip (CORE4, 2026-09-07).
 
-    A real skip, not a formality for the J8 policy test: drydocs/data/ is
-    gitignored wholesale and its tracked CSVs are grandfathered inside it, so
-    today every path here is present and the skip never fires. Written per
-    reader so a missing sample can only quiet the tests that actually need it.
+    This used to be a ``pytest.skip``, and its own docstring said why that was
+    wrong while defending it: "drydocs/data/ is gitignored wholesale and its
+    tracked CSVs are grandfathered inside it, so today every path here is present
+    and the skip never fires". A guard that never fires is not protecting the
+    suite from anything — it was written to satisfy the J8 skip-guard policy,
+    which at the time called any drydocs/data/ path a gitignored asset and could
+    not see that these four are force-tracked.
+
+    Every path this reads is in git, so a fresh clone HAS it. If one is missing
+    the clone is broken, not incomplete, and the right behaviour is to say so
+    loudly — the cost of the old skip was that a genuinely missing sample would
+    have quietly disabled this interlock's real assertions instead.
+
+    The policy now asks git rather than the path prefix, so this file needs no
+    guard at all and carries none.
     """
-    if not path.exists():
-        pytest.skip(f"{path.relative_to(REPO)} absent — this interlock has no other half")
+    assert path.exists(), (
+        f"{path.relative_to(REPO)} is TRACKED and absent — this clone is broken, "
+        "not incomplete. The bundled samples ship with the repo; restore them "
+        "rather than skipping the interlock that reads them."
+    )
     with path.open(newline="", encoding="utf-8") as fh:
         return list(csv.DictReader(fh))
 
@@ -159,3 +201,78 @@ def test_at_least_one_team_owns_an_application_a_folder_runs_for() -> None:
         f"no application is both owned by a team and named by a folder — teams "
         f"{sorted(team_apps)} vs folders {sorted(folder_apps)}"
     )
+
+
+# ---- LOAD4: the join the other four assumed and nobody checked -----------------
+
+#: folder_id -> the application id its name carries, for folders the capture
+#: deliberately does NOT declare. ONE entry, and it has to stay that way for the
+#: guard to mean anything: 161999 is status=R with an empty user_daily, and a
+#: retired folder naming an application the registry no longer carries is the
+#: unattributed case the demo should show. Every OTHER folder must resolve — that
+#: is the whole point, because before LOAD4 six of them silently could not, and
+#: the coverage report read that as a finding rather than as a fixture defect.
+DELIBERATE_GAPS = {"161999": "70041"}
+
+
+def test_every_folder_names_an_application_the_capture_carries() -> None:
+    """LOAD4 (d). The fixture's two halves were authored apart: folder names on
+    one side, the SEAL capture on the other, and nothing compared them. Six
+    folders named applications that did not exist, so no evidence could ever have
+    attributed them."""
+    captured = _captured_app_ids()
+    missing = {
+        folder_id: app_id
+        for folder_id, app_id in _folder_app_ids().items()
+        if app_id not in captured
+    }
+    assert missing == DELIBERATE_GAPS, (
+        f"folder-name application ids that config/taxonomy/business-application.yaml "
+        f"does not declare: {missing}. Expected exactly the deliberate gap "
+        f"{DELIBERATE_GAPS}. Declare the id in the capture, or add it here WITH ITS "
+        f"REASON — a gap that is merely tolerated is how the last one lasted."
+    )
+
+
+def test_the_bundled_demo_attributes_most_of_its_folders_and_says_why_the_rest_do_not() -> None:
+    """LOAD4 (c) — the coverage claim, made sample-reproducible (J18).
+
+    "Attribution works on the samples" was a thing said about a machine. This
+    runs the real resolver over the committed fixtures, in-process and with no
+    Neo4j, so the numbers below are reproducible in any clone. Before LOAD4 they
+    were 1 attributed and 7 unmatched, and six of those seven could not have been
+    fixed by any amount of evidence.
+    """
+    from drydocs.loaders.folder_attribution import FolderAttributionAdapter
+    from drydocs_core.adapters import CsvAdapter
+    from drydocs_core.models import FolderAttributionRow
+
+    # folder -> app_code, the fan-out index: the demo has no authored app-code
+    # store (config/overrides/app-code-mappings.csv is header-only), so every
+    # attribution below comes from the K2 job-grain fallback.
+    folder_codes: dict[str, str | None] = {row["folder_id"].strip(): None for row in _rows(FOLDERS)}
+    for row in _rows(JOBS):
+        folder_codes[row["folder_id"].strip()] = (row.get("application") or "").strip() or None
+
+    adapter = FolderAttributionAdapter([], folder_codes, fact_source=CsvAdapter(FACTS))
+    with adapter:
+        rows = [FolderAttributionRow.model_validate(r) for r in adapter.rows()]
+    coverage = adapter.coverage
+    assert coverage is not None and coverage.reconciles()
+
+    attributed = {r.folder_id: r.app_id for r in rows}
+    assert attributed == {
+        "161014": "70002",
+        "161015": "70011",
+        "161016": "70011",
+        "160500": "70021",
+        "160501": "70022",
+        "162001": "70031",
+    }
+    assert (coverage.eligible_folders, coverage.attributed, coverage.unmatched) == (8, 6, 2)
+    assert not coverage.conflicts
+
+    # the two unmatched are the two named in the module docstring, for two
+    # different reasons — a demo that shows only one kind of gap shows less
+    unmatched = set(folder_codes) - set(attributed)
+    assert unmatched == {"161020", "161999"}

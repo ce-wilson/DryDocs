@@ -1,0 +1,61 @@
+id: PLAN8
+epic: project-board
+title: "A synonym to canonical-term to home ledger for Control-M knowledge, filled into the research-terms shell that already exists"
+type: task
+module: drydocs-plan
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- .claude/skills/research-probe-discipline/references/terms.template.yaml
+- .claude/skills/controlm-db/SKILL.md
+- external/orchestration/bmc-controlm/
+- knowledge/standards/technology/
+- internal/remediation/standards-rules-registry.md
+- docs/restructure/backlog/items/G34.yaml
+acceptance: |
+  The failed research session's problem was VOCABULARY, not search: the smuggling-dot eval
+  case records that a search for "period" reaches none of six sources because the prose says
+  "dot", and docs.data-centers.v1 exists as a registered spec while a session could not find
+  data-center material. The deliverable is an INDEX, not a procedure.
+
+  (a) A synonym to canonical-term to home ledger exists and is filled, spanning the four
+      places Control-M knowledge lives: external/orchestration/bmc-controlm/,
+      knowledge/standards/technology/, internal/remediation/standards-rules-registry.md, and
+      the controlm-db skill's references/er-model.md.
+  (b) IT FILLS A SHELL THAT ALREADY EXISTS - no fifth surface. Two candidates, both tracked
+      and both empty: the research ledger
+      (.claude/skills/research-probe-discipline/references/terms.template.yaml, schema
+      drydocs.research-terms.v1, whose internal/research/_registry/terms.yaml instance was
+      never created) and internal/glossary/terms.yaml (the G34 scaffold, schema
+      drydocs.glossary.v1, business definitions). A synonym-to-LOCATION map is the research
+      ledger's shape and that is the recommendation; the item CONFIRMS the schema actually
+      carries a home field before writing into it, and records which was chosen and why.
+  (c) Three seed rows, verified at 839eab1f, are present:
+      - period / dot / concatenate / the doubled-period spelling: dot smuggling versus the
+        concatenation delimiter (registry rule R1, the greenfield standard at :179,
+        resolver.py:21, the detector field at variables.py:272).
+      - cyclic / the C and S letters: CYCLIC is the Y-or-N flag and CYCLIC_TYPE is the cycle
+        type, NOT is-cyclic - the trap itself. THE LETTER MAP STAYS To-verify: the ledger
+        records the open question and never a guess.
+      - daily versus cyclic: the folder suffixes, with daily inferred from absence.
+  (d) If a skill wrapper helps discovery, controlm-db is EXTENDED from "which table holds X"
+      to "which document explains X" rather than a new skill being added.
+notes: |
+  Minted 2026-09-07 from IDEAS.md Idea-278 (the UI session's eval-case review, reviewed at
+  839eab1f on feat/cyclic-type-test-case), decision D2 - agreed in session, not built.
+
+  module drydocs-plan / phase 8, the PLAN5 and PLAN6 route for skill-shape work; the ledger
+  is a skill reference artifact rather than any code module's file.
+
+  Do this BEFORE WEB18's acronym link (Idea-277 converges on the same missing term index from
+  the console side), so that link has a target. REM1 contributes a row on its own: the string
+  R10 has two homes.
+
+  The choice in (b) is recorded as a recommendation rather than parked: both shells are
+  tracked and empty, the entry itself argues for the research ledger, and the acceptance
+  makes the puller confirm the schema before writing - which is the only part of the choice
+  that can be wrong.

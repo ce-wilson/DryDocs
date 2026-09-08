@@ -1,0 +1,42 @@
+id: PORT5
+epic: release-infrastructure
+title: "A PORT-MANIFEST entry_rule that asserts the consumer's tree is stale the moment the consumer moves - rewrite each one as a rows-union rule with a tracked per-side count"
+type: bug
+module: drydocs-port
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- PORT-MANIFEST.yaml
+- tests/unit/test_port_manifest.py
+- config/taxonomy/ui-components.yaml
+acceptance: |
+  A PORT-MANIFEST entry_rule that describes the CONSUMER's tree ('company = producer MINUS
+  x') is stale the moment the consumer moves, and only the consumer can see that it did. The
+  config/taxonomy/ui-components.yaml rule encoded the K7-K15 hold as 'producer minus the
+  AppCodeCascadePane row' while the company had carried that row since before carve-out 8, so
+  honoring the rule would have failed three of their guards. The manifest can only know the
+  producer's tree.
+
+  (a) Every entry_rule is swept for a consumer-tree assertion: a hold, a 'they do not have', a
+      fixed company count.
+  (b) Each is rewritten as a ROWS-UNION rule plus a TRACKED per-side count - the rule says what
+      the union contains, and each side's count is a number that side maintains.
+  (c) A check in tests/unit/test_port_manifest.py: an entry_rule never contains a
+      'company = producer MINUS' construction or a bare company count. Read the manifest as data,
+      not the prose around it.
+  (d) Where a hold is REAL it belongs in the company's own divergence ledger, which the company
+      maintains - the sweep moves it out of the manifest rather than deleting the fact.
+notes: |
+  Minted 2026-09-07 from IDEAS.md Idea-265 (the company's close-out on port-base-20260902,
+  transcribed machine-local, 2026-09-05).
+
+  Type bug rather than chore: the manifest currently states something false about a tree it
+  cannot observe, and honoring it broke three consumer guards.
+
+  Clause (c)'s check needs a home; if tests/unit/test_port_manifest.py does not exist on the
+  tree at build time, it is created - the manifest has guards spread across the port tests today
+  and one named file is the cheaper answer.

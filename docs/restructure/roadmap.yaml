@@ -22,7 +22,11 @@
 #       L  = an epic slice — multiple sessions, usually a HITL gate
 #       XL = a multi-epic program
 #
-# classification: Internal (idea summaries ride along; same boundary as the inbox).
+# classification: Internal-Public producer-side — the file is in the public push, and
+# the idea summaries that ride along are already published from IDEAS.md. The 2026-08-07
+# comment here read Internal beside the 2026-09-05 J58 field reading Internal-Public; the
+# field is right and the comment was stale (found company-side at carve-out D, where the
+# same file IS Internal because its rows are firm data — RELAY-29).
 
 schema: drydocs.roadmap.v1
 classification: Internal-Public

@@ -1,0 +1,106 @@
+id: API3
+epic: web-console
+title: "scripts/dump_openapi.py opens the committed openapi.json before it renders, so a render failure leaves a zero-byte artifact"
+type: bug
+module: drydocs-api
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- scripts/dump_openapi.py
+- web/src/generated/openapi.json
+- web/package.json
+acceptance: |
+  scripts/dump_openapi.py opens web/src/generated/openapi.json for WRITING before it calls
+  render_schema(), so a render failure truncates the committed artifact to zero bytes. The
+  result reads as a corrupt commit rather than a failed run, and npm run api:types then fails on
+  an empty document one step later with no pointer back to the cause.
+
+  (a) Render to a string FIRST, then open and write - the artifact is never opened until there
+      is content to put in it.
+  (b) The script exits non-zero with the exception named, so the failing step says what failed.
+  (c) The test that pins the writer grows the failure case: a render that raises leaves the
+      existing artifact BYTE-IDENTICAL and the process exits non-zero.
+notes: |
+  Minted 2026-09-07 from IDEAS.md Idea-268 (Lane B close report, laptop, 2026-09-05,
+  API1 hand-back one).
+
+  Two lines of fix and a test; the test is the point, since the same open-then-render shape is
+  easy to reintroduce.
+
+  -- CLOSED 2026-09-07, Lane B (laptop), branch wip/API3-laptop from main at 55c2a204 --
+
+  ALL THREE CLAUSES MET. Two lines of fix, as the entry predicted, and the test that pins
+  them turned out to be the part with a decision in it.
+
+  -- (a) THE ORDER --
+
+  `write_schema` renders in full, then `_write` opens. `open("w")` TRUNCATES at the moment
+  it is called, so rendering inside the `with` emptied the committed artifact BEFORE
+  `create_app()` ran. The failure that actually happens is an unset DRYDOCS_DATA_ROOT
+  (G81), which `create_app()` raises at import because it builds the intake store -- so the
+  script most likely to fail is the one whose failure was most destructive.
+
+  -- (b) THE REPORT --
+
+  `main` attempts the render on its own and reports it rather than letting a traceback
+  become the next step's problem: exit 1, the exception's TYPE and MESSAGE on stderr, and
+  the sentence "<path> was NOT modified". That sentence is worth a line: "did this just
+  corrupt my working tree" is the first question a failed dump raises, the answer used to
+  be yes, and it is now no by construction rather than by luck. An ImportError additionally
+  names the optional api group, since that is the other way this script fails on a fresh
+  clone.
+
+  `--check` goes through the same path. It is the mode CI runs, where a traceback is
+  furthest from anyone who can act on it.
+
+  TWO SMALL THINGS THE REWRITE PAID FOR:
+  * `_relative()` -- the old code called `Path.relative_to(REPO)` in the message, which
+    RAISES for an `--out` outside the repo. Every new test passes a tmp_path, so the
+    reporting path would have crashed while reporting. A crash inside the error handler is
+    how the real cause gets lost.
+  * `_matches()` -- `main` already holds a rendered schema by the time it reaches --check
+    and must not render a second one, but two callers each deciding what "matches" means is
+    how two answers to one question start to disagree. One comparison, two callers.
+
+  -- (c) THE TEST, and the decision inside it --
+
+  THE ORDERING TEST HAD TO BE AT THE LIBRARY BOUNDARY, and that is a finding rather than a
+  preference. Mutation-checked by reintroducing the defect: the three CLI tests STILL PASS,
+  because `main` now renders before it calls `_write` and is safe whatever `write_schema`
+  does internally. Only `test_a_failed_render_leaves_the_artifact_byte_identical` goes red,
+  with b'' against the original bytes. A clause-(c) test written only against the CLI would
+  have been green on the exact defect it was written for -- the vacuous-guard shape CORE2
+  closed two items earlier in this lane, arriving from a different direction.
+
+  NO SOURCE GUARD WAS ADDED, deliberately. The behavioural test IS the guard: put the
+  render back inside the `with` and it goes red. A scan asserting the two calls are not
+  nested would be a weaker statement of the same thing -- it would pass on any rewrite that
+  kept the order wrong in a shape the pattern did not anticipate.
+
+  A POSITIVE CONTROL RIDES WITH THE FOUR FAILURE TESTS (`a_successful_run_still_writes`):
+  four tests that all assert on a failure path would every one of them be satisfied by a
+  `main` that returned 1 unconditionally.
+
+  -- HANDED BACK TO LANE A --
+
+  1. NOTHING GENERATED MOVED. openapi.json is untouched by this item -- the script that
+     writes it changed, not the schema. (API2, earlier in this lane, does move it.)
+  2. NO PORT-MANIFEST ROW. No new tracked path; both files already exist.
+  3. WEB16, LATER IN THIS QUEUE, IS THE OTHER HALF OF THE SAME REPORT: this makes the
+     python side say what failed, and WEB16 makes `npm run api:types` stop burying it in a
+     Node stack. They are independent -- neither waits on the other -- but a reader of
+     either should know the other exists.
+
+  VERIFIED on this laptop (J18): full unit suite 3560 passed / 14 skipped / 0 failed, ruff
+  check and ruff format --check clean over the repo. The real failure was exercised end to
+  end rather than only simulated: with DRYDOCS_DATA_ROOT unset the script exits 1, names
+  DataRootNotSetError with its remediation, and web/src/generated/openapi.json is unchanged
+  at 102,283 bytes. No web build -- this item adds no TypeScript.
+
+  EXPECTED RED, per the Lane B handoff: test_committed_roadmap_page_matches_its_sources
+  fails on this close commit -- a close writes notes and Lane B does not render (Y5's
+  tolerance covers a CLAIM, not a close). Lane A renders once at merge.

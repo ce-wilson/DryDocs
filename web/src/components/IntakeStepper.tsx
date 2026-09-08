@@ -1,4 +1,5 @@
 import type { LegalTransitions } from '../lib/intakeApi'
+import { WAITING_ON, WAITING_ON_SUMMARY } from '../lib/intakeReview'
 
 // The O47 intake status machine, rendered — adapted from LoadsTimeline's
 // dot-and-rail (ordered stage array, one status dot per stage, ui-conventions
@@ -34,11 +35,17 @@ export default function IntakeStepper({
   legal,
   busy,
   onTransition,
+  showActions = true,
 }: {
   status: string
   legal: LegalTransitions
   busy: boolean
-  onTransition: (to: string) => void
+  onTransition?: (to: string) => void
+  /** O50: the admin review panel renders the machine for CONTEXT and owns the
+   *  buttons itself, because its Send-back carries the note rule. Two button
+   *  rows off one map would be two rows to keep in step; the map still decides
+   *  what the one row holds. */
+  showActions?: boolean
 }) {
   // admin-returned re-queues to the front; no-new-value dead-ends where it was.
   const currentIdx =
@@ -79,25 +86,34 @@ export default function IntakeStepper({
         </p>
       )}
       {legal.waiting_on_gate && (
-        <p className="mt-1 text-xs text-faint">Waiting on the gated load (O50 slice — parked).</p>
+        // O50: the park, named. ui-conventions §1 puts "queued, not yet moving"
+        // at --yellow, which is what this is — an accepted record is neither
+        // done (--green) nor broken (--status-fail-soft), and reading it as
+        // either is the confusion the plan calls the load boundary.
+        <p className="mt-1 text-xs" style={{ color: 'var(--yellow)' }}>
+          {WAITING_ON_SUMMARY}{' '}
+          {WAITING_ON.map((w) => `${w.what} — ${w.gate}`).join('; ')}.
+        </p>
       )}
-      <div className="mt-2 flex flex-wrap gap-2">
-        {legal.transitions.map((t) => (
-          <button
-            key={t.to}
-            type="button"
-            disabled={busy}
-            onClick={() => onTransition(t.to)}
-            className="rounded border border-edge-soft bg-panel px-2 py-1 text-xs hover:border-blue-bright disabled:opacity-50"
-            title={`→ ${t.to}`}
-          >
-            {t.action}
-          </button>
-        ))}
-        {legal.transitions.length === 0 && !legal.terminal && !legal.thread_decision_required && (
-          <span className="text-xs text-faint">No actions for your role at this stage.</span>
-        )}
-      </div>
+      {showActions && (
+        <div className="mt-2 flex flex-wrap gap-2">
+          {legal.transitions.map((t) => (
+            <button
+              key={t.to}
+              type="button"
+              disabled={busy}
+              onClick={() => onTransition?.(t.to)}
+              className="rounded border border-edge-soft bg-panel px-2 py-1 text-xs hover:border-blue-bright disabled:opacity-50"
+              title={`→ ${t.to}`}
+            >
+              {t.action}
+            </button>
+          ))}
+          {legal.transitions.length === 0 && !legal.terminal && !legal.thread_decision_required && (
+            <span className="text-xs text-faint">No actions for your role at this stage.</span>
+          )}
+        </div>
+      )}
     </div>
   )
 }

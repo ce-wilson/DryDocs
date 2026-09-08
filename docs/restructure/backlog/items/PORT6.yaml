@@ -1,0 +1,106 @@
+id: PORT6
+epic: release-infrastructure
+title: "A roll close proves the clean-add class complete: a completeness check reads PORT-MANIFEST through the disposition classifier, lists every base-tag path absent from the consumer tree, and refuses COMPLETE unless the survivors are deferred by path"
+type: task
+module: drydocs-port
+phase: 8
+agent: main
+model: sonnet
+priority: p1
+status: done
+depends_on: []
+inputs:
+- PORT-MANIFEST.yaml
+- scripts/render_port_dispositions.py
+- scripts/port_rename_check.py
+- .claude/skills/reconcile-port/SKILL.md
+- docs/port/port-prompt.md
+- tests/unit/test_port_manifest.py
+acceptance: |
+  A roll close proves the collision classes complete and never the clean-add class. Seven
+  paths and four per-entry rows present at port-base-20260902 surfaced two carve-outs later
+  as "not in this roll" AFTER that roll had closed COMPLETE (2026-09-07 transcription,
+  sixteenth and seventeenth reports; RELAY-35 carries the by-hand recipe). Two mechanisms,
+  both confirmed by the consumer session itself: (1) its per-entry pass merged the RANGE DIFF
+  where the entry_rule says union by id against the tag's file, so a row added in an earlier
+  range and never merged is in neither diff and stays invisible to every later pass; (2) its
+  attribution instrument (`git diff --numstat <base> <next> -- <path>`, empty = not this roll)
+  prints empty for a forgotten path exactly as for a deferred one, and only the lineage pair
+  has a named deferral (T24) - so after a roll closes, deferred and missed are
+  indistinguishable.
+
+  (a) scripts/port_completeness_check.py (canonical-producer, ships to the consumer) takes a
+      base tag, reads PORT-MANIFEST.yaml through the SAME classifier
+      scripts/render_port_dispositions.py uses (one classifier, not a second reading of the
+      manifest), lists every path at `git ls-tree -r --name-only <tag>` that is absent from
+      the working tree and whose class is neither never-port nor canonical-company, and exits
+      non-zero unless that list is empty or every survivor is named in the roll's deferral
+      section.
+  (b) The deferral section is a by-PATH list in the port-prompt's roll record, and the
+      acceptance gate refuses COMPLETE while the completeness check has survivors not in it.
+      T24 is the prose form of exactly one entry and becomes the first row. The section is
+      per-roll and cumulative: a path deferred in roll N is still deferred in roll N+1 until
+      it is applied or the row is retired with a date.
+  (c) The reconcile-port skill's close step names BOTH instruments together and says what each
+      answers: `--numstat` for "this roll or not" (attribution), the completeness check for
+      "ever applied or not" (completeness). Neither alone.
+  (d) Guard, producer-side, at the incident's shape (J76): a fixture repo where a path lands
+      in range 1, is skipped, and range 2 touches nothing near it - the check must name that
+      path at range 2's close, and `--numstat` over range 2 must be empty for it, which is
+      the whole point.
+  (e) A relay tells the consumer the script exists and where the deferral section lives.
+      Nothing is asked back.
+  (f) Added 2026-09-08 (twenty-second report; RELAY-37): the check covers the union-append
+      class too, by HEADING - every `## ` heading in a union-append file at the base tag
+      (`git show <tag>:<path>`) is present in the working-tree file, or the roll is not
+      COMPLETE. Per-entry rows by id, clean-add paths by name, union-append entries by
+      heading: one instrument, three classes. The incident it reconstructs (J76): the
+      consumer's config/gate-log.md held none of the ten producer entries owed by three
+      applied rolls, two of them closed COMPLETE, and the only guard that could see any of
+      it (tests/unit/test_gates_json.py) saw one, because scripts/render_gates.py hides a
+      self-declared prompt with no log entry - that half is Idea-303, not this item.
+  (g) Added 2026-09-08 (twenty-fourth report; the consumer's correction 12): the consumer ran
+      RELAY-35's by-hand recipe at 0905 and bucketed the survivors by disposition class - 113
+      survivors, 87 owed or deferred once never-port is removed, 82 of them already absent at
+      a roll closed COMPLETE, 51 falling to the manifest default with nothing recording a
+      decision - so the check's output is BY CLASS, in that table's shape, and that run is its
+      first real-values fixture (J76). Two things the run taught: the check says in its own
+      --help that it is a PRESENCE check, blind to present-but-divergent content (the T24
+      shape), so nobody over-trusts it; and RELAY-35 listed a never-port path as owed
+      (drydocs/data/samples/controlm_hosts__sample.csv), which is exactly the misread (a)'s
+      classifier filter exists to prevent - a by-hand sweep and the classifier disagreed, and
+      the classifier is the one that reads the manifest.
+notes: |
+  Minted 2026-09-07 from IDEAS.md Idea-291 (desktop, Lane A); the stub shipped in e0f2b799
+  under a stale CFG5 message - see CORE6's note. Source is the company's carve-out I close
+  and its turn-24 corrections, transcribed to the machine-local back-flow file named in
+  Idea-291 (never the captures); RELAY-35 in docs/port/port-prompt.md is the by-hand form
+  the consumer already has.
+
+  Sequencing: lands as a relay in the NEXT roll, not mid-apply (a moving manifest is worse
+  than a wrong one - the same rule Workstream A of the id-grammar plan follows). The
+  in-flight roll (0902..0905, carve-out H under way) closes on RELAY-35's by-hand recipe.
+  p1 because the failure it fixes has already happened once and is silent by construction.
+
+  DONE 2026-09-08 (desktop, Lane A). Built as three pieces plus the surfaces. (a)/(g)
+  drydocs/port/dispositions.py holds the ONE classifier (classify + the anchored glob
+  matcher), extracted from scripts/render_port_dispositions.py, which now imports it;
+  tests/unit/test_port_dispositions.py asserts the renderer's name IS the module's function.
+  drydocs/port/port_completeness.py is the pure logic - survivors by class, never-port
+  dropped, canonical-company listed as a ruling band that does not fail, the consumer's
+  table shape (disposition | carried | new | deferred | owed | total) - and
+  scripts/port_completeness_check.py the thin CLI; --help states PRESENCE only. (b) the
+  port-prompt gained DEFERRED BY PATH with a fenced deferred-paths block (pattern | roll |
+  ref | retired), first row drydocs_lineage/** T24, cumulative and retired by date; the
+  check reads it at the base tag with git show because docs/port never crosses, plus
+  --deferrals FILE for consumer-ruled rows; the ACCEPTANCE GATE carries the check as a
+  bullet. (c) the reconcile-port skill's step 3b names both instruments and what each
+  answers, and the Port report template carries the check's last line. (d)
+  tests/unit/test_port_completeness.py builds the fixture repo: pkg/new.py added in range 1,
+  never applied, and at range 2's close numstat over range 2 is asserted EMPTY for it while
+  the check names it as carried - plus deferral round-trip, retired rows, tag-read of the
+  port-prompt, canonical-company band, union-append heading gap, unresolvable tag refused
+  (exit 2, J76). (e) RELAY-40. (f) union-append by H2 heading, markdown only, fences
+  stripped; YAML union-append rows stay with the J7 guards. Smoke producer-side against
+  port-base-20260905 --prev port-base-20260902: 5 survivors, all paths deleted since the
+  tag - the expected producer-side reading of a consumer instrument.

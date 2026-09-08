@@ -48,7 +48,7 @@
 schema: drydocs.source-mapping.v1
 source: "pat:people-report"     # v2 DATASET id — PatProductMappingLoader binds to it; DevTeamsLoader binds to pat:product-catalog but reads the SAME report's team columns (see note)
 classification: Internal-Public
-updated: 2026-08-29
+updated: 2026-09-07
 
 objects:
   # ---------------------------------------------------------------------------
@@ -159,7 +159,7 @@ objects:
          note: "display name beside the id"}
       - {name: "Seal IDs", disposition: projected, origin: source,
          target: "staging:seal_ids",
-         note: "PINNED 2026-08-29 -- and CORRECTED by the census. Carried as `SEAL IDs` until then: the pat-evidence README pinned the column's EXISTENCE and its semicolon delimiter, and the CASING rode along unverified. Header matching is exact, so the wrong casing RAISED ProjectionError on the first real run rather than loading an empty column -- right behaviour, wrong pin, on the field feeding the ACTIVE arch_develops edge. Semicolon-separated; PatProductMappingRow normalises ';' -> ',' at the row boundary and the cypher splits on ','. Values are Internal"}
+         note: "PINNED 2026-08-29 -- and CORRECTED by the census. Carried as `SEAL IDs` until then: the pat-evidence README pinned the column's EXISTENCE and its semicolon delimiter, and the CASING rode along unverified. Header matching is exact, so the wrong casing RAISED ProjectionError on the first real run rather than loading an empty column -- right behaviour, wrong pin, on the field feeding the ACTIVE arch_develops edge. Delimiter is semicolon + space (`; `); MULTI-VALUED, one team to many applications, with long lists in the live data (dozens of ids on one row), so a scalar read drops most of the relationship; token width is 4 to 7 digits, never assume 5 or 6 (profile SME-reported 2026-09-07, K30 close note). PatProductMappingRow normalises ';' -> ',' at the row boundary and the cypher splits on ',' with trim(), no width filter. Values are Internal"}
       - {name: "Legacy Team ID", disposition: excluded, origin: source, reason: scope,
          note: "PINNED: opaque UUID-shaped predecessor key; team_id remains the only team key"}
       - {name: "Team Type Name", disposition: excluded, origin: source, reason: scope,

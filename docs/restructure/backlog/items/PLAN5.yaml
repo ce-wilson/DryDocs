@@ -1,0 +1,59 @@
+id: PLAN5
+epic: project-board
+title: "lane-handoff --suggest compares a lane's items against the other lane's pens and never against its queue - fold in the input-overlap check that found seven collisions"
+type: task
+module: drydocs-plan
+phase: 8
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- .claude/skills/lane-handoff/scripts/overlap_prototype.py
+- .claude/skills/lane-handoff/scripts/handoff.py
+- tests/unit/test_lane_handoff.py
+- docs/lane-b-handoff.md
+acceptance: |
+  lane-handoff --suggest compares a lane's item inputs against the OTHER lane's PENS and
+  never against the other lane's QUEUE, so four of ten queued Lane B items passed clean while
+  sharing input paths with items Lane A was building: WEB8 relocates askApi.ts while WEB9 edits
+  it, O63 rewrites the same file, and both need drydocs_api/schemas.py inside R15/R16's
+  whole-package input. Lane B skipped WEB8 and O63 by hand and took R12 and O68 knowingly.
+
+  START FROM THE PROTOTYPE, NOT FROM THIS DESCRIPTION: Lane B's roughly 30-line version was
+  preserved as run at .claude/skills/lane-handoff/scripts/overlap_prototype.py (e89a66ca, merged
+  47383aae). It retires when this fold-in lands.
+
+  (a) --suggest compares item inputs against the other queue's item inputs, prefix-aware, so
+      drydocs_api/ covers drydocs_api/schemas.py. One row per collision, naming both items and
+      the shared prefix, and the row says which side supplied the coarse path (O68's web/src
+      alone matches seven Lane A paths, so a coarse input dominates and the reader must be able
+      to see that).
+  (b) THE RULING THIS ITEM CARRIES AND DOES NOT MAKE: run cold the prototype reports SEVEN of
+      ten, not four - WEB2, WEB6 and WEB7 collide only on
+      docs/reviews/modules/web-2026-09-05.md, the review that spawned every WEB item on both
+      lanes. That is read-only provenance, not a write target, and 'a shared input is a
+      collision only if one side WRITES it' is not expressible today: inputs is the only path
+      field in the v3 schema and no item declares outputs. Two options, both written into this
+      item so the call can be made from the item file - (1) grow the schema with outputs:, or
+      (2) exclude provenance by convention (docs/reviews/). 66 of 663 items name a review path,
+      so the choice is not cosmetic. The user rules; the build follows the ruling.
+  (c) --check cannot do this without a front-matter change: a generated handoff records queue:
+      and pens: and the other lane's ids survive only in a prose table row, which J37 forbids
+      parsing. Generate writes an ADDITIVE other_queue: line, and --check takes a graceful path
+      for files that predate it (docs/lane-b-handoff.md is one) rather than failing on them.
+  (d) Pinned in tests/unit/test_lane_handoff.py, including the coarse-prefix case and the
+      predates-other_queue case.
+notes: |
+  Minted 2026-09-07 from IDEAS.md Idea-269 (Lane B close report, laptop, 2026-09-06,
+  headline finding). The three facts in clause (b) and (c) come from re-running the prototype
+  cold on 2026-09-06 and are the entry's own, not the groom's.
+
+  Model fable because clause (b) is a schema question (does an item declare outputs) that binds
+  every future item file - the matrix's schema-changing case. J74's precedent applies: the item
+  carries the options so the ruling can be made from the item file, and the build waits on the
+  ruling rather than guessing it.
+
+  PLAN6 (Idea-264) is the sibling gap in the same check, kept separate because it is a
+  different missing signal (venue, not overlap) and either can land first.

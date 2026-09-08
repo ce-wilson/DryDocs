@@ -36,6 +36,23 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/data-centers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Data Centers */
+        get: operations["get_data_centers_data_centers_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/demo": {
         parameters: {
             query?: never;
@@ -79,6 +96,23 @@ export type paths = {
         };
         /** Get Export Manifest */
         get: operations["get_export_manifest_exports__export_id__manifest_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/graph-status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Graph Status */
+        get: operations["get_graph_status_graph_status_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -462,6 +496,57 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/review-quality": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Review Quality */
+        get: operations["get_review_quality_review_quality_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/review-quality/block": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Post Review Quality Block */
+        post: operations["post_review_quality_block_review_quality_block_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/review-quality/unblock": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Post Review Quality Unblock */
+        post: operations["post_review_quality_unblock_review_quality_unblock_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/specs": {
         parameters: {
             query?: never;
@@ -549,6 +634,16 @@ export type components = {
                 [key: string]: unknown;
             }[];
         };
+        /** BlockBody */
+        BlockBody: {
+            /** Persona Id */
+            persona_id: string;
+            /**
+             * Reason
+             * @default
+             */
+            reason: string;
+        };
         /** Body_post_intake_evidence_intake__intake_id__evidence_post */
         Body_post_intake_evidence_intake__intake_id__evidence_post: {
             /** Files */
@@ -609,8 +704,11 @@ export type components = {
             label: string;
             /** Name */
             name: string;
-            /** Type */
-            type: string;
+            /**
+             * Type
+             * @enum {string}
+             */
+            type: "string" | "int" | "list";
         };
         /**
          * ConfigOut
@@ -679,6 +777,49 @@ export type components = {
             generated_on: string;
             /** Markdown */
             markdown: string;
+        };
+        /**
+         * DataCenterOut
+         * @description One row of the data-center spelling registry (LOAD2), as the console reads
+         *     it for Z6's runtime map.
+         *
+         *     ``default_time`` and ``suffix`` are OPTIONAL BY RULE and not by accident: the
+         *     ``E####``-as-default-time reading comes from an internal standard whose own
+         *     open items include "confirm E is always Eastern", so a name that carries no
+         *     time segment registers exactly like one that does. They are declared here as
+         *     plain strings that may be empty for that reason — a null would suggest the
+         *     lookup failed, and nothing failed.
+         */
+        DataCenterOut: {
+            /** Code */
+            code: string;
+            /** Default Time */
+            default_time: string;
+            /** Name */
+            name: string;
+            /** Note */
+            note: string;
+            /** Sample */
+            sample: boolean;
+            /** Suffix */
+            suffix: string;
+        };
+        /**
+         * DataCentersOut
+         * @description GET /data-centers.
+         *
+         *     ``source`` names the venue the rows came from (J18): the machine-local
+         *     internal twin, or the publishable synthetic sample. A console that showed a
+         *     default time without saying which file it read would make a producer-side
+         *     demo look like a statement about production.
+         */
+        DataCentersOut: {
+            /** Data Centers */
+            data_centers: components["schemas"]["DataCenterOut"][];
+            /** Source */
+            source: string;
+            /** Updated */
+            updated: string;
         };
         /**
          * DraftReceiptOut
@@ -805,6 +946,37 @@ export type components = {
             params: {
                 [key: string]: unknown;
             };
+        };
+        /**
+         * GraphStatusOut
+         * @description GET /graph-status. Is the graph the console reads actually reachable, and
+         *     which database is it?
+         *
+         *     WHY A ROUTE AND NOT A QuerySpec, the same question /docs-verify answered and
+         *     the same answer: this takes NO parameters and the Cypher is chosen entirely
+         *     server-side (a bare ``RETURN 1``), which is the property ADR 0005 protects.
+         *     A spec would also be the wrong instrument — a spec run that fails tells you
+         *     the spec failed, and the whole point here is to separate "the graph is not
+         *     there" from "your question was bad".
+         *
+         *     ``database`` is the reviewed READ database, taken from ``SPEC_DATABASES``
+         *     rather than from ``Neo4jSettings.database`` (which is nullable and is the
+         *     driver's default, not the console's). If the reviewed set ever gains a
+         *     second name that is a deliberate edit, and this follows it.
+         *
+         *     ``detail`` carries the EXCEPTION CLASS when a probe fails - never the URI,
+         *     the user or anything from the settings. A page that can name the host it
+         *     could not reach is a page carrying a deployment coordinate (ADR 0020), and
+         *     the class name is what actually distinguishes an auth failure from a
+         *     refused connection.
+         */
+        GraphStatusOut: {
+            /** Database */
+            database: string;
+            /** Detail */
+            detail: string | null;
+            /** Reachable */
+            reachable: boolean;
         };
         /** HealthOut */
         HealthOut: {
@@ -1267,6 +1439,61 @@ export type components = {
             overrides: number;
         };
         /**
+         * PersonaBlockOut
+         * @description A submit block, open or lifted. Append-only in the store: an unblock
+         *     fills the three ``unblock*`` fields rather than deleting the row, because a
+         *     judgment about a person that can be erased is not a record.
+         */
+        PersonaBlockOut: {
+            /** Block Id */
+            block_id: string;
+            /** Blocked At */
+            blocked_at: string;
+            /** Blocked By */
+            blocked_by: string;
+            /** Persona Id */
+            persona_id: string;
+            /** Reason */
+            reason: string;
+            /** Unblock Note */
+            unblock_note?: string | null;
+            /** Unblocked At */
+            unblocked_at?: string | null;
+            /** Unblocked By */
+            unblocked_by?: string | null;
+        };
+        /**
+         * PersonaQualityOut
+         * @description O51: one reviewer's signals over the rolling window.
+         *
+         *     ``auto_accept_rate`` is NULLABLE ON PURPOSE and is null everywhere today.
+         *     The metric needs the agent's candidate-binding set (O48) to compare a
+         *     confirmation against; reporting 0.0 would read as a reviewer who modifies
+         *     everything, which is the best possible score. The reason travels beside it
+         *     in ``auto_accept_unavailable_because`` so no consumer has to guess whether
+         *     null means zero, missing, or broken.
+         */
+        PersonaQualityOut: {
+            /** Admin Return Rate */
+            admin_return_rate: number;
+            /** Auto Accept Rate */
+            auto_accept_rate: number | null;
+            /** Auto Accept Unavailable Because */
+            auto_accept_unavailable_because: string;
+            /** Blocked */
+            blocked: boolean;
+            /** Flags */
+            flags: components["schemas"]["QualityFlagOut"][];
+            /** Median Review Seconds */
+            median_review_seconds: number | null;
+            /** Persona Id */
+            persona_id: string;
+            /** Submissions */
+            submissions: number;
+            /** Too Fast Rate */
+            too_fast_rate: number;
+        };
+        /**
          * PromotedDiffOut
          * @description POST /mappings/drafts/{draft_id}/promote — the unified diff to apply on a
          *     branch. The server still writes nothing; git is the only commit target.
@@ -1287,6 +1514,22 @@ export type components = {
             /** Path */
             path: string;
         };
+        /**
+         * QualityFlagOut
+         * @description One limit an SME crossed. The metric that tripped travels WITH the
+         *     number and the limit it was compared against, so the rail can say what
+         *     happened without the console holding a second copy of the thresholds.
+         */
+        QualityFlagOut: {
+            /** Detail */
+            detail: string;
+            /** Limit */
+            limit: number;
+            /** Metric */
+            metric: string;
+            /** Value */
+            value: number;
+        };
         /** QueryBody */
         QueryBody: {
             /**
@@ -1301,6 +1544,28 @@ export type components = {
         RawBody: {
             /** Cypher */
             cypher: string;
+        };
+        /**
+         * ReviewQualityOut
+         * @description GET /review-quality (admin only).
+         *
+         *     ``limits`` rides along so the console renders the number a metric was
+         *     compared against instead of restating the thresholds in TypeScript — the
+         *     same reason a spec result carries its own column declarations.
+         */
+        ReviewQualityOut: {
+            /** Blocks */
+            blocks: components["schemas"]["PersonaBlockOut"][];
+            /** Limits */
+            limits: {
+                [key: string]: unknown;
+            };
+            /** Min Decisions For Flag */
+            min_decisions_for_flag: number;
+            /** Personas */
+            personas: components["schemas"]["PersonaQualityOut"][];
+            /** Window Days */
+            window_days: number;
         };
         /**
          * SpecOut
@@ -1386,6 +1651,16 @@ export type components = {
             /** Decision */
             decision: string;
         };
+        /** UnblockBody */
+        UnblockBody: {
+            /**
+             * Note
+             * @default
+             */
+            note: string;
+            /** Persona Id */
+            persona_id: string;
+        };
         /** ValidationError */
         ValidationError: {
             /** Context */
@@ -1455,6 +1730,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ConfigOut"];
+                };
+            };
+        };
+    };
+    get_data_centers_data_centers_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataCentersOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -1532,6 +1838,37 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_graph_status_graph_status_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GraphStatusOut"];
                 };
             };
             /** @description Validation Error */
@@ -2279,6 +2616,107 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["NamedRunOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_review_quality_review_quality_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewQualityOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    post_review_quality_block_review_quality_block_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BlockBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PersonaBlockOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    post_review_quality_unblock_review_quality_unblock_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UnblockBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PersonaBlockOut"];
                 };
             };
             /** @description Validation Error */

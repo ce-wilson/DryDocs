@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: done
 depends_on: []
 inputs:
 - .github/workflows/ci.yml
@@ -64,3 +64,102 @@ notes: |
   55-failure acceptance run. Two variables, one measurement, and no way afterwards to say which
   moved the baseline. Keeping the interpreter question away from the pin question is the whole
   reason this is its own item.
+
+  CLOSED 2026-09-07 (laptop / NewThinkpad, Lane B, branch wip/j67-laptop; queue item 4 of
+  docs/lane-b-handoff.md). All five clauses answered.
+
+  A SECOND MEASUREMENT THAT CHANGES THE PICTURE, taken here and venue-stamped (J18): the LAPTOP
+  runs CPython 3.12.10 - base and venv, win32, `poetry env info` 2026-09-07. The desktop
+  measured 3.14.6 on 2026-09-01. So the two producer machines are on DIFFERENT interpreters,
+  both inside `^3.11`, and CI proved exactly one of them. The comment standing in ci.yml gave
+  as its reason for a single version that "3.12 is what both dev machines run" - which was
+  already false when J67 measured the desktop, and is now precisely half true in a way that
+  reads as agreement. That comment, not the missing matrix, is the part that would have kept
+  this invisible.
+
+  (a) DECIDED: THE RANGE STAYS AND CI GREW. The reverse - narrowing to what CI proved - would
+  have declared `^3.12` and excluded 3.14, the interpreter the desktop writes every line on. A
+  range that excludes a machine in daily use is a worse falsehood than an untested one, and
+  clause (d) rules the lock out of scope anyway. `.github/workflows/ci.yml` `gates` is now a
+  four-leg matrix and `pyproject.toml` carries a comment above the range naming the matrix that
+  proves it, so the two statements point at each other rather than merely coexisting.
+
+  THE LEGS, AND WHY NOT MORE: ubuntu/3.12 BLOCKING (the status quo, unchanged cost);
+  ubuntu/3.11 advisory (an untested FLOOR is exactly the assertion this item objects to);
+  ubuntu/3.14 advisory (the desktop); windows-latest/3.12 advisory (see (c)). 3.13 is
+  deliberately skipped and the file says so - an interior point between two tested ends, against
+  a 2026-08-21 Actions-minutes decision that is still a real constraint.
+
+  (b) ADVISORY FIRST, exactly as the clause asks: `continue-on-error: ${{ matrix.advisory }}`
+  per leg, with `fail-fast: false` so an advisory leg can never cancel the blocking one.
+  Flipping one to blocking is a separate decision and the file says so, citing J10 stage 5 -
+  the blocking gate nobody watched that ran red for 100+ consecutive runs. Nothing here can
+  turn the trunk red: the only leg that can fail the job is the one that could yesterday.
+
+  (c) WINDOWS IS IN SCOPE, not ruled out - one advisory leg, windows-latest on 3.12. The clause
+  warns that silence here reads as "covered", so the positive statement: this repo already
+  carries `.gitattributes` CRLF rules, `getpass` handling and `VIRTUAL_ENV` behaviour that
+  exist BECAUSE the two platforms differ, and all local work is Windows, so ruling it out would
+  have left the OS axis exactly as the clause predicted it would be left. The evidence that it
+  is likely to pass rather than a speculative red: the full suite ran green on Windows three
+  times on this machine today (3652 / 3637 / 3638 passed on the three branches this session).
+  What the leg does NOT cover: it runs 3.12, not the desktop's 3.14, so Windows-on-3.14 - the
+  desktop's actual configuration - is still untested by anything. That is the next flip to
+  consider, and it is deliberately not taken here.
+
+  The Poetry cache path is per-OS from the matrix, because Poetry caches under ~/.cache on
+  Linux and %LOCALAPPDATA% on Windows: pointing the Windows leg at the Linux path would have
+  cached nothing while looking like it cached something. The cache KEY now varies by
+  interpreter as well as by runner.os, so four legs cannot share one another's wheels.
+
+  (d) THE LOCK IS UNTOUCHED. `git status --short poetry.lock` is empty on this branch; nothing
+  ran `poetry lock` or `poetry update`. `poetry check` reports only the four pre-existing
+  [tool.poetry] deprecation warnings, unchanged by the comment added above the range.
+
+  (e) THE AGENTS VENV IS NAMED ON THE ROW, in the matrix comment block itself rather than only
+  here: `agents/requirements.txt` is a separate interpreter that LEADS this project by
+  declaration (neo4j>=6.2,<7 against the project's 5.x - G110, "may lead, but only by
+  declaration"), no leg installs it, and this matrix does not extend to it.
+
+  ALSO SCOPED OUT, said in the file so it is not read as an oversight: the `web` job keeps its
+  single Python 3.12. Its subject is the console; Python is one process it happens to start,
+  and running the browser suite four times to vary an interpreter it never exercises would buy
+  nothing at four times the cost.
+
+  Gates: full suite 3637 passed / 14 skipped / 18 deselected; `ruff check .` and `ruff format
+  --check .` clean; the two guards that parse this workflow as YAML
+  (test_precommit_config.py, test_console_delivery.py) 15 passed. No render, no snapshot -
+  Lane A pens.
+
+  WHAT THIS ITEM CANNOT PROVE FROM HERE, stated rather than implied: the three new legs have
+  never run. Their first execution is the push of this branch, and an advisory leg going red is
+  the item working, not the item failing - the point of (b) is that the truth arrives without
+  costing the trunk. Lane A should read the first run of all four legs before deciding whether
+  any advisory one is believable enough to block on.
+
+  THE FIRST RUN, READ (run 34180616297, wip/j67-laptop, 2026-09-08). It came back while this
+  lane was still open, so the paragraph above is now answered rather than left to Lane A. ALL
+  FOUR LEGS RAN, and all four report the SAME single failure - 1 failed, 3529 passed, 42
+  skipped, 18 deselected - and that one failure is
+  test_committed_roadmap_page_matches_its_sources, the roadmap guard going red on a close
+  commit because Lane B writes notes and does not render. It is the expected Lane B close red,
+  identical on every leg, and it is not an interpreter or platform finding.
+
+  So the substantive result is: NOTHING IS BROKEN ON ANY OF THE THREE NEW LEGS. Poetry
+  installed, the lock resolved and the full suite ran on 3.11, on 3.14 and on Windows. The
+  desktop's "the lock cannot resolve on 3.14" worry, which is what put this item in the
+  backlog, is now disproved in CI as well as locally - two independent venues.
+
+  TWO DIFFERENCES WORTH KEEPING, neither a failure:
+  - 3.14 emits 37 warnings against 7 on 3.12, same suite, same tree. Nobody has read them.
+    That is the kind of thing an advisory leg exists to surface, and it is a candidate for its
+    own item rather than something to fix inside this one.
+  - The Windows leg takes 394s against ~205-215s on the three Linux legs, roughly 1.9x. Real
+    Actions-minutes cost, and the number to weigh if anyone proposes making it blocking.
+
+  WHAT THIS DOES NOT SETTLE: one green run is not "green long enough to be believed", which is
+  the bar clause (b) sets and the J10 stage-5 precedent it cites. The flip to blocking stays a
+  separate decision with a separate reading, and this note is the first data point toward it,
+  not the case for it. The run also cannot say anything about a leg on a commit that renders
+  cleanly, since every leg here was measured on a Lane B close - the first fully green reading
+  will come from Lane A's merge commit.

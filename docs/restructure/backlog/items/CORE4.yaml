@@ -1,0 +1,108 @@
+id: CORE4
+epic: release-infrastructure
+title: "The skip-guard policy calls every drydocs/data/ reference gitignored, but the sample CSVs under it are tracked - ask git rather than pattern-match the directory"
+type: bug
+module: drydocs-core
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: done
+depends_on: []
+inputs:
+- tests/unit/test_skip_guard_policy.py
+- docs/restructure/backlog/items/J8.yaml
+acceptance: |
+  The J8 skip-guard policy treats any drydocs/data/ reference as a reference to a
+  gitignored asset. The tree/samples under it are FORCE-TRACKED, so the policy flags a test
+  that reads a tracked sample as if it read machine-local data, and the fix at Z8 was a real
+  existence guard written to satisfy a policy that was measuring the wrong thing. A fake skip
+  in place of a real assertion is the cost.
+
+  (a) The policy asks GIT whether the cited path is tracked (git ls-files) instead of
+      pattern-matching the directory prefix. A tracked path needs no skip guard; an untracked
+      one still does.
+  (b) The two cases are distinguished in the failure message, so a future reader sees which of
+      the two the file tripped.
+  (c) The Z8-era guard written to satisfy the old policy is revisited: if it exists only to
+      pass the policy, it is replaced by the real existence assertion the test wanted.
+  (d) Fixtures cover both directions - a tracked sample under drydocs/data/ passes with no
+      skip, an untracked one under the same prefix still fails without one - and the existing
+      glob/manifest-row carve-outs keep working.
+notes: |
+  Minted 2026-09-07 from IDEAS.md Idea-258 (Lane B close report, laptop, 2026-09-05,
+  found while moving the Z8 fixtures).
+
+  The test is tests/unit/test_skip_guard_policy.py (verified on this tree); the entry called it
+  'J8's skip guard', which is the item that built it.
+
+  The same instrument-versus-subject error as CORE2, one level up: the policy's instrument (a
+  path prefix) does not measure its subject (whether the asset is in the clone).
+
+  CLOSED 2026-09-07 (laptop / NewThinkpad, Lane B, branch wip/core4-laptop; queue item 2 of
+  docs/lane-b-handoff.md). All four clauses done.
+
+  THE MEASUREMENT THAT SETTLES IT, taken on this tree before anything was changed: `.gitignore`
+  line 41 is `drydocs/data/`, and `git ls-files drydocs/data/` returns FOURTEEN files. Both are
+  true at once - the tree is ignored wholesale and the samples inside it are force-tracked -
+  which is precisely why a prefix cannot answer the question. `git check-ignore` on one of those
+  samples reports nothing, because ignore rules do not apply to tracked paths; that is the same
+  fact from the other side.
+
+  (a) DONE. The policy now asks git ls-files (one subprocess, cached at import, the
+  test_publish_boundary_values::_tracked_files idiom) whether the cited path is in a fresh clone.
+  References are read through `ast` instead of a regex over source text, which buys three things
+  at once: a multi-line `/` chain is seen whole (the two test_variable_* files build their path
+  across five lines), a path named in a COMMENT is invisible because it is not a read, and the
+  anchor logic can ignore whatever precedes `"drydocs" / "data"` - REPO, Path(__file__).resolve()
+  .parents[2], any spelling of the repo root - since none of it changes which file is named.
+  ONE module-level name hop is followed, which is what resolves `SAMPLES = REPO / "drydocs" /
+  "data" / "samples"` plus `SAMPLES / "x.csv"`. Imports are not followed and neither is anything
+  else; the boundary is the point, because real dataflow is how a policy test becomes something
+  nobody can reason about.
+
+  (b) DONE, with THREE outcomes rather than the two the clause names - and the third is the
+  reason to read this note. tracked -> no guard needed. UNTRACKED -> the port failure, add the
+  guard. UNRESOLVABLE -> the checker cannot name the file, so it cannot clear it either, and the
+  message says "name the path so it resolves, or keep a guard". Folding unresolvable into
+  "tracked" would have quietly excused the one shape this checker is blindest to, and that shape
+  is not hypothetical: test_pat_projection.py:220 builds its path from an imported constant.
+
+  (c) DONE. The Z8-era guard is gone, and its own docstring convicted it - "drydocs/data/ is
+  gitignored wholesale and its tracked CSVs are grandfathered inside it, so today every path
+  here is present and the skip never fires". A guard that never fires is not protecting the
+  suite from anything; it was written to satisfy the old policy. `_rows` now asserts, with a
+  message saying a missing tracked sample means a BROKEN clone rather than an incomplete one.
+  test_bundled_demo_interlock.py now carries no guard marker at all, and its unused `pytest`
+  import is gone - the file passing the policy with nothing to satisfy it is what proves the
+  new question is the right one.
+
+  (d) DONE, both directions plus the third state, in the checker's own self-test: an untracked
+  path under drydocs/data/samples/ flags, a tracked one under the identical prefix does not, and
+  a name-terminated chain is unresolvable. The glob / manifest-row, prose and prose-plus-real
+  carve-outs are unchanged and still pass, which is the carve-out proof the clause asks for.
+
+  J66 CAUGHT IN THE ACT, and recorded because it is that rule's own failure mode landing on a
+  guard being rewritten to obey it. `_has_guard` was `re.compile(r"skipif|importorskip|
+  pytest.skip")` over raw source. The moment this module's prose explained why a file no longer
+  needs a guard, the words in that explanation read AS a guard - and the interlock, whose guard
+  had just been removed, still counted as guarded because its new docstring says what used to be
+  there. It now goes through tests.source_scan.called_names: a guard is a CALL, not a word. A
+  self-test pins that a docstring mentioning pytest.skip is not a guard.
+
+  VERDICTS ON THE REAL TREE (ten files reference the two trees): test_variable_classifier and
+  test_variable_staging keep their guards because controlm_variables__sample.csv is genuinely
+  untracked and absent here - the original port-failure shape, still caught, which is the proof
+  the policy was not merely loosened. test_data_centers and test_pat_projection keep theirs as
+  unresolvable. The other six resolve fully tracked.
+
+  Gates: full suite 3637 passed / 15 skipped / 18 deselected (the skip count is UNCHANGED - the
+  interlock's four reads never skipped, which was the complaint); `ruff check .` clean; `ruff
+  format --check .` clean; `import drydocs.cli` and `drydocs --help` exit 0. No render, no
+  snapshot - Lane A pens.
+
+  TWO THINGS REPORTED, NOT FIXED, both beyond this item's clauses and handed to Lane A:
+  test_pat_projection.py:220's skip is the same fake-skip class as the interlock's (its path is
+  tracked) but it is NAME-terminated by design so the constant cannot drift, and the acceptance
+  does not name it; and test_data_centers.py, test_email_extracts.py and three others now pass
+  the policy without needing their guards at all, which is a cleanup sweep rather than this bug.

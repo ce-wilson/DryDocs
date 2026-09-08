@@ -7,7 +7,7 @@ phase: 6
 agent: main
 model: fable
 priority: p2
-status: todo
+status: done
 depends_on: [G44]
 gates: [snowflake-data-catalog]
 inputs:
@@ -33,3 +33,13 @@ notes: |
   closes done and the session is never scheduled. Drafting item G44 closed done when the prompt landed; nobody owned the RUN.
   This item is the sign-off session's claim surface; the session itself is
   HITL (agent: main).
+  DONE 2026-09-07 (desktop, Lane A) - SME-DEFERRED (user ruling in-chat; config/gate-log.md
+  2026-09-07 DEFERRED entry). RE-ARM TRIGGER: the Logical Container gate signs (ONT3 drafts the prompt; the SME's five-tier formula of
+  2026-09-04 proposes a tier the declared taxonomy has no home for, and the org hierarchy is
+  ruled once, top to bottom, before this page is run against it). WHY: the
+  catalog gate's open question is what a curated data product IS in this graph, and that
+  question now lives in the Logical Container gate (DPROD/EKGF is the candidate standard on
+  both pages); the rulings and citations already logged for this gate stand unchanged. THE
+  STALE-RECORD HALF WAS DONE, NOT DEFERRED: the gate-log registry table row that read 'gate
+  prompt not drafted' carries a dated correction in place (never a rewrite) naming the prompt
+  file that exists. The drafted page stays on disk.

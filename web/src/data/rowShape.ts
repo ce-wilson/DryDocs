@@ -29,8 +29,13 @@ import type { SpecResult } from '../lib/graph'
 //      holds — the names are the contract and the types are a placeholder. So an
 //      ephemeral result is checked for PRESENCE only. (This is why the seam
 //      carries the server's `ephemeral` flag: see graph.ts.)
-//   3. TWO SERVER DECLARATIONS ARE WRONG TODAY, and they are named below rather
-//      than papered over.
+//   3. A COLUMN CAN BE A LIST. `runbooks.series.v1` collects assets and
+//      `lineage.schema-definition.v1` comprehends property keys; both now declare
+//      `list` and are checked as lists. Until API2 (2026-09-07) there was no list
+//      type to declare, both said `string`, and this module carried a two-spec
+//      exemption so the console would render them at all. The exemption is gone
+//      with its cause, and the server now refuses a scalar declaration over a
+//      collected column at import (tests/unit/test_column_types.py).
 //
 // WHAT THIS IS NOT: a general-purpose schema validator. It checks the columns a
 // panel says it needs, against the types the server says it sends. Anything more
@@ -40,27 +45,6 @@ import type { SpecResult } from '../lib/graph'
  *  compile error rather than a runtime miss — the list is checked against the
  *  type it describes, which is the one part of this a compiler can still do. */
 export type RowShape<T> = readonly (keyof T & string)[]
-
-/** Columns whose SERVER declaration does not match what the spec returns.
- *
- * Both return a LIST under `type: "string"`:
- *   runbooks.series.v1        `lands`      = collect(DISTINCT d.assetId)
- *   lineage.schema-definition.v1 `properties` = [k IN keys(d) WHERE ...]
- *
- * Verified by reading the registry, not the render: the Cypher aliases a
- * collect()/comprehension to the name, and `ColumnDef` has no list type to
- * declare. The console already treats `lands` as an array — nvl-mapping's series
- * mapper iterates it — so the DECLARATION is what is wrong, not the data.
- *
- * `drydocs_api/query_specs.py` is the api pen and not this lane's to edit, so
- * these are exempted from the TYPE check (never from the presence check) and
- * handed back in WEB6's close note. The dead-entry test below is what makes the
- * exemption self-retiring: when the server grows a list type, an entry that no
- * longer matches a declared column fails. */
-export const DECLARED_TYPE_EXCEPTIONS: Readonly<Record<string, readonly string[]>> = {
-  'runbooks.series.v1': ['lands'],
-  'lineage.schema-definition.v1': ['properties'],
-}
 
 export type ShapeResult<T> = { ok: true; rows: T[] } | { ok: false; message: string }
 
@@ -80,11 +64,16 @@ function describe(v: unknown): string {
 /** True when `value` satisfies the server's declared type for that column.
  *  Null always satisfies (see note 1 above). An unrecognised declared type
  *  passes: the vocabulary is the server's, and a console that rejected a type it
- *  had not heard of would break on the next one drydocs_api adds. */
+ *  had not heard of would break on the next one drydocs_api adds. API2 closed
+ *  the vocabulary in the CONTRACT (`ColumnOut.type` is a Literal, so api.d.ts
+ *  carries the union) and this fallthrough stays anyway — a closed declaration
+ *  and a forward-compatible runtime are different guarantees, and only the
+ *  second one is this function's job. */
 function satisfies(value: unknown, declared: string): boolean {
   if (value === null || value === undefined) return true
   if (declared === 'string') return typeof value === 'string'
   if (declared === 'int') return typeof value === 'number' && !Number.isNaN(value)
+  if (declared === 'list') return Array.isArray(value)
   return true
 }
 
@@ -108,8 +97,6 @@ export interface RowSource {
    *  which case the check is presence only — which is still the check that
    *  catches a renamed or dropped column. */
   types?: ReadonlyMap<string, string>
-  /** Column names exempt from the TYPE check, never from the presence check. */
-  exempt?: ReadonlySet<string>
 }
 
 /** The core check, over any keys-and-rows source. */
@@ -128,13 +115,12 @@ export function validateRowsOf<T>(src: RowSource, required: RowShape<T>): ShapeR
     }
   }
 
-  const exempt = src.exempt ?? new Set<string>()
   const limit = Math.min(src.rows.length, TYPE_CHECK_ROWS)
   for (let i = 0; i < limit; i++) {
     const row = src.rows[i]
     for (const name of required) {
       const type = types.get(name)
-      if (type === undefined || exempt.has(name)) continue
+      if (type === undefined) continue
       if (!satisfies(row[name], type)) {
         return {
           ok: false,
@@ -161,7 +147,6 @@ export function validateRows<T>(result: SpecResult, required: RowShape<T>): Shap
       // placeholders (note 2). The names still had to be there, which is the
       // check that matters for an agent-registered query.
       types: result.ephemeral ? undefined : new Map(result.columns.map((c) => [c.name, c.type])),
-      exempt: new Set(DECLARED_TYPE_EXCEPTIONS[result.spec_id] ?? []),
     },
     required,
   )

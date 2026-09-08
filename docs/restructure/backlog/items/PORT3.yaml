@@ -1,0 +1,44 @@
+id: PORT3
+epic: release-infrastructure
+title: "A canonical-producer test that pins a never-port path fails on every consumer tree by construction, and nothing checks the join"
+type: task
+module: drydocs-port
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- PORT-MANIFEST.yaml
+- tests/source_scan.py
+- tests/unit/test_markdown_fences.py
+- tests/unit/test_runbook_currency.py
+acceptance: |
+  A canonical-producer test that pins a NEVER-PORT path fails on every consumer tree by
+  construction, and nothing checks the join. One retired stub (docs/port/port-prompt.md on the
+  company side) broke three separate producer guards at their chunk-2 apply of
+  port-base-20260902: the test_markdown_fences.py canary, the fence-scope change, and all four
+  tests of test_runbook_currency.py through EXTRA_DOCS. Each was fixed producer-side after the
+  fact (20449d47, and the NEVER_PORT_ZONE_OF skip), and each was found by the company running
+  the full suite - never by anything on this side.
+
+  (a) One guard: for every test whose PORT-MANIFEST disposition is canonical-producer, read its
+      CODE (J66 - tests/source_scan.py, string literals that look like repo paths) and assert no
+      literal lies under a never-port row, unless the test names it in an exemption that says
+      how it skips when the path is absent.
+  (b) It reads the IMPORTABLE manifest and the code, never the prose (J37/J66).
+  (c) The exemption's skip must be TRACKED-CONTENT-BASED, never a directory probe: the company's
+      docs/port/ exists and holds one gitignored file, so is_dir() read a zone that never crossed
+      as present (found the same day, fixed with git ls-files). The guard catches a cited path
+      that is present-but-untracked as well as one that is absent.
+  (d) The three guards from the incident are the fixtures - the guard fails on the pre-fix shape
+      and passes on the post-fix shape.
+notes: |
+  Minted 2026-09-07 from IDEAS.md Idea-252 (the company's chunk-2 apply of
+  port-base-20260902, relayed 2026-09-03).
+
+  The reason this is worth a guard rather than a habit: three separate guards broke on ONE
+  retired stub, and the producer had no way to see it. The join between 'this test is
+  producer-canonical' and 'this path never crosses' exists in two files today and in nobody's
+  head.

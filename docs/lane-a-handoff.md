@@ -2,15 +2,15 @@
 handoff: drydocs.lane-handoff.v1
 lane: A
 machine: desktop
-generated: 2026-09-06
-generated_at: 9841ac9b (main)
-queue: [WEB9, R15, R16, WEB10, R19, P6, N27]
+generated: 2026-09-08
+generated_at: 24076bc2 (main)
+queue: [PORT6, PLAN5, PLAN6, J57, J75, N26]
 pens: [backlog, port, adr, gates, snapshot]
 ---
 
-# Lane A handoff — desktop, 2026-09-06
+# Lane A handoff — desktop, 2026-09-08
 
-**From:** Lane A close of the 2026-09-05 burst (desktop, 2026-09-06). **To:** the Lane A session on the desktop.
+**From:** Lane A (desktop). **To:** the Lane A session on the desktop.
 **Lifecycle:** a working handoff, not a durable record — the item files are. When
 the queue below is empty, delete this file in the closing commit
 (`python .claude/skills/lane-handoff/scripts/handoff.py --check <this file>` says when).
@@ -40,7 +40,7 @@ is the pen for a SURFACE.
 4. Per-machine facts are yours to verify: `DRYDOCS_DATA_ROOT`, `DRYDOCS_LOGDIR`, the
    `.env`, and whether Neo4j is reachable here. Venue-stamp any live claim (J18).
 
-## Your queue, in order (7 items) — claim one at a time
+## Your queue, in order (6 items) — claim one at a time
 
 Every item below is `todo` with every dependency `done` at the generating commit — the
 same rule the board's Ready strip uses (`derive_summary`). Re-check on pull: the other
@@ -49,13 +49,16 @@ since PLAN1), so two lanes minting in disjoint series cannot collide on a number
 
 | # | Id | Title | Type / prio | Module | Model | Notes from the check |
 |---|---|---|---|---|---|---|
-| 1 | **WEB9** | Credential propagation to the agent tier - the drydocs-api bearer token leaves the Ask message body and rides a header, a short-TTL exchange token or a session id, so no credential lands in an agent transcript | task / p1 | `drydocs-web` | sonnet | clean |
-| 2 | **R15** | Epistemic labeling on query answers: every lineage/impact-style answer declares exact vs lower-bound and names the causes that limited the walk | task / p2 | `drydocs-api` | sonnet | clean |
-| 3 | **R16** | Named agent verbs over the reviewed QuerySpecs: impact, context and trace as purpose-built tools instead of raw Cypher against the generic MCP server | task / p2 | `drydocs-api` | sonnet | clean |
-| 4 | **WEB10** | The console's delivery shape - same-origin behind the API or one reverse proxy, a runtime-configured API base instead of a build-time inlined VITE_API_URL, and a production build that fails rather than falling back to localhost | task / p2 | `drydocs-web` | sonnet | clean |
-| 5 | **R19** | Ask clarification loop for unresolved acronyms and graph-label intent (after R2, R5) | requirement / p1 | `drydocs-agents` | sonnet | clean |
-| 6 | **P6** | Run the data-center collision probe on live psgmgr before any multi-data-center load — one table id in two data centers silently merges two folders into one graph node | task / p1 | `config` | opus | clean |
-| 7 | **N27** | Control-M cannot be the source of record for a relationship whose other end is unregistered - register the three file-transfer platforms as systems with a classification and an owner | task / p1 | `config` | sonnet | clean |
+| 1 | **PORT6** | A roll close proves the clean-add class complete: a completeness check reads PORT-MANIFEST through the disposition classifier, lists every base-tag path absent from the consumer tree, and refuses COMPLETE unless the survivors are deferred by path | task / p1 | `drydocs-port` | sonnet | notes say machine-local |
+| 2 | **PLAN5** | lane-handoff --suggest compares a lane's items against the other lane's pens and never against its queue - fold in the input-overlap check that found seven collisions | task / p2 | `drydocs-plan` | fable | clean |
+| 3 | **PLAN6** | A venue wall written in acceptance prose is invisible to lane-handoff --suggest - give items a declared venue the check can read | task / p2 | `drydocs-plan` | sonnet | clean |
+| 4 | **J57** | Acceptance that compares TOTALS lets two sessions agree on a number and both be wrong — the port and snapshot rituals record the failing-test ID SET, and a clean claim runs the repo-wide guard family | chore / p2 | `docs` | sonnet | clean |
+| 5 | **J75** | A config surface, its renderer SURFACES row and the derived artifact it feeds are one coupling - a port slice that carries only part of the triple makes the derived file unproducible | chore / p2 | `docs` | sonnet | clean |
+| 6 | **N26** | Nothing surfaces what the registry holds, so a wrong registration stays invisible until somebody trips over it - one view organized by class and one answer per loader, both from fields that already exist | task / p2 | `config` | sonnet | clean |
+
+**Flags to rule before claiming** (the script flags; the author decides):
+
+- PORT6: notes say machine-local — does the desktop have it? If not, this item belongs to the other lane or waits for the file to be copied over.
 
 ## Surfaces — who holds which pen this burst
 
@@ -79,10 +82,18 @@ the change back through the sender.
 | `gates` (this skill's addition to §0) | `config/gate-log.md` | Lane A — the signed gate record |
 | `gates` (this skill's addition to §0) | `config/crosswalks/` | Lane A — orchestrator crosswalks — gate-bound config |
 | `snapshot` (this skill's addition to §0) | `knowledge/depgraph-snapshots/` | Lane A — the session snapshot — one writer per burst |
-| Lane B's queue | the items WEB8, O63 and their inputs | do not claim or edit |
+| Lane B's queue | the items R18, AGENT1, API4, WEB18, V9 and their inputs | do not claim or edit |
 | `code:<module>` | everything an item in YOUR queue names in `inputs` | this lane, claimed per item |
-| `code:drydocs-web` | `config/taxonomy/ui-components.yaml` | this lane, with the module — the O42 ledger guard fails on any new .tsx, so every web item adds its row here (the 2026-09-05 Lane B close: five items touched it, none named it) |
 | — | `docs/plan/*.html`, `web/src/generated/**`, `docs/design/*.html` | derived renders — Lane A regenerates once at close; nobody merges them by hand (J43) |
+
+**About Lane B's queue, from the same check** (for the sender to rule — this lane
+does nothing with these):
+
+- R18: input `docs/decisions/0007-agentic-qa-architecture.md` — pen `adr` (ADRs and their index)
+- AGENT1: input `docs/restructure/backlog/items/API4.yaml` — pen `backlog` (items, epics, plan — the board's sources)
+- AGENT1: input `docs/restructure/backlog/items/O62.yaml` — pen `backlog` (items, epics, plan — the board's sources)
+- API4: input `docs/restructure/backlog/items/O62.yaml` — pen `backlog` (items, epics, plan — the board's sources)
+- WEB18: input `docs/restructure/backlog/items/R22.yaml` — pen `backlog` (items, epics, plan — the board's sources)
 
 ## Rules that have bitten — the durable ones live in CLAUDE.md
 

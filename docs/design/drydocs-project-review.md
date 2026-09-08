@@ -453,18 +453,22 @@ enforced, and an audit spec asserts nothing uncertain is reachable from a ground
 path — the three ADR 0011 clause-1 guards, landed BEFORE the fold rather than after.
 
 (Two names retired along the way and a container older than either still shows them
-until they are dropped by hand: `ddlineage`, provisioned from G1 until 2026-08-04 and
-never written or read; and `ddcontext` plus the composite `ddall` at the fold — a
-composite over one database federates nothing. A third, `dddocs`, was rejected before
+until they are dropped by hand. Retired: `ddlineage`, provisioned from G1 until
+2026-08-04 and never written or read; and, at the fold, the retired `ddcontext`
+plus the retired composite `ddall` — a composite over one database federates
+nothing. A third name,
+`dddocs`, was retired before
 it was ever provisioned: a proposed database whose contents belong in the original
 fails the naming rule.)
 
-The point of `ddcontext` is architectural honesty: uncertain data lives in its own
-transaction domain, so it is *physically impossible* to write it into ground truth by
-accident. The composite database joins its constituents by **business key** (a proxy-node
-pattern), never by internal node id — so context records survive a full rebuild of the
-ground-truth database and simply re-link. Promotion from `ddcontext` to `drydocs` is only
-ever a gate-confirmed load, never a cross-database edit.
+The point of the retired `ddcontext` was architectural honesty: uncertain data lived in
+its own transaction domain, so it was *physically impossible* to write it into ground
+truth by accident. The composite database joined its constituents by **business key** (a
+proxy-node pattern), never by internal node id — so context records survived a full
+rebuild of the ground-truth database and re-linked. Promotion from the
+retired `ddcontext` to `drydocs` was only ever a gate-confirmed load, never a
+cross-database edit. Since the G32/G102 fold (2026-08-18) the same honesty is carried by the
+`:Uncertain` LABEL inside `drydocs`: the argument survived, the second database did not.
 
 The ADR trail (`docs/decisions/`) records the load-bearing decisions and their rejected
 alternatives: ontology base scope (0001), component/database topology (0002 family),
@@ -487,8 +491,9 @@ The loaders get the headlines, but more than half the machinery exists for what 
   holds writes behind a gate-bound writer until the vocabulary entry flips active. The
   shared command-line parser lives in the core, so lineage and deepdoc cannot drift apart.
 - **Deep documentation** (`drydocs_deepdoc`). The reactive investigator: when something
-  fails, it digs — and its findings land in `ddcontext`, clearly marked as inference,
-  eligible for promotion only through the gate.
+  fails, it digs — and its findings land in `drydocs` behind the `:Uncertain` label
+  (they landed in the retired `ddcontext` before the fold), clearly marked as
+  inference, eligible for promotion only through the gate.
 - **Remediation** (`drydocs_remediation`). The self-repair loop: detect metadata defects
   (empty descriptions, stale routing, hard-coded hosts), build corrected greenfield
   definitions, prove equivalence offline, and hand a fix package to the owning team via

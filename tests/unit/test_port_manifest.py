@@ -9,6 +9,7 @@ consumer's wired Confluence originals). Pure YAML — no git, no Neo4j.
 
 from __future__ import annotations
 
+import re
 from collections import Counter
 from pathlib import Path
 
@@ -257,6 +258,82 @@ def uncoupled_pairs(
         if guard not in declaration_text and declaration not in guard_text:
             out.append((declaration, guard))
     return out
+
+
+_SKILL_ROW = re.compile(r"^\.claude/skills/(?P<skill>[A-Za-z0-9_-]+)/\*\*$")
+
+
+def portability_gaps(rows: list[dict], test_paths: list[str]) -> list[tuple[str, str, str]]:
+    """(test, never-port skill row, disposition the test resolves to) for every tracked
+    ``tests/unit/test_<skill>*.py`` whose skill row is never-port but whose own governing
+    row is not — or is absent, which is the tests/** default_ok, i.e. portable.
+
+    A file's disposition may not be more portable than its subject's. The pairing is by
+    name (``lane-handoff`` -> ``test_lane_handoff``), which is the repo's own convention
+    for a skill's unit test and is the one relation a manifest can check without importing
+    the test.
+    """
+    out: list[tuple[str, str, str]] = []
+    for row in rows:
+        if row.get("disposition") != "never-port":
+            continue
+        m = _SKILL_ROW.match(row["path"])
+        if not m:
+            continue
+        stem = "tests/unit/test_" + m.group("skill").replace("-", "_")
+        for test in test_paths:
+            if not test.startswith(stem):
+                continue
+            governing = _row_for(rows, test)
+            disposition = "" if governing is None else governing.get("disposition", "")
+            if disposition != "never-port":
+                out.append((test, row["path"], disposition or "tests/** default_ok"))
+    return out
+
+
+def test_no_test_is_more_portable_than_its_never_port_subject(manifest: dict) -> None:
+    """Found by the company's carve-out G on 2026-09-07: `tests/unit/test_lane_handoff.py`
+    fell to the tests/** default_ok and crossed, while its subject
+    `.claude/skills/lane-handoff/scripts/handoff.py` is never-port — fourteen tests red by
+    rule, forever, and the two rows contradicted each other with nothing catching it. The
+    company dropped the test and named the contradiction; this is the check that was
+    missing. Tracked tests only: an untracked file has no disposition to be wrong about."""
+    tracked = sorted(
+        p.relative_to(REPO).as_posix() for p in (REPO / "tests" / "unit").glob("test_*.py")
+    )
+    gaps = portability_gaps(manifest["rows"], tracked)
+    assert not gaps, (
+        "tests whose subject is never-port but which resolve to a portable disposition — "
+        "add a never-port row (and its row_may_match_nothing entry) for each:\n  "
+        + "\n  ".join(f"{t}  (subject {s}) -> {d}" for t, s, d in gaps)
+    )
+
+
+def test_the_portability_detector_catches_the_carve_out_g_shape() -> None:
+    """The guard is watched to fail on the defect it exists for (the J26 idiom)."""
+    rows = [
+        {"path": ".claude/skills/lane-handoff/**", "disposition": "never-port"},
+        {"path": ".claude/**", "disposition": "canonical-producer"},
+    ]
+    tests = ["tests/unit/test_lane_handoff.py", "tests/unit/test_backlog.py"]
+    assert portability_gaps(rows, tests) == [
+        ("tests/unit/test_lane_handoff.py", ".claude/skills/lane-handoff/**", "tests/** default_ok")
+    ]
+    fixed = (
+        rows[:1]
+        + [{"path": "tests/unit/test_lane_handoff.py", "disposition": "never-port"}]
+        + rows[1:]
+    )
+    assert portability_gaps(fixed, tests) == []
+    # a portable ROW, not just a missing one, is the same defect
+    wrong = (
+        rows[:1]
+        + [{"path": "tests/unit/test_lane_handoff.py", "disposition": "canonical-producer"}]
+        + rows[1:]
+    )
+    assert portability_gaps(wrong, tests) == [
+        ("tests/unit/test_lane_handoff.py", ".claude/skills/lane-handoff/**", "canonical-producer")
+    ]
 
 
 def test_every_declaration_names_the_guard_that_reads_it(manifest: dict) -> None:

@@ -305,7 +305,11 @@ def test_next_free_is_max_plus_one_and_never_fills_a_gap() -> None:
     """
     alloc = _allocator()
     taken = {"PLAN1", "PLAN2", "PLAN5"}  # PLAN3 and PLAN4 are gaps
-    assert alloc.next_id("PLAN", taken) == ("PLAN6", 5)
+    # venue pinned, as the siblings below pin it: without it the call reads the live
+    # config/dev-environment.yaml, and on a tree that declares no `edition:` (a consumer
+    # before its own edition gate) the allocator refuses before it ever counts - which
+    # made THIS test red on the 2026-09-05 apply for a reason that is not the gap rule.
+    assert alloc.next_id("PLAN", taken, venue="base") == ("PLAN6", 5)
 
 
 def test_the_allocator_refuses_the_reserved_series() -> None:
@@ -493,13 +497,37 @@ def test_the_frozen_band_ids_parse_and_pass_under_the_new_grammar() -> None:
     assert _frozen_strays(["G10001", "DD10003"]) == []
 
 
-def test_the_venue_is_declared_in_the_venue_file_and_the_producer_is_the_base() -> None:
-    """PLAN2 b: the allocator reads config/dev-environment.yaml `edition:` and nothing
-    else. The producer declares `base` - it is never undeclared (rider C1)."""
-    alloc = _allocator()
-    assert alloc.venue_edition() == alloc.BASE_EDITION
+def _declared_venue_value() -> str | None:
     doc = yaml.safe_load((REPO / "config" / "dev-environment.yaml").read_text(encoding="utf-8"))
-    assert doc.get("edition") == "base"
+    value = doc.get("edition") if isinstance(doc, dict) else None
+    return None if value is None or str(value).strip() == "" else str(value).strip()
+
+
+def test_the_allocator_reads_the_venue_from_the_venue_file_and_nowhere_else() -> None:
+    """PLAN2 b: venue_edition() answers from config/dev-environment.yaml `edition:` -
+    `base` -> BASE_EDITION, a code -> that code upper-cased, no key -> None - and from
+    nothing else. This pins the READ, so it holds on every tree, declared or not. The
+    VALUE the producer declares is the next test's, kept apart on purpose: on the
+    2026-09-05 apply (carve-out D, 2026-09-07) the consumer left `edition:` absent on
+    the producer's own ruling, and the one test that asserted both went red on a fact
+    about the producer's tree, not about the allocator."""
+    alloc = _allocator()
+    declared = _declared_venue_value()
+    got = alloc.venue_edition()
+    if declared is None:
+        assert got is None
+    elif declared.lower() == alloc.BASE_EDITION:
+        assert got == alloc.BASE_EDITION
+    else:
+        assert got == declared.upper()
+
+
+def test_the_producer_declares_itself_the_base() -> None:
+    """PRODUCER-VENUE FACT (rider C1): the producer is `base`, never undeclared. A
+    consumer tree fails this by construction - undeclared until its edition gate, then
+    declared as its own code - so a per-entry take drops THIS test deliberately and
+    keeps the read test above, which is the one that travels."""
+    assert _declared_venue_value() == "base"
 
 
 # ---- the series is the module (ruling 2026-09-02) ----------------------------------
@@ -1092,7 +1120,8 @@ def test_no_stored_rollup() -> None:
 
 def test_derived_summary_is_consistent() -> None:
     """The derivation itself: counts sum to the item total; next_ready is exactly the
-    todo items whose every dependency is done."""
+    todo items whose every dependency is done AND that carry no ``hold:`` (Y7); ``held``
+    is exactly the items that do."""
     doc = _load()
     summary = backlog_store.derive_summary(doc)
     items = {i["id"]: i for i in doc["items"]}
@@ -1101,9 +1130,137 @@ def test_derived_summary_is_consistent() -> None:
         iid
         for iid, item in items.items()
         if item["status"] == "todo"
+        and not backlog_store.is_held(item)
         and all(items[dep]["status"] == "done" for dep in item.get("depends_on", []))
     }
     assert set(summary["next_ready"]) == expected
+    assert set(summary["held"]) == {
+        iid for iid, item in items.items() if backlog_store.is_held(item)
+    }
+    assert not set(summary["held"]) & set(summary["next_ready"])
+
+
+# --- Y7: a hold is a declared field, read by the derivation, rendered by the board -------
+#
+# O26 was pulled and claimed on 2026-09-02 with its dependencies done and a hold sitting in
+# annotations.status, which no derivation reads. These pin the fix at all three surfaces:
+# the derivation (held leaves next_ready), the board (HELD is rendered, never dropped) and
+# the boundary (an annotation is a note and never a hold - a general rule over annotations
+# would hold items nobody meant to hold, invisibly).
+
+
+def _hold_doc(hold, status: str = "todo") -> dict:
+    """Two done deps and one todo item that is dependency-ready by construction."""
+    item = {"id": "H3", "status": status, "depends_on": ["H1", "H2"]}
+    if hold is not None:
+        item["hold"] = hold
+    return {
+        "items": [
+            {"id": "H1", "status": "done", "depends_on": []},
+            {"id": "H2", "status": "done", "depends_on": []},
+            item,
+        ]
+    }
+
+
+_HOLD = {
+    "since": "2026-07-22",
+    "by": "SME",
+    "until": "the template session rules",
+    "reason": "do not pull",
+}
+
+
+def test_held_item_is_excluded_from_next_ready() -> None:
+    """(c) and (g): dependency-ready, and still not ready, because a human said so."""
+    ready = backlog_store.derive_summary(_hold_doc(None))
+    assert ready["next_ready"] == ["H3"] and ready["held"] == []
+    held = backlog_store.derive_summary(_hold_doc(_HOLD))
+    assert held["next_ready"] == [], "a held item must leave next_ready"
+    assert held["held"] == ["H3"], "and must be listed as held, never silently dropped"
+
+
+def test_unblessed_annotation_does_not_hold() -> None:
+    """(b): the exact O26 shape before Y7 - a hold written as prose in annotations - does
+    NOT hold. Only the declared field does. This is the boundary, stated as a test so that
+    a future 'helpful' rule over annotations fails here first."""
+    doc = _hold_doc(None)
+    doc["items"][2]["annotations"] = {
+        "status": "SME HOLD 2026-07-22: do NOT pull this item until that session rules"
+    }
+    summary = backlog_store.derive_summary(doc)
+    assert summary["next_ready"] == ["H3"], "an annotation is a note, not a hold"
+    assert summary["held"] == []
+    assert not backlog_store.is_held(doc["items"][2])
+    assert backlog_store.hold_errors(doc["items"][2]) == []
+
+
+def test_held_item_is_rendered_as_held_with_its_text() -> None:
+    """(d): the board shows the item as HELD, with the hold text visible OUTSIDE the
+    collapsed detail, and lists it in the Held strip; it does not appear in the ready
+    strip and does not get the ready accent."""
+    from drydocs.plan.plan_board import backlog_from_dict, render_board
+
+    raw = _hold_doc(_HOLD)
+    for it in raw["items"]:
+        it.update(
+            title=f"t {it['id']}", type="chore", module="docs", agent="a", phase=8, priority="p2"
+        )
+    doc = {
+        "schema": "drydocs.backlog.v3",
+        "plan": {"phases": [{"id": 8, "title": "eight", "goal": "g"}]},
+        "items": raw["items"],
+    }
+    html = render_board(backlog_from_dict(doc))
+    h3 = html.index('id="card-H3"')
+    card_tag = html[html.rindex('<div class="card', 0, h3) : h3]
+    assert "held" in card_tag
+    assert "ready" not in card_tag, "a held item never wears the ready accent"
+    card = html[h3 : html.index('<div class="detail"', h3)]
+    assert "hold-badge" in card and "HELD" in card
+    assert "do not pull" in card, "the hold text is outside the collapsed detail"
+    assert "the template session rules" in card
+    held_strip = html[html.index('class="held-strip"') :]
+    held_strip = held_strip[: held_strip.index("</div>")]
+    assert "H3" in held_strip
+    ready_strip = html[html.index('class="ready-strip"') :]
+    ready_strip = ready_strip[: ready_strip.index("</div>")]
+    assert "H3" not in ready_strip
+
+
+def test_hold_shape_is_guarded_and_fails_closed() -> None:
+    """A malformed hold still HOLDS (fail closed - a typo must not release an item) and
+    is reported, so the mistake is visible rather than silently obeyed. A hold on a status
+    that cannot be pulled is a stale or bypassed hold, and fails too."""
+    bad = {"id": "X1", "status": "todo", "depends_on": [], "hold": "SME HOLD"}
+    assert backlog_store.is_held(bad)
+    assert backlog_store.hold_errors(bad), "a non-mapping hold is reported"
+    missing = {"id": "X2", "status": "todo", "depends_on": [], "hold": {"since": "2026-09-07"}}
+    assert any("reason" in e for e in backlog_store.hold_errors(missing))
+    unknown = {"id": "X3", "status": "todo", "depends_on": [], "hold": {**_HOLD, "date": "x"}}
+    assert any("date" in e for e in backlog_store.hold_errors(unknown))
+    done = {"id": "X4", "status": "done", "depends_on": [], "hold": dict(_HOLD)}
+    assert any("done" in e for e in backlog_store.hold_errors(done))
+    assert (
+        backlog_store.hold_errors({"id": "X5", "status": "todo", "depends_on": [], "hold": None})
+        == []
+    )
+    assert (
+        backlog_store.hold_errors(
+            {"id": "X6", "status": "blocked", "depends_on": [], "hold": dict(_HOLD)}
+        )
+        == []
+    )
+
+
+def test_every_committed_hold_is_well_formed() -> None:
+    """The fixtures are real items (O26, G64). Any hold in the tree passes the shape guard,
+    and the two the item named are present and held."""
+    doc = _load()
+    errors = [e for it in doc["items"] for e in backlog_store.hold_errors(it)]
+    assert errors == [], errors
+    held = set(backlog_store.derive_summary(doc)["held"])
+    assert {"O26", "G64"} <= held, f"the two live instances must be held: {sorted(held)}"
 
 
 def test_monolith_is_a_tombstone() -> None:
@@ -1114,3 +1271,83 @@ def test_monolith_is_a_tombstone() -> None:
     doc = yaml.safe_load(TOMBSTONE.read_text(encoding="utf-8")) or {}
     assert doc.get("schema") == "drydocs.backlog.tombstone", "backlog.yaml is not the tombstone"
     assert "items" not in doc, "backlog.yaml grew an `items:` key — the monolith was resurrected"
+
+
+# ---------------------------------------------------------------------------
+# I8 -- dependency currency, the groom-time warning.
+#
+# THE MECHANISM ONLY. These assert that a known-stale pair is reported and a
+# current one is not, against a hand-built time map. They deliberately never
+# assert the CONTENT of the live list: that list changes with every commit that
+# touches an item file, so a test pinning it would be a diary that fails for
+# reasons unrelated to the code -- and would be "fixed" by pasting in whatever
+# today's output happens to be, which asserts nothing.
+# ---------------------------------------------------------------------------
+
+#: A fixed clock. Values are unix times only in shape; nothing here reads git.
+_OLDER, _NEWER = 1_700_000_000, 1_700_009_999
+
+
+def test_a_dependency_committed_after_its_dependent_is_reported() -> None:
+    v = _allocator()
+    times = {"A1": _OLDER, "A2": _NEWER}
+    items = [{"id": "A1", "status": "todo", "depends_on": ["A2"]}]
+    assert v.dependency_currency_warnings(items, times) == [("A1", "A2")]
+
+
+def test_a_dependency_older_than_its_dependent_is_not_reported() -> None:
+    """The common case, and the reason this is a warning and not a gate: most
+    edges are simply fine and must produce no line at all."""
+    v = _allocator()
+    times = {"A1": _NEWER, "A2": _OLDER}
+    items = [{"id": "A1", "status": "todo", "depends_on": ["A2"]}]
+    assert v.dependency_currency_warnings(items, times) == []
+
+
+def test_a_done_item_is_excluded_however_stale_its_dependency_is() -> None:
+    """Clause (c), asserted rather than only commented: a closed item's acceptance
+    describing an older dependency is a HISTORICAL RECORD and correct as written.
+    Reporting those would invite reopening verified work to make it retrospectively
+    true -- the argument the 2026-08-28 groom used when it filed O77 fresh rather
+    than reopening O66."""
+    v = _allocator()
+    times = {"A1": _OLDER, "A2": _NEWER}
+    for status in ("done", "blocked"):
+        items = [{"id": "A1", "status": status, "depends_on": ["A2"]}]
+        assert v.dependency_currency_warnings(items, times) == [], status
+
+
+def test_an_item_or_dependency_with_no_commit_is_skipped_not_crashed() -> None:
+    """A just-minted item file has no commit yet, so it is absent from the map.
+    There is nothing to compare and the right answer is silence -- not a
+    KeyError in the middle of a groom."""
+    v = _allocator()
+    items = [
+        {"id": "A1", "status": "todo", "depends_on": ["MISSING"]},
+        {"id": "UNCOMMITTED", "status": "todo", "depends_on": ["A2"]},
+        {"id": "A3", "status": "todo"},  # no depends_on key at all
+    ]
+    assert v.dependency_currency_warnings(items, {"A1": _OLDER, "A2": _NEWER}) == []
+
+
+def test_equal_timestamps_are_not_stale() -> None:
+    """One commit touching both files is the ordinary case for an item minted with
+    its dependency, or for a bulk status sweep. Strictly-newer is the rule."""
+    v = _allocator()
+    items = [{"id": "A1", "status": "todo", "depends_on": ["A2"]}]
+    assert v.dependency_currency_warnings(items, {"A1": _OLDER, "A2": _OLDER}) == []
+
+
+def test_the_time_map_actually_reads_this_repository() -> None:
+    """Instrument check (J76). Every assertion above would pass unchanged against a
+    time map that is always empty, and an always-empty map is exactly what a broken
+    git call produces -- silently, since the warning list would simply be empty and
+    read as "nothing stale". So one test asks the real reader for the real tree."""
+    v = _allocator()
+    times = v.item_commit_times()
+    if not times:
+        pytest.skip("no git history here — the batched log returned nothing")
+    ids = {p.stem for p in (BACKLOG / "items").glob("*.yaml")}
+    assert len(times) > 100, f"only {len(times)} item files have a commit time"
+    assert times.keys() & ids, "the map shares no id with the items directory"
+    assert all(isinstance(v_, int) for v_ in times.values()), "non-integer commit time"

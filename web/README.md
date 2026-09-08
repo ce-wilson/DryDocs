@@ -110,6 +110,39 @@ canonical container/ports live in `config/dev-environment.yaml`; bolt is
 `bolt://localhost:7687` on the `neo4jtest` EE container), then
 `npm install && npm run dev`.
 
+## The `js-cookie` override — do not remove it because it looks unnecessary
+
+`package.json` pins `"overrides": { "js-cookie": "^3.0.8" }`. It has no direct
+dependent here, so it reads as dead weight. It is not.
+
+`@neo4j-nvl/react` -> `@neo4j-nvl/base` -> `@segment/analytics-next@1.81.1` ->
+`js-cookie@3.0.1`, which is **GHSA-qjx8-664m-686j** (high; per-instance prototype
+hijack in `assign()` enabling cookie-attribute injection). npm reports it five
+times — once per link in the chain — but it is one defect. The override resolves
+`js-cookie` to 3.0.8, which is fixed, and `npm run audit:high` (the CI gate) goes
+from five high findings to zero.
+
+Three things worth knowing before touching it:
+
+- **`npm audit fix --force` is wrong here.** It proposes `@neo4j-nvl/base@1.0.0`,
+  a DOWNGRADE from the 1.2.1 we run, and calls it a breaking change. It would cost
+  the graph canvas. NVL 1.2.1 is already the latest published, and it pins Segment
+  at an exact `1.81.1`, so there is no upstream release to move to instead.
+- **The vulnerable code never shipped.** NVL gates Segment behind
+  `init(apiKey)` and nothing here supplies a key; `AnalyticsBrowser` appears zero
+  times in NVL's browser build; and a production `npm run build` contains no
+  `js-cookie`, `withAttributes`, `analytics-next` or `cdn.segment` (NVL itself is
+  present, so the check is not vacuous). Tree-shaking drops the chain. The override
+  is hygiene and a green audit gate, not an incident fix.
+- **Why the narrow pin.** `@segment/analytics-next@1.84.1` also clears the
+  advisory (it covers `<=1.84.0`), but that is a three-minor jump in a package we
+  never execute. Overriding the leaf is the smaller blast radius; 3.0.1 -> 3.0.8 is
+  patch-level on a tiny stable API.
+
+Retire the override when NVL ships a release that no longer depends on a
+vulnerable `@segment/analytics-next` — check with
+`npm view @neo4j-nvl/base@latest dependencies`.
+
 ## Tests (O80)
 
 Two runners, both blocking in CI's `web` job the way `ruff` is in `gates`:
@@ -288,15 +321,21 @@ not written by hand. Two committed artifacts, one chain, guarded at every link:
 
 | Artifact | Written by | Guarded by |
 |---|---|---|
-| `src/generated/openapi.json` | `poetry run python scripts/dump_openapi.py` (repo root; reads `create_app().openapi()`, the importable object) | `tests/unit/test_openapi_client.py`, and `scripts/dump_openapi.py --check` in the CI `web` job |
-| `src/generated/api.d.ts` | `npm run api:types` (`scripts/writeApiTypes.mjs` → `scripts/genApiTypes.ts`) | `src/generated/api.test.ts` regenerates in memory and compares |
+| `src/generated/openapi.json` | `poetry run python scripts/dump_openapi.py` (repo root; reads `create_app().openapi()`, the importable object) — **needs `DRYDOCS_DATA_ROOT` set**: `create_app()` resolves the data root at import and there is no default (G81) | `tests/unit/test_openapi_client.py`, and `scripts/dump_openapi.py --check` in the CI `web` job |
+| `src/generated/api.d.ts` | `npm run api:types` (`scripts/writeApiTypes.ts` → `scripts/genApiTypes.ts`) | `src/generated/api.test.ts` regenerates in memory and compares |
 | every call site | `src/lib/apiClient.ts` — `openapi-fetch` over the generated `paths` | `npm run build` (`tsc -b`), a CI step since O70 |
 
 **After any `drydocs_api` change, regenerate in that order and commit both files**:
 
 ```sh
-poetry run python scripts/dump_openapi.py && (cd web && npm run api:types)
+DRYDOCS_DATA_ROOT="$HOME/data/DryDocs" poetry run python scripts/dump_openapi.py   && (cd web && npm run api:types)
 ```
+
+`DRYDOCS_DATA_ROOT` belongs to the FIRST command only — `npm run api:types` reads a
+committed JSON file and needs nothing from the environment. Unset, the first command now
+exits 1 naming the variable and leaves `openapi.json` untouched (API3); if you reach the
+second command with a missing or empty schema anyway, it says so and points back here
+rather than failing on a JSON parse error three layers from the cause (WEB16).
 
 What the generation buys: a path, path/query parameter or JSON body the schema
 does not declare does not compile, and a response is typed wherever the server

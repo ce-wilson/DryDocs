@@ -98,3 +98,10 @@ groom_log:
   note: 'Groomed 2026-09-02 from Idea-231. O92: canAccessModule has three call sites and no test, and
     no guard pins which modules are designated sme. Not an authorization defect - the API is the enforcement
     point - it is about the console''s audience decisions staying deliberate.'
+- date: '2026-09-07'
+  note: '2026-09-07 groom: four items. API2 (ColumnDef has no list type, so two list-returning columns are declared
+      string and WEB6''s client exempts them by spec id), API3 (dump_openapi truncates its own artifact on
+      a render failure), WEB16 (api:types needs DRYDOCS_DATA_ROOT and says so as a buried traceback), WEB17
+      (the two Lane B build follow-ups) and DOC5, the ADR WEB7 nominated - the code-splitting boundary follows
+      the authorization boundary.'
+  attached_at: API2

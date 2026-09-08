@@ -29,6 +29,7 @@ import pytest
 pytest.importorskip("fastapi", reason="optional api group (poetry install --with api)")
 
 from drydocs_api.audit import ApiAuditLog  # noqa: E402
+from drydocs_api.intake import STATUSES  # noqa: E402
 
 SECRET = "a-test-console-secret"
 
@@ -100,6 +101,15 @@ def test_docs_verify_validates_against_its_model(api):
     body = _ok(client.get("/docs-verify", headers=_auth(token)), "GET /docs-verify")
     assert body["databases_queried"] == ["drydocs"], "the fake server has exactly this one"
     assert "statuses" in body and body["classification"]
+
+
+def test_graph_status_validates_against_its_model(api):
+    """O63. The behaviour (roles, the unreachable verdict, no coordinate in the
+    detail) is tests/unit/test_service_probe.py's; this tier only says the route
+    answers 200 through the framework with its model applied."""
+    client, token, _ = api
+    body = _ok(client.get("/graph-status", headers=_auth(token)), "GET /graph-status")
+    assert body["database"] and body["reachable"] is True
 
 
 def test_log_estate_validates_against_its_model(api):
@@ -354,6 +364,86 @@ def test_thread_decision_validates_and_carries_the_optional_transition_fields(ap
     assert decided["thread_decision"] == "adds-value"
 
 
+def test_data_centers_validates_against_its_model(api):
+    """Z6's config read. Worth a drive of its own even though it touches no graph:
+    ``extra='forbid'`` turns a registry row that grew a field into a 500 here, and
+    this route is the ONLY path to the E#### default-time seed — a dead one means
+    every job with no explicit timing silently reports no runtime."""
+    client, token, _ = api
+    body = _ok(client.get("/data-centers", headers=_auth(token)), "GET /data-centers")
+    assert body["data_centers"], "the publishable sample is committed and never empty"
+    assert body["source"] in ("internal-twin", "publishable-sample"), (
+        "the venue is the J18 half of this payload: a default time shown without it "
+        "would make a synthetic sample read as a statement about production"
+    )
+    row = body["data_centers"][0]
+    assert set(row) == {"code", "name", "default_time", "suffix", "sample", "note"}
+    # OPTIONAL BY RULE, asserted as such: the E#### reading is an internal
+    # convention whose own open item is "confirm E is always Eastern", so a row
+    # with no default_time is a legitimate registration and must not 500.
+    assert all(isinstance(d["default_time"], str) for d in body["data_centers"])
+
+
+def test_a_blank_return_note_is_a_422_and_the_reason_reaches_the_caller(api):
+    """O50: the admin queue's Send-back button is convenience; THIS is the rule.
+
+    ``test_intake_api.test_return_requires_a_note`` already pins the store's
+    refusal, and pinning it again would be a second copy. What is new here is
+    the WIRE: the console disables the button until a note is typed, and if that
+    client check ever diverges from the server's, the admin has to read the
+    SERVER's sentence — so the status code and the message both have to survive
+    the HTTP boundary. A 500, or a 422 with FastAPI's generic body, would leave
+    the queue printing a shrug.
+    """
+    client, token, _ = api
+    created = _ok(
+        client.post(
+            "/intake",
+            json={"context_type": "other", "area": {}, "note": "o50 return-note test"},
+            headers=_auth(token),
+        ),
+        "POST /intake",
+    )
+    intake_id = created["intake_id"]
+    # Walk to sme-confirmed by following the server's own map at each hop —
+    # never a hard-coded path, which would be the machine written down twice.
+    for _ in range(len(STATUSES)):
+        record = _ok(client.get(f"/intake/{intake_id}", headers=_auth(token)), "GET /intake/{id}")
+        if record["status"] == "sme-confirmed":
+            break
+        forward = record["legal_transitions"]["transitions"][0]["to"]
+        _ok(
+            client.post(
+                f"/intake/{intake_id}/transition",
+                json={"to": forward, "note": ""},
+                headers=_auth(token),
+            ),
+            "POST /intake/{id}/transition",
+        )
+    else:  # pragma: no cover - only reachable if the machine grows a cycle
+        raise AssertionError("never reached sme-confirmed following the legal map")
+
+    refused = client.post(
+        f"/intake/{intake_id}/transition",
+        json={"to": "admin-returned", "note": "   "},
+        headers=_auth(token),
+    )
+    assert refused.status_code == 422, refused.text
+    assert refused.json()["detail"] == (
+        "a return goes back with a note — the SME needs the why"
+    ), "the console prints this verbatim; a paraphrase here is a second copy of the rule"
+
+    accepted = _ok(
+        client.post(
+            f"/intake/{intake_id}/transition",
+            json={"to": "admin-returned", "note": "bindings look wrong"},
+            headers=_auth(token),
+        ),
+        "POST /intake/{id}/transition",
+    )
+    assert accepted["status"] == "admin-returned"
+
+
 def test_every_console_route_in_the_schema_guard_was_driven_here() -> None:
     """The two guards are kept in step by name.
 
@@ -374,6 +464,7 @@ def test_every_console_route_in_the_schema_guard_was_driven_here() -> None:
         ("/specs", "get"),
         ("/specs/{spec_id}/run", "post"),
         ("/docs-verify", "get"),
+        ("/graph-status", "get"),
         ("/admin/log-estate", "get"),
         ("/specs/ephemeral", "post"),
         ("/intake", "get"),
@@ -393,6 +484,7 @@ def test_every_console_route_in_the_schema_guard_was_driven_here() -> None:
         ("/mappings/drafts/{draft_id}/promote", "post"),
         ("/mappings/app-code/draft", "post"),
         ("/mappings/app-code/migrations", "get"),
+        ("/data-centers", "get"),
     }
     missing = set(CONSOLE_ROUTES) - driven
     assert not missing, f"declared but never driven through the framework: {sorted(missing)}"

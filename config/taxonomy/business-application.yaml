@@ -85,6 +85,74 @@ nodes:
       ports: [EventProcessing, BatchProcessing]
       batch_orchestrator: ControlM
 
+    # --- DEMO PLUMBING (LOAD4, 2026-09-07) — NOT part of the G35 shape design --
+    # The five below exist for ONE reason: the bundled Control-M folder names
+    # carry application ids this capture had never declared. The capture said
+    # 70001-70003 and the sample folders said 70002, 70011, 70012, 70021, 70022,
+    # 70031 and 70041 — authored apart, so only ONE folder in the whole demo could
+    # ever reach an application, and the coverage counters reported 7 of 8
+    # unattributed as if that were a finding rather than a fixture defect.
+    #
+    # WHY THE CAPTURE GREW INSTEAD OF THE FOLDERS NARROWING (LOAD4 (a) asked for
+    # one direction, chosen and written down): narrowing the folder names onto
+    # 70001-70003 would have rewritten about twenty files — this file's sibling
+    # taxonomy rows, four sample CSVs, server-location.yaml's worked comment, and
+    # the WORKED EXAMPLES of two design docs, where
+    # `--folder 'PRARAG-HLDM-70011-PEX%'` is the running illustration of prefix
+    # matching selecting both 70011 folders. Those design pages are governed
+    # renders. Growing the capture is additive instead: the three shapes below are
+    # untouched, byte for byte.
+    #
+    # These five are deliberately UNIFORM and deliberately DULL. 70001 FULL,
+    # 70002 WIDE and 70003 MINIMAL are the G35 gate walk's sample and carry its
+    # role-cardinality cases; these five carry the smallest membership block that
+    # still generates a row (drydocs/seal_samples.py builds application rows FROM
+    # the memberships, so an application with none is invisible to the generated
+    # SEAL sample and would not have fixed anything). Do not read a fourth shape
+    # into them, and do not use them for a role rule.
+    #
+    # 70041 IS ABSENT ON PURPOSE — see the deliberate-gap note under `counts`.
+    - sealid: 70011
+      name: Trusted Exposure Load
+      short_name: TRUST-EXP-LD
+      state: Operate
+      lob: CCB
+      info_classification: Internal
+      ports: [EventProcessing, BatchProcessing]
+      batch_orchestrator: ControlM
+    - sealid: 70012
+      name: Provisioning Exposure Feed
+      short_name: PROV-EXP-FD
+      state: Operate
+      lob: CCB
+      info_classification: Internal
+      ports: [EventProcessing, BatchProcessing]
+      batch_orchestrator: ControlM
+    - sealid: 70021
+      name: Auto Refund Processing
+      short_name: AUTO-RFND
+      state: Operate
+      lob: CCB
+      info_classification: Internal
+      ports: [EventProcessing, BatchProcessing]
+      batch_orchestrator: ControlM
+    - sealid: 70022
+      name: Auto Trusted Load
+      short_name: AUTO-TRUST
+      state: Operate
+      lob: CCB
+      info_classification: Internal
+      ports: [EventProcessing, BatchProcessing]
+      batch_orchestrator: ControlM
+    - sealid: 70031
+      name: Account Reconciliation
+      short_name: ACCT-RECON
+      state: Operate
+      lob: CCB
+      info_classification: Internal
+      ports: [EventProcessing, BatchProcessing]
+      batch_orchestrator: ControlM
+
   # Port — the two-port classification (DPROD). Structural: every BusinessApplication has both.
   ports:
     - kind: EventProcessing
@@ -168,6 +236,40 @@ nodes:
         - { role: Design Authority, sid: K234567 }
         - { role: L2 Operate Manager, sid: K456789 }
 
+    # DEMO PLUMBING (LOAD4) — the five applications added above. Three roles each,
+    # identical shape, existing SIDs. The three are not an arbitrary minimum: they
+    # are EXACTLY seal_samples.EMBEDDED_ROLES, the trio DECO_SEAL_APP_INFO carries
+    # inline (Application Owner / Primary Information Owner / Chief Technology
+    # Officer), and test_seal_samples::test_every_application_row_carries_all_
+    # three_inline_contacts refuses a row missing any of them. A shorter block does
+    # not generate a usable application row, which is what the bundled folders need
+    # to attribute to. Not a fourth G35 shape; see the note beside the declarations.
+    - sealid: 70011
+      roles:
+        - { role: Application Owner, sid: K123456 }
+        - { role: Primary Information Owner, sid: K567890 }
+        - { role: Chief Technology Officer, sid: K345678 }
+    - sealid: 70012
+      roles:
+        - { role: Application Owner, sid: K123456 }
+        - { role: Primary Information Owner, sid: K567890 }
+        - { role: Chief Technology Officer, sid: K345678 }
+    - sealid: 70021
+      roles:
+        - { role: Application Owner, sid: K234567 }
+        - { role: Primary Information Owner, sid: K678901 }
+        - { role: Chief Technology Officer, sid: K345678 }
+    - sealid: 70022
+      roles:
+        - { role: Application Owner, sid: K234567 }
+        - { role: Primary Information Owner, sid: K678901 }
+        - { role: Chief Technology Officer, sid: K345678 }
+    - sealid: 70031
+      roles:
+        - { role: Application Owner, sid: K789012 }
+        - { role: Primary Information Owner, sid: K123456 }
+        - { role: Chief Technology Officer, sid: K345678 }
+
   # THE ROLE REGISTER THAT STOOD HERE WAS DELETED AT G70 — not moved, not
   # reinterpreted (gate tom-roles-enumeration-and-cardinality §F3: a new
   # declared file won, and "leaving both is the one outcome to refuse"). It
@@ -187,10 +289,24 @@ nodes:
   # vocabulary, so this file can never quietly grow a fifteenth name the
   # register does not carry.
 
+# THE ONE FOLDER LEFT UNRESOLVABLE ON PURPOSE (LOAD4 (b)/(d), 2026-09-07).
+# Application 70041 is NOT declared here and is not an oversight. The bundled
+# folder `PRRPDG-RPD-70041-RISK-RETIRED` is status=R with an empty
+# user_daily — a RETIRED folder naming an application the registry no longer
+# carries is the real unattributed shape, and a demo whose every folder resolves
+# proves less than one that shows a genuine gap. The guard that keeps this honest
+# rather than accidental is
+# tests/unit/test_bundled_demo_interlock.py::test_every_folder_names_an_application_the_capture_carries,
+# whose DELIBERATE_GAPS constant names 70041 and nothing else — so the next id
+# that drifts out of this capture fails instead of joining the gap quietly.
+# Separately and NOT closed by LOAD4: 2 of the 4 sample hosts stay unresolved
+# (tests/unit/test_server_inventory_fixture.py), the same idea one join over.
+
 counts:
-  business_applications: 3
+  business_applications: 8  # 3 (the G35 shapes) + 5 (LOAD4 demo plumbing)
   ports_per_app: 2          # EventProcessing + BatchProcessing
-  memberships: 32           # 14 (70001 full) + 12 (70002 wide) + 6 (70003 minimal)
+  memberships: 47           # 14 (70001 full) + 12 (70002 wide) + 6 (70003 minimal)
+                            # + 15 (the five LOAD4 applications, 3 roles each)
   distinct_roles: 14        # distinct role names observed in the memberships sample (the SME's
                             # 13-class list + CBT); every one canonicalizes into the DECLARED
                             # vocabulary (tom-role-vocabulary.yaml) — guarded, see the note above

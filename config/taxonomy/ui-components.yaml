@@ -100,8 +100,9 @@ components:
   - { id: rightSidebarContext,     area: layout,       path: layout/rightSidebarContext.tsx }
   - { id: FeedbackLayer,           area: layout,       path: feedback/FeedbackLayer.tsx }   # O89 the L5 screen loop: an annotate control per anchored block, mounted beside main
 
-  # --- route (25) ---
+  # --- route (26) ---
   - { id: AdminConfigRoute,        area: route,        path: routes/AdminConfigRoute.tsx }
+  - { id: ReviewQualityTab,        area: route,        path: routes/ReviewQualityTab.tsx }
   - { id: AppCodeCascadePane,      area: route,        path: routes/AppCodeCascadePane.tsx }
   - { id: AskRoute,                area: route,        path: routes/AskRoute.tsx,                         module: ask,        module_evidence: route-name }
   - { id: AssetPathRoute,          area: route,        path: routes/AssetPathRoute.tsx }
@@ -143,7 +144,7 @@ components:
   - { id: Tabs,                    area: ui-primitive, path: components/ui/Tabs.tsx }
   - { id: TruncationBadge,         area: ui-primitive, path: components/ui/TruncationBadge.tsx }   # WEB2 one completeness vocabulary: the canvas's node ceiling and the grid's row ceiling
 
-  # --- component (19) ---
+  # --- component (26) ---
   - { id: BrandMark,               area: component,    path: components/BrandMark.tsx }
   - { id: CypherConsole,           area: component,    path: components/CypherConsole.tsx }
   # O81: the NVL canvas and its QuerySpec-bound frame. UNBOUND to any module on
@@ -154,9 +155,13 @@ components:
   # CAVEAT above), and widening it waits on O42's disposition — one .ts row while
   # 25 others stay out would be an arbitrary exception, not coverage.
   - { id: GraphCanvas,             area: component,    path: components/GraphCanvas.tsx }
+  - { id: ServiceStatusStrip,      area: component,    path: components/ServiceStatusStrip.tsx }   # O63 (f): the standing view of lib/serviceProbe - on demand and timestamped, never a poll
   - { id: SpecGraphPane,           area: component,    path: components/SpecGraphPane.tsx }
   - { id: GraphExplorer,           area: component,    path: components/GraphExplorer.tsx }
   - { id: GraphSvg,                area: component,    path: components/GraphSvg.tsx }
+  # O50: section 7's admin review queue. UNBOUND for the same reason as
+  # IntakeRoute and IntakeStepper — 'intake' is not a registry module.
+  - { id: IntakeReviewQueue,       area: component,    path: components/IntakeReviewQueue.tsx }
   - { id: IntakeStepper,           area: component,    path: components/IntakeStepper.tsx }
   - { id: LinkedDemoFrame,         area: component,    path: components/LinkedDemoFrame.tsx }
   - { id: MiniDag,                 area: component,    path: components/MiniDag.tsx }
@@ -169,11 +174,28 @@ components:
   # beside it rather than in components/icons/ because the three glyphs mean
   # nothing outside a map legend.
   - { id: LocationMap,             area: component,    path: components/map/LocationMap.tsx }
+  # Z6: the same map core with one axis added — a run window read against the
+  # world clock. UNBOUND for LocationMap's own reason: it takes its access and
+  # its registry as props and the Explorer tab is only its first consumer.
+  # RuntimeSpanPanel is the FETCHING half, split off so the map can be rendered
+  # against fixtures with no server — which is what makes its clauses testable.
+  - { id: RuntimeSpanMap,          area: component,    path: components/map/RuntimeSpanMap.tsx }
+  - { id: RuntimeSpanPanel,        area: component,    path: components/map/RuntimeSpanPanel.tsx }
   # O66: the one relationship-label edge for every graph canvas (ownership +
   # explorer + lineage adopt it) — deliberately UNBOUND, same rule as TrustLegend
   - { id: RelEdge,                 area: component,    path: components/RelEdge.tsx }
+  # O51: the admin queue's quality rail and the per-reviewer panel. Both
+  # UNBOUND — the reviewer-quality surface is not a registry module — and both
+  # deliberately separate: the rail flags, the panel holds the block behind a
+  # required reason, so a measurement is never one click from a decision.
+  - { id: QualityRail,             area: component,    path: components/QualityRail.tsx }
   - { id: SignIn,                  area: component,    path: components/SignIn.tsx }
+  - { id: ReviewerQualityPanel,    area: component,    path: components/ReviewerQualityPanel.tsx }
   - { id: StatTiles,               area: component,    path: components/StatTiles.tsx }
+  # O50: the thread delta, moved out of IntakeRoute when it gained its second
+  # consumer (the admin panel must show exactly what the SME saw). UNBOUND —
+  # 'intake' is not a registry module — and shared, which is TrustLegend's rule.
+  - { id: ThreadDiff,              area: component,    path: components/ThreadDiff.tsx }
   - { id: ThemeToggle,             area: component,    path: components/ThemeToggle.tsx }
   - { id: TowerDrill,              area: component,    path: components/TowerDrill.tsx }
   - { id: ProvenanceNotice,        area: component,    path: components/ProvenanceNotice.tsx }
@@ -183,7 +205,7 @@ components:
   - { id: MapGlyphs,               area: icon,         path: components/map/MapGlyphs.tsx }
   - { id: HubGlyphs,               area: icon,         path: components/icons/HubGlyphs.tsx }
 
-  # --- ask (3) ---
+  # --- ask (4) ---
   # R6 Tier-2 task graph. Renders the agent's IN-PROCESS working memory (R1
   # ruling A) — deliberately its own visual language so it is never mistaken
   # for the knowledge graph, though it shares lib/forceLayout.ts.
@@ -195,6 +217,7 @@ components:
   # R19: the clarification card. Renders the agent's structured request for an
   # unresolved acronym or label as choices the person makes; composes the next
   # turn's clarifications and never picks a near match for them.
+  - { id: FailureLadder,           area: ask,          path: ask/FailureLadder.tsx,                        module: ask,        module_evidence: directory }   # O63 (a)-(e): the staged self-diagnosis Ask shows instead of one red line
   - { id: ClarificationCard,       area: ask,          path: ask/ClarificationCard.tsx,                   module: ask,        module_evidence: directory }
 
   # --- explorer (4) ---

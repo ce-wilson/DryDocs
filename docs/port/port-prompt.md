@@ -1036,6 +1036,32 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   company state.
 `scripts/port_preflight.py` fails the port if any live relay lacks one.
 
+**A STRUCTURAL REFACTOR OF AN EVALUATE PATH IS A MANDATORY RELAY (J73, 2026-09-07).**
+A commit whose subject begins `refactor(` and touches a path whose manifest disposition
+is `evaluate` — an explicit `evaluate` row, or no row at all so the path falls to an
+evaluate-on-collision default — gets a relay in this section at the roll that carries
+it, written by the session that made the refactor, while it still knows why. The relay
+names three things and no more: **the file**, **the new shape**, and **where your
+content goes in that shape**. One paragraph. It is not a change log and not a merge
+guide; the ledger step already holds the reasoning and the manifest row already holds
+the merge rule. **What an evaluate note cannot say, and why this exists:** an evaluate
+note tells you how to merge CONTENT, and no wording of it can say "the producer
+changed the SHAPE of this file — take the shape and re-home your content". **The
+case that wrote this rule:** S8 (2026-08-21, `f5e7229d`, subject `refactor(S8): split
+cli.py (3184 lines) into a thin composition root + six per-domain command modules`)
+shipped under a `drydocs/cli.py` row that read "composition root; both sides add
+commands — merge per collision ledger". No relay was written. TWO ports walked past
+it: the row was followed literally and producer verbs were merged INTO the consumer
+monolith, twice, while the six modules it should have imported sat orphaned beside it
+(RELAY-24 is the relay S8 should have carried, written twelve days late). **Scope:**
+the trigger is the conjunction — `refactor(` subject AND evaluate path. A refactor of
+a `canonical-producer` path needs none (you take the file whole; the shape comes with
+it). A content change to an evaluate path needs none (the row already says how to
+merge it). Nothing checks the trigger for you: `port_preflight.py` fails a live relay
+without a basis tag, and does not know a refactor from a fix. That is deliberate —
+the producer author is the one party who knows which of their commits changed a
+shape, and whether to mechanise the trigger is a separate question, not proposed here.
+
 - **RELAY-1 (was R1) — AIS acronym expansion: transplant the VALUE across files**
   `[VERIFIED-PRODUCER]` (standing
   since 2026-07-21; re-verified at the 2026-08-09 roll). Producer's
@@ -2607,6 +2633,470 @@ internal URL", and their `git log --all -S "in-house"` showed it was never there
   regenerate from your `drydocs_api`, never carry the producer's.
   Nothing is asked back.
 
+- **RELAY-27 — `scripts/reconcile_before.py` EXISTS ON BOTH SIDES WITH TWO SHAPES, AND
+  YOUR DURABLE BEFORE-DIR NEEDS ONE FILE BEFORE THE SEVENTH ROLL'S GUARDS READ IT** (new
+  2026-09-07, mid-apply; acts at the NEXT roll, nothing here changes the range you are in).
+  `[VERIFIED-PRODUCER]` — the producer built `scripts/reconcile_before.py` over
+  `drydocs/port/reconcile_before.py` at `2aa90898` on 2026-09-05, AFTER `port-base-20260905`
+  (`5cad5653`) was cut: the tag holds neither file and its `.claude/skills/reconcile-port/SKILL.md` never
+  names the script, so nothing in your current range mentions it. The producer shape: ONE
+  call writes the four mandatory before-files the J7/J16 guards read
+  (`relationship_vocabulary.yaml`, `taxonomy-ontology-map.yaml`, `backlog.yaml`,
+  `gate-log.md`), the two optional J51 lists when their modules import, and a one-line stamp
+  **`BASE.sha`** — the full 40-hex sha of the commit snapshotted. It refuses a dirty source.
+  `tests/unit/test_port_reconcile_guards.py` (`77cae33a`) runs
+  `test_reconcile_before_dir_stamp_describes_this_tree_live` FIRST and fails BY NAME on a
+  before-dir with no `BASE.sha`, a sha that does not resolve, one that is not an ancestor of
+  `HEAD`, a `gate-log.md` that differs from `git show <sha>:config/gate-log.md`, or a sha
+  that is not where the apply branch left `main` (J76 — the phantom 22nd baseline failure of
+  2026-09-05 was a before-dir from the EARLIER apply that outlived a skipped teardown).
+  `--describe` prints the line the PORT-REPORT carries.
+  `[SME-REPORTED]` — during this apply you wrote your own `scripts/reconcile_before.py`
+  (`--repo <tree> --dest <dir>`, a `SNAPSHOT-META.txt` with taken_at / head sha / describe
+  / subject; commit `a4603b7e` on your apply branch), took a durable before-dir OUTSIDE your
+  data root, verified all six files SHA256-identical to your pre-apply tag's tree, and set
+  `RECONCILE_BEFORE_DIR` at **User** scope so it survives a reboot. If none of that is on
+  your branch, this relay's second and third paragraphs do not apply and the first is a
+  clean-add at the next roll; nothing else changes.
+  **WHAT HAPPENS AT THE SEVENTH ROLL IF NOTHING IS DONE:** `scripts/**` is `evaluate`, so
+  the two `scripts/reconcile_before.py` files COLLIDE and hand-merge (your rule; the
+  producer's is a 61-line wrapper over the `drydocs/port/` module, which arrives as a
+  clean-add). `tests/**` is DEFAULT, so the guard arrives as written — and your durable
+  before-dir has NO `BASE.sha`, so the stamp test fails by name against a snapshot you
+  cannot retake, because the apply has moved the tree. That failure would be the
+  INSTRUMENT, not the subject (J76).
+  **THE ONE-FILE FIX, YOURS TO APPLY WHEN THE SEVENTH ROLL LANDS (not before — the guard is
+  not on your tree yet):** write your pre-apply commit's FULL 40-hex sha, one line, no
+  newline required, to `BASE.sha` inside the durable before-dir. That commit is the one
+  your `pre-cewilson-port-20260905`-shaped tag points at — the tree your six files were
+  verified against. Then every one of the five checks passes on that dir: the sha
+  resolves, it is an ancestor of your branch's `HEAD`, it is where the branch left `main`,
+  and the `gate-log.md` you already proved byte-identical equals `git show <sha>:config/
+  gate-log.md` by construction. Keep `SNAPSHOT-META.txt` beside it — the producer's
+  `write_snapshot` ignores files it did not write and the guards read only what they name.
+  When the two scripts hand-merge, keep the producer's stamp and refusals (the guards
+  import `drydocs.port.reconcile_before`, so the module's contract is the one that
+  matters) and carry your `--repo` argument and your META file forward if you want them;
+  they are additive.
+  **THE TEARDOWN CONSEQUENCE, WHICH YOU FOUND FIRST:** a User-scope `RECONCILE_BEFORE_DIR`
+  outlives its directory far more easily than a process-scope one, and the guards then
+  FAIL on set-but-unusable, they do not skip. The producer skill's step 4 now says so
+  (`[Environment]::SetEnvironmentVariable('RECONCILE_BEFORE_DIR', $null, 'User')` beside
+  `Remove-Item Env:`), taken from your report. Nothing is asked back.
+
+- **RELAY-28 — THERE IS NO `-fork` TAG, AND THE DISPOSITION RENDERER NOW REFUSES A REF THAT
+  DOES NOT RESOLVE INSTEAD OF WRITING "0 PATHS"** (new 2026-09-07, mid-apply; acts at the
+  NEXT roll, nothing here changes the range you are in). `[SME-REPORTED]` — your carve-out D
+  plan named `port-base-20260905-fork` as the render base; your Phase 0 check found no
+  `-fork` tag of any date and STOPPED before applying; you tabled what the tree holds (your
+  pre-apply branch point, `port-base-20260902`, `port-base-20260905`), measured the candidate
+  ranges (323 = producer delta this roll; 1511 = full divergence since your branch point; 211
+  = already applied by A/B/C/C2) and chose the 323 range. That choice is right, and so was the
+  method. The producer cuts ONE tag per roll, `port-base-<date>`, and never a `-fork`; the
+  other end of a consumer range is YOUR ref — the pre-apply branch point your own tag marks
+  — which the producer cannot name because it does not exist here. The 1511 range is the
+  STANDING divergence, worked as dispositions across rolls and never an apply range; the
+  range a roll brings is `<previous port-base>..<this port-base>`.
+  `[VERIFIED-PRODUCER]` — the same plan exposed a producer defect: on the producer tree at
+  `55c2a204`, `scripts/render_port_dispositions.py port-base-20260905-fork port-base-20260905`
+  wrote the dispositions file with `0 paths` and exited 0, because `_git` swallows a failed
+  `git diff` into an empty string — the instrument failing into clean (J76). Fixed at
+  `df7a57c3`: both refs are checked with `git rev-parse --verify` before the diff; a ref
+  that does not resolve is named on stderr, exit 1, nothing written. Pinned by
+  `test_a_ref_that_does_not_resolve_is_refused_by_name_not_rendered_empty` in
+  `tests/unit/test_port_dispositions.py`. When the seventh roll lands, the two-argument
+  consumer form you already use (`<your pre-apply ref> <port-base tag>`, see step 333)
+  refuses a typo'd ref for you; your Phase-0 table is still the right thing to keep doing,
+  because the renderer checks that the refs EXIST, not that they are the right two. Nothing is
+  asked back.
+
+- **RELAY-29 — `classification:` IS A SIDE-LOCAL JUDGMENT, AND THE J58 HEADER MADE IT A FIELD
+  A PER-ENTRY TAKE CAN CARRY: ON EVERY per-entry ROW THE VALUE IS YOURS** (new 2026-09-07,
+  mid-apply; acts at the NEXT roll — at D you have already ruled it correctly).
+  `[SME-REPORTED]` — your merge of `docs/restructure/roadmap.yaml` first took the producer's
+  new `classification: Internal-Public` verbatim, beside your own header comment reading
+  Internal; your reviewer caught it and the session fixed it to Internal with the reason
+  inline, then audited `config/source-bindings.yaml` and the vocabulary `00-header.yaml`
+  and kept both Internal-Public on a content-not-path test: real firm data (production DC
+  names, rosters, real object names) → Internal; mechanism-only → Internal-Public. That
+  discriminator is the producer's too, so those two are consistent, not a second exception.
+  `[VERIFIED-PRODUCER]` — J58 (`182523e7`, 2026-09-05) added the `schema` /
+  `classification` / `updated` triple to every governed YAML. Before that no manifest row
+  had to say who owns `classification`, because a comment does not cross on a per-entry
+  take; a field does. One row said the wrong thing: `config/taxonomy/software-registry.yaml`'s
+  entry_rule listed `classification` among the producer mechanism that crosses whole.
+  Corrected at `df7a57c3`, and the rule is written once on that row for every per-entry
+  YAML: **`schema` is the producer's (mechanism), `classification` is the consumer's
+  (judgment about what THIS tree's rows hold), `updated` is the row owner's.** The
+  producer's repo is outside the firm, so its Internal-Public means "publishable from the
+  producer's public mirror" and says nothing about the same file on your tree. The same
+  commit fixed the producer's own `docs/restructure/roadmap.yaml`, where the 2026-08-07
+  header comment read Internal beside the 2026-09-05 field reading Internal-Public — the
+  contradiction you found inside one file was on the producer's tree first, and there the
+  FIELD is the one that is right (the file is in the public push). Nothing is asked back.
+
+- **RELAY-30 — THE GATE-PROMPTS CLEAN-ADD IS NOW AN `entry_rule`, AND THE COUNT IN THE
+  REPORT IS THE COMMIT'S, NOT THE ENUMERATION'S** (new 2026-09-07, mid-apply; acts at the
+  NEXT roll — at D you already did the right thing on a note). `[SME-REPORTED]` — your
+  carve-out D enumerated every slug your items' `gates:` name, found the prompts missing
+  (all present at the tag, none yours), took them, and flagged that the take reached into a
+  `canonical-company` row on the strength of that row's `note:` alone. You then found the
+  reported count was wrong by one — the commit holds ten files, the enumeration found nine
+  AFTER the first was taken on a direct ruling — and reconciled ten against the six new
+  `prompt-only` gates.json entries: six with no prior gate-log record, three whose gates
+  the log already carried (file missing, no new entry), one a RIDER that renders no page of
+  its own. That reconciliation is correct and is now the rule's own text.
+  `[VERIFIED-PRODUCER]` — at `PORT-MANIFEST.yaml` the `config/gate-prompts/**` row carries
+  an `entry_rule` (promoted from the note this day): consumer specs win and are never
+  overwritten; a producer slug the consumer does not hold crosses whole, because
+  `test_declared_gates_are_lists_of_known_prompt_slugs` requires every declared slug to
+  resolve and `gates.json` is derived from the files present; enumerate from `gates:` plus
+  the gate-log citations minus the files on disk; a rider crosses the same way; and the
+  count reported is `git show --name-only`'s. A note explains, an entry_rule authorizes —
+  the inference you had to flag is the rule you will read next roll. Nothing is asked back.
+
+- **RELAY-31 — TWO `test_backlog.py` TESTS READ THE PRODUCER'S VENUE FILE, AND ONE OF YOUR
+  TWO "DELIBERATE" EDITION-ABSENT REDS WAS A PRODUCER DEFECT** (new 2026-09-07, mid-apply;
+  acts at the NEXT roll — leave both red as they are, the fix arrives with the range).
+  `[SME-REPORTED]` — after removing `edition:` on the producer's ruling, your suite showed
+  two edition-absent failures in `tests/unit/test_backlog.py` and you recorded both as the
+  intended state until your edition gate mints a code. `[VERIFIED-PRODUCER]` — only ONE of
+  them is that. `test_next_free_is_max_plus_one_and_never_fills_a_gap` called
+  `alloc.next_id("PLAN", taken)` with no `venue=`, so it read the live
+  `config/dev-environment.yaml` and hit the allocator's refusal before it ever counted;
+  its siblings pin `venue="base"` and it now does too. The gap rule was never red — the
+  test was reading the wrong instrument (J76). The other,
+  `test_the_venue_is_declared_in_the_venue_file_and_the_producer_is_the_base`, asserted
+  two things in one test — that the allocator reads the file faithfully, and that the file
+  says `base` — and the second is a fact about the PRODUCER's tree, red on every consumer
+  tree by construction (undeclared until your gate, then declared as your own code; the
+  PORT3 shape). Split at the producer: `..._reads_the_venue_from_the_venue_file_and_nowhere_else`
+  pins the READ and passes on any tree, declared or not; `test_the_producer_declares_itself_the_base`
+  carries the producer-only fact and says in its docstring that a per-entry take drops it.
+  Replayed on the producer tree with `edition:` commented out: the gap test and the read
+  test pass, the producer-fact test fails, by name. When the range lands, take the two
+  fixed tests, drop the one that names itself producer-only, and your `test_backlog.py`
+  edition-absent count goes from two to zero — your edition gate then owes nothing to the
+  suite, only to the allocator. Nothing is asked back.
+
+- **RELAY-32 — A NEVER-PORT SKILL'S TEST IS NEVER-PORT TOO, AND `domain:` ON A SHARED
+  VOCABULARY ENTRY IS THE PARTITION KEY** (new 2026-09-07, mid-apply; acts at the NEXT
+  roll — at G you already did the right thing). `[SME-REPORTED]` — your carve-out G dropped
+  `tests/unit/test_lane_handoff.py` rather than naming it, because its subject
+  `.claude/skills/lane-handoff/scripts/handoff.py` is `never-port` while the test fell to
+  the `tests/**` default_ok, and you named the contradiction: two rows disagree and nothing
+  catches it. You also declined an overlay `row_may_match_nothing` entry because
+  `tests/**` matches plenty. `[VERIFIED-PRODUCER]` — both readings are right, and the fix
+  is producer-side: `PORT-MANIFEST.yaml` now carries a `never-port` row for
+  `tests/unit/test_lane_handoff.py` beside the skill's row, with its own
+  `row_may_match_nothing` entry (company-side the test never exists, by construction — the
+  skill's own shape), and `test_port_manifest.py` holds the invariant as
+  `test_no_test_is_more_portable_than_its_never_port_subject`: for every never-port row
+  under `.claude/skills/<x>/`, no tracked `tests/unit/test_<x>*.py` may resolve to a
+  portable disposition. It was the first test in the tree whose subject is never-port.
+  Second, `test_domain_registry` (3 red) is NOT a rename that slipped through D.
+  `controlm -> scheduler` and `seal -> business-application` are real producer renames at
+  `496aa268` (2026-08-12, `port-base-20260817`, four rolls ago); `corporate`, `itsm`,
+  `infrastructure` and `human` were ADDED, never renamed from anything; and the producer has
+  never had a `company` or `snow` domain — those two are YOUR domain values on YOUR
+  entries. The vocabulary row's `entry_rule` never said who owns `domain:` on a shared id,
+  so a per-entry merge that kept `domain: controlm` for four rolls followed the rule as
+  written; it now says `domain:` is the partition key, a gate-ruled rename travels with the
+  entry, and a domain only one side has registered in `config/taxonomy/domains.yaml` is
+  that side's mint. Which makes your three reds a RULING your own manifest already
+  describes (`domains.yaml`, per-entry: the company base mints ITS OWN domains at ITS OWN
+  gate): register `company` and `snow` as `minted_by: company` rows, or adopt
+  `corporate` / `itsm` through your own vocabulary-domains gate — never rename the fragments
+  to the producer's names to make the test pass, because that re-rules a domain without a
+  gate. The `scheduler` / `business_application` half takes the producer's `domain:` with
+  the entry at the next roll under the amended rule. Nothing is asked back.
+
+- **RELAY-33 — THREE POINTERS FROM THE G CLOSE: THE INTERLOCK TEST HAS A PRODUCER TWIN, THE
+  `ideas.html` OVERLAY ENTRY WENT STALE AT E, AND A WORKTREE BASELINE MOVES ONE TEST** (new
+  2026-09-07, mid-apply; nothing here waits for the roll). `[SME-REPORTED]` —
+  `test_bundled_demo_interlock` (Z7) is red because your PAT sample's teams own no
+  application any folder runs for; the sample is `never-port` and yours to fix, deferred.
+  `[VERIFIED-PRODUCER]` — the producer's bundled samples fail the same contract the other
+  way round (the SEAL capture declares three applications, the sample folders carry seven
+  other ids, one folder attributes) and that is backlog item LOAD4, in build this week; the
+  test's expectation — the bundled samples must reference EACH OTHER — is the contract,
+  and each side fixes its own fixture under `drydocs/data/**` never-port. Second,
+  `[SME-REPORTED]` your overlay's `row_may_match_nothing` entry for `docs/plan/ideas.html`
+  says you do not render that surface, yet E's `render_board.py` run moved it.
+  `[VERIFIED-PRODUCER]` — a default-paths `scripts/render_board.py` run imports and runs
+  `render_ideas.main()` and the producer row for the page is `derived`; the entry stopped
+  being true the moment the renderer ran, and retiring it is overlay housekeeping on your
+  side. Third, `[SME-REPORTED]` a fourth "turned green" at G was
+  `test_repo_paths::test_swept_defaults_resolve_inside_a_real_worktree`, and you recorded
+  it as a venue artifact because the baseline ran inside a worktree. `[VERIFIED-PRODUCER]` —
+  that test spends a real `git worktree add` (J48 (b)) and is venue-sensitive to running
+  inside one; the reconcile-port skill's set-compare step now names it: exclude it by name
+  or take the baseline from a plain checkout. Your refusal to bank it was correct. Nothing
+  is asked back.
+
+- **RELAY-34 — TWO VERDICTS FROM YOUR LINEAGE WORKTREE READ A TREE BEHIND THE BASE, ONE
+  REGISTRY ROW CARRIES A DUPLICATE KEY, AND TWO GATE PROMPTS WERE CORRECTED IN PLACE** (new
+  2026-09-07, mid-apply; nothing here waits for the roll). `[SME-REPORTED]` — a sweep on
+  your lineage worktree (one commit past an old main) reported the data-flow-overview
+  gate's "`:DataFlow` plus five edges registered planned" as false and the
+  controlm-folder-identity-grain gate as non-existent. `[VERIFIED-PRODUCER]` — both are
+  in `port-base-20260905`: the `DataFlow` label and the five architecture and docs edges
+  are registered `planned` in the per-domain vocabulary fragments (the 2026-08-21 commit
+  that closed the drafting item), and the folder-identity gate prompt was drafted
+  2026-09-04. Neither reaches your tree until the ontology class is taken, which you have
+  deferred since 2026-08-26 by choice; "absent here" is that deferral, not a defect. The
+  sweep printed no `reviewed_commit`, which is the whole failure (J63) — a verdict names
+  the tree it read. Second, `[SME-REPORTED]` your `config/source-registry.yaml` row for
+  the definition-table export carries the `adapter:` key twice. `[VERIFIED-PRODUCER]` on
+  the YAML behavior only — `yaml.safe_load` keeps the LAST duplicate key and says
+  nothing, so whichever `adapter:` sits lower in the row is the one every reader sees; the
+  producer row has one `adapter: ~`, so this is a company build defect in the per-entry
+  merge, same class as the `stack:` finding. Third, `[VERIFIED-PRODUCER]` two UNSIGNED
+  producer gate prompts were corrected in place on 2026-09-07 and ride the next roll under
+  the gate-prompts entry_rule: dpl-dataset-registry-contract restates its B3 axis (the
+  registry `zone` is a multi-valued enum, not a lake-layer triple; `version_id` is opaque;
+  audit actors are mixed) as dated amendments plus proposal rows C1-a/b/c and C2-a, shape
+  only — the counts that motivated them are your §B profile and stay with you; and
+  code-graph-package-layer retires a pointer to the pre-fragment vocabulary path and marks
+  its 2026-08-02 header counts as dated. Your own copies of those prompts, if amended
+  company-side, merge per-entry as the rule already says. Nothing is asked back.
+
+- **RELAY-35 — A PER-ENTRY MERGE THAT READS THE RANGE DIFF ACCUMULATES EVERY ROW IT EVER
+  SKIPPED; A ROLL CLOSED COMPLETE CARRIES ITS DEFERRALS BY PATH; AND T24 IS THE DISPOSITION
+  FOR EVERY `drydocs_lineage/**` COLLISION** (new 2026-09-07, mid-apply; nothing here waits
+  for the roll). `[COMPANY-CONFIRMED]` — your carve-out I close re-ran the range and found
+  that the per-entry pass had merged the RANGE'S DELTAS where the entry_rule says union by id
+  against the producer file: a product row and a Q27 `current_for` in
+  `config/taxonomy/software-registry.yaml`, and two corpora in `config/doc-source-registry.yaml`,
+  all present at `port-base-20260902`, all absent on your tree after that roll closed
+  COMPLETE. `[VERIFIED-PRODUCER]` — every one of those rows landed between 2026-08-27 and
+  2026-08-31, INSIDE the previous roll's own range, so a delta pass should have seen them
+  too; the fix does not depend on which pass skipped them. The rule the manifest already
+  states, restated as its failure mode: a per-entry row unions against the file AT THE BASE
+  TAG (`git show <base-tag>:<path>`), never against `git diff <prev>..<base> -- <path>` — a
+  row added in an earlier range and never merged is in neither tree's diff and stays
+  invisible to every later delta pass, forever. Second, `[VERIFIED-PRODUCER]` seven paths
+  your carve-out I reverted or found absent — the corpus-status module the API app imports,
+  the mapping report function `test_mapping_api.py` needs, four test files your UI-tests
+  ledger names, the publishing guard the enforcement matrix lists, and the server-inventory
+  sample CSV the fixture interlock reads — are all present at `port-base-20260902`
+  (`git ls-tree -r --name-only port-base-20260902 -- <path>`), none touched in
+  0902..0905. "Not in this roll" is true and is not a disposition: they are owed by a CLOSED
+  roll, and nothing on either side records them as deferred — only the lineage pair has a
+  named deferral (T24). So two instruments, together, at every roll close: your
+  `git diff --numstat <base> <next> -- <path>` answers "this roll or not" and prints empty
+  for a forgotten path exactly as it does for a deferred one; the complement is
+  `git ls-tree -r --name-only <base-tag>` minus your tree minus the never-port and
+  canonical-company rows, expected EMPTY, and every path that survives is either written
+  into the roll's deferral list by name or applied. Third, `[VERIFIED-PRODUCER]` the
+  lineage revert re-found T24 (2026-09-01): `drydocs_lineage/writer.py` and
+  `drydocs_lineage/extractors/controlm_inventory.py` were ruled deferred behind the
+  vocabulary migration,
+  and `model.py`'s two gates — the `scheduler_*` ids and the kind constant — are two rolls
+  old (2026-08-21 and 2026-08-25) and live in the same deferred file. Carve-out G's note
+  that I would close the lineage failures contradicted T24; carve-out I corrected it back.
+  T24 is the disposition for every `drydocs_lineage/**` collision until the vocabulary class
+  is taken. Fourth, `[VERIFIED-PRODUCER]` the ruff hit your close fixed in
+  `scripts/build_schema_matrix.py` is a CONFIGURATION divergence, not a producer defect: the
+  producer `pyproject.toml` has ignored RUF002 and RUF003 since 2026-08-12 (ambiguous
+  Unicode in prose; the suggested replacements are wrong for it) at the same 0.5.7 pin, and
+  the file passes here. Your `pyproject.toml` is per-entry and does not carry that ignore;
+  the comment reword is harmless and is not being carried back. Fifth, one attribution for
+  your port report, `[VERIFIED-PRODUCER]`: the relationship-vocabulary directory at
+  `port-base-20260902` already holds all 17 fragments — the four renames and the two
+  additions — and the single file that changed in 0902..0905 is `00-header.yaml`
+  (2026-09-04, the header becomes a pointer to the domain registry). Your carve-out D
+  handled this roll's share correctly; the rename set is the gate-bound class deferred since
+  2026-08-26, one roll older than your carve-out I commit body says. Nothing is asked back.
+
+- **RELAY-36 — TWO CORRECTIONS FOR THE PORT REPORT: THE PRE-START LOAD-MAP ADVICE READ THE
+  PRODUCER TREE, AND THE RUFF DIVERGENCE IS A MANIFEST GAP, NOT A MISSED UNION** (new
+  2026-09-08, mid-apply; nothing here waits for the roll). First, `[VERIFIED-PRODUCER]` a
+  correction to what you were told before carve-out H started: "the renderer has no skip flag,
+  so render then check out the two load-map files" and "four tests red by design" were facts
+  about the PRODUCER tree — `scripts/render_board.py` calls the load-map renderer here (since
+  2026-07-29) and `tests/unit/test_load_map_json.py` has no module skip here. Your copies of
+  both are your own evaluated versions (`scripts/**` and `tests/**` evaluate on collision;
+  neither file changed in 0902..0905), consistent with your ruling that the load-map surfaces
+  are out of scope, so on your tree the render could not write load-map and the two tests skip.
+  Your close report has it right; the pre-start advice did not, and it is the J63 failure mode
+  the manifest keeps naming — absent-on-your-tree read from present-on-this-one. Second,
+  `[COMPANY-CONFIRMED]` the stale `web/src/generated/load-map.json` you found — your own ids,
+  weeks behind your registry, its guard skipped — is a real finding with the cause stated
+  wrong: the renderer does emit it here, and on your tree the CALL was removed and the GUARD
+  skipped together, so nothing sees the file go stale. `[VERIFIED-PRODUCER]` the disposition
+  the manifest already gives that directory is regenerate-or-nothing (`web/src/generated/**`,
+  derived): a committed copy no renderer stands behind is the exact "reflects someone else's
+  sources" failure the row was written for, and the T19 exemption your
+  `tests/unit/test_runbook_currency.py` carries says out of scope while the tree says
+  present-and-stale. Delete it, or if your console reads it, regenerate it from your own
+  sources; either way it is a by-path disposition in your port report, so the next roll can
+  tell it from a miss. Third, `[VERIFIED-PRODUCER]` on the RUF003 hit in
+  `scripts/build_schema_matrix.py`: RELAY-35's fourth point stands (configuration divergence,
+  not carried back), and your "third instance of the delta-vs-union defect" framing is half
+  right. `pyproject.toml` IS per-entry, but its entry_rule covers dependencies only ("union of
+  dependencies; keep the consumer's version string") and says nothing about `[tool.ruff]` —
+  so no union of the ignore list was specified and none was missed; the row is
+  under-specified. The intent is already written elsewhere: `.pre-commit-config.yaml` is
+  canonical-producer (J62, same hooks at the same standard on both sides) and the ruff pin
+  upgrades in lockstep, so the lint STANDARD is meant to be one thing on both sides. The
+  producer closes that gap in `PORT-MANIFEST.yaml` at the next roll — the `[tool.ruff]` block
+  named producer-canonical inside the per-entry file — and until then the collision you
+  predicted is real and is a hand-merge in your favor of the producer block. One more note on
+  the close report's measurement, `[VERIFIED-PRODUCER]` from the numbers as reported: "the
+  same eight fail both ways" compares a 75-test run with a 135-test run, so it holds over the
+  intersection only; your planned full-suite by-test-id pass is the instrument that settles
+  it. Nothing is asked back.
+
+- **RELAY-37 — THE GATE-LOG UNION-APPEND HAS NOT LANDED A PRODUCER ENTRY SINCE THE 0825 ROLL:
+  TEN ENTRIES ACROSS THREE ROLLS, AND THE GUARD CAN SEE EXACTLY ONE OF THEM** (new 2026-09-08,
+  mid-apply; nothing here waits for the roll). `[VERIFIED-PRODUCER]` — your
+  `test_gates_json::test_every_log_entry_and_prompt_has_a_row` failure on `idea-series-grammar`
+  is the visible corner of a larger gap. The producer `config/gate-log.md` carries eleven
+  entries after the 2026-08-25 `CatalogSubLOB` ruling; ten of them are owed by tags you have
+  applied or are applying, listed here with the first `port-base-*` tag that carries each:
+  `standard-identity-and-carrier` DRAFTED (2026-08-25, 0826); `tech-partner-attach-level`
+  DRAFTED (2026-08-26, 0826); the org-acronym `cdo-*` rename record (2026-08-26, 0829); the
+  extract-vintage convention record (2026-08-27, 0829); `source-connection-and-run-identity`
+  DRAFTED (2026-08-28, 0829); `replica-derivation-edge` DRAFTED (2026-09-01, 0901); the schema
+  publish-ceiling re-ask for Teams Edition (2026-09-01, 0902); the PLAN1 record freezing the 27
+  letter series (2026-09-02, 0902); `ontology-domain-registry-and-edition-grain` SIGNED OFF
+  14/14 (2026-09-02, 0902); `idea-series-grammar` SIGNED OFF 9/9 (2026-09-05, 0905). The
+  eleventh, the 2026-09-07 DEFERRED entry for three catalog gates, is after the 0905 tag and is
+  not owed. `[SME-REPORTED]` — the tail of your file, as captured, runs from the 2026-08-22
+  vendor-docs entries through the CatalogSubLOB ruling and then your own two 2026-08-27
+  records, and ends there; none of the ten appears in it, and a file that is chronological to
+  that point cannot hold a 2026-08-28-or-later entry anywhere else in order. The check is one
+  `grep -n -F` per heading against your file; the two 2026-08-25/26 DRAFTED records are the
+  ones that could in principle sit earlier by date, so check those first. Second,
+  `[VERIFIED-PRODUCER]` why the guard saw one: `scripts/render_gates.py` gives every prompt a
+  row — a `prompt-only` row when no log entry accounts for it — unless the prompt self-declares
+  (`^# SIGNED OFF` / `^# DEFERRED`, `_SELF_DECLARED_RE`), and of the ten only
+  `config/gate-prompts/idea-series-grammar.yaml` self-declares. So on your tree today four
+  drafted gates render as "session not yet run" instead of "recorded", and a signed 14/14 gate
+  — the domain-registry ruling behind the allocator refusing letter series, which your copy of
+  `.claude/skills/groom-backlog/validate.py` already enforces — renders as never run. The
+  entry-count check in the same test compares the render to the same file and cannot see a
+  missing entry. Nothing in the tree can; this is the PORT6 completeness class for the
+  union-append rows, and the producer will add the by-heading check for them next roll. Third,
+  `[VERIFIED-PRODUCER]` the same 0902 range swept the two 2026-08-05 headings in place to
+  the `cdo-*` slugs (the org-acronym retirement, 2026-08-26; the old string does not appear
+  in publishable files, this one included — the mapping is `internal/cdo-reference/README.md`
+  on your side); under union-append a producer-authored entry takes the producer's current
+  heading, and the render keys rows on heading text. The repair
+  is one commit: for each of the ten headings, in producer order, take the section from
+  `git show port-base-20260905:config/gate-log.md` (a section runs from its `## ` heading to
+  the next), append it, apply the two heading renames, run `scripts/render_board.py` so
+  `web/src/generated/gates.json` refreshes with it, and confirm `tests/unit/test_gates_json.py`
+  green. Your own entries stay where they are; the render does not care that the order is by
+  side rather than by date. The port report's gate-log line should then say ten appended and
+  two headings renamed, not one. Nothing is asked back.
+
+- **RELAY-38 — `render_load_map.main()` IS IN `render_board.py`'S DEFAULT RUN, AND HAS BEEN AT
+  EVERY BASE TAG; AND A COMPARISON FIGURE IN A 0905 REPORT SHOULD COME FROM THE 0905 TAG** (new
+  2026-09-08, on the in-progress PORT-REPORT at your e7f70e20; two corrections, nothing waits
+  for the roll). First, `[VERIFIED-PRODUCER]` — the report's load-map section says
+  `render_load_map` is still not wired into `render_board`'s default run, so the drift guard
+  and not the session ritual keeps the two load-map surfaces current. On the producer tree
+  that has been false since N4 (`0b95a118`, 2026-07-29): `scripts/render_board.py` calls
+  `render_load_map.main()` in the default-paths branch, beside `render_gates.main()` and
+  `render_enforcement_matrix.main()`, and `git show <tag>:scripts/render_board.py` shows
+  the call at every `port-base-*` tag from 0810 through 0905; the file did not move in
+  0902..0905. If the sentence is true of YOUR tree, your `scripts/render_board.py` (class
+  `evaluate`, `scripts/**`, hand-merge on collision) lost the line in an earlier hand-merge —
+  which would also explain how your board renders kept succeeding from 2026-08-20 while
+  `render_load_map` could not run, since a wired `render_board.py` dies on
+  `CadenceDerivationError` at every render. Either way the consequence is the one you just
+  named: the next `render_board.py` run leaves `load-map.json` and `load-map.html` stale
+  again. The check is `grep -n "render_load_map.main()" scripts/render_board.py` on your
+  side; if it is absent, the producer's file at the base tag is the reference for the
+  default-paths block, and the report's sentence should then say the line was missing here
+  rather than unwired there. Second, `[VERIFIED-PRODUCER]` — "producer `gates.json` at
+  `2e71ede1` reads 114 gates / 21 open-deferred-pending" is right for the commit named,
+  and that commit is dated 2026-09-07, 228 commits past `port-base-20260905`; the report's
+  J63 block names 0905 as the reviewed base. At `port-base-20260905` the producer
+  `gates.json` reads 116 gates / 23 open-deferred-pending (19 open, 3 pending, 1
+  deferred). Cite the tag's figure, or say in the sentence why the comparison reaches past
+  the base; RELAY-36 was this class in the other direction. The rest of the report checks
+  out against the tree — the nine `cadence:` rows at 0901/0902/0905, the three DERIVED steps
+  of 21, the guard names and messages, the RUF002/RUF003 reframing, the `replaces` schema
+  reading, the `auth.ts` contradiction — and RELAY-37's gate-log append is the sixth
+  Outstanding item, not repeated here. Nothing is asked back.
+
+- **RELAY-39 — RELAY-38'S HAND-MERGE HYPOTHESIS IS WITHDRAWN: THE ABSENCE IS YOUR SIGNED
+  DEFERRAL; BOTH RELAY-35 CORRECTIONS ACCEPTED; AND `scripts/reconcile_before.py` COLLIDES
+  NEXT ROLL** (new 2026-09-08, on the corrected PORT-REPORT at your 5671f745; nothing waits
+  for the roll). First, `[COMPANY-CONFIRMED]` — your correction 6 is right and the corrected
+  sentence stands as written: the `render_load_map.main()` call is absent on your tree by a
+  signed company deferral, recorded on your side five times, not lost in a hand-merge. The
+  producer's own machine-local record of your ninth and twenty-first reports already said the
+  call "correctly stayed off the chain" under that deferral; RELAY-38 should have read it
+  before offering the hypothesis, and the hypothesis is withdrawn. What stands from RELAY-38
+  is the half your correction carries as its first paragraph — the producer has called it at
+  every base tag since N4 (`0b95a118`) — and a company DEFERRED gate is yours to hold or
+  retire; nothing here overrules it. Your correction 11 follows the same ruling: the producer's
+  `tests/unit/test_render_determinism.py` lists `render_load_map.py` in both
+  `COMMITTED_RENDERERS` and `COMMITTED_SURFACE_WRITERS`, and which of the two your copy keeps
+  is the wiring decision's to make. Second, `[VERIFIED-PRODUCER]` — your correction 7's
+  producer row matches the tag exactly: `git show port-base-20260905:web/src/generated/gates.json`
+  holds 116 gates — 19 open, 3 pending, 1 deferred, 57 recorded, 36 signed-off. The 8-vs-1
+  deferred column is the intended divergence, as you say. Third, `[VERIFIED-PRODUCER]` —
+  both of correction 12's corrections to RELAY-35 are accepted. The fixture-interlock CSV
+  RELAY-35 named is the half you hold (`tests/fixtures/server_inventory/synthetic-server-export.csv`,
+  present at the tag on both trees); the half absent on your side is
+  `drydocs/data/samples/controlm_hosts__sample.csv`, which sits under the `drydocs/data/**`
+  never-port row — a gitignored tree whose fourteen tracked samples are grandfathered, and
+  whose absence `tests/unit/test_server_inventory_fixture.py` skips on by design. Not owed,
+  and RELAY-35's count is one short of what it said. The classification behind your table
+  also reads as the producer manifest reads: `default:` is quoted verbatim; `docs/decisions/**`,
+  `docs/reviews/**`, `drydocs-icons/**`, `internal/**`, `scripts/**` and `tests/**` are
+  default-resolved rows (clean-add when absent), `docs/design/**` is evaluate, `graph-tests/**`
+  and `config/gate-prompts/**` are canonical-company, and every path in the 87 that was
+  spot-checked here exists at the tag. The table is the first real-values fixture for the
+  producer's completeness instrument (PORT6), which is where "deciding what to APPLY" gets a
+  by-path deferral list to refuse COMPLETE against. Fourth, `[VERIFIED-PRODUCER]` — your
+  correction 8's `scripts/reconcile_before.py` is your own file, and it collides next roll.
+  At `port-base-20260905` the reconcile-port skill set `RECONCILE_BEFORE_DIR` and shipped no
+  script for it, which is why you wrote one at `a4603b7e`. The producer closed that gap the
+  day the tag was cut, after it: `scripts/reconcile_before.py` landed at `2aa90898`
+  (2026-09-05) as a short wrapper over `drydocs/port/reconcile_before.py`, whose write sites
+  pin `newline=""` (J49 — your Windows CRLF reasoning is the rule's own), and the skill's
+  close step now cites its `--describe <before-dir>` output. `scripts/**` is evaluate, so the
+  next roll hand-merges the two; the producer's is the reference for the CLI the skill
+  cites, and your `89c54ee6` fix has nothing to carry anywhere. Nothing is asked back.
+
+- **RELAY-40 — THE ROLL-CLOSE COMPLETENESS CHECK EXISTS, THE DEFERRAL LIST IS A FENCED BLOCK
+  IN THIS FILE, AND CANONICAL-COMPANY IS A RULING BAND, NOT AN OWED ONE** (new 2026-09-08;
+  lands with the next roll, and the recipe in RELAY-35 stays valid until it does).
+  `[VERIFIED-PRODUCER]` — `scripts/port_completeness_check.py` is the by-hand recipe from
+  RELAY-35 as a script: it lists every path at the base tag that your tree does not hold,
+  bucketed by the disposition `PORT-MANIFEST.yaml` resolves for it, in the table shape your
+  correction 12 used (disposition | carried | new | total, where carried = already absent at
+  the previous tag, a roll that closed COMPLETE), and for the union-append markdown files it
+  lists every `## ` heading the tag's copy has and yours lacks — the gate-log shape RELAY-37
+  described, at entry grain. It exits 0 only when every survivor is in a `deferred-paths`
+  row or is canonical-company. Three things about it worth knowing before you run it. (1)
+  ONE classifier. `drydocs/port/dispositions.py` now holds the manifest reading, and both
+  `scripts/render_port_dispositions.py` and this check import it, so the two cannot bucket a
+  path differently — your sweep and RELAY-35 disagreed about a `drydocs/data/**` sample
+  because there were two readings, and now there is one; `tests/unit/test_port_dispositions.py`
+  asserts the renderer's name IS the module's function. (2) The deferral list lives in THIS
+  file, in a fenced `deferred-paths` block under DEFERRED BY PATH, first row T24, cumulative
+  across rolls and retired by date rather than deleted; `docs/port/**` never crosses, so the
+  check reads it with `git show <base-tag>:docs/port/port-prompt.md`, which your clone can do
+  because you hold the producer tags. A deferral only you have ruled goes in a file of your
+  own, same fence, `--deferrals FILE`. (3) Canonical-company paths absent your side are
+  LISTED and do not fail — your correction was right that they need a ruling, not a default,
+  and the table says "ruling, not owed" on that band so nobody reads it as a gap. What the
+  check is NOT: it is PRESENCE only. A path present on both sides with different content —
+  the T24 shape, `drydocs_lineage/writer.py` — does not show, and neither does the per-entry
+  delta-vs-union defect; those stay with `--numstat` and the J7 reconcile guards. So two
+  instruments at every close, and the reconcile-port skill's close step now names both with
+  the question each answers: `--numstat` for "this roll or not", the completeness check for
+  "ever applied or not". The fixture behind it is your incident at its shape: a path added in
+  range 1 and never applied, at range 2's close, where `--numstat` over range 2 prints nothing
+  for it and the check names it as carried. Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
@@ -2985,6 +3475,31 @@ cost, what it did NOT authorize. The disposition table tells you the ORDER and t
 RULE; the ledger tells you the MEANING, and a step is the thing you read when a
 per-entry merge needs a judgment call. Steps are cited from the classes, never folded
 into them.
+
+DEFERRED BY PATH (new 2026-09-08, PORT6 — the roll's deferral record, machine-readable).
+A roll closes COMPLETE on the collision classes and never on the clean-add class: a path
+present at the base tag and absent from your tree has no diff to bucket and no `--numstat`
+line to attribute, so a forgotten path and a deferred one print the same empty output.
+Two rolls closed COMPLETE that way (2026-09-01 and 2026-09-05) and the paths surfaced as
+carve-outs afterwards. The rule from RELAY-35 — a roll closed COMPLETE carries its
+deferrals BY PATH — now has a place to carry them:
+
+```deferred-paths
+# pattern | roll deferred at | ref (T-row, relay or report) | retired (date, or - while active)
+drydocs_lineage/** | port-base-20260901 | T24 | -
+```
+
+Rules for the block. One row per path or glob, in the manifest's glob grammar (`**`
+spans separators, `*` does not). The list is CUMULATIVE across rolls: a path deferred at
+roll N stays deferred at roll N+1 until it is applied or its row is RETIRED — never
+deleted — by writing the date in the last cell, so the record of what was deferred and
+for how long survives. T24 is the prose form of exactly one entry and is the first row;
+a new deferral gets a row here AND its reasoning in a T-row or relay, the way T24 has
+both. This block is what `scripts/port_completeness_check.py` reads (it reads this file
+AT THE BASE TAG, `git show <base-tag>:docs/port/port-prompt.md`, because `docs/port/**`
+never crosses and you have no working-tree copy); deferrals only you have ruled go in a
+file of your own, same fence, passed with `--deferrals FILE`. Retiring a row is a
+producer edit unless the deferral was yours.
 
 ---
 
@@ -5957,4 +6472,11 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - J7 reconcile guards with RECONCILE_BEFORE_DIR set: all pass (producer-side at the
   back-flow enactment: 12 passed / 4 skipped; the J16 manifest-coverage /
   default_ok / backlog-no-regression checks run unconditionally, no env var needed).
+- The roll-close COMPLETENESS check (new 2026-09-08, PORT6): from the apply worktree,
+  `python scripts/port_completeness_check.py <base-tag> --prev <previous-base-tag>`
+  exits 0 — every path at the base tag absent from your tree is either in a
+  `deferred-paths` row or in the canonical-company ruling band, and every union-append
+  markdown file holds every `## ` heading the tag's copy has. PRESENCE only; it does not
+  replace `--numstat`, which answers a different question (this roll or not). The
+  PORT-REPORT carries its last line verbatim beside the `--describe` line.
 ````

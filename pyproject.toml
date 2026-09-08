@@ -7,6 +7,13 @@ readme = "README.md"
 packages = [{ include = "drydocs" }, { include = "drydocs_core" }, { include = "drydocs_remediation" }, { include = "drydocs_lineage" }, { include = "drydocs_deepdoc" }, { include = "drydocs_docmeta" }, { include = "drydocs_api" }]
 
 [tool.poetry.dependencies]
+# ^3.11 IS TESTED, as of J67 (2026-09-07) — before that it was an assertion
+# nothing exercised: CI pinned 3.12 on Linux and nothing anywhere ran the floor,
+# the top, or Windows. The `gates` matrix in .github/workflows/ci.yml now runs
+# 3.11 (this floor), 3.12 (blocking) and 3.14 (what the desktop writes on), plus
+# one Windows leg; the three new ones are advisory first, and that comment block
+# carries the reasoning. If this range moves, that matrix moves with it — a
+# declared range and a tested range that disagree is the defect J67 closed.
 python = "^3.11"
 neo4j = "^5.20"
 oracledb = "^2.2"

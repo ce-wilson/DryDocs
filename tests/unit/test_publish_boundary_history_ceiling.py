@@ -26,15 +26,25 @@ publishes, so a guard that only ever holds the token in a local variable,
 derived at runtime from an Internal-only source, cannot itself become a place
 the retired string leaks from.
 
-WHERE THIS ACTUALLY BITES: a full clone, which in practice means a developer's
-machine running the pre-push suite. CI checks out shallow (`actions/checkout`
-with no `fetch-depth`, so depth 1), where `git log` can see one commit and the
-count would come back 0 — a pass that proves nothing. This guard detects that
-and SKIPS LOUDLY rather than going green on an instrument that cannot measure
-(CLAUDE.md section 6: check the instrument before the subject). The local
-enforcement point is the right one regardless: a commit message cannot be
-corrected after a push without the very rewrite this ceiling exists to avoid,
-so the moment to catch it is before it leaves the machine that wrote it.
+WHERE THIS RUNS. It needs a FULL CLONE: on a shallow one `git log` sees a
+truncated history and the count comes back near zero — a pass that proves
+nothing. The guard detects that and SKIPS LOUDLY rather than go green on an
+instrument that cannot measure (CLAUDE.md section 6: check the instrument before
+the subject).
+
+CORE3 (2026-09-07) gave the CI `gates` job `fetch-depth: 0`, so it measures
+there as well as at the desk. Until then it ran only on a developer's machine —
+correct, and inert in the one place it would otherwise run on every push, since
+the pre-push suite is a habit and CI is a mechanism. Both venues, for different
+reasons: the DESK is where a finding is still ACTIONABLE, because a commit
+message cannot be corrected after a push without the very rewrite this ceiling
+exists to avoid; CI is where a miss is at least NOTICED the same day, in time to
+re-record the ceiling honestly instead of discovering an unexplained rise months
+later.
+
+The verdict line in the first test exists because of that second venue: a SKIP
+and a PASS are the same non-failure in a CI log, so the guard says which of the
+two happened rather than leaving it to be inferred from silence.
 """
 
 from __future__ import annotations
@@ -136,7 +146,21 @@ def test_no_new_commit_message_carries_the_retired_org_acronym() -> None:
         )
 
     pattern = re.compile(r"\b" + re.escape(token) + r"\b", re.IGNORECASE)
-    offenders = [sha for sha, message in _commit_messages() if pattern.search(message)]
+    records = _commit_messages()
+    offenders = [sha for sha, message in records if pattern.search(message)]
+
+    # THE VERDICT LINE (CORE3). A green guard and a skipped guard both read as
+    # "no failure" in a CI log, which is exactly the confusion that let this run
+    # inert since J74 landed. Saying the two numbers out loud makes a MEASURING
+    # run distinguishable from a SKIPPING one at a glance, and it surfaces the
+    # margin that `test_the_ceiling_is_not_stale_by_a_wide_margin` guards. The
+    # named CI step runs this file with `-s` so the line reaches the log; under
+    # the plain suite run pytest captures it, which is correct — one verdict in
+    # one place.
+    print(
+        f"[J74] MEASURED on a full clone: {len(offenders)} of {len(records)} commit "
+        f"messages carry the retired token; recorded ceiling {CEILING}."
+    )
 
     assert len(offenders) <= CEILING, (
         f"{len(offenders)} commit messages carry the retired internal org acronym "

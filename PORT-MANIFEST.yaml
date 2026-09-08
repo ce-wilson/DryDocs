@@ -163,7 +163,17 @@ rows:
       seal_has_membership / seal_of_role / seal_held_by — take the producer's
       deprecated status; the gate outcome IS the authority). Back-flow-origin
       ids (m3_seal_app_ref and successors) are consumer-canonical once promoted.
-    note: "guarded producer-side by test_schema.py + test_taxonomy_ontology_map.py"
+      `domain:` on an id BOTH sides hold is the PARTITION KEY, not a per-side field:
+      a base that renames a domain does so at a gate (vocabulary-domains-and-id-policy
+      renamed controlm -> scheduler and seal -> business-application, 2026-08-12, and
+      moved every entry with it), and the rename travels WITH the entry - take the
+      renaming side's `domain:` and re-home the entry to that domain's fragment. An
+      entry whose `domain:` names a domain only ONE side has registered in
+      config/taxonomy/domains.yaml is that side's mint (its row, its gate), never a
+      rename to resolve. Stated 2026-09-07: for four rolls the rule named no owner, so
+      per-entry merges kept `domain: controlm` on the consumer and the domain registry
+      (CFG1) then failed on it.
+    note: "guarded producer-side by test_schema.py + test_taxonomy_ontology_map.py + test_domain_registry.py"
   - path: "config/taxonomy-ontology-map/**"
     disposition: per-entry
     gate_bound: config/gate-log.md   # J43: same rule as the vocabulary row above —
@@ -191,6 +201,28 @@ rows:
       only thing that ever changes here is the rev, which moves WITH the pin
       (tests/unit/test_precommit_config.py fails when they differ). Nothing installs
       it for you - `pre-commit install` once per clone, as the file's header says.
+  # ---- the console stack as Compose (O72, 2026-09-07) ---------------------------
+  # Three rows, one mechanism. The Dockerfiles, the proxy-config renderer and the
+  # build-context filter are pure mechanism and cross whole; compose.yaml is the
+  # file that WIRES that mechanism to one side's container facts, so it takes the
+  # dev-environment.yaml shape (row below): structure adapted, values local.
+  - path: "deploy/**"
+    disposition: canonical-producer
+    note: >
+      O72 (2026-09-07). api.Dockerfile, agent.Dockerfile, console.Dockerfile and
+      render_proxy_config.mjs - build recipes and a proxy-config renderer with no
+      side-local value in them (the renderer reads its upstreams from compose.yaml's
+      service names, which are the same on both sides). Take whole. Added at the
+      Lane A merge from O72's hand-back; verified cold from empty volumes on the
+      laptop, tests/unit/test_compose_stack.py rides the tests/** row.
+  - path: ".dockerignore"
+    disposition: canonical-producer
+    note: >
+      O72 (2026-09-07). The build-context filter for the deploy/** recipes; lists
+      what NEVER enters an image (internal/, internal-local/, every .env* file).
+      Pure mechanism - a consumer-only ignore line here would be a consumer-only
+      path that should not be in an image either, so surface it and adopt it
+      producer-side rather than diverging the file.
   # ---- the backlog: sharded 2026-08-20 (Y2, ADR 0013) ---------------------------
   # One item per file. Rows are ordered most-specific first; backlog.yaml itself is
   # now a TOMBSTONE and the ONE-TIME split sequence rides its row.
@@ -420,7 +452,25 @@ rows:
       company prompt.
   - path: "config/gate-prompts/**"
     disposition: canonical-company
-    note: "consumer's real gate specs win; producer specs are prep/templates — new producer specs that don't collide are clean-adds"
+    entry_rule: >
+      The consumer's real gate specs WIN and are never overwritten. A producer
+      spec whose slug the consumer does not hold is a CLEAN-ADD, taken whole:
+      every slug an item's `gates:` names must resolve to a prompt file
+      (tests/unit/test_backlog.py::test_declared_gates_are_lists_of_known_prompt_slugs)
+      and gates.json is DERIVED from the files present, so a missing prompt is
+      a red guard and a gate page that cannot render. Enumerate, do not browse:
+      the slugs named by any item's `gates:` plus the slugs config/gate-log.md
+      cites, minus the slugs on disk, is the list; a rider (a prompt whose
+      title says it rides another gate) crosses the same way and renders no
+      page of its own. Report the count the COMMIT contains (`git show
+      --name-only`), not the count the enumeration produced - the 2026-09-05
+      apply (carve-out D, 2026-09-07) took one prompt on a direct ruling, then
+      nine more from its enumeration, and reported nine. Promoted from a note
+      to a rule the same day: that apply crossed ten files into a
+      canonical-company row on the strength of the note alone and had to flag
+      the take as its own inference. A rule the apply must read is an
+      entry_rule; a note explains, it does not authorize.
+    note: "consumer's real gate specs win; producer specs are prep/templates — a colliding slug is the consumer's, a non-colliding producer slug crosses whole (entry_rule)"
   - path: "config/dev-environment.yaml"
     disposition: canonical-company
     entry_rule: >
@@ -443,6 +493,23 @@ rows:
       next port: producer `33cfc68` adds a `plugins:` block + `plugins_volume`
       here (APOC/GDS as a mounted volume) — structure to adapt, values to
       decide locally, NOT a file to check out.
+  - path: "compose.yaml"
+    disposition: canonical-company
+    entry_rule: >
+      Each side keeps its OWN file, for the reason dev-environment.yaml does: it pins
+      the Neo4j image tag against config/dev-environment.yaml, accepts the `eval`
+      license, and publishes host ports - producer-local container facts, three of
+      them, inside ~280 lines of mechanism (four services, healthchecks, the proxy
+      wiring, the empty-volume cold start). New producer SERVICES, healthcheck shapes
+      or environment KEYS are ADAPTED BY HAND from the PORT-REPORT's structural
+      delta; the consumer fills in its own image tag, license and ports. NEVER port
+      a registry host or an image coordinate across (PUBLISH-BOUNDARY).
+    note: >
+      O72 (2026-09-07), disposition proposed by Lane B in the item's hand-back and
+      taken at the Lane A merge. The two wrong instruments O72 found and fixed
+      (RETURN 1 refused on the system database; busybox wget resolving localhost to
+      ::1 against IPv4-only nginx) live in the healthcheck lines - those ARE
+      mechanism and should cross by hand at the first adapt, not be re-discovered.
   - path: "graph-tests/**"
     disposition: canonical-company
     note: "consumer's real acceptance suites win; seed twins follow producer renames as deliberate consumer commits"
@@ -869,6 +936,18 @@ rows:
       fell into. Carved out of the `.claude/**` canonical-producer default, not gated at
       runtime: a manifest row is the layer that decides what crosses, and a skill that is
       never carried has nothing to guard."
+  # 2026-09-07: the skill's TEST twin is never-port too. Found by the company's carve-out G
+  # (port-base-20260905): the test fell to the tests/** default_ok and crossed, and its
+  # subject cannot - 14 tests red by rule, forever. First test in the tree whose subject is
+  # never-port; test_port_manifest.py::test_no_test_is_more_portable_than_its_never_port_subject
+  # now holds the shape.
+  - path: "tests/unit/test_lane_handoff.py"
+    disposition: never-port
+    note: "The unit test for .claude/skills/lane-handoff/scripts/handoff.py, which it loads
+      by path. A file's disposition may not be more portable than its subject's: the skill
+      is never-port (row above), so the test that imports it is never-port, and company-side
+      it never exists (row_may_match_nothing). The company dropped it correctly at carve-out G
+      on 2026-09-07 and named the contradiction; this row is the fix."
   - path: ".claude/**"
     disposition: canonical-producer
     note: "agents + skills are producer-maintained tooling; consumer-local skills live under other names"
@@ -1004,8 +1083,14 @@ rows:
       whole, at the O68 (d) shape - `scripts/render_software_registry.py` at the
       base reads that shape and a pre-O68 input breaks the whole render_board.py
       chain, which is how this row was found. `invocation_patterns`, `schema`,
-      `classification`, `adr` and the header comment are producer mechanism and
-      cross whole; `updated` is the row owner's. UNNAMED FIELDS: on a vendor or
+      `adr` and the header comment are producer mechanism and cross whole;
+      `updated` is the row owner's. `classification` is the CONSUMER's (corrected
+      2026-09-07, RELAY-29): the J58 header turned a comment into a field a take
+      can carry, and the value is a side-local judgment — the producer repo is
+      outside the firm, so its Internal-Public means publishable from the
+      producer's public mirror; the same file holding firm rows is Internal
+      there. The rule for every per-entry row: `schema` is the producer's,
+      `classification` is the consumer's, `updated` is the row owner's. UNNAMED FIELDS: on a vendor or
       product row belong to whichever side owns the row under the id rule above;
       a new top-level key is the producer's.
     note: >
@@ -1604,6 +1689,12 @@ row_may_match_nothing:
       row is the carve-out from the `.claude/**` canonical-producer default doing
       its job, not a dead row. Producer-side it always matches. Added 2026-09-04
       from the company's chunk-5 apply of port-base-20260902 (their idea inbox).
+  - path: "tests/unit/test_lane_handoff.py"
+    reason: >
+      the never-port skill's test twin (2026-09-07): its subject never crosses, so the
+      test never exists company-side and the row matches nothing there by construction.
+      Producer-side it always matches. Added from the company's carve-out G apply of
+      port-base-20260905, which dropped the test and named the tests/** contradiction.
   - path: "docs/restructure/ideas/pending-*.md"
     reason: >
       PLAN4 (d): a pending file exists only between a branch capture and its landing pass,

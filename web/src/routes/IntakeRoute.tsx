@@ -1,19 +1,22 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { SpecResult } from '../lib/graph'
-import type { Persona } from '../lib/auth'
+import { canReviewIntake, type Persona } from '../lib/auth'
 import { createIntakeApi, type IntakeRecord } from '../lib/intakeApi'
 import contextTypesData from '../generated/context-types.json'
 import ModuleToolbar from '../layout/ModuleToolbar'
 import IdChip from '../components/ui/IdChip'
 import IntakeStepper from '../components/IntakeStepper'
+import IntakeReviewQueue from '../components/IntakeReviewQueue'
+import ThreadDiff from '../components/ThreadDiff'
 import { useGraphAccess } from '../data/graphAccess'
 import { validateRows, type RowShape } from '../data/rowShape'
 
 // O47 — the Context Intake page, slice 3 of docs/design/ui-exploration/sme-intake-page-plan.md.
 // Sections 1–3 are live against O45 (context-type artifact) and O46 (intake
-// store); sections 4–8 render as disabled placeholders naming their slice —
-// never silently absent. The area selector is a HINT channel by design (Q10:
-// unattributable email lands unassigned, never guessed).
+// store); O50 made section 7 live (the admin review queue); 4, 5, 6 and 8
+// render as disabled placeholders naming their slice — never silently absent.
+// The area selector is a HINT channel by design (Q10: unattributable email
+// lands unassigned, never guessed).
 
 const AREA_TREE_SPEC = 'intake.area-tree.v1'
 const APP_SPEC = 'explorer.applications.v1'
@@ -103,19 +106,6 @@ function PlaceholderSection({ n, title, slice }: { n: number; title: string; sli
       <SectionHeader n={n} title={title} />
       <p className="text-xs text-faint">Not in this slice — lands with {slice}.</p>
     </section>
-  )
-}
-
-/** The inline thread diff: the O46 delta payload, new content highlighted. */
-function ThreadDiff({ delta }: { delta: string }) {
-  return (
-    <pre className="max-h-48 overflow-auto rounded border border-edge-soft bg-panel-2 p-2 text-xs">
-      {delta.split('\n').map((line, i) => (
-        <div key={i} style={{ background: 'color-mix(in srgb, var(--teal) 18%, transparent)' }}>
-          {line || ' '}
-        </div>
-      ))}
-    </pre>
   )
 }
 
@@ -522,7 +512,23 @@ export default function IntakeRoute({ persona }: { persona: Persona }) {
         <PlaceholderSection n={4} title="Review for ontology (the CDO-style pass)" slice="O48" />
         <PlaceholderSection n={5} title="Related nodes in the structured graph" slice="O49" />
         <PlaceholderSection n={6} title="Agent first-pass correlation" slice="O49" />
-        <PlaceholderSection n={7} title="Confirm → admin review → (gated) load" slice="O50" />
+        <section className="rounded border border-edge-soft p-4">
+          <SectionHeader n={7} title="Confirm → admin review → (gated) load" />
+          {canReviewIntake(persona) ? (
+            <IntakeReviewQueue api={intakeApi} />
+          ) : (
+            // Not a placeholder and not a hidden section: the rail exists, it
+            // is not this persona's. Saying so is the same rule the stepper
+            // follows for a stage whose buttons belong to someone else — a
+            // surface that simply disappears reads as "not built", which is
+            // what section 7 stopped being with O50.
+            <p className="text-xs text-faint">
+              Admin review queue — the accept / send-back rail is the admin
+              persona’s. Your record’s position in the machine is the stepper in
+              section 3.
+            </p>
+          )}
+        </section>
         <PlaceholderSection n={8} title="Reviewer-quality signal + admin block" slice="O51" />
       </div>
     </div>

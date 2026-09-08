@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "drydocs:config/schemas/precedence.schema.json",
   "title": "config/precedence.yaml (drydocs.precedence.v1)",
-  "description": "Shape only (S6). Resolution semantics live in drydocs_core/precedence.py and tests/unit/test_precedence.py.",
+  "description": "Shape only (S6). Resolution semantics live in drydocs_core/precedence.py and tests/unit/test_precedence.py.\n\nCLOSED AT THE TOP LEVEL (CFG3, 2026-09-07), the three sibling family schemas' rule: an open schema accepts a misspelled key in silence, and a config nobody validates is a config that drifts. Closing it surfaced one real omission -- `classification`, live in the file and declared nowhere -- which is the whole argument for closing, in one key.\n\nSTILL OPEN, deliberately and named so it is not mistaken for an oversight: `conflict_policy` is `type: object` with no properties (live keys: winner, loser_disposition, never, require_sme_confirmation) and the `order[]` items accept extra keys. Both are the same defect one level down; CFG3 is scoped to the top level and they are handed back rather than swept in.",
   "type": "object",
   "required": [
     "schema",
@@ -37,7 +37,7 @@
             "minimum": 1
           },
           "stamp": {
-            "description": "G72 (SS-D3): the Attribution.source value this surface stamps — attribution-surface entries only",
+            "description": "G72 (SS-D3): the Attribution.source value this surface stamps \u2014 attribution-surface entries only",
             "type": "string",
             "pattern": "^[A-Za-z_]+$"
           },
@@ -68,6 +68,20 @@
       "additionalProperties": {
         "type": "boolean"
       }
+    },
+    "classification": {
+      "description": "J58 identity header. Present in the live file and undeclared until CFG3, which is exactly what an open schema hides.",
+      "enum": [
+        "External",
+        "Internal-Public",
+        "Internal"
+      ]
+    },
+    "source": {
+      "description": "J58 identity header, optional here: a file authored in this repository names no upstream extract. Declared so closing the schema cannot make the header profile unsatisfiable.",
+      "type": "string",
+      "minLength": 1
     }
-  }
+  },
+  "additionalProperties": false
 }

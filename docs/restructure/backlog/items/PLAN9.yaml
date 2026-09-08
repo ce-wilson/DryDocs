@@ -1,0 +1,51 @@
+id: PLAN9
+epic: project-board
+title: "Census pins are venue data: the coverage-census tuple in test_docs_coverage moves to a venue-owned config block the test reads, after a survey of the other pins of the same shape"
+type: task
+module: drydocs-plan
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- tests/unit/test_docs_coverage.py
+- config/dev-environment.yaml
+- PORT-MANIFEST.yaml
+- config/taxonomy/software-registry.yaml
+- config/doc-source-registry.yaml
+acceptance: |
+  tests/unit/test_docs_coverage.py:358 test_the_live_coverage_census_is_pinned hard-codes the
+  producer's census tuple (products, products with no corpus, and two more counts) over the
+  REAL registries. The test is right as a guard - the coverage picture must not drift
+  silently - and the tuple inside it is a fact about ONE checkout's corpus, so on every roll
+  it collides, the consumer re-pins to its own numbers by hand, and any later producer edit
+  to the same lines collides again (2026-09-07 transcription, sixteenth report, the
+  hand-merges). Same family as any live-config count checked in as if it were code.
+
+  (a) Survey first, in the item's close note: every unit test that pins a count over a LIVE
+      config file (not a fixture - a grep for tuple equalities in tests/unit/ finds mostly
+      fixture pins, which are not this class) is listed with its file, line and the tuple.
+      The census pin is one; the constraint count over the schema and the vocabulary fragment
+      count are the candidates to check.
+  (b) One shape is chosen for the class and applied to every pin the survey found. Preferred:
+      the tuple moves to config/dev-environment.yaml, which already declares `edition:` per
+      venue and is a per-entry manifest row, as a `census:` block the test reads - the guard
+      keeps its teeth, the DATA stops crossing. Alternative, if a pin cannot move: a per-entry
+      PORT-MANIFEST.yaml row for the test file whose entry_rule names the pin lines as
+      consumer-owned. The close note says which shape each pin took and why.
+  (c) The test's docstring keeps its history (the O81 15/13 -> 16/14 note) and adds one line
+      saying where the numbers now live and that a consumer edits the venue file, never the
+      test.
+  (d) A relay tells the consumer the pin moved and where its own numbers go. Nothing is
+      asked back.
+notes: |
+  Minted 2026-09-07 from IDEAS.md Idea-292 (desktop, Lane A); the stub shipped in e0f2b799
+  under a stale CFG5 message - see CORE6's note. Source is the company's carve-out I
+  hand-merge list, transcribed to the machine-local back-flow file named in Idea-292.
+
+  module drydocs-plan for the guard; the venue file is config and rides along - one item,
+  because splitting the pin from the file it reads is how the two drift. Lands with PORT6 as
+  a next-roll relay, not mid-apply. p2: it costs one hand-merge per roll today and no data is
+  wrong.
