@@ -29,7 +29,8 @@ fe120bf9, point 2).
 
 WHAT IT REFUSES, AND WHAT IT ONLY FLAGS. It refuses an id that does not exist,
 an item that is not ``todo``, and an item whose dependencies are not all
-``done`` — those are facts the board holds. It only FLAGS venue-bound inputs
+``done`` — those are facts the board holds. It only FLAGS venue-bound inputs, a declared
+``venue:`` this side does not meet (PLAN6 — the venue file's ``venues:`` map says which),
 and, for a Lane B queue, inputs under a Lane A pen, because which machine
 holds a data root and which session owns a surface this week are the author's
 facts, not the tree's; the flags print, and land in the file, so the decision
@@ -74,9 +75,14 @@ if str(REPO) not in sys.path:
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
+import yaml  # noqa: E402
+
 from drydocs_core import backlog_store  # noqa: E402
 
 BACKLOG = REPO / "docs" / "restructure" / "backlog"
+#: The declared-not-inferred venue file: ``venues:`` says which venue codes exist and
+#: whether THIS side has each (PLAN6). Same file, same reason as PLAN2's ``edition:``.
+DEV_ENVIRONMENT = REPO / "config" / "dev-environment.yaml"
 
 #: THE pens, keyed by the names CLAUDE.md §0 uses. Each pen maps to the path
 #: prefixes it covers, with the reason a reader can check. Lane A holds every pen
@@ -154,10 +160,43 @@ def load() -> tuple[dict, dict[str, dict], list[str]]:
     return doc, items, ready
 
 
-def venue_flags(item: dict) -> list[str]:
-    """Machine-local inputs. The notes check is a substring heuristic — a note that says
-    "not machine-local" flags too, by design: a false flag costs a reader one glance,
-    a missed one costs the other machine a session."""
+def load_venues(path: Path = DEV_ENVIRONMENT) -> dict[str, dict]:
+    """The ``venues:`` map of the venue file: code -> {available, what}. A file without
+    the section declares no venue, so every declared requirement reads as unmet here —
+    the same refusal shape the allocator gives a copy with no ``edition:`` key."""
+    doc = yaml.safe_load(path.read_text(encoding="utf-8")) if path.is_file() else None
+    venues = (doc or {}).get("venues") if isinstance(doc, dict) else None
+    return {str(k): dict(v or {}) for k, v in (venues or {}).items()}
+
+
+def declared_venue_flags(item: dict, venues: dict[str, dict]) -> list[str]:
+    """The item's ``venue:`` codes against what this side declares (PLAN6). Reads the
+    FIELD, never the acceptance prose: G132 said "none of which exist producer-side" in
+    clause (g) and was queued to the laptop anyway on 2026-09-05, because the only
+    thing this check read was input paths. Each flag names the requirement that failed;
+    an item with no ``venue:`` yields nothing, exactly as before."""
+    flags = []
+    codes = item.get("venue") or []
+    for code in codes if isinstance(codes, list) else [codes]:
+        code = str(code)
+        declared = venues.get(code)
+        if declared is None:
+            flags.append(
+                f"venue `{code}` required, but {DEV_ENVIRONMENT.name} declares no such code"
+            )
+        elif not declared.get("available"):
+            flags.append(
+                f"venue `{code}` required, not available on this machine "
+                f"(venues.{code}.available: false in {DEV_ENVIRONMENT.name})"
+            )
+    return flags
+
+
+def venue_flags(item: dict, venues: dict[str, dict] | None = None) -> list[str]:
+    """Machine-local inputs, then the declared requirement. The notes check is a
+    substring heuristic — a note that says "not machine-local" flags too, by design: a
+    false flag costs a reader one glance, a missed one costs the other machine a
+    session. ``venues`` defaults to this checkout's venue file."""
     flags = []
     for p in item.get("inputs") or []:
         if any(m in norm_path(p) for m in VENUE_MARKERS):
@@ -165,6 +204,7 @@ def venue_flags(item: dict) -> list[str]:
     notes = str(item.get("notes") or "")
     if re.search(r"machine[- ]local", notes, re.I):
         flags.append("notes say machine-local")
+    flags.extend(declared_venue_flags(item, load_venues() if venues is None else venues))
     return flags
 
 
@@ -270,6 +310,7 @@ def check_queue(
     ready: list[str],
     lane: str = "B",
     other: list[str] | None = None,
+    venues: dict[str, dict] | None = None,
 ) -> tuple[list[dict], list[str]]:
     """Validate an ordered queue: refusals stop the run; flags ride into the file.
 
@@ -278,8 +319,12 @@ def check_queue(
     G116-G119 for touching config/gate-prompts on a Lane A handoff — wrong).
     Overlap flags need ``other`` — the other lane's queue — and are a flag, not a
     refusal: Lane B took R12 and O68 knowingly on 2026-09-05, and that is the
-    author's call to make with the collision in front of them.
+    author's call to make with the collision in front of them. ``venues`` is the
+    receiving side's declaration (default: this checkout's venue file) — a declared
+    ``venue:`` it does not meet is a venue flag naming the code (PLAN6).
     """
+    if venues is None:
+        venues = load_venues()
     rows, refusals = [], []
     seen: set[str] = set()
     for raw in ids:
@@ -315,7 +360,7 @@ def check_queue(
                 "module": str(item.get("module")),
                 "model": item.get("model"),
                 "deps": [str(d) for d in item.get("depends_on") or []],
-                "venue": venue_flags(item),
+                "venue": venue_flags(item, venues),
                 "surfaces": surface_flags(item) if lane == "B" else [],
                 "gates": gate_flags(item),
                 "overlap": overlap_flags(iid, other or [], items),
@@ -557,13 +602,22 @@ def render(
     return "\n".join(out)
 
 
-def cmd_suggest(items: dict[str, dict], ready: list[str], other: list[str] | None = None) -> int:
+def cmd_suggest(
+    items: dict[str, dict],
+    ready: list[str],
+    other: list[str] | None = None,
+    venues: dict[str, dict] | None = None,
+) -> int:
     other = other or []
+    if venues is None:
+        venues = load_venues()
     by_module: dict[str, list[dict]] = {}
     for iid in ready:
         by_module.setdefault(str(items[iid].get("module")), []).append(items[iid])
+    have = sorted(c for c, v in venues.items() if v.get("available"))
     print(
-        f"Ready to pull: {len(ready)} items, grouped by module. Marks: V = machine-local input, "
+        f"Ready to pull: {len(ready)} items, grouped by module. Marks: V = machine-local input "
+        f"or a declared venue this machine lacks (declared here: {', '.join(have) or 'none'}), "
         "S = under a Lane A pen (a Lane B concern), G = gate-bound (an SME session), "
         "O = input overlaps an item in --other-queue"
         + (f" ({', '.join(other)})" if other else " (none given)")
@@ -572,7 +626,7 @@ def cmd_suggest(items: dict[str, dict], ready: list[str], other: list[str] | Non
     for module in sorted(by_module):
         print(f"[{module}]")
         for it in by_module[module]:
-            v, s, g = venue_flags(it), surface_flags(it), gate_flags(it)
+            v, s, g = venue_flags(it, venues), surface_flags(it), gate_flags(it)
             o = overlap_flags(str(it["id"]), other, items)
             marks = (
                 ("V" if v else "-")

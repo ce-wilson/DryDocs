@@ -492,7 +492,11 @@ rows:
       `depgraph:` block can never equal the producer's. Live example for the
       next port: producer `33cfc68` adds a `plugins:` block + `plugins_volume`
       here (APOC/GDS as a mounted volume) — structure to adapt, values to
-      decide locally, NOT a file to check out.
+      decide locally, NOT a file to check out. Second live example (PLAN6,
+      2026-09-08): the `venues:` map. Its KEYS are the vocabulary backlog
+      items' `venue:` fields validate against — adopt a new key, or an item
+      that carries it fails the schema guard on this side — while each
+      `available:` is the local fact and stays as the consumer set it.
   - path: "compose.yaml"
     disposition: canonical-company
     entry_rule: >

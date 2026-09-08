@@ -7,7 +7,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - .claude/skills/lane-handoff/scripts/handoff.py
@@ -39,3 +39,23 @@ notes: |
   config/dev-environment.yaml is already the declared-not-inferred venue file (PLAN2 uses its
   edition: key the same way), so the venue vocabulary has a home and this item does not invent
   one.
+
+  DONE 2026-09-08 (desktop, Lane A). (a) Items gain an optional venue: list of codes, additive
+  to v3. The vocabulary is a new venues: map in config/dev-environment.yaml - the file that
+  already declares rather than infers (PLAN2's edition: key) - where each code carries
+  available: (this side's local fact) and what:. Seeded with controlm-server (G132's wall),
+  oracle-replica and neo4j; producer declares only neo4j available. The PORT-MANIFEST note on
+  that canonical-company row says the KEYS are adopted by hand and available: stays the
+  consumer's. (b) handoff.py: load_venues reads the map; declared_venue_flags reads the FIELD
+  and never prose, and each flag names the code and the key that failed (not available here,
+  or no such code declared); venue_flags, check_queue and cmd_suggest thread a venues map
+  (default: this checkout's file), so the V mark and the generate flag now cover it; the
+  --suggest header prints which codes this side declares available. (c) G132 carries venue:
+  [controlm-server]; --suggest on this desktop marks it V with the named requirement; an item
+  with no venue: is silent, as before. (d) tests/unit/test_lane_handoff.py: flag / silence /
+  undeclared code, check_queue on both lanes, G132 read from its real file against a synthetic
+  map on both sides, load_venues on a file without the section, the --suggest mark and line;
+  tests/unit/test_backlog.py: venue: is a list of declared, unrepeated codes (the gates: shape,
+  J50); tests/unit/test_dev_environment.py: every code carries a boolean available and a what.
+  SKILL.md names the check and what it does not do: the file is committed, so two producer
+  machines declare the same set - a per-machine difference stays the author's ruling.

@@ -56,6 +56,16 @@ def test_schema_and_required_fields():
     }
 
 
+def test_venues_declare_availability_and_purpose():
+    """PLAN6: every venue code carries a boolean `available` (the local fact) and a
+    `what` (so the flag a reader meets in a handoff file can be looked up here)."""
+    venues = _load()["venues"]
+    assert "controlm-server" in venues, "G132's wall is the founding code"
+    for code, spec in venues.items():
+        assert isinstance(spec.get("available"), bool), code
+        assert str(spec.get("what", "")).strip(), code
+
+
 def test_databases_match_provisioning_script():
     """The topology names here must be exactly what 01_databases.cypher creates.
 

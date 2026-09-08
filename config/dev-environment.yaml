@@ -28,6 +28,29 @@ updated: 2026-09-05
 # until it declares (rider idea-series-grammar C1). The producer is the base.
 edition: base
 
+# WHAT A BACKLOG ITEM MAY REQUIRE OF THE MACHINE THAT BUILDS IT (PLAN6, 2026-09-08). An
+# item's optional `venue:` list names codes from THIS map, and the backlog schema guard
+# (tests/unit/test_backlog.py) refuses a code that is not declared here - so the KEYS
+# are the shared vocabulary and `available:` is the local fact: does this checkout's
+# side have the venue. lane-handoff --suggest reads both and flags a queued item whose
+# requirement this side does not meet, naming the code (a V mark), where before it
+# read only input PATHS and a wall written in acceptance prose was invisible to it:
+# G132's collector runs only on a Control-M server host, said so in clause (g), and was
+# still queued to the laptop on 2026-09-05. An item with no `venue:` is silent here,
+# exactly as before. Declared, never inferred, for the same reason as `edition:` above;
+# this file is canonical-company in PORT-MANIFEST.yaml, so the company's copy carries
+# the company's own availability (its hosts, its replica) and adopts new KEYS by hand.
+venues:
+  controlm-server:
+    available: false
+    what: a Control-M server host - the folder-pull collector (G132) runs only there
+  oracle-replica:
+    available: false
+    what: a live connection to the Control-M replica schema - the oracle-db skill acts on it
+  neo4j:
+    available: true
+    what: the local Enterprise container declared below - loaders, e2e and the MCP server
+
 neo4j:
   # Local Neo4j Enterprise container (EE required — ADR 0002 multi-DB + composite;
   # Aura ruled out 2026-07-06). Provision the topology once after first start:

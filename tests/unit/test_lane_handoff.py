@@ -151,6 +151,81 @@ def test_paths_are_normalized_before_pen_matching(h, items, ready):
     assert h.norm_path("docs\\port\\x.md") == "docs/port/x.md"
 
 
+# ---- a declared venue the receiving machine lacks (PLAN6) -------------------------------
+
+WITHOUT_SERVER = {"controlm-server": {"available": False}, "neo4j": {"available": True}}
+WITH_SERVER = {"controlm-server": {"available": True}, "neo4j": {"available": True}}
+
+
+def _declared(iid: str, *codes: str):
+    item = _item(iid)
+    item["venue"] = list(codes)
+    return item
+
+
+def test_a_declared_venue_this_side_lacks_is_a_venue_flag_naming_the_code(h):
+    """PLAN6 (a)/(b): the FIELD is read, never the acceptance prose, and the flag says
+    which requirement failed. The same item on a machine that declares the venue is
+    silent; an undeclared code is its own flag, not a silent pass."""
+    item = _declared("SERVER1", "controlm-server")
+    assert h.venue_flags(item, WITHOUT_SERVER) == [
+        "venue `controlm-server` required, not available on this machine "
+        "(venues.controlm-server.available: false in dev-environment.yaml)"
+    ]
+    assert h.venue_flags(item, WITH_SERVER) == []
+    assert h.venue_flags(_declared("TYPO1", "mainframe"), WITH_SERVER) == [
+        "venue `mainframe` required, but dev-environment.yaml declares no such code"
+    ]
+    # no declaration: silence, not a new failure (PLAN6 c)
+    assert h.venue_flags(_item("PLAIN1"), WITHOUT_SERVER) == []
+
+
+def test_check_queue_carries_the_declared_venue_as_a_flag_on_both_lanes(h, items, ready):
+    items["SERVER1"] = _declared("SERVER1", "controlm-server")
+    ready = [*ready, "SERVER1"]
+    for lane in ("A", "B"):
+        (row,), refusals = h.check_queue(["SERVER1"], items, ready, lane, venues=WITHOUT_SERVER)
+        assert refusals == [] and row["venue"] == [
+            "venue `controlm-server` required, not available on this machine "
+            "(venues.controlm-server.available: false in dev-environment.yaml)"
+        ]
+    (row,), _ = h.check_queue(["SERVER1"], items, ready, "B", venues=WITH_SERVER)
+    assert row["venue"] == []
+
+
+def test_g132_is_the_worked_example(h):
+    """PLAN6 (c): G132 carries the declaration, and a --suggest run on a machine without
+    the server venue flags it. Read from the real item file; the venue map is synthetic
+    on both sides of the comparison so this holds on a checkout that DOES declare it."""
+    g132 = h.backlog_store.load_backlog_document(h.BACKLOG / "items" / "G132.yaml")
+    assert g132["venue"] == ["controlm-server"]
+    assert h.declared_venue_flags(g132, WITHOUT_SERVER) == [
+        "venue `controlm-server` required, not available on this machine "
+        "(venues.controlm-server.available: false in dev-environment.yaml)"
+    ]
+    assert h.declared_venue_flags(g132, WITH_SERVER) == []
+
+
+def test_load_venues_reads_the_venue_file_and_an_absent_section_declares_nothing(h, tmp_path):
+    live = h.load_venues()
+    assert live and all({"available", "what"} <= set(v) for v in live.values())
+    assert all(isinstance(v["available"], bool) for v in live.values())
+    f = tmp_path / "dev-environment.yaml"
+    f.write_text("schema: drydocs.dev-environment.v1\nedition: base\n", encoding="utf-8")
+    assert h.load_venues(f) == {}
+    assert h.load_venues(tmp_path / "missing.yaml") == {}
+
+
+def test_suggest_marks_v_and_names_the_failed_requirement(h, items, ready, capsys):
+    items["SERVER1"] = _declared("SERVER1", "controlm-server")
+    assert h.cmd_suggest(items, [*ready, "SERVER1"], venues=WITHOUT_SERVER) == 0
+    out = capsys.readouterr().out
+    assert "(declared here: neo4j)" in out
+    line = next(ln for ln in out.splitlines() if "SERVER1" in ln)
+    assert line.strip().startswith("V---")
+    assert "- venue `controlm-server` required, not available on this machine" in out
+
+
 # ---- the other lane's queue: notes, never refusals ------------------------------------
 
 

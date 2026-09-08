@@ -1058,6 +1058,33 @@ def test_declared_gates_are_lists_of_known_prompt_slugs() -> None:
     assert not failures, "\n".join(failures)
 
 
+def test_declared_venues_are_lists_of_codes_the_venue_file_declares() -> None:
+    """PLAN6: `venue:` is optional; when present it is a list of codes declared under
+    `venues:` in config/dev-environment.yaml. lane-handoff reads ONLY this field to flag
+    an item the receiving machine cannot build, so an undeclared code is a wall the
+    check cannot see - hence the guard, on the `gates:` shape (J50)."""
+    doc = _load()
+    venue_doc = yaml.safe_load(
+        (REPO / "config" / "dev-environment.yaml").read_text(encoding="utf-8")
+    )
+    codes = set((venue_doc.get("venues") or {}).keys())
+    assert codes, "config/dev-environment.yaml declares no venues: section"
+    failures: list[str] = []
+    for item in doc.get("items", []):
+        venue = item.get("venue")
+        if venue is None:
+            continue
+        if not isinstance(venue, list) or not all(isinstance(v, str) for v in venue):
+            failures.append(f"[{item['id']}] venue must be a list of code strings")
+            continue
+        for v in venue:
+            if v not in codes:
+                failures.append(f"[{item['id']}] venue names undeclared code '{v}'")
+        if len(set(venue)) != len(venue):
+            failures.append(f"[{item['id']}] venue repeats a code")
+    assert not failures, "\n".join(failures)
+
+
 def test_dependencies_resolve_and_are_acyclic() -> None:
     doc = _load()
     items = {item["id"]: item for item in doc.get("items", [])}

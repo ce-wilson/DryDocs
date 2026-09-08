@@ -61,7 +61,7 @@ that disagree. So:
 
 | Mode | Command | Reads | Writes |
 |---|---|---|---|
-| suggest | `--suggest [--other-queue …]` | the backlog | nothing — the Ready strip by module, marked V (machine-local) / S (Lane A pen) / G (gate-bound) / O (input overlaps an item in `--other-queue`) |
+| suggest | `--suggest [--other-queue …]` | the backlog, `config/dev-environment.yaml` | nothing — the Ready strip by module, marked V (machine-local input, or a declared `venue:` this machine lacks) / S (Lane A pen) / G (gate-bound) / O (input overlaps an item in `--other-queue`) |
 | generate | `--lane B --machine laptop --queue LOAD12,CORE3 [--other-queue …] [--from …] [--out …]` | the backlog, `git` | one file, `docs/lane-<x>-handoff.md` |
 | check | `--check docs/lane-b-handoff.md` | the backlog | nothing — each queued id's status, and the input overlaps still open between `queue:` and `other_queue:`; retire when all are `done` |
 
@@ -91,14 +91,31 @@ in an additive `other_queue:` front-matter line so `--check` re-runs the compari
 items still open on both sides without parsing the prose table (J37); a file generated before
 the line says so and skips that part.
 
+**A venue wall in acceptance prose is invisible; a declared one is not (PLAN6, 2026-09-08).**
+The V mark read only input PATHS, so G132 — whose collector runs only on a Control-M server
+host, and says so in clause (g) — passed clean and was queued to the laptop on 2026-09-05; the
+lane hit the wall on read and left it `todo`. The fix is not to parse prose. An item may carry
+an optional `venue:` list of codes, validated by the backlog schema guard against the `venues:`
+map in `config/dev-environment.yaml`, where each code says whether THIS side has it
+(`available:`) and what it is. `--suggest` and generate flag a queued item whose code this side
+does not declare available, naming the code and the key that failed; an undeclared code is its
+own flag; an item with no `venue:` is silent, exactly as before. The venue file is the
+declared-not-inferred file already (PLAN2's `edition:` lives there), it is canonical-company in
+`PORT-MANIFEST.yaml`, so the company's copy carries the company's own availability and adopts
+new codes by hand. G132 is the worked example and carries `venue: [controlm-server]`. What this
+does not do: tell two producer machines apart — the file is committed, so the laptop and the
+desktop declare the same set; a per-machine difference (one lane without Neo4j) is still the
+author's ruling at queue time.
+
 **One vocabulary for surfaces.** `PENS` in the script is keyed by §0's pen names (`backlog`,
 `port`, `adr`) plus two this skill adds and marks as additions (`gates`, `snapshot`). The
 surfaces table AND the `pen:` line the receiving session commits are both generated from that
 one structure, so the file and §0 cannot say different things. Change a surface's owner there,
 with the reason — it is policy, not a guard. `tests/unit/test_lane_handoff.py` pins the refuse /
 flag split, the lane-aware pens, path normalization, the other-queue notes, `--check`'s
-MISSING state, and the overlap check (the coarse-prefix case, the provenance exclusion, and a
-file that predates `other_queue:`).
+MISSING state, the overlap check (the coarse-prefix case, the provenance exclusion, and a
+file that predates `other_queue:`), and the declared venue (flag, silence, undeclared code, and
+G132 as the worked example).
 
 It does not claim items — the pull rule does that per item, at pull time. It does not render,
 mint, or commit.

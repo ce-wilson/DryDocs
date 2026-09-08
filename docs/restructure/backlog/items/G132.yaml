@@ -16,6 +16,8 @@ inputs:
 - drydocs_lineage/collect/README.md
 - config/source-registry.yaml
 - .gitattributes
+venue:
+- controlm-server
 acceptance: |
   (a) HOME IT WHERE THE PRECEDENT PUTS IT. The folder-pull collector and a conf
   sibling land in drydocs_lineage/collect/, the directory rua_inventory.sh
