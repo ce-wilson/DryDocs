@@ -49,6 +49,22 @@ function route(prefix: string, target: string): [string, ProxyOptions] {
       changeOrigin: true,
       rewrite: (path) => path.replace(anchored, '') || '/',
       configure: (proxyServer) => {
+        // ORIGIN IS REMOVED, and `changeOrigin` is why it has to be done by hand:
+        // that option rewrites HOST only. The browser's `Origin` header rode
+        // through untouched, so an upstream on its own port saw
+        // `Origin: http://localhost:5173` and read it as cross-origin — which it
+        // is, at that hop. ADR 0020's premise is that no browser request is
+        // cross-origin, and that is true of the BROWSER (page and /agent share an
+        // origin) but was never true of the request arriving at the service.
+        // The ADK (agents/serve.py, no --allow_origins by that ADR) has origin
+        // checking on with an empty allowlist and answered 403 to every Ask;
+        // drydocs-api has no origin check, which is why only /agent broke.
+        // Deleting the header restores the premise at the hop that lost it, and
+        // matches deploy/render_proxy_config.mjs's `proxy_set_header Origin ""`
+        // so dev and the Compose stack present the same request.
+        proxyServer.on('proxyReq', (proxyReq) => {
+          proxyReq.removeHeader('origin')
+        })
         proxyServer.on('error', (_err, _req, res) => {
           if (!('writeHead' in res) || res.headersSent) return
           res.writeHead(502, { 'Content-Type': 'text/plain' })

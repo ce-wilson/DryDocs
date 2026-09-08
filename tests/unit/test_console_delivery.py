@@ -34,6 +34,9 @@ from __future__ import annotations
 
 import json
 import re
+import shutil
+import subprocess
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -169,6 +172,61 @@ def test_the_guard_carries_every_shape_a_service_coordinate_takes() -> None:
     code = _ts_code(DIST_GUARD)
     for shape in COORDINATE_SHAPES:
         assert shape in code, shape
+
+
+# ---- neither proxy forwards the browser's Origin to an upstream ----------------------
+#
+# THE DEFECT THIS RETIRES (2026-09-07). ADR 0020's premise is that the browser makes
+# no cross-origin request, so no service needs an allowlist. True at the BROWSER —
+# page and /agent share an origin — and false at the UPSTREAM: both proxies rewrite
+# Host and forwarded `Origin` untouched, so a service on its own port received
+# `Origin: <page origin>` and read it as cross-origin, which at that hop it is. The
+# ADK (agents/serve.py, no --allow_origins on this ADR's reasoning) has origin
+# checking on with an EMPTY allowlist, so every console Ask got
+# "403 Forbidden: origin not allowed" while every /api page worked, because
+# drydocs-api has no origin check to fail. Reproduced both ways: the ADK answers 200
+# with no Origin header and 403 with one.
+#
+# Both proxies must therefore drop the header, and BOTH are checked here because the
+# defect was that they agreed on Host and diverged on nothing else — one fixed and
+# one not would put dev and the Compose stack back on two different requests, which
+# is the drift this whole file exists to prevent.
+
+
+def test_the_nginx_renderer_clears_origin_on_every_proxied_prefix() -> None:
+    """The RENDERED config, not the script's prose: the renderer is run and its
+    output read, so this fails if the directive stops reaching nginx for any reason
+    - a moved template, a prefix that renders its own header block, an edit that
+    drops it from COMMON."""
+    node = shutil.which("node")
+    if node is None:  # pragma: no cover - node is present in CI's web job
+        pytest.skip("node not on PATH")
+    with tempfile.TemporaryDirectory() as tmp:
+        out = Path(tmp) / "default.conf"
+        subprocess.run(
+            [node, str(REPO / "deploy" / "render_proxy_config.mjs"), str(DELIVERY), str(out)],
+            check=True,
+            capture_output=True,
+        )
+        conf = out.read_text(encoding="utf-8")
+    # One `proxy_pass` per proxied location; every one of them must sit under a
+    # block that clears Origin. COMMON is shared, so counting is the cheap check
+    # that no location grew its own header set without it.
+    assert 'proxy_set_header Origin "";' in conf, conf
+    assert conf.count('proxy_set_header Origin "";') == conf.count(
+        "proxy_set_header X-Forwarded-Proto"
+    ), "a proxied location carries the forwarded-proto header but not the Origin clear"
+
+
+def test_the_vite_proxy_removes_the_origin_header() -> None:
+    """Read as code (J66), because the comment above the hook explains the defect and
+    would satisfy a substring test on its own. `changeOrigin` rewrites HOST only, so
+    the removal has to be explicit and this is what proves it still is."""
+    code = _ts_code(WEB / "vite.config.ts")
+    assert "proxyReq" in code, "the proxy no longer hooks proxyReq"
+    assert re.search(
+        r"removeHeader\(\s*['\"]origin['\"]\s*\)", code, re.IGNORECASE
+    ), "vite.config.ts no longer removes the Origin header before forwarding"
 
 
 # ---- the ledger still records venues in the readable shape (carried from O85) ------

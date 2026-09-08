@@ -52,7 +52,26 @@ const agentPrefix = prefixOf('agent')
 // The shared proxy headers. `Host` is left to nginx's default ($proxy_host, the
 // upstream) — that is what Vite's `changeOrigin: true` does, so a service that
 // reflects the Host header behaves the same in dev and here.
+//
+// ORIGIN IS CLEARED, and this is the header that made ADR 0020 half true. The
+// ADR's premise is that the browser never makes a cross-origin request: it calls
+// /api and /agent on the page's own origin, so no allowlist is needed anywhere.
+// That holds at the BROWSER and breaks at the UPSTREAM. Both proxies rewrite Host
+// and forwarded `Origin` untouched, so a service listening on its own port
+// received `Origin: <the page's origin>` and correctly read it as cross-origin.
+// The ADK server (agents/serve.py, which passes no --allow_origins on this ADR's
+// reasoning) has origin checking ON with an EMPTY allowlist, so it answered
+// 403 "origin not allowed" to every console Ask while /api worked — drydocs-api
+// has no origin check at all, which is why only one prefix ever failed.
+//
+// Clearing it here restores the ADR's own premise at the hop where it was lost:
+// the request reaching the upstream is not cross-origin, because it no longer
+// claims to be. `""` makes nginx omit the header entirely (the documented way),
+// which is the state the ADK already accepts — it answers 200 with no Origin.
+// The proxy is the trust boundary; the upstreams are not published, so the CSRF
+// signal dropped here is one the upstream was not the right place to read.
 const COMMON = `        proxy_http_version 1.1;
+        proxy_set_header Origin "";
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;`
 
