@@ -136,3 +136,30 @@ notes: |
   the item working, not the item failing - the point of (b) is that the truth arrives without
   costing the trunk. Lane A should read the first run of all four legs before deciding whether
   any advisory one is believable enough to block on.
+
+  THE FIRST RUN, READ (run 34180616297, wip/j67-laptop, 2026-09-08). It came back while this
+  lane was still open, so the paragraph above is now answered rather than left to Lane A. ALL
+  FOUR LEGS RAN, and all four report the SAME single failure - 1 failed, 3529 passed, 42
+  skipped, 18 deselected - and that one failure is
+  test_committed_roadmap_page_matches_its_sources, the roadmap guard going red on a close
+  commit because Lane B writes notes and does not render. It is the expected Lane B close red,
+  identical on every leg, and it is not an interpreter or platform finding.
+
+  So the substantive result is: NOTHING IS BROKEN ON ANY OF THE THREE NEW LEGS. Poetry
+  installed, the lock resolved and the full suite ran on 3.11, on 3.14 and on Windows. The
+  desktop's "the lock cannot resolve on 3.14" worry, which is what put this item in the
+  backlog, is now disproved in CI as well as locally - two independent venues.
+
+  TWO DIFFERENCES WORTH KEEPING, neither a failure:
+  - 3.14 emits 37 warnings against 7 on 3.12, same suite, same tree. Nobody has read them.
+    That is the kind of thing an advisory leg exists to surface, and it is a candidate for its
+    own item rather than something to fix inside this one.
+  - The Windows leg takes 394s against ~205-215s on the three Linux legs, roughly 1.9x. Real
+    Actions-minutes cost, and the number to weigh if anyone proposes making it blocking.
+
+  WHAT THIS DOES NOT SETTLE: one green run is not "green long enough to be believed", which is
+  the bar clause (b) sets and the J10 stage-5 precedent it cites. The flip to blocking stays a
+  separate decision with a separate reading, and this note is the first data point toward it,
+  not the case for it. The run also cannot say anything about a leg on a commit that renders
+  cleanly, since every leg here was measured on a Lane B close - the first fully green reading
+  will come from Lane A's merge commit.
