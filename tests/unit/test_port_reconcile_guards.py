@@ -836,30 +836,10 @@ def test_before_text_missing_file_names_all_four(
 # legitimate resolution the message names (.gitignore it — local-only by intent).
 
 
-def glob_to_regex(pattern: str) -> re.Pattern[str]:
-    """Compile a manifest path glob, anchored.
-
-    ``**`` spans separators, ``*`` and ``?`` do not — so ``drydocs/review/publishing/**``
-    covers the whole subtree while ``docs/*.md`` stays at one level and cannot
-    quietly swallow ``docs/decisions/adr.md``. That distinction is the whole point
-    of the allowlist's "prefer a narrow pattern" rule; fnmatch would erase it.
-    """
-    out: list[str] = []
-    i = 0
-    while i < len(pattern):
-        if pattern.startswith("**", i):
-            out.append(".*")
-            i += 2
-        elif pattern[i] == "*":
-            out.append("[^/]*")
-            i += 1
-        elif pattern[i] == "?":
-            out.append("[^/]")
-            i += 1
-        else:
-            out.append(re.escape(pattern[i]))
-            i += 1
-    return re.compile("".join(out) + r"\Z")
+# `glob_to_regex` moved to `drydocs/port/dispositions.py` (PORT6, 2026-09-08) so the
+# renderer and the completeness check share ONE matcher; re-exported here because this
+# module's own tests and `test_port_manifest.py` import it by this name.
+from drydocs.port.dispositions import glob_to_regex  # noqa: E402
 
 
 def resolve_path(path: str, patterns: Iterable[tuple[str, re.Pattern[str]]]) -> str | None:

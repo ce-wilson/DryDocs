@@ -7,7 +7,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - PORT-MANIFEST.yaml
@@ -81,3 +81,26 @@ notes: |
   than a wrong one - the same rule Workstream A of the id-grammar plan follows). The
   in-flight roll (0902..0905, carve-out H under way) closes on RELAY-35's by-hand recipe.
   p1 because the failure it fixes has already happened once and is silent by construction.
+
+  DONE 2026-09-08 (desktop, Lane A). Built as three pieces plus the surfaces. (a)/(g)
+  drydocs/port/dispositions.py holds the ONE classifier (classify + the anchored glob
+  matcher), extracted from scripts/render_port_dispositions.py, which now imports it;
+  tests/unit/test_port_dispositions.py asserts the renderer's name IS the module's function.
+  drydocs/port/port_completeness.py is the pure logic - survivors by class, never-port
+  dropped, canonical-company listed as a ruling band that does not fail, the consumer's
+  table shape (disposition | carried | new | deferred | owed | total) - and
+  scripts/port_completeness_check.py the thin CLI; --help states PRESENCE only. (b) the
+  port-prompt gained DEFERRED BY PATH with a fenced deferred-paths block (pattern | roll |
+  ref | retired), first row drydocs_lineage/** T24, cumulative and retired by date; the
+  check reads it at the base tag with git show because docs/port never crosses, plus
+  --deferrals FILE for consumer-ruled rows; the ACCEPTANCE GATE carries the check as a
+  bullet. (c) the reconcile-port skill's step 3b names both instruments and what each
+  answers, and the Port report template carries the check's last line. (d)
+  tests/unit/test_port_completeness.py builds the fixture repo: pkg/new.py added in range 1,
+  never applied, and at range 2's close numstat over range 2 is asserted EMPTY for it while
+  the check names it as carried - plus deferral round-trip, retired rows, tag-read of the
+  port-prompt, canonical-company band, union-append heading gap, unresolvable tag refused
+  (exit 2, J76). (e) RELAY-40. (f) union-append by H2 heading, markdown only, fences
+  stripped; YAML union-append rows stay with the J7 guards. Smoke producer-side against
+  port-base-20260905 --prev port-base-20260902: 5 survivors, all paths deleted since the
+  tag - the expected producer-side reading of a consumer instrument.
