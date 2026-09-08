@@ -3540,6 +3540,48 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   reserved for the §3-redaction ruling**; nothing in this postscript is that ruling.
   Nothing is asked back.
 
+  **SECOND POSTSCRIPT TO RELAY-46 - THREE CORRECTIONS TO YOUR 0908 APPLY, READ AT ITS PHASE 3
+  (2026-09-08, producer main `d1016072`, base `port-base-20260908`, venue desktop; your report of
+  the apply is `[SME-REPORTED]`, each correction is checked at the tag):** Your Phase 0, Phase 1
+  and the stale-step correction (`PRODUCER_BASELINE` gone, `edition:` deliberately unset until your
+  own mint) read correctly from here, and your correction-21 handling of `55c2a084` - stop, name
+  it, take producer text, reconstruct nothing, no local exemption - is the right handling; that
+  ruling is producer-owned and RELAY-47 stays reserved for it. Three things in your Phase 3 do not
+  survive a read of the producer tag. **One - the writer did not drop `--repo`.**
+  `[VERIFIED-PRODUCER]` `scripts/reconcile_before.py` at `port-base-20260908` declares it
+  (`--repo`, default the checkout containing the cwd, help text "the consumer checkout to
+  snapshot"), beside the positional before-dir and `--describe`; it arrived in producer `2aa90898`
+  on 2026-09-05 and the file is byte-identical between the tag and producer `main`. Your Phase 1
+  invocation - a detached worktree at the tag, then the writer with `--repo <worktree>` - is the
+  producer CLI's own documented shape. The "hand-merge in the diverged class" is a diff against
+  your 0905-era local copy reading the library-plus-CLI refactor as a drop (J76's fourth failure
+  mode, from the first postscript: `git log -1 -- <file>` against the tag before comparing text).
+  Take the fast-forward. **Two - there is no bootstrapping problem, so the stamp guard clears
+  today.** `[VERIFIED-PRODUCER]` The stamp your `BASE_SHA` names is `BASE.sha` - one line, the
+  40-hex sha, `drydocs/port/reconcile_before.py` - and the guard is
+  `test_reconcile_before_dir_stamp_describes_this_tree_live` in
+  `tests/unit/test_port_reconcile_guards.py`. The writer's refusal is narrower than "a dirty
+  tree": it is `git status --porcelain` over the snapshot's SOURCE files only, run in the `--repo`
+  checkout. Point it at a worktree detached at `pre-cewilson-port-20260908` and the sources are
+  clean by construction; the stamp it writes is `b73fd9d1`, which is an ancestor of
+  `port/20260908` and is where that branch left `main`, so every check the guard makes passes -
+  missing, unresolvable, not-an-ancestor, gate-log byte mismatch, not-the-fork-point. Nothing has
+  to land first; the library is already on your branch as a clean-add and the CLI is a
+  fast-forward. **Three - PORT6 is closed, and was never a home for owed-path rows.**
+  `[VERIFIED-PRODUCER]` PORT5, PORT6 and PORT7 are `done` on the producer; PORT6 was the clean-add
+  completeness check. The 87 owed paths already have a producer reading in
+  `docs/reviews/company-owed-path-review-2026-09-08.md` (first postscript: 73 ruled by the
+  manifest, 14 need the SME), and any new row for them is PORT4's accepted-drop seam or a fresh
+  mint - keeping the 87 out of this roll is the right scope call either way. **Two notes, not
+  corrections.** Your 2-of-3 interlock caution is the manifest's own rule: `MODULE_MAP.md`,
+  `drydocs_core/component_map.py` and `tests/unit/test_module_boundary.py` are one `per-entry`
+  classification in `PORT-MANIFEST.yaml` ("three files, one classification"), so a wholesale take
+  of any of the three is the defect the row exists to stop. And your closing lesson - the unit of
+  application is the dependency closure, not the disposition class - is now producer inbox
+  Idea-307, mechanism only: the classifier answers per path, the `pairs_with` column records the
+  closure by hand and nothing reads it, and the depgraph snapshot already holds the import edges
+  to derive it. Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
