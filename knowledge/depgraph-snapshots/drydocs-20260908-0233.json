@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-08T01:47:12",
+    "captured_at": "2026-09-08T02:33:34",
     "date": "20260908",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "ae846600",
-      "full": "ae84660020c2e58c901a05d0eb0b23bb174ebadd",
+      "commit": "dc73c4fa",
+      "full": "dc73c4fad4619075e097b37f1b58d129adab980a",
       "branch": "main",
-      "describe": "port-base-20260905-317-gae846600",
-      "subject": "docs(adr): ADR 0020 amended - the proxy owns the request it presents (clause 4), the Consequences bullet said the opposite of the defect, a Revisit trigger for a directly published upstream",
+      "describe": "port-base-20260905-323-gdc73c4fa",
+      "subject": "Merge branch fix/us-english-and-adk-wording - US-English on the /explorer canvas, and the ADK origin check described as same-origin-only",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -9345,6 +9345,24 @@
       "name": "next-session-cron-prompt.md",
       "extension": ".md",
       "rel_path": "docs/history/next-session-cron-prompt.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/lane-a-handoff.md",
+      "name": "lane-a-handoff.md",
+      "extension": ".md",
+      "rel_path": "docs/lane-a-handoff.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/lane-b-handoff.md",
+      "name": "lane-b-handoff.md",
+      "extension": ".md",
+      "rel_path": "docs/lane-b-handoff.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -22976,10 +22994,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260908-0129.json",
-      "name": "drydocs-20260908-0129.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260908.json",
+      "name": "drydocs-20260908.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260908-0129.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260908.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -41159,6 +41177,16 @@
     [
       "drydocs/docs",
       "CONTAINS",
+      "drydocs/docs/lane-a-handoff.md"
+    ],
+    [
+      "drydocs/docs",
+      "CONTAINS",
+      "drydocs/docs/lane-b-handoff.md"
+    ],
+    [
+      "drydocs/docs",
+      "CONTAINS",
       "drydocs/docs/next-session-handoff.md"
     ],
     [
@@ -49574,7 +49602,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260908-0129.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260908.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -53171,13 +53199,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2960,
+    "files": 2962,
     "edges": 1792,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 3282,
+    "rels": 3284,
     "directories": 323
   }
 }

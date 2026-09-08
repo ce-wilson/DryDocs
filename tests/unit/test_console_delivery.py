@@ -181,8 +181,9 @@ def test_the_guard_carries_every_shape_a_service_coordinate_takes() -> None:
 # page and /agent share an origin — and false at the UPSTREAM: both proxies rewrite
 # Host and forwarded `Origin` untouched, so a service on its own port received
 # `Origin: <page origin>` and read it as cross-origin, which at that hop it is. The
-# ADK (agents/serve.py, no --allow_origins on this ADR's reasoning) has origin
-# checking on with an EMPTY allowlist, so every console Ask got
+# ADK (agents/serve.py, no --allow_origins on this ADR's reasoning) checks the
+# header UNCONDITIONALLY and, with nothing configured, allows only its OWN origin
+# - same-origin-only, not an absent check - so every console Ask got
 # "403 Forbidden: origin not allowed" while every /api page worked, because
 # drydocs-api has no origin check to fail. Reproduced both ways: the ADK answers 200
 # with no Origin header and 403 with one.

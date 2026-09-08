@@ -3023,6 +3023,48 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   reading, the `auth.ts` contradiction — and RELAY-37's gate-log append is the sixth
   Outstanding item, not repeated here. Nothing is asked back.
 
+- **RELAY-39 — RELAY-38'S HAND-MERGE HYPOTHESIS IS WITHDRAWN: THE ABSENCE IS YOUR SIGNED
+  DEFERRAL; BOTH RELAY-35 CORRECTIONS ACCEPTED; AND `scripts/reconcile_before.py` COLLIDES
+  NEXT ROLL** (new 2026-09-08, on the corrected PORT-REPORT at your 5671f745; nothing waits
+  for the roll). First, `[COMPANY-CONFIRMED]` — your correction 6 is right and the corrected
+  sentence stands as written: the `render_load_map.main()` call is absent on your tree by a
+  signed company deferral, recorded on your side five times, not lost in a hand-merge. The
+  producer's own machine-local record of your ninth and twenty-first reports already said the
+  call "correctly stayed off the chain" under that deferral; RELAY-38 should have read it
+  before offering the hypothesis, and the hypothesis is withdrawn. What stands from RELAY-38
+  is the half your correction carries as its first paragraph — the producer has called it at
+  every base tag since N4 (`0b95a118`) — and a company DEFERRED gate is yours to hold or
+  retire; nothing here overrules it. Your correction 11 follows the same ruling: the producer's
+  `tests/unit/test_render_determinism.py` lists `render_load_map.py` in both
+  `COMMITTED_RENDERERS` and `COMMITTED_SURFACE_WRITERS`, and which of the two your copy keeps
+  is the wiring decision's to make. Second, `[VERIFIED-PRODUCER]` — your correction 7's
+  producer row matches the tag exactly: `git show port-base-20260905:web/src/generated/gates.json`
+  holds 116 gates — 19 open, 3 pending, 1 deferred, 57 recorded, 36 signed-off. The 8-vs-1
+  deferred column is the intended divergence, as you say. Third, `[VERIFIED-PRODUCER]` —
+  both of correction 12's corrections to RELAY-35 are accepted. The fixture-interlock CSV
+  RELAY-35 named is the half you hold (`tests/fixtures/server_inventory/synthetic-server-export.csv`,
+  present at the tag on both trees); the half absent on your side is
+  `drydocs/data/samples/controlm_hosts__sample.csv`, which sits under the `drydocs/data/**`
+  never-port row — a gitignored tree whose fourteen tracked samples are grandfathered, and
+  whose absence `tests/unit/test_server_inventory_fixture.py` skips on by design. Not owed,
+  and RELAY-35's count is one short of what it said. The classification behind your table
+  also reads as the producer manifest reads: `default:` is quoted verbatim; `docs/decisions/**`,
+  `docs/reviews/**`, `drydocs-icons/**`, `internal/**`, `scripts/**` and `tests/**` are
+  default-resolved rows (clean-add when absent), `docs/design/**` is evaluate, `graph-tests/**`
+  and `config/gate-prompts/**` are canonical-company, and every path in the 87 that was
+  spot-checked here exists at the tag. The table is the first real-values fixture for the
+  producer's completeness instrument (PORT6), which is where "deciding what to APPLY" gets a
+  by-path deferral list to refuse COMPLETE against. Fourth, `[VERIFIED-PRODUCER]` — your
+  correction 8's `scripts/reconcile_before.py` is your own file, and it collides next roll.
+  At `port-base-20260905` the reconcile-port skill set `RECONCILE_BEFORE_DIR` and shipped no
+  script for it, which is why you wrote one at `a4603b7e`. The producer closed that gap the
+  day the tag was cut, after it: `scripts/reconcile_before.py` landed at `2aa90898`
+  (2026-09-05) as a short wrapper over `drydocs/port/reconcile_before.py`, whose write sites
+  pin `newline=""` (J49 — your Windows CRLF reasoning is the rule's own), and the skill's
+  close step now cites its `--describe <before-dir>` output. `scripts/**` is evaluate, so the
+  next roll hand-merges the two; the producer's is the reference for the CLI the skill
+  cites, and your `89c54ee6` fix has nothing to carry anywhere. Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has

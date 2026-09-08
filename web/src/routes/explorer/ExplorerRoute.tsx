@@ -131,15 +131,15 @@ export default function ExplorerRoute({ persona }: { persona: Persona }) {
             fallback={<DataFrame cols={FOLDERS_FRAME.cols} rows={FOLDERS_FRAME.rows} {...frameProps} />}
           />
         ),
-        // O81 surface 2: the application neighbourhood, drawn from the same
+        // O81 surface 2: the application neighborhood, drawn from the same
         // reviewed spec the Folders tab tables — folder → application, folder →
-        // data centre. The :Port hop the spec traverses is deliberately NOT
+        // data center. The :Port hop the spec traverses is deliberately NOT
         // drawn: the rows carry no port identity, so a port node would be one
         // the console invented (see nvl-mapping.ts).
-        'App neighbourhood': (
+        'App neighborhood': (
           <SpecGraphPane
             specId="explorer.folder-applications.v1"
-            title="Application neighbourhood · folder → application · folder → data centre"
+            title="Application neighborhood · folder → application · folder → data center"
             selected={canvasNode}
             onSelect={setCanvasNode}
           />

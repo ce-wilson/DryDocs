@@ -59,6 +59,17 @@ acceptance: |
       applied rolls, two of them closed COMPLETE, and the only guard that could see any of
       it (tests/unit/test_gates_json.py) saw one, because scripts/render_gates.py hides a
       self-declared prompt with no log entry - that half is Idea-303, not this item.
+  (g) Added 2026-09-08 (twenty-fourth report; the consumer's correction 12): the consumer ran
+      RELAY-35's by-hand recipe at 0905 and bucketed the survivors by disposition class - 113
+      survivors, 87 owed or deferred once never-port is removed, 82 of them already absent at
+      a roll closed COMPLETE, 51 falling to the manifest default with nothing recording a
+      decision - so the check's output is BY CLASS, in that table's shape, and that run is its
+      first real-values fixture (J76). Two things the run taught: the check says in its own
+      --help that it is a PRESENCE check, blind to present-but-divergent content (the T24
+      shape), so nobody over-trusts it; and RELAY-35 listed a never-port path as owed
+      (drydocs/data/samples/controlm_hosts__sample.csv), which is exactly the misread (a)'s
+      classifier filter exists to prevent - a by-hand sweep and the classifier disagreed, and
+      the classifier is the one that reads the manifest.
 notes: |
   Minted 2026-09-07 from IDEAS.md Idea-291 (desktop, Lane A); the stub shipped in e0f2b799
   under a stale CFG5 message - see CORE6's note. Source is the company's carve-out I close

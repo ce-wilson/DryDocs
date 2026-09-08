@@ -67,14 +67,14 @@ export const MODULES: readonly ModuleDef[] = [
     // Locations (Z5, 2026-08-22): the reusable map module's first consumer.
     // It sits beside Servers deliberately — same estate, one tab answering
     // "what do we have" and the next answering "where is it".
-    // 'App neighbourhood' added at O81: the NVL canvas over the same
+    // 'App neighborhood' added at O81: the NVL canvas over the same
     // explorer.folder-applications.v1 the Folders tab tables, drawn as folder →
-    // application and folder → data centre. It sits directly after Folders so
+    // application and folder → data center. It sits directly after Folders so
     // the table and its picture are neighbours.
     tabs: [
       'Applications',
       'Folders',
-      'App neighbourhood',
+      'App neighborhood',
       'App codes',
       'Jobs',
       'Conditions',

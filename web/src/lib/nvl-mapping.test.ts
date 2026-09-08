@@ -101,7 +101,7 @@ describe('mapAppNeighbourhood — explorer.folder-applications.v1', () => {
     },
   ]
 
-  it('draws folder -> application and folder -> data centre', () => {
+  it('draws folder -> application and folder -> data center', () => {
     const g = mapAppNeighbourhood(rows)
     expect(g.relationships.map((r) => r.caption).sort()).toEqual([
       'BELONGS_TO_APPLICATION',
@@ -129,7 +129,7 @@ describe('mapAppNeighbourhood — explorer.folder-applications.v1', () => {
     expect(folder?.properties.Jobs).toBe('12')
   })
 
-  it('tolerates a row with no data centre', () => {
+  it('tolerates a row with no data center', () => {
     const g = mapAppNeighbourhood([{ folder: 'F', app_id: 'A', application: 'App' }])
     expect(g.relationships.map((r) => r.caption)).toEqual(['BELONGS_TO_APPLICATION'])
   })
