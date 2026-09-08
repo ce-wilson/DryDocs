@@ -106,6 +106,35 @@ kinds:
       is an audit relic. The consequence is deliberate and stated — sweeping it
       destroys the only record that turns a hash back into words.
 
+  - id: qa-debug
+    writer: agents.common.qa_trace.QaTrace
+    retention_days: 7
+    rotation: per-day
+    format: jsonl
+    note: >
+      R18 — the Ask DECISION TRACE: the diagnostic record of why one answer came
+      out the way it did (normalized question, router decision and its stated
+      rationale, the schema/vocabulary prompt text2cypher was grounded on, every
+      generated Cypher with its validation and fix attempts, executed row counts,
+      the answer call's INPUT SHAPE, and the closing tier/timing). A SEPARATE KIND
+      from `qa` for the reason api-debug is separate from `api`: `qa` is a 90-day
+      record whose run line is the only place a question hash turns back into
+      words, and burying it in prompt-sized debug noise would cost the thing it
+      exists for. Seven days, swept aggressively, joined to `qa` and to `api` by
+      the same run_id.
+      OFF UNLESS THIS DECLARATION SAYS level: DEBUG — the api-debug ruling applies
+      unchanged: an Ask question arrives as an HTTP request into the ADK server,
+      which has no --verbose, and a per-request flag would let an untrusted caller
+      turn on verbose capture of their own traffic. Enablement is settings-level,
+      and this line is the setting.
+      WHAT IT REFUSES TO CARRY, and this is a rule rather than an omission: the
+      ANSWER call's user prompt is the retrieved rows JSON — folder names, host
+      names, SEAL ids — so that hop is recorded as SHAPE (row count, column keys,
+      chars, truncation) and never as values. R8 drew that boundary for the `qa`
+      ledger; a debug tier that crossed it would move graph content into a log
+      under a rule written for a question a person typed. Text fields are bounded
+      at qa_trace.TRACE_TEXT_BOUND with a `<field>_truncated` flag.
+
   - id: api
     writer: drydocs_api.audit.ApiAuditLog
     rotation: per-day

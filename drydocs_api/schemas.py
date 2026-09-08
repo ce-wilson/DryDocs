@@ -376,6 +376,36 @@ class LogEstateOut(_Declared):
     zones: list[LogZoneOut]
 
 
+class QaTraceOut(_Declared):
+    """GET /admin/qa-trace (R18 clause d). The ONE payload on this API that
+    carries log CONTENTS, and the exception is ruled rather than assumed: R18's
+    acceptance says an admin retrieves the Ask decision trace by run_id /
+    session_id. It reaches only the `qa-debug` kind; the api-debug question
+    LogEstateOut declines above is untouched and unreachable from here.
+
+    `records` is deliberately untyped. It is the writer's own JSONL, replayed —
+    a diagnostic whose fields grow with the pipeline's hops, and a declared
+    shape here would be a second contract free to disagree with the file. The
+    envelope AROUND it is typed, which is where the guarantees actually live:
+    which run, whether this deployment records at all, how many lines were
+    unreadable, and whether the answer was cut short.
+    """
+
+    run_id: str | None
+    session_id: str | None
+    #: whether the qa-debug declaration turns the trace on HERE. An empty
+    #: `records` with this False is "nothing was recorded"; with it True it is
+    #: "no such run" — the same empty list, two different problems.
+    enabled: bool
+    files: list[str]
+    records: list[dict[str, Any]]
+    record_count: int
+    #: lines that were not parsable JSON — reported, so a consumer never
+    #: silently reads less than it thinks (the ledger_read ruling)
+    skipped: int
+    truncated: bool
+
+
 # ── /intake/* (O46 store, O47 client) ────────────────────────────────────────
 
 
