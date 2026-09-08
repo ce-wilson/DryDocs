@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-08T01:29:38",
+    "captured_at": "2026-09-08T01:47:12",
     "date": "20260908",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "9fd73651",
-      "full": "9fd7365181999d81c9ef8b6a8b7fcaaa83beacdf",
+      "commit": "ae846600",
+      "full": "ae84660020c2e58c901a05d0eb0b23bb174ebadd",
       "branch": "main",
-      "describe": "port-base-20260905-312-g9fd73651",
-      "subject": "docs(port): RELAY-38 - render_load_map.main() is in render_board's default run at every base tag; a 0905 report cites the 0905 gates figure",
+      "describe": "port-base-20260905-317-gae846600",
+      "subject": "docs(adr): ADR 0020 amended - the proxy owns the request it presents (clause 4), the Consequences bullet said the opposite of the defect, a Revisit trigger for a directly published upstream",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -22976,10 +22976,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260908.json",
-      "name": "drydocs-20260908.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260908-0129.json",
+      "name": "drydocs-20260908-0129.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260908.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260908-0129.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -49574,7 +49574,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260908.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260908-0129.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
