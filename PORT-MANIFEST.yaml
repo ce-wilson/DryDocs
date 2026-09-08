@@ -203,7 +203,16 @@ rows:
       findings stood on one side only and read as a producer defect until reframed
       as configuration divergence; consumer correction 4 / RELAY-36). A consumer
       that needs a ruff exception the producer does not carry asks for it as a
-      ported change to this block, never as a local edit.
+      ported change to this block, never as a local edit. And the `ruff` DEV
+      DEPENDENCY PIN is the one dependency entry that does NOT union: it crosses
+      whole too. J10 stage 0 requires the two repos to agree byte for byte on
+      formatter output, which only holds at one exact version; the
+      `.pre-commit-config.yaml` rev IS that pin (canonical-producer row below, its
+      note already assuming what nothing enforced across the repos); and a union of
+      two pins has no meaning - it either picks one silently or carries both. The
+      tables above and this one line are the whole of what J10 calls the SHARED
+      contract; every other dependency in the file unions as it always has, and the
+      version string stays the consumer's.
   - path: ".pre-commit-config.yaml"
     disposition: canonical-producer
     note: >

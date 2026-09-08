@@ -171,6 +171,27 @@ def test_pyproject_row_pins_the_version_string_rule(manifest: dict) -> None:
     assert "tags never cherry-pick" in rule, rule
 
 
+def test_pyproject_row_carries_the_shared_ruff_contract(manifest: dict) -> None:
+    """PORT7: the ruff tables AND the ruff pin cross whole inside the per-entry file.
+
+    Both halves are load-bearing and both were under-specified at some point. The
+    TABLES: a per-entry union of their lists let the `ignore` list diverge, and the
+    divergence read as a producer defect for a whole roll before it was reframed as
+    configuration (consumer correction 4, 2026-09-08). The PIN: J10 stage 0 holds
+    only at one exact ruff version, `.pre-commit-config.yaml`'s rev is derived from
+    it, and "union of dependencies" cannot resolve two pins. Nothing in this repo can
+    check the far side of a port, so what IS checkable is that the rule still says
+    it - a later rewrite of the row that drops either half fails here.
+    """
+    row = next(r for r in manifest["rows"] if r["path"] == "pyproject.toml")
+    rule = row["entry_rule"].lower()
+    for table in ("[tool.ruff]", "[tool.ruff.lint]", "[tool.ruff.format]"):
+        assert table in rule, f"{table} must be named as crossing whole: {rule}"
+    assert "per-file-ignores" in rule, rule
+    assert "cross whole" in rule or "crosses whole" in rule, rule
+    assert "pin" in rule, "the ruff pin must be named as crossing whole too: " + rule
+
+
 # ---- J68: a declaration and its guard must find each other -------------------
 # A DECLARATION file (MODULE_MAP.md, source-registry.yaml, 01_databases.cypher)
 # and the GUARD that reads it encode ONE fact in two languages. Take one without
