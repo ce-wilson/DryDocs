@@ -293,6 +293,11 @@ function Get-CiVerdict {
 # never green at somebody else's older commit. Three outcomes (J78): GREEN at
 # HEAD, RED at HEAD, or NO VERDICT at HEAD - printed as UNVERIFIED, never as
 # either of the other two.
+# NOT A COUNT COMPARISON (J57 d, examined 2026-09-08): the verdict is CI's
+# `conclusion` for the run whose headSha IS HEAD's sha - an identity match, never
+# a passed/failed total - so the set-not-count rule the port and reconcile
+# rituals adopted has nothing to change here. Recorded so the third surface reads
+# as examined rather than unexamined.
 try {
   $ghCmd = $null
   try { $ghCmd = Get-Command gh -ErrorAction Stop } catch { }

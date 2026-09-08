@@ -341,6 +341,14 @@ units from `docs/restructure/backlog/items/`. Each backlog item names its agent 
   (`cli_shared` + the six S8 command modules) are guarded by
   `tests/unit/test_cli_import_order.py`, subprocess-per-import, because an in-process
   import proves nothing about import order (S13: exactly that gap shipped a cycle).
+  **A clean claim after a targeted fix runs the repo-wide guard family (J57):**
+  `tests/unit/test_module_boundary.py`, `tests/unit/test_render_determinism.py`,
+  `tests/unit/test_no_render_parsing.py`, `tests/unit/test_source_scan.py`,
+  `tests/unit/test_runbook_currency.py` — their failures are the ones a targeted-file run
+  cannot see. And when a verification compares failures, it compares the sorted SET of
+  failing node ids (`pytest -q -rf`), never two totals: on 2026-08-27 two sessions agreed
+  on a failing total and one failure was new — agreeing on a total is not agreeing on its
+  contents (J18 made a claim name its venue; this makes it name its contents).
 - **Secrets discipline:** architecture-level only. No real data values in commits.
 
 See `internal/repo-README.md` for the runnable pipeline and `docs/restructure/01-project-plan.md` for the founding narrative (the phase list itself is `docs/restructure/backlog/plan.yaml`, rendered on `docs/plan/roadmap.html`).

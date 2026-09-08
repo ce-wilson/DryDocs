@@ -3097,6 +3097,21 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   range 1 and never applied, at range 2's close, where `--numstat` over range 2 prints nothing
   for it and the check names it as carried. Nothing is asked back.
 
+- **RELAY-41 — THE ACCEPTANCE KEYS ON THE FAILING-TEST SET, NOT THE TOTAL (2026-09-08,
+  J57):** `[VERIFIED-PRODUCER]` Your eighteenth-postscript method — `--lf` on the branch, the
+  main sha in a detached worktree, a set-compare of the two failure lists — is now written
+  where the acceptance is asked for, not only where it was praised. The ACCEPTANCE GATE below
+  gains a bullet: the sorted `FAILED` node ids from `pytest tests/unit -q -rf`, diffed against
+  your last PORT-REPORT's set, with the total kept beside it as the reading. The reconcile-port
+  skill's Track-1 acceptance carries the same rule with its one-sentence reason (two sessions
+  agreed on a failing total on 2026-08-27 and one failure was new), its report template gains
+  a `Failing set` line and a `Clean-claim guard family` line, and a "clean" claim after a
+  targeted fix is defined as one that also ran the repo-wide guards the skill names by test
+  path — module boundary, render determinism, no-render-parsing, repo-path currency — whose
+  failures a targeted run cannot see. The snapshot ritual's green-at-HEAD check was examined
+  and left alone: its verdict is CI's conclusion at HEAD's sha, an identity, not a count. No
+  test, guard or CI stage changed. Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
@@ -6465,6 +6480,17 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   artifacts + adaptations) and drops excluded paths. And `git status --short` line
   count is NOT a file count: `MM` and rename double-entries inflate it (that is where
   the transient "159" came from). Reconcile the three in your PORT-REPORT.
+- THE FAILING SET, NOT THE TOTAL (J57, 2026-09-08). Every figure in the bullet above is a
+  reading; the acceptance is the sorted set of failing test node ids
+  (`poetry run pytest tests/unit -q -rf | grep "^FAILED" | sort`) diffed against the set in
+  your last PORT-REPORT — added ids are the finding, removed ids are progress, and the total
+  stays beside the set as the number people read. Reason, here because it is the rule: on
+  2026-08-27 two sessions measured the same failing total on one tree and took the agreement
+  as confirmation, and one failure was new and self-inflicted; the eighteenth postscript
+  said it for rows and for the 21-against-21 compare, and it holds for every acceptance
+  line on this page. A "clean" claim after a targeted fix also runs the repo-wide guard
+  family the reconcile-port skill names by test-file path (module boundary, render
+  determinism, no-render-parsing, repo-path currency) — a targeted run cannot see those.
 - CI guards green: test_schema.py (EXPECTED_CONSTRAINTS company-based — see ledger;
   every active edge has its supplement block), test_classification.py,
   test_taxonomy_ontology_map.py, test_backlog.py, test_doc_outline.py,

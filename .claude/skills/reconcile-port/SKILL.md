@@ -197,7 +197,9 @@ stay skipped — confirm with the operator if a new one appears.
   recorded number (66acea8 lesson: "trust the file, not the ledger").
 - Condition key: `scope_key` vs producer `folder_id`.
 - Suite size: company suite is much larger (scrapers/Confluence). **Do not chase
-  the producer's `186 passed` full-suite number** — only zero *new* failures matters.
+  the producer's `186 passed` full-suite number** — only zero *new* failures matters,
+  and *new* is a node id absent from your last PORT-REPORT's failing SET, never a total
+  that stayed where it was (J57; the Track-1 acceptance section has the command).
 - **Permanently-diverged tests (bd7952f bundle port, 2026-07-20) — removed
   company-side; do NOT re-add them as clean-adds and do NOT count them in
   acceptance:** `tests/unit/test_publishing.py` (producer publishing template;
@@ -415,6 +417,31 @@ test `test_entrypoint_is_exempt_but_still_classified`; the 2026-07-25 guard fix 
 composition root and may import any component (`ENTRYPOINT_MODULES`) — a company `cli.py`
 that owns the review commands passes as-is; do NOT extract a `review_cli.py` sub-app.
 
+**THE SET, NOT THE COUNT (J57, 2026-09-08).** Every figure above is a reading, not the
+acceptance. The acceptance is the sorted set of failing test NODE IDS, diffed against the set
+your last PORT-REPORT recorded: added ids are the finding, removed ids are progress, and an
+unchanged total says nothing about either. Produce it with `-rf` and keep the total beside it:
+
+```
+poetry run pytest tests/unit -q -rf | grep "^FAILED" | sort
+```
+
+Reason, at the point of use because a rule with no recorded reason is the first thing a later
+session optimises away: on 2026-08-27 two sessions independently measured the same failing
+total on the same tree and treated the agreement as confirmation — one of the failures was
+new and self-inflicted, and the total hid it because another had gone away the same day.
+Agreeing on a total is not agreeing on its contents.
+
+**A CLEAN CLAIM RUNS THE REPO-WIDE GUARD FAMILY (J57 c).** "This is clean" after a targeted
+fix means the targeted files pass AND these pass, because their failures are ones no
+targeted-file run can see: `tests/unit/test_module_boundary.py` (a new module landed in no
+bucket), `tests/unit/test_render_determinism.py` with `tests/unit/test_plan_roadmap.py`,
+`tests/unit/test_enforcement_matrix.py` and `tests/unit/test_gates_json.py` (a committed
+render no longer matches its source), `tests/unit/test_no_render_parsing.py` and
+`tests/unit/test_source_scan.py` (a guard reads a render or the prose around code), and
+`tests/unit/test_runbook_currency.py` (a backticked path a document names does not exist).
+Name the run in the report; a claim without it is a claim about the targeted files only.
+
 ## Per-entry guards — run them around the merge (J7)
 
 The PORT-MANIFEST `per-entry` / `union-append` entry_rules are executable
@@ -533,6 +560,8 @@ Port Report: cewilson/main -> <company>/main
 - What conflicted + resolution: <per collision ledger>
 - What was skipped: <commits + why>
 - Track-1 result: <N passed, 3 skipped, 0 failed>
+- Failing set (J57): <the sorted `FAILED` node ids from `pytest tests/unit -q -rf`, or "none"; then the set diff against your last PORT-REPORT — added: [...] removed: [...] — that diff is the acceptance, the totals above are the reading>
+- Clean-claim guard family (J57 c): <ran / not run — the repo-wide guards named in Track-1 acceptance>
 - Backlog union (J42): <paste the scripts/port_backlog_union.py block WITH its command line — the --producer-ref <tag> it ran against, producer/consumer counts, missing ids, accepted differences, PASS|FAIL>
 - Reconcile guards (J7): <paste `scripts/reconcile_before.py --describe <before-dir>` — BASE.sha, date, commits behind HEAD — and the guard run's pass/fail>
 - Completeness (PORT6): <paste the last line of `scripts/port_completeness_check.py <base> --prev <prev>` — COMPLETE / NOT COMPLETE, owed paths, heading gaps — beside the `--numstat` attribution you used; the two answer different questions>

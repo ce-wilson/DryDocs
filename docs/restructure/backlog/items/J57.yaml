@@ -9,7 +9,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - .claude/skills/reconcile-port/SKILL.md
@@ -34,3 +34,25 @@ notes: |
   Epic release-infrastructure / module docs / phase 8 follows J52, the direct precedent: the same shape of item (a verification discipline learned from one incident, written into a skill so the next session inherits it rather than rediscovers it) and the same epic/module/phase. Model sonnet, not haiku: clause (e) requires actually finding the surfaces, which is a survey rather than a transcription.
 
   The general principle is J18's, one level up. J18 made a verification claim name its VENUE; this makes a verification claim name its CONTENTS. Both fix the same thing — an assertion that looks checkable and is not.
+
+  DONE 2026-09-08 (desktop, Lane A). Procedure only; no test, guard or CI stage changed (f).
+  CHANGED - (a)(b) reconcile-port SKILL.md Track-1 acceptance: a SET, NOT THE COUNT paragraph
+  with the -rf command, the set diff against the last PORT-REPORT as the acceptance, the total
+  kept beside it, and the 2026-08-27 reason at the point of use; the divergence-ledger line
+  (only zero new failures matters) now defines new as a node id absent from the last report's
+  set; the report template gains a Failing set line and a Clean-claim guard family line.
+  (a)(b) port-prompt ACCEPTANCE GATE: a THE FAILING SET, NOT THE TOTAL bullet before CI guards
+  green, citing the eighteenth postscript's set-compare; RELAY-41 tells the company, asks
+  nothing back. (c) The clean-claim convention names the guard family by path in the skill and
+  in CLAUDE.md's Tests gate every change bullet - test_module_boundary, test_render_determinism,
+  test_plan_roadmap, test_enforcement_matrix, test_gates_json, test_no_render_parsing,
+  test_source_scan, test_runbook_currency - each verified present in this tree. (d) snapshot.ps1:
+  examined; its verdict is CI's conclusion at HEAD's sha, an identity match and not a count, so
+  no change - a comment records the examination.
+  UNCHANGED, WITH REASON (e) - reconcile-port apply rules (21 failures to 102): incident
+  narrative, not an acceptance. port-prompt eighteenth postscript: already set-based, now cited.
+  port-prompt Last completed port records and the producer chain reference: records of runs,
+  not asks. docs/restructure/02-backlog.md and 05-drydocs-review-backflow.md counts: historical
+  status notes. port-prompt-archive-steps-1-42.md: archive. oracle-db devops database-testing:
+  vendor-general guidance. IDEAS.md: inbox. Every surface that compares a failing total today
+  is one of these.
