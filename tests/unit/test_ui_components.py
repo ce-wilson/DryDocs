@@ -446,10 +446,20 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     inside a component whose subject is numbers, and the one that matters -- who
     may read a decision trace -- would be the easiest to lose in an edit. Both
     counts move by one.
+    107 -> 108 at WEB18 (2026-09-08): TaglineWithProvenance, UNBOUND, bound stays
+    43. LogEstatePanel's rule and ServiceStatusStrip's: it lives under
+    components/ rather than a route directory, so there is no directory
+    evidence, and its one consumer today (the module header) is not binding
+    evidence -- every module renders that header, so if anything it is bound to
+    all of them, which is what unbound means here. It earns its own file for
+    ClarificationCard's reason rather than for size: what it decides is not
+    layout but whether a console-INVENTED term is presented beside "backs onto
+    drydocs" with nothing separating the two, which is the adjacency that put a
+    Tower question onto :TOMRole on 2026-08-20.
     """
     comps = _ui()["components"]
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
         43,
-        107,
+        108,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"
