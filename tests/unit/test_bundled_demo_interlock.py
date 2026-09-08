@@ -28,7 +28,6 @@ import csv
 import re
 from pathlib import Path
 
-import pytest
 import yaml
 
 REPO = Path(__file__).resolve().parents[2]
@@ -59,15 +58,29 @@ _FOLDER_APP_ID = re.compile(r"^[A-Z]+-[A-Z]+-(\d{5})-")
 
 
 def _rows(path: Path) -> list[dict[str, str]]:
-    """Read one sample, or skip if it is not in this clone.
+    """Read one sample. Absence is a FAILURE here, not a skip (CORE4, 2026-09-07).
 
-    A real skip, not a formality for the J8 policy test: drydocs/data/ is
-    gitignored wholesale and its tracked CSVs are grandfathered inside it, so
-    today every path here is present and the skip never fires. Written per
-    reader so a missing sample can only quiet the tests that actually need it.
+    This used to be a ``pytest.skip``, and its own docstring said why that was
+    wrong while defending it: "drydocs/data/ is gitignored wholesale and its
+    tracked CSVs are grandfathered inside it, so today every path here is present
+    and the skip never fires". A guard that never fires is not protecting the
+    suite from anything — it was written to satisfy the J8 skip-guard policy,
+    which at the time called any drydocs/data/ path a gitignored asset and could
+    not see that these four are force-tracked.
+
+    Every path this reads is in git, so a fresh clone HAS it. If one is missing
+    the clone is broken, not incomplete, and the right behaviour is to say so
+    loudly — the cost of the old skip was that a genuinely missing sample would
+    have quietly disabled this interlock's real assertions instead.
+
+    The policy now asks git rather than the path prefix, so this file needs no
+    guard at all and carries none.
     """
-    if not path.exists():
-        pytest.skip(f"{path.relative_to(REPO)} absent — this interlock has no other half")
+    assert path.exists(), (
+        f"{path.relative_to(REPO)} is TRACKED and absent — this clone is broken, "
+        "not incomplete. The bundled samples ship with the repo; restore them "
+        "rather than skipping the interlock that reads them."
+    )
     with path.open(newline="", encoding="utf-8") as fh:
         return list(csv.DictReader(fh))
 
