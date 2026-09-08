@@ -31,6 +31,7 @@ from __future__ import annotations
 
 import ast
 import re
+import subprocess
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -104,6 +105,47 @@ SCANNED_DOCS: dict[str, str] = {
     ),
 }
 
+#: SCANNED_DOCS entries under a NEVER-PORT zone. This file is canonical-producer,
+#: so it runs on the company tree too -- where `internal/` cannot exist, because
+#: never-port is what `internal/` MEANS (PORT-MANIFEST.yaml; component_map calls it
+#: the publish-boundary twin). Without this map the entry below would fail there and
+#: read as BROKEN when it means NOT HERE, which is J63's shape and is not
+#: hypothetical: the company's 2026-09-03 apply hit exactly this in
+#: test_runbook_currency.py and emptied that file's EXTRA_DOCS as a "divergence",
+#: losing three routing docs from coverage. Same idiom, same reason, deliberately
+#: not a new one.
+#:
+#: The rule is two-sided, so a producer that MOVES the file still fails: when the
+#: zone has no tracked content here, the entry is skipped by name; when it does, the
+#: document must exist.
+NEVER_PORT_ZONE_OF: dict[str, str] = {
+    "internal/repo-README.md": "internal",
+}
+
+
+def _zone_has_tracked_content(zone: str) -> bool:
+    """TRACKED content, not a directory probe -- `is_dir()` answers "present" for a
+    zone holding only gitignored working state, which is how the same question was
+    got wrong once already (test_runbook_currency.py's note). Only git can answer it."""
+    try:
+        out = subprocess.run(
+            ["git", "ls-files", "--", zone],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            check=True,
+        ).stdout
+    except (OSError, subprocess.CalledProcessError):  # pragma: no cover - no git here
+        return (REPO_ROOT / zone).is_dir()
+    return bool(out.strip())
+
+
+def _absent_never_port_zone(rel: str) -> bool:
+    zone = NEVER_PORT_ZONE_OF.get(rel)
+    return zone is not None and not _zone_has_tracked_content(zone)
+
+
 #: A line may name a superseded database ONLY if it says so. This is the escape hatch
 #: for supersession notes and history, and it is deliberately the *only* one — you can
 #: mention the old name, but you have to admit it is old. ("retire" joined at X2 —
@@ -133,9 +175,17 @@ def _python_files() -> list[Path]:
 
 
 def _doc_files() -> list[Path]:
-    """The declared operator docs that exist. Missing ones are a separate failure
-    (see the test below), so this never silently shrinks the scan."""
-    return [REPO_ROOT / rel for rel in SCANNED_DOCS if (REPO_ROOT / rel).is_file()]
+    """The declared operator docs to scan on THIS tree.
+
+    A never-port zone that did not cross drops out by name; anything else that is
+    missing is a separate, loud failure (see the test below), so the scan never
+    silently shrinks.
+    """
+    return [
+        REPO_ROOT / rel
+        for rel in SCANNED_DOCS
+        if not _absent_never_port_zone(rel) and (REPO_ROOT / rel).is_file()
+    ]
 
 
 def _superseded_lines(paths: list[Path]) -> list[str]:
@@ -332,11 +382,22 @@ def test_every_scanned_doc_exists_and_carries_a_reason() -> None:
     skip. The reason is required for the same purpose it serves in EXTRA_DOCS: it
     tells the next person whether their document belongs on the list."""
     for rel, why in SCANNED_DOCS.items():
-        assert (REPO_ROOT / rel).is_file(), (
+        assert _absent_never_port_zone(rel) or (REPO_ROOT / rel).is_file(), (
             f"SCANNED_DOCS names {rel!r}, which does not exist -- it moved, and this "
             "list is what keeps it in coverage. Re-path it rather than deleting the row."
         )
         assert len(why) > 30, f"SCANNED_DOCS[{rel!r}] needs a reason, not {why!r}"
+
+
+def test_the_never_port_zone_map_does_not_drift_from_what_it_joins() -> None:
+    """A skip list that stops matching stops skipping, silently. Every key is a
+    SCANNED_DOCS entry and lies under its own zone; and here -- the producer -- both
+    zones are present, so the documents must be too."""
+    for rel, zone in NEVER_PORT_ZONE_OF.items():
+        assert rel in SCANNED_DOCS, f"{rel!r} is in NEVER_PORT_ZONE_OF but not SCANNED_DOCS"
+        assert rel.startswith(zone + "/"), f"{rel!r} does not lie under its zone {zone!r}"
+        if _zone_has_tracked_content(zone):  # the producer tree
+            assert (REPO_ROOT / rel).is_file(), f"zone {zone!r} is here, so {rel!r} must be"
 
 
 def test_the_doc_scan_reads_the_files_it_claims_to() -> None:
@@ -344,7 +405,8 @@ def test_the_doc_scan_reads_the_files_it_claims_to() -> None:
     that is precisely the state this guard was in before G127 -- green, and looking
     at nothing."""
     paths = _doc_files()
-    assert len(paths) == len(SCANNED_DOCS), "a declared doc is missing from the scan"
+    expected = [rel for rel in SCANNED_DOCS if not _absent_never_port_zone(rel)]
+    assert len(paths) == len(expected), "a declared doc is missing from the scan"
     assert any("startup-refresh-runbook" in p.name for p in paths)
     assert (
         sum(len(p.read_text(encoding="utf-8").splitlines()) for p in paths) > 1000

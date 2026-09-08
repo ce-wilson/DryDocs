@@ -110,6 +110,22 @@ notes: |
       Negative control run: a `ddcontext` line appended to the core runbook fails the new test
       naming file and line; removed after.
 
+      PORT-BOUNDARY FOLLOW-UP, caught reviewing the guard before the close and fixed on
+      the same branch: `internal/repo-README.md` is in SCANNED_DOCS and `internal/` is
+      NEVER-PORT by definition, while this test file is canonical-producer and therefore
+      RUNS on the company tree. As first written, two of the new tests would have failed
+      there and read as BROKEN when they meant NOT HERE - J63's shape exactly, and not
+      hypothetical: the company's 2026-09-03 apply hit precisely this in
+      test_runbook_currency.py and emptied that file's EXTRA_DOCS as a "divergence",
+      losing three routing docs from coverage. The fix mirrors that file's
+      NEVER_PORT_ZONE_OF idiom rather than inventing a second one, including its
+      tracked-content probe (`git ls-files`, not `is_dir()` - a zone holding only
+      gitignored working state answers "present" to a directory check, which is how the
+      same question was got wrong once already). The rule stays two-sided, so a PRODUCER
+      that moves the file still fails. Proven both ways: with the zone reporting absent,
+      the entry drops out by name and four tests pass; with it present, a moved file is
+      refused by name.
+
       Also added, and it is the one that matters: `test_the_doc_scan_reads_the_files_it_claims
       _to` (J76). An empty file list passes the scan vacuously, and vacuously-green is exactly
       the state this guard was in before today - it was passing while 18 offending lines sat in
