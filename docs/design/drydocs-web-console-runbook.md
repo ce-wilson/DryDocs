@@ -5,7 +5,24 @@
   (V1 coverage rule, 2026-08-04). The `Module:` line is what
   `tests/unit/test_runbook_coverage.py` reads; coverage is a claim the document
   makes about itself, never inferred from the filename.
-- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 4, 2026-09-06
+- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 6, 2026-09-07
+  audits the document against the shipped console (backlog V10, Epic V):** what you
+  land on is described for the first time (the O35 category-first rebuild), the FB-03
+  page designations are recorded where an operator can act on them, the standalone
+  agent-test page gains the build and ship path its own header rules, and the build
+  gate is corrected — it named one command while CI blocks on six. Three of those
+  four were ABSENT rather than wrong, which is why the audit was worth running: a
+  runbook is stale when it is silent about a surface, not only when it misdescribes
+  one. **Rev 5, 2026-09-07
+  adds the one-command stack (backlog O72):** Startup now offers two paths, and
+  Path A is `docker compose up --wait` — Compose brings up the same processes with
+  each service's health check set to that step's own success check, so a forgotten
+  process is named at the shell instead of diagnosed in the browser. It is FIVE
+  services, not four: ADR 0020's reverse proxy is a real process, played by Vite in
+  the per-process path and by nginx in front of `dist/` here, which makes this stack
+  the first place the production delivery shape actually runs. Path B, the
+  per-process path, is unchanged and is kept — debugging one service is a real need.
+  Not a deployment: no TLS, no Traefik. **Rev 4, 2026-09-06
   makes the console same-origin with its services (ADR 0020, backlog WEB10):** the
   browser calls the PATHS `/api` and `/agent` on the page's own origin and a reverse
   proxy forwards them — Vite's own dev and preview servers here, the Compose stack's
@@ -32,8 +49,10 @@
   only in the repo-root `.env`, and console secrets only in a machine-local
   `console-credentials.json` under `internal-local/`; neither is ever quoted here)
 - **Audience:** anyone bringing the DryDocs web console up locally — the UI stack is
-  four processes: Neo4j (optional, for live frames), drydocs-api, the ADK agent server
-  (only the Ask module needs it), and the Vite dev server
+  Neo4j (optional, for live frames), drydocs-api, the ADK agent server (only the Ask
+  module needs it), and something serving the page and forwarding `/api` and `/agent`
+  on its origin — the Vite dev server in the per-process path, a reverse proxy in
+  front of `dist/` in the one-command stack
 - **Companion:** `docs/design/drydocs-startup-refresh-runbook.md` (the graph itself —
   container, schema, ingest; explicitly out of scope here),
   `docs/design/drydocs-web-console-tdd.md` (architecture), `drydocs_api/README.md`,
@@ -46,14 +65,15 @@
 
 **Purpose.** Bring the DryDocs web console from OFF to VERIFIED in a local sandbox:
 the thin API (`drydocs-api`, FastAPI/uvicorn on port 8001), the ADK agent server
-(`agents/`, on port 8000) and the React console (`web/`, Vite on port 5173), signed in
-and serving frames — live QuerySpec grids when the graph has data, the SYNTHESIZED demo
-frames otherwise.
+(`agents/`, on port 8000) and the React console (`web/`, Vite on port 5173 in the
+per-process path, the production build behind a proxy on 4173 in the one-command
+stack), signed in and serving frames — live QuerySpec grids when the graph has data,
+the SYNTHESIZED demo frames otherwise.
 
 **In scope.** The API server (auth stub, QuerySpec registry, two-path export, mapping
 store); the ADK agent server behind the Ask module; the web dev server and its
-production build/preview; the mock-persona sign-in; verification of the frame/export
-round-trip.
+production build/preview; the one-command Compose stack that starts all of them
+(O72); the mock-persona sign-in; verification of the frame/export round-trip.
 
 **Which process serves which module.** Every module except Ask reads through
 drydocs-api, reached as `/api/*` on the console's own origin (the proxy forwards it to
@@ -159,6 +179,56 @@ prerequisite only for live frames. Company-side deployment (OIDC, GHE) is not co
 
 From OFF to READY. Run from the repo root; each step states its success check.
 
+**Two paths, and they are alternatives, not stages.** Path A below is one command
+and is the right default. Path B is the per-process path, kept because debugging
+one service — `uvicorn --reload`, a breakpoint, Vite's HMR — is a real need that a
+container stack does not serve.
+
+### Path A — the whole stack, one command (backlog O72)
+
+```powershell
+docker compose up --wait          # from the repo root
+```
+
+*Success:* the command EXITS 0. `--wait` blocks until every service reports
+healthy and returns non-zero if one does not, and each service's health check is
+the corresponding Path B success check below — `/health` answering `ok`, the agent
+server listing exactly its four apps, the page serving its mount point. So the
+process you forgot is named at the shell rather than diagnosed in the browser
+three layers away, which is what this path exists to fix. Then open
+**http://localhost:4173** and sign in (Path B step 5 — the credential step is the
+same, and the file is bind-mounted read-only from `internal-local/`).
+
+`docker compose ps` shows the health column; `docker compose logs -f <service>`
+follows one; `docker compose down` stops the stack and `down -v` also discards
+its volumes.
+
+What it starts, and how it differs from Path B:
+
+- **five services, not four** — Neo4j, `drydocs-api`, the ADK agent server, and a
+  **reverse proxy serving the production build**. ADR 0020 made the console
+  same-origin with its services, so something must serve the page and forward
+  `/api` and `/agent` on that same origin; in Path B that something is Vite, and
+  here it is nginx in front of `dist/`. This stack is where that production shape
+  first runs.
+- **the console is on 4173, not 5173** — the same port Path B step 6 uses for the
+  production build, and it leaves 5173 free so `npm run dev` can run beside the
+  stack against the published `:8001` / `:8000`.
+- **its Neo4j is NOT `neo4jtest`** — the stack has its own volumes and publishes
+  no Neo4j port, so it neither collides with the canonical container nor risks two
+  servers on one store. It starts EMPTY with the ADR 0002 topology provisioned, so
+  frames show the demo fallback until something loads it. To point the stack at
+  the graph you already have, set `DRYDOCS_STACK_NEO4J_URI=bolt://host.docker.internal:7687`.
+- **no secret is baked** — Compose reads the repo-root `.env` for
+  `NEO4J_PASSWORD` and `ANTHROPIC_API_KEY`, and the console credential file is a
+  read-only bind mount. `.dockerignore` keeps `internal-local/`, `internal/` and
+  every `.env` out of the build context.
+
+Not in scope, deliberately: TLS, Traefik, and anything else shaped like a
+deployment. This is a local convenience.
+
+### Path B — process by process
+
 1. **(Optional) the graph:** companion runbook Startup §1–3 (`docker start …`,
    `drydocs check`, bootstrap/supplements). Skip entirely for a demo-only console.
 2. **drydocs-api:**
@@ -206,6 +276,26 @@ From OFF to READY. Run from the repo root; each step states its success check.
    the account or the secret was wrong, because the difference is what turns a login
    route into an account enumerator.
 
+   **What you land on (`/`, the Overview route) is CATEGORY-FIRST** since the O35
+   rebuild (SME feedback FB-01/FB-02: the hub was too busy and the product name
+   unreadable). Two explicit pick-lists, not a dashboard: **modules** — "what do you
+   want to look at?", rendered from the same `web/src/modules/registry.ts` the aside
+   nav reads, so the two cannot disagree — and **business area / tower**, which scopes
+   Explorer and Lineage. The product name renders exactly once, in the nav wordmark;
+   the h1 is the value proposition. Worth knowing at the console rather than in a
+   design doc: a module MISSING from the landing pick-list is a registry entry
+   missing, not a landing bug, and the pick-list is filtered by the signed-in
+   persona's access, so two personas correctly see two different lists.
+
+   **Which pages an SME reviews (FB-03).** The designation is `/software`, `/gates`
+   and `/load-map`. They share one property that makes them the review set: each
+   renders from a COMMITTED GENERATED ARTIFACT rather than from the graph, so they are
+   reproducible on any machine with no Neo4j at all — which is also why the O88
+   capture tool takes them as its default route set. Every other route is graph-backed
+   and is only as good as the graph behind the API at that moment. Take that as the
+   rule for demo and review sessions: the three designated pages are safe to show
+   cold; anything else needs the graph checked first.
+
    **Headless verification (`?as=<personaId>`)** is a real sign-in now, so it needs a
    real secret: set `VITE_DEV_CONSOLE_SECRET` in the shell that runs `npm run dev` to
    the secret you stored for that account. There is no default and no fallback — a
@@ -222,6 +312,25 @@ From OFF to READY. Run from the repo root; each step states its success check.
    npm run build --prefix web
    npm run preview --prefix web        # serves dist/ on http://localhost:4173, same proxy
    ```
+7. **The standalone agent-test page** (`/agent-test.html`) — NOT part of the console
+   shell, and that is a ruling rather than an omission: the FB-04 harness was
+   re-ruled an INDEPENDENT page at SME sign-off on 2026-07-29 (`config/gate-log.md`).
+   No auth layer, dark view only, no shell — the minimal real-time twin of Under the
+   Hood, built for the company port's live-data test, read-only throughout (O20).
+
+   **Build and ship path, which is the part an operator needs:** it is a
+   self-contained file in `web/public/`, so Vite passes it through VERBATIM — no
+   build step transforms it, and it lands unchanged inside `web/dist`. It therefore
+   ships with the console and needs no separate deploy. Reach it at
+   `/agent-test.html` on whichever server is serving the page: `:5173` in dev,
+   `:4173` for the preview or the one-command stack.
+
+   **Open it over http, not `file://`.** The layout renders either way, so the
+   distinction looks cosmetic and is not: the ADK fetch from a `file://` origin can
+   be refused, and the symptom is a page that draws correctly and answers nothing.
+   It also fetches no CDN, no framework and no remote fonts (the locked-down-intranet
+   rule) — system and local IBM Plex only, with its token sheet hand-frozen and held
+   to the console's by the WEB14 parity test.
 
 <!-- anchor: refresh-ingest -->
 ## Refresh / ingest
@@ -293,9 +402,38 @@ differently:
    run id's date, or ask something new.
 6. **Both themes:** header toggle System / Dark / Light — tokens flip everywhere
    including the React Flow canvas (no hard-coded colors).
-7. **Build gate:** `npm run build --prefix web` exits 0 (tsc + vite);
-   `poetry run pytest -q` green (the API layer is fully covered offline — no server
-   or driver needed).
+7. **Build gate — SIX WEB COMMANDS, not one.** This step named `npm run build` alone
+   until Rev 6, while CI had grown five more BLOCKING web checks around it. A local
+   "green" that ran one of six is the shape of the failure Idea-111 records: the unit
+   suite passed for a week while CI ran red, because nothing local resembled what CI
+   was doing. The list below is read off `.github/workflows/ci.yml`, not off
+   `package.json` — the scripts block holds several things CI does not gate on, and
+   which ones it gates on is the only question this step answers. From `web/`:
+   ```powershell
+   npm run build          # tsc -b + vite build — a type error fails here
+   npm run lint           # oxlint, --max-warnings 0 (the flag lives in the script, so
+                          # a local run and a CI run gate identically)
+   npm run bundle:check   # initial-chunk size ceiling
+   npm run dist:check     # no deployment coordinate reached the bundle (ADR 0020)
+   npm run test:coverage  # vitest AND the WEB13 statements floor — a ratchet that
+                          # only goes up; it subsumes a bare `npm test`
+   npm run test:e2e       # playwright, and it is BLOCKING, not optional
+   ```
+   Plus, from the repo root, `poetry run pytest -q` (the API layer is fully covered
+   offline — no server or driver needed) and `poetry run python scripts/dump_openapi.py
+   --check`, the other half of the O70 pair; it runs in CI's `web` job because that is
+   the one venue with the `api` group installed.
+
+   Two commands people reach for here that are NOT gates, so that a red one is priced
+   correctly: `npm run audit:high` is WARN-ONLY in CI by decision (WEB13 (d) — the
+   finding it closed was that nobody was looking, not the advisories themselves), and
+   `npm run api:types` REGENERATES the client rather than checking it. Run the latter
+   when the schema moved; `dump_openapi.py --check` is what fails if you forget.
+
+   *Local-only caveat, and it is a machine fact rather than a defect:* `dist:check`
+   fails on a machine that has a `web/.env.local`, because Vite inlines its `VITE_*`
+   values into the bundle and the check exists to refuse exactly that. Move the file
+   aside and rebuild to check; do not edit `src/` to satisfy it.
 
 <!-- anchor: rollback -->
 ## Rollback
@@ -320,6 +458,9 @@ Symptom → diagnosis → fix; each grounded in a real incident this stack has p
 
 | Symptom | Diagnosis | Fix |
 |---|---|---|
+| `docker compose up --wait` exits non-zero with `container drydocs-<x>-1 is unhealthy` | Path A working as designed: the named service failed ITS success check. This is the whole point — the answer is in the message, not in the browser | `docker compose logs <x>`, then `docker inspect drydocs-<x>-1 --format '{{json .State.Health}}'` for what the probe itself printed |
+| Path A: `Error ... port is already allocated` on 8000, 8001 or 4173 | Path B's processes are still running, or another stack holds the port. The two paths are alternatives | Stop the host processes, or `docker compose down`. Nothing here conflicts with `neo4jtest`: the stack publishes no Neo4j port |
+| Path A: sign-in says "no console credentials are configured on this machine" | Correct on a fresh clone, and stack-independent. The credential file is bind-mounted from `internal-local/`, so the API sees exactly what the host has | Prerequisite 6, on the HOST, then `docker compose restart api` is not even needed — the API re-reads the file on change |
 | Frames show "the server behind /api is not answering (the page's own server returned 502 for it)" | drydocs-api not running behind the proxy (the adapter fails loud by design — no silent bolt fallback). The page's own server IS up — it wrote the 502 | Startup step 2; if the API is up on a non-default port, set `DRYDOCS_API_UPSTREAM` for the Vite shell |
 | Frames show "nothing answered at /api on this page's own origin" | The server that serves the PAGE is gone (Vite or the production proxy), so the fetch threw. Not an API fault | Restart Vite (step 4) or the proxy; a dead API never produces this message since Rev 4 |
 | `ModuleNotFoundError: fastapi` / `uvicorn not found` | api dependency group not installed | `poetry install --with api` |

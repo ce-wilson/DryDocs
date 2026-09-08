@@ -121,6 +121,12 @@ CLASSES: dict[str, tuple[str, str]] = {
     # -- somebody else's schema ---------------------------------------------
     ".github/": (TOOLING, "GitHub Actions workflow — GitHub's schema, not ours"),
     ".pre-commit-config.yaml": (TOOLING, "pre-commit's own schema"),
+    "compose.yaml": (
+        TOOLING,
+        "Docker Compose's own schema (O72's one-command console stack). A `schema:` or "
+        "`classification:` key at the top level is not something Compose allows, so the "
+        "block cannot go there; the file's provenance is its header comment instead",
+    ),
     # -- fixtures ------------------------------------------------------------
     "tests/fixtures/": (FIXTURE, "a fixture's shape is the thing under test"),
     # -- one-offs ------------------------------------------------------------

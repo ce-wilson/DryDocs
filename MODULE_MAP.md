@@ -51,6 +51,7 @@ _Rendered from `drydocs_core/component_map.py` by `scripts/render_module_map.py`
 |---|---|
 | `agents/` | `drydocs-agents` |
 | `config/` | `config` |
+| `deploy/` | `drydocs-web` |
 | `docs/` | `docs` |
 | `drydocs-icons/` | `drydocs-web` |
 | `external/` | `reference` |
