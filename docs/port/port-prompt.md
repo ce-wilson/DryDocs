@@ -3204,6 +3204,52 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   for `drydocs/loaders/**` is doing what it says and the resolution is the place to look.
   Nothing is asked back.
 
+- **RELAY-45 — YOUR PORT-REPORT FOR port-base-20260905 READ AGAINST PRODUCER `main`: ONE
+  ITEM IS TREE-LAG, TWO PRODUCER DEFECTS IT NAMED ARE FIXED, AND THE ACCEPTANCE GATE BELOW
+  IS RESTATED TO SAY WHAT YOUR BY-TEST-ID INSTRUMENT ALREADY MEASURES (2026-09-08, post
+  port-base-20260905):** `[VERIFIED-PRODUCER]` Read at producer `d274e5ee`, against your
+  report at its correction-16 state and the session that merged `port/20260905` and the ruff
+  sweep into your `main` (`25bace48`, `b485ab72`, `d1451fe5`). **One - tree-lag, not a gap.**
+  The line-based reading of the gate-log append-only guard your report asks for exists:
+  `aef8dfcb` (RELAY-43), which is NOT in `port-base-20260905` and lands with the next roll.
+  Same commit carries the `controlm_jobs.sql` per-entry row (your correction 14, item 1) and
+  the currency message that names what moved. Nothing to do on your side until the roll. **Two
+  - a producer defect your close-out found, fixed at `1a5d30b0`.** `depgraph.capability_assert`
+  was read by `tests/unit/test_probe_instrument.py` and never by
+  `knowledge/depgraph-snapshots/snapshot.ps1`, so the guard said recorded divergence and the
+  ritual said defect about the same checkout. The script now reads the flag: `false` warns,
+  writes a degraded snapshot, and the meta header carries `capability_assert` and
+  `capability_gap` so the artifact describes its own degradation. Two of its messages guessed
+  a cause and both guessed wrong on your tree - the refusal's "a checkout stranded on an older
+  revision is the likely cause" fired on a checkout that matched its pin, and the CI check's
+  "gh not authenticated?" fired on a remote whose workflow has never run. Both now report the
+  measurement (checkout-vs-pin; gh-failed vs zero-runs, the latter printed as UNVERIFIED) and
+  list the causes without picking one (J76). **Three - the ruff block, fixed at `3d1278aa`.**
+  `PORT-MANIFEST.yaml`'s `pyproject.toml` row now says what RELAY-36 promised and your
+  correction 4 asked for: the `[tool.ruff]`, `[tool.ruff.lint]`,
+  `[tool.ruff.lint.per-file-ignores]` and `[tool.ruff.format]` tables cross WHOLE, producer
+  text verbatim, and an exception one side needs is asked for as a ported change to that block,
+  never made as a local edit. `[SME-REPORTED]` Your sweep left `ruff check` red by decision
+  on fifteen RUF002/RUF003 findings pending exactly this row - under it, the producer's
+  ignore list crosses whole at the next roll and those fifteen clear without a local edit. The
+  ten other findings your table lists (B007, N999, RUF013, N812, E722) are per-site judgment
+  calls on your own files and are not this row's business. **Four - the load-map absence.**
+  Your report's "stale-by-blocked-renderer" reading matches RELAY-39: the missing
+  `render_load_map` call is your signed T19 deferral, and no producer hypothesis about it
+  stands. **Five - SME review status on the one number the report does not itemize.** At
+  `f8c2233c` the buckets reconcile to the total (2 regressions + 20 pre-existing + 38 new
+  tests + 1 unskipped = 61), and the
+  regression bucket is itemized by test id with a ruling beside each of the two that remain.
+  The 38 "new tests failing" bucket is the only one that is a count and not a list: tests that
+  DID cross in this range and DO fail on your tree, un-named. Under the ACCEPTANCE GATE as now
+  restated (Six), that bucket is where COMPLETE turns - a count is not a bucket, a list of ids
+  is. **Six - the ACCEPTANCE GATE sentence is restated below**, from "ZERO failures is the
+  contract" to zero regressions BY TEST ID against your own prior PORT-REPORT, with every other
+  failing id bucketed by name. Your correction 14 built exactly that instrument and applied it
+  correctly; the producer sentence lagged it. What this does NOT change: the reference figures
+  stay producer figures, never your acceptance number, and a failure that is not bucketed is
+  still a failure. Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
@@ -6516,7 +6562,13 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   sample-backed tests skip without the CSV — at step 48 the CSV-absent figure was
   114 / 3). Company baseline is ABOVE the
   producer floor — compare against your own PORT-REPORT-e60822fc numbers, not these.
-- Full `pytest tests/unit/` — ZERO failures is the contract;
+- Full `pytest tests/unit/` — the contract is ZERO REGRESSIONS BY TEST ID against the
+  consumer's OWN prior PORT-REPORT, with every other failing id bucketed BY NAME in the
+  PORT-REPORT (pre-existing / new test that crossed / unskipped) — a failure that is not
+  bucketed is a failure, a count is not a bucket, and a deliberate remaining regression
+  carries the ruling that supersedes it beside its id (restated 2026-09-08, RELAY-45; the
+  earlier "ZERO failures" wording described a tree no consumer has ever had, and the
+  by-test-id comparison the 2026-09-08 apply ran is the instrument that settles it);
   producer reference at the CERTIFIED BASE (`port-base-20260824c`,
   laptop `NewThinkpad`, 2026-08-24): **2385 passed / 9 skipped**, with the production
   sample CSV ABSENT (3 of the skips) and `RECONCILE_BEFORE_DIR` unset (6). (The same-day first base
