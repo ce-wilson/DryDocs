@@ -3130,6 +3130,45 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   rule: a slice touching a `config/` path is read with its SURFACES row and the matrix in
   the same breath. No test, guard or CI stage changed. Nothing is asked back.
 
+- **RELAY-43 — THE GATE-LOG GUARD NOW READS LINES, NOT BYTES; A LOADER SQL FILE GETS ITS
+  OWN ROW; A CURRENCY MESSAGE NAMES WHAT MOVED (2026-09-08, port-base-20260905 apply):**
+  `[VERIFIED-PRODUCER]` Three producer-owed fixes from your twenty-fifth report, each a
+  commit past `port-base-20260905` that lands with the next roll by its manifest row.
+  **One — the ruling you asked for.** `test_reconcile_gate_log_append_only_live` was
+  stricter than the rule it enforces: the manifest row for `config/gate-log.md` says
+  chronological union, dropping either side's entries is the violation; the guard demanded
+  the pre-merge text be a byte PREFIX of the merged text, which forbids a dated postscript
+  under any record that is not the last one and forbids interleaving the other side's
+  records by date. Your T19 postscript was the first shape; the producer's own log already
+  carried one (2026-09-07, under the ADR 0007 record) that no run had ever seen, because the
+  `_live` guards skip producer-side. `append_only_violation` in
+  `tests/unit/test_port_reconcile_guards.py` is now an ordered LINE SUBSEQUENCE: every
+  pre-merge line must survive, in order; insertions anywhere pass; the byte-prefix case is
+  the fast path; and a failure names the first pre-merge line, by number and text, that is
+  missing or altered, instead of a character offset. The mechanics test pins the three
+  permitted shapes (postscript under a non-last record, a record interleaved by date,
+  pure append) and the two still forbidden (a line dropped from the middle, records
+  reordered). Your T19 postscript passes under it. One thing the new reading will surface
+  that the old one hid behind the postscript: the producer commit `55c2a204` redacted a
+  company product name IN PLACE in one signed line under the ADR 0007 record (its postscript
+  says so). If your pre-merge copy carried the pre-redaction spelling, the guard will name
+  that line. That is a true in-place edit of a signed line, the guard reading correctly; on
+  your side the original spelling is not a publish-boundary matter, so keeping either
+  spelling is your call, and re-taking the snapshot after you decide is the mechanism, not
+  a workaround. **Two — the manifest gap.** `drydocs/loaders/sql/controlm_jobs.sql` sat
+  under the wholesale `drydocs/loaders/**` canonical-producer row while your own signed gate
+  had added a derived column to it, so the take dropped the column and your guard caught it
+  (correction 14, item 1). It now has its own `per-entry` row ABOVE the wildcard (the
+  manifest is first-match-wins; `test_port_manifest.py` guards the shadow): an entry is one
+  SELECT-list column keyed by alias, producer columns cross whole, a column your gate ruled
+  survives the take. Same family as the MODULE_MAP.md / test_module_boundary.py pair (J68).
+  **Three — the instrument.** `test_documentation_currency_drift_is_visible_not_hidden`
+  failed with a message that printed the drift line that WAS present, pointing away from the
+  missing one (correction 14, item 3; J76). It now reports `missing:` and `unexpected:`
+  separately. A guard changed this time — the append-only guard is looser in exactly the
+  two shapes the manifest rule permits and no looser anywhere else; no CI stage changed.
+  Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has

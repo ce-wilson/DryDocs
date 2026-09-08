@@ -234,13 +234,21 @@ def test_documentation_currency_drift_is_visible_not_hidden() -> None:
 
     # The known state, pinned so a silent change is loud. Update this list when
     # an SME confirms a capture against a runtime version (or recaptures).
-    assert drifted == [
+    expected = [
         "controlm: runtime 9.0.21.300 not covered by docs 9.0.20",
         # Q27: the MWAA corpus is registered with current_for EMPTY — no SME has
         # confirmed the internal prose against any runtime version yet, so the
         # drift line is a true statement, pinned like controlm's.
         "airflow: runtime 3.x not covered by docs 2026-08-07 locator",
-    ], f"documentation currency changed: {drifted}"
+    ]
+    # Name what MOVED, not the whole list: on the company's 2026-09-08 apply the
+    # airflow product row had not crossed and this message printed the controlm
+    # line that WAS present, pointing away from the defect (J76).
+    assert drifted == expected, (
+        "documentation currency changed — missing: "
+        f"{[d for d in expected if d not in drifted]}; unexpected: "
+        f"{[d for d in drifted if d not in expected]}"
+    )
 
 
 ACCESS_STATES = {"open", "forbidden"}

@@ -688,9 +688,22 @@ rows:
       inventory) — producer-authored, ports wholesale; the guide's crosswalk
       exception references company-internal vocabulary on purpose (L22,
       2026-08-03)
+  - path: "drydocs/loaders/sql/controlm_jobs.sql"
+    disposition: per-entry
+    entry_rule: >
+      An ENTRY is one SELECT-list column, keyed by its alias. Producer columns
+      cross whole (LOAD2's fix arrived this way); a column the company's own
+      signed gate added SURVIVES the take — `ctlm_id`, derived as
+      `TABLE_ID || '.' || JOB_ID` under their `controlm-q1q3-phase1` ruling, is
+      the standing instance. The producer never ruled that column, so its file
+      does not carry it, and the `drydocs/loaders/**` row below took the file
+      wholesale on the 2026-09-08 apply and dropped it; their guard
+      (test_jobs_sql_derives_ctlm_id) caught it and the fix was a hand-merge.
+      Same family as MODULE_MAP.md / test_module_boundary.py (J68): a file one
+      side holds a signed ruling in cannot sit under a wholesale row.
   - path: "drydocs/loaders/**"
     disposition: canonical-producer
-    note: "Control-M loaders/SQL/DDL/cypher incl. base.py (provenance diet) — producer-authored"
+    note: "Control-M loaders/SQL/DDL/cypher incl. base.py (provenance diet) — producer-authored; controlm_jobs.sql has its own row above (a company gate-bound column lives in it)"
   - path: "drydocs_core/schema/constraints.cypher"
     disposition: per-entry
     entry_rule: >

@@ -12,8 +12,14 @@ Three rules:
   backlog.yaml ``done`` → todo/in_progress (J16, 2026-07-28: that file became a
   per-entry row once the fall-through guard showed it had none); and a consumer
   entry may never simply VANISH (per-entry means union of entries).
-* **Append-only** — union-append audit files (config/gate-log.md): the
-  pre-merge text must be a byte prefix of the merged text.
+* **Append-only** — union-append audit files (config/gate-log.md): every
+  pre-merge LINE survives the merge, in order; insertions anywhere are allowed.
+  Until 2026-09-08 this was a byte-PREFIX check, which forbade two things the
+  manifest rule (`chronological union ... dropping either side's entries is an
+  audit violation`) permits: a dated postscript under a signed record that is
+  not the last one, and a chronological interleave of the other side's entries.
+  The company's 2026-09-08 apply hit the first (their T19 postscript); the
+  producer's own log already carried one (:803, 2026-09-07) that no run had seen.
 * **Version-string rule** — asserted in test_port_manifest.py (the manifest row
   itself is the contract).
 
@@ -214,16 +220,30 @@ def unsigned_activations(
 
 
 def append_only_violation(before_text: str, after_text: str) -> str | None:
-    """None if ``before_text`` is a byte prefix of ``after_text``; else a message."""
+    """None if every line of ``before_text`` survives in ``after_text``, in order.
+
+    Insertions anywhere are allowed — a dated postscript under any signed record,
+    the other side's entries interleaved chronologically. A pre-merge line that
+    is missing or altered is the violation, and the message names it. The
+    byte-prefix case (pure append at EOF) is the fast path.
+    """
     if after_text.startswith(before_text):
         return None
-    limit = min(len(before_text), len(after_text))
-    at = next((i for i in range(limit) if before_text[i] != after_text[i]), limit)
-    return (
-        f"append-only violated: merged file diverges from the pre-merge text at "
-        f"char {at} (existing entries must be a prefix — dropping or editing "
-        "either side's audit entries is an audit violation)"
-    )
+    before = before_text.splitlines()
+    after = after_text.splitlines()
+    j = 0
+    for i, line in enumerate(before, start=1):
+        while j < len(after) and after[j] != line:
+            j += 1
+        if j == len(after):
+            return (
+                f"append-only violated: pre-merge line {i} is missing or altered in the "
+                f"merged file: {line!r} (every existing line must survive in order — "
+                "dropping or editing either side's audit entries is an audit violation; "
+                "inserting under a record, or between records, is not)"
+            )
+        j += 1
+    return None
 
 
 def vocab_entries(doc: dict) -> list[dict]:
@@ -407,6 +427,29 @@ def test_gate_log_append_only_mechanics() -> None:
     assert "append-only violated" in append_only_violation(before, truncated)
     edited = before.replace("Confirmed: 4", "Confirmed: 3") + "\n## later\n"
     assert "append-only violated" in append_only_violation(before, edited)
+    # 2026-09-08: the three shapes the manifest rule permits and the byte-prefix
+    # check forbade. A postscript under a record that is not the last one:
+    two = before + "\n## 2026-07-11 - second gate\n- Confirmed: 1\n"
+    postscript = two.replace(
+        "- Confirmed: 4\n", "- Confirmed: 4\n- **POSTSCRIPT 2026-09-08:** clause A re-read.\n"
+    )
+    assert append_only_violation(two, postscript) is None
+    # The other side's entry interleaved by date, before an existing record:
+    interleaved = two.replace(
+        "## 2026-07-11 - second gate",
+        "## 2026-07-01 - theirs\n- Confirmed: 2\n\n## 2026-07-11 - second gate",
+    )
+    assert append_only_violation(two, interleaved) is None
+    # And a line removed from the MIDDLE still fails, naming the line:
+    middle_drop = two.replace("- Confirmed: 4\n", "")
+    msg = append_only_violation(two, middle_drop)
+    assert msg is not None and "line 4" in msg and "Confirmed: 4" in msg
+    # Reordering existing records is an edit, not an insertion:
+    reordered = (
+        two.replace("## 2026-06-21 - C1\n- Confirmed: 4\n\n", "")
+        + "\n## 2026-06-21 - C1\n- Confirmed: 4\n"
+    )
+    assert append_only_violation(two, reordered) is not None
 
 
 def test_current_files_pass_their_own_rules() -> None:
