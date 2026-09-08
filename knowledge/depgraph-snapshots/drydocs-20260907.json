@@ -1,17 +1,17 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-07T20:46:32",
+    "captured_at": "2026-09-07T21:59:40",
     "date": "20260907",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "a8f8bc4d",
-      "full": "a8f8bc4de258231ad72332900e1fdf386a45eb32",
+      "commit": "b2360435",
+      "full": "b236043590bf4351c1d5791490629e16d05860ae",
       "branch": "main",
-      "describe": "port-base-20260905-266-ga8f8bc4d",
-      "subject": "port(manifest): a never-port skill's test is never-port too, domain: is the partition key, RELAY-32/33",
-      "dirty": true,
+      "describe": "port-base-20260905-278-gb2360435",
+      "subject": "chore(plan): render board and roadmap over Lane B's V7 claim",
+      "dirty": false,
       "untracked_present": false,
       "pr": null
     },
@@ -10533,6 +10533,15 @@
       "name": "CFG4.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/CFG4.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/CFG5.yaml",
+      "name": "CFG5.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/CFG5.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -22922,10 +22931,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260907.json",
-      "name": "drydocs-20260907.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260907-2046.json",
+      "name": "drydocs-20260907-2046.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260907.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260907-2046.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -42669,6 +42678,11 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/CFG5.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/CORE1.yaml"
     ],
     [
@@ -49474,7 +49488,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260907.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260907-2046.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -53071,13 +53085,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2954,
+    "files": 2955,
     "edges": 1788,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 3276,
+    "rels": 3277,
     "directories": 323
   }
 }
