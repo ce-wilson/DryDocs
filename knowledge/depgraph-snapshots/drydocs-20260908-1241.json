@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-08T11:10:35",
+    "captured_at": "2026-09-08T12:42:08",
     "date": "20260908",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "aef8dfcb",
-      "full": "aef8dfcba833ba936b7e8d0690f9d5866d567d35",
+      "commit": "f14c059c",
+      "full": "f14c059c50080c9a3f4fbf96b2d4e28dbbd30601",
       "branch": "main",
-      "describe": "port-base-20260905-379-gaef8dfcb",
-      "subject": "fix(port): gate-log append-only guard reads lines not bytes; controlm_jobs.sql per-entry row; currency message names what moved (RELAY-43)",
+      "describe": "port-base-20260905-384-gf14c059c",
+      "subject": "docs(port): RELAY-44 - the G65 B3 restatement is past the base, the G64 page grew four clauses, and one commit to check on the company side",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -23066,10 +23066,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260908-1030.json",
-      "name": "drydocs-20260908-1030.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260908.json",
+      "name": "drydocs-20260908.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260908-1030.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260908.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -50033,7 +50033,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260908-1030.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260908.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
