@@ -194,6 +194,16 @@ rows:
     entry_rule: >
       union of dependencies; KEEP the consumer's version string (per-repo
       release cadence); producer v* release tags never cherry-pick.
+      The [tool.ruff], [tool.ruff.lint], [tool.ruff.lint.per-file-ignores] and
+      [tool.ruff.format] tables cross WHOLE, producer text verbatim - they are the
+      SHARED contract the file's own comment declares (J10 stage 0: same tool, same
+      pin, same config, each side formats its own tree), and a per-entry union of
+      their lists is what let the `ignore` list diverge (2026-09-08: the consumer
+      carried two entries where the producer carried four, so fifteen RUF002/RUF003
+      findings stood on one side only and read as a producer defect until reframed
+      as configuration divergence; consumer correction 4 / RELAY-36). A consumer
+      that needs a ruff exception the producer does not carry asks for it as a
+      ported change to this block, never as a local edit.
   - path: ".pre-commit-config.yaml"
     disposition: canonical-producer
     note: >
