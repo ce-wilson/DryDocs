@@ -4592,7 +4592,7 @@
       },
       {
         "path": "config/taxonomy/ui-components.yaml",
-        "blob": "74a3cb071074bdfeee37065ffdda81c629a698d5"
+        "blob": "f30b4665bbae1432876ebcfd583774b0bce218bc"
       },
       {
         "path": "config/taxonomy/ui-concepts.yaml",
@@ -4603,7 +4603,7 @@
         "blob": "4773ab3e5c0f8c4d039718628097530411f786f5"
       }
     ],
-    "digest": "675cba243c1ddffde53fa27c1cd957a5ef4b9171",
+    "digest": "2d2afbe07d94cea86828dca20266d0655c672da9",
     "how_to_resolve": "git log --find-object=<blob> names the commits that carry an input"
   }
 }

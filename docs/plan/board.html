@@ -79,7 +79,7 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 .capture-status{font-size:.78rem;color:#166534;margin:.3rem 0 0;min-height:1.1em}</style>
 </head><body>
 <h1>DryDocs — project board</h1>
-<p class="subtitle">Rendered from <code>docs/restructure/backlog/</code> 698 items &middot; 107 todo / 11 in progress / 0 blocked / 580 done. The repo is the system of record; this page is a working aid.</p>
+<p class="subtitle">Rendered from <code>docs/restructure/backlog/</code> 698 items &middot; 107 todo / 6 in progress / 0 blocked / 585 done. The repo is the system of record; this page is a working aid.</p>
 <p class="subtitle">Location: <code id="board-url"></code> <button type="button" id="board-url-copy">copy</button></p>
 <script>document.getElementById('board-url').textContent=window.location.href;document.getElementById('board-url-copy').onclick=function(){navigator.clipboard.writeText(window.location.href);};</script>
 <p class="subtitle"><a class="capture-link" href="roadmap.html">Module roadmap &rarr;</a> <a class="capture-link" href="ideas.html">Idea inbox &rarr;</a></p>
@@ -94,12 +94,12 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P7</span><span class="status-badge status-done">done</span></div><h3>Review toolkit back-flow</h3><p class="goal">Company SME-review/HITL toolkit reproduced generically, offline (Epic H).</p><div class="progress"><div class="progress-bar" style="width:88%"></div></div><p class="progress-text">7 / 8</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P8</span><span class="status-badge status-in_progress">in_progress</span><span class="release">v0.3.0</span></div><h3>Planning &amp; release infrastructure</h3><p class="goal">Repo-native project board + capture loop; groundwork for versioned releases (Epic I).</p><div class="progress"><div class="progress-bar" style="width:79%"></div></div><p class="progress-text">92 / 117</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P9</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Application attribution</h3><p class="goal">Jobs attributed to SEAL applications (seal_app_ref) end-to-end — gate-confirmed match policy, loader, verify coverage (Epic K).</p><div class="progress"><div class="progress-bar" style="width:92%"></div></div><p class="progress-text">36 / 39</p></div>
-<div class="phase-card"><div class="phase-head"><span class="phase-id">P10</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Documentation infrastructure</h3><p class="goal">Every design doc (TDD/Runbook/BRD) conforms to a canonical outline; deterministic md→HTML/PDF render; HITL markup loop (digital + pen/paper) re-attaches to a requirement-traceability backbone (Epic L).</p><div class="progress"><div class="progress-bar" style="width:75%"></div></div><p class="progress-text">33 / 44</p></div>
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P10</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Documentation infrastructure</h3><p class="goal">Every design doc (TDD/Runbook/BRD) conforms to a canonical outline; deterministic md→HTML/PDF render; HITL markup loop (digital + pen/paper) re-attaches to a requirement-traceability backbone (Epic L).</p><div class="progress"><div class="progress-bar" style="width:77%"></div></div><p class="progress-text">34 / 44</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P11</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Source governance ledgers</h3><p class="goal">Per-source governance as test-enforced config: audit envelope + edge diet (doc 06, Epic M) and column-mapping ledgers (doc 08, Epic N); property-term bindings via the gate.</p><div class="progress"><div class="progress-bar" style="width:67%"></div></div><p class="progress-text">22 / 33</p></div>
-<div class="phase-card"><div class="phase-head"><span class="phase-id">P12</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Web console / graph visualization</h3><p class="goal">Browser front-end over the knowledge graph: navigable C4/graph views, with a decided browser↔Neo4j access path (bolt-from-browser vs a thin API).</p><div class="progress"><div class="progress-bar" style="width:91%"></div></div><p class="progress-text">109 / 120</p></div>
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P12</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Web console / graph visualization</h3><p class="goal">Browser front-end over the knowledge graph: navigable C4/graph views, with a decided browser↔Neo4j access path (bolt-from-browser vs a thin API).</p><div class="progress"><div class="progress-bar" style="width:92%"></div></div><p class="progress-text">110 / 120</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P13</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Runtime topology &amp; maintenance windows</h3><p class="goal">Control-M host topology (CM_HOSTS) + runtime-stats supplement (CM_AVG_RUN) loaded per their gates; the maintenance-window question (best patch window for a host/group) answerable from the graph (Epic P).</p><div class="progress"><div class="progress-bar" style="width:75%"></div></div><p class="progress-text">6 / 8</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P14</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Document ingestion &amp; doc-graph benchmarks</h3><p class="goal">Unstructured documents as graph corpora (docmeta): the P0 benchmark verdict (traversal vs manifest-routed md vs vector RAG) with its evidence experiments, and the landing zone for the docmeta component&#x27;s P1+ phases once the verdict + docmeta ADR gate them (Epic Q).</p><div class="progress"><div class="progress-bar" style="width:89%"></div></div><p class="progress-text">24 / 27</p></div>
-<div class="phase-card"><div class="phase-head"><span class="phase-id">P15</span><span class="status-badge status-todo">todo</span></div><h3>Agentic Q&amp;A console</h3><p class="goal">Free-text questions answered by a tiered read-only agent (QuerySpec router → schema-grounded text2cypher → bounded graph-of-thoughts loop) with every executed Cypher exposed via ephemeral specs, per-run question/context/memory/token telemetry, and stale-source rescrape (Epic R; ADR 0007).</p><div class="progress"><div class="progress-bar" style="width:72%"></div></div><p class="progress-text">18 / 25</p></div>
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P15</span><span class="status-badge status-todo">todo</span></div><h3>Agentic Q&amp;A console</h3><p class="goal">Free-text questions answered by a tiered read-only agent (QuerySpec router → schema-grounded text2cypher → bounded graph-of-thoughts loop) with every executed Cypher exposed via ephemeral specs, per-run question/context/memory/token telemetry, and stale-source rescrape (Epic R; ADR 0007).</p><div class="progress"><div class="progress-bar" style="width:84%"></div></div><p class="progress-text">21 / 25</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P16</span><span class="status-badge status-todo">todo</span></div><h3>Self-documentation — DryDocs&#x27; own code in the graph</h3><p class="goal">DryDocs documents ITSELF the way it documents Control-M: the project&#x27;s code-dependency snapshot enters the knowledge graph under the software ontology (SWO), under an explicit :Project root, so &#x27;which module loads this job&#x27; is a query rather than a JSON file a human reads (Epic U).</p><div class="progress"><div class="progress-bar" style="width:83%"></div></div><p class="progress-text">24 / 29</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P17</span><span class="status-badge status-todo">todo</span></div><h3>Mind-map — deepdoc leaves the placeholder</h3><p class="goal">The per-data-flow overview record and its first producer: a graph-seeded, mind-map-driven investigator over the SDLC/ops corpora (Jira, Bitbucket, Confluence, email, Control-M Output logs) whose every finding is :Uncertain, weighted, and carries a provenance breadcrumb to its source; promotion is an SME gate write (Epic MM; docs/design/deepdoc-data-flow-overview.md).</p><div class="progress"><div class="progress-bar" style="width:21%"></div></div><p class="progress-text">3 / 14</p></div>
 </div>
@@ -2709,7 +2709,7 @@ transcribed from seven company artifacts on an UNMERGED research branch and cite
 
 Related: MM2, MM3, MM6, MM10, MM12, R16, L28, G102, ADR 0007, ADR 0011, Idea-236.
 </p></div></div></div></div>
-<div class="column" data-status="in_progress"><div class="column-head"><h2>In progress</h2><span class="count" data-count-for="in_progress">11</span></div><div class="column-body"><div class="card" id="card-E1" data-id="E1" data-module="ontology" data-phase="4" data-epic="context-graph" data-type="task" data-status="in_progress" data-search="e1 register sosa/ssn observation terms via the gate" tabindex="0"><div class="card-head"><span class="card-id">E1</span><span class="card-title">Register SOSA/SSN observation terms via the gate</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P4</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / ontology-mapper</span></div><div class="epic">context-graph</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C1" data-target="card-C1">C1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> sosa:* terms present with IRIs; status planned-&gt;confirmed via gate</p><p class="notes"><strong>Notes:</strong> Registration step DONE (main, 2026-06-22): sosa/ssn prefixes in namespaces.py; terms seeded in drydocs_core/schema/sosa_experimental_supplement.cypher (opt-in `drydocs apply-sosa-supplement`, NOT in bootstrap; every term adoption:&quot;experimental&quot;); 4 context relationships in relationship_vocabulary.yaml (sosa_observes/has_result/ made_by_sensor/observed_property, status planned, domain context); README split into Declared-Adopted vs Experimental/Early-Adoption. REMAINING for ontology-mapper: take the `jobrun-observation` map entry through the HITL gate (resolve ControlMJobRun-as-Observation vs separate-Observation-node; run-history source), then planned-&gt;confirmed. GATE SESSION DEFERRED 2026-07-14 (SME: not ready yet) — page stays rendered/pending; nothing flips; re-present at a future session (see gate-log 2026-07-14 deferral note).
+<div class="column" data-status="in_progress"><div class="column-head"><h2>In progress</h2><span class="count" data-count-for="in_progress">6</span></div><div class="column-body"><div class="card" id="card-E1" data-id="E1" data-module="ontology" data-phase="4" data-epic="context-graph" data-type="task" data-status="in_progress" data-search="e1 register sosa/ssn observation terms via the gate" tabindex="0"><div class="card-head"><span class="card-id">E1</span><span class="card-title">Register SOSA/SSN observation terms via the gate</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P4</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / ontology-mapper</span></div><div class="epic">context-graph</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C1" data-target="card-C1">C1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> sosa:* terms present with IRIs; status planned-&gt;confirmed via gate</p><p class="notes"><strong>Notes:</strong> Registration step DONE (main, 2026-06-22): sosa/ssn prefixes in namespaces.py; terms seeded in drydocs_core/schema/sosa_experimental_supplement.cypher (opt-in `drydocs apply-sosa-supplement`, NOT in bootstrap; every term adoption:&quot;experimental&quot;); 4 context relationships in relationship_vocabulary.yaml (sosa_observes/has_result/ made_by_sensor/observed_property, status planned, domain context); README split into Declared-Adopted vs Experimental/Early-Adoption. REMAINING for ontology-mapper: take the `jobrun-observation` map entry through the HITL gate (resolve ControlMJobRun-as-Observation vs separate-Observation-node; run-history source), then planned-&gt;confirmed. GATE SESSION DEFERRED 2026-07-14 (SME: not ready yet) — page stays rendered/pending; nothing flips; re-present at a future session (see gate-log 2026-07-14 deferral note).
 </p></div></div>
 <div class="card" id="card-G62" data-id="G62" data-module="drydocs-lineage" data-phase="6" data-epic="component-topology" data-type="task" data-status="in_progress" data-search="g62 run the rua-bundle data-profile gate: the sme names the load population, the agent profiles it, and only the walked population enters the curated load" tabindex="0"><div class="card-head"><span class="card-id">G62</span><span class="card-title">Run the rua-bundle data-profile gate: the SME names the load population, the agent profiles it, and only the walked population enters the curated load</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-lineage</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">component-topology</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-G22" data-target="card-G22">G22</a> <a class="dep-link" href="#card-G23" data-target="card-G23">G23</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> USER-GATED START — the SME convenes the session; the pull loop SKIPS this item until then (the C12/J13 idiom). The drafted rua-bundle-data-profile page is walked in its ruled two-step order: section A the SME identifies the source data (which hosts&#x27; bundles, where they sit, which collector produced each — Internal, recorded company-side, never on the page), section B the agent profiles that population through the G20 extractor in STAGING with zero graph writes, and section C consumes the profile to admit or trim the population, dispose of the hash-absent and collision cases it counts, and clear the F1 sweep. Sign-off transcribed to config/gate-log.md; gates.json + the enforcement matrix regenerate. No population the page has not walked enters the G23 curated load.
 </p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-09 from Idea-85, which asked only for ids and scheduling — the four post-G22 data-profile prompts were drafted 2026-08-07 and unsigned, and an unsigned prompt with no backlog id is invisible to the pull loop. Sessions run COMPANY-SIDE because the identify-the-source-data step names real hosts and paths (Internal); what lands producer-side is the transcription and the regenerated gate surfaces. Model fable: the ruling decides what may be written to the graph.
@@ -2842,180 +2842,6 @@ run_named; a graph-unavailable answer degrades to the named read path, never an 
 or a silent zero. 7 tests in test_mapping_api.py; full suite 2590 passed / ruff check +
 format clean (venue: worktree of origin/main on MSI desktop). Console pane = follow-on.
 </p></div></div>
-<div class="card" id="card-WEB18" data-id="WEB18" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="in_progress" data-search="web18 the explorer header puts the word tower beside &#x27;backs onto drydocs&#x27; with no provenance - the console half of the r22 fix, sourced from ui-concepts.yaml" tabindex="0"><div class="card-head"><span class="card-id">WEB18</span><span class="card-title">The Explorer header puts the word Tower beside &#x27;backs onto drydocs&#x27; with no provenance - the console half of the R22 fix, sourced from ui-concepts.yaml</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> ModuleTemplate.tsx:51 renders every module header as tagline, a dot, then &quot;backs onto&quot; the
-declared backend; for Explorer (web/src/modules/registry.ts:60) that reads
-&quot;Tower / app drill-down graph - backs onto drydocs&quot;. backsOnto: &#x27;drydocs&#x27; is CORRECT - the
-tabs do read the graph - but the word Tower beside it invites exactly the inference R22
-exists to prevent: on 2026-08-20 &quot;how many towers&quot; fell through to text2cypher and the
-model proxied a console term onto :TOMRole, crossing from UI taxonomy into the TOM ontology
-unannounced. R22 fixed /ask (answer_declared, agents/graph_qa/pipeline.py:487, answering
-from the declaration with its provenance). The Explorer header never got the fix.
-
-(a) The header term carries a hover and/or link whose text is SOURCED from
-    config/taxonomy/ui-concepts.yaml (schema drydocs.ui-concepts.v1; source
-    web/src/data/towers.ts, graph_binding: none, aliases including the CTO spelling;
-    guarded by tests/unit/test_ui_concepts.py). It is never hand-written - a second
-    definition drifts from the guarded one, which is the whole defect.
-(b) It MAY say the console-side fact: defined in the console, not read from the graph,
-    four of them. It MAY NOT assert any ontology binding (Tower to :TOMRole or any other) -
-    that is a HITL gate decision and the mapping stays status: planned until the gate
-    confirms it. Any binding claim ships VIA THE GATE, never from this item.
-(c) THE OPEN QUESTION IS DECIDED AND RECORDED BEFORE ANYTHING IS BUILT: there is no
-    web/src/generated/ui-concepts.json today, so either
-    (a-option) a render step emits one - the gates / enforcement-matrix / software-registry
-    precedent, drift-guarded, and a page header should not depend on a live request; or
-    (b-option) the header calls docs.ui-concepts.v1 at render time - no new file, but a
-    request and a failure mode on a page header.
-    Precedent favors the render step. It is a render-surface change and therefore the
-    render pen&#x27;s call: the item records which was chosen and why, and if the render step is
-    chosen, the generated file is drift-guarded like its siblings.
-(d) Cheap win taken either way: the aliases from ui-concepts.yaml are surfaced in the
-    hover. A real acronym LINK waits on PLAN8&#x27;s term ledger, which is where the target
-    would live.
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-07 from IDEAS.md Idea-277 (the UI session&#x27;s eval-case review, reviewed at
-839eab1f on feat/cyclic-type-test-case), decision D4 - agreed in session, not built.
-
-Clause (c) is deliberately left as a decision ON the item rather than groomed into a done
-deal: both options are real, they have different drift and failure profiles, and the choice
-belongs to whoever holds the render pen. Clause (b) is the hard boundary - the ontology
-binding routes through the HITL gate and no hover text may pre-empt it.
-</p></div></div>
-<div class="card" id="card-AGENT1" data-id="AGENT1" data-module="drydocs-agents" data-phase="15" data-epic="agentic-qa" data-type="task" data-status="in_progress" data-search="agent1 the /ask scope selector is a router hint that filters the spec catalog, and its vendor-corpus option must not ship until a spec searches chunk text" tabindex="0"><div class="card-head"><span class="card-id">AGENT1</span><span class="card-title">The /ask scope selector is a router hint that filters the spec catalog, and its vendor-corpus option must not ship until a spec searches chunk text</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-agents</span><span class="chip" data-kind="phase">P15</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">agentic-qa</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The scope dropdown in front of &quot;Ask the knowledge graph&quot; is a ROUTER HINT, not a second
-retrieval path: it constrains the spec catalog the LLM router already sees. No new tier,
-no second backend.
-
-(a) A scope filters specs_catalog.catalog_lines() BEFORE the join into the router system
-    prompt (agents/graph_qa/pipeline.py::_route). A test shows that with a scope set, a
-    spec outside it is absent from the router prompt and cannot be chosen.
-(b) The request envelope carries the scope and the answer reports which scope ran, so an
-    answer can be read back against the catalog it was allowed to see.
-(c) READINESS IS PER-OPTION, and this is the finding to hold on to - the three are not
-    equally ready and shipping the control does not ship them all:
-    - knowledge graph: ready (registered specs + text2cypher).
-    - vendor corpus: NOT ready and NOT shipped under this id. It is gated on API4; a
-      control labelled &quot;vendor corpus&quot; over a title-and-abstract search would turn O62&#x27;s
-      illusion (a full listing read as a search hit by title similarity) into a feature.
-      The option is absent from the shipped control, or present and disabled with the
-      reason stated - never present and live.
-    - general knowledge: needs a distinct R15 epistemic label before it ships, and it
-      overlaps R19&#x27;s clarification tier, which already handles &quot;the user does not know the
-      subject&quot; by asking. R19 is checked FIRST and the item records what it found, because
-      the cheapest outcome here is that this option should not exist.
-(d) The console control (drydocs-web) and the pipeline filter are separable: the filter and
-    envelope may land first with no UI, and the item says which half is done.
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-07 from IDEAS.md Idea-279 (the UI session&#x27;s eval-case review, reviewed at
-839eab1f on feat/cyclic-type-test-case), decision D1 - agreed in session, not built.
-
-First id in the AGENT series. module drydocs-agents (the filter and the envelope); the
-control itself is a drydocs-web surface and is clause (d), so the two pens can move
-independently.
-
-depends_on stays empty on purpose: the knowledge-graph scope is buildable today and the
-dependency is per-OPTION, carried in clause (c) rather than as a hold on the whole item.
-</p></div></div>
-<div class="card" id="card-API4" data-id="API4" data-module="drydocs-api" data-phase="15" data-epic="agentic-qa" data-type="task" data-status="in_progress" data-search="api4 no registered spec searches chunk text and the pipeline hardcodes chunks: 0, so the doc corpus is unreachable by term from /ask" tabindex="0"><div class="card-head"><span class="card-id">API4</span><span class="card-title">No registered spec searches chunk text and the pipeline hardcodes chunks: 0, so the doc corpus is unreachable by term from /ask</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-api</span><span class="chip" data-kind="phase">P15</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">agentic-qa</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Two follow-ups the cyclic-type-trap eval case named and never inboxed, plus the evidence
-the smuggling-dot case leaves homeless. The first two are the item; the third is scoped
-here and ruled elsewhere.
-
-(a) A registered docs QuerySpec searches Chunk.text by term (a spec over the chunk text or
-    a full-text index behind one). docs.search.v1 today searches Document title and
-    abstract and says of itself that it is Chunk-free (drydocs_api/query_specs.py:946), so
-    a term that appears only in a chunk body is unreachable. The new or widened spec is
-    registered, has its catalog line, and its test shows a term found in a chunk body and
-    NOT in any title or abstract coming back.
-(b) The hardcoded chunks: 0 in agents/graph_qa/pipeline.py (:362 and :535) stops being a
-    literal: the count is a parameter of the tier or the request, its default is stated,
-    and a non-zero value provably reaches chunk text end to end. This is why no /ask tier
-    reads chunk text today, and (a) is unobservable from the console without it.
-(c) A chunk-level trust override is SCOPED here and not decided here: the illustrative
-    ctmdefine enum the cyclic-type-trap case flags is loaded GROUNDED by document default
-    while its hazard banner sits in a different chunk, which the case itself calls a trust
-    defect. The item names where the override would live on the docmeta trust axis and
-    what it would key on; the axis change itself is the docmeta owner&#x27;s ruling and does
-    not ship under this id.
-(d) O62&#x27;s illusion is not re-created: a full listing read as a search hit by title
-    similarity. The test in (a) distinguishes a term match in body text from a listing.
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-07 from IDEAS.md Idea-282 (the UI session&#x27;s eval-case review, reviewed at
-839eab1f on feat/cyclic-type-test-case), finding B AS AMENDED in the same session - the
-first form of the finding was partly wrong and would have sent someone to rebuild
-ask.file-search.v1, which O62 already built as the first term-accepting spec, over
-DataAsset.assetId (graph assets, not chunks). The amendment is the reason this item exists
-at all: what is genuinely un-inboxed is chunk TEXT, not term search in general.
-
-module drydocs-api because the spec is the deliverable; clause (b) touches
-agents/graph_qa and is called out so the two pens do not collide. This item is the GATE on
-AGENT1&#x27;s vendor-corpus option - a control labelled &quot;vendor corpus&quot; over a title-only
-search would turn O62&#x27;s illusion into a feature.
-
-The smuggling-dot case&#x27;s B1 evidence also lands here as context, not as acceptance:
-_consume_delimiter (drydocs_core/orchestration/controlm/resolver.py:141) consumes a period
-only when the variable sigil follows, so the doubled-period spelling over-emits. Reproduce
-it by running the three shapes rather than reading it off the table.
-</p></div></div>
-<div class="card" id="card-R18" data-id="R18" data-module="drydocs-agents" data-phase="15" data-epic="agentic-qa" data-type="requirement" data-status="in_progress" data-search="r18 ask debug trace: opt-in verbose decision log correlated to run_id and session_id" tabindex="0"><div class="card-head"><span class="card-id">R18</span><span class="card-title">Ask debug trace: opt-in verbose decision log correlated to run_id and session_id</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-agents</span><span class="chip" data-kind="phase">P15</span><span class="chip" data-kind="type">requirement</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">agentic-qa</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-R3" data-target="card-R3">R3</a> <a class="dep-link" href="#card-R5" data-target="card-R5">R5</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) An explicit opt-in `--debug` / `--verbose` runtime option (or the equivalent documented service setting for the ADK server) enables an append-only diagnostic trace for one Ask run, correlated on every record by the existing `run_id` and `session_id`. (b) The trace captures the observable decision path: normalized question, router outcome and candidate/spec rationale, schema/vocabulary inputs selected for text2cypher, generated Cypher, validation/fix attempts and errors, executed row counts, answer inputs, and final envelope status/timing. It must not capture hidden chain-of-thought or provider secrets. (c) Default behavior remains the current minimal telemetry contract; debug is off unless explicitly enabled, and sensitive question/answer content follows the existing local-log classification and retention rules. (d) An admin can retrieve or download the trace by run_id/session_id and distinguish one question from concurrent sessions; the Ask UI links the visible run id to the trace when debug is enabled. Unit tests cover correlation, disabled-by-default behavior, redaction, and a full router -&gt; query -&gt; answer trace.
-</p><p class="notes"><strong>Notes:</strong> Follow-on to R3, which is DONE and already writes per-call JSONL plus the :AgentRun summary, and R5, which exposes the safe per-step Cypher in the Ask UI. This item fills the current gap between those surfaces and the richer diagnostic evidence needed to explain routing and generated-query decisions. &quot;Thinking&quot; means an auditable decision trace, not unrestricted model chain-of-thought.
-VERIFIED 2026-08-21 (desktop, live Ask session `ask-jdoe4821-wjtacr8x`, three runs,
-`qa.graph_qa.20260821.jsonl` + `agents/graph_qa/.adk/session.db`) — the gap this item
-names is REAL and is larger than a logging change. Read at the code, not inferred.
-
-WHAT EACH HOP KEEPS TODAY, transcribed as observed:
-- router — kept: `spec_id` and `ms` on the StepRecord, nothing else. Dropped: the prompt,
-  and the ENTIRE raw reply. In `_route()` (agents/graph_qa/pipeline.py, the `raw = self._llm(...)`
-  call) the reply is a local, handed to `_extract_json`, reduced to `spec_id` + `params`,
-  and lost when the function returns. `StepRecord` (agents/graph_qa/envelope.py) has no
-  field that could hold it.
-- text2cypher — kept: the generated `cypher` string, plus `database`, `rows`, `truncated`,
-  `fix_retries`, `error`. Dropped: the schema/vocabulary prompt built by `build_schema_prompt`,
-  and any prose the model wrapped around the JSON. The kept Cypher is the ONE genuinely
-  diagnostic intermediate that exists today.
-- answer — kept: `ms` on the step; the output text lands in `envelope.answer`. Dropped: the
-  system prompt and the rows JSON it reasoned over.
-
-WHY, and this is the part that changes the build: there are TWO independent causes, and
-neither is fixed by writing more log lines.
-1. No rationale is ever GENERATED. `ROUTER_SYSTEM` closes with a JSON-only instruction whose
-   object has exactly two keys, `spec_id` and `params` — there is no `reason` field, so the
-   model is never asked to explain the choice. The telemetry confirms nothing was emitted and
-   suppressed: router completion tokens were 17, 17 and 30 across the three runs, which is the
-   size of those JSON literals alone. Clause (b) asks for &quot;router outcome and candidate/spec
-   rationale&quot;; the outcome half is already recorded, the rationale half requires a CONTRACT
-   CHANGE to the router prompt plus a `StepRecord` field, not a capture change.
-2. Nothing below the pipeline could carry it either. `LiteLlmProvider.complete`
-   (agents/graph_qa/providers.py) reads only `response.choices[0].message.content`, passes no
-   thinking parameter, and runs at temperature 0 — so a provider-side reasoning block would be
-   discarded before the pipeline ever saw it. This is consistent with the notes above: the item
-   wants an auditable decision trace, and clause (b) fences off hidden chain-of-thought.
-
-SINK BOUNDARY, pinning clause (c) to a specific place: full prompt and reply text belongs in
-the DRYDOCS_LOGDIR ledger that R3 already owns, NOT in the envelope. `Envelope` deliberately
-reduces question text and caller identity to sha256-plus-length so neither is persisted in a
-payload or in-graph, while R3&#x27;s run line is already the sanctioned home for full question text.
-A trace that widened the envelope would cross a boundary this repo drew on purpose.
-
-WHAT THE THREE RUNS SHOWED, as the worked example a builder can test against: same session,
-same user, one subject — BMC Control-M OS job parameters. Run 1 routed to text2cypher and
-generated `(d:Document)-[:HAS_CHUNK]-&gt;(c:Chunk)` filtered on `d.name`; the corpus edge is
-`(:Chunk)-[:PART_OF]-&gt;(:Document)` and `Document` carries `doc_id`/`title`/`source_page`, so
-two independent defects each produced 0 rows. Run 2 routed to text2cypher and read the same
-words as an OPERATIONAL question, generating a valid `ControlMFolder`/`ControlMJob` traversal
-on `task_type` — 0 rows, right schema, wrong domain. Run 3 named a graph property in the
-question, routed to spec `docs.documents.v1`, and found the document — `controlm-os-job-parameters`,
-16 chunks, GROUNDED/External. So the corpus held the answer the whole time and two of three
-runs told the user it was not ingested. Today a reviewer can reconstruct WHAT ran from the kept
-Cypher but nothing says WHY the router read the same subject three different ways, which is
-precisely the evidence this item exists to produce.
-
-TIES: O62 is the search-side sibling — run 3 is a real user performing its file-name search
-use case, and it is worth noting there that `docs.documents.v1` applies no search filter at all
-(it lists every Document and the answer LLM picked the match out of 27 rows by title
-similarity), so the retrieval was approximate even though the answer was right. R13 concerns
-growth of the same `.adk/session.db` this evidence was read from, and R23 (groomed 2026-08-22
-from Idea-155) is the cleartext credential in that same store — cited here as &quot;Idea-151&quot; when
-this note was written, which is the BRANCH-side number for that report; on `main` Idea-151 is
-the unrelated stale-render entry that became Y5.
-</p></div></div>
-<div class="card" id="card-V9" data-id="V9" data-module="docs" data-phase="10" data-epic="sme-runbooks" data-type="task" data-status="in_progress" data-search="v9 sme runbook: drydocs-agents — adk service venv, run, console wiring, agent smoke checks" tabindex="0"><div class="card-head"><span class="card-id">V9</span><span class="card-title">SME runbook: drydocs-agents — ADK service venv, run, console wiring, agent smoke checks</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P10</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">sme-runbooks</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-V1" data-target="card-V1">V1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> docs/design/drydocs-agents-runbook.md (outline-conformant, rendered, stale-render-clean), drydocs-agents off RUNBOOK_PENDING. Covers: the module&#x27;s own venv (pinned google-adk per R10), starting the service, wiring the console to it (VITE_ADK_URL, names only), the read-only contract, and a smoke check per registered app with expected output shape — including the ADK-unreachable fallback behaviour the console surfaces (SYNTHESIZED demo trace + banner).
-</p><p class="notes"><strong>Notes:</strong> Groomed 2026-07-29 (Epic V).</p></div></div>
 <div class="card" id="card-MM7" data-id="MM7" data-module="drydocs-lineage" data-phase="17" data-epic="mind-map" data-type="task" data-status="in_progress" data-search="mm7 control-m output-tab log extractor — launcher job kind, resolved arguments, placement handoff pair, landing prefix, compute target — joined onto :etlprocess by pipeline guid, dpl_mac-shaped, every skip counted" tabindex="0"><div class="card-head"><span class="card-id">MM7</span><span class="card-title">Control-M Output-tab log extractor — launcher job KIND, resolved arguments, placement handoff pair, landing prefix, compute target — joined onto :ETLProcess by pipeline GUID, dpl_mac-shaped, every skip counted</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-lineage</span><span class="chip" data-kind="phase">P17</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">mind-map</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-G17" data-target="card-G17">G17</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> drydocs_lineage/extractors/controlm_output.py takes (source, into: LineageGraph) like every extractor, reads Output text per &lt;job, order-id, run&gt; from a NAMED sysout file — the modern wrapper writes no identity into the body, so job name / order id / run stamp are parsed from the FILE NAME (tolerant scan, site-pinnable pattern override, name-derived date kept as run_date and never merged into the launcher&#x27;s -od) and a detached text blob is rejected with a counted reason — and joins onto already-staged DPL processes on the pipeline GUID (falling back to &lt;job, run&gt; when the command line carried a variable), returning an OutputCoverage dataclass with a counted reason for every skip (no_launcher_banner, kind_unknown, guid_mismatch_vs_cmdline, truncated_json, token_redacted, identity_not_in_filename, no_order_id_in_filename). It sets PROPERTIES only — launcher_kind (from the `Identified &#x27;&lt;KIND&gt;&#x27; Job` line), compute_target, provenance_guid (placement response) and the -proId of the ingestion consuming that placement, recorded as a run-scoped PAIR whose scope is those two jobs and which never keys an edge, landing_prefix, submission_cluster, image_digest, compute_profile_ref — and creates no edge (m3_* stay as they are). A synthetic mechanism-only fixture under tests/fixtures/ reproduces the four kinds seen (PLACEMENT, INGESTION, TRANSFORM, PROVISION), a placement handoff across exactly two jobs, a transform that logs no provenance id (expected-absent, counted, never reported as a break), and a line that carries a bearer token — which the extractor REDACTS before any field and counts. The source row is registered in config/source-registry.yaml with classification and an acquisition path per Idea-133 (mode, via). A chained run (inventory → mac → output) exists as one CLI invocation and curation.py&#x27;s stub docstring names it as the cadence hook; the Output read is described in the design doc §3 as an INPUT to deepdoc, not a deepdoc feature.</p><p class="notes"><strong>Notes:</strong> Iteration 2 of the launcher contract. Genuine greenfield: no code, item or idea in the repo ingests Control-M sysout today. The log is authoritative where CMDLINE carries a %%variable and it asserts the job kind G12 wanted. Iteration 3 (run-history join via the P4 tables) is named in the doc and not minted until this lands.
 
 POC 2026-08-21 (user direction: a proof of concept frames the implementation before the
@@ -3030,7 +2856,7 @@ printed bearer token (redacted and counted). Real logs live under
 internal-local/controlm-output-logs/ (git-ignored). The Python extractor is still this
 item&#x27;s deliverable; the PoC fixed its field list and skip-reason set.</p></div></div></div></div>
 <div class="column" data-status="blocked"><div class="column-head"><h2>Blocked</h2><span class="count" data-count-for="blocked">0</span></div><div class="column-body"><p class="empty">(no items)</p></div></div>
-<div class="column" data-status="done"><div class="column-head"><h2>Done</h2><span class="count" data-count-for="done">580</span></div><div class="column-body"><div class="card" id="card-A1" data-id="A1" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a1 audit reference registry paths for staleness" tabindex="0"><div class="card-head"><span class="card-id">A1</span><span class="card-title">Audit reference registry paths for staleness</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every entry marked ok/stale; stale paths fixed or flagged</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All local mirrors + platform/standard doc paths resolve; no stale entries. verified: 2026-06-21 in REGISTRY.yaml.</p></div></div>
+<div class="column" data-status="done"><div class="column-head"><h2>Done</h2><span class="count" data-count-for="done">585</span></div><div class="column-body"><div class="card" id="card-A1" data-id="A1" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a1 audit reference registry paths for staleness" tabindex="0"><div class="card-head"><span class="card-id">A1</span><span class="card-title">Audit reference registry paths for staleness</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every entry marked ok/stale; stale paths fixed or flagged</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All local mirrors + platform/standard doc paths resolve; no stale entries. verified: 2026-06-21 in REGISTRY.yaml.</p></div></div>
 <div class="card" id="card-A2" data-id="A2" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a2 account for every bmc doc in the source manifest" tabindex="0"><div class="card-head"><span class="card-id">A2</span><span class="card-title">Account for every BMC doc in the source manifest</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every .md in bmc-controlm/ accounted for in the manifest</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All 26 bmc-controlm .md files are referenced in SOURCE-MANIFEST.md (0 uncovered).</p></div></div>
 <div class="card" id="card-A3" data-id="A3" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a3 seed the research index with linked rationale" tabindex="0"><div class="card-head"><span class="card-id">A3</span><span class="card-title">Seed the research index with linked rationale</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> &gt;=5 rows, each with a working link and a &#x27;why it matters&#x27;</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. 7 rows with working links (3 Neo4j blogs + PROV-O/SOSA/ORG/agent-memory) + why-it-matters.</p></div></div>
 <div class="card" id="card-A4" data-id="A4" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a4 registry.yaml points the dcat row at a per-standard readme that was never written" tabindex="0"><div class="card-head"><span class="card-id">A4</span><span class="card-title">REGISTRY.yaml points the dcat row at a per-standard README that was never written</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> reference/REGISTRY.yaml&#x27;s dcat row no longer cites a path that does not exist. Exactly one of two resolutions, and the choice is recorded in the close note: (a) write reference/standards/dcat/README.md following the dcmi-terms pattern from M4 — namespace, what we use it for, the specific terms we reference, source_url — or (b) re-point the row&#x27;s `docs:` at reference/standards/README.md the way the skos row already does. Nothing else in the registry changes.
@@ -16375,6 +16201,107 @@ clean; `npm run build` (tsc -b + vite build), `npm run lint`, `npm test` (482) a
 tracked path, so no PORT-MANIFEST row to hand back, and no new `.tsx`, so no
 `config/taxonomy/ui-components.yaml` row.
 </p></div></div>
+<div class="card" id="card-WEB18" data-id="WEB18" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="done" data-search="web18 the explorer header puts the word tower beside &#x27;backs onto drydocs&#x27; with no provenance - the console half of the r22 fix, sourced from ui-concepts.yaml" tabindex="0"><div class="card-head"><span class="card-id">WEB18</span><span class="card-title">The Explorer header puts the word Tower beside &#x27;backs onto drydocs&#x27; with no provenance - the console half of the R22 fix, sourced from ui-concepts.yaml</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> ModuleTemplate.tsx:51 renders every module header as tagline, a dot, then &quot;backs onto&quot; the
+declared backend; for Explorer (web/src/modules/registry.ts:60) that reads
+&quot;Tower / app drill-down graph - backs onto drydocs&quot;. backsOnto: &#x27;drydocs&#x27; is CORRECT - the
+tabs do read the graph - but the word Tower beside it invites exactly the inference R22
+exists to prevent: on 2026-08-20 &quot;how many towers&quot; fell through to text2cypher and the
+model proxied a console term onto :TOMRole, crossing from UI taxonomy into the TOM ontology
+unannounced. R22 fixed /ask (answer_declared, agents/graph_qa/pipeline.py:487, answering
+from the declaration with its provenance). The Explorer header never got the fix.
+
+(a) The header term carries a hover and/or link whose text is SOURCED from
+    config/taxonomy/ui-concepts.yaml (schema drydocs.ui-concepts.v1; source
+    web/src/data/towers.ts, graph_binding: none, aliases including the CTO spelling;
+    guarded by tests/unit/test_ui_concepts.py). It is never hand-written - a second
+    definition drifts from the guarded one, which is the whole defect.
+(b) It MAY say the console-side fact: defined in the console, not read from the graph,
+    four of them. It MAY NOT assert any ontology binding (Tower to :TOMRole or any other) -
+    that is a HITL gate decision and the mapping stays status: planned until the gate
+    confirms it. Any binding claim ships VIA THE GATE, never from this item.
+(c) THE OPEN QUESTION IS DECIDED AND RECORDED BEFORE ANYTHING IS BUILT: there is no
+    web/src/generated/ui-concepts.json today, so either
+    (a-option) a render step emits one - the gates / enforcement-matrix / software-registry
+    precedent, drift-guarded, and a page header should not depend on a live request; or
+    (b-option) the header calls docs.ui-concepts.v1 at render time - no new file, but a
+    request and a failure mode on a page header.
+    Precedent favors the render step. It is a render-surface change and therefore the
+    render pen&#x27;s call: the item records which was chosen and why, and if the render step is
+    chosen, the generated file is drift-guarded like its siblings.
+(d) Cheap win taken either way: the aliases from ui-concepts.yaml are surfaced in the
+    hover. A real acronym LINK waits on PLAN8&#x27;s term ledger, which is where the target
+    would live.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-07 from IDEAS.md Idea-277 (the UI session&#x27;s eval-case review, reviewed at
+839eab1f on feat/cyclic-type-test-case), decision D4 - agreed in session, not built.
+
+Clause (c) is deliberately left as a decision ON the item rather than groomed into a done
+deal: both options are real, they have different drift and failure profiles, and the choice
+belongs to whoever holds the render pen. Clause (b) is the hard boundary - the ontology
+binding routes through the HITL gate and no hover text may pre-empt it.
+
+BUILT 2026-09-08 (Lane B, laptop `NewThinkpad`, wip/web18-laptop; offline - no graph and no
+server, the artifact and the component are both testable without either). The branch is
+based on wip/api4-laptop and therefore on the whole lane chain; MERGE ORDER: r18, agent1,
+api4, web18. It is chained for a specific reason rather than by habit: the O42 ledger&#x27;s
+module-binding COUNTER in tests/unit/test_ui_components.py is a single assertion tuple, R18
+already moved it to 43/107, and a WEB18 branched off main would have moved the same line to
+42/107 - one line, two branches, a guaranteed merge conflict over a number.
+
+CLAUSE (c) IS DECIDED, AND THE DECISION WAS NOT MINE TO MAKE. The item says the choice
+belongs to the render pen and that pen is Lane A&#x27;s, so it was ASKED in session on
+2026-09-08 and answered: the RENDER STEP (a-option). Two reasons carried it, both on the
+item already. A page HEADER should not depend on a live request - a provenance hover that
+is empty whenever the API is cold disappears exactly when someone is debugging the thing it
+explains. And an artifact is drift-guarded where a live read is only as current as the last
+deploy. The cost is an edit to scripts/render_board.py, which is the render pen, and that
+edit is handed back below rather than assumed.
+
+WHAT LANDED. `scripts/render_ui_concepts.py` emits `web/src/generated/ui-concepts.json`
+from config/taxonomy/ui-concepts.yaml and rides the default render_board.py run (the
+J17/J20/N4 one-entry-point idiom - a generated artifact whose regeneration is not wired
+into the one command is one somebody forgets, and its guard then fails for a reason nobody
+caused). `web/src/lib/uiConcepts.ts` looks a term up by declaration and COMPOSES the
+sentence; `TaglineWithProvenance` renders it as an `abbr` on the one word that needs one.
+
+THE SPLIT IS THE POINT: the WORDING is in TypeScript, every FACT is in the artifact. A
+hand-written &quot;Tower is a console concept, there are four&quot; would be a SECOND definition, and
+a second definition drifting from the guarded one is the entire defect this item closes -
+so a guard asserts no member name, no cardinality and no term literal appears in the
+console consumer. Equally, the artifact composes no sentence: a rendered sentence in a
+generated file is the same second definition wearing a build step.
+
+CLAUSE (b), THE HARD BOUNDARY, IS GUARDED ON BOTH SIDES. In the data: the artifact carries
+`graph_binding` as declared and a test fails if it ever names a graph label. In the
+renderer: only `graph_binding: none` licenses the &quot;not read from the graph&quot; clause, so any
+value other than `none` makes this surface say LESS rather than more - because a confirmed
+binding is a gate ruling and the sentence for it belongs to whoever writes that ruling. The
+component test asserts the hover never says `TOMRole`, never says &quot;label&quot;, and never says
+&quot;maps to&quot; - :TOMRole being the label a model actually proxied Tower onto on 2026-08-20.
+
+ONE DETAIL WORTH KEEPING: the match is word-boundary anchored, so &quot;Towering&quot; is not a
+Tower. A header is read at a glance and a WRONG provenance note is worse than none - which
+is the same judgement the item makes about hand-written text, applied to matching.
+
+(d) taken: the aliases ride in the hover, which is what helps the person who typed &quot;CTO
+towers&quot; and got nothing. A real acronym LINK still waits on PLAN8&#x27;s term ledger.
+
+SURFACES: scripts/render_ui_concepts.py (new), scripts/render_board.py (the wiring - the
+render pen), web/src/generated/ui-concepts.json (new artifact),
+web/src/lib/uiConcepts.ts (new), web/src/components/ui/TaglineWithProvenance.tsx (new),
+web/src/routes/ModuleTemplate.tsx, config/taxonomy/ui-components.yaml + the O42 counter.
+TESTS: tests/unit/test_ui_concepts_json.py (6) + TaglineWithProvenance.test.tsx (9).
+
+HANDBACKS FOR LANE A:
+1. `backlog` (the render pen) - scripts/render_board.py gained one import and one call.
+   That is the cost clause (c)&#x27;s chosen option carries and it was ruled in session, but the
+   edit is in Lane A&#x27;s pen and is named here rather than assumed.
+2. `snapshot`/`backlog` - the new artifact is regenerated by the standard board run, so no
+   new step joins the session ritual. Re-running render_board.py at merge is idempotent and
+   confirms it.
+3. Explorer is the ONLY header this changes today, because Tower is the only declared
+   concept. Every other tagline renders byte-identically. If more concepts are declared the
+   surface widens with no code change, which is the property the render step buys.
+</p></div></div>
 <div class="card" id="card-P1" data-id="P1" data-module="config" data-phase="13" data-epic="runtime-topology" data-type="task" data-status="done" data-search="p1 run the cm_hosts + cm_avg_run profiling probes internally; record conclusions + the dc scope call" tabindex="0"><div class="card-head"><span class="card-id">P1</span><span class="card-title">Run the CM_HOSTS + CM_AVG_RUN profiling probes internally; record conclusions + the DC scope call</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P13</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">haiku / main</span></div><div class="epic">runtime-topology</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Conclusions (counts/domains/match rates only — never result rows) recorded for cm_hosts P1–P5 and cm_avg_run P0–P8 (P4s scoped smoke test BEFORE the estate-wide join, per the user&#x27;s performance flag) in the two gate specs&#x27; provenance blocks + the ledger via fields; the 22-DC-vs-production scope call appended to config/gate-log.md as the controlm-hosts-topology residual resolution.
 </p><p class="notes"><strong>Notes:</strong> User-run on the internal network (no producer-side psgmgr access); agent transcribes.</p></div></div>
 <div class="card" id="card-P2" data-id="P2" data-module="ontology" data-phase="13" data-epic="runtime-topology" data-type="task" data-status="done" data-search="p2 cm_avg_run supplement gate session (controlm-avg-run-supplement) — sme review" tabindex="0"><div class="card-head"><span class="card-id">P2</span><span class="card-title">CM_AVG_RUN supplement gate session (controlm-avg-run-supplement) — SME review</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P13</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">runtime-topology</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> SME records Confirm/edit/reject per section (A landing shape, B weak-key join policy, C normalization rules, D refresh, E use case) in config/gate-log.md; map entry job-runtime-stats-supplement flips proposed→confirmed only then.
@@ -16688,6 +16615,223 @@ printed &quot;documentation locator(s) with no corpus registered&quot; unconditi
 to rows still on no-corpus, since airflow&#x27;s locator IS backed by a registered corpus.
 Renders (load-map / software-registry / enforcement-matrix / board) regenerated
 in-commit. Suite 2596 passed / 11 skipped; ruff clean.
+</p></div></div>
+<div class="card" id="card-AGENT1" data-id="AGENT1" data-module="drydocs-agents" data-phase="15" data-epic="agentic-qa" data-type="task" data-status="done" data-search="agent1 the /ask scope selector is a router hint that filters the spec catalog, and its vendor-corpus option must not ship until a spec searches chunk text" tabindex="0"><div class="card-head"><span class="card-id">AGENT1</span><span class="card-title">The /ask scope selector is a router hint that filters the spec catalog, and its vendor-corpus option must not ship until a spec searches chunk text</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-agents</span><span class="chip" data-kind="phase">P15</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">agentic-qa</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The scope dropdown in front of &quot;Ask the knowledge graph&quot; is a ROUTER HINT, not a second
+retrieval path: it constrains the spec catalog the LLM router already sees. No new tier,
+no second backend.
+
+(a) A scope filters specs_catalog.catalog_lines() BEFORE the join into the router system
+    prompt (agents/graph_qa/pipeline.py::_route). A test shows that with a scope set, a
+    spec outside it is absent from the router prompt and cannot be chosen.
+(b) The request envelope carries the scope and the answer reports which scope ran, so an
+    answer can be read back against the catalog it was allowed to see.
+(c) READINESS IS PER-OPTION, and this is the finding to hold on to - the three are not
+    equally ready and shipping the control does not ship them all:
+    - knowledge graph: ready (registered specs + text2cypher).
+    - vendor corpus: NOT ready and NOT shipped under this id. It is gated on API4; a
+      control labelled &quot;vendor corpus&quot; over a title-and-abstract search would turn O62&#x27;s
+      illusion (a full listing read as a search hit by title similarity) into a feature.
+      The option is absent from the shipped control, or present and disabled with the
+      reason stated - never present and live.
+    - general knowledge: needs a distinct R15 epistemic label before it ships, and it
+      overlaps R19&#x27;s clarification tier, which already handles &quot;the user does not know the
+      subject&quot; by asking. R19 is checked FIRST and the item records what it found, because
+      the cheapest outcome here is that this option should not exist.
+(d) The console control (drydocs-web) and the pipeline filter are separable: the filter and
+    envelope may land first with no UI, and the item says which half is done.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-07 from IDEAS.md Idea-279 (the UI session&#x27;s eval-case review, reviewed at
+839eab1f on feat/cyclic-type-test-case), decision D1 - agreed in session, not built.
+
+First id in the AGENT series. module drydocs-agents (the filter and the envelope); the
+control itself is a drydocs-web surface and is clause (d), so the two pens can move
+independently.
+
+depends_on stays empty on purpose: the knowledge-graph scope is buildable today and the
+dependency is per-OPTION, carried in clause (c) rather than as a hold on the whole item.
+
+BUILT 2026-09-08 (Lane B, laptop `NewThinkpad`, wip/agent1-laptop; offline - fakes, no
+litellm, no driver, no ADK, no Neo4j). The branch is based on wip/r18-laptop rather than
+on main: both items edit `Envelope` and `pipeline.py` in the same regions, and branching
+sequentially was the alternative to handing Lane A a conflict. MERGE R18 FIRST.
+
+THE FILTER NEEDED A LATCH, AND THE TEST IS WHAT FOUND IT. Clause (a) says an out-of-scope
+spec is &quot;absent from the router prompt and cannot be chosen&quot;, and those turn out to be two
+requirements rather than one phrasing of the same. Dropping the catalog LINE does not make
+the id absent from the PROMPT: a kept spec&#x27;s description names a dropped one -
+`docs.utility-lookup.v1` cites `docs.search.v1` as its own fallback - so the router can
+read an id it was never offered. An out-of-scope `spec_id` is now dropped in `_route` and
+Tier 1 takes over, which is exactly the existing treatment of a hallucinated id, because
+that is what it is. The first version of the test asserted the id was absent from the raw
+prompt and failed on that prose; the assertion moved to the CATALOG ENTRY and a second
+test covers the latch, which is the honest split.
+
+MEMBERSHIP IS A CONSTANT IN CODE AND A DERIVATION IN THE TEST. The evidence for which
+specs read only the corpus is each spec&#x27;s own Cypher, but a runtime regex over Cypher text
+would be a string parse standing in for a declaration, and `QuerySpec` carries no scope
+field - 47 spec definitions are the wrong layer to edit for a router hint. So
+`agents/common/scopes.py` holds the sets and `tests/unit/test_ask_scopes.py` derives them
+from the labels the registered Cypher touches and asserts the two agree. That is
+`ColumnOut`&#x27;s arrangement with `query_specs.COLUMN_TYPES`: a second copy is allowed
+exactly when a test makes disagreement impossible.
+Counts, derived 2026-09-08 against 47 registered specs: 6 corpus-ONLY (dropped by the
+knowledge-graph scope), 3 hybrids (KEPT - &quot;which utility does this document describe&quot; is a
+graph question whose answer cites a document; dropping it would make the scope mean &quot;specs
+that never mention a document&quot;), 38 graph-only. One derivation detail is load-bearing
+rather than tidy: node labels are CamelCase and relationship types are UPPER_SNAKE, so
+without the `isupper()` filter `:PART_OF` reads as a label named PART and two corpus-only
+specs misclassify as hybrids. That was a real wrong answer before it was a comment.
+
+CLAUSE (c), THE R19 CHECK, RECORDED RATHER THAN ASSUMED - the item asks for this first and
+says the cheapest outcome is that the option should not exist. R19 covers HALF of it, and
+covers that half well: `build_clarification` turns any term that resolves to none of the
+four sources into a Tier-0 clarification request, before anything routes, which IS &quot;the
+person does not know the subject&quot; asked back instead of guessed at. It does NOT cover the
+other half: `detect_terms` fires on ACRONYM- and LABEL-SHAPED tokens, so a plain-prose
+general question detects nothing and is never asked about.
+But the blocker is not the missing detection and it is not an epistemic label.
+`pipeline.ANSWER_SYSTEM` answers &quot;from query results ONLY ... never invent data&quot;, so
+general-knowledge needs a DIFFERENT ANSWER CONTRACT - a decision about whether this system
+answers ungrounded at all, which is a gate question, not a dropdown entry. Recorded in
+`scopes.GENERAL_KNOWLEDGE_FINDING` and pinned by a test so it cannot quietly become a
+build. RECOMMENDATION: the option should not ship under this id.
+
+VENDOR-CORPUS is DECLARED and REFUSED. Declared so the filter is testable and so API4 has
+something to switch on; refused by `resolve()` so no answer can be produced under a label
+claiming the documents were searched when only their titles were - O62&#x27;s illusion promoted
+to a feature, which is the exact thing the item exists to prevent.
+
+DEGRADATION: an unknown or unready scope answers UNSCOPED and says why on
+`envelope.scope_note`. Never an error, and never an empty catalog - a test walks every
+input shape to prove the catalog is non-empty for each. The empty catalog is the worst of
+the three outcomes because the router silently has nothing to choose from and the run
+reads as a routing judgement.
+
+CLAUSE (d) - WHICH HALF IS DONE. The filter and the envelope land; NO console control
+ships. With vendor-corpus gated and general-knowledge blocked on a ruling, the dropdown
+would carry one live option, which is a label rather than a control. `askApi.ts` types
+`scope` and `scope_note` so the console can READ which scope ran; nothing sends one yet.
+
+SURFACES: agents/common/scopes.py (new), agents/common/specs_catalog.py (the filter),
+agents/graph_qa/{pipeline,envelope,agent,control}.py, web/src/lib/askApi.ts (types only),
+agents/graph_qa/README.md (the envelope contract bump).
+TESTS: tests/unit/test_ask_scopes.py (16).
+
+HANDBACKS FOR LANE A:
+1. `backlog` - the console control is a drydocs-web item to mint when a SECOND option is
+   ready; it is not worth minting before that, since a one-option dropdown is a label.
+2. `backlog`/`gates` - general-knowledge needs a ruling on whether /ask ever answers
+   without rows. That is the blocker, not the R15 label the idea assumed, and it is a gate
+   question rather than a build.
+3. No governed file maps a node LABEL to a scope. `config/taxonomy/domains.yaml`
+   partitions the relationship VOCABULARY (edges) rather than specs, and several corpus
+   specs traverse no edge at all (`docs.search.v1` matches a bare `:Document`), so it
+   cannot answer this as it stands. The constant-plus-derivation-test is the cheap answer;
+   a declared spec taxonomy would be the real one, if anything else ever needs it.
+</p></div></div>
+<div class="card" id="card-API4" data-id="API4" data-module="drydocs-api" data-phase="15" data-epic="agentic-qa" data-type="task" data-status="done" data-search="api4 no registered spec searches chunk text and the pipeline hardcodes chunks: 0, so the doc corpus is unreachable by term from /ask" tabindex="0"><div class="card-head"><span class="card-id">API4</span><span class="card-title">No registered spec searches chunk text and the pipeline hardcodes chunks: 0, so the doc corpus is unreachable by term from /ask</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-api</span><span class="chip" data-kind="phase">P15</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">agentic-qa</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Two follow-ups the cyclic-type-trap eval case named and never inboxed, plus the evidence
+the smuggling-dot case leaves homeless. The first two are the item; the third is scoped
+here and ruled elsewhere.
+
+(a) A registered docs QuerySpec searches Chunk.text by term (a spec over the chunk text or
+    a full-text index behind one). docs.search.v1 today searches Document title and
+    abstract and says of itself that it is Chunk-free (drydocs_api/query_specs.py:946), so
+    a term that appears only in a chunk body is unreachable. The new or widened spec is
+    registered, has its catalog line, and its test shows a term found in a chunk body and
+    NOT in any title or abstract coming back.
+(b) The hardcoded chunks: 0 in agents/graph_qa/pipeline.py (:362 and :535) stops being a
+    literal: the count is a parameter of the tier or the request, its default is stated,
+    and a non-zero value provably reaches chunk text end to end. This is why no /ask tier
+    reads chunk text today, and (a) is unobservable from the console without it.
+(c) A chunk-level trust override is SCOPED here and not decided here: the illustrative
+    ctmdefine enum the cyclic-type-trap case flags is loaded GROUNDED by document default
+    while its hazard banner sits in a different chunk, which the case itself calls a trust
+    defect. The item names where the override would live on the docmeta trust axis and
+    what it would key on; the axis change itself is the docmeta owner&#x27;s ruling and does
+    not ship under this id.
+(d) O62&#x27;s illusion is not re-created: a full listing read as a search hit by title
+    similarity. The test in (a) distinguishes a term match in body text from a listing.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-07 from IDEAS.md Idea-282 (the UI session&#x27;s eval-case review, reviewed at
+839eab1f on feat/cyclic-type-test-case), finding B AS AMENDED in the same session - the
+first form of the finding was partly wrong and would have sent someone to rebuild
+ask.file-search.v1, which O62 already built as the first term-accepting spec, over
+DataAsset.assetId (graph assets, not chunks). The amendment is the reason this item exists
+at all: what is genuinely un-inboxed is chunk TEXT, not term search in general.
+
+module drydocs-api because the spec is the deliverable; clause (b) touches
+agents/graph_qa and is called out so the two pens do not collide. This item is the GATE on
+AGENT1&#x27;s vendor-corpus option - a control labelled &quot;vendor corpus&quot; over a title-only
+search would turn O62&#x27;s illusion into a feature.
+
+The smuggling-dot case&#x27;s B1 evidence also lands here as context, not as acceptance:
+_consume_delimiter (drydocs_core/orchestration/controlm/resolver.py:141) consumes a period
+only when the variable sigil follows, so the doubled-period spelling over-emits. Reproduce
+it by running the three shapes rather than reading it off the table.
+
+BUILT 2026-09-08 (Lane B, laptop `NewThinkpad`, wip/api4-laptop; offline - no graph was
+consulted and none is needed, because every fact below is in committed code). Branch is
+based on wip/agent1-laptop, which is based on wip/r18-laptop: clause (b) edits the same
+region of pipeline.py both of those already edit. MERGE ORDER: r18, agent1, api4.
+
+(a) `docs.chunk-search.v1` - a NEW spec, not a widening, and the distinction is a contract
+rather than taste: `docs.search.v1`&#x27;s own description promises &quot;Chunk-free; docs.chunks.v1
+is the second step&quot;, and the Q15 note above the docs family states the same rule for all of
+them (triage on abstract and page_role first, spend the chunk read second). Widening the
+title door would break a promise two other descriptions cite.
+It filters server-side on `toLower(coalesce(c.text,&#x27;&#x27;)) CONTAINS toLower($q)` and walks
+`(c:Chunk)-[:PART_OF]-&gt;(d:Document)` - the real corpus edge, not the `HAS_CHUNK` R18&#x27;s
+evidence caught a model inventing. It returns a BOUNDED SNIPPET
+(`query_specs.SNIPPET_CHARS`, 400) plus `chunk_id`, never the chunk: the Q15 rule says a
+navigation spec does not return chunk text, and the full chunk is one call away by id.
+(d) is in the test and in the catalog line: the predicate is on the chunk body and NOT on
+`d.title` or `d.abstract`, which is what separates a match from O62&#x27;s illusion - a full
+listing that a title similarity picked a winner out of afterwards.
+
+(b) `chunks: 0` is DERIVED, not parameterised, and that choice is the substance. A
+request-level &quot;how many chunks&quot; knob would be a number the CALLER asserts; the count is now
+one the RESULT proves - `pipeline.count_chunk_rows` counts the distinct `chunk_id` values in
+the rows that came back. DISTINCT because a chunk reached twice is one chunk of context,
+not two; and in Tier 2 the ids are UNIONED across the loop&#x27;s retrievals for the same reason,
+accumulated in the `_retrieve` closure so tier2.py stays a pure loop that knows nothing
+about corpora. The stated default is 0 and it is still 0 for every graph answer - the
+difference is that it is now a true count rather than a placeholder.
+
+(c) SCOPED, AND THE SCOPING TURNED INTO A DIAGNOSIS. The override does not need building;
+it exists and is UNREAD. `docs.chunks.v1` and `docs.trust-provenance.v1` both compute
+effective trust as `coalesce(c.trust, d.trust_default)`, and NO loader writes `Chunk.trust`:
+bmc_docs.cypher:80 and essential_graphrag.cypher write `c.provenance` (VERBATIM / GROUNDED /
+SYNTHESIZED from `bmc_docs.classify_chunk_tier`), and email_extracts.cypher writes no chunk
+tier at all. So the coalesce always falls through and every chunk reports its document&#x27;s
+default - which IS the cyclic-type-trap case&#x27;s trust defect, exactly: an illustrative enum
+reads GROUNDED because its document does, while the hazard banner that would downgrade it
+sits in a different chunk.
+And the two fields share a vocabulary. `BmcDocChunkRow.trust_default`
+(drydocs_core/models/docs.py:62) documents ITSELF as &quot;the doc-level fallback tier absent any
+chunk-level override ... the per-chunk &#x27;provenance&#x27; field is what actually varies&quot;. So the
+gap is a PROPERTY NAME, not a missing model, and the ruling&#x27;s first question is which name
+wins - `c.trust` (change two loaders) or `c.provenance` (change two specs).
+NOT FIXED HERE, on the item&#x27;s own instruction: the axis change is the docmeta owner&#x27;s.
+`tests/unit/test_chunk_search_spec.py` pins the gap OPEN so it cannot close by accident and
+so the ruling has something that fails when it lands.
+
+SURFACES: drydocs_api/query_specs.py (the spec + SNIPPET_CHARS),
+agents/graph_qa/pipeline.py (the derived count), agents/common/scopes.py (the new spec
+joins CORPUS_ONLY_SPECS - AGENT1&#x27;s drift guard failed on it, which is the guard working).
+TESTS: tests/unit/test_chunk_search_spec.py (12).
+
+HANDBACKS FOR LANE A:
+1. `backlog` - THE GATE ON AGENT1&#x27;S VENDOR-CORPUS OPTION IS NOW MET. A registered spec
+   searches chunk text, so the reason that scope was declared-and-refused is gone. Whether
+   it FLIPS to `ready` is AGENT1&#x27;s re-evaluation and not this item&#x27;s to make; it is a
+   one-line change in `agents/common/scopes.py` plus its test.
+2. `backlog` - a robustness gap found in passing, pre-existing and out of scope. In
+   `pipeline._run_spec`, `resolve_params` is retried with `{}` &quot;defaults over router noise&quot;,
+   but a spec with a REQUIRED param raises again on the retry and the exception leaves the
+   pipeline (agent.py turns it into an error payload, so a question answers with an error
+   rather than falling through to Tier 1). It predates API4 - `ask.file-search.v1` has the
+   same shape - but API4 adds a second required-param spec, so the odds go up. Worth an
+   item: a required-param spec the router names without params should fall through, which
+   is what the surrounding code already believes it does.
+3. The docmeta trust-axis ruling in (c) needs a home - it is a gate question, not a build.
 </p></div></div>
 <div class="card" id="card-R1" data-id="R1" data-module="docs" data-phase="15" data-epic="agentic-qa" data-type="task" data-status="done" data-search="r1 sme gate session: review adr 0007 (agentic q&amp;a architecture) and rule the three open axes — context-graph escalation residency, :agentrun target db, llm key strategy" tabindex="0"><div class="card-head"><span class="card-id">R1</span><span class="card-title">SME gate session: review ADR 0007 (agentic Q&amp;A architecture) and rule the three open axes — context-graph escalation residency, :AgentRun target DB, LLM key strategy</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P15</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">agentic-qa</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> ADR 0007 status flipped to ACCEPTED (or SME edits recorded and the ADR re-drafted) in a gate session; the three axes it leaves open are ruled and recorded in the ADR body — (a) context-graph escalation residency (in-process only vs ddcontext SYNTHESIZED envelope with session tag + TTL sweep), (b) :AgentRun envelope target DB (proposal ddcontext; never drydocs), (c) LLM key strategy for the ADK agents (Gemini vs Anthropic via LiteLLM) — closing the 2026-07-03 IDEAS.md key question into the ruling.
 </p><p class="notes"><strong>Notes:</strong> Decision item → fable per the model matrix (residency + key strategy change component boundaries). Reference clones live in the sandbox beside this repo (llm-graph-builder, knowledge-graph-of-thoughts). DONE 2026-07-23 — accepted as written; rulings: (a) in-process-only task-graph residency (ddcontext persistence deferred, new gate if ever), (b) :AgentRun -&gt; ddcontext via a dedicated writer boundary, (c) LLM keys environment-split — local/producer Anthropic, company Azure OpenAI, Gemini NOT the default (supersedes the 2026-07-03 IDEAS assumption); provider adapter + usage-extractor seam must cover both from day one.
@@ -17121,6 +17265,166 @@ section and test_tier1_prompt_is_grounded_and_bounded failed. Live check: deskto
 neo4jtest, drydocs DB - impact 1 row at distance 1, context 2 rows across two folders, trace 2 pairs
 x 2 hops. Full suite 3440 passed / 13 skipped / 18 deselected (floor 3426); ruff clean; OpenAPI dump
 unchanged. Next roll&#x27;s relay names the verb layer, the three specs and CHAIN_WALK.
+</p></div></div>
+<div class="card" id="card-R18" data-id="R18" data-module="drydocs-agents" data-phase="15" data-epic="agentic-qa" data-type="requirement" data-status="done" data-search="r18 ask debug trace: opt-in verbose decision log correlated to run_id and session_id" tabindex="0"><div class="card-head"><span class="card-id">R18</span><span class="card-title">Ask debug trace: opt-in verbose decision log correlated to run_id and session_id</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-agents</span><span class="chip" data-kind="phase">P15</span><span class="chip" data-kind="type">requirement</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">agentic-qa</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-R3" data-target="card-R3">R3</a> <a class="dep-link" href="#card-R5" data-target="card-R5">R5</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) An explicit opt-in `--debug` / `--verbose` runtime option (or the equivalent documented service setting for the ADK server) enables an append-only diagnostic trace for one Ask run, correlated on every record by the existing `run_id` and `session_id`. (b) The trace captures the observable decision path: normalized question, router outcome and candidate/spec rationale, schema/vocabulary inputs selected for text2cypher, generated Cypher, validation/fix attempts and errors, executed row counts, answer inputs, and final envelope status/timing. It must not capture hidden chain-of-thought or provider secrets. (c) Default behavior remains the current minimal telemetry contract; debug is off unless explicitly enabled, and sensitive question/answer content follows the existing local-log classification and retention rules. (d) An admin can retrieve or download the trace by run_id/session_id and distinguish one question from concurrent sessions; the Ask UI links the visible run id to the trace when debug is enabled. Unit tests cover correlation, disabled-by-default behavior, redaction, and a full router -&gt; query -&gt; answer trace.
+</p><p class="notes"><strong>Notes:</strong> Follow-on to R3, which is DONE and already writes per-call JSONL plus the :AgentRun summary, and R5, which exposes the safe per-step Cypher in the Ask UI. This item fills the current gap between those surfaces and the richer diagnostic evidence needed to explain routing and generated-query decisions. &quot;Thinking&quot; means an auditable decision trace, not unrestricted model chain-of-thought.
+VERIFIED 2026-08-21 (desktop, live Ask session `ask-jdoe4821-wjtacr8x`, three runs,
+`qa.graph_qa.20260821.jsonl` + `agents/graph_qa/.adk/session.db`) — the gap this item
+names is REAL and is larger than a logging change. Read at the code, not inferred.
+
+WHAT EACH HOP KEEPS TODAY, transcribed as observed:
+- router — kept: `spec_id` and `ms` on the StepRecord, nothing else. Dropped: the prompt,
+  and the ENTIRE raw reply. In `_route()` (agents/graph_qa/pipeline.py, the `raw = self._llm(...)`
+  call) the reply is a local, handed to `_extract_json`, reduced to `spec_id` + `params`,
+  and lost when the function returns. `StepRecord` (agents/graph_qa/envelope.py) has no
+  field that could hold it.
+- text2cypher — kept: the generated `cypher` string, plus `database`, `rows`, `truncated`,
+  `fix_retries`, `error`. Dropped: the schema/vocabulary prompt built by `build_schema_prompt`,
+  and any prose the model wrapped around the JSON. The kept Cypher is the ONE genuinely
+  diagnostic intermediate that exists today.
+- answer — kept: `ms` on the step; the output text lands in `envelope.answer`. Dropped: the
+  system prompt and the rows JSON it reasoned over.
+
+WHY, and this is the part that changes the build: there are TWO independent causes, and
+neither is fixed by writing more log lines.
+1. No rationale is ever GENERATED. `ROUTER_SYSTEM` closes with a JSON-only instruction whose
+   object has exactly two keys, `spec_id` and `params` — there is no `reason` field, so the
+   model is never asked to explain the choice. The telemetry confirms nothing was emitted and
+   suppressed: router completion tokens were 17, 17 and 30 across the three runs, which is the
+   size of those JSON literals alone. Clause (b) asks for &quot;router outcome and candidate/spec
+   rationale&quot;; the outcome half is already recorded, the rationale half requires a CONTRACT
+   CHANGE to the router prompt plus a `StepRecord` field, not a capture change.
+2. Nothing below the pipeline could carry it either. `LiteLlmProvider.complete`
+   (agents/graph_qa/providers.py) reads only `response.choices[0].message.content`, passes no
+   thinking parameter, and runs at temperature 0 — so a provider-side reasoning block would be
+   discarded before the pipeline ever saw it. This is consistent with the notes above: the item
+   wants an auditable decision trace, and clause (b) fences off hidden chain-of-thought.
+
+SINK BOUNDARY, pinning clause (c) to a specific place: full prompt and reply text belongs in
+the DRYDOCS_LOGDIR ledger that R3 already owns, NOT in the envelope. `Envelope` deliberately
+reduces question text and caller identity to sha256-plus-length so neither is persisted in a
+payload or in-graph, while R3&#x27;s run line is already the sanctioned home for full question text.
+A trace that widened the envelope would cross a boundary this repo drew on purpose.
+
+WHAT THE THREE RUNS SHOWED, as the worked example a builder can test against: same session,
+same user, one subject — BMC Control-M OS job parameters. Run 1 routed to text2cypher and
+generated `(d:Document)-[:HAS_CHUNK]-&gt;(c:Chunk)` filtered on `d.name`; the corpus edge is
+`(:Chunk)-[:PART_OF]-&gt;(:Document)` and `Document` carries `doc_id`/`title`/`source_page`, so
+two independent defects each produced 0 rows. Run 2 routed to text2cypher and read the same
+words as an OPERATIONAL question, generating a valid `ControlMFolder`/`ControlMJob` traversal
+on `task_type` — 0 rows, right schema, wrong domain. Run 3 named a graph property in the
+question, routed to spec `docs.documents.v1`, and found the document — `controlm-os-job-parameters`,
+16 chunks, GROUNDED/External. So the corpus held the answer the whole time and two of three
+runs told the user it was not ingested. Today a reviewer can reconstruct WHAT ran from the kept
+Cypher but nothing says WHY the router read the same subject three different ways, which is
+precisely the evidence this item exists to produce.
+
+TIES: O62 is the search-side sibling — run 3 is a real user performing its file-name search
+use case, and it is worth noting there that `docs.documents.v1` applies no search filter at all
+(it lists every Document and the answer LLM picked the match out of 27 rows by title
+similarity), so the retrieval was approximate even though the answer was right. R13 concerns
+growth of the same `.adk/session.db` this evidence was read from, and R23 (groomed 2026-08-22
+from Idea-155) is the cleartext credential in that same store — cited here as &quot;Idea-151&quot; when
+this note was written, which is the BRANCH-side number for that report; on `main` Idea-151 is
+the unrelated stale-render entry that became Y5.
+
+BUILT 2026-09-08 (Lane B, laptop `NewThinkpad`, wip/r18-laptop; offline — fakes, no litellm,
+no driver, no ADK, no Neo4j, so nothing here is machine-pinned). The notes above were right
+that this is a contract change and not a logging change, and the build split exactly there.
+
+THE SINK IS A DECLARED KIND, `qa-debug`, not a new mechanism. `drydocs_core.log_kinds.kind()`
+REFUSES an undeclared id, so a writer with no row in config/log-kinds.yaml cannot open a file
+at all — the row is structural, not documentation. Seven days, jsonl, per-day, and the api-debug
+ruling carried over verbatim for the split: `qa` is a 90-day record whose run line is the only
+place a question hash turns back into words, and burying it in prompt-sized debug noise would
+cost it the thing it exists for.
+ENABLEMENT (clause a) is the kind&#x27;s declared `level: DEBUG`, read once at import, exactly as
+drydocs_api.audit.ApiAuditLog does it. NOT an env var and NOT a request field, and the reason is
+the one that ruling already gives: an Ask question arrives as an HTTP request into the ADK
+server, an HTTP request has no --verbose, and a per-request flag would let an untrusted caller
+turn on verbose capture of their own traffic. The shipped declaration has no `level:`, so the
+default deployment records nothing.
+
+THE RATIONALE IS GENERATED, WHICH IS THE HALF NO CAPTURE COULD HAVE FIXED. `ROUTER_SYSTEM` now
+asks for `reason` beside `spec_id` and `params`, and it asks in BOTH modes — a debug mode that
+altered the prompt would debug a pipeline nobody runs, and the reason belongs to the decision
+rather than to the observer. It lands on `StepRecord.rationale` (the field these notes
+prescribed), bounded at 500 chars, `None` when the reply carried none.
+
+CAPTURE IS AT THE TWO SEAMS EVERY HOP ALREADY PASSES THROUGH — `_llm` for prompt/reply and
+`_push_step` for the step — plus a run_open/run_close pair, so five call sites did not each grow
+their own logging. Every record carries run_id, session_id and a process-wide `seq`, which is
+what lets two concurrent sessions interleave in one day-file and still read back apart
+(clause d&#x27;s &quot;distinguish one question from concurrent sessions&quot;, tested that way).
+
+THE ONE REDACTION THAT NEEDED A DESIGN, and it is R8&#x27;s boundary held rather than a new rule:
+the ANSWER hop&#x27;s user prompt IS the retrieved rows JSON — folder names, host names, SEAL ids —
+so that hop records SHAPE (row count, column keys, sizes) and never values. `llm_shape` is the
+entry point that cannot carry them; the test plants a value that exists in no prompt, schema or
+vocabulary and asserts it appears nowhere in the file. Caller identity is the same one level
+down: nothing in the writer takes a raw user_id, only the envelope&#x27;s already-hashed slot.
+What this means for a reader: the trace explains WHY a query was written and WHAT came back,
+and to see the values you go back to the graph — which is the correct place to ask.
+
+CLAUSE (d) IS THE FIRST ROUTE ON THIS API THAT SERVES LOG CONTENTS, and it is worth saying so
+plainly. log_estate.py holds the standing position for `api-debug` — capturing is ruled,
+SURFACING is held for SME review — and that concern was a rendered page anyone with the console
+could read. R18&#x27;s acceptance rules the question the other way for THIS kind, so:
+GET /admin/qa-trace is AdminUser-gated in its signature (the /raw-cypher gate, ADR 0005),
+reaches exactly one kind (a constant, no parameter names a file), and REFUSES a call with
+neither run_id nor session_id with 422 — a lookup by run id and a bulk log download are not the
+same route. The api-debug question is untouched and unreachable from here.
+Console half: the run id the metrics chip already showed becomes a fetch-and-download control,
+drawn only for an admin AND only when `envelope.debug_trace` says the server recorded one;
+everyone else keeps the plain id. A plain link would 401 — the API takes a bearer token.
+
+SURFACES: agents/common/qa_trace.py (writer), agents/graph_qa/{pipeline,envelope,agent}.py,
+drydocs_api/qa_trace_read.py + schemas.QaTraceOut + the route, web/src/lib/qaTrace.ts,
+web/src/ask/TraceLink.tsx, config/log-kinds.yaml (the kind), config/taxonomy/ui-components.yaml
+(the O42 row), agents/graph_qa/README.md (the envelope contract bump).
+TESTS: tests/unit/test_qa_trace.py (28) + web/src/ask/TraceLink.test.tsx (6). Full suite,
+ruff check, ruff format --check, oxlint, tsc and the web suite all green on the branch; the one
+expected red is test_committed_roadmap_page_matches_its_sources, which every Lane B close carries
+because a close writes notes and Lane B does not render.
+
+TIER 2 WAS CHECKED SEPARATELY, because it is the other path that touches rows and the answer
+hop&#x27;s protection does not reach it: Tier 2 is entered only when Tier 1 gathered nothing, so its
+solve call is what answers. Reading tier2.py settles it — `_summarize` emits
+`- &lt;subquestion&gt; -&gt; &lt;N&gt; row(s)`, an evidence node&#x27;s label is the model&#x27;s own subquestion and
+`rows` is a count, and nothing in the loop interpolates `result.records`. That is already R8&#x27;s
+counts-and-identities shape, so no new capture rule was needed. A test pins it anyway, and pins
+the positive control with it (the solve prompt IS captured), so a future prompt that pasted
+evidence rows into the block fails loudly instead of quietly widening the trace.
+
+HANDBACKS FOR LANE A, none of them blocking:
+1. `adr` pen — ADR 0007 §5 lists three telemetry sinks; this is a fourth, and the section
+   should name it. R18 read the ADR and did not edit it.
+2. `gates`/`adr` — audit.py&#x27;s docstring enumerates the audited routes as &quot;every route that
+   EXECUTES CYPHER or WRITES&quot;, twelve of them. /admin/qa-trace does neither, so it is NOT
+   audited, consistent with /admin/log-estate. Whether a route that serves log CONTENTS should
+   widen that ruled scope is a judgement for whoever owns it, not for this build.
+3. `backlog` — worth an idea: `steps[].rationale` now exists on the envelope and the console
+   renders nothing with it. Showing it on the router step would answer, for every user, the
+   question these notes opened with (why the router read one subject three ways). Left out
+   deliberately as WEB-surface scope.
+4. Regenerated artifacts. `web/src/generated/{openapi.json,api.d.ts}` were regenerated HERE
+   (scripts/dump_openapi.py, then `npm run api:types`) rather than left for Lane A, because
+   web/src/lib/qaTrace.ts types against `Schemas[&#x27;QaTraceOut&#x27;]` and the branch could not
+   typecheck without them. `web/src/generated/enforcement-matrix.json` likewise, via
+   scripts/render_enforcement_matrix.py — config/log-kinds.yaml is an enforcement surface whose
+   content the matrix embeds. `render_board.py` was NOT run: the board and roadmap are Lane A&#x27;s.
+   The stronger reason, found after: CI&#x27;s `web` job runs `scripts/dump_openapi.py --check`
+   (.github/workflows/ci.yml), so leaving the dump for the merge would have put the branch red
+   there as well as failing tsc — this is not a tidiness call. All three writers are idempotent,
+   so re-running them at merge costs nothing and confirms it.
+5. Two SOURCE files outside any declared pen, named here rather than asked about first, which is
+   the handoff&#x27;s own prescription for a change this size. `config/log-kinds.yaml` gained the
+   `qa-debug` row: structurally required, since `log_kinds.kind()` refuses an undeclared id and
+   the writer could not open a file without it. `tests/unit/test_ui_components.py` gained a line
+   on its module-binding counter, which is the O42 ledger&#x27;s shadow — the handoff already rules
+   that every web item writes `config/taxonomy/ui-components.yaml`, and this counter fails the
+   moment that file grows a row. Both travelled under `code:drydocs-agents` / `code:drydocs-web`
+   on that same precedent; Lane A accepts them there or moves them.
 </p></div></div>
 <div class="card" id="card-R19" data-id="R19" data-module="drydocs-agents" data-phase="15" data-epic="agentic-qa" data-type="requirement" data-status="done" data-search="r19 ask clarification loop for unresolved acronyms and graph-label intent" tabindex="0"><div class="card-head"><span class="card-id">R19</span><span class="card-title">Ask clarification loop for unresolved acronyms and graph-label intent</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-agents</span><span class="chip" data-kind="phase">P15</span><span class="chip" data-kind="type">requirement</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">agentic-qa</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-R2" data-target="card-R2">R2</a> <a class="dep-link" href="#card-R5" data-target="card-R5">R5</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) When the initial question contains an acronym, label, or domain term that does not resolve to a registered QuerySpec, active vocabulary row, live label/property, or approved acronym sense, the agent does not silently choose a near match; it returns a structured clarification request with the unresolved term, the detected candidate senses/labels, and one or more concise choices. (b) The Ask UI renders the clarification as an actionable question, preserves the pending question/session, and submits the user&#x27;s selection or free-text clarification as the next turn. A confirmed clarification is visible in the trace and is used for the subsequent router/text2cypher decision. (c) If the user declines or no clarification is possible, the answer states the ambiguity and does not present a zero-row near-match as a definitive answer. Existing clear questions remain single-pass and unchanged. (d) Tests cover unknown acronym, ambiguous label with multiple candidates, user selection, cancellation, session persistence, and the no-clarification regression path.
 </p><p class="notes"><strong>Notes:</strong> Requested as a companion to R18 after the Tower/TOMRole mismatch: the Explorer&#x27;s synthesized Tower concept was silently mapped to the real TOMRole label. This is a disambiguation contract, not permission for the agent to invent ontology or relationship meanings; unresolved meaning still routes to the SME/HITL path.
@@ -18037,6 +18341,73 @@ byte-splice path a fixture of its own. It is a fixture-authoring item, not this 
 </p></div></div>
 <div class="card" id="card-V8" data-id="V8" data-module="docs" data-phase="10" data-epic="sme-runbooks" data-type="task" data-status="done" data-search="v8 sme runbook: drydocs-api — server run + mappings api; rule the overlap with the mapping-store runbook" tabindex="0"><div class="card-head"><span class="card-id">V8</span><span class="card-title">SME runbook: drydocs-api — server run + mappings API; rule the overlap with the mapping-store runbook</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P10</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">sme-runbooks</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-V1" data-target="card-V1">V1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Per V1&#x27;s disposition: EITHER the mapping-store runbook is extended to be the drydocs-api module runbook (Rev bump) OR a distinct drydocs-api-runbook.md is authored; outline-conformant, rendered, stale-render-clean; drydocs-api off RUNBOOK_PENDING. Covers: starting the thin API, its read-only vs store-write surfaces, and the loader-stays-the-only-graph-writer contract as the operating rule.
 </p><p class="notes"><strong>Notes:</strong> Groomed 2026-07-29 (Epic V).</p></div></div>
+<div class="card" id="card-V9" data-id="V9" data-module="docs" data-phase="10" data-epic="sme-runbooks" data-type="task" data-status="done" data-search="v9 sme runbook: drydocs-agents — adk service venv, run, console wiring, agent smoke checks" tabindex="0"><div class="card-head"><span class="card-id">V9</span><span class="card-title">SME runbook: drydocs-agents — ADK service venv, run, console wiring, agent smoke checks</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P10</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">sme-runbooks</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-V1" data-target="card-V1">V1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> docs/design/drydocs-agents-runbook.md (outline-conformant, rendered, stale-render-clean), drydocs-agents off RUNBOOK_PENDING. Covers: the module&#x27;s own venv (pinned google-adk per R10), starting the service, wiring the console to it (VITE_ADK_URL, names only), the read-only contract, and a smoke check per registered app with expected output shape — including the ADK-unreachable fallback behaviour the console surfaces (SYNTHESIZED demo trace + banner).
+</p><p class="notes"><strong>Notes:</strong> Groomed 2026-07-29 (Epic V).
+
+BUILT 2026-09-08 (Lane B, laptop `NewThinkpad`, wip/v9-laptop). Chained onto
+wip/web18-laptop and therefore onto the whole lane; MERGE ORDER: r18, agent1, api4,
+web18, v9. Chained deliberately: V9 documents the agents service that R18, AGENT1 and
+API4 changed, and a runbook written against main would describe a pipeline with no scope
+hint, no decision trace and no chunk search — stale the moment Lane A merged them.
+
+docs/design/drydocs-agents-runbook.md, rendered, outline-conformant; drydocs-agents is
+off RUNBOOK_PENDING with its RUNBOOK_DISPOSITION entry.
+
+EVERY VERSION, COMMAND AND OUTPUT IN IT WAS RUN, on the laptop against `neo4jtest`, and
+the ones that were NOT run say so and say why — the three key-spending apps, because
+running someone&#x27;s provider key to produce a runbook example is not a decision a document
+makes for you. `graph_query` needs no key, so it was smoked end to end and its envelope
+is transcribed from what came back.
+
+THE RUNBOOK FOUND A LIVE DEFECT, which is the part worth reading. `agents/serve.py`
+DOES NOT START on this venv: `google.adk.cli.utils._nested_agent_loader` does not exist
+in google-adk 2.3.0, and the loader R14 uses to hide `common/` from /list-apps is not
+among what 2.3.0 offers (`AgentLoader` and `BaseAgentLoader` only). The declaration is
+`google-adk&gt;=2,&lt;3`, so a fresh resolve lands on 2.3.0 and the ruled entry point is dead.
+Scoped precisely rather than alarmingly: the R23 redaction seam is FINE
+(`fast_api.create_session_service_from_options` is still present at 2.3.0), so this is
+an app-discovery break, not a redaction break. Verified by starting the server on the
+vendor loader instead, where /list-apps answers with five names including `common` —
+which is exactly the defect R14 exists to prevent, reproduced.
+NOT FIXED HERE: V9&#x27;s module is `docs`, and re-pointing R14 at 2.3.0 is a
+drydocs-agents code change with a design question inside it. It is handback 1.
+
+TWO ACCEPTANCE DETAILS ARE STALE AND THE RUNBOOK CORRECTS THEM IN PLACE, because a
+runbook that repeated them would send an operator to configure things that no longer
+exist:
+1. &quot;VITE_ADK_URL&quot; — retired at ADR 0020 / WEB10. The console reaches this service as
+   `/agent/*` on its OWN origin through the same proxy that serves the page, and the
+   prefix comes from web/delivery.json. There is nothing to set. `--allow_origins` is
+   retired for the same reason and `agents/README.md`&#x27;s Run block still shows it.
+2. &quot;the ADK-unreachable fallback the console surfaces (SYNTHESIZED demo trace +
+   banner)&quot; — THAT IS NOT THE BEHAVIOUR. An unreachable agent renders the O63 FAILURE
+   LADDER; there is no demo trace and no fallback answer anywhere in AskRoute. The
+   SYNTHESIZED banner is real but a different surface: it fires on an ANSWER whose
+   sources are watermarked, so it is a claim about the data, not about the transport.
+   The acceptance was written 2026-07-29 and O63 landed after it.
+
+ALSO MEASURED AND WORTH KEEPING: two installed versions disagree with requirements.txt
+on this machine. `litellm` is 1.91.4, BELOW its declared `&gt;=1.97` floor, because the
+Windows wheels-only gotcha pins the known-good build; `google-adk` is 2.3.0, which is
+the version the launcher does not start on. Both are in the runbook&#x27;s prerequisites
+table so the next person does not conclude their install is broken.
+
+SURFACES: docs/design/drydocs-agents-runbook.md + its render,
+tests/unit/test_runbook_coverage.py (off RUNBOOK_PENDING, into RUNBOOK_DISPOSITION).
+
+HANDBACKS FOR LANE A:
+1. `backlog` — MINT AN ITEM: `agents/serve.py` does not start on google-adk 2.3.0. The
+   R14 nested loader is gone; re-point it at what 2.3.0 offers, or pin the dependency
+   to the last version that has it, or drop R14 and accept `common` in /list-apps. That
+   is a real choice and not a mechanical fix. Module drydocs-agents. The workaround and
+   its cost (it also skips the R23 redaction) are in the runbook&#x27;s troubleshooting.
+2. `backlog` — a smaller one: `agents/README.md`&#x27;s Run block still shows
+   `--allow_origins http://localhost:5173`, retired at ADR 0020. Inert, not harmful,
+   but it is the first thing a new operator copies.
+3. The three key-spending apps have no executed smoke output in the runbook. If that
+   matters, it is a deliberate spend and someone should decide to make it rather than
+   have a document make it for them.
+</p></div></div>
 <div class="card" id="card-V10" data-id="V10" data-module="docs" data-phase="10" data-epic="sme-runbooks" data-type="chore" data-status="done" data-search="v10 sme runbook: drydocs-web — audit the existing web-console runbook current (post o35-o41, fb-03/fb-04 access model)" tabindex="0"><div class="card-head"><span class="card-id">V10</span><span class="card-title">SME runbook: drydocs-web — audit the existing web-console runbook current (post O35-O41, FB-03/FB-04 access model)</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P10</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">sme-runbooks</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-V1" data-target="card-V1">V1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The web-console runbook is audited against the shipped state and Rev-bumped where stale: category-first landing (O35), the FB-03 page-role/access designations, the standalone agent-test page&#x27;s build/ship path (FB-04 re-ruling), and current build/verify commands; rendered, stale-render-clean; drydocs-web marked COVERED in V1&#x27;s map.
 </p><p class="notes"><strong>Notes:</strong> Groomed 2026-07-29 (Epic V). COORDINATE: a parallel session is actively working the standalone agent-test page — audit only after its stream lands; do not describe in-flight state.
 
