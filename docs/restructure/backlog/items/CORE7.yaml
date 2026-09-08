@@ -9,8 +9,36 @@ model: sonnet
 priority: p3
 status: todo
 depends_on: []
-inputs: []
+inputs:
+- tests/unit/test_repo_paths.py
+- drydocs_core/repo_paths.py
 acceptance: |
-  Stub - minted 2026-09-07 under the I6 protocol; the body follows in the next push.
+  tests/unit/test_repo_paths.py:356 test_swept_defaults_resolve_inside_a_real_worktree spends
+  a real `git worktree add` to prove the swept defaults resolve inside a linked worktree. It is
+  right about what it checks and wrong about where it may run: when pytest itself runs FROM a
+  linked worktree, the test fails, and in the company's reconcile recipe - baseline taken in
+  a clean worktree at HEAD, then compared by test id against the main tree - it has read as a
+  false "turned green" in two consecutive carve-out reconciliations (2026-09-07 transcription,
+  sixteenth and seventeenth reports; the second time it was caught only because the first
+  was remembered).
+
+  (a) At the top of the test, the checkout is classified: `git rev-parse --git-common-dir`
+      differing from `git rev-parse --git-dir` means the current checkout is itself a linked
+      worktree, and the test skips with a named reason ("runs from the main checkout only -
+      a nested worktree is not the shape under test"). The skip reason names the mechanism,
+      not the symptom, so the J8 skip-guard policy accepts it on its merits.
+  (b) The skip is honest: one assertion in the same file shows the skip fires from inside a
+      linked worktree and does NOT fire from the main checkout (J76: the instrument gets a
+      fixture). Both halves run on a clone with no worktrees present - build the worktree in
+      tmp_path, run the classifier there, tear it down.
+  (c) The test's original assertion is unchanged; the item adds a precondition and its proof,
+      nothing else.
 notes: |
-  Minted 2026-09-07 from IDEAS.md (desktop, Lane A). Title is final; acceptance and inputs land in the body commit.
+  Minted 2026-09-07 from IDEAS.md Idea-293 (desktop, Lane A); the stub shipped in e0f2b799
+  under a stale CFG5 message - see CORE6's note for the correction. Source of the finding is
+  the company's carve-out I reconciliation, transcribed to the machine-local back-flow file
+  named in Idea-293 (never the captures).
+
+  module drydocs-core because the module under test is drydocs_core/repo_paths.py. p3: the
+  failure is a known false positive that a careful reader discards; the cost is the reading,
+  twice so far, on every reconcile that uses a worktree baseline.

@@ -9,8 +9,55 @@ model: sonnet
 priority: p1
 status: todo
 depends_on: []
-inputs: []
+inputs:
+- PORT-MANIFEST.yaml
+- scripts/render_port_dispositions.py
+- scripts/port_rename_check.py
+- .claude/skills/reconcile-port/SKILL.md
+- docs/port/port-prompt.md
+- tests/unit/test_port_manifest.py
 acceptance: |
-  Stub - minted 2026-09-07 under the I6 protocol; the body follows in the next push.
+  A roll close proves the collision classes complete and never the clean-add class. Seven
+  paths and four per-entry rows present at port-base-20260902 surfaced two carve-outs later
+  as "not in this roll" AFTER that roll had closed COMPLETE (2026-09-07 transcription,
+  sixteenth and seventeenth reports; RELAY-35 carries the by-hand recipe). Two mechanisms,
+  both confirmed by the consumer session itself: (1) its per-entry pass merged the RANGE DIFF
+  where the entry_rule says union by id against the tag's file, so a row added in an earlier
+  range and never merged is in neither diff and stays invisible to every later pass; (2) its
+  attribution instrument (`git diff --numstat <base> <next> -- <path>`, empty = not this roll)
+  prints empty for a forgotten path exactly as for a deferred one, and only the lineage pair
+  has a named deferral (T24) - so after a roll closes, deferred and missed are
+  indistinguishable.
+
+  (a) scripts/port_completeness_check.py (canonical-producer, ships to the consumer) takes a
+      base tag, reads PORT-MANIFEST.yaml through the SAME classifier
+      scripts/render_port_dispositions.py uses (one classifier, not a second reading of the
+      manifest), lists every path at `git ls-tree -r --name-only <tag>` that is absent from
+      the working tree and whose class is neither never-port nor canonical-company, and exits
+      non-zero unless that list is empty or every survivor is named in the roll's deferral
+      section.
+  (b) The deferral section is a by-PATH list in the port-prompt's roll record, and the
+      acceptance gate refuses COMPLETE while the completeness check has survivors not in it.
+      T24 is the prose form of exactly one entry and becomes the first row. The section is
+      per-roll and cumulative: a path deferred in roll N is still deferred in roll N+1 until
+      it is applied or the row is retired with a date.
+  (c) The reconcile-port skill's close step names BOTH instruments together and says what each
+      answers: `--numstat` for "this roll or not" (attribution), the completeness check for
+      "ever applied or not" (completeness). Neither alone.
+  (d) Guard, producer-side, at the incident's shape (J76): a fixture repo where a path lands
+      in range 1, is skipped, and range 2 touches nothing near it - the check must name that
+      path at range 2's close, and `--numstat` over range 2 must be empty for it, which is
+      the whole point.
+  (e) A relay tells the consumer the script exists and where the deferral section lives.
+      Nothing is asked back.
 notes: |
-  Minted 2026-09-07 from IDEAS.md (desktop, Lane A). Title is final; acceptance and inputs land in the body commit.
+  Minted 2026-09-07 from IDEAS.md Idea-291 (desktop, Lane A); the stub shipped in e0f2b799
+  under a stale CFG5 message - see CORE6's note. Source is the company's carve-out I close
+  and its turn-24 corrections, transcribed to the machine-local back-flow file named in
+  Idea-291 (never the captures); RELAY-35 in docs/port/port-prompt.md is the by-hand form
+  the consumer already has.
+
+  Sequencing: lands as a relay in the NEXT roll, not mid-apply (a moving manifest is worse
+  than a wrong one - the same rule Workstream A of the id-grammar plan follows). The
+  in-flight roll (0902..0905, carve-out H under way) closes on RELAY-35's by-hand recipe.
+  p1 because the failure it fixes has already happened once and is silent by construction.
