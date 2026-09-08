@@ -2861,6 +2861,53 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   its 2026-08-02 header counts as dated. Your own copies of those prompts, if amended
   company-side, merge per-entry as the rule already says. Nothing is asked back.
 
+- **RELAY-35 — A PER-ENTRY MERGE THAT READS THE RANGE DIFF ACCUMULATES EVERY ROW IT EVER
+  SKIPPED; A ROLL CLOSED COMPLETE CARRIES ITS DEFERRALS BY PATH; AND T24 IS THE DISPOSITION
+  FOR EVERY `drydocs_lineage/**` COLLISION** (new 2026-09-07, mid-apply; nothing here waits
+  for the roll). `[COMPANY-CONFIRMED]` — your carve-out I close re-ran the range and found
+  that the per-entry pass had merged the RANGE'S DELTAS where the entry_rule says union by id
+  against the producer file: a product row and a Q27 `current_for` in
+  `config/taxonomy/software-registry.yaml`, and two corpora in `config/doc-source-registry.yaml`,
+  all present at `port-base-20260902`, all absent on your tree after that roll closed
+  COMPLETE. `[VERIFIED-PRODUCER]` — every one of those rows landed between 2026-08-27 and
+  2026-08-31, INSIDE the previous roll's own range, so a delta pass should have seen them
+  too; the fix does not depend on which pass skipped them. The rule the manifest already
+  states, restated as its failure mode: a per-entry row unions against the file AT THE BASE
+  TAG (`git show <base-tag>:<path>`), never against `git diff <prev>..<base> -- <path>` — a
+  row added in an earlier range and never merged is in neither tree's diff and stays
+  invisible to every later delta pass, forever. Second, `[VERIFIED-PRODUCER]` seven paths
+  your carve-out I reverted or found absent — the corpus-status module the API app imports,
+  the mapping report function `test_mapping_api.py` needs, four test files your UI-tests
+  ledger names, the publishing guard the enforcement matrix lists, and the server-inventory
+  sample CSV the fixture interlock reads — are all present at `port-base-20260902`
+  (`git ls-tree -r --name-only port-base-20260902 -- <path>`), none touched in
+  0902..0905. "Not in this roll" is true and is not a disposition: they are owed by a CLOSED
+  roll, and nothing on either side records them as deferred — only the lineage pair has a
+  named deferral (T24). So two instruments, together, at every roll close: your
+  `git diff --numstat <base> <next> -- <path>` answers "this roll or not" and prints empty
+  for a forgotten path exactly as it does for a deferred one; the complement is
+  `git ls-tree -r --name-only <base-tag>` minus your tree minus the never-port and
+  canonical-company rows, expected EMPTY, and every path that survives is either written
+  into the roll's deferral list by name or applied. Third, `[VERIFIED-PRODUCER]` the
+  lineage revert re-found T24 (2026-09-01): `drydocs_lineage/writer.py` and
+  `extractors/controlm_inventory.py` were ruled deferred behind the vocabulary migration,
+  and `model.py`'s two gates — the `scheduler_*` ids and the kind constant — are two rolls
+  old (2026-08-21 and 2026-08-25) and live in the same deferred file. Carve-out G's note
+  that I would close the lineage failures contradicted T24; carve-out I corrected it back.
+  T24 is the disposition for every `drydocs_lineage/**` collision until the vocabulary class
+  is taken. Fourth, `[VERIFIED-PRODUCER]` the ruff hit your close fixed in
+  `scripts/build_schema_matrix.py` is a CONFIGURATION divergence, not a producer defect: the
+  producer `pyproject.toml` has ignored RUF002 and RUF003 since 2026-08-12 (ambiguous
+  Unicode in prose; the suggested replacements are wrong for it) at the same 0.5.7 pin, and
+  the file passes here. Your `pyproject.toml` is per-entry and does not carry that ignore;
+  the comment reword is harmless and is not being carried back. Fifth, one attribution for
+  your port report, `[VERIFIED-PRODUCER]`: the relationship-vocabulary directory at
+  `port-base-20260902` already holds all 17 fragments — the four renames and the two
+  additions — and the single file that changed in 0902..0905 is `00-header.yaml`
+  (2026-09-04, the header becomes a pointer to the domain registry). Your carve-out D
+  handled this roll's share correctly; the rename set is the gate-bound class deferred since
+  2026-08-26, one roll older than your carve-out I commit body says. Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
