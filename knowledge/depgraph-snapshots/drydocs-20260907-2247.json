@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-07T21:59:40",
+    "captured_at": "2026-09-07T22:47:23",
     "date": "20260907",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "b2360435",
-      "full": "b236043590bf4351c1d5791490629e16d05860ae",
+      "commit": "61dfe4c2",
+      "full": "61dfe4c2a8580d30a6998059d02cfd7409020853",
       "branch": "main",
-      "describe": "port-base-20260905-278-gb2360435",
-      "subject": "chore(plan): render board and roadmap over Lane B's V7 claim",
+      "describe": "port-base-20260905-282-g61dfe4c2",
+      "subject": "fix(port): RELAY-35 names the lineage extractor by its real path (drydocs_lineage/extractors/...) - the path-currency guard caught the consumer's shorthand; pen: backlog . port . adr . gates . snapshot (Lane A, desktop)",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -22931,10 +22931,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260907-2046.json",
-      "name": "drydocs-20260907-2046.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260907.json",
+      "name": "drydocs-20260907.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260907-2046.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260907.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -49488,7 +49488,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260907-2046.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260907.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
