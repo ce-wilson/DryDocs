@@ -9,9 +9,54 @@ model: sonnet
 priority: p1
 status: todo
 depends_on: []
-inputs: []
+inputs:
+- drydocs_core/entity_extract.py
+- tests/unit/test_publish_boundary_values.py
+- tests/unit/test_bundled_demo_interlock.py
+- docs/restructure/backlog/items/K30.yaml
+- docs/restructure/backlog/items/MM3.yaml
 acceptance: |
-  STUB - minted 2026-09-07, body follows in the next commit (I6: the stub carries the
-  final title, is pushed, and only then is the body written).
+  The application-id pattern in the prose entity extractor fixes the width at five digits
+  (_APP_ID_RE, drydocs_core/entity_extract.py:135) and the module docstring calls an
+  application id "a standalone 5-digit token" throughout. The live population profiled from
+  the real PAT team report's Seal IDs column is four to seven digits wide, with five AND six
+  both common - so a six-digit id in a design page, a runbook or a Confluence chunk is never
+  emitted as application_id, cued or not.
+
+  (a) The extractor recognizes the real width (four to seven digits), and the module
+      docstring stops asserting five. The width comes from the profiled column, and the item
+      records the profile it was taken from.
+  (b) A regression test carries at least one four-digit, one six-digit and one seven-digit
+      id through the extractor, plus a negative case that shows what the wider pattern must
+      NOT swallow (a bare year, a row count) - widening a bare-digit pattern buys false
+      positives, so the cue rules that keep precision are stated in the test, not assumed.
+  (c) The two neighbour beliefs are examined in the same pass and each is either fixed or
+      recorded as deliberately unchanged, with the reason:
+      - tests/unit/test_publish_boundary_values.py:125 scans for five-to-six-digit tokens in
+        the publishable tree and therefore cannot see a four- or seven-digit real id.
+        Widening to four digits would match every year, so this one wants a cue or an
+        allow-list, NOT a wider bare pattern.
+      - tests/unit/test_bundled_demo_interlock.py:47 reads a five-digit app-id segment out
+        of the synthetic demo folder names (the 70001 block). Fine as it stands; it
+        documents the same belief and should say so.
+  (d) The PAT loading path is confirmed unaffected and left alone: PatProductMappingRow and
+      pat_product_mapping.cypher split on the delimiter with no width rule.
+  (e) The Team ID hazard is pinned where the projection reads headers: Team ID in the same
+      report is a dense integer surrogate key that is SEAL-shaped and is the FIRST column, so
+      any shape-matching discovery of "the seal column" picks it first. The projection matches
+      headers by exact name and a comment or test says it must keep doing so.
 notes: |
-  STUB.
+  Minted 2026-09-07 from IDEAS.md Idea-284 (company-side profile of the real PAT team
+  report's Seal IDs column, SME-supplied captures, transcribed to
+  internal-local/company-backflow/k30-team-details-report-header-list-2026-09-07.md section 2;
+  the K30 close note cites the same file).
+
+  module drydocs-core because the defect is in the extractor; the two guard rows in clause
+  (c) live in the drydocs-load test tree and ride along rather than splitting the item -
+  they are the same belief written three times, and fixing one while leaving the others is
+  how a belief survives its own correction. phase 9 / seal-attribution to sit beside K30,
+  which profiled the column.
+
+  p1, not p2: this is a silent miss, not a visible failure. Nothing errors when a six-digit
+  id is dropped - the extraction is simply empty, and every downstream consumer reads that
+  as "no application id in this document".

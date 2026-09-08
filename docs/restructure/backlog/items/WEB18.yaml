@@ -9,9 +9,48 @@ model: sonnet
 priority: p2
 status: todo
 depends_on: []
-inputs: []
+inputs:
+- web/src/routes/ModuleTemplate.tsx
+- web/src/modules/registry.ts
+- config/taxonomy/ui-concepts.yaml
+- tests/unit/test_ui_concepts.py
+- docs/restructure/backlog/items/R22.yaml
 acceptance: |
-  STUB - minted 2026-09-07, body follows in the next commit (I6: the stub carries the
-  final title, is pushed, and only then is the body written).
+  ModuleTemplate.tsx:51 renders every module header as tagline, a dot, then "backs onto" the
+  declared backend; for Explorer (web/src/modules/registry.ts:60) that reads
+  "Tower / app drill-down graph - backs onto drydocs". backsOnto: 'drydocs' is CORRECT - the
+  tabs do read the graph - but the word Tower beside it invites exactly the inference R22
+  exists to prevent: on 2026-08-20 "how many towers" fell through to text2cypher and the
+  model proxied a console term onto :TOMRole, crossing from UI taxonomy into the TOM ontology
+  unannounced. R22 fixed /ask (answer_declared, agents/graph_qa/pipeline.py:487, answering
+  from the declaration with its provenance). The Explorer header never got the fix.
+
+  (a) The header term carries a hover and/or link whose text is SOURCED from
+      config/taxonomy/ui-concepts.yaml (schema drydocs.ui-concepts.v1; source
+      web/src/data/towers.ts, graph_binding: none, aliases including the CTO spelling;
+      guarded by tests/unit/test_ui_concepts.py). It is never hand-written - a second
+      definition drifts from the guarded one, which is the whole defect.
+  (b) It MAY say the console-side fact: defined in the console, not read from the graph,
+      four of them. It MAY NOT assert any ontology binding (Tower to :TOMRole or any other) -
+      that is a HITL gate decision and the mapping stays status: planned until the gate
+      confirms it. Any binding claim ships VIA THE GATE, never from this item.
+  (c) THE OPEN QUESTION IS DECIDED AND RECORDED BEFORE ANYTHING IS BUILT: there is no
+      web/src/generated/ui-concepts.json today, so either
+      (a-option) a render step emits one - the gates / enforcement-matrix / software-registry
+      precedent, drift-guarded, and a page header should not depend on a live request; or
+      (b-option) the header calls docs.ui-concepts.v1 at render time - no new file, but a
+      request and a failure mode on a page header.
+      Precedent favors the render step. It is a render-surface change and therefore the
+      render pen's call: the item records which was chosen and why, and if the render step is
+      chosen, the generated file is drift-guarded like its siblings.
+  (d) Cheap win taken either way: the aliases from ui-concepts.yaml are surfaced in the
+      hover. A real acronym LINK waits on PLAN8's term ledger, which is where the target
+      would live.
 notes: |
-  STUB.
+  Minted 2026-09-07 from IDEAS.md Idea-277 (the UI session's eval-case review, reviewed at
+  839eab1f on feat/cyclic-type-test-case), decision D4 - agreed in session, not built.
+
+  Clause (c) is deliberately left as a decision ON the item rather than groomed into a done
+  deal: both options are real, they have different drift and failure profiles, and the choice
+  belongs to whoever holds the render pen. Clause (b) is the hard boundary - the ontology
+  binding routes through the HITL gate and no hover text may pre-empt it.

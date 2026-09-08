@@ -9,9 +9,47 @@ model: sonnet
 priority: p2
 status: todo
 depends_on: []
-inputs: []
+inputs:
+- drydocs_api/query_specs.py
+- agents/graph_qa/pipeline.py
+- docs/restructure/backlog/items/O62.yaml
 acceptance: |
-  STUB - minted 2026-09-07, body follows in the next commit (I6: the stub carries the
-  final title, is pushed, and only then is the body written).
+  Two follow-ups the cyclic-type-trap eval case named and never inboxed, plus the evidence
+  the smuggling-dot case leaves homeless. The first two are the item; the third is scoped
+  here and ruled elsewhere.
+
+  (a) A registered docs QuerySpec searches Chunk.text by term (a spec over the chunk text or
+      a full-text index behind one). docs.search.v1 today searches Document title and
+      abstract and says of itself that it is Chunk-free (drydocs_api/query_specs.py:946), so
+      a term that appears only in a chunk body is unreachable. The new or widened spec is
+      registered, has its catalog line, and its test shows a term found in a chunk body and
+      NOT in any title or abstract coming back.
+  (b) The hardcoded chunks: 0 in agents/graph_qa/pipeline.py (:362 and :535) stops being a
+      literal: the count is a parameter of the tier or the request, its default is stated,
+      and a non-zero value provably reaches chunk text end to end. This is why no /ask tier
+      reads chunk text today, and (a) is unobservable from the console without it.
+  (c) A chunk-level trust override is SCOPED here and not decided here: the illustrative
+      ctmdefine enum the cyclic-type-trap case flags is loaded GROUNDED by document default
+      while its hazard banner sits in a different chunk, which the case itself calls a trust
+      defect. The item names where the override would live on the docmeta trust axis and
+      what it would key on; the axis change itself is the docmeta owner's ruling and does
+      not ship under this id.
+  (d) O62's illusion is not re-created: a full listing read as a search hit by title
+      similarity. The test in (a) distinguishes a term match in body text from a listing.
 notes: |
-  STUB.
+  Minted 2026-09-07 from IDEAS.md Idea-282 (the UI session's eval-case review, reviewed at
+  839eab1f on feat/cyclic-type-test-case), finding B AS AMENDED in the same session - the
+  first form of the finding was partly wrong and would have sent someone to rebuild
+  ask.file-search.v1, which O62 already built as the first term-accepting spec, over
+  DataAsset.assetId (graph assets, not chunks). The amendment is the reason this item exists
+  at all: what is genuinely un-inboxed is chunk TEXT, not term search in general.
+
+  module drydocs-api because the spec is the deliverable; clause (b) touches
+  agents/graph_qa and is called out so the two pens do not collide. This item is the GATE on
+  AGENT1's vendor-corpus option - a control labelled "vendor corpus" over a title-only
+  search would turn O62's illusion into a feature.
+
+  The smuggling-dot case's B1 evidence also lands here as context, not as acceptance:
+  _consume_delimiter (drydocs_core/orchestration/controlm/resolver.py:141) consumes a period
+  only when the variable sigil follows, so the doubled-period spelling over-emits. Reproduce
+  it by running the three shapes rather than reading it off the table.

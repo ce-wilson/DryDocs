@@ -9,9 +9,33 @@ model: sonnet
 priority: p3
 status: todo
 depends_on: []
-inputs: []
+inputs:
+- .claude/skills/research-probe-discipline/SKILL.md
+- docs/style/review-provenance.md
+- docs/restructure/backlog/items/J63.yaml
 acceptance: |
-  STUB - minted 2026-09-07, body follows in the next commit (I6: the stub carries the
-  final title, is pushed, and only then is the body written).
+  Both research-probe-discipline eval cases carry checked_against: origin/main dbd13170 -
+  correct J63 form, a real commit - and origin/main is 367 commits past it, with the churn
+  concentrated on exactly the console arm the cases assess (R19's clarification tier, R15
+  epistemic labeling, O63 reachability, WEB8, WEB10). Their core conclusions still hold at
+  839eab1f, but their "the console arm cannot answer this today" sections are dated
+  2026-09-02 and 2026-09-03 and perish with every console commit.
+
+  (a) The eval-case shape gains a way to mark which sections are sha-sensitive - a
+      perishable list beside checked_against, or a per-section marker. One mechanism, stated
+      in the skill, not two.
+  (b) The two existing cases are marked with it, so the shape has been exercised on the
+      material that produced it.
+  (c) A re-check reads the marking: the marked sections are re-run against the current tree
+      and the rest are cited as standing. The skill says that in one sentence.
+  (d) It does not become a second provenance block. The review-provenance block names the
+      TREE a review ran against (J63); this names which CLAIMS depend on that tree, and the
+      skill says which is which so the two are not confused.
 notes: |
-  STUB.
+  Minted 2026-09-07 from IDEAS.md Idea-281 (the UI session's eval-case review, reviewed at
+  839eab1f on feat/cyclic-type-test-case), finding C.
+
+  module drydocs-plan / phase 8, the same route PLAN5 and PLAN6 took for skill-shape work
+  this week; the artifact is the eval-case shape inside the research-probe-discipline skill,
+  not any code module. p3 because nothing is broken - the cases' conclusions hold - and the
+  cost of not doing it is a future re-check that cannot tell which half to re-run.

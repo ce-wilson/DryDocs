@@ -9,9 +9,27 @@ model: haiku
 priority: p3
 status: todo
 depends_on: []
-inputs: []
+inputs:
+- internal/remediation/standards-rules-registry.md
+- docs/restructure/backlog/items/R10.yaml
+- docs/restructure/backlog/items/R1.yaml
 acceptance: |
-  STUB - minted 2026-09-07, body follows in the next commit (I6: the stub carries the
-  final title, is pushed, and only then is the body written).
+  R10 names two unrelated things: a remediation rules-registry rule (concatenation-dot
+  correctness, internal/remediation/standards-rules-registry.md:57) and a backlog item
+  (docs/restructure/backlog/items/R10.yaml, an unrelated closed chore about pinning an agent
+  dependency). R1 collides the same way - the dot-smuggling rule id in the remediation
+  detector against backlog R1. Prose that says "Rule R10 in the registry" is precise, but a
+  search for R10 alone lands on the wrong artifact.
+
+  (a) The standards-rules registry's header states the convention: a rules-registry rule is
+      cited as "registry R10" on first use in any prose.
+  (b) NO RENUMBERING of either series. The R letter was frozen with the other 26 on
+      2026-09-02, and backlog ids are stable join keys. This is a citation convention and
+      nothing else.
+  (c) The row is offered to PLAN8's term ledger when that exists: the string R10, two homes.
 notes: |
-  STUB.
+  Minted 2026-09-07 from IDEAS.md Idea-280 (the UI session's eval-case review, reviewed at
+  839eab1f on feat/cyclic-type-test-case), finding D.
+
+  First id in the REM series. phase 6 / component-topology, where the drydocs-remediation
+  items live. haiku and p3: one header line, no code, no renaming.

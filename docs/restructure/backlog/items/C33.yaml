@@ -63,3 +63,17 @@ notes: |
   gate in config/gate-log.md. B2 sharpened, not re-keyed; the MERGE key may now be written.
   The build follows the acceptance as written; the synthetic-fixture / company-venue split
   for the :Document citation is in the RECORD.
+  MERGED 2026-09-07 - IDEAS.md Idea-275, on its own instruction ("do not mint a loader item
+  for it: it is a C33 follow-up corpus, and C33's acceptance already forbids a second key").
+  The other ETL platform in the software registry - the informatica-powercenter row - is
+  DECOMMISSION by end-2027 in the company governance catalog and its row is a name with a
+  vendor and nothing else: versions empty, no evidence, no corpus. That is exactly the shape
+  this item's subject had before the SME email. What it needs is what abinitio got, in this
+  order: a dated install census from the SME, captured as a corpus row in
+  config/doc-source-registry.yaml with its capture rung, and then THIS loader run against it -
+  so the Q3 key decision, now RULED as the census key {source, as_of, fid, install_path}, is
+  made once for both platforms and never re-asked per product. The census date and the
+  governance-read date stay two as_of values. Also recorded here, and NOT built under this
+  id: for a DIVEST or DECOMMISSION platform the fid population is CLOSED, so a fid appearing
+  after the census date is a FINDING and not a row - a flag-not-build detector candidate for
+  drydocs-remediation, to be inboxed as its own entry when someone wants it built.

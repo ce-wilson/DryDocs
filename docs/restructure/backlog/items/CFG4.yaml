@@ -9,9 +9,44 @@ model: sonnet
 priority: p2
 status: todo
 depends_on: []
-inputs: []
+inputs:
+- config/taxonomy/software-registry.yaml
+- UI-WIP/two-track-ui-plan.md
+- docs/restructure/backlog/items/C33.yaml
+- docs/restructure/backlog/items/N24.yaml
 acceptance: |
-  STUB - minted 2026-09-07, body follows in the next commit (I6: the stub carries the
-  final title, is pushed, and only then is the body written).
+  The company technology-governance catalog rules one of the web UI's graph-rendering
+  dependencies NOT_ALLOWED while the framework it sits on is ALLOWED, and the company user's
+  note is that the change is known: the UI will flip to the company data-marketplace
+  platform, which is built on the Google ADK. Neither half below is a rewrite.
+
+  (a) THE SCHEMA HALF. The registry gains a per-product governance block - the mechanism the
+      company side already uses: an as_of that is MANDATORY when the block is present, ids
+      and never names, and absence recorded rather than left blank. The producer has no
+      catalog to read, so producer rows carry an empty governance value and the guard checks
+      only the shape: present implies as_of. A registry row with a governance block and no
+      as_of fails.
+  (b) Governance status ANNOTATES; it has no authority over the ledger. Nothing in the
+      registry is removed, retired or re-keyed by a governance value, and the guard or a
+      comment says so where someone would otherwise be tempted.
+  (c) THE NOTE HALF. UI-WIP/two-track-ui-plan.md gains a DATED note that the company's target
+      UI stack is an ADK-based data-marketplace platform and that the producer's
+      ReUI / graph-rendering choice is producer-only. This matters for what the port carries
+      under web/, and that consequence is stated in the note.
+  (d) The registry now reads governance status on its OWN dependencies, not only on the
+      estate it documents - a self-application the item states explicitly, because that is
+      the finding.
 notes: |
-  STUB.
+  Minted 2026-09-07 from IDEAS.md Idea-276 (the company-side session of 2026-09-07 that
+  reconciled all 16 software-registry products against the technology-governance catalog
+  through its MCP server; transcribed to
+  internal-local/research/2026-09-07-c33-governance-catalog-mcp-capture.md section 2 - the
+  images are not the source).
+
+  module config (the schema is config/taxonomy/software-registry.yaml) with the drydocs-web
+  note as clause (c) rather than a second item: one dated paragraph does not carry an id, and
+  splitting it would lose the reason it is being written.
+
+  phase 2 / ontology-mapping to sit with C25, C33 and C43, the items that own this registry.
+  The company-side enrichment itself is company-owned and does not port; only its schema half
+  is producer work, which is why (a) stops at the shape.
