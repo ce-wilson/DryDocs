@@ -132,7 +132,91 @@ applied to the tool that certifies everything else.
 
 ## Lens 2 — technical debt
 
-*(step 5)*
+Two findings, one per half, and they have opposite characters: the `review` half carries
+debt that is **documented, dated, and past its own expiry**; the `agents` half carries
+debt that is **undocumented and structural**.
+
+| hatch | `drydocs-review` | `drydocs-agents` |
+|---|---|---|
+| `# type: ignore` | 0 | 0 |
+| `cast(` | 0 | 0 |
+| `TODO` / `FIXME` | 0 | 0 |
+| `: Any` | 11 | 0 |
+| `# pragma: no cover` | 1 | 0 |
+| `# noqa` | **0** | **17** |
+
+### L2-1 — eight re-export shims are past the removal trigger they name, and the item that should have retired them was never minted
+
+Eight files in `drydocs/` are 12 lines each and identical in shape
+(`fid_census`, `gate_pages`, `graph_review`, `graph_verify`, `review_labels`,
+`run_as_detect`, `sme_notes`, `source_mappings`). Each says:
+
+> Re-export shim (ADR 0018 D4, 2026-09-02): this module moved to `drydocs.review.X`.
+> Kept for ONE port cycle so every old import path, patch target and citation resolves to
+> the SAME module object … **Removed at the roll after next**; new code imports the new path.
+
+The mechanism is careful — `sys.modules[__name__] = _target`, so private names and
+monkeypatches work through either path. The problem is the schedule.
+
+| | |
+|---|---|
+| shims created | 2026-09-02 (LOAD1, `2c128f6e`) |
+| rolls since | **two** — `port-base-20260905`, then `port-base-20260908` **today** |
+| the stated trigger | "the roll after next" — **fired today** |
+| ADR 0018 action item 6 | *"[ ] Shim removal at the roll after next (an item minted when the relay rolls)"* — **unchecked** |
+| item or idea for the removal | **none** — no backlog item mentions it, `IDEAS.md` returns zero |
+
+**Consequence.** These shims work perfectly, which is precisely why nothing will ever
+signal that they are stale: no test fails, no import breaks, no lint fires. The migration
+they exist to smooth is complete on the writing side and open forever on the cleanup side,
+and every cycle that passes makes "new code imports the new path" less true — nothing
+enforces it, so an old path remains available to any new caller. The ADR anticipated this
+exactly and left the enforcement to a minted item that was never minted.
+
+**Scope note.** This slot owns **8** of them. Repo-wide there are **18** carrying the same
+ADR 0018 D4 banner, spanning `plan`, `port` and `docgen` — those belong to slots 7 and 8,
+which have not run yet. The removal is one action across four components, not four
+actions, which is an argument for minting it once now rather than four times later.
+
+**Cheapest correction:** mint the item the ADR says to mint. If the removal should NOT
+happen yet, the honest fix is to amend the trigger in ADR 0018 and in the eighteen
+docstrings, because a stated expiry that passes silently is worse than a longer one
+stated accurately.
+
+### L2-2 — nine copies of a `sys.path` preamble, and the thirteen suppressions that exist only to serve it
+
+All 17 `# noqa` in the `agents` half break into two groups. Four are `F401` and explained
+at the site (the ADK app convention exposing `agent.root_agent`; `serve.py`'s import for
+its `.env` merge). **The other thirteen are `E402`**, and every one of them follows the
+same three lines — here from `common/graph_read.py:27-31`:
+
+```python
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+
+from drydocs_core.notifications import from_summary, to_payload  # noqa: E402
+```
+
+**Nine files under `agents/` do this**, because the ADK tree runs from its own venv
+(`agents/.venv`) which does not have the repo installed, so anything needing
+`drydocs_core` re-derives the repo root and mutates `sys.path` at import time.
+
+**Consequence, and it is fragility rather than ugliness.** `parents[2]` is a hard-coded
+depth repeated nine times: move one of these files a directory deeper and it silently
+computes the wrong root, and the failure surfaces at the NEXT line as
+`ModuleNotFoundError: drydocs_core`, which reads as a missing dependency rather than a
+wrong path. It is also import-time mutation of global interpreter state performed by
+library modules, so importing any one of them reorders `sys.path` for everything else in
+the process.
+
+**Cheapest correction, in order:** install the repo into `agents/.venv` as a path
+dependency, after which all nine preambles and all thirteen `E402` suppressions delete
+and the imports become ordinary. If the two environments must stay independent — and
+there is a real argument that they should, since `serve.py` documents the ADK venv as the
+interpreter — then hoist the preamble into **one** module (`agents/common/_bootstrap.py`)
+imported first, so the depth constant exists once and moving a file cannot silently break
+it.
 
 ## Ranked
 
