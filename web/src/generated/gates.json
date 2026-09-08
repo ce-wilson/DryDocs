@@ -890,7 +890,9 @@
         "config/gate-prompts/server-location-ontology.yaml"
       ],
       "log_ref": "config/gate-log.md:3695",
-      "unblocks": []
+      "unblocks": [
+        "LOAD6"
+      ]
     },
     {
       "kind": "log-entry",
@@ -1065,6 +1067,7 @@
       ],
       "log_ref": "config/gate-log.md:4234",
       "unblocks": [
+        "CORE8",
         "N19",
         "N20",
         "N21"
@@ -1079,7 +1082,9 @@
         "config/gate-prompts/replica-derivation-edge.yaml"
       ],
       "log_ref": "config/gate-log.md:4256",
-      "unblocks": []
+      "unblocks": [
+        "CORE8"
+      ]
     },
     {
       "kind": "log-entry",

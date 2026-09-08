@@ -1,0 +1,60 @@
+id: CFG6
+epic: release-infrastructure
+title: "Every behaviour switch in config/dev-environment.yaml has a non-test consumer or a stated reason it has none, enforced by an allow-list guard that reads code and not prose"
+type: task
+module: config
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- config/dev-environment.yaml
+- knowledge/depgraph-snapshots/snapshot.ps1
+- tests/unit/test_probe_instrument.py
+- tests/source_scan.py
+acceptance: |
+  A behaviour SWITCH in config/dev-environment.yaml is a key whose value changes what some
+  script DOES - refuse or warn, run or skip, assert or record. A switch that only a test
+  reads is not a switch: it is a test fixture wearing a config key name, and the script it
+  appears to govern still behaves as if the key were absent. The instance: depgraph
+  capability_assert was added so a venue whose depgraph fork is separately owned could record
+  a missing scanner capability as an owed action rather than a defect here;
+  tests/unit/test_probe_instrument.py read it and skipped, and
+  knowledge/depgraph-snapshots/snapshot.ps1 never read it and refused unconditionally. One
+  checkout, one afternoon, two halves of one mechanism disagreeing about the same fact. That
+  key is fixed at 1a5d30b0; the CLASS is not.
+
+  (a) A guard beside the existing config tests carries an ALLOW-LIST of the switch keys in
+      config/dev-environment.yaml. It starts with depgraph capability_assert and the two keys
+      snapshot.ps1 reads for its currency check (expected_commit, expected_branch). For each
+      listed key, at least one NON-TEST consumer is found, or the key carries an inline
+      comment beside it in the shape "no runtime consumer because ...".
+  (b) The consumer search reads CODE, never the prose around it (J66): tests/source_scan.py
+      code_only over the Python surfaces, plus a comment-stripped read of the ps1 scripts -
+      the flag name appears in the explanatory comment of the very script that failed to read
+      it, so a bare substring search finds a consumer that does not exist.
+  (c) Default-deny, the shape tests/unit/test_module_boundary.py already uses: a key added to
+      the switch section with neither a consumer nor the inline reason fails as UNCLASSIFIED,
+      naming the key and both ways to satisfy the guard.
+  (d) The declaration keys in the same file - container, volume, plugins_volume,
+      home_db_warning, zones_declaration - are explicitly NOT switches and the guard says so
+      in its docstring: a test asserting them against compose.yaml is a consistency guard
+      between two declarations, which is what a test is for.
+  (e) A fixture at the incident shape (J76): a switch key read by a test and by nothing else
+      must FAIL the guard, and adding a non-test consumer must clear it.
+notes: |
+  Groomed 2026-09-08 from IDEAS.md Idea-306 (base venue, desktop). The finding comes from the
+  consumer 2026-09-08 port close-out read against producer main the same day (RELAY-45); the
+  review itself is machine-local under internal-local/research/ and is not cited as a tracked
+  path.
+
+  module config because the file under guard is config/dev-environment.yaml and the rule is
+  about what that file keys must be backed by; the guard lives with the other config tests.
+  phase 8 / release-infrastructure with the rest of the guard family. p2: no behaviour is
+  wrong today, and the class produced one live contradiction already.
+
+  What this is NOT: not a request to make every yaml key load-bearing, and not J76 again -
+  J76 is about an instrument that fails toward a reassuring answer; this is about an
+  instrument that exists in one place and is enforced in another.

@@ -3233,7 +3233,13 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   on fifteen RUF002/RUF003 findings pending exactly this row - under it, the producer's
   ignore list crosses whole at the next roll and those fifteen clear without a local edit. The
   ten other findings your table lists (B007, N999, RUF013, N812, E722) are per-site judgment
-  calls on your own files and are not this row's business. **Four - the load-map absence.**
+  calls on your own files and are not this row's business. The row also now names the `ruff`
+  DEV DEPENDENCY PIN as crossing whole (PORT7, `5637d694`): it is the one dependency entry
+  that does not union, because J10 stage 0 holds only at one exact version and
+  `.pre-commit-config.yaml`'s rev is that pin. That was assumed on both sides and enforced by
+  nothing across the two repos - if your pin has drifted from `0.5.7`, the next roll is where
+  it converges, and until it does a green `ruff format --check` on one side says nothing about
+  the other. **Four - the load-map absence.**
   Your report's "stale-by-blocked-renderer" reading matches RELAY-39: the missing
   `render_load_map` call is your signed T19 deferral, and no producer hypothesis about it
   stands. **Five - SME review status on the one number the report does not itemize.** At
@@ -3248,7 +3254,17 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   failing id bucketed by name. Your correction 14 built exactly that instrument and applied it
   correctly; the producer sentence lagged it. What this does NOT change: the reference figures
   stay producer figures, never your acceptance number, and a failure that is not bucketed is
-  still a failure. Nothing is asked back.
+  still a failure. **Seven - every `PORT-MANIFEST.yaml` entry_rule was swept for the shape your
+  carve-out 8 apply reported, and a guard now holds the line (PORT5, `58a76d3f`).** The rule
+  that cost you three guards said what YOUR tree contained; the sweep found five more rules
+  doing a milder version of the same thing - a count of your rows, a named set of your
+  company-only groups, a claim that one of your exemption tables was empty - and rewrote each
+  as what the UNION contains, with any reading of your tree marked as a dated observation of
+  one report on one day. Nothing about the take changes: the same rows cross, the same rows
+  stay. What changes is that a rule no longer goes stale when you move, and
+  `test_no_entry_rule_asserts_the_consumers_tree` fails the next author who writes one that
+  would. If a rule still describes your tree wrongly, it is a producer defect and the roll is
+  where it is fixed. Nothing is asked back.
 
 OWED COMPANY-SIDE:
 

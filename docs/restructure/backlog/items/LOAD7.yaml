@@ -1,0 +1,38 @@
+id: LOAD7
+epic: seal-attribution
+title: "test_pat_projection stops skipping on a tracked sample fixture - a missing PAT product-mapping sample fails the test loudly"
+type: bug
+module: drydocs-load
+phase: 9
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- tests/unit/test_pat_projection.py
+- drydocs/pat_projection.py
+acceptance: |
+  tests/unit/test_pat_projection.py skips with the reason "sample fixture absent on this
+  machine (drydocs/data/ is gitignored)" for a file that is TRACKED - git ls-files lists
+  drydocs/data/samples/pat_product_mapping__sample.csv. The skip can therefore never fire on a
+  clone, and the assertion behind it is protected by nothing: the same fake-skip class CORE4
+  removed from the demo interlock.
+
+  (a) The skip reason is wrong twice and the fix states it once: drydocs/data/ is gitignored
+      but drydocs/data/samples/ is carved back in (fourteen tracked files), and the fixture
+      path is NAME-terminated on purpose (PAT_PRODUCT_MAPPING_FILE, so the constant cannot
+      drift from the fixture) - which is exactly why absence must be a FAILURE. A renamed
+      sample must break this test; today it would skip it.
+  (b) The exists() branch is dropped, the file is read unconditionally, and a missing fixture
+      fails loudly. One docstring line carries the reason above.
+  (c) The concern the test already has is unchanged: the committed fixture and the projection
+      share one header.
+  (d) The line is re-found at the time of the fix rather than taken from this item - the
+      finding was reported at line 220 and sits at 252 on the merged trunk.
+notes: |
+  Groomed 2026-09-08 from IDEAS.md Idea-295 (base venue, desktop); reported in the CORE4 close
+  note.
+
+  module drydocs-load because drydocs/pat_projection.py is drydocs-load (G82) and the test
+  rides with it. p3: one assertion is unprotected and nothing else depends on it.

@@ -1,0 +1,64 @@
+id: CORE8
+epic: source-column-mappings
+title: "The source registry names the application that PRODUCED a dataset, not only the subject domain its origin label carries - the carrier-of-carrier chain ruled via the gate"
+type: task
+module: drydocs-core
+phase: 11
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on: []
+gates: [source-connection-and-run-identity, replica-derivation-edge]
+inputs:
+- config/schemas/source-registry.schema.json
+- config/gate-prompts/source-connection-and-run-identity.yaml
+- config/gate-prompts/replica-derivation-edge.yaml
+acceptance: |
+  A field trace of one people-directory dataset found FOUR layers where the registry grammar
+  has two: the bytes are produced by an identity application and a separate HR application,
+  computed by the schema of an ETL application, stored on a database platform that is itself a
+  registered business application, and only then copied into the replica the registry names as
+  system. The origin value on the dataset row names the SUBJECT DOMAIN of the data - right as a
+  provenance label, wrong as an answer to "which application produced this". The v2 grammar
+  (origin@db.schema.table) has one origin, one system and one acquisition block;
+  config/schemas/source-registry.schema.json has no producing-application slot and no upstream
+  pointer; via (api or db) can hold either hop value but only for the LAST hop. The two
+  populations inside that one table also arrive by different routes from different producers,
+  which a single acquisition block cannot state.
+
+  (a) The ruling comes VIA THE GATE - a rider on source-connection-and-run-identity, with the
+      derivation half cross-referenced to replica-derivation-edge; both are DRAFTED and
+      unsigned, so this is an amendment to open prompts, not a new decision made in code. The
+      choice put to the SME: either origin stays a domain label and a producing-application
+      pointer is ADDED (a produced_by naming a business-application id, one per population), or
+      the chain is expressed only through the derivation edge, with unconnectable intermediate
+      carriers explicitly allowed.
+  (b) Whichever way it is ruled, no schema field is added and no relationship is loaded before
+      the gate signs; any mapping the prompt proposes stays status planned until then.
+  (c) The prompt carries the hazard already observed once, because it is what makes this
+      urgent: the SIGNED fid-identity-and-scope gate treats the table as a carrier with a
+      dataset-on-replica registration and NO new system row (the gate-log reshape of E1), while
+      the signed yaml still reads "system row plus dataset row" and is not edited under N13 - so
+      a reader of the yaml alone rebuilds the system row, and one edition did (N25 clause (c),
+      the fake-HR-system case, seen live).
+  (d) The prompt states why the nearest existing owners do not cover this, so the SME is not
+      asked to re-derive it: reg_derived_from (C38) is dataset-PAIR grain and presumes the
+      intermediate dataset is registered, which would need a system row and a connection block
+      for every hop; N23 owns the carrier slot of the URN for ONE carrier; N25 owns where the
+      layer label lives; the replica origin-is-not-system rule is true for one hop.
+  (e) The consumers are named in the prompt so the ruling reaches them: the mandated
+      stale-premise sweep of source-connection-and-run-identity (A1 restricted record per hop,
+      B2 first non-hypothetical row, C1 and C2 hop semantics) and B3 of replica-derivation-edge.
+notes: |
+  Groomed 2026-09-08 from IDEAS.md Idea-305 (base venue, desktop). Source is a field trace of
+  one people-directory dataset, company-side, SME-REPORTED, transcribed 2026-09-08 to a
+  machine-local file under internal-local/research/ - the transcription is cited, never the
+  captures.
+
+  module drydocs-core per the entry (the source registry is core), rather than config where
+  N23 and N25 sit: the schema file and the registry reader are the artifacts this changes. epic
+  source-column-mappings, phase 11, model fable - it changes what a registry field MEANS.
+
+  ONTOLOGY, SO GATED: this item drafts the rider and takes the ruling through the HITL gate. It
+  writes no edge and adds no schema field on its own authority.

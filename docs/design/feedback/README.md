@@ -19,6 +19,17 @@ produce the same anchor-keyed YAML:
   anchor-keyed YAML — transcribing faithfully first, then keying each note to the margin
   anchor nearest it.
 
+A later rev CARRIES FORWARD the notes of the earlier one — that is what makes a capture the
+whole of what the reviewer sent, rather than the part that is still open. One consequence is
+worth knowing about because it cost a question on a port: a rev file is a strict superset of
+its predecessor's text, which is the exact input the port rename detector's containment measure
+scores 1.00. It read `drydocs-startup-refresh-runbook-rev11.yaml` as possibly being `-rev1`
+renamed. The score was right and the question was wrong — both files are meant to exist — so
+`drydocs/port/port_rename_detect.py` now treats two files whose stems match modulo the `-rev<N>`
+suffix as one subject and never proposes a rename between them (PORT2, 2026-09-08). Keep the
+`<doc-id>-rev<N>.yaml` shape and that stays true; a capture named some other way is compared
+like any other file.
+
 ## Format (`drydocs.docgen.design_doc.feedback_yaml`)
 
 ```yaml

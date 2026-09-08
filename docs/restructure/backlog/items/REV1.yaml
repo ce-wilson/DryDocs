@@ -1,0 +1,51 @@
+id: REV1
+epic: drydocs-review-backflow
+title: "A script that prints a verdict prints its J63 provenance triple first - a review_provenance helper, the style rule, and a source-scan guard"
+type: task
+module: drydocs-review
+phase: 7
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- scripts/review_stamp.py
+- docs/style/review-provenance.md
+- tests/source_scan.py
+acceptance: |
+  Sweep and triage scripts emit verdicts (BROKEN, MOVED, HOLDS) with no reviewed_commit. On
+  2026-09-07 four ad hoc sweeps - a Control-M precedence sweep, a code-graph sweep, a data-flow
+  gate sweep and a source-connection sweep - each printed a verdict table, none printed the
+  commit, branch or port base it ran against, and the verdicts were read as facts about the
+  producer. Read against producer main at 43ba10fa, two gates called BROKEN were intact and the
+  gate said not to exist existed: the absent-here-is-not-broken failure
+  docs/style/review-provenance.md names, for the third time. scripts/review_stamp.py already
+  prints the block for a human to paste; the gap is that a script emitting verdicts does not
+  call it.
+
+  (a) A review_provenance() helper returns the J63 triple (reviewed_commit, reviewed_branch,
+      reviewed_port_base) as a value, importable rather than pasteable - either from
+      drydocs_core or exposed by the stamp script, whichever keeps the module boundary
+      (MODULE_MAP: pure resolve belongs in core).
+  (b) docs/style/review-provenance.md gains one rule: any script that prints a verdict prints
+      the triple first. The rule is a sentence, and the helper is what makes it cheap.
+  (c) A guard on the shape J37 and J66 already use: a script under scripts/ whose called_names
+      include a verdict-emitting print and NOT the provenance helper is flagged. It reads code,
+      never the prose around it (tests/source_scan.py), because the rule text itself names the
+      verdict words.
+  (d) The verdict vocabulary the guard recognises is listed in its docstring with the reason
+      each word is in it, so extending the list is a decision and not a patch.
+  (e) The close note states what this does NOT fix: a script run in another repo never sees
+      this guard, so the relay carries the rule as a sentence.
+notes: |
+  Groomed 2026-09-08 from IDEAS.md Idea-287 (base venue, desktop); source is the 2026-09-07
+  lineage-workstream transcription and its whole-set review (machine-local under
+  internal-local/research/, finding F2 and the section 1 reclassification table).
+
+  module drydocs-review (the helper and the guard) over docs (the style rule) - the idea named
+  both and the code half is the larger one; the style edit rides along. phase 7 with the review
+  toolkit. p2: the class has manufactured findings three times now, most expensively when the
+  verdicts were about another venue.
+
+  FIRST id in the REV series.
