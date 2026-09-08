@@ -8,7 +8,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on:
 - G114
 inputs:
@@ -56,3 +56,90 @@ notes: |
   G114 declined to bundle this on purpose, and the reason is the reason this item is sonnet and
   not haiku - governed renders make it a review-and-re-render job rather than a mechanical
   substitution.
+
+  CLOSED 2026-09-07 (Lane B, laptop, wip/G127-laptop).
+
+  (a) RE-MEASURED FIRST, with the guard's own SUPERSEDED_NAMES and _ALLOWED_IN_LINE imported
+      from tests/unit/test_database_names.py rather than restated - a second copy of that set
+      is the drift the guard exists to stop. The figure reproduces G114's dry run exactly:
+        drydocs_core/schema/provisioning/README.md      6
+        docs/design/drydocs-startup-refresh-runbook.md  5
+        docs/design/drydocs-project-review.md           6
+        docs/design/drydocs-core-runbook.md             1
+        internal/repo-README.md                         0
+        TOTAL                                          18
+      After the pass, all five read 0.
+
+  (b) THE ESCAPE WORDING, one admitted word (retired / superseded / renamed / historical) on
+      the SAME LINE as each dead name, because the guard is line-based and a heading two lines
+      up does not reach it. That detail cost three extra rounds here and is worth recording:
+      reflowing a paragraph to fit the word in repeatedly pushed the NAME onto a line whose
+      admission had stayed behind, so the count went 18 -> 12 -> 8 -> 2 -> 2 -> 0 with two of
+      those rounds fixing damage the previous round had done. Put the word beside the name,
+      not in the sentence.
+
+      Two edits are more than cosmetic and are called out because a reviewer should look at
+      them rather than skim: drydocs-project-review.md described the retired `ddcontext` in the
+      PRESENT TENSE ("The point of ddcontext IS architectural honesty", "its findings LAND in
+      ddcontext"), which teaches a reader an architecture that has not existed since the
+      2026-08-18 fold. Those moved to the past tense and gained a sentence saying where the
+      argument went - the `:Uncertain` label inside `drydocs`. The mechanism names themselves
+      are untouched, per the style guide's boundary.
+
+  (c) RENDERS RE-RUN, NOT HAND-EDITED: `render_design_doc.py docs/design/*.md`. Exactly the
+      three .html files whose .md changed came back modified and nothing else did, which is
+      also the evidence that the other renders were current beforehand. A second run produced
+      no further diff, so the render is idempotent at this tree.
+
+      DEVIATION FROM THE LANE B FENCE, deliberately, and the sender should know: the handoff
+      lists docs/design/*.html as derived renders Lane A regenerates once at close and nobody
+      commits by hand. This item's clause (c) requires the opposite in terms - "the committed
+      HTML matches its source afterwards" - so the three renders ARE committed here. The
+      conflict is not real: a correct render committed on this branch makes Lane A's close
+      render a no-op for these three files, which is strictly better than leaving them stale
+      through the merge. Note also that nothing in the suite would have caught the omission -
+      there is no committed-vs-source guard for docs/design/*.html (raised as an inbox item
+      from the O72 close, same session).
+
+  (d) THE GUARD NOW SCANS A DECLARED OPERATOR-DOC LIST: SCANNED_DOCS in
+      tests/unit/test_database_names.py, five entries each with its reason and each required to
+      EXIST, which is the EXTRA_DOCS idiom from test_runbook_currency.py and is there for that
+      idiom's reason - a document renamed out from under the list would otherwise drop out of
+      coverage silently. The .py scan and the doc scan now share one `_superseded_lines()`
+      reader, so the two surfaces cannot come to disagree about what the escape wording is.
+      Negative control run: a `ddcontext` line appended to the core runbook fails the new test
+      naming file and line; removed after.
+
+      PORT-BOUNDARY FOLLOW-UP, caught reviewing the guard before the close and fixed on
+      the same branch: `internal/repo-README.md` is in SCANNED_DOCS and `internal/` is
+      NEVER-PORT by definition, while this test file is canonical-producer and therefore
+      RUNS on the company tree. As first written, two of the new tests would have failed
+      there and read as BROKEN when they meant NOT HERE - J63's shape exactly, and not
+      hypothetical: the company's 2026-09-03 apply hit precisely this in
+      test_runbook_currency.py and emptied that file's EXTRA_DOCS as a "divergence",
+      losing three routing docs from coverage. The fix mirrors that file's
+      NEVER_PORT_ZONE_OF idiom rather than inventing a second one, including its
+      tracked-content probe (`git ls-files`, not `is_dir()` - a zone holding only
+      gitignored working state answers "present" to a directory check, which is how the
+      same question was got wrong once already). The rule stays two-sided, so a PRODUCER
+      that moves the file still fails. Proven both ways: with the zone reporting absent,
+      the entry drops out by name and four tests pass; with it present, a moved file is
+      refused by name.
+
+      Also added, and it is the one that matters: `test_the_doc_scan_reads_the_files_it_claims
+      _to` (J76). An empty file list passes the scan vacuously, and vacuously-green is exactly
+      the state this guard was in before today - it was passing while 18 offending lines sat in
+      files it never opened.
+
+  (e) HISTORY IS NOT SWEPT, and SCANNED_DOCS says so in a comment rather than leaving it to
+      judgement: changelogs, item notes, gate records and the port archive are dated records,
+      and rewriting them to satisfy a guard would make the record false to protect a test. The
+      list holds operator docs only - documents somebody reads TO OPERATE THE SYSTEM, where a
+      dead database name is an instruction to do the wrong thing. Two of the reworded lines are
+      themselves dated records (a 2026-07-02 volume's contents, a revision entry's four-name
+      enumeration); both kept their facts and gained the word "historical", which is the
+      admission the guard asks for and not a rewrite of what happened.
+
+  Gates at close: pytest -q 3616 passed / 14 skipped; ruff check and ruff format --check clean;
+  no diff left in the committed renders after re-rendering. No new tracked path, so no
+  PORT-MANIFEST row to hand back. Expected red on this tip: the roadmap fingerprint only.

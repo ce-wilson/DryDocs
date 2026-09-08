@@ -30,7 +30,8 @@
   spent two weeks telling readers to provision a four-database topology two of whose
   names were retired. Three defects fixed: the topology enumerations drop to
   **`drydocs` + `ddschema`**; `load-essential-graphrag` no longer documents a
-  `-> ddcontext` target the CLI stopped carrying at `4763e63e`; and **provisioning moves
+  `-> ddcontext` target (retired) that the CLI stopped carrying at `4763e63e`; and
+  **provisioning moves
   from step 4 to step 2**, because it CREATES the databases every later step connects to —
   `drydocs check` raises `DatabaseNotFound` on a DBMS where `drydocs` is absent, so the
   old order could not be followed on the fresh container it was written for. Why it
@@ -41,7 +42,8 @@
   it gains the standing `docs-verify` step it had been missing and a guard now fails
   if it drifts again (N6); on top of
   Rev 9, same day, where `ddlineage` retired — ADR 0002 X1 amendment: the topology enumerations drop to four
-  names (drydocs, ddcontext, ddschema, ddall) and a host still carrying the fifth
+  names (the historical set: drydocs, ddcontext, ddschema, ddall) and a host still
+  carrying the fifth
   drops it per Epic X; on top of Rev 8, same day, where
   the rollback promise retires on the laptop — the copy it pointed at no longer
   exists, so Appendix A stops offering a recovery path that isn't there; on top of
@@ -102,7 +104,8 @@
 > exists on the laptop.** Appendix A told every reader that `neo4j-drydocs-ee` was "kept
 > stopped as a rollback copy." On the laptop the container had already been removed, and
 > a Docker cleanup on 2026-08-04 (G52) deleted the anonymous data volume that had outlived
-> it — 1.35GB still holding a 2026-07-02 `drydocs`/`ddlineage`/`ddcontext`. Appendix A now
+> it — 1.35GB still holding a historical 2026-07-02 `drydocs`/`ddlineage`/`ddcontext`.
+> Appendix A now
 > says so plainly, because the failure mode of a stale rollback line is the worst kind:
 > it is read at exactly the moment someone needs the fallback, and it costs them the time
 > to go looking before they discover it is not there.
@@ -243,7 +246,8 @@ beyond a first-time pointer (G1's `provision.ps1` README owns it).
    session if unknown: `CREATE DATABASE … IF NOT EXISTS` is a no-op on a name that
    exists, so a green re-run proves nothing about a NEWLY ADDED one; and provisioning
    **never drops**, so a container older than a retirement still carries the dead name
-   after a green run (`ddlineage` 2026-08-04; `ddcontext` and the `ddall` composite
+   after a green run (retired: `ddlineage` 2026-08-04; `ddcontext` and the `ddall`
+   composite
    2026-08-18, at the G32/G102 fold). Dropping those is manual and per-machine; they are
    inert meanwhile.
 
@@ -444,7 +448,8 @@ is a shared fact, because the topology is ruled rather than local.
 
 **No rollback copy exists on the laptop.** The retired `neo4j-drydocs-ee` (7476/7689) container
 is long gone there, and the orphaned data volume that outlived it — still holding a 2026-07-02
-`drydocs`/`ddlineage`/`ddcontext` — was deleted 2026-08-04 (G52). A laptop recovery therefore
+`drydocs`/`ddlineage`/`ddcontext`, the historical set — was deleted 2026-08-04 (G52).
+A laptop recovery therefore
 restores from `neo4j-testdata` or a re-ingest, never from a second container. The desktop may
 still hold its own stopped copy; G50 is open there. Wherever two Neo4j containers are up,
 `docker port` is the only way to tell which one `.env` is talking to.
