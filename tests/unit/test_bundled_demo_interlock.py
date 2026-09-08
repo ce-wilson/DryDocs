@@ -44,6 +44,17 @@ APPLICATIONS = REPO / "config" / "taxonomy" / "business-application.yaml"
 #: reads the id from a normalized variable, not from this name — but the sample
 #: folder names are where a reader sees which application a folder is for, and
 #: they are what these tests read to say the two sides agree.
+#:
+#: THE `\d{5}` HERE IS THE SYNTHETIC WIDTH, NOT A CLAIM ABOUT THE REAL ONE, and
+#: it is deliberately left at five (CORE5, 2026-09-07). The demo folder names are
+#: built from the reserved block 70001-70099, which is five digits by
+#: construction, so this pattern is exact for its subject and widening it would
+#: only let a non-block value through unnoticed. The LIVE population is 4 to 7
+#: digits (config/source-mappings/pat-team-report.yaml, the `Seal IDs` row) —
+#: which is why the prose extractor and the publish-boundary scans DID widen, and
+#: why this comment exists: the same five-digit belief was written in four places
+#: and only one of them was ever right. If the demo ever mints an id outside the
+#: block, this is the line that has to move with it.
 _FOLDER_APP_ID = re.compile(r"^[A-Z]+-[A-Z]+-(\d{5})-")
 
 
