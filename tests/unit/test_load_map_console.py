@@ -81,6 +81,10 @@ def test_every_collection_in_the_json_has_a_consumer() -> None:
         "unchained_loaders": "UNCHAINED_LOADERS",
         "steps_with_uncommitted_inputs": "STEPS_WITH_UNCOMMITTED_INPUTS",
         "note": "GENERATOR_NOTE",
+        # N26 — the class-organized view and its two companions
+        "class_view": "CLASS_VIEW",
+        "layer_category_matrix": "LAYER_CATEGORY_MATRIX",
+        "provenance": "PROVENANCE",
     }
     keys = set(_data()) - {"note"}
     unrouted = keys - set(consumed)
@@ -107,6 +111,9 @@ def test_the_route_renders_each_collection_whole() -> None:
         "MAP_ENTRIES_WITHOUT_SOURCE",
         "UNCHAINED_LOADERS",
         "STEPS_WITH_UNCOMMITTED_INPUTS",
+        "CLASS_VIEW",
+        "LAYER_CATEGORY_MATRIX",
+        "PROVENANCE",
     ):
         assert f"{export}." in route, f"{export} is imported but never rendered by LoadMapRoute"
 

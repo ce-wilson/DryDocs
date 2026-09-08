@@ -257,6 +257,9 @@
       "name": "psgmgr Control-M replica DB (Oracle)",
       "layer": "data",
       "classification": "Internal",
+      "application_id": "[seal-id]",
+      "application_id_state": "placeholder",
+      "dataset_count": 10,
       "taxonomy_captures": []
     },
     {
@@ -264,6 +267,9 @@
       "name": "BMC Control-M (the orchestrator itself)",
       "layer": "technology",
       "classification": "Internal",
+      "application_id": "[seal-id]",
+      "application_id_state": "placeholder",
+      "dataset_count": 1,
       "taxonomy_captures": [
         "config/taxonomy/controlm.yaml"
       ]
@@ -273,6 +279,9 @@
       "name": "SEAL application inventory",
       "layer": "business",
       "classification": "Internal",
+      "application_id": "[seal-id]",
+      "application_id_state": "placeholder",
+      "dataset_count": 1,
       "taxonomy_captures": []
     },
     {
@@ -280,6 +289,9 @@
       "name": "Product Agility Tool (internal catalog UI)",
       "layer": "business",
       "classification": "Internal",
+      "application_id": "[seal-id]",
+      "application_id_state": "placeholder",
+      "dataset_count": 2,
       "taxonomy_captures": [
         "config/taxonomy/lob-product-team.yaml"
       ]
@@ -289,6 +301,9 @@
       "name": "ServiceNow (SaaS ITSM / CMDB)",
       "layer": "technology",
       "classification": "Internal",
+      "application_id": "[seal-id]",
+      "application_id_state": "placeholder",
+      "dataset_count": 1,
       "taxonomy_captures": []
     },
     {
@@ -296,6 +311,9 @@
       "name": "AutoSys (CA/Broadcom) — placeholder orchestrator",
       "layer": "technology",
       "classification": "Internal",
+      "application_id": "[seal-id]",
+      "application_id_state": "placeholder",
+      "dataset_count": 1,
       "taxonomy_captures": []
     },
     {
@@ -303,6 +321,9 @@
       "name": "AWS Airflow / MWAA — placeholder orchestrator",
       "layer": "technology",
       "classification": "Internal",
+      "application_id": "[seal-id]",
+      "application_id_state": "placeholder",
+      "dataset_count": 1,
       "taxonomy_captures": []
     },
     {
@@ -310,6 +331,9 @@
       "name": "DPL pipeline/dataset taxonomy registry",
       "layer": "technology",
       "classification": "Internal",
+      "application_id": "[seal-id]",
+      "application_id_state": "placeholder",
+      "dataset_count": 2,
       "taxonomy_captures": [
         "config/taxonomy/medallion-stages.yaml"
       ]
@@ -319,6 +343,9 @@
       "name": "Snowflake (data platform)",
       "layer": "data",
       "classification": "Internal",
+      "application_id": "[seal-id]",
+      "application_id_state": "placeholder",
+      "dataset_count": 3,
       "taxonomy_captures": []
     },
     {
@@ -326,6 +353,9 @@
       "name": "Enterprise data catalog (dataset/distribution registration)",
       "layer": "data",
       "classification": "Internal",
+      "application_id": "[seal-id]",
+      "application_id_state": "placeholder",
+      "dataset_count": 0,
       "taxonomy_captures": []
     },
     {
@@ -333,6 +363,9 @@
       "name": "Control-M execution hosts (rua collector)",
       "layer": "technology",
       "classification": "Internal",
+      "application_id": "[seal-id]",
+      "application_id_state": "placeholder",
+      "dataset_count": 1,
       "taxonomy_captures": []
     },
     {
@@ -340,6 +373,9 @@
       "name": "Company code repositories (Bitbucket/GitHub)",
       "layer": "technology",
       "classification": "Internal",
+      "application_id": "[seal-id]",
+      "application_id_state": "placeholder",
+      "dataset_count": 1,
       "taxonomy_captures": []
     },
     {
@@ -347,6 +383,9 @@
       "name": "Oracle DB schemas (data platform, placeholder)",
       "layer": "data",
       "classification": "Internal",
+      "application_id": "[seal-id]",
+      "application_id_state": "placeholder",
+      "dataset_count": 1,
       "taxonomy_captures": []
     },
     {
@@ -354,6 +393,9 @@
       "name": "DryDocs staging schema (our own derived store)",
       "layer": "data",
       "classification": "Internal",
+      "application_id": "[seal-id]",
+      "application_id_state": "placeholder",
+      "dataset_count": 1,
       "taxonomy_captures": []
     },
     {
@@ -361,6 +403,9 @@
       "name": "The DryDocs repo itself (repo-committed ledgers + derived captures)",
       "layer": "technology",
       "classification": "Internal-Public",
+      "application_id": "[seal-id]",
+      "application_id_state": "placeholder",
+      "dataset_count": 3,
       "taxonomy_captures": []
     },
     {
@@ -368,6 +413,9 @@
       "name": "Infrastructure inventory site (per-application server export)",
       "layer": "technology",
       "classification": "Internal",
+      "application_id": "[seal-id]",
+      "application_id_state": "placeholder",
+      "dataset_count": 1,
       "taxonomy_captures": [
         "config/taxonomy/server-location.yaml"
       ]
@@ -377,6 +425,9 @@
       "name": "MFTS (managed file transfer platform; Axway SecureTransport)",
       "layer": "technology",
       "classification": "Internal",
+      "application_id": "[seal-id]",
+      "application_id_state": "placeholder",
+      "dataset_count": 0,
       "taxonomy_captures": []
     },
     {
@@ -384,6 +435,9 @@
       "name": "FileMover (legacy file-transfer surface; replaced by OneMFT)",
       "layer": "technology",
       "classification": "Internal",
+      "application_id": "[seal-id]",
+      "application_id_state": "placeholder",
+      "dataset_count": 0,
       "taxonomy_captures": []
     },
     {
@@ -391,6 +445,9 @@
       "name": "OneMFT (current file-transfer surface; FileMover's successor)",
       "layer": "technology",
       "classification": "Internal",
+      "application_id": "[seal-id]",
+      "application_id_state": "placeholder",
+      "dataset_count": 0,
       "taxonomy_captures": []
     }
   ],
@@ -416,12 +473,16 @@
         {
           "id": "application-contains-folder",
           "status": "applied",
-          "label": "CONTAINS_FOLDER"
+          "label": "CONTAINS_FOLDER",
+          "from_node": "ControlMApplication",
+          "to_node": "ControlMFolder"
         },
         {
           "id": "folder-scheduled-on",
           "status": "confirmed",
-          "label": "SCHEDULED_ON"
+          "label": "SCHEDULED_ON",
+          "from_node": "ControlMFolder",
+          "to_node": "ControlMServer"
         }
       ],
       "loaders": [
@@ -434,7 +495,38 @@
             "ingest-controlm"
           ]
         }
-      ]
+      ],
+      "class_facts": {
+        "layer": "data",
+        "taxonomy_category": "Pipelines",
+        "acquisition": {
+          "mode": "automated",
+          "via": "db",
+          "format": null,
+          "drop_dir": null,
+          "drop_dir_base": null
+        },
+        "replica": {
+          "state": "replica",
+          "origin": "controlm",
+          "carrier": "psgmgr",
+          "corroboration": "authority: ADS"
+        },
+        "ontology_class": {
+          "state": "classified",
+          "classes": [
+            "ControlMApplication",
+            "ControlMFolder",
+            "ControlMServer"
+          ],
+          "relationships": [
+            "CONTAINS_FOLDER",
+            "SCHEDULED_ON"
+          ],
+          "pending": 0,
+          "reason": null
+        }
+      }
     },
     {
       "id": "controlm@[db].psgmgr.cm_def_vjob",
@@ -457,12 +549,16 @@
         {
           "id": "job-contains",
           "status": "applied",
-          "label": "CONTAINS_JOB"
+          "label": "CONTAINS_JOB",
+          "from_node": "ControlMFolder",
+          "to_node": "ControlMJob"
         },
         {
           "id": "app-code-defined-mapping",
           "status": "confirmed",
-          "label": "BELONGS_TO_APPLICATION"
+          "label": "BELONGS_TO_APPLICATION",
+          "from_node": "ControlMFolder",
+          "to_node": "Port"
         }
       ],
       "loaders": [
@@ -475,7 +571,38 @@
             "ingest-controlm"
           ]
         }
-      ]
+      ],
+      "class_facts": {
+        "layer": "data",
+        "taxonomy_category": "Pipelines",
+        "acquisition": {
+          "mode": "automated",
+          "via": "db",
+          "format": null,
+          "drop_dir": null,
+          "drop_dir_base": null
+        },
+        "replica": {
+          "state": "replica",
+          "origin": "controlm",
+          "carrier": "psgmgr",
+          "corroboration": "authority: ADS"
+        },
+        "ontology_class": {
+          "state": "classified",
+          "classes": [
+            "ControlMFolder",
+            "ControlMJob",
+            "Port"
+          ],
+          "relationships": [
+            "BELONGS_TO_APPLICATION",
+            "CONTAINS_JOB"
+          ],
+          "pending": 0,
+          "reason": null
+        }
+      }
     },
     {
       "id": "controlm@[db].psgmgr.cm_def_lnki_p_vw",
@@ -498,12 +625,16 @@
         {
           "id": "job-requires-in-condition",
           "status": "confirmed",
-          "label": "REQUIRES_IN_CONDITION"
+          "label": "REQUIRES_IN_CONDITION",
+          "from_node": "ControlMJob",
+          "to_node": "Condition"
         },
         {
           "id": "job-was-informed-by",
           "status": "confirmed",
-          "label": "WAS_INFORMED_BY"
+          "label": "WAS_INFORMED_BY",
+          "from_node": "ControlMJob",
+          "to_node": "ControlMJob"
         }
       ],
       "loaders": [
@@ -525,7 +656,37 @@
             "ingest-controlm"
           ]
         }
-      ]
+      ],
+      "class_facts": {
+        "layer": "data",
+        "taxonomy_category": "Pipelines",
+        "acquisition": {
+          "mode": "automated",
+          "via": "db",
+          "format": null,
+          "drop_dir": null,
+          "drop_dir_base": null
+        },
+        "replica": {
+          "state": "replica",
+          "origin": "controlm",
+          "carrier": "psgmgr",
+          "corroboration": "authority: ADS"
+        },
+        "ontology_class": {
+          "state": "classified",
+          "classes": [
+            "Condition",
+            "ControlMJob"
+          ],
+          "relationships": [
+            "REQUIRES_IN_CONDITION",
+            "WAS_INFORMED_BY"
+          ],
+          "pending": 0,
+          "reason": null
+        }
+      }
     },
     {
       "id": "controlm@[db].psgmgr.cm_def_lnko_p_vw",
@@ -548,7 +709,9 @@
         {
           "id": "job-emits-out-condition",
           "status": "confirmed",
-          "label": "EMITS_OUT_CONDITION"
+          "label": "EMITS_OUT_CONDITION",
+          "from_node": "ControlMJob",
+          "to_node": "Condition"
         }
       ],
       "loaders": [
@@ -561,7 +724,36 @@
             "ingest-controlm"
           ]
         }
-      ]
+      ],
+      "class_facts": {
+        "layer": "data",
+        "taxonomy_category": "Pipelines",
+        "acquisition": {
+          "mode": "automated",
+          "via": "db",
+          "format": null,
+          "drop_dir": null,
+          "drop_dir_base": null
+        },
+        "replica": {
+          "state": "replica",
+          "origin": "controlm",
+          "carrier": "psgmgr",
+          "corroboration": "authority: ADS"
+        },
+        "ontology_class": {
+          "state": "classified",
+          "classes": [
+            "Condition",
+            "ControlMJob"
+          ],
+          "relationships": [
+            "EMITS_OUT_CONDITION"
+          ],
+          "pending": 0,
+          "reason": null
+        }
+      }
     },
     {
       "id": "controlm@[db].psgmgr.cm_def_setvar_vw",
@@ -581,7 +773,31 @@
       },
       "taxonomy_captures": [],
       "ontology_mappings": [],
-      "loaders": []
+      "loaders": [],
+      "class_facts": {
+        "layer": "data",
+        "taxonomy_category": "Pipelines",
+        "acquisition": {
+          "mode": "automated",
+          "via": "db",
+          "format": null,
+          "drop_dir": null,
+          "drop_dir_base": null
+        },
+        "replica": {
+          "state": "replica",
+          "origin": "controlm",
+          "carrier": "psgmgr",
+          "corroboration": "authority: ADS"
+        },
+        "ontology_class": {
+          "state": "UNCLASSIFIED",
+          "classes": [],
+          "relationships": [],
+          "pending": 0,
+          "reason": "no map entry - asset_type default only"
+        }
+      }
     },
     {
       "id": "controlm@[db].psgmgr.cm_hosts",
@@ -604,17 +820,23 @@
         {
           "id": "job-runs-on-host-group",
           "status": "applied",
-          "label": "RUNS_ON"
+          "label": "RUNS_ON",
+          "from_node": "ControlMJob",
+          "to_node": "ControlMHostGroup"
         },
         {
           "id": "host-group-contains-host",
           "status": "applied",
-          "label": "CONTAINS_HOST"
+          "label": "CONTAINS_HOST",
+          "from_node": "ControlMHostGroup",
+          "to_node": "ExecutionHost"
         },
         {
           "id": "host-group-defined-on",
           "status": "confirmed",
-          "label": "DEFINED_ON"
+          "label": "DEFINED_ON",
+          "from_node": "ControlMHostGroup",
+          "to_node": "ControlMServer"
         }
       ],
       "loaders": [
@@ -627,7 +849,40 @@
             "ingest-controlm"
           ]
         }
-      ]
+      ],
+      "class_facts": {
+        "layer": "data",
+        "taxonomy_category": "Infrastructure",
+        "acquisition": {
+          "mode": "automated",
+          "via": "db",
+          "format": null,
+          "drop_dir": null,
+          "drop_dir_base": null
+        },
+        "replica": {
+          "state": "replica",
+          "origin": "controlm",
+          "carrier": "psgmgr",
+          "corroboration": "authority: ADS"
+        },
+        "ontology_class": {
+          "state": "classified",
+          "classes": [
+            "ControlMHostGroup",
+            "ControlMJob",
+            "ControlMServer",
+            "ExecutionHost"
+          ],
+          "relationships": [
+            "CONTAINS_HOST",
+            "DEFINED_ON",
+            "RUNS_ON"
+          ],
+          "pending": 0,
+          "reason": null
+        }
+      }
     },
     {
       "id": "controlm@[db].psgmgr.cm_avg_run",
@@ -650,10 +905,38 @@
         {
           "id": "job-runtime-stats-supplement",
           "status": "confirmed",
-          "label": null
+          "label": null,
+          "from_node": "ControlMJob",
+          "to_node": null
         }
       ],
-      "loaders": []
+      "loaders": [],
+      "class_facts": {
+        "layer": "data",
+        "taxonomy_category": "Pipelines",
+        "acquisition": {
+          "mode": "automated",
+          "via": "db",
+          "format": null,
+          "drop_dir": null,
+          "drop_dir_base": null
+        },
+        "replica": {
+          "state": "replica",
+          "origin": "controlm",
+          "carrier": "psgmgr",
+          "corroboration": "authority: ADS"
+        },
+        "ontology_class": {
+          "state": "classified",
+          "classes": [
+            "ControlMJob"
+          ],
+          "relationships": [],
+          "pending": 0,
+          "reason": null
+        }
+      }
     },
     {
       "id": "controlm@[db].psgmgr.cm_hist_vw",
@@ -676,10 +959,36 @@
         {
           "id": "jobrun-observation",
           "status": "proposed",
-          "label": "OBSERVES"
+          "label": "OBSERVES",
+          "from_node": "ControlMJobRun",
+          "to_node": "ControlMJob"
         }
       ],
-      "loaders": []
+      "loaders": [],
+      "class_facts": {
+        "layer": "data",
+        "taxonomy_category": "Pipelines",
+        "acquisition": {
+          "mode": "automated",
+          "via": "db",
+          "format": null,
+          "drop_dir": null,
+          "drop_dir_base": null
+        },
+        "replica": {
+          "state": "replica",
+          "origin": "controlm",
+          "carrier": "psgmgr",
+          "corroboration": "authority: ADS"
+        },
+        "ontology_class": {
+          "state": "UNCLASSIFIED",
+          "classes": [],
+          "relationships": [],
+          "pending": 1,
+          "reason": "1 map entry proposed, none ruled"
+        }
+      }
     },
     {
       "id": "hr@[db].psgmgr.hr_phone_exp",
@@ -699,7 +1008,31 @@
       },
       "taxonomy_captures": [],
       "ontology_mappings": [],
-      "loaders": []
+      "loaders": [],
+      "class_facts": {
+        "layer": "data",
+        "taxonomy_category": "People & Org",
+        "acquisition": {
+          "mode": "automated",
+          "via": "db",
+          "format": null,
+          "drop_dir": null,
+          "drop_dir_base": null
+        },
+        "replica": {
+          "state": "replica",
+          "origin": "hr",
+          "carrier": "psgmgr",
+          "corroboration": "authority: ADS"
+        },
+        "ontology_class": {
+          "state": "UNCLASSIFIED",
+          "classes": [],
+          "relationships": [],
+          "pending": 0,
+          "reason": "no map entry - asset_type default only"
+        }
+      }
     },
     {
       "id": "seal@[db].psgmgr.cm_escalation_db",
@@ -719,7 +1052,31 @@
       },
       "taxonomy_captures": [],
       "ontology_mappings": [],
-      "loaders": []
+      "loaders": [],
+      "class_facts": {
+        "layer": "data",
+        "taxonomy_category": "ITSM / Gov",
+        "acquisition": {
+          "mode": "automated",
+          "via": "db",
+          "format": null,
+          "drop_dir": null,
+          "drop_dir_base": null
+        },
+        "replica": {
+          "state": "replica",
+          "origin": "seal",
+          "carrier": "psgmgr",
+          "corroboration": "authority: ADS"
+        },
+        "ontology_class": {
+          "state": "UNCLASSIFIED",
+          "classes": [],
+          "relationships": [],
+          "pending": 0,
+          "reason": "no map entry - asset_type default only"
+        }
+      }
     },
     {
       "id": "controlm:deftable-xml-export",
@@ -739,7 +1096,31 @@
       },
       "taxonomy_captures": [],
       "ontology_mappings": [],
-      "loaders": []
+      "loaders": [],
+      "class_facts": {
+        "layer": "technology",
+        "taxonomy_category": "Pipelines",
+        "acquisition": {
+          "mode": "manual",
+          "via": null,
+          "format": "ascii",
+          "drop_dir": "controlm-xml/",
+          "drop_dir_base": "data_root"
+        },
+        "replica": {
+          "state": "original",
+          "origin": "controlm",
+          "carrier": "controlm",
+          "corroboration": null
+        },
+        "ontology_class": {
+          "state": "UNCLASSIFIED",
+          "classes": [],
+          "relationships": [],
+          "pending": 0,
+          "reason": "no map entry - asset_type default only"
+        }
+      }
     },
     {
       "id": "autosys:export",
@@ -759,7 +1140,31 @@
       },
       "taxonomy_captures": [],
       "ontology_mappings": [],
-      "loaders": []
+      "loaders": [],
+      "class_facts": {
+        "layer": "technology",
+        "taxonomy_category": "Pipelines",
+        "acquisition": {
+          "mode": "manual",
+          "via": null,
+          "format": "ascii",
+          "drop_dir": "autosys/",
+          "drop_dir_base": "data_root"
+        },
+        "replica": {
+          "state": "original",
+          "origin": "autosys",
+          "carrier": "autosys",
+          "corroboration": null
+        },
+        "ontology_class": {
+          "state": "UNCLASSIFIED",
+          "classes": [],
+          "relationships": [],
+          "pending": 0,
+          "reason": "no map entry - asset_type default only"
+        }
+      }
     },
     {
       "id": "airflow:dag-export",
@@ -779,7 +1184,31 @@
       },
       "taxonomy_captures": [],
       "ontology_mappings": [],
-      "loaders": []
+      "loaders": [],
+      "class_facts": {
+        "layer": "technology",
+        "taxonomy_category": "Pipelines",
+        "acquisition": {
+          "mode": "manual",
+          "via": null,
+          "format": "ascii",
+          "drop_dir": "airflow/",
+          "drop_dir_base": "data_root"
+        },
+        "replica": {
+          "state": "original",
+          "origin": "airflow",
+          "carrier": "airflow",
+          "corroboration": null
+        },
+        "ontology_class": {
+          "state": "UNCLASSIFIED",
+          "classes": [],
+          "relationships": [],
+          "pending": 0,
+          "reason": "no map entry - asset_type default only"
+        }
+      }
     },
     {
       "id": "seal:app-extract",
@@ -804,42 +1233,58 @@
         {
           "id": "requires-scheduler",
           "status": "rejected",
-          "label": "REQUIRES_SCHEDULER"
+          "label": "REQUIRES_SCHEDULER",
+          "from_node": "Port",
+          "to_node": "SchedulerKind"
         },
         {
           "id": "application-as-dataproduct",
           "status": "applied",
-          "label": null
+          "label": null,
+          "from_node": "BusinessApplication",
+          "to_node": null
         },
         {
           "id": "seal-tom-attribution",
           "status": "applied",
-          "label": "WAS_ATTRIBUTED_TO"
+          "label": "WAS_ATTRIBUTED_TO",
+          "from_node": "BusinessApplication",
+          "to_node": "Employee"
         },
         {
           "id": "app-has-port",
           "status": "confirmed",
-          "label": "HAS_PORT"
+          "label": "HAS_PORT",
+          "from_node": "BusinessApplication",
+          "to_node": "Port"
         },
         {
           "id": "app-has-membership",
           "status": "confirmed",
-          "label": "HAS_MEMBERSHIP"
+          "label": "HAS_MEMBERSHIP",
+          "from_node": "BusinessApplication",
+          "to_node": "Membership"
         },
         {
           "id": "membership-of-role",
           "status": "confirmed",
-          "label": "OF_ROLE"
+          "label": "OF_ROLE",
+          "from_node": "Membership",
+          "to_node": "Role"
         },
         {
           "id": "membership-held-by",
           "status": "confirmed",
-          "label": "HELD_BY"
+          "label": "HELD_BY",
+          "from_node": "Membership",
+          "to_node": "Employee"
         },
         {
           "id": "business-application-identity",
           "status": "confirmed",
-          "label": null
+          "label": null,
+          "from_node": "BusinessApplication",
+          "to_node": null
         }
       ],
       "loaders": [
@@ -872,7 +1317,43 @@
             "refresh-reference"
           ]
         }
-      ]
+      ],
+      "class_facts": {
+        "layer": "business",
+        "taxonomy_category": "Software / Apps",
+        "acquisition": {
+          "mode": "manual",
+          "via": null,
+          "format": "csv",
+          "drop_dir": "seal/",
+          "drop_dir_base": "data_root"
+        },
+        "replica": {
+          "state": "original",
+          "origin": "seal",
+          "carrier": "seal",
+          "corroboration": null
+        },
+        "ontology_class": {
+          "state": "classified",
+          "classes": [
+            "BusinessApplication",
+            "Employee",
+            "Membership",
+            "Port",
+            "Role"
+          ],
+          "relationships": [
+            "HAS_MEMBERSHIP",
+            "HAS_PORT",
+            "HELD_BY",
+            "OF_ROLE",
+            "WAS_ATTRIBUTED_TO"
+          ],
+          "pending": 0,
+          "reason": null
+        }
+      }
     },
     {
       "id": "pat:product-catalog",
@@ -895,42 +1376,58 @@
         {
           "id": "product-cabinet-attribution",
           "status": "confirmed",
-          "label": null
+          "label": null,
+          "from_node": "Product | AreaProduct",
+          "to_node": "Employee"
         },
         {
           "id": "lob-has-product-line",
           "status": "confirmed",
-          "label": "HAS_PRODUCT_LINE"
+          "label": "HAS_PRODUCT_LINE",
+          "from_node": "CatalogLOB",
+          "to_node": "ProductLine"
         },
         {
           "id": "product-line-has-product",
           "status": "confirmed",
-          "label": "HAS_PRODUCT"
+          "label": "HAS_PRODUCT",
+          "from_node": "ProductLine",
+          "to_node": "Product"
         },
         {
           "id": "product-has-dev-team",
           "status": "confirmed",
-          "label": "HAS_DEV_TEAM"
+          "label": "HAS_DEV_TEAM",
+          "from_node": "Product",
+          "to_node": "DevTeam"
         },
         {
           "id": "lob-reconciles-to-segment",
           "status": "confirmed",
-          "label": "RECONCILES_TO"
+          "label": "RECONCILES_TO",
+          "from_node": "CatalogLOB",
+          "to_node": "BusinessSegment"
         },
         {
           "id": "product-has-application",
           "status": "confirmed",
-          "label": "HAS_APPLICATION"
+          "label": "HAS_APPLICATION",
+          "from_node": "Product",
+          "to_node": "BusinessApplication"
         },
         {
           "id": "sub-lob-org-unit",
           "status": "rejected",
-          "label": "HAS_SUB_LOB"
+          "label": "HAS_SUB_LOB",
+          "from_node": "CatalogLOB",
+          "to_node": "CatalogSubLOB"
         },
         {
           "id": "catalog-lob-reconciles-segment",
           "status": "rejected",
-          "label": "RECONCILES_TO"
+          "label": "RECONCILES_TO",
+          "from_node": "CatalogLOB",
+          "to_node": "BusinessSegment"
         }
       ],
       "loaders": [
@@ -981,7 +1478,46 @@
             "refresh-reference"
           ]
         }
-      ]
+      ],
+      "class_facts": {
+        "layer": "business",
+        "taxonomy_category": "Product",
+        "acquisition": {
+          "mode": "manual",
+          "via": null,
+          "format": "csv",
+          "drop_dir": "pat/",
+          "drop_dir_base": "data_root"
+        },
+        "replica": {
+          "state": "original",
+          "origin": "pat",
+          "carrier": "pat",
+          "corroboration": null
+        },
+        "ontology_class": {
+          "state": "classified",
+          "classes": [
+            "BusinessApplication",
+            "BusinessSegment",
+            "CatalogLOB",
+            "DevTeam",
+            "Employee",
+            "Product",
+            "Product | AreaProduct",
+            "ProductLine"
+          ],
+          "relationships": [
+            "HAS_APPLICATION",
+            "HAS_DEV_TEAM",
+            "HAS_PRODUCT",
+            "HAS_PRODUCT_LINE",
+            "RECONCILES_TO"
+          ],
+          "pending": 0,
+          "reason": null
+        }
+      }
     },
     {
       "id": "pat:people-report",
@@ -1004,12 +1540,16 @@
         {
           "id": "dev-team-supports",
           "status": "confirmed",
-          "label": "SUPPORTS"
+          "label": "SUPPORTS",
+          "from_node": "DevTeam",
+          "to_node": "AreaProduct"
         },
         {
           "id": "dev-team-develops-app",
           "status": "confirmed",
-          "label": "WAS_ATTRIBUTED_TO"
+          "label": "WAS_ATTRIBUTED_TO",
+          "from_node": "BusinessApplication",
+          "to_node": "DevTeam"
         }
       ],
       "loaders": [
@@ -1033,7 +1573,38 @@
             "refresh-teams"
           ]
         }
-      ]
+      ],
+      "class_facts": {
+        "layer": "business",
+        "taxonomy_category": "People & Org",
+        "acquisition": {
+          "mode": "manual",
+          "via": null,
+          "format": "csv",
+          "drop_dir": "pat/",
+          "drop_dir_base": "data_root"
+        },
+        "replica": {
+          "state": "original",
+          "origin": "pat",
+          "carrier": "pat",
+          "corroboration": null
+        },
+        "ontology_class": {
+          "state": "classified",
+          "classes": [
+            "AreaProduct",
+            "BusinessApplication",
+            "DevTeam"
+          ],
+          "relationships": [
+            "SUPPORTS",
+            "WAS_ATTRIBUTED_TO"
+          ],
+          "pending": 0,
+          "reason": null
+        }
+      }
     },
     {
       "id": "snow:cmdb-ci-classes",
@@ -1053,7 +1624,31 @@
       },
       "taxonomy_captures": [],
       "ontology_mappings": [],
-      "loaders": []
+      "loaders": [],
+      "class_facts": {
+        "layer": "technology",
+        "taxonomy_category": "ITSM / Gov",
+        "acquisition": {
+          "mode": "manual",
+          "via": null,
+          "format": "csv",
+          "drop_dir": "snow/",
+          "drop_dir_base": "data_root"
+        },
+        "replica": {
+          "state": "original",
+          "origin": "snow",
+          "carrier": "snow",
+          "corroboration": null
+        },
+        "ontology_class": {
+          "state": "UNCLASSIFIED",
+          "classes": [],
+          "relationships": [],
+          "pending": 0,
+          "reason": "no map entry - asset_type default only"
+        }
+      }
     },
     {
       "id": "repo:software-registry",
@@ -1083,7 +1678,31 @@
             "load-software-registry"
           ]
         }
-      ]
+      ],
+      "class_facts": {
+        "layer": "technology",
+        "taxonomy_category": "Software / Apps",
+        "acquisition": {
+          "mode": "manual",
+          "via": null,
+          "format": "ascii",
+          "drop_dir": "config/taxonomy/",
+          "drop_dir_base": "repo"
+        },
+        "replica": {
+          "state": "original",
+          "origin": "repo",
+          "carrier": "repo",
+          "corroboration": null
+        },
+        "ontology_class": {
+          "state": "UNCLASSIFIED",
+          "classes": [],
+          "relationships": [],
+          "pending": 0,
+          "reason": "no map entry - asset_type default only"
+        }
+      }
     },
     {
       "id": "repo:depgraph-snapshot",
@@ -1106,7 +1725,9 @@
         {
           "id": "self-documentation-code-graph",
           "status": "confirmed",
-          "label": null
+          "label": null,
+          "from_node": "Project",
+          "to_node": "CodeModule"
         }
       ],
       "loaders": [
@@ -1128,7 +1749,34 @@
             "load-code-snapshot"
           ]
         }
-      ]
+      ],
+      "class_facts": {
+        "layer": "technology",
+        "taxonomy_category": "Architecture",
+        "acquisition": {
+          "mode": "manual",
+          "via": null,
+          "format": "json",
+          "drop_dir": "knowledge/depgraph-snapshots/",
+          "drop_dir_base": "repo"
+        },
+        "replica": {
+          "state": "original",
+          "origin": "repo",
+          "carrier": "repo",
+          "corroboration": null
+        },
+        "ontology_class": {
+          "state": "classified",
+          "classes": [
+            "CodeModule",
+            "Project"
+          ],
+          "relationships": [],
+          "pending": 0,
+          "reason": null
+        }
+      }
     },
     {
       "id": "repo:design-docs",
@@ -1151,7 +1799,9 @@
         {
           "id": "doc-traceability-feedback",
           "status": "confirmed",
-          "label": null
+          "label": null,
+          "from_node": "DesignDoc",
+          "to_node": "DocSection | Requirement | Component | TestCase | FeedbackNote | Employee"
         }
       ],
       "loaders": [
@@ -1182,7 +1832,34 @@
             "load-doc-traceability"
           ]
         }
-      ]
+      ],
+      "class_facts": {
+        "layer": "technology",
+        "taxonomy_category": "Architecture",
+        "acquisition": {
+          "mode": "manual",
+          "via": null,
+          "format": "ascii",
+          "drop_dir": "docs/design/",
+          "drop_dir_base": "repo"
+        },
+        "replica": {
+          "state": "original",
+          "origin": "repo",
+          "carrier": "repo",
+          "corroboration": null
+        },
+        "ontology_class": {
+          "state": "classified",
+          "classes": [
+            "DesignDoc",
+            "DocSection | Requirement | Component | TestCase | FeedbackNote | Employee"
+          ],
+          "relationships": [],
+          "pending": 0,
+          "reason": null
+        }
+      }
     },
     {
       "id": "exec-hosts:rua-bundle",
@@ -1202,7 +1879,31 @@
       },
       "taxonomy_captures": [],
       "ontology_mappings": [],
-      "loaders": []
+      "loaders": [],
+      "class_facts": {
+        "layer": "technology",
+        "taxonomy_category": "Infrastructure",
+        "acquisition": {
+          "mode": "manual",
+          "via": null,
+          "format": "archive",
+          "drop_dir": "rua/incoming/",
+          "drop_dir_base": "data_root"
+        },
+        "replica": {
+          "state": "original",
+          "origin": "exec-hosts",
+          "carrier": "exec-hosts",
+          "corroboration": null
+        },
+        "ontology_class": {
+          "state": "UNCLASSIFIED",
+          "classes": [],
+          "relationships": [],
+          "pending": 0,
+          "reason": "no map entry - asset_type default only"
+        }
+      }
     },
     {
       "id": "dpl:pipeline-registry",
@@ -1222,7 +1923,31 @@
       },
       "taxonomy_captures": [],
       "ontology_mappings": [],
-      "loaders": []
+      "loaders": [],
+      "class_facts": {
+        "layer": "technology",
+        "taxonomy_category": "Pipelines",
+        "acquisition": {
+          "mode": "manual",
+          "via": null,
+          "format": "json",
+          "drop_dir": "dpl-registry/",
+          "drop_dir_base": "data_root"
+        },
+        "replica": {
+          "state": "original",
+          "origin": "dpl",
+          "carrier": "dpl",
+          "corroboration": null
+        },
+        "ontology_class": {
+          "state": "UNCLASSIFIED",
+          "classes": [],
+          "relationships": [],
+          "pending": 0,
+          "reason": "no map entry - asset_type default only"
+        }
+      }
     },
     {
       "id": "dpl:dataset-registry",
@@ -1242,7 +1967,31 @@
       },
       "taxonomy_captures": [],
       "ontology_mappings": [],
-      "loaders": []
+      "loaders": [],
+      "class_facts": {
+        "layer": "technology",
+        "taxonomy_category": "Data Asset",
+        "acquisition": {
+          "mode": "manual",
+          "via": null,
+          "format": "json",
+          "drop_dir": "dpl-registry/",
+          "drop_dir_base": "data_root"
+        },
+        "replica": {
+          "state": "original",
+          "origin": "dpl",
+          "carrier": "dpl",
+          "corroboration": null
+        },
+        "ontology_class": {
+          "state": "UNCLASSIFIED",
+          "classes": [],
+          "relationships": [],
+          "pending": 0,
+          "reason": "no map entry - asset_type default only"
+        }
+      }
     },
     {
       "id": "catalog@[db].[schema].datasets_v",
@@ -1262,7 +2011,31 @@
       },
       "taxonomy_captures": [],
       "ontology_mappings": [],
-      "loaders": []
+      "loaders": [],
+      "class_facts": {
+        "layer": "data",
+        "taxonomy_category": "Data Asset",
+        "acquisition": {
+          "mode": "automated",
+          "via": "db",
+          "format": null,
+          "drop_dir": null,
+          "drop_dir_base": null
+        },
+        "replica": {
+          "state": "replica",
+          "origin": "catalog",
+          "carrier": "snowflake",
+          "corroboration": "authority: ADS"
+        },
+        "ontology_class": {
+          "state": "UNCLASSIFIED",
+          "classes": [],
+          "relationships": [],
+          "pending": 0,
+          "reason": "no map entry - asset_type default only"
+        }
+      }
     },
     {
       "id": "catalog@[db].[schema].distributions_v",
@@ -1282,7 +2055,31 @@
       },
       "taxonomy_captures": [],
       "ontology_mappings": [],
-      "loaders": []
+      "loaders": [],
+      "class_facts": {
+        "layer": "data",
+        "taxonomy_category": "Data Asset",
+        "acquisition": {
+          "mode": "automated",
+          "via": "db",
+          "format": null,
+          "drop_dir": null,
+          "drop_dir_base": null
+        },
+        "replica": {
+          "state": "replica",
+          "origin": "catalog",
+          "carrier": "snowflake",
+          "corroboration": "authority: ADS"
+        },
+        "ontology_class": {
+          "state": "UNCLASSIFIED",
+          "classes": [],
+          "relationships": [],
+          "pending": 0,
+          "reason": "no map entry - asset_type default only"
+        }
+      }
     },
     {
       "id": "bitbucket:repo-objects-manifest",
@@ -1302,7 +2099,31 @@
       },
       "taxonomy_captures": [],
       "ontology_mappings": [],
-      "loaders": []
+      "loaders": [],
+      "class_facts": {
+        "layer": "technology",
+        "taxonomy_category": "Software / Apps",
+        "acquisition": {
+          "mode": "manual",
+          "via": null,
+          "format": "ascii",
+          "drop_dir": "bitbucket/",
+          "drop_dir_base": "data_root"
+        },
+        "replica": {
+          "state": "original",
+          "origin": "bitbucket",
+          "carrier": "bitbucket",
+          "corroboration": null
+        },
+        "ontology_class": {
+          "state": "UNCLASSIFIED",
+          "classes": [],
+          "relationships": [],
+          "pending": 0,
+          "reason": "no map entry - asset_type default only"
+        }
+      }
     },
     {
       "id": "oracle:schema-inventory",
@@ -1327,10 +2148,36 @@
         {
           "id": "oracle-schema-asset",
           "status": "proposed",
-          "label": "USED"
+          "label": "USED",
+          "from_node": "ControlMJob",
+          "to_node": "DataAsset"
         }
       ],
-      "loaders": []
+      "loaders": [],
+      "class_facts": {
+        "layer": "data",
+        "taxonomy_category": "Data Asset",
+        "acquisition": {
+          "mode": "automated",
+          "via": "db",
+          "format": null,
+          "drop_dir": null,
+          "drop_dir_base": null
+        },
+        "replica": {
+          "state": "original",
+          "origin": "oracle",
+          "carrier": "oracle",
+          "corroboration": null
+        },
+        "ontology_class": {
+          "state": "UNCLASSIFIED",
+          "classes": [],
+          "relationships": [],
+          "pending": 1,
+          "reason": "1 map entry proposed, none ruled"
+        }
+      }
     },
     {
       "id": "snowflake:schema-inventory",
@@ -1350,7 +2197,31 @@
       },
       "taxonomy_captures": [],
       "ontology_mappings": [],
-      "loaders": []
+      "loaders": [],
+      "class_facts": {
+        "layer": "data",
+        "taxonomy_category": "Data Asset",
+        "acquisition": {
+          "mode": "automated",
+          "via": "db",
+          "format": null,
+          "drop_dir": null,
+          "drop_dir_base": null
+        },
+        "replica": {
+          "state": "original",
+          "origin": "snowflake",
+          "carrier": "snowflake",
+          "corroboration": null
+        },
+        "ontology_class": {
+          "state": "UNCLASSIFIED",
+          "classes": [],
+          "relationships": [],
+          "pending": 0,
+          "reason": "no map entry - asset_type default only"
+        }
+      }
     },
     {
       "id": "controlm@[db].drydocs_stg.stg_app_fact",
@@ -1373,7 +2244,9 @@
         {
           "id": "job-seal-app-ref",
           "status": "confirmed",
-          "label": "WAS_ASSOCIATED_WITH"
+          "label": "WAS_ASSOCIATED_WITH",
+          "from_node": "ControlMJob",
+          "to_node": "BusinessApplication"
         }
       ],
       "loaders": [
@@ -1386,7 +2259,36 @@
             "load-folder-attribution"
           ]
         }
-      ]
+      ],
+      "class_facts": {
+        "layer": "data",
+        "taxonomy_category": "Software / Apps",
+        "acquisition": {
+          "mode": "automated",
+          "via": "db",
+          "format": null,
+          "drop_dir": null,
+          "drop_dir_base": null
+        },
+        "replica": {
+          "state": "replica-uncorroborated",
+          "origin": "controlm",
+          "carrier": "drydocs-stg",
+          "corroboration": null
+        },
+        "ontology_class": {
+          "state": "classified",
+          "classes": [
+            "BusinessApplication",
+            "ControlMJob"
+          ],
+          "relationships": [
+            "WAS_ASSOCIATED_WITH"
+          ],
+          "pending": 0,
+          "reason": null
+        }
+      }
     },
     {
       "id": "infra:server-export",
@@ -1416,7 +2318,31 @@
             "load-server-inventory"
           ]
         }
-      ]
+      ],
+      "class_facts": {
+        "layer": "technology",
+        "taxonomy_category": "Infrastructure",
+        "acquisition": {
+          "mode": "manual",
+          "via": null,
+          "format": "csv",
+          "drop_dir": "internal/server-inventory/",
+          "drop_dir_base": "repo"
+        },
+        "replica": {
+          "state": "original",
+          "origin": "infra",
+          "carrier": "infra",
+          "corroboration": null
+        },
+        "ontology_class": {
+          "state": "UNCLASSIFIED",
+          "classes": [],
+          "relationships": [],
+          "pending": 0,
+          "reason": "no map entry - asset_type default only"
+        }
+      }
     },
     {
       "id": "bmc-docs",
@@ -1449,22 +2375,30 @@
         {
           "id": "doc-describes-product",
           "status": "applied",
-          "label": "DESCRIBES"
+          "label": "DESCRIBES",
+          "from_node": "Document",
+          "to_node": "SoftwareProduct"
         },
         {
           "id": "doc-chunk-part-of",
           "status": "applied",
-          "label": "PART_OF"
+          "label": "PART_OF",
+          "from_node": "Chunk",
+          "to_node": "Document"
         },
         {
           "id": "doc-first-chunk",
           "status": "applied",
-          "label": "FIRST_CHUNK"
+          "label": "FIRST_CHUNK",
+          "from_node": "Document",
+          "to_node": "Chunk"
         },
         {
           "id": "doc-next-chunk",
           "status": "applied",
-          "label": "NEXT_CHUNK"
+          "label": "NEXT_CHUNK",
+          "from_node": "Chunk",
+          "to_node": "Chunk"
         }
       ],
       "loaders": [
@@ -1477,7 +2411,40 @@
             "load-bmc-docs"
           ]
         }
-      ]
+      ],
+      "class_facts": {
+        "layer": null,
+        "taxonomy_category": null,
+        "acquisition": {
+          "mode": "undeclared",
+          "via": null,
+          "format": null,
+          "drop_dir": null,
+          "drop_dir_base": null
+        },
+        "replica": {
+          "state": "original",
+          "origin": null,
+          "carrier": null,
+          "corroboration": null
+        },
+        "ontology_class": {
+          "state": "classified",
+          "classes": [
+            "Chunk",
+            "Document",
+            "SoftwareProduct"
+          ],
+          "relationships": [
+            "DESCRIBES",
+            "FIRST_CHUNK",
+            "NEXT_CHUNK",
+            "PART_OF"
+          ],
+          "pending": 0,
+          "reason": null
+        }
+      }
     },
     {
       "id": "bmc-docs-controlm-utilities",
@@ -1510,7 +2477,9 @@
         {
           "id": "vendor-docs-entity-core",
           "status": "confirmed",
-          "label": null
+          "label": null,
+          "from_node": "ControlMUtility",
+          "to_node": "SoftwareProduct | Document | DocSection | ControlMJob"
         }
       ],
       "loaders": [
@@ -1523,7 +2492,34 @@
             "load-vendor-docs"
           ]
         }
-      ]
+      ],
+      "class_facts": {
+        "layer": null,
+        "taxonomy_category": null,
+        "acquisition": {
+          "mode": "undeclared",
+          "via": null,
+          "format": null,
+          "drop_dir": null,
+          "drop_dir_base": null
+        },
+        "replica": {
+          "state": "original",
+          "origin": null,
+          "carrier": null,
+          "corroboration": null
+        },
+        "ontology_class": {
+          "state": "classified",
+          "classes": [
+            "ControlMUtility",
+            "SoftwareProduct | Document | DocSection | ControlMJob"
+          ],
+          "relationships": [],
+          "pending": 0,
+          "reason": null
+        }
+      }
     },
     {
       "id": "neo4j-docs-essential-graphrag",
@@ -1563,7 +2559,31 @@
             "load-essential-graphrag"
           ]
         }
-      ]
+      ],
+      "class_facts": {
+        "layer": null,
+        "taxonomy_category": null,
+        "acquisition": {
+          "mode": "undeclared",
+          "via": null,
+          "format": null,
+          "drop_dir": null,
+          "drop_dir_base": null
+        },
+        "replica": {
+          "state": "original",
+          "origin": null,
+          "carrier": null,
+          "corroboration": null
+        },
+        "ontology_class": {
+          "state": "UNCLASSIFIED",
+          "classes": [],
+          "relationships": [],
+          "pending": 0,
+          "reason": "no map entry - asset_type default only"
+        }
+      }
     },
     {
       "id": "cdo-frameworks",
@@ -1593,7 +2613,31 @@
       "taxonomy_path": null,
       "taxonomy_captures": [],
       "ontology_mappings": [],
-      "loaders": []
+      "loaders": [],
+      "class_facts": {
+        "layer": null,
+        "taxonomy_category": null,
+        "acquisition": {
+          "mode": "undeclared",
+          "via": null,
+          "format": null,
+          "drop_dir": null,
+          "drop_dir_base": null
+        },
+        "replica": {
+          "state": "original",
+          "origin": null,
+          "carrier": null,
+          "corroboration": null
+        },
+        "ontology_class": {
+          "state": "UNCLASSIFIED",
+          "classes": [],
+          "relationships": [],
+          "pending": 0,
+          "reason": "no map entry - asset_type default only"
+        }
+      }
     },
     {
       "id": "seal-pat-scrape",
@@ -1626,10 +2670,41 @@
         {
           "id": "seal-doc-source-of-record",
           "status": "confirmed",
-          "label": "HAD_PRIMARY_SOURCE"
+          "label": "HAD_PRIMARY_SOURCE",
+          "from_node": "BusinessApplication",
+          "to_node": "Document"
         }
       ],
-      "loaders": []
+      "loaders": [],
+      "class_facts": {
+        "layer": null,
+        "taxonomy_category": null,
+        "acquisition": {
+          "mode": "undeclared",
+          "via": null,
+          "format": null,
+          "drop_dir": null,
+          "drop_dir_base": null
+        },
+        "replica": {
+          "state": "original",
+          "origin": null,
+          "carrier": null,
+          "corroboration": null
+        },
+        "ontology_class": {
+          "state": "classified",
+          "classes": [
+            "BusinessApplication",
+            "Document"
+          ],
+          "relationships": [
+            "HAD_PRIMARY_SOURCE"
+          ],
+          "pending": 0,
+          "reason": null
+        }
+      }
     },
     {
       "id": "adhoc-sme-email",
@@ -1659,7 +2734,31 @@
       "taxonomy_path": null,
       "taxonomy_captures": [],
       "ontology_mappings": [],
-      "loaders": []
+      "loaders": [],
+      "class_facts": {
+        "layer": null,
+        "taxonomy_category": null,
+        "acquisition": {
+          "mode": "undeclared",
+          "via": null,
+          "format": null,
+          "drop_dir": null,
+          "drop_dir_base": null
+        },
+        "replica": {
+          "state": "original",
+          "origin": null,
+          "carrier": null,
+          "corroboration": null
+        },
+        "ontology_class": {
+          "state": "UNCLASSIFIED",
+          "classes": [],
+          "relationships": [],
+          "pending": 0,
+          "reason": "no map entry - asset_type default only"
+        }
+      }
     },
     {
       "id": "ops-email-extracts",
@@ -1692,7 +2791,9 @@
         {
           "id": "email-concerns-subject",
           "status": "confirmed",
-          "label": "CONCERNS"
+          "label": "CONCERNS",
+          "from_node": "Document",
+          "to_node": "ControlMFolder | ETLProcess"
         }
       ],
       "loaders": [
@@ -1705,7 +2806,36 @@
             "load-email-extracts"
           ]
         }
-      ]
+      ],
+      "class_facts": {
+        "layer": null,
+        "taxonomy_category": null,
+        "acquisition": {
+          "mode": "undeclared",
+          "via": null,
+          "format": null,
+          "drop_dir": null,
+          "drop_dir_base": null
+        },
+        "replica": {
+          "state": "original",
+          "origin": null,
+          "carrier": null,
+          "corroboration": null
+        },
+        "ontology_class": {
+          "state": "classified",
+          "classes": [
+            "ControlMFolder | ETLProcess",
+            "Document"
+          ],
+          "relationships": [
+            "CONCERNS"
+          ],
+          "pending": 0,
+          "reason": null
+        }
+      }
     },
     {
       "id": "jpmc-reports",
@@ -1735,7 +2865,31 @@
       "taxonomy_path": null,
       "taxonomy_captures": [],
       "ontology_mappings": [],
-      "loaders": []
+      "loaders": [],
+      "class_facts": {
+        "layer": null,
+        "taxonomy_category": null,
+        "acquisition": {
+          "mode": "undeclared",
+          "via": null,
+          "format": null,
+          "drop_dir": null,
+          "drop_dir_base": null
+        },
+        "replica": {
+          "state": "original",
+          "origin": null,
+          "carrier": null,
+          "corroboration": null
+        },
+        "ontology_class": {
+          "state": "UNCLASSIFIED",
+          "classes": [],
+          "relationships": [],
+          "pending": 0,
+          "reason": "no map entry - asset_type default only"
+        }
+      }
     },
     {
       "id": "chase-leadership-scrape",
@@ -1765,7 +2919,31 @@
       "taxonomy_path": null,
       "taxonomy_captures": [],
       "ontology_mappings": [],
-      "loaders": []
+      "loaders": [],
+      "class_facts": {
+        "layer": null,
+        "taxonomy_category": null,
+        "acquisition": {
+          "mode": "undeclared",
+          "via": null,
+          "format": null,
+          "drop_dir": null,
+          "drop_dir_base": null
+        },
+        "replica": {
+          "state": "original",
+          "origin": null,
+          "carrier": null,
+          "corroboration": null
+        },
+        "ontology_class": {
+          "state": "UNCLASSIFIED",
+          "classes": [],
+          "relationships": [],
+          "pending": 0,
+          "reason": "no map entry - asset_type default only"
+        }
+      }
     },
     {
       "id": "mwaa-implementation-docs",
@@ -1795,7 +2973,31 @@
       "taxonomy_path": "technology/orchestration/airflow",
       "taxonomy_captures": [],
       "ontology_mappings": [],
-      "loaders": []
+      "loaders": [],
+      "class_facts": {
+        "layer": null,
+        "taxonomy_category": null,
+        "acquisition": {
+          "mode": "undeclared",
+          "via": null,
+          "format": null,
+          "drop_dir": null,
+          "drop_dir_base": null
+        },
+        "replica": {
+          "state": "original",
+          "origin": null,
+          "carrier": null,
+          "corroboration": null
+        },
+        "ontology_class": {
+          "state": "UNCLASSIFIED",
+          "classes": [],
+          "relationships": [],
+          "pending": 0,
+          "reason": "no map entry - asset_type default only"
+        }
+      }
     }
   ],
   "retired": [
@@ -1944,6 +3146,8 @@
       "id": "dl-contact-point",
       "status": "proposed",
       "label": "HAS_CONTACT_POINT",
+      "from_node": "BusinessApplication | DevTeam | AreaProduct",
+      "to_node": "DistributionList",
       "source": "outlook-dl",
       "exemption": "N8 ruling 2026-08-06 — NO FEED BY DESIGN, deliberately unregistered. The DL is defined only in Outlook/Exchange; no extract exists and none is planned (the gate's store-as-source discussion: HAS_CONTACT_POINT rows are steward-authored in the O24 store, which IS the source). Registering `outlook-dl` would fabricate a machine feed the source_evidence above explicitly says does not exist. The load-map render displays this reason (the SOURCELESS_LOADERS written-reason idiom); if the email-dl gate ever rules for extraction-fed candidate rows, that ruling replaces this exemption with a real registration."
     },
@@ -1951,48 +3155,64 @@
       "id": "catalog-producedby-app",
       "status": "proposed",
       "label": "~ — deliberately unnamed until C1 rules target AND shape together",
+      "from_node": "DataAsset",
+      "to_node": "OPEN — BusinessApplication or its BatchProcessing Port (gate clause C1)",
       "source": "snowflake-data-catalog"
     },
     {
       "id": "catalog-business-term",
       "status": "proposed",
       "label": "IS_REPRESENTED_AS",
+      "from_node": "CatalogElement",
+      "to_node": "CatalogBusinessTerm",
       "source": "glossary"
     },
     {
       "id": "doc-supersedes-doc",
       "status": "proposed",
       "label": "SUPERSEDES",
+      "from_node": "Document",
+      "to_node": "Document",
       "source": "any multi-version corpus (the internal process pages are the named case)"
     },
     {
       "id": "script-scm-status",
       "status": "proposed",
       "label": null,
+      "from_node": "Script",
+      "to_node": "Script",
       "source": "cmdline-nfr-vetting live case (2026-07-21)"
     },
     {
       "id": "script-identity-binding",
       "status": "proposed",
       "label": null,
+      "from_node": "Script",
+      "to_node": "Script",
       "source": "CMDLINE resolution chain (resolved command lines) + G56 mount capture (storage scope derived) + G97 payload build (the boundary as built)"
     },
     {
       "id": "company-has-sub-organization",
       "status": "proposed",
       "label": "HAS_SUB_ORGANIZATION",
+      "from_node": "Company",
+      "to_node": "Company",
       "source": "doc-source-registry#jpmc-reports"
     },
     {
       "id": "org-change-original",
       "status": "proposed",
       "label": "ORIGINAL_ORGANIZATION",
+      "from_node": "OrgChangeEvent",
+      "to_node": "BusinessSegment",
       "source": "doc-source-registry#jpmc-reports"
     },
     {
       "id": "org-change-resulting",
       "status": "proposed",
       "label": "RESULTING_ORGANIZATION",
+      "from_node": "OrgChangeEvent",
+      "to_node": "BusinessSegment",
       "source": "doc-source-registry#jpmc-reports"
     }
   ],
@@ -2019,5 +3239,1371 @@
       "searched": "drydocs/data/samples",
       "exemption": "generated per machine from the capture by scripts/build_seal_samples.py — run it after checkout; the fixture derives from internal SEAL data shapes and is deliberately not committed"
     }
-  ]
+  ],
+  "class_view": {
+    "asset_type": {
+      "field": "asset_type",
+      "constant": true,
+      "value": "dcat:Dataset",
+      "rows": 30,
+      "of": 30
+    },
+    "layers": [
+      {
+        "layer": "business",
+        "systems": [
+          {
+            "system": "pat",
+            "name": "Product Agility Tool (internal catalog UI)",
+            "application_id": "[seal-id]",
+            "application_id_state": "placeholder",
+            "dataset_count": 2,
+            "classes": [
+              {
+                "ontology_class": "AreaProduct + BusinessApplication + DevTeam",
+                "datasets": [
+                  {
+                    "id": "pat:people-report",
+                    "taxonomy_category": "People & Org",
+                    "acquisition_mode": "manual",
+                    "authority": "SOR",
+                    "replica": "original",
+                    "confirmed": true,
+                    "loader_count": 2,
+                    "ontology_class": {
+                      "state": "classified",
+                      "classes": [
+                        "AreaProduct",
+                        "BusinessApplication",
+                        "DevTeam"
+                      ],
+                      "relationships": [
+                        "SUPPORTS",
+                        "WAS_ATTRIBUTED_TO"
+                      ],
+                      "pending": 0,
+                      "reason": null
+                    }
+                  }
+                ]
+              },
+              {
+                "ontology_class": "BusinessApplication + BusinessSegment + CatalogLOB + DevTeam + Employee + Product + Product | AreaProduct + ProductLine",
+                "datasets": [
+                  {
+                    "id": "pat:product-catalog",
+                    "taxonomy_category": "Product",
+                    "acquisition_mode": "manual",
+                    "authority": "SOR",
+                    "replica": "original",
+                    "confirmed": true,
+                    "loader_count": 5,
+                    "ontology_class": {
+                      "state": "classified",
+                      "classes": [
+                        "BusinessApplication",
+                        "BusinessSegment",
+                        "CatalogLOB",
+                        "DevTeam",
+                        "Employee",
+                        "Product",
+                        "Product | AreaProduct",
+                        "ProductLine"
+                      ],
+                      "relationships": [
+                        "HAS_APPLICATION",
+                        "HAS_DEV_TEAM",
+                        "HAS_PRODUCT",
+                        "HAS_PRODUCT_LINE",
+                        "RECONCILES_TO"
+                      ],
+                      "pending": 0,
+                      "reason": null
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "system": "seal",
+            "name": "SEAL application inventory",
+            "application_id": "[seal-id]",
+            "application_id_state": "placeholder",
+            "dataset_count": 1,
+            "classes": [
+              {
+                "ontology_class": "BusinessApplication + Employee + Membership + Port + Role",
+                "datasets": [
+                  {
+                    "id": "seal:app-extract",
+                    "taxonomy_category": "Software / Apps",
+                    "acquisition_mode": "manual",
+                    "authority": "SOR",
+                    "replica": "original",
+                    "confirmed": true,
+                    "loader_count": 3,
+                    "ontology_class": {
+                      "state": "classified",
+                      "classes": [
+                        "BusinessApplication",
+                        "Employee",
+                        "Membership",
+                        "Port",
+                        "Role"
+                      ],
+                      "relationships": [
+                        "HAS_MEMBERSHIP",
+                        "HAS_PORT",
+                        "HELD_BY",
+                        "OF_ROLE",
+                        "WAS_ATTRIBUTED_TO"
+                      ],
+                      "pending": 0,
+                      "reason": null
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "layer": "data",
+        "systems": [
+          {
+            "system": "catalog",
+            "name": "Enterprise data catalog (dataset/distribution registration)",
+            "application_id": "[seal-id]",
+            "application_id_state": "placeholder",
+            "dataset_count": 0,
+            "classes": []
+          },
+          {
+            "system": "drydocs-stg",
+            "name": "DryDocs staging schema (our own derived store)",
+            "application_id": "[seal-id]",
+            "application_id_state": "placeholder",
+            "dataset_count": 1,
+            "classes": [
+              {
+                "ontology_class": "BusinessApplication + ControlMJob",
+                "datasets": [
+                  {
+                    "id": "controlm@[db].drydocs_stg.stg_app_fact",
+                    "taxonomy_category": "Software / Apps",
+                    "acquisition_mode": "automated",
+                    "authority": null,
+                    "replica": "replica-uncorroborated",
+                    "confirmed": true,
+                    "loader_count": 1,
+                    "ontology_class": {
+                      "state": "classified",
+                      "classes": [
+                        "BusinessApplication",
+                        "ControlMJob"
+                      ],
+                      "relationships": [
+                        "WAS_ASSOCIATED_WITH"
+                      ],
+                      "pending": 0,
+                      "reason": null
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "system": "oracle",
+            "name": "Oracle DB schemas (data platform, placeholder)",
+            "application_id": "[seal-id]",
+            "application_id_state": "placeholder",
+            "dataset_count": 1,
+            "classes": [
+              {
+                "ontology_class": "UNCLASSIFIED",
+                "datasets": [
+                  {
+                    "id": "oracle:schema-inventory",
+                    "taxonomy_category": "Data Asset",
+                    "acquisition_mode": "automated",
+                    "authority": "SOR",
+                    "replica": "original",
+                    "confirmed": false,
+                    "loader_count": 0,
+                    "ontology_class": {
+                      "state": "UNCLASSIFIED",
+                      "classes": [],
+                      "relationships": [],
+                      "pending": 1,
+                      "reason": "1 map entry proposed, none ruled"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "system": "psgmgr",
+            "name": "psgmgr Control-M replica DB (Oracle)",
+            "application_id": "[seal-id]",
+            "application_id_state": "placeholder",
+            "dataset_count": 10,
+            "classes": [
+              {
+                "ontology_class": "Condition + ControlMJob",
+                "datasets": [
+                  {
+                    "id": "controlm@[db].psgmgr.cm_def_lnki_p_vw",
+                    "taxonomy_category": "Pipelines",
+                    "acquisition_mode": "automated",
+                    "authority": "ADS",
+                    "replica": "replica",
+                    "confirmed": true,
+                    "loader_count": 2,
+                    "ontology_class": {
+                      "state": "classified",
+                      "classes": [
+                        "Condition",
+                        "ControlMJob"
+                      ],
+                      "relationships": [
+                        "REQUIRES_IN_CONDITION",
+                        "WAS_INFORMED_BY"
+                      ],
+                      "pending": 0,
+                      "reason": null
+                    }
+                  },
+                  {
+                    "id": "controlm@[db].psgmgr.cm_def_lnko_p_vw",
+                    "taxonomy_category": "Pipelines",
+                    "acquisition_mode": "automated",
+                    "authority": "ADS",
+                    "replica": "replica",
+                    "confirmed": true,
+                    "loader_count": 1,
+                    "ontology_class": {
+                      "state": "classified",
+                      "classes": [
+                        "Condition",
+                        "ControlMJob"
+                      ],
+                      "relationships": [
+                        "EMITS_OUT_CONDITION"
+                      ],
+                      "pending": 0,
+                      "reason": null
+                    }
+                  }
+                ]
+              },
+              {
+                "ontology_class": "ControlMApplication + ControlMFolder + ControlMServer",
+                "datasets": [
+                  {
+                    "id": "controlm@[db].psgmgr.cm_def_vtab",
+                    "taxonomy_category": "Pipelines",
+                    "acquisition_mode": "automated",
+                    "authority": "ADS",
+                    "replica": "replica",
+                    "confirmed": true,
+                    "loader_count": 1,
+                    "ontology_class": {
+                      "state": "classified",
+                      "classes": [
+                        "ControlMApplication",
+                        "ControlMFolder",
+                        "ControlMServer"
+                      ],
+                      "relationships": [
+                        "CONTAINS_FOLDER",
+                        "SCHEDULED_ON"
+                      ],
+                      "pending": 0,
+                      "reason": null
+                    }
+                  }
+                ]
+              },
+              {
+                "ontology_class": "ControlMFolder + ControlMJob + Port",
+                "datasets": [
+                  {
+                    "id": "controlm@[db].psgmgr.cm_def_vjob",
+                    "taxonomy_category": "Pipelines",
+                    "acquisition_mode": "automated",
+                    "authority": "ADS",
+                    "replica": "replica",
+                    "confirmed": true,
+                    "loader_count": 1,
+                    "ontology_class": {
+                      "state": "classified",
+                      "classes": [
+                        "ControlMFolder",
+                        "ControlMJob",
+                        "Port"
+                      ],
+                      "relationships": [
+                        "BELONGS_TO_APPLICATION",
+                        "CONTAINS_JOB"
+                      ],
+                      "pending": 0,
+                      "reason": null
+                    }
+                  }
+                ]
+              },
+              {
+                "ontology_class": "ControlMHostGroup + ControlMJob + ControlMServer + ExecutionHost",
+                "datasets": [
+                  {
+                    "id": "controlm@[db].psgmgr.cm_hosts",
+                    "taxonomy_category": "Infrastructure",
+                    "acquisition_mode": "automated",
+                    "authority": "ADS",
+                    "replica": "replica",
+                    "confirmed": true,
+                    "loader_count": 1,
+                    "ontology_class": {
+                      "state": "classified",
+                      "classes": [
+                        "ControlMHostGroup",
+                        "ControlMJob",
+                        "ControlMServer",
+                        "ExecutionHost"
+                      ],
+                      "relationships": [
+                        "CONTAINS_HOST",
+                        "DEFINED_ON",
+                        "RUNS_ON"
+                      ],
+                      "pending": 0,
+                      "reason": null
+                    }
+                  }
+                ]
+              },
+              {
+                "ontology_class": "ControlMJob",
+                "datasets": [
+                  {
+                    "id": "controlm@[db].psgmgr.cm_avg_run",
+                    "taxonomy_category": "Pipelines",
+                    "acquisition_mode": "automated",
+                    "authority": "ADS",
+                    "replica": "replica",
+                    "confirmed": true,
+                    "loader_count": 0,
+                    "ontology_class": {
+                      "state": "classified",
+                      "classes": [
+                        "ControlMJob"
+                      ],
+                      "relationships": [],
+                      "pending": 0,
+                      "reason": null
+                    }
+                  }
+                ]
+              },
+              {
+                "ontology_class": "UNCLASSIFIED",
+                "datasets": [
+                  {
+                    "id": "controlm@[db].psgmgr.cm_def_setvar_vw",
+                    "taxonomy_category": "Pipelines",
+                    "acquisition_mode": "automated",
+                    "authority": "ADS",
+                    "replica": "replica",
+                    "confirmed": true,
+                    "loader_count": 0,
+                    "ontology_class": {
+                      "state": "UNCLASSIFIED",
+                      "classes": [],
+                      "relationships": [],
+                      "pending": 0,
+                      "reason": "no map entry - asset_type default only"
+                    }
+                  },
+                  {
+                    "id": "controlm@[db].psgmgr.cm_hist_vw",
+                    "taxonomy_category": "Pipelines",
+                    "acquisition_mode": "automated",
+                    "authority": "ADS",
+                    "replica": "replica",
+                    "confirmed": false,
+                    "loader_count": 0,
+                    "ontology_class": {
+                      "state": "UNCLASSIFIED",
+                      "classes": [],
+                      "relationships": [],
+                      "pending": 1,
+                      "reason": "1 map entry proposed, none ruled"
+                    }
+                  },
+                  {
+                    "id": "hr@[db].psgmgr.hr_phone_exp",
+                    "taxonomy_category": "People & Org",
+                    "acquisition_mode": "automated",
+                    "authority": "ADS",
+                    "replica": "replica",
+                    "confirmed": false,
+                    "loader_count": 0,
+                    "ontology_class": {
+                      "state": "UNCLASSIFIED",
+                      "classes": [],
+                      "relationships": [],
+                      "pending": 0,
+                      "reason": "no map entry - asset_type default only"
+                    }
+                  },
+                  {
+                    "id": "seal@[db].psgmgr.cm_escalation_db",
+                    "taxonomy_category": "ITSM / Gov",
+                    "acquisition_mode": "automated",
+                    "authority": "ADS",
+                    "replica": "replica",
+                    "confirmed": false,
+                    "loader_count": 0,
+                    "ontology_class": {
+                      "state": "UNCLASSIFIED",
+                      "classes": [],
+                      "relationships": [],
+                      "pending": 0,
+                      "reason": "no map entry - asset_type default only"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "system": "snowflake",
+            "name": "Snowflake (data platform)",
+            "application_id": "[seal-id]",
+            "application_id_state": "placeholder",
+            "dataset_count": 3,
+            "classes": [
+              {
+                "ontology_class": "UNCLASSIFIED",
+                "datasets": [
+                  {
+                    "id": "catalog@[db].[schema].datasets_v",
+                    "taxonomy_category": "Data Asset",
+                    "acquisition_mode": "automated",
+                    "authority": "ADS",
+                    "replica": "replica",
+                    "confirmed": false,
+                    "loader_count": 0,
+                    "ontology_class": {
+                      "state": "UNCLASSIFIED",
+                      "classes": [],
+                      "relationships": [],
+                      "pending": 0,
+                      "reason": "no map entry - asset_type default only"
+                    }
+                  },
+                  {
+                    "id": "catalog@[db].[schema].distributions_v",
+                    "taxonomy_category": "Data Asset",
+                    "acquisition_mode": "automated",
+                    "authority": "ADS",
+                    "replica": "replica",
+                    "confirmed": false,
+                    "loader_count": 0,
+                    "ontology_class": {
+                      "state": "UNCLASSIFIED",
+                      "classes": [],
+                      "relationships": [],
+                      "pending": 0,
+                      "reason": "no map entry - asset_type default only"
+                    }
+                  },
+                  {
+                    "id": "snowflake:schema-inventory",
+                    "taxonomy_category": "Data Asset",
+                    "acquisition_mode": "automated",
+                    "authority": "SOR",
+                    "replica": "original",
+                    "confirmed": false,
+                    "loader_count": 0,
+                    "ontology_class": {
+                      "state": "UNCLASSIFIED",
+                      "classes": [],
+                      "relationships": [],
+                      "pending": 0,
+                      "reason": "no map entry - asset_type default only"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "layer": "technology",
+        "systems": [
+          {
+            "system": "airflow",
+            "name": "AWS Airflow / MWAA — placeholder orchestrator",
+            "application_id": "[seal-id]",
+            "application_id_state": "placeholder",
+            "dataset_count": 1,
+            "classes": [
+              {
+                "ontology_class": "UNCLASSIFIED",
+                "datasets": [
+                  {
+                    "id": "airflow:dag-export",
+                    "taxonomy_category": "Pipelines",
+                    "acquisition_mode": "manual",
+                    "authority": "SOR",
+                    "replica": "original",
+                    "confirmed": true,
+                    "loader_count": 0,
+                    "ontology_class": {
+                      "state": "UNCLASSIFIED",
+                      "classes": [],
+                      "relationships": [],
+                      "pending": 0,
+                      "reason": "no map entry - asset_type default only"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "system": "autosys",
+            "name": "AutoSys (CA/Broadcom) — placeholder orchestrator",
+            "application_id": "[seal-id]",
+            "application_id_state": "placeholder",
+            "dataset_count": 1,
+            "classes": [
+              {
+                "ontology_class": "UNCLASSIFIED",
+                "datasets": [
+                  {
+                    "id": "autosys:export",
+                    "taxonomy_category": "Pipelines",
+                    "acquisition_mode": "manual",
+                    "authority": "SOR",
+                    "replica": "original",
+                    "confirmed": true,
+                    "loader_count": 0,
+                    "ontology_class": {
+                      "state": "UNCLASSIFIED",
+                      "classes": [],
+                      "relationships": [],
+                      "pending": 0,
+                      "reason": "no map entry - asset_type default only"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "system": "bitbucket",
+            "name": "Company code repositories (Bitbucket/GitHub)",
+            "application_id": "[seal-id]",
+            "application_id_state": "placeholder",
+            "dataset_count": 1,
+            "classes": [
+              {
+                "ontology_class": "UNCLASSIFIED",
+                "datasets": [
+                  {
+                    "id": "bitbucket:repo-objects-manifest",
+                    "taxonomy_category": "Software / Apps",
+                    "acquisition_mode": "manual",
+                    "authority": "SOR",
+                    "replica": "original",
+                    "confirmed": true,
+                    "loader_count": 0,
+                    "ontology_class": {
+                      "state": "UNCLASSIFIED",
+                      "classes": [],
+                      "relationships": [],
+                      "pending": 0,
+                      "reason": "no map entry - asset_type default only"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "system": "controlm",
+            "name": "BMC Control-M (the orchestrator itself)",
+            "application_id": "[seal-id]",
+            "application_id_state": "placeholder",
+            "dataset_count": 1,
+            "classes": [
+              {
+                "ontology_class": "UNCLASSIFIED",
+                "datasets": [
+                  {
+                    "id": "controlm:deftable-xml-export",
+                    "taxonomy_category": "Pipelines",
+                    "acquisition_mode": "manual",
+                    "authority": "SOR",
+                    "replica": "original",
+                    "confirmed": false,
+                    "loader_count": 0,
+                    "ontology_class": {
+                      "state": "UNCLASSIFIED",
+                      "classes": [],
+                      "relationships": [],
+                      "pending": 0,
+                      "reason": "no map entry - asset_type default only"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "system": "dpl",
+            "name": "DPL pipeline/dataset taxonomy registry",
+            "application_id": "[seal-id]",
+            "application_id_state": "placeholder",
+            "dataset_count": 2,
+            "classes": [
+              {
+                "ontology_class": "UNCLASSIFIED",
+                "datasets": [
+                  {
+                    "id": "dpl:dataset-registry",
+                    "taxonomy_category": "Data Asset",
+                    "acquisition_mode": "manual",
+                    "authority": "SOR",
+                    "replica": "original",
+                    "confirmed": true,
+                    "loader_count": 0,
+                    "ontology_class": {
+                      "state": "UNCLASSIFIED",
+                      "classes": [],
+                      "relationships": [],
+                      "pending": 0,
+                      "reason": "no map entry - asset_type default only"
+                    }
+                  },
+                  {
+                    "id": "dpl:pipeline-registry",
+                    "taxonomy_category": "Pipelines",
+                    "acquisition_mode": "manual",
+                    "authority": "SOR",
+                    "replica": "original",
+                    "confirmed": true,
+                    "loader_count": 0,
+                    "ontology_class": {
+                      "state": "UNCLASSIFIED",
+                      "classes": [],
+                      "relationships": [],
+                      "pending": 0,
+                      "reason": "no map entry - asset_type default only"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "system": "exec-hosts",
+            "name": "Control-M execution hosts (rua collector)",
+            "application_id": "[seal-id]",
+            "application_id_state": "placeholder",
+            "dataset_count": 1,
+            "classes": [
+              {
+                "ontology_class": "UNCLASSIFIED",
+                "datasets": [
+                  {
+                    "id": "exec-hosts:rua-bundle",
+                    "taxonomy_category": "Infrastructure",
+                    "acquisition_mode": "manual",
+                    "authority": "SOR",
+                    "replica": "original",
+                    "confirmed": true,
+                    "loader_count": 0,
+                    "ontology_class": {
+                      "state": "UNCLASSIFIED",
+                      "classes": [],
+                      "relationships": [],
+                      "pending": 0,
+                      "reason": "no map entry - asset_type default only"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "system": "filemover",
+            "name": "FileMover (legacy file-transfer surface; replaced by OneMFT)",
+            "application_id": "[seal-id]",
+            "application_id_state": "placeholder",
+            "dataset_count": 0,
+            "classes": []
+          },
+          {
+            "system": "infra",
+            "name": "Infrastructure inventory site (per-application server export)",
+            "application_id": "[seal-id]",
+            "application_id_state": "placeholder",
+            "dataset_count": 1,
+            "classes": [
+              {
+                "ontology_class": "UNCLASSIFIED",
+                "datasets": [
+                  {
+                    "id": "infra:server-export",
+                    "taxonomy_category": "Infrastructure",
+                    "acquisition_mode": "manual",
+                    "authority": "SOR",
+                    "replica": "original",
+                    "confirmed": true,
+                    "loader_count": 1,
+                    "ontology_class": {
+                      "state": "UNCLASSIFIED",
+                      "classes": [],
+                      "relationships": [],
+                      "pending": 0,
+                      "reason": "no map entry - asset_type default only"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "system": "mfts",
+            "name": "MFTS (managed file transfer platform; Axway SecureTransport)",
+            "application_id": "[seal-id]",
+            "application_id_state": "placeholder",
+            "dataset_count": 0,
+            "classes": []
+          },
+          {
+            "system": "onemft",
+            "name": "OneMFT (current file-transfer surface; FileMover's successor)",
+            "application_id": "[seal-id]",
+            "application_id_state": "placeholder",
+            "dataset_count": 0,
+            "classes": []
+          },
+          {
+            "system": "repo",
+            "name": "The DryDocs repo itself (repo-committed ledgers + derived captures)",
+            "application_id": "[seal-id]",
+            "application_id_state": "placeholder",
+            "dataset_count": 3,
+            "classes": [
+              {
+                "ontology_class": "CodeModule + Project",
+                "datasets": [
+                  {
+                    "id": "repo:depgraph-snapshot",
+                    "taxonomy_category": "Architecture",
+                    "acquisition_mode": "manual",
+                    "authority": null,
+                    "replica": "original",
+                    "confirmed": true,
+                    "loader_count": 2,
+                    "ontology_class": {
+                      "state": "classified",
+                      "classes": [
+                        "CodeModule",
+                        "Project"
+                      ],
+                      "relationships": [],
+                      "pending": 0,
+                      "reason": null
+                    }
+                  }
+                ]
+              },
+              {
+                "ontology_class": "DesignDoc + DocSection | Requirement | Component | TestCase | FeedbackNote | Employee",
+                "datasets": [
+                  {
+                    "id": "repo:design-docs",
+                    "taxonomy_category": "Architecture",
+                    "acquisition_mode": "manual",
+                    "authority": "SOR",
+                    "replica": "original",
+                    "confirmed": true,
+                    "loader_count": 3,
+                    "ontology_class": {
+                      "state": "classified",
+                      "classes": [
+                        "DesignDoc",
+                        "DocSection | Requirement | Component | TestCase | FeedbackNote | Employee"
+                      ],
+                      "relationships": [],
+                      "pending": 0,
+                      "reason": null
+                    }
+                  }
+                ]
+              },
+              {
+                "ontology_class": "UNCLASSIFIED",
+                "datasets": [
+                  {
+                    "id": "repo:software-registry",
+                    "taxonomy_category": "Software / Apps",
+                    "acquisition_mode": "manual",
+                    "authority": "SOR",
+                    "replica": "original",
+                    "confirmed": true,
+                    "loader_count": 1,
+                    "ontology_class": {
+                      "state": "UNCLASSIFIED",
+                      "classes": [],
+                      "relationships": [],
+                      "pending": 0,
+                      "reason": "no map entry - asset_type default only"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "system": "snow",
+            "name": "ServiceNow (SaaS ITSM / CMDB)",
+            "application_id": "[seal-id]",
+            "application_id_state": "placeholder",
+            "dataset_count": 1,
+            "classes": [
+              {
+                "ontology_class": "UNCLASSIFIED",
+                "datasets": [
+                  {
+                    "id": "snow:cmdb-ci-classes",
+                    "taxonomy_category": "ITSM / Gov",
+                    "acquisition_mode": "manual",
+                    "authority": "SOR",
+                    "replica": "original",
+                    "confirmed": false,
+                    "loader_count": 0,
+                    "ontology_class": {
+                      "state": "UNCLASSIFIED",
+                      "classes": [],
+                      "relationships": [],
+                      "pending": 0,
+                      "reason": "no map entry - asset_type default only"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "layer": "no layer",
+        "systems": [
+          {
+            "system": null,
+            "name": "doc-ledger corpora (config/doc-source-registry.yaml)",
+            "application_id": null,
+            "application_id_state": "absent",
+            "dataset_count": 10,
+            "classes": [
+              {
+                "ontology_class": "BusinessApplication + Document",
+                "datasets": [
+                  {
+                    "id": "seal-pat-scrape",
+                    "taxonomy_category": null,
+                    "acquisition_mode": "undeclared",
+                    "authority": null,
+                    "replica": "original",
+                    "confirmed": false,
+                    "loader_count": 0,
+                    "ontology_class": {
+                      "state": "classified",
+                      "classes": [
+                        "BusinessApplication",
+                        "Document"
+                      ],
+                      "relationships": [
+                        "HAD_PRIMARY_SOURCE"
+                      ],
+                      "pending": 0,
+                      "reason": null
+                    }
+                  }
+                ]
+              },
+              {
+                "ontology_class": "Chunk + Document + SoftwareProduct",
+                "datasets": [
+                  {
+                    "id": "bmc-docs",
+                    "taxonomy_category": null,
+                    "acquisition_mode": "undeclared",
+                    "authority": null,
+                    "replica": "original",
+                    "confirmed": true,
+                    "loader_count": 1,
+                    "ontology_class": {
+                      "state": "classified",
+                      "classes": [
+                        "Chunk",
+                        "Document",
+                        "SoftwareProduct"
+                      ],
+                      "relationships": [
+                        "DESCRIBES",
+                        "FIRST_CHUNK",
+                        "NEXT_CHUNK",
+                        "PART_OF"
+                      ],
+                      "pending": 0,
+                      "reason": null
+                    }
+                  }
+                ]
+              },
+              {
+                "ontology_class": "ControlMFolder | ETLProcess + Document",
+                "datasets": [
+                  {
+                    "id": "ops-email-extracts",
+                    "taxonomy_category": null,
+                    "acquisition_mode": "undeclared",
+                    "authority": null,
+                    "replica": "original",
+                    "confirmed": true,
+                    "loader_count": 1,
+                    "ontology_class": {
+                      "state": "classified",
+                      "classes": [
+                        "ControlMFolder | ETLProcess",
+                        "Document"
+                      ],
+                      "relationships": [
+                        "CONCERNS"
+                      ],
+                      "pending": 0,
+                      "reason": null
+                    }
+                  }
+                ]
+              },
+              {
+                "ontology_class": "ControlMUtility + SoftwareProduct | Document | DocSection | ControlMJob",
+                "datasets": [
+                  {
+                    "id": "bmc-docs-controlm-utilities",
+                    "taxonomy_category": null,
+                    "acquisition_mode": "undeclared",
+                    "authority": null,
+                    "replica": "original",
+                    "confirmed": false,
+                    "loader_count": 1,
+                    "ontology_class": {
+                      "state": "classified",
+                      "classes": [
+                        "ControlMUtility",
+                        "SoftwareProduct | Document | DocSection | ControlMJob"
+                      ],
+                      "relationships": [],
+                      "pending": 0,
+                      "reason": null
+                    }
+                  }
+                ]
+              },
+              {
+                "ontology_class": "UNCLASSIFIED",
+                "datasets": [
+                  {
+                    "id": "adhoc-sme-email",
+                    "taxonomy_category": null,
+                    "acquisition_mode": "undeclared",
+                    "authority": null,
+                    "replica": "original",
+                    "confirmed": false,
+                    "loader_count": 0,
+                    "ontology_class": {
+                      "state": "UNCLASSIFIED",
+                      "classes": [],
+                      "relationships": [],
+                      "pending": 0,
+                      "reason": "no map entry - asset_type default only"
+                    }
+                  },
+                  {
+                    "id": "cdo-frameworks",
+                    "taxonomy_category": null,
+                    "acquisition_mode": "undeclared",
+                    "authority": null,
+                    "replica": "original",
+                    "confirmed": true,
+                    "loader_count": 0,
+                    "ontology_class": {
+                      "state": "UNCLASSIFIED",
+                      "classes": [],
+                      "relationships": [],
+                      "pending": 0,
+                      "reason": "no map entry - asset_type default only"
+                    }
+                  },
+                  {
+                    "id": "chase-leadership-scrape",
+                    "taxonomy_category": null,
+                    "acquisition_mode": "undeclared",
+                    "authority": null,
+                    "replica": "original",
+                    "confirmed": false,
+                    "loader_count": 0,
+                    "ontology_class": {
+                      "state": "UNCLASSIFIED",
+                      "classes": [],
+                      "relationships": [],
+                      "pending": 0,
+                      "reason": "no map entry - asset_type default only"
+                    }
+                  },
+                  {
+                    "id": "jpmc-reports",
+                    "taxonomy_category": null,
+                    "acquisition_mode": "undeclared",
+                    "authority": null,
+                    "replica": "original",
+                    "confirmed": false,
+                    "loader_count": 0,
+                    "ontology_class": {
+                      "state": "UNCLASSIFIED",
+                      "classes": [],
+                      "relationships": [],
+                      "pending": 0,
+                      "reason": "no map entry - asset_type default only"
+                    }
+                  },
+                  {
+                    "id": "mwaa-implementation-docs",
+                    "taxonomy_category": null,
+                    "acquisition_mode": "undeclared",
+                    "authority": null,
+                    "replica": "original",
+                    "confirmed": false,
+                    "loader_count": 0,
+                    "ontology_class": {
+                      "state": "UNCLASSIFIED",
+                      "classes": [],
+                      "relationships": [],
+                      "pending": 0,
+                      "reason": "no map entry - asset_type default only"
+                    }
+                  },
+                  {
+                    "id": "neo4j-docs-essential-graphrag",
+                    "taxonomy_category": null,
+                    "acquisition_mode": "undeclared",
+                    "authority": null,
+                    "replica": "original",
+                    "confirmed": true,
+                    "loader_count": 1,
+                    "ontology_class": {
+                      "state": "UNCLASSIFIED",
+                      "classes": [],
+                      "relationships": [],
+                      "pending": 0,
+                      "reason": "no map entry - asset_type default only"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "layer_category_matrix": {
+    "layers": [
+      "business",
+      "data",
+      "technology"
+    ],
+    "categories": [
+      "Architecture",
+      "Data Asset",
+      "ITSM / Gov",
+      "Infrastructure",
+      "People & Org",
+      "Pipelines",
+      "Product",
+      "Software / Apps"
+    ],
+    "cells": {
+      "business": {
+        "People & Org": [
+          "pat:people-report"
+        ],
+        "Product": [
+          "pat:product-catalog"
+        ],
+        "Software / Apps": [
+          "seal:app-extract"
+        ]
+      },
+      "data": {
+        "Data Asset": [
+          "catalog@[db].[schema].datasets_v",
+          "catalog@[db].[schema].distributions_v",
+          "oracle:schema-inventory",
+          "snowflake:schema-inventory"
+        ],
+        "ITSM / Gov": [
+          "seal@[db].psgmgr.cm_escalation_db"
+        ],
+        "Infrastructure": [
+          "controlm@[db].psgmgr.cm_hosts"
+        ],
+        "People & Org": [
+          "hr@[db].psgmgr.hr_phone_exp"
+        ],
+        "Pipelines": [
+          "controlm@[db].psgmgr.cm_avg_run",
+          "controlm@[db].psgmgr.cm_def_lnki_p_vw",
+          "controlm@[db].psgmgr.cm_def_lnko_p_vw",
+          "controlm@[db].psgmgr.cm_def_setvar_vw",
+          "controlm@[db].psgmgr.cm_def_vjob",
+          "controlm@[db].psgmgr.cm_def_vtab",
+          "controlm@[db].psgmgr.cm_hist_vw"
+        ],
+        "Software / Apps": [
+          "controlm@[db].drydocs_stg.stg_app_fact"
+        ]
+      },
+      "technology": {
+        "Architecture": [
+          "repo:depgraph-snapshot",
+          "repo:design-docs"
+        ],
+        "Data Asset": [
+          "dpl:dataset-registry"
+        ],
+        "ITSM / Gov": [
+          "snow:cmdb-ci-classes"
+        ],
+        "Infrastructure": [
+          "exec-hosts:rua-bundle",
+          "infra:server-export"
+        ],
+        "Pipelines": [
+          "airflow:dag-export",
+          "autosys:export",
+          "controlm:deftable-xml-export",
+          "dpl:pipeline-registry"
+        ],
+        "Software / Apps": [
+          "bitbucket:repo-objects-manifest",
+          "repo:software-registry"
+        ]
+      }
+    },
+    "singletons": [
+      {
+        "layer": "business",
+        "category": "People & Org",
+        "dataset": "pat:people-report"
+      },
+      {
+        "layer": "business",
+        "category": "Product",
+        "dataset": "pat:product-catalog"
+      },
+      {
+        "layer": "business",
+        "category": "Software / Apps",
+        "dataset": "seal:app-extract"
+      },
+      {
+        "layer": "data",
+        "category": "ITSM / Gov",
+        "dataset": "seal@[db].psgmgr.cm_escalation_db"
+      },
+      {
+        "layer": "data",
+        "category": "Infrastructure",
+        "dataset": "controlm@[db].psgmgr.cm_hosts"
+      },
+      {
+        "layer": "data",
+        "category": "People & Org",
+        "dataset": "hr@[db].psgmgr.hr_phone_exp"
+      },
+      {
+        "layer": "data",
+        "category": "Software / Apps",
+        "dataset": "controlm@[db].drydocs_stg.stg_app_fact"
+      },
+      {
+        "layer": "technology",
+        "category": "Data Asset",
+        "dataset": "dpl:dataset-registry"
+      },
+      {
+        "layer": "technology",
+        "category": "ITSM / Gov",
+        "dataset": "snow:cmdb-ci-classes"
+      }
+    ],
+    "displaced": [
+      {
+        "layer": "business",
+        "category": "Software / Apps",
+        "dataset": "seal:app-extract",
+        "home_layer": "technology",
+        "home_rows": 2
+      },
+      {
+        "layer": "data",
+        "category": "Infrastructure",
+        "dataset": "controlm@[db].psgmgr.cm_hosts",
+        "home_layer": "technology",
+        "home_rows": 2
+      },
+      {
+        "layer": "data",
+        "category": "Software / Apps",
+        "dataset": "controlm@[db].drydocs_stg.stg_app_fact",
+        "home_layer": "technology",
+        "home_rows": 2
+      },
+      {
+        "layer": "technology",
+        "category": "Data Asset",
+        "dataset": "dpl:dataset-registry",
+        "home_layer": "data",
+        "home_rows": 4
+      }
+    ]
+  },
+  "provenance": {
+    "inputs": [
+      {
+        "path": "config/doc-source-registry.yaml",
+        "blob": "8c83ccff2c80e009f271494954126f6b0bc7bf06"
+      },
+      {
+        "path": "config/source-registry.yaml",
+        "blob": "de6f87fa47d9b645d5bf5b9118fcb24dac83b1a8"
+      },
+      {
+        "path": "config/taxonomy-ontology-map/00-header.yaml",
+        "blob": "7f5d9063429f600340c77f832f96a1c41a5db15f"
+      },
+      {
+        "path": "config/taxonomy-ontology-map/10-mappings-controlm.yaml",
+        "blob": "f7ef8c0224e4570af7ddf42c4062935e98360742"
+      },
+      {
+        "path": "config/taxonomy-ontology-map/20-mappings-seal.yaml",
+        "blob": "8820fa06bf5ab80f76ef6454f7124b3a3b3d91ab"
+      },
+      {
+        "path": "config/taxonomy-ontology-map/30-mappings-catalog.yaml",
+        "blob": "4fea22dd8287ec495dadd467cb39a87c8a80a6e9"
+      },
+      {
+        "path": "config/taxonomy-ontology-map/40-mappings-docs.yaml",
+        "blob": "a190fcaac56df8e473c2feef8c4947a0ae5feb57"
+      },
+      {
+        "path": "config/taxonomy-ontology-map/50-mappings-architecture.yaml",
+        "blob": "e434b34848731bad32ab93716f051cebeb8e75a5"
+      },
+      {
+        "path": "config/taxonomy-ontology-map/60-mappings-corporate.yaml",
+        "blob": "cbf0294fe8bd495b4b0ba5f1c0d85959047b83ef"
+      },
+      {
+        "path": "config/taxonomy-ontology-map/90-summary.yaml",
+        "blob": "2e1310af2118402162a6d8bffbd97baae295f5da"
+      },
+      {
+        "path": "config/taxonomy/business-application.yaml",
+        "blob": "e1552a336155ea1201aee0458c335c3dcfa9a2fa"
+      },
+      {
+        "path": "config/taxonomy/context-types.yaml",
+        "blob": "950772700c83691f1c20084b281a2328bc999ddb"
+      },
+      {
+        "path": "config/taxonomy/controlm.yaml",
+        "blob": "009ad52d5aa5403f532940d2ccbb5166d1d1b673"
+      },
+      {
+        "path": "config/taxonomy/data-centers.yaml",
+        "blob": "60121e9089d7ddbe52a765042f89bc9e4b68696c"
+      },
+      {
+        "path": "config/taxonomy/domains.yaml",
+        "blob": "7226eafbf1fb3d2acd43970cce6c811206c02edf"
+      },
+      {
+        "path": "config/taxonomy/editions.yaml",
+        "blob": "c74b6eaa4f33316c1fbc0486f9480a3c722b83ea"
+      },
+      {
+        "path": "config/taxonomy/lob-product-team.yaml",
+        "blob": "11459aacc5460604a707878900bdb5797056d50e"
+      },
+      {
+        "path": "config/taxonomy/location-gazetteer.yaml",
+        "blob": "70c2b61655ffa47c582a0ab6b3bb8643cc40bd29"
+      },
+      {
+        "path": "config/taxonomy/medallion-stages.yaml",
+        "blob": "89578748e290fafb96561e6b96a3b00ce23ed0e2"
+      },
+      {
+        "path": "config/taxonomy/oracle-schemas.yaml",
+        "blob": "baa2c0242947d7487d071ae29a521e857a714549"
+      },
+      {
+        "path": "config/taxonomy/platforms.yaml",
+        "blob": "2d5a7763f227bc630cf193004e495c9d3aca5963"
+      },
+      {
+        "path": "config/taxonomy/server-location.yaml",
+        "blob": "cdc0aeb0523d65d3555d59eeeb2bbc7d36161d90"
+      },
+      {
+        "path": "config/taxonomy/software-registry.yaml",
+        "blob": "f9e9c2d34402f0e8c6a9476277c0bd6a2027c2dc"
+      },
+      {
+        "path": "config/taxonomy/tom-role-vocabulary.yaml",
+        "blob": "848fdd9783f5edf1f9ddb9f27e5601d373a8c8c1"
+      },
+      {
+        "path": "config/taxonomy/ui-components.yaml",
+        "blob": "74a3cb071074bdfeee37065ffdda81c629a698d5"
+      },
+      {
+        "path": "config/taxonomy/ui-concepts.yaml",
+        "blob": "4dbadb7d7eacac7b02c8fe30c723e3c60cee577e"
+      },
+      {
+        "path": "config/taxonomy/ui-tests.yaml",
+        "blob": "4773ab3e5c0f8c4d039718628097530411f786f5"
+      }
+    ],
+    "digest": "675cba243c1ddffde53fa27c1cd957a5ef4b9171",
+    "how_to_resolve": "git log --find-object=<blob> names the commits that carry an input"
+  }
 }

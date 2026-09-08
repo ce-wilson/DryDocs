@@ -61,6 +61,7 @@ export type LoadMapSource = {
   taxonomy_captures: unknown[]
   ontology_mappings: OntologyMappingRef[]
   loaders: LoaderRef[]
+  class_facts: ClassFacts
 }
 
 export interface LoadMapSystem {
@@ -68,7 +69,88 @@ export interface LoadMapSystem {
   name: string
   layer: string | null
   classification: string | null
+  /** N26: the business-application axis — the id and its STATE
+   *  (`placeholder` on every committed row today, D1). */
+  application_id: string | null
+  application_id_state: 'absent' | 'placeholder' | 'declared'
+  dataset_count: number
   taxonomy_captures: unknown[]
+}
+
+/** N26 — what the registry DERIVES about a dataset (drydocs_core.registry_view),
+ *  never a stored field: the system's BDAT layer, the category, the acquisition
+ *  block flattened, the replica predicate with its corroboration, and the ruled
+ *  ontology class or UNCLASSIFIED. */
+export interface OntologyClass {
+  relationships: string[]
+  state: 'classified' | 'UNCLASSIFIED'
+  classes: string[]
+  pending: number
+  reason: string | null
+}
+
+export interface ReplicaState {
+  state: 'replica' | 'replica-uncorroborated' | 'ads-without-distinct-origin' | 'original'
+  origin: string | null
+  carrier: string | null
+  corroboration: string | null
+}
+
+export interface ClassFacts {
+  layer: string | null
+  taxonomy_category: string | null
+  acquisition: {
+    mode: string
+    via: string | null
+    format: string | null
+    drop_dir: string | null
+    drop_dir_base: string | null
+  }
+  replica: ReplicaState
+  ontology_class: OntologyClass
+}
+
+/** N26 — the class-organized view: layer → system (application) → ontology class → datasets. */
+export interface ClassViewDataset {
+  id: string
+  taxonomy_category: string | null
+  acquisition_mode: string
+  authority: string | null
+  replica: ReplicaState['state']
+  confirmed: boolean
+  loader_count: number
+  ontology_class: OntologyClass
+}
+
+export interface ClassViewSystem {
+  system: string | null
+  name: string | null
+  application_id: string | null
+  application_id_state: 'absent' | 'placeholder' | 'declared'
+  dataset_count: number
+  classes: { ontology_class: string; datasets: ClassViewDataset[] }[]
+}
+
+export interface ClassView {
+  /** `asset_type` measured across the rows — a constant is not a classification. */
+  asset_type: { field: string; constant: boolean; value: string | null; rows: number; of: number }
+  layers: { layer: string; systems: ClassViewSystem[] }[]
+}
+
+/** N26 — BDAT layer x taxonomy_category; `displaced` is the derivable odd row. */
+export interface LayerCategoryMatrix {
+  layers: string[]
+  categories: string[]
+  cells: Record<string, Record<string, string[]>>
+  singletons: { layer: string; category: string; dataset: string }[]
+  displaced: { layer: string; category: string; dataset: string; home_layer: string; home_rows: number }[]
+}
+
+/** N26 (g) — content identity of the render's inputs: git blob ids and one digest. */
+export interface Provenance {
+  inputs: { path: string; blob: string }[]
+  digest: string
+  how_to_resolve: string
 }
 
 export interface RetiredId {
@@ -149,6 +231,9 @@ const data = loadMapData as {
   map_entries_without_registry_source: MapEntryWithoutSource[]
   unchained_loaders: UnchainedLoader[]
   steps_with_uncommitted_inputs: StepWithUncommittedInput[]
+  class_view: ClassView
+  layer_category_matrix: LayerCategoryMatrix
+  provenance: Provenance
 }
 
 export const GENERATOR_NOTE = data.note
@@ -177,6 +262,10 @@ export const SOURCELESS_LOADERS: SourcelessLoader[] = data.sourceless_loaders
 export const MAP_ENTRIES_WITHOUT_SOURCE: MapEntryWithoutSource[] = data.map_entries_without_registry_source
 export const UNCHAINED_LOADERS: UnchainedLoader[] = data.unchained_loaders
 export const STEPS_WITH_UNCOMMITTED_INPUTS: StepWithUncommittedInput[] = data.steps_with_uncommitted_inputs
+/** N26 — the class-organized view, the layer x category matrix, and the inputs stamp. */
+export const CLASS_VIEW: ClassView = data.class_view
+export const LAYER_CATEGORY_MATRIX: LayerCategoryMatrix = data.layer_category_matrix
+export const PROVENANCE: Provenance = data.provenance
 
 /** All four declared defect lists, totalled for the page's defect count. */
 export const DEFECT_COUNT =

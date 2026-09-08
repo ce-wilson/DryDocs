@@ -28,6 +28,19 @@ precedent — so the page lives beside it; docs/design/ was rejected because
 that tree's contract is hand-authored .md validated against outline
 templates, and a generated file there would break both the contract and
 test_doc_outline.
+
+N26 — the CLASS-ORGANIZED view rides on the same data. Every dataset row
+carries a ``class_facts`` block DERIVED by ``drydocs_core.registry_view`` (BDAT
+layer from the carrier system, ``taxonomy_category``, the flattened
+``acquisition`` block, the replica predicate with its corroboration, the ruled
+ontology class or UNCLASSIFIED), and three top-level keys join the map:
+``class_view`` (layer → system/application → ontology class → datasets, loaders
+demoted to a count), ``layer_category_matrix`` (BDAT layer × category with
+singleton cells flagged — the derivable form of the DPL oddness) and
+``provenance`` (git blob ids of every input plus one digest, acceptance g: a
+committed render can carry the CONTENT identity of its inputs where a commit
+sha would go stale at the commit that writes it). The ``drydocs registry``
+verb reads the same module against the live tree. NO NEW REGISTRY FIELD.
 """
 
 from __future__ import annotations
@@ -41,7 +54,10 @@ import yaml
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO))
 
-from drydocs_core import yaml_fragments  # noqa: E402  (needs the sys.path insert above)
+from drydocs_core import (  # noqa: E402  (needs the sys.path insert above)
+    registry_view,
+    yaml_fragments,
+)
 
 REGISTRY = REPO / "config" / "source-registry.yaml"
 DOC_REGISTRY = REPO / "config" / "doc-source-registry.yaml"
@@ -49,6 +65,11 @@ TAXONOMY_DIR = REPO / "config" / "taxonomy"
 MAP_FILE = REPO / "config" / "taxonomy-ontology-map"
 OUT = REPO / "web" / "src" / "generated" / "load-map.json"
 OUT_HTML = REPO / "docs" / "plan" / "load-map.html"
+
+# What the render READS. The provenance stamp hashes exactly these (directories
+# expand to their *.yaml), so `provenance.digest` changes iff an input changes.
+# Shared with the `drydocs registry <loader>` verb so both stamp the same content.
+INPUTS = registry_view.LOAD_MAP_INPUTS
 
 
 def _ledger_state(entry: dict) -> dict:
@@ -127,11 +148,7 @@ def build_load_map() -> dict:
     registry_ids = {e["id"] for e in dataset_entries} | {e["id"] for e in doc_entries}
     for m in map_entries:
         source = (m.get("taxonomy") or {}).get("source")
-        row = {
-            "id": m.get("id"),
-            "status": m.get("status"),
-            "label": (m.get("ontology") or {}).get("neo4j_label"),
-        }
+        row = registry_view.map_row(m)
         if source in registry_ids:
             mappings_by_source.setdefault(source, []).append(row)
         else:
@@ -153,6 +170,12 @@ def build_load_map() -> dict:
                 "name": entry.get("name"),
                 "layer": entry.get("layer"),
                 "classification": entry.get("classification"),
+                # N26: the business-application axis. `seal_id` is a standing
+                # `[placeholder]` on every committed row (D1); the STATE says so
+                # rather than rendering thirty bracketed strings.
+                "application_id": entry.get("seal_id"),
+                "application_id_state": registry_view.application_id_state(entry.get("seal_id")),
+                "dataset_count": sum(1 for d in dataset_entries if d.get("system") == entry["id"]),
                 "taxonomy_captures": captures_by_source.get(entry["id"], []),
             }
         )
@@ -178,6 +201,11 @@ def build_load_map() -> dict:
                 "taxonomy_captures": captures_by_source.get(sid, []),
                 "ontology_mappings": mappings_by_source.get(sid, []),
                 "loaders": loaders_by_source.get(sid, []),
+                # N26: derived, never stored — layer (system's), category,
+                # acquisition, replica predicate + corroboration, ruled class.
+                "class_facts": registry_view.dataset_derivations(
+                    entry, system or None, mappings_by_source.get(sid, [])
+                ),
             }
         )
     for entry in doc_entries:  # the doc-ledger union (pipeline twins dropped, N9)
@@ -211,6 +239,9 @@ def build_load_map() -> dict:
                 "taxonomy_captures": captures_by_source.get(sid, []),
                 "ontology_mappings": mappings_by_source.get(sid, []),
                 "loaders": loaders_by_source.get(sid, []),
+                "class_facts": registry_view.dataset_derivations(
+                    entry, None, mappings_by_source.get(sid, [])
+                ),
             }
         )
 
@@ -318,6 +349,22 @@ def build_load_map() -> dict:
         "map_entries_without_registry_source": unmatched_map_sources,
         "unchained_loaders": unchained,
         "steps_with_uncommitted_inputs": steps_with_uncommitted_inputs,
+        # N26 — the class-organized view (a), the matrix that derives the odd
+        # row (d), and the content-identity stamp (g). `asset_type` rides inside
+        # class_view because it is the header fact of that view: a constant on
+        # every row, measured, so it is reported as "not a classification".
+        "class_view": {
+            "asset_type": registry_view.constant_fields(dataset_entries, "asset_type"),
+            "layers": registry_view.class_view(
+                system_entries,
+                dataset_entries,
+                mappings_by_source,
+                loaders_by_source,
+                doc_sources=doc_entries,
+            ),
+        },
+        "layer_category_matrix": registry_view.layer_category_matrix(dataset_entries, system_by_id),
+        "provenance": registry_view.input_provenance(REPO, INPUTS),
     }
 
 
@@ -355,6 +402,15 @@ code,.mono{font-family:ui-monospace,monospace;font-size:.82rem}
 ul.tight{margin:.2rem 0 .2rem 1.1rem;padding:0}
 ul.tight li{margin:.1rem 0}
 .muted{color:#9ca3af}
+td.single{background:#f8fafc}
+td.displaced{background:#fef3c7;font-weight:600}
+td.empty{color:#d1d5db}
+.rp-replica{background:#dbeafe;color:#1e40af}
+.rp-replica-uncorroborated{background:#fef3c7;color:#92400e}
+.rp-ads-without-distinct-origin{background:#fef3c7;color:#92400e}
+.rp-original{background:#e5e7eb;color:#374151}
+.oc-UNCLASSIFIED{background:#fecaca;color:#991b1b}
+.oc-classified{background:#bbf7d0;color:#166534}
 .warn{background:#fef3c7;border:1px solid #fde68a;border-radius:6px;padding:.5rem .7rem;
   font-size:.85rem}
 @media print{
@@ -436,6 +492,130 @@ def _status_chip(status: object) -> str:
     return f'<span class="chip {cls}">{_esc(status)}</span>'
 
 
+_DASH = '<span class="muted">—</span>'
+
+
+def _replica_chip(state: str) -> str:
+    return f'<span class="chip rp-{_esc(state)}">{_esc(state)}</span>'
+
+
+def _class_chip(oc: dict) -> str:
+    if oc["classes"]:
+        return " ".join(f'<span class="chip oc-classified">{_esc(c)}</span>' for c in oc["classes"])
+    pending = f" ({oc['pending']} proposed)" if oc["pending"] else ""
+    return (
+        f'<span class="chip oc-UNCLASSIFIED" title="{_esc(oc["reason"])}">'
+        f"{registry_view.UNCLASSIFIED}{_esc(pending)}</span>"
+    )
+
+
+def _add_class_view(add, data: dict) -> None:
+    """N26 (a): layer → business application (system) → ontology class → dataset."""
+    view = data["class_view"]
+    at = view["asset_type"]
+    add("<h2>By class — layer · business application · ontology class · dataset</h2>")
+    if at["constant"]:
+        asset_line = (
+            f"<code>asset_type</code> is <code>{_esc(at['value'])}</code> on "
+            f"{at['rows']} of {at['of']} dataset rows — a constant, not a classification; "
+            "the class here is the taxonomy-ontology map's RULED label "
+            "(<code>applied</code> or <code>confirmed</code>)."
+        )
+    else:
+        asset_line = (
+            f"<code>asset_type</code> varies across {at['rows']} of {at['of']} rows; the "
+            "class here is still the map's ruled label, not that field."
+        )
+    add(
+        '<p class="sub">The BDAT layer is a SYSTEM property the dataset inherits; the '
+        "application id is the system's, a standing placeholder on every committed row "
+        "(D1). A dataset with no applied/confirmed map entry is UNCLASSIFIED. "
+        "Replica-ness is <code>origin != system</code>, corroborated by "
+        f"<code>authority: ADS</code>; the two are shown together. {asset_line} "
+        "Loaders are a count — the per-dataset detail sits below. No registry field "
+        "was added for any of this.</p>"
+    )
+    for layer in view["layers"]:
+        for sysrow in layer["systems"]:
+            ident = (
+                f"<code>{_esc(sysrow['system'])}</code> — {_esc(sysrow['name'])}"
+                if sysrow["system"]
+                else _esc(sysrow["name"])
+            )
+            app = (
+                f"application id: <code>{_esc(sysrow['application_id'])}</code> "
+                f"({_esc(sysrow['application_id_state'])})"
+                if sysrow["application_id"]
+                else f"application id: {_esc(sysrow['application_id_state'])}"
+            )
+            add(
+                f"<h3>{_esc(layer['layer'])} · {ident} · {app} · "
+                f"{sysrow['dataset_count']} dataset(s)</h3>"
+            )
+            if not sysrow["classes"]:
+                add('<p class="sub muted">no datasets registered under this system</p>')
+                continue
+            add(
+                "<table><tr><th>ontology class</th><th>dataset</th><th>category</th>"
+                "<th>acquisition</th><th>authority</th><th>replica</th>"
+                "<th>confirmed</th><th>loaders</th></tr>"
+            )
+            for group in sysrow["classes"]:
+                for d in group["datasets"]:
+                    confirmed = "✓" if d["confirmed"] else '<span class="muted">no</span>'
+                    add(
+                        f"<tr><td>{_class_chip(d['ontology_class'])}</td>"
+                        f'<td><a href="#src-{_esc(d["id"])}"><code>{_esc(d["id"])}</code></a></td>'
+                        f"<td>{_esc(d['taxonomy_category']) or _DASH}</td>"
+                        f"<td>{_esc(d['acquisition_mode'])}</td>"
+                        f"<td>{_esc(d['authority']) or _DASH}</td>"
+                        f"<td>{_replica_chip(d['replica'])}</td>"
+                        f"<td>{confirmed}</td><td>{d['loader_count']}</td></tr>"
+                    )
+            add("</table>")
+
+
+def _add_layer_category_matrix(add, data: dict) -> None:
+    """N26 (d): BDAT layer × taxonomy_category; a singleton cell is the odd row."""
+    m = data["layer_category_matrix"]
+    add("<h2>Layer x category — where a category sits once</h2>")
+    displaced_ids = {s["dataset"] for s in m["displaced"]}
+    displaced = (
+        "; ".join(
+            f"<code>{_esc(s['dataset'])}</code> is the only <em>{_esc(s['category'])}</em> "
+            f"under <em>{_esc(s['layer'])}</em> while that category has {s['home_rows']} "
+            f"rows under <em>{_esc(s['home_layer'])}</em>"
+            for s in m["displaced"]
+        )
+        or "none"
+    )
+    add(
+        "<p class=\"sub\">Rows are the system's BDAT layer, columns the dataset's "
+        "<code>taxonomy_category</code>, cells the dataset count. A cell of ONE is a "
+        "singleton (named in its cell); a singleton whose category has its home — two "
+        "or more rows — under another layer is DISPLACED (highlighted): the derivable form "
+        f"of a row that does not fit its neighbors, no id typed. Today: {displaced}.</p>"
+    )
+    add("<table><tr><th>layer \\ category</th>")
+    for c in m["categories"]:
+        add(f"<th>{_esc(c)}</th>")
+    add("</tr>")
+    for layer in m["layers"]:
+        add(f"<tr><td><b>{_esc(layer)}</b></td>")
+        row = m["cells"][layer]
+        for c in m["categories"]:
+            ids = row.get(c, [])
+            if not ids:
+                add('<td class="empty">·</td>')
+            elif len(ids) == 1:
+                cls = "displaced" if ids[0] in displaced_ids else "single"
+                add(f'<td class="{cls}" title="{_esc(ids[0])}">1 <code>{_esc(ids[0])}</code></td>')
+            else:
+                add(f'<td title="{_esc(", ".join(ids))}">{len(ids)}</td>')
+        add("</tr>")
+    add("</table>")
+
+
 def build_load_map_html(data: dict) -> str:
     out: list[str] = []
     add = out.append
@@ -459,6 +639,15 @@ def build_load_map_html(data: dict) -> str:
         f"{len(data['retired'])} retired ids · "
         f"{len(data['sequence'])} sequence steps.</p>"
     )
+    prov = data["provenance"]
+    add(
+        f'<p class="sub">Inputs digest <code>{_esc(prov["digest"])}</code> over '
+        f"{len(prov['inputs'])} files (git blob ids; "
+        f"<code>git log --find-object=&lt;blob&gt;</code> resolves one to its commits).</p>"
+    )
+
+    _add_class_view(add, data)
+    _add_layer_category_matrix(add, data)
 
     # -- the canonical sequence -----------------------------------------------
     add("<h2>Canonical load sequence</h2>")
