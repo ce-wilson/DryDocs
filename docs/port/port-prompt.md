@@ -3486,6 +3486,60 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   Seven paths; the table names them.
   Nothing is asked back.
 
+  **POSTSCRIPT TO RELAY-46 - THREE OF ITS FIGURES ARE SUPERSEDED, AND THE OWED PATHS ARE
+  ALREADY A LIST (2026-09-08, after the roll; your hand-carried carve-out review and your
+  landing report, plus the producer's review of the first):** Read producer-side at
+  `05e365dd` on `main`, port base `port-base-20260908`; venue desktop. The relay above was
+  written at the roll and stands as written (L25: a rider, never an edit); this postscript
+  says what moved after it. **One - your `main` is `b73fd9d1`, not `d527afce`**
+  `[SME-REPORTED]`: all five of the hand-carried fixes landed, both working branches are
+  deleted local and remote, and the "2 deliberate regressions" in RELAY-46 and in the sixth
+  base's bullet under `## Last completed port` are now ONE.
+  `test_reconcile_gate_log_append_only_live` went green with the signed 2026-08-20 text
+  byte-identical - so it was never a regression of the record, only of the guard's copy
+  (SECOND POSTSCRIPT TO RELAY-45, its opening paragraph).
+  `test_reconcile_runbook_exemptions_no_drop_live` remains, and remains correctly: it
+  reports the two `HISTORICAL_PATHS` rows the T19 ruling
+  dropped, which is the guard doing its job on a ruled drop, not a defect. Of the 38 "new
+  tests failing", 30 sit in T24 and the vocabulary rename `[SME-REPORTED]`, unchecked from
+  here. **Two - RELAY-46 said the 82 owed paths were owed AS A LIST. They already are one.**
+  Your `sme-path-carveout-review.md` and its `.csv` twin, produced against section 5 of
+  `docs/company-prompts/port-base-20260905-closeout-company-prompt.md`, name 87 paths; the
+  relay was written before that document was carried over, and its "a count cannot be
+  written as a pattern" stands only as history. `[VERIFIED-PRODUCER]` The producer read that
+  list with its own classifier - `drydocs.port.dispositions.classify` against
+  `PORT-MANIFEST.yaml`, the importable object (J37), never a render - and the result is
+  `docs/reviews/company-owed-path-review-2026-09-08.md` (`775248a7`, amended `fcf3c00b`):
+  **the manifest already rules 73 of the 87.** Five are canonical-producer, seven are
+  per-entry (blocked on T24, not on a ruling), three are derived (regenerate, never carry),
+  and 51 are `default_ok` - every one of them matched an explicit J16 row with a `reason:`,
+  none fell through to the bare default, so the decision for those 51 IS recorded and the
+  review's §3 says where. **Fourteen need the SME**: the 13 `docs/design/**` rows the
+  manifest classes `evaluate`, and `graph-tests/tom-required-contacts.yaml`, whose
+  canonical-company row carries a note and no rule. **The one item with a clock is not among
+  the fourteen:** seven of the eight canonical-company rows are `config/gate-prompts/**`
+  specs, and that row's entry_rule already rules them - a producer spec whose slug the
+  consumer does not hold is a CLEAN-ADD, taken whole. They wait on nobody, and a missing
+  prompt is a gate page that cannot render (review §2). One reading correction to your own
+  document, for your own record: the summary table's canonical-company cells are transposed
+  (the `1 | 7` cells should read `7 | 1`; review §4). No `deferred-paths` row is written on this
+  side for any of the 87: a row is a producer ruling, only 14 are needed, and the 14 are the
+  SME's to make. **Three - the pointer, which is what this postscript is for.** Your fetch
+  of the producer works now (guardrail 1: read at producer HEAD, not at the ref you last
+  fetched), so this relay is a pointer and not a payload: **read producer `main` at
+  `05e365dd`** - `git show 05e365dd:<path>` from the fetched ref reads a file without
+  applying it, and `docs/port/**` stays never-port whether or not you read it. Three files
+  are worth naming. The review above. The hand prompt named above, whose section 4 is the
+  standing instruction for the §3-redaction line until the ruling lands. And
+  `docs/style/review-provenance.md`, which since `fcf3c00b` and `05e365dd` carries J76's
+  fourth failure mode - the instrument is correct and read correctly and is STALE, a
+  superseded function under the same name, signature and docstring; the check is
+  `git log -1 -- <file>` against your base, and the 2026-08-06 FETCH RESOLVED note (a failed
+  producer fetch degrading silently to a cached `5f79d145`) was its single-case form. That
+  is the shape the SECOND POSTSCRIPT TO RELAY-45 found on this side by hand. **RELAY-47 stays
+  reserved for the §3-redaction ruling**; nothing in this postscript is that ruling.
+  Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
