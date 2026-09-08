@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-08T16:38:42",
+    "captured_at": "2026-09-08T18:40:08",
     "date": "20260908",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "588f98d5",
-      "full": "588f98d5955906017f3d3251f57f1bb3d2e754a5",
+      "commit": "1f54b5d4",
+      "full": "1f54b5d4cfc7fe34408a0b4478969fddbc1edc53",
       "branch": "main",
-      "describe": "port-base-20260908-1-g588f98d5",
-      "subject": "chore(port): ledger - the seventh footnote counts the range at the tag, 407 not 405",
+      "describe": "port-base-20260908-13-g1f54b5d4",
+      "subject": "fix(port): RELAY-47 follow-through - matrix row, repo_root anchor, refreshed renders",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -6517,6 +6517,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/config/gate-log-redactions.yaml",
+      "name": "gate-log-redactions.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/gate-log-redactions.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/config/gate-log.md",
       "name": "gate-log.md",
       "extension": ".md",
@@ -9383,6 +9392,24 @@
       "name": "next-session-cron-prompt.md",
       "extension": ".md",
       "rel_path": "docs/history/next-session-cron-prompt.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/lane-a-handoff.md",
+      "name": "lane-a-handoff.md",
+      "extension": ".md",
+      "rel_path": "docs/lane-a-handoff.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/lane-b-handoff.md",
+      "name": "lane-b-handoff.md",
+      "extension": ".md",
+      "rel_path": "docs/lane-b-handoff.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -16570,6 +16597,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/reviews/company-owed-path-review-2026-09-08.md",
+      "name": "company-owed-path-review-2026-09-08.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/company-owed-path-review-2026-09-08.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/reviews/doc-inventory-2026-07-22.md",
       "name": "doc-inventory-2026-07-22.md",
       "extension": ".md",
@@ -19562,6 +19598,15 @@
       "name": "dispositions.py",
       "extension": ".py",
       "rel_path": "drydocs/port/dispositions.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/port/gate_log_redactions.py",
+      "name": "gate_log_redactions.py",
+      "extension": ".py",
+      "rel_path": "drydocs/port/gate_log_redactions.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -23194,10 +23239,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260908-1455.json",
-      "name": "drydocs-20260908-1455.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260908.json",
+      "name": "drydocs-20260908.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260908-1455.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260908.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -31205,6 +31250,10 @@
       "drydocs/drydocs/plan/plan_roadmap.py"
     ],
     [
+      "drydocs/drydocs/port/gate_log_redactions.py",
+      "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
       "drydocs/drydocs/port/port_backlog_union.py",
       "drydocs/drydocs_core/backlog_store.py"
     ],
@@ -34371,6 +34420,10 @@
     [
       "drydocs/tests/unit/test_port_reconcile_guards.py",
       "drydocs/drydocs/port/dispositions.py"
+    ],
+    [
+      "drydocs/tests/unit/test_port_reconcile_guards.py",
+      "drydocs/drydocs/port/gate_log_redactions.py"
     ],
     [
       "drydocs/tests/unit/test_port_reconcile_guards.py",
@@ -40991,6 +41044,11 @@
     [
       "drydocs/config",
       "CONTAINS",
+      "drydocs/config/gate-log-redactions.yaml"
+    ],
+    [
+      "drydocs/config",
+      "CONTAINS",
       "drydocs/config/gate-log.md"
     ],
     [
@@ -41697,6 +41755,16 @@
       "drydocs/docs",
       "CONTAINS",
       "drydocs/docs/history"
+    ],
+    [
+      "drydocs/docs",
+      "CONTAINS",
+      "drydocs/docs/lane-a-handoff.md"
+    ],
+    [
+      "drydocs/docs",
+      "CONTAINS",
+      "drydocs/docs/lane-b-handoff.md"
     ],
     [
       "drydocs/docs",
@@ -46596,6 +46664,11 @@
     [
       "drydocs/docs/reviews",
       "CONTAINS",
+      "drydocs/docs/reviews/company-owed-path-review-2026-09-08.md"
+    ],
+    [
+      "drydocs/docs/reviews",
+      "CONTAINS",
       "drydocs/docs/reviews/doc-inventory-2026-07-22.md"
     ],
     [
@@ -48292,6 +48365,11 @@
       "drydocs/drydocs/port",
       "CONTAINS",
       "drydocs/drydocs/port/dispositions.py"
+    ],
+    [
+      "drydocs/drydocs/port",
+      "CONTAINS",
+      "drydocs/drydocs/port/gate_log_redactions.py"
     ],
     [
       "drydocs/drydocs/port",
@@ -50231,7 +50309,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260908-1455.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260908.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -53903,13 +53981,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2999,
-    "edges": 1838,
+    "files": 3004,
+    "edges": 1840,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 3321,
+    "rels": 3326,
     "directories": 323
   }
 }
