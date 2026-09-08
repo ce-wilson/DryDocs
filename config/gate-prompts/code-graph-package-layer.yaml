@@ -1,5 +1,24 @@
 # SME gate-prompt spec — CODE GRAPH, LEVEL TWO: does the PACKAGE become a node?
 #
+# AMENDED 2026-09-07 (producer, pre-session stale-pointer sweep; U10 is the runner). Two
+# things on this page had gone stale under it and are corrected in place so the session does
+# not trip on them. (1) THE VOCABULARY POINTER. `relationship_vocabulary.yaml:2226` no
+# longer exists: the registry is per-domain fragments since S5, and the entry this page
+# revises was force-migrated at G87 (2026-08-21, gate vocabulary-domains-and-id-policy §B3):
+# u1_has_module is `deprecated`, `superseded_by: arch_has_module`, both in
+# drydocs_core/ontology/relationship_vocabulary/43-local-architecture.yaml. Every "revise
+# u1_has_module" below therefore revises arch_has_module; the u1_* names are kept in the
+# text as the ids the page was written against. The same holds for u1_imports ->
+# arch_imports and u1_is_encoded_in -> arch_is_encoded_in. (2) THE HEADER NUMBERS. The
+# v2 figures (1457 files + 251 directories + 1956 CONTAINS + 458 import edges) are the
+# 2026-08-02 artifact; the shape they describe (meta.tree true, one whole-repo snapshot)
+# still holds and is the ruling that matters, but the counts drift with every snapshot
+# and are not to be read as current. The current figures live in the newest
+# knowledge/depgraph-snapshots/drydocs-*.json `meta` block, which is where the session
+# reads them. A company-side sweep on 2026-09-07 read a tree behind the producer base and
+# reported the v2 shape as "never landed"; it landed on 2026-08-02, and every snapshot
+# since carries it (J63 - a verdict names the tree it read).
+#
 # REVISED v2 2026-08-02 — THE SCANNER CHANGED UNDER THIS PAGE, same day it was drafted.
 # SME direction: "update the scanner to pull all files, so that we can create the tree.
 # the old dep snapshots can be removed this was the intent." Acted on immediately, so
@@ -93,7 +112,7 @@
 # our own repo-relative path. There is no company data in a code snapshot.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
-updated: 2026-08-02
+updated: 2026-09-07
 
 id: code-graph-package-layer
 title: "SME Gate — Code graph level two: does the PACKAGE become a node, how is a package identified when __init__.py is not a sound test, and what does HAS_MODULE mean once there are two levels"
@@ -123,13 +142,13 @@ summary: >
   time, destroying the offline+deterministic property §H1 guarded. §C2 is the real decision
   on this page; everything else follows from it.
 meta:
-  Module: "drydocs-load-code-snapshot · drydocs/loaders/code_snapshot.py + cypher/code_snapshot.cypher · drydocs_core/ontology/relationship_vocabulary.yaml · drydocs_core/schema/{constraints,schema_graph,ontology_supplement}.cypher · knowledge/depgraph-snapshots/snapshot.ps1 (scanner, only if §C2 rules (d))"
-  Source: "knowledge/depgraph-snapshots/drydocs-*.json — RESHAPED v2: ONE file (drydocs-20260802.json), all-files scan, meta.tree true, 1457 files + 251 directories + 1956 CONTAINS + 458 import edges, git-ignored paths filtered (U9). The 101-file dated series and both tree one-offs are removed. PLUS pyproject.toml [tool.poetry] packages as a second, authoritative input if §C2 rules (c)"
+  Module: "drydocs-load-code-snapshot · drydocs/loaders/code_snapshot.py + cypher/code_snapshot.cypher · drydocs_core/ontology/relationship_vocabulary/43-local-architecture.yaml [AMENDED 2026-09-07 - was the pre-S5 monolith path] · drydocs_core/schema/{constraints,schema_graph,ontology_supplement}.cypher · knowledge/depgraph-snapshots/snapshot.ps1 (scanner, only if §C2 rules (d))"
+  Source: "knowledge/depgraph-snapshots/drydocs-*.json — RESHAPED v2: ONE file (drydocs-20260802.json), all-files scan, meta.tree true, 1457 files + 251 directories + 1956 CONTAINS + 458 import edges AS OF 2026-08-02 [AMENDED 2026-09-07 - counts drift per snapshot; read the newest file's meta block, the shape is the ruling], git-ignored paths filtered (U9). The 101-file dated series and both tree one-offs are removed. PLUS pyproject.toml [tool.poetry] packages as a second, authoritative input if §C2 rules (c)"
   Registry ref: "depgraph-snapshot — registered at the parent gate §H6, classification Internal-Public. NO new source is registered here if §C2 rules (a)/(b); ruling (c) adds pyproject.toml as an input to an existing source, not a new source"
   Classification: "Internal-Public — repo-relative paths and our own package names only. The parent gate's §H4 abs_path drop still holds and this page adds no new field carrying machine state"
   Taxonomy: "NONE — still a derived structural capture, not an imported hierarchy. The §C2(c) option would read pyproject.toml, which is committed source, not a taxonomy file"
   Ontology map: "self-documentation-code-graph (confirmed 2026-07-27) — this gate AMENDS that entry rather than adding a second one, because it is the same source, same loader and same subgraph. §H4 rules whether an amendment or a new entry is correct"
-  Vocabulary: "u1_has_module (ACTIVE — from_node/to_node change under every option except §E1(a); relationship_vocabulary.yaml:2226) · u1_imports (ACTIVE, untouched) · u1_is_encoded_in (ACTIVE, untouched) · NEW terms proposed: u1_has_package (Project -> CodePackage) and u1_defines_package (CodeModule -> CodePackage, the __init__.py tie, §D2) — both `status: planned` until §I"
+  Vocabulary: "u1_has_module (ACTIVE at drafting; DEPRECATED at G87 2026-08-21, superseded_by arch_has_module in 43-local-architecture.yaml - the revision below lands on arch_has_module [AMENDED 2026-09-07] — from_node/to_node change under every option except §E1(a)) · u1_imports (ACTIVE, untouched) · u1_is_encoded_in (ACTIVE, untouched) · NEW terms proposed: u1_has_package (Project -> CodePackage) and u1_defines_package (CodeModule -> CodePackage, the __init__.py tie, §D2) — both `status: planned` until §I"
   Related gates: "self-documentation-code-graph (2026-07-27 — PARENT; §B1/§B2/§C4 re-opened, everything else stands) · software-usage-patterns (:SoftwareProduct — the §F1 collision guard must be EXTENDED to :CodePackage, §G2)"
   Company impact: "NIL on data. The loader and vocabulary PORT; the company's tree has different packages. But §C2(c) would make the loader read pyproject.toml, and the company's differs — §H5 rules whether that is a hard dependency or a soft input"
 mapping:
@@ -151,7 +170,7 @@ mapping:
     edge: "new edge  [DECISION — §D2]"
   - n: 5
     element: "HAS_MODULE re-pointing"
-    target: "u1_has_module from_node changes Project -> CodePackage under §C1(b). The registry entry at relationship_vocabulary.yaml:2226 is REVISED, not added"
+    target: "u1_has_module from_node changes Project -> CodePackage under §C1(b). The registry entry - arch_has_module in drydocs_core/ontology/relationship_vocabulary/43-local-architecture.yaml, the G87 successor of u1_has_module [AMENDED 2026-09-07; was relationship_vocabulary.yaml:2226] - is REVISED, not added"
     edge: "vocabulary change  [DECISION — §E1]"
   - n: 6
     element: "tests/ — 45% of the graph"
@@ -239,7 +258,7 @@ sections:
       - "D2: the fix. (a) STATUS QUO — keep them as ordinary :CodeModule nodes, as parent §C4 ruled [defensible if §C1(a) wins; indefensible alongside a :CodePackage level, because then the package exists as a node AND the thing that defines it sits unrelated beside it]. (b) KEEP THE FILE NODE AND ADD THE TIE — (:CodeModule {name:'__init__.py'})-[:DEFINES_PACKAGE]->(:CodePackage), new vocabulary term u1_defines_package [AGENT RECOMMENDATION — preserves all 103 import edges and file identity, states the real relationship, and leaves the namespace-package case (§B2) honestly represented as a :CodePackage with has_init=false and NO incoming DEFINES_PACKAGE edge, which is exactly what is true of drydocs_core/schema]. (c) COLLAPSE — the __init__.py node BECOMES the package node [this is the one variant parent §C1 correctly killed: it destroys file identity for 16 files and their import edges. Offered here only so the record shows it was considered and refused for the same reason as before]."
   - title: "E. What HAS_MODULE then means"
     confirmations:
-      - "E1: under §C1(b) the containment edges must be named. (a) HAS_MODULE for BOTH levels, letting prov:hadMember carry Collection->Collection and Collection->Entity alike [PROV-permitted and fewest terms; but a single edge name meaning two different containments is how the current confusion started]. (b) THREE TERMS — u1_has_package (Project->CodePackage, NEW), u1_has_package again or a distinct nesting term for Package->Package (§C3), and u1_has_module RE-POINTED to Package->Module [AGENT RECOMMENDATION — each edge then says one thing; u1_has_module's registry entry at relationship_vocabulary.yaml:2226 is REVISED (from_node Project -> CodePackage), not duplicated]. (c) rename the whole family to CONTAINS [rejected: tree-mode snapshots already use CONTAINS for filesystem containment (parent §G3) and reusing the name would fuse two concepts the same gate separated]."
+      - "E1: under §C1(b) the containment edges must be named. (a) HAS_MODULE for BOTH levels, letting prov:hadMember carry Collection->Collection and Collection->Entity alike [PROV-permitted and fewest terms; but a single edge name meaning two different containments is how the current confusion started]. (b) THREE TERMS — u1_has_package (Project->CodePackage, NEW), u1_has_package again or a distinct nesting term for Package->Package (§C3), and u1_has_module RE-POINTED to Package->Module [AGENT RECOMMENDATION — each edge then says one thing; u1_has_module's registry entry - now arch_has_module in 43-local-architecture.yaml after G87 [AMENDED 2026-09-07; was relationship_vocabulary.yaml:2226] - is REVISED (from_node Project -> CodePackage), not duplicated]. (c) rename the whole family to CONTAINS [rejected: tree-mode snapshots already use CONTAINS for filesystem containment (parent §G3) and reusing the name would fuse two concepts the same gate separated]."
       - "E2 *** THE ONTOLOGY CHECK, since this is what the re-open asked for *** u1_has_module maps to prov:hadMember (Collection -> member). PROV-O places NO constraint against a member being itself a Collection — nesting is native, and a package containing modules while belonging to a project is the textbook shape. Confirm that the PROV mapping SUPPORTS the two-level model rather than merely tolerating it, and that the flat shape was therefore a modelling CHOICE and never a limitation the standard imposed. This is the substantive answer to 'review against the ontology' and belongs in the record."
       - "E3 [cheap, but decide it explicitly]: with a package traversal available, CodeModule.project becomes redundant — it is derivable as the root of the package chain. Retain it as denormalisation (zero migration cost under wipe-and-rebuild; keeps every existing query working) or drop it? AGENT RECOMMENDATION: RETAIN, and record it as deliberate denormalisation rather than leaving a future reader to wonder whether it was an oversight."
   - title: "F. tests/ — 45% of the code graph"
@@ -261,4 +280,4 @@ sections:
       - "H6: the loader must NEVER enumerate scan roots in code. §B1 showed a hard-coded six going stale within a week. Confirm the roots are read from the artifact on every run, and that a new root appearing requires no code change and no gate."
   - title: "I. Sign-off"
     confirmations:
-      - "ON SIGN-OFF: the proposed vocabulary terms (u1_has_package, u1_defines_package, plus the u1_has_module revision) are registered in drydocs_core/ontology/relationship_vocabulary.yaml at `status: planned`; the taxonomy-ontology-map entry is amended per §H4; the parent gate's §B1/§B2/§C4 are annotated IN PLACE as re-opened-and-superseded-by-this-gate with the date, per the file class's rule that the reasoning is the audit trail; a build item is added to backlog.yaml naming this gate as its dependency; gates.json and the enforcement matrix are regenerated. NOTHING IS WRITTEN TO THE GRAPH AT THE GATE ITSELF — and note that when the loader IS re-run, the code subgraph is rebuilt from the newest snapshot, so the five-day gap between the live graph (210 nodes, f76dbb1) and HEAD (238) closes as a side effect rather than needing its own step."
+      - "ON SIGN-OFF: the proposed vocabulary terms (u1_has_package, u1_defines_package, plus the u1_has_module revision) are registered in drydocs_core/ontology/relationship_vocabulary/43-local-architecture.yaml (the architecture fragment; [AMENDED 2026-09-07] - was the monolith path) at `status: planned`; the taxonomy-ontology-map entry is amended per §H4; the parent gate's §B1/§B2/§C4 are annotated IN PLACE as re-opened-and-superseded-by-this-gate with the date, per the file class's rule that the reasoning is the audit trail; a build item is added to backlog.yaml naming this gate as its dependency; gates.json and the enforcement matrix are regenerated. NOTHING IS WRITTEN TO THE GRAPH AT THE GATE ITSELF — and note that when the loader IS re-run, the code subgraph is rebuilt from the newest snapshot, so the five-day gap between the live graph (210 nodes, f76dbb1) and HEAD (238) closes as a side effect rather than needing its own step."

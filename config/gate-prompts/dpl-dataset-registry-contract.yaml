@@ -8,9 +8,26 @@
 # profiles it, the rulings close or re-scope the contract and its audit stub.
 # GATE-BOUND: this page PROPOSES; rendering it builds, flips, and stamps
 # nothing. Mechanism-only: GUIDs, SEAL ids and registry URLs stay company-side.
+# AMENDED 2026-09-07 (producer, pre-session, from the transcription of a company-side §B
+# profile run against the live registry; [SME-REPORTED] - the profile itself is company-
+# internal and never lands here). Three things the drafted page assumed turned out wrong on
+# the data, so the page is corrected BEFORE the session rather than re-asked at it: (1) the
+# registry's `zone` is NOT a RAW/TRUSTED/REFINED lake layer - it is a multi-valued enum that
+# is a lake layer for object-store rows and a database technology for the rest, a minority
+# of its keys are in use, two in-use keys are unregistered, and the only registered
+# "refined" key is a typo matching no row; B3 is restated on that axis and C1-a/C1-c carry
+# the rulings. The payload `zone` in dataset_flow.json (gate dpl-dataset-identity-zone) is
+# a DIFFERENT field with the same spelling - J32 applies. (2) `version_id` is not semver:
+# suffixed, date-styled, two-component and case-variant forms all occur - C1-b. (3) the
+# audit identities are MIXED - overwhelmingly person-shaped, with a small set of service
+# identities including reverse-hydrate process names - so the pipeline sibling's "person,
+# not service principal" reading does not carry to datasets - C2-a. A fourth spelling of
+# the owner-application field was also seen (a different token, not a different case), so
+# the sibling's case-insensitivity fix does not cover it - named under C1-a. Counts stay
+# company-side (estate volumetrics are fenced); this page carries the shape only.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
-updated: 2026-08-07
+updated: 2026-09-07
 
 id: dpl-dataset-registry-contract
 title: "SME Gate — dpl dataset-registry contract: identify a real export (HITL, Internal), profile it against the ASSUMED contract (agent), then rule the contract, the audit stub, and discovery precedence"
@@ -22,7 +39,8 @@ summary: >
   this page; the run names its venue (J18). (2) AGENT: parse and profile it —
   field census against the ASSUMED contract, createdBy/lastModifiedBy
   evidence for the audit stub, and GUID join coverage against the G17
-  dataset_flow READS/WRITES candidates (with zone distribution) and the
+  dataset_flow READS/WRITES candidates (with system-type and lake-layer
+  distribution) and the
   catalog registration views' dpl_dataset identities. Zero graph writes.
   Section C consumes the profile: contract confirmed or amended, audit stub
   closed or standing, and per-SEAL-vs-bulk discovery precedence ruled in
@@ -46,7 +64,7 @@ mapping:
     edge: "audit evidence  [clause C2]"
   - n: 3
     element: "Registry GUID x G17 dataset_flow inputDatasets/outputDatasets candidates"
-    target: "join coverage per zone (RAW/TRUSTED/REFINED) — how much of the MAC lineage evidence the registry knows"
+    target: "join coverage per system_type, and per lake layer only where the system type is the object store [AMENDED 2026-09-07 - was 'per zone (RAW/TRUSTED/REFINED)'; the registry zone is not that axis] — how much of the MAC lineage evidence the registry knows"
     edge: "coverage  [clause C3]"
   - n: 4
     element: "Per-SEAL API vs bulk export naming the same GUID"
@@ -71,11 +89,15 @@ sections:
     confirmations:
       - "B1 [profile]: parse the §A export(s); field census against the ASSUMED contract — per field: present / absent / present-but-empty, with counts; unassumed real fields listed by name. [profile attached]"
       - "B2 [profile]: createdBy / lastModifiedBy — existence, population rate, value shape; the audit stub's revisit evidence. [profile attached]"
-      - "B3 [profile]: GUID join against the G17 dataset_flow candidates — match / registry-only / flow-only counts, broken out per zone (RAW/TRUSTED/REFINED); plus overlap with the catalog views' dpl_dataset identities (the G41 seam). [profile attached]"
+      - "B3 [profile]: GUID join against the G17 dataset_flow candidates — match / registry-only / flow-only counts, broken out per system_type, and per lake layer only where the system type is the object store [AMENDED 2026-09-07 - was 'per zone (RAW/TRUSTED/REFINED)', an axis the registry does not carry; see the header]; plus overlap with the catalog views' dpl_dataset identities (the G41 seam). [profile attached]"
       - "B4 [profile]: if §A2 paired — the api-vs-bulk diff for the same SEAL/day: GUIDs in one and not the other, field-level divergence counts (the clone-lag measurement, made concrete). [profile attached / n-a]"
   - title: "C. Rulings — the profile decides, the SME signs"
     confirmations:
       - "C1: the field contract is CONFIRMED or AMENDED field-by-field (extractor follows at its next build; T13's dataset half closes either way). [confirm / amend]"
+      - "C1-a [PROPOSED 2026-09-07, from the company §B profile, SME-REPORTED]: the `zone` axis. The registry zone is ruled a multi-valued enum - lake layer for object-store rows, database technology otherwise - and the contract names it so; the RAW/TRUSTED/REFINED reading is withdrawn from this page. The payload zone of dataset_flow.json is a different field (gate dpl-dataset-identity-zone) and the two are never joined by name (J32). The owner-application field's FOURTH spelling is admitted to the contract as an alias, as a distinct token - the pipeline sibling's case-insensitivity fix does not reach it. [confirm / amend]"
+      - "C1-b [PROPOSED 2026-09-07, SME-REPORTED]: `version_id` is OPAQUE. Suffixed, date-styled, two-component and case-variant forms all occur, so no semver parse, no numeric comparator; any (guid, version) join is exact-string after case folding, and a mismatch is a named finding class, never a silent drop. Same class as the pipeline sibling's non-conforming pipeline_id finding. [confirm / amend]"
+      - "C1-c [PROPOSED 2026-09-07, SME-REPORTED]: zone values outside the registered enum. Two in-use keys are unregistered and one registered key is a typo matching no row. Loader rule: an unregistered value is ACCEPTED and reported on the WARN stream under a named finding class (the G16 value-contract shape), never rejected and never normalized to a guess; the typo key is recorded as a registered-but-empty finding for the registry's owners, not corrected by this loader. [confirm / amend]"
       - "C2: the audit-envelope stub for this source CLOSES (envelope written in config/audit-fields.yaml, the source's per-entry row) or STANDS re-affirmed on evidence. [closes / stands]"
+      - "C2-a [PROPOSED 2026-09-07, SME-REPORTED]: the audit actors are MIXED. createdBy / lastModifiedBy are overwhelmingly person-shaped with a small set of service identities (environment-suffixed platform accounts and reverse-hydrate process names), so the envelope records TWO actor classes - person and process - and the sibling gate's 'person, not service principal' ruling is NOT carried across. The stub may close on that evidence; the export-shape question (does the per-SEAL export carry the same two columns) stays under C1. [closes on two-class evidence / stands]"
       - "C3: the §B3 join coverage is ACCEPTED as the lineage-enrichment baseline; registry-only and flow-only populations get a disposition in words (finding classes, not cleanup chores). [ruled / deferred]"
       - "C4: discovery precedence ruled — per-SEAL API vs bulk export, in config/precedence.yaml terms, with the §B4 measurement cited (or the ruling deferred until a paired sample exists). [ruled / deferred]"
