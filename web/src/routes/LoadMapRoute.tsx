@@ -5,10 +5,13 @@ import StatTiles from '../components/StatTiles'
 import EmptyState from '../components/ui/EmptyState'
 import {
   AD_HOC_COMMANDS,
+  CLASS_VIEW,
   DEFECT_COUNT,
   DOC_CORPUS_COUNT,
   KINDS,
+  LAYER_CATEGORY_MATRIX,
   MAP_ENTRIES_WITHOUT_SOURCE,
+  PROVENANCE,
   RETIRED,
   SEQUENCE,
   SOURCELESS_LOADERS,
@@ -365,6 +368,113 @@ export default function LoadMapRoute() {
     </div>
   )
 
+  // N26 — layer → business application → ontology class → dataset. Loaders are
+  // a count; the Sources tab keeps the per-loader detail. Every layer, every
+  // system and every dataset renders — no slice.
+  const displacedIds = new Set(LAYER_CATEGORY_MATRIX.displaced.map((d) => d.dataset))
+  const byClassTab = (
+    <div className="flex h-full min-h-0 flex-col gap-3 overflow-auto">
+      <p className="text-xs text-muted">
+        The BDAT layer is a system property the dataset inherits; the application id is the system's, a
+        standing placeholder on every committed row. The class is the taxonomy-ontology map's RULED label
+        (applied or confirmed); a dataset with none is UNCLASSIFIED.{' '}
+        {CLASS_VIEW.asset_type.constant ? (
+          <>
+            <code>asset_type</code> is <code>{CLASS_VIEW.asset_type.value}</code> on {CLASS_VIEW.asset_type.rows} of{' '}
+            {CLASS_VIEW.asset_type.of} rows — a constant, not a classification.
+          </>
+        ) : (
+          <>
+            <code>asset_type</code> varies across the rows.
+          </>
+        )}{' '}
+        Replica-ness is <code>origin != system</code>, corroborated by <code>authority: ADS</code>. Inputs digest{' '}
+        <code>{PROVENANCE.digest}</code> over {PROVENANCE.inputs.length} files ({PROVENANCE.how_to_resolve}).
+      </p>
+      {CLASS_VIEW.layers.map((layer) => (
+        <section key={layer.layer} className="flex flex-col gap-2">
+          <h3 className="text-sm font-semibold text-text">{layer.layer}</h3>
+          {layer.systems.map((sys) => (
+            <div key={sys.system ?? sys.name ?? 'none'} className="flex flex-col gap-1">
+              <div className="text-xs text-muted">
+                <span className="font-mono text-text">{sys.system ?? '—'}</span> · {sys.name ?? '—'} · application id:{' '}
+                <span className="font-mono">{sys.application_id ?? '—'}</span> ({sys.application_id_state}) ·{' '}
+                {sys.dataset_count} dataset(s)
+              </div>
+              {sys.classes.length === 0 ? (
+                <div className="text-xs text-faint">no datasets registered under this system</div>
+              ) : (
+                <Table
+                  headers={['Ontology class', 'Dataset', 'Category', 'Acquisition', 'Authority', 'Replica', 'Confirmed', 'Loaders']}
+                >
+                  {sys.classes.flatMap((group) =>
+                    group.datasets.map((d, i) => (
+                      <tr key={d.id} className={i % 2 ? 'bg-bg-2/40' : ''}>
+                        <td className={`${TD} text-muted`}>
+                          {d.ontology_class.classes.length ? (
+                            d.ontology_class.classes.join(' + ')
+                          ) : (
+                            <span title={d.ontology_class.reason ?? ''}>
+                              UNCLASSIFIED{d.ontology_class.pending ? ` (${d.ontology_class.pending} proposed)` : ''}
+                            </span>
+                          )}
+                        </td>
+                        <td className={`${TD} font-mono text-sm text-text`}>
+                          {d.id}
+                          {displacedIds.has(d.id) ? <span className="ml-1 text-xs text-faint">(displaced)</span> : null}
+                        </td>
+                        <td className={`${TD} text-muted`}>{d.taxonomy_category ?? '—'}</td>
+                        <td className={`${TD} text-muted`}>{d.acquisition_mode}</td>
+                        <td className={`${TD} text-muted`}>{d.authority ?? '—'}</td>
+                        <td className={`${TD} text-muted`}>{d.replica}</td>
+                        <td className={`${TD} text-muted`}>{d.confirmed ? 'yes' : 'no'}</td>
+                        <td className={`${TD} tabular-nums text-muted`}>{d.loader_count}</td>
+                      </tr>
+                    )),
+                  )}
+                </Table>
+              )}
+            </div>
+          ))}
+        </section>
+      ))}
+      <section className="flex flex-col gap-1">
+        <h3 className="text-sm font-semibold text-text">Layer x category</h3>
+        <p className="text-xs text-muted">
+          Cells are dataset counts. A singleton whose category has its home (two or more rows) under another
+          layer is displaced — the derivable form of a row that does not fit its neighbors.{' '}
+          {LAYER_CATEGORY_MATRIX.displaced.length
+            ? LAYER_CATEGORY_MATRIX.displaced
+                .map((s) => `${s.dataset} (${s.category} under ${s.layer}; home ${s.home_layer}, ${s.home_rows} rows)`)
+                .join('; ')
+            : 'none today'}
+          .
+        </p>
+        <Table headers={['layer \\ category', ...LAYER_CATEGORY_MATRIX.categories]}>
+          {LAYER_CATEGORY_MATRIX.layers.map((layer, i) => (
+            <tr key={layer} className={i % 2 ? 'bg-bg-2/40' : ''}>
+              <td className={`${TD} font-semibold text-text`}>{layer}</td>
+              {LAYER_CATEGORY_MATRIX.categories.map((c) => {
+                const ids = LAYER_CATEGORY_MATRIX.cells[layer]?.[c] ?? []
+                const displaced = ids.length === 1 && displacedIds.has(ids[0])
+                return (
+                  <td
+                    key={c}
+                    title={ids.join(', ')}
+                    className={`${TD} tabular-nums ${displaced ? 'font-semibold text-text' : ids.length ? 'text-muted' : 'text-faint'}`}
+                  >
+                    {ids.length ? ids.length : '·'}
+                    {ids.length === 1 ? <span className="ml-1 font-mono text-xs">{ids[0]}</span> : null}
+                  </td>
+                )
+              })}
+            </tr>
+          ))}
+        </Table>
+      </section>
+    </div>
+  )
+
   const sequenceTab = (
     <div className="flex h-full min-h-0 flex-col gap-1.5">
       <Table headers={['#', 'Command', 'Mode', 'Profiles', 'Loaders', 'Note']}>
@@ -498,6 +608,7 @@ export default function LoadMapRoute() {
       graphPane={graphPane}
       tabContent={{
         Sources: sourcesTab,
+        'By class': byClassTab,
         Systems: systemsTab,
         'Load sequence': sequenceTab,
         'Retired ids': retiredTab,
