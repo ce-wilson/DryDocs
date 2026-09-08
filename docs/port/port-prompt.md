@@ -2948,6 +2948,50 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   intersection only; your planned full-suite by-test-id pass is the instrument that settles
   it. Nothing is asked back.
 
+- **RELAY-37 — THE GATE-LOG UNION-APPEND HAS NOT LANDED A PRODUCER ENTRY SINCE THE 0825 ROLL:
+  TEN ENTRIES ACROSS THREE ROLLS, AND THE GUARD CAN SEE EXACTLY ONE OF THEM** (new 2026-09-08,
+  mid-apply; nothing here waits for the roll). `[VERIFIED-PRODUCER]` — your
+  `test_gates_json::test_every_log_entry_and_prompt_has_a_row` failure on `idea-series-grammar`
+  is the visible corner of a larger gap. The producer `config/gate-log.md` carries eleven
+  entries after the 2026-08-25 `CatalogSubLOB` ruling; ten of them are owed by tags you have
+  applied or are applying, listed here with the first `port-base-*` tag that carries each:
+  `standard-identity-and-carrier` DRAFTED (2026-08-25, 0826); `tech-partner-attach-level`
+  DRAFTED (2026-08-26, 0826); the org-acronym `cdo-*` rename record (2026-08-26, 0829); the
+  extract-vintage convention record (2026-08-27, 0829); `source-connection-and-run-identity`
+  DRAFTED (2026-08-28, 0829); `replica-derivation-edge` DRAFTED (2026-09-01, 0901); the schema
+  publish-ceiling re-ask for Teams Edition (2026-09-01, 0902); the PLAN1 record freezing the 27
+  letter series (2026-09-02, 0902); `ontology-domain-registry-and-edition-grain` SIGNED OFF
+  14/14 (2026-09-02, 0902); `idea-series-grammar` SIGNED OFF 9/9 (2026-09-05, 0905). The
+  eleventh, the 2026-09-07 DEFERRED entry for three catalog gates, is after the 0905 tag and is
+  not owed. `[SME-REPORTED]` — the tail of your file, as captured, runs from the 2026-08-22
+  vendor-docs entries through the CatalogSubLOB ruling and then your own two 2026-08-27
+  records, and ends there; none of the ten appears in it, and a file that is chronological to
+  that point cannot hold a 2026-08-28-or-later entry anywhere else in order. The check is one
+  `grep -n -F` per heading against your file; the two 2026-08-25/26 DRAFTED records are the
+  ones that could in principle sit earlier by date, so check those first. Second,
+  `[VERIFIED-PRODUCER]` why the guard saw one: `scripts/render_gates.py` gives every prompt a
+  row — a `prompt-only` row when no log entry accounts for it — unless the prompt self-declares
+  (`^# SIGNED OFF` / `^# DEFERRED`, `_SELF_DECLARED_RE`), and of the ten only
+  `config/gate-prompts/idea-series-grammar.yaml` self-declares. So on your tree today four
+  drafted gates render as "session not yet run" instead of "recorded", and a signed 14/14 gate
+  — the domain-registry ruling behind the allocator refusing letter series, which your copy of
+  `.claude/skills/groom-backlog/validate.py` already enforces — renders as never run. The
+  entry-count check in the same test compares the render to the same file and cannot see a
+  missing entry. Nothing in the tree can; this is the PORT6 completeness class for the
+  union-append rows, and the producer will add the by-heading check for them next roll. Third,
+  `[VERIFIED-PRODUCER]` the same 0902 range swept the two 2026-08-05 headings in place to
+  the `cdo-*` slugs (the org-acronym retirement, 2026-08-26; the old string does not appear
+  in publishable files, this one included — the mapping is `internal/cdo-reference/README.md`
+  on your side); under union-append a producer-authored entry takes the producer's current
+  heading, and the render keys rows on heading text. The repair
+  is one commit: for each of the ten headings, in producer order, take the section from
+  `git show port-base-20260905:config/gate-log.md` (a section runs from its `## ` heading to
+  the next), append it, apply the two heading renames, run `scripts/render_board.py` so
+  `web/src/generated/gates.json` refreshes with it, and confirm `tests/unit/test_gates_json.py`
+  green. Your own entries stay where they are; the render does not care that the order is by
+  side rather than by date. The port report's gate-log line should then say ten appended and
+  two headings renamed, not one. Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
