@@ -220,6 +220,94 @@ def _item_module(module: str):
     return _item("WEB1", module=module)
 
 
+# ---- input overlap against the OTHER queue (PLAN5) --------------------------------------
+
+
+@pytest.fixture
+def overlap_items(h):
+    return {
+        "COARSE1": _item("COARSE1", inputs=("drydocs_api/", "docs/reviews/modules/api.md")),
+        "FINE1": _item("FINE1", inputs=("drydocs_api/schemas.py", "docs/reviews/modules/api.md")),
+        "SAME1": _item("SAME1", inputs=("web/src/ask/askApi.ts",)),
+        "SAME2": _item("SAME2", inputs=(".\\web\\src\\ask\\askApi.ts",)),
+        "REVIEWONLY1": _item("REVIEWONLY1", inputs=("docs/reviews/modules/api.md",)),
+        "APART1": _item("APART1", inputs=("drydocs_core/x.py",)),
+        "DONE2": _item("DONE2", status="done", inputs=("drydocs_api/schemas.py",)),
+    }
+
+
+def test_a_coarse_prefix_covers_a_finer_path_and_the_row_names_the_coarse_side(h, overlap_items):
+    rows = h.input_overlaps(["FINE1"], ["COARSE1"], overlap_items)
+    assert [(r["shared"], r["coarse"]) for r in rows] == [("drydocs_api", "COARSE1")]
+    assert h.format_overlap(rows[0]) == (
+        "FINE1 <-> COARSE1: `drydocs_api` (COARSE1's input, coarse) covers `drydocs_api/schemas.py`"
+    )
+    # symmetric: the same collision seen from the coarse side names the same coarse item
+    (back,) = h.input_overlaps(["COARSE1"], ["FINE1"], overlap_items)
+    assert back["coarse"] == "COARSE1"
+    assert h.covers("a/b", "a/b/c") == "a/b" == h.covers("a/b/c", "a/b")
+    assert h.covers("a/b", "a/bc") is None
+
+
+def test_the_same_path_is_one_row_after_normalization(h, overlap_items):
+    (row,) = h.input_overlaps(["SAME1"], ["SAME2"], overlap_items)
+    assert row["coarse"] == "same"
+    assert h.format_overlap(row) == "SAME1 <-> SAME2: both name `web/src/ask/askApi.ts`"
+
+
+def test_a_shared_review_path_is_provenance_and_never_an_overlap(h, overlap_items):
+    """The PLAN5 (b) ruling, 2026-09-08: exclude provenance by convention, no outputs field.
+    COARSE1 and FINE1 both name the review that spawned them; only the code path collides."""
+    assert h.PROVENANCE_PREFIXES == ("docs/reviews/",)
+    assert h.input_overlaps(["REVIEWONLY1"], ["COARSE1", "FINE1"], overlap_items) == []
+    assert len(h.input_overlaps(["FINE1"], ["COARSE1"], overlap_items)) == 1
+    assert h.write_inputs(overlap_items["COARSE1"]) == ["drydocs_api"]
+
+
+def test_disjoint_and_unknown_and_self_ids_yield_no_rows(h, overlap_items):
+    assert h.input_overlaps(["APART1"], ["COARSE1", "GHOST9"], overlap_items) == []
+    assert h.input_overlaps(["COARSE1"], ["COARSE1"], overlap_items) == []
+
+
+def test_check_queue_carries_overlap_as_a_flag_and_render_records_the_other_queue(
+    h, items, overlap_items
+):
+    items.update(overlap_items)
+    ready = [i for i, it in items.items() if it["status"] == "todo" and not it["depends_on"]]
+    (row,), refusals = h.check_queue(["FINE1"], items, ready, "B", other=["COARSE1"])
+    assert refusals == [] and row["overlap"] == [
+        "FINE1 <-> COARSE1: `drydocs_api` (COARSE1's input, coarse) covers `drydocs_api/schemas.py`"
+    ]
+    (clean,), _ = h.check_queue(["FINE1"], items, ready, "B")
+    assert clean["overlap"] == []
+    text = h.render(
+        lane="B", machine="laptop", sender="A", rows=[row], other_queue=["COARSE1", "APART1"]
+    )
+    assert "\nother_queue: [COARSE1, APART1]\n" in text
+    assert "overlap: FINE1 <-> COARSE1" in text
+
+
+def test_check_reruns_the_overlap_from_the_front_matter_and_skips_files_that_predate_it(
+    h, items, overlap_items, tmp_path, capsys
+):
+    items.update(overlap_items)
+    f = tmp_path / "lane-b-handoff.md"
+    f.write_text("---\nqueue: [FINE1]\nother_queue: [COARSE1, DONE2]\n---\n", encoding="utf-8")
+    assert h.cmd_check(f, items) == 1
+    out = capsys.readouterr().out
+    assert "Input overlap, open items on both sides (1):" in out
+    assert "FINE1 <-> COARSE1" in out and "DONE2" not in out  # a done item is not a collision
+    # predates PLAN5: no other_queue line — graceful, and the queue verdict is unchanged
+    f.write_text("---\nqueue: [FINE1]\n---\n", encoding="utf-8")
+    assert h.cmd_check(f, items) == 1
+    out = capsys.readouterr().out
+    assert "no `other_queue:` line" in out and "skipped" in out and "Keep the file" in out
+
+
+def test_the_prototype_retired_when_the_fold_in_landed(h):
+    assert not (Path(h.__file__).parent / "overlap_prototype.py").exists()
+
+
 # ---- check: MISSING is its own state ---------------------------------------------------
 
 

@@ -1,7 +1,7 @@
 """Generate, suggest and check a lane handoff — the per-burst queue one machine hands another.
 
 Usage (from the repo root):
-    python .claude/skills/lane-handoff/scripts/handoff.py --suggest
+    python .claude/skills/lane-handoff/scripts/handoff.py --suggest [--other-queue CFG1,CFG2]
     python .claude/skills/lane-handoff/scripts/handoff.py --lane B --machine laptop \
         --queue LOAD12,CORE3 [--other-queue CFG1,CFG2] [--from "desktop Lane A session"] \
         [--out docs/lane-b-handoff.md]
@@ -34,6 +34,23 @@ and, for a Lane B queue, inputs under a Lane A pen, because which machine
 holds a data root and which session owns a surface this week are the author's
 facts, not the tree's; the flags print, and land in the file, so the decision
 is visible. The other lane's queue gets the same check as NOTES.
+
+INPUTS AGAINST THE OTHER QUEUE'S INPUTS, NOT ONLY AGAINST ITS PENS (PLAN5). The
+2026-09-05 burst queued ten Lane B items and four passed clean while sharing
+input paths with items Lane A was building (WEB8 relocating a file WEB9 edits;
+two items needing a module inside another item's whole-package input), because
+the check compared inputs against Lane A's PENS and never against Lane A's
+QUEUE. :func:`input_overlaps` compares them, prefix-aware — ``drydocs_api/``
+covers ``drydocs_api/schemas.py`` — one row per collision naming both items,
+the shared prefix, and which side supplied the coarse path (a coarse input
+dominates: one ``web/src`` matched seven paths). Inputs under
+:data:`PROVENANCE_PREFIXES` are skipped by convention: the review that spawned
+an item is read-only provenance, not a write target, and ``inputs`` is the only
+path field in the v3 schema — ruled 2026-09-08 (PLAN5 (b)) over growing the
+schema with an ``outputs:`` field. Generate records the other queue in an
+additive ``other_queue:`` front-matter line so ``--check`` can re-run the
+comparison without parsing the prose table (J37); a file that predates the line
+gets a graceful skip, not a failure.
 
 Reads the backlog; writes ONE markdown file; touches nothing else. It does
 not claim items (the pull rule does that, per item, at pull time), does not
@@ -107,6 +124,12 @@ MODULE_SURFACES: dict[str, tuple[tuple[str, str], ...]] = {
 #: Input paths that say "this item needs data that lives on one machine".
 VENUE_MARKERS: tuple[str, ...] = ("internal-local/", "DRYDOCS_DATA_ROOT", "data/DryDocs")
 
+#: Inputs that are PROVENANCE, never write targets, and so never an overlap: the review
+#: that spawned an item. Excluded by convention rather than by an ``outputs:`` field —
+#: the ruling PLAN5 carried (2026-09-08): 66 of 663 items name a review path, three WEB
+#: items on each lane named the same one, and none of them writes it.
+PROVENANCE_PREFIXES: tuple[str, ...] = ("docs/reviews/",)
+
 LANES = ("A", "B")
 
 
@@ -170,14 +193,92 @@ def gate_flags(item: dict) -> list[str]:
     return [f"gate-bound: {', '.join(gates)} (an SME session, not a build)"] if gates else []
 
 
+def write_inputs(item: dict) -> list[str]:
+    """An item's inputs as normalized, slash-stripped paths, minus provenance."""
+    out: list[str] = []
+    for raw in item.get("inputs") or []:
+        p = norm_path(raw).rstrip("/")
+        if any(p == pre.rstrip("/") or p.startswith(pre) for pre in PROVENANCE_PREFIXES):
+            continue
+        out.append(p)
+    return out
+
+
+def covers(a: str, b: str) -> str | None:
+    """The shared prefix when one normalized path is the other or contains it, else None.
+    Symmetric on purpose (the prototype's rule): ``drydocs_api`` covers
+    ``drydocs_api/schemas.py`` whichever side names which."""
+    if a == b:
+        return a
+    if b.startswith(a + "/"):
+        return a
+    if a.startswith(b + "/"):
+        return b
+    return None
+
+
+def input_overlaps(
+    ids: list[str], other: list[str], items: dict[str, dict]
+) -> list[dict[str, str]]:
+    """Every (this item, other item) pair whose write inputs share a prefix — one row per
+    collision, carrying both paths so the reader sees which side was coarse. Ids the
+    backlog does not hold are skipped here; ``check_queue`` refuses them by name."""
+    rows: list[dict[str, str]] = []
+    for iid in ids:
+        if iid not in items:
+            continue
+        for oid in other:
+            if oid not in items or oid == iid:
+                continue
+            for p in write_inputs(items[iid]):
+                for q in write_inputs(items[oid]):
+                    shared = covers(p, q)
+                    if shared is None:
+                        continue
+                    coarse = "same" if p == q else (iid if shared == p else oid)
+                    rows.append(
+                        {
+                            "id": iid,
+                            "other": oid,
+                            "shared": shared,
+                            "path": p,
+                            "other_path": q,
+                            "coarse": coarse,
+                        }
+                    )
+    return rows
+
+
+def format_overlap(row: dict[str, str]) -> str:
+    """``A <-> B: shared prefix (who was coarse)`` — one line, both items, the prefix."""
+    if row["coarse"] == "same":
+        return f"{row['id']} <-> {row['other']}: both name `{row['shared']}`"
+    fine = row["other_path"] if row["coarse"] == row["id"] else row["path"]
+    return (
+        f"{row['id']} <-> {row['other']}: `{row['shared']}` ({row['coarse']}'s input, coarse) "
+        f"covers `{fine}`"
+    )
+
+
+def overlap_flags(iid: str, other: list[str], items: dict[str, dict]) -> list[str]:
+    return [format_overlap(r) for r in input_overlaps([iid], other, items)]
+
+
 def check_queue(
-    ids: list[str], items: dict[str, dict], ready: list[str], lane: str = "B"
+    ids: list[str],
+    items: dict[str, dict],
+    ready: list[str],
+    lane: str = "B",
+    other: list[str] | None = None,
 ) -> tuple[list[dict], list[str]]:
     """Validate an ordered queue: refusals stop the run; flags ride into the file.
 
     Surface flags are a Lane B concern: Lane A OWNS those pens, so a Lane A queue
     of gate sessions is the normal case, not a warning (the first eval run flagged
     G116-G119 for touching config/gate-prompts on a Lane A handoff — wrong).
+    Overlap flags need ``other`` — the other lane's queue — and are a flag, not a
+    refusal: Lane B took R12 and O68 knowingly on 2026-09-05, and that is the
+    author's call to make with the collision in front of them.
     """
     rows, refusals = [], []
     seen: set[str] = set()
@@ -217,6 +318,7 @@ def check_queue(
                 "venue": venue_flags(item),
                 "surfaces": surface_flags(item) if lane == "B" else [],
                 "gates": gate_flags(item),
+                "overlap": overlap_flags(iid, other or [], items),
             }
         )
     return rows, refusals
@@ -275,6 +377,7 @@ def render(
         f"generated: {today}",
         f"generated_at: {sha} ({branch})",
         f"queue: [{', '.join(queue_ids)}]",
+        f"other_queue: [{', '.join(other_queue)}]",
         f"pens: [{', '.join(pens)}]",
         "---",
         "",
@@ -322,6 +425,7 @@ def render(
     ]
     for n, r in enumerate(rows, 1):
         notes = r["venue"] + r["surfaces"] + r["gates"]
+        notes += [f"overlap: {o}" for o in r.get("overlap", [])]
         note = "; ".join(notes) if notes else "clean"
         deps = f" (after {', '.join(r['deps'])})" if r["deps"] else ""
         out.append(
@@ -453,22 +557,32 @@ def render(
     return "\n".join(out)
 
 
-def cmd_suggest(items: dict[str, dict], ready: list[str]) -> int:
+def cmd_suggest(items: dict[str, dict], ready: list[str], other: list[str] | None = None) -> int:
+    other = other or []
     by_module: dict[str, list[dict]] = {}
     for iid in ready:
         by_module.setdefault(str(items[iid].get("module")), []).append(items[iid])
     print(
         f"Ready to pull: {len(ready)} items, grouped by module. Marks: V = machine-local input, "
-        "S = under a Lane A pen (a Lane B concern), G = gate-bound (an SME session)\n"
+        "S = under a Lane A pen (a Lane B concern), G = gate-bound (an SME session), "
+        "O = input overlaps an item in --other-queue"
+        + (f" ({', '.join(other)})" if other else " (none given)")
+        + "\n"
     )
     for module in sorted(by_module):
         print(f"[{module}]")
         for it in by_module[module]:
             v, s, g = venue_flags(it), surface_flags(it), gate_flags(it)
-            marks = ("V" if v else "-") + ("S" if s else "-") + ("G" if g else "-")
+            o = overlap_flags(str(it["id"]), other, items)
+            marks = (
+                ("V" if v else "-")
+                + ("S" if s else "-")
+                + ("G" if g else "-")
+                + ("O" if o else "-")
+            )
             title = " ".join(str(it.get("title", "")).split())
             print(f"  {marks} {it['id']:7} {it.get('priority')}  {title[:88]}")
-            for f in v + s + g:
+            for f in v + s + g + [f"overlap: {x}" for x in o]:
                 print(f"        - {f}")
         print()
     return 0
@@ -481,6 +595,8 @@ def cmd_check(path: Path, items: dict[str, dict]) -> int:
         print(f"{path}: no `queue:` line in the front matter — not a generated handoff")
         return 2
     ids = [x.strip() for x in m.group(1).split(",") if x.strip()]
+    om = re.search(r"^other_queue: \[(.*?)\]$", text, re.M)
+    other = [x.strip() for x in om.group(1).split(",") if x.strip()] if om else []
     open_ids, missing_ids = [], []
     for iid in ids:
         item = items.get(iid)
@@ -492,6 +608,20 @@ def cmd_check(path: Path, items: dict[str, dict]) -> int:
         print(f"  {iid:7} {status}")
         if status != "done":
             open_ids.append(iid)
+    if om is None:
+        print(
+            "\n(no `other_queue:` line — a handoff generated before PLAN5; the input-overlap "
+            "check is skipped for this file)"
+        )
+    else:
+        open_other = [o for o in other if o in items and str(items[o].get("status")) != "done"]
+        overlaps = input_overlaps(open_ids, open_other, items)
+        if overlaps:
+            print(f"\nInput overlap, open items on both sides ({len(overlaps)}):")
+            for r in overlaps:
+                print(f"  - {format_overlap(r)}")
+        else:
+            print("\nNo input overlap between the open items on either side.")
     if missing_ids:
         print(
             f"\nMISSING: {', '.join(missing_ids)} — not open, not done: the queue predates a change "
@@ -515,7 +645,10 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--machine", help="the receiving machine, e.g. laptop / desktop")
     ap.add_argument("--queue", help="ordered, comma-separated item ids for the receiving lane")
     ap.add_argument(
-        "--other-queue", default="", help="ids the OTHER lane holds (fenced in the file)"
+        "--other-queue",
+        default="",
+        help="ids the OTHER lane holds (fenced in the file; with --suggest, the overlap check's "
+        "other side)",
     )
     ap.add_argument("--from", dest="sender", default="", help="who is handing off")
     ap.add_argument("--out", type=Path, help="output path (default docs/lane-<x>-handoff.md)")
@@ -527,31 +660,33 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
 
     _, items, ready = load()
+    other = [x.strip() for x in args.other_queue.split(",") if x.strip()]
     if args.suggest:
-        return cmd_suggest(items, ready)
+        return cmd_suggest(items, ready, other)
     if args.check:
         return cmd_check(args.check, items)
     if not (args.lane and args.machine and args.queue):
         ap.error("generate needs --lane, --machine and --queue (or use --suggest / --check)")
 
-    rows, refusals = check_queue(args.queue.split(","), items, ready, args.lane)
+    rows, refusals = check_queue(args.queue.split(","), items, ready, args.lane, other)
     if refusals:
         print("REFUSED — fix the queue:")
         for r in refusals:
             print(f"  - {r}")
         return 2
-    flagged = [r["id"] for r in rows if r["venue"] or r["surfaces"]]
+    flagged = [r["id"] for r in rows if r["venue"] or r["surfaces"] or r["overlap"]]
     if flagged and not args.allow_flagged:
-        print(f"FLAGGED — {', '.join(flagged)} carry venue or surface flags (shown below).")
+        print(
+            f"FLAGGED — {', '.join(flagged)} carry venue, surface or overlap flags (shown below)."
+        )
         for r in rows:
-            for f in r["venue"] + r["surfaces"]:
+            for f in r["venue"] + r["surfaces"] + [f"overlap: {o}" for o in r["overlap"]]:
                 print(f"  - {r['id']}: {f}")
         print(
             "Rule on them, then re-run with --allow-flagged to write the file with the flags recorded."
         )
         return 3
 
-    other = [x.strip() for x in args.other_queue.split(",") if x.strip()]
     other_lane = "B" if args.lane == "A" else "A"
     notes = other_queue_notes(other, items, ready, other_lane)
     for n in notes:

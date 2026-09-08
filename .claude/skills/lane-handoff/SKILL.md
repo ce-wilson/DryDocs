@@ -61,9 +61,9 @@ that disagree. So:
 
 | Mode | Command | Reads | Writes |
 |---|---|---|---|
-| suggest | `--suggest` | the backlog | nothing — the Ready strip by module, marked V (machine-local) / S (Lane A pen) / G (gate-bound) |
+| suggest | `--suggest [--other-queue …]` | the backlog | nothing — the Ready strip by module, marked V (machine-local) / S (Lane A pen) / G (gate-bound) / O (input overlaps an item in `--other-queue`) |
 | generate | `--lane B --machine laptop --queue LOAD12,CORE3 [--other-queue …] [--from …] [--out …]` | the backlog, `git` | one file, `docs/lane-<x>-handoff.md` |
-| check | `--check docs/lane-b-handoff.md` | the backlog | nothing — each queued id's status; retire when all are `done` |
+| check | `--check docs/lane-b-handoff.md` | the backlog | nothing — each queued id's status, and the input overlaps still open between `queue:` and `other_queue:`; retire when all are `done` |
 
 Readiness is `drydocs_core.backlog_store.derive_summary` — the board's own rule — so the queue
 and the Ready-to-pull strip cannot disagree. The script **refuses** what the tree knows to be
@@ -74,13 +74,31 @@ normal case and is not flagged). Flagged queues need `--allow-flagged`, and the 
 the file. The `--other-queue` ids get the same check as **notes**, so the sender learns here
 that MM4 was never ready or that MM5's input is machine-local, not on the other machine.
 
+**Inputs against the other queue's inputs, not only against its pens (PLAN5, 2026-09-08).**
+The 2026-09-05 burst queued ten Lane B items and four passed clean while sharing input paths
+with items Lane A was building, because the check compared inputs against Lane A's PENS and
+never against Lane A's QUEUE. Now every queued item's `inputs` are compared with every
+`--other-queue` item's `inputs`, prefix-aware (`drydocs_api/` covers `drydocs_api/schemas.py`),
+one row per collision naming both items, the shared prefix and which side supplied the coarse
+path — a coarse input dominates (one `web/src` matched seven paths), so the reader has to see
+whose it was. An overlap is a **flag**, not a refusal: Lane B took R12 and O68 knowingly, and
+that is the author's call to make with the collision in front of them. Inputs under
+`docs/reviews/` are skipped by convention — the review that spawned an item is provenance, not
+a write target, and `inputs` is the only path field in the v3 schema; the ruling (2026-09-08)
+was to exclude by convention rather than grow the schema with `outputs:`, so the convention is
+one named constant, `PROVENANCE_PREFIXES`, pinned by a test. Generate records the other side
+in an additive `other_queue:` front-matter line so `--check` re-runs the comparison over the
+items still open on both sides without parsing the prose table (J37); a file generated before
+the line says so and skips that part.
+
 **One vocabulary for surfaces.** `PENS` in the script is keyed by §0's pen names (`backlog`,
 `port`, `adr`) plus two this skill adds and marks as additions (`gates`, `snapshot`). The
 surfaces table AND the `pen:` line the receiving session commits are both generated from that
 one structure, so the file and §0 cannot say different things. Change a surface's owner there,
 with the reason — it is policy, not a guard. `tests/unit/test_lane_handoff.py` pins the refuse /
-flag split, the lane-aware pens, path normalization, the other-queue notes and `--check`'s
-MISSING state.
+flag split, the lane-aware pens, path normalization, the other-queue notes, `--check`'s
+MISSING state, and the overlap check (the coarse-prefix case, the provenance exclusion, and a
+file that predates `other_queue:`).
 
 It does not claim items — the pull rule does that per item, at pull time. It does not render,
 mint, or commit.
@@ -94,7 +112,10 @@ ordering, not the strip's.
 **2. `--suggest`,** then pick the queue with the user, by module. Prefer items whose `inputs`
 are disjoint from the other lane's, code+tests items for a lane without Neo4j, and never a
 gate-runner item unless that machine is where the SME sits. A `V` mark means the data lives
-somewhere: put the item on the machine that has it, or leave it out and say so.
+somewhere: put the item on the machine that has it, or leave it out and say so. Once the
+sender's own queue is known, re-run with `--other-queue <those ids>`: an `O` mark names the
+collision and the coarse side, and the user rules whether the item moves lanes, waits, or is
+taken knowingly.
 
 **3. Generate,** passing `--other-queue` with the ids Lane A keeps for itself. Read the output
 once as the receiving session would: is every "Notes from the check" cell actionable?
