@@ -1,17 +1,17 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-07T18:52:52",
+    "captured_at": "2026-09-07T20:07:52",
     "date": "20260907",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "2e71ede1",
-      "full": "2e71ede1e8918d26068e82210623853d8b20752c",
+      "commit": "fe9ff979",
+      "full": "fe9ff979fed2874143d25f9cd0f04d7fdca1e341",
       "branch": "main",
-      "describe": "port-base-20260905-228-g2e71ede1",
-      "subject": "chore(G127): claim - escape the surviving historical database mentions and widen the guard (Lane B queue item 5)",
-      "dirty": true,
+      "describe": "port-base-20260905-262-gfe9ff979",
+      "subject": "chore(lane-a): Lane B queue closed - the O72 manifest rows, Idea-285, one render, the handoff retired",
+      "dirty": false,
       "untracked_present": false,
       "pr": null
     },
@@ -4706,6 +4706,51 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/.claude/skills/research-probe-discipline/evals",
+      "name": "evals",
+      "extension": "",
+      "rel_path": ".claude/skills/research-probe-discipline/evals",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/research-probe-discipline/evals/evals.json",
+      "name": "evals.json",
+      "extension": ".json",
+      "rel_path": ".claude/skills/research-probe-discipline/evals/evals.json",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/research-probe-discipline/evals/files",
+      "name": "files",
+      "extension": "",
+      "rel_path": ".claude/skills/research-probe-discipline/evals/files",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/research-probe-discipline/evals/files/cyclic-type-trap.md",
+      "name": "cyclic-type-trap.md",
+      "extension": ".md",
+      "rel_path": ".claude/skills/research-probe-discipline/evals/files/cyclic-type-trap.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/research-probe-discipline/evals/files/smuggling-dot.md",
+      "name": "smuggling-dot.md",
+      "extension": ".md",
+      "rel_path": ".claude/skills/research-probe-discipline/evals/files/smuggling-dot.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/.claude/skills/research-probe-discipline/references",
       "name": "references",
       "extension": "",
@@ -5813,6 +5858,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/.dockerignore",
+      "name": ".dockerignore",
+      "extension": "",
+      "rel_path": ".dockerignore",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/.editorconfig",
       "name": ".editorconfig",
       "extension": "",
@@ -6330,6 +6384,15 @@
       "name": "serve.py",
       "extension": ".py",
       "rel_path": "agents/serve.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/compose.yaml",
+      "name": "compose.yaml",
+      "extension": ".yaml",
+      "rel_path": "compose.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -7590,6 +7653,51 @@
       "name": "ui-tests.yaml",
       "extension": ".yaml",
       "rel_path": "config/taxonomy/ui-tests.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/deploy",
+      "name": "deploy",
+      "extension": "",
+      "rel_path": "deploy",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/deploy/agent.Dockerfile",
+      "name": "agent.Dockerfile",
+      "extension": ".Dockerfile",
+      "rel_path": "deploy/agent.Dockerfile",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/deploy/api.Dockerfile",
+      "name": "api.Dockerfile",
+      "extension": ".Dockerfile",
+      "rel_path": "deploy/api.Dockerfile",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/deploy/console.Dockerfile",
+      "name": "console.Dockerfile",
+      "extension": ".Dockerfile",
+      "rel_path": "deploy/console.Dockerfile",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/deploy/render_proxy_config.mjs",
+      "name": "render_proxy_config.mjs",
+      "extension": ".mjs",
+      "rel_path": "deploy/render_proxy_config.mjs",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -9224,15 +9332,6 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/docs/lane-b-handoff.md",
-      "name": "lane-b-handoff.md",
-      "extension": ".md",
-      "rel_path": "docs/lane-b-handoff.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
       "file_id": "drydocs/docs/next-session-handoff.md",
       "name": "next-session-handoff.md",
       "extension": ".md",
@@ -9908,6 +10007,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/AGENT1.yaml",
+      "name": "AGENT1.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/AGENT1.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/API1.yaml",
       "name": "API1.yaml",
       "extension": ".yaml",
@@ -9930,6 +10038,15 @@
       "name": "API3.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/API3.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/API4.yaml",
+      "name": "API4.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/API4.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -10403,6 +10520,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/CFG4.yaml",
+      "name": "CFG4.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/CFG4.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/CORE1.yaml",
       "name": "CORE1.yaml",
       "extension": ".yaml",
@@ -10434,6 +10560,15 @@
       "name": "CORE4.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/CORE4.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/CORE5.yaml",
+      "name": "CORE5.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/CORE5.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -14678,6 +14813,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/PLAN7.yaml",
+      "name": "PLAN7.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/PLAN7.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/PLAN8.yaml",
+      "name": "PLAN8.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/PLAN8.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/PORT1.yaml",
       "name": "PORT1.yaml",
       "extension": ".yaml",
@@ -15186,6 +15339,15 @@
       "name": "REF1.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/REF1.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/REM1.yaml",
+      "name": "REM1.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/REM1.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -15780,6 +15942,15 @@
       "name": "WEB17.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/WEB17.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/WEB18.yaml",
+      "name": "WEB18.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/WEB18.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -22742,10 +22913,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260907.json",
-      "name": "drydocs-20260907.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260907-1852.json",
+      "name": "drydocs-20260907-1852.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260907.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260907-1852.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -24825,6 +24996,15 @@
       "name": "test_component_run_logs.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_component_run_logs.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_compose_stack.py",
+      "name": "test_compose_stack.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_compose_stack.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -36505,6 +36685,11 @@
     [
       "drydocs",
       "CONTAINS",
+      "drydocs/.dockerignore"
+    ],
+    [
+      "drydocs",
+      "CONTAINS",
       "drydocs/.editorconfig"
     ],
     [
@@ -36585,7 +36770,17 @@
     [
       "drydocs",
       "CONTAINS",
+      "drydocs/compose.yaml"
+    ],
+    [
+      "drydocs",
+      "CONTAINS",
       "drydocs/config"
+    ],
+    [
+      "drydocs",
+      "CONTAINS",
+      "drydocs/deploy"
     ],
     [
       "drydocs",
@@ -39365,7 +39560,32 @@
     [
       "drydocs/.claude/skills/research-probe-discipline",
       "CONTAINS",
+      "drydocs/.claude/skills/research-probe-discipline/evals"
+    ],
+    [
+      "drydocs/.claude/skills/research-probe-discipline",
+      "CONTAINS",
       "drydocs/.claude/skills/research-probe-discipline/references"
+    ],
+    [
+      "drydocs/.claude/skills/research-probe-discipline/evals",
+      "CONTAINS",
+      "drydocs/.claude/skills/research-probe-discipline/evals/evals.json"
+    ],
+    [
+      "drydocs/.claude/skills/research-probe-discipline/evals",
+      "CONTAINS",
+      "drydocs/.claude/skills/research-probe-discipline/evals/files"
+    ],
+    [
+      "drydocs/.claude/skills/research-probe-discipline/evals/files",
+      "CONTAINS",
+      "drydocs/.claude/skills/research-probe-discipline/evals/files/cyclic-type-trap.md"
+    ],
+    [
+      "drydocs/.claude/skills/research-probe-discipline/evals/files",
+      "CONTAINS",
+      "drydocs/.claude/skills/research-probe-discipline/evals/files/smuggling-dot.md"
     ],
     [
       "drydocs/.claude/skills/research-probe-discipline/references",
@@ -40803,6 +41023,26 @@
       "drydocs/config/taxonomy-ontology-map/90-summary.yaml"
     ],
     [
+      "drydocs/deploy",
+      "CONTAINS",
+      "drydocs/deploy/agent.Dockerfile"
+    ],
+    [
+      "drydocs/deploy",
+      "CONTAINS",
+      "drydocs/deploy/api.Dockerfile"
+    ],
+    [
+      "drydocs/deploy",
+      "CONTAINS",
+      "drydocs/deploy/console.Dockerfile"
+    ],
+    [
+      "drydocs/deploy",
+      "CONTAINS",
+      "drydocs/deploy/render_proxy_config.mjs"
+    ],
+    [
       "drydocs/docs",
       "CONTAINS",
       "drydocs/docs/RELATIONSHIP_GUIDE.md"
@@ -40836,11 +41076,6 @@
       "drydocs/docs",
       "CONTAINS",
       "drydocs/docs/history"
-    ],
-    [
-      "drydocs/docs",
-      "CONTAINS",
-      "drydocs/docs/lane-b-handoff.md"
     ],
     [
       "drydocs/docs",
@@ -42130,6 +42365,11 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/AGENT1.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/API1.yaml"
     ],
     [
@@ -42141,6 +42381,11 @@
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
       "drydocs/docs/restructure/backlog/items/API3.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/API4.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -42405,6 +42650,11 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/CFG4.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/CORE1.yaml"
     ],
     [
@@ -42421,6 +42671,11 @@
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
       "drydocs/docs/restructure/backlog/items/CORE4.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/CORE5.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -44780,6 +45035,16 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/PLAN7.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/PLAN8.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/PORT1.yaml"
     ],
     [
@@ -45061,6 +45326,11 @@
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
       "drydocs/docs/restructure/backlog/items/REF1.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/REM1.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -45391,6 +45661,11 @@
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
       "drydocs/docs/restructure/backlog/items/WEB17.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/WEB18.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -49185,7 +49460,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260907.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260907-1852.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -50271,6 +50546,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_component_run_logs.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_compose_stack.py"
     ],
     [
       "drydocs/tests/unit",
@@ -52777,13 +53057,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2936,
+    "files": 2953,
     "edges": 1788,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 3255,
-    "directories": 320
+    "rels": 3275,
+    "directories": 323
   }
 }
