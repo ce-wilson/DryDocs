@@ -60,9 +60,11 @@ const agentPrefix = prefixOf('agent')
 // and forwarded `Origin` untouched, so a service listening on its own port
 // received `Origin: <the page's origin>` and correctly read it as cross-origin.
 // The ADK server (agents/serve.py, which passes no --allow_origins on this ADR's
-// reasoning) has origin checking ON with an EMPTY allowlist, so it answered
-// 403 "origin not allowed" to every console Ask while /api worked — drydocs-api
-// has no origin check at all, which is why only one prefix ever failed.
+// reasoning) checks the header UNCONDITIONALLY and, with nothing configured,
+// allows only its OWN origin — same-origin-only, not an absent check, so no
+// allowlist value would have helped and the proxy was the only place to fix it.
+// It answered 403 "origin not allowed" to every console Ask while /api worked —
+// drydocs-api has no origin check at all, which is why only one prefix failed.
 //
 // Clearing it here restores the ADR's own premise at the hop where it was lost:
 // the request reaching the upstream is not cross-origin, because it no longer
