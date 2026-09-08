@@ -7121,7 +7121,7 @@ hand-carried and nothing parked.
     ritual under the existing patterns (snapshots, claims, renders, grooms); 303 are cited in
     steps 334–353 — the 302 the ledger was written against plus the roll commit itself. No
     pattern spelling drifted this roll, so `drydocs/port/port_preflight.py` is untouched. The
-    roll commit (`ROLL7SHA`, subject `docs(port):` — outside the `chore(port): roll` ritual
+    roll commit (`98270a44`, subject `docs(port):` — outside the `chore(port): roll` ritual
     pattern, so it is cited here rather than exempted) touches `docs/port/port-prompt.md`, the
     plan renders, and two research-probe-discipline eval fixtures whose machine-local
     transcript paths lost their backticks — preflight check 4 resolves every backticked path
