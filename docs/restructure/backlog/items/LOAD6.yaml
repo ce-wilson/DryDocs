@@ -8,9 +8,48 @@ agent: main
 model: fable
 priority: p2
 status: todo
-depends_on: []
-inputs: []
+depends_on: [Z4]
+gates: [server-location-ontology]
+inputs:
+- docs/reviews/modules/lineage-2026-09-08.md
+- drydocs_core/ontology/relationship_vocabulary/51-local-infrastructure.yaml
+- web/src/components/map/resolve.ts
 acceptance: |
-  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).
+  The operational question is not which of the fifty virtual servers behind a load-balancer
+  alias ran the job - it is which DATA CENTER is live for that job now, keyed by city and
+  state, since prod and DR share a country. A builder who wires the edge alone emits fifty
+  RESOLVES_TO_SERVER edges with match_tier dns-resolved, satisfies the shape the SIGNED
+  server-location-ontology gate already fixed, and leaves the question unanswered.
+
+  (a) The ruling comes VIA THE GATE - a rider on server-location-ontology (or its own prompt if
+      the SME prefers a fresh one), never decided in the build. Three questions go to the SME:
+      what observation makes a data center ACTIVE for a job; how observations that DISAGREE
+      across a bundle collapse (latest wins, majority, or all shown with their dates); and
+      whether the collapsed answer is a property on the existing edge or an edge of its own.
+      Any new or reshaped relationship stays status planned in the relationship-vocabulary
+      registry until the gate is signed.
+  (b) The prompt states the constraint that makes this a ruling and not a lookup: an nslookup
+      answer records where the alias POINTED AT COLLECTION TIME - an observation, not a status -
+      and the Z2 discipline is positive-only observation that never infers absence, so a stale
+      bundle can say "not observed since X" and can never say "active now".
+  (c) The prompt carries the USE CASE, not just the edge: the acceptance of the build that
+      follows is that one job yields ONE data center by city and state, not fifty servers.
+  (d) Scope is stated so the build is not mis-taken for UI work: the renderer half already
+      exists - web/src/components/map/resolve.ts de-duplicates data centers per site (its test
+      "merges rows at one city and de-duplicates data centres and origins") - so the missing
+      piece is the COLLAPSE RULE from N resolved members to one data center.
+  (e) The build that reads the Z4 evidence file into the server-resolution pass is a SEPARATE
+      item, minted when the gate is signed and named in this item close note.
 notes: |
-  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).
+  Groomed 2026-09-08 from IDEAS.md Idea-304 (base venue, desktop). Source is SME direction
+  2026-09-08 against L1-1 of the slot-3 lineage review
+  (docs/reviews/modules/lineage-2026-09-08.md, grooming candidate 1, amended on
+  review/module-sweep at f8c4953a).
+
+  module drydocs-load per the entry (the server-resolution pass), with drydocs-lineage at the
+  seam - Z4 is a drydocs-lineage item and this one consumes its evidence file. epic
+  server-location, phase 6, with Z2 and Z4. model fable: it changes what an edge MEANS.
+  depends_on Z4 because the evidence file is its output.
+
+  This item DRAFTS and RUNS the ruling; it does not write the edge. That is the HITL rule and
+  the reason the acceptance says "via the gate".

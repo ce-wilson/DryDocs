@@ -8,9 +8,35 @@ agent: main
 model: sonnet
 priority: p2
 status: todo
-depends_on: []
-inputs: []
+depends_on: [V7]
+inputs:
+- docs/design/drydocs-remediation-runbook.md
+- drydocs/data/samples/
 acceptance: |
-  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).
+  The remediation runbook names exactly one CLI verb, drydocs profile-folder-set <export-dir>,
+  and no synthetic Control-M XML export exists in the tree for it to read - so the runbook
+  cannot be demonstrated in a clone. That is the J18 preference (sample-reproducible over
+  machine-pinned) failing on the one document written for the support audience. The other
+  sample-driven verbs (ingest-controlm, the demo interlock) read fixtures under
+  drydocs/data/samples/; the folder-set profiler has none, so its only demonstrations have been
+  against real exports on one machine and the runbook reader takes the output shape on faith.
+
+  (a) A synthetic export is checked in beside the other samples: two or three folders, a dozen
+      jobs, one instance of each defect the remediation detectors handle. Deliberately
+      synthetic - the job of the fixture is to be READABLE, not representative.
+  (b) Its application ids come from the 70001-70099 block, the same block the demo folders use,
+      so the app-id read in the demo interlock stays true.
+  (c) A header comment in the fixture names the rules it exercises, one line each, so a reader
+      can tell which finding each job is there to produce.
+  (d) The runbook command line points at the fixture path, and the "one verb" statement stays
+      accurate.
+  (e) A unit test runs the verb against the fixture and pins the TOP-LEVEL shape of the report
+      (counts and section keys, not prose) - J76: the instrument gets a fixture.
 notes: |
-  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).
+  Groomed 2026-09-08 from IDEAS.md Idea-299 (base venue, desktop); source is the Lane B V7
+  close - the verb at runbook line 101 and the one-verb statement at line 124, both to be
+  re-found at build time rather than trusted from here.
+
+  module drydocs-remediation because the profiler and its detectors are that component; epic
+  sme-runbooks and phase 10 because the fixture exists to make V7 demonstrable. depends_on V7,
+  which is done. p2.

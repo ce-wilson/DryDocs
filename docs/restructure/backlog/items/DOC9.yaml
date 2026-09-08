@@ -9,8 +9,36 @@ model: sonnet
 priority: p2
 status: todo
 depends_on: []
-inputs: []
+inputs:
+- scripts/render_design_doc.py
+- tests/unit/test_design_doc.py
+- docs/design/
 acceptance: |
-  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).
+  The board and the roadmap have test_committed_roadmap_page_matches_its_sources; the design
+  docs have only the session ritual. tests/unit/test_design_doc.py pins the RENDERER
+  (determinism, one surface per L13, anchors, the rev footer read from the DECLARED rev) but
+  never opens a committed .html, and the stale-render check in CLAUDE.md section 0 is a habit.
+  Idea-111 already records what a habit-only check costs: Lane B committed four governed design
+  renders on wip branches and nothing in CI would have said either way.
+
+  (a) For every docs/design/<stem>.md, the guard renders in memory and compares to the
+      committed docs/design/<stem>.html, reporting the stems that DIFFER (all of them, not the
+      first).
+  (b) The comparison is on the renderer BYTES, never a normalized or whitespace-tolerant form:
+      governed renders publish VERBATIM (CLAUDE.md section 6), so a restyled copy must fail.
+  (c) The tolerance is settled and stated in the docstring rather than discovered later. Start
+      strict - Y5 exists because a claim is a status-only edit that ships no render, and a
+      design doc has no equivalent one-key edit. The case to check before committing to strict
+      is a .md that changes ONLY its rev: line under the L5 feedback loop; whichever way that
+      is ruled, the docstring says why.
+  (d) A fixture proves the guard fails on a hand-edited .html and passes on a freshly rendered
+      one (J76: the instrument gets a fixture).
 notes: |
-  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).
+  Groomed 2026-09-08 from IDEAS.md Idea-285 (base venue, desktop); source is the Lane B close
+  report (laptop, 2026-09-07) handed back to the inbox. G127 and V10 are the two items whose
+  renders it noticed.
+
+  module docs rather than a drydocs-docs (which is not a module in modules.yaml): the guard
+  lives beside tests/unit/test_design_doc.py and the surfaces are docs/design/. phase 10 /
+  doc-infrastructure with the rest of Epic L. p2 - a stale governed render breaks HITL feedback
+  re-attachment silently, which is the failure the ritual exists to prevent.

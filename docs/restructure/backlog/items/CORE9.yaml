@@ -8,9 +8,33 @@ agent: main
 model: sonnet
 priority: p3
 status: todo
-depends_on: []
-inputs: []
+depends_on: [CORE4]
+inputs:
+- tests/unit/test_skip_guard_policy.py
+- tests/unit/test_data_centers.py
+- tests/unit/test_email_extracts.py
 acceptance: |
-  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).
+  CORE4 rewrote the skip-guard policy, and after it several test files pass the policy WITHOUT
+  the guards they still carry - tests/unit/test_data_centers.py and
+  tests/unit/test_email_extracts.py are the two the CORE4 close note names, and it reported
+  five in total. The CORE4 finding was that a skip guard written to satisfy J8 rather than to
+  protect anything is worse than no guard, because it looks like a decision. These five are
+  the same finding one step milder: the guard is real, the policy simply stopped needing it.
+
+  (a) The five files are ENUMERATED first, by running tests/unit/test_skip_guard_policy.py
+      against the current tree - not by trusting the two names in this item, which came from
+      a close note written before the merge.
+  (b) For each file, the guard is removed and the policy test re-run; where it stays green
+      the guard and its docstring sentence go, where it does not the guard stays and the
+      close note says which file and why.
+  (c) The unit suite is green afterwards, and the number of skips the policy test reports is
+      stated in the close note before and after.
+  (d) The close note names all five files by path. Nothing else in those tests changes - this
+      removes vestigial guards, it does not touch assertions.
 notes: |
-  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).
+  Groomed 2026-09-08 from IDEAS.md Idea-296 (base venue, desktop); the finding is the CORE4
+  close note, "reported, not fixed" - the CORE4 clauses did not cover a sweep.
+
+  module drydocs-core because tests/unit/test_skip_guard_policy.py is the instrument and CORE4
+  owns it. depends_on CORE4, which is done, so this is startable now. p3: nothing is broken;
+  the cost is that a guard protecting nothing reads as protection.

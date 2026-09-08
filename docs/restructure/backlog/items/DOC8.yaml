@@ -8,9 +8,34 @@ agent: main
 model: sonnet
 priority: p3
 status: todo
-depends_on: []
-inputs: []
+depends_on: [J67]
+inputs:
+- .github/workflows/ci.yml
+- pyproject.toml
 acceptance: |
-  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).
+  The 3.14 advisory leg emits 37 warnings where the 3.12 leg emits 7, and nobody has read the
+  extra thirty. An advisory leg that is never read is a leg that only costs. Thirty new
+  warnings at a new interpreter are usually a handful of deprecations repeated across many
+  tests, and the triage is one read of the -rw summary deduplicated by message.
+
+  (a) The warning summaries of both legs are read once and reported DEDUPLICATED BY MESSAGE,
+      with a count per class - the raw totals (37 and 7) are the symptom, the class list is the
+      finding.
+  (b) Each class ends in one of two dispositions, never in silence: a fix (a one-line change
+      that is safe on 3.12 as well), or a named filter in the pyproject.toml
+      [tool.pytest.ini_options] filterwarnings list WITH its reason, which is the disposition
+      for a warning that belongs to a dependency.
+  (c) The 3.12 baseline of 7 is read in the same pass - it has the same unread history, and
+      this is the moment both get read.
+  (d) The counts before and after are stated in the close note, and the numbers name the run
+      they were read from (J18: a measurement names its venue).
 notes: |
-  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).
+  Groomed 2026-09-08 from IDEAS.md Idea-297 (base venue, desktop); source is the Lane B J67
+  build, whose leg went green on its first run.
+
+  module docs because CI items live there (J10, J67), and depends_on J67 which built the
+  matrix. p3: nothing is broken - the cost is a leg whose output nobody reads, and the fix is
+  cheapest while the count is thirty and the leg is new.
+
+  RELATED, SEPARATE: Idea-298 asks whether the Windows leg earns its 1.9x cost on every push.
+  That is a user ruling on CI spend and stays in the inbox as a question.

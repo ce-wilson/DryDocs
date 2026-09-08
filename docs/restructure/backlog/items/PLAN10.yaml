@@ -9,8 +9,39 @@ model: sonnet
 priority: p2
 status: todo
 depends_on: []
-inputs: []
+inputs:
+- scripts/render_gates.py
+- tests/unit/test_gates_json.py
+- config/gate-log.md
 acceptance: |
-  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).
+  scripts/render_gates.py emits NO row for a gate prompt that self-declares (a leading
+  "# SIGNED OFF" or "# DEFERRED" banner) and has no entry in config/gate-log.md. The skip at
+  _SELF_DECLARED_RE assumes a self-declared prompt always has its log entry - true on the tree
+  that signed it, false on any tree the entry has not reached. Nine of the ten producer entries
+  missing from the consumer gate-log on 2026-09-08 rendered as ordinary "session not yet run"
+  rows, and the tenth failed the guard only because its prompt happened to carry the banner.
+  For a DRAFTED-and-recorded gate whose record is missing, "gate page rendered - session not
+  yet run" is wrong twice: it was run, it is recorded, and what is absent is the record.
+
+  (a) A self-declared prompt with no accounting entry gets a ROW, never no row, and the row
+      says what is wrong: the prompt declares SIGNED OFF or DEFERRED and no log entry accounts
+      for it. Its status is open, so the surface shows the gap instead of hiding it, and
+      tests/unit/test_gates_json.py test_every_log_entry_and_prompt_has_a_row keeps passing
+      for the right reason.
+  (b) A fixture at the incident shape (J76): a prompt file carrying the banner plus a gate-log
+      with no matching heading must produce exactly that row, and adding the heading must
+      remove it.
+  (c) Nothing changes for a prompt whose entry IS present, and the existing rows keep their
+      titles and statuses byte for byte - the render is governed, so a diff on any other row
+      is a regression.
 notes: |
-  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).
+  Groomed 2026-09-08 from IDEAS.md Idea-303 (base venue, desktop). Source is the machine-local
+  back-flow transcription (twentieth report) and RELAY-37 in docs/port/port-prompt.md; the
+  captures themselves are never cited.
+
+  module drydocs-plan because scripts/render_gates.py and tests/unit/test_gates_json.py are the
+  board and gate render family. p2: the render tells a reader the opposite of the truth, and
+  the guard that should have caught it passes.
+
+  SCOPE FENCE: whether the consumer gate-log carries every producer heading at the base tag is
+  PORT6 clause (f), not this item. This is only the render telling the truth when it does not.

@@ -8,9 +8,40 @@ agent: main
 model: sonnet
 priority: p2
 status: todo
-depends_on: []
-inputs: []
+depends_on: [CFG5]
+inputs:
+- tests/unit/test_backlog.py
+- config/gate-prompts/
+- config/gate-log.md
+- docs/restructure/backlog/items/CFG5.yaml
 acceptance: |
-  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).
+  An unsigned gate prompt with no item that owns its RUN is invisible work. The 2026-08-27
+  sweep found thirteen of them and fixed them by hand; the controlm-folder-identity-grain gate
+  repeated it eight days later and was found by accident, which is what makes this a guard and
+  not another sweep.
+
+  (a) The rule: for every config/gate-prompts/<id>.yaml, if config/gate-log.md holds no SIGNED
+      (or SME-DEFERRED, BLOCKED, SUPERSEDED) record for <id>, then at least one item under
+      docs/restructure/backlog/items/ carries <id> in its gates list with status not done.
+  (b) It reads the IMPORTABLE objects (J37) - the backlog store and the gate-log parser the
+      board already uses for the derived gate QUEUE - never the rendered gate pages.
+  (c) Two edge cases are ruled IN THE GUARD DOCSTRING rather than special-cased silently: a
+      gate whose runner is USER-GATED START is still owned (it is todo, which is the point);
+      and a gate recorded as a RECORD entry classifies "recorded" and MUST count as unsigned
+      here, or the guard inherits the exact blind spot found on 2026-08-31, when six gates
+      awaiting a session had dropped out of the derived queue as recorded.
+  (d) First run reports ZERO findings after CFG5 - that is the assertion the guard exists to
+      keep true. If it reports more, each finding is either given an owner item in the same
+      commit or named in the close note with why it is not one.
 notes: |
-  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).
+  Groomed 2026-09-08 from IDEAS.md Idea-286 (base venue, desktop); the finding is the
+  2026-09-07 lineage-workstream whole-set review (machine-local under internal-local/research/)
+  and the CFG5 mint that same evening.
+
+  module drydocs-plan because the guard sits beside the gates-field validation already in
+  tests/unit/test_backlog.py. depends_on CFG5 so the first run starts from a clean queue
+  rather than reporting a gate whose owner is being minted in parallel. p2.
+
+  RELATED POLICY, NOT THIS ITEM: Idea-288 asks whether a gate-DRAFTING item may close before a
+  runner exists. That is a backlog-policy ruling for the HITL flow and stays in the inbox; this
+  guard catches what the policy misses either way.

@@ -16,6 +16,7 @@ inputs:
 - knowledge/standards/technology/
 - internal/remediation/standards-rules-registry.md
 - docs/restructure/backlog/items/G34.yaml
+- docs/restructure/backlog/items/REM1.yaml
 acceptance: |
   The failed research session's problem was VOCABULARY, not search: the smuggling-dot eval
   case records that a search for "period" reaches none of six sources because the prose says
@@ -59,3 +60,11 @@ notes: |
   tracked and empty, the entry itself argues for the research ledger, and the acceptance
   makes the puller confirm the schema before writing - which is the only part of the choice
   that can be wrong.
+
+  [base 2026-09-08] MERGED from IDEAS.md Idea-300. REM1 (done) wrote the CONTENT of its R10
+  row into its own item file - the "offered to PLAN8 term ledger" note, lines 69-72 at the
+  2026-09-07 merge - because PLAN8 was todo and a build lane does not edit an open item another
+  lane may pull. A note on a done item is a handoff nobody re-reads, so
+  docs/restructure/backlog/items/REM1.yaml is now an inputs entry here (an item file is a
+  legitimate input; CORE5 lists K30 and MM3 the same way). Whoever pulls PLAN8 finds the row
+  without knowing to look for it.

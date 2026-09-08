@@ -9,8 +9,30 @@ model: haiku
 priority: p3
 status: todo
 depends_on: []
-inputs: []
+inputs:
+- CLAUDE.md
+- .claude/skills/lane-handoff/SKILL.md
 acceptance: |
-  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).
+  J31 says when to PUSH a wip/<id>-<machine> branch and nothing says when to DELETE the local
+  copy, so a build lane accumulates merged branches that no longer exist on origin - twelve on
+  the laptop at the 2026-09-07 Lane B close, none of them on the remote. The Lane A close step
+  already deletes the REMOTE branch after the no-ff merge (lane-handoff rule 3), so the remote
+  is clean and the local tracking branches are the residue. A stale local wip/ branch reads as
+  unmerged work to anyone running the J31 pre-release check from that machine: git branch -r is
+  clean, git branch is not, and the rule names the remote form only by luck.
+
+  (a) The lane-handoff close for Lane B gains the sentence: after the sender confirms the
+      merge, git fetch --prune, then git branch -d each merged wip/ branch. The -d refuses an
+      unmerged branch, which IS the check - never -D.
+  (b) The J31 paragraph in CLAUDE.md section 0 names the local form beside the remote one: the
+      pre-release check reads the remote (git branch -r --list "wip/<id>-*"), and the local
+      branch is deleted once the merge is confirmed.
+  (c) Both edits are one sentence each. No script: if the sentence turns out to need one, that
+      is a separate item minted then.
 notes: |
-  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).
+  Groomed 2026-09-08 from IDEAS.md Idea-301 (base venue, desktop); source is the Lane B close
+  report of the seven-item burst that ended 2026-09-07.
+
+  module docs, phase 10 / doc-infrastructure: this is routing-document prose, not code. p3 and
+  haiku - the ruling is made, the work is transcription. Both files are canonical-producer, so
+  the sentence crosses on the next roll without a manifest change.

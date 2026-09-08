@@ -18,6 +18,7 @@ inputs:
 - config/gate-prompts/rua-load-shapes.yaml
 - docs/decisions/0001-ontology-base-scope.md
 - config/gate-log.md
+- config/gate-prompts/dpl-dataset-registry-contract.yaml
 acceptance: |
   A rider is DRAFTED and put to the SME. Nothing is applied: dataset identity is a signed
   ruling (G22 section G clause f, rua-load-shapes, 2026-08-07) and re-opening it is the
@@ -58,6 +59,19 @@ acceptance: |
   waits for it to arrive by back-flow before asserting the payload's contents as fact. Until
   then the rider carries the producer-side collision from clause (a), which stands on its
   own, and marks the payload claim as company-reported.
+
+  (f) [base 2026-09-08] TWO FIELDS SPELLED ZONE, AND NEITHER SESSION REASONS FROM THE OTHER
+  POPULATION. The zone this rider reads is the one inside dataset_flow.json payloads, which the
+  gate found degenerate - one value in practice, so it discriminates nothing. The zone the G65
+  registry profile read is a different object: a column of the dataset registry, multi-valued,
+  a lake layer for object-store rows and a database technology otherwise. Same spelling,
+  different objects, different populations - the J32 shape again, one layer over from clause
+  (a). Section A1 of the prompt proposes that the single payload value is a registry catch-all
+  key; that is a HYPOTHESIS drawn from the registry profile, not a measured join, and nothing
+  on either page says so. So: the stale-premise sweep restates A1 as a hypothesis to be tested
+  by joining the two fields BY GUID and never by name, and the G65 amended B3 / C1-a axis is an
+  input here. The G65 prompt already carries the reverse pointer (amended 2026-09-07, header
+  and C1-a).
 notes: |
   Minted 2026-08-31 alongside G135, from the same company-side G64 read. The two were split
   on exactly the line the user drew: G135 is a defect provable from this tree and it gets
@@ -102,3 +116,8 @@ notes: |
 
   STILL OPEN: clauses A-C are unsigned, and clause (e) holds - the payload claim stays marked
   company-reported until internal/research/G64-SME-MM-research.md arrives by back-flow.
+
+  [base 2026-09-08] MERGED from IDEAS.md Idea-289: acceptance clause (f) added, and the G65
+  prompt added as an input. Source is the 2026-09-07 lineage-workstream transcription and its
+  whole-set review, finding F5 (machine-local under internal-local/research/). The point of the
+  cross-reference is that neither session reasons from the other population by accident.

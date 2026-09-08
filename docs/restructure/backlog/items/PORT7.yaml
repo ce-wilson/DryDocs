@@ -9,8 +9,33 @@ model: haiku
 priority: p2
 status: todo
 depends_on: []
-inputs: []
+inputs:
+- PORT-MANIFEST.yaml
+- pyproject.toml
+- .pre-commit-config.yaml
 acceptance: |
-  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).
+  The per-entry row for pyproject.toml says "union of dependencies; keep the consumer version
+  string" and says nothing about the [tool.ruff] block, so the lint ignore list the producer
+  ruled on 2026-08-12 (RUF002 and RUF003, ambiguous Unicode in prose) never crossed and the
+  consumer copy carries E501 and N817 only. One lint standard on both sides is the stated
+  intent: J62 makes .pre-commit-config.yaml canonical-producer and the ruff pin upgrades in
+  lockstep. The row should say so.
+
+  (a) The pyproject.toml entry_rule in PORT-MANIFEST.yaml gains one sentence naming the
+      [tool.ruff] block - select, ignore, per-file-ignores and the pin - as producer-canonical
+      INSIDE the per-entry file. The dependency table stays per-entry, unchanged.
+  (b) A relay line tells the consumer the block now crosses whole, so the next apply replaces
+      its ruff block rather than hand-merging it.
+  (c) It lands with the next roll alongside PORT6 and PLAN9 - never mid-apply, which would
+      change the rule under a session already applying it.
 notes: |
-  Stub minted 2026-09-08 by the backlog groom; the body lands in the next commit (I6).
+  Groomed 2026-09-08 from IDEAS.md Idea-302 (base venue, desktop). Source is the consumer
+  carve-out H close (RELAY-36, third point), transcribed to the machine-local back-flow file.
+
+  The consumer read this as a third instance of the per-entry delta-versus-union defect. It is
+  not: no union of the ruff block was ever specified, so none was missed. It is the row being
+  under-specified - the same family as the source-registry and dev-environment fall-throughs
+  the manifest already records, a file class sitting under a rule that does not cover it.
+
+  module drydocs-port, phase 8. p2, model haiku: one sentence in a manifest row plus a relay
+  line, with the judgement already made here.
