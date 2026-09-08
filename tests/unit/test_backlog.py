@@ -305,7 +305,11 @@ def test_next_free_is_max_plus_one_and_never_fills_a_gap() -> None:
     """
     alloc = _allocator()
     taken = {"PLAN1", "PLAN2", "PLAN5"}  # PLAN3 and PLAN4 are gaps
-    assert alloc.next_id("PLAN", taken) == ("PLAN6", 5)
+    # venue pinned, as the siblings below pin it: without it the call reads the live
+    # config/dev-environment.yaml, and on a tree that declares no `edition:` (a consumer
+    # before its own edition gate) the allocator refuses before it ever counts - which
+    # made THIS test red on the 2026-09-05 apply for a reason that is not the gap rule.
+    assert alloc.next_id("PLAN", taken, venue="base") == ("PLAN6", 5)
 
 
 def test_the_allocator_refuses_the_reserved_series() -> None:
@@ -493,13 +497,37 @@ def test_the_frozen_band_ids_parse_and_pass_under_the_new_grammar() -> None:
     assert _frozen_strays(["G10001", "DD10003"]) == []
 
 
-def test_the_venue_is_declared_in_the_venue_file_and_the_producer_is_the_base() -> None:
-    """PLAN2 b: the allocator reads config/dev-environment.yaml `edition:` and nothing
-    else. The producer declares `base` - it is never undeclared (rider C1)."""
-    alloc = _allocator()
-    assert alloc.venue_edition() == alloc.BASE_EDITION
+def _declared_venue_value() -> str | None:
     doc = yaml.safe_load((REPO / "config" / "dev-environment.yaml").read_text(encoding="utf-8"))
-    assert doc.get("edition") == "base"
+    value = doc.get("edition") if isinstance(doc, dict) else None
+    return None if value is None or str(value).strip() == "" else str(value).strip()
+
+
+def test_the_allocator_reads_the_venue_from_the_venue_file_and_nowhere_else() -> None:
+    """PLAN2 b: venue_edition() answers from config/dev-environment.yaml `edition:` -
+    `base` -> BASE_EDITION, a code -> that code upper-cased, no key -> None - and from
+    nothing else. This pins the READ, so it holds on every tree, declared or not. The
+    VALUE the producer declares is the next test's, kept apart on purpose: on the
+    2026-09-05 apply (carve-out D, 2026-09-07) the consumer left `edition:` absent on
+    the producer's own ruling, and the one test that asserted both went red on a fact
+    about the producer's tree, not about the allocator."""
+    alloc = _allocator()
+    declared = _declared_venue_value()
+    got = alloc.venue_edition()
+    if declared is None:
+        assert got is None
+    elif declared.lower() == alloc.BASE_EDITION:
+        assert got == alloc.BASE_EDITION
+    else:
+        assert got == declared.upper()
+
+
+def test_the_producer_declares_itself_the_base() -> None:
+    """PRODUCER-VENUE FACT (rider C1): the producer is `base`, never undeclared. A
+    consumer tree fails this by construction - undeclared until its edition gate, then
+    declared as its own code - so a per-entry take drops THIS test deliberately and
+    keeps the read test above, which is the one that travels."""
+    assert _declared_venue_value() == "base"
 
 
 # ---- the series is the module (ruling 2026-09-02) ----------------------------------

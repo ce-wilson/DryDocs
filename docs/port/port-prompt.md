@@ -2735,6 +2735,50 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   contradiction you found inside one file was on the producer's tree first, and there the
   FIELD is the one that is right (the file is in the public push). Nothing is asked back.
 
+- **RELAY-30 — THE GATE-PROMPTS CLEAN-ADD IS NOW AN `entry_rule`, AND THE COUNT IN THE
+  REPORT IS THE COMMIT'S, NOT THE ENUMERATION'S** (new 2026-09-07, mid-apply; acts at the
+  NEXT roll — at D you already did the right thing on a note). `[SME-REPORTED]` — your
+  carve-out D enumerated every slug your items' `gates:` name, found the prompts missing
+  (all present at the tag, none yours), took them, and flagged that the take reached into a
+  `canonical-company` row on the strength of that row's `note:` alone. You then found the
+  reported count was wrong by one — the commit holds ten files, the enumeration found nine
+  AFTER the first was taken on a direct ruling — and reconciled ten against the six new
+  `prompt-only` gates.json entries: six with no prior gate-log record, three whose gates
+  the log already carried (file missing, no new entry), one a RIDER that renders no page of
+  its own. That reconciliation is correct and is now the rule's own text.
+  `[VERIFIED-PRODUCER]` — at `PORT-MANIFEST.yaml` the `config/gate-prompts/**` row carries
+  an `entry_rule` (promoted from the note this day): consumer specs win and are never
+  overwritten; a producer slug the consumer does not hold crosses whole, because
+  `test_declared_gates_are_lists_of_known_prompt_slugs` requires every declared slug to
+  resolve and `gates.json` is derived from the files present; enumerate from `gates:` plus
+  the gate-log citations minus the files on disk; a rider crosses the same way; and the
+  count reported is `git show --name-only`'s. A note explains, an entry_rule authorizes —
+  the inference you had to flag is the rule you will read next roll. Nothing is asked back.
+
+- **RELAY-31 — TWO `test_backlog.py` TESTS READ THE PRODUCER'S VENUE FILE, AND ONE OF YOUR
+  TWO "DELIBERATE" EDITION-ABSENT REDS WAS A PRODUCER DEFECT** (new 2026-09-07, mid-apply;
+  acts at the NEXT roll — leave both red as they are, the fix arrives with the range).
+  `[SME-REPORTED]` — after removing `edition:` on the producer's ruling, your suite showed
+  two edition-absent failures in `tests/unit/test_backlog.py` and you recorded both as the
+  intended state until your edition gate mints a code. `[VERIFIED-PRODUCER]` — only ONE of
+  them is that. `test_next_free_is_max_plus_one_and_never_fills_a_gap` called
+  `alloc.next_id("PLAN", taken)` with no `venue=`, so it read the live
+  `config/dev-environment.yaml` and hit the allocator's refusal before it ever counted;
+  its siblings pin `venue="base"` and it now does too. The gap rule was never red — the
+  test was reading the wrong instrument (J76). The other,
+  `test_the_venue_is_declared_in_the_venue_file_and_the_producer_is_the_base`, asserted
+  two things in one test — that the allocator reads the file faithfully, and that the file
+  says `base` — and the second is a fact about the PRODUCER's tree, red on every consumer
+  tree by construction (undeclared until your gate, then declared as your own code; the
+  PORT3 shape). Split at the producer: `..._reads_the_venue_from_the_venue_file_and_nowhere_else`
+  pins the READ and passes on any tree, declared or not; `test_the_producer_declares_itself_the_base`
+  carries the producer-only fact and says in its docstring that a per-entry take drops it.
+  Replayed on the producer tree with `edition:` commented out: the gap test and the read
+  test pass, the producer-fact test fails, by name. When the range lands, take the two
+  fixed tests, drop the one that names itself producer-only, and your `test_backlog.py`
+  edition-absent count goes from two to zero — your edition gate then owes nothing to the
+  suite, only to the allocator. Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has

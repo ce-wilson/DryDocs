@@ -124,9 +124,12 @@ PAT_PRODUCT_MAPPING_COLUMNS = (
     "sponsored_area_product_id",
 )
 
-#: logical field -> raw report header. SEE "HEADER BASIS" above: only the four
-#: marked PINNED are SME-confirmed spellings; the rest are transcribed beliefs
-#: that the first real run confirms or overrides via --header-map.
+#: logical field -> raw report header. SEE "HEADER BASIS" above. Every spelling
+#: here is a MEASURED column of the live 43-column export (census closed
+#: 2026-08-29; re-confirmed 2026-09-07 against the SME's transposed header sheet,
+#: K30 close note) — except `jira_board_id`, which names a column of a SIBLING
+#: export (ACKNOWLEDGED_ABSENT). A re-export that moves a spelling is re-pinned
+#: via --header-map and corrected here, saying which spelling it replaced.
 DEFAULT_HEADER_MAP: dict[str, str] = {
     "team_id": "Team ID",
     "team_name": "Team Name",

@@ -1,0 +1,17 @@
+id: AGENT1
+epic: agentic-qa
+title: "The /ask scope selector is a router hint that filters the spec catalog, and its vendor-corpus option must not ship until a spec searches chunk text"
+type: task
+module: drydocs-agents
+phase: 15
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs: []
+acceptance: |
+  STUB - minted 2026-09-07, body follows in the next commit (I6: the stub carries the
+  final title, is pushed, and only then is the body written).
+notes: |
+  STUB.

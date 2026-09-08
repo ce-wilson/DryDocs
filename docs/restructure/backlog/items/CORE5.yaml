@@ -1,0 +1,17 @@
+id: CORE5
+epic: seal-attribution
+title: "The prose entity extractor pins an application id at exactly five digits while the live SEAL population is four to seven, so most real ids are never emitted"
+type: bug
+module: drydocs-core
+phase: 9
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on: []
+inputs: []
+acceptance: |
+  STUB - minted 2026-09-07, body follows in the next commit (I6: the stub carries the
+  final title, is pushed, and only then is the body written).
+notes: |
+  STUB.
