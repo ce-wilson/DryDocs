@@ -292,7 +292,7 @@ FORCE_COLOR / Idea-101 findings that motivated J41.)
   condition stays open). Company CI has never run on that remote. Transcribed in the
   POSTSCRIPT and SECOND POSTSCRIPT to RELAY-45; answered by the hand prompt
   `docs/company-prompts/port-base-20260905-closeout-company-prompt.md`. **NEXT-PORT BASE:
-  `port-base-20260908`** — the seventh roll, `port-base-20260905..port-base-20260908`, 405
+  `port-base-20260908`** — the seventh roll, `port-base-20260905..port-base-20260908`, 407
   commits / 493 changed paths, steps 334–353, RELAY-46; the one ruling owed from this side
   (a §3 redaction against the line-based append-only guard, RELAY-46) lands as a rider, not
   in the base.
@@ -3419,7 +3419,7 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   THIS SIDE** (new 2026-09-08, at the roll). `[VERIFIED-PRODUCER]` throughout except the
   two company figures marked `[SME-REPORTED]` — every producer sha here is on `main` under
   the new tag, and nothing here restates a ruling that is yours.
-  **THE RANGE:** 405 commits at the tag, 303 of them in ledger steps 334–353 (the rest are
+  **THE RANGE:** 407 commits at the tag, 303 of them in ledger steps 334–353 (the rest are
   the ritual patterns `drydocs/port/port_preflight.py` already recognizes); **493 changed
   paths across 8 classes**, the table is in the disposition section above. Your
   `port-base-20260905` apply is reported COMPLETE at your `d527afce` (`[SME-REPORTED]`, the
@@ -3941,7 +3941,7 @@ depgraph snapshots in the range are ritual — per-entry backlog union, derived
 regeneration, never-port outputs — and get no step. **Steps 273–296 are the
 2026-09-01 (fourth) roll**, covering `port-base-20260829..port-base-20260901`;
 steps 241–272 remain live below them because that base was certified and never
-applied, so the two rolls are one range for the consumer. **Steps 297–312 are the 2026-09-02 (fifth) roll**, covering `port-base-20260901..port-base-20260902`, rolled BEFORE the company's retry so that the retry applies ONE range, `port-base-20260826..port-base-20260902`, with all seven live relays inside it and nothing hand-carried (RELAY-24; the 20260901 apply is parked unmerged). **Steps 313–333 are the 2026-09-05 (sixth) roll**, covering `port-base-20260902..port-base-20260905` — 186 commits at the tag, 132 cited, the first roll since 2026-08-26 to start from a range the company had already applied COMPLETE (its `4d9ddba7`), so nothing is parked and nothing is hand-carried; RELAY-26 is its one relay. **Steps 334–353 are the 2026-09-08 (seventh) roll**, covering `port-base-20260905..port-base-20260908` — 405 commits at the tag, 303 cited, one range again because the company reported the 0905 apply COMPLETE at its `d527afce` (`[SME-REPORTED]`); the nineteen relays written during that apply (27–45) all act in this range, RELAY-46 says where each lands, and it is the roll's one new relay.
+applied, so the two rolls are one range for the consumer. **Steps 297–312 are the 2026-09-02 (fifth) roll**, covering `port-base-20260901..port-base-20260902`, rolled BEFORE the company's retry so that the retry applies ONE range, `port-base-20260826..port-base-20260902`, with all seven live relays inside it and nothing hand-carried (RELAY-24; the 20260901 apply is parked unmerged). **Steps 313–333 are the 2026-09-05 (sixth) roll**, covering `port-base-20260902..port-base-20260905` — 186 commits at the tag, 132 cited, the first roll since 2026-08-26 to start from a range the company had already applied COMPLETE (its `4d9ddba7`), so nothing is parked and nothing is hand-carried; RELAY-26 is its one relay. **Steps 334–353 are the 2026-09-08 (seventh) roll**, covering `port-base-20260905..port-base-20260908` — 407 commits at the tag, 303 cited, one range again because the company reported the 0905 apply COMPLETE at its `d527afce` (`[SME-REPORTED]`); the nineteen relays written during that apply (27–45) all act in this range, RELAY-46 says where each lands, and it is the roll's one new relay.
 
 124. LOCAL-INFRA CHORES + ONE ADR [venue-pinned / docs] (`8c4ee1e` G49, `5a6208e`
     G50, `3304666` G49 follow-up, `034eb70` G53). G49/G50 are DESKTOP-VENUE facts —
@@ -7116,8 +7116,8 @@ hand-carried and nothing parked.
     else). Laptop session, `pen: port`, pushed 2026-09-08 between this roll's pull and its
     write; the roll took them in rather than cutting the base under them.
 
-    LEDGER COVERAGE FOOTNOTE (2026-09-08, SEVENTH ROLL). 405 commits in
-    `port-base-20260905..port-base-20260908` (`git rev-list --count` at the tag); 103 read as
+    LEDGER COVERAGE FOOTNOTE (2026-09-08, SEVENTH ROLL). 407 commits in
+    `port-base-20260905..port-base-20260908` (`git rev-list --count` at the tag); 104 read as
     ritual under the existing patterns (snapshots, claims, renders, grooms); 303 are cited in
     steps 334–353 — the 302 the ledger was written against plus the roll commit itself. No
     pattern spelling drifted this roll, so `drydocs/port/port_preflight.py` is untouched. The
