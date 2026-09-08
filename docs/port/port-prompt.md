@@ -2834,6 +2834,33 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   or take the baseline from a plain checkout. Your refusal to bank it was correct. Nothing
   is asked back.
 
+- **RELAY-34 — TWO VERDICTS FROM YOUR LINEAGE WORKTREE READ A TREE BEHIND THE BASE, ONE
+  REGISTRY ROW CARRIES A DUPLICATE KEY, AND TWO GATE PROMPTS WERE CORRECTED IN PLACE** (new
+  2026-09-07, mid-apply; nothing here waits for the roll). `[SME-REPORTED]` — a sweep on
+  your lineage worktree (one commit past an old main) reported the data-flow-overview
+  gate's "`:DataFlow` plus five edges registered planned" as false and the
+  controlm-folder-identity-grain gate as non-existent. `[VERIFIED-PRODUCER]` — both are
+  in `port-base-20260905`: the `DataFlow` label and the five architecture and docs edges
+  are registered `planned` in the per-domain vocabulary fragments (the 2026-08-21 commit
+  that closed the drafting item), and the folder-identity gate prompt was drafted
+  2026-09-04. Neither reaches your tree until the ontology class is taken, which you have
+  deferred since 2026-08-26 by choice; "absent here" is that deferral, not a defect. The
+  sweep printed no `reviewed_commit`, which is the whole failure (J63) — a verdict names
+  the tree it read. Second, `[SME-REPORTED]` your `config/source-registry.yaml` row for
+  the definition-table export carries the `adapter:` key twice. `[VERIFIED-PRODUCER]` on
+  the YAML behavior only — `yaml.safe_load` keeps the LAST duplicate key and says
+  nothing, so whichever `adapter:` sits lower in the row is the one every reader sees; the
+  producer row has one `adapter: ~`, so this is a company build defect in the per-entry
+  merge, same class as the `stack:` finding. Third, `[VERIFIED-PRODUCER]` two UNSIGNED
+  producer gate prompts were corrected in place on 2026-09-07 and ride the next roll under
+  the gate-prompts entry_rule: dpl-dataset-registry-contract restates its B3 axis (the
+  registry `zone` is a multi-valued enum, not a lake-layer triple; `version_id` is opaque;
+  audit actors are mixed) as dated amendments plus proposal rows C1-a/b/c and C2-a, shape
+  only — the counts that motivated them are your §B profile and stay with you; and
+  code-graph-package-layer retires a pointer to the pre-fragment vocabulary path and marks
+  its 2026-08-02 header counts as dated. Your own copies of those prompts, if amended
+  company-side, merge per-entry as the rule already says. Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
