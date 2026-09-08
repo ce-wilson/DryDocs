@@ -191,6 +191,28 @@ rows:
       only thing that ever changes here is the rev, which moves WITH the pin
       (tests/unit/test_precommit_config.py fails when they differ). Nothing installs
       it for you - `pre-commit install` once per clone, as the file's header says.
+  # ---- the console stack as Compose (O72, 2026-09-07) ---------------------------
+  # Three rows, one mechanism. The Dockerfiles, the proxy-config renderer and the
+  # build-context filter are pure mechanism and cross whole; compose.yaml is the
+  # file that WIRES that mechanism to one side's container facts, so it takes the
+  # dev-environment.yaml shape (row below): structure adapted, values local.
+  - path: "deploy/**"
+    disposition: canonical-producer
+    note: >
+      O72 (2026-09-07). api.Dockerfile, agent.Dockerfile, console.Dockerfile and
+      render_proxy_config.mjs - build recipes and a proxy-config renderer with no
+      side-local value in them (the renderer reads its upstreams from compose.yaml's
+      service names, which are the same on both sides). Take whole. Added at the
+      Lane A merge from O72's hand-back; verified cold from empty volumes on the
+      laptop, tests/unit/test_compose_stack.py rides the tests/** row.
+  - path: ".dockerignore"
+    disposition: canonical-producer
+    note: >
+      O72 (2026-09-07). The build-context filter for the deploy/** recipes; lists
+      what NEVER enters an image (internal/, internal-local/, every .env* file).
+      Pure mechanism - a consumer-only ignore line here would be a consumer-only
+      path that should not be in an image either, so surface it and adopt it
+      producer-side rather than diverging the file.
   # ---- the backlog: sharded 2026-08-20 (Y2, ADR 0013) ---------------------------
   # One item per file. Rows are ordered most-specific first; backlog.yaml itself is
   # now a TOMBSTONE and the ONE-TIME split sequence rides its row.
@@ -461,6 +483,23 @@ rows:
       next port: producer `33cfc68` adds a `plugins:` block + `plugins_volume`
       here (APOC/GDS as a mounted volume) — structure to adapt, values to
       decide locally, NOT a file to check out.
+  - path: "compose.yaml"
+    disposition: canonical-company
+    entry_rule: >
+      Each side keeps its OWN file, for the reason dev-environment.yaml does: it pins
+      the Neo4j image tag against config/dev-environment.yaml, accepts the `eval`
+      license, and publishes host ports - producer-local container facts, three of
+      them, inside ~280 lines of mechanism (four services, healthchecks, the proxy
+      wiring, the empty-volume cold start). New producer SERVICES, healthcheck shapes
+      or environment KEYS are ADAPTED BY HAND from the PORT-REPORT's structural
+      delta; the consumer fills in its own image tag, license and ports. NEVER port
+      a registry host or an image coordinate across (PUBLISH-BOUNDARY).
+    note: >
+      O72 (2026-09-07), disposition proposed by Lane B in the item's hand-back and
+      taken at the Lane A merge. The two wrong instruments O72 found and fixed
+      (RETURN 1 refused on the system database; busybox wget resolving localhost to
+      ::1 against IPv4-only nginx) live in the healthcheck lines - those ARE
+      mechanism and should cross by hand at the first adapt, not be re-discovered.
   - path: "graph-tests/**"
     disposition: canonical-company
     note: "consumer's real acceptance suites win; seed twins follow producer renames as deliberate consumer commits"
