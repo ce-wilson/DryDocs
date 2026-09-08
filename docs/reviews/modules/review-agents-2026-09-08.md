@@ -28,7 +28,34 @@ which half it is talking about rather than averaging them.
 
 ## Measurements
 
-*(step 3 — tests, guards, linter, counts; raw numbers recorded as they arrive)*
+Taken before any module code was read. The two halves are counted separately.
+
+| measure | `drydocs-review` | `drydocs-agents` |
+|---|---|---|
+| first-party Python | **2,317 lines** | **4,901 lines**, 33 files (excludes `agents/.venv`) |
+| shape | `drydocs/review/` package 2,197 + `publishing/` 24 + **8 re-export shims at 12 lines each** | the ADK app tree, own venv |
+| largest unit | `review/gate_pages.py` 431 · `source_mappings.py` 382 · `fid_census.py` 366 | — |
+| combined | **7,218 lines** against the plan table's 4,851 on 2026-09-05 — **+49%**, the largest gap yet | |
+
+| both halves | |
+|---|---|
+| tests naming either | **40** files |
+| scoped suite | **602 passed, 12 skipped**, 30s |
+| `ruff check drydocs/review/ agents/` | clean |
+| committed acceptance suites | **6** in `graph-tests/`, **30 assertions**: 28 `empty`, 2 `nonempty` |
+
+**+49% is the widest divergence from the plan table so far** (slot 4 was +36%, slot 3
++16%, slot 5 exactly on). Four of the six slots measured have come in over. That is now a
+pattern rather than a slot fact, and belongs to slot 10 rather than to any module: either
+the table is stale by design and should say so, or the rotation is being sized against
+numbers that no longer hold.
+
+**One skip is a venue fact worth naming (J18):** `test_session_redaction.py:261` skips
+because *"google-adk lives in agents/.venv, not this interpreter"*. The `agents` half is
+therefore only partly exercised by this worktree's suite by construction — its own venv
+is where its dependencies live. That is the same split that made the `api` group matter in
+slot 4, and unlike that one it cannot be fixed by installing a group here: the ADK tree is
+deliberately a separate environment.
 
 ## Lens 1 — system design
 
