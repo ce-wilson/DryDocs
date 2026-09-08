@@ -25,7 +25,28 @@ proves absence`, because the output drives deletion) is the standard to hold thi
 
 ## Measurements
 
-*(step 3 — tests, guards, linter, counts; raw numbers recorded as they arrive)*
+Taken before any module code was read.
+
+| measure | value |
+|---|---|
+| first-party Python in scope | **4,418 lines**, 11 files — exactly the plan-table size (4,418 on 2026-09-05), the **only slot so far that has not grown** |
+| largest unit | `xml_io.py` — 1,277 lines, 29% of the module |
+| next largest | `detect.py` 862 · `profile.py` 553 · `jira.py` 359 · `changes.py` 311 |
+| rules in the registry | **45** (`internal/remediation/standards-rules-registry.md`, R1–R44 with R39a/R39b) |
+| rules the detector implements | **17** — R1 (dot-smuggling) + R2 + R30–R38 + R39a/R39b + R40–R42 + R44 (read as the object, J37) |
+| tests naming the module | 22 files |
+| scoped suite | **311 passed, 9 skipped**, 23s |
+| `ruff check drydocs_remediation/` | clean |
+
+**The first slot to come in exactly at its plan size.** Slots 3 and 4 were +16% and +36%
+over three days; this one is unchanged, which is consistent with a component whose last
+build (G3) closed and whose open work is gated rather than in progress.
+
+**The pipeline is six stages, and four of them are checks rather than transforms:**
+`detect` → `transform` → `equivalence` (offline proof) → `corroborate` → `changes` /
+`changedoc` → `jira`. That ratio is the right shape for a component whose output drives
+changes to production job definitions, and Lens 1 tests whether each check says what it
+actually proved.
 
 ## Lens 1 — system design
 
