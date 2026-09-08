@@ -2909,6 +2909,45 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   handled this roll's share correctly; the rename set is the gate-bound class deferred since
   2026-08-26, one roll older than your carve-out I commit body says. Nothing is asked back.
 
+- **RELAY-36 — TWO CORRECTIONS FOR THE PORT REPORT: THE PRE-START LOAD-MAP ADVICE READ THE
+  PRODUCER TREE, AND THE RUFF DIVERGENCE IS A MANIFEST GAP, NOT A MISSED UNION** (new
+  2026-09-08, mid-apply; nothing here waits for the roll). First, `[VERIFIED-PRODUCER]` a
+  correction to what you were told before carve-out H started: "the renderer has no skip flag,
+  so render then check out the two load-map files" and "four tests red by design" were facts
+  about the PRODUCER tree — `scripts/render_board.py` calls the load-map renderer here (since
+  2026-07-29) and `tests/unit/test_load_map_json.py` has no module skip here. Your copies of
+  both are your own evaluated versions (`scripts/**` and `tests/**` evaluate on collision;
+  neither file changed in 0902..0905), consistent with your ruling that the load-map surfaces
+  are out of scope, so on your tree the render could not write load-map and the two tests skip.
+  Your close report has it right; the pre-start advice did not, and it is the J63 failure mode
+  the manifest keeps naming — absent-on-your-tree read from present-on-this-one. Second,
+  `[COMPANY-CONFIRMED]` the stale `web/src/generated/load-map.json` you found — your own ids,
+  weeks behind your registry, its guard skipped — is a real finding with the cause stated
+  wrong: the renderer does emit it here, and on your tree the CALL was removed and the GUARD
+  skipped together, so nothing sees the file go stale. `[VERIFIED-PRODUCER]` the disposition
+  the manifest already gives that directory is regenerate-or-nothing (`web/src/generated/**`,
+  derived): a committed copy no renderer stands behind is the exact "reflects someone else's
+  sources" failure the row was written for, and the T19 exemption your
+  `tests/unit/test_runbook_currency.py` carries says out of scope while the tree says
+  present-and-stale. Delete it, or if your console reads it, regenerate it from your own
+  sources; either way it is a by-path disposition in your port report, so the next roll can
+  tell it from a miss. Third, `[VERIFIED-PRODUCER]` on the RUF003 hit in
+  `scripts/build_schema_matrix.py`: RELAY-35's fourth point stands (configuration divergence,
+  not carried back), and your "third instance of the delta-vs-union defect" framing is half
+  right. `pyproject.toml` IS per-entry, but its entry_rule covers dependencies only ("union of
+  dependencies; keep the consumer's version string") and says nothing about `[tool.ruff]` —
+  so no union of the ignore list was specified and none was missed; the row is
+  under-specified. The intent is already written elsewhere: `.pre-commit-config.yaml` is
+  canonical-producer (J62, same hooks at the same standard on both sides) and the ruff pin
+  upgrades in lockstep, so the lint STANDARD is meant to be one thing on both sides. The
+  producer closes that gap in `PORT-MANIFEST.yaml` at the next roll — the `[tool.ruff]` block
+  named producer-canonical inside the per-entry file — and until then the collision you
+  predicted is real and is a hand-merge in your favor of the producer block. One more note on
+  the close report's measurement, `[VERIFIED-PRODUCER]` from the numbers as reported: "the
+  same eight fail both ways" compares a 75-test run with a 135-test run, so it holds over the
+  intersection only; your planned full-suite by-test-id pass is the instrument that settles
+  it. Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
