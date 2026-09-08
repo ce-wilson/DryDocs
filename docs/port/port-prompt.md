@@ -3233,7 +3233,13 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   on fifteen RUF002/RUF003 findings pending exactly this row - under it, the producer's
   ignore list crosses whole at the next roll and those fifteen clear without a local edit. The
   ten other findings your table lists (B007, N999, RUF013, N812, E722) are per-site judgment
-  calls on your own files and are not this row's business. **Four - the load-map absence.**
+  calls on your own files and are not this row's business. The row also now names the `ruff`
+  DEV DEPENDENCY PIN as crossing whole (PORT7, `5637d694`): it is the one dependency entry
+  that does not union, because J10 stage 0 holds only at one exact version and
+  `.pre-commit-config.yaml`'s rev is that pin. That was assumed on both sides and enforced by
+  nothing across the two repos - if your pin has drifted from `0.5.7`, the next roll is where
+  it converges, and until it does a green `ruff format --check` on one side says nothing about
+  the other. **Four - the load-map absence.**
   Your report's "stale-by-blocked-renderer" reading matches RELAY-39: the missing
   `render_load_map` call is your signed T19 deferral, and no producer hypothesis about it
   stands. **Five - SME review status on the one number the report does not itemize.** At

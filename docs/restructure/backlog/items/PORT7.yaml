@@ -7,7 +7,7 @@ phase: 8
 agent: main
 model: haiku
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - PORT-MANIFEST.yaml
@@ -29,6 +29,19 @@ acceptance: |
   (c) It lands with the next roll alongside PORT6 and PLAN9 - never mid-apply, which would
       change the rule under a session already applying it.
 notes: |
+  Done 2026-09-08 (base venue, desktop), in three commits. (a) landed in two halves:
+  3d1278aa named the [tool.ruff], [tool.ruff.lint], [tool.ruff.lint.per-file-ignores]
+  and [tool.ruff.format] tables as crossing WHOLE inside the per-entry file, and
+  5637d694 added the half that one missed - the ruff dev-dependency PIN, which the row
+  had left under "union of dependencies" where a union has no meaning. (b) is RELAY-45
+  in docs/port/port-prompt.md (42338d48, extended with the pin sentence). (c) held:
+  the consumer had already merged its port-base-20260905 apply the same day, so this
+  landed between rolls and not under a session mid-apply.
+
+  A guard rode with it (test_pyproject_row_carries_the_shared_ruff_contract): nothing
+  in this repo can read the far side of a port, so what is checkable is that the row
+  still names both halves. Under-specification is how this row failed the first time.
+
   Groomed 2026-09-08 from IDEAS.md Idea-302 (base venue, desktop). Source is the consumer
   carve-out H close (RELAY-36, third point), transcribed to the machine-local back-flow file.
 
