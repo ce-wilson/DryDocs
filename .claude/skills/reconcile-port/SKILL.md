@@ -455,6 +455,20 @@ poetry run pytest tests/unit/test_port_reconcile_guards.py -q
 # ...and the line the PORT-REPORT carries (sha, date, commits behind HEAD) - paste it verbatim:
 poetry run python scripts/reconcile_before.py --describe "$env:TEMP/reconcile-before"
 
+# 3b. COMPLETENESS - two instruments at the close, and neither alone (PORT6, 2026-09-08).
+# `git diff --numstat <prev-base> <base> -- <path>` answers ATTRIBUTION: "did this roll touch
+# the path" - empty means not this roll. It prints the same empty line for a path the last
+# roll FORGOT as for one it deferred, which is how two rolls closed COMPLETE with paths owed
+# (2026-09-01, 2026-09-05; found afterwards as carve-outs). The completeness check answers
+# the other question - "was it EVER applied" - by listing every path at the base tag this
+# tree does not hold, by disposition, plus every `## ` heading a union-append markdown file
+# has at the tag and lacks here (the gate-log shape). Exit 0 = every survivor is in a
+# `deferred-paths` row (the producer's, read from the port-prompt AT THE TAG; or yours,
+# --deferrals FILE) or is canonical-company (a ruling band, listed, never owed). It is
+# PRESENCE only - a path present on both sides with different content is --numstat's and
+# the J7 guards' subject, not this one's. Paste its last line into the PORT-REPORT.
+poetry run python scripts/port_completeness_check.py <base-tag> --prev <previous-base-tag>
+
 # 4. TEARDOWN — clear the variable AT EVERY SCOPE IT WAS SET, then drop the snapshot. Do
 # not skip this: skipping it is how a two-day-old before-dir produced the phantom 22nd
 # baseline failure on 2026-09-05. The second line is a no-op when the variable was never
@@ -521,6 +535,7 @@ Port Report: cewilson/main -> <company>/main
 - Track-1 result: <N passed, 3 skipped, 0 failed>
 - Backlog union (J42): <paste the scripts/port_backlog_union.py block WITH its command line — the --producer-ref <tag> it ran against, producer/consumer counts, missing ids, accepted differences, PASS|FAIL>
 - Reconcile guards (J7): <paste `scripts/reconcile_before.py --describe <before-dir>` — BASE.sha, date, commits behind HEAD — and the guard run's pass/fail>
+- Completeness (PORT6): <paste the last line of `scripts/port_completeness_check.py <base> --prev <prev>` — COMPLETE / NOT COMPLETE, owed paths, heading gaps — beside the `--numstat` attribution you used; the two answer different questions>
 - Track-2 status: <ran/blocked + CM_DEF_SETVAR_VW finding>
 - State: branch ahead of <company>/main by N; NOT pushed; backup tag pre-cewilson-port
 - New divergences observed: <add to the ledger if any>

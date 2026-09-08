@@ -168,3 +168,12 @@ def test_the_apply_section_sits_above_the_ledger_the_coverage_guard_reads() -> N
         "inside it, its backticked shas would be counted as ledger citations by "
         "drydocs/port/port_preflight.py:cited_shas"
     )
+
+
+def test_the_renderer_uses_the_one_classifier() -> None:
+    """One manifest, one reading (PORT6): the renderer's `classify` IS the module's
+    function, not a copy of it. A copy is how a by-hand sweep and RELAY-35 came to
+    disagree about a `drydocs/data/**` sample."""
+    from drydocs.port import dispositions
+
+    assert _renderer().classify is dispositions.classify

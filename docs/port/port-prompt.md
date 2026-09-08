@@ -3065,6 +3065,38 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   next roll hand-merges the two; the producer's is the reference for the CLI the skill
   cites, and your `89c54ee6` fix has nothing to carry anywhere. Nothing is asked back.
 
+- **RELAY-40 — THE ROLL-CLOSE COMPLETENESS CHECK EXISTS, THE DEFERRAL LIST IS A FENCED BLOCK
+  IN THIS FILE, AND CANONICAL-COMPANY IS A RULING BAND, NOT AN OWED ONE** (new 2026-09-08;
+  lands with the next roll, and the recipe in RELAY-35 stays valid until it does).
+  `[VERIFIED-PRODUCER]` — `scripts/port_completeness_check.py` is the by-hand recipe from
+  RELAY-35 as a script: it lists every path at the base tag that your tree does not hold,
+  bucketed by the disposition `PORT-MANIFEST.yaml` resolves for it, in the table shape your
+  correction 12 used (disposition | carried | new | total, where carried = already absent at
+  the previous tag, a roll that closed COMPLETE), and for the union-append markdown files it
+  lists every `## ` heading the tag's copy has and yours lacks — the gate-log shape RELAY-37
+  described, at entry grain. It exits 0 only when every survivor is in a `deferred-paths`
+  row or is canonical-company. Three things about it worth knowing before you run it. (1)
+  ONE classifier. `drydocs/port/dispositions.py` now holds the manifest reading, and both
+  `scripts/render_port_dispositions.py` and this check import it, so the two cannot bucket a
+  path differently — your sweep and RELAY-35 disagreed about a `drydocs/data/**` sample
+  because there were two readings, and now there is one; `tests/unit/test_port_dispositions.py`
+  asserts the renderer's name IS the module's function. (2) The deferral list lives in THIS
+  file, in a fenced `deferred-paths` block under DEFERRED BY PATH, first row T24, cumulative
+  across rolls and retired by date rather than deleted; `docs/port/**` never crosses, so the
+  check reads it with `git show <base-tag>:docs/port/port-prompt.md`, which your clone can do
+  because you hold the producer tags. A deferral only you have ruled goes in a file of your
+  own, same fence, `--deferrals FILE`. (3) Canonical-company paths absent your side are
+  LISTED and do not fail — your correction was right that they need a ruling, not a default,
+  and the table says "ruling, not owed" on that band so nobody reads it as a gap. What the
+  check is NOT: it is PRESENCE only. A path present on both sides with different content —
+  the T24 shape, `drydocs_lineage/writer.py` — does not show, and neither does the per-entry
+  delta-vs-union defect; those stay with `--numstat` and the J7 reconcile guards. So two
+  instruments at every close, and the reconcile-port skill's close step now names both with
+  the question each answers: `--numstat` for "this roll or not", the completeness check for
+  "ever applied or not". The fixture behind it is your incident at its shape: a path added in
+  range 1 and never applied, at range 2's close, where `--numstat` over range 2 prints nothing
+  for it and the check names it as carried. Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
@@ -3443,6 +3475,31 @@ cost, what it did NOT authorize. The disposition table tells you the ORDER and t
 RULE; the ledger tells you the MEANING, and a step is the thing you read when a
 per-entry merge needs a judgment call. Steps are cited from the classes, never folded
 into them.
+
+DEFERRED BY PATH (new 2026-09-08, PORT6 — the roll's deferral record, machine-readable).
+A roll closes COMPLETE on the collision classes and never on the clean-add class: a path
+present at the base tag and absent from your tree has no diff to bucket and no `--numstat`
+line to attribute, so a forgotten path and a deferred one print the same empty output.
+Two rolls closed COMPLETE that way (2026-09-01 and 2026-09-05) and the paths surfaced as
+carve-outs afterwards. The rule from RELAY-35 — a roll closed COMPLETE carries its
+deferrals BY PATH — now has a place to carry them:
+
+```deferred-paths
+# pattern | roll deferred at | ref (T-row, relay or report) | retired (date, or - while active)
+drydocs_lineage/** | port-base-20260901 | T24 | -
+```
+
+Rules for the block. One row per path or glob, in the manifest's glob grammar (`**`
+spans separators, `*` does not). The list is CUMULATIVE across rolls: a path deferred at
+roll N stays deferred at roll N+1 until it is applied or its row is RETIRED — never
+deleted — by writing the date in the last cell, so the record of what was deferred and
+for how long survives. T24 is the prose form of exactly one entry and is the first row;
+a new deferral gets a row here AND its reasoning in a T-row or relay, the way T24 has
+both. This block is what `scripts/port_completeness_check.py` reads (it reads this file
+AT THE BASE TAG, `git show <base-tag>:docs/port/port-prompt.md`, because `docs/port/**`
+never crosses and you have no working-tree copy); deferrals only you have ruled go in a
+file of your own, same fence, passed with `--deferrals FILE`. Retiring a row is a
+producer edit unless the deferral was yours.
 
 ---
 
@@ -6415,4 +6472,11 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - J7 reconcile guards with RECONCILE_BEFORE_DIR set: all pass (producer-side at the
   back-flow enactment: 12 passed / 4 skipped; the J16 manifest-coverage /
   default_ok / backlog-no-regression checks run unconditionally, no env var needed).
+- The roll-close COMPLETENESS check (new 2026-09-08, PORT6): from the apply worktree,
+  `python scripts/port_completeness_check.py <base-tag> --prev <previous-base-tag>`
+  exits 0 — every path at the base tag absent from your tree is either in a
+  `deferred-paths` row or in the canonical-company ruling band, and every union-append
+  markdown file holds every `## ` heading the tag's copy has. PRESENCE only; it does not
+  replace `--numstat`, which answers a different question (this roll or not). The
+  PORT-REPORT carries its last line verbatim beside the `--describe` line.
 ````

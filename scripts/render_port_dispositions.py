@@ -42,6 +42,13 @@ cut; its own Phase 0 caught it before applying. The producer cuts ONE tag per ro
 `port-base-<date>`; the other end of a consumer range is the consumer's own pre-apply
 ref. A ref that does not resolve is now named on stderr and refused with exit 1, and
 nothing is written.
+
+THE CLASSIFIER IS IMPORTED, NOT DEFINED HERE (PORT6, 2026-09-08). `classify` lives in
+`drydocs/port/dispositions.py` because the roll-close completeness check
+(`scripts/port_completeness_check.py`) asks the same question of the same manifest, and
+two readings of one manifest is how a by-hand sweep and RELAY-35 came to disagree about
+a `drydocs/data/**` sample. `tests/unit/test_port_dispositions.py` asserts the name here
+IS the module's function.
 """
 
 from __future__ import annotations
@@ -53,6 +60,7 @@ from pathlib import Path
 
 import yaml
 
+from drydocs.port.dispositions import classify  # the ONE classifier (PORT6)
 from drydocs_core.repo_paths import repo_root
 
 REPO = repo_root(Path(__file__).resolve().parents[1])
@@ -102,28 +110,6 @@ def ref_resolves(ref: str) -> bool:
 
 def changed_paths(base: str, head: str = "HEAD") -> list[str]:
     return sorted(p for p in _git("diff", "--name-only", f"{base}..{head}").splitlines() if p)
-
-
-def classify(path: str, doc: dict) -> tuple[str, str, str]:
-    """``(disposition, matching pattern, entry_rule)`` — first match wins.
-
-    Rows are checked in file order because the manifest is first-match-wins and
-    `test_no_row_is_shadowed_by_an_earlier_glob` already guarantees a specific row
-    precedes the glob that would swallow it. `default_ok` is consulted only after
-    every row misses, which is what makes "deliberately default" distinguishable
-    from "nobody thought about it" — the distinction J16 exists for.
-    """
-    from tests.unit.test_port_reconcile_guards import glob_to_regex
-
-    for row in doc["rows"]:
-        pattern = row["path"]
-        if pattern == path or glob_to_regex(pattern).match(path):
-            return row["disposition"], pattern, (row.get("entry_rule") or "").strip()
-    for row in doc.get("default_ok") or []:
-        pattern = row["path"]
-        if pattern == path or glob_to_regex(pattern).match(path):
-            return "default_ok", pattern, ""
-    return "DEFAULT", "(no row)", ""
 
 
 def render(base: str, paths: list[str], doc: dict, head: str = "HEAD") -> str:
