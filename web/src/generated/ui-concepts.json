@@ -1,0 +1,24 @@
+{
+  "schema": "drydocs.ui-concepts.v1",
+  "updated": "2026-08-21",
+  "concepts": [
+    {
+      "term": "Tower",
+      "aliases": [
+        "towers",
+        "CTO tower",
+        "CTO towers"
+      ],
+      "source": "web/src/data/towers.ts",
+      "source_kind": "in-repo-definitions",
+      "cardinality": 4,
+      "members": [
+        "Home Lending",
+        "Auto",
+        "Credit Cards",
+        "Shared Services"
+      ],
+      "graph_binding": "none"
+    }
+  ]
+}

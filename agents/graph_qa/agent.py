@@ -27,6 +27,7 @@ from common.ephemeral_client import make_register
 from common.graph_read import run_read
 from common.llm_ledger import LlmLedger
 from common.neo4j_tool import graph_schema_detailed
+from common.qa_trace import QaTrace
 from google.adk.agents import BaseAgent
 from google.adk.agents.invocation_context import InvocationContext
 from google.adk.events import Event
@@ -41,6 +42,14 @@ _LOGGER = logging.getLogger(__name__)
 
 _provider: LiteLlmProvider | None = None
 _ledger = LlmLedger()  # R3 sink 1: per-LLM-call JSONL in DRYDOCS_LOGDIR
+# R18 sink 4: the qa-debug decision trace. Constructed ONCE at import, which is
+# also where its enablement is decided — the kind's declared level is read here
+# and never again, so a running server has one answer to "is the trace on"
+# rather than a per-request one. That is the same settings-level shape
+# drydocs_api.audit.ApiAuditLog has, and for the same reason: an Ask question
+# arrives as an HTTP request, and a request-scoped verbose switch would belong
+# to whoever sent the request.
+_trace = QaTrace()
 
 
 def _get_provider() -> LiteLlmProvider:
@@ -70,6 +79,7 @@ def _build_pipeline(control: dict, on_step, run_id: str | None = None) -> GraphQ
             run_id=run_id,
         ),
         on_step=on_step,
+        trace=_trace,
     )
 
 
@@ -153,6 +163,11 @@ class GraphQaAgent(BaseAgent):
                     # R19: the person's own words about their own terms, the
                     # one control field the pipeline carries into a prompt.
                     clarifications=control.get("clarifications"),
+                    # AGENT1: the router hint. Unlike `clarifications` this
+                    # never reaches a prompt as text — it SHORTENS the spec
+                    # catalog the router is shown, so a bad value can only
+                    # widen the menu back to everything, never inject.
+                    scope=control.get("scope"),
                 )
             )
             while True:

@@ -437,10 +437,29 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     required reason, and the tab is the only one of them that fetches. A rail
     that could block would put a decision about a person one click from a
     measurement, and keeping them in one file is how that ends up happening.
+    106 -> 107 at R18 (2026-09-08): TraceLink, BOUND to `ask` by directory
+    evidence -- FailureLadder's rule unchanged, and it earns its own file for
+    ClarificationCard's reason rather than for size. It is the only thing on the
+    Ask page that reaches an ADMIN route, and it has to decide NOT to render
+    three separate ways (no run id, the server recorded no trace, this persona
+    may not read one). Folded into the metrics chip, those conditions would sit
+    inside a component whose subject is numbers, and the one that matters -- who
+    may read a decision trace -- would be the easiest to lose in an edit. Both
+    counts move by one.
+    107 -> 108 at WEB18 (2026-09-08): TaglineWithProvenance, UNBOUND, bound stays
+    43. LogEstatePanel's rule and ServiceStatusStrip's: it lives under
+    components/ rather than a route directory, so there is no directory
+    evidence, and its one consumer today (the module header) is not binding
+    evidence -- every module renders that header, so if anything it is bound to
+    all of them, which is what unbound means here. It earns its own file for
+    ClarificationCard's reason rather than for size: what it decides is not
+    layout but whether a console-INVENTED term is presented beside "backs onto
+    drydocs" with nothing separating the two, which is the adjacency that put a
+    Tower question onto :TOMRole on 2026-08-20.
     """
     comps = _ui()["components"]
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
-        42,
-        106,
+        43,
+        108,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"

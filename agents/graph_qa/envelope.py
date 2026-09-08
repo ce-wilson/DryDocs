@@ -56,6 +56,16 @@ class StepRecord:
     # prompt on a 'clarify' step, the person's own resolution (or that they
     # declined) on a 'clarified' step. None on every other kind.
     note: str | None = None
+    # R18: the router's own one-sentence reason for the spec it picked, on the
+    # 'router' step and nowhere else. This is a GENERATED field, not a captured
+    # one: no rationale existed to record until ROUTER_SYSTEM began asking for
+    # it, which is why R18 is a contract change and not a logging change. It is
+    # the model's stated reason for an observable choice — an auditable
+    # decision trace — never hidden chain-of-thought, which the pipeline
+    # neither requests nor would receive (providers.py passes no thinking
+    # parameter). Bounded at pipeline.RATIONALE_CHARS. None when the reply
+    # carried none, so a pre-R18 agent build reads as absent, not as empty.
+    rationale: str | None = None
 
 
 @dataclass
@@ -123,6 +133,22 @@ class Envelope:
     # choices}], prompt}). `answer` then carries the same prompt as text, so a
     # consumer that knows nothing of R19 still shows a sentence, not a blank.
     clarification: dict | None = None
+    # R18: whether the qa-debug decision trace was recording this run. A FLAG,
+    # never the trace — the trace text lives in DRYDOCS_LOGDIR under the sink
+    # boundary this envelope exists to hold (question text is sha256 + length
+    # HERE and full only in the ledger). The console reads this to decide
+    # whether the run id it already shows can be followed to a trace, and the
+    # admin route is what serves one. False on every run of a server whose
+    # declaration does not say level: DEBUG, which is every default server.
+    debug_trace: bool = False
+    # AGENT1: the scope that actually RAN — the router hint that shortened the
+    # spec catalog, or None for an unscoped run, which is every run that asks
+    # for nothing. `scope_note` is why a REQUESTED scope was not honoured
+    # (unknown, or declared-but-not-ready): the request degrades to unscoped
+    # rather than to an error or an empty catalog, and a degradation nobody is
+    # told about is the one that gets read as a routing judgement.
+    scope: str | None = None
+    scope_note: str | None = None
 
     def to_dict(self) -> dict:
         return asdict(self)

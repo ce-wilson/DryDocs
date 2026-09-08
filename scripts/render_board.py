@@ -10,8 +10,9 @@ A default-paths run ALSO refreshes ``web/src/generated/gates.json`` (J17),
 ``docs/plan/ideas.html`` (the inbox read view the board links to),
 ``web/src/generated/software-registry.json`` (+ its ``web/public/vendor-icons/``
 assets — the software-registry <-> drydocs-icons soft link, 2026-07-31) and
-``web/src/generated/context-types.json`` (O45, the intake dropdown vocabulary): all
-read sources this ritual edits
+``web/src/generated/context-types.json`` (O45, the intake dropdown vocabulary) and
+``web/src/generated/ui-concepts.json`` (WEB18, the console header's provenance
+note): all read sources this ritual edits
 (backlog item text; the gate-prompts tree; the source registry + N3 loader
 declarations), so a groom, gate-prompt add or loader change would otherwise
 silently drift them past their guards (``test_gates_json.py`` /
@@ -63,12 +64,20 @@ def main() -> None:
         import render_remediation_profile
         import render_roadmap
         import render_software_registry
+        import render_ui_concepts
 
         render_gates.main()
         render_enforcement_matrix.main()
         render_load_map.main()
         render_software_registry.main()
         render_context_types.main()
+        # WEB18 (2026-09-08): the UI-concept provenance artifact, here for the
+        # same J20 reason as context-types — it is generated from a config
+        # taxonomy the console reads, so editing ui-concepts.yaml without a
+        # re-render leaves a committed artifact describing a term the yaml no
+        # longer declares that way, and the console header would say so out
+        # loud on every page.
+        render_ui_concepts.main()
         # The Z5 map assets (2026-08-22): the gazetteer artifact rides here for
         # the same J20 reason as the others -- it is generated from a config
         # taxonomy the console reads, so an edit without a re-render leaves a

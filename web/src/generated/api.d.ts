@@ -19,6 +19,23 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/admin/qa-trace": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Qa Trace */
+        get: operations["get_qa_trace_admin_qa_trace_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/config": {
         parameters: {
             query?: never;
@@ -1515,6 +1532,41 @@ export type components = {
             path: string;
         };
         /**
+         * QaTraceOut
+         * @description GET /admin/qa-trace (R18 clause d). The ONE payload on this API that
+         *     carries log CONTENTS, and the exception is ruled rather than assumed: R18's
+         *     acceptance says an admin retrieves the Ask decision trace by run_id /
+         *     session_id. It reaches only the `qa-debug` kind; the api-debug question
+         *     LogEstateOut declines above is untouched and unreachable from here.
+         *
+         *     `records` is deliberately untyped. It is the writer's own JSONL, replayed —
+         *     a diagnostic whose fields grow with the pipeline's hops, and a declared
+         *     shape here would be a second contract free to disagree with the file. The
+         *     envelope AROUND it is typed, which is where the guarantees actually live:
+         *     which run, whether this deployment records at all, how many lines were
+         *     unreadable, and whether the answer was cut short.
+         */
+        QaTraceOut: {
+            /** Enabled */
+            enabled: boolean;
+            /** Files */
+            files: string[];
+            /** Record Count */
+            record_count: number;
+            /** Records */
+            records: {
+                [key: string]: unknown;
+            }[];
+            /** Run Id */
+            run_id: string | null;
+            /** Session Id */
+            session_id: string | null;
+            /** Skipped */
+            skipped: number;
+            /** Truncated */
+            truncated: boolean;
+        };
+        /**
          * QualityFlagOut
          * @description One limit an SME crossed. The metric that tripped travels WITH the
          *     number and the limit it was compared against, so the rail can say what
@@ -1701,6 +1753,40 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["LogEstateOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_qa_trace_admin_qa_trace_get: {
+        parameters: {
+            query?: {
+                run_id?: string | null;
+                session_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QaTraceOut"];
                 };
             };
             /** @description Validation Error */

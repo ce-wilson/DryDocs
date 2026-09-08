@@ -7,7 +7,7 @@ phase: 15
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs_api/query_specs.py
@@ -53,3 +53,69 @@ notes: |
   _consume_delimiter (drydocs_core/orchestration/controlm/resolver.py:141) consumes a period
   only when the variable sigil follows, so the doubled-period spelling over-emits. Reproduce
   it by running the three shapes rather than reading it off the table.
+
+  BUILT 2026-09-08 (Lane B, laptop `NewThinkpad`, wip/api4-laptop; offline - no graph was
+  consulted and none is needed, because every fact below is in committed code). Branch is
+  based on wip/agent1-laptop, which is based on wip/r18-laptop: clause (b) edits the same
+  region of pipeline.py both of those already edit. MERGE ORDER: r18, agent1, api4.
+
+  (a) `docs.chunk-search.v1` - a NEW spec, not a widening, and the distinction is a contract
+  rather than taste: `docs.search.v1`'s own description promises "Chunk-free; docs.chunks.v1
+  is the second step", and the Q15 note above the docs family states the same rule for all of
+  them (triage on abstract and page_role first, spend the chunk read second). Widening the
+  title door would break a promise two other descriptions cite.
+  It filters server-side on `toLower(coalesce(c.text,'')) CONTAINS toLower($q)` and walks
+  `(c:Chunk)-[:PART_OF]->(d:Document)` - the real corpus edge, not the `HAS_CHUNK` R18's
+  evidence caught a model inventing. It returns a BOUNDED SNIPPET
+  (`query_specs.SNIPPET_CHARS`, 400) plus `chunk_id`, never the chunk: the Q15 rule says a
+  navigation spec does not return chunk text, and the full chunk is one call away by id.
+  (d) is in the test and in the catalog line: the predicate is on the chunk body and NOT on
+  `d.title` or `d.abstract`, which is what separates a match from O62's illusion - a full
+  listing that a title similarity picked a winner out of afterwards.
+
+  (b) `chunks: 0` is DERIVED, not parameterised, and that choice is the substance. A
+  request-level "how many chunks" knob would be a number the CALLER asserts; the count is now
+  one the RESULT proves - `pipeline.count_chunk_rows` counts the distinct `chunk_id` values in
+  the rows that came back. DISTINCT because a chunk reached twice is one chunk of context,
+  not two; and in Tier 2 the ids are UNIONED across the loop's retrievals for the same reason,
+  accumulated in the `_retrieve` closure so tier2.py stays a pure loop that knows nothing
+  about corpora. The stated default is 0 and it is still 0 for every graph answer - the
+  difference is that it is now a true count rather than a placeholder.
+
+  (c) SCOPED, AND THE SCOPING TURNED INTO A DIAGNOSIS. The override does not need building;
+  it exists and is UNREAD. `docs.chunks.v1` and `docs.trust-provenance.v1` both compute
+  effective trust as `coalesce(c.trust, d.trust_default)`, and NO loader writes `Chunk.trust`:
+  bmc_docs.cypher:80 and essential_graphrag.cypher write `c.provenance` (VERBATIM / GROUNDED /
+  SYNTHESIZED from `bmc_docs.classify_chunk_tier`), and email_extracts.cypher writes no chunk
+  tier at all. So the coalesce always falls through and every chunk reports its document's
+  default - which IS the cyclic-type-trap case's trust defect, exactly: an illustrative enum
+  reads GROUNDED because its document does, while the hazard banner that would downgrade it
+  sits in a different chunk.
+  And the two fields share a vocabulary. `BmcDocChunkRow.trust_default`
+  (drydocs_core/models/docs.py:62) documents ITSELF as "the doc-level fallback tier absent any
+  chunk-level override ... the per-chunk 'provenance' field is what actually varies". So the
+  gap is a PROPERTY NAME, not a missing model, and the ruling's first question is which name
+  wins - `c.trust` (change two loaders) or `c.provenance` (change two specs).
+  NOT FIXED HERE, on the item's own instruction: the axis change is the docmeta owner's.
+  `tests/unit/test_chunk_search_spec.py` pins the gap OPEN so it cannot close by accident and
+  so the ruling has something that fails when it lands.
+
+  SURFACES: drydocs_api/query_specs.py (the spec + SNIPPET_CHARS),
+  agents/graph_qa/pipeline.py (the derived count), agents/common/scopes.py (the new spec
+  joins CORPUS_ONLY_SPECS - AGENT1's drift guard failed on it, which is the guard working).
+  TESTS: tests/unit/test_chunk_search_spec.py (12).
+
+  HANDBACKS FOR LANE A:
+  1. `backlog` - THE GATE ON AGENT1'S VENDOR-CORPUS OPTION IS NOW MET. A registered spec
+     searches chunk text, so the reason that scope was declared-and-refused is gone. Whether
+     it FLIPS to `ready` is AGENT1's re-evaluation and not this item's to make; it is a
+     one-line change in `agents/common/scopes.py` plus its test.
+  2. `backlog` - a robustness gap found in passing, pre-existing and out of scope. In
+     `pipeline._run_spec`, `resolve_params` is retried with `{}` "defaults over router noise",
+     but a spec with a REQUIRED param raises again on the retry and the exception leaves the
+     pipeline (agent.py turns it into an error payload, so a question answers with an error
+     rather than falling through to Tier 1). It predates API4 - `ask.file-search.v1` has the
+     same shape - but API4 adds a second required-param spec, so the odds go up. Worth an
+     item: a required-param spec the router names without params should fall through, which
+     is what the surrounding code already believes it does.
+  3. The docmeta trust-axis ruling in (c) needs a home - it is a gate question, not a build.

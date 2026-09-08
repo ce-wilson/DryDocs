@@ -29,6 +29,11 @@ export interface AskStep {
   // R19: the clarification prompt on a 'clarify' step; the person's own
   // resolution (or 'declined: ...') on a 'clarified' step. Rendered as given.
   note?: string | null
+  // R18: the router's own one-sentence reason for the spec it picked, on the
+  // 'router' step only. Optional because an envelope from a pre-R18 agent
+  // build has none — and null because a model that ignored the instruction
+  // states no reason, which is different from stating an empty one.
+  rationale?: string | null
 }
 
 // R19 — the clarification contract (agents/graph_qa/term_resolution.py).
@@ -111,6 +116,20 @@ export interface AskEnvelope {
   // R19: present only when status/tier is 'clarification' — the question the
   // console asks instead of rendering an answer.
   clarification?: AskClarification | null
+  // R18: whether the qa-debug decision trace recorded this run. A FLAG, never
+  // the trace — the trace stays in DRYDOCS_LOGDIR and reaches an admin through
+  // /admin/qa-trace. Optional for the pre-R18 agent build; false on every
+  // server whose declaration does not say level: DEBUG, which is the default.
+  debug_trace?: boolean
+  session_id?: string
+  // AGENT1: the scope that RAN — the router hint that shortened the spec
+  // catalog — or null/absent for an unscoped run, which is every run today
+  // because no console control sets one yet (the item's clause (d) split).
+  // `scope_note` is why a requested scope was not honoured: unknown, or
+  // declared but not yet ready. A refused scope still answers, unscoped, so
+  // this is the only place a consumer can tell the two apart.
+  scope?: string | null
+  scope_note?: string | null
 }
 
 /** The R5 control part: the session's PUBLIC handle, and nothing else.

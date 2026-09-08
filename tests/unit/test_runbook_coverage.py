@@ -100,7 +100,6 @@ RUNBOOK_PENDING: frozenset[str] = frozenset(
         "drydocs-review",  # V4
         "drydocs-docgen",  # V5
         "drydocs-lineage",  # V6 — two chain-scoped runbooks exist; neither covers the module
-        "drydocs-agents",  # V9
         "drydocs-docmeta",  # BUILT at Q6; no V-item yet, so this list is where it is visible
     }
 )
@@ -139,6 +138,17 @@ RUNBOOK_DISPOSITION: dict[str, tuple[str | None, str, str]] = {
         "drydocs-web",
         "drydocs-web",
         "the console IS the module; V10 audits its currency post-O35-O41 separately",
+    ),
+    "drydocs-agents-runbook.md": (
+        "drydocs-agents",
+        "drydocs-agents",
+        "V9: the module's whole operate surface -- its OWN venv (the one thing that makes "
+        "this module unlike every other: poetry cannot start it and a repo `pip list` says "
+        "nothing about it), the service launcher and the two rulings it carries that `adk "
+        "api_server` does not (R14 app discovery, R23 control redaction), the console "
+        "wiring, the read-only contract, and a smoke check per registered app. NOT split "
+        "from the web-console runbook the way the load/startup pair is: this is a separate "
+        "PROCESS with its own interpreter, not a second view of the same one",
     ),
     "drydocs-remediation-runbook.md": (
         "drydocs-remediation",

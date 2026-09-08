@@ -22,6 +22,7 @@ import time
 from collections.abc import Callable
 
 from common import specs_catalog
+from common.scopes import resolve as resolve_scope
 from common.specs_catalog import ensure_read_only
 
 from graph_qa.declared_terms import answer_declared
@@ -50,11 +51,30 @@ MAX_FIX_RETRIES = 2  # R2 acceptance: fix loop capped at 2
 ROW_CAP = 100
 ANSWER_CONTEXT_CHARS = 6_000  # rows JSON offered to the answer call, bounded
 
+#: R18: the router's stated reason, bounded before it reaches the envelope. A
+#: rationale is a sentence; anything longer is a model ignoring the instruction
+#: and must not become an unbounded field on a payload the console renders.
+RATIONALE_CHARS = 500
+
+# R18 CHANGED THIS CONTRACT, and did so in BOTH modes on purpose. The reply
+# object had exactly two keys, so no rationale was ever GENERATED — R18's
+# evidence pins router completion tokens at 17/17/30 across three runs, the size
+# of those literals alone, which is why the missing half of "router outcome and
+# candidate/spec rationale" could not be fixed by capturing more. `reason` is
+# asked for whether or not the debug trace is recording: a debug mode that
+# altered the prompt would debug a pipeline nobody runs, and the reason belongs
+# to the decision rather than to the observer watching it. It is a statement
+# ABOUT an observable choice, which is what makes it auditable and what keeps it
+# on the right side of the chain-of-thought fence R18 draws.
 ROUTER_SYSTEM = (
     "You route a user question about the DryDocs knowledge graph onto ONE "
     "registered query spec, or none. Only pick a spec that clearly answers "
     "the question; never force a fit. Use only params the spec declares.\n"
-    'Reply with JSON only: {"spec_id": "<id>" | null, "params": {}}'
+    '"reason" is ONE short sentence naming what in the question decided it — '
+    "the spec you picked and what ruled the near misses out, or, when no spec "
+    "fits, what the question asks for that none of them answers.\n"
+    'Reply with JSON only: {"spec_id": "<id>" | null, "params": {}, '
+    '"reason": "<one sentence>"}'
 )
 
 TEXT2CYPHER_USER = (
@@ -103,6 +123,43 @@ def _epistemic_clause(envelope: Envelope) -> str:
     return ""
 
 
+#: API4 (b): the column whose presence in a returned row makes that row a piece
+#: of the document CORPUS rather than of the graph. Every corpus spec returns it
+#: (docs.chunks.v1, docs.chunk-search.v1, docs.trust-provenance.v1 aggregate
+#: aside), and no graph spec does — which is what lets the count be DERIVED from
+#: the rows instead of declared beside them.
+CHUNK_ROW_KEY = "chunk_id"
+
+
+def count_chunk_rows(records) -> int:
+    """How many of these rows are chunks — the honest source for
+    ``metrics.context['chunks']``, which was the literal ``0`` until API4.
+
+    IT IS DERIVED, NOT A PARAMETER, and that is the point. A request-level
+    "how many chunks" knob would be a number the caller asserts; this is a
+    number the RESULT proves — a spec returned N rows carrying a chunk id, so N
+    chunks grounded the answer. The default is 0 and it stays 0 for every graph
+    answer, which is most of them: not a placeholder any more, a true count of
+    the chunks that were there.
+
+    Counted DISTINCT because a spec may return one chunk on several rows (a
+    chunk joined to more than one document role), and the metric is "how much
+    corpus was in the context", not "how many rows mentioned one".
+    """
+    return len(chunk_row_ids(records))
+
+
+def chunk_row_ids(records) -> set:
+    """The distinct chunk ids in one result — the set behind the count, so a
+    multi-step tier can union across retrievals instead of adding counts that
+    double-count a chunk two subquestions both reached."""
+    return {
+        r.get(CHUNK_ROW_KEY)
+        for r in (records or [])
+        if isinstance(r, dict) and r.get(CHUNK_ROW_KEY)
+    }
+
+
 def _extract_json(text: str) -> dict:
     """Defensive JSON extraction — models wrap JSON in prose/fences often enough."""
     match = re.search(r"\{.*\}", text, re.DOTALL)
@@ -125,6 +182,7 @@ class GraphQaPipeline:
         on_step: Callable | None = None,
         token_budget: int = DEFAULT_TOKEN_BUDGET,
         glossary_loader: Callable = load_glossary_senses,
+        trace=None,
     ) -> None:
         self.provider = provider
         self.run_read = run_read
@@ -152,14 +210,41 @@ class GraphQaPipeline:
         # senses also resolve a term). Injected so the unit suite runs without
         # the repo's glossary files.
         self.glossary_loader = glossary_loader
+        # R18: the qa-debug decision trace (agents/common/qa_trace.QaTrace).
+        # Duck-typed like the ledger, and off by default in two independent
+        # ways — None here, and `.enabled` False unless the kind's declaration
+        # says level: DEBUG. Every call below is guarded by `_traced`, so the
+        # default pipeline pays one attribute read per hop and writes nothing.
+        self.trace = trace
+
+    @property
+    def _traced(self) -> bool:
+        return self.trace is not None and self.trace.enabled
 
     def _push_step(self, envelope: Envelope, step: StepRecord) -> None:
         envelope.steps.append(step)
+        if self._traced:
+            try:  # a diagnostic is never the reason an answer fails
+                self.trace.step(envelope.run_id, envelope.session_id, step)
+            except Exception:
+                pass
         if self.on_step is not None:
             try:
                 self.on_step(step)
             except Exception:
                 pass
+
+    def _trace_close(self, envelope: Envelope) -> Envelope:
+        """Close the trace and hand the envelope back, so every ``return`` in
+        ``answer()`` closes the record it opened — the two early tiers (R22
+        declared, R19 clarification) included. A run that opened a trace and
+        never closed one is the shape a reader cannot tell from a crash."""
+        if self._traced:
+            try:  # a diagnostic is never the reason an answer fails
+                self.trace.run_close(envelope)
+            except Exception:
+                pass
+        return envelope
 
     def _explore_ref(self, cypher: str, database: str, params: dict) -> str | None:
         """Register one EXECUTED query; a registration failure never kills an
@@ -179,7 +264,17 @@ class GraphQaPipeline:
         user: str,
         timings: dict,
         step: str = "llm",
+        trace_shape: dict | None = None,
     ) -> str:
+        """The ONE seam every LLM call passes through, which is why R18 captures
+        here rather than at five call sites.
+
+        ``trace_shape`` is the answer hop's opt-out from text capture: when it is
+        given, the prompt is recorded as shape (row count, column keys, sizes)
+        instead of as text, because THAT hop's user prompt is the retrieved rows
+        JSON and R8 already ruled row values out of the telemetry files. The
+        parameter carries the shape the caller alone can compute; passing it is
+        what selects the safe path."""
         reply = self.provider.complete(system, user)
         envelope.metrics.llm_calls += 1
         envelope.metrics.tokens.prompt += reply.usage.prompt_tokens
@@ -203,12 +298,48 @@ class GraphQaPipeline:
                     envelope.metrics.cost_est_usd = (envelope.metrics.cost_est_usd or 0.0) + cost
             except Exception:
                 pass
+        if self._traced:
+            try:  # a diagnostic is never the reason an answer fails
+                common = {
+                    "step": step,
+                    "system": system,
+                    "model": reply.model,
+                    "provider": getattr(self.provider, "provider", None),
+                    "prompt_tokens": reply.usage.prompt_tokens,
+                    "completion_tokens": reply.usage.completion_tokens,
+                    "ms": reply.ms,
+                }
+                if trace_shape is None:
+                    self.trace.llm(
+                        envelope.run_id,
+                        envelope.session_id,
+                        user=user,
+                        reply=reply.text,
+                        **common,
+                    )
+                else:
+                    self.trace.llm_shape(
+                        envelope.run_id,
+                        envelope.session_id,
+                        user_chars=len(user),
+                        reply_chars=len(reply.text),
+                        **trace_shape,
+                        **common,
+                    )
+            except Exception:
+                pass
         return reply.text
 
     # -- tiers ----------------------------------------------------------------
-    def _route(self, envelope: Envelope, question: str, timings: dict) -> tuple:
+    def _route(
+        self, envelope: Envelope, question: str, timings: dict, scope: str | None = None
+    ) -> tuple:
         started = self.clock()
-        catalog = "\n".join(specs_catalog.catalog_lines())
+        # AGENT1: the ONE place a scope acts. A scoped catalog is a SHORTER
+        # catalog, so a spec outside the scope is ABSENT from the prompt and
+        # cannot be chosen — a constraint the router cannot ignore, which
+        # "prefer specs about X" in the prompt would have been.
+        catalog = "\n".join(specs_catalog.catalog_lines(scope))
         raw = self._llm(
             envelope,
             ROUTER_SYSTEM,
@@ -216,18 +347,65 @@ class GraphQaPipeline:
             timings,
             step="router",
         )
-        spec_id, params = None, {}
+        spec_id, params, rationale, parse_error = None, {}, None, None
+        out_of_scope: str | None = None
         try:
             decision = _extract_json(raw)
             spec_id = decision.get("spec_id") or None
             params = decision.get("params") or {}
-        except (ValueError, json.JSONDecodeError):
-            spec_id = None  # router noise never kills the question — fall through to Tier 1
+            # R18: the generated half of "router outcome and candidate/spec
+            # rationale". Absent on a pre-R18 reply and on a model that ignored
+            # the instruction — both read as None rather than as empty text.
+            reason = decision.get("reason")
+            rationale = str(reason).strip()[:RATIONALE_CHARS] if reason else None
+            # AGENT1: the catalog is the constraint, and this is the LATCH on
+            # it. Shortening the prompt is not by itself "cannot be chosen":
+            # a dropped spec's id can still appear inside a SURVIVING spec's
+            # description (docs.utility-lookup.v1 names docs.search.v1 as its
+            # own fallback), so the router can read an id it was never offered.
+            # An out-of-scope id is then treated exactly as a hallucinated one
+            # — dropped, Tier 1 takes over — because that is what it is.
+            if spec_id is not None and not specs_catalog.in_scope(spec_id, scope):
+                out_of_scope, spec_id, params = spec_id, None, {}
+        except (ValueError, json.JSONDecodeError) as exc:
+            # Router noise never kills the question — it falls through to Tier 1.
+            # R18 records WHICH it was: a fall-through after an unparseable reply
+            # and a fall-through the model chose look identical in the envelope
+            # (spec_id None either way) and are different defects.
+            spec_id, parse_error = None, f"{type(exc).__name__}: {exc}"
         timings["routing"] += int((self.clock() - started) * 1000)
+        if self._traced:
+            try:  # a diagnostic is never the reason an answer fails
+                self.trace.router(
+                    envelope.run_id,
+                    envelope.session_id,
+                    # AGENT1: the candidates the router actually SAW, which a
+                    # scoped run makes different from the registry. Recording
+                    # the full registry here would misreport the decision.
+                    candidates=sorted(
+                        s for s in specs_catalog.QUERY_SPECS if specs_catalog.in_scope(s, scope)
+                    ),
+                    spec_id=spec_id,
+                    params=params,
+                    rationale=rationale,
+                    parse_error=parse_error
+                    or (
+                        f"router chose {out_of_scope!r}, outside scope {scope!r}; "
+                        "dropped and answered from Tier 1"
+                        if out_of_scope
+                        else None
+                    ),
+                )
+            except Exception:
+                pass
         self._push_step(
             envelope,
             StepRecord(
-                i=len(envelope.steps) + 1, kind="router", spec_id=spec_id, ms=timings["routing"]
+                i=len(envelope.steps) + 1,
+                kind="router",
+                spec_id=spec_id,
+                ms=timings["routing"],
+                rationale=rationale,
             ),
         )
         return spec_id, params
@@ -344,8 +522,18 @@ class GraphQaPipeline:
         def _llm(system: str, user: str, step: str = "tier2") -> str:
             return self._llm(envelope, system, user, timings, step=step)
 
+        # API4 (b): Tier 2 retrieves several times, so the chunk count is a
+        # UNION across its retrievals rather than a sum — two subquestions that
+        # reach the same chunk gathered one chunk, not two. Accumulated here
+        # because this closure is the only place the results are visible;
+        # tier2.py stays a pure loop that knows nothing about corpora.
+        chunk_ids: set = set()
+
         def _retrieve(subquestion: str):
-            return self._run_text2cypher(envelope, subquestion, timings)
+            result = self._run_text2cypher(envelope, subquestion, timings)
+            if result is not None:
+                chunk_ids.update(chunk_row_ids(result.records))
+            return result
 
         outcome = run_tier2(
             question,
@@ -359,7 +547,7 @@ class GraphQaPipeline:
         envelope.metrics.iterations = outcome.iterations
         envelope.metrics.context = {
             "rows": outcome.evidence_rows,
-            "chunks": 0,  # doc-chunk retrieval arrives with R7 corpora wiring
+            "chunks": len(chunk_ids),  # API4 (b): unioned across the loop's retrievals
             "tokens_est": est_tokens("x" * outcome.evidence_chars),
         }
         envelope.metrics.budget = {
@@ -455,12 +643,25 @@ class GraphQaPipeline:
         memory_chars: int = 0,
         user_id: str = "",
         clarifications: list[dict] | None = None,
+        scope: str | None = None,
     ) -> Envelope:
         total_started = self.clock()
         # R19: what the person already said their terms mean, from the console's
         # control part. Never re-asked; carried into every prompt below as a
         # clause on the question. The envelope hashes the ORIGINAL question.
         clarified = parse_clarifications(clarifications)
+        # Computed here rather than after the two early returns so the R18 trace
+        # can open with BOTH forms of the question. Pure and unconditional —
+        # `clarification_clause` reads `clarified` and nothing else — so which
+        # path uses which string is unchanged: the declared (R22) and
+        # clarification (R19) tiers still work from the ORIGINAL question.
+        prompt_question = question + clarification_clause(clarified)
+        # AGENT1: resolved ONCE, here, so everything below reads a scope that is
+        # both declared and ready, or reads None. An unknown or not-yet-ready
+        # scope degrades to unscoped and says why — _route's existing rule for a
+        # hallucinated spec_id, applied one level up: a hint never kills a
+        # question, and it must never quietly empty the catalog either.
+        scope, scope_note = resolve_scope(scope)
         timings = {"routing": 0, "retrieve": 0, "llm": 0}
         envelope = Envelope(
             run_id=run_id,
@@ -471,6 +672,8 @@ class GraphQaPipeline:
             answer="",
             provider=getattr(self.provider, "provider", None),
             metrics=Metrics(),
+            scope=scope,
+            scope_note=scope_note,
         )
         envelope.metrics.memory = {
             "events": memory_events,
@@ -479,6 +682,18 @@ class GraphQaPipeline:
         if user_id:  # R3 reserved slot: hash + length only, never the identity
             envelope.user_id_sha256 = sha256_text(user_id)
             envelope.user_id_chars = len(user_id)
+
+        # R18: open the decision trace. `debug_trace` is set on EVERY run,
+        # including the ones with no trace behind them — the console has to be
+        # able to tell "no trace was recorded" from "the field is missing
+        # because this agent predates R18", and only an explicit False does
+        # that. Nothing below this line behaves differently when it is True.
+        envelope.debug_trace = self._traced
+        if self._traced:
+            try:
+                self.trace.run_open(run_id, session_id, question, prompt_question)
+            except Exception:
+                pass
 
         # R22: a term with a DECLARED non-graph source (config/taxonomy/
         # ui-concepts.yaml — Tower first) is answered from its declaration at
@@ -498,7 +713,7 @@ class GraphQaPipeline:
                 "total": int((self.clock() - total_started) * 1000),
                 **timings,
             }
-            return envelope
+            return self._trace_close(envelope)
 
         # R19: a term that resolves to none of the four sources is asked about
         # before anything routes — a near match is a choice the person makes,
@@ -511,10 +726,9 @@ class GraphQaPipeline:
                 "total": int((self.clock() - total_started) * 1000),
                 **timings,
             }
-            return envelope
-        prompt_question = question + clarification_clause(clarified)
+            return self._trace_close(envelope)
 
-        spec_id, params = self._route(envelope, prompt_question, timings)
+        spec_id, params = self._route(envelope, prompt_question, timings, scope)
         result = self._run_spec(envelope, spec_id, params, timings) if spec_id else None
         if result is not None:
             envelope.tier = "spec"
@@ -532,7 +746,8 @@ class GraphQaPipeline:
             rows_json = json.dumps(result.records, default=str)[:ANSWER_CONTEXT_CHARS]
             envelope.metrics.context = {
                 "rows": result.row_count,
-                "chunks": 0,  # doc-chunk retrieval arrives with R7 corpora wiring
+                # API4 (b): counted from the rows that came back, not asserted.
+                "chunks": count_chunk_rows(result.records),
                 "tokens_est": est_tokens(rows_json),
             }
             envelope.answer = self._llm(
@@ -543,6 +758,15 @@ class GraphQaPipeline:
                 f"{_epistemic_clause(envelope)}):\n{rows_json}",
                 timings,
                 step="answer",
+                # R18: THIS user prompt is the rows JSON — folder names, host
+                # names, SEAL ids. Handing the shape here is what routes the
+                # answer hop onto the trace's values-free path; the rows never
+                # reach a file (qa_trace.llm_shape / _row_shape).
+                trace_shape={
+                    "rows": result.records,
+                    "row_count": result.row_count,
+                    "truncated": result.truncated,
+                },
             )
             self._push_step(
                 envelope,
@@ -572,4 +796,4 @@ class GraphQaPipeline:
             "total": int((self.clock() - total_started) * 1000),
             **timings,
         }
-        return envelope
+        return self._trace_close(envelope)

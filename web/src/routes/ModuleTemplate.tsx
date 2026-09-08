@@ -4,6 +4,7 @@ import ModuleToolbar from '../layout/ModuleToolbar'
 import ResizableSplit from '../components/ui/ResizableSplit'
 import Tabs, { type TabDef } from '../components/ui/Tabs'
 import EmptyState from '../components/ui/EmptyState'
+import { TaglineWithProvenance } from '../components/ui/TaglineWithProvenance'
 
 interface ModuleTemplateProps {
   module: ModuleDef
@@ -48,7 +49,15 @@ export default function ModuleTemplate({ module, selection, graphPane, tabConten
           <h2 tabIndex={-1} data-view-heading className="text-2xl font-semibold text-text outline-none">
             {module.label}
           </h2>
-          <p className="mt-1 text-[13px] text-muted">{module.tagline} · backs onto {module.backsOnto}</p>
+          {/* WEB18: the tagline can name a term the console DEFINES rather than
+              reads from the graph, and it sits beside "backs onto drydocs" —
+              which is how "how many towers" became a :TOMRole query on
+              2026-08-20. The note is sourced from ui-concepts.yaml through the
+              generated artifact, never written here. A tagline that names no
+              declared term renders exactly as before. */}
+          <p className="mt-1 text-[13px] text-muted">
+            <TaglineWithProvenance tagline={module.tagline} /> · backs onto {module.backsOnto}
+          </p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
           {toolbarActions ?? (

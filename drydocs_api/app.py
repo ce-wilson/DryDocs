@@ -87,6 +87,7 @@ from drydocs_api.mappings import (
     source_corrections_report,
 )
 from drydocs_api.personas import UnknownPersonaError
+from drydocs_api.qa_trace_read import TraceQueryError, read_trace
 from drydocs_api.queries import NAMED_QUERIES, ParamValidationError, UnknownQueryError
 from drydocs_api.query_specs import SPEC_DATABASES, UnknownSpecError
 from drydocs_api.review_quality import (
@@ -122,6 +123,7 @@ from drydocs_api.schemas import (
     PersonaBlockOut,
     PersonaQualityOut,
     PromotedDiffOut,
+    QaTraceOut,
     ReviewQualityOut,
     SpecOut,
     SpecRunOut,
@@ -966,6 +968,28 @@ def create_app(
     @app.get("/admin/log-estate")
     def get_log_estate(user: AdminUser) -> LogEstateOut:
         return log_estate()
+
+    # R18 (d): the Ask decision trace, by correlation key. THE ONE ROUTE ON THIS
+    # API THAT SERVES LOG CONTENTS, and three things keep that narrow.
+    #
+    # It is ADMIN-GATED in its signature, the way /raw-cypher is — a non-admin
+    # 403s before the query string is read (ADR 0005's gate, reused rather than
+    # re-invented). It reaches ONE kind: `qa-debug` is a constant in
+    # qa_trace_read, so there is no parameter here through which another kind's
+    # file could be named, and the api-debug surfacing question log_estate.py
+    # holds for SME review stays held. And the filter is REQUIRED: with neither
+    # id this refuses (422) instead of returning the file, because a lookup by
+    # run id and a bulk log download are not the same route.
+    @app.get("/admin/qa-trace")
+    def get_qa_trace(
+        user: AdminUser,
+        run_id: str | None = None,
+        session_id: str | None = None,
+    ) -> QaTraceOut:
+        try:
+            return read_trace(run_id=run_id, session_id=session_id)
+        except TraceQueryError as exc:
+            raise HTTPException(422, str(exc)) from None
 
     # ── O51: reviewer-quality signals + the admin block ──────────────────────
     #

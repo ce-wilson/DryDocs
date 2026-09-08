@@ -72,11 +72,12 @@ transaction timeout 15 s.
   "answer": "…",
   "model": "…", "provider": "anthropic | azure",
   "steps": [
-    { "i": 1, "kind": "router", "spec_id": "explorer.jobs.v2", "ms": 480 },
+    { "i": 1, "kind": "router", "spec_id": "explorer.jobs.v2", "ms": 480,
+      "rationale": "the question names a folder and asks what runs in it" },
     { "i": 2, "kind": "spec", "spec_id": "explorer.jobs.v2",
       "cypher": "MATCH …", "database": "drydocs", "rows": 42,
       "truncated": false, "fix_retries": 0, "error": null, "explore_ref": null,
-      "epistemic": null, "causes": [], "note": null },
+      "epistemic": null, "causes": [], "note": null, "rationale": null },
     { "i": 3, "kind": "answer", "ms": 1210 }
   ],
   "sources": [ { "document": "spec:explorer.jobs.v2", "trust": "CONFIRMED",
@@ -92,7 +93,10 @@ transaction timeout 15 s.
     "tier2": { "engaged": false, "votes": [], "forced_solve": false }
   },
   "task_graph": [],
-  "clarification": null
+  "clarification": null,
+  "debug_trace": false,
+  "scope": null,
+  "scope_note": null
 }
 ```
 
@@ -104,6 +108,49 @@ kind. `clarification` is set ONLY at `tier: "clarification"` (and
 choices}], prompt}`, with `answer` carrying the same prompt as text so a
 consumer that knows nothing of R19 still shows a sentence. The two fixed
 choice ids are `__free_text__` and `__proceed__` (answer anyway).
+
+R18 adds two more, and the first is a CONTRACT CHANGE rather than a new
+capture. `steps[].rationale` is the router's own one-sentence reason for the
+spec it picked, on the `router` step and nowhere else — it exists because
+`ROUTER_SYSTEM` now asks for a `reason` alongside `spec_id` and `params`.
+Nothing generated one before, so no amount of extra logging could have
+produced it; `null` means the reply carried none (a pre-R18 build, or a model
+that ignored the instruction), never an empty stated reason. It is a statement
+about an observable choice — an auditable decision trace — and not hidden
+chain-of-thought, which this pipeline neither requests nor would receive
+(`providers.py` passes no thinking parameter and reads only the message
+content).
+
+`debug_trace` says whether the `qa-debug` decision trace recorded this run. A
+FLAG, never the trace: the trace text stays in `DRYDOCS_LOGDIR` under the same
+sink boundary that keeps full question text out of this payload, and an admin
+retrieves it from `GET /admin/qa-trace?run_id=…`. It is `false` on every server
+whose `config/log-kinds.yaml` does not declare the `qa-debug` kind at
+`level: DEBUG` — which is the shipped default — and an explicit `false` rather
+than an absent field, so a consumer can tell "no trace was recorded" from "this
+agent predates R18". Enablement is settings-level and never per request, for
+the reason `api-debug` gives: an Ask question arrives as an HTTP request, and a
+per-request switch would belong to whoever sent the request.
+
+AGENT1 adds `scope` and `scope_note`. A scope is a ROUTER HINT and nothing
+else: it SHORTENS the spec catalog joined into `ROUTER_SYSTEM`, so a spec
+outside it is never offered and, if the router names one anyway out of another
+spec's description, it is dropped exactly like a hallucinated id and Tier 1
+takes over. No new tier, no second backend, no separate index. The control part
+carries it (`{"drydocs_control": {"scope": "knowledge-graph"}}`); unlike
+`clarifications` it never reaches a prompt as text.
+
+`scope` reports what RAN, which is `null` on every unscoped run — and that is
+every run today, because no console control sets one yet (the item's clause (d)
+split: the filter and the envelope land first). `scope_note` is why a REQUESTED
+scope was not honoured, because readiness is per option and only one is ready:
+`knowledge-graph` is live; `vendor-corpus` is declared and refused until a spec
+searches chunk text (API4) — a control over a title-and-abstract search would
+claim the documents had been searched; `general-knowledge` is declared and
+refused because answers here come from query results only, so it needs a
+different answer contract and a ruling rather than an epistemic label. An
+unknown or unready scope answers UNSCOPED and says so; it never errors, and it
+never empties the catalog.
 
 Notes on honesty markers: `question_sha256`/`question_chars` only — full
 question text belongs to the local ledger (R3), never a persistable payload.

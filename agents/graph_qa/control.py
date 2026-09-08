@@ -26,7 +26,11 @@ their own question, so the pipeline appends it to the question as a clause
 for the router and text2cypher calls (``term_resolution.clarification_clause``);
 it is user-authored, never a credential, and is not in
 ``SECRET_CONTROL_FIELDS`` on purpose — a stored trace SHOULD show what the
-person said a term meant. An in-band part was chosen over ADK session state deliberately:
+person said a term meant. AGENT1 adds ``scope``, and it is NOT a second
+exception: a scope never reaches a prompt as text, it SHORTENS the spec catalog
+the router is shown (``specs_catalog.catalog_lines``), and an unknown value
+resolves to unscoped rather than being passed on — so the widest thing a bad
+value can do is restore the menu it was meant to narrow. An in-band part was chosen over ADK session state deliberately:
 the shape is fully owned by this repo on both ends, testable without an ADK
 runtime, and carries no assumption about ADK's request schema. Company-side
 OIDC replaces the whole handshake (ADR 0005 Evidence).
