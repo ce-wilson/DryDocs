@@ -198,7 +198,76 @@ If a belt-and-braces check is still wanted at this site, route it through
 
 ## Ranked
 
-*(step 6 — the ranked list; its presence is what marks this report complete)*
+Two findings, one per lens, and they are the same failure at different depths: **a result
+that does not carry the limits of its own method.**
+
+1. **L1-1 — the findings list does not declare its rule coverage.** 17 of 45 registry
+   rules are implemented; `detect_all` returns a bare `list[Finding]` and `profile.py:340`
+   embeds it while asserting nothing. A short result reads as *conforms* and means *no
+   violations among the rules this build implements*. Ranked first because the output
+   drives changes to production job definitions and a Jira handoff, so "clean" ends an
+   inspection — and because the module states the correct standard three times elsewhere
+   (`equivalence.py`'s three-valued verdict and *"no evidence is never evidence"*,
+   `profile.py`'s `not-supplied` never a default) and did not apply it here.
+2. **L2-1 — a raw-substring guard reintroduces the LOAD5 defect class.**
+   `test_remediation_changes.py:323` greps source for `execute_write`, so a comment
+   explaining the prohibition fails the test (J66). Redundant as well as brittle: the
+   package-wide AST guard beside it already covers that marker by name. Ranked second
+   because the correction is deleting one line, and because nothing is currently wrong —
+   the risk is that writing the explanation this repo wants is what breaks it.
+
+**Not ranked:** the strengths in L1-2 and the three cut candidates in Lens 2. Recorded so
+no later firing re-derives them.
+
+## Cross-links
+
+**Between the lenses.** They found the same thing from opposite ends. Lens 1: a result
+that does not state what it checked. Lens 2: a guard that checks the wrong artifact and
+would punish stating why. Both are about **the distance between what a check proves and
+what its output claims** — which is this component's whole subject, since its business is
+proposing changes to live jobs.
+
+**To slot 2 (`load`) — the second recurrence, and the first with a mechanical remedy.**
+L2-1 is LOAD5's defect class exactly: a guard asserting on prose rather than code. LOAD5
+was found this morning and fixed on `main` at `e15d319a`. Two slots, two independent
+instances, and `tests/source_scan.py` already exists to prevent both. Slot 10 should ask
+whether the AST/`code_only` instrument is the *default* for source-reading guards or just
+available.
+
+**To slots 9, 2, 3 and 4 — the completeness pattern, now five for five.** Web truncated
+silently; load's `:JobRun` records no scope; lineage counts a tier with no writer; api
+DECLARES its ceiling and the console reads it; and here a findings list omits its
+denominator. **This module is the second fixed instance and a fresh unfixed one at the
+same time** — `equivalence.py` was explicitly repaired for this exact defect (defect B',
+2026-08-12: *"a run that broke six CMDLINEs reported PASS 12/12"* because "equal" and
+"nothing compared" were one value), and the lesson did not travel one file over to
+`detect`. That a component can fix the pattern in one function and reproduce it in
+another is the strongest evidence yet that it is a repo-level convention question, not a
+series of local bugs.
+
+**Forward to slot 10.** Two questions this slot sharpens: whether "a result states the
+limits of its own method" should be a written convention rather than a habit some
+functions have; and whether the source-reading guard instrument should be mandatory.
+
+## Candidates for grooming
+
+Four. None minted — the backlog pen is Lane A's and this firing holds neither it nor an id.
+
+1. **Return rule coverage alongside findings.** `drydocs-remediation`, p2. `detect_all`
+   returns the evaluated rule ids (and ideally the registry ids not evaluated) so an empty
+   list carries its denominator; one caller (`profile.py:340`) to update. No gate question
+   — stating what you checked asserts nothing new about meaning. Acceptance should say the
+   coverage travels into the profile JSON, since that is what a reader actually sees.
+2. **Delete `test_remediation_changes.py:323`.** `drydocs-remediation`, p3, one line. The
+   package AST guard already covers `execute_write` by name. If a check is still wanted at
+   that site, route it through `tests/source_scan.py`'s `code_only`. Pair it with LOAD5 in
+   the same groom so the class is closed rather than the instance.
+3. **Decide whether `source_scan` is mandatory for source-reading guards.** Cross-module,
+   slot 10's framing. Two instances in two slots argues for a rule; the repo already has
+   the instrument and a J-number for the reasoning.
+4. **Nothing for `xml_io.py`'s size.** Recorded as a deliberate non-candidate: 1,277 lines
+   of byte-offset splicing exist because the measured alternative produces a diff no
+   reviewer can read, and the measurement is in the docstring.
 
 ## Cross-links
 
