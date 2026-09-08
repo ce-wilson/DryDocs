@@ -1,5 +1,5 @@
-# SME gate-prompt spec — dpl pipeline-registry contract (backlog id: at next
-# groom). DRAFTED 2026-08-07, UNSIGNED. The T13 discharge gate for
+# SME gate-prompt spec — dpl pipeline-registry contract (backlog G64; groomed
+# 2026-08-09). DRAFTED 2026-08-07, UNSIGNED. The T13 discharge gate for
 # dpl:pipeline-registry: the field contract has been ASSUMED since G25 — never
 # validated against a real export — and the two dpl audit stubs
 # (audit-envelope-phase4) are ruled stubs FOR THAT REASON. The SME identifies
@@ -7,9 +7,24 @@
 # and the rulings close or re-scope the contract on evidence.
 # GATE-BOUND: this page PROPOSES; rendering it builds, flips, and stamps
 # nothing. Mechanism-only: GUIDs, SEAL ids and registry URLs stay company-side.
+# AMENDED 2026-09-08 (producer, pre-session, from the transcription of a company-side
+# sign-off PACKAGE that ran section B against real exports and drafted the C rulings as
+# proposals; [SME-REPORTED] - the package is company-internal and never lands here). The
+# gate did not convene. Four things the package needed and the page could not hold are
+# added as clauses rather than answered in the package's table: (1) the registry admits
+# ANY non-empty id while the launcher join requires an anchored GUID, so a non-GUID id
+# can never match and reads today as merely unobserved - C5; (2) the extractor's docstring
+# has promised since G25 that this gate rules the intake-naming question (OQ-8: the export
+# file is named for the enclosing folder, not for the pipeline) and no clause asked it -
+# C6; (3) the package answered A2 by leaning on a fleet-grain metadata carrier the page
+# never admits as a surface - A3 names it, so A2 can be answered honestly as drafted; (4) a
+# fourth candidate usage signal (a runnable flag) turned up beside active - C3-a. B1 now
+# names the G135 census (669a9c0a) as its instrument. The package's composite-key row
+# ((guid, connectorName)) is NOT a clause here: the dpl-dataset-identity-zone rider owns
+# it, and this gate stays a contract gate. Counts stay company-side; shape only.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
-updated: 2026-08-07
+updated: 2026-09-08
 
 id: dpl-pipeline-registry-contract
 title: "SME Gate — dpl pipeline-registry contract: identify a real export (HITL, Internal), profile it against the ASSUMED contract (agent), then close or re-scope T13 and the audit stubs"
@@ -65,9 +80,10 @@ sections:
     confirmations:
       - "A1 [identify]: the SME identifies a REAL pipeline_id.json export — which SEALs' registries, pulled when, by whom, from which venue (J18). Recorded company-side / in internal/; this page carries SEAL COUNT and pull date only. [named / deferred]"
       - "A2 [identify]: the SME rules whether the sample is REPRESENTATIVE — one SEAL's registry validates one SEAL's contract; claiming the fleet needs either more SEALs in §A1 or an explicit scope note on every §C ruling. [representative / scoped]"
+      - "A3 [PROPOSED 2026-09-08, admit a corroborating surface; SME-REPORTED]: a fleet-grain metadata carrier holding the same registry records (the registry DB replica the company profile read) MAY serve §B2/§B3 distributions and §A2's representativeness claim; the §A1 export stays the CONTRACT authority - a field the replica carries and the export does not is a replica field, not a contract field. Admitting it does not re-open the registry row's discovery route (that is the dataset sibling's C4). [admitted / declined]"
   - title: "B. Agent — profile the existing data (staged-only, deterministic, zero graph writes)"
     confirmations:
-      - "B1 [profile]: parse the §A export(s) with the G25 extractor; field census against the ASSUMED contract — per field: present / absent / present-but-empty, with counts. Fields in the real export that the assumption LACKS are listed by name. [profile attached]"
+      - "B1 [profile]: parse the §A export(s) with the G25 extractor; field census against the ASSUMED contract — per field: present / absent / present-but-empty, with counts. Fields in the real export that the assumption LACKS are listed by name. INSTRUMENT: the G135 FieldCensus / contract_lines() output (drydocs_lineage/extractors/dpl_registry.py), so the census is the extractor's own reading of the files and not a hand-kept table. [profile attached]"
       - "B2 [profile]: createdBy / lastModifiedBy specifically — existence, population rate, and value shape (person vs service principal), the exact evidence the audit stub's revisit trigger names. [profile attached]"
       - "B3 [profile]: version + active distributions, and the GUID join against G15/G17 staged tokens — match / registry-only / evidence-only counts (the §H three-signal feed). [profile attached]"
   - title: "C. Rulings — the profile decides, the SME signs"
@@ -75,4 +91,7 @@ sections:
       - "C1: the field contract is CONFIRMED as assumed, or AMENDED field-by-field (the extractor's next build follows the amendment; tracker T13 closes either way — it asked for the validation, not a particular answer). [confirm / amend]"
       - "C2: the audit-envelope stub for this source CLOSES (fields exist — the envelope entry is written in config/audit-fields.yaml, the source's per-entry row) or STANDS re-affirmed on evidence. [closes / stands]"
       - "C3: active stays the third usage signal — staged and corroborated, never collapsed into 'used' (restating G22 §H on this data, so the number sits next to the rule). [confirm]"
+      - "C3-a [PROPOSED 2026-09-08, SME-REPORTED]: the export carries a fourth candidate signal beside active - a runnable flag. Rule it a SYNONYM of active (one signal, two spellings), an INDEPENDENT fourth signal (staged and corroborated on its own terms, per G22 §H1 at config/gate-log.md), or DEFERRED until its population is profiled. It is never collapsed into used either way. [synonym / independent / deferred]"
       - "C4: the §B3 join coverage is ACCEPTED as the enrichment baseline, with registry-only and evidence-only populations dispositioned in words (a finding class each, not a cleanup chore). [ruled / deferred]"
+      - "C5 [PROPOSED 2026-09-08, key shape; SME-REPORTED]: registry ids that are NOT GUID-shaped. The extractor admits any non-empty id (dpl_registry.py, the pipeline_id read) while the launcher-side join requires an anchored GUID (drydocs_core/orchestration/shell.py), so such an id can never match and today reads as merely unobserved. Options: ADMIT (staged, labelled non-conforming, reported on the WARN stream as its own finding class), REJECT (refused at intake, counted), or QUARANTINE (staged apart, never joined). Whichever signs, the extractor LABELS it - a silent non-match is the shape this clause exists to end. [admit / reject / quarantine]"
+      - "C6 [PROPOSED 2026-09-08, intake naming - OQ-8; SME-REPORTED]: the export file is named for the enclosing folder, not for the pipeline it describes, which the extractor docstring has promised since G25 that this gate rules. Options: RENAME ON INTAKE (the drop-dir convention names the file for the pipeline id it carries, and the folder name is recorded as provenance), or CHANGE THE EXTRACTOR (read the id from the payload only and treat the file name as opaque). Either way the file name is never the join key. [rename on intake / extractor reads payload]"
