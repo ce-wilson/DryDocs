@@ -39,8 +39,8 @@ acceptance: |
   (d) ROUTE IDENTITY IS A CLAUSE OF THIS GATE, not a separate ruling: a prod route can be
   disabled while its CAT twin stays enabled, so route_id alone cannot express identity;
   (route_id, fts_id) can, and MFT System Environment is already a column in the search export.
-  Pose it beside G64's (guid, connectorName) finding, which the research says is worth ruling
-  together, and carry OQ-11 with it - if a re-provisioned route does not keep its id, route_id
+  Pose it beside the (guid, connectorName) finding, which the dpl-dataset-identity-zone rider
+  (G136) owns - not the G64 contract gate - and which the research says is worth ruling together, and carry OQ-11 with it - if a re-provisioned route does not keep its id, route_id
   fails ADR 0001's business-key test outright.
 
   (e) CARRY THE SME RULING ALREADY MADE, so the gate does not re-litigate it: NO DAILY CAPTURE

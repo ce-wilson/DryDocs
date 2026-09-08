@@ -651,7 +651,7 @@ datasets:
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: automated
       via: db                           # the row's own id names the qualified object
-    confirmed: false                    # no gate — this is the K17 gate's own subject (fid-identity-and-scope). Registered here so the K16 census has a source row to cite; NOTHING loads until K17 signs.
+    confirmed: false                    # no gate — this is the K17 gate's own subject (fid-identity-and-scope). Registered here so the K16 census has a source row to cite. K17 SIGNED 2026-08-19 (gate-log, 33/33); the build is K26 and this flag flips at K26 close (N13).
     notes: >
       THE FID DIRECTORY, AND IT WAS NEVER AN EXTERNAL SYSTEM (SME evidence
       2026-08-12). Functional-account rows are `EMP_TYP_CD = 'FCT'`. This row
