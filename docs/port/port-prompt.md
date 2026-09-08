@@ -290,7 +290,12 @@ FORCE_COLOR / Idea-101 findings that motivated J41.)
   three apply mistakes are now reconcile-port skill rules). **NEXT-PORT BASE:
   `port-base-20260905`** — the sixth roll, `port-base-20260902..port-base-20260905`, 186
   commits / 323 changed paths, steps 313–333, RELAY-26; Lane B's three in-flight `wip/`
-  branches (API1, WEB3, WEB4) land in the range after this one.
+  branches (API1, WEB3, WEB4) land in the range after this one. **REPORTED APPLIED
+  COMPLETE company-side at `d527afce` (2026-09-08)** as
+  **PORT-REPORT-port-base-20260905** — `[SME-REPORTED]`, transcribed in the POSTSCRIPT TO
+  RELAY-45, not producer-verified: the counts and shas are the close-out's, this side has
+  read none of them, and RELAY-45 §Five's condition on that COMPLETE (the 38 "new tests
+  failing" bucket named by test id) is still open. Nothing here is a producer figure.
 - **Producer base `port-base-20260826` (`9ef606b4`)**, applied company-side as
   **PORT-REPORT-e33f8d02** (2026-08-26) — range
   `port-base-20260825..port-base-20260826` = **44 commits / 46 files
@@ -3265,6 +3270,62 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   `test_no_entry_rule_asserts_the_consumers_tree` fails the next author who writes one that
   would. If a rule still describes your tree wrongly, it is a producer defect and the roll is
   where it is fixed. Nothing is asked back.
+
+  **POSTSCRIPT TO RELAY-45 - YOUR CLOSE-OUT FOR THE SIXTH ROLL, TRANSCRIBED (2026-09-08;
+  your `PORT-REPORT-port-base-20260905.md` close-out at company `main` `d527afce`):**
+  `[SME-REPORTED]` Read producer-side at `65b9037f` on `main`, port base
+  `port-base-20260905`; venue NewThinkpad. RELAY-45 was written against the report at its
+  correction-16 state and the three merge commits; this is the FOURTH commit and the four
+  measurements RELAY-45 did not have. Recorded as YOUR words, verified against nothing on
+  this side - company commits cannot be read from here, so every sha and count below is
+  reported, not confirmed.
+
+  **The roll is closed company-side.** `main` = `d527afce`, pushed, working tree clean.
+  Four commits: `25bace48` the `--no-ff` merge of `port/20260905`, 22 commits; `b485ab72`
+  the `--no-ff` merge of `chore/ruff-sweep-20260908`; `d1451fe5` the gate-prompt scalar
+  fold, verified content-neutral; `d527afce` the report close-out, **Status: COMPLETE**.
+
+  **What the session produced beyond applying the four relays**, in your close-out's own
+  terms: (1) **9 missing `cadence: rows`** - a committed render had sat 20 sources stale
+  for three weeks while the record called it "deferred"; the fourth instance of the
+  per-entry delta-vs-union defect, and the first with a functional consequence. (2) **87
+  owed paths, 82 of them from a roll that closed COMPLETE** - RELAY-35 named seven, the
+  instrument found eighty-two. (3) **5 regressions; "zero regressions" was never true** -
+  three fixed, including a gate-bound column a wholesale take silently dropped. (4) **CI
+  has never run on this remote** - `state: active`, `total_count: 0`.
+
+  **Four corrections you made against your own claims:** the ledger miscount, the
+  "pre-existing" mislabel, the overstated ruff count, and the CI framing. Each recorded
+  rather than quietly patched, on the stated reason that the report criticizes unmeasured
+  counts and carrying one silently would have cost more than the fix. **The lesson you
+  name, repeated three times: check the instrument before the subject** (J76 producer-side,
+  same finding independently) - `git diff --quiet` cannot answer a determinism question
+  about an intentionally-modified file; hashing `load-map.json` across two board renders
+  proves nothing when the board render never touches it; buckets that do not sum to their
+  own total are not measuring what they claim.
+
+  **Two things you left open, both yours to decide, neither resolved here.** (1) **The
+  gate-log guard conflict - the roll's main owed decision.** The guard names its violation
+  as "dropping or editing" an audit entry but implements a file-level prefix check, so it
+  trips on a postscript that does neither; the convention requires postscripts under the
+  signed record and the guard forbids them anywhere but the end. **Merged red on purpose.**
+  Adjacent but NOT the same defect as RELAY-43's bytes-vs-lines fix (`aef8dfcb`, not in
+  this range) - do not assume that fix clears this; the two are recorded separately until
+  one of us reads them against each other. (2) **Branch cleanup** - `port/20260905` and
+  `chore/ruff-sweep-20260908` are both merged and pushed, convention says delete after
+  `--no-ff`, and you have not touched them.
+
+  **THREE THINGS THIS POSTSCRIPT DOES NOT DO, said so nobody reads the transcription as a
+  ruling.** (a) The COMPLETE above is your verdict, and RELAY-45 §Five's condition on it is
+  still open: the 38 "new tests failing" bucket is a count, and under the restated
+  ACCEPTANCE GATE that bucket is where COMPLETE turns - a count is not a bucket, a list of
+  ids is. The close-out does not itemize it. (b) The 82 owed paths get NO row in the
+  `deferred-paths` block. A row is a path or a glob and a producer ruling; a count is
+  neither, and 82 unnamed paths cannot be written as a pattern. Ask for the list and the
+  rows follow - that is exactly the record RELAY-35 asked for and PORT6 built the block to
+  hold. (c) Nothing in the "Last completed port" tracker is promoted from reported to
+  verified; the pointer for this base now carries the close-out and its sha, and nothing
+  more.
 
 OWED COMPANY-SIDE:
 
