@@ -1271,3 +1271,83 @@ def test_monolith_is_a_tombstone() -> None:
     doc = yaml.safe_load(TOMBSTONE.read_text(encoding="utf-8")) or {}
     assert doc.get("schema") == "drydocs.backlog.tombstone", "backlog.yaml is not the tombstone"
     assert "items" not in doc, "backlog.yaml grew an `items:` key — the monolith was resurrected"
+
+
+# ---------------------------------------------------------------------------
+# I8 -- dependency currency, the groom-time warning.
+#
+# THE MECHANISM ONLY. These assert that a known-stale pair is reported and a
+# current one is not, against a hand-built time map. They deliberately never
+# assert the CONTENT of the live list: that list changes with every commit that
+# touches an item file, so a test pinning it would be a diary that fails for
+# reasons unrelated to the code -- and would be "fixed" by pasting in whatever
+# today's output happens to be, which asserts nothing.
+# ---------------------------------------------------------------------------
+
+#: A fixed clock. Values are unix times only in shape; nothing here reads git.
+_OLDER, _NEWER = 1_700_000_000, 1_700_009_999
+
+
+def test_a_dependency_committed_after_its_dependent_is_reported() -> None:
+    v = _allocator()
+    times = {"A1": _OLDER, "A2": _NEWER}
+    items = [{"id": "A1", "status": "todo", "depends_on": ["A2"]}]
+    assert v.dependency_currency_warnings(items, times) == [("A1", "A2")]
+
+
+def test_a_dependency_older_than_its_dependent_is_not_reported() -> None:
+    """The common case, and the reason this is a warning and not a gate: most
+    edges are simply fine and must produce no line at all."""
+    v = _allocator()
+    times = {"A1": _NEWER, "A2": _OLDER}
+    items = [{"id": "A1", "status": "todo", "depends_on": ["A2"]}]
+    assert v.dependency_currency_warnings(items, times) == []
+
+
+def test_a_done_item_is_excluded_however_stale_its_dependency_is() -> None:
+    """Clause (c), asserted rather than only commented: a closed item's acceptance
+    describing an older dependency is a HISTORICAL RECORD and correct as written.
+    Reporting those would invite reopening verified work to make it retrospectively
+    true -- the argument the 2026-08-28 groom used when it filed O77 fresh rather
+    than reopening O66."""
+    v = _allocator()
+    times = {"A1": _OLDER, "A2": _NEWER}
+    for status in ("done", "blocked"):
+        items = [{"id": "A1", "status": status, "depends_on": ["A2"]}]
+        assert v.dependency_currency_warnings(items, times) == [], status
+
+
+def test_an_item_or_dependency_with_no_commit_is_skipped_not_crashed() -> None:
+    """A just-minted item file has no commit yet, so it is absent from the map.
+    There is nothing to compare and the right answer is silence -- not a
+    KeyError in the middle of a groom."""
+    v = _allocator()
+    items = [
+        {"id": "A1", "status": "todo", "depends_on": ["MISSING"]},
+        {"id": "UNCOMMITTED", "status": "todo", "depends_on": ["A2"]},
+        {"id": "A3", "status": "todo"},  # no depends_on key at all
+    ]
+    assert v.dependency_currency_warnings(items, {"A1": _OLDER, "A2": _NEWER}) == []
+
+
+def test_equal_timestamps_are_not_stale() -> None:
+    """One commit touching both files is the ordinary case for an item minted with
+    its dependency, or for a bulk status sweep. Strictly-newer is the rule."""
+    v = _allocator()
+    items = [{"id": "A1", "status": "todo", "depends_on": ["A2"]}]
+    assert v.dependency_currency_warnings(items, {"A1": _OLDER, "A2": _OLDER}) == []
+
+
+def test_the_time_map_actually_reads_this_repository() -> None:
+    """Instrument check (J76). Every assertion above would pass unchanged against a
+    time map that is always empty, and an always-empty map is exactly what a broken
+    git call produces -- silently, since the warning list would simply be empty and
+    read as "nothing stale". So one test asks the real reader for the real tree."""
+    v = _allocator()
+    times = v.item_commit_times()
+    if not times:
+        pytest.skip("no git history here — the batched log returned nothing")
+    ids = {p.stem for p in (BACKLOG / "items").glob("*.yaml")}
+    assert len(times) > 100, f"only {len(times)} item files have a commit time"
+    assert times.keys() & ids, "the map shares no id with the items directory"
+    assert all(isinstance(v_, int) for v_ in times.values()), "non-integer commit time"
