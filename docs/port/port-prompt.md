@@ -3169,6 +3169,41 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   two shapes the manifest rule permits and no looser anywhere else; no CI stage changed.
   Nothing is asked back.
 
+- **RELAY-44 — THE DPL DATASET GATE'S B3 WAS RESTATED ON THE REGISTRY'S REAL ZONE AXIS
+  AFTER YOUR BASE WAS CUT; THE G64 PAGE GREW FOUR CLAUSES; AND ONE COMMIT TO CHECK ON YOUR
+  SIDE (2026-09-08, post port-base-20260905):** `[VERIFIED-PRODUCER]` Three things, each
+  a commit past `port-base-20260905` that the next roll carries by its manifest row.
+  **One.** `config/gate-prompts/dpl-dataset-registry-contract.yaml` at `ecc1622c`
+  (2026-09-07): B3 no longer asks for a RAW/TRUSTED/REFINED reading of the registry's
+  `zone` - the page now treats it as a multi-valued enum, lake layer for object-store rows
+  and database technology otherwise - and proposal rows C1-a, C1-b, C1-c and C2-a carry the
+  rulings that follow from that (zone axis, opaque version string, unregistered and
+  registered-but-empty keys, two audit actor classes). Your copy of the page at the base
+  still carries the old B3, so a G65 session convened from the base would ask for an axis
+  the data does not have; the page you want is the one that lands with the roll. **Two.**
+  `config/gate-prompts/dpl-pipeline-registry-contract.yaml` (2026-09-08): four clauses
+  added so the page can hold what a section-B run produces - A3 admits a fleet-grain
+  corroborating surface beside the A1 export; C5 rules non-GUID registry ids (the extractor
+  admits any non-empty id, the launcher join requires an anchored GUID, so today such an id
+  silently never matches); C6 rules the OQ-8 intake-naming question the extractor docstring
+  has promised to this gate since G25; C3-a rules a fourth candidate usage signal beside
+  active. The composite-key `(guid, connectorName)` question is deliberately NOT on this
+  page - `config/gate-prompts/dpl-dataset-identity-zone.yaml` owns it, and a G64 table
+  that signs it would rule identity inside a contract gate. **Three - SME review status
+  on the recording half of G121.** The whole of G121's recording half is ONE producer
+  commit, `3f5b5769` (2026-08-27), inside every base from `port-base-20260829` on: it adds
+  the `run_meta` parameter to `BaseLoader.__init__` in `drydocs/loaders/base.py`, the
+  `_csv_acquisition_meta` helper in `drydocs/cli_ingest.py`, and
+  `tests/unit/test_load_csv_acquisition.py`. Producer-side all 22 registered loaders
+  accept `run_meta` and the test file is present. A tree that carries the helper in
+  `cli_ingest.py` but a `BaseLoader.__init__` without the parameter, and no test file, is
+  the shape of a `base.py` cherry-pick conflict resolved to the receiving hunk - the
+  `_acquisition_mode` helper that lives in that region on your side does not exist here,
+  so the two hunks collide exactly there. Whether your post-apply `base.py` carries the
+  parameter is one import and one attribute check, and if it does not, the manifest row
+  for `drydocs/loaders/**` is doing what it says and the resolution is the place to look.
+  Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
