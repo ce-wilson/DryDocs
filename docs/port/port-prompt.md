@@ -1240,7 +1240,7 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   independently invent a competing one against the same source. It nearly did:
   G35's walk on 2026-08-11 was about to admit ServiceNow group-scoped roles and
   would have minted a second group→application shape. It was stopped by the SME
-  showing the screenshots, not by anything in this repo.
+  relaying the company's signed model, not by anything in this repo.
   **RULED AT THAT WALK (gate-log 2026-08-11 RECORD):** G35 admits the group-scoped
   role TYPES into the vocabulary and mints NO graph shape — the shape stays owned by
   `snow-hpsm-queue-to-group`. **What the company session should do with this relay:**
