@@ -125,7 +125,76 @@ new about meaning.
 
 ## Lens 2 — technical debt
 
-*(step 5)*
+**The cleanest escape-hatch counts in the sweep**, and one guard that reintroduces a
+defect class this repo fixed on `main` earlier today.
+
+| hatch | count | slot 4 | slot 3 | slot 2 |
+|---|---|---|---|---|
+| `# type: ignore` | **0** | 1 | 0 | 6 |
+| `# noqa` | **0** | 2 | 0 | 2 |
+| `cast(` | **0** | 0 | 0 | 0 |
+| `: Any` / `-> Any` | **0 / 0** | 1 / 0 | 4 / 0 | 41 / 16 |
+| `TODO` / `FIXME` | **0** | 0 | 0 | 0 |
+| `# pragma: no cover` | 4 | 2 | 0 | 9 |
+
+Zero on every axis but `pragma`, and all four of those are on genuinely unreachable
+branches, each explaining itself at the site (`equivalence.py:73` *"the probe always
+resolves"*; `xml_io.py:421` *"expat errors first"*; `xml_io.py:1215` *"binary I/O is
+exact"*). `ruff` clean, 311 scoped tests green.
+
+### L2-1 — a guard reads raw source where the AST guard beside it already covers the same marker
+
+`tests/unit/test_remediation_changes.py:322-323`:
+
+```python
+assert not hasattr(changes, "write_transaction")
+assert "execute_write" not in open(changes.__file__, encoding="utf-8").read()
+```
+
+The first line reads the imported object and is correct. **The second is a raw substring
+scan over source text**, comments and string literals included — the exact shape J66
+names: *a guard that greps for a forbidden pattern also matches the comment explaining
+why it is forbidden, so it fails on the explanation and teaches people to stop writing
+explanations.* In a repo whose comments carry its rulings, that is the expensive kind of
+brittleness. Add a line to `changes.py` explaining why `execute_write` must never appear
+there and this test goes red on the explanation.
+
+**It is also redundant.** `tests/unit/test_remediation_no_graph_write.py` declares
+`WRITE_MARKERS = {"execute_write", "write_transaction", "begin_transaction"}` (`:17`) and
+**walks the whole `drydocs_remediation` package AST** (`:24-34`) checking referenced
+names. `changes.py` is inside that package, so `execute_write` is already guarded
+correctly, by name, one file away — and the test containing the substring line even
+imports that guard module deliberately (`:319`) to pin the claim that the structural
+guards needed zero changes. The substring assertion is not the point of the test; it is a
+belt-and-braces line that reintroduces the defect class the AST guard exists to avoid.
+
+**This is the same defect class as LOAD5**, found by slot 2 this morning and fixed on
+`main` at `e15d319a` — `test_recursive_sql_cyclic_type_disabled` asserted that a comment
+phrase was present rather than that the predicate was absent from executable SQL. **Two
+slots, two independent instances, one class.** That is the second pattern this sweep has
+found recurring across modules, and unlike the completeness one it has a mechanical
+remedy already in the repo: `tests/source_scan.py` (`code_only`, `called_names`).
+
+**Cheapest correction:** delete line 323. The AST guard covers it, by name, package-wide.
+If a belt-and-braces check is still wanted at this site, route it through
+`source_scan.code_only` so it reads code rather than prose. Line 322 stays as it is.
+
+### What was checked and cut
+
+- **`xml_io.py` is 1,277 lines, 29% of the module.** Cut: it is a purpose-built lossless
+  splicer that parses only to LOCATE, using `expat` byte offsets, because
+  `fix-package.md` §XML requires the emitted file to diff by exactly the approved changes
+  and — measured on this repo's own fixtures — both `ElementTree` and `lxml` rebuild
+  start tags from an attribute dict, producing *"the 100%-diff file no developer can
+  review"*. A justified reimplementation with its measurement recorded is not debt.
+- **Two XML readers in one component.** Cut: `xml_bridge.py` says of itself that
+  *"reading was solved twice over"*, but it adapts the LINEAGE component's staged
+  `controlm_xml` output while `xml_io` reads definition XML directly — different inputs,
+  and `xml_bridge` has a live caller (`drydocs/cli.py`).
+- **`jira.py` and `changedoc.py` have no producer-side caller** (496 lines). Cut, and the
+  reason is in the code: `jira.py` is *"the component's ONLY side-effect boundary"* and
+  its REST implementation is **company-side configuration** — credentials never live in
+  the engine (PUBLISH-BOUNDARY.md). Absent here is not-yet-ported, not broken.
 
 ## Ranked
 
