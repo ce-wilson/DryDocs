@@ -5,7 +5,15 @@
   (V1 coverage rule, 2026-08-04). The `Module:` line is what
   `tests/unit/test_runbook_coverage.py` reads; coverage is a claim the document
   makes about itself, never inferred from the filename.
-- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 5, 2026-09-07
+- **Status:** DESCRIPTIVE — documents the working procedure. **Rev 6, 2026-09-07
+  audits the document against the shipped console (backlog V10, Epic V):** what you
+  land on is described for the first time (the O35 category-first rebuild), the FB-03
+  page designations are recorded where an operator can act on them, the standalone
+  agent-test page gains the build and ship path its own header rules, and the build
+  gate is corrected — it named one command while CI blocks on six. Three of those
+  four were ABSENT rather than wrong, which is why the audit was worth running: a
+  runbook is stale when it is silent about a surface, not only when it misdescribes
+  one. **Rev 5, 2026-09-07
   adds the one-command stack (backlog O72):** Startup now offers two paths, and
   Path A is `docker compose up --wait` — Compose brings up the same processes with
   each service's health check set to that step's own success check, so a forgotten
@@ -268,6 +276,26 @@ deployment. This is a local convenience.
    the account or the secret was wrong, because the difference is what turns a login
    route into an account enumerator.
 
+   **What you land on (`/`, the Overview route) is CATEGORY-FIRST** since the O35
+   rebuild (SME feedback FB-01/FB-02: the hub was too busy and the product name
+   unreadable). Two explicit pick-lists, not a dashboard: **modules** — "what do you
+   want to look at?", rendered from the same `web/src/modules/registry.ts` the aside
+   nav reads, so the two cannot disagree — and **business area / tower**, which scopes
+   Explorer and Lineage. The product name renders exactly once, in the nav wordmark;
+   the h1 is the value proposition. Worth knowing at the console rather than in a
+   design doc: a module MISSING from the landing pick-list is a registry entry
+   missing, not a landing bug, and the pick-list is filtered by the signed-in
+   persona's access, so two personas correctly see two different lists.
+
+   **Which pages an SME reviews (FB-03).** The designation is `/software`, `/gates`
+   and `/load-map`. They share one property that makes them the review set: each
+   renders from a COMMITTED GENERATED ARTIFACT rather than from the graph, so they are
+   reproducible on any machine with no Neo4j at all — which is also why the O88
+   capture tool takes them as its default route set. Every other route is graph-backed
+   and is only as good as the graph behind the API at that moment. Take that as the
+   rule for demo and review sessions: the three designated pages are safe to show
+   cold; anything else needs the graph checked first.
+
    **Headless verification (`?as=<personaId>`)** is a real sign-in now, so it needs a
    real secret: set `VITE_DEV_CONSOLE_SECRET` in the shell that runs `npm run dev` to
    the secret you stored for that account. There is no default and no fallback — a
@@ -284,6 +312,25 @@ deployment. This is a local convenience.
    npm run build --prefix web
    npm run preview --prefix web        # serves dist/ on http://localhost:4173, same proxy
    ```
+7. **The standalone agent-test page** (`/agent-test.html`) — NOT part of the console
+   shell, and that is a ruling rather than an omission: the FB-04 harness was
+   re-ruled an INDEPENDENT page at SME sign-off on 2026-07-29 (`config/gate-log.md`).
+   No auth layer, dark view only, no shell — the minimal real-time twin of Under the
+   Hood, built for the company port's live-data test, read-only throughout (O20).
+
+   **Build and ship path, which is the part an operator needs:** it is a
+   self-contained file in `web/public/`, so Vite passes it through VERBATIM — no
+   build step transforms it, and it lands unchanged inside `web/dist`. It therefore
+   ships with the console and needs no separate deploy. Reach it at
+   `/agent-test.html` on whichever server is serving the page: `:5173` in dev,
+   `:4173` for the preview or the one-command stack.
+
+   **Open it over http, not `file://`.** The layout renders either way, so the
+   distinction looks cosmetic and is not: the ADK fetch from a `file://` origin can
+   be refused, and the symptom is a page that draws correctly and answers nothing.
+   It also fetches no CDN, no framework and no remote fonts (the locked-down-intranet
+   rule) — system and local IBM Plex only, with its token sheet hand-frozen and held
+   to the console's by the WEB14 parity test.
 
 <!-- anchor: refresh-ingest -->
 ## Refresh / ingest
@@ -355,9 +402,38 @@ differently:
    run id's date, or ask something new.
 6. **Both themes:** header toggle System / Dark / Light — tokens flip everywhere
    including the React Flow canvas (no hard-coded colors).
-7. **Build gate:** `npm run build --prefix web` exits 0 (tsc + vite);
-   `poetry run pytest -q` green (the API layer is fully covered offline — no server
-   or driver needed).
+7. **Build gate — SIX WEB COMMANDS, not one.** This step named `npm run build` alone
+   until Rev 6, while CI had grown five more BLOCKING web checks around it. A local
+   "green" that ran one of six is the shape of the failure Idea-111 records: the unit
+   suite passed for a week while CI ran red, because nothing local resembled what CI
+   was doing. The list below is read off `.github/workflows/ci.yml`, not off
+   `package.json` — the scripts block holds several things CI does not gate on, and
+   which ones it gates on is the only question this step answers. From `web/`:
+   ```powershell
+   npm run build          # tsc -b + vite build — a type error fails here
+   npm run lint           # oxlint, --max-warnings 0 (the flag lives in the script, so
+                          # a local run and a CI run gate identically)
+   npm run bundle:check   # initial-chunk size ceiling
+   npm run dist:check     # no deployment coordinate reached the bundle (ADR 0020)
+   npm run test:coverage  # vitest AND the WEB13 statements floor — a ratchet that
+                          # only goes up; it subsumes a bare `npm test`
+   npm run test:e2e       # playwright, and it is BLOCKING, not optional
+   ```
+   Plus, from the repo root, `poetry run pytest -q` (the API layer is fully covered
+   offline — no server or driver needed) and `poetry run python scripts/dump_openapi.py
+   --check`, the other half of the O70 pair; it runs in CI's `web` job because that is
+   the one venue with the `api` group installed.
+
+   Two commands people reach for here that are NOT gates, so that a red one is priced
+   correctly: `npm run audit:high` is WARN-ONLY in CI by decision (WEB13 (d) — the
+   finding it closed was that nobody was looking, not the advisories themselves), and
+   `npm run api:types` REGENERATES the client rather than checking it. Run the latter
+   when the schema moved; `dump_openapi.py --check` is what fails if you forget.
+
+   *Local-only caveat, and it is a machine fact rather than a defect:* `dist:check`
+   fails on a machine that has a `web/.env.local`, because Vite inlines its `VITE_*`
+   values into the bundle and the check exists to refuse exactly that. Move the file
+   aside and rebuild to check; do not edit `src/` to satisfy it.
 
 <!-- anchor: rollback -->
 ## Rollback

@@ -8,7 +8,7 @@ phase: 10
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on:
 - V1
 inputs:
@@ -18,3 +18,80 @@ acceptance: |
   The web-console runbook is audited against the shipped state and Rev-bumped where stale: category-first landing (O35), the FB-03 page-role/access designations, the standalone agent-test page's build/ship path (FB-04 re-ruling), and current build/verify commands; rendered, stale-render-clean; drydocs-web marked COVERED in V1's map.
 notes: |
   Groomed 2026-07-29 (Epic V). COORDINATE: a parallel session is actively working the standalone agent-test page — audit only after its stream lands; do not describe in-flight state.
+
+  CLOSED 2026-09-07 (Lane B, laptop, wip/V10-laptop). Runbook now Rev 6.
+
+  THE COORDINATE NOTE IS SATISFIED, checked rather than assumed: web/public/agent-test.html
+  exists, and WEB14 records the FB-04 re-ruling as SME-decided on 2026-07-29 - the same day
+  this note was written, which is why it still reads as open and is not. The page's own
+  header carries the ruling and the gate-log citation, so it is the audit's source here.
+
+  BRANCH BASE, because it changes how this merges: wip/V10-laptop is branched from
+  wip/O72-laptop, not from main. V10's one input is the web-console runbook, which O72
+  restructured into Path A / Path B and bumped to Rev 5 in the same burst; auditing main's
+  copy would have produced two independent rewrites of one file and a conflict. Merging V10
+  brings O72 with it. A useful side effect: this branch's render also clears the stale .html
+  that O72's close handed to Lane A, so that handback is discharged here.
+
+  WHAT THE AUDIT FOUND. Three of the four clauses were ABSENT rather than wrong, which is
+  the finding worth recording on its own: a runbook goes stale by being SILENT about a
+  surface at least as often as by misdescribing one, and only the fourth would have been
+  caught by reading the document against itself.
+
+  (1) THE O35 CATEGORY-FIRST LANDING was not described anywhere. The document walked an
+      operator to a signed-in shell and said nothing about what they land on. Now recorded
+      as shipped (web/src/routes/OverviewRoute.tsx, WF-LND keys), not as O35's acceptance
+      text: two explicit pick-lists - modules, from the same registry.ts the aside nav
+      reads, and business area / tower, which scopes Explorer and Lineage - with the
+      product name rendered once in the nav wordmark. Two operator-facing consequences
+      added because they are the ones that produce support questions: a module missing
+      from the pick-list is a REGISTRY entry missing rather than a landing bug, and the
+      list is filtered by the signed-in persona's access, so two personas correctly see
+      two different lists.
+
+  (2) THE FB-03 DESIGNATIONS were not in the document at all. Recorded now with the reason
+      that makes them the review set rather than as a bare list: /software, /gates and
+      /load-map render from COMMITTED GENERATED ARTIFACTS, so they are reproducible on any
+      machine with no Neo4j - the same property that makes them O88's default capture
+      routes. Stated as an operating rule: those three are safe to show cold, everything
+      else is graph-backed and is only as good as the graph behind the API at that moment.
+
+  (3) THE STANDALONE AGENT-TEST PAGE and its build/ship path were missing. Added as
+      Startup step 7, with the ruling first (FB-04 re-ruled it an INDEPENDENT page at SME
+      sign-off 2026-07-29 - no auth, dark only, no shell, read-only per O20) and then the
+      part an operator needs: it is a self-contained file in web/public/, so Vite passes
+      it through VERBATIM and it lands unchanged inside web/dist, shipping with the console
+      and needing no separate deploy. Reachable at /agent-test.html on whichever server
+      serves the page. The `file://` trap is called out because it presents as a working
+      page that answers nothing: the layout renders from disk, and the ADK fetch from a
+      file origin can be refused.
+
+  (4) THE BUILD GATE WAS STALE, and this is the one that was wrong rather than absent. It
+      named `npm run build` alone while CI's web job blocks on six: build, lint,
+      bundle:check, dist:check, test:coverage and test:e2e, plus dump_openapi.py --check
+      from the repo root. That is the Idea-111 shape exactly - a local "green" that
+      resembles nothing CI does.
+
+      MY FIRST DRAFT OF THIS LIST WAS WRONG and the correction is the useful part: I wrote
+      it from package.json's scripts block and listed `api:types` as a gate and omitted the
+      blocking e2e run. The scripts block says what CAN be run, not what CI gates on, and
+      those are different questions. The list is now read off .github/workflows/ci.yml, the
+      step says so, and two commands people reach for here are explicitly priced as NOT
+      gates: audit:high is warn-only by WEB13 (d)'s decision, and api:types REGENERATES the
+      client rather than checking it. The laptop `.env.local` / dist:check caveat is noted
+      as a machine fact, with the instruction not to edit src/ to satisfy it.
+
+  RENDERED and stale-render-clean: render_design_doc.py re-run, a second run produced no
+  further diff, and the .html is committed on this branch. Same deliberate deviation from
+  the Lane B fence that G127 records - the acceptance says "rendered, stale-render-clean",
+  which cannot be satisfied by leaving the render to the merge.
+
+  drydocs-web WAS ALREADY COVERED in V1's map and needed no edit: V1's own close ruled
+  "web-console SATISFIES drydocs-web (the only COVERED module today)", and
+  tests/unit/test_runbook_coverage.py carries the row. Verified rather than re-asserted -
+  6 passed.
+
+  Gates at close: pytest -q 3620 passed / 15 skipped; ruff check and ruff format --check
+  clean. Expected red on this tip, both inherited from the O72 work this branch carries:
+  the roadmap fingerprint, and the PORT-MANIFEST fall-through for O72's six new paths
+  (rows proposed in O72's notes).
