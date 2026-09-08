@@ -100,7 +100,6 @@ RUNBOOK_PENDING: frozenset[str] = frozenset(
         "drydocs-review",  # V4
         "drydocs-docgen",  # V5
         "drydocs-lineage",  # V6 — two chain-scoped runbooks exist; neither covers the module
-        "drydocs-remediation",  # V7
         "drydocs-agents",  # V9
         "drydocs-docmeta",  # BUILT at Q6; no V-item yet, so this list is where it is visible
     }
@@ -140,6 +139,18 @@ RUNBOOK_DISPOSITION: dict[str, tuple[str | None, str, str]] = {
         "drydocs-web",
         "drydocs-web",
         "the console IS the module; V10 audits its currency post-O35-O41 separately",
+    ),
+    "drydocs-remediation-runbook.md": (
+        "drydocs-remediation",
+        "drydocs-remediation",
+        "V7: covers the module WHOLE -- the detectors, the Tier-1 transform engine, "
+        "corroboration and the Jira handoff -- rather than one chain of it, which is why "
+        "it claims the module. Authored distinct from the TDD deliberately: the TDD is the "
+        "contract and wins on conflict, and the runbook says so in its own front matter "
+        "instead of restating design. The awkward fact it states rather than hides is that "
+        "the module has exactly ONE registered CLI verb (profile-folder-set) and the batch "
+        "is a library API, so the procedure is written as Python calls -- implying a verb "
+        "that does not exist would have been the easier document and the wrong one",
     ),
     "drydocs-mapping-store-runbook.md": (
         None,
