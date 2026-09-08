@@ -59,7 +59,76 @@ deliberately a separate environment.
 
 ## Lens 1 — system design
 
-*(step 4)*
+**The recurring pattern of this sweep reaches its highest-stakes instance here: the tool
+whose job is to certify the graph reports PASS against a graph that is not there.**
+
+### L1-1 — four of six acceptance suites cannot fail on an empty graph
+
+`drydocs/review/graph_verify.py` is the *"data-driven Cypher acceptance runner"*: it loads
+`TC-*` YAML suites from `graph-tests/`, runs each case's Cypher against a live graph, and
+asserts a result shape — `empty`, `nonempty`, or `equals`. *"A suite fails (non-zero exit)
+if any case fails."*
+
+`evaluate` (`:136-148`) is pure and does exactly what it says:
+
+```python
+if assertion is Assertion.EMPTY:
+    return (len(rows) == 0, ...)
+```
+
+There is **no precondition anywhere** — no anchor case, no row-count floor, no "is
+anything loaded" check before the assertions are evaluated. So an `empty` case passes
+whenever the query returns nothing, including when it returns nothing because the graph
+holds nothing.
+
+That would be harmless if suites mixed positive and negative assertions. **They do not.**
+Counted across the six committed suites — 30 assertions, **28 `empty` and 2 `nonempty`**:
+
+| suite | `empty` | `nonempty` | |
+|---|---|---|---|
+| `folder-attribution-coverage.yaml` | **12** | **0** | cannot fail on an empty graph |
+| `bmc-docs-lexical.yaml` | **5** | **0** | cannot fail on an empty graph |
+| `business-application-identity.yaml` | **5** | **0** | cannot fail on an empty graph |
+| `provenance-diet.yaml` | **2** | **0** | cannot fail on an empty graph |
+| `bmc-docs-smoke.yaml` | 2 | 1 | anchored |
+| `tom-required-contacts.yaml` | 2 | 1 | anchored |
+
+**Four of six suites, and 24 of 30 assertions, are unfalsifiable against an unloaded
+graph.** The shape is inherent to what these suites are for — a negative assertion
+("no folder lacks attribution", "no document is orphaned") is the natural way to express
+a standard — and that is exactly why the runner has to supply the anchor the suite cannot.
+
+**Consequence, and it is the sharpest version of this sweep's recurring finding.** A green
+`graph-verify` run means *either* "the estate conforms to every rule in this suite" *or*
+"the database was empty and every rule was vacuously satisfied", and the runner cannot
+tell the reader which. `folder-attribution-coverage.yaml` is the clearest case: a
+**coverage** suite, 12 negative assertions, no anchor — it cannot detect the absence of
+the very thing whose coverage it measures. Because this is the acceptance gate, a false
+green does not merely mislead; it ends the check.
+
+**Cheapest correction:** a per-suite precondition, asserted by the runner before any case
+is evaluated. The suite declares an anchor — a `nonempty` case, or a minimum row count on
+a named label — and the runner reports `NOT RUN` rather than `PASS` when it fails. The
+loader and evaluator are already pure and offline, so this is testable without Neo4j, and
+the vocabulary already exists in the component: slot 3's `equivalence.py` calls the third
+state **not proven** and rules that *"no evidence is never evidence."* This is that rule,
+applied to the tool that certifies everything else.
+
+### L1-2 — what this slot already gets right, recorded so no later firing re-audits it
+
+- **The verifier writes nothing and says why it needs no gate.** *"The graph is only READ —
+  this component writes no meaning edges, so it needs no HITL gate to run"*
+  (`graph_verify.py:9-11`). The permission argument is made from the behaviour rather
+  than asserted.
+- **The classification boundary is stated at the file that would breach it.** The
+  committed suite is a vendor-BMC smoke test, Internal-Public; *"real acceptance suites
+  (internal counts/IDs) live in a gitignored twin"* (`:13-14`). Which also means the
+  `empty`/`nonempty` ratio measured above is of the PUBLIC suites — the twin may be
+  anchored differently, and this report cannot see it. **Recorded as a limit on the
+  finding, not a hedge:** the four unanchored suites named are the ones that ship.
+- **`unknown_targets` ties the suites to the review backbone** (`:151-158`) — a suite
+  targeting a label the `review_labels` backbone does not know is reported, and the
+  cross-check is kept pure by passing the backbone in rather than importing it.
 
 ## Lens 2 — technical debt
 
