@@ -263,7 +263,7 @@ class GraphQaPipeline:
         if self._traced:
             try:  # a diagnostic is never the reason an answer fails
                 common = {
-                    "hop": step,
+                    "step": step,
                     "system": system,
                     "model": reply.model,
                     "provider": getattr(self.provider, "provider", None),

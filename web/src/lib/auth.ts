@@ -108,6 +108,20 @@ export function canReviewIntake(persona: Persona): boolean {
   return persona.role === 'admin'
 }
 
+/** May this persona follow a run id to its Ask decision trace (R18 d)?
+ *
+ *  Its own name rather than a reuse of `canReviewIntake`, even though both read
+ *  `role === 'admin'` today: these are two different permissions that happen to
+ *  agree, and a shared predicate is how they stop being able to diverge. What
+ *  this one guards is prompt text and host-side diagnostic detail; what that one
+ *  guards is a review queue. Like its neighbour it is a DISPLAY decision and not
+ *  a second gate — /admin/qa-trace 403s a non-admin on its own — so what it
+ *  picks is whether the metrics chip draws a control or renders the plain run id
+ *  it always has. */
+export function canReadAskTrace(persona: Persona): boolean {
+  return persona.role === 'admin'
+}
+
 /** The one place the API base is decided, and it is a PATH, not a URL (ADR 0020).
  *  The console is same-origin with drydocs-api in every environment: a reverse
  *  proxy (Vite's own in dev and preview, O72's in the Compose stack) forwards

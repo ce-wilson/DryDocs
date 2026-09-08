@@ -1914,6 +1914,77 @@
         "title": "PromotedDiffOut",
         "type": "object"
       },
+      "QaTraceOut": {
+        "additionalProperties": false,
+        "description": "GET /admin/qa-trace (R18 clause d). The ONE payload on this API that\ncarries log CONTENTS, and the exception is ruled rather than assumed: R18's\nacceptance says an admin retrieves the Ask decision trace by run_id /\nsession_id. It reaches only the `qa-debug` kind; the api-debug question\nLogEstateOut declines above is untouched and unreachable from here.\n\n`records` is deliberately untyped. It is the writer's own JSONL, replayed \u2014\na diagnostic whose fields grow with the pipeline's hops, and a declared\nshape here would be a second contract free to disagree with the file. The\nenvelope AROUND it is typed, which is where the guarantees actually live:\nwhich run, whether this deployment records at all, how many lines were\nunreadable, and whether the answer was cut short.",
+        "properties": {
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "files": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Files",
+            "type": "array"
+          },
+          "record_count": {
+            "title": "Record Count",
+            "type": "integer"
+          },
+          "records": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Records",
+            "type": "array"
+          },
+          "run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Id"
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id"
+          },
+          "skipped": {
+            "title": "Skipped",
+            "type": "integer"
+          },
+          "truncated": {
+            "title": "Truncated",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "run_id",
+          "session_id",
+          "enabled",
+          "files",
+          "records",
+          "record_count",
+          "skipped",
+          "truncated"
+        ],
+        "title": "QaTraceOut",
+        "type": "object"
+      },
       "QualityFlagOut": {
         "additionalProperties": false,
         "description": "One limit an SME crossed. The metric that tripped travels WITH the\nnumber and the limit it was compared against, so the rail can say what\nhappened without the console holding a second copy of the thresholds.",
@@ -2334,6 +2405,84 @@
           }
         },
         "summary": "Get Log Estate"
+      }
+    },
+    "/admin/qa-trace": {
+      "get": {
+        "operationId": "get_qa_trace_admin_qa_trace_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "run_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Run Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "session_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Session Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QaTraceOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Qa Trace"
       }
     },
     "/config": {

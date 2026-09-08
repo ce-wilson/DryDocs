@@ -205,7 +205,7 @@ components:
   - { id: MapGlyphs,               area: icon,         path: components/map/MapGlyphs.tsx }
   - { id: HubGlyphs,               area: icon,         path: components/icons/HubGlyphs.tsx }
 
-  # --- ask (4) ---
+  # --- ask (5) ---
   # R6 Tier-2 task graph. Renders the agent's IN-PROCESS working memory (R1
   # ruling A) — deliberately its own visual language so it is never mistaken
   # for the knowledge graph, though it shares lib/forceLayout.ts.
@@ -219,6 +219,11 @@ components:
   # turn's clarifications and never picks a near match for them.
   - { id: FailureLadder,           area: ask,          path: ask/FailureLadder.tsx,                        module: ask,        module_evidence: directory }   # O63 (a)-(e): the staged self-diagnosis Ask shows instead of one red line
   - { id: ClarificationCard,       area: ask,          path: ask/ClarificationCard.tsx,                   module: ask,        module_evidence: directory }
+  # R18 (d): the run id the metrics chip already showed, turned into the way to
+  # the qa-debug decision trace behind it. Drawn only for an admin AND only when
+  # the server actually recorded one - otherwise the plain id, never a button
+  # that exists to explain why it will not work.
+  - { id: TraceLink,               area: ask,          path: ask/TraceLink.tsx,                           module: ask,        module_evidence: directory }
 
   # --- explorer (4) ---
   - { id: DataFrame,               area: explorer,     path: explorer/DataFrame.tsx,                      module: explorer,   module_evidence: directory }

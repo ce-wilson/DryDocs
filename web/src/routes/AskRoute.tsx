@@ -18,7 +18,8 @@ import ClarificationCard from '../ask/ClarificationCard'
 import FailureLadder from '../ask/FailureLadder'
 import TaskGraphPane from '../ask/TaskGraphPane'
 import FileReport from '../ask/FileReport'
-import { agentBaseUrl, type Persona } from '../lib/auth'
+import { TraceLink } from '../ask/TraceLink'
+import { agentBaseUrl, apiBaseUrl, canReadAskTrace, type Persona } from '../lib/auth'
 import { useGraphAccess } from '../data/graphAccess'
 import * as storage from '../lib/storage'
 
@@ -281,6 +282,7 @@ export default function AskRoute({ persona }: { persona: Persona }) {
               turn={turn}
               specClass={specClass}
               busy={running}
+              persona={persona}
               onClarify={(clarifications) =>
                 void onAsk({ question: turn.question, clarifications })
               }
@@ -336,12 +338,14 @@ function TurnCard({
   turn,
   specClass,
   busy,
+  persona,
   onClarify,
   onDismiss,
 }: {
   turn: Turn
   specClass: Record<string, string>
   busy: boolean
+  persona: Persona
   onClarify: (clarifications: Clarification[]) => void
   onDismiss: () => void
 }) {
@@ -425,7 +429,7 @@ function TurnCard({
             </div>
           )}
 
-          <MetricsChip envelope={envelope} />
+          <MetricsChip envelope={envelope} persona={persona} />
 
           {/* R6: the Tier-2 task graph, one frame per iteration. Present only
               on runs that actually escalated — most never do. */}
@@ -504,7 +508,7 @@ function SourceChip({ source, specClass }: { source: AskSource; specClass: Recor
   )
 }
 
-function MetricsChip({ envelope }: { envelope: AskEnvelope }) {
+function MetricsChip({ envelope, persona }: { envelope: AskEnvelope; persona: Persona }) {
   const m = envelope.metrics
   if (!m) return null
   const cost = m.cost_est_usd
@@ -516,7 +520,16 @@ function MetricsChip({ envelope }: { envelope: AskEnvelope }) {
         {typeof cost === 'number' ? ` · ~$${cost.toFixed(4)}` : ''}
       </span>
       <span>
-        tier {envelope.tier} · {envelope.model ?? 'model n/a'} · run {envelope.run_id}
+        tier {envelope.tier} · {envelope.model ?? 'model n/a'} ·{' '}
+        {/* R18 (d): the run id the chip already showed, now the way to the
+            decision trace behind it — for an admin, on a run the server
+            actually recorded. Everyone else keeps the plain id. */}
+        <TraceLink
+          runId={envelope.run_id}
+          enabled={envelope.debug_trace}
+          canRead={canReadAskTrace(persona)}
+          apiBase={apiBaseUrl()}
+        />
       </span>
       {/* R6: a cap is only tunable if you can see it act. Shown when Tier 2
           engaged, and always when the budget was spent — never silently. */}

@@ -7,7 +7,7 @@ phase: 15
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on:
 - R3
 - R5
@@ -80,3 +80,101 @@ notes: |
   from Idea-155) is the cleartext credential in that same store — cited here as "Idea-151" when
   this note was written, which is the BRANCH-side number for that report; on `main` Idea-151 is
   the unrelated stale-render entry that became Y5.
+
+  BUILT 2026-09-08 (Lane B, laptop `NewThinkpad`, wip/r18-laptop; offline — fakes, no litellm,
+  no driver, no ADK, no Neo4j, so nothing here is machine-pinned). The notes above were right
+  that this is a contract change and not a logging change, and the build split exactly there.
+
+  THE SINK IS A DECLARED KIND, `qa-debug`, not a new mechanism. `drydocs_core.log_kinds.kind()`
+  REFUSES an undeclared id, so a writer with no row in config/log-kinds.yaml cannot open a file
+  at all — the row is structural, not documentation. Seven days, jsonl, per-day, and the api-debug
+  ruling carried over verbatim for the split: `qa` is a 90-day record whose run line is the only
+  place a question hash turns back into words, and burying it in prompt-sized debug noise would
+  cost it the thing it exists for.
+  ENABLEMENT (clause a) is the kind's declared `level: DEBUG`, read once at import, exactly as
+  drydocs_api.audit.ApiAuditLog does it. NOT an env var and NOT a request field, and the reason is
+  the one that ruling already gives: an Ask question arrives as an HTTP request into the ADK
+  server, an HTTP request has no --verbose, and a per-request flag would let an untrusted caller
+  turn on verbose capture of their own traffic. The shipped declaration has no `level:`, so the
+  default deployment records nothing.
+
+  THE RATIONALE IS GENERATED, WHICH IS THE HALF NO CAPTURE COULD HAVE FIXED. `ROUTER_SYSTEM` now
+  asks for `reason` beside `spec_id` and `params`, and it asks in BOTH modes — a debug mode that
+  altered the prompt would debug a pipeline nobody runs, and the reason belongs to the decision
+  rather than to the observer. It lands on `StepRecord.rationale` (the field these notes
+  prescribed), bounded at 500 chars, `None` when the reply carried none.
+
+  CAPTURE IS AT THE TWO SEAMS EVERY HOP ALREADY PASSES THROUGH — `_llm` for prompt/reply and
+  `_push_step` for the step — plus a run_open/run_close pair, so five call sites did not each grow
+  their own logging. Every record carries run_id, session_id and a process-wide `seq`, which is
+  what lets two concurrent sessions interleave in one day-file and still read back apart
+  (clause d's "distinguish one question from concurrent sessions", tested that way).
+
+  THE ONE REDACTION THAT NEEDED A DESIGN, and it is R8's boundary held rather than a new rule:
+  the ANSWER hop's user prompt IS the retrieved rows JSON — folder names, host names, SEAL ids —
+  so that hop records SHAPE (row count, column keys, sizes) and never values. `llm_shape` is the
+  entry point that cannot carry them; the test plants a value that exists in no prompt, schema or
+  vocabulary and asserts it appears nowhere in the file. Caller identity is the same one level
+  down: nothing in the writer takes a raw user_id, only the envelope's already-hashed slot.
+  What this means for a reader: the trace explains WHY a query was written and WHAT came back,
+  and to see the values you go back to the graph — which is the correct place to ask.
+
+  CLAUSE (d) IS THE FIRST ROUTE ON THIS API THAT SERVES LOG CONTENTS, and it is worth saying so
+  plainly. log_estate.py holds the standing position for `api-debug` — capturing is ruled,
+  SURFACING is held for SME review — and that concern was a rendered page anyone with the console
+  could read. R18's acceptance rules the question the other way for THIS kind, so:
+  GET /admin/qa-trace is AdminUser-gated in its signature (the /raw-cypher gate, ADR 0005),
+  reaches exactly one kind (a constant, no parameter names a file), and REFUSES a call with
+  neither run_id nor session_id with 422 — a lookup by run id and a bulk log download are not the
+  same route. The api-debug question is untouched and unreachable from here.
+  Console half: the run id the metrics chip already showed becomes a fetch-and-download control,
+  drawn only for an admin AND only when `envelope.debug_trace` says the server recorded one;
+  everyone else keeps the plain id. A plain link would 401 — the API takes a bearer token.
+
+  SURFACES: agents/common/qa_trace.py (writer), agents/graph_qa/{pipeline,envelope,agent}.py,
+  drydocs_api/qa_trace_read.py + schemas.QaTraceOut + the route, web/src/lib/qaTrace.ts,
+  web/src/ask/TraceLink.tsx, config/log-kinds.yaml (the kind), config/taxonomy/ui-components.yaml
+  (the O42 row), agents/graph_qa/README.md (the envelope contract bump).
+  TESTS: tests/unit/test_qa_trace.py (28) + web/src/ask/TraceLink.test.tsx (6). Full suite,
+  ruff check, ruff format --check, oxlint, tsc and the web suite all green on the branch; the one
+  expected red is test_committed_roadmap_page_matches_its_sources, which every Lane B close carries
+  because a close writes notes and Lane B does not render.
+
+  TIER 2 WAS CHECKED SEPARATELY, because it is the other path that touches rows and the answer
+  hop's protection does not reach it: Tier 2 is entered only when Tier 1 gathered nothing, so its
+  solve call is what answers. Reading tier2.py settles it — `_summarize` emits
+  `- <subquestion> -> <N> row(s)`, an evidence node's label is the model's own subquestion and
+  `rows` is a count, and nothing in the loop interpolates `result.records`. That is already R8's
+  counts-and-identities shape, so no new capture rule was needed. A test pins it anyway, and pins
+  the positive control with it (the solve prompt IS captured), so a future prompt that pasted
+  evidence rows into the block fails loudly instead of quietly widening the trace.
+
+  HANDBACKS FOR LANE A, none of them blocking:
+  1. `adr` pen — ADR 0007 §5 lists three telemetry sinks; this is a fourth, and the section
+     should name it. R18 read the ADR and did not edit it.
+  2. `gates`/`adr` — audit.py's docstring enumerates the audited routes as "every route that
+     EXECUTES CYPHER or WRITES", twelve of them. /admin/qa-trace does neither, so it is NOT
+     audited, consistent with /admin/log-estate. Whether a route that serves log CONTENTS should
+     widen that ruled scope is a judgement for whoever owns it, not for this build.
+  3. `backlog` — worth an idea: `steps[].rationale` now exists on the envelope and the console
+     renders nothing with it. Showing it on the router step would answer, for every user, the
+     question these notes opened with (why the router read one subject three ways). Left out
+     deliberately as WEB-surface scope.
+  4. Regenerated artifacts. `web/src/generated/{openapi.json,api.d.ts}` were regenerated HERE
+     (scripts/dump_openapi.py, then `npm run api:types`) rather than left for Lane A, because
+     web/src/lib/qaTrace.ts types against `Schemas['QaTraceOut']` and the branch could not
+     typecheck without them. `web/src/generated/enforcement-matrix.json` likewise, via
+     scripts/render_enforcement_matrix.py — config/log-kinds.yaml is an enforcement surface whose
+     content the matrix embeds. `render_board.py` was NOT run: the board and roadmap are Lane A's.
+     The stronger reason, found after: CI's `web` job runs `scripts/dump_openapi.py --check`
+     (.github/workflows/ci.yml), so leaving the dump for the merge would have put the branch red
+     there as well as failing tsc — this is not a tidiness call. All three writers are idempotent,
+     so re-running them at merge costs nothing and confirms it.
+  5. Two SOURCE files outside any declared pen, named here rather than asked about first, which is
+     the handoff's own prescription for a change this size. `config/log-kinds.yaml` gained the
+     `qa-debug` row: structurally required, since `log_kinds.kind()` refuses an undeclared id and
+     the writer could not open a file without it. `tests/unit/test_ui_components.py` gained a line
+     on its module-binding counter, which is the O42 ledger's shadow — the handoff already rules
+     that every web item writes `config/taxonomy/ui-components.yaml`, and this counter fails the
+     moment that file grows a row. Both travelled under `code:drydocs-agents` / `code:drydocs-web`
+     on that same precedent; Lane A accepts them there or moves them.

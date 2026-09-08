@@ -72,11 +72,12 @@ transaction timeout 15 s.
   "answer": "…",
   "model": "…", "provider": "anthropic | azure",
   "steps": [
-    { "i": 1, "kind": "router", "spec_id": "explorer.jobs.v2", "ms": 480 },
+    { "i": 1, "kind": "router", "spec_id": "explorer.jobs.v2", "ms": 480,
+      "rationale": "the question names a folder and asks what runs in it" },
     { "i": 2, "kind": "spec", "spec_id": "explorer.jobs.v2",
       "cypher": "MATCH …", "database": "drydocs", "rows": 42,
       "truncated": false, "fix_retries": 0, "error": null, "explore_ref": null,
-      "epistemic": null, "causes": [], "note": null },
+      "epistemic": null, "causes": [], "note": null, "rationale": null },
     { "i": 3, "kind": "answer", "ms": 1210 }
   ],
   "sources": [ { "document": "spec:explorer.jobs.v2", "trust": "CONFIRMED",
@@ -92,7 +93,8 @@ transaction timeout 15 s.
     "tier2": { "engaged": false, "votes": [], "forced_solve": false }
   },
   "task_graph": [],
-  "clarification": null
+  "clarification": null,
+  "debug_trace": false
 }
 ```
 
@@ -104,6 +106,29 @@ kind. `clarification` is set ONLY at `tier: "clarification"` (and
 choices}], prompt}`, with `answer` carrying the same prompt as text so a
 consumer that knows nothing of R19 still shows a sentence. The two fixed
 choice ids are `__free_text__` and `__proceed__` (answer anyway).
+
+R18 adds two more, and the first is a CONTRACT CHANGE rather than a new
+capture. `steps[].rationale` is the router's own one-sentence reason for the
+spec it picked, on the `router` step and nowhere else — it exists because
+`ROUTER_SYSTEM` now asks for a `reason` alongside `spec_id` and `params`.
+Nothing generated one before, so no amount of extra logging could have
+produced it; `null` means the reply carried none (a pre-R18 build, or a model
+that ignored the instruction), never an empty stated reason. It is a statement
+about an observable choice — an auditable decision trace — and not hidden
+chain-of-thought, which this pipeline neither requests nor would receive
+(`providers.py` passes no thinking parameter and reads only the message
+content).
+
+`debug_trace` says whether the `qa-debug` decision trace recorded this run. A
+FLAG, never the trace: the trace text stays in `DRYDOCS_LOGDIR` under the same
+sink boundary that keeps full question text out of this payload, and an admin
+retrieves it from `GET /admin/qa-trace?run_id=…`. It is `false` on every server
+whose `config/log-kinds.yaml` does not declare the `qa-debug` kind at
+`level: DEBUG` — which is the shipped default — and an explicit `false` rather
+than an absent field, so a consumer can tell "no trace was recorded" from "this
+agent predates R18". Enablement is settings-level and never per request, for
+the reason `api-debug` gives: an Ask question arrives as an HTTP request, and a
+per-request switch would belong to whoever sent the request.
 
 Notes on honesty markers: `question_sha256`/`question_chars` only — full
 question text belongs to the local ledger (R3), never a persistable payload.

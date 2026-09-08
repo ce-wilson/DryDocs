@@ -36,7 +36,12 @@ count, column keys, chars, truncation) and never as values; ``llm_shape`` is
 the entry point that cannot carry them, and the pipeline calls it for that hop.
 Caller identity is the same story one level down: nothing here takes a
 ``user_id``, only the envelope's already-hashed slot. Neither rule is a promise
-in a comment — ``tests/unit/test_qa_trace.py`` reads the code for both.
+in a comment: ``tests/unit/test_qa_trace.py`` MEASURES both, by planting a value
+that exists in no prompt, schema or vocabulary — and a caller identity that
+exists nowhere but the argument — and asserting neither reaches the file. That
+is a behavioural check rather than a source scan on purpose; a scan would prove
+this module contains no offending line, where what is worth proving is that no
+path through it, or through the pipeline calling it, writes one.
 
 Line shape (every record carries the correlation key and its ordinal):
 
@@ -180,7 +185,7 @@ class QaTrace:
         run_id: str,
         session_id: str,
         *,
-        hop: str,
+        step: str,
         system: str,
         user: str,
         reply: str,
@@ -195,7 +200,7 @@ class QaTrace:
         error) plus the question, which the `qa` ledger already stores in full.
         The answer hop is the exception and uses ``llm_shape`` instead."""
         payload: dict = {
-            "hop": hop,
+            "step": step,
             "model": model,
             "provider": provider,
             "prompt_tokens": prompt_tokens,
@@ -212,7 +217,7 @@ class QaTrace:
         run_id: str,
         session_id: str,
         *,
-        hop: str,
+        step: str,
         system: str,
         rows,
         row_count: int,
@@ -231,7 +236,7 @@ class QaTrace:
         the answer text, which the `qa` ledger already holds under R8 — it is
         sized here rather than copied, so the trace adds no second home for it."""
         payload: dict = {
-            "hop": hop,
+            "step": step,
             "input": {**_row_shape(rows), "row_count": row_count, "truncated": truncated},
             "user_chars": user_chars,
             "reply_chars": reply_chars,
