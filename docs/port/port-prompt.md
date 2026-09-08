@@ -295,7 +295,10 @@ FORCE_COLOR / Idea-101 findings that motivated J41.)
   **PORT-REPORT-port-base-20260905** — `[SME-REPORTED]`, transcribed in the POSTSCRIPT TO
   RELAY-45, not producer-verified: the counts and shas are the close-out's, this side has
   read none of them, and RELAY-45 §Five's condition on that COMPLETE (the 38 "new tests
-  failing" bucket named by test id) is still open. Nothing here is a producer figure.
+  failing" bucket named by test id) is still open. Nothing here is a producer figure. That
+  COMPLETE was closed carrying one red the company has since re-diagnosed as its own
+  placement, not a guard defect (SECOND POSTSCRIPT to RELAY-45) - the guard it was read
+  against is `aef8dfcb^`, superseded here and landing next roll.
 - **Producer base `port-base-20260826` (`9ef606b4`)**, applied company-side as
   **PORT-REPORT-e33f8d02** (2026-08-26) — range
   `port-base-20260825..port-base-20260826` = **44 commits / 46 files
@@ -3326,6 +3329,71 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   hold. (c) Nothing in the "Last completed port" tracker is promoted from reported to
   verified; the pointer for this base now carries the close-out and its sha, and nothing
   more.
+
+  **SECOND POSTSCRIPT TO RELAY-45 - THE GATE-LOG CONFLICT IS RESOLVED, AND MY OWN CAUTION
+  AT (1) ABOVE WAS WRONG: IT IS THE SAME GUARD, ALREADY FIXED ON THIS SIDE, AND YOU ARE
+  READING THE SUPERSEDED COPY (2026-09-08; your gate-log walk-through, same session as the
+  close-out):** Read producer-side at `df006a05` on `main`, venue NewThinkpad. The first
+  postscript said the conflict was "adjacent but NOT the same defect as RELAY-43's
+  bytes-vs-lines fix - do not assume that fix clears this." **That is withdrawn.** It is
+  the same guard and that fix does clear it. The function your walk-through quotes -
+  `"""None if before_text is a byte prefix of after_text; else a message."""` - is
+  `aef8dfcb^` verbatim, the version RELAY-43 replaced at 11:01 on 2026-09-08, and
+  `aef8dfcb` is NOT in `port-base-20260905`. RELAY-45 point one already told you the
+  line-based reading lands with the next roll; the first postscript then fenced the two
+  apart on a guess rather than reading the parent commit, which is the J76 failure your own
+  close-out names three times, committed here on the fourth. Corrected by rider, not by
+  editing the paragraph above.
+
+  **ONE - YOUR RETRACTION IS RIGHT ABOUT THE TREE YOU HOLD, AND THE RENDERING DEFECT IS
+  REAL ON EVERY TREE.** `[SME-REPORTED]` On your copy the check IS a strict byte prefix, a
+  `### POSTSCRIPT` subsection inserted mid-file at your line 3454 DOES break it, and the
+  guard was reporting a real placement defect. Two things stand independently of any guard:
+  a `###` renders as part of the 2026-08-20 entry rather than as its own dated record, and
+  your relocation test (`before is prefix of MOVED-to-EOF: True`, signed text
+  byte-identical) proves the move is content-neutral.
+
+  **TWO - KEEP THE FIX, CHANGE ITS REASON, AND SOFTEN CORRECTION 18.** `[VERIFIED-PRODUCER]`
+  Promote the block to a top-level `##` dated entry at EOF - but for the RENDERING reason,
+  not the guard reason. Under `aef8dfcb` a mid-file postscript PASSES:
+  `append_only_violation` now reads "every line of `before_text` survives in `after_text`,
+  in order. Insertions anywhere are allowed - a dated postscript under any signed record,
+  the other side's entries interleaved chronologically," with the byte-prefix case kept as
+  the fast path, and `test_gate_log_append_only_mechanics` names exactly your shape ("a
+  postscript under a record that is not the last one") as permitted. So correction 18
+  should NOT read as a clean self-retraction: your original claim - the guard is stricter
+  than the rule it names - was ACCEPTED on this side and fixed seven hours before you wrote
+  the retraction, on a commit your tree does not hold. What was wrong was the placement, on
+  your tree, under the guard you have. The rule-versus-implementation gap you named was
+  real.
+
+  **THREE - THE CONVENTION CLAIM IS WRONG ON THIS TREE, AND THE STRUCTURE IS NOT ONLY
+  YOURS.** `[VERIFIED-PRODUCER]` `config/gate-log.md:803` carries
+  `- **POSTSCRIPT 2026-09-07 (desktop):**` INSIDE the signed 2026-07-23 ADR 0007 entry that
+  opens at line 779 - bullet-level, mid-file, under a signed record. The guard's own test
+  blesses the shape. Your reading of `03-hitl-sme-flow.md` is otherwise sound and the rule
+  is L25 producer-side: a correction is a dated rider appended BESIDE the signed entry,
+  never an edit of the signed text. "Beside" has been satisfied both ways here.
+
+  **FOUR - THE ONE THAT NEEDS A RULING, AND IT IS COMING AT YOU NEXT ROLL.**
+  `[VERIFIED-PRODUCER]` The same commit that added that postscript, `55c2a204` (after
+  `port-base-20260905`), also ALTERED SIGNED TEXT IN PLACE inside that entry: a
+  company-internal product name, redacted per CLAUDE.md §3, in clause C of a gate signed
+  2026-07-23. Not named here, and it is not to be reconstructed - the whole point of the
+  commit was to remove it from tracked prose. **A changed line is what the line-based guard
+  still fails**, by design, and it CANNOT be fixed the way your postscript can: a
+  publish-boundary redaction has nowhere to relocate to. So at the next roll your
+  `append_only_violation` will fail on producer text, correctly, and neither side has a
+  ruling for it. **The open question, stated and not answered here:** how does a
+  union-append append-only guard survive a MANDATORY redaction of already-ported signed
+  text - accepted-drop seam (PORT4), an exemption keyed to a publish-boundary commit, or a
+  rule that §3 redactions are ported as riders that supersede rather than as in-place
+  edits? Producer-side question, producer-side answer owed, and it is owed before the roll
+  rather than at it.
+
+  **FIVE - THE COUNT.** Your 144 → 145 is yours and stands. Note only that the producer
+  postscript at 803 adds NO `##` entry, so nothing in the next roll moves that count for
+  it; `config/gate-log.md` has 98 top-level entries producer-side.
 
 OWED COMPANY-SIDE:
 
