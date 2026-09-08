@@ -136,5 +136,5 @@ The second is worse and must never be filed as a lint warning.
 - **Format-agnostic definitions** — no XML assumption outside `XmlDefinitionFormat`.
   `dump()` still raises: emitting importable XML needs the vendor schema.
 
-Related: `detect.py` (R1 + the conformance pass) · `transform.py` (the ratified-only
+Related: `detect.py` (registry R1 + the conformance pass) · `transform.py` (the ratified-only
 engine) · `jira.py` (the handoff boundary) · `xml_bridge.py` (staged extract → definitions)

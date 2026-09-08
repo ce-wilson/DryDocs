@@ -6,6 +6,22 @@ The prose standards turned into a **checkable rule set** — the single source f
 **Status legend:** ✅ ratified · 🟡 provisional (observed, not signed off) · ❓ open (needs SME).
 **Severity:** 🔴 must-fix · 🟡 should-fix · ⚪ advisory.
 
+**HOW TO CITE A RULE FROM THIS REGISTRY (REM1, 2026-09-07): write "registry R10" on first
+use in any prose outside this file, then plain `R10` for the rest of that passage.** The
+reason is a collision, not a style preference: `R10` and `R1` each name TWO unrelated
+things — a rule here, and a DryDocs backlog item (`docs/restructure/backlog/items/R10.yaml`
+is a closed chore about pinning an agent dependency; `R1.yaml` is its own item). "Rule R10
+in the registry" is perfectly precise prose and still fails the thing people actually do,
+which is search for `R10` and land on the wrong artifact. The qualifier puts the
+disambiguating word IN the searchable string.
+
+Inside this file the bare id stands alone — the document is already the scope, and R1's
+greenfield line below citing "the dot rule (R10)" is correct as written.
+
+**NOTHING IS RENUMBERED, in either series.** The `R` letter was frozen with the other 26
+legacy letters on 2026-09-02 and backlog ids are stable join keys that other files cite.
+This is a citation convention and nothing else.
+
 ---
 
 ## R1 — No dot-smuggling (punctuation-as-value)
