@@ -10,6 +10,10 @@ consumer tree exists.
 
 from __future__ import annotations
 
+from pathlib import Path
+
+import pytest
+
 from drydocs.port.port_rename_detect import (
     MAX_MATCHES_PER_ADD,
     SIMILARITY_FLOOR,
@@ -25,6 +29,7 @@ from drydocs.port.port_rename_detect import (
     rename_candidates,
     render_git_renames,
     report,
+    revision_siblings,
     structural_candidates,
     text_similarity,
     vanished_twin_candidates,
@@ -618,3 +623,55 @@ def test_the_veto_is_decided_per_pair_not_per_file() -> None:
     a, b = discounted_pair(short, long, freq, corpus_size)
     assert set(a.split()) == set(normalized_text(short).split()), "short side kept raw"
     assert set(b.split()) == set(normalized_text(long).split()), "so is its partner"
+
+
+def test_two_revisions_of_one_document_are_never_a_rename_candidate() -> None:
+    """PORT2: the consumer's 1.00 pair was a revision series, not a rename.
+
+    Measured before fixing, on the two real files: rev1 normalizes to 52 tokens,
+    rev11 to 286, and all 52 are inside the 286 — so Jaccard reads 0.18,
+    containment reads 1.00 and the max wins. Neither of the two explanations the
+    finding offered was right: nothing was discarded (rev11 is five times the
+    token count) and nothing was empty (four notes with resolutions). A later
+    revision is a superset of the earlier one BY CONSTRUCTION, which is exactly
+    the input containment scores 1.00, so every revision series in the tree is a
+    standing false positive that no threshold can reach."""
+    a = "notes: front-matter start each bullet on a new line"
+    b = a + " resolution: done at rev 12 and re-verified against the render"
+    proposed = {"docs/design/feedback/runbook-rev11.yaml": b}
+    existing = {"docs/design/feedback/runbook-rev1.yaml": a}
+    assert (
+        text_similarity(normalized_text(b), normalized_text(a)) == 1.0
+    ), "the fixture must reproduce the 1.00 score, or this test guards nothing"
+    assert rename_candidates(proposed, existing) == []
+
+
+def test_the_revision_rule_reads_the_subject_not_the_number() -> None:
+    """Two DIFFERENT documents that both carry a revision number are still
+    comparable — the rule keys on the stem before `-revN`, so it can never
+    silence a real rename that happens to sit in a numbered directory."""
+    assert revision_siblings("f/doc-rev1.yaml", "f/doc-rev11.yaml")
+    assert not revision_siblings("f/doc-a-rev1.yaml", "f/doc-b-rev1.yaml")
+    assert not revision_siblings("f/doc.yaml", "f/doc-rev1.yaml")
+    assert not revision_siblings("f/doc-rev1.yaml", "g/doc-rev2.yaml")
+    assert not revision_siblings("f/doc-rev1.yaml", "f/doc-rev2.md")
+
+
+def test_the_real_feedback_pair_scores_one_and_yields_no_candidate() -> None:
+    """The two files from the finding, pinned as the fixture (PORT2 clause d).
+
+    Skipped rather than failed if either is gone: they are a review artifact and
+    may be archived, and a currency guard that fails on a legitimate cleanup
+    teaches people to delete the guard."""
+    folder = Path(__file__).resolve().parents[2] / "docs" / "design" / "feedback"
+    rev1 = folder / "drydocs-startup-refresh-runbook-rev1.yaml"
+    rev11 = folder / "drydocs-startup-refresh-runbook-rev11.yaml"
+    if not (rev1.exists() and rev11.exists()):
+        pytest.skip("the pinned feedback pair has been archived")
+    a, b = rev1.read_text(encoding="utf-8"), rev11.read_text(encoding="utf-8")
+    tokens_a, tokens_b = set(normalized_text(a).split()), set(normalized_text(b).split())
+    assert tokens_a < tokens_b, "rev1 must still be a strict subset of rev11"
+    assert text_similarity(normalized_text(b), normalized_text(a)) == 1.0
+    proposed = {"docs/design/feedback/drydocs-startup-refresh-runbook-rev11.yaml": b}
+    existing = {"docs/design/feedback/drydocs-startup-refresh-runbook-rev1.yaml": a}
+    assert rename_candidates(proposed, existing) == []

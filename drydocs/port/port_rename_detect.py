@@ -230,6 +230,46 @@ def slot_of(path: str) -> str | None:
     return match.group(1) if match else None
 
 
+#: A trailing revision number, as the design-doc feedback captures use it
+#: (``drydocs-startup-refresh-runbook-rev11.yaml``). Where a filename numbers a
+#: REVISION, the number is not a slot and the stem is not a name in flux — both
+#: files are meant to exist, so neither can be the other under a different name.
+_REVISION_SUFFIX = re.compile(r"^(?P<stem>.+)-rev\d+$")
+
+
+def revision_siblings(a: str, b: str) -> bool:
+    """True when two paths are numbered revisions of ONE subject.
+
+    PORT2 (2026-09-08), and the measurement is the whole argument. The consumer's
+    chunk-1 rename look scored ``drydocs-startup-refresh-runbook-rev11.yaml``
+    against its ``-rev1`` sibling at **1.00** and asked which of two things that
+    meant: an empty capture, or a normalizer discarding the payload. Measured, it
+    is neither. rev1 normalizes to 52 tokens and rev11 to 286; all 52 are in the
+    286. Jaccard reads 0.18, containment reads 1.00, and :func:`compare` takes the
+    max. Nothing is discarded and nothing is empty — rev11 carries rev1's notes
+    forward VERBATIM by design (its own comment says so) and adds two more notes
+    and their resolutions.
+
+    So containment is working exactly as contributed, on a pair whose relationship
+    it cannot represent: a later revision of a document is a superset of the
+    earlier one BY CONSTRUCTION, which is the input containment scores 1.00. Every
+    revision series in the tree is therefore a standing false positive, and no
+    threshold fixes it — the score is correct and the QUESTION is wrong.
+
+    Reading the filename settles it without reading content at all, the same shape
+    :func:`slot_of` uses one function up. A rename claim says "these two names are
+    one file"; two revisions are two files, and the consumer keeps both.
+    """
+    pa, pb = Path(a), Path(b)
+    if pa.parent != pb.parent or pa.suffix != pb.suffix:
+        return False
+    ma = _REVISION_SUFFIX.match(pa.stem)
+    mb = _REVISION_SUFFIX.match(pb.stem)
+    if not (ma and mb):
+        return False
+    return ma.group("stem") == mb.group("stem")
+
+
 def structural_candidates(
     proposed: dict[str, str], existing: dict[str, str]
 ) -> list[RenameCandidate]:
@@ -431,6 +471,8 @@ def rename_candidates(
                 continue
             if same_directory_only and str(Path(old_path).parent) != new_dir:
                 continue
+            if revision_siblings(new_path, old_path):
+                continue  # two revisions of one document; see revision_siblings
             score, basis = compare(*discounted_pair(new_text, old_text, freq, size))
             if score >= floor:
                 matches.append(RenameCandidate(new_path, old_path, score, basis))

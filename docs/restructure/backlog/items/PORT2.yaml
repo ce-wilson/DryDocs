@@ -7,7 +7,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - docs/design/feedback/
@@ -29,6 +29,38 @@ acceptance: |
   (d) Either way the finding is written down, because a 1.00 score between rev1 and rev11 is the
       kind of thing that gets re-discovered every port.
 notes: |
+  Done 2026-09-08 (base venue, desktop). (a) ANSWERED BY MEASUREMENT, and it is neither
+  of the two things the finding offered: rev1 normalizes to 52 tokens and rev11 to 286,
+  all 52 inside the 286. Nothing is discarded (rev11 is five times the token count) and
+  rev11 is not empty (four notes, three with resolutions). Jaccard reads 0.18,
+  containment reads 1.00, compare() takes the max.
+
+  So the cause is a third thing the item did not consider: a later revision of a
+  document is a SUPERSET of the earlier one by construction, and that is precisely the
+  input containment was contributed to score 1.00. The measure is right and the
+  question is wrong - every revision series is a standing false positive, and no
+  threshold reaches it because the score is correct.
+
+  (b) NOT the fix that landed. normalized_text is not too aggressive; it kept
+  everything. The fix reads the FILENAME instead, the shape slot_of already uses:
+  revision_siblings() in drydocs/port/port_rename_detect.py returns true for two paths
+  whose stems match modulo a -rev<N> suffix, and rename_candidates skips such a pair
+  before scoring it. A rename claim says two names are one file; two revisions are two
+  files and both are meant to exist.
+  (c) Does not apply - the capture is not empty.
+  (d) Written down twice: the docstring carries the measurement, and
+  docs/design/feedback/README.md tells a reader of the naming convention why the
+  convention now matters to the detector. The two real files are pinned as a fixture
+  (test_the_real_feedback_pair_scores_one_and_yields_no_candidate), which skips rather
+  than fails if they are ever archived.
+
+  BLAST RADIUS CHECKED: exactly two tracked files carry a -revN suffix, both of them
+  this pair, so the rule silences nothing else today; and the sibling test asserts a
+  different document with a rev number is still compared normally.
+
+  MODULE CHOICE held: the fix is in the port's detector, as the note predicted, though
+  by a different route than clause (b) expected. No docgen follow-up is owed.
+
   Minted 2026-09-07 from IDEAS.md Idea-251 (the company's chunk-1 rename-look on
   port-base-20260902, their PORT-REPORT question 7).
 
