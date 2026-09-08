@@ -29,8 +29,72 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # THE INTERPRETER / OS MATRIX (backlog J67, 2026-09-07). One leg blocks; the
+  # rest report. Until this existed, `pyproject.toml` declared `python = "^3.11"`
+  # and CI proved exactly one point inside that range, on one OS — so the range
+  # was an assertion nothing tested, and the two dev machines had already drifted
+  # apart underneath it without anything noticing.
+  #
+  # WHAT IS ACTUALLY RUN, measured rather than assumed, each stamped with its
+  # venue (J18): desktop base interpreter CPython 3.14.6, both producer venvs
+  # (2026-09-01, recorded on J67); laptop `NewThinkpad` base and venv CPython
+  # 3.12.10 on win32 (2026-09-07). The comment that stood here said "3.12 is what
+  # both dev machines run" and gave that as the reason for a single version — it
+  # is half true now and was already stale when J67 measured it. Both machines are
+  # inside `^3.11`; neither is what makes the range safe, because nothing tested
+  # its ends.
+  #
+  # WHY THE RANGE STAYED AND CI GREW, rather than the reverse (J67 (a) asked for
+  # one direction): narrowing to what CI proved would have declared `^3.12` and
+  # thereby excluded 3.14 — the interpreter the desktop writes every line on. A
+  # range that excludes a machine in daily use is a worse falsehood than an
+  # untested one, and J67 (d) rules the lock out of scope besides.
+  #
+  # WHICH LEGS, AND WHY NOT MORE. 3.12 blocking (the status quo, unchanged cost);
+  # 3.11 because an untested FLOOR is precisely the assertion this item objects
+  # to; 3.14 because it is what the desktop runs; windows-latest because all local
+  # work is Windows and the repo already carries `.gitattributes` CRLF rules,
+  # `getpass` handling and `VIRTUAL_ENV` behaviour that exist BECAUSE the two
+  # platforms differ. 3.13 is deliberately skipped: it is an interior point
+  # between two tested ends, and the 2026-08-21 Actions-minutes decision is still
+  # a real constraint.
+  #
+  # ADVISORY FIRST, AND FLIPPING ONE IS A SEPARATE DECISION (J67 (b)). A new leg
+  # reports the truth without turning the trunk red on something nobody has
+  # triaged. The precedent is J10 stage 5, where a blocking gate nobody watched
+  # ran red for 100+ consecutive runs: a gate is only worth blocking on once
+  # somebody believes it. `fail-fast: false` so an advisory leg can never cancel
+  # the blocking one.
+  #
+  # NOT COVERED, DELIBERATELY (J67 (e)): `agents/requirements.txt` is a separate
+  # interpreter that LEADS this project by declaration (neo4j>=6.2,<7 against the
+  # project's 5.x — G110, "may lead, but only by declaration"). No leg here
+  # installs it and this matrix does not extend to it. Naming the gap keeps it
+  # deliberate instead of discovered again later.
   gates:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.advisory }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            python-version: "3.12"
+            advisory: false
+            poetry-cache: ~/.cache/pypoetry
+          - os: ubuntu-latest
+            python-version: "3.11"
+            advisory: true
+            poetry-cache: ~/.cache/pypoetry
+          - os: ubuntu-latest
+            python-version: "3.14"
+            advisory: true
+            poetry-cache: ~/.cache/pypoetry
+          - os: windows-latest
+            python-version: "3.12"
+            advisory: true
+            poetry-cache: ~\AppData\Local\pypoetry\Cache
+    name: gates (${{ matrix.os }}, py${{ matrix.python-version }}${{ matrix.advisory && ', advisory' || '' }})
     steps:
       # FULL HISTORY, ON PURPOSE, AND ONLY HERE (backlog CORE3, 2026-09-07).
       #
@@ -57,23 +121,26 @@ jobs:
         with:
           fetch-depth: 0
 
-      # Single version by decision (2026-08-21, Actions-minutes cost): 3.12 is
-      # what both dev machines run. pyproject's ^3.11 floor is deliberately
-      # untested here — tightening it to ^3.12 would churn poetry.lock instead.
-      - name: Set up Python 3.12
+      # The version comes from the matrix above, which carries the reasoning.
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: ${{ matrix.python-version }}
 
       - name: Install Poetry
         run: pipx install poetry
 
+      # The cache PATH is per-OS, from the matrix: Poetry's cache lives under
+      # ~/.cache on Linux and %LOCALAPPDATA% on Windows, and pointing the Windows
+      # leg at the Linux path would have cached nothing while looking like it
+      # cached something. The key already varied by runner.os; it now varies by
+      # interpreter too, so four legs cannot share one another's wheels.
       - name: Cache Poetry virtualenv
         uses: actions/cache@v5
         with:
-          path: ~/.cache/pypoetry
-          key: poetry-${{ runner.os }}-py3.12-${{ hashFiles('poetry.lock') }}
-          restore-keys: poetry-${{ runner.os }}-py3.12-
+          path: ${{ matrix.poetry-cache }}
+          key: poetry-${{ runner.os }}-py${{ matrix.python-version }}-${{ hashFiles('poetry.lock') }}
+          restore-keys: poetry-${{ runner.os }}-py${{ matrix.python-version }}-
 
       - name: Install dependencies
         run: poetry install --no-interaction
@@ -161,6 +228,12 @@ jobs:
       # The e2e suite starts drydocs-api as one of its two servers, so this job
       # needs the Python side installed too — the browser is only one of the
       # three processes the path crosses.
+      #
+      # SINGLE VERSION HERE ON PURPOSE, and outside J67's matrix: the subject of
+      # this job is the console, and Python is incidental to it — one process it
+      # happens to start. Running the browser suite four times to vary an
+      # interpreter it never exercises would buy nothing at four times the cost.
+      # The interpreter range is proved by `gates`.
       - name: Set up Python 3.12
         uses: actions/setup-python@v6
         with:
