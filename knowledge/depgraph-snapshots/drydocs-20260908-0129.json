@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-08T00:25:04",
+    "captured_at": "2026-09-08T01:29:38",
     "date": "20260908",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "f59c1e56",
-      "full": "f59c1e56c60bdf65ac265e2a5336834b6862203b",
+      "commit": "9fd73651",
+      "full": "9fd7365181999d81c9ef8b6a8b7fcaaa83beacdf",
       "branch": "main",
-      "describe": "port-base-20260905-308-gf59c1e56",
-      "subject": "docs(ideas): Idea-302 - the pyproject per-entry row covers dependencies and not the ruff block",
+      "describe": "port-base-20260905-312-g9fd73651",
+      "subject": "docs(port): RELAY-38 - render_load_map.main() is in render_board's default run at every base tag; a 0905 report cites the 0905 gates figure",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -22976,10 +22976,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260907-2337.json",
-      "name": "drydocs-20260907-2337.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260908.json",
+      "name": "drydocs-20260908.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260907-2337.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260908.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -49574,7 +49574,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260907-2337.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260908.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
