@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-07T22:47:23",
+    "captured_at": "2026-09-07T23:06:40",
     "date": "20260907",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "61dfe4c2",
-      "full": "61dfe4c2a8580d30a6998059d02cfd7409020853",
+      "commit": "d86954d9",
+      "full": "d86954d9678a14c9fe20d1437360d0f54f3f660c",
       "branch": "main",
-      "describe": "port-base-20260905-282-g61dfe4c2",
-      "subject": "fix(port): RELAY-35 names the lineage extractor by its real path (drydocs_lineage/extractors/...) - the path-currency guard caught the consumer's shorthand; pen: backlog . port . adr . gates . snapshot (Lane A, desktop)",
+      "describe": "port-base-20260905-302-gd86954d9",
+      "subject": "docs(plan): Lane B closed - seven wip/*-laptop branches merged --no-ff (CORE5 CORE4 LOAD4 J67 L29 V7 REM1), board and roadmap rendered once, handoff file retired (handoff.py --check: queue empty, 7 done); pen: backlog . port . adr . gates . snapshot (Lane A, desktop)",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -8369,6 +8369,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/design/drydocs-remediation-runbook.html",
+      "name": "drydocs-remediation-runbook.html",
+      "extension": ".html",
+      "rel_path": "docs/design/drydocs-remediation-runbook.html",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/drydocs-remediation-runbook.md",
+      "name": "drydocs-remediation-runbook.md",
+      "extension": ".md",
+      "rel_path": "docs/design/drydocs-remediation-runbook.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/design/drydocs-remediation-tdd.html",
       "name": "drydocs-remediation-tdd.html",
       "extension": ".html",
@@ -9327,15 +9345,6 @@
       "name": "next-session-cron-prompt.md",
       "extension": ".md",
       "rel_path": "docs/history/next-session-cron-prompt.md",
-      "project": "drydocs",
-      "circular": false,
-      "kind": "file"
-    },
-    {
-      "file_id": "drydocs/docs/lane-b-handoff.md",
-      "name": "lane-b-handoff.md",
-      "extension": ".md",
-      "rel_path": "docs/lane-b-handoff.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -22931,10 +22940,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260907.json",
-      "name": "drydocs-20260907.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260907-2247.json",
+      "name": "drydocs-20260907-2247.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260907.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260907-2247.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -32483,6 +32492,18 @@
       "drydocs/drydocs_core/schema/constraints.py"
     ],
     [
+      "drydocs/tests/unit/test_bundled_demo_interlock.py",
+      "drydocs/drydocs/loaders/folder_attribution.py"
+    ],
+    [
+      "drydocs/tests/unit/test_bundled_demo_interlock.py",
+      "drydocs/drydocs_core/adapters/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_bundled_demo_interlock.py",
+      "drydocs/drydocs_core/models/__init__.py"
+    ],
+    [
       "drydocs/tests/unit/test_capture_registry_join.py",
       "drydocs/drydocs_docmeta/registry.py"
     ],
@@ -34333,6 +34354,10 @@
     [
       "drydocs/tests/unit/test_service_probe.py",
       "drydocs/tests/stub_adk.py"
+    ],
+    [
+      "drydocs/tests/unit/test_skip_guard_policy.py",
+      "drydocs/tests/source_scan.py"
     ],
     [
       "drydocs/tests/unit/test_sme_notes.py",
@@ -41098,11 +41123,6 @@
     [
       "drydocs/docs",
       "CONTAINS",
-      "drydocs/docs/lane-b-handoff.md"
-    ],
-    [
-      "drydocs/docs",
-      "CONTAINS",
       "drydocs/docs/next-session-handoff.md"
     ],
     [
@@ -41494,6 +41514,16 @@
       "drydocs/docs/design",
       "CONTAINS",
       "drydocs/docs/design/drydocs-project-tdd.md"
+    ],
+    [
+      "drydocs/docs/design",
+      "CONTAINS",
+      "drydocs/docs/design/drydocs-remediation-runbook.html"
+    ],
+    [
+      "drydocs/docs/design",
+      "CONTAINS",
+      "drydocs/docs/design/drydocs-remediation-runbook.md"
     ],
     [
       "drydocs/docs/design",
@@ -49488,7 +49518,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260907.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260907-2247.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -53085,13 +53115,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 2955,
-    "edges": 1788,
+    "files": 2956,
+    "edges": 1792,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 3277,
+    "rels": 3278,
     "directories": 323
   }
 }
