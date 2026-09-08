@@ -40,3 +40,10 @@ notes: |
   The shape is deliberately the UNION_EXCLUSIONS shape rather than a new invention: an accepted
   difference is rendered under its own heading, never as silence and never as a failure, and a
   stale allowance fails.
+
+  RELAY-47 (2026-09-08) did NOT land here, and the reason is the boundary of this seam: this
+  item rules a dropped PATH in the side-local overlay, and the section-3 redaction is a
+  changed LINE inside config/gate-log.md, a union-append file both sides hold. It got its own
+  file, config/gate-log-redactions.yaml (canonical-producer, so the consumer's fast-forwarded
+  guard reads the same declaration), read by drydocs/port/gate_log_redactions.py - the same
+  listed-not-silenced / stale-fails shape this item specifies, one level down.

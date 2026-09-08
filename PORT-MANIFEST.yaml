@@ -337,6 +337,17 @@ rows:
   - path: "config/gate-log.md"
     disposition: union-append
     note: "chronological union of both sides' gate records; dropping either side's entries is an audit violation"
+  - path: "config/gate-log-redactions.yaml"
+    disposition: canonical-producer
+    note: >
+      RELAY-47 (2026-09-08): the declared section-3 redactions of signed gate-log text - the
+      ONE legitimate in-place edit of a union-append file. A redaction is a producer ruling
+      about producer text, so the file is canonical-producer and crosses whole; the
+      consumer's append-only guard (`tests/unit/test_port_reconcile_guards.py`, a
+      fast-forward) reads this same declaration through `drydocs.port.gate_log_redactions`,
+      LISTS a declared redaction and FAILS a stale one. Holds the AFTER line only - never
+      the removed text. Not PORT4's accepted-drop seam: that is a dropped PATH in the
+      side-local overlay; this is a changed LINE in a file both sides hold.
   - path: "docs/restructure/ideas/pending-*.md"
     disposition: never-port
     note: >
