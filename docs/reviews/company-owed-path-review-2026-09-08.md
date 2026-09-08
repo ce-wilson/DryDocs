@@ -1,7 +1,7 @@
 # The owed-path carve-out, reviewed — the manifest already rules 73 of the 87
 
 **Date:** 2026-09-08 · **Trigger:** the company's `sme-path-carveout-review.md` + `.csv`,
-committed company-side at `a78bb07d`, produced in answer to §5 of
+committed company-side, produced in answer to §5 of
 `docs/company-prompts/port-base-20260905-closeout-company-prompt.md`, and relayed by the SME
 with one instruction: review it. **Lens:** the producer's own disposition classifier, run
 against the producer tree. **Classification:** Internal-Public (mechanism only; path names and
@@ -12,9 +12,13 @@ actually needed.
 - **Reviewed at:** commit `42789fd6` on `main`, port base `port-base-20260905`; venue
   NewThinkpad. *Absent here reads as not-yet-ported, not as broken
   (`docs/style/review-provenance.md`).*
-- **Subject:** the company's `sme-path-carveout-review.md` at their `a78bb07d`
-  — `[SME-REPORTED]`, hand-carried. The company's tree cannot be read from here, so their
+- **Subject:** the company's `sme-path-carveout-review.md` and its `.csv` twin —
+  `[SME-REPORTED]`, hand-carried. The company's tree cannot be read from here, so their
   87-row absence claim is taken as reported and is NOT what this review checks.
+  **The FILE is the citation and the commit sha deliberately is not:** two hand-carries of
+  that close-out relayed two different shas for it, neither verifiable from this side, and a
+  sha nobody here can resolve is worse than no sha — it reads as checked. The company's own
+  ledger holds the number.
 - **Instrument:** `drydocs.port.dispositions.classify` at `42789fd6` — the ONE classifier
   (PORT6), called as an importable object against `PORT-MANIFEST.yaml`, never by parsing a
   render (J37).

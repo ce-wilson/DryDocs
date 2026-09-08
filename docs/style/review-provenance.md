@@ -100,3 +100,23 @@ said everything was OK. Each is a default that optimises for not interrupting.
 The guarded case is the only one of the three that admits a guard cleanly; promoting the other two
 to guards would be the disease this rule names — an instrument that reports "clean" for reasons of
 its own.
+
+**A fourth mode, added 2026-09-08: CHECK WHICH VERSION OF THE INSTRUMENT YOU ARE HOLDING.** The
+three above are a broken instrument, a mis-parsed one, and one authored to fit. This one is
+different and harder to see: the instrument is correct, is read correctly, and is **stale**. A
+superseded function reads exactly like a current one — same name, same signature, a docstring
+that still describes what it used to do — so every check the rule already prescribes passes.
+Reading the source is not enough; the source has a vintage, and `git log -1 -- <file>` against
+the base you are working from is the check.
+
+**Why it earns a row: it happened twice in one day, on both trees, in opposite directions.** The
+company read `append_only_violation`'s docstring, found it said "byte prefix", concluded the
+implementation matched its documented rule, and retracted a finding that was **correct** — the
+function they held was one commit behind the fix their own report had prompted. The producer then
+transcribed that exchange and fenced the conflict away from the fix as "adjacent but NOT the same
+defect", on a guess, without reading the parent commit — and had to withdraw it by rider. One
+stale read, one unread commit, the same rule, opposite errors. The cost is symmetrical and worth
+naming: a stale instrument retracts true findings, and an unchecked one manufactures false ones.
+
+No guard is proposed. A test cannot know which revision of a file the reader had open, and the
+three-mode paragraph above already says why reaching for one here would be the disease.
