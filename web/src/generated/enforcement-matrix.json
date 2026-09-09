@@ -27,6 +27,57 @@
       "extra_contents": {}
     },
     {
+      "id": "source-descriptors",
+      "title": "Source descriptors (five registration axes)",
+      "file": "config/source-descriptors.yaml",
+      "code_resident": false,
+      "symbols": [],
+      "consumers": [
+        "drydocs_core/source_descriptors.py",
+        "drydocs/source_registration/",
+        "scripts/build_synthetic_sources.py"
+      ],
+      "guard_tests": [
+        "test_source_descriptors.py",
+        "test_synthetic_sources.py"
+      ],
+      "gate_ref": null,
+      "status": "enforced",
+      "pending_entries": 0,
+      "env_refs": [
+        "PROD"
+      ],
+      "files": [
+        "config/source-descriptors.yaml"
+      ],
+      "content": "# =============================================================================\n# config/source-descriptors.yaml — THE REGISTRATION DESCRIPTOR (PoC,\n# feat/source-registration-poc, 2026-09-09).\n#\n# WHAT THIS FILE IS. config/source-registry.yaml says WHAT a source is (system\n# and dataset rows, ruled at gate source-registry-v2). config/source-bindings.yaml\n# says HOW TO REACH its carrier. This file says how a dataset is REGISTERED as a\n# catalog asset: five finite axes per dataset, every value drawn from a closed\n# list declared below, so the same registry produces the same asset set on every\n# run. Nothing here is prose a reader has to interpret — a consumer reads the\n# axis value, never a comment.\n#\n# THE FIVE AXES. Each has a DERIVATION from the registry and an OVERRIDE table;\n# the reader applies the override when a row names the dataset, the derivation\n# otherwise, and refuses a value outside the axis. The derivation is written\n# down so a registry edit moves the descriptor for free and an override is the\n# only way to disagree with it.\n#\n#   acquisition  manual | automated       <- dataset acquisition.mode\n#   format       csv | ascii | json | archive | db\n#                                         <- acquisition.format for manual rows,\n#                                            acquisition.via (db) for automated\n#   authority    primary | replica        <- SOR -> primary, ADS -> replica;\n#                                            a derived store has no authority\n#                                            and is marked replica (it copies)\n#   layer        human | business | data | technology\n#                                         <- the system row's layer; the\n#                                            override table moves the ONE\n#                                            dataset whose subject is people\n#   access       fid | human | repo       <- the credential class that reads it:\n#                                            a bound carrier is read by a\n#                                            functional id, a manual drop by a\n#                                            person, a repo-based zone by the\n#                                            checkout itself\n#\n# THE SYNTHETIC SECTION. Which datasets get a generated stand-in, under which\n# file name in the loader's landing zone, with a fixed seed. Every generated row\n# carries the `record_origin` column set to `sample`, so a fixture can never be\n# mistaken for a production capture (publish boundary, CLAUDE.md §3). Themed on\n# the Neo4j Matrix sample graph — names, never facts.\n#\n# THE DATAHUB SECTION. How the assets are emitted: the platform per system, the\n# environment, the tag prefix and a FIXED observation timestamp, so the emitted\n# MCP file is byte-stable across runs (determinism is a test, not a hope).\n#\n# Reader: drydocs_core/source_descriptors.py. Guard: tests/unit/test_source_descriptors.py.\n# =============================================================================\nschema: drydocs.source-descriptors.v1\nclassification: Internal-Public\nupdated: 2026-09-09\n\naxes:\n  acquisition: [manual, automated]\n  format: [csv, ascii, json, archive, db]\n  authority: [primary, replica]\n  layer: [human, business, data, technology]\n  access: [fid, human, repo]\n\n# The authority map: registry vocabulary -> descriptor vocabulary.\nauthority_map:\n  SOR: primary\n  ADS: replica\n  derived: replica\n\n# Dataset overrides. Key = registry dataset id; value = any subset of the axes.\n# Every id here must exist in the registry and every value must be on its axis.\noverrides:\n  \"hr@[db].psgmgr.hr_phone_exp\":\n    layer: human            # the subject is people, whatever carrier holds it\n  \"pat:people-report\":\n    layer: human            # people and their team roles\n\ndatahub:\n  env: PROD\n  tag_prefix: drydocs\n  # ISO-8601 UTC, applied as systemMetadata.lastObserved on every aspect; fixed\n  # so two runs over one registry emit one file.\n  observed_at: \"2026-09-09T00:00:00Z\"\n  # DataHub dataPlatform per SYSTEM row. Unlisted systems fall to `default`.\n  platforms:\n    default: file\n    psgmgr: oracle\n    oracle: oracle\n    drydocs-stg: oracle\n    snowflake: snowflake\n    catalog: snowflake\n    repo: git\n    bitbucket: git\n    seal: file\n    pat: file\n    snow: file\n    infra: file\n  # DataHub Lite sink (a DuckDB file) — path relative to DRYDOCS_DATA_ROOT.\n  lite_file: datahub/drydocs-lite.duckdb\n\nsynthetic:\n  seed: 1999                  # the year the first film released; any int works\n  theme: matrix\n  record_origin_field: record_origin\n  record_origin_value: sample\n  # The gzip bundle checked into the repo (never-port). Extracted on demand;\n  # tests skip when it is absent.\n  bundle: drydocs/data/samples/synthetic-sources.json.gz\n  # DuckDB file the extracted CSVs are loaded into — relative to DRYDOCS_DATA_ROOT.\n  duckdb_file: synthetic/drydocs-synthetic.duckdb\n  # Row counts, one knob per generated table.\n  rows:\n    applications: 12\n    contacts_per_application: 2\n    teams: 6\n    roles_per_team: 2\n    servers_per_application: 2\n    folders: 4\n    jobs_per_folder: 5\n    hosts: 6\n    ci_classes: 8\n  # Which datasets are generated, and the files each produces. `file` is the\n  # SOURCE-mode name the loader reads (chain step name + .csv); a db-carried\n  # dataset gets a CSV MIRROR under `mirror_dir` (relative to DRYDOCS_DATA_ROOT)\n  # instead of a landing zone, because a replica table has no drop directory.\n  mirror_dir: psgmgr-mirror\n  datasets:\n    \"pat:product-catalog\":\n      files: [catalog_lobs.csv, product_lines.csv, products.csv, pat_product_mapping.csv]\n    \"pat:people-report\":\n      files: [dev_teams.csv, pat_team_roles.csv]\n    \"seal:app-extract\":\n      files: [seal_applications.csv, seal_contacts.csv]\n    \"infra:server-export\":\n      files: [server_inventory.csv]\n    \"snow:cmdb-ci-classes\":\n      files: [cmdb_ci_classes.csv]\n    \"controlm@[db].psgmgr.cm_def_vtab\":\n      files: [controlm_folders.csv]\n    \"controlm@[db].psgmgr.cm_def_vjob\":\n      files: [controlm_jobs.csv]\n    \"controlm@[db].psgmgr.cm_def_lnki_p_vw\":\n      files: [controlm_conditions_in.csv, controlm_dependencies.csv]\n    \"controlm@[db].psgmgr.cm_def_lnko_p_vw\":\n      files: [controlm_conditions_out.csv]\n    \"controlm@[db].psgmgr.cm_hosts\":\n      files: [controlm_hosts.csv]\n",
+      "extra_contents": {}
+    },
+    {
+      "id": "datahub-recipes",
+      "title": "DataHub ingestion recipes",
+      "file": "config/datahub/",
+      "code_resident": false,
+      "symbols": [],
+      "consumers": [
+        "drydocs/source_registration/datahub_emit.py"
+      ],
+      "guard_tests": [
+        "test_synthetic_sources.py"
+      ],
+      "gate_ref": null,
+      "status": "enforced",
+      "pending_entries": 0,
+      "env_refs": [],
+      "files": [
+        "config/datahub/README.md",
+        "config/datahub/duckdb-profile.dhub.yml",
+        "config/datahub/lite-import.dhub.yml"
+      ],
+      "content": null,
+      "extra_contents": {}
+    },
+    {
       "id": "loader-source-overlay",
       "title": "Loader-source binding overlay",
       "file": "config/loader-source-overlay.yaml",

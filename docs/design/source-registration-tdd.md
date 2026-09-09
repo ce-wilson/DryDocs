@@ -1,11 +1,12 @@
 # Technical Design — source registration (five-axis descriptors, synthetic stand-ins, DuckDB and DataHub)
 
 <!-- anchor: front-matter -->
-**Status:** DESCRIPTIVE — documents the built proof of concept as of **Rev 2, 2026-09-09**,
-authored against commit `de0eeb6f` on branch `feat/source-registration-poc` (one commit, based
-on `main` at `7e80f122`). Nothing here is prescriptive: every mechanism described is in the tree and
-covered by a test. Two of those tests are RED, and the branch has never had a green CI run — see
-"QA & tests", which separates what the local suite reports from what CI reports. ·
+**Status:** DESCRIPTIVE — documents the built proof of concept as of **Rev 3, 2026-09-09**,
+authored against commit `de0eeb6f`, which was landed onto `main` linearly rather than merged,
+together with the two guard fixes described under "QA & tests". Nothing here is prescriptive:
+every mechanism described is in the tree and covered by a test. Two of those tests were red while
+the work sat on its branch and both are fixed here; "QA & tests" records what each one was, and why
+one of them could not fail on the machine that wrote it. ·
 **Classification:** Internal-Public — mechanism only. Every value the generator emits is
 synthetic, and no connection coordinate appears in this document or in the files it describes. ·
 **Audience:** engineers working on `drydocs_core/source_descriptors.py` or
@@ -352,25 +353,29 @@ one-time operator verification, not an automated test, and it is recorded as suc
 The usual gates apply and were run: the unit suite, the root import, and the module-boundary test,
 which is default-deny and so required the new prefix and map rows in the same commit.
 
-**Two guards are red, and both are red about this branch.** They are also the reason this section
-distinguishes a local run from a CI run, because the two disagree.
+**Two guards were red while the work sat on its branch, and both are fixed at landing.** They are
+worth recording because one of them is a lesson about where a test can be measured, not about the
+code it tests.
 
-The local suite on this desktop reports 3895 passed and one failure: the identity-header guard
-rejects both recipe files under `config/datahub/`, each for the same three missing keys — `schema`,
-`classification` and `updated`. The guard is right. Both files are governed configuration and
-neither carries the identity block that every other governed file carries. The fix is not purely
-mechanical, because a DataHub recipe is parsed by DataHub and three unknown top-level keys may not
-survive that parse, so the choice is between adding the block and exempting the family with a
-written reason.
+The **identity-header guard** rejected both recipe files for the same three missing keys: `schema`,
+`classification` and `updated`. The guard was right that they lacked the block and wrong that they
+could carry it. DataHub parses a recipe with a model that declares `extra="forbid"`, so the three
+keys would not be ignored — the recipe would stop parsing and the file would stop working. That is
+the same situation the map already records for the Compose file, and the recipes are now classed the
+same way, as somebody else's schema, with the verification written beside the entry. Their
+provenance rides in each recipe's header comment and in the directory's README instead.
 
-CI reports **two** failures on every runner: that one, and the bundle parity guard described in the
-detailed design, which fails because gzip output is not portable across zlib builds. The second
-failure cannot be reproduced on the machine that wrote the bundle, which is exactly why it was not
-caught before the branch was pushed. The branch's own CI run was red for both reasons on the day it
-landed.
+The **bundle parity guard** failed only in CI, and could not fail on the machine that wrote the
+bundle. It compared compressed bytes, and gzip output is not portable across zlib builds. The fix is
+to compare the decompressed payload, which is the thing the test was always about. The gzip artifact
+and its size are unchanged. One consequence is worth knowing: two machines can now hold
+byte-different bundles that both pass, so a rebuild elsewhere can show as a modified file in `git
+status` even when the content is identical. Tracking the payload uncompressed would remove that too,
+at a cost of about 16 KB, and remains available if the churn becomes annoying.
 
-Neither failure is caused by this document, and nothing in this design depends on how either is
-resolved. The branch should not merge while they stand.
+This is also the clearest argument in this design for reading a failure before believing a green
+local run. The local suite reported one failure and CI reported two, and the extra one was the more
+interesting of the pair.
 
 <!-- anchor: hitl-gate -->
 ## HITL gate & open questions
@@ -410,7 +415,7 @@ therefore stays with DataHub, and that is a fact about the two products rather t
 | Every planned file is generated exactly once, with no extras and no gaps | detailed-design | drydocs-load | `test_synthetic_sources.py` — plan coverage | done |
 | A generated row can never pass for a capture | classification-security | drydocs-load | `test_synthetic_sources.py` — sample marker, identifier fences | done |
 | The bundle payload is stable, and packing is repeatable within one build | detailed-design | drydocs-load | `test_synthetic_sources.py` — pack stability | done |
-| The tracked bundle matches the generator on any platform | detailed-design | drydocs-load | `test_synthetic_sources.py` — bundle parity — RED in CI: gzip streams differ across zlib builds, payload identical | open |
+| The tracked bundle matches the generator on any platform | detailed-design | drydocs-load | `test_synthetic_sources.py` — bundle parity, compared as decompressed payload | done |
 | Extraction lands each file in the zone its loader reads, and never in the repository tree | detailed-design | drydocs-load | `test_synthetic_sources.py` — extraction targets | done |
 | A tree without the bundle reports "not tested", never a failure | qa-tests | drydocs-load | measured: 8 passed / 3 skipped with the bundle moved aside | done |
 | DuckDB is optional, and its absence costs one step only | detailed-design | drydocs-load | `test_synthetic_sources.py` — load test skips on absence | done |
@@ -419,7 +424,7 @@ therefore stays with DataHub, and that is a fact about the two products rather t
 | Two runs over one config emit one file | detailed-design | drydocs-load | `test_synthetic_sources.py` — emission determinism | done |
 | The new module is classified, mapped and port-dispositioned in the same commit | classification-security | drydocs-core, drydocs-load | `test_module_boundary.py`; port-manifest rows; matrix re-render | done |
 | The recipes run end to end against a local store | qa-tests | operator-side | one run on this desktop: 283 import events, 137 profile events, 18 profiles | done |
-| Governed config files carry the identity header | qa-tests | drydocs-load | `test_config_identity_header.py` — RED: both files under `config/datahub/` lack `schema`, `classification` and `updated` | open |
+| Every tracked YAML is classified for the identity header, carrying it or exempt with a reason | qa-tests | drydocs-load | `test_config_identity_header.py` — the recipes classed as somebody else's schema | done |
 | The five axes are the right five | hitl-gate | — | SME question, open | open |
 | A catalog product is adopted | hitl-gate | — | ADR 0017, PROPOSED | open |
 

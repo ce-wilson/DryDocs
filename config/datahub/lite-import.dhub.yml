@@ -1,0 +1,18 @@
+# Register the DryDocs sources as DataHub assets in a local datahub-lite store.
+# Input: the MCP file written by
+#   python scripts/build_synthetic_sources.py --datahub-json "$DRYDOCS_DATA_ROOT/datahub/drydocs-sources.mcp.json"
+# Run:   datahub ingest -c config/datahub/lite-import.dhub.yml
+# Paths are RELATIVE TO THE DATA ROOT: cd "$DRYDOCS_DATA_ROOT" before running.
+# (An absolute Windows path cannot be used here: DataHub's file source reads
+# the drive letter as a URL scheme and fails with 'no registered class for c'.) Sink file matches
+# config/source-descriptors.yaml datahub.lite_file.
+source:
+  type: file
+  config:
+    path: datahub/drydocs-sources.mcp.json
+sink:
+  type: datahub-lite
+  config:
+    type: duckdb
+    config:
+      file: datahub/drydocs-lite.duckdb

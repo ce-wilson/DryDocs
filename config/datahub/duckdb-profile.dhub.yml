@@ -1,0 +1,34 @@
+# Profile the synthetic tables with DataHub's sqlalchemy profiler over DuckDB.
+# Input: the DuckDB file written by
+#   python scripts/build_synthetic_sources.py --extract --duckdb
+# Run:   datahub ingest -c config/datahub/duckdb-profile.dhub.yml
+# Needs the duckdb-engine SQLAlchemy dialect in the DataHub environment
+# (pip install duckdb-engine). Same lite sink as lite-import.dhub.yml so the
+# profiles land beside the registered assets. The dataset urns differ from the
+# registration's (platform "duckdb", name "<db>.main.<table>") on purpose: the
+# registration describes the SOURCE, the profile describes the synthetic COPY.
+source:
+  type: sqlalchemy
+  config:
+    platform: duckdb
+    connect_uri: duckdb:///synthetic/drydocs-synthetic.duckdb
+    include_views: false
+    profiling:
+      enabled: true
+      profile_table_level_only: false
+      include_field_null_count: true
+      include_field_distinct_count: true
+      include_field_min_value: true
+      include_field_max_value: true
+      include_field_sample_values: true
+      include_field_mean_value: false
+      include_field_median_value: false
+      include_field_stddev_value: false
+      include_field_quantiles: false
+      include_field_histogram: false
+sink:
+  type: datahub-lite
+  config:
+    type: duckdb
+    config:
+      file: datahub/drydocs-lite.duckdb

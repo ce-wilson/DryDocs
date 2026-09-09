@@ -66,6 +66,34 @@ SURFACES: list[dict] = [
         "gate_ref": "per-source gates (add-source-object flow)",
     },
     {
+        "id": "source-descriptors",
+        "title": "Source descriptors (five registration axes)",
+        # source-registration PoC (2026-09-09): acquisition / format / authority / layer / access,
+        # each a closed axis, derived per registry dataset and refined by overrides.
+        # The synthetic plan (which datasets get a generated stand-in, seed, bundle
+        # path) and the DataHub emission settings ride in the same file.
+        "file": "config/source-descriptors.yaml",
+        "consumers": [
+            "drydocs_core/source_descriptors.py",
+            "drydocs/source_registration/",
+            "scripts/build_synthetic_sources.py",
+        ],
+        "guard_tests": ["test_source_descriptors.py", "test_synthetic_sources.py"],
+        "gate_ref": None,
+    },
+    {
+        "id": "datahub-recipes",
+        "title": "DataHub ingestion recipes",
+        # Operator-side recipes for the DataHub CLI (its own environment, never a
+        # repo dependency): lite import of the emitted MCP file, and the sqlalchemy
+        # profiler over the synthetic DuckDB. Paths are RELATIVE to DRYDOCS_DATA_ROOT
+        # by design (config/datahub/README.md says why).
+        "file": "config/datahub/",
+        "consumers": ["drydocs/source_registration/datahub_emit.py"],
+        "guard_tests": ["test_synthetic_sources.py"],
+        "gate_ref": None,
+    },
+    {
         "id": "loader-source-overlay",
         "title": "Loader-source binding overlay",
         "file": "config/loader-source-overlay.yaml",

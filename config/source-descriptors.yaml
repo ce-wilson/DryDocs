@@ -1,0 +1,142 @@
+# =============================================================================
+# config/source-descriptors.yaml — THE REGISTRATION DESCRIPTOR (PoC,
+# feat/source-registration-poc, 2026-09-09).
+#
+# WHAT THIS FILE IS. config/source-registry.yaml says WHAT a source is (system
+# and dataset rows, ruled at gate source-registry-v2). config/source-bindings.yaml
+# says HOW TO REACH its carrier. This file says how a dataset is REGISTERED as a
+# catalog asset: five finite axes per dataset, every value drawn from a closed
+# list declared below, so the same registry produces the same asset set on every
+# run. Nothing here is prose a reader has to interpret — a consumer reads the
+# axis value, never a comment.
+#
+# THE FIVE AXES. Each has a DERIVATION from the registry and an OVERRIDE table;
+# the reader applies the override when a row names the dataset, the derivation
+# otherwise, and refuses a value outside the axis. The derivation is written
+# down so a registry edit moves the descriptor for free and an override is the
+# only way to disagree with it.
+#
+#   acquisition  manual | automated       <- dataset acquisition.mode
+#   format       csv | ascii | json | archive | db
+#                                         <- acquisition.format for manual rows,
+#                                            acquisition.via (db) for automated
+#   authority    primary | replica        <- SOR -> primary, ADS -> replica;
+#                                            a derived store has no authority
+#                                            and is marked replica (it copies)
+#   layer        human | business | data | technology
+#                                         <- the system row's layer; the
+#                                            override table moves the ONE
+#                                            dataset whose subject is people
+#   access       fid | human | repo       <- the credential class that reads it:
+#                                            a bound carrier is read by a
+#                                            functional id, a manual drop by a
+#                                            person, a repo-based zone by the
+#                                            checkout itself
+#
+# THE SYNTHETIC SECTION. Which datasets get a generated stand-in, under which
+# file name in the loader's landing zone, with a fixed seed. Every generated row
+# carries the `record_origin` column set to `sample`, so a fixture can never be
+# mistaken for a production capture (publish boundary, CLAUDE.md §3). Themed on
+# the Neo4j Matrix sample graph — names, never facts.
+#
+# THE DATAHUB SECTION. How the assets are emitted: the platform per system, the
+# environment, the tag prefix and a FIXED observation timestamp, so the emitted
+# MCP file is byte-stable across runs (determinism is a test, not a hope).
+#
+# Reader: drydocs_core/source_descriptors.py. Guard: tests/unit/test_source_descriptors.py.
+# =============================================================================
+schema: drydocs.source-descriptors.v1
+classification: Internal-Public
+updated: 2026-09-09
+
+axes:
+  acquisition: [manual, automated]
+  format: [csv, ascii, json, archive, db]
+  authority: [primary, replica]
+  layer: [human, business, data, technology]
+  access: [fid, human, repo]
+
+# The authority map: registry vocabulary -> descriptor vocabulary.
+authority_map:
+  SOR: primary
+  ADS: replica
+  derived: replica
+
+# Dataset overrides. Key = registry dataset id; value = any subset of the axes.
+# Every id here must exist in the registry and every value must be on its axis.
+overrides:
+  "hr@[db].psgmgr.hr_phone_exp":
+    layer: human            # the subject is people, whatever carrier holds it
+  "pat:people-report":
+    layer: human            # people and their team roles
+
+datahub:
+  env: PROD
+  tag_prefix: drydocs
+  # ISO-8601 UTC, applied as systemMetadata.lastObserved on every aspect; fixed
+  # so two runs over one registry emit one file.
+  observed_at: "2026-09-09T00:00:00Z"
+  # DataHub dataPlatform per SYSTEM row. Unlisted systems fall to `default`.
+  platforms:
+    default: file
+    psgmgr: oracle
+    oracle: oracle
+    drydocs-stg: oracle
+    snowflake: snowflake
+    catalog: snowflake
+    repo: git
+    bitbucket: git
+    seal: file
+    pat: file
+    snow: file
+    infra: file
+  # DataHub Lite sink (a DuckDB file) — path relative to DRYDOCS_DATA_ROOT.
+  lite_file: datahub/drydocs-lite.duckdb
+
+synthetic:
+  seed: 1999                  # the year the first film released; any int works
+  theme: matrix
+  record_origin_field: record_origin
+  record_origin_value: sample
+  # The gzip bundle checked into the repo (never-port). Extracted on demand;
+  # tests skip when it is absent.
+  bundle: drydocs/data/samples/synthetic-sources.json.gz
+  # DuckDB file the extracted CSVs are loaded into — relative to DRYDOCS_DATA_ROOT.
+  duckdb_file: synthetic/drydocs-synthetic.duckdb
+  # Row counts, one knob per generated table.
+  rows:
+    applications: 12
+    contacts_per_application: 2
+    teams: 6
+    roles_per_team: 2
+    servers_per_application: 2
+    folders: 4
+    jobs_per_folder: 5
+    hosts: 6
+    ci_classes: 8
+  # Which datasets are generated, and the files each produces. `file` is the
+  # SOURCE-mode name the loader reads (chain step name + .csv); a db-carried
+  # dataset gets a CSV MIRROR under `mirror_dir` (relative to DRYDOCS_DATA_ROOT)
+  # instead of a landing zone, because a replica table has no drop directory.
+  mirror_dir: psgmgr-mirror
+  datasets:
+    "pat:product-catalog":
+      files: [catalog_lobs.csv, product_lines.csv, products.csv, pat_product_mapping.csv]
+    "pat:people-report":
+      files: [dev_teams.csv, pat_team_roles.csv]
+    "seal:app-extract":
+      files: [seal_applications.csv, seal_contacts.csv]
+    "infra:server-export":
+      files: [server_inventory.csv]
+    "snow:cmdb-ci-classes":
+      files: [cmdb_ci_classes.csv]
+    "controlm@[db].psgmgr.cm_def_vtab":
+      files: [controlm_folders.csv]
+    "controlm@[db].psgmgr.cm_def_vjob":
+      files: [controlm_jobs.csv]
+    "controlm@[db].psgmgr.cm_def_lnki_p_vw":
+      files: [controlm_conditions_in.csv, controlm_dependencies.csv]
+    "controlm@[db].psgmgr.cm_def_lnko_p_vw":
+      files: [controlm_conditions_out.csv]
+    "controlm@[db].psgmgr.cm_hosts":
+      files: [controlm_hosts.csv]

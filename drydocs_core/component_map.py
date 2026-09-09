@@ -95,6 +95,14 @@ COMPONENT_GROUPS: dict[str, tuple[str, ...]] = {
         # Carries docs_verify's RE-HOME caveat: move both to docmeta if that
         # component ever takes over corpus state.
         "drydocs.docs_coverage",
+        # drydocs.source_registration = source-registration PoC (2026-09-09): the synthetic
+        # stand-ins for every registered source (seeded generator, the gzip bundle,
+        # extraction into the loaders' landing zones), the optional DuckDB load and
+        # the DataHub MCP emission. Load, same bucket as seal_samples and for the
+        # same reason: it produces loader INPUT at the zone paths the chains read.
+        # The five-axis DESCRIPTOR it consumes is core (drydocs_core.source_descriptors):
+        # pure config + registry resolve, no I/O.
+        "drydocs.source_registration",
     ),
     # drydocs-review — SME review + graph acceptance + docs publish (Epic H).
     # The default-deny test below FORCES a new review module to be classified here

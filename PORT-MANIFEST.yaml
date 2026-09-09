@@ -1423,6 +1423,22 @@ rows:
       omission until the 2026-07-28 port" — and `config/source-bindings.yaml` two
       rows above records it a second time. This is the THIRD instance, which is
       why J68 also adds the guard rather than only the row.
+  - path: "config/source-descriptors.yaml"
+    disposition: per-entry
+    entry_rule: >
+      Keyed by dataset id under `overrides:` and `synthetic.datasets:`; the axes, the
+      authority map, the datahub block and the synthetic seed are producer-owned
+      MECHANISM and cross whole. A consumer's own registry rows (company-only
+      datasets) need their own override/synthetic entries HERE, which a wholesale
+      take would drop - the same shape as config/source-registry.yaml above, and
+      declared per-entry on day one so it is never the fourth instance of the
+      config/** fall-through.
+  - path: "config/datahub/**"
+    disposition: canonical-producer
+    note: >
+      Operator-side DataHub recipes; data-root-relative paths, no venue values.
+      A consumer that points them at a real DataHub GMS instead of datahub-lite
+      changes the SINK block only, and does that in its side-local overlay.
   - path: "config/**"
     disposition: canonical-producer
     note: "configuration layer default — the per-entry/canonical-company/union rows ABOVE override for the map, gate-prompts, review-labels, gate-log, dev-environment (first match wins). A file of LOCAL infrastructure facts does not belong under this default; dev-environment.yaml sat here by omission until the 2026-07-28 port"
@@ -1561,6 +1577,11 @@ rows:
   - path: "drydocs/data/**"
     disposition: never-port
     note: "gitignored samples; Track-1 tests skip without them by design"
+  # 2026-09-09 (source-registration PoC): the synthetic-sources bundle drydocs/data/samples/
+  # synthetic-sources.json.gz is force-tracked producer-side and falls under the row
+  # above ON PURPOSE - it is generated from config/source-descriptors.yaml, so a
+  # consumer regenerates it (scripts/build_synthetic_sources.py --bundle) rather than
+  # receiving it, and every test that reads it SKIPS on absence (test_synthetic_sources.py).
   - path: "internal-local/**"
     disposition: never-port
     note: "gitignored; travels by hand only, never by git"

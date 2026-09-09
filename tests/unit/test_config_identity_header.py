@@ -127,6 +127,17 @@ CLASSES: dict[str, tuple[str, str]] = {
         "`classification:` key at the top level is not something Compose allows, so the "
         "block cannot go there; the file's provenance is its header comment instead",
     ),
+    "config/datahub/": (
+        TOOLING,
+        "DataHub ingestion recipes — DataHub's own schema, the compose.yaml case again and "
+        "for a stronger reason than 'not allowed': its PipelineConfig extends a ConfigModel "
+        'declaring `extra="forbid"` (verified against upstream at '
+        "metadata-ingestion/src/datahub/configuration/common.py in the upstream tree read for "
+        "docs/design/datahub-substrate-review.md), so the three header keys "
+        "would not be ignored — they would make the recipe fail to parse and the file stop "
+        "working. Provenance rides in each recipe's header comment and in "
+        "config/datahub/README.md instead",
+    ),
     # -- fixtures ------------------------------------------------------------
     "tests/fixtures/": (FIXTURE, "a fixture's shape is the thing under test"),
     # -- one-offs ------------------------------------------------------------
