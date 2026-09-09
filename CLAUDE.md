@@ -75,7 +75,12 @@ things share the word *port* — never conflate them:
   **`wip/<id>-<machine>`** (the shape the K9 recovery used, `wip/k9-laptop`), never `main`;
   (3) BEFORE RELEASING someone else's `in_progress` claim back to `todo`, run
   **`git branch -r --list "wip/<id>-*"`** — a claim with a wip branch behind it is not dead, it is
-  someone's unmerged work. Evidence, twice: K9 was fully built on the laptop and never pushed, so
+  someone's unmerged work. **The check reads the REMOTE, and the LOCAL branch is deleted once the
+  merge is confirmed** (DOC7): Lane A's close already deletes the remote branch after the `--no-ff`
+  merge, so the local tracking branches are residue — `git branch -d` each one (never `-D`: the
+  refusal on an unmerged branch IS the check). Left alone they accumulate, and a bare `git branch`
+  then reads as unmerged work to the next person running this check from that machine — measured on
+  the laptop at 29 local `wip/` branches against 5 on the remote. Evidence, twice: K9 was fully built on the laptop and never pushed, so
   the desktop read claim commit `3608ae5` as a dead tip and rebuilt it (`17d9e08` on main,
   `bfb2f0b` stranded on a branch); and the C19 double-build above. What this does NOT fix: a session
   that dies before its first push stays invisible, and no convention changes that.

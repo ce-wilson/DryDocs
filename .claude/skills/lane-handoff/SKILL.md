@@ -147,7 +147,11 @@ into its first commit, then §0 as cited, then the queue.
 **6. At close, `--check`.** Exit 0: every queued item is `done` — delete the file in the closing
 commit. Exit 1: what is still open (or MISSING — re-minted since; ask the sender) — the file
 stays. B's close is push-and-report; A's close is merge `--no-ff`, delete the `wip/` branches,
-render once, snapshot once.
+render once, snapshot once. **Then B deletes its LOCAL branches (DOC7):** once the sender confirms
+the merge, `git fetch --prune` and `git branch -d` each merged `wip/` branch — never `-D`, because
+`-d` refusing an unmerged branch IS the check. A's close cleans the remote, so what is left on the
+build lane's machine is residue that reads as unmerged work to the next J31 check run there (29
+local against 5 remote when this was written).
 
 ## What this skill will not do
 
