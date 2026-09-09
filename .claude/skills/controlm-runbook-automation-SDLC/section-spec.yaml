@@ -241,8 +241,19 @@ sections:
     source: graph
     shape: prose
     fill: end_to_end_process
-    derived: "The umbrella: how many workflows the folder holds and how the\
-      \ subsections below are organized."
+    sor: [controlm-graph, conditions]
+    derived: "The umbrella, plus the two answers only an ESTATE-WIDE read can give.\
+      \ The run order within the folder — which jobs are entry points, which are\
+      \ intermediate, which is terminal, and what each waits for, naming the\
+      \ upstream JOB rather than the condition. And the downstream impact: every\
+      \ job in another folder that waits on a condition this folder raises. Every\
+      \ other section of this document looks inward at one folder; this is the only\
+      \ place the run book can say who else is late when this folder is late."
+    residue: "Consumers OUTSIDE the orchestrator — reports, extracts, downstream\
+      \ teams — do not appear in the condition graph, so an empty downstream table\
+      \ means no orchestrated consumer and not 'nothing depends on this'. The\
+      \ generated section says so in those words rather than leaving the reader to\
+      \ infer it."
 
   - anchor: etl-jobs
     heading: "Informatica ETL Jobs"

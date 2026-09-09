@@ -152,6 +152,12 @@ class FolderFacts:
     #: seven as "external" and the most useful sentence in the run book ("this
     #: waits on that job over there") would never be written.
     emitters: dict[str, tuple[str, str]] = field(default_factory=dict)
+    #: condition name -> the (folder, job) pairs that WAIT on it, estate-wide. The
+    #: mirror of `emitters`, and the one fact in this whole document that answers
+    #: "if this folder is late, who else is late" — the question a support
+    #: engineer actually has at 03:00. Nothing else here can answer it, because
+    #: every other section looks inward at one folder.
+    consumers: dict[str, list[tuple[str, str]]] = field(default_factory=dict)
     provenance: str = ""
     venue: str = ""
     missing_inputs: list[str] = field(default_factory=list)
@@ -268,6 +274,17 @@ def load_from_samples(folder_name: str, samples_dir: Path = SAMPLES_DIR) -> Fold
                 (folder_by_id.get(cond.get("folder_id", ""), ""), job.get("job_name", "")),
             )
 
+    consumers: dict[str, list[tuple[str, str]]] = {}
+    for cond in all_in:
+        job = job_by_key.get((cond.get("folder_id"), cond.get("job_id")))
+        if job:
+            pair = (folder_by_id.get(cond.get("folder_id", ""), ""), job.get("job_name", ""))
+            waiting = consumers.setdefault(cond.get("condition_name", ""), [])
+            if pair not in waiting:
+                waiting.append(pair)
+    for waiting in consumers.values():
+        waiting.sort()
+
     app_id = _app_id_from_folder_name(folder_name)
     application = None
     origin = "none — the folder name carries no application-id segment"
@@ -316,6 +333,7 @@ def load_from_samples(folder_name: str, samples_dir: Path = SAMPLES_DIR) -> Fold
         hosts=hosts,
         server=folder.get("data_center", ""),
         emitters=emitters,
+        consumers=consumers,
         provenance=f"bundled sample CSVs ({rel})",
         venue="none - the Control-M samples are tracked and read the same in any clone",
         missing_inputs=missing,
@@ -359,6 +377,14 @@ MATCH (target:ControlMFolder {sched_table: $folder})-[:CONTAINS_JOB]->(tj:Contro
 MATCH (tj)-[:REQUIRES_IN_CONDITION]->(c:Condition)
 MATCH (src:ControlMFolder)-[:CONTAINS_JOB]->(sj:ControlMJob)-[:EMITS_OUT_CONDITION]->(c)
 RETURN DISTINCT c.name AS condition_name, src.sched_table AS folder, sj.job_name AS job
+"""
+
+# The mirror: who WAITS on what this folder emits. The blast radius.
+CONSUMERS_QUERY = """
+MATCH (target:ControlMFolder {sched_table: $folder})-[:CONTAINS_JOB]->(tj:ControlMJob)
+MATCH (tj)-[:EMITS_OUT_CONDITION]->(c:Condition)
+MATCH (dst:ControlMFolder)-[:CONTAINS_JOB]->(dj:ControlMJob)-[:REQUIRES_IN_CONDITION]->(c)
+RETURN DISTINCT c.name AS condition_name, dst.sched_table AS folder, dj.job_name AS job
 """
 
 # The attribution edge lands on the application's BATCH PORT, never on the
@@ -420,6 +446,15 @@ def load_from_graph(client, folder_name: str, venue: str) -> FolderFacts:
     for row in client.run(EMITTERS_QUERY, {"folder": folder_name}):
         emitters.setdefault(row["condition_name"], (row["folder"] or "", row["job"] or ""))
 
+    consumers: dict[str, list[tuple[str, str]]] = {}
+    for row in client.run(CONSUMERS_QUERY, {"folder": folder_name}):
+        pair = (row["folder"] or "", row["job"] or "")
+        waiting = consumers.setdefault(row["condition_name"], [])
+        if pair not in waiting:
+            waiting.append(pair)
+    for waiting in consumers.values():
+        waiting.sort()
+
     application = None
     origin = "none"
     app_rows = client.run(APPLICATION_QUERY, {"folder": folder_name})
@@ -470,6 +505,7 @@ def load_from_graph(client, folder_name: str, venue: str) -> FolderFacts:
         hosts=hosts,
         server=str(server),
         emitters=emitters,
+        consumers=consumers,
         provenance="DryDocs graph",
         venue=venue,
     )
@@ -695,13 +731,71 @@ def _r_archival(spec: dict, facts: FolderFacts, meta: dict) -> str:
 
 
 def _r_end_to_end(spec: dict, facts: FolderFacts, meta: dict) -> str:
-    return (
+    """The umbrella, plus the two things only an estate-wide read can say.
+
+    The subsections below all look INWARD at one folder. This section is the only
+    place the run book can answer "what has to finish before we start" and "who is
+    late if we are late", and both are derivable from the condition graph. A Tier 2
+    engineer opens a run book at 03:00 with a failed job; the run order and the
+    blast radius are the two things they need before anything else in the document
+    is useful.
+    """
+    order_rows = []
+    for job in facts.jobs:
+        waits = facts.conditions_for(job.get("job_id", ""))
+        upstream = []
+        for wait in waits:
+            emitter = facts.emitted_by(wait["condition_name"])
+            upstream.append(emitter or f"`{wait['condition_name']}` (no emitter in the estate)")
+        role = "terminal" if (job.get("end_folder") or "").upper() == "Y" else ""
+        if not waits:
+            role = ("entry point, " + role).strip(", ") if role else "entry point"
+        order_rows.append(
+            [
+                str(job.get("job_order") or ""),
+                job.get("job_name", ""),
+                role or "intermediate",
+                "; ".join(upstream) if upstream else "nothing — starts on its own schedule",
+            ]
+        )
+
+    blast_rows = []
+    for cond in facts.conditions_out:
+        name = cond.get("condition_name", "")
+        for folder, job in facts.consumers.get(name, []):
+            if folder != facts.folder_name:
+                blast_rows.append([f"`{name}`", f"`{folder}`", job])
+    blast_rows.sort()
+
+    parts = [
         f"This folder holds **{len(facts.jobs)} job(s)** and "
         f"**{len(facts.scripts())} distinct command line(s)**. The subsections below cover the "
         "scheduled workflows, the adhoc workflows, the shell scripts they invoke, the servers "
         "they run on, how they obtain credentials, and where the authoritative Control-M "
-        "definition lives."
-    )
+        "definition lives.",
+        "",
+        "**Run order within this folder**",
+        "",
+        table(["Order", "Job", "Role", "Waits for"], order_rows),
+        "",
+        "**Downstream impact — what waits on this folder**",
+        "",
+    ]
+    if blast_rows:
+        parts += [
+            table(["Condition raised here", "Waiting folder", "Waiting job"], blast_rows),
+            "",
+            "_If this folder is late, the jobs above are late. This is the blast radius the "
+            "condition graph can prove; consumers outside Control-M (reports, extracts, "
+            "downstream teams) are SME capture._",
+        ]
+    else:
+        parts.append(
+            "No job anywhere in the ingested estate waits on a condition this folder raises. "
+            "That means no ORCHESTRATED consumer — it does not mean nothing depends on this "
+            "data. Downstream reports, extracts and teams are SME capture."
+        )
+    return "\n".join(parts)
 
 
 def _r_etl_jobs(spec: dict, facts: FolderFacts, meta: dict) -> str:
