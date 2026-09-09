@@ -105,7 +105,8 @@ is the file named, not this skill:
 
 | Section family | Cited authority |
 |---|---|
-| Folder, jobs, descriptions, owners, command lines | the `-excel` SKILL.md column map + the `ingest-controlm` graph |
+| Folder, jobs, descriptions, owners | the `-excel` SKILL.md column map + the `ingest-controlm` graph |
+| What a job LAUNCHES — script, jar, parameter file | `drydocs_core.orchestration.controlm.parse_command`, the repo's own parser, called rather than re-implemented. The folder-set profiler and the lineage inventory extractor call the same function, which is why this run book and the workbook cannot print different script paths for one folder |
 | Folder → application attribution | the `-excel` map's SEAL row; the edge lands on the application's **batch port**, folder grain, never job grain |
 | Ownership and escalation contacts | the SEAL role-attribution chain (the `-excel` map's escalation row covers the queue/DL half, which this skill does **not** re-derive) |
 | Conditions and job-to-job dependencies | the BMC baseline's condition grammar |

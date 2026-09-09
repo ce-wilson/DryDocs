@@ -304,6 +304,73 @@ def test_the_skill_md_coverage_sentence_matches_the_spec(spec: dict) -> None:
     assert stated_na == na, f"SKILL.md says {stated_na} N/A sections, the spec has {na}"
 
 
+def test_command_facts_come_from_the_shared_parser_at_production_shapes(
+    generator, clone_samples: Path
+) -> None:
+    """The anti-duplication clause, made testable at values the samples do not have.
+
+    Every bundled `cmd_line` is a bare path with no arguments, so a string slice
+    and the shared parser agree on all of them — which is exactly why a guard
+    built only on the samples would never notice the difference. These two shapes
+    are the ones production uses (a wrapper script with arguments, and the
+    `dt-launcher` jar the sibling's own spec uses as its example), and on them a
+    slice gets four things wrong at once.
+    """
+    facts = generator.load_from_samples("PRARAG-HLDM-70002-PEX-RFND-DLY", samples_dir=clone_samples)
+    facts.jobs[0]["cmd_line"] = "sh /home/ops/scripts/run_wrapper.ksh job_a.pset {ODATE},1,Y,NO"
+    facts.jobs[1]["cmd_line"] = (
+        "java -jar /apps/etl/dt-accelerators/dt-launcher-current.jar "
+        "-c /apps/etl/tenants/cfg/70004-epv-conf.json"
+    )
+
+    by_target = {fact.target: fact for fact in facts.commands()}
+    # 1 — the script is the SCRIPT, not the whole argv
+    assert "/home/ops/scripts/run_wrapper.ksh" in by_target
+    # 2 — the jar is the target; the java verb is not
+    assert "/apps/etl/dt-accelerators/dt-launcher-current.jar" in by_target
+    # 3 — the parameter file lands in the field named for it, from either shape
+    assert by_target["/home/ops/scripts/run_wrapper.ksh"].config_path == "job_a.pset"
+    assert (
+        by_target["/apps/etl/dt-accelerators/dt-launcher-current.jar"].config_path
+        == "/apps/etl/tenants/cfg/70004-epv-conf.json"
+    )
+    # 4 — the directory is the artifact's, never the shell verb's, and never the
+    #     config's for a jar launch
+    assert facts.script_directories() == [
+        "/apps/etl/dt-accelerators",
+        "/home/ops/scripts",
+    ]
+    # and the kinds come from the parser, not from a suffix test
+    assert by_target["/home/ops/scripts/run_wrapper.ksh"].kind == "SHELL_SCRIPT"
+    assert [fact.target for fact in facts.shell_scripts()] == ["/home/ops/scripts/run_wrapper.ksh"]
+
+
+def test_one_script_invoked_by_two_jobs_is_one_row_with_two_callers(
+    generator, clone_samples: Path
+) -> None:
+    """The fan-out the folder-set profiler measures, not two look-alike scripts."""
+    facts = generator.load_from_samples("PRARAG-HLDM-70002-PEX-RFND-DLY", samples_dir=clone_samples)
+    shared = "/home/ops/scripts/run_wrapper.ksh"
+    facts.jobs[0]["cmd_line"] = f"{shared} first.pset"
+    facts.jobs[1]["cmd_line"] = f"{shared} second.pset"
+    scripts = facts.shell_scripts()
+    assert len(scripts) == 1, f"one wrapper, two argument sets, {len(scripts)} rows"
+    assert len(scripts[0].jobs) == 2, "both invoking jobs must be named on the row"
+
+
+def test_a_condition_with_two_emitters_names_both(generator, clone_samples: Path) -> None:
+    """Naming only the first sends a reader chasing a late upstream to the wrong job.
+
+    The bundled estate has this case for real: one condition name is raised from
+    two different folders.
+    """
+    facts = generator.load_from_samples("PRARAG-HLDM-70002-PEX-RFND-DLY", samples_dir=clone_samples)
+    multi = [name for name, raising in facts.emitters.items() if len(raising) > 1]
+    assert multi, "the bundled estate is expected to contain a multi-emitter condition"
+    rendered = facts.emitted_by(multi[0])
+    assert " or " in rendered, f"only one emitter named for {multi[0]}: {rendered}"
+
+
 def test_every_na_section_carries_a_reason(spec: dict) -> None:
     """`N/A` on its own is an omission; `N/A — <reason>` is an answer."""
     for section in spec["sections"]:

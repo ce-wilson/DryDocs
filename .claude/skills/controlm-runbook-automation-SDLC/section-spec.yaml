@@ -119,10 +119,18 @@ sor_citations:
   cmd-line:
     cite: ".claude/skills/controlm-runbook-automation-excel/SKILL.md — column map row\
       \ 'Command line, script/jar, param files'"
-    detail: "The job's cmd_line property, and behind it the cmd-line staging store\
-      \ (export -> resolve -> parse). This spec reads only the cmd_line string that\
-      \ ingest-controlm already carries; the resolved-argument grain is the -excel\
-      \ skill's and the lineage chain's, and is cited rather than re-queried."
+    detail: "The job's cmd_line property, PARSED by drydocs_core.orchestration\
+      \ .controlm.parse_command — the repo's own command parser, the same one the\
+      \ folder-set profiler and the lineage inventory extractor call. That shared\
+      \ call is the SHARED half of the sibling clause and it is not decorative: a\
+      \ string slice of cmd_line agrees with the parser only while every command\
+      \ line is a bare path, which is true of the bundled sample and false in\
+      \ production. `sh /path/run.ksh a.pset {ODATE}` sliced gives a script name\
+      \ that is the whole argv and a 'directory' of `sh /path`; parsed it gives\
+      \ target, config_path and invocation_type. Two skills printing different\
+      \ script paths for one folder is precisely what the clause forbids.\
+      \ The RESOLVED-argument grain behind it (export -> resolve -> parse staging)\
+      \ stays the -excel skill's and the lineage chain's, cited and not re-queried."
   excel-workbook:
     cite: ".claude/skills/controlm-runbook-automation-excel/"
     detail: "The 2-tab folder-grain Excel runbook. Its 'Control M Job details' tab\

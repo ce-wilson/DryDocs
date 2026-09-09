@@ -66,7 +66,7 @@ import argparse
 import re
 import sys
 from dataclasses import dataclass, field
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 REPO = Path(__file__).resolve().parents[3]
 if str(REPO) not in sys.path:
@@ -79,8 +79,10 @@ from drydocs_core.adapters.csv_adapter import CsvAdapter  # noqa: E402
 from drydocs_core.entity_extract import extract_entities  # noqa: E402
 from drydocs_core.orchestration.controlm import (  # noqa: E402
     ParsedFolderName,
+    parse_command,
     parse_folder_name,
 )
+from drydocs_core.orchestration.shell import Invocation  # noqa: E402
 
 HERE = Path(__file__).parent
 SPEC_PATH = HERE / "section-spec.yaml"
@@ -121,11 +123,45 @@ UNKNOWN = "_not captured_"
 #: are the SME's to supply.
 CAPTURE_ROW_NOTE = "_SME capture — no ingested system of record; see the marker above._"
 
-#: A Control-M command line is not always a script. These two families are what
-#: the bundled sample actually contains, measured; anything else is reported as
-#: unclassified rather than filed under a heading it does not belong to.
-SHELL_SUFFIXES = (".ksh", ".sh", ".bash", ".csh")
+#: Parameter-file extensions, used ONLY to pick a parameter file out of an
+#: invocation's arguments when the parser did not identify a config path itself.
+#: The invocation KIND comes from the parser, never from a suffix.
 PARAM_SUFFIXES = (".pset", ".prm", ".param", ".parm")
+
+
+@dataclass
+class CommandFact:
+    """One launched artifact, with every job in this folder that launches it.
+
+    Keyed on the parser's ``target`` rather than on the raw command line, so one
+    wrapper script called by four jobs with four argument sets is ONE row with
+    four callers — the fan-out the folder-set profiler measures — instead of four
+    rows that look like four different scripts.
+    """
+
+    target: str
+    kind: str
+    config_path: str | None
+    raw: str
+    jobs: list[str] = field(default_factory=list)
+
+
+def _parameter_file(inv: Invocation) -> str | None:
+    """The parameter file this invocation uses, if it names one.
+
+    The parser's ``config_path`` first — it is the field that answers the
+    question. Falling back to the target and then the arguments covers the two
+    shapes the bundled sample and the sibling's own example use: a parameter set
+    invoked directly, and one passed as an argument to a wrapper script.
+    """
+    if inv.config_path:
+        return inv.config_path
+    if inv.target.endswith(PARAM_SUFFIXES):
+        return inv.target
+    for arg in inv.args:
+        if arg.endswith(PARAM_SUFFIXES):
+            return arg
+    return None
 
 
 # --------------------------------------------------------------------------
@@ -184,36 +220,90 @@ class FolderFacts:
         stamps = [str(s)[:10] for s in stamps if s]
         return max(stamps) if stamps else UNKNOWN
 
-    def scripts(self) -> list[tuple[str, str]]:
-        """(command-line path, invoking job name) pairs, ordered, de-duplicated."""
-        seen: dict[str, str] = {}
-        for job in self.jobs:
-            cmd = (job.get("cmd_line") or "").strip()
-            if cmd and cmd not in seen:
-                seen[cmd] = job.get("job_name", "")
-        return sorted(seen.items())
+    def commands(self) -> list[CommandFact]:
+        """What each job actually LAUNCHES, through the repo's own command parser.
 
-    def shell_scripts(self) -> list[tuple[str, str]]:
-        """Only the command lines that are SHELL SCRIPTS.
+        Not a string slice of `cmd_line`. `drydocs_core.orchestration.controlm`
+        exports `parse_command`, the same parser the folder-set profiler and the
+        lineage inventory extractor use, and it is the reason this run book and
+        the `-excel` workbook cannot print different script paths for one folder.
 
-        Section 6.3 is titled "UNIX Shell Scripts" and the outline asks for
-        "every .ksh invoked from Informatica workflows or Control-M". A Control-M
-        command line is not always a script: in the bundled sample, 10 of the 16
-        distinct command lines are Informatica parameter sets (`.pset`) and 6 are
-        `.ksh`. Listing a parameter set under "Unix Script Name" would put a value
-        in the wrong column — which is the failure mode a run book can least
-        afford, because the reader has no way to tell it happened.
+        Slicing the raw string agrees with the parser on the bundled sample only
+        because every sample command line is a bare path with no arguments. At
+        production shapes it stops agreeing, in four ways at once, and every one
+        of them is a wrong value in a column a reader trusts:
+
+            sh /path/run_wrapper.ksh pex_calctot.pset {ODATE},1,Y,NO
+            java -jar /apps/.../dt-launcher-current.jar -c /apps/.../conf.json
+
+        the whole argv would be printed as the script name; the shell verb would
+        become part of the "scripts location" directory; one wrapper invoked by
+        two jobs would render as two different scripts rather than one with two
+        callers; and the parameter file would be buried in the argv instead of
+        landing in the row named for it. The parser answers all four —
+        `target`, `config_path`, `invocation_type` — so this reads the parser.
         """
-        return [(cmd, job) for cmd, job in self.scripts() if cmd.endswith(SHELL_SUFFIXES)]
+        by_target: dict[str, CommandFact] = {}
+        for job in self.jobs:
+            raw = (job.get("cmd_line") or "").strip()
+            if not raw:
+                continue
+            job_name = job.get("job_name", "")
+            parsed = parse_command(raw)
+            if not parsed.invocations:
+                # Nothing the parser recognized. Reported, never dropped.
+                fact = by_target.setdefault(
+                    raw, CommandFact(target=raw, kind="UNPARSED", config_path=None, raw=raw)
+                )
+                if job_name not in fact.jobs:
+                    fact.jobs.append(job_name)
+                continue
+            for inv in parsed.invocations:
+                fact = by_target.setdefault(
+                    inv.target,
+                    CommandFact(
+                        target=inv.target,
+                        kind=inv.invocation_type,
+                        config_path=_parameter_file(inv),
+                        raw=raw,
+                    ),
+                )
+                if job_name not in fact.jobs:
+                    fact.jobs.append(job_name)
+        for fact in by_target.values():
+            fact.jobs.sort()
+        return sorted(by_target.values(), key=lambda f: f.target)
 
-    def parameter_files(self) -> list[tuple[str, str]]:
-        """The command lines that are parameter sets rather than scripts."""
-        return [(cmd, job) for cmd, job in self.scripts() if cmd.endswith(PARAM_SUFFIXES)]
+    def shell_scripts(self) -> list[CommandFact]:
+        """The SHELL SCRIPT launches. Section 6.3's subject, and only that.
 
-    def unclassified_commands(self) -> list[tuple[str, str]]:
-        """Command lines that are neither — reported rather than silently dropped."""
-        known = set(self.shell_scripts()) | set(self.parameter_files())
-        return [pair for pair in self.scripts() if pair not in known]
+        The outline asks 6.3 for "every .ksh invoked from Informatica workflows or
+        Control-M". A Control-M command line is not always a script: measured on
+        the bundled sample, 10 of the 16 distinct command lines are Informatica
+        parameter sets and 6 are shell scripts. The classification is the parser's
+        `invocation_type`, not a suffix test, so a wrapper invoked as
+        `sh /path/x.ksh ...` classifies correctly and a `.ksh` argument to
+        something else does not.
+        """
+        return [fact for fact in self.commands() if fact.kind == "SHELL_SCRIPT"]
+
+    def non_shell_commands(self) -> list[CommandFact]:
+        """Everything else the folder launches, kept so nothing is dropped."""
+        return [fact for fact in self.commands() if fact.kind != "SHELL_SCRIPT"]
+
+    def script_directories(self) -> list[str]:
+        """The directories the launched artifacts live in — parents of TARGETS.
+
+        Of the target, never of the raw command line: `Path(raw).parent` on
+        `sh /home/x/run.ksh a b` yields `sh /home/x`, which is presented to a
+        reader as a directory and is not one.
+        """
+        dirs = {
+            PurePosixPath(fact.target).parent.as_posix()
+            for fact in self.commands()
+            if fact.target.startswith("/")
+        }
+        return sorted(dirs)
 
     def conditions_for(self, job_id: str) -> list[dict[str, str]]:
         """This job's IN conditions, ordered as Control-M orders them.
@@ -729,7 +819,7 @@ def _coverage_table(facts: FolderFacts, meta: dict) -> str:
             f"**{meta['empty_table_sections']}**",
         ],
         ["Jobs in this folder's bundle", str(len(facts.jobs))],
-        ["Distinct command lines", str(len(facts.scripts()))],
+        ["Distinct launched artifacts", str(len(facts.commands()))],
         ["IN / OUT conditions", f"{len(facts.conditions_in)} / {len(facts.conditions_out)}"],
         ["Ownership contacts resolved", str(len(facts.contacts))],
         ["Application attribution", facts.app_id_origin],
@@ -902,7 +992,7 @@ def _r_end_to_end(spec: dict, facts: FolderFacts, meta: dict) -> str:
 
     parts = [
         f"This folder holds **{len(facts.jobs)} job(s)** and "
-        f"**{len(facts.scripts())} distinct command line(s)**. The subsections below cover the "
+        f"**{len(facts.commands())} distinct launched artifact(s)**. The subsections below cover "
         "scheduled workflows, the adhoc workflows, the shell scripts they invoke, the servers "
         "they run on, how they obtain credentials, and where the authoritative Control-M "
         "definition lives.",
@@ -931,15 +1021,21 @@ def _r_end_to_end(spec: dict, facts: FolderFacts, meta: dict) -> str:
     return "\n".join(parts)
 
 
-def _param_file_cell(cmd: str) -> str:
-    """The Param File Path value, saying what the command line actually is."""
-    if cmd == UNKNOWN:
+def _param_file_cell(facts: FolderFacts, job: dict[str, str]) -> str:
+    """The Param File Path value for one job, from the shared parser's answer.
+
+    The parser reports a `config_path` where the invocation names one; where it
+    does not, the row says so rather than printing the whole command line under a
+    label that claims it is a parameter file.
+    """
+    raw = (job.get("cmd_line") or "").strip()
+    if not raw:
         return UNKNOWN
-    if cmd.endswith(PARAM_SUFFIXES):
-        return f"`{cmd}`"
-    if cmd.endswith(SHELL_SUFFIXES):
-        return f"`{cmd}` — a shell script, not a parameter set; see section 6.3"
-    return f"`{cmd}` — command line of an unrecognized kind"
+    named = [fact.config_path for fact in facts.commands() if job.get("job_name") in fact.jobs]
+    found = sorted({path for path in named if path})
+    if found:
+        return ", ".join(f"`{path}`" for path in found)
+    return f"{UNKNOWN} — the command line `{raw}` names no parameter file"
 
 
 def _r_etl_jobs(spec: dict, facts: FolderFacts, meta: dict) -> str:
@@ -959,14 +1055,13 @@ def _r_etl_jobs(spec: dict, facts: FolderFacts, meta: dict) -> str:
         "",
     ]
     for job in facts.jobs:
-        cmd = job.get("cmd_line", "") or UNKNOWN
         header_values = {
             "Control-M job name": job.get("job_name", ""),
             "Schedule Information": UNKNOWN,
             # The outline mandates this row's LABEL, and a Control-M command line
             # is not always a parameter file. Print what it actually is rather
             # than letting the mandated label assert something about the value.
-            "Param File Path": _param_file_cell(cmd),
+            "Param File Path": _param_file_cell(facts, job),
             "Src Schema/DB": UNKNOWN,
             "Stg Schema/DB": UNKNOWN,
             "Target Schema/DB": UNKNOWN,
@@ -1019,33 +1114,41 @@ def _r_etl_adhoc(spec: dict, facts: FolderFacts, meta: dict) -> str:
 
 def _r_unix_scripts(spec: dict, facts: FolderFacts, meta: dict) -> str:
     rows = [
-        [f"`{cmd}`", UNKNOWN, f"{job} (scheduled in Control-M)"]
-        for cmd, job in facts.shell_scripts()
+        [
+            f"`{fact.target}`",
+            UNKNOWN,
+            "; ".join(fact.jobs) + " (scheduled in Control-M)",
+        ]
+        for fact in facts.shell_scripts()
     ]
     parts = [table(spec["columns"], rows)]
     if not rows:
         parts += [
             "",
-            "No job in this folder runs a shell script directly — every command line is an "
-            "Informatica parameter set, listed with its workflow in section 6.1.",
+            "No job in this folder launches a shell script — see the table below for what it "
+            "does launch.",
         ]
-    params = facts.parameter_files()
-    if params:
+    others = facts.non_shell_commands()
+    if others:
+        by_kind: dict[str, list[str]] = {}
+        for fact in others:
+            by_kind.setdefault(fact.kind, []).append(fact.target)
         parts += [
             "",
-            f"_{len(params)} further command line(s) in this folder are Informatica parameter "
-            "sets rather than scripts; they appear as **Param File Path** in the per-workflow "
-            "blocks of section 6.1. A parameter set under 'Unix Script Name' would be a value "
-            "in the wrong column._",
-        ]
-    unclassified = facts.unclassified_commands()
-    if unclassified:
-        parts += [
+            "**Not shell scripts — what else this folder launches**",
             "",
-            "_Command line(s) that are neither a known shell-script nor a known parameter-set "
-            "extension, reported rather than filed under a heading they may not belong to: "
-            + ", ".join(f"`{cmd}`" for cmd, _ in unclassified)
-            + "._",
+            table(
+                ["Launch kind", "Artifacts"],
+                [
+                    [kind, ", ".join(f"`{t}`" for t in sorted(targets))]
+                    for kind, targets in sorted(by_kind.items())
+                ],
+            ),
+            "",
+            "_Classified by the shared command parser, not by file extension. They are listed "
+            "here rather than dropped, and their parameter files appear as **Param File Path** "
+            "in the per-workflow blocks of section 6.1 — a parameter set under 'Unix Script "
+            "Name' would be a value in the wrong column._",
         ]
     parts += [
         "",
@@ -1077,7 +1180,7 @@ def _r_password_scripts(spec: dict, facts: FolderFacts, meta: dict) -> str:
         [
             "**Vault function call per script**",
             "",
-            table(spec["columns"], [[f"`{cmd}`", UNKNOWN] for cmd, _ in facts.shell_scripts()]),
+            table(spec["columns"], [[f"`{f.target}`", UNKNOWN] for f in facts.shell_scripts()]),
             "",
             "**Safe details**",
             "",
@@ -1213,7 +1316,7 @@ def _r_application_login_ids(spec: dict, facts: FolderFacts, meta: dict) -> str:
 def _r_directory_configuration(spec: dict, facts: FolderFacts, meta: dict) -> str:
     owners = sorted({j.get("owner", "") for j in facts.jobs if j.get("owner")})
     owner = owners[0] if len(owners) == 1 else (", ".join(owners) or UNKNOWN)
-    dirs = sorted({str(Path(cmd).parent).replace("\\", "/") for cmd, _ in facts.scripts()})
+    dirs = facts.script_directories()
     rows = [["Scripts location", f"`{d}`", owner] for d in dirs]
     for component in (
         "ETL repository details",
@@ -1517,7 +1620,7 @@ def _coverage_report(facts: FolderFacts, spec: dict) -> str:
         f"provenance  : {facts.provenance}",
         f"venue       : {facts.venue}",
         f"jobs        : {len(facts.jobs)}",
-        f"scripts     : {len(facts.scripts())}",
+        f"artifacts   : {len(facts.commands())} ({len(facts.shell_scripts())} shell script(s))",
         f"conditions  : {len(facts.conditions_in)} in / {len(facts.conditions_out)} out",
         f"contacts    : {len(facts.contacts)}",
         f"attribution : {facts.app_id_origin}",
