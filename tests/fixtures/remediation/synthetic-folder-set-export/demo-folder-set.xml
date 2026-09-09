@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  REM2 — a synthetic Control-M definition export for `drydocs profile-folder-set`.
+
+  SYNTHETIC THROUGHOUT, and deliberately so: invented FIDs, example.invalid
+  addresses, /apps/synth and /data/synth paths, and application ids from the
+  reserved 70001-70099 block (70004 and 70005 here — the demo folder samples
+  use 70001-70003, so the block read stays true and the values cannot collide).
+  Nothing is copied from an estate. The J15 lesson applies at the value level:
+  a real id hides inside a folder-name string, which is why the ids appear in
+  the folder names on purpose, in the reserved block.
+
+  READABLE, NOT REPRESENTATIVE. A real folder set has hundreds of jobs and each
+  job carries a dozen defects at once. This one is 3 folders and 12 jobs, and
+  each job is here to produce ONE named finding so a reader can hold the report
+  and the export side by side. The required declaration sets are hoisted to
+  folder scope for the same reason: without that, R32 alone fires 40+ times and
+  buries everything else.
+
+  WHAT EACH JOB IS FOR — one line each, rule ids as the detectors emit them
+  (drydocs_remediation.detect.CONFORMANCE_RULE_IDS, plus R1 from the M0 pass):
+
+    JOB0010_DEMO_R30_R31   R30 references %%MISSING_MAPPING, declared nowhere
+                           R31 declares %%ORPHAN_FLAG and references it nowhere
+    JOB0020_DEMO_R33_R34   R33 carries -pipeline as a literal AND declares PIPELINE_ID
+                           R34 declares DS_VER 'v2', which the contract says is dotted-numeric
+                           R31 PIPELINE_ID is also an orphan, and that is the POINT of
+                               R33: the command already carries the fact as a literal,
+                               so the declared variable is referenced by nothing
+    JOB0030_DEMO_R37_R38   R37 command places two %% references side by side
+                           R38 declares %%RUN-DATE, and '-' is forbidden in a user name
+                           R30 + R31 ride along, and they are the REASON R38 is must-fix
+                               rather than cosmetic: a reference stops at the illegal
+                               character, so `%%RUN-DATE` reads as a reference to
+                               undeclared %%RUN (R30) and leaves RUN-DATE itself
+                               referenced by nothing (R31). The name is not just
+                               against the standard; it cannot be used
+    JOB0040_DEMO_R41       R41 declares %%ENVCODE twice in one job with different values
+    JOB0050_DEMO_R35_A     R35 (with the next job) same name+value at JOB scope on both
+    JOB0060_DEMO_R35_B     R35 the other half of the hoistable pair
+    JOB0070_DEMO_R1_R2     R1  %%DELIM's value is pure punctuation (dot-smuggling)
+                           R2  declares %%ds_name, a case drift from canonical DS_NAME
+    JOB0110_DEMO_FEED_DAT  R39b a DAT watcher that cats the data file it watched
+    JOB0120_DEMO_FEED_TOK  R39a a TOK watcher that does NOT cat the file it watched
+    JOB0130_DEMO_FEED_CTL  (none) the compliant control — a CTL watcher that cats correctly
+    JOB0210_LEGACY_R40     R40 emits DOMAIL
+                           R32 folder scope declares three of the four command
+                               requirements, so ETL_ARTIFACT_KIND is missing here
+                               and on the next job — the only R32 in the set
+                           R44 one authored CREATED_BY spans this job and the next.
+                               The finding TARGETS this job because it is the first
+                               of the pair, and its message names both
+    JOB0220_LEGACY_R44     R32 the other half of the missing requirement. Its name
+                               says R44 because it is the second job R44 needs; the
+                               R44 finding itself reports against JOB0210
+
+  And two findings belong to the SET rather than to any job:
+
+    R36  the sub-folder declares the same file as a path and as a basename
+    R42  PRSYNG_REM2_70005_LEGACY separates its fields with '_' while its two
+         siblings use '-', so a positional parse returns a different field COUNT
+         per folder and silently reads the wrong field
+
+  The XML contract this is written against is the one stated in
+  drydocs_lineage/extractors/controlm_xml.py — DEFTABLE root, FOLDER /
+  SMART_FOLDER, SUB_FOLDER, JOB, VARIABLE, document order as the contract.
+-->
+<DEFTABLE>
+
+  <!-- =====================================================================
+       Folder 1 — the command jobs. The four command requirements (R32) are
+       declared at folder scope, so every R32 the report shows comes from
+       folder 3 and is there on purpose.
+       ===================================================================== -->
+  <SMART_FOLDER DATACENTER="T032-E0700-DMA" FOLDER_NAME="PRSYNG-REM2-70004-DEMO-DLY"
+                DESCRIPTION="delivery: batch | support_dl: l2_support@example.invalid">
+    <VARIABLE NAME="%%FID" VALUE="fid.synth.rem2"/>
+    <VARIABLE NAME="%%SEAL" VALUE="70004"/>
+    <VARIABLE NAME="%%LAUNCHER_SCRIPT_PATH" VALUE="/apps/synth/bin/generic_wrapper.ksh"/>
+    <VARIABLE NAME="%%ETL_PLATFORM" VALUE="informatica"/>
+    <VARIABLE NAME="%%ETL_ARTIFACT_URI" VALUE="/apps/synth/etl/rem2_demo.xml"/>
+    <VARIABLE NAME="%%ETL_ARTIFACT_KIND" VALUE="mapping"/>
+    <VARIABLE NAME="%%EMAIL_DL_L2" VALUE="l2_support@example.invalid"/>
+
+    <SUB_FOLDER FOLDER_NAME="DEMO_DATASET">
+      <VARIABLE NAME="%%DS_NAME" VALUE="demo_dataset"/>
+      <!-- R36: the same file written twice, as a path and as a basename. At
+           SUB_FOLDER scope rather than on a job, so it reads as the set-level
+           defect it is and does not also count as a job orphan (R31). -->
+      <VARIABLE NAME="%%DAT_FILE" VALUE="/data/synth/in/demo_dataset.dat"/>
+      <VARIABLE NAME="%%DAT_FILE_NM" VALUE="demo_dataset.dat"/>
+
+      <JOB JOBNAME="JOB0010_DEMO_R30_R31" TASKTYPE="Command"
+           APPLICATION="SYNTHREM" RUN_AS="svc.synth.rem"
+           CMDLINE="%%LAUNCHER_SCRIPT_PATH -m %%MISSING_MAPPING">
+        <VARIABLE NAME="%%ORPHAN_FLAG" VALUE="unused"/>
+      </JOB>
+
+      <JOB JOBNAME="JOB0020_DEMO_R33_R34" TASKTYPE="Command"
+           APPLICATION="SYNTHREM" RUN_AS="svc.synth.rem"
+           CMDLINE="%%LAUNCHER_SCRIPT_PATH -pipeline 3f2a1b4c-5d6e-4f70-8a9b-0c1d2e3f4a5b -v %%DS_VER">
+        <VARIABLE NAME="%%PIPELINE_ID" VALUE="3f2a1b4c-5d6e-4f70-8a9b-0c1d2e3f4a5b"/>
+        <VARIABLE NAME="%%DS_VER" VALUE="v2"/>
+      </JOB>
+
+      <JOB JOBNAME="JOB0030_DEMO_R37_R38" TASKTYPE="Command"
+           APPLICATION="SYNTHREM" RUN_AS="svc.synth.rem"
+           CMDLINE="%%LAUNCHER_SCRIPT_PATH -f %%FILE_PREFIX%%FILE_EXTENSION -d %%RUN-DATE">
+        <VARIABLE NAME="%%FILE_PREFIX" VALUE="demo_dataset"/>
+        <VARIABLE NAME="%%FILE_EXTENSION" VALUE=".csv"/>
+        <VARIABLE NAME="%%RUN-DATE" VALUE="20260909"/>
+      </JOB>
+
+      <JOB JOBNAME="JOB0040_DEMO_R41" TASKTYPE="Command"
+           APPLICATION="SYNTHREM" RUN_AS="svc.synth.rem"
+           CMDLINE="%%LAUNCHER_SCRIPT_PATH -e %%ENVCODE">
+        <VARIABLE NAME="%%ENVCODE" VALUE="prod"/>
+        <VARIABLE NAME="%%ENVCODE" VALUE="uat"/>
+      </JOB>
+
+      <JOB JOBNAME="JOB0050_DEMO_R35_A" TASKTYPE="Command"
+           APPLICATION="SYNTHREM" RUN_AS="svc.synth.rem"
+           CMDLINE="%%LAUNCHER_SCRIPT_PATH -w %%BATCH_WINDOW">
+        <VARIABLE NAME="%%BATCH_WINDOW" VALUE="0200-0400"/>
+      </JOB>
+
+      <JOB JOBNAME="JOB0060_DEMO_R35_B" TASKTYPE="Command"
+           APPLICATION="SYNTHREM" RUN_AS="svc.synth.rem"
+           CMDLINE="%%LAUNCHER_SCRIPT_PATH -w %%BATCH_WINDOW">
+        <VARIABLE NAME="%%BATCH_WINDOW" VALUE="0200-0400"/>
+      </JOB>
+
+      <JOB JOBNAME="JOB0070_DEMO_R1_R2" TASKTYPE="Command"
+           APPLICATION="SYNTHREM" RUN_AS="svc.synth.rem"
+           CMDLINE="%%LAUNCHER_SCRIPT_PATH -o %%ds_name --sep %%DELIM">
+        <VARIABLE NAME="%%DELIM" VALUE="."/>
+        <VARIABLE NAME="%%ds_name" VALUE="demo_dataset"/>
+      </JOB>
+    </SUB_FOLDER>
+  </SMART_FOLDER>
+
+  <!-- =====================================================================
+       Folder 2 — the FileWatcher trio, and the only place the two-clause
+       post-exec rule can be shown: a DAT that must NOT be cat'd, a TOK that
+       must be, and a CTL doing it correctly as the control.
+       ===================================================================== -->
+  <SMART_FOLDER DATACENTER="T032-E0700-DMA" FOLDER_NAME="PRSYNG-REM2-70004-DEMO-WKLY"
+                DESCRIPTION="delivery: mft | support_dl: l2_support@example.invalid">
+    <VARIABLE NAME="%%FID" VALUE="fid.synth.rem2"/>
+    <VARIABLE NAME="%%SEAL" VALUE="70004"/>
+
+    <SUB_FOLDER FOLDER_NAME="DEMO_FEED">
+      <VARIABLE NAME="%%FILE_DIR" VALUE="/data/synth/in"/>
+      <VARIABLE NAME="%%FILE_PREFIX" VALUE="demo_feed"/>
+      <VARIABLE NAME="%%FILE_BUSINESS_DATE" VALUE="%%$ODATE"/>
+
+      <JOB JOBNAME="JOB0110_DEMO_FEED_DAT" TASKTYPE="FileWatcher"
+           APPLICATION="SYNTHREM" RUN_AS="ctm.platform.acct"
+           FILE_PATH="/data/synth/in/demo_feed.dat"
+           POSTCMD="cat /data/synth/in/demo_feed.dat">
+        <VARIABLE NAME="%%FILE_EXTENSION" VALUE=".dat"/>
+      </JOB>
+
+      <JOB JOBNAME="JOB0120_DEMO_FEED_TOK" TASKTYPE="FileWatcher"
+           APPLICATION="SYNTHREM" RUN_AS="ctm.platform.acct"
+           FILE_PATH="/data/synth/in/demo_feed.tok">
+        <VARIABLE NAME="%%FILE_EXTENSION" VALUE=".tok"/>
+      </JOB>
+
+      <JOB JOBNAME="JOB0130_DEMO_FEED_CTL" TASKTYPE="FileWatcher"
+           APPLICATION="SYNTHREM" RUN_AS="ctm.platform.acct"
+           FILE_PATH="/data/synth/in/demo_feed.ctl"
+           POSTCMD="cat /data/synth/in/demo_feed.ctl">
+        <VARIABLE NAME="%%FILE_EXTENSION" VALUE=".ctl"/>
+      </JOB>
+    </SUB_FOLDER>
+  </SMART_FOLDER>
+
+  <!-- =====================================================================
+       Folder 3 — the legacy-shaped folder. Its name separates fields with '_'
+       while its two siblings use '-' (R42), it still emits generated mail
+       (R40), both jobs carry one copied CREATED_BY (R44), and folder scope
+       declares three of the four command requirements so R32 fires here and
+       nowhere else.
+       ===================================================================== -->
+  <FOLDER DATACENTER="T032-E0700-DMA" FOLDER_NAME="PRSYNG_REM2_70005_LEGACY"
+          DESCRIPTION="delivery: batch | source_contact: legacy_owner@example.invalid">
+    <VARIABLE NAME="%%FID" VALUE="fid.synth.legacy"/>
+    <VARIABLE NAME="%%SEAL" VALUE="70005"/>
+    <VARIABLE NAME="%%LAUNCHER_SCRIPT_PATH" VALUE="/apps/synth/bin/legacy_wrapper.ksh"/>
+    <VARIABLE NAME="%%ETL_PLATFORM" VALUE="datastage"/>
+    <VARIABLE NAME="%%ETL_ARTIFACT_URI" VALUE="/apps/synth/etl/rem2_legacy.dsx"/>
+    <VARIABLE NAME="%%NOTIFY" VALUE="legacy_mail@example.invalid"/>
+
+    <JOB JOBNAME="JOB0210_LEGACY_R40" TASKTYPE="Command"
+         APPLICATION="SYNTHLEG" RUN_AS="svc.synth.legacy" CREATED_BY="template.author"
+         CMDLINE="%%LAUNCHER_SCRIPT_PATH -j legacy_extract">
+      <ON>
+        <DOMAIL DEST="%%NOTIFY" SUBJECT="legacy extract failed"/>
+      </ON>
+    </JOB>
+
+    <JOB JOBNAME="JOB0220_LEGACY_R44" TASKTYPE="Command"
+         APPLICATION="SYNTHLEG" RUN_AS="svc.synth.legacy" CREATED_BY="template.author"
+         CMDLINE="%%LAUNCHER_SCRIPT_PATH -j legacy_load"/>
+  </FOLDER>
+
+</DEFTABLE>

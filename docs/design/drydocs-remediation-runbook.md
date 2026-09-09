@@ -110,8 +110,21 @@ are holding.
    This is the module's only CLI verb. It asserts nothing about meaning, and it writes no
    graph.
 
-3. **If you have no export**, use the tracked synthetic fixture — the whole procedure
-   below runs on it in any clone, with no company data and no graph:
+   **With no export of your own, run it on the tracked synthetic folder set** — the same
+   verb, the same output, in any clone and with no company data:
+   ```powershell
+   poetry run drydocs profile-folder-set tests/fixtures/remediation/synthetic-folder-set-export --out folder-set-profile.json
+   ```
+   Success: a summary reporting 3 folders and 12 jobs, the yellow not-supplied slot list,
+   then `wrote folder-set-profile.json`. The fixture is deliberately readable rather than
+   representative: each job is there to produce one named finding, and its header comment
+   says which rule each one exercises. Read that header beside the report the first time —
+   it is the fastest way to learn what the census is telling you.
+
+3. **If you have no export**, the other tracked fixture is a TRANSCRIPT rather than an
+   XML export — it feeds the library procedure below, where the folder set above feeds
+   the verb. The whole procedure below runs on it in any clone, with no company data and
+   no graph:
    ```powershell
    poetry run python -c "from drydocs_remediation.formats import TranscriptDefinitionFormat; d = TranscriptDefinitionFormat().load('tests/fixtures/remediation/synthetic-legacy-transcript.yaml'); print(len(d.folders), 'folder(s),', len(d.jobs), 'job(s)')"
    ```
