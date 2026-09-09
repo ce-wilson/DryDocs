@@ -1,0 +1,21 @@
+id: GRAPH6
+epic: component-topology
+title: "duckdb is imported lazily and declared nowhere, and openpyxl sits in the dev group - declare the optional dependency group and decide openpyxl's group before a generator ships in-product"
+type: chore
+module: graph-infra
+phase: 6
+agent: main
+model: haiku
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- pyproject.toml
+- drydocs/source_registration/duckdb_load.py
+acceptance: |
+  duckdb declared in an optional extras group named for the source-registration step it serves;
+  openpyxl's group decided (dev today; runtime if the Excel runbook generator ships in-product) and
+  the reason recorded beside the entry; poetry lock clean; the lazy import and its skip line unchanged.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). Plan 2026-09-09, Phase 4 unit 4.4; the survey found the PoC's DuckDB leg resting on an undeclared
+  package.

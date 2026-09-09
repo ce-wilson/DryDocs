@@ -1,0 +1,26 @@
+id: LOAD14
+epic: release-infrastructure
+title: "A coverage report over the stand-ins' object classes - folders, jobs, datasets, docs - so the base says which classes it reached and why the rest did not, with not-probed never rendered as zero"
+type: task
+module: drydocs-load
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- drydocs/docs_coverage.py
+- drydocs_core/docs_verify.py
+- config/source-registry.yaml
+- config/source-descriptors.yaml
+acceptance: |
+  drydocs/docs_coverage.py's existing shape (declared / loaded / blocker, None for not-probed) is
+  extended from the document corpus to the classes the synthetic stand-ins declare; the blocker
+  names the axis that holds a class (semantic hold versus wiring hold, read from confirmed today
+  and from the wired value once it exists, labeled either way); the docs-coverage verb is
+  generalized, not duplicated. READS config/source-registry.yaml and config/source-descriptors.yaml,
+  writes only its module and tests. No ADR 0015 citation: the base's own statement of what is not
+  loaded; Team Edition Phase 4 generalizes it later.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). Plan 2026-09-09, Phase 2 row 2.

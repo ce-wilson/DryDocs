@@ -1,0 +1,26 @@
+id: LOAD11
+epic: server-location
+title: "After the server-location-ontology rider signs, read the Z4 lb_resolution evidence into the server-resolution pass and write the ruled RESOLVES_TO_SERVER shape - the dns-resolved tier gets its writer"
+type: task
+module: drydocs-load
+phase: 13
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: [LOAD6]
+gates: [server-location-ontology]
+inputs:
+- drydocs/loaders/server_resolution.py
+- drydocs_lineage/extractors/lb_resolution.py
+- drydocs_core/ontology/relationship_vocabulary/51-local-infrastructure.yaml
+acceptance: |
+  Lands ONLY after the LOAD6 rider signs (what observation makes a data center active; how
+  disagreeing observations collapse; property versus edge). A loader or verb reads the Z4 evidence
+  file and emits what the ruling defines - RESOLVES_TO_SERVER {match_tier: dns-resolved} edges or a
+  collapsed property - scoped against 51-local-infrastructure.yaml; the summary's
+  matched_dns_resolved stops being permanently zero; the sample-reproducible evidence names its
+  venue (J18).
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). lineage-2026-09-08.md candidate 1b (L1-1, ranked 1); the gate half is LOAD6, whose own body names
+  this as "a SEPARATE item, minted when the gate is signed".

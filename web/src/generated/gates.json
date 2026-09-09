@@ -891,7 +891,8 @@
       ],
       "log_ref": "config/gate-log.md:3695",
       "unblocks": [
-        "LOAD6"
+        "LOAD6",
+        "LOAD11"
       ]
     },
     {
@@ -1199,7 +1200,9 @@
         "config/gate-prompts/console-auth-boundary.yaml"
       ],
       "log_ref": null,
-      "unblocks": []
+      "unblocks": [
+        "WEB22"
+      ]
     },
     {
       "kind": "prompt-only",
@@ -1242,7 +1245,8 @@
         "MM9",
         "MM10",
         "MM11",
-        "MM13"
+        "MM13",
+        "ONT4"
       ]
     },
     {

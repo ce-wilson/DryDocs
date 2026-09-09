@@ -1,0 +1,23 @@
+id: CORE13
+epic: component-topology
+title: "Give core's Neo4j client a timeout and retry policy - nothing in drydocs_core sets a transaction timeout, a retry ceiling or an acquisition timeout, so an unreachable server hangs the caller"
+type: task
+module: drydocs-core
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- drydocs_core/neo4j_client.py
+- tests/unit/test_neo4j_client.py
+acceptance: |
+  Neo4jClient gains max_transaction_retry_time, a per-transaction timeout and a connection
+  acquisition timeout, each read from config/dev-environment.yaml or the client's constructor
+  (never a literal - ADR 0014), with a test that a hung server produces a named error within the
+  ceiling. Settled TOGETHER with the drydocs-api query-bound decision minted in the same pass so
+  the two ends of one system do not land contradicting values.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). core-2026-09-07.md candidate 2 (S4). Cross-linked by the report to the console's S5 (the other
+  end of the same system).

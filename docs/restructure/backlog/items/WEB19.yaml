@@ -1,0 +1,28 @@
+id: WEB19
+epic: web-console
+title: "Make the completeness envelope hard to drop - one shared hook returns rows and truncated together, the four consumers that discard the flag today migrate onto it, and a consumer that reads a list without the envelope fails a test"
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- web/src/components/map/RuntimeSpanMap.tsx
+- web/src/routes/IntakeRoute.tsx
+- web/src/components/map/LocationMap.tsx
+- web/src/ask/FileReport.tsx
+- drydocs_api/schemas.py
+- config/taxonomy/ui-components.yaml
+acceptance: |
+  A shared hook or return type in web/src returns data and the completeness envelope together;
+  RuntimeSpanMap, IntakeRoute, LocationMap and FileReport migrate onto it so the mechanism ships
+  with its own proof; a test enumerates spec consumers and fails one that renders a list without
+  reading the flag; the ui-components ledger row is added in the same change (the O42 guard). This
+  is organ (b) of the premise-drift review - contract non-propagation - closed the only way it
+  closes.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). web-2026-09-09.md candidate 1 (L1-1(b), ranked 1) and premise-drift ask 3. PEN: belongs to the UI-testing session's code:drydocs-web pen (user ruling 2026-09-09); the
+  Lane B queue skips it and Lane A merges it like any wip branch.

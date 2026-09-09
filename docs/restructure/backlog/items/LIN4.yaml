@@ -1,0 +1,21 @@
+id: LIN4
+epic: component-topology
+title: "rua_inventory reads a bundle envelope without checking its collector version, so a newer bundle parses silently at full apparent confidence - validate it the way lb_resolution.py already does"
+type: bug
+module: drydocs-lineage
+phase: 6
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- drydocs_lineage/extractors/rua_inventory.py
+- drydocs_lineage/extractors/lb_resolution.py
+acceptance: |
+  rua_inventory._read_envelope checks meta['schema'] against KNOWN_COLLECTOR_VERSIONS as
+  lb_resolution.py does, and a mismatch reaches the existing RuaCoverage notes channel rather than
+  being carried forward unchecked. The two copies of the envelope contract stay two on purpose (the
+  report dates the second so a third knows what it joins); this item does not extract a shared reader.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). lineage-2026-09-08.md candidate 3 (L2-1, ranked 2).

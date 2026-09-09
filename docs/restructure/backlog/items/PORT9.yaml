@@ -1,0 +1,30 @@
+id: PORT9
+epic: team-edition
+title: "Team Edition Phase 2 - copier.yml, the questionnaire, the file-class exclusions, the frozen-class checksum guard and the seeded CLAUDE.local.md overlay, proven by CI generating the two synthetic editions XMPL and SMPL and running their suites"
+type: task
+module: drydocs-port
+phase: 18
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: [CORE19, PORT10, ONT6]
+inputs:
+- config/taxonomy/editions.yaml
+- config/dev-environment.yaml
+- drydocs_core/edition_registry.py
+- tests/unit/test_domain_registry.py
+- .github/workflows/ci.yml
+- pyproject.toml
+acceptance: |
+  (a) copier declared as a dependency; copier.yml at the repo root with the questionnaire (team,
+  LOB, edition code = tenant segment, orchestrator, warehouse, doc platform, ticket system,
+  composite alias). (b) _exclude derived from the file-class render; the checksum guard fails on an
+  edited canonical-template file and passes on an edited instance-owned one. (c) A generated
+  instance's config/dev-environment.yaml carries edition: <code> and its editions.yaml row;
+  drydocs_core/edition_registry.py gains its first production consumer. (d) The CLAUDE.local.md
+  overlay is seeded from the questionnaire and speaks the edition's terms. (e) CI generates XMPL and
+  SMPL and runs their suites green with disjoint id prefixes. (f) groom-backlog --scope and the
+  allocator's --edition are reconciled in the ADR's dated section. No real edition is named.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). ADR 0015 follow-up table row 2 - "two instances prove a template; one does not".

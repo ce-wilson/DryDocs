@@ -1,0 +1,33 @@
+id: ONT4
+epic: mind-map
+title: "Clause G on the data-flow-overview prompt for use case 3 - a declared flow id when no launcher names the flow, a succession edge extending Q6 on docs_supersedes' shape, the parallel-run match report as evidence, and the run-digest question - drafted to pre-pick nothing"
+type: task
+module: ontology
+phase: 17
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on: [MM13]
+gates: [data-flow-overview]
+inputs:
+- config/gate-prompts/data-flow-overview.yaml
+- drydocs_core/ontology/relationship_vocabulary/43-local-architecture.yaml
+- drydocs_core/ontology/relationship_vocabulary/45-local-docs.yaml
+- docs/design/deepdoc-data-flow-overview.md
+acceptance: |
+  (a) G1: a DECLARED flow_id with flow_id_source: declared and its owner, for a flow no launcher
+  names. (b) G2 EXTENDS the page's Q6 rather than re-asking it: arch_supersedes, DataFlow to
+  DataFlow, prov:wasRevisionOf, pairwise chains, current = no incoming edge, registered planned in
+  43-local-architecture.yaml on docs_supersedes' shape in the same commit. (c) G3: the parallel-run
+  match report is EVIDENCE under whichever of clause E's grammars the SME rules, never a node class.
+  (d) G4: whether parity evidence needs the :JobRun input digest - if yes, that is
+  source-connection-and-run-identity's named re-arm. (e) The parity-as-observation reading belongs
+  to E1's existing deferred page sosa-jobrun-observation and is named as deferred, never re-drafted
+  here. (f) The feed-grain inventory sheet is profiled for <DATAFLOW> values recurring under more
+  than one application and the COUNT and its command land on the prompt's provenance block (a
+  number, no names; the sheet stays machine-local, cited by file name). (g) One relay line queued:
+  the prompt file is canonical-company.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). Plan 2026-09-09, Phase 6 units 6.2 and 6.3. Use case 3 has no primitive in code today; ruling the
+  edge and the evidence together means the extractor is built once against a signed shape.

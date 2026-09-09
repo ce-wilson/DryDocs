@@ -1,0 +1,23 @@
+id: API5
+epic: web-console
+title: "A graph outage answers 500, which the console reads as a bug rather than 'service down' - one exception handler maps Neo4j driver failures to 503 and passes the exception class only, never its message"
+type: bug
+module: drydocs-api
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- drydocs_api/app.py
+- web/src/lib/reachability.ts
+- tests/unit/test_api_app.py
+acceptance: |
+  One FastAPI exception handler over the driver's error classes returns 503; the console needs no
+  change because isUpstreamDown already treats 502/503/504 as down. The handler carries the
+  exception CLASS and never its message (ADR 0020 keeps the database URI off the page). A test
+  raises each driver class through a route and asserts 503 with no message text; a regression guard
+  keeps it that way.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). api-2026-09-08.md candidate 1 (L1-1) - "the cheapest high-value item in this report".

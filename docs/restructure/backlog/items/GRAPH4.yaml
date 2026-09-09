@@ -1,0 +1,26 @@
+id: GRAPH4
+epic: component-topology
+title: "Triage the eighteen test guards that read raw source against J66's exception, convert the code-subject ones to tests/source_scan.py, fold in test_remediation_changes.py's open instance, and decide whether source_scan becomes mandatory"
+type: task
+module: graph-infra
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- tests/source_scan.py
+- tests/unit/test_source_scan.py
+- tests/unit/test_remediation_changes.py
+- tests/unit/test_remediation_no_graph_write.py
+acceptance: |
+  A table in the item (path, subject, verdict, reason) over every site that reads raw Python source
+  and asserts a substring; the code-subject ones converted in one commit; the prose-subject ones
+  kept and said so; test_remediation_changes.py:323 (the one an AST guard beside it already covers)
+  deleted; and a check in test_source_scan.py that a new raw-read guard justifies itself in an
+  exemption table. The mandatory-source_scan ruling is recorded as a note for CLAUDE.md section 6,
+  which Lane A carries.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). seams-2026-09-08.md candidate 2 (L2-1) with remediation-2026-09-08.md candidates 2 and 3 folded
+  in, as the seams report asks.

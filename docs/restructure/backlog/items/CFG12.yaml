@@ -1,0 +1,22 @@
+id: CFG12
+epic: team-edition
+title: "Use case 3's source rows as shape - oracle:schema-inventory and snowflake:schema-inventory carry their wiring reason, and a synthetic parity-report entry lives only in the descriptor's synthetic section"
+type: chore
+module: config
+phase: 18
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: [N23]
+inputs:
+- config/source-registry.yaml
+- config/source-descriptors.yaml
+acceptance: |
+  After sitting 2 (a dataset id minted before the grammar signs is re-minted after - the N22
+  precedent) and after the wired build: the two schema-inventory rows carry the wiring reason per
+  sitting 1's ruling instead of a bare confirmed false; a synthetic parity-report stand-in exists in
+  config/source-descriptors.yaml's synthetic section only, never as a registry row claiming a real
+  feed; no row's load state changes.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). Plan 2026-09-09, Phase 6 unit 6.7.

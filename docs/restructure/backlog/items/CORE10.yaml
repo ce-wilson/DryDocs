@@ -1,0 +1,35 @@
+id: CORE10
+epic: component-topology
+title: "ADR 0021 instrument: one three-outcome type in drydocs_core (checked-clean, findings, not-checked-with-reason), a declared probe registry, and a guard that reads code - the preflight and the doc-coverage report adopt it first"
+type: task
+module: drydocs-core
+phase: 6
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- drydocs_core/
+- docs/decisions/0021-not-checked-is-not-clean.md
+- drydocs/port/port_preflight.py
+- drydocs/docs_coverage.py
+- tests/source_scan.py
+acceptance: |
+  Builds ONLY after ADR 0021 is ACCEPTED (its acceptance is the SME's at sitting 1; the record is
+  PROPOSED today). (a) One frozen dataclass in drydocs_core with exactly three states; bool() on it
+  raises; every state renders itself as an operator line; NOT_CHECKED carries a reason of at least
+  forty characters. (b) A declared registry of probe dotted-names in core, and a unit guard that
+  imports each, reads its return annotation through tests/source_scan.py (J66), and fails a
+  registered probe that returns a bare bool or is unannotated - with a positive and a negative case,
+  and a shrink-only rule (a registered name that no longer resolves fails). (c) First adopters:
+  drydocs/port/port_preflight.py replaces its interim third state with the type, and
+  drydocs/docs_coverage.py expresses None-for-not-probed through it, behavior unchanged. (d) The
+  six precedent sites named in ADR 0021 gain ONE citing comment each and are not rewritten.
+  (e) MODULE_MAP.md re-rendered; module boundary and J57 guards green.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). Raised five times in cycle 1 of the module sweep (seams candidate 3, api candidate 3, review-agents
+  candidate 4, port-docgen-docmeta candidate 3, plan-deepdoc-libs candidate 3 - "the cycle's single
+  most valuable output"). The CONVENTION half is ADR 0021 (docs/decisions/0021-not-checked-is-not-clean.md,
+  drafted at the Lane A close); this item is the INSTRUMENT half its D3 names. Lane A builds it
+  (core plus drydocs/port are Lane A surfaces this burst).

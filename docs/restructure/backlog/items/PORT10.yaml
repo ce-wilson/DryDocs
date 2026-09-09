@@ -1,0 +1,27 @@
+id: PORT10
+epic: team-edition
+title: "The template's file classes DERIVED from PORT-MANIFEST dispositions as a committed render - canonical-producer to canonical-template, company-owned rows and fields to instance-owned, derived stays derived - plus the three missing D4 instance-owned manifest rows"
+type: task
+module: drydocs-port
+phase: 18
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: [N23]
+inputs:
+- PORT-MANIFEST.yaml
+- scripts/render_port_dispositions.py
+- docs/decisions/0015-team-edition-template.md
+- drydocs/port/dispositions.py
+acceptance: |
+  After ADR 0015 is ACCEPTED: (a) a deterministic render maps every manifest row to a template
+  file class through drydocs.port.dispositions.classify (one classifier, J37), committed as derived
+  (J43), a per-entry file with a field split appearing in BOTH classes with the split named; (b) the
+  three D4 instance-owned files with no row today - config/taxonomy/business-application.yaml,
+  config/taxonomy/oracle-schemas.yaml, config/data-zones.yaml - gain per-entry rows so they stop
+  falling to the config/** producer-wins default; (c) a guard on the J71 totality shape keeps the
+  render and the manifest agreeing.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). Plan 2026-09-09, Phase 5 unit 5.5. D4 says the disposition vocabulary transfers as the file
+  grammar; deriving it means the port and the template cannot disagree about who owns a file.

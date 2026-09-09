@@ -1,0 +1,27 @@
+id: CORE19
+epic: team-edition
+title: "Team Edition Phase 1 as a declaration, not a second tree - the D2 module cut as an edition-cut list component_map reads, plus an import-closure guard that fails when a kept module imports a cut one"
+type: task
+module: drydocs-core
+phase: 18
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: [N23, GRAPH1]
+inputs:
+- drydocs_core/component_map.py
+- tests/unit/test_module_boundary.py
+- docs/decisions/0015-team-edition-template.md
+- MODULE_MAP.md
+acceptance: |
+  Starts only after ADR 0015 is ACCEPTED at sitting 2 (N23 is the vehicle; its clauses (h) and
+  (i) are Phase 0). (a) The D2 cut lives as a declared list in drydocs_core/component_map.py or a
+  sibling config it reads: agents, web, remediation, port, fid_census, run_as_detect and the five
+  cut loaders are CUT; backlog_store is KEPT (amendment A1). (b) A guard fails if a kept module
+  imports a cut one, dynamic imports included (the importlib fix). (c) Nothing is deleted in the
+  producer tree; the cut executes at generation (copier _exclude). (d) ADR 0015's Phase 1 row is
+  annotated that the cut is a declaration; MODULE_MAP.md re-rendered.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). ADR 0015 follow-up table row 1. A carved second tree is a fork by another name; a declared list
+  is one file the copier reads and one guard that keeps it true.

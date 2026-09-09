@@ -1,0 +1,19 @@
+id: LOAD12
+epic: server-location
+title: "The resolution summary reports matched_dns_resolved: 0 for a tier that has no writer - distinguish 'no writer' from 'no matches' so the zero stops asserting a false claim"
+type: bug
+module: drydocs-load
+phase: 13
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- drydocs/loaders/server_resolution.py
+acceptance: |
+  The summary marks the dns-resolved tier as not-written rather than reporting a bare zero that
+  reads as "no matches"; once the ADR 0021 type exists the tier's value is NOT_CHECKED with the
+  reason. Independent of the Z4 build - "a line, not a build" - and it may land first.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). lineage-2026-09-08.md candidate 2.

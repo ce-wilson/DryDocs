@@ -1,0 +1,27 @@
+id: team-edition
+letter: TE
+title: Team Edition - the copier template on the edition mechanism (ADR 0015), proven on two synthetic editions
+order: 28
+groom_log:
+- date: '2026-09-09'
+  note: |-
+    Opened 2026-09-09 (Lane A mint pass, desktop) from ADR 0015's follow-up table, which said
+    "groom into the backlog as an epic" on 2026-08-27 and was never groomed: no epic existed,
+    no item covered a phase, and Phase 0 - the URN shared-vs-owned ruling that "blocks all
+    code" - had no prompt. Phase 0 rides N23 (its clauses (h) tenant segment and (i) the D6
+    memory-scope name through the 0002 Q8 test), held in ONE sitting with J70's publish-ceiling
+    prompt because the three rule one string; ADR 0015 is ACCEPTED in that sitting's record.
+    Phases 1, 2, 4 and 6 are minted here with depends_on running base to instance only; Phase 5
+    is the mind-map epic's data-flow record (MM10/MM11); Phases 3 (the estate composite) and 3a
+    (the aggregate roll-up) are deliberately NOT minted - both need two real instances
+    company-side, and 3a is recorded open by the 2026-09-04 amendment. The three use cases from
+    the 2026-09-09 planning session are the epic's acceptance targets: (1) the base end to end
+    on synthetic stand-ins (release-infrastructure items, the finish-line test); (2) a DevOps
+    team's file-to-table FIELD-level mapping from an Excel workbook - the first generated
+    instance, whose base contribution is the xlsx axis value, a stage-only extractor and the
+    :CatalogField reservation, with the mapping edge minted by the edition; (3) a legacy process
+    captured before it is lost and compared to its lift-and-shift successor - the capture is
+    gate-free (a corpus row), the structured record follows the data-flow gate's clause G.
+    Producer-side proofs run on the synthetic editions XMPL and SMPL; the producer never names a
+    real edition, Area Product or team.
+  attached_at: CORE19

@@ -1,0 +1,22 @@
+id: GRAPH3
+epic: component-topology
+title: "No Python coverage threshold exists at all - test:coverage is declared only for the web console - decide whether one exists and what it is before any Python slot runs the tool"
+type: task
+module: graph-infra
+phase: 6
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- pyproject.toml
+- web/package.json
+- .github/workflows/ci.yml
+acceptance: |
+  A decision recorded before pytest --cov runs for any slot ("an impression wearing a number's
+  clothes" otherwise): whether a floor exists, where it lives (pyproject.toml), what it is, and
+  whether it ratchets like the web floor. If yes, the CI step and the WEB13-shaped rule follow as
+  their own item.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). load-2026-09-08.md candidate 4, deferred by the report to the seams slot's ownership.

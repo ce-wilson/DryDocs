@@ -1,0 +1,21 @@
+id: API6
+epic: web-console
+title: "No route, spec or runner in drydocs-api sets a query timeout, so a hung query and a slow one look alike and the proxy's eventual 504 reads as a dead service - decide the bound before any build"
+type: task
+module: drydocs-api
+phase: 12
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- drydocs_api/query_specs.py
+- drydocs_api/app.py
+acceptance: |
+  A decision, recorded in the item and in the spec registry's own docstring: global versus per-spec
+  ceiling, the value, and what the caller is told when it trips - which must be distinguishable
+  from "service down" or finding 1 returns by another route. Settled together with the core
+  driver timeout item so the two ends of one system agree. The build that follows is its own item.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). api-2026-09-08.md candidate 2 (L1-2).

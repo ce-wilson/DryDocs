@@ -1,0 +1,20 @@
+id: AGENT2
+epic: agentic-qa
+title: "Retire the nine-copy sys.path preamble in agents/ - a hard-coded parents[2] plus thirteen E402 suppressions - by installing the repo into agents/.venv as a path dependency, or hoisting one bootstrap module"
+type: chore
+module: drydocs-agents
+phase: 15
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- agents/
+- agents/common/
+acceptance: |
+  Preferred: the repo installed into agents/.venv as a path dependency, every sys.path preamble and
+  every E402 suppression deleted. Fallback if the two venvs must stay independent: one
+  agents/common/_bootstrap.py holding the depth constant once. The agents' own tests green either way.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). review-agents-2026-09-08.md candidate 3 (L2-2).

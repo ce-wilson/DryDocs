@@ -1,0 +1,20 @@
+id: META1
+epic: docmeta
+title: "drydocs_docmeta has had no design-lens read - slot 7 confirmed hygiene only - so cycle 2 of the sweep gives it one rather than assuming it covered"
+type: task
+module: drydocs-docmeta
+phase: 14
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- drydocs_docmeta/
+- docs/reviews/module-review-sweep-plan.md
+acceptance: |
+  A system-design and tech-debt read of drydocs_docmeta specifically, stamped with its tree (J63),
+  landing as a report under docs/reviews/modules/ from the sweep's venue; recorded here so no later
+  slot assumes the module was covered by slot 7's hygiene signals.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). port-docgen-docmeta-2026-09-08.md candidate 4. Runs from the review-sweep venue (review:sweep pen).

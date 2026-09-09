@@ -110,7 +110,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
-- **`Idea-309`** · 2026-09-09 · `[chore]` · **open** · prio? **Med** —
+- **`Idea-309`** · 2026-09-09 · `[chore]` · **groomed → CORE18 (2026-09-09)** · prio? **Med** —
   **The data root's layout is declared in three places and only two of them are cross-checked,
   and the one landing zone that holds a source payload instead of a committed artifact is the
   one sitting inside the repo tree.** Measured on the desktop at `fcc3c8bb`, prompted by the

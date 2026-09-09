@@ -1,0 +1,26 @@
+id: REV2
+epic: drydocs-review-backflow
+title: "graph_verify's acceptance runner cannot fail on an empty graph in four of six suites - every suite declares an anchor, the runner evaluates it first, and a suite whose anchor fails reports NOT RUN instead of PASS"
+type: bug
+module: drydocs-review
+phase: 7
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- drydocs/review/graph_verify.py
+- graph-tests/folder-attribution-coverage.yaml
+- graph-tests/bmc-docs-lexical.yaml
+- graph-tests/business-application-identity.yaml
+- graph-tests/provenance-diet.yaml
+acceptance: |
+  (a) A suite declares an anchor (a non-empty case, or a minimum row count on a named label).
+  (b) graph_verify evaluates the anchor FIRST and reports NOT RUN, never PASS, when it fails.
+  (c) The four unanchored committed suites gain anchors in the same change, or the mechanism ships
+  without coverage and says so. (d) A unit test runs a suite against an empty graph stub and
+  asserts NOT RUN. Once the ADR 0021 type exists the runner's verdict is that type.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). review-agents-2026-09-08.md candidate 1 (L1-1, ranked 1): 28 of 30 negative assertions have no
+  anchor.

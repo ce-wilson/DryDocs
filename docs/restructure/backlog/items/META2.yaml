@@ -1,0 +1,26 @@
+id: META2
+epic: team-edition
+title: "Use case 3's gate-free half - register the legacy-capture corpus as a doc-source-registry row (the producer ships the SHAPE as a synthetic row) so a legacy process can be captured as documents and SME notes before it is lost"
+type: task
+module: drydocs-docmeta
+phase: 18
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- config/doc-source-registry.yaml
+- drydocs/review/sme_notes.py
+- .claude/skills/research-probe-discipline/SKILL.md
+acceptance: |
+  (a) A synthetic doc-source-registry row with trust_default and curation set, shaped for a corpus
+  of legacy-process captures (design notes, worked examples, the SQL as it was run); the real row is
+  instance-owned and company-side. (b) The capture method is the research-probe discipline's
+  ledgers (positive controls, negatives recorded); transcripts are machine-local and cited by file
+  name, never by image. (c) SME notes ride sme_notes' $FR/$UC/$OQ harvest. (d) SQL examples land as
+  :Chunk rows citing their source, never as facts; no vocabulary term beyond the active docs terms;
+  no evidence-grammar choice presupposed (clause E of data-flow-overview is sitting 3's).
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). Plan 2026-09-09, Phase 2 Lane B row 8. The "before it is lost" half of use case 3 needs no gate;
+  the structured record follows sitting 3 (MM10).

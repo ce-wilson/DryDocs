@@ -1,0 +1,28 @@
+id: CORE11
+epic: component-topology
+title: "Raise drydocs_core.Neo4jClient to the level of its two younger siblings - a read access mode, captured driver notifications - and record in an ADR whether drydocs_api and the agents adopt it or stay separate"
+type: task
+module: drydocs-core
+phase: 6
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- drydocs_core/neo4j_client.py
+- drydocs_api/app.py
+- agents/common/neo4j_tool.py
+- docs/decisions/README.md
+acceptance: |
+  (a) An ADR (the core report nominates the title "the graph driver seam") that names the three
+  driver implementations, what each does that the others do not (read mode, notification capture,
+  timeouts), and RULES whether drydocs_api and agents/common/neo4j_tool.py adopt the core client or
+  stay separate on purpose. (b) Neo4jClient.run gains a read-access path (execute_read) beside the
+  write path, and stops discarding the driver's result summary (the 2026-08-20 four-warnings
+  incident is the motivating case). (c) Nothing in the API or the agents changes until the ADR is
+  accepted; the ADR's action items own those moves.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). core-2026-09-07.md candidates 1 (S1/S2/S3), "large enough to want an ADR rather than a plain item".
+  The report's S2 finding: every read in core runs inside execute_write. Fable because the ADR is a
+  boundary decision; the code half follows it.

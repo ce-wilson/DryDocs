@@ -1,0 +1,25 @@
+id: CORE12
+epic: component-topology
+title: "Declare drydocs_core's public surface once - grow __all__ to match reality, mark internals by convention, or give the boundary test a second axis - so 22 of 34 core modules stop being imported outside any declared contract"
+type: task
+module: drydocs-core
+phase: 6
+agent: main
+model: fable
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- drydocs_core/__init__.py
+- drydocs_core/repo_paths.py
+- tests/unit/test_module_boundary.py
+acceptance: |
+  One ruling, recorded (the core report nominates an ADR titled "what of core is public"): which of
+  the three shapes core's contract takes. Under whichever is chosen, repo_paths (24 importers, the
+  most-imported undeclared module) and the other 21 modules imported outside __all__ are resolved,
+  and the boundary test either gains the second axis (what may be imported) or the ruling says why
+  it does not.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). core-2026-09-07.md candidate 4 (S6/T5). Slot 10 (seams) was asked whether a second axis belongs
+  beside who-may-import-core; its answer is that the invariant holds and the question is a ruling,
+  not a defect.

@@ -1,0 +1,19 @@
+id: DOC11
+epic: doc-infrastructure
+title: "Regenerate the module-sweep plan's size column at cycle 2's open - six of seven measured slots moved from the 2026-09-05 snapshot, drydocs-web by 55 percent"
+type: chore
+module: docs
+phase: 10
+agent: main
+model: haiku
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- docs/reviews/module-review-sweep-plan.md
+acceptance: |
+  The size column is re-derived against current line counts with the command that produced them
+  beside the table, or the table is marked as a dated snapshot with the re-measure rule stated;
+  done at cycle 2's open from the sweep's venue.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). review-agents candidate 5, seams candidate 4, web (second pass) candidate 4.

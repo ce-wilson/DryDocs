@@ -1,0 +1,27 @@
+id: DOC12
+epic: doc-infrastructure
+title: "Generate the two-tab Excel Application Run Book FROM THE GRAPH - the sibling L23's long-form generator implies - filling the 31 graph-derivable columns from the runbooks QuerySpecs and marking every manual cell as needing capture"
+type: task
+module: docs
+phase: 10
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- .claude/skills/controlm-runbook-automation-excel/template-spec.yaml
+- .claude/skills/controlm-runbook-automation-excel/generate_template.py
+- drydocs_api/query_specs.py
+- tests/integration/test_e2e_load.py
+acceptance: |
+  A generate_runbook.py beside generate_template.py reads template-spec.yaml's per-field source
+  (graph, graph-partial, manual) and fills the graph-derivable columns for one folder from the
+  runbooks QuerySpecs; a manual or graph-partial cell is tinted and marked "needs capture", never
+  blank as if fetched; the run reports per-column filled / partial / manual counts; queries are
+  SHARED with L23, never re-written (two skills disagreeing about one runbook fact is the failure
+  the L23 clause names); demonstrable on the bundled samples the e2e loads; committed files stay
+  mechanism-only, a FILLED workbook is Internal.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). Plan 2026-09-09, Phase 2 Lane B row 3. Today only the TEMPLATE renders; use case 1's "minimal docs"
+  is this generator.

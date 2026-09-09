@@ -1,0 +1,21 @@
+id: GRAPH2
+epic: component-topology
+title: "reconcile_before reaches into tests.unit.test_runbook_currency for three exemption tables - decide whether the tables move to a non-test home rather than declaring the crossing"
+type: task
+module: graph-infra
+phase: 6
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- drydocs/port/reconcile_before.py
+- tests/unit/test_runbook_currency.py
+acceptance: |
+  A ruling, then the move it implies: HISTORICAL_PATHS, FOREIGN_PATHS and GENERATED_PATHS live where
+  production code and the guard can both read them (a core or port module, or a config file the
+  guard reads), or the crossing is declared with the reason it stays. The seams report split this
+  out on purpose - it "probably wants a different answer than a declaration".
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). seams-2026-09-08.md candidate 1, the separated question (reconcile_before.py:216).

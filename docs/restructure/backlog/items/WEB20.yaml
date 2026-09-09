@@ -1,0 +1,23 @@
+id: WEB20
+epic: web-console
+title: "Retrofit the three surfaces that predate the completeness contract - IntakeRoute, LocationMap, FileReport - to read the truncated flag they already receive, taking honoring consumers to 8 of 8"
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- web/src/routes/IntakeRoute.tsx
+- web/src/components/map/LocationMap.tsx
+- web/src/ask/FileReport.tsx
+- config/taxonomy/ui-components.yaml
+acceptance: |
+  Each of the three reads and surfaces the flag from the envelope; if the shared hook lands first
+  they migrate onto it rather than being patched twice; the count the second pass measured (3 of 8
+  direct readers) reaches 8 of 8 and the close note says so with the command that counted.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). web-2026-09-09.md candidate 2 (L1-1(a)). PEN: belongs to the UI-testing session's code:drydocs-web pen (user ruling 2026-09-09); the
+  Lane B queue skips it and Lane A merges it like any wip branch.

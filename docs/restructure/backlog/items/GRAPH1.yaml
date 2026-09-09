@@ -1,0 +1,26 @@
+id: GRAPH1
+epic: component-topology
+title: "The module-boundary guard sees static imports only - teach it importlib.import_module and __import__ with a string constant, and declare the drydocs.port.reconcile_before to drydocs_remediation crossing"
+type: bug
+module: graph-infra
+phase: 6
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- tests/unit/test_module_boundary.py
+- drydocs_core/component_map.py
+- drydocs/port/reconcile_before.py
+acceptance: |
+  (a) The AST walk treats importlib.import_module("<literal>") and __import__("<literal>") as
+  import edges when the argument is a string constant. (b) drydocs.port.reconcile_before ->
+  drydocs_remediation.detect is added to DECLARED_COMPONENT_IMPORTS with its reason, so the
+  load-bearing staleness test protects it. (c) The docstring states the residual plainly: an
+  import built from a variable stays invisible. (d) MODULE_MAP.md re-rendered. Lane B may take it
+  only after the port-preflight fix is on origin (reconcile_before.py is the one drydocs/port file
+  it touches).
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). seams-2026-09-08.md candidate 1 (L1-1, ranked 1). The copier will read component_map to decide
+  what a component drags with it; an object that under-reports coupling produces a wrong carve.

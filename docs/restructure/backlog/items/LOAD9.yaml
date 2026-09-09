@@ -1,0 +1,20 @@
+id: LOAD9
+epic: component-topology
+title: "An absent run log is silent - keep a load non-fatal when DRYDOCS_LOGDIR is unwritable, but say so in the end-of-run summary the operator reads"
+type: task
+module: drydocs-load
+phase: 6
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- drydocs/loaders/base.py
+- drydocs_core/run_log.py
+acceptance: |
+  When the run log cannot be written the load still completes, and the summary line every load
+  prints carries "no run log written: <reason>" so the missing audit trail cannot be missed. Explicitly
+  the fallback to the :JobRun-scope item, not its replacement.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). load-2026-09-08.md candidate 2 (L1-2). "Cheaper than 1 and strictly less good".

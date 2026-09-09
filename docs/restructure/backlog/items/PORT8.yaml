@@ -1,0 +1,31 @@
+id: PORT8
+epic: release-infrastructure
+title: "The port preflight certifies a base it could not read - _git discards the exit code, an unresolvable base yields an empty range, and both range checks pass on emptiness - so the preflight fails closed and reports NOT CHECKED"
+type: bug
+module: drydocs-port
+phase: 8
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- drydocs/port/port_preflight.py
+- scripts/port_preflight.py
+- .claude/skills/reconcile-port/SKILL.md
+- docs/port/port-prompt.md
+acceptance: |
+  (a) A base-resolves check (git rev-parse --verify) runs first; (b) _git surfaces a non-zero exit
+  instead of returning empty stdout; (c) range_commits and added_documents distinguish "no commits"
+  from "git failed"; (d) the report renders NOT CHECKED with the git stderr, passed False, beside the
+  existing SKIPPED idiom - a local third state now, the ADR 0021 type once accepted; (e) --tag refuses
+  on NOT CHECKED; (f) a unit test pins "unknown base -> not certified" and "empty range on a real base
+  -> checked-clean"; (g) the reconcile-port checklist gains: the verdict word appears in the
+  certification, NOT CHECKED blocks the tag, a re-certification postscript is owed when a tag's
+  preflight is re-run after a preflight fix; (h) the fixed preflight is re-run over
+  port-base-20260905..port-base-20260908 and the verdict recorded as a postscript to RELAY-46.
+  Ships BEFORE the eighth roll.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). port-docgen-docmeta-2026-09-08.md candidate 1 - "the highest-priority item this sweep has
+  produced" - with slot 8's amendment (the repo-wide sweep for the shape found two correct sites and
+  no third instance). Verified in code at drydocs/port/port_preflight.py:359 on 2026-09-09.

@@ -1,0 +1,24 @@
+id: CFG7
+epic: release-infrastructure
+title: "One-off sweep, not a guard - the nineteen gate prompts and two sweepable items still citing the S5-retired file names get the current directory paths with dated AMENDED markers"
+type: chore
+module: config
+phase: 8
+agent: main
+model: haiku
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- config/gate-prompts/
+- docs/restructure/backlog/items/
+acceptance: |
+  The nineteen prompt files citing config/taxonomy-ontology-map.yaml or
+  drydocs_core/ontology/relationship_vocabulary.yaml (both directories since S5) are corrected with
+  the sanctioned [AMENDED 2026-09-xx; was <old-path>] shape (the precedent is
+  code-graph-package-layer.yaml at ecc1622c); the two non-done items too; signed pages get riders,
+  never edits (L25); the validator is green; and because config/gate-prompts/** is canonical-company,
+  one relay line for the next roll is written in this item's notes. Explicitly a sweep: a bare-path
+  guard would fail on the marker recording its own fix.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). premise-drift-2026-09-09.md section 6 ask 2 (25 of 30 broken citations are this one pair).

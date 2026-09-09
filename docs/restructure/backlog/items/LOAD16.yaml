@@ -1,0 +1,24 @@
+id: LOAD16
+epic: team-edition
+title: "Team Edition Phase 4 - the coverage ledger generalized per application and per object class (repos, jobs, folders, tables, datasets, docs) on the ADR 0021 type, with wired: false rows counted as a named blocker class"
+type: task
+module: drydocs-load
+phase: 18
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: [LOAD14, CORE10]
+inputs:
+- drydocs/docs_coverage.py
+- drydocs_core/docs_verify.py
+- config/source-registry.yaml
+acceptance: |
+  Starts after ADR 0015 is ACCEPTED. Per application, per class: declared / inventoried /
+  residual / blocker, the blocker naming its class (semantic hold, wiring hold, SDLC join hole -
+  COLLABORATION Jira projects with no application binding are a declared countable gap, never
+  fuzzy-matched); not-probed never renders as zero; one verb, the base's docs-coverage generalized.
+  Pure declaration join first; the graph probe stays optional through the injected run() seam.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). ADR 0015 follow-up table row 4; D1 says everything else in Team Edition is downstream of this
+  ledger. Phase 4 precedes 5 and 6 deliberately.

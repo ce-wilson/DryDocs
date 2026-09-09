@@ -1,0 +1,30 @@
+id: CORE18
+epic: runtime-topology
+title: "The data root's layout is declared in three places and only two are cross-checked - internal/server-inventory/ leaves the repo tree, bundle.py's hardcoded repo/ prefix moves into config/data-zones.yaml, and the non-overlap invariant covers all three"
+type: task
+module: drydocs-core
+phase: 13
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- config/data-zones.yaml
+- config/source-registry.yaml
+- config/source-descriptors.yaml
+- drydocs/source_registration/bundle.py
+- drydocs_core/landing_zones.py
+- tests/unit/test_data_zones.py
+acceptance: |
+  (a) internal/server-inventory/ moves from a base:repo landing zone to a data-root zone; the README
+  stays as a pointer; drydocs_core/landing_zones.py's three named repo exceptions are true again.
+  (b) The repo/ redirect prefix in drydocs/source_registration/bundle.py is read from
+  config/data-zones.yaml where the other 28 paths live; the extraction test reads the declaration.
+  (c) tests/unit/test_data_zones.py's non-overlap invariant sees the descriptor-declared paths too,
+  naming both sides on a collision. (d) psgmgr-mirror/, synthetic/ and datahub/ are listed and left
+  as they are (Idea-309 clause 3). (e) The larger internal/ reorganization is NOT here; it is
+  inboxed for the Team Edition Phase 1 carve. Lands AFTER the wired build so the two do not collide
+  on config/source-descriptors.yaml.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). Groomed from Idea-309 (2026-09-09). Lane A: every input is a config surface this burst.

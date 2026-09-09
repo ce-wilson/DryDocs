@@ -1,0 +1,27 @@
+id: LOAD15
+epic: team-edition
+title: "Use case 2's base contribution, load half - a stage-only extractor for a field-level mapping workbook (source dataset and field, target dataset and field, rule) that refuses an unknown header shape and writes no graph"
+type: task
+module: drydocs-load
+phase: 18
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: [CFG10, N23]
+inputs:
+- drydocs/loaders/
+- config/source-descriptors.yaml
+- drydocs/source_registration/synthetic.py
+acceptance: |
+  (a) A loader module stages rows keyed (source dataset id, source field, target dataset id,
+  target field, rule) from an xlsx workbook whose declared header shape is checked first; a
+  workbook that does not match is REFUSED with the differing headers named, never guessed at.
+  (b) Zero graph writes, pinned by a test. (c) A synthetic stand-in workbook joins the descriptor's
+  synthetic plan so the extractor is demonstrable in a clone. (d) Its dataset id is minted only
+  after sitting 2 signs the id grammar (the N22 precedent). The mapping EDGE is an edition domain
+  row, never a base term - the ontology proposal item owns the label reservation.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). Plan 2026-09-09, Phase 5 unit 5.8 (load half). ADR 0015 refuses the field grain in the base; the
+  base ships the path and one synthetic example, and the DevOps team's edition mints its own domain
+  company-side.

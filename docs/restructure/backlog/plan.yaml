@@ -90,3 +90,7 @@ plan:
       whose every finding is :Uncertain, weighted, and carries a provenance breadcrumb to its source;
       promotion is an SME gate write (Epic MM; docs/design/deepdoc-data-flow-overview.md).'
     status: todo
+  - id: 18
+    title: Team Edition - the copier template on the edition mechanism
+    goal: ADR 0015 accepted at the identifier sitting; the D2 cut declared, the template generated for two synthetic editions in CI, the coverage ledger generalized, use cases 2 and 3 carried on the base (Epic TE).
+    status: todo

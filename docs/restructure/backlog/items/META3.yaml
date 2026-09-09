@@ -1,0 +1,22 @@
+id: META3
+epic: team-edition
+title: "Team Edition Phase 6 - the requirements chain, commit to author to issue to epic to business justification, loadable as structure, :Uncertain-stamped and promotable only through the gate"
+type: task
+module: drydocs-docmeta
+phase: 18
+agent: main
+model: fable
+priority: p3
+status: todo
+depends_on: [LOAD16]
+inputs:
+- drydocs_docmeta/
+- docs/decisions/0015-team-edition-template.md
+- docs/design/deepdoc-data-flow-overview.md
+acceptance: |
+  Starts after Phase 4 lands. The chain is loadable as structure through the deepdoc :Uncertain
+  boundary; a COLLABORATION Jira project with no application binding is a declared, countable gap
+  in the ledger (ADR 0015 D5), never papered over; promotion is a gate write. The ontology
+  proposals it needs (:SdlcProject and its binding type, MM6) go through the gate first.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). ADR 0015 follow-up table row 6.

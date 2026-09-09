@@ -1,0 +1,20 @@
+id: DEEP1
+epic: mind-map
+title: "investigate.py's opening docstring still describes the reactive on-failure model retired at G32 - restate the corpus-driven-retriever charter or point at __init__"
+type: chore
+module: drydocs-deepdoc
+phase: 17
+agent: main
+model: haiku
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- drydocs_deepdoc/investigate.py
+- drydocs_deepdoc/__init__.py
+acceptance: |
+  The docstring matches the __init__.py charter (G32 2026-08-18, restated MM1 2026-08-21) or is a
+  pointer to it; two lines, no behavior change. While there, re-examine - not decide - whether the
+  noqa F401 parser re-export at investigate.py:13 still has a purpose and say so in the close note.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). plan-deepdoc-libs-2026-09-08.md candidate 1 (L1-1, ranked 1).

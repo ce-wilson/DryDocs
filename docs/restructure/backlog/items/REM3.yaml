@@ -1,0 +1,24 @@
+id: REM3
+epic: component-topology
+title: "detect_all() returns findings with no rule denominator, so an empty list reads as 'conforms' when it means 'no violations among the 17 of 45 rules implemented' - return the evaluated rule ids beside the findings and carry them into the profile"
+type: task
+module: drydocs-remediation
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- drydocs_remediation/detect.py
+- drydocs_remediation/profile.py
+- tests/unit/test_remediation_detect.py
+acceptance: |
+  detect_all returns the evaluated rule ids (CONFORMANCE_RULE_IDS plus R1) beside the findings,
+  and the registry ids NOT evaluated where the registry is readable; profile.py's one caller
+  carries both into the profile JSON so a reader sees the denominator. No gate: stating what was
+  checked asserts nothing new about a job. Once the ADR 0021 type exists this is a FINDINGS result
+  with its size.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). remediation-2026-09-08.md candidate 1 (L1-1, ranked 1). Measured against the module's own standard
+  (equivalence.py's three-valued verdict).

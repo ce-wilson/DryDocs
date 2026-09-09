@@ -1,0 +1,29 @@
+id: PLAN13
+epic: project-board
+title: "lane-handoff learns three things - a pending-<branch>.md capture path carved out of the backlog pen, --mint-pending at Lane A's close, and a remote-ref pass so --suggest and --check see done-on-branch items and dead claims"
+type: task
+module: drydocs-plan
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- .claude/skills/lane-handoff/scripts/handoff.py
+- .claude/skills/lane-handoff/SKILL.md
+- tests/unit/test_lane_handoff.py
+- docs/restructure/ideas/README.md
+acceptance: |
+  (a) The generated Lane B block tells the receiver to capture ideas in
+  docs/restructure/ideas/pending-<branch>.md (PLAN4 d already mints them) instead of a close-report
+  paragraph, and the PENS table and fence carve pending-<branch>.md OUT of the backlog pen so the
+  receiver may write it; Lane A's close gains "run validate.py --mint-pending on each merged pending
+  file before the render". (b) --suggest and --check read the remote refs (the allocator's
+  remote_ids() pattern) and print items done on a pushed wip branch and claims older than 48 hours
+  with no branch. (c) test_lane_handoff.py pins both sentences and both listings. (d) The no-mint
+  rule leaves the string literal at handoff.py and lands in CLAUDE.md section 0 with its derivation
+  (mint, then the stub render, and Lane B holds no render pen) - Lane A carries that edit.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). Plan 2026-09-09, Phase 1 unit 1.5. The reviews' stated bottleneck is that only Lane A mints; the
+  merge is the one moment both lanes' work is in one place.

@@ -1,0 +1,27 @@
+id: LOAD13
+epic: release-infrastructure
+title: "The base's finish line, as a test - from a clean clone, extract the synthetic stand-ins, bootstrap, ingest, verify, report coverage and generate both runbooks, every step green or skipped with its reason"
+type: task
+module: drydocs-load
+phase: 8
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- tests/integration/test_e2e_load.py
+- scripts/build_synthetic_sources.py
+- drydocs/source_registration/bundle.py
+- drydocs/data/samples/
+acceptance: |
+  A sibling of tests/integration/test_e2e_load.py runs the chain: build_synthetic_sources.py
+  --extract into the data root, bootstrap, apply-supplements, ingest-controlm in SOURCE mode on the
+  stand-ins, m3-verify, the coverage report, and both runbook generators once they exist (until
+  then their steps are SKIPPED with that reason, never silent). Without Docker or the tracked bundle
+  it SKIPS with the reason (J78); the run is venue-stamped (J18). ONE named residual, stated in the
+  test's docstring: snow:cmdb-ci-classes is a semantic hold, so its loader is skipped with that
+  reason. No declared finish line existed for the base before this test; this is it.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). Plan 2026-09-09, Phase 2 row 1 (the base finish line). Lane B: it reads config, writes tests and
+  the load module only.

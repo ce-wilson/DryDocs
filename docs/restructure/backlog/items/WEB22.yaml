@@ -1,0 +1,24 @@
+id: WEB22
+epic: web-console
+title: "Run the console-auth-boundary gate - the one drafted-unsigned prompt with no item owning its session - to a recorded outcome"
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on: []
+gates: [console-auth-boundary]
+inputs:
+- config/gate-prompts/console-auth-boundary.yaml
+- config/gate-log.md
+acceptance: |
+  A sign-off session for console-auth-boundary is HELD and recorded in config/gate-log.md as
+  SIGNED, SME-DEFERRED with a named re-arm trigger, or BLOCKED with a named blocker - silence is
+  the one non-outcome. BEFORE: the stale-premise sweep of the drafted page against the console as
+  shipped (ADR 0020 landed, O72 done), markers not rewrites. AFTER: follow-up items for every
+  practice the ruling adopts, or an explicit none-needed note.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). Plan 2026-09-09; the 2026-08-27 run-the-gate sweep's class (a drafting item closes done and nobody
+  owns the RUN) found one more instance. O71 drafted the page.

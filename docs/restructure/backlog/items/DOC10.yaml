@@ -1,0 +1,21 @@
+id: DOC10
+epic: doc-infrastructure
+title: "The review sweep's plan needs a declared environment step - poetry install and a drydocs_core.__file__ venue assertion before any measurement is trusted - closing the firing that measured another worktree's tree"
+type: chore
+module: docs
+phase: 10
+agent: main
+model: haiku
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- docs/reviews/module-review-sweep-plan.md
+acceptance: |
+  Section 4 step 0 of the sweep plan requires poetry install in the venue and an explicit check
+  that drydocs_core resolves from the review worktree before any pytest or coverage number is
+  recorded; the report that found it (core, 2026-09-07) is cited. Edited from the sweep's venue
+  under its review:sweep pen.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). core-2026-09-07.md candidate 8 - "the highest-value thing this firing learned", a J18 failure
+  shape (a claim that does not name its venue).

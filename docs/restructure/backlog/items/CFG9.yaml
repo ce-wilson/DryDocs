@@ -1,0 +1,24 @@
+id: CFG9
+epic: source-column-mappings
+title: "Run the source-descriptor-axes gate in the same sitting as registry-wiring-readiness, and record the outcome"
+type: task
+module: config
+phase: 11
+agent: main
+model: fable
+priority: p1
+status: todo
+depends_on: [CFG8]
+inputs:
+- config/gate-log.md
+- config/source-descriptors.yaml
+acceptance: |
+  Held in ONE session with N18 (the 2026-09-02 shape: the rulings that matter in one message, the
+  rest confirmed-as-drafted and reopenable); the outcome per clause recorded in config/gate-log.md as
+  SIGNED, SME-DEFERRED with a named trigger, or BLOCKED with a named blocker; the wired BUILD item is
+  minted from the record with the signed name, home, polarity and required-versus-optional - never
+  before; ADR 0021's acceptance is recorded in the same message; the gates: field of this item is
+  set when the prompt file lands.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). Plan 2026-09-09, Phase 3 unit 3.3. gates: left empty at mint because the prompt file does not
+  exist yet (a slug must resolve to a file at the commit).

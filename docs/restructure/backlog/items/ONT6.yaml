@@ -1,0 +1,24 @@
+id: ONT6
+epic: team-edition
+title: "Rule where an edition's vocabulary fragment lives - an instance-owned file inside the frozen fragment directory, a declared editions sub-root, or the instance's own tree - as a dated ADR 0015 amendment the reader resolves"
+type: task
+module: ontology
+phase: 18
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on: [N23]
+inputs:
+- docs/decisions/0015-team-edition-template.md
+- drydocs_core/ontology/domain_registry.py
+- tests/unit/test_domain_registry.py
+- config/taxonomy/domains.yaml
+acceptance: |
+  After sitting 2: one dated section in ADR 0015 with the three options and the ruling; the domain
+  registry's on-disk check resolves the ruled root; the CFG1 guard still refuses a base-id reuse from
+  the new location; the amendment states that an edition fragment holds only edition-minted domain
+  rows and never a base id (the B5 rider is not reopened). The copier item depends on this ruling.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). Plan 2026-09-09, Phase 5 unit 5.7. Use case 2's MAPS_TO edge has nowhere to live until this is
+  ruled; ruling it before the copier ships avoids re-templating the fragment directory.

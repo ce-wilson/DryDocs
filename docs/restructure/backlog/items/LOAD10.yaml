@@ -1,0 +1,19 @@
+id: LOAD10
+epic: component-topology
+title: "Collapse catalog.py's eleven duplicated field-validator wrappers into shared Annotated aliases so a model that diverges from the helper becomes inexpressible"
+type: chore
+module: drydocs-load
+phase: 6
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- drydocs/loaders/catalog.py
+acceptance: |
+  A CatalogId-style Annotated alias (and the equivalents for _sparse_name / _name_or_none)
+  replaces the per-model two-line @field_validator/@classmethod delegation blocks across the seven
+  row models. Existing tests cover the behavior; this is a refactor and the suite proves it.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). load-2026-09-08.md candidate 3 (L2-2).

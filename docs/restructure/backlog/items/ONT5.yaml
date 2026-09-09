@@ -1,0 +1,25 @@
+id: ONT5
+epic: team-edition
+title: "Reserve the physical half of the G34 pattern - :CatalogField keyed field_id and one planned edge DataAsset-[:HAS_FIELD]->CatalogField - in the base, with the flip to confirmed riding ONT3's Logical Container prompt, never an edit to a deferred page"
+type: task
+module: ontology
+phase: 18
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- drydocs_core/ontology/relationship_vocabulary/10-node-classifications.yaml
+- drydocs_core/ontology/relationship_vocabulary/42-local-catalog.yaml
+- docs/patterns/data-catalog/data-catalog-schema.cypher
+acceptance: |
+  (a) :CatalogField registered as a planned node classification (key field_id, the pattern's own
+  spelling) and DataAsset-[:HAS_FIELD]->CatalogField as a planned edge, loader ~, supplement ~.
+  (b) The proposal states that the MAPPING edge between fields is an edition domain row, minted by
+  the edition's code, never a base term. (c) The clause that flips these to confirmed is written
+  into ONT3's Logical Container prompt when ONT3 drafts it - the 2026-09-07 record says the three
+  deferred pages stay on disk unchanged. (d) Nothing flips past planned here.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). Plan 2026-09-09, Phase 5 unit 5.9. 10-node-classifications.yaml reserved only the logical
+  CatalogElement (G34) and says the physical half is NOT reserved; use case 2 needs it.

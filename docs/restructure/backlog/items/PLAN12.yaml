@@ -1,0 +1,36 @@
+id: PLAN12
+epic: project-board
+title: "An inputs: existence guard in tests/unit/test_backlog.py - non-done items only, against git ls-files, gitignore-aware, byte-safe - landing green with the five stale item files fixed in the same commit"
+type: task
+module: drydocs-plan
+phase: 8
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- tests/unit/test_backlog.py
+- .claude/skills/groom-backlog/validate.py
+- tests/unit/test_runbook_currency.py
+- docs/restructure/backlog/items/C42.yaml
+- docs/restructure/backlog/items/C44.yaml
+- docs/restructure/backlog/items/CFG4.yaml
+- docs/restructure/backlog/items/DOC5.yaml
+- docs/restructure/backlog/items/Y4.yaml
+acceptance: |
+  Spec is section 4 of docs/reviews/premise-drift-2026-09-09.md, verbatim: (a) for every item whose
+  status is todo or in_progress, every inputs: string resolves against git ls-files, never
+  Path.exists(); (b) bytes on both sides of the pipe (-z) and the docstring says why (J76: text pipes
+  on Windows turned CR into part of the path); (c) gitignored inputs classified with git check-ignore
+  and skipped with a stated reason (LIN3, MM5, MM7, MM9 today); (d) malformed entries on non-done
+  items fail loudly; (e) an INPUT_EXEMPTIONS table, forty-character reasons, shrink-only, on the
+  shape of test_path_exemptions_carry_a_reason_and_are_still_cited; (f) the five item fixes in the
+  SAME commit - C42:19 and C44:55 to drydocs_core/orchestration/controlm/description_tokens.py,
+  CFG4:14 and :32 to docs/design/ui-exploration/two-track-ui-plan.md, DOC5:17 docs/adr/ to
+  docs/decisions/, Y4:15 to docs/restructure/backlog/items/ - so the guard ships with its own proof;
+  (g) validate.py mirrors the check. NOT extended to acceptance:; gate prompts NOT guarded.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). premise-drift-2026-09-09.md section 6 ask 1: "the one drifting surface where the instrument already
+  exists, the data is structured, and nothing has ever been pointed at it". Five of five Lane B items
+  last burst had a premise wrong against the tree.

@@ -1,0 +1,25 @@
+id: CFG11
+epic: team-edition
+title: "A synthetic XMPL domain row in config/taxonomy/domains.yaml with its own vocabulary fragment carrying the field-mapping edge, so extend-never-override is exercised on the real rail beside the test fixture"
+type: task
+module: config
+phase: 18
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: [ONT6, ONT5]
+inputs:
+- config/taxonomy/domains.yaml
+- config/taxonomy/editions.yaml
+- drydocs_core/ontology/domain_registry.py
+- tests/unit/test_domain_registry.py
+acceptance: |
+  After the fragment-placement ruling: one domain row minted_by XMPL (the synthetic edition) whose
+  fragment, at the ruled location, registers the planned edge CatalogField-[:MAPS_TO {rule}]->
+  CatalogField under the edition's authority; the CFG1 guard is green with a real fragment on disk
+  (it must refuse a base-id reuse from there, proven by a negative test); nothing real is named; the
+  DevOps team's edition mints its own code and domain company-side at its own gate.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). Plan 2026-09-09, Phase 5 unit 5.10. A base mints, an instance requests (edition-grain gate B2):
+  the node label is the base's reservation; the mapping edge is the edition's row.

@@ -1,0 +1,25 @@
+id: CFG10
+epic: team-edition
+title: "Use case 2's base contribution, config half - xlsx joins the format axis and the registry schema enum, a classification change made after the axes gate signs so it is never re-ruled"
+type: task
+module: config
+phase: 18
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: [CFG9]
+inputs:
+- config/source-descriptors.yaml
+- config/schemas/source-registry.schema.json
+- drydocs_core/source_descriptors.py
+- tests/unit/test_source_descriptors.py
+acceptance: |
+  xlsx is on the closed format list in config/source-descriptors.yaml and in the registry schema
+  enum; the reader's derivation maps a manual row declaring format xlsx without an override; a
+  test pins the value on its axis; the office-script reader the skills already carry is named as the
+  adapter kind in the descriptor comment. No graph term changes.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). Plan 2026-09-09, Phase 5 unit 5.8 (config half). Layer 1 classification (the TDD's own rule); it
+  waits for the axes sitting only so the five-axes ruling is not reopened by a sixth value the day
+  after.

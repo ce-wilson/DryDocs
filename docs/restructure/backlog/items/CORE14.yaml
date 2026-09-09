@@ -1,0 +1,21 @@
+id: CORE14
+epic: component-topology
+title: "apoc_available() collapses every failure to False - it must tell 'cannot reach the server' from 'APOC not installed' instead of catching bare Exception"
+type: bug
+module: drydocs-core
+phase: 6
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- drydocs_core/neo4j_client.py
+acceptance: |
+  apoc_available() distinguishes connection, auth and network failures from a genuine
+  missing-plugin condition and reports which; a caller that used to read False for both can read
+  the difference; a test covers each class. Once the ADR 0021 type exists this is a probe and
+  returns it; until then the return carries the class explicitly rather than a bool.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). core-2026-09-07.md candidate 3 (S5), "very small". The console's O85 probe pattern, uncorrected
+  in core - an instance of the checked-vs-not-checked family ADR 0021 names.

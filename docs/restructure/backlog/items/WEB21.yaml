@@ -1,0 +1,21 @@
+id: WEB21
+epic: web-console
+title: "Re-check the web coverage ratchet - the statements floor is pinned at 9.8 against a 22,715-line tree that is now 35,197 lines - reading the three thresholds together before re-pinning"
+type: chore
+module: drydocs-web
+phase: 12
+agent: main
+model: haiku
+priority: p3
+status: todo
+depends_on: []
+inputs:
+- web/package.json
+acceptance: |
+  npm run test:coverage where the install exists; the three thresholds (statements, branches,
+  functions) are read together because the denominators may differ; if statements are materially
+  above 9.8 the floor is re-pinned per WEB13's own rule, and the close note records the numbers and
+  the command. The premise-drift review deliberately did not assert drift here; this is the check.
+notes: |
+  Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). web-2026-09-09.md candidate 3 (L2-2). PEN: belongs to the UI-testing session's code:drydocs-web pen (user ruling 2026-09-09); the
+  Lane B queue skips it and Lane A merges it like any wip branch.
