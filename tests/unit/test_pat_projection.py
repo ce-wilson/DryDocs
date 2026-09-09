@@ -260,7 +260,19 @@ def test_file_round_trip_writes_the_two_names_the_refresh_chain_reads(tmp_path: 
     assert report.mapping_rows == 1
     # the committed fixtures and the projection share one header, so the
     # loaders cannot tell a projected file from a fixture — that is the point
-    fixture = REPO / "drydocs" / "data" / "samples" / PAT_PRODUCT_MAPPING_FILE
+    # Spelled as a LITERAL, then tied back to the constant. Removing the skip
+    # guard above made the skip-guard policy demand one here, because a path
+    # ending in an imported constant is UNRESOLVABLE to it and a policy that
+    # cannot name the file cannot clear it. Its error names both fixes — resolve
+    # the path, or keep a guard — and resolving is the right one: a guard is
+    # exactly what LOAD7 is removing. The name-termination the item wanted is not
+    # lost, it is promoted from an implicit consequence of building the path to
+    # an assertion that says what drift means when it happens.
+    fixture = REPO / "drydocs" / "data" / "samples" / "pat_product_mapping__sample.csv"
+    assert fixture.name == PAT_PRODUCT_MAPPING_FILE, (
+        f"the projection writes {PAT_PRODUCT_MAPPING_FILE!r} but the committed fixture is "
+        f"{fixture.name!r} — the constant and the fixture have drifted apart"
+    )
     assert fixture.exists(), (
         f"{fixture} is missing. It is a TRACKED file, so this is a renamed or deleted "
         "fixture, not an absent local one — see this test's docstring."

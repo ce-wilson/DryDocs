@@ -31,6 +31,24 @@ acceptance: |
   (d) The line is re-found at the time of the fix rather than taken from this item - the
       finding was reported at line 220 and sits at 252 on the merged trunk.
 notes: |
+  CORRECTION, CAUGHT WHILE ENUMERATING FOR CORE9 AND FIXED HERE. Removing the skip
+  guard made tests/unit/test_skip_guard_policy.py FAIL, and the first push of this
+  branch was red for one commit. The policy requires a guard on any local-tree path it
+  cannot RESOLVE, and `REPO / "drydocs" / "data" / "samples" / PAT_PRODUCT_MAPPING_FILE`
+  ends in an imported constant, so it is unresolvable to the checker - a policy that
+  cannot name the file cannot clear it. Its error names both fixes: resolve the path, or
+  keep a guard. Keeping a guard is the thing this item exists to remove, so the path is
+  now spelled as a LITERAL and tied back to the constant by an assertion. The
+  name-termination clause (a) wanted is not lost - it is promoted from an implicit
+  consequence of how the path was built into an assertion that says what drift MEANS
+  when it happens.
+
+  WHY IT WAS MISSED, stated so it is not repeated: the J57 guard family named in
+  CLAUDE.md section 6 is module_boundary / render_determinism / no_render_parsing /
+  source_scan / runbook_currency, and test_skip_guard_policy.py is not in it although it
+  is a repo-wide guard of exactly that character - it reads every test file, so a change
+  to ANY test file can turn it red. Worth adding to that list; captured for the sender.
+
   DONE on wip/load7-laptop (Lane B, laptop). The exists() branch is gone, the fixture
   is read unconditionally, and a missing one fails with a message that says what its
   absence actually means.
