@@ -7,7 +7,7 @@ phase: 2
 agent: main
 model: fable
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 gates: [remediation-fix-tracking]
 inputs:
@@ -16,3 +16,73 @@ inputs:
 - drydocs_core/ontology/relationship_vocabulary/20-property-terms.yaml
 acceptance: |
   Gate remediation-fix-tracking SIGNED 2026-08-12. A dedicated drydocs-load loader consumes drydocs.remediation.fix-tracking.v1 change-sets: UNWIND $batch, MATCH on the NODE KEY ((folder_id, job_id) / folder_id) -- NEVER MERGE-creating a target (a missing target is an error, not a node to invent), SET the three ruled properties (remediation_fix_id, remediation_status, remediation_status_date), REMOVE them on rejection. Standard JobRun provenance applies. The §D1 dd: local property_terms entries land with this build (section 0b, prose definitions, revisit standard terms at RDF export). The emitter stays no-graph-write -- the AST guard and corroborate regex are untouched. Enum drift is already refused at emission (FIX_STATUS_ENUM); the loader validates the same enum on intake.
+notes: |
+  DONE on wip/g90-laptop (Lane B, laptop). Built as ruled; four things worth
+  reading before the merge.
+
+  WHERE THE VOCABULARY LANDED. §C1's separation of duties puts the emitter and
+  the loader in two components, and components never import each other, so the
+  schema id, the status enum, the three ruled names, the target NODE KEYs and
+  the change-set reader went to drydocs_core/fix_tracking.py, with
+  drydocs_remediation/changes.py re-exporting the two names it published first
+  (its tested surface is unchanged). That is also what §E1's "drift guard"
+  becomes: there is no second copy to drift, pinned by IDENTITY rather than
+  equality. Hoisted rather than added to DECLARED_COMPONENT_IMPORTS, which
+  carries exactly one entry and calls cross-component imports the defect.
+
+  MATCH-NEVER-MERGE NEEDED A PREFLIGHT TO MEAN ANYTHING. Writing MATCH instead
+  of MERGE only gets half of §C1: a MATCH that finds nothing writes nothing and
+  reports OK, so a change-set naming five jobs of which two were never loaded
+  would come back successful having marked three. The loader resolves EVERY
+  target first and refuses the whole change-set if any is absent, before
+  _open_run, so a refused load writes nothing at all -- not even the :JobRun.
+  Same all-or-nothing posture graph_anchors takes at the emitting end.
+
+  THREE PROPERTIES, NOT FIVE -- a correction made mid-build. The first draft
+  also set remediation_last_run_id and remediation_last_loaded_at. §B1 ruled
+  three names, and "which run marked this fix, and when" is what the :JobRun
+  edge already answers; a fourth remediation_* property would be an unruled
+  name in a ruled namespace with no §D1 property_terms entry. Removed, and
+  pinned by a guard so the next draft cannot re-add them quietly. If the SME
+  DOES want run stamps on the node, that is a gate amendment, not a code change.
+
+  REJECTION IS A MODE, NOT A STATUS. The ruled enum has no rejected member
+  (§B2), so the v1 artifact cannot carry the intent and the caller states it
+  (--mode apply|reject). The reject branch is fenced on remediation_fix_id: a
+  stale rejection must not strip a NEWER fix's marks, the one way this loader
+  could destroy a fact it did not write.
+
+  AD HOC AND SOURCELESS, both by ruling. §C2 was declined so a fix is markable
+  the hour its package ships, so load-fix-tracking sits in AD_HOC_COMMANDS and
+  no refresh cadence. source_id is None because the input is an artifact this
+  system emits, not an external feed -- the N3 exemption carries the reason.
+
+  VERIFIED. 22 unit tests against a recording client, two of them
+  positive-controlled (MATCH->MERGE and preflight-after-load each turn the
+  matching test red). Plus a round-trip test that emits with the real
+  fix_tracking_changeset and reads with parse_change_set, because every other
+  test feeds the reader a fixture the test file wrote. LIVE: the template was
+  EXPLAINed (compile-only, no writes, no data touched) on the LAPTOP, Neo4j
+  Kernel 2026.05.0 Enterprise, database `drydocs` -- it compiles. The first
+  draft used a CALL{} UNION subquery, which has no precedent in this repo and
+  raised a Cypher-version question; it was replaced with the OPTIONAL MATCH +
+  CASE idiom the preflight already used. Both compile; the shared idiom was
+  chosen for a correctness reason, not style -- a preflight that resolves by
+  one rule while the write resolves by another can pass its check and still
+  miss.
+
+  FOR LANE A AT MERGE:
+  - RENDERS: a new loader + command means web/src/generated/load-map.json and
+    docs/plan/load-map.html need the refresh. Lane B does not render.
+  - PORT-MANIFEST: nothing needed. All four new files fall under existing
+    catch-all rows (drydocs_core/**, drydocs/**, tests/**), so the fall-through
+    guard is satisfied -- no row to add, no hunt.
+  - SENDER'S RULING vs ACCEPTANCE: the handoff said G90 "reads
+    20-property-terms.yaml ... writes neither". The acceptance and gate §E1
+    both REQUIRE the three §D1 entries in that file. Acceptance won; the write
+    is confined to that one file, appended at the end of section 0b. Flagging
+    it rather than leaving it to be noticed at merge.
+  - IDEA (not mine to take): the Cypher stripper in test_vocabulary_endpoints.py
+    now has TWO consumers. test_source_scan.py pins it as an exemption and says
+    promoting it is "a DECISION to re-take, not a test to delete". That decision
+    is now ripe.

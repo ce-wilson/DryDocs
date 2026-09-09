@@ -72,6 +72,11 @@ class UnresolvedFixTargetError(FixTrackingError):
 #: NODE KEYs, so each matches at most one node, and a null job_id matches
 #: nothing (a property comparison against null never matches) — which is why a
 #: folder row's job branch is naturally empty without a guard.
+#:
+#: THE WRITE TEMPLATE RESOLVES THE SAME WAY, on purpose. If this checked targets
+#: by one rule while ``fix_tracking.cypher`` wrote by another, the preflight
+#: could pass and the write still miss — which is precisely the failure the
+#: preflight exists to prevent, reintroduced one layer down.
 _RESOLVE_TARGETS = """
 UNWIND $batch AS row
 OPTIONAL MATCH (j:ControlMJob {folder_id: row.folder_id, job_id: row.job_id})
@@ -157,19 +162,33 @@ class FixTrackingLoader(BaseLoader):
         super()._preflight_indexes()
         self._preflight_targets()
 
+    def _probe_batch(self) -> list[dict[str, Any]]:
+        """The rows the preflight sends, coerced the way the WRITE will send them.
+
+        YAML types are not the graph's: an unquoted ``folder_id: 123`` parses as
+        an int, and ``FixTrackingRow`` turns it into ``"123"`` before the write
+        ever sees it. Probing with the raw value would compare an int against a
+        string property and report a target that exists as missing — a refusal
+        rather than a mis-write, so the direction is safe, but it is still the
+        wrong answer. Validating here means the preflight asks about exactly the
+        values the write will use.
+        """
+        return [self.to_params(self.row_model.model_validate(row)) for row in self._rows]
+
     def _preflight_targets(self) -> None:
         """Refuse the whole change-set unless every target resolves (§C1)."""
         if not self._rows:
             raise UnresolvedFixTargetError(
                 f"{self.name}: the change-set names no targets — nothing to apply."
             )
-        resolved = self.client.run(_RESOLVE_TARGETS, batch=self._rows)
+        probe = self._probe_batch()
+        resolved = self.client.run(_RESOLVE_TARGETS, batch=probe)
         found = {
             (r.get("kind"), r.get("folder_id"), r.get("job_id")) for r in resolved if r.get("found")
         }
         missing = [
             row
-            for row in self._rows
+            for row in probe
             if (row.get("kind"), row.get("folder_id"), row.get("job_id")) not in found
         ]
         if missing:

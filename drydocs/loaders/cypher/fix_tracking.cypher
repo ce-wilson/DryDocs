@@ -40,23 +40,23 @@
 
 UNWIND $batch AS row
 
-// The row's `kind` discriminator picks the branch; each branch MATCHes on that
-// label's NODE KEY verbatim (constraints.cypher). A UNION subquery rather than
-// two OPTIONAL MATCHes: this way a row that resolves to nothing produces no
-// output row at all, so the write clauses below cannot run against a null.
-CALL {
-  WITH row
-  WITH row WHERE row.kind = 'job'
-  MATCH (n:ControlMJob {folder_id: row.folder_id, job_id: row.job_id})
-  RETURN n
-  UNION
-  WITH row
-  WITH row WHERE row.kind = 'folder'
-  MATCH (n:ControlMFolder {folder_id: row.folder_id})
-  RETURN n
-}
-
-WITH row, n
+// Resolve each row to its node, keyed on that label's NODE KEY verbatim
+// (constraints.cypher), and drop anything that resolved to nothing so the write
+// clauses below can never run against a null.
+//
+// THE SAME IDIOM THE PREFLIGHT USES, deliberately. _RESOLVE_TARGETS in
+// fix_tracking.py resolves targets exactly this way, so "what the preflight
+// checked" and "what the write touches" cannot be two different questions — a
+// preflight that resolved by one rule while the write resolved by another would
+// pass its check and still miss, which is the failure the preflight exists to
+// prevent. Neither OPTIONAL MATCH can multiply rows: both patterns are NODE
+// KEYs, so each matches at most one node, and the job pattern matches nothing
+// for a folder row because its job_id is null and a property comparison against
+// null never matches.
+OPTIONAL MATCH (j:ControlMJob {folder_id: row.folder_id, job_id: row.job_id})
+OPTIONAL MATCH (f:ControlMFolder {folder_id: row.folder_id})
+WITH row, CASE row.kind WHEN 'job' THEN j WHEN 'folder' THEN f END AS n
+WHERE n IS NOT NULL
 
 // §B1 — the three ruled names, applied together. A partial application would
 // leave a node claiming a status with no fix id to trace it to.

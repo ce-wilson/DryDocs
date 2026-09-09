@@ -270,9 +270,9 @@ def test_the_template_matches_and_never_merges_a_target(tmp_path: Path) -> None:
     template = FixTrackingLoader.cypher_path
     assert template is not None
     code = cypher_code_only(template.read_text(encoding="utf-8"))
-    for label in ("ControlMJob", "ControlMFolder"):
-        assert f"MATCH (n:{label}" in code
-        assert f"MERGE (n:{label}" not in code
+    for var, label in (("j", "ControlMJob"), ("f", "ControlMFolder")):
+        assert f"OPTIONAL MATCH ({var}:{label}" in code
+        assert f"MERGE ({var}:{label}" not in code
         assert f"MERGE (:{label}" not in code
     # the only MERGE the template is allowed is the :JobRun provenance edge
     for line in code.splitlines():
@@ -329,6 +329,30 @@ def test_an_unresolved_target_refuses_the_whole_change_set(tmp_path: Path) -> No
     assert "DAILY_EXTRACT" in message  # named, so the operator can act on it
     assert "J-1" in message
     assert "PAYMENTS_DAILY" not in message  # the resolvable one is not blamed
+
+
+def test_the_preflight_probes_the_values_the_write_will_send(tmp_path: Path) -> None:
+    """YAML types are not the graph's.
+
+    An unquoted ``folder_id: 123`` parses as an int; ``FixTrackingRow`` coerces
+    it to ``"123"`` before the write sees it. If the preflight probed the raw
+    value it would compare an int against a string property, call an existing
+    target missing, and refuse a change-set that was fine. Both batches must
+    carry the same values — which is what makes "the preflight checked it" mean
+    "the write will find it".
+    """
+    target = dict(JOB_TARGET)
+    target["node_key"] = {"folder_id": 123, "job_id": 456}
+    rows = change_set_rows(_write(tmp_path, targets=[target]))
+
+    client = _RecordingClient()
+    FixTrackingLoader(client, rows, mode=APPLY, run_log=False).load()
+
+    probe = next(bind for cypher, bind in client.calls if "n IS NOT NULL" in cypher)
+    _, written = client.batch_call()
+    assert probe["batch"] == written["batch"]
+    assert written["batch"][0]["folder_id"] == "123"
+    assert written["batch"][0]["job_id"] == "456"
 
 
 def test_the_refusal_happens_before_the_run_opens(tmp_path: Path) -> None:
