@@ -139,8 +139,18 @@ sections:
     fill: front_matter
     sor: [folder-attribution, controlm-graph]
     derived: "Application name and SEAL id (via the folder's batch port), the\
-      \ Control-M folder the book covers, the classification carried by the SEAL\
-      \ record, and the source commit the revision reflects."
+      \ Control-M folder the book covers, the environment and line of business the\
+      \ folder name decodes to, and — the one a support reader must not miss —\
+      \ whether the folder is ACTIVELY SCHEDULED. That comes from user_daily, the\
+      \ one lifecycle field whose meaning the typed model settles (null = inactive,\
+      \ quarantined not dropped); an inactive folder gets a WARNING on the cover,\
+      \ not a table row. The table_status letter code is printed RAW and named as\
+      \ undefined, because the repo's own source mapping says 'BMC definition still\
+      \ to confirm' — reading R as 'retired' would be a guess wearing the clothes\
+      \ of a fact, in the part of a run book a reader trusts most. Two\
+      \ classifications are shown and kept apart: the DryDocs one the outline asks\
+      \ for, and the SEAL record's own info_classification, labeled as the source's\
+      \ term."
     residue: "Project name, document version and date are document metadata, not\
       \ application facts — the generator takes them as parameters and a run that\
       \ does not supply them says so on the cover."

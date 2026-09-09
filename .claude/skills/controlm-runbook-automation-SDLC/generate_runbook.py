@@ -578,6 +578,48 @@ def capture_table(header: list[str]) -> str:
 # --------------------------------------------------------------------------
 
 
+def _scheduling_state(facts: FolderFacts) -> str:
+    """Whether the folder is scheduling, from the ONE field whose meaning is settled.
+
+    ``user_daily`` is documented in the typed model as the active-scheduling flag,
+    null meaning inactive — quarantined, not dropped. That is a fact about the
+    folder a support reader must not miss.
+    """
+    flag = (facts.folder.get("user_daily") or "").strip()
+    if flag.upper() == "Y":
+        return "yes"
+    if not flag:
+        return "**NO — this folder is not actively scheduled** (quarantined, not dropped)"
+    return f"flag is `{flag}`, which is neither Y nor empty — check the folder in Control-M"
+
+
+def _lifecycle_code(facts: FolderFacts) -> str:
+    """The raw lifecycle code, WITHOUT inventing a meaning for the letter.
+
+    ``table_status`` is a one-character code and the repo's own source mapping
+    says "BMC definition still to confirm". Reading `R` as "retired" would be a
+    guess wearing the clothes of a fact, in the section of a run book a reader
+    trusts most. Print the code, name it as undefined, and let the reader ask.
+    """
+    code = (facts.folder.get("table_status") or "").strip()
+    if not code:
+        return UNKNOWN
+    return f"`{code}` — the code's meaning is not defined in any source we hold"
+
+
+def _inactive_banner(facts: FolderFacts) -> list[str]:
+    """A cover warning when the folder is not scheduling. Empty otherwise."""
+    if (facts.folder.get("user_daily") or "").strip().upper() == "Y":
+        return []
+    return [
+        ">",
+        "> **THIS FOLDER IS NOT ACTIVELY SCHEDULED.** Its active-scheduling flag is not set,",
+        "> which the typed model documents as inactive — quarantined, not dropped. Treat every",
+        "> procedure below as historical until someone confirms the folder's status in",
+        "> Control-M itself.",
+    ]
+
+
 def _r_front_matter(spec: dict, facts: FolderFacts, meta: dict) -> str:
     app = facts.application or {}
     name = app.get("name") or facts.folder_name
@@ -602,7 +644,10 @@ def _r_front_matter(spec: dict, facts: FolderFacts, meta: dict) -> str:
         ["**Reflects**", meta.get("reflects") or UNKNOWN],
         ["**Environment**", parsed.environment or UNKNOWN],
         ["**Line of business**", parsed.lob or UNKNOWN],
+        ["**Active scheduling**", _scheduling_state(facts)],
+        ["**Folder lifecycle status code**", _lifecycle_code(facts)],
     ]
+    banner = _inactive_banner(facts)
     return "\n".join(
         [
             f"# {name} — SDLC Application Run Book",
@@ -621,6 +666,7 @@ def _r_front_matter(spec: dict, facts: FolderFacts, meta: dict) -> str:
             ">",
             "> **A FILLED run book is Internal.** Move it to `internal/` or `internal-local/`",
             "> before adding real values; nothing under this skill directory may carry them.",
+            *banner,
             "",
             table(["", ""], rows),
             "",
