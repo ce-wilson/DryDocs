@@ -231,3 +231,30 @@ addopts = "-ra --strict-markers -m 'not integration'"
 markers = [
     "integration: end-to-end tests requiring Docker (testcontainers); opt-in via -m integration",
 ]
+# WARNING DISPOSITIONS (DOC8, 2026-09-09). The J67 matrix made warnings visible at
+# three interpreters and nobody had read them: the 3.14 advisory leg reported 37 and
+# the 3.12 blocking leg 7. Deduplicated by message they are TWO classes, and the
+# thirty-warning gap is one dependency deprecation repeated across the suite -- read
+# from run 34372329929 (2026-09-09), all four legs.
+#
+# Every entry is filtered BY MESSAGE with its reason and its removal trigger, so an
+# entry that outlives its subject is visible rather than silent. A class that is OURS
+# to fix does not belong here -- it gets fixed.
+filterwarnings = [
+    # neo4j 5.x calls asyncio.iscoroutinefunction, deprecated in 3.14 and slated for
+    # removal in 3.16. THIS IS THE WHOLE 3.14 GAP: 30 of the 37, one call site
+    # (neo4j/_meta.py:213) re-entered once per driver construction. Not ours to fix --
+    # it is the vendored driver's, and pinning or patching it to silence a warning
+    # would be worse than the warning. REMOVAL TRIGGER: a neo4j release that uses
+    # inspect.iscoroutinefunction; drop this line and the count should stay at zero.
+    "ignore:'asyncio.iscoroutinefunction' is deprecated:DeprecationWarning",
+    # Our own ADR 0014 clause 1 deprecation, emitted by drydocs_core/run_log.py when
+    # the legacy SPIDERP_LOGDIR is the variable that resolved. It is the BASELINE on
+    # every leg -- 7 on 3.11, on both 3.12s and inside the 3.14 total -- and it is
+    # correct behaviour rather than a defect: seven tests exercise the legacy path on
+    # purpose, so the warning fires because the deprecation works. Filtered rather
+    # than fixed because fixing it would mean not testing the path that still ships.
+    # REMOVAL TRIGGER: ADR 0014's own -- the port after that ADR was accepted, which
+    # removes the variable. When it goes, this line must go with it.
+    "ignore:SPIDERP_LOGDIR is deprecated:DeprecationWarning",
+]
