@@ -47,6 +47,21 @@ poetry run python .claude/skills/controlm-runbook-automation-SDLC/generate_runbo
 Both sources build the same `FolderFacts`, so the renderer cannot tell them
 apart and every document names on its cover which one produced it.
 
+**Same shape, not always the same content — and the difference is the point.**
+Run both for one folder and diff them: the sections, tables and columns are
+identical, and what differs is what the two sources actually hold. For the
+refund folder in the bundled estate the graph resolves 12 ownership contacts to
+the CSV bundle's 9, because it carries the SEAL application-data roles as
+attributions too, and it reports a *confirmed* attribution edge where the CSV
+path can only offer the id the folder name carries. The cover's coverage block
+states which it was, every time.
+
+That diff is also the test the two paths get held to. Two Cypher bugs were found
+by running it and by nothing else — a `:Condition` join that could not cross
+folders, and a `:Role` label that matches nothing because the role vocabulary
+uses `:TOMRole`. Neither raised an error; each just quietly rendered a worse
+document than the sample path did.
+
 ## The provenance vocabulary — the `-excel` sibling's, on purpose
 
 `section-spec.yaml` labels every section with one of three values, and they are

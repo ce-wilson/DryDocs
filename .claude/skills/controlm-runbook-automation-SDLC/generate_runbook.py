@@ -158,7 +158,7 @@ class FolderFacts:
     #: by a job in a DIFFERENT folder, so a folder-scoped lookup would report all
     #: seven as "external" and the most useful sentence in the run book ("this
     #: waits on that job over there") would never be written.
-    emitters: dict[str, tuple[str, str]] = field(default_factory=dict)
+    emitters: dict[str, list[tuple[str, str]]] = field(default_factory=dict)
     #: condition name -> the (folder, job) pairs that WAIT on it, estate-wide. The
     #: mirror of `emitters`, and the one fact in this whole document that answers
     #: "if this folder is late, who else is late" — the question a support
@@ -225,12 +225,20 @@ class FolderFacts:
         return sorted(rows, key=lambda c: (int(c.get("order_") or 0), c.get("condition_name", "")))
 
     def emitted_by(self, condition_name: str) -> str:
-        """Who raises ``condition_name`` — 'job (folder)', or '' if nothing here does."""
-        hit = self.emitters.get(condition_name)
-        if not hit:
+        """EVERY job that raises ``condition_name``, or '' if nothing here does.
+
+        Plural on purpose. One condition name can be raised by several jobs — in
+        the bundled sample, ``PL-PARAD0010_..._DAT_ONPM_FW-OK`` is raised from two
+        different folders — and naming only the first would tell a reader chasing
+        a late upstream to go look at the wrong job. Whichever emitter actually
+        ran late, the run book has to list them all.
+        """
+        raising = self.emitters.get(condition_name) or []
+        if not raising:
             return ""
-        folder, job = hit
-        return job if folder == self.folder_name else f"{job} in `{folder}`"
+        return " or ".join(
+            job if folder == self.folder_name else f"{job} in `{folder}`" for folder, job in raising
+        )
 
 
 # --------------------------------------------------------------------------
@@ -294,14 +302,16 @@ def load_from_samples(folder_name: str, samples_dir: Path = SAMPLES_DIR) -> Fold
     all_jobs = _read_csv(samples_dir / "controlm_jobs__sample.csv")
     job_by_key = {(j.get("folder_id"), j.get("job_id")): j for j in all_jobs}
     folder_by_id = {f["folder_id"]: f.get("sched_table", "") for f in folders}
-    emitters: dict[str, tuple[str, str]] = {}
+    emitters: dict[str, list[tuple[str, str]]] = {}
     for cond in all_out:
         job = job_by_key.get((cond.get("folder_id"), cond.get("job_id")))
         if job:
-            emitters.setdefault(
-                cond.get("condition_name", ""),
-                (folder_by_id.get(cond.get("folder_id", ""), ""), job.get("job_name", "")),
-            )
+            pair = (folder_by_id.get(cond.get("folder_id", ""), ""), job.get("job_name", ""))
+            raising = emitters.setdefault(cond.get("condition_name", ""), [])
+            if pair not in raising:
+                raising.append(pair)
+    for raising in emitters.values():
+        raising.sort()
 
     consumers: dict[str, list[tuple[str, str]]] = {}
     for cond in all_in:
@@ -401,19 +411,35 @@ RETURN j.job_id AS job_id, c.name AS condition_name
 
 # Estate-wide, so a cross-folder emitter can be named rather than reported as
 # "external". Scoped to the conditions this folder actually waits on.
+#
+# THE JOIN IS ON THE NAME, NOT ON THE NODE, and that is the whole correctness of
+# these two queries. `constraints.cypher` declares
+#     REQUIRE (c.folder_id, c.name) IS NODE KEY
+# so a :Condition node is PER FOLDER by design: one condition name that crosses
+# folders exists as several distinct nodes. Measured on the bundled estate, the
+# name `PL-PARAD0010_PEX_EXPLOANRQTDTL_DAT_ONPM_FW-OK` is three nodes in three
+# folders. A pattern that matches the waiter's node and the emitter's node as the
+# SAME `c` therefore resolves only same-folder pairs — it returns zero rows for
+# exactly the cross-folder case these queries exist to answer, and the document
+# then tells a Tier 2 engineer that an upstream is outside the estate while the
+# graph holds the emitting job and folder. That is the quietly-wrong run book
+# this skill is supposed to prevent, so the join reads the name.
 EMITTERS_QUERY = """
 MATCH (target:ControlMFolder {sched_table: $folder})-[:CONTAINS_JOB]->(tj:ControlMJob)
-MATCH (tj)-[:REQUIRES_IN_CONDITION]->(c:Condition)
-MATCH (src:ControlMFolder)-[:CONTAINS_JOB]->(sj:ControlMJob)-[:EMITS_OUT_CONDITION]->(c)
-RETURN DISTINCT c.name AS condition_name, src.sched_table AS folder, sj.job_name AS job
+MATCH (tj)-[:REQUIRES_IN_CONDITION]->(cin:Condition)
+MATCH (src:ControlMFolder)-[:CONTAINS_JOB]->(sj:ControlMJob)-[:EMITS_OUT_CONDITION]->(cout:Condition)
+WHERE cout.name = cin.name
+RETURN DISTINCT cin.name AS condition_name, src.sched_table AS folder, sj.job_name AS job
 """
 
-# The mirror: who WAITS on what this folder emits. The blast radius.
+# The mirror: who WAITS on what this folder emits. The blast radius. Same
+# name-join rule, same reason.
 CONSUMERS_QUERY = """
 MATCH (target:ControlMFolder {sched_table: $folder})-[:CONTAINS_JOB]->(tj:ControlMJob)
-MATCH (tj)-[:EMITS_OUT_CONDITION]->(c:Condition)
-MATCH (dst:ControlMFolder)-[:CONTAINS_JOB]->(dj:ControlMJob)-[:REQUIRES_IN_CONDITION]->(c)
-RETURN DISTINCT c.name AS condition_name, dst.sched_table AS folder, dj.job_name AS job
+MATCH (tj)-[:EMITS_OUT_CONDITION]->(cout:Condition)
+MATCH (dst:ControlMFolder)-[:CONTAINS_JOB]->(dj:ControlMJob)-[:REQUIRES_IN_CONDITION]->(cin:Condition)
+WHERE cin.name = cout.name
+RETURN DISTINCT cout.name AS condition_name, dst.sched_table AS folder, dj.job_name AS job
 """
 
 # The attribution edge lands on the application's BATCH PORT, never on the
@@ -425,11 +451,18 @@ MATCH (a:BusinessApplication {app_id: p.parent_app_id})
 RETURN properties(a) AS app, p.active_state AS port_state
 """
 
+# The HAD_ROLE target is NOT constrained to a label. The role vocabulary's nodes
+# carry `:TOMRole`, and a `:Role` there matches nothing — every contact then
+# renders as "unlabeled role", which is not an error anywhere, just twelve
+# identical-looking rows in the one table an escalation is routed from. A second
+# guessed label after `Condition.condition_name`; both were caught by comparing
+# the graph path's output against the samples path's, which is the reason the two
+# paths render the same structure.
 CONTACTS_QUERY = """
 MATCH (a:BusinessApplication {app_id: $app_id})-[:QUALIFIED_ATTRIBUTION]->(at:Attribution)
 MATCH (at)-[:HAS_AGENT]->(e:Employee)
-OPTIONAL MATCH (at)-[:HAD_ROLE]->(r:Role)
-RETURN coalesce(r.pref_label, 'unlabeled role') AS role,
+OPTIONAL MATCH (at)-[:HAD_ROLE]->(r)
+RETURN coalesce(r.pref_label, r.id, 'unlabeled role') AS role,
        e.full_name AS name, e.employee_id AS employee_id, e.email AS email
 """
 
@@ -471,9 +504,14 @@ def load_from_graph(client, folder_name: str, venue: str) -> FolderFacts:
     ]
     cond_out.sort(key=lambda c: (c["job_id"], c["condition_name"]))
 
-    emitters: dict[str, tuple[str, str]] = {}
+    emitters: dict[str, list[tuple[str, str]]] = {}
     for row in client.run(EMITTERS_QUERY, {"folder": folder_name}):
-        emitters.setdefault(row["condition_name"], (row["folder"] or "", row["job"] or ""))
+        pair = (row["folder"] or "", row["job"] or "")
+        raising = emitters.setdefault(row["condition_name"], [])
+        if pair not in raising:
+            raising.append(pair)
+    for raising in emitters.values():
+        raising.sort()
 
     consumers: dict[str, list[tuple[str, str]]] = {}
     for row in client.run(CONSUMERS_QUERY, {"folder": folder_name}):

@@ -11,7 +11,7 @@
 # owns the section set, the order, the headings and the guidance. This file adds
 # exactly one layer on top: provenance per section. Every `anchor` below must
 # exist in that outline and every required anchor in that outline must appear
-# below — tests/unit/test_sdlc_runbook_spec.py fails on either kind of drift, so
+# below — tests/unit/test_sdlc_runbook_generator.py fails on either kind of drift, so
 # a section added to the outline cannot silently arrive unlabeled here.
 #
 # ---------------------------------------------------------------------------
@@ -106,10 +106,16 @@ sor_citations:
       \ and the job-to-job (:ControlMJob)-[:WAS_INFORMED_BY]->(:ControlMJob) edge\
       \ derived from them."
   hosts:
-    cite: ".claude/skills/controlm-runbook-automation-excel/SKILL.md — column map row\
-      \ 'Folder, job names, descriptions, start times, CYCLIC, calendar'"
-    detail: "(:ControlMJob)-[:RUNS_ON]->(:ControlMHostGroup|:ExecutionHost) and\
-      \ (:ControlMFolder)-[:SCHEDULED_ON]->(:ControlMServer)."
+    cite: "NO -excel column-map row — the workbook carries no host column, so this\
+      \ is THIS skill's own derivation. Said plainly rather than borrowing a\
+      \ neighbouring row's authority: a citation that does not support the claim it\
+      \ is attached to is worse than no citation, because it survives a check."
+    detail: "(:ControlMJob)-[:RUNS_ON]->(:ControlMHostGroup|:ExecutionHost), where the\
+      \ two labels carry the host name under DIFFERENT properties — `name` on the\
+      \ group, `nodeid` on the host, read off the live schema rather than assumed —\
+      \ plus (:ControlMFolder)-[:SCHEDULED_ON]->(:ControlMServer). The job's own\
+      \ node_id is the fallback where no host row was ingested, which is the common\
+      \ case in the bundled sample."
   cmd-line:
     cite: ".claude/skills/controlm-runbook-automation-excel/SKILL.md — column map row\
       \ 'Command line, script/jar, param files'"
