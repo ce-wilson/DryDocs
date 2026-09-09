@@ -7,7 +7,7 @@ phase: 9
 agent: main
 model: sonnet
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - tests/unit/test_pat_projection.py
@@ -31,6 +31,74 @@ acceptance: |
   (d) The line is re-found at the time of the fix rather than taken from this item - the
       finding was reported at line 220 and sits at 252 on the merged trunk.
 notes: |
+  CORRECTION, CAUGHT WHILE ENUMERATING FOR CORE9 AND FIXED HERE. Removing the skip
+  guard made tests/unit/test_skip_guard_policy.py FAIL, and the first push of this
+  branch was red for one commit. The policy requires a guard on any local-tree path it
+  cannot RESOLVE, and `REPO / "drydocs" / "data" / "samples" / PAT_PRODUCT_MAPPING_FILE`
+  ends in an imported constant, so it is unresolvable to the checker - a policy that
+  cannot name the file cannot clear it. Its error names both fixes: resolve the path, or
+  keep a guard. Keeping a guard is the thing this item exists to remove, so the path is
+  now spelled as a LITERAL and tied back to the constant by an assertion. The
+  name-termination clause (a) wanted is not lost - it is promoted from an implicit
+  consequence of how the path was built into an assertion that says what drift MEANS
+  when it happens.
+
+  WHY IT WAS MISSED, stated so it is not repeated: the J57 guard family named in
+  CLAUDE.md section 6 is module_boundary / render_determinism / no_render_parsing /
+  source_scan / runbook_currency, and test_skip_guard_policy.py is not in it although it
+  is a repo-wide guard of exactly that character - it reads every test file, so a change
+  to ANY test file can turn it red. Worth adding to that list; captured for the sender.
+
+  DONE on wip/load7-laptop (Lane B, laptop). The exists() branch is gone, the fixture
+  is read unconditionally, and a missing one fails with a message that says what its
+  absence actually means.
+
+  (d) done first, as the item asked: the skip was re-found at this tree rather than
+  taken from the item. It sits at lines 251-252 of tests/unit/test_pat_projection.py
+  on the merged trunk, which is where the item said it would be.
+
+  ONE CORRECTION TO CLAUSE (a), and it changed the line that went into the code.
+  The acceptance says "drydocs/data/ is gitignored but drydocs/data/samples/ is carved
+  back in (fourteen tracked files)". There is NO carve-out. `.gitignore` has no `!`
+  negation for that path, and `git check-ignore -v --no-index` confirms the
+  `drydocs/data/` pattern still MATCHES the fixture. The fourteen files are present in
+  every clone for a different reason: they are already TRACKED, and git's ignore rules
+  do not apply to tracked files. The conclusion the item drew is unaffected and
+  correct - the skip can never fire on a clone - but the mechanism is different, and
+  clause (b) asked for a docstring line carrying the reason. Writing "carved back in"
+  into a test docstring would have put a false statement into a repo whose comments
+  carry its rulings, so the docstring states the tracking reason instead. Corroboration
+  that this is the right reading: tests/unit/test_data_centers.py's own docstring
+  already calls them "the force-tracked samples".
+
+  VERIFIED BOTH WAYS rather than just green. With the fixture present, 12 pass. With
+  the fixture moved aside, the test FAILS (it would previously have skipped) - the
+  positive control for the whole point of the item. Fixture restored; ruff check and
+  ruff format --check clean.
+
+  (c) unchanged as instructed: the assertion that the committed fixture and the
+  projection share one header is untouched, and it is now actually protected.
+
+  FOR LANE A - the same fake-skip class, TWO MORE CONFIRMED, out of scope here:
+  - tests/unit/test_classification.py:57 skips on `config/source-registry.yaml`
+    "not present"
+  - tests/unit/test_classification.py:101 skips on `reference/REGISTRY.yaml`
+    "not present"
+  Both files are TRACKED (`git ls-files --error-unmatch` confirms), so both skips can
+  never fire and both assertions behind them are protected by nothing - identical to
+  what LOAD7 just fixed, and to the class CORE4 removed from the demo interlock.
+  Not taken here because LOAD7's acceptance is scoped to test_pat_projection and
+  widening it would have made the item unreviewable. Worth its own item.
+  Two more are CANDIDATES that need the same tracked-or-not check before anyone acts,
+  and are NOT claimed as defects: tests/unit/test_schema.py:163 (VOCAB_FILE - the
+  vocabulary became a fragment DIRECTORY at S5, so what `.exists()` answers there needs
+  looking at) and tests/unit/test_data_centers.py:42 (its skip reasons explicitly about
+  a corpus that legitimately varies per clone, so it may well be correct as written).
+  tests/unit/test_code_snapshot_loader.py and test_command_parser.py:299 guard
+  genuinely-absent gitignored artifacts and look correct.
+
+  No render needed; no new tracked paths, so no PORT-MANIFEST row.
+
   Groomed 2026-09-08 from IDEAS.md Idea-295 (base venue, desktop); reported in the CORE4 close
   note.
 
