@@ -35,6 +35,7 @@ import csv
 import re
 from pathlib import Path
 
+import pytest
 import yaml
 
 REPO = Path(__file__).resolve().parents[2]
@@ -62,17 +63,19 @@ def _server_names() -> set[str]:
 
 
 def _controlm_nodeids() -> set[str]:
-    """The Control-M sample's host names. No skip: the sample is a tracked file.
+    """The Control-M sample's host names, or a skip where the sample is not.
 
-    CORE9: the skip that used to stand here is GONE. Its own docstring already
-    conceded the file "is present in every clone and the skip never fires", and
-    it argued only about SCOPE — per-test rather than module-level, so it could
-    not go quiet on the assertions above it. The rewritten policy answers the
-    prior question instead: `drydocs/data/` is gitignored wholesale, but this
-    CSV is TRACKED inside it, and a tracked path needs no guard at all, because
-    a missing tracked file means a broken clone and the interlock should say so
-    loudly rather than excusing itself.
+    The sample is TRACKED here and absent on every consumer: drydocs/data/** is
+    `never-port` in PORT-MANIFEST.yaml, so the port never carries it, and this
+    file crosses. CORE9 (2026-09-08) removed the skip on the CORE4 premise that a
+    tracked path is in every clone - true of clones of THIS repo, and not the
+    question test_never_port_citations.py (PORT1) asks, which is whether the
+    CONSUMER has the file. Restored at the Lane B merge (2026-09-09), per test as
+    before, so the value sweep and the contract pin above keep running whatever
+    happens to the sample tree.
     """
+    if not CONTROLM_HOSTS.exists():
+        pytest.skip(f"{CONTROLM_HOSTS.relative_to(REPO)} absent - never-port, consumer tree")
     with CONTROLM_HOSTS.open(newline="", encoding="utf-8") as fh:
         return {r["nodeid"].strip().lower() for r in csv.DictReader(fh)}
 

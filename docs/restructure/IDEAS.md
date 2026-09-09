@@ -110,6 +110,27 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
+- **`Idea-308`** · 2026-09-09 · `[bug]` · **open** · prio? **Med** —
+  **Two skip policies answer two different questions and disagree on the same file: the
+  skip-guard policy asks "is this path in a fresh clone of THIS repo" and the never-port
+  citations guard asks "is it on the CONSUMER" - a tracked file under a never-port zone is
+  yes to the first and no to the second.** Found at the Lane B merge (desktop, 2026-09-09):
+  CORE9 removed the skips on three crossing tests that read tracked samples under
+  `drydocs/data/samples/` on the CORE4 premise (tracked -> present everywhere, "none should be
+  written"); `tests/unit/test_never_port_citations.py` (PORT1, in CORE9's own branch history)
+  then failed the merged tree, because `drydocs/data/**` is `never-port` and a crossing test
+  citing it must skip or fail on the consumer by construction. CORE9 verified 103 targeted
+  tests and never ran the citations guard - the J57 gap again, one file over from the
+  test_skip_guard_policy.py gap CORE9 itself flagged. The skips were restored per test at
+  the merge. The fix behind the fix: `test_skip_guard_policy._is_tracked` should not clear a
+  path that classifies `never-port` through `drydocs.port.dispositions.classify` - tracked
+  here is not present there - so the two guards read one rule; and its docstring's "none
+  should be written" needs the never-port exception stated. Also worth ruling: whether the
+  fourteen force-tracked synthetic samples should CROSS (a `drydocs/data/samples/**`
+  canonical-producer row above the never-port glob), which would make CORE9 right and both
+  guards quiet - a port-pen call, not a test edit. Module drydocs-core. Related [[CORE4]],
+  [[CORE9]], [[PORT1]], [[J57]].
+
 - **`Idea-307`** · 2026-09-08 · `[idea]` · **open** · prio? **Med** —
   **A port applies by DEPENDENCY CLOSURE, not by disposition class: the classifier answers per
   path, and a set of paths that import each other is taken or held as one unit.** The manifest

@@ -121,3 +121,12 @@ notes: |
   module drydocs-core because tests/unit/test_skip_guard_policy.py is the instrument and CORE4
   owns it. depends_on CORE4, which is done, so this is startable now. p3: nothing is broken;
   the cost is that a guard protecting nothing reads as protection.
+  POSTSCRIPT 2026-09-09 (desktop, Lane A, at the merge of wip/core9-laptop). Three of the
+  four removals were REVERSED KNOWINGLY, as the note above invites: test_email_extracts.py,
+  test_email_concerns.py and test_server_inventory_fixture.py read tracked samples under
+  drydocs/data/samples/, and that zone is `never-port` in PORT-MANIFEST.yaml - so the files
+  are in every clone of THIS repo and on no consumer, and tests/unit/test_never_port_citations.py
+  (PORT1, 87a9eeaa, already in this branch's history) failed the merged tree on exactly those
+  three. The guards came back PER TEST, not as a module pytestmark, so the scope point
+  stands. The two policies asking different questions is Idea-308. The command_parser
+  removal and the anchoring stand.

@@ -32,9 +32,15 @@ from drydocs.loaders.email_extracts import EmailExtractsAdapter
 # already anchored this way.
 SAMPLES = Path(__file__).resolve().parents[2] / "drydocs" / "data" / "samples" / "email-extracts"
 
-# CORE9: the module-level policy guard that used to sit here is GONE — same
-# reasoning as test_email_extracts.py. It was a `pytestmark`, so it would have
-# silently skipped every test in this file rather than failing one.
+# The samples are TRACKED here and still absent on every consumer: drydocs/data/**
+# is `never-port` in PORT-MANIFEST.yaml, so the port never carries them, and this
+# test file DOES cross. CORE9 (2026-09-08) removed the guard on the CORE4 premise
+# that a tracked path is in every clone; that premise is about clones of THIS repo
+# and test_never_port_citations.py (PORT1) reads the other side: a crossing test
+# citing a never-port path must skip on its absence, or it fails on the consumer
+# by construction. Restored at the Lane B merge (2026-09-09) PER TEST, not as a
+# module pytestmark - CORE9's scope point stands: the tests that never read the
+# samples keep running whatever happens to the sample tree.
 
 _OK = ConcernsAssignment(
     doc_id="email:0001",
@@ -122,6 +128,8 @@ def test_source_signal_pass_performs_zero_edges_over_the_bundled_samples() -> No
     structured folder/process field, so the source-signal path ships with no
     live producer. The declared field list being EMPTY is load-bearing."""
     assert STRUCTURED_SIGNAL_FIELDS == ()
+    if not SAMPLES.is_dir():
+        pytest.skip("drydocs/data/samples/email-extracts absent - never-port, consumer tree")
     with EmailExtractsAdapter(SAMPLES) as adapter:
         rows = list(adapter.rows())
     assert rows, "bundled G47 samples parsed empty — the zero-edge claim would be vacuous"
