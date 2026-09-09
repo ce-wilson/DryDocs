@@ -70,11 +70,17 @@ folder's bundle actually held. Read the coverage block, not the label, when
 asking whether a given run book is complete.
 
 Measured over the current spec: 4 sections `graph`, 11 `graph-partial`, 26
-`manual`, of which 10 are N/A for a pure-batch module. That ratio is the honest
-one and it is *worse* than the workbook's — the `-excel` job tab is ~90%
-graph-derivable because it is all orchestration metadata, while the long form
-adds recovery procedures, escalation scenarios, vault safes and directory maps,
-none of which any system we ingest holds.
+`manual` (41 in all, the outline's own count), and 10 of the 26 are N/A for a
+pure-batch module. The spec test pins those totals against the outline, so they
+cannot drift silently.
+
+That ratio is the honest one and it is *worse* than the workbook's — the sibling
+measures its job tab at 31 of 35 columns `graph` or `graph-partial`, because
+that tab is all orchestration metadata. The long form adds recovery procedures,
+escalation scenarios, vault safes and directory maps, none of which any system
+we ingest holds. The backlog item that asked for this skill predicted exactly
+that: "the long form has MORE prose sections, so its SME residue is
+proportionally LARGER, not smaller." It is.
 
 ## Section → system of record (cited, never restated)
 

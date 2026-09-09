@@ -257,6 +257,53 @@ def _squash(text: str) -> str:
     return re.sub(r"\s+", "", text).casefold()
 
 
+def test_the_skill_md_coverage_sentence_matches_the_spec(spec: dict) -> None:
+    """SKILL.md states 4 / 11 / 26 / 10. The spec is the authority; keep them equal.
+
+    This guard READS PROSE on purpose, which is normally the wrong thing to do —
+    the rule is to read the importable object, not the human-facing render. The
+    exception is a guard whose SUBJECT is the prose, and this is one: the claim
+    under test is the sentence itself. A number quoted in a document nothing
+    checks is a number that rots, and this repo has paid for that more than once.
+    Edit the spec and this test tells you which sentence to update.
+    """
+    counts = {value: 0 for value in SOURCE_VALUES}
+    for section in spec["sections"]:
+        counts[section["source"]] += 1
+    na = sum(1 for section in spec["sections"] if section.get("na_for_batch"))
+    na_in_manual = sum(
+        1
+        for section in spec["sections"]
+        if section.get("na_for_batch") and section["source"] == "manual"
+    )
+    assert na == na_in_manual, (
+        "an N/A section is labeled something other than `manual`, so the SKILL.md "
+        "sentence '10 of the 26 are N/A' would be counting across two buckets"
+    )
+
+    text = SKILL_MD.read_text(encoding="utf-8")
+    stated = re.search(
+        r"(\d+) sections? `graph`, (\d+) `graph-partial`, (\d+)\s*\n?`manual`.*?"
+        r"\((\d+) in all.*?(\d+) of the \d+ are N/A",
+        text,
+        re.S,
+    )
+    assert stated, "SKILL.md's coverage sentence changed shape — update this guard with it"
+    graph, partial, manual, total, stated_na = (int(g) for g in stated.groups())
+    assert (graph, partial, manual) == (
+        counts["graph"],
+        counts["graph-partial"],
+        counts["manual"],
+    ), (
+        f"SKILL.md says {graph}/{partial}/{manual}; the spec has "
+        f"{counts['graph']}/{counts['graph-partial']}/{counts['manual']}"
+    )
+    assert total == len(
+        spec["sections"]
+    ), f"SKILL.md says {total} sections, spec has {len(spec['sections'])}"
+    assert stated_na == na, f"SKILL.md says {stated_na} N/A sections, the spec has {na}"
+
+
 def test_every_na_section_carries_a_reason(spec: dict) -> None:
     """`N/A` on its own is an omission; `N/A — <reason>` is an answer."""
     for section in spec["sections"]:
