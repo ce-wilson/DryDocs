@@ -71,9 +71,24 @@ notes: |
   one rule while the write resolves by another can pass its check and still
   miss.
 
+  FULL SUITE: 4 failed, 3804 passed, 15 skipped. The failing SET, not a count
+  (J57), and every one of the four is render staleness:
+    tests/unit/test_load_map_json.py::test_committed_load_map_matches_regeneration
+    tests/unit/test_load_map_json.py::test_committed_load_map_html_matches_regeneration
+    tests/unit/test_load_map_json.py::test_every_concrete_loader_appears_exactly_once
+    tests/unit/test_plan_roadmap.py::test_committed_roadmap_page_matches_its_sources
+  The third is the least obvious and was checked rather than assumed: it reads
+  the COMMITTED load-map.json and compares it to the live concrete-loader set,
+  so a new loader fails it as coverage drift even though the cause is the
+  un-refreshed render. CONFIRMED by running render_board.py locally, re-running
+  both files (19 passed), and REVERTING the four render outputs — they are Lane
+  A's pen and nothing was committed. ruff check and ruff format --check clean.
+
   FOR LANE A AT MERGE:
-  - RENDERS: a new loader + command means web/src/generated/load-map.json and
-    docs/plan/load-map.html need the refresh. Lane B does not render.
+  - RENDERS: a new loader + command means web/src/generated/load-map.json,
+    docs/plan/load-map.html, docs/plan/board.html and docs/plan/roadmap.html
+    need the refresh — a default-paths render_board.py run does all four and
+    turns the whole failing set above green. Lane B does not render.
   - PORT-MANIFEST: nothing needed. All four new files fall under existing
     catch-all rows (drydocs_core/**, drydocs/**, tests/**), so the fall-through
     guard is satisfied -- no row to add, no hunt.
