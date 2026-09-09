@@ -64,7 +64,78 @@ already raised it as a candidate for slot 10.
 
 ## Lens 1 — system design
 
-*(step 4)*
+**The port preflight certifies a base that does not exist.** Every range-derived check
+passes when the range is empty, and the range is empty whenever git fails — including when
+the base ref is mistyped. This is the sweep's recurring pattern at the surface with the
+highest consequence in the repo: the gate that decides what crosses the publish boundary.
+
+### L1-1 — a bad base makes the preflight cleaner, not louder
+
+`_git` (`port_preflight.py:359-366`) runs with `check=False` and returns **only
+`.stdout.strip()`**. The return code and stderr are discarded, so a `git log` against a
+nonexistent revision — which prints `fatal: bad revision` to stderr and exits non-zero —
+returns the empty string, indistinguishable from a genuinely empty range.
+
+`range_commits` (`:369-377`) iterates that empty string and returns `[]`. `run_checks`
+(`:425`) then feeds it to the range-derived checks, and `CheckResult` (`:192-196`) is
+**two-valued** — `name`, `passed: bool`, `detail: str`. There is no state for *could not
+evaluate*.
+
+**Demonstrated on this tree rather than argued:**
+
+```
+real base   (port-base-20260908)        -> 38 commits
+bogus base  (port-base-NOPE-does-not-exist) -> 0 commits
+added_documents(bogus)                  -> 0 docs
+uncited_commits([], text)               -> []      # the check PASSES
+```
+
+So the uncited-commit check passes, the cited-path check (`unresolved_citations`, fed by
+`added_documents`, same `_git` path) has nothing to resolve and passes, and any other
+range-derived check passes. **The worse the base, the greener the certification.**
+
+**Consequence, and why it ranks above every other finding this sweep has produced.** This
+module exists because ports kept starting from uncertified bases — its own docstring
+records the 2026-08-09 cycle lost to exactly that, and two real failures that *"would have
+read as port-introduced"*. A preflight that answers "certified" for a base it could not
+read reproduces the failure it was built to end, in the one direction nobody re-checks: a
+green preflight is the signal to proceed, and what proceeds is material crossing from this
+repo to the company one. The checks that go quiet are precisely the ones about
+completeness and citations — what is in the range, and whether new documents cite paths
+that resolve.
+
+**Cheapest correction, and it is small.** Make `_git` fail loudly: capture `returncode`
+and `stderr`, and raise (or return a sentinel) rather than returning `""` for a non-zero
+exit. Every caller in this module already assumes success, so the failure currently has
+nowhere to surface. A second, independent layer worth having: give `CheckResult` a third
+state — the vocabulary already exists two slots over, in `equivalence.py`'s **not proven**
+— so a check that could not evaluate reports as such instead of as a pass. A guard belongs
+with it: nothing today would notice this regressing, because the wrong behaviour is
+silence.
+
+### L1-2 — the same two-valued shape, one layer up, in `port_completeness`
+
+`port_completeness.py` (463 lines) is the module whose name is this sweep's throughline,
+and it inherits the same input path: it reads the range through the same helpers. The
+finding above is the root; this is where it surfaces to a human as a completeness claim.
+Recorded separately so that fixing `_git` is understood to fix both, and so a later firing
+does not read L1-1 as an isolated helper bug.
+
+### L1-3 — what this slot gets right, recorded so no later firing re-audits it
+
+- **Every check names the failure that motivated it.** The docstring is a list of dated
+  incidents — the 2026-08-09 undoable-phase cycle, the `FORCE_COLOR` failure, the duplicate
+  `Idea-101` from a two-session id collision, and Idea-110's doc branch whose *"Approved /
+  canonical"* list still pointed at brand marks main had deleted. A reader can tell why
+  each check exists, which is what stops a future session deleting one as noise.
+- **The purity boundary is stated and held.** *"Pure functions here take TEXT, COMMIT LISTS
+  and DOCUMENT MAPS, never a repository, so the guards can exercise them without one. Only
+  `run_checks` shells out."* That is exactly why L1-1 was demonstrable in four lines of
+  script — and it is also why the fix is cheap: there is one shelling-out seam.
+- **`will_tag` resolves a real chicken-and-egg rather than papering it.** The tag check
+  gates certification while `--tag` is how the tag gets made, so when the caller is about to
+  create it the check *"reports intent instead of absence"* (`:431-434`). A lesser version
+  would have skipped the check.
 
 ## Lens 2 — technical debt
 
