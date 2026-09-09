@@ -94,6 +94,24 @@ things share the word *port* — never conflate them:
   [`lane-handoff` skill](.claude/skills/lane-handoff/SKILL.md) generates the queue, the pens
   line and the surface fence as one self-retiring file** (`docs/lane-<x>-handoff.md`); its
   `PENS` table is keyed by the names above, plus `gates` and `snapshot`, which it adds.
+  **Fan-out inside ONE checkout — the coordinator rule (I7).** Everything above assumes the
+  concurrent writers are SESSIONS ON DIFFERENT MACHINES, coordinated by pushed claims and pens.
+  A fan-out command that spawns parallel workers breaks that assumption *inside a single
+  checkout*, at a much higher rate: no push separates the workers, so the claim protocol cannot
+  see them at all. No skill here spawns workers today, which is exactly why this is written down
+  now rather than rediscovered by the first one that does. When an orchestrator fans out:
+  **(1) the COORDINATOR allocates every id up front** — one caller of the mint rule's allocator
+  above, ids handed to workers pre-assigned; a worker never mints, because N workers asking "what
+  is next free" in one tree all get the same answer. **(2) NO worker renders.** This is the
+  sharper half and the one that gets missed: any worker touching the backlog or the inbox would
+  regenerate the board, the roadmap, `web/src/generated/**` and the design HTML — files that are
+  DERIVED and have exactly one writer per cycle by construction, so N workers produce N
+  conflicting versions of them. The coordinator renders ONCE, after the workers finish.
+  **(3) Fan out only over units whose source files are DISJOINT** — the same reasoning the lane
+  handoff applies across machines, applied within one tree. This rule lives HERE because the
+  orchestration command lives OUTSIDE this repo and cannot carry it. No guard backs it, and none
+  can: the actor is an external orchestrator, and there is no point in the sequence where a test
+  could observe it.
 
 **Mint rule (the claim protocol's other half; I6).** A pull is claimed by pushing `status: in_progress`. An id is claimed the same way, and for the same reason: an id that exists only in your tree is an id the other machine will mint too. **Never read the next free number off your own tree** — ask the allocator, which unions the local items, every remote ref's tree listing, and every id ever added in history, and returns max+1 (a gap is usually a BURNED id — `config/gate-log.md` cites ids inside SIGNED records, so re-issuing one silently re-points a signed gate):
 ```
