@@ -200,7 +200,73 @@ demonstrated vacuous pass.
 
 ## Ranked
 
-*(step 6 — the ranked list; its presence is what marks this report complete)*
+Two findings, and they are one defect seen from two lenses: **a helper that cannot report
+failure, in a module that everywhere else reports it correctly.**
+
+1. **L1-1 — the preflight certifies a base it could not read.** `_git` discards the exit
+   code, so a mistyped base yields an empty range, and every range-derived check passes:
+   demonstrated at 38 commits real vs 0 bogus, with `uncited_commits([]) == []`. Ranked
+   first in this report and, in my judgement, the most consequential finding of the sweep
+   so far — not because the code is worse than elsewhere but because of **where it sits**.
+   A green preflight is the signal to proceed, and what proceeds is material crossing the
+   publish boundary. The checks that fall silent are precisely completeness and cited
+   paths.
+2. **L2-1 — `_git` is the only one of four `check=False` calls that swallows its result.**
+   The same file already reports a skipped suite as `("suite green", False, "SKIPPED — not
+   a certification")`. Ranked second only because it is the same defect described from the
+   debt side; operationally it is the fix for finding 1 and should be groomed as one item.
+
+**Not ranked:** L1-3's strengths (every check naming its motivating incident, the stated
+purity boundary, `will_tag` resolving a real chicken-and-egg), the perfect hatch scores,
+and the three correct subprocess sites. Recorded so no later firing re-audits them.
+
+## Cross-links
+
+**Between the lenses.** They found the same line from opposite directions: Lens 1 asked
+"what does this answer when it cannot check" and Lens 2 asked "what does this module do
+with a failed subprocess". The answer to the second is *the right thing, three times out
+of four*, which is what makes the first a defect rather than a design choice.
+
+**To slots 9, 2, 3, 4, 5, 6 — seven for seven, and this is the sharpest instance.** The
+pattern is now unbroken across every slot reviewed: a result that cannot distinguish
+"checked and clean" from "not checked". Slot 6 held the previous worst case — an
+acceptance runner that passes on an empty graph. **This one is worse in one specific
+respect: the empty graph at least has to exist.** Here a base that does not exist at all
+produces the cleanest possible certification, and the certification's audience is the
+company session about to receive a range.
+
+**To slot 6 specifically, on the remedy.** Slot 6 recommended writing the convention down
+and naming the instrument. This slot supplies the strongest argument for it AND the
+clearest template: `("suite green", False, "SKIPPED — not a certification")` is the whole
+convention in one line — the check reports its own inability as a non-pass, in the string a
+human reads. Four in-repo remedies now exist (`equivalence.py`'s **not proven**,
+`archival.py`'s coverage-on-itself, `drydocs_api`'s declared `truncated`, and this), and
+none has become a rule.
+
+**To slot 8, forward.** It owns `plan_board` and `plan_roadmap` — two of the eighteen
+shims — and should not re-report L2-1 of slot 6. It should check whether the `_git`
+shape recurs in its own modules, since the helper pattern is idiomatic across this repo.
+
+## Candidates for grooming
+
+Four. None minted — the backlog pen is Lane A's and this firing holds neither it nor an id.
+
+1. **Make `_git` fail loudly, and give `CheckResult` a third state.** `drydocs-port`,
+   **p1** — the highest-priority item this sweep has produced. `_git` returns the
+   `CompletedProcess` or raises on non-zero; `CheckResult` gains a "could not evaluate"
+   state so a check that did not run cannot read as a pass. Acceptance must include a
+   guard, because the wrong behaviour is silence and nothing would notice it regressing —
+   the natural test is the one this report ran: a bogus base must not certify.
+2. **Sweep the repo for the `_git` shape.** Cross-module, p2. The helper is idiomatic here
+   — `subprocess.run(..., check=False)` returning `.stdout` — and slot 7 found three
+   correct sites and one wrong one in a single file. The item is "find the others", not
+   "fix this one", and slot 8 and slot 10 are the natural places to start.
+3. **Write the convention down and name the instrument.** Cross-module, slot 10's framing,
+   carried forward from slot 6 with this slot's template attached. Seven instances, four
+   in-repo remedies, no rule.
+4. **A docmeta design read.** `drydocs-docmeta`, p3. Recorded because this firing
+   explicitly did not do one: 1,105 lines with clean hygiene signals and no design
+   assessment. Not urgent, but a later slot should not assume it is covered.
 
 ## Cross-links
 
