@@ -48,6 +48,10 @@
          tree scanned, and with tracked changes that is a claim about a tree no
          commit describes. Commit first, then scan. -AllowDirty downgrades it to
          a warning for a deliberate mid-work comparison; the header says dirty=true.
+    U27 — the CI check asks `gh run list` about the branch HEAD is ON, never `main`
+         by literal (from a branch, HEAD could not appear and the verdict was
+         no-run-yet forever); detached HEAD is a named skip. The verdict function
+         moved to ci_verdict.ps1, dot-sourced, so pytest drives its five cases.
 #>
 [CmdletBinding()]
 param(
@@ -262,63 +266,11 @@ if ($designDocs) {
 }
 
 # --- CI gate check (Idea-111) — runs BEFORE the snapshot ---------------------
-# The verdict is a pure function of (runs, head) so every branch is exercisable
-# without a network — the reporting half is the part that rots, and a check that
-# only ever prints GREEN on the machine that wrote it is how this got missed.
-function Get-CiVerdict {
-  param($Runs, [string]$Head, [int]$GhExit = 0)
-  $short = $Head.Substring(0, 7)
-  # Two empty-list cases, two different facts (J76, 2026-09-08). The old single
-  # message guessed a cause - "gh not authenticated?" - and on a remote whose
-  # workflow is registered but has NEVER executed (zero runs, ever: the company
-  # remote at its 2026-09-08 close-out) it named a cause that was false while the
-  # real one went unreported. Report the measurement; list the causes; pick none.
-  if ($GhExit -ne 0) {
-    return @{ Color = "DarkGray"; Text = ("ci: gh run list exited {0} - the run list could not be read (authentication, network, or no GitHub remote; 'gh auth status' tells which) - check skipped" -f $GhExit) }
-  }
-  if (@($Runs).Count -eq 0) {
-    return @{ Color = "Yellow"; Text = ("ci: UNVERIFIED at HEAD {0} - the remote reports ZERO runs on main. The workflow has never executed there (a fresh remote, or a workflow that is registered but has never triggered); nothing pushed to it has been checked." -f $short) }
-  }
-  # J78 (2026-09-06): three outcomes, not two. The sha match added after
-  # Idea-111 catches STALE GREEN - a green run that belongs to an older
-  # commit. A CANCELLED run (GitHub cancels a push run when the next push
-  # supersedes it) has a MATCHING sha and NO result, so the sha match sees
-  # nothing wrong and the old two-way split filed it under RED - which it is
-  # not. Different failure, same channel: the commit was never checked, and
-  # the next push that does run will attribute any failure to whoever made
-  # it. So no verdict is reported AS no verdict - UNVERIFIED, by name - and
-  # a MISSING run for HEAD is the same state whatever the reason (not yet
-  # scheduled, workflow skipped, run deleted). Still warn-only.
-  $unverified = "ci: UNVERIFIED at HEAD {0} - {1}. This commit has not been checked; the next push that runs will attribute its failure to whoever made it."
-  $mine = @($Runs | Where-Object { $_.headSha -eq $Head })
-  if ($mine.Count -eq 0) {
-    $newest = @($Runs)[0]
-    $newestState = [string]$newest.conclusion
-    if ([string]::IsNullOrEmpty($newestState)) { $newestState = [string]$newest.status }
-    return @{ Color = "Yellow"; Text = ($unverified -f $short, ("no run exists for it; newest on main is {0} ({1})" -f `
-      $newestState, [string]$newest.displayTitle)) }
-  }
-  # U24 (2026-08-21): the 2026-08-19 snapshot printed `ci: System.Object[] AT
-  # HEAD ...` - PS 5.1 member enumeration stringified a nested property as an
-  # array. Pin ONE run object and read each property as a scalar string; every
-  # branch below, not only the RED one that was observed, shares the hazard.
-  $first = @($mine)[0]
-  $status = [string]$first.status
-  $conclusion = [string]$first.conclusion
-  if ($status -ne "completed") {
-    return @{ Color = "Yellow"; Text = ("ci: run for HEAD {0} is {1} - re-check before you close the session" -f `
-      $short, $status) }
-  }
-  if ($conclusion -eq "success") {
-    return @{ Color = "Green"; Text = ("ci: GREEN at HEAD {0}" -f $short) }
-  }
-  if ($conclusion -eq "cancelled" -or $conclusion -eq "skipped" -or [string]::IsNullOrEmpty($conclusion)) {
-    $reason = if ([string]::IsNullOrEmpty($conclusion)) { "the run completed with no conclusion" } else { "the run was " + $conclusion }
-    return @{ Color = "Yellow"; Text = ($unverified -f $short, $reason) }
-  }
-  return @{ Color = "Red"; Text = ("ci: {0} AT HEAD {1} - main is RED. Run 'gh run view --log-failed' before you stop." -f `
-    $conclusion.ToUpper(), $short) }
-}
+# The verdict itself - Get-CiVerdict, a pure function of (runs, head, gh exit,
+# branch) - lives in ci_verdict.ps1 beside this file, dot-sourced here, so that
+# pytest can drive its five cases without a network (U27, 2026-09-08). This
+# block owns the MEASUREMENT: which branch, which sha, what gh returned.
+. (Join-Path $here "ci_verdict.ps1")
 
 # WARN-ONLY by design: this reports, it never blocks. A snapshot records repo
 # STRUCTURE; refusing to record it because a lint gate is red would couple two
@@ -345,20 +297,33 @@ try {
   } else {
     Push-Location $repo
     $head = (& git rev-parse HEAD).Trim()
-    $raw = & gh run list --branch main --limit 10 --json headSha,conclusion,status,displayTitle
-    $ghExit = $LASTEXITCODE
+    # U27 (2026-09-08): ask about the branch HEAD is ON, not `main` by literal.
+    # The literal fetched main's ten newest runs and matched the LOCAL sha
+    # against them, so from any branch - a worktree, an epic slice, an agent
+    # fork, exactly the sessions CLAUDE.md says to branch for - HEAD was never
+    # in the answer and every run took the yellow no-run-yet path until merge
+    # (CI was GREEN on feat/ui-workstream and invisible to the check, Idea-156).
+    # A detached HEAD has no branch to ask about and is a named skip, not a
+    # crash and not a guess.
+    $branchName = (& git rev-parse --abbrev-ref HEAD).Trim()
     Pop-Location
-    $runs = @()
-    if ($ghExit -eq 0 -and -not [string]::IsNullOrWhiteSpace($raw)) {
-      # PS 5.1 trap (false GREEN, 2026-08-20): ConvertFrom-Json emits a JSON
-      # array as ONE PSObject-wrapped item (argument form included), so the
-      # verdict's scalar tests become member-enumeration FILTERS - '-eq
-      # "success"' is truthy if ANY of the 10 runs succeeded, not if HEAD's
-      # did. Enumerating the parsed object is what actually unrolls it here.
-      $runs = @((ConvertFrom-Json ($raw -join "`n")) | ForEach-Object { $_ })
+    if ($branchName -eq "HEAD") {
+      Write-Host ("ci: detached HEAD at {0} - no branch to list runs for; check skipped. Check out the branch (or read 'gh run list --commit {0}') before you close." -f $head.Substring(0, 7)) -ForegroundColor DarkGray
+    } else {
+      $raw = & gh run list --branch $branchName --limit 10 --json headSha,conclusion,status,displayTitle
+      $ghExit = $LASTEXITCODE
+      $runs = @()
+      if ($ghExit -eq 0 -and -not [string]::IsNullOrWhiteSpace($raw)) {
+        # PS 5.1 trap (false GREEN, 2026-08-20): ConvertFrom-Json emits a JSON
+        # array as ONE PSObject-wrapped item (argument form included), so the
+        # verdict's scalar tests become member-enumeration FILTERS - '-eq
+        # "success"' is truthy if ANY of the 10 runs succeeded, not if HEAD's
+        # did. Enumerating the parsed object is what actually unrolls it here.
+        $runs = @((ConvertFrom-Json ($raw -join "`n")) | ForEach-Object { $_ })
+      }
+      $verdict = Get-CiVerdict -Runs $runs -Head $head -GhExit $ghExit -Branch $branchName
+      Write-Host $verdict.Text -ForegroundColor $verdict.Color
     }
-    $verdict = Get-CiVerdict -Runs $runs -Head $head -GhExit $ghExit
-    Write-Host $verdict.Text -ForegroundColor $verdict.Color
   }
 } catch {
   Pop-Location -ErrorAction SilentlyContinue
