@@ -19,6 +19,8 @@ plan.yaml + modules.yaml. The board is a render of it. This guard keeps it hones
 from __future__ import annotations
 
 import hashlib
+import re
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -1108,6 +1110,126 @@ def test_the_producer_declares_its_venues() -> None:
     canonical-company copy - the file's own header states that rule - so a per-entry take
     drops THIS test deliberately and keeps the membership test above, which travels."""
     assert _declared_venue_codes(), "config/dev-environment.yaml declares no venues: section"
+
+
+#: PLAN12 (2026-09-09) - `inputs:` entries a non-done item may carry that are NOT claims
+#: about the tracked tree. Shrink-only, on the runbook-currency guard's idiom: every entry
+#: carries a reason of at least forty characters, and an exemption no non-done item cites
+#: any more fails the suite. Empty at the guard's landing on purpose - the four genuine
+#: failures the premise-drift review measured were FIXED in the same commit, not exempted.
+INPUT_EXEMPTIONS: dict[str, str] = {}
+
+#: The path grammar an `inputs:` entry must fit to be a claim the guard can test. Anything
+#: A leading dot is a path (`.claude/`, `.github/`); a `..` segment is not. Anything
+#: else on a non-done item - a prose annotation (`config/x (G26)`), a cross-repo reference
+#: (`owner/repo@sha`), a screenshot filename - is MALFORMED and fails loudly: a pre-filter that
+#: silently discarded entries with a space is exactly how a stale annotated path would slip
+#: through unchecked.
+_INPUT_PATH = re.compile(
+    r"^(?!\.\.)[A-Za-z0-9_.][A-Za-z0-9_.+\-]*(?:/(?!\.\.)[A-Za-z0-9_.+\-]+)*/?$"
+)
+
+
+def _tracked_paths() -> set[str]:
+    """Every path git tracks, read with -z and decoded HERE. Bytes on both sides of the
+    pipe on purpose (J76): a text pipe on Windows writes CRLF, git reads the CR as part of
+    the pathname and C-quotes its echo - both measurers of the premise-drift review hit it."""
+    out = subprocess.run(
+        ["git", "-C", str(REPO_ROOT), "ls-files", "-z"], capture_output=True, check=True
+    ).stdout
+    return {p.decode("utf-8") for p in out.split(b"\0") if p}
+
+
+def _ignored_paths(paths: list[str]) -> set[str]:
+    """The subset of *paths* that .gitignore rules cover - machine-local inputs, absent on
+    every clone by construction (LIN3, MM5, MM7, MM9 at the guard's landing). -z and bytes
+    both ways, same reason as above; a non-zero exit with empty output means none matched."""
+    if not paths:
+        return set()
+    proc = subprocess.run(
+        ["git", "-C", str(REPO_ROOT), "check-ignore", "-z", "--stdin"],
+        input="\0".join(paths).encode("utf-8") + b"\0",
+        capture_output=True,
+        check=False,
+    )
+    return {p.decode("utf-8") for p in proc.stdout.split(b"\0") if p}
+
+
+def _input_resolves(rel: str, tracked: set[str]) -> bool:
+    """A file resolves when git tracks it; a directory resolves when git tracks anything
+    under it. Tracked, never `Path.exists()`: the parent guard documents the fresh-clone
+    divergence as its known limit, and Windows `.exists()` is case-insensitive while CI is
+    not."""
+    rel = rel.rstrip("/")
+    if rel in tracked:
+        return True
+    prefix = rel + "/"
+    return any(p.startswith(prefix) for p in tracked)
+
+
+def test_inputs_of_open_items_resolve_against_the_tracked_tree() -> None:
+    """PLAN12: for every item whose status is `todo` or `in_progress`, every `inputs:` string
+    resolves against `git ls-files` - the premise-drift review's organ (a), path drift, on
+    the one drifting surface where the instrument already existed (test_runbook_currency.py),
+    the data is structured rather than prose, and nothing had ever been pointed at it. Five
+    of five Lane B items in the 2026-09-09 burst had a premise wrong against the tree.
+
+    Scoped to non-done items: I8 clause (c) already rules a closed item's text a record of
+    completed work, so the 109 stale citations on done items are history, not defects.
+    Gitignored inputs are classified with `git check-ignore` and skipped - a machine-local
+    path is absent on every clone by construction, and failing it would red the suite for
+    whoever holds the claim. Deliberately NOT extended to `acceptance:` (five of eleven
+    bare-path hits there are deliverables the item will create; a regex cannot tell a promise
+    from a claim) and NOT applied to the gate prompts (their sanctioned `[AMENDED; was ...]`
+    edit shape preserves the old path on purpose)."""
+    doc = _load()
+    tracked = _tracked_paths()
+    failures: list[str] = []
+    candidates: list[tuple[str, str]] = []
+    for item in doc.get("items", []):
+        if item.get("status") not in {"todo", "in_progress"}:
+            continue
+        inputs = item.get("inputs") or []
+        if not isinstance(inputs, list):
+            failures.append(f"[{item['id']}] inputs must be a list")
+            continue
+        for raw in inputs:
+            if not isinstance(raw, str) or not _INPUT_PATH.match(raw):
+                failures.append(
+                    f"[{item['id']}] malformed inputs entry {raw!r} - a path, or an INPUT_EXEMPTIONS row"
+                )
+                continue
+            if raw in INPUT_EXEMPTIONS:
+                continue
+            candidates.append((item["id"], raw))
+    ignored = _ignored_paths(sorted({raw for _, raw in candidates}))
+    for iid, raw in candidates:
+        if raw.rstrip("/") in ignored or raw in ignored:
+            continue  # machine-local by construction; the item's venue note says where it lives
+        if not _input_resolves(raw, tracked):
+            failures.append(f"[{iid}] inputs names `{raw}`, which git does not track here")
+    assert not failures, (
+        f"{len(failures)} inputs: entr{'y' if len(failures) == 1 else 'ies'} on open items "
+        "do not resolve - fix the path (the file moved: cite where it is now), or add an "
+        "INPUT_EXEMPTIONS row with the reason:\n" + "\n".join(failures)
+    )
+
+
+def test_input_exemptions_carry_a_reason_and_are_still_cited() -> None:
+    """Shrink-only, the runbook-currency idiom: an exemption for a path no open item cites
+    is dead weight that outlives the reason it was added."""
+    doc = _load()
+    cited = {
+        raw
+        for item in doc.get("items", [])
+        if item.get("status") in {"todo", "in_progress"}
+        for raw in (item.get("inputs") or [])
+        if isinstance(raw, str)
+    }
+    short = [p for p, why in INPUT_EXEMPTIONS.items() if len(why.strip()) < 40]
+    assert not short, f"INPUT_EXEMPTIONS reason under forty characters: {short}"
+    unused = [p for p in INPUT_EXEMPTIONS if p not in cited]
+    assert not unused, f"INPUT_EXEMPTIONS names a path no open item cites - remove it: {unused}"
 
 
 def test_dependencies_resolve_and_are_acyclic() -> None:

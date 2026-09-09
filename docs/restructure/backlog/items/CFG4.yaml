@@ -11,7 +11,7 @@ status: todo
 depends_on: []
 inputs:
 - config/taxonomy/software-registry.yaml
-- UI-WIP/two-track-ui-plan.md
+- docs/design/ui-exploration/two-track-ui-plan.md
 - docs/restructure/backlog/items/C33.yaml
 - docs/restructure/backlog/items/N24.yaml
 acceptance: |
@@ -29,7 +29,7 @@ acceptance: |
   (b) Governance status ANNOTATES; it has no authority over the ledger. Nothing in the
       registry is removed, retired or re-keyed by a governance value, and the guard or a
       comment says so where someone would otherwise be tempted.
-  (c) THE NOTE HALF. UI-WIP/two-track-ui-plan.md gains a DATED note that the company's target
+  (c) THE NOTE HALF. docs/design/ui-exploration/two-track-ui-plan.md gains a DATED note that the company's target
       UI stack is an ADK-based data-marketplace platform and that the producer's
       ReUI / graph-rendering choice is producer-only. This matters for what the port carries
       under web/, and that consequence is stated in the note.

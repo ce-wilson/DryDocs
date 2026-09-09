@@ -12,7 +12,7 @@ status: todo
 depends_on:
 - Y3
 inputs:
-- backlog/items/
+- docs/restructure/backlog/items/
 - drydocs_api/query_specs.py
 - .claude/skills/groom-backlog/SKILL.md
 acceptance: |

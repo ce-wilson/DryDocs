@@ -12,7 +12,6 @@ depends_on: []
 inputs:
 - drydocs_remediation/detect.py
 - drydocs_remediation/profile.py
-- tests/unit/test_remediation_detect.py
 acceptance: |
   detect_all returns the evaluated rule ids (CONFORMANCE_RULE_IDS plus R1) beside the findings,
   and the registry ids NOT evaluated where the registry is readable; profile.py's one caller

@@ -7,7 +7,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - tests/unit/test_backlog.py
@@ -34,3 +34,19 @@ notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). premise-drift-2026-09-09.md section 6 ask 1: "the one drifting surface where the instrument already
   exists, the data is structured, and nothing has ever been pointed at it". Five of five Lane B items
   last burst had a premise wrong against the tree.
+
+  DONE 2026-09-09 (Lane A, desktop). test_inputs_of_open_items_resolve_against_the_tracked_tree
+  in tests/unit/test_backlog.py, beside the dependency test: todo and in_progress items only;
+  git ls-files -z with bytes both ways (the docstring says why); gitignored inputs classified by
+  git check-ignore -z and skipped; a malformed entry fails loudly (a leading dot is a path, a ..
+  segment is not); INPUT_EXEMPTIONS shrink-only with forty-character reasons, checked by its own
+  test, and EMPTY at landing - the five fixes shipped instead: C42:19 and C44:55 to
+  drydocs_core/orchestration/controlm/description_tokens.py, CFG4:14 and :32 to
+  docs/design/ui-exploration/two-track-ui-plan.md, DOC5:17 docs/adr/ to docs/decisions/, Y4:15
+  to docs/restructure/backlog/items/. validate.py mirrors the check (check_inputs_resolve,
+  reading INPUT_EXEMPTIONS from the test module). The guard proved itself on the same day's
+  mint: it found five fresh items (CORE13, CORE15, LOAD8, REM3, API5) citing test files they
+  will CREATE - deliverables, not inputs - and those were dropped from inputs:. Not extended to
+  acceptance:; gate prompts not guarded (CFG7 sweeps them). test_backlog 55 passed; the J57
+  family 73 passed; full unit suite green except the roadmap guard, which this commit's render
+  clears.

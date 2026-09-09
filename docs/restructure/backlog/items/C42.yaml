@@ -16,7 +16,7 @@ inputs:
 - config/gate-log.md
 - config/gate-prompts/
 - internal/research/JOB-MFTS-MM-research.md
-- drydocs_core/description_tokens.py
+- drydocs_core/orchestration/controlm/description_tokens.py
 acceptance: |
   (a) THE DEFECT, precisely: C30 (done, SME-ruled) retired INBOUND_ROUTE/OUTBOUND_ROUTE on
   FileWatcher jobs - a watcher is inherently inbound - and pointed them at FTS_ID plus REC_ID.

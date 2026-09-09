@@ -12,7 +12,6 @@ depends_on: []
 inputs:
 - drydocs_api/app.py
 - web/src/lib/reachability.ts
-- tests/unit/test_api_app.py
 acceptance: |
   One FastAPI exception handler over the driver's error classes returns 503; the console needs no
   change because isUpstreamDown already treats 502/503/504 as down. The handler carries the

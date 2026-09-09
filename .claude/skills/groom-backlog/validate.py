@@ -1123,6 +1123,67 @@ def _pending_header(stem: str) -> str:
     )
 
 
+# PLAN12 (2026-09-09): the inputs: existence check, mirrored from
+# tests/unit/test_backlog.py::test_inputs_of_open_items_resolve_against_the_tracked_tree so a
+# groom sees a moved path before the suite does. Same rules: non-done items only, git ls-files
+# (bytes, -z), gitignored inputs skipped, a malformed entry is a failure. The test wins on any
+# disagreement; INPUT_EXEMPTIONS lives THERE and is read from there, never duplicated here.
+_INPUT_PATH_RE = re.compile(
+    r"^(?!\.\.)[A-Za-z0-9_.][A-Za-z0-9_.+\-]*(?:/(?!\.\.)[A-Za-z0-9_.+\-]+)*/?$"
+)
+
+
+def _git_bytes(*args: str, stdin: bytes | None = None, check: bool = True) -> bytes:
+    proc = subprocess.run(
+        ["git", "-C", str(REPO_ROOT), *args], input=stdin, capture_output=True, check=check
+    )
+    return proc.stdout
+
+
+def _input_exemptions() -> set[str]:
+    try:
+        import importlib.util
+
+        spec = importlib.util.spec_from_file_location(
+            "_test_backlog", REPO_ROOT / "tests" / "unit" / "test_backlog.py"
+        )
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)  # type: ignore[union-attr]
+        return set(getattr(mod, "INPUT_EXEMPTIONS", {}))
+    except Exception:  # - a groom on a tree without pytest still validates
+        return set()
+
+
+def check_inputs_resolve(items: list[dict]) -> list[str]:
+    tracked = {p.decode("utf-8") for p in _git_bytes("ls-files", "-z").split(b"\0") if p}
+    exempt = _input_exemptions()
+    fails: list[str] = []
+    candidates: list[tuple[str, str]] = []
+    for it in items:
+        if it.get("status") not in {"todo", "in_progress"}:
+            continue
+        for raw in it.get("inputs") or []:
+            if not isinstance(raw, str) or not _INPUT_PATH_RE.match(raw):
+                fails.append(f"[{it.get('id')}] malformed inputs entry {raw!r}")
+            elif raw not in exempt:
+                candidates.append((it.get("id"), raw))
+    paths = sorted({raw for _, raw in candidates})
+    ignored = set()
+    if paths:
+        out = _git_bytes(
+            "check-ignore", "-z", "--stdin", stdin="\0".join(paths).encode() + b"\0", check=False
+        )
+        ignored = {p.decode("utf-8") for p in out.split(b"\0") if p}
+    for iid, raw in candidates:
+        rel = raw.rstrip("/")
+        if rel in ignored or raw in ignored:
+            continue
+        if rel in tracked or any(p.startswith(rel + "/") for p in tracked):
+            continue
+        fails.append(f"[{iid}] inputs names `{raw}`, which git does not track here")
+    return fails
+
+
 def main() -> int:
     fails: list[str] = []
     sys.path.insert(0, str(REPO_ROOT))
@@ -1203,6 +1264,8 @@ def main() -> int:
     # ADR 0013 Clause 3: nothing stores a roll-up; the derived one is printed so the
     # groomer can read next_ready without opening the board.
     derived = derive_summary(doc)
+    fails.extend(check_inputs_resolve(items))
+
     for path in sorted(BACKLOG.rglob("*.yaml")):
         d = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
         for key in ("summary", "next_ready", "updated"):

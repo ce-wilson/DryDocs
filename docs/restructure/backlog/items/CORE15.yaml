@@ -11,7 +11,6 @@ status: todo
 depends_on: []
 inputs:
 - drydocs_core/run_log.py
-- tests/unit/test_run_log.py
 acceptance: |
   Each of the four handlers (run_log.py lines 81, 121, 146 and 191 at the review's tree) emits a
   warning naming the path that degraded and what was lost; the branches the coverage report showed

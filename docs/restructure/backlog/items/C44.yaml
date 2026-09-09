@@ -52,7 +52,7 @@ acceptance: |
   (f) THE LOADER IS NOT IN SCOPE AND MUST BE NAMED AS OUT OF SCOPE. :MftsRoute {route_id},
   USES_INBOUND_ROUTE/USES_OUTBOUND_ROUTE, DELIVERED_VIA -> :DeliveryMechanism and
   controlm_filewatcher_metadata.cypher are built and active on the company's feat/dd_lineage with
-  route_id UNIQUE-constrained; producer holds only the parser (drydocs_core/description_tokens.py).
+  route_id UNIQUE-constrained; producer holds only the parser (drydocs_core/orchestration/controlm/description_tokens.py).
   So the loader is a back-flow candidate that must WAIT for this ruling or it imports the
   question - the research's G-1 names the consequence: the key was committed before the shape was
   ruled.

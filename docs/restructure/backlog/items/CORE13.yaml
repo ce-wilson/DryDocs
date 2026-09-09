@@ -11,7 +11,6 @@ status: todo
 depends_on: []
 inputs:
 - drydocs_core/neo4j_client.py
-- tests/unit/test_neo4j_client.py
 acceptance: |
   Neo4jClient gains max_transaction_retry_time, a per-transaction timeout and a connection
   acquisition timeout, each read from config/dev-environment.yaml or the client's constructor

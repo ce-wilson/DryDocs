@@ -14,7 +14,7 @@ inputs:
 - web/src/modules/lazyRoutes.test.ts
 - web/scripts/checkBundleSize.mjs
 - PUBLISH-BOUNDARY.md
-- docs/adr/
+- docs/decisions/
 acceptance: |
   WEB7 shipped a rule and the guard that enforces it, and the rule outlives the item: the
   lazy-loaded route set IS the gated route set, derived from the one route table both the gate
