@@ -24,6 +24,19 @@ acceptance: |
   with no branch. (c) test_lane_handoff.py pins both sentences and both listings. (d) The no-mint
   rule leaves the string literal at handoff.py and lands in CLAUDE.md section 0 with its derivation
   (mint, then the stub render, and Lane B holds no render pen) - Lane A carries that edit.
+  (e) --check COMPARES AGAINST origin/main, not against the working tree alone, or refuses with the
+  distance when the tree is behind it. Clause (b) reads the wip refs and still would not have caught
+  this: a queued item can be done on MAIN while the checking tree has never seen the merge, and
+  --check reads the tree's own item files. Measured 2026-09-09 by the Lane B session, whose checkout
+  sat 71 commits behind origin/main: --check reported DOC9, REM2, MM12, V4, V5, V6 and DOC8 as
+  in_progress when all seven were done on main, so a receiver who trusted it would have rebuilt seven
+  finished items. That is the C19/K9 double-build arriving through the handoff check rather than
+  through the claim protocol, which is the one failure mode this skill exists to close. A fetch is
+  not assumed: if the refs are stale the distance is unknown and the refusal says so.
 notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). Plan 2026-09-09, Phase 1 unit 1.5. The reviews' stated bottleneck is that only Lane A mints; the
   merge is the one moment both lanes' work is in one place.
+  Clause (e) added 2026-09-09 (Lane A, desktop, at the L23 merge) from the Lane B session's close
+  report - its own finding about the instrument it was handed, measured on its own stale tree and
+  reported rather than worked around. Lane B holds no backlog pen, so it could not file this, and the
+  hand-back through the close report is the J59 clause (c) shape working as intended.
