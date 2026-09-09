@@ -19001,7 +19001,8 @@ DONE 2026-09-08 (desktop, Lane A; built on wip/u27-desktop per J31, merged --no-
     -NonInteractive -ExecutionPolicy Bypass; where neither is on PATH the file skips with a
     message naming both shells (the U26 shape). Desktop runs it under Windows PowerShell
     5.1.26100; the CI legs (ubuntu-latest and windows-latest) both carry pwsh, so the
-    fixtures execute there rather than skipping - the wip/u27-desktop run is the proof. test_powershell_keeps_non_ascii_out_of_quoted_strings already rglobs
+    fixtures execute there rather than skipping - the wip/u27-desktop run is the proof.
+    test_powershell_keeps_non_ascii_out_of_quoted_strings already rglobs
     every *.ps1, so ci_verdict.ps1 is under the CP1252 guard without a change;
     test_refusal_and_ci_messages_report_the_measurement_not_a_guess now reads both files
     because the CI messages moved.
