@@ -41,6 +41,10 @@ Ingest commands:
                                     {role: seal_app_ref} edges onto Batch Ports
   drydocs load-manual-mappings    — tier-5 SME-authored mapping CSV
                                     (config/manual-loads/, PIN semantics)
+  drydocs load-fix-tracking       — G90: a fix-tracking.v1 change-set -> the
+                                    three remediation_* properties (gate
+                                    remediation-fix-tracking §C1; --mode
+                                    apply|reject, all-or-nothing)
   drydocs load-code-snapshot      — G33 self-documentation: newest depgraph
                                     snapshot -> :Project / :CodeModule subgraph
   drydocs load-server-inventory   — Z3: infra server export -> :Server /
