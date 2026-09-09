@@ -7,7 +7,7 @@ phase: 10
 agent: main
 model: haiku
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - CLAUDE.md
@@ -30,6 +30,33 @@ acceptance: |
   (c) Both edits are one sentence each. No script: if the sentence turns out to need one, that
       is a separate item minted then.
 notes: |
+  DONE on wip/j61-laptop (Lane B, laptop), fourth and last of the section 0 cluster.
+
+  (a) The lane-handoff skill's close step gains the sentence for Lane B: after the sender
+  confirms the merge, `git fetch --prune`, then `git branch -d` each merged wip/ branch.
+  Never -D, and the reason is written beside it - -d REFUSING an unmerged branch is the
+  check, so swapping in -D removes the only safety the step has.
+
+  (b) The J31 paragraph in CLAUDE.md section 0 now names the local form beside the remote
+  one: the pre-release check reads the REMOTE (git branch -r --list), and the local branch
+  is deleted once the merge is confirmed.
+
+  (c) One sentence each, no script.
+
+  EVIDENCE RE-MEASURED ON THIS MACHINE TODAY rather than taken from the item. The groom
+  reported twelve stale local branches at the 2026-09-07 Lane B close. Today the laptop
+  carries 29 local wip/ branches against 5 on the remote, and those 5 are exactly this
+  burst's (g90, j59, load7, core9, j61) - so 24 are residue from closed lanes. The defect
+  has roughly doubled in two days, which is what an accumulating residue does and is worth
+  more than the original number.
+
+  NOT DONE HERE, deliberately: the 24 stale branches on this laptop are not deleted by
+  this item. Lane A has not confirmed the merges for the current burst, and the whole
+  point of the new sentence is that deletion follows confirmation - deleting them while
+  writing the rule that says to wait for confirmation would be the wrong first
+  demonstration of it. They are the receiving session's cleanup at the close the rule now
+  describes.
+
   Groomed 2026-09-08 from IDEAS.md Idea-301 (base venue, desktop); source is the Lane B close
   report of the seven-item burst that ended 2026-09-07.
 

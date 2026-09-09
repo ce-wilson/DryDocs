@@ -27,6 +27,13 @@ things share the word *port* — never conflate them:
 - **Branch guardrail (this is what prevents the main-vs-branch mix-ups):** ALWAYS run
   `git branch --show-current` immediately before committing and name the target branch — HEAD can change
   between turns, agents, worktrees, or forks, so never assume it persisted. Wrong branch → stop and confirm.
+  **In a DETACHED worktree that command prints an EMPTY string** (measured, J61), and
+  `git rev-parse --abbrev-ref HEAD` prints the literal `HEAD` — neither is a name to check, so the
+  guardrail as written produces nothing exactly where it is needed most. The substitute, run before
+  committing: **`git rev-parse HEAD` must equal `git rev-parse origin/main`** (after your first commit,
+  compare `HEAD^`). Equal means *detached at the tip you intend to push onto*; unequal means *detached
+  somewhere else* — stop and confirm, the same as a wrong branch. Those are the two outcomes the
+  guardrail exists to separate, and the empty string separates neither.
 
 **Where to work, by output type:**
 - output is a **commit** → **Claude Code** (CLI/desktop/IDE). All repo work, running the
@@ -49,8 +56,13 @@ things share the word *port* — never conflate them:
   `docs/restructure/backlog/items/` whose every `depends_on` is `done` and that carries no
   `hold:` (the board's Ready-to-pull strip lists exactly these — a held item is excluded from
   it and shown under **Held** with its reason, Y7); **commit and push** `status: in_progress` in that one item file
-  **before starting work** — a claim ships NO render (Y5: the roadmap guard tolerates
-  status-only drift, so the claim sha stays green; renders catch up at session close); do exactly that item, staying inside your layer; meet its
+  **before starting work** — a claim on an EXISTING item ships NO render (Y5: the roadmap guard tolerates
+  status-only drift, so the claim sha stays green; renders catch up at session close), but **a claim that
+  MINTS a new item ships the board and roadmap render WITH it** (Y6): minting adds a row the roadmap never
+  had, so its source fingerprint moves for a STRUCTURAL reason and the status-only tolerance correctly does
+  not apply — the guard is right and the blanket sentence was incomplete. Evidence: the O75 claim commit
+  `49356d9a` followed the rule as written, shipped no render, and failed
+  `test_committed_roadmap_page_matches_its_sources` with "stale beyond a status-only change"; do exactly that item, staying inside your layer; meet its
   `acceptance`; set it `done`."* Anything ambiguous → the HITL
   gate ([`docs/restructure/03-hitl-sme-flow.md`](docs/restructure/03-hitl-sme-flow.md)), never auto-decided.
   **Pushed, not merely committed — why:** the item file's `status` is the only claim channel between
@@ -63,7 +75,12 @@ things share the word *port* — never conflate them:
   **`wip/<id>-<machine>`** (the shape the K9 recovery used, `wip/k9-laptop`), never `main`;
   (3) BEFORE RELEASING someone else's `in_progress` claim back to `todo`, run
   **`git branch -r --list "wip/<id>-*"`** — a claim with a wip branch behind it is not dead, it is
-  someone's unmerged work. Evidence, twice: K9 was fully built on the laptop and never pushed, so
+  someone's unmerged work. **The check reads the REMOTE, and the LOCAL branch is deleted once the
+  merge is confirmed** (DOC7): Lane A's close already deletes the remote branch after the `--no-ff`
+  merge, so the local tracking branches are residue — `git branch -d` each one (never `-D`: the
+  refusal on an unmerged branch IS the check). Left alone they accumulate, and a bare `git branch`
+  then reads as unmerged work to the next person running this check from that machine — measured on
+  the laptop at 29 local `wip/` branches against 5 on the remote. Evidence, twice: K9 was fully built on the laptop and never pushed, so
   the desktop read claim commit `3608ae5` as a dead tip and rebuilt it (`17d9e08` on main,
   `bfb2f0b` stranded on a branch); and the C19 double-build above. What this does NOT fix: a session
   that dies before its first push stays invisible, and no convention changes that.
@@ -82,6 +99,24 @@ things share the word *port* — never conflate them:
   [`lane-handoff` skill](.claude/skills/lane-handoff/SKILL.md) generates the queue, the pens
   line and the surface fence as one self-retiring file** (`docs/lane-<x>-handoff.md`); its
   `PENS` table is keyed by the names above, plus `gates` and `snapshot`, which it adds.
+  **Fan-out inside ONE checkout — the coordinator rule (I7).** Everything above assumes the
+  concurrent writers are SESSIONS ON DIFFERENT MACHINES, coordinated by pushed claims and pens.
+  A fan-out command that spawns parallel workers breaks that assumption *inside a single
+  checkout*, at a much higher rate: no push separates the workers, so the claim protocol cannot
+  see them at all. No skill here spawns workers today, which is exactly why this is written down
+  now rather than rediscovered by the first one that does. When an orchestrator fans out:
+  **(1) the COORDINATOR allocates every id up front** — one caller of the mint rule's allocator
+  above, ids handed to workers pre-assigned; a worker never mints, because N workers asking "what
+  is next free" in one tree all get the same answer. **(2) NO worker renders.** This is the
+  sharper half and the one that gets missed: any worker touching the backlog or the inbox would
+  regenerate the board, the roadmap, `web/src/generated/**` and the design HTML — files that are
+  DERIVED and have exactly one writer per cycle by construction, so N workers produce N
+  conflicting versions of them. The coordinator renders ONCE, after the workers finish.
+  **(3) Fan out only over units whose source files are DISJOINT** — the same reasoning the lane
+  handoff applies across machines, applied within one tree. This rule lives HERE because the
+  orchestration command lives OUTSIDE this repo and cannot carry it. No guard backs it, and none
+  can: the actor is an external orchestrator, and there is no point in the sequence where a test
+  could observe it.
 
 **Mint rule (the claim protocol's other half; I6).** A pull is claimed by pushing `status: in_progress`. An id is claimed the same way, and for the same reason: an id that exists only in your tree is an id the other machine will mint too. **Never read the next free number off your own tree** — ask the allocator, which unions the local items, every remote ref's tree listing, and every id ever added in history, and returns max+1 (a gap is usually a BURNED id — `config/gate-log.md` cites ids inside SIGNED records, so re-issuing one silently re-points a signed gate):
 ```
@@ -97,6 +132,32 @@ The 27 legacy letters (A..Z, GN, MM) were FROZEN on 2026-09-02 — a letter reco
    ruff commands CI blocks on then run on the staged files at every commit, at the exact ruff pin —
    a fast first line, never the gate. Not installed for you, on purpose: `.pre-commit-config.yaml`
    explains itself so a hook failure on a fresh clone is never an unexplained one.
+   ***When that `git pull` ABORTS (J61) — the shared-checkout recovery.*** The case that actually
+   happens on the desktop: another live session in the SAME tree has an uncommitted file the incoming
+   merge touches, so the pull aborts **wholesale** even though nothing you intend to touch is involved.
+   Do not stash another session's work and do not wait. Work from a detached worktree instead — every
+   command below was run once against this tree at build time and its output recorded in J61's notes:
+   ```bash
+   git fetch origin
+   git worktree add --detach "$SCRATCH/wt" origin/main   # $SCRATCH = your scratchpad dir
+   cd "$SCRATCH/wt"
+   git rev-parse HEAD; git rev-parse origin/main         # the detached guardrail above — must match
+   # ... do the work ...
+   git add <explicit paths>                              # BY PATH: the worktree also holds renders
+   git commit -F <msgfile>                               #          and a .venv you did not intend
+   git push origin HEAD:main
+   cd - && git worktree remove --force "$SCRATCH/wt"
+   ```
+   Two things this recipe does NOT do, stated because a reader otherwise assumes both. **It unblocks
+   the WORK, not the TREE:** the push advances the remote while the blocked checkout's own `main` ref
+   stays put, so the shared tree ends the session *further behind* than it started, with the same dirty
+   file plus more commits to catch up on. Only the session holding that file can clear it. And **it
+   does not fix the close-time CI check's detached-HEAD blindness** — that is U27's, already captured;
+   do not re-solve it here. Renders ARE safe from a worktree: a default-paths `render_board.py` run
+   writes worktree-local (verified at build time — every reported output path sat under the worktree
+   root and the main checkout stayed clean), which is true because J48 fixed it and was not before.
+   Note the first `poetry run` inside a fresh worktree BUILDS a second in-project `.venv` there;
+   invoking the main checkout's interpreter by absolute path skips that.
 2. **During:** the in-session Task list is *ephemeral* working memory for the one item — distinct
    from the durable item file.
 3. **End:** update the item's `status`, **regenerate the board** (`poetry run python scripts/render_board.py`)

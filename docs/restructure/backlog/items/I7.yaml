@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - CLAUDE.md
@@ -37,6 +37,42 @@ acceptance: |
   (f) IT DOES NOT RESTATE I6. I6 builds the allocator; this constrains who may call it. If I6 has
   landed by the time this is pulled, the rule points at the command rather than describing it.
 notes: |
+  DONE on wip/j61-laptop (Lane B, laptop), third of the four-item section 0 cluster.
+
+  (a) The rule sits directly beside the pull rule and the one-pen-per-surface paragraph it
+  qualifies, at the end of the concurrency block - which is the placement the clause asks
+  for, and the placement that makes it read as the in-checkout case of a model the reader
+  has just finished reading rather than as an unrelated new rule.
+
+  (b) BOTH MECHANISMS, with the second given the weight the clause demands. Ids are the
+  obvious half and are one sentence. The sharper half is renders: a worker touching the
+  backlog or the inbox regenerates the board, the roadmap, web/src/generated/** and the
+  design HTML, and those are DERIVED files with exactly one writer per cycle BY
+  CONSTRUCTION - so N workers do not race to write the same file, they each produce a
+  DIFFERENT correct-looking version of it. The rule is that no worker renders at all and
+  the coordinator renders once after they finish, which is the only shape that keeps the
+  one-writer property true.
+
+  (c) Stated in the text: the rule lives in this repo because the orchestration command
+  does not, and an external fan-out invocation cannot carry it.
+
+  (d) The broken assumption is named explicitly - the whole concurrency model above it is
+  written for cross-machine sessions coordinated by PUSHED claims, and fan-out inside one
+  checkout has no push between the workers, so the claim protocol cannot see them at all.
+  That is why the failure rate is higher than the two-machine case rather than the same.
+
+  (e) No code, no guard, and the text says why: the actor is an orchestrator outside this
+  repo, so there is no point in the sequence where a test could observe it.
+
+  (f) IT DOES NOT RESTATE I6. I6 has landed - the mint rule and its allocator are in
+  section 0 already - so this POINTS AT that allocator ("one caller of the mint rule's
+  allocator above") and constrains WHO MAY CALL IT, exactly as the clause says to do once
+  I6 is in. The allocator is not re-described.
+
+  SCOPE HELD, per the sender's burst ruling: section 0 only. I5 holds
+  .claude/skills/groom-backlog/SKILL.md this burst, so if a groom-skill sentence is wanted
+  it is handed back rather than written here. Nothing in .claude/skills/ was touched.
+
   Groomed 2026-08-30 (desktop, weekly groom) from Idea-205b, which was split from Idea-205a by the
   capture itself on the grounds that one is a tool to build and the other is a working agreement to
   write. The split is kept for the same reason - no dependency between them, and the agreement is
