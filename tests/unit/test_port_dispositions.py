@@ -19,6 +19,7 @@ step with the manifest; that is the whole reason this one is generated.
 from __future__ import annotations
 
 import importlib.util
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -29,6 +30,26 @@ REPO = Path(__file__).resolve().parents[2]
 RENDERER = REPO / "scripts" / "render_port_dispositions.py"
 MANIFEST = REPO / "PORT-MANIFEST.yaml"
 PORT_PROMPT = REPO / "docs" / "port" / "port-prompt.md"
+
+
+def _is_tracked_here(rel: str) -> bool:
+    """Whether ``rel`` is TRACKED in this tree - never whether its directory exists.
+
+    The port-prompt is never-port (PORT-MANIFEST.yaml), so the consumer holds a
+    retired stub or nothing; its ``docs/port/`` directory still exists, holding the
+    gitignored working state the renderer writes, so ``is_dir()`` / ``exists()``
+    answered "present" for a zone that never crossed (the company's chunk-2 apply of
+    port-base-20260902, fixed at af9194c4). Only git can answer the question the guard
+    below actually asks."""
+    result = subprocess.run(
+        ["git", "ls-files", "--", rel],
+        cwd=REPO,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        check=True,
+    )
+    return bool(result.stdout.strip())
 
 
 def _renderer():
@@ -160,7 +181,15 @@ def test_the_apply_section_sits_above_the_ledger_the_coverage_guard_reads() -> N
     table happened to name their sha. Above the marker, it is prose; below it, it is
     evidence. That distinction is worth a guard.
     """
+    rel = PORT_PROMPT.relative_to(REPO).as_posix()
+    if not _is_tracked_here(rel):
+        # Producer-only by nature (PORT1 b): the section and the ledger it must sit
+        # above are both in a never-port file. A consumer tree has no tracked copy - or
+        # a retired stub carrying neither marker - and neither is a defect there.
+        pytest.skip(f"{rel} is not tracked in this tree; the apply section is producer-only")
     text = PORT_PROMPT.read_text(encoding="utf-8")
+    if "APPLY BY DISPOSITION" not in text or "STEP LEDGER" not in text:
+        pytest.skip(f"{rel} carries no apply section / ledger markers here (a retired stub)")
     apply_at = text.index("APPLY BY DISPOSITION")
     ledger_at = text.index("STEP LEDGER")
     assert apply_at < ledger_at, (

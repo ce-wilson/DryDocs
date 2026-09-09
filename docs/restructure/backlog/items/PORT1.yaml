@@ -7,7 +7,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - scripts/render_port_dispositions.py
@@ -49,3 +49,28 @@ notes: |
 
   First item in the PORT series (module drydocs-port, added at CORE1). Filed
   release-infrastructure / phase 8 with the other port mechanisms (J34, J72).
+  DONE 2026-09-08 (desktop, Lane A).
+  (a) Was already on main before the claim, at eee64ce3 (2026-09-07, the same day this
+      item was minted): main() takes an optional second argument as the head, render()
+      takes it too, a third argument is refused, and test_port_dispositions.py pins the
+      pass-through. Nothing to adopt beyond recording that the adoption had landed.
+  (b) The fourth guard now skips through git ls-files -- docs/port/port-prompt.md (never a
+      directory probe), and again when the tracked file carries neither marker (a retired
+      stub). This is the case PORT3's guard exists for, and PORT3 had it WRONG: its fixture
+      allowance for test_port_dispositions.py said "input to classify()", but the test opens
+      the file. The false allowance is removed here, and the PORT3 guard replayed on the
+      pre-(b) shape FINDS the citation and reads the post-(b) shape CLEAN - the two items lock.
+  (c) scripts/port_rename_check.py reads the producer tree through one git cat-file --batch
+      pipe (_blobs), decoding exactly as _git did (UTF-8 replace, then universal newlines).
+      Measured on this tree, whole tree, --producer-ref port-base-20260905: 109 s before,
+      8 s after; the report output is byte-identical (diff of the two captures is empty).
+      tests/unit/test_port_rename_check.py (new, 3 tests) pins per-path equality with git
+      show, the missing-object skip, the decode, and that no _git("show", ...) call remains.
+  (d) Both rules land in the APPLY BY DISPOSITION section of docs/port/port-prompt.md,
+      under the renderer command, which is now the consumer's two-argument form: a chunk
+      plan that names a script names the commit the script needs (bed22549 / eee64ce3 /
+      df7a57c3 / 6f8c7825, all in port-base-20260908); classify with the manifest AT THE
+      BASE (git checkout <base-tag> -- PORT-MANIFEST.yaml is class 1's first take anyway),
+      then git diff <pre-apply-tag> <base-tag> -- PORT-MANIFEST.yaml - the rows that differ
+      are the port's own manifest rows for the range.
+  The item's inputs list docs/port-prompt.md; the file is docs/port/port-prompt.md.

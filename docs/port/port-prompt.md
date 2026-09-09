@@ -3945,11 +3945,35 @@ reference. That is the right shape. This section makes it the file's shape too.
 applying FROM:
 
 ```
-PYTHONPATH=. python scripts/render_port_dispositions.py <your-base-tag>
+PYTHONPATH=. python scripts/render_port_dispositions.py <pre-apply-tag> <base-tag>
 ```
 
+Two arguments on your side, always: `<pre-apply-tag>` is your own ref for the tree
+BEFORE this apply, `<base-tag>` is the producer's `port-base-<date>`. One argument
+(`<base-tag>` alone) renders `<base-tag>..HEAD`, which is right on the producer and wrong
+on yours — HEAD is your apply branch, so it renders what you have already taken under a
+plausible "wrote N paths" line (Idea-250; the two-argument form is `eee64ce3`).
+
+**THE WORKPLAN RULE (PORT1 d, 2026-09-08). A chunk plan that names a script names the
+COMMIT the script needs.** Your chunk 1 of 2026-09-01 was told to run this renderer, and
+the renderer landed AFTER your base (J69 at `bed22549`); the two-argument form is
+`eee64ce3`, the unresolvable-ref refusal is `df7a57c3`, and the one-classifier import is
+`6f8c7825`. All four are in `port-base-20260908`; a plan written against an earlier base
+names the one it needs and takes that file first, wholesale — `scripts/**` is default_ok,
+so nothing else brings it. The second half of the rule is about WHICH MANIFEST does the
+classifying: **classify with the manifest AT THE BASE, never with your current one.**
+`PORT-MANIFEST.yaml` is canonical-producer, so `git checkout <base-tag> --
+PORT-MANIFEST.yaml` is the first wholesale take of class 1 anyway; do it BEFORE you
+render, or the table buckets the range by rows the range itself changed (the producer's
+519, above, was measured with the manifest at HEAD instead of at the tag — the same
+mistake from the other side). Then `git diff <pre-apply-tag> <base-tag> --
+PORT-MANIFEST.yaml`: the rows that differ ARE the port's own manifest rows for this range,
+and each one is a path class that moved — read them before the table, because they say
+where a path you handled last roll is handled differently this roll.
+
 It writes `docs/port/port-dispositions.md` — **gitignored working state, generated
-per apply and never committed.** Its range is `<base>..HEAD`, so a committed copy would
+per apply and never committed.** Its range is `<pre-apply-tag>..<base-tag>` on your side
+(`<base-tag>..HEAD` on the producer's), so a committed copy would
 be stale the moment anyone commits; the RENDERER is what carries guards. The file holds
 every changed path in the range, bucketed
 by the disposition `PORT-MANIFEST.yaml` resolves for it, with each row's `entry_rule`
