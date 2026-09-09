@@ -516,12 +516,27 @@ def load_from_graph(client, folder_name: str, venue: str) -> FolderFacts:
 # --------------------------------------------------------------------------
 
 
+def _cell(value: object) -> str:
+    """One table cell, made safe for a pipe table.
+
+    Two characters end a markdown table when they arrive inside a value, and both
+    reach here from real data: a literal ``|`` (Control-M command lines contain
+    pipes) and a newline (the sibling spec already carries a multi-line example
+    value, so a real extract will too). A newline is folded to a space rather than
+    escaped — a cell cannot hold a line break in this table syntax, and silently
+    truncating the row at the break would drop content a reader needs.
+    """
+    if value is None or value == "":
+        return ""
+    text = str(value).replace("\r\n", "\n").replace("\r", "\n")
+    return text.replace("\n", " ").replace("|", "\\|").strip()
+
+
 def table(header: list[str], rows: list[list[str]]) -> str:
     """A pipe table. An empty ``rows`` still emits the header — the shape IS content."""
-    out = ["| " + " | ".join(header) + " |", "|" + "---|" * len(header)]
+    out = ["| " + " | ".join(_cell(h) for h in header) + " |", "|" + "---|" * len(header)]
     for row in rows:
-        cells = [str(c).replace("|", "\\|") if c else "" for c in row]
-        out.append("| " + " | ".join(cells) + " |")
+        out.append("| " + " | ".join(_cell(c) for c in row) + " |")
     return "\n".join(out)
 
 
