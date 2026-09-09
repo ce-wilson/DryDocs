@@ -318,3 +318,188 @@ def test_anchored_list_gets_gutter_tag_and_derived_li_ids() -> None:
         '<ol id="run-order"><span class="dd-margin-tag" aria-hidden="true">run-order</span>' in html
     )
     assert '<li id="run-order--start-the-container">' in html
+
+
+# ---------------------------------------------------------------------------
+# DOC9 — the committed pages, not only the renderer.
+#
+# Everything above this line pins render_doc's OUTPUT on fixtures. None of it
+# opens a committed docs/design/*.html, so until now the only thing standing
+# between an edited .md and a stale governed render was the session ritual in
+# CLAUDE.md section 0 — a habit. Idea-111 records what a habit-only check is
+# worth: CI ran red for a week while sessions pushed past it, because nothing
+# local ever looked wrong. Lane B then committed four governed design renders on
+# wip branches in 2026-09-07 and nothing in CI would have said either way. The
+# board and the roadmap have had test_committed_roadmap_page_matches_its_sources
+# since Y5; this is the same guard for the design docs.
+# ---------------------------------------------------------------------------
+
+DESIGN_DIR = REPO_ROOT / "docs" / "design"
+
+#: The fix the assertion prints, verbatim from the session ritual (CLAUDE.md
+#: section 0). The roadmap guard's shape: a drift guard names the command that
+#: clears it, because the operator who hits it is usually not its author.
+RENDER_COMMAND = "poetry run python scripts/render_design_doc.py docs/design/*.md"
+
+
+def _fresh_page(md_path: Path) -> bytes:
+    """The bytes write_doc would commit for ``md_path``, produced in memory.
+
+    In memory, and safe to be in memory only because the next test pins it: this
+    re-states write_doc's two choices — ``doc_id`` is the .md stem, and the file
+    is written LF — so on its own it could drift from what the writer actually
+    emits and this guard would happily compare against a shape nobody ships.
+    ``test_the_in_memory_page_is_what_write_doc_commits`` holds the two to the
+    same bytes, so the writer cannot move without breaking a test first.
+    """
+    return render_doc(md_path.read_text(encoding="utf-8"), doc_id=md_path.stem).encode("utf-8")
+
+
+def _design_render_drift(directory: Path) -> list[str]:
+    """Every stem in ``directory`` whose committed .html is not the current render.
+
+    ALL of them, never just the first: a report that stops at the first stale doc
+    sends the operator back for another round per document. A .md with no .html at
+    all is drift too — the ritual renders ``docs/design/*.md`` as a set, so a
+    missing page is a page nobody rendered, not a document that opted out.
+
+    Sorted by ``p.name``, a str, and not by the Path: sorting Path objects is
+    case-folded on Windows and case-sensitive on POSIX, which is the bug that held
+    CI red for roughly 180 runs (test_render_determinism.py's opening note). A
+    guard whose report order depends on the OS that ran it has no business
+    reporting on cross-platform renders.
+    """
+    drift: list[str] = []
+    for md in sorted(directory.glob("*.md"), key=lambda p: p.name):
+        page = md.with_suffix(".html")
+        expected = _fresh_page(md)
+        if not page.exists():
+            drift.append(f"{md.stem}: no committed .html beside the source")
+        elif (committed := page.read_bytes()) == expected:
+            continue
+        elif committed.replace(b"\r\n", b"\n") == expected:
+            drift.append(f"{md.stem}: CR bytes only — a writer added them after checkout")
+        else:
+            drift.append(f"{md.stem}: {len(committed)} committed bytes, {len(expected)} rendered")
+    return drift
+
+
+def test_committed_design_pages_match_their_sources() -> None:
+    """The stale-render check from the session ritual, as a test — and STRICT.
+
+    BYTES, never a normalized or whitespace-tolerant form (clause b). Governed
+    renders publish VERBATIM (CLAUDE.md section 6) because the HITL loop
+    re-attaches L5 digital and L6 paper feedback by anchor, so a restyled copy —
+    exactly what a whitespace-tolerant compare waves through — breaks
+    re-attachment silently. The one difference this does not own is the CR byte:
+    test_render_determinism.py::test_committed_surfaces_carry_no_cr_byte already
+    covers docs/design/*.html for that. The report NAMES that case so a CRLF
+    checkout cannot read as a restyle, which is diagnosis; tolerating it would be
+    the normalization the clause forbids.
+
+    STRICT, with the tolerance question settled here rather than left to whoever
+    hits it first (clause c). Y5 relaxed the roadmap guard for status-only drift
+    because the claim protocol REQUIRES an un-rendered push: a claim is a one-key
+    edit of one item file, pushed before work starts, and it is the only channel
+    between the two machines. A design doc has no equivalent one-key edit and no
+    protocol that forces one. The case worth checking before committing to strict
+    was a .md that changes only its ``Rev N`` line — and it turns out to be the
+    strongest argument FOR strictness, not against it. The rev feeds
+    ``sme_feedback_filename`` and the printed footer, so a stale page at a rev
+    bump hands the SME paper whose margin tags and feedback filename name the
+    PREVIOUS revision. Feedback attributed to the wrong rev is the precise failure
+    the L5/L6 loop exists to prevent, which makes a rev-only edit the worst case
+    for tolerance rather than the candidate for it.
+    """
+    drift = _design_render_drift(DESIGN_DIR)
+    assert not drift, (
+        "committed design render(s) do not match their .md source:\n  "
+        + "\n  ".join(drift)
+        + f"\nRe-run `{RENDER_COMMAND}` and commit the refresh. The .md is the source "
+        "of truth and the .html is a deterministic render of it (Epic L / L13), so a "
+        "page that differs is a page the ritual skipped — or one somebody edited by "
+        "hand, which governed surfaces never tolerate."
+    )
+
+
+def test_the_in_memory_page_is_what_write_doc_commits(tmp_path: Path) -> None:
+    """The pin that makes the in-memory comparison above legitimate.
+
+    ``_fresh_page`` re-states write_doc's doc_id and newline choices. If the
+    writer ever changes either, this fails and the guard is fixed before it can
+    start passing against bytes the ritual would never produce. Driven on the real
+    Control-M TDD rather than a fixture, because the shape that matters is the one
+    that ships.
+    """
+    written = write_doc(CONTROLM_TDD, tmp_path)
+    assert written.read_bytes() == _fresh_page(CONTROLM_TDD), (
+        "write_doc no longer emits what render_doc(md, doc_id=stem) produces — "
+        "test_committed_design_pages_match_their_sources is comparing against the "
+        "wrong bytes until _fresh_page is brought back into line with the writer"
+    )
+
+
+def _fixture_doc(directory: Path, stem: str, rev: int = 1) -> Path:
+    """A minimal but real design doc: title, declared rev, one anchored section."""
+    md = directory / f"{stem}.md"
+    md.write_text(
+        f"# {stem.replace('-', ' ').title()}\n\n"
+        f"**Rev {rev}** · commit `abc123`\n\n"
+        "<!-- anchor: a-section -->\n## A section\n\ntext\n",
+        encoding="utf-8",
+        newline="\n",
+    )
+    return md
+
+
+def test_the_guard_passes_on_a_fresh_page_and_fails_on_a_hand_edit(tmp_path: Path) -> None:
+    """J76: the instrument gets a fixture — and the fixture proves the STRICT half.
+
+    The hand edit is ONE trailing newline, deliberately the smallest edit a
+    whitespace-tolerant comparison would wave through. A restyled ``<style>``
+    block would fail any comparison at all and so would prove nothing about clause
+    (b); this one fails only because the comparison is on bytes.
+    """
+    md = _fixture_doc(tmp_path, "fixture-doc")
+    page = write_doc(md)
+    assert _design_render_drift(tmp_path) == [], "a freshly rendered page must pass"
+
+    page.write_bytes(page.read_bytes() + b"\n")
+    drift = _design_render_drift(tmp_path)
+    assert len(drift) == 1 and drift[0].startswith("fixture-doc:"), drift
+
+
+def test_a_source_with_no_committed_page_is_drift_not_a_crash(tmp_path: Path) -> None:
+    """A .md nobody rendered is the commonest way this guard earns its keep —
+    a new design doc committed without running the ritual."""
+    _fixture_doc(tmp_path, "never-rendered")
+    assert _design_render_drift(tmp_path) == [
+        "never-rendered: no committed .html beside the source"
+    ]
+
+
+def test_every_stale_stem_is_reported_not_only_the_first(tmp_path: Path) -> None:
+    """Clause (a): all of them. One round of re-rendering, not one per document."""
+    for stem in ("alpha-doc", "beta-doc", "gamma-doc"):
+        write_doc(_fixture_doc(tmp_path, stem))
+    (tmp_path / "alpha-doc.html").write_bytes(b"<!doctype html>\n<html>hand-written</html>\n")
+    (tmp_path / "gamma-doc.html").unlink()
+
+    drift = _design_render_drift(tmp_path)
+    assert [d.split(":")[0] for d in drift] == ["alpha-doc", "gamma-doc"], drift
+
+
+def test_a_rev_bump_alone_is_drift_because_the_tolerance_is_strict(tmp_path: Path) -> None:
+    """The clause (c) ruling, executable. Changing only ``Rev 1`` to ``Rev 2``
+    moves the printed footer and the SME feedback filename, so the committed page
+    genuinely no longer matches its source — and this is the case the item asked
+    to settle before committing to strict. Settled: it fails."""
+    md = _fixture_doc(tmp_path, "rev-doc", rev=1)
+    write_doc(md)
+    assert _design_render_drift(tmp_path) == []
+
+    _fixture_doc(tmp_path, "rev-doc", rev=2)
+    assert _design_render_drift(tmp_path), (
+        "a rev-only edit left the committed page passing — the footer and "
+        "sme_feedback_filename both key on the rev, so this must be drift"
+    )
