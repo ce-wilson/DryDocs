@@ -9,7 +9,7 @@ phase: 17
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: in_progress
 depends_on:
 - MM3
 inputs:

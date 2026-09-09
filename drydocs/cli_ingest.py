@@ -81,6 +81,14 @@ from .loaders.code_snapshot import (
     CodeTreeLoader,
     select_newest_snapshot,
 )
+from .loaders.fix_tracking import (
+    APPLY,
+    MODES,
+    REJECT,
+    FixTrackingError,
+    FixTrackingLoader,
+    change_set_rows,
+)
 from .loaders.folder_attribution import (
     FolderAttributionAdapter,
     FolderAttributionLoader,
@@ -976,6 +984,57 @@ def load_manual_mappings(
         raise typer.Exit(2) from exc
     with _client() as cli:
         summary = ManualSealAttributionLoader(cli, ManualMappingAdapter(rows)).load()
+    console.print(summary.as_dict())
+
+
+@app.command(name="load-fix-tracking")
+def load_fix_tracking(
+    change_set: Path = typer.Argument(
+        ...,
+        help="A drydocs.remediation.fix-tracking.v1 change-set, as emitted by "
+        "drydocs_remediation.changes.fix_tracking_changeset.",
+    ),
+    mode: str = typer.Option(
+        APPLY,
+        "--mode",
+        help=(
+            f"{APPLY} = SET the three ruled properties; {REJECT} = REMOVE them. "
+            "Rejection is a mode and not a status: the ruled enum has no "
+            "'rejected' member (gate remediation-fix-tracking §B2), so the same "
+            "change-set that applied a fix is what un-applies it."
+        ),
+    ),
+) -> None:
+    """Apply a fix-tracking change-set (gate remediation-fix-tracking §C1).
+
+    Fix tracking is OUR intervention record — a fourth property axis beside
+    source authorship, pull tracking and load provenance (§A1). The remediation
+    component emits the change-set and never writes the graph (§A2); this verb
+    is the write half.
+
+    ALL-OR-NOTHING. Every target must already exist: a fix target that does not
+    exist is an error, not a node to invent, so an unresolved target refuses the
+    whole change-set before the :JobRun opens rather than marking the half that
+    happened to resolve.
+
+    Ad hoc by ruling, never on a refresh cadence — §C2 (a pass inside an
+    existing Control-M loader) was declined so that a fix is markable the hour
+    its package ships.
+    """
+    if mode not in MODES:
+        console.print(f"[red]--mode must be {' | '.join(MODES)} (got {mode!r}).[/]")
+        raise typer.Exit(2)
+    try:
+        rows = change_set_rows(change_set)
+    except FixTrackingError as exc:
+        console.print(f"[red]{exc}[/]")
+        raise typer.Exit(2) from exc
+    with _client() as cli:
+        try:
+            summary = FixTrackingLoader(cli, rows, mode=mode).load()
+        except FixTrackingError as exc:
+            console.print(f"[red]{exc}[/]")
+            raise typer.Exit(2) from exc
     console.print(summary.as_dict())
 
 

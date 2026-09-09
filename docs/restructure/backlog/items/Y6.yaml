@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: done
 depends_on: []
 inputs:
 - CLAUDE.md
@@ -27,6 +27,50 @@ acceptance: |
 
   Verified by minting a throwaway item, committing the claim with the renders per the new clause, and confirming the roadmap guard passes at that sha — then discarding it. poetry run pytest -q green.
 notes: |
+  DONE on wip/j61-laptop (Lane B, laptop), second of the four-item section 0 cluster.
+
+  (a) and (b): section 0's pull rule now splits the sentence that made the blanket claim.
+  A claim on an EXISTING item still ships no render and the Y5 tolerance still covers it;
+  a claim that MINTS ships the board and roadmap render with it, because minting adds a
+  row the roadmap never had and moves the source fingerprint for a STRUCTURAL reason the
+  status-only tolerance correctly does not forgive.
+
+  (c) NO CODE CHANGE. test_plan_roadmap.py and the Y5 tolerance are untouched. Widening
+  them to make the old blanket sentence true would forgive exactly the stale render the
+  guard exists to catch, which is the opposite of the fix.
+
+  (d) The evidence is named in the text (the O75 claim commit 49356d9a and the failure
+  string) rather than left only in this file.
+
+  VERIFIED FROM BOTH SIDES, not only the passing one. A throwaway item DOCGEN1 was minted
+  locally (the allocator's next free id for drydocs-docgen) and committed twice against a
+  deliberately green local baseline:
+
+    * the mint committed with NO render -> test_committed_roadmap_page_matches_its_sources
+      FAILS. This is the half that matters: it reproduces O75 and shows the rule as
+      previously written PRODUCES the failure rather than merely failing to prevent it.
+    * the same mint committed WITH a default-paths render_board.py run -> 11 passed.
+
+  The probe was then discarded with `git reset --hard` back to the branch tip. No
+  throwaway item, no probe commit and no render reached the branch, and DOCGEN1 was never
+  PUSHED - so the id is not burned and the allocator will hand it out again.
+
+  A green baseline had to be manufactured first: this branch is already red on the roadmap
+  guard because J61's close notes are beyond a status-only diff. That is the expected Lane
+  B close state (the handoff says so) and Lane A's render at merge clears it; the baseline
+  render used for the probe was discarded with the rest.
+
+  A NOTE FOR THE NEXT SESSION THAT REHEARSES SOMETHING ENDING IN A HARD RESET: the reset
+  discarded the probe AND the uncommitted CLAUDE.md edit this item exists to make, which
+  had to be re-applied from scratch. Commit the deliverable BEFORE rehearsing. Cheap here
+  because the edit is four lines; not cheap in general.
+
+  BRANCH NOTE FOR LANE A: origin/main was merged into this branch mid-cluster, because the
+  cluster branch was cut before the Y6/I7/DOC7 claim commits landed on main. Without that
+  merge the branch would have carried `todo -> done` against main's `in_progress` and
+  handed the merge a conflict on the status line of every item claimed after the branch
+  was cut.
+
   Groomed 2026-08-28 (ui-workstream worktree) from Idea-198 (2026-08-28, prio proposed Med). A one-clause documentation fix, filed as an item rather than done inline because it edits the routing file every session reads and the wording is the whole deliverable.
 
   WORTH STATING BECAUSE THE FAILURE IS SILENT in the normal ritual: the item gets built, the next push carries the render anyway, and the red claim sha is only visible to somebody reading gh run list afterwards — precisely the nobody-was-looking failure Idea-111 already made a session step for.

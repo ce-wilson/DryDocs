@@ -38,15 +38,24 @@ from pathlib import Path
 
 import yaml
 
+from drydocs_core.fix_tracking import (
+    FIX_STATUS_ENUM,
+    FIX_TRACKING_SCHEMA,
+)
+
 from .corroborate import ReadOnlyGraph
 from .xml_io import EditScript, Effect, Locator, XmlDocument, locate
 
-FIX_TRACKING_SCHEMA = "drydocs.remediation.fix-tracking.v1"
-
-#: the status enum ruled at gate remediation-fix-tracking §B2 (SIGNED OFF
-#: 2026-08-12, config/gate-log.md). No "rejected" state: a rejected fix
-#: removes the properties; the package records the rejection.
-FIX_STATUS_ENUM = ("proposed", "in_progress", "applied", "verified")
+# The schema id and the status enum ruled at gate remediation-fix-tracking
+# (§B2, SIGNED OFF 2026-08-12) moved to drydocs_core.fix_tracking with the §C1
+# loader build (G90) and are re-exported here, where they were first published.
+# ONE definition, imported by both halves of the ruled separation of duties:
+# this component EMITS the change-set, the drydocs-load loader APPLIES it, and
+# components never import each other. That is also what §E1's "the enum lands
+# beside the artifact schema with a drift guard" reduces to — the two sides
+# cannot disagree about the enum because there is no second copy to disagree
+# with. No 'rejected' member: a rejected fix REMOVES the properties (the
+# loader's reject mode); the package records the rejection.
 
 
 def _citable_relationships() -> tuple[str, ...]:

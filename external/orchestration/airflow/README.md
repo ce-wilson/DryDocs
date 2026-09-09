@@ -23,10 +23,43 @@ and records how it will crosswalk to the **BMC Control-M baseline**.
 > `config/source-registry.yaml`. That is a different fact from the `apache.org` publisher URL on
 > the `apache` vendor row — who publishes Airflow, versus where our own deployment is documented.
 
+## Vendor reference held here: the DataHub Airflow plugin
+
+`datahub-airflow-plugin/` is DataHub's Airflow lineage plugin, copied unmodified from the
+`datahub-project/datahub` repository (Apache-2.0; provenance, commit and what was left behind
+in [`SOURCE-MANIFEST.md`](SOURCE-MANIFEST.md)). It is here as the worked example of how a
+running Airflow's metadata gets captured — read, never imported or run. Two things in it are
+the reason it is worth holding:
+
+**Its concept mapping, which is the same kind of table as the crosswalk above** — Airflow
+native object to the capturing platform's concept, with the run axis the crosswalk does not
+yet have (`src/datahub_airflow_plugin/client/airflow_generator.py`):
+
+| Airflow native | DataHub concept | Where | The baseline concept it lands on here |
+|----------------|-----------------|-------|----------------------------------------|
+| DAG | `DataFlow` | `generate_dataflow` | Folder (`ControlMFolder`) |
+| Task | `DataJob` | `generate_datajob` | Job (`ControlMJob`) |
+| Task upstream ids | `DataJob.upstream_urns` | `_get_dependencies` | OUT->IN dependency (`WAS_INFORMED_BY`) |
+| DAG run / task instance | `DataProcessInstance`, with `run_*` / `complete_*` status events | `run_dataflow`, `run_datajob`, `complete_*` | run history — the `cm_hist_vw` shape, not yet modelled for Airflow |
+| `owner` (default_args) | ownership aspect | `_extract_owners` | run-as user (`AppUser`) |
+| Operator inlets / outlets | `DataJob.inlets` / `outlets` (dataset URNs) | `airflow3/datahub_listener.py` `_extract_lineage` | dataset READS / WRITES (the DPL `dataset_flow` seam) |
+
+**Its option set, which is finite and declared** (`src/datahub_airflow_plugin/_config.py`,
+`DatahubLineageConfig`): `enabled`, `datahub_conn_id`, `cluster`, `platform_instance`,
+`capture_ownership_info`, `capture_tags_info`, `capture_executions`, `materialize_iolets`,
+`enable_extractors`, `patch_sql_parser`, `dag_filter_pattern`, `emit_mode`, and a handful
+more — every knob a capture needs, as typed fields with defaults, not prose. That is the shape
+the source registry's per-dataset descriptor is being held to (N18, `registry-wiring-readiness`).
+
+What it does **not** answer: how *our* MWAA environment exports DAG metadata. The plugin emits
+from inside the scheduler to a DataHub instance; it is not a file drop. Step 1 below still
+needs the internal implementation docs for that.
+
 ## To activate
-1. Add `SOURCE-MANIFEST.md` (MWAA environment, Airflow version, how DAG metadata is exported)
-   — start from the internal implementation docs referenced above; they are the only source
-   that can answer the environment and the deployed version.
+1. Complete `SOURCE-MANIFEST.md` for the **deployment** (MWAA environment, Airflow version,
+   how DAG metadata is exported) — the manifest here covers only the vendor plugin. Start
+   from the internal implementation docs referenced above; they are the only source that
+   can answer the environment and the deployed version.
 2. Complete `crosswalk.md`; run through the HITL gate.
 3. Register in `config/source-registry.yaml` with `orchestrator: airflow`.
 4. Implement loader emitting baseline node/edge types only.

@@ -63,18 +63,19 @@ def _server_names() -> set[str]:
 
 
 def _controlm_nodeids() -> set[str]:
-    """The Control-M sample's host names, or a skip if the sample is not here.
+    """The Control-M sample's host names, or a skip where the sample is not.
 
-    The skip is REAL, not a formality for the J8 policy test. `drydocs/data/` is
-    gitignored wholesale — "may contain sensitive source data" — and the bundled
-    `samples/` CSVs are tracked inside it anyway, so today this file is present in
-    every clone and the skip never fires. It is written per-test rather than at
-    module level precisely so it cannot go quiet on the assertions above it: the
-    value sweep and the contract pin read only tracked fixture and config paths,
-    and they must keep running whatever happens to the sample tree.
+    The sample is TRACKED here and absent on every consumer: drydocs/data/** is
+    `never-port` in PORT-MANIFEST.yaml, so the port never carries it, and this
+    file crosses. CORE9 (2026-09-08) removed the skip on the CORE4 premise that a
+    tracked path is in every clone - true of clones of THIS repo, and not the
+    question test_never_port_citations.py (PORT1) asks, which is whether the
+    CONSUMER has the file. Restored at the Lane B merge (2026-09-09), per test as
+    before, so the value sweep and the contract pin above keep running whatever
+    happens to the sample tree.
     """
     if not CONTROLM_HOSTS.exists():
-        pytest.skip(f"{CONTROLM_HOSTS.relative_to(REPO)} absent — the interlock has no other half")
+        pytest.skip(f"{CONTROLM_HOSTS.relative_to(REPO)} absent - never-port, consumer tree")
     with CONTROLM_HOSTS.open(newline="", encoding="utf-8") as fh:
         return {r["nodeid"].strip().lower() for r in csv.DictReader(fh)}
 

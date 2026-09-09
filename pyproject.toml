@@ -106,6 +106,11 @@ target-version = "py311"
 # findings and 12 of the 44 unformatted files blocking CI.
 # If a future capture lands elsewhere under docs/, widen this to `docs` rather
 # than adding a third path — any `.py` under a documentation tree is an artifact.
+# Vendored External reference code (2026-09-09): the DataHub Airflow plugin under
+# external/orchestration/airflow/ is Apache-2.0 source copied unmodified as the
+# placeholder's worked example (its SOURCE-MANIFEST.md says why). Nothing imports
+# it, and reformatting a verbatim capture would break the byte-identical claim
+# the manifest makes — the same reasoning as both blocks above.
 extend-exclude = [
     ".claude/skills/docx",
     ".claude/skills/pptx",
@@ -114,10 +119,17 @@ extend-exclude = [
     ".claude/skills/skill-creator",
     "docs/reviews/graph-vs-files-experiment/results",
     "docs/reviews/graph-vs-files-experiment/results-sonnet",
+    "external/orchestration/airflow/datahub-airflow-plugin",
 ]
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I", "B", "UP", "N", "RUF"]
+# D100/D104 only (J60): a module and a package say what they are FOR. Enforced by
+# the linter CI already blocks on rather than by a bespoke test, which would be a
+# second, weaker copy of a check the toolchain ships. The CONVENTION below is what
+# keeps the rest of the D family off — without it, selecting any D rule switches on
+# a whole pydocstyle style guide nobody ruled on. D101/D102/D103 (class, method,
+# function) are deliberately OUT: J60 clause (e).
+select = ["E", "F", "W", "I", "B", "UP", "N", "RUF", "D100", "D104"]
 ignore = [
     # The formatter owns layout. What survives `ruff format` is prose inside
     # strings, comments and docstrings, which the formatter never wraps — by
@@ -145,6 +157,12 @@ ignore = [
     "RUF002",
     "RUF003",
 ]
+
+[tool.ruff.lint.pydocstyle]
+# Pinned so `select`'s two D rules cannot drag the rest of the family in behind
+# them. The repo's docstrings are prose-first summaries, not numpy/google
+# sections, and no item ruled a section format.
+convention = "pep257"
 
 [tool.ruff.lint.per-file-ignores]
 # Typer's API IS a call in the default: `def cmd(x: str = typer.Option(...))`.

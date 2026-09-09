@@ -34,3 +34,26 @@ property_terms:
     term:       "dct:modified"
     decided_by: envelope-property-terms
     note:       "Date the record was last changed in the source system ('date on which the resource was changed')."
+
+  # — fix tracking: OUR intervention record (gate remediation-fix-tracking §D1) —
+  # A FOURTH AXIS, deliberately not the envelope's. §A1 fences the dct: family to
+  # source-system authorship, so these are dd: LOCAL terms with prose definitions
+  # rather than borrowed standard ones — §D1 ruled exactly that, and ruled the
+  # standard-term binding revisited when an RDF export exists. A prov: qualified-
+  # influence reading was offered and left as a note, not taken: these are node
+  # properties recording what WE did to a Control-M object, and reaching for a
+  # PROV edge shape for three properties would mix two models for no gain today.
+  - property:   remediation_fix_id
+    term:       "dd:remediationFixId"
+    decided_by: remediation-fix-tracking
+    note:       "The fix package / Jira reference this node's remediation is tracked under. Local term by ruling (§D1): the standard-term binding is revisited when an RDF export exists. NOT authorship — the dct: family stays the source envelope's (§A1)."
+
+  - property:   remediation_status
+    term:       "dd:remediationStatus"
+    decided_by: remediation-fix-tracking
+    note:       "Where the fix stands: proposed | in_progress | applied | verified (§B2). 'applied' = the dev team imported the updated XML; 'verified' = the equivalence proof re-ran against the re-exported live definition. There is no 'rejected' value — a rejected fix REMOVES all three properties and the package records the rejection."
+
+  - property:   remediation_status_date
+    term:       "dd:remediationStatusDate"
+    decided_by: remediation-fix-tracking
+    note:       "Date of the LAST status transition (§B3). One date, not a per-status set: the full history lives in the fix package, and per-status dates were declined because they invite drift against it."

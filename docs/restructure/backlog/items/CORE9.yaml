@@ -7,7 +7,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p3
-status: todo
+status: done
 depends_on: [CORE4]
 inputs:
 - tests/unit/test_skip_guard_policy.py
@@ -32,9 +32,101 @@ acceptance: |
   (d) The close note names all five files by path. Nothing else in those tests changes - this
       removes vestigial guards, it does not touch assertions.
 notes: |
+  DONE on wip/core9-laptop (Lane B, laptop). Four guards removed, one KEPT with its
+  reason, and the item's own two example names turned out to be one right and one wrong.
+
+  (a) ENUMERATED FROM THE INSTRUMENT, NOT FROM THIS ITEM, exactly as the clause asks -
+  and it mattered. The enumeration runs test_skip_guard_policy's own helpers
+  (`references`, `needs_guard`, `_has_guard`) over every file in tests/unit and asks
+  which files reference a local-tree path, need NO guard under the rewritten policy,
+  and carry one anyway. That is five files:
+
+    1. tests/unit/test_command_parser.py
+    2. tests/unit/test_email_concerns.py
+    3. tests/unit/test_email_extracts.py
+    4. tests/unit/test_publish_boundary_values.py
+    5. tests/unit/test_server_inventory_fixture.py
+
+  The item names test_data_centers.py and test_email_extracts.py as "the two the CORE4
+  close note names". test_email_extracts.py is in the five. test_data_centers.py IS
+  NOT: its reference is `SAMPLES / name`, which the checker cannot resolve (a name hop
+  it does not follow), so the policy STILL requires its guard and it must keep it. The
+  close note that produced the item was written before the merge, which is precisely
+  why clause (a) said to enumerate.
+
+  (b) FOUR REMOVED, ONE KEPT. The clause's mechanical test - remove the guard, re-run
+  the policy, keep it if the policy goes red - is not sufficient on its own, because
+  `_has_guard` is FILE-level: a file can appear here because of a skip that has nothing
+  to do with the asset policy. That is the fifth file.
+
+    KEPT - tests/unit/test_publish_boundary_values.py:188. Its skip is
+    `pytest.skip("git unavailable - publishable tree cannot be enumerated")`, which
+    guards a `git ls-files` subprocess, not a fixture read. The policy would go green
+    without it, and removing it would still be wrong: it protects something real, and
+    the file only surfaced in the enumeration because the marker is counted per file.
+    The other three references in that file are tracked fixtures needing no guard, and
+    none of them is what this skip is for.
+
+    REMOVED - the other four. Two of them (test_email_concerns.py, test_email_extracts.py)
+    carried a comment saying "Policy guard (test_skip_guard_policy)" in as many words,
+    which is the item's thesis stated by the guard itself. Both were `pytestmark`, i.e.
+    MODULE-level, so the day the tree did go missing they would have skipped every test
+    in the file rather than failing one - the CORE4 concern at its worst scope.
+    test_command_parser.py's reason was wrong twice ("gitignored production sample not
+    present" for a tracked bundled fixture). test_server_inventory_fixture.py's docstring
+    argued the skip was "REAL, not a formality" but conceded in the next sentence that
+    the file "is present in every clone and the skip never fires"; its argument was about
+    SCOPE, not existence, and the rewritten policy answers the prior question - a tracked
+    path needs no guard at all. That prior reasoning is recorded here so the removal can
+    be reversed knowingly if someone disagrees.
+
+  ONE NAMED EXCEPTION TO CLAUSE (d), taken deliberately rather than silently. (d) says
+  nothing else in those tests changes. Two of the four built their path CWD-relative
+  (`Path("drydocs/data/samples/...")` in test_command_parser.py and
+  test_email_concerns.py) and the guard was masking it: with the guard gone, running
+  pytest from anywhere but the repo root would turn a skip that never fired into a
+  FAILURE that depends on where you launched it. Both are now anchored at the repo the
+  way their siblings already are. Anchoring is what makes the removal safe; without it
+  this item would trade one silent wrong behaviour for a louder one. No assertion was
+  touched in any of the four.
+
+  (c) BEFORE AND AFTER, measured with the instrument: files carrying a guard the policy
+  no longer requires went 5 -> 1, and the 1 is the deliberate keep above. The number of
+  SKIPS actually reported by running these files is 0 both before and after - which is
+  the whole point of the item, since a guard that never fires is what "vestigial" means
+  here. tests/unit/test_skip_guard_policy.py stays green (it also still holds
+  test_data_centers.py, test_pat_projection.py, test_variable_classifier.py,
+  test_variable_staging.py and its own fixtures to their guards, which is the port
+  failure it exists for, untouched).
+
+  VERIFIED: 103 tests across the policy, the five enumerated files, test_source_scan and
+  test_no_render_parsing. ruff check and ruff format --check clean.
+
+  FOUND WHILE ENUMERATING, fixed in its own item, worth reading here: LOAD7 (removing
+  the pat_projection guard) turned test_skip_guard_policy.py RED, and its branch was
+  pushed that way for one commit. The policy demands a guard on any local-tree path it
+  cannot RESOLVE, and pat_projection built its path from an imported constant. Fixed on
+  wip/load7-laptop by resolving the path instead of restoring the guard. The reason it
+  was missed is worth acting on: the J57 guard family in CLAUDE.md section 6 does not
+  list test_skip_guard_policy.py, although it reads EVERY test file and so can go red
+  from a change to any of them. Adding it to that list is a docs change on a surface
+  Lane B holds this burst (J61/Y6/I7/DOC7 fence section 0) but the J57 list is in
+  section 6 - flagging rather than taking it.
+
+  No render needed; no new tracked paths, so no PORT-MANIFEST row.
+
   Groomed 2026-09-08 from IDEAS.md Idea-296 (base venue, desktop); the finding is the CORE4
   close note, "reported, not fixed" - the CORE4 clauses did not cover a sweep.
 
   module drydocs-core because tests/unit/test_skip_guard_policy.py is the instrument and CORE4
   owns it. depends_on CORE4, which is done, so this is startable now. p3: nothing is broken;
   the cost is that a guard protecting nothing reads as protection.
+  POSTSCRIPT 2026-09-09 (desktop, Lane A, at the merge of wip/core9-laptop). Three of the
+  four removals were REVERSED KNOWINGLY, as the note above invites: test_email_extracts.py,
+  test_email_concerns.py and test_server_inventory_fixture.py read tracked samples under
+  drydocs/data/samples/, and that zone is `never-port` in PORT-MANIFEST.yaml - so the files
+  are in every clone of THIS repo and on no consumer, and tests/unit/test_never_port_citations.py
+  (PORT1, 87a9eeaa, already in this branch's history) failed the merged tree on exactly those
+  three. The guards came back PER TEST, not as a module pytestmark, so the scope point
+  stands. The two policies asking different questions is Idea-308. The command_parser
+  removal and the anchoring stand.

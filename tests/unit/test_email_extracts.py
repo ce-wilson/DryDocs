@@ -25,16 +25,29 @@ from drydocs_core.models.docs import EmailExtractRow
 REPO = Path(__file__).resolve().parents[2]
 SAMPLES = REPO / "drydocs" / "data" / "samples" / "email-extracts"
 
-# Policy guard (test_skip_guard_policy): these samples are COMMITTED, so on a
-# clean clone this never fires — it exists so a partial checkout skips instead
-# of failing, per the policy's fresh-clone rule.
-pytestmark = pytest.mark.skipif(not SAMPLES.exists(), reason="sample extracts absent")
+# The samples are TRACKED here and still absent on every consumer: drydocs/data/**
+# is `never-port` in PORT-MANIFEST.yaml, so the port never carries them, and this
+# test file DOES cross. CORE9 (2026-09-08) removed the guard on the CORE4 premise
+# that a tracked path is in every clone; that premise is about clones of THIS repo
+# and test_never_port_citations.py (PORT1) reads the other side: a crossing test
+# citing a never-port path must skip on its absence, or it fails on the consumer
+# by construction. Restored at the Lane B merge (2026-09-09) PER TEST, not as a
+# module pytestmark - CORE9's scope point stands: the tests that never read the
+# samples keep running whatever happens to the sample tree.
+
+
+def _samples_or_skip() -> Path:
+    if not SAMPLES.is_dir():
+        pytest.skip("drydocs/data/samples/email-extracts absent - never-port, consumer tree")
+    return SAMPLES
 
 
 def test_samples_define_the_assumed_contract():
     """The two synthetic files carry every required key between them — one with
     message_id, one without (the doc_id fallback path)."""
-    payloads = [json.loads(p.read_text(encoding="utf-8")) for p in sorted(SAMPLES.glob("*.json"))]
+    payloads = [
+        json.loads(p.read_text(encoding="utf-8")) for p in sorted(_samples_or_skip().glob("*.json"))
+    ]
     assert len(payloads) == 2
     assert any("message_id" in p for p in payloads)
     assert any("message_id" not in p for p in payloads)
@@ -44,7 +57,7 @@ def test_samples_define_the_assumed_contract():
 
 
 def test_adapter_rows_validate_chain_and_stay_unassigned():
-    adapter = EmailExtractsAdapter(SAMPLES)
+    adapter = EmailExtractsAdapter(_samples_or_skip())
     rows = list(adapter.rows())
     assert rows and not adapter.rejected
     docs = {r["doc_id"] for r in rows}

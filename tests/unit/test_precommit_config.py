@@ -59,13 +59,50 @@ def _locked_ruff() -> str:
 def test_the_ruff_hooks_are_the_only_hooks_and_carry_no_extra_arguments() -> None:
     """Exactly the two commands CI blocks on, run as CI runs them: no --fix on `ruff`
     (the hook reports the finding CI would report rather than editing under you),
-    nothing else bolted on that CI does not enforce."""
+    nothing else bolted on that CI does not enforce.
+
+    The enumeration stays CLOSED and this test stays the place a new hook has to
+    argue for itself. What widened at J59 is the list, not the rule: a second
+    `repo: local` entry is now allowed, and it is enumerated below by id rather
+    than waved through, because the question "does this hook duplicate a gate or
+    replace one that cannot exist?" is the one worth being asked every time.
+    """
     repos = _config()["repos"]
-    assert [r["repo"] for r in repos] == [RUFF_REPO]
+    assert [r["repo"] for r in repos] == [RUFF_REPO, "local"]
     hooks = repos[0]["hooks"]
     assert [h["id"] for h in hooks] == ["ruff", "ruff-format"]
     for hook in hooks:
         assert set(hook) == {"id"}, f"hook {hook['id']} carries extra keys: {sorted(hook)}"
+
+
+def test_the_local_hook_is_the_freshness_check_and_nothing_else() -> None:
+    """J59. The ruff hooks duplicate a gate CI runs; this one exists because its
+    check CANNOT run in CI — the shallow checkout has no per-file git history, so
+    a CI-hosted version would report green while measuring nothing.
+
+    Pinned by id, entry and file filter so a later hook cannot ride in on this
+    entry's back, and so the entry keeps pointing at the script that is actually
+    in the tree.
+    """
+    local = _config()["repos"][1]
+    hooks = local["hooks"]
+    assert [h["id"] for h in hooks] == ["header-freshness"]
+    hook = hooks[0]
+    assert hook["entry"] == "python scripts/check_header_freshness.py"
+    assert hook["language"] == "system"
+    assert hook["files"] == r"\.ya?ml$"
+    assert (PRECOMMIT.parent / "scripts" / "check_header_freshness.py").exists()
+
+
+def test_the_config_says_why_the_local_hook_cannot_be_a_ci_step() -> None:
+    """The reason travels with the hook, not only in the item file.
+
+    Without it the next reader's obvious cleanup is "move this into CI with the
+    others" — which is precisely the change that makes the check measure nothing.
+    """
+    text = PRECOMMIT.read_text(encoding="utf-8")
+    assert "fetch-depth" in text
+    assert "DRYDOCS_FRESHNESS_SKIP" in text
 
 
 def test_the_hook_rev_equals_the_exact_ruff_pin_and_the_lock() -> None:

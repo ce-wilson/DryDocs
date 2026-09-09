@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-08T21:14:45",
-    "date": "20260908",
+    "captured_at": "2026-09-09T01:12:21",
+    "date": "20260909",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "2673ae24",
-      "full": "2673ae247678232c6adeaebf6d5ce73a57317d9a",
+      "commit": "776c216a",
+      "full": "776c216ac9871a20a370685599a8aee12a924b02",
       "branch": "main",
-      "describe": "port-base-20260908-37-g2673ae24",
-      "subject": "chore(plan): render catch-up for the I5 claim (Y5)",
+      "describe": "port-base-20260908-78-g776c216a",
+      "subject": "docs(plan): Lane B handoff — build-lane queue for the laptop session",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -18946,6 +18946,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs/loaders/cypher/fix_tracking.cypher",
+      "name": "fix_tracking.cypher",
+      "extension": ".cypher",
+      "rel_path": "drydocs/loaders/cypher/fix_tracking.cypher",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs/loaders/cypher/folder_attribution.cypher",
       "name": "folder_attribution.cypher",
       "extension": ".cypher",
@@ -19175,6 +19184,15 @@
       "name": "essential_graphrag.py",
       "extension": ".py",
       "rel_path": "drydocs/loaders/essential_graphrag.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/loaders/fix_tracking.py",
+      "name": "fix_tracking.py",
+      "extension": ".py",
+      "rel_path": "drydocs/loaders/fix_tracking.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -20458,6 +20476,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs_core/fix_tracking.py",
+      "name": "fix_tracking.py",
+      "extension": ".py",
+      "rel_path": "drydocs_core/fix_tracking.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs_core/glossary.py",
       "name": "glossary.py",
       "extension": ".py",
@@ -20588,6 +20615,15 @@
       "name": "registry.py",
       "extension": ".py",
       "rel_path": "drydocs_core/models/registry.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs_core/models/remediation.py",
+      "name": "remediation.py",
+      "extension": ".py",
+      "rel_path": "drydocs_core/models/remediation.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -21902,6 +21938,510 @@
       "name": "README.md",
       "extension": ".md",
       "rel_path": "external/orchestration/airflow/README.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/SOURCE-MANIFEST.md",
+      "name": "SOURCE-MANIFEST.md",
+      "extension": ".md",
+      "rel_path": "external/orchestration/airflow/SOURCE-MANIFEST.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin",
+      "name": "datahub-airflow-plugin",
+      "extension": "",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/LICENSE",
+      "name": "LICENSE",
+      "extension": "",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/LICENSE",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/README.md",
+      "name": "README.md",
+      "extension": ".md",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/README.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/pyproject.toml",
+      "name": "pyproject.toml",
+      "extension": ".toml",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/pyproject.toml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/setup.cfg",
+      "name": "setup.cfg",
+      "extension": ".cfg",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/setup.cfg",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/setup.py",
+      "name": "setup.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/setup.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src",
+      "name": "src",
+      "extension": "",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin",
+      "name": "datahub_airflow_plugin",
+      "extension": "",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/__init__.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_airflow_asset_adapter.py",
+      "name": "_airflow_asset_adapter.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_airflow_asset_adapter.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_airflow_shims.py",
+      "name": "_airflow_shims.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_airflow_shims.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_airflow_version_specific.py",
+      "name": "_airflow_version_specific.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_airflow_version_specific.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_config.py",
+      "name": "_config.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_config.py",
+      "project": "drydocs",
+      "circular": true,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_constants.py",
+      "name": "_constants.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_constants.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_datahub_ol_adapter.py",
+      "name": "_datahub_ol_adapter.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_datahub_ol_adapter.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_sql_parsing_common.py",
+      "name": "_sql_parsing_common.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_sql_parsing_common.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_version.py",
+      "name": "_version.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_version.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3",
+      "name": "airflow3",
+      "extension": "",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/__init__.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_airflow_compat.py",
+      "name": "_airflow_compat.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_airflow_compat.py",
+      "project": "drydocs",
+      "circular": true,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_athena_openlineage_patch.py",
+      "name": "_athena_openlineage_patch.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_athena_openlineage_patch.py",
+      "project": "drydocs",
+      "circular": true,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_bigquery_openlineage_patch.py",
+      "name": "_bigquery_openlineage_patch.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_bigquery_openlineage_patch.py",
+      "project": "drydocs",
+      "circular": true,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_shims.py",
+      "name": "_shims.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_shims.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_sql_parser_patch.py",
+      "name": "_sql_parser_patch.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_sql_parser_patch.py",
+      "project": "drydocs",
+      "circular": true,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_sqlite_openlineage_patch.py",
+      "name": "_sqlite_openlineage_patch.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_sqlite_openlineage_patch.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_teradata_openlineage_patch.py",
+      "name": "_teradata_openlineage_patch.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_teradata_openlineage_patch.py",
+      "project": "drydocs",
+      "circular": true,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/datahub_listener.py",
+      "name": "datahub_listener.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/datahub_listener.py",
+      "project": "drydocs",
+      "circular": true,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/client",
+      "name": "client",
+      "extension": "",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/client",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/client/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/client/__init__.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/client/airflow_generator.py",
+      "name": "airflow_generator.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/client/airflow_generator.py",
+      "project": "drydocs",
+      "circular": true,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/datahub_listener.py",
+      "name": "datahub_listener.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/datahub_listener.py",
+      "project": "drydocs",
+      "circular": true,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/datahub_plugin.py",
+      "name": "datahub_plugin.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/datahub_plugin.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/entities.py",
+      "name": "entities.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/entities.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags",
+      "name": "example_dags",
+      "extension": "",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags/.airflowignore",
+      "name": ".airflowignore",
+      "extension": "",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags/.airflowignore",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags/README.md",
+      "name": "README.md",
+      "extension": ".md",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags/README.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags/__init__.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags/generic_recipe_sample_dag.py",
+      "name": "generic_recipe_sample_dag.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags/generic_recipe_sample_dag.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags/graph_usage_sample_dag.py",
+      "name": "graph_usage_sample_dag.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags/graph_usage_sample_dag.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags/lineage_backend_demo.py",
+      "name": "lineage_backend_demo.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags/lineage_backend_demo.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags/lineage_backend_taskflow_demo.py",
+      "name": "lineage_backend_taskflow_demo.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags/lineage_backend_taskflow_demo.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags/lineage_emission_dag.py",
+      "name": "lineage_emission_dag.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags/lineage_emission_dag.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags/mysql_sample_dag.py",
+      "name": "mysql_sample_dag.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags/mysql_sample_dag.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags/snowflake_sample_dag.py",
+      "name": "snowflake_sample_dag.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags/snowflake_sample_dag.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/hooks",
+      "name": "hooks",
+      "extension": "",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/hooks",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/hooks/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/hooks/__init__.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/hooks/datahub.py",
+      "name": "datahub.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/hooks/datahub.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/operators",
+      "name": "operators",
+      "extension": "",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/operators",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/operators/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/operators/__init__.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/operators/datahub.py",
+      "name": "datahub.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/operators/datahub.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/operators/datahub_assertion_operator.py",
+      "name": "datahub_assertion_operator.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/operators/datahub_assertion_operator.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/operators/datahub_assertion_sensor.py",
+      "name": "datahub_assertion_sensor.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/operators/datahub_assertion_sensor.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/operators/datahub_operation_operator.py",
+      "name": "datahub_operation_operator.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/operators/datahub_operation_operator.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/operators/datahub_operation_sensor.py",
+      "name": "datahub_operation_sensor.py",
+      "extension": ".py",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/operators/datahub_operation_sensor.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/py.typed",
+      "name": "py.typed",
+      "extension": ".typed",
+      "rel_path": "external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/py.typed",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -23257,10 +23797,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260908-1839.json",
-      "name": "drydocs-20260908-1839.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260908.json",
+      "name": "drydocs-20260908.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260908-1839.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260908.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -24107,6 +24647,15 @@
       "name": "build_seal_samples.py",
       "extension": ".py",
       "rel_path": "scripts/build_seal_samples.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/scripts/check_header_freshness.py",
+      "name": "check_header_freshness.py",
+      "extension": ".py",
+      "rel_path": "scripts/check_header_freshness.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -25894,6 +26443,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_fix_tracking_loader.py",
+      "name": "test_fix_tracking_loader.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_fix_tracking_loader.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_folder_attribution.py",
       "name": "test_folder_attribution.py",
       "extension": ".py",
@@ -25961,6 +26519,15 @@
       "name": "test_graph_verify.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_graph_verify.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_header_freshness.py",
+      "name": "test_header_freshness.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_header_freshness.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -30506,6 +31073,10 @@
     ],
     [
       "drydocs/drydocs/cli_ingest.py",
+      "drydocs/drydocs/loaders/fix_tracking.py"
+    ],
+    [
+      "drydocs/drydocs/cli_ingest.py",
       "drydocs/drydocs/loaders/folder_attribution.py"
     ],
     [
@@ -30707,6 +31278,10 @@
     [
       "drydocs/drydocs/cli_shared.py",
       "drydocs/drydocs/loaders/essential_graphrag.py"
+    ],
+    [
+      "drydocs/drydocs/cli_shared.py",
+      "drydocs/drydocs/loaders/fix_tracking.py"
     ],
     [
       "drydocs/drydocs/cli_shared.py",
@@ -31131,6 +31706,18 @@
     [
       "drydocs/drydocs/loaders/essential_graphrag.py",
       "drydocs/drydocs_core/source_registry.py"
+    ],
+    [
+      "drydocs/drydocs/loaders/fix_tracking.py",
+      "drydocs/drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/drydocs/loaders/fix_tracking.py",
+      "drydocs/drydocs_core/fix_tracking.py"
+    ],
+    [
+      "drydocs/drydocs/loaders/fix_tracking.py",
+      "drydocs/drydocs_core/models/__init__.py"
     ],
     [
       "drydocs/drydocs/loaders/folder_attribution.py",
@@ -31893,6 +32480,10 @@
       "drydocs/drydocs_core/source_bindings.py"
     ],
     [
+      "drydocs/drydocs_core/fix_tracking.py",
+      "drydocs/drydocs_core/yaml_fragments.py"
+    ],
+    [
       "drydocs/drydocs_core/glossary.py",
       "drydocs/drydocs_core/repo_paths.py"
     ],
@@ -31982,7 +32573,15 @@
     ],
     [
       "drydocs/drydocs_core/models/__init__.py",
+      "drydocs/drydocs_core/models/remediation.py"
+    ],
+    [
+      "drydocs/drydocs_core/models/__init__.py",
       "drydocs/drydocs_core/models/seal.py"
+    ],
+    [
+      "drydocs/drydocs_core/models/remediation.py",
+      "drydocs/drydocs_core/fix_tracking.py"
     ],
     [
       "drydocs/drydocs_core/models/seal.py",
@@ -32446,6 +33045,10 @@
     ],
     [
       "drydocs/drydocs_remediation/changes.py",
+      "drydocs/drydocs_core/fix_tracking.py"
+    ],
+    [
+      "drydocs/drydocs_remediation/changes.py",
       "drydocs/drydocs_core/ontology/schema_graph.py"
     ],
     [
@@ -32545,6 +33148,206 @@
       "drydocs/drydocs_remediation/formats.py"
     ],
     [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/__init__.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_version.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_airflow_asset_adapter.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/entities.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_airflow_shims.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_shims.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_config.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/datahub_listener.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_config.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/hooks/datahub.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_airflow_compat.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_config.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_airflow_compat.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_athena_openlineage_patch.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_airflow_compat.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_bigquery_openlineage_patch.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_airflow_compat.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_sql_parser_patch.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_airflow_compat.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_sqlite_openlineage_patch.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_airflow_compat.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_teradata_openlineage_patch.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_athena_openlineage_patch.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_config.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_athena_openlineage_patch.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_constants.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_athena_openlineage_patch.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_sql_parsing_common.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_bigquery_openlineage_patch.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_config.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_bigquery_openlineage_patch.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_constants.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_bigquery_openlineage_patch.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_sql_parsing_common.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_bigquery_openlineage_patch.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/datahub_listener.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_sql_parser_patch.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_config.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_sql_parser_patch.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_constants.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_sql_parser_patch.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_datahub_ol_adapter.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_sql_parser_patch.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_sql_parsing_common.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_sql_parser_patch.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/datahub_listener.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_teradata_openlineage_patch.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_config.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_teradata_openlineage_patch.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_constants.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_teradata_openlineage_patch.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_sql_parsing_common.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/datahub_listener.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_airflow_asset_adapter.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/datahub_listener.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_config.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/datahub_listener.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_constants.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/datahub_listener.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_datahub_ol_adapter.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/datahub_listener.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_version.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/datahub_listener.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/__init__.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/datahub_listener.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_airflow_compat.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/datahub_listener.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_shims.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/datahub_listener.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/client/airflow_generator.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/datahub_listener.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/entities.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/client/airflow_generator.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_airflow_shims.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/client/airflow_generator.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_airflow_version_specific.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/client/airflow_generator.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_config.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/datahub_listener.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/datahub_listener.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/datahub_plugin.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/datahub_listener.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags/graph_usage_sample_dag.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/hooks/datahub.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags/lineage_backend_demo.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/entities.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags/lineage_backend_taskflow_demo.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/entities.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags/lineage_emission_dag.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/operators/datahub.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/operators/datahub.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/hooks/datahub.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/operators/datahub_assertion_operator.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/hooks/datahub.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/operators/datahub_assertion_sensor.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/hooks/datahub.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/operators/datahub_operation_operator.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/hooks/datahub.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/operators/datahub_operation_sensor.py",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/hooks/datahub.py"
+    ],
+    [
       "drydocs/knowledge/depgraph-snapshots/metrics_ledger.py",
       "drydocs/drydocs/code_graph_freshness.py"
     ],
@@ -32587,6 +33390,10 @@
     [
       "drydocs/scripts/build_seal_samples.py",
       "drydocs/drydocs/seal_samples.py"
+    ],
+    [
+      "drydocs/scripts/check_header_freshness.py",
+      "drydocs/tests/unit/test_config_identity_header.py"
     ],
     [
       "drydocs/scripts/doc_to_pdf.py",
@@ -33853,6 +34660,42 @@
       "drydocs/drydocs/review/fid_census.py"
     ],
     [
+      "drydocs/tests/unit/test_fix_tracking_loader.py",
+      "drydocs/drydocs/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_fix_tracking_loader.py",
+      "drydocs/drydocs/cli_shared.py"
+    ],
+    [
+      "drydocs/tests/unit/test_fix_tracking_loader.py",
+      "drydocs/drydocs/loaders/fix_tracking.py"
+    ],
+    [
+      "drydocs/tests/unit/test_fix_tracking_loader.py",
+      "drydocs/drydocs_core/fix_tracking.py"
+    ],
+    [
+      "drydocs/tests/unit/test_fix_tracking_loader.py",
+      "drydocs/drydocs_core/ontology/schema_graph.py"
+    ],
+    [
+      "drydocs/tests/unit/test_fix_tracking_loader.py",
+      "drydocs/drydocs_core/yaml_fragments.py"
+    ],
+    [
+      "drydocs/tests/unit/test_fix_tracking_loader.py",
+      "drydocs/drydocs_remediation/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_fix_tracking_loader.py",
+      "drydocs/drydocs_remediation/changes.py"
+    ],
+    [
+      "drydocs/tests/unit/test_fix_tracking_loader.py",
+      "drydocs/tests/unit/test_vocabulary_endpoints.py"
+    ],
+    [
       "drydocs/tests/unit/test_folder_attribution.py",
       "drydocs/drydocs/loaders/base.py"
     ],
@@ -33927,6 +34770,18 @@
     [
       "drydocs/tests/unit/test_graph_verify.py",
       "drydocs/drydocs/review/review_labels.py"
+    ],
+    [
+      "drydocs/tests/unit/test_header_freshness.py",
+      "drydocs/scripts/check_header_freshness.py"
+    ],
+    [
+      "drydocs/tests/unit/test_header_freshness.py",
+      "drydocs/tests/unit/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_header_freshness.py",
+      "drydocs/tests/unit/test_config_identity_header.py"
     ],
     [
       "drydocs/tests/unit/test_incremental_delete.py",
@@ -48081,6 +48936,11 @@
     [
       "drydocs/drydocs/loaders",
       "CONTAINS",
+      "drydocs/drydocs/loaders/fix_tracking.py"
+    ],
+    [
+      "drydocs/drydocs/loaders",
+      "CONTAINS",
       "drydocs/drydocs/loaders/folder_attribution.py"
     ],
     [
@@ -48232,6 +49092,11 @@
       "drydocs/drydocs/loaders/cypher",
       "CONTAINS",
       "drydocs/drydocs/loaders/cypher/essential_graphrag.cypher"
+    ],
+    [
+      "drydocs/drydocs/loaders/cypher",
+      "CONTAINS",
+      "drydocs/drydocs/loaders/cypher/fix_tracking.cypher"
     ],
     [
       "drydocs/drydocs/loaders/cypher",
@@ -48816,6 +49681,11 @@
     [
       "drydocs/drydocs_core",
       "CONTAINS",
+      "drydocs/drydocs_core/fix_tracking.py"
+    ],
+    [
+      "drydocs/drydocs_core",
+      "CONTAINS",
       "drydocs/drydocs_core/glossary.py"
     ],
     [
@@ -49017,6 +49887,11 @@
       "drydocs/drydocs_core/models",
       "CONTAINS",
       "drydocs/drydocs_core/models/registry.py"
+    ],
+    [
+      "drydocs/drydocs_core/models",
+      "CONTAINS",
+      "drydocs/drydocs_core/models/remediation.py"
     ],
     [
       "drydocs/drydocs_core/models",
@@ -49667,6 +50542,286 @@
       "drydocs/external/orchestration/airflow",
       "CONTAINS",
       "drydocs/external/orchestration/airflow/README.md"
+    ],
+    [
+      "drydocs/external/orchestration/airflow",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/SOURCE-MANIFEST.md"
+    ],
+    [
+      "drydocs/external/orchestration/airflow",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/LICENSE"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/README.md"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/pyproject.toml"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/setup.cfg"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/setup.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/__init__.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_airflow_asset_adapter.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_airflow_shims.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_airflow_version_specific.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_config.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_constants.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_datahub_ol_adapter.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_sql_parsing_common.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/_version.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/client"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/datahub_listener.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/datahub_plugin.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/entities.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/hooks"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/operators"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/py.typed"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/__init__.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_airflow_compat.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_athena_openlineage_patch.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_bigquery_openlineage_patch.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_shims.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_sql_parser_patch.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_sqlite_openlineage_patch.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/_teradata_openlineage_patch.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/airflow3/datahub_listener.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/client",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/client/__init__.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/client",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/client/airflow_generator.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags/.airflowignore"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags/README.md"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags/__init__.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags/generic_recipe_sample_dag.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags/graph_usage_sample_dag.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags/lineage_backend_demo.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags/lineage_backend_taskflow_demo.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags/lineage_emission_dag.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags/mysql_sample_dag.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/example_dags/snowflake_sample_dag.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/hooks",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/hooks/__init__.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/hooks",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/hooks/datahub.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/operators",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/operators/__init__.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/operators",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/operators/datahub.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/operators",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/operators/datahub_assertion_operator.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/operators",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/operators/datahub_assertion_sensor.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/operators",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/operators/datahub_operation_operator.py"
+    ],
+    [
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/operators",
+      "CONTAINS",
+      "drydocs/external/orchestration/airflow/datahub-airflow-plugin/src/datahub_airflow_plugin/operators/datahub_operation_sensor.py"
     ],
     [
       "drydocs/external/orchestration/autosys",
@@ -50426,7 +51581,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260908-1839.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260908.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -50832,6 +51987,11 @@
       "drydocs/scripts",
       "CONTAINS",
       "drydocs/scripts/build_seal_samples.py"
+    ],
+    [
+      "drydocs/scripts",
+      "CONTAINS",
+      "drydocs/scripts/check_header_freshness.py"
     ],
     [
       "drydocs/scripts",
@@ -51821,6 +52981,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_fix_tracking_loader.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_folder_attribution.py"
     ],
     [
@@ -51857,6 +53022,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_graph_verify.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_header_freshness.py"
     ],
     [
       "drydocs/tests/unit",
@@ -54123,13 +55293,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 3011,
-    "edges": 1851,
-    "circular_files": 5,
+    "files": 3066,
+    "edges": 1923,
+    "circular_files": 14,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 3333,
-    "directories": 323
+    "rels": 3396,
+    "directories": 331
   }
 }
