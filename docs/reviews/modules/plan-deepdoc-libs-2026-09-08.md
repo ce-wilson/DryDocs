@@ -205,7 +205,75 @@ a closed one-line fix, and it means the repo's subprocess handling is otherwise 
 
 ## Ranked
 
-*(step 6 — the ranked list; its presence is what marks this report complete)*
+One finding and one negative result. This is the healthiest slot in the sweep, and the
+most useful thing it produced is not a defect.
+
+1. **L1-1 — `deepdoc/investigate.py` documents a charter retired three weeks ago.** The
+   package `__init__` says the reactive on-failure model was retired at G32 (2026-08-18,
+   restated MM1); `investigate.py` still opens by describing it, and it is the file
+   holding the entry point. Nothing can act on it wrongly — the function raises and has no
+   production caller — so this is ranked as the slot's only finding and a small one. Two
+   lines to fix, no behaviour.
+2. **The `_git` carry-over answered NEGATIVE, and that is the slot's most valuable
+   output.** Slot 7 left an open-ended candidate: sweep the repo for its `check=False`
+   shape. Searched six packages; two sites outside `drydocs/port/` and both correct; zero
+   here. **`port_preflight._git` is a lone outlier, not an idiom** — which converts slot 7's
+   candidate 2 from an unbounded search into a one-line fix, and tells slot 10 the repo's
+   subprocess handling is otherwise sound.
+
+**Not ranked:** the six in-repo remedies catalogued in L1-3, deepdoc's scaffold-status
+paragraph, the board's determinism contract, and the three Lens 2 candidates cut with
+reasons. Recorded so no later firing re-derives them.
+
+## Cross-links
+
+**Between the lenses.** Neither found much, and both found the same thing: this slot's
+modules **say what they are**. `__init__` declares which of its own bodies raise;
+`plan_board` declares its determinism and its system of record; `spider_login` declares
+that it is a drop-in with no DryDocs imports. Every Lens 2 candidate was cut by reading
+the file's own first paragraph. The one defect is the one place where that paragraph is
+out of date.
+
+**To every prior slot — the pattern completes at eight for eight, and inverts.** Slots 9,
+2, 3, 4, 5, 6 and 7 each found a result that could not distinguish "checked and clean"
+from "not checked". This slot found the opposite: `plan_board` renders **"no items"**
+rather than `0 / 0`, and deepdoc **states which of its parts are unbuilt**. Adding those
+to `equivalence.py`'s **not proven**, `archival.py`'s coverage-on-itself, the API's
+declared `truncated`, and `port_preflight`'s *"SKIPPED — not a certification"* gives
+**six independent correct implementations and zero written conventions**.
+
+That is the finding the sweep has actually produced, and it is now fully evidenced: **the
+repo knows the answer. It just does not know that it knows it.** Six teams-of-one solved
+the same problem six times without any of them becoming the rule the seventh would have
+inherited. Slot 10 should not frame this as "components get completeness wrong" — it
+should frame it as "a solved problem that does not propagate", because those need
+different fixes: the first needs education, the second needs a written convention and an
+instrument.
+
+**To slot 10, forward.** Everything is now in hand: eight module reports, seven instances
+of the defect, six instances of the remedy, one closed carry-over, and one cross-component
+grooming candidate (the eighteen ADR 0018 shims) that three slots have deliberately not
+re-reported. Slot 10 reviews the seams, and the seam this sweep found is not between two
+modules — it is between a solution and its neighbours.
+
+## Candidates for grooming
+
+Three. None minted — the backlog pen is Lane A's and this firing holds neither it nor an id.
+
+1. **Fix `deepdoc/investigate.py`'s docstring to the G32/MM1 charter.**
+   `drydocs-deepdoc`, p3, two lines. While there, re-examine whether the `noqa: F401`
+   parser re-export still has a purpose once the on-failure model is gone — flagged, not
+   decided, because MM10's `investigate()` may want it.
+2. **Narrow slot 7's candidate 2 to its one site.** `drydocs-port`. Not a new item — an
+   amendment to slot 7's candidate, recording that the repo-wide search is DONE and
+   returned two correct sites and no other outlier. Whoever grooms slot 7's p1 should fold
+   this in so nobody re-runs the search.
+3. **Write the completeness convention down, and name its instrument.** Cross-module,
+   slot 10's to frame, and this report supplies the closing argument: six correct
+   implementations, zero conventions, eight slots. The item is not "fix completeness" —
+   it is "write down the rule these six already follow, and give a guard something to
+   check", because a solved problem that does not propagate is a documentation and
+   tooling gap, not a knowledge one.
 
 ## Cross-links
 
