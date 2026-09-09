@@ -1,10 +1,11 @@
 # Technical Design — source registration (five-axis descriptors, synthetic stand-ins, DuckDB and DataHub)
 
 <!-- anchor: front-matter -->
-**Status:** DESCRIPTIVE — documents the built proof of concept as of **Rev 1, 2026-09-09**,
+**Status:** DESCRIPTIVE — documents the built proof of concept as of **Rev 2, 2026-09-09**,
 authored against commit `de0eeb6f` on branch `feat/source-registration-poc` (one commit, based
-on `main` at `7e80f122`). Nothing here is prescriptive: every mechanism described is in the tree
-and covered by a test. ·
+on `main` at `7e80f122`). Nothing here is prescriptive: every mechanism described is in the tree and
+covered by a test. Two of those tests are RED, and the branch has never had a green CI run — see
+"QA & tests", which separates what the local suite reports from what CI reports. ·
 **Classification:** Internal-Public — mechanism only. Every value the generator emits is
 synthetic, and no connection coordinate appears in this document or in the files it describes. ·
 **Audience:** engineers working on `drydocs_core/source_descriptors.py` or
@@ -200,9 +201,23 @@ for, it raises rather than quietly emitting a short set.
 
 Everything is packed into one gzip file at `drydocs/data/samples/synthetic-sources.json.gz`, tracked
 in the repository at 4076 bytes. One tracked binary is one publish-boundary decision instead of a
-dozen. It is byte-stable by construction: the JSON is sorted and compact, and the gzip header
-carries a zero timestamp and no filename, so two runs over one config produce one file and any diff
-means the generator or the config changed.
+dozen. The JSON inside it is stable by construction: sorted and compact, with a gzip header that
+carries a zero timestamp and no filename, so two runs over one config produce the same payload and
+any change to it means the generator or the config changed.
+
+**The compressed bytes are a different matter, and this is where the design is currently wrong.**
+The parity test compares the committed file's raw bytes against a fresh compression, and gzip output
+is not portable: the same input at the same compression level produces a different stream under a
+different zlib build. The committed file was written on Windows, whose interpreter links zlib-ng,
+and it fails that comparison on the Linux runners. The evidence that this is compression and not
+content is in the failure itself — the gzip trailer, which carries the checksum and the uncompressed
+size of the payload, is identical on both sides, so both platforms produced the same 20375 bytes of
+JSON and disagreed only on how to deflate it.
+
+The fix is to compare the payload rather than the stream: decompress and compare the JSON, or track
+the artifact uncompressed. It is a small change and it belongs to whoever holds the branch, so it is
+recorded here rather than made. Until then the parity guard is red in CI on every platform that is
+not the one that wrote the file, which is every platform CI runs.
 
 Extraction never writes into the repository tree. Each dataset's target is decided from its
 placement:
@@ -337,14 +352,25 @@ one-time operator verification, not an automated test, and it is recorded as suc
 The usual gates apply and were run: the unit suite, the root import, and the module-boundary test,
 which is default-deny and so required the new prefix and map rows in the same commit.
 
-**One guard is red, and it is red about this branch.** The full unit suite reports 3895 passed and
-one failure: the identity-header guard rejects both recipe files under `config/datahub/`, each for
-the same three missing keys — `schema`, `classification` and `updated`. The guard is right. Both
-files are governed configuration and neither carries the identity block that every other governed
-file carries. The fix is not purely mechanical, because a DataHub recipe is parsed by DataHub and
-three unknown top-level keys may not survive that parse, so the choice is between adding the block
-and exempting the family with a written reason. Nothing in this design depends on the outcome, but
-the branch should not merge while the guard is red.
+**Two guards are red, and both are red about this branch.** They are also the reason this section
+distinguishes a local run from a CI run, because the two disagree.
+
+The local suite on this desktop reports 3895 passed and one failure: the identity-header guard
+rejects both recipe files under `config/datahub/`, each for the same three missing keys — `schema`,
+`classification` and `updated`. The guard is right. Both files are governed configuration and
+neither carries the identity block that every other governed file carries. The fix is not purely
+mechanical, because a DataHub recipe is parsed by DataHub and three unknown top-level keys may not
+survive that parse, so the choice is between adding the block and exempting the family with a
+written reason.
+
+CI reports **two** failures on every runner: that one, and the bundle parity guard described in the
+detailed design, which fails because gzip output is not portable across zlib builds. The second
+failure cannot be reproduced on the machine that wrote the bundle, which is exactly why it was not
+caught before the branch was pushed. The branch's own CI run was red for both reasons on the day it
+landed.
+
+Neither failure is caused by this document, and nothing in this design depends on how either is
+resolved. The branch should not merge while they stand.
 
 <!-- anchor: hitl-gate -->
 ## HITL gate & open questions
@@ -383,7 +409,8 @@ therefore stays with DataHub, and that is a fact about the two products rather t
 | Generated data is a pure function of config and seed | detailed-design | drydocs-load | `test_synthetic_sources.py` — determinism | done |
 | Every planned file is generated exactly once, with no extras and no gaps | detailed-design | drydocs-load | `test_synthetic_sources.py` — plan coverage | done |
 | A generated row can never pass for a capture | classification-security | drydocs-load | `test_synthetic_sources.py` — sample marker, identifier fences | done |
-| The tracked bundle is byte-stable and matches the generator | detailed-design | drydocs-load | `test_synthetic_sources.py` — pack stability, bundle parity | done |
+| The bundle payload is stable, and packing is repeatable within one build | detailed-design | drydocs-load | `test_synthetic_sources.py` — pack stability | done |
+| The tracked bundle matches the generator on any platform | detailed-design | drydocs-load | `test_synthetic_sources.py` — bundle parity — RED in CI: gzip streams differ across zlib builds, payload identical | open |
 | Extraction lands each file in the zone its loader reads, and never in the repository tree | detailed-design | drydocs-load | `test_synthetic_sources.py` — extraction targets | done |
 | A tree without the bundle reports "not tested", never a failure | qa-tests | drydocs-load | measured: 8 passed / 3 skipped with the bundle moved aside | done |
 | DuckDB is optional, and its absence costs one step only | detailed-design | drydocs-load | `test_synthetic_sources.py` — load test skips on absence | done |
