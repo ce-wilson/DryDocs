@@ -8,7 +8,7 @@ phase: 10
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on:
 - V1
 inputs:
@@ -18,5 +18,76 @@ inputs:
 - docs/design/feedback/
 acceptance: |
   docs/design/drydocs-docgen-runbook.md (outline-conformant, rendered, stale-render-clean), drydocs-docgen off RUNBOOK_PENDING. Covers: the md-is-source / html-is-render contract, the default-paths board render and everything that rides it (gates.json, enforcement matrix — J17/J20), the stale-render check, and both feedback halves (L5 save-button export, L6 scan + transcribe-doc-markup) back to anchor-keyed YAML.
-notes: Groomed 2026-07-29 (Epic V). This one documents the machinery the other runbooks are rendered BY
-  — author it early.
+notes: |
+  Groomed 2026-07-29 (Epic V). This one documents the machinery the other runbooks are
+  rendered BY - author it early.
+
+  DONE on wip/v5-laptop (Lane B, laptop, 2026-09-09). docs/design/drydocs-docgen-runbook.md
+  (Rev 1, 284 lines) plus the two V1 map edits.
+
+  (a) ZERO OF THE 55 REGISTERED VERBS REACH THIS MODULE - measured, not assumed: every one of
+  the 55 callbacks was read through inspect.getsource and none was unreadable. So every
+  procedure is written as a `python scripts/...` invocation. And the two verbs that SOUND like
+  this module's are not: docs-verify and docs-coverage operate the graph doc CORPUS through
+  drydocs_core/docs_verify.py and config/doc-source-registry.yaml. The names collide; the
+  surfaces do not, and the page says so in one line so a reader does not conflate them.
+
+  (b) THE BOARD RENDER IS DESCRIBED HERE THOUGH IT IS drydocs-plan's CODE, and the reason is
+  already in the tree: MODULE_EXEMPT records that drydocs-plan is exempt from runbook coverage
+  because the board renderer is "operated by the CLAUDE.md section 0 session ritual, not by a
+  module runbook". So there is no plan runbook and there will not be one - if this page does not
+  describe the run, nothing does. It DESCRIBES and ROUTES: the WHEN stays in CLAUDE.md section 0.
+  The other half of the join is real too - a default-paths board run fires this module's ideas
+  render (render_ideas -> drydocs.docgen.plan_ideas), the only one of the eleven that reaches here.
+
+  (c) A MEASURED DEFECT IN THE DRIFT-PREVENTION TOOL ITSELF, and it is this session's best
+  specimen of organ (c) from docs/reviews/premise-drift-2026-09-09.md. A default-paths
+  render_board.py run fires ELEVEN sub-renderers, counted two independent ways - the
+  `import render_*` lines and the `render_*.main()` calls in the same block, both 11. Its own
+  docstring says "One command refreshes all four", and CLAUDE.md section 0 names four as well.
+  The docstring enumerates roughly eight in the prose above that sentence, so the claim drifted
+  as the code grew. Neither file is Lane B's pen (scripts/render_board.py is drydocs-plan;
+  CLAUDE.md is the routing doc), so the accurate count goes in this page WITH the command that
+  produced it, and both are handed back. This is a better specimen than the V6 miscount because
+  the drifted claim sits in the tool whose whole purpose is preventing that drift.
+
+  (d) EVERYTHING RUN, AND NO COMMITTED PAGE MOVED. Every render went to a scratch --out-dir and
+  `git status` was checked after each step - clean throughout, which matters because a
+  default-paths run writes Lane A's renders. Measured: 27 sources under docs/design/*.md; one
+  render byte-identical across two runs to two different directories (30829 bytes); the outline
+  validator on BOTH paths (exit 0 conform, exit 1 fail with one actionable per-anchor bullet
+  each, exit 2 on a positional call); doc_to_pdf resolving Edge on this venue and producing
+  byte-identical 243073-byte PDFs across two runs - which VERIFIES its docstring's "structurally
+  identical" claim rather than repeating it; and the L5 mechanism confirmed PRESENT in a fresh
+  render (localStorage, the Copy feedback control, the anchor markers, @media print) without
+  clicking anything, which is the honest form of evidence for a browser-side surface.
+
+  (e) TWO GOTCHAS THE INSTRUMENTS FOUND, both now in Troubleshooting: --out-dir DOES NOT CREATE
+  its directory (FileNotFoundError, measured), and the validator's real exit code 1 displays as
+  -1 or 255 under PowerShell - the same instrument-versus-subject trap V4's page documents for
+  stderr warnings. Read the code in a POSIX shell or compare against 0.
+
+  (f) BOTH V1 MAP EDITS SHIP IN ONE COMMIT because either alone reds the guard: drydocs-docgen
+  leaves RUNBOOK_PENDING (shrink-only), and the new file gains a RUNBOOK_DISPOSITION row.
+
+  ONE BLIND SPOT I HIT AND CAUGHT BY HAND, worth recording because the review committed earlier
+  today predicted it. The self-check that runs test_runbook_currency's backtick idiom over this
+  page passed 21-for-21 - but the four test paths in the Verify section sit inside a FENCED CODE
+  BLOCK, which the idiom cannot see. I verified all four by hand; tests/unit/test_doc_pdf.py
+  exists. That is precisely the coverage limit section 2 of the premise-drift review measured
+  (14 backticked path tokens across the whole item corpus against 96 bare ones), met in the
+  document written the same day.
+
+  VERIFIED: full suite 3901 passed / 16 skipped / 0 failed. The J57 family +
+  test_skip_guard_policy + test_never_port_citations + test_doc_outline + test_runbook_coverage
+  = 100 passed. `ruff check .` and `ruff format --check .` clean (613 files already formatted).
+
+  RENDER IS LANE A'S: drydocs-docgen-runbook renders to 37538 bytes and has NO committed .html.
+  That makes SIX stems this burst - REM2's remediation runbook, V6's three, V4's, and this one.
+  With DOC9 merged, test_committed_design_pages_match_their_sources goes RED on all six until
+  render_design_doc.py runs at the merge.
+
+  HANDED BACK: the two stale sub-renderer counts (scripts/render_board.py's docstring and
+  CLAUDE.md section 0 both say four; the code fires eleven).
+
+  No new tracked code path, no PORT-MANIFEST row, no IDEAS.md append, no board render.

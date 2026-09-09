@@ -97,7 +97,6 @@ MODULE_EXEMPT: dict[str, str] = {
 #: without a backlog item that says who writes it.
 RUNBOOK_PENDING: frozenset[str] = frozenset(
     {
-        "drydocs-docgen",  # V5
         "drydocs-docmeta",  # BUILT at Q6; no V-item yet, so this list is where it is visible
     }
 )
@@ -189,6 +188,20 @@ RUNBOOK_DISPOSITION: dict[str, tuple[str | None, str, str]] = {
         "asked for the Confluence base URL 'as config' and there is no such key "
         "producer-side, because the real publisher is a company-side gitignored twin "
         "implementing the Publisher protocol",
+    ),
+    "drydocs-docgen-runbook.md": (
+        "drydocs-docgen",
+        "drydocs-docgen",
+        "V5: the module WHOLE -- the md-is-source / html-is-render contract, outline "
+        "validation, the PDF path, the ideas render, and both halves of the L5/L6 feedback "
+        "loop. Two measured facts shape it. ZERO of the 55 registered verbs reach this "
+        "module (every callback read, not assumed), so every procedure is a scripts/ "
+        "invocation -- and the two verbs that SOUND like its own, docs-verify and "
+        "docs-coverage, operate the graph doc corpus instead. And it describes the "
+        "default-paths render_board.py run although that is drydocs-plan's code, for the "
+        "reason MODULE_EXEMPT records: drydocs-plan is exempt from runbook coverage, so if "
+        "this page does not describe the run then nothing does. It routes the WHEN to "
+        "CLAUDE.md section 0 rather than restating the ritual",
     ),
     "drydocs-mapping-store-runbook.md": (
         None,
