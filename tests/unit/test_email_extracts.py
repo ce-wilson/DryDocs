@@ -11,8 +11,6 @@ import json
 from itertools import pairwise
 from pathlib import Path
 
-import pytest
-
 from drydocs.loaders.base import _code_semicolons
 from drydocs.loaders.email_extracts import (
     EmailExtractsAdapter,
@@ -25,10 +23,12 @@ from drydocs_core.models.docs import EmailExtractRow
 REPO = Path(__file__).resolve().parents[2]
 SAMPLES = REPO / "drydocs" / "data" / "samples" / "email-extracts"
 
-# Policy guard (test_skip_guard_policy): these samples are COMMITTED, so on a
-# clean clone this never fires — it exists so a partial checkout skips instead
-# of failing, per the policy's fresh-clone rule.
-pytestmark = pytest.mark.skipif(not SAMPLES.exists(), reason="sample extracts absent")
+# CORE9: the module-level policy guard that used to sit here is GONE. It said the
+# samples are committed and so it never fires — which is the whole objection. It
+# was a `pytestmark`, so the day the tree did go missing it would have skipped
+# EVERY test in this file rather than failing one, and the rewritten policy asks
+# for the opposite: a tracked path needs no guard, because a missing tracked file
+# means a broken clone and the suite should say so loudly.
 
 
 def test_samples_define_the_assumed_contract():

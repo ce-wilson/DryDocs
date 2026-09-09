@@ -35,7 +35,6 @@ import csv
 import re
 from pathlib import Path
 
-import pytest
 import yaml
 
 REPO = Path(__file__).resolve().parents[2]
@@ -63,18 +62,17 @@ def _server_names() -> set[str]:
 
 
 def _controlm_nodeids() -> set[str]:
-    """The Control-M sample's host names, or a skip if the sample is not here.
+    """The Control-M sample's host names. No skip: the sample is a tracked file.
 
-    The skip is REAL, not a formality for the J8 policy test. `drydocs/data/` is
-    gitignored wholesale — "may contain sensitive source data" — and the bundled
-    `samples/` CSVs are tracked inside it anyway, so today this file is present in
-    every clone and the skip never fires. It is written per-test rather than at
-    module level precisely so it cannot go quiet on the assertions above it: the
-    value sweep and the contract pin read only tracked fixture and config paths,
-    and they must keep running whatever happens to the sample tree.
+    CORE9: the skip that used to stand here is GONE. Its own docstring already
+    conceded the file "is present in every clone and the skip never fires", and
+    it argued only about SCOPE — per-test rather than module-level, so it could
+    not go quiet on the assertions above it. The rewritten policy answers the
+    prior question instead: `drydocs/data/` is gitignored wholesale, but this
+    CSV is TRACKED inside it, and a tracked path needs no guard at all, because
+    a missing tracked file means a broken clone and the interlock should say so
+    loudly rather than excusing itself.
     """
-    if not CONTROLM_HOSTS.exists():
-        pytest.skip(f"{CONTROLM_HOSTS.relative_to(REPO)} absent — the interlock has no other half")
     with CONTROLM_HOSTS.open(newline="", encoding="utf-8") as fh:
         return {r["nodeid"].strip().lower() for r in csv.DictReader(fh)}
 
