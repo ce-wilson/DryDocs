@@ -98,7 +98,6 @@ MODULE_EXEMPT: dict[str, str] = {
 RUNBOOK_PENDING: frozenset[str] = frozenset(
     {
         "drydocs-review",  # V4
-        "drydocs-docgen",  # V5
         "drydocs-lineage",  # V6 — two chain-scoped runbooks exist; neither covers the module
         "drydocs-docmeta",  # BUILT at Q6; no V-item yet, so this list is where it is visible
     }
@@ -161,6 +160,20 @@ RUNBOOK_DISPOSITION: dict[str, tuple[str | None, str, str]] = {
         "the module has exactly ONE registered CLI verb (profile-folder-set) and the batch "
         "is a library API, so the procedure is written as Python calls -- implying a verb "
         "that does not exist would have been the easier document and the wrong one",
+    ),
+    "drydocs-docgen-runbook.md": (
+        "drydocs-docgen",
+        "drydocs-docgen",
+        "V5: the module WHOLE -- the md-is-source / html-is-render contract, outline "
+        "validation, the PDF path, the ideas render, and both halves of the L5/L6 feedback "
+        "loop. Two measured facts shape it. ZERO of the 55 registered verbs reach this "
+        "module (every callback read, not assumed), so every procedure is a scripts/ "
+        "invocation -- and the two verbs that SOUND like its own, docs-verify and "
+        "docs-coverage, operate the graph doc corpus instead. And it describes the "
+        "default-paths render_board.py run although that is drydocs-plan's code, for the "
+        "reason MODULE_EXEMPT records: drydocs-plan is exempt from runbook coverage, so if "
+        "this page does not describe the run then nothing does. It routes the WHEN to "
+        "CLAUDE.md section 0 rather than restating the ritual",
     ),
     "drydocs-mapping-store-runbook.md": (
         None,
