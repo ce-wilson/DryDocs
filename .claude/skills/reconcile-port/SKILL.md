@@ -39,6 +39,16 @@ the accumulated lessons from prior ports. Read both.
    off `main`'s first-parent line. It is a convention the producer session writes, not
    a guard - a roll from the eighth on that lacks the line has an unverified range,
    not a green one.
+   **The preflight's verdict has three words, and only one of them certifies (PORT8,
+   2026-09-09).** A certification quotes the preflight's summary line: `CERTIFIED`, or
+   `NOT CERTIFIED` with its checks named. A check that reads `NOT CHECKED` - the base did
+   not resolve, or git failed reading the range - is neither green nor red and blocks
+   the tag exactly as a failure does; before PORT8 an unresolvable base passed BOTH
+   range checks on an empty range, so a roll certified with the old instrument may have
+   been green on emptiness. When a tag's preflight is re-run after a preflight fix, the
+   producer records the re-certification as a dated postscript to that roll's relay; a
+   roll without one was certified by the instrument of its day.
+
 2. **Read the manifest first:** `git show cewilson/main:PORT-MANIFEST.yaml` —
    the machine-readable disposition per path (first match wins; `**` spans
    separators, `*`/`?` do not; per-entry rows FORBID whole-file checkout).

@@ -7,7 +7,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs/port/port_preflight.py
@@ -29,3 +29,18 @@ notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). port-docgen-docmeta-2026-09-08.md candidate 1 - "the highest-priority item this sweep has
   produced" - with slot 8's amendment (the repo-wide sweep for the shape found two correct sites and
   no third instance). Verified in code at drydocs/port/port_preflight.py:359 on 2026-09-09.
+
+  DONE 2026-09-09 (Lane A, desktop). (a)-(f) in drydocs/port/port_preflight.py and
+  scripts/port_preflight.py: GitError from the helper on a non-zero exit; base_resolves() runs
+  first through git rev-parse --verify; range_checks() turns an unresolvable base, or a git
+  failure reading the range, into NOT CHECKED on both range checks; CheckResult carries the
+  third state and refuses passed=True with it by construction; the CLI prints the verdict word
+  and NOT CERTIFIED names the not-checked checks, so --tag never runs. Four tests pin the helper
+  raising, the state's invariant, the unresolvable base (NOT CHECKED twice, never clean) and the
+  EMPTY range on a real base (still a clean pass, and the base is resolved before the range is
+  read). (g) the reconcile-port checklist carries the three-word verdict and the
+  re-certification-postscript rule. (h) re-run over port-base-20260905..port-base-20260908: base
+  resolves, 407 commits, 0 uncited, 10 added documents, 0 unresolved - recorded as the third
+  postscript to RELAY-46. The interim third state is a field on CheckResult; CORE10 replaces it
+  with the ADR 0021 type once that record is accepted. test_port_preflight 68 passed; ruff
+  clean.

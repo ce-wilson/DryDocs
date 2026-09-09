@@ -3599,6 +3599,20 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   closure by hand and nothing reads it, and the depgraph snapshot already holds the import edges
   to derive it. Nothing is asked back.
 
+  **THIRD POSTSCRIPT TO RELAY-46 - THE SEVENTH ROLL RE-CERTIFIED ON THE FIXED INSTRUMENT
+  (2026-09-09, producer PORT8, venue desktop) [VERIFIED-PRODUCER]:** the module sweep's slot 7
+  found that the preflight's git helper discarded the exit code, so a base git could not
+  resolve yielded an EMPTY commit range and both range-derived checks (ledger coverage, cited
+  paths resolve) passed on emptiness - the worse the base, the greener the certification.
+  PORT8 makes the preflight fail closed: a base-resolves check runs first, a git failure is
+  loud, and a check that could not run reports NOT CHECKED, which blocks the tag as a failure
+  does. Re-run over `port-base-20260905..port-base-20260908` with the fixed instrument: the
+  base resolves; 407 commits, 0 uncited; 10 added documents, 0 unresolved citations. The
+  seventh roll's certification therefore holds as issued - the defect was latent, not
+  exercised, because its base was a real tag. From this postscript on, a certification quotes
+  the preflight's summary word, and a roll whose preflight is re-run after a preflight fix
+  carries a postscript like this one. Nothing is asked back.
+
 - **RELAY-47 — THE SECTION-3 REDACTION RULING: A PUBLISH-BOUNDARY REDACTION OF SIGNED
   GATE-LOG TEXT IS DECLARED, NEVER EXCUSED** (new 2026-09-08, producer `main` after
   `port-base-20260908` / `314b1715`, venue desktop; the commit that carries this relay also

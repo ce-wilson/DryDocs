@@ -32,14 +32,25 @@ def main() -> int:
 
     print(f"PORT PREFLIGHT — base {args.base}\n")
     for result in results:
-        print(f"  [{'PASS' if result.passed else 'FAIL'}] {result.name}")
+        print(f"  [{result.verdict}] {result.name}")
         for line in result.detail.splitlines():
             print(f"        {line.strip()}" if not line.startswith("    ") else line)
-    failed = [r for r in results if not r.passed]
+    not_checked = [r for r in results if r.not_checked]
+    failed = [r for r in results if not r.passed and not r.not_checked]
     print()
 
-    if failed:
-        print(f"NOT CERTIFIED — {len(failed)} check(s) failed: {', '.join(r.name for r in failed)}")
+    # Three outcomes (J78, PORT8): a check that could not run is neither green
+    # nor red, and it blocks the tag exactly as a failure does - the base was
+    # never checked, so nothing here certified it.
+    if failed or not_checked:
+        parts = []
+        if failed:
+            parts.append(f"{len(failed)} check(s) failed: {', '.join(r.name for r in failed)}")
+        if not_checked:
+            parts.append(
+                f"{len(not_checked)} NOT CHECKED: {', '.join(r.name for r in not_checked)}"
+            )
+        print(f"NOT CERTIFIED — {'; '.join(parts)}")
         print("Do not offer this commit as a port base.")
         return 1
 

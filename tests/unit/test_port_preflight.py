@@ -10,16 +10,20 @@ from __future__ import annotations
 
 import pytest
 
+from drydocs.port import port_preflight as _pf
 from drydocs.port.port_preflight import (
     BASIS_TAGS,
     RECORD_PREFIXES,
+    CheckResult,
     Commit,
+    GitError,
     cited_paths,
     cited_shas,
     is_record_document,
     is_ritual,
     is_suite_guarded,
     next_base_tag,
+    range_checks,
     relays_missing_basis,
     uncited_commits,
     unresolved_citations,
@@ -394,3 +398,73 @@ def test_a_second_certification_on_one_day_suffixes_rather_than_collides() -> No
     existing = ["port-base-20260809"]
     assert next_base_tag(existing, "20260809") == "port-base-20260809b"
     assert next_base_tag([*existing, "port-base-20260809b"], "20260809") == "port-base-20260809c"
+
+
+# ---- PORT8: the preflight fails closed --------------------------------------
+#
+# Slot 7 of the module sweep demonstrated the defect: real base, 38 commits and
+# 8 added documents; bogus base, 0 and 0; and `uncited_commits([], text)` is []
+# so the certification passed. The worse the base, the greener the report. These
+# pin the three facts that close it - a git failure is loud, an unresolvable base
+# is NOT CHECKED (never clean), and an EMPTY range on a base that resolves is
+# still a clean pass, because "no commits" and "could not look" are different
+# answers.
+
+
+def test_git_helper_raises_on_a_nonzero_exit(monkeypatch: pytest.MonkeyPatch) -> None:
+    import subprocess
+
+    def fake_run(args, **kwargs):  # - subprocess.run's signature
+        return subprocess.CompletedProcess(
+            args, 128, stdout="", stderr="fatal: bad revision 'nosuchref'"
+        )
+
+    monkeypatch.setattr(_pf.subprocess, "run", fake_run)
+    with pytest.raises(GitError) as err:
+        _pf._git("log", "nosuchref..HEAD")
+    assert err.value.returncode == 128
+    assert "bad revision" in err.value.stderr
+
+
+def test_a_not_checked_result_can_never_have_passed() -> None:
+    with pytest.raises(ValueError):
+        CheckResult("ledger coverage", True, "impossible", not_checked=True)
+    result = CheckResult("ledger coverage", False, "NOT CHECKED - why", not_checked=True)
+    assert result.verdict == "NOT CHECKED"
+    assert CheckResult("x", True, "").verdict == "PASS"
+    assert CheckResult("x", False, "").verdict == "FAIL"
+
+
+def test_an_unresolvable_base_is_not_checked_never_clean(monkeypatch: pytest.MonkeyPatch) -> None:
+    def failing_git(*args: str, cwd=None):
+        raise GitError(args, 128, "fatal: Needed a single revision")
+
+    monkeypatch.setattr(_pf, "_git", failing_git)
+    results = range_checks("nosuchref", LEDGER)
+    by_name = {r.name: r for r in results}
+    assert set(by_name) == {"base resolves", "ledger coverage", "cited paths resolve"}
+    for r in results:
+        assert r.not_checked, r.name
+        assert not r.passed, r.name
+        assert "NOT CHECKED" in r.detail, r.name
+
+
+def test_an_empty_range_on_a_real_base_is_still_a_clean_pass(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[tuple[str, ...]] = []
+
+    def resolving_git(*args: str, cwd=None):
+        calls.append(args)
+        if args[0] == "rev-parse":
+            return "0d3761a9deadbeef"
+        return ""  # an empty log and an empty diff: nothing in the range
+
+    monkeypatch.setattr(_pf, "_git", resolving_git)
+    results = range_checks("0d3761a9", LEDGER)
+    by_name = {r.name: r for r in results}
+    assert by_name["base resolves"].passed and not by_name["base resolves"].not_checked
+    assert by_name["ledger coverage"].passed and not by_name["ledger coverage"].not_checked
+    assert "all 0 commits" in by_name["ledger coverage"].detail
+    assert by_name["cited paths resolve"].passed
+    assert calls[0][0] == "rev-parse", "the base is resolved before the range is read"

@@ -191,9 +191,32 @@ class Commit:
 
 @dataclass(frozen=True)
 class CheckResult:
+    """One check's verdict. Three states, not two (J78, and ADR 0021's subject).
+
+    ``passed`` is the certification bit. ``not_checked`` is the third state: the
+    check could not evaluate its subject at all, which is a different fact from
+    "evaluated and failed" and must never render as a pass. PORT8 (2026-09-09):
+    ``_git`` used to swallow git's exit code, so an unresolvable base yielded an
+    empty commit range and BOTH range-derived checks passed on emptiness - the
+    worse the base, the greener the certification. A not-checked result is
+    refused the ``passed`` bit by construction, so that shape cannot come back.
+    """
+
     name: str
     passed: bool
     detail: str
+    not_checked: bool = False
+
+    def __post_init__(self) -> None:
+        if self.not_checked and self.passed:
+            raise ValueError(f"{self.name}: a check that did not run cannot have passed")
+
+    @property
+    def verdict(self) -> str:
+        """The word the report prints: PASS, FAIL, or NOT CHECKED."""
+        if self.not_checked:
+            return "NOT CHECKED"
+        return "PASS" if self.passed else "FAIL"
 
 
 def is_ritual(subject: str) -> bool:
@@ -356,14 +379,109 @@ def unresolved_citations(
     return findings
 
 
+class GitError(RuntimeError):
+    """git exited non-zero. Carries the command and its stderr, so a caller that
+    turns this into a NOT CHECKED verdict can say why."""
+
+    def __init__(self, args: tuple[str, ...], returncode: int, stderr: str) -> None:
+        self.git_args = args
+        self.returncode = returncode
+        self.stderr = stderr.strip()
+        super().__init__(f"git {' '.join(args)} exited {returncode}: {self.stderr}")
+
+
 def _git(*args: str, cwd: Path | None = None) -> str:
-    return subprocess.run(
+    """Run git and return its stdout - or raise :class:`GitError`.
+
+    Until PORT8 this returned ``.stdout.strip()`` with ``check=False`` and nothing
+    else, so ``git log nosuchref..HEAD`` (exit 128, empty stdout) came back as ""
+    and :func:`range_commits` turned it into "no commits". The slot-7 review
+    demonstrated it: real base, 38 commits; bogus base, 0 commits; the coverage
+    check passed. Every other ``check=False`` call in this module reads the
+    returncode; this one is now the same.
+    """
+    proc = subprocess.run(
         ["git", *args],
         cwd=str(cwd or REPO_ROOT),
         capture_output=True,
         text=True,
         check=False,
-    ).stdout.strip()
+    )
+    if proc.returncode != 0:
+        raise GitError(args, proc.returncode, proc.stderr)
+    return proc.stdout.strip()
+
+
+def base_resolves(base: str, cwd: Path | None = None) -> CheckResult:
+    """The first check: is *base* a commit git can see here?
+
+    A typo, a tag never fetched, or a sha from the other repo used to fail OPEN
+    through the two range checks. Now it is a named verdict, and the range checks
+    that depend on it report NOT CHECKED rather than running over nothing.
+    """
+    try:
+        sha = _git("rev-parse", "--verify", "--quiet", f"{base}^{{commit}}", cwd=cwd)
+    except GitError as err:
+        why = err.stderr or f"git exit {err.returncode}"
+        return CheckResult(
+            "base resolves",
+            False,
+            f"NOT CHECKED - {base!r} is not a commit here ({why})",
+            not_checked=True,
+        )
+    return CheckResult("base resolves", True, f"{base} -> {sha}")
+
+
+def range_checks(base: str, port_prompt_text: str, cwd: Path | None = None) -> list[CheckResult]:
+    """The two range-derived checks, guarded by :func:`base_resolves`.
+
+    Kept apart from :func:`run_checks` so the guards can drive it with an
+    injected ``_git`` and no renderer or suite: the property under test is that a
+    base git cannot resolve yields NOT CHECKED twice, and an EMPTY range on a base
+    it can resolve still yields a clean pass - "no commits" and "could not look"
+    are different answers.
+    """
+    resolved = base_resolves(base, cwd=cwd)
+    results = [resolved]
+    if resolved.not_checked:
+        reason = "NOT CHECKED - the base did not resolve, so the range could not be read"
+        results.append(CheckResult("ledger coverage", False, reason, not_checked=True))
+        results.append(CheckResult("cited paths resolve", False, reason, not_checked=True))
+        return results
+
+    try:
+        commits = range_commits(base, cwd=cwd)
+        docs = added_documents(base, cwd=cwd)
+    except GitError as err:
+        reason = f"NOT CHECKED - git failed reading {base}..HEAD ({err.stderr})"
+        results.append(CheckResult("ledger coverage", False, reason, not_checked=True))
+        results.append(CheckResult("cited paths resolve", False, reason, not_checked=True))
+        return results
+
+    uncited = uncited_commits(commits, port_prompt_text)
+    results.append(
+        CheckResult(
+            "ledger coverage",
+            not uncited,
+            "\n".join(f"    UNCITED {c.sha} {c.subject}" for c in uncited)
+            or f"all {len(commits)} commits in {base}..HEAD are cited or ritual",
+        )
+    )
+    root = cwd or REPO_ROOT
+    unresolved = unresolved_citations(
+        docs,
+        repo_roots={entry.name for entry in root.iterdir()},
+        exists=lambda rel: (root / rel).exists(),
+    )
+    results.append(
+        CheckResult(
+            "cited paths resolve",
+            not unresolved,
+            "\n".join(f"    UNRESOLVED {doc}: `{path}`" for doc, path in unresolved)
+            or f"every path cited by the {len(docs)} document(s) this range adds resolves",
+        )
+    )
+    return results
 
 
 def range_commits(base: str, head: str = "HEAD", cwd: Path | None = None) -> list[Commit]:
@@ -423,7 +541,7 @@ def venue_line() -> str:
 
 
 def run_checks(base: str, *, skip_tests: bool = False, will_tag: bool = False) -> list[CheckResult]:
-    """The five structural checks plus the relay-basis and cited-path checks.
+    """The structural checks plus the relay-basis, base-resolves and cited-path checks.
 
     Ordered cheapest-first so a dirty tree fails in milliseconds rather than after
     a minute of pytest.
@@ -449,31 +567,9 @@ def run_checks(base: str, *, skip_tests: bool = False, will_tag: bool = False) -
         )
     )
 
-    commits = range_commits(base)
-    uncited = uncited_commits(commits, text)
-    results.append(
-        CheckResult(
-            "ledger coverage",
-            not uncited,
-            "\n".join(f"    UNCITED {c.sha} {c.subject}" for c in uncited)
-            or f"all {len(commits)} commits in {base}..HEAD are cited or ritual",
-        )
-    )
-
-    docs = added_documents(base)
-    unresolved = unresolved_citations(
-        docs,
-        repo_roots={entry.name for entry in REPO_ROOT.iterdir()},
-        exists=lambda rel: (REPO_ROOT / rel).exists(),
-    )
-    results.append(
-        CheckResult(
-            "cited paths resolve",
-            not unresolved,
-            "\n".join(f"    UNRESOLVED {doc}: `{path}`" for doc, path in unresolved)
-            or f"every path cited by the {len(docs)} document(s) this range adds resolves",
-        )
-    )
+    # PORT8: the base is resolved BEFORE the two range checks read it, and a base
+    # git cannot see turns both into NOT CHECKED rather than into a clean pass.
+    results.extend(range_checks(base, text))
 
     render = subprocess.run(
         ["poetry", "run", "python", "scripts/render_board.py"],
