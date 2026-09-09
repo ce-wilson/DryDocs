@@ -9,6 +9,7 @@ model: fable
 priority: p1
 status: todo
 depends_on: [CFG8]
+gates: [source-descriptor-axes]
 inputs:
 - config/gate-log.md
 - config/source-descriptors.yaml
