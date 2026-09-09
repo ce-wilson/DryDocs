@@ -35,7 +35,32 @@ them and does not re-derive the finding.
 
 ## Measurements
 
-*(step 3 — tests, guards, linter, counts; raw numbers recorded as they arrive)*
+Taken before any module code was read.
+
+| module | lines | shape |
+|---|---|---|
+| `drydocs/port/` | **2,786** | 9 files — `port_rename_detect` 638, `port_preflight` 544, `port_completeness` 463, `port_drops` 317, `reconcile_before` 308, `port_backlog_union` 250, `gate_log_redactions` 178, `dispositions` 82 |
+| `drydocs/docgen/` | **1,189** | 5 files |
+| `drydocs_docmeta/` | **1,105** | package |
+| ADR 0018 shims in scope | **84** | 7 files × 12 lines |
+| **combined** | **5,164** | against the plan table's 3,770 — **+37%** |
+
+| both halves | |
+|---|---|
+| tests naming any of the three | **26** files |
+| scoped suite | **485 passed, 9 skipped**, 43s |
+| `ruff check drydocs/port/ drydocs/docgen/ drydocs_docmeta/` | clean |
+
+**Correction to this report's own skeleton.** The skeleton said ten of slot 6's eighteen
+shims live in this slot's prefixes. The real count is **seven** — `design_doc`,
+`doc_outline`, `doc_pdf`, `plan_ideas`, `port_backlog_union`, `port_preflight`,
+`port_rename_detect`. The remaining eleven are slot 6's eight, slot 8's `plan_board` and
+`plan_roadmap`, and one package `__init__`. Recorded rather than silently edited, because
+a later reader comparing the two numbers should see which one was checked.
+
+**Five of seven slots have now come in over the plan table** (+37% here, after +49%, +36%,
++16%, one exactly on). The pattern is stable enough to stop being a per-slot note; slot 6
+already raised it as a candidate for slot 10.
 
 ## Lens 1 — system design
 
