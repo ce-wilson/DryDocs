@@ -8,6 +8,12 @@ CROSSING two fields the registry already records separately is reporting. If a
 `wired:` key ever appears in the registry sources, this key stopped reporting and
 started asserting, and that must fail loudly rather than ship quietly.
 
+AMENDED 2026-09-09 (CFG13). The gate signed - registry-wiring-readiness 18/18, with
+source-descriptor-axes 13/13 in the same sitting - and ruled the fact a SIXTH
+DESCRIPTOR AXIS, `wired`, declared per side with a reason. So the load-map row for a
+registry-home dataset now CARRIES that declaration and the cross reads it. What stays
+forbidden is what was always forbidden: a wiring field on the REGISTRY row itself.
+
 The second failure is divergence. The same cross renders on two surfaces — the
 console (web/src/loadmap/loadMapModel.ts) and N5's paper surface
 (docs/plan/load-map.html) — and a key that disagrees between screen and print is
@@ -24,11 +30,16 @@ import json
 import re
 from pathlib import Path
 
+import yaml
+
+from drydocs_core.source_descriptors import SourceDescriptors
+
 REPO = Path(__file__).resolve().parents[2]
 LOAD_MAP = REPO / "web" / "src" / "generated" / "load-map.json"
 PRINT_HTML = REPO / "docs" / "plan" / "load-map.html"
 MODEL_TS = REPO / "web" / "src" / "loadmap" / "loadMapModel.ts"
 RENDERER = REPO / "scripts" / "render_load_map.py"
+REGISTRY_YAML = REPO / "config" / "source-registry.yaml"
 
 STATE_IDS = ("wired", "planned", "awaiting", "registered")
 
@@ -38,7 +49,8 @@ def _sources() -> list[dict]:
 
 
 def _state(source: dict) -> str:
-    built = bool(source["loaders"])
+    # the declared fact where the row carries one (CFG13); loader presence where not
+    built = source["wired"] if "wired" in source else bool(source["loaders"])
     if source["confirmed"]:
         return "wired" if built else "planned"
     return "awaiting" if built else "registered"
@@ -52,19 +64,41 @@ def _census() -> dict[str, int]:
 
 
 def test_the_key_reports_and_never_rules() -> None:
-    """No source row carries a wiring field of its own.
+    """The wiring fact lives on the descriptor axis, never on the registry row.
 
-    The moment one does, the cross is no longer derived from two independent
-    dispositions and the unsigned N10 gate has been pre-empted by a renderer.
+    AMENDED 2026-09-09 by the ruling (registry-wiring-readiness D3, SIGNED 18/18;
+    source-descriptor-axes B1/B2): the sixth axis `wired` is DECLARED per side in
+    config/source-descriptors.yaml, so a load-map row for a registry-home dataset
+    CARRIES that declaration, verbatim, and the cross reads it. Three things are
+    pinned. A REGISTRY row (config/source-registry.yaml datasets[]) still carries
+    none of the four names - there it would overload `confirmed` again, which is
+    the conflation the gate ended. Every registry-home load-map row carries the
+    descriptor's value and reason, unchanged - the renderer copies, it does not
+    decide. And a doc-ledger row, which no descriptor answers for, carries no
+    `wired` key at all - the cross falls back to loader presence there, as O90
+    built it, and a key that appeared on one would be a value nobody declared.
     """
     forbidden = {"wired", "wiring", "wiring_state", "ready"}
-    for s in _sources():
-        overlap = forbidden & set(s)
+    registry = yaml.safe_load(REGISTRY_YAML.read_text(encoding="utf-8"))
+    for row in registry["datasets"]:
+        overlap = forbidden & set(row)
         assert not overlap, (
-            f"source {s['id']} carries {sorted(overlap)} — a wiring disposition is "
-            "gate territory (N10, registry-wiring-readiness, unsigned). The key "
-            "crosses `confirmed` x `loaders`; it must not read or write a field."
+            f"registry row {row['id']} carries {sorted(overlap)} - the wiring fact's home is "
+            "the descriptor's sixth axis (config/source-descriptors.yaml wired:), ruled "
+            "2026-09-09; a field on the registry row overloads `confirmed` again."
         )
+    descriptors = SourceDescriptors.from_yaml()
+    for s in _sources():
+        if s["home"] == "source-registry":
+            declared, reason = descriptors.wired(s["id"])
+            assert s.get("wired") == declared and s.get("wired_reason") == reason, (
+                f"load-map row {s['id']} does not carry the descriptor's declaration "
+                f"({declared!r}, {reason!r}) - re-run scripts/render_load_map.py"
+            )
+        else:
+            assert (
+                "wired" not in s and "wired_reason" not in s
+            ), f"doc-ledger row {s['id']} carries a wiring value nobody declared"
 
 
 def test_both_axes_are_really_independent() -> None:

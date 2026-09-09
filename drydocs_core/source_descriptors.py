@@ -1,5 +1,7 @@
 """Registration descriptors — five finite axes per dataset, derived from the
-source registry and overridable in ``config/source-descriptors.yaml``.
+source registry and overridable in ``config/source-descriptors.yaml``, plus a
+sixth, ``wired``, that is DECLARED there per side and never derived (CFG13,
+2026-09-09: is the pipeline that reads the dataset built on this tree).
 
 The registry (``drydocs_core.source_registry``) says WHAT a source is; the
 bindings say HOW TO REACH it; this module says how it is REGISTERED as a
@@ -26,6 +28,12 @@ REPO_ROOT = repo_root(Path(__file__).resolve().parents[1])
 DEFAULT_DESCRIPTORS_PATH = REPO_ROOT / "config" / "source-descriptors.yaml"
 
 AXES: tuple[str, ...] = ("acquisition", "format", "authority", "layer", "access")
+#: The sixth axis (registry-wiring-readiness B1/B2, source-descriptor-axes B1-B4, SIGNED
+#: 2026-09-09): DECLARED per side in the config's ``wired:`` block, never derived here -
+#: core cannot see loader registration. Required for every registry-home dataset; a
+#: false carries a reason of at least this many characters (the SOURCELESS_LOADERS idiom).
+WIRED_AXIS = "wired"
+WIRED_REASON_MIN = 40
 
 
 class DescriptorError(ValueError):
@@ -47,6 +55,10 @@ class Descriptor:
     urn: str
     derived: bool
     confirmed: bool
+    #: The declared wiring fact: is the pipeline that reads this dataset built on THIS
+    #: side. Independent of ``confirmed``, which is the semantic ruling only.
+    wired: bool = False
+    wired_reason: str | None = None
 
     def axis_values(self) -> dict[str, str]:
         return {axis: getattr(self, axis) for axis in AXES}
@@ -79,7 +91,9 @@ class SourceDescriptors:
         self._overrides: dict[str, dict[str, str]] = dict(config.get("overrides", {}))
         self.datahub: dict[str, Any] = dict(config.get("datahub", {}))
         self.synthetic: dict[str, Any] = dict(config.get("synthetic", {}))
+        self._wired: dict[str, tuple[bool, str | None]] = {}
         self._validate_overrides()
+        self._validate_wired(config.get(WIRED_AXIS))
 
     # ------------------------------------------------------------------ load
     @classmethod
@@ -112,6 +126,63 @@ class SourceDescriptors:
                 raise DescriptorError(f"override names unknown dataset {source_id!r}")
             for axis, value in values.items():
                 self._check(axis, value, source_id)
+
+    def _validate_wired(self, block: Any) -> None:
+        """The sixth axis is DECLARED and REQUIRED (wiring page B4/B5, 2026-09-09).
+
+        Every registry-home dataset carries an entry: ``true``, or a mapping with
+        ``value: false`` and a ``reason`` of at least :data:`WIRED_REASON_MIN`
+        characters. A missing block, a missing entry, an unknown id, a non-boolean
+        value or a bare or short reason is refused HERE, at construction, so a
+        config that has not answered for a new row fails before the first read
+        rather than on whichever dataset is asked for first. Never derived: a
+        declared value with a reason is a decision someone can re-read and reverse;
+        a computed one is neither.
+        """
+        if not isinstance(block, dict):
+            raise DescriptorError(
+                f"{WIRED_AXIS}: block missing or not a mapping keyed by dataset id "
+                f"(every registry-home dataset must declare true, or value: false + reason)"
+            )
+        known = set(self.dataset_ids())
+        unknown = sorted(set(block) - known)
+        if unknown:
+            raise DescriptorError(f"{WIRED_AXIS} names unknown dataset(s) {unknown}")
+        missing = sorted(known - set(block))
+        if missing:
+            raise DescriptorError(
+                f"{WIRED_AXIS} is REQUIRED for every registry-home dataset; missing {missing}"
+            )
+        for source_id, entry in block.items():
+            if entry is True:
+                self._wired[source_id] = (True, None)
+                continue
+            if isinstance(entry, dict) and isinstance(entry.get("value"), bool):
+                reason = entry.get("reason")
+                if entry["value"]:
+                    self._wired[source_id] = (True, reason if isinstance(reason, str) else None)
+                    continue
+                if not isinstance(reason, str) or len(reason.strip()) < WIRED_REASON_MIN:
+                    raise DescriptorError(
+                        f"{source_id}: {WIRED_AXIS}=false needs a reason of at least "
+                        f"{WIRED_REASON_MIN} characters - a bare false is a fact, a reasoned "
+                        f"false is a decision someone can re-read and reverse"
+                    )
+                self._wired[source_id] = (False, reason.strip())
+                continue
+            raise DescriptorError(
+                f"{source_id}: {WIRED_AXIS} must be true, or a mapping with value: false and "
+                f"a reason - got {entry!r}"
+            )
+
+    def wired(self, source_id: str) -> tuple[bool, str | None]:
+        """The declared wiring fact and its reason for one registry-home dataset."""
+        try:
+            return self._wired[source_id]
+        except KeyError:
+            raise DescriptorError(
+                f"{source_id}: no {WIRED_AXIS} entry (not a registry-home dataset?)"
+            ) from None
 
     def _check(self, axis: str, value: str, source_id: str) -> str:
         if axis not in self.axes:
@@ -159,12 +230,15 @@ class SourceDescriptors:
         values.update(self._overrides.get(source_id, {}))
         for axis, value in values.items():
             self._check(axis, value, source_id)
+        wired, wired_reason = self.wired(source_id)
         return Descriptor(
             source_id=source_id,
             system_id=system.id,
             urn=source.urn,
             derived=bool(source.data.get("derived")),
             confirmed=bool(source.confirmed),
+            wired=wired,
+            wired_reason=wired_reason,
             **values,
         )
 

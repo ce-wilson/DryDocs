@@ -11,8 +11,11 @@ environment. What is emitted, per registry row:
   layer, classification, binding; ``dataPlatformInstance``; ``subTypes``
   ``Source system``; ``status``),
 * one **dataset** per DATASET (``datasetProperties`` whose ``customProperties``
-  are the five descriptor axes plus the DryDocs id and URN; ``container``
-  pointing at its system; ``globalTags`` — one tag per axis value, plus
+  are the five descriptor axes, the declared ``wired`` fact and its reason (CFG13)
+  plus the DryDocs id and URN; ``container``
+  pointing at its system; ``globalTags`` — one tag per axis value, one
+  ``<prefix>.wired.<true|false>`` tag (axes page C2: ``confirmed`` on an asset means
+  the semantic ruling only, so the wiring fact is its own tag), plus
   ``<prefix>.synthetic`` when a stand-in exists; ``subTypes`` from the format;
   ``status``; and ``schemaMetadata`` from the synthetic CSV headers when a
   generated table exists, every field ``StringType`` because the CSVs are text),
@@ -178,6 +181,8 @@ def build_mcps(
             "drydocs_urn": desc.urn,
             "system": desc.system_id,
             "confirmed": str(desc.confirmed).lower(),
+            "wired": str(desc.wired).lower(),
+            "wired_reason": desc.wired_reason or "",
             "derived": str(desc.derived).lower(),
             "synthetic_files": ",".join(t.name for t in synthetic),
         }
@@ -221,6 +226,17 @@ def build_mcps(
         tag_urns = [tag_urn(descriptors, axis, value) for axis, value in desc.axis_values().items()]
         for axis, value in desc.axis_values().items():
             tags_used[tag_urn(descriptors, axis, value)] = f"{axis} = {value}"
+        # CFG13 (source-descriptor-axes C2, 2026-09-09): `confirmed` on the asset means
+        # the SEMANTIC ruling only; the wiring fact is its OWN tag, so no tagged asset
+        # is ambiguous about which of the two it carries.
+        wired_value = str(desc.wired).lower()
+        t = tag_urn(descriptors, "wired", wired_value)
+        tag_urns.append(t)
+        tags_used[t] = (
+            "wired = true (the pipeline that reads this dataset is built on this side)"
+            if desc.wired
+            else "wired = false (declared with a reason on the descriptor; not built here)"
+        )
         if synthetic:
             t = tag_urn(descriptors, "synthetic")
             tag_urns.append(t)

@@ -58,6 +58,7 @@ from drydocs_core import (  # noqa: E402  (needs the sys.path insert above)
     registry_view,
     yaml_fragments,
 )
+from drydocs_core.source_descriptors import SourceDescriptors  # noqa: E402
 
 REGISTRY = REPO / "config" / "source-registry.yaml"
 DOC_REGISTRY = REPO / "config" / "doc-source-registry.yaml"
@@ -142,6 +143,11 @@ def build_load_map() -> dict:
     for rows in loaders_by_source.values():
         rows.sort(key=lambda r: r["name"])
 
+    # CFG13 (2026-09-09): the wiring fact is DECLARED on the descriptor's sixth axis,
+    # never derived here; each registry-home row carries the declaration and the
+    # wiring cross below reads it.
+    descriptors = SourceDescriptors.from_yaml()
+
     # ontology mappings by taxonomy.source (dataset ids; doc-corpus ids valid too)
     mappings_by_source: dict[str, list[dict]] = {}
     unmatched_map_sources: list[dict] = []
@@ -201,6 +207,11 @@ def build_load_map() -> dict:
                 "taxonomy_captures": captures_by_source.get(sid, []),
                 "ontology_mappings": mappings_by_source.get(sid, []),
                 "loaders": loaders_by_source.get(sid, []),
+                # CFG13: the declared wiring fact (config/source-descriptors.yaml
+                # `wired:`), per side, with its reason when false. Doc-ledger rows
+                # carry none - no descriptor answers for them.
+                "wired": descriptors.wired(sid)[0],
+                "wired_reason": descriptors.wired(sid)[1],
                 # N26: derived, never stored — layer (system's), category,
                 # acquisition, replica predicate + corroboration, ruled class.
                 "class_facts": registry_view.dataset_derivations(
@@ -444,6 +455,14 @@ def _esc(text: object) -> str:
 #
 # Four cells, not two -- the two middle ones are neither wired nor planned, and
 # flattening them is the conflation N10 exists to end.
+#
+# AMENDED 2026-09-09 (CFG13): registry-wiring-readiness SIGNED 18/18 and ruled the
+# fact a SIXTH DESCRIPTOR AXIS, `wired`, declared per side with a reason. A
+# registry-home row now carries that declaration and the cross READS it instead
+# of deriving it from loader presence - the better input the console's comment
+# said it would take. A doc-ledger row has no declaration and keeps the O90
+# fallback. The guard is amended, not worked around: a wiring field on the
+# REGISTRY row is still refused (tests/unit/test_load_map_wiring_key.py).
 
 WIRING_STATES: tuple[tuple[str, str, str], ...] = (
     ("wired", "wired", "a gate ruled its meaning and a loader is built"),
@@ -454,8 +473,13 @@ WIRING_STATES: tuple[tuple[str, str, str], ...] = (
 
 
 def _wiring_state(source: dict) -> str:
-    """Cross `confirmed` with loader presence. Pure function of the row."""
-    built = bool(source["loaders"])
+    """Cross `confirmed` with the wiring fact. Pure function of the row.
+
+    Since CFG13 a registry-home row carries the DECLARED `wired` value from the
+    descriptor's sixth axis and the cross reads it; a doc-ledger row has no
+    declaration and falls back to loader presence, as O90 built it.
+    """
+    built = source["wired"] if "wired" in source else bool(source["loaders"])
     if source["confirmed"]:
         return "wired" if built else "planned"
     return "awaiting" if built else "registered"

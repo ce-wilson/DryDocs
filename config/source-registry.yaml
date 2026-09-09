@@ -72,7 +72,7 @@
 schema: drydocs.source-registry.v2
 classification: Internal-Public
 
-updated: 2026-09-06     # N27: systems `mfts`, `filemover`, `onemft` registered (three file-transfer platforms, no datasets). Prior 2026-08-19, Z3: infra:server-export flips confirmed: true (gate server-location-ontology 12/12 + the loader build, same day). Prior same day, Z1: system `infra` + dataset infra:server-export registered confirmed: false. Prior: 2026-08-07 gate rua-load-shapes SIGNED OFF (G22, 28/28): exec-hosts:rua-bundle, bitbucket:repo-objects-manifest and the two dpl registries flip confirmed:true
+updated: 2026-09-09     # CFG13: the wiring-fact clauses retire from the confirmed: comments (the fact is the wired axis in config/source-descriptors.yaml) and the DATASETS header says what confirmed means. Prior 2026-09-06, N27: systems `mfts`, `filemover`, `onemft` registered (three file-transfer platforms, no datasets). Prior 2026-08-19, Z3: infra:server-export flips confirmed: true (gate server-location-ontology 12/12 + the loader build, same day). Prior same day, Z1: system `infra` + dataset infra:server-export registered confirmed: false. Prior: 2026-08-07 gate rua-load-shapes SIGNED OFF (G22, 28/28): exec-hosts:rua-bundle, bitbucket:repo-objects-manifest and the two dpl registries flip confirmed:true
 
 # ---------------------------------------------------------------------------
 # SYSTEMS — the things we connect to. layer = BDAT four-value view
@@ -456,7 +456,11 @@ systems:
       not inherited from MFTS.
 
 # ---------------------------------------------------------------------------
-# DATASETS — what loaders read and gates rule. `confirmed` is PER DATASET.
+# DATASETS — what loaders read and gates rule. `confirmed` is PER DATASET and means the
+# SEMANTIC ruling only (a gate signed the meaning). Whether the pipeline that reads a row
+# is BUILT on this side is the `wired` axis in config/source-descriptors.yaml - a sixth
+# descriptor axis, declared per side with a reason (registry-wiring-readiness SIGNED
+# 2026-09-09, B1; the build is CFG13) - never a comment beside the flag, where it used to live.
 # `urn` is DERIVED (never written here). `replaces` back-points the retired
 # v1 flat id (D4).
 # ---------------------------------------------------------------------------
@@ -630,7 +634,7 @@ datasets:
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: automated
       via: db                           # the row's own id names the qualified object
-    confirmed: false                    # planned run-history feed (jobrun-observation mapping, status proposed); no extractor/loader yet
+    confirmed: false                    # planned run-history feed (jobrun-observation mapping, status proposed)
     notes: >
       Run history (DTSREMGR retired; JOB_MEM_NAME = JOB_NAME is the only
       reliable join back to CM_DEF_VJOB — MEMNAME is junk, never a key).
@@ -694,7 +698,7 @@ datasets:
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: automated
       via: db                           # the row's own id names the qualified object
-    confirmed: false                    # future feed — no extractor/loader; registered as the gate's worked example of the replica GRAMMAR (the id shape), not as an endorsement of the origin value — see notes
+    confirmed: false                    # future feed; registered as the gate's worked example of the replica GRAMMAR (the id shape), not as an endorsement of the origin value — see notes
     notes: >
       Escalation / incident-routing rows keyed to JOB NAME (EJOBNAME join;
       ECOMPONENT = SEAL). NOT a BMC out-of-the-box object — it is company-local,
@@ -796,7 +800,7 @@ datasets:
       # placeholder vendor — the convention is declared ahead of any real drop
     crosswalk: config/crosswalks/autosys-to-bmc.yaml
     gate_spec: config/gate-prompts/autosys-crosswalk.yaml
-    confirmed: true                     # gate autosys-crosswalk SIGNED OFF 2026-07-14 (13 confirmations) — transfers per Q6; loader still unbuilt + separately gated
+    confirmed: true                     # gate autosys-crosswalk SIGNED OFF 2026-07-14 (13 confirmations) — transfers per Q6
     replaces: autosys-export
     notes: >
       Crosswalk CONFIRMED (row 6 demoted exact -> approximate at the SME
@@ -821,7 +825,7 @@ datasets:
       # placeholder vendor — convention declared ahead of any real drop
     crosswalk: config/crosswalks/airflow-to-bmc.yaml
     gate_spec: config/gate-prompts/airflow-crosswalk.yaml
-    confirmed: true                     # gate airflow-crosswalk SIGNED OFF 2026-07-14 (17 confirmations) — transfers per Q6; loader still unbuilt + separately gated
+    confirmed: true                     # gate airflow-crosswalk SIGNED OFF 2026-07-14 (17 confirmations) — transfers per Q6
     replaces: airflow-mwaa
     notes: >
       Crosswalk CONFIRMED (row 8 split 8a/8b/8c at the SME wording review).
@@ -1195,7 +1199,7 @@ datasets:
     acquisition:                        # N12 (2026-08-18): how the data arrives
       mode: automated
       via: db                           # the row's own id names the qualified object
-    confirmed: false                    # ingestion pipeline planned (see backlog)
+    confirmed: false                    # no gate yet; the per-schema split is the future gate (notes)
     replaces: oracle-schemas
     notes: "Oracle DB schemas/scripts as taxonomy -> DataAsset. Per-schema split is the future gate; real names are confidential."
 

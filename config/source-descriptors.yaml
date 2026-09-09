@@ -43,6 +43,23 @@
 # environment, the tag prefix and a FIXED observation timestamp, so the emitted
 # MCP file is byte-stable across runs (determinism is a test, not a hope).
 #
+# THE SIXTH AXIS, `wired` (registry-wiring-readiness SIGNED 18/18 and source-descriptor-axes
+# SIGNED 13/13, one sitting, 2026-09-09; the build is CFG13). Is the pipeline that reads this
+# dataset BUILT on THIS side - a fact about one tree, DECLARED here per dataset and never
+# derived (core cannot see loader registration, and a declared value with a reason is the
+# smaller mechanism - axes page B4): `true`, or `{value: false, reason: <forty characters or
+# more>}`. REQUIRED for every registry-home dataset: a missing entry, an unknown id, a bare
+# false or a short reason is refused at construction, so a new row must answer before its
+# first read. PER SIDE at the port (PORT-MANIFEST.yaml `per_side_fields` names `wired`) -
+# per-entry is not per-side, and what is built on one tree says nothing about the other.
+# `confirmed` on the registry row stays the SEMANTIC ruling only, and crosses again as the
+# producer's signed WHAT on shared rows (wiring page E1). require_confirmed() refuses unless
+# BOTH hold and says which failed. The load map's wiring cross and the DataHub emission READ
+# this block; the guard is tests/unit/test_load_map_wiring_key.py. Counted by command at the
+# build (wiring page E3), never carried: the sitting's B5 said the 21 confirmed rows declare
+# true - by command, 13 rows have a loader bound and declare true, 17 declare false with
+# their reason.
+#
 # Reader: drydocs_core/source_descriptors.py. Guard: tests/unit/test_source_descriptors.py.
 # =============================================================================
 schema: drydocs.source-descriptors.v1
@@ -55,6 +72,7 @@ axes:
   authority: [primary, replica]
   layer: [human, business, data, technology]
   access: [fid, human, repo]
+  wired: [true, false]              # the sixth axis - declared per side in the wired: block below
 
 # The authority map: registry vocabulary -> descriptor vocabulary.
 authority_map:
@@ -69,6 +87,74 @@ overrides:
     layer: human            # the subject is people, whatever carrier holds it
   "pat:people-report":
     layer: human            # people and their team roles
+
+# The wired block: one entry per registry-home dataset, keyed by id (see the header). A
+# true is bare; a false is a mapping with its reason. Declared for THIS side's tree.
+wired:
+  "controlm@[db].psgmgr.cm_def_vtab": true
+  "controlm@[db].psgmgr.cm_def_vjob": true
+  "controlm@[db].psgmgr.cm_def_lnki_p_vw": true
+  "controlm@[db].psgmgr.cm_def_lnko_p_vw": true
+  "controlm@[db].psgmgr.cm_def_setvar_vw":
+    value: false
+    reason: "no loader in LOADER_REGISTRY binds this id on this side; the meaning is signed (controlm-q1q3-phase1, the C3/C4 normalization gates) and the loader for the variable view is not built"
+  "controlm@[db].psgmgr.cm_hosts": true
+  "controlm@[db].psgmgr.cm_avg_run":
+    value: false
+    reason: "no loader in LOADER_REGISTRY binds this id on this side; the meaning is signed (controlm-avg-run-supplement, 2026-07-14) and the P4 run-stats loader exists company-side only, a back-flow candidate here"
+  "controlm@[db].psgmgr.cm_hist_vw":
+    value: false
+    reason: "no extractor or loader is built; the run-history feed is planned (jobrun-observation mapping, status proposed)"
+  "hr@[db].psgmgr.hr_phone_exp":
+    value: false
+    reason: "no loader is built; the meaning is signed (K17, 2026-08-19, 33/33) and the build is K26 - this entry flips there, in the same commit as the flag (N13)"
+  "seal@[db].psgmgr.cm_escalation_db":
+    value: false
+    reason: "no extractor or loader, by design; registered as the replica GRAMMAR's worked example (the id shape) for a future feed"
+  "controlm:deftable-xml-export":
+    value: false
+    reason: "the G47 extractor stages only and no loader is bound; the precedence ruling against the psgmgr replica datasets (D11, controlm-definition-precedence, armed 2026-09-07) is open"
+  "autosys:export":
+    value: false
+    reason: "the crosswalk is signed (autosys-crosswalk, 2026-07-14); the loader is unbuilt and separately gated, and no AutoSys export is ingested on this side"
+  "airflow:dag-export":
+    value: false
+    reason: "the crosswalk is signed (airflow-crosswalk, 2026-07-14); the loader is unbuilt and separately gated, and no Airflow DAG export is ingested on this side"
+  "seal:app-extract": true
+  "pat:product-catalog": true
+  "pat:people-report": true
+  "snow:cmdb-ci-classes":
+    value: false
+    reason: "no loader is built; the class export is a header-only sampled capture and no gate has ruled its meaning yet"
+  "repo:software-registry": true
+  "repo:depgraph-snapshot": true
+  "repo:design-docs": true
+  "exec-hosts:rua-bundle":
+    value: false
+    reason: "the G20 extractor stages only; the curated load is G23 and the adapter stays unset - G22 (2026-08-07) is authority to load, not a loader"
+  "dpl:pipeline-registry":
+    value: false
+    reason: "the G25 extractor stages only and no loader is bound; the field contract is still assumed (T13) and the drop is a hand-exported Swagger file"
+  "dpl:dataset-registry":
+    value: false
+    reason: "the G25 extractor stages only and no loader is bound - the same condition as its sibling dpl:pipeline-registry"
+  "catalog@[db].[schema].datasets_v":
+    value: false
+    reason: "the G42 extractor stages only and no loader is bound; the activation gate snowflake-data-catalog is DEFERRED (2026-09-07) to the Logical Container trigger"
+  "catalog@[db].[schema].distributions_v":
+    value: false
+    reason: "the G42 extractor stages only and no loader is bound - the same activation condition as the datasets view"
+  "bitbucket:repo-objects-manifest":
+    value: false
+    reason: "the G24 extractor stages and corroborates only; no loader is bound (G22 ruled identity and grain, not a loader)"
+  "oracle:schema-inventory":
+    value: false
+    reason: "no extractor or loader; the ingestion pipeline is planned (see backlog) and no gate has ruled the per-schema split"
+  "snowflake:schema-inventory":
+    value: false
+    reason: "no extractor or loader; an expansion placeholder with no pipeline planned yet on this side"
+  "controlm@[db].drydocs_stg.stg_app_fact": true
+  "infra:server-export": true
 
 datahub:
   env: PROD

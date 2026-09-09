@@ -7,7 +7,7 @@ phase: 11
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 gates: [registry-wiring-readiness, source-descriptor-axes]
 inputs:
@@ -27,7 +27,7 @@ acceptance: |
       (true | false), never derived: a `wired:` block keyed by dataset id, REQUIRED for every
       registry-home dataset (a missing entry is refused at construction - a new row must
       answer), and a false carries a `reason` of at least forty characters, refused otherwise.
-      The 21 loading rows declare true; the 4 wiring holds (cm_hist_vw, oracle:schema-inventory,
+      The 21 loading rows declare true [at build, by command: 13 - see notes]; the 4 wiring holds (cm_hist_vw, oracle:schema-inventory,
       snowflake:schema-inventory, hr_phone_exp) declare false with the reason their YAML
       comment carries today; the 4 semantic holds and cm_escalation_db declare what is true
       of THEIR pipeline. The wiring-fact comments retire in the same commit; comments carrying
@@ -56,3 +56,31 @@ notes: |
   the same day's mint pass, because a drafted gate decides nothing and B1/B2/B5 decided this
   shape. Lane A: every input is a config, core or port surface. CORE18 (the data root declared
   once) lands after this so the two do not collide on config/source-descriptors.yaml.
+  DONE 2026-09-09 (Lane A, desktop). Built as the two records rule, with one measured
+  correction recorded here, in the descriptor header and in RELAY-54: the wiring page's B5
+  said the 21 loading rows declare true - 21 is the confirmed count; by command (E3) 13
+  registry-home datasets have a loader bound on this side and declare true, and 17 declare
+  false with a reason: the 4 wiring holds, the 4 semantic holds, cm_escalation_db, and the 8
+  confirmed-but-unbuilt rows (setvar, avg_run, autosys, airflow, rua-bundle, the two dpl
+  registries, bitbucket). The value stays DECLARED, and a guard holds the declaration against
+  LOADER_REGISTRY (test_wired_declaration_agrees_with_the_tree) so it cannot drift from the
+  tree unnoticed - the reader never derives it. UnwiredSourceError subclasses
+  UnconfirmedSourceError, so every catch site still catches; the wired half is read for the
+  committed registry only, and a fixture registry keeps the confirmed-only gate (pinned).
+  Surfaces: the descriptor config and reader; the registry gate; the load-map renderer,
+  console model and O90 guard (amended, both read the declared value on registry-home rows
+  and keep the loader fallback for doc-ledger rows); the DataHub emitter (wired property and
+  its own tag); PORT-MANIFEST per_side_fields wired + the E1 amendment on the source-registry
+  entry_rule + the descriptor row; the registry's DATASETS header and four confirmed: comments
+  trimmed of their wiring clauses (ruling citations kept); the TDD; RELAY-54 for the ninth
+  roll. Left as found, on purpose: hr_phone_exp keeps confirmed: false under N13 (the flag
+  flips at K26 close) - with the axis in place the K17 record alone supports the flip, and
+  K26 makes it in the same commit as its wired: true.
+  HANDED BACK, not built here (one pen per surface): the console model's read of the axis
+  is under the code:drydocs-web pen, which the UI-testing session holds. The change for that
+  session, twelve lines in web/src/loadmap/loadMapModel.ts: LoadMapSource gains two optional
+  fields, wired (boolean) and wired_reason (string or null), absent on doc-ledger rows; and
+  wiringState reads the declared value where the row carries one, loader presence where not
+  (built = s.wired ?? s.loaders.length > 0), with a dated paragraph under the O90 comment.
+  Until it lands the screen derives the same value the print reads, and
+  test_wired_declaration_agrees_with_the_tree pins them equal.

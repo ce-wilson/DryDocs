@@ -169,6 +169,19 @@ The override table is validated when the reader is constructed, not on first use
 disagrees with the registry fails immediately rather than on whichever dataset happens to be asked
 for first.
 
+**The sixth axis, `wired` (added 2026-09-09).** Two gates signed in one sitting
+(`registry-wiring-readiness` 18/18, `source-descriptor-axes` 13/13) ruled that whether the pipeline
+that reads a dataset is BUILT is a second fact the registry's `confirmed` flag had been carrying in
+comments, and that its home is here, as a sixth axis: `wired`, `true` or `false`, DECLARED per
+dataset in a `wired:` block keyed by id and never derived - the core package cannot see loader
+registration, and a declared value with a written reason is the smaller mechanism. Every
+registry-home dataset must answer; a `false` carries a reason of at least forty characters; a
+missing entry, a bare false or a short reason is refused when the reader is constructed. The value
+is per side at the port (`PORT-MANIFEST.yaml` `per_side_fields`), because what is built on one tree
+says nothing about the other. `require_confirmed()` refuses unless both `confirmed` and `wired`
+hold and says which failed; the load map's wiring cross and the DataHub emission read the
+declaration, and `confirmed` on a catalog asset means the semantic ruling only. The build is CFG13.
+
 ### Which datasets get a descriptor
 
 Registry-home datasets only, in registry order. The document ledger's entries share the identifier

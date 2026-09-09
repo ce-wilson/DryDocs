@@ -30,6 +30,7 @@ try:
         SourceRegistry,
         UnconfirmedSourceError,
         UnknownSourceError,
+        UnwiredSourceError,
     )
 
     _AVAILABLE = True
@@ -787,3 +788,62 @@ def test_manually_downloaded_reports_name_the_report_they_come_from() -> None:
         "so loader -> source -> report resolves without tribal knowledge. The URL "
         "stays in the internal twin (N7); only the name belongs here."
     )
+
+
+# --- CFG13 (2026-09-09): confirmed AND wired, and the refusal says which -------------
+
+
+def test_require_confirmed_names_which_fact_failed() -> None:
+    """Two facts, two owners, one refusal that says which (wiring page B3)."""
+    from drydocs_core.source_descriptors import SourceDescriptors
+
+    reg = SourceRegistry.from_yaml()
+    descriptors = SourceDescriptors.from_yaml(registry=reg)
+    confirmed_unwired = [d.source_id for d in descriptors.all() if d.confirmed and not d.wired]
+    unconfirmed_unwired = [
+        d.source_id for d in descriptors.all() if not d.confirmed and not d.wired
+    ]
+    assert (
+        confirmed_unwired and unconfirmed_unwired
+    ), "both cells must exist for this to mean anything"
+
+    with pytest.raises(UnwiredSourceError) as exc:
+        reg.require_confirmed(confirmed_unwired[0])
+    msg = str(exc.value)
+    assert "NOT WIRED" in msg and "wired: false" in msg and "config/source-descriptors.yaml" in msg
+    assert "not confirmed" not in msg  # the meaning IS signed; the message does not blame the gate
+
+    with pytest.raises(UnconfirmedSourceError) as exc:
+        reg.require_confirmed(unconfirmed_unwired[0])
+    msg = str(exc.value)
+    assert "not confirmed (confirmed: false)" in msg and "also NOT WIRED" in msg
+    assert not isinstance(exc.value, UnwiredSourceError)  # the gate is the first owner named
+
+
+def test_every_row_that_loaded_before_loads_after() -> None:
+    """D1 of the wiring gate: the axis changes no row's load state. Every registry-home
+    dataset that is confirmed AND declared wired passes, and every doc-ledger corpus is
+    gated on `confirmed` alone because no descriptor answers for it."""
+    from drydocs_core.source_descriptors import SourceDescriptors
+
+    reg = SourceRegistry.from_yaml()
+    descriptors = SourceDescriptors.from_yaml(registry=reg)
+    loading = [d.source_id for d in descriptors.all() if d.confirmed and d.wired]
+    assert len(loading) >= 10, loading
+    for sid in loading:
+        assert reg.require_confirmed(sid).id == sid
+    for sid in reg.ids():
+        if reg.get(sid).home == "doc-registry" and reg.is_confirmed(sid):
+            assert reg.require_confirmed(sid).id == sid
+
+
+def test_a_registry_read_from_another_path_is_gated_on_confirmed_alone(tmp_path: Path) -> None:
+    """No descriptor block answers for a fixture registry's rows, so the wired half is
+    not asked of them - the pre-CFG13 behaviour, kept for fixtures and overlay experiments."""
+    reg = SourceRegistry.from_yaml(
+        _write_registry(
+            tmp_path,
+            [{"id": "sys:live-feed", "confirmed": True, "system": "sys", "artifact": "live-feed"}],
+        )
+    )
+    assert reg.require_confirmed("sys:live-feed").id == "sys:live-feed"

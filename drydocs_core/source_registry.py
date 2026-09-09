@@ -27,8 +27,10 @@ D3 — every dataset's URN handle
 refused at parse time.
 
 ``require_confirmed(source_id)`` is the gate: it raises a clear, actionable
-error for an unknown, retired, or unconfirmed source, and is a no-op for a
-confirmed one. The CLI wraps it at each production-load point (see
+error for an unknown, retired, or unconfirmed source - and, since CFG13
+(2026-09-09), for a confirmed source whose pipeline is not WIRED on this side
+(the descriptor's sixth axis), naming which of the two facts failed - and is a
+no-op for a source that is both. The CLI wraps it at each production-load point (see
 ``drydocs/cli.py``).
 """
 
@@ -64,6 +66,13 @@ class DuplicateSourceIdError(ValueError):
 
 class UnconfirmedSourceError(RuntimeError):
     """A declared source whose crosswalk is not yet SME-confirmed (confirmed: false)."""
+
+
+class UnwiredSourceError(UnconfirmedSourceError):
+    """CFG13 (2026-09-09): the meaning is signed but the pipeline is not built on
+    this side - the descriptor's ``wired`` axis is false. A subclass of
+    :class:`UnconfirmedSourceError` so every gate that catches the old refusal
+    still does; a caller that needs to know WHICH fact failed catches this first."""
 
 
 class RetiredSourceIdError(ValueError):
@@ -153,6 +162,12 @@ class SourceRegistry:
         overlay: dict[str, str] | None = None,
     ) -> None:
         self._sources = sources
+        # CFG13: the descriptor block answers for the COMMITTED registry only. Set by
+        # from_yaml() when it reads the default path; a registry from another path (a
+        # fixture, an overlay experiment) keeps the confirmed-only gate, because no
+        # descriptor block can name its rows.
+        self._wired_gate = False
+        self._descriptors: Any = None
         self._systems = systems or {}
         self._retired = retired or {}
         self._overlay = overlay or {}
@@ -270,7 +285,9 @@ class SourceRegistry:
                         f"guard, extended per D2)."
                     )
 
-        return cls(sources, systems=systems, retired=retired, overlay=overlay)
+        registry = cls(sources, systems=systems, retired=retired, overlay=overlay)
+        registry._wired_gate = is_default
+        return registry
 
     # ---- queries ---------------------------------------------------------
 
@@ -330,13 +347,30 @@ class SourceRegistry:
     # ---- the gate --------------------------------------------------------
 
     def require_confirmed(self, source_id: str) -> Source:
-        """Return the source if confirmed; otherwise raise with a clear message.
+        """Return the source if confirmed AND wired; otherwise raise naming WHICH failed.
 
         Raises :class:`UnknownSourceError` for an undeclared id,
-        :class:`RetiredSourceIdError` for a D4-retired id, and
-        :class:`UnconfirmedSourceError` for a declared-but-unconfirmed source.
+        :class:`RetiredSourceIdError` for a D4-retired id,
+        :class:`UnconfirmedSourceError` for a declared source no gate has ruled (go
+        find an SME), and :class:`UnwiredSourceError` - its subclass - for a confirmed
+        source whose pipeline is not built on this side (go build a loader, then
+        declare it). Two facts, two owners, one refusal that says which
+        (registry-wiring-readiness B3, SIGNED 2026-09-09; the build is CFG13).
+
+        The wiring fact is the descriptor's sixth axis (``config/source-descriptors.yaml``
+        ``wired:``), read for registry-home datasets of the COMMITTED registry only:
+        a registry loaded from another path has no descriptor block answering for its
+        rows and is gated on ``confirmed`` alone, as before.
         """
         src = self.get(source_id)
+        wired, wired_reason = self._wired_fact(src)
+        if src.confirmed and not wired:
+            raise UnwiredSourceError(
+                f"Source {source_id!r} is confirmed but NOT WIRED (wired: false - "
+                f"{wired_reason}) and will not load. Its meaning is signed; what is missing "
+                f"is the pipeline. Build the loader that binds this id, then declare "
+                f"wired: true for it in config/source-descriptors.yaml."
+            )
         if not src.confirmed:
             where = src.crosswalk or "config/source-registry.yaml"
             if src.home == "doc-registry":
@@ -346,9 +380,28 @@ class SourceRegistry:
                 if src.home == "doc-registry"
                 else "config/source-registry.yaml"
             )
+            also = ""
+            if not wired:
+                also = (
+                    f" It is also NOT WIRED (wired: false - {wired_reason}); that half is "
+                    f"cleared by building the loader and declaring wired: true in "
+                    f"config/source-descriptors.yaml - a different owner from the gate."
+                )
             raise UnconfirmedSourceError(
                 f"Source {source_id!r} is not confirmed (confirmed: false) and will not load. "
                 f"Its crosswalk must pass the HITL gate (docs/restructure/03-hitl-sme-flow.md), "
-                f"then set confirmed: true in {ledger}. See {where}."
+                f"then set confirmed: true in {ledger}. See {where}.{also}"
             )
         return src
+
+    def _wired_fact(self, src: Source) -> tuple[bool, str | None]:
+        """The declared wiring fact for one row: ``(True, None)`` wherever no
+        descriptor answers for it (a doc-ledger row, or a registry read from a path
+        other than the committed one), else the descriptor's own declaration."""
+        if src.home != "source-registry" or not self._wired_gate:
+            return True, None
+        if self._descriptors is None:
+            from drydocs_core.source_descriptors import SourceDescriptors  # lazy: it imports us
+
+            self._descriptors = SourceDescriptors.from_yaml(registry=self)
+        return self._descriptors.wired(src.id)

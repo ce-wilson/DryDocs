@@ -3973,6 +3973,35 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   `1f54b5d4` fixed them one commit later; the eighth footnote names the cancelled runs. Nothing
   is asked back.
 
+- **RELAY-54 - THE WIRING FACT HAS ITS OWN HOME AND IT IS PER SIDE: `wired` IS A SIXTH
+  DESCRIPTOR AXIS, `confirmed` CROSSES AGAIN ON SHARED ROWS, AND YOUR TWO STANDING PINS
+  RETIRE** [VERIFIED-PRODUCER] (2026-09-09, venue desktop; lands in the NINTH roll). Two gates
+  signed in one sitting on 2026-09-09 - `registry-wiring-readiness` (18/18) and
+  `source-descriptor-axes` (13/13) - and CFG13 is the build. What changes for you: (1)
+  `config/source-descriptors.yaml` gains a `wired:` block, one entry per registry-home dataset,
+  `true` or `{value: false, reason: <forty characters or more>}`; the reader refuses a missing
+  block, a missing entry, an unknown id, a bare false and a short reason at construction, so a
+  dataset you register without answering fails on its first read - by design; (2) the block is
+  PER SIDE (`per_side_fields` names `wired`): your entries say what is built on YOUR tree and are
+  never overwritten by a port in either direction - on take, keep your block and add entries
+  only for ids new to you; (3) `require_confirmed()` refuses unless confirmed AND wired and its
+  message says which failed; `UnwiredSourceError` is a subclass of `UnconfirmedSourceError`, so
+  every gate that caught the old refusal still does; (4) the source-registry entry_rule is
+  amended per the sitting's E1: `confirmed` and its `_by`/`_at` stamps now CROSS on shared rows
+  as the producer's signed WHAT - a company that has not ratified a producer sign-off records
+  that in its own gate-log; company-only rows stay yours, as per-entry already rules; (5) your
+  two standing pins - `cm_hosts` and `controlm:deftable-xml-export` - RETIRE: declare each row's
+  own `wired` value in your block and record the retirement as a gate-log entry (C4) rather than
+  deleting the pinned entries; (6) the load map's wiring cross reads the declared value on
+  registry-home rows, and `test_the_key_reports_and_never_rules` is amended to admit the axis
+  while still forbidding a wiring field on the registry row - take the test with the renderer;
+  the console model's matching read lands under the web pen with its own step; (7) the DataHub emission carries `wired` as its own property and tag,
+  and `confirmed` on an asset means the semantic ruling only (C2). One count, corrected here so
+  the record and the build agree: the sitting's B5 said the 21 loading rows declare true - 21 is
+  the `confirmed` count; by command 13 registry-home datasets have a loader bound producer-side
+  and declare true, and 17 declare false with their reason (E3: counts by command, never
+  carried). Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has

@@ -84,19 +84,42 @@ def test_unsigned_but_cited_gates_render_open():
     """The live pins. The item's original proof case (seal-app-ref-edge-reshape)
     was overtaken by events — K7 signed it 2026-08-03 with a heading-named
     entry, so it is correctly ABSENT from the open rows (the mechanism test
-    above pins its pre-K7 pattern instead). The fix's live catches: the two
-    gates whose only log presence is citations or a pending entry."""
+    above pins its pre-K7 pattern instead). The fix's live catch: the one gate
+    whose only log presence is citations or a pending entry.
+
+    AMENDED 2026-09-09: the second live catch, software-usage-patterns, was
+    DEFERRED by user ruling at sitting 1 (a heading-named DEFERRED entry with a
+    named re-arm), so it correctly LEFT the open rows the same way K7's sign-off
+    did — overtaken by a ruling, not by a classifier change. The pin moves with
+    it: it must now render in a deferred log-entry row and nowhere in prompt-only.
+    The old pin stayed red for one push (783a7a4e, the sitting record; first seen
+    at 550cec20's run) — named at the ninth roll under J77.
+    """
     committed = json.loads(COMMITTED.read_text(encoding="utf-8"))
     prompt_only = {
         g["prompt_files"][0]: g for g in committed["gates"] if g["kind"] == "prompt-only"
     }
-    for slug in ("software-usage-patterns", "seal-tom-attribution-reshape"):
+    for slug in ("seal-tom-attribution-reshape",):
         row = prompt_only.get(f"config/gate-prompts/{slug}.yaml")
         assert (
             row is not None
         ), f"{slug} has rulings/citations but no recorded sign-off — must render open"
         assert row["status"] == "open"
         assert "sign-off not recorded" in row["title"]
+    deferred_prompts = {
+        pf
+        for g in committed["gates"]
+        if g["kind"] == "log-entry" and g["status"] == "deferred"
+        for pf in g["prompt_files"]
+    }
+    assert "config/gate-prompts/software-usage-patterns.yaml" in deferred_prompts, (
+        "software-usage-patterns was DEFERRED 2026-09-09 (heading-named entry) — "
+        "absence from a deferred row means the classifier stopped honouring DEFERRED headings"
+    )
+    assert "config/gate-prompts/software-usage-patterns.yaml" not in prompt_only, (
+        "a deferred gate rendering open is the 2026-09-07 defect class: a heading the "
+        "classifier does not read"
+    )
     assert "config/gate-prompts/seal-app-ref-edge-reshape.yaml" not in prompt_only, (
         "K7 signed this gate 2026-08-03 (heading-named entry) — an open row here "
         "means the classifier stopped honouring heading-named sign-offs"
