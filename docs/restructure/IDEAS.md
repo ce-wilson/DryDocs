@@ -110,6 +110,36 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
+- **`Idea-309`** · 2026-09-09 · `[chore]` · **open** · prio? **Med** —
+  **The data root's layout is declared in three places and only two of them are cross-checked,
+  and the one landing zone that holds a source payload instead of a committed artifact is the
+  one sitting inside the repo tree.** Measured on the desktop at `fcc3c8bb`, prompted by the
+  user's carve-out concern that `internal/` and the input data are both cluttered rather than
+  defined. Three declaration sources feed one directory: `config/data-zones.yaml` (17 working
+  zones with read/write modes), the `acquisition.drop_dir` rows in `config/source-registry.yaml`
+  (11 data-root landing zones), and — new at `fcc3c8bb` — `config/source-descriptors.yaml` plus
+  one hardcoded literal. `tests/unit/test_data_zones.py` already holds the first two to a
+  non-overlap invariant that names both sides on a collision; the third set is invisible to it.
+  **Two things to fix, and one deliberately not to.** (1) `internal/server-inventory/` is the
+  odd zone: of the four `base: repo` landing zones, three (`config/taxonomy/`,
+  `docs/design/`, `knowledge/depgraph-snapshots/`) hold committed artifacts and are the
+  exception `drydocs_core/landing_zones.py` documents by name, while this one holds a single
+  `README.md` and exists so an UNTRACKED server export can land inside the working tree —
+  exactly what that module's docstring argues at length must never happen, since no gitignore
+  rule protects a payload from a `git clean -fdx`. Move it to a data-root zone like the other
+  ten and leave the README as a pointer; that also makes the module's stated three exceptions
+  true again. (2) Bring the source-registration paths under the same declaration and the same
+  invariant as everything else, which removes the hardcoded `repo/` redirect prefix from
+  `drydocs/source_registration/bundle.py` into config where the other 28 paths live.
+  **(3) NOT NOW — the mirror.** `psgmgr-mirror/`, `synthetic/` and `datahub/` are listed here
+  so the inventory is complete and nobody rediscovers them as a surprise; they are explicitly
+  OUT OF SCOPE until that work has landed and settled. Do not move or rename them as part of
+  this chore. **Scope note:** reorganizing `internal/` itself (17 subdirectories, 6 of them
+  holding one or two tracked files, mixing internal reference, captured evidence and this one
+  input drop point) is a separate and larger question about grouping reference material — only
+  the server-inventory zone belongs to this item. Modules drydocs-core, drydocs-load. Related
+  [[Z1]], [[N12]].
+
 - **`Idea-308`** · 2026-09-09 · `[bug]` · **open** · prio? **Med** —
   **Two skip policies answer two different questions and disagree on the same file: the
   skip-guard policy asks "is this path in a fresh clone of THIS repo" and the never-port
