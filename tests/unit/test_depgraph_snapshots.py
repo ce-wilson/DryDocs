@@ -292,8 +292,11 @@ def test_refusal_and_ci_messages_report_the_measurement_not_a_guess() -> None:
     had simply never run. Report what was measured; list causes; pick none."""
     # Code, not the comments that explain the change (J66): the script's own
     # comment quotes the retired sentences to say why they went.
-    code = chr(10).join(ln for ln in _script().splitlines() if not ln.lstrip().startswith("#"))
-    script = _script()
+    # U27 moved Get-CiVerdict to ci_verdict.ps1 (dot-sourced); the CI messages
+    # live there now, the refusal still lives in snapshot.ps1 - read both.
+    both = _script() + (SNAP_DIR / "ci_verdict.ps1").read_text(encoding="utf-8")
+    code = chr(10).join(ln for ln in both.splitlines() if not ln.lstrip().startswith("#"))
+    script = both
     assert "stranded on an older revision is the likely cause" not in code
     assert "gh not authenticated?" not in code
     assert (
@@ -306,3 +309,36 @@ def test_refusal_and_ci_messages_report_the_measurement_not_a_guess() -> None:
     assert (
         "[int]$GhExit" in script
     ), "gh's exit code must reach the verdict so the two empty cases stay distinct"
+
+
+# --- J64 (2026-09-08): the scan runs against the tree of the commit it stamps ---
+
+
+def test_a_dirty_tree_at_scan_time_is_refused_not_stamped() -> None:
+    """The meta header names HEAD as the tree scanned. With tracked changes present
+    that is a claim about a tree no commit describes: the 20260805 snapshot carried
+    dirty=true and was committed as if clean, and the 2026-08-29 snapshot scanned
+    from a tree predating main's rename sweep tripped the J55 publish guard and was
+    regenerated against the merge commit (2b06c153). The script must refuse, name
+    the paths, and take -AllowDirty as the only way past - as a warning that keeps
+    dirty=true in the header, never a silent stamp."""
+    script = _script()
+    code = chr(10).join(ln for ln in script.splitlines() if not ln.lstrip().startswith("#"))
+    assert "[switch]$AllowDirty" in code, "the deliberate mid-work scan needs a named switch"
+    start = code.index("$state     = Get-WorktreeState $repo")
+    end = code.index("$date = Get-Date")
+    block = code[start:end]
+    assert (
+        "if ($dirty)" in block
+    ), "the refusal must key on the TRACKED-changes flag (U15), not on untracked paths"
+    assert (
+        "throw" in block and "Refusing to scan" in block
+    ), "tracked changes at scan time must refuse by default"
+    assert (
+        "if ($AllowDirty)" in block and "Write-Warning" in block
+    ), "-AllowDirty downgrades to a warning, never to silence"
+    assert "--untracked-files=no" in block, "the paths named must be the tracked ones"
+    readme = (SNAP_DIR / "README.md").read_text(encoding="utf-8")
+    assert (
+        "J64" in readme and "-AllowDirty" in readme
+    ), "README must document the refusal and its switch"

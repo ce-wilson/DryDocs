@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: done
 depends_on: []
 inputs:
 - tests/unit/test_plan_ideas.py
@@ -28,3 +28,39 @@ notes: |
   Second instance, which is why it earns an item rather than a fix in place. Idea-170 records the identical failure company-side (a capture that landed with no id at all, minted only after the user asked where it was) and quotes the existing docstring's own reasoning: "the entry simply does not appear in the scan, which reads as 'nothing to review here' rather than as a formatting slip". That is precisely what happened here, on the producer side, with all four guards green.
 
   Epic project-board / module docs / phase 8: `test_plan_ideas.py` guards the capture loop that I1-I4 built, and I3 is the groom skill that reads the file. The release-infrastructure lane was the other plausible home and is the wrong one — nothing here is about releasing.
+  DONE 2026-09-08 (desktop, Lane A).
+  (a) tests/unit/test_plan_ideas.py gains _CANDIDATE, the loose net: a list item whose
+      leading bold token opens with an Idea id, backticked or not, so both
+      `- **`Idea-177`** ·` and `- **Idea-177 (2026-08-26, desktop):**` are candidates.
+      _capture_candidates(text) walks the WHOLE file tracking the `## ` heading each
+      candidate sits under; _misfiled_captures(text) holds _HEADER against every catch
+      and requires the section to be `## Inbox` or `## Recently groomed (audit trail)`,
+      reporting by id and line. test_every_capture_anywhere_conforms_and_sits_in_a_
+      capture_section runs it over the live file.
+  (b) _all_idea_ids() now returns the ids of that same loose set, so
+      test_idea_ids_are_unique (and the band check, which reads the same helper) see a
+      capture with a malformed header. The fixture proves it: a second `Idea-2` in the
+      ad-hoc shape is reported as a duplicate.
+  (c) Capture vs citation is stated in the test docstring and the _CANDIDATE comment: a
+      capture is an id at the head of a list item's bold token; a citation is an id
+      anywhere else - inside a sentence, in [[...]], after a groom arrow - and is never
+      a candidate. The format section's `Idea-N` example has no digits and does not
+      match. The fixture carries a [[Idea-1]] citation, an "Idea-2's" inside a sentence
+      and the format example, and the guard names none of them.
+  (d) Observed RED before green, two ways. test_the_capture_guard_is_red_on_the_pre_
+      groom_shape holds a fixture in the c0ae3004 shape (captures appended below the
+      audit trail as `- **Idea-N (date, machine):**`, plus a conforming header misfiled
+      under a third section) and asserts the exact ids and lines reported. And the
+      helpers were run against the real trees: `git show c0ae3004:docs/restructure/
+      IDEAS.md` reports Idea-177 at line 5195 and Idea-178 at line 5202 (the two this
+      item is about) - and also Idea-165 and Idea-161; `45f4f1e5` (the 2026-08-27 groom)
+      reports only Idea-165 and Idea-161.
+  THIRD INSTANCE, FOUND BY THE GUARD. Idea-165 and Idea-161 sat in the audit trail with
+  status `done (...)`, which is not a status the capture format defines (open, parked,
+  groomed, merged, closed); they were groomed into the trail on 2026-08-24 in that shape
+  and no guard read the trail's headers. Both now read `closed (...)`, the format's word
+  for the same state, dates and machine note kept; docs/plan/ideas.html re-rendered.
+  Live file: 309 candidates, 0 misfiled, 0 duplicates.
+  Guards: test_plan_ideas (14), test_backlog, test_render_determinism, test_module_boundary,
+  test_no_render_parsing, test_source_scan, test_runbook_currency all green; ruff check
+  and format --check clean at the 0.5.7 pin.

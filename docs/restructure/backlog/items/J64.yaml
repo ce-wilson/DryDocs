@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: done
 depends_on: []
 inputs:
 - knowledge/depgraph-snapshots/snapshot.ps1
@@ -40,3 +40,25 @@ notes: |
   would be guessing at a user decision; the ordering half is a plain defect with a reproduction.
 
   The cadence half stays in the inbox as an open question and is named in the groom report.
+  DONE 2026-09-08 (desktop, Lane A).
+  (a) Enforced in the script: at the point the header's commit is read, tracked changes
+      (Get-WorktreeState.dirty, U15 - untracked paths never count) REFUSE the scan with the
+      paths listed and the fix stated (commit - a refreshed stale render is the usual way to
+      arrive here - then re-run). New switch -AllowDirty downgrades the refusal to a warning
+      for a deliberate mid-work comparison; the header still says dirty=true. README gains
+      the paragraph beside the CI-check one; header list gains J64. Guard:
+      test_a_dirty_tree_at_scan_time_is_refused_not_stamped in test_depgraph_snapshots.py.
+  (b) The fault, reproduced by the record rather than by a destructive re-run: the header
+      path read dirty into meta.git and printed nothing, so the 20260805 snapshot was
+      committed carrying dirty=true (the U15 comment's own case) and the 2026-08-29
+      snapshot scanned from a tree predating main's 08-26 rename sweep named the retired
+      directory and was regenerated at 2b06c153. The fix, run live (desktop, PowerShell tool,
+      HEAD 4cb966c9, README.md and snapshot.ps1 modified): every refresh step ran, the CI
+      line printed, then `Refusing to scan - tracked changes present at scan time - the
+      header would name commit 4cb966c9 for a tree that commit does not describe.` with
+      the two paths; no file written, the committed drydocs-20260908-1839.json untouched.
+      The clean-tree run is the ritual at the end of this sitting.
+  (c) Reported: the refusal names the paths; -AllowDirty prints them as a warning and the
+      header records dirty=true, which is now a flag that something read.
+  (d) Cadence untouched; the script rolls when it is run, as before.
+  (e) J65 landed in the commit before this one; U27 follows. Neither re-solved here.

@@ -4062,7 +4062,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   which is why this has never been seen interactively — and is a second reason the message needs
   to name the cause rather than the banner. Mechanism-only, no gate.
 
-- **`Idea-165`** · 2026-08-24 · `[bug]` · **done (2026-08-24)** · prio? **Med** —
+- **`Idea-165`** · 2026-08-24 · `[bug]` · **closed (2026-08-24)** · prio? **Med** —
   **A SKILL still routes agents into two databases that do not exist**, which is worse
   than the stale prose swept at `703c2019` because a skill is executable guidance rather
   than description. `.claude/skills/data-context-extractor/` carries **18 sites** across
@@ -4091,7 +4091,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
   query that has to cross databases cannot rank what it finds. Two mentions of the dead
   names survive on purpose, both inside a comment that says they retired.
 
-- **`Idea-161`** · 2026-08-24 · `[task]` · **done (2026-08-24, laptop `NewThinkpad`)** · prio? **Med** —
+- **`Idea-161`** · 2026-08-24 · `[task]` · **closed (2026-08-24, laptop `NewThinkpad`)** · prio? **Med** —
   **The wave-2 base is CERTIFIED: `port-base-20260824` @ `68b53716`, preflight 7/7.**
   All three named blockers cleared plus the relay defect. **(1) Ledger coverage** —
   the estimate in the original entry was wrong and the correction is the useful part:

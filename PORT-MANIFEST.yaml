@@ -282,7 +282,14 @@ rows:
     entry_rule: "plan.phases keyed by id — union; phase `status` is per-repo like item status."
   - path: "docs/restructure/backlog/modules.yaml"
     disposition: per-entry
-    entry_rule: "modules[] is a UNION of names; never drop one — test_runbook_coverage reads it as the census."
+    entry_rule: >
+      modules[] is a UNION of names; never drop one — test_runbook_coverage reads it
+      as the census. `series:` is a map keyed by module name and UNIONS by key (PLAN1,
+      2026-09-02: the series IS the module, so a code is a fact about a module, not
+      about a side): the producer's codes for the modules both sides hold cross
+      whole; a module only the company holds gets its code from the company, three or
+      more letters, never DD, never a frozen letter, and the producer never writes or
+      overwrites it. UNNAMED FIELDS: the producer owns them.
   - path: "docs/restructure/backlog/README.md"
     disposition: canonical-producer
     note: "prose about the mechanism; no side-local facts"
@@ -1446,10 +1453,22 @@ rows:
       test_schema.py: keep the consumer count, take the producer's drift-guard
       logic. Without this row the tests/** default would revert 17 -> 15 at
       every port - the company flagged it and did not add the row itself,
-      correctly: the manifest is producer-owned.
+      correctly: the manifest is producer-owned. PLAN9 (2026-09-08): the COUNT
+      left the test - it is census.automated_datasets in config/dev-environment.yaml
+      (canonical-company), so the test file now crosses byte-identical; the row
+      stays evaluate for whatever else the consumer's copy carries.
   - path: "tests/unit/test_schema.py"
     disposition: evaluate
-    note: "consumer EXPECTED_CONSTRAINTS is ahead (superset: base + snow-support supplements). Producer was 47 at the step-45 head and is 49 at 78ba7fd (+2 from the P3 hosts loader, step 46e). Counts drift EVERY port — trust the live test files over this note (66acea8 lesson); keep consumer count, take producer drift-guard logic, and raise the consumer number only for genuinely new active edges that ship their own supplement block"
+    note: >
+      consumer constraint count is ahead (superset: base + snow-support supplements).
+      Producer was 47 at the step-45 head and is 49 at 78ba7fd (+2 from the P3 hosts
+      loader, step 46e). Counts drift EVERY port — trust the live files over this note
+      (66acea8 lesson). PLAN9 (2026-09-08): the COUNT left the test - it is
+      census.schema_constraints in config/dev-environment.yaml (canonical-company), so
+      the test file now crosses byte-identical and the consumer raises its own number,
+      in its own venue file, only for genuinely new active edges that ship their own
+      supplement block; the row stays evaluate for whatever else the consumer's copy
+      carries.
   - path: "tests/unit/test_controlm_cypher.py"
     disposition: evaluate
     note: "consumer scope_key condition-key variant wins"

@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: haiku
 priority: p3
-status: todo
+status: done
 depends_on: []
 inputs:
 - VERSIONING.md
@@ -25,3 +25,28 @@ notes: |
   Module `docs`, epic release-infrastructure, phase 8 — VERSIONING.md is release-ritual documentation.
 
   p3/haiku: two corrections against facts already established by ADR 0013.
+  DONE 2026-09-08 (desktop, Lane A). No edit to VERSIONING.md in this close, and that is
+  the finding: (a) had ALREADY landed on 2026-08-31 in e0134168 ("three stale pointers in
+  the public-surface list"), committed against Idea-163 rather than this item, so the item
+  stayed open over a file that was current. That commit fixed both facts named here - the
+  schema line reads `drydocs.backlog.v3` and the changelog cross-reference reads
+  `docs/restructure/backlog/items/<id>.yaml` - and a third the item did not name: the
+  graph-model surface pointed at `relationship_vocabulary.yaml` as one file, now the
+  per-domain fragments directory (S5).
+  (b) The rest of the file, read line by line against the tree at a5a8ad52 and found
+  correct: `pyproject.toml` `[tool.poetry] version` is 0.3.0 (:1, :3); `v0.3.0` is an
+  ANNOTATED tag (git cat-file -t = tag, 2026-07-09) and the only v* tag - the other 18
+  tags are port-base-* and archive/*, outside this policy; `plan.yaml` phase 8 "Planning &
+  release infrastructure" carries `release: v0.3.0`, the example the file gives; the six
+  schema families all exist - drydocs.backlog.v3 (backlog_store.py, test_backlog.py),
+  drydocs.source-registry.v2, drydocs.taxonomy-ontology-map.v1, drydocs.classification.v1,
+  drydocs.source-mapping.v1 (config/*.yaml, config/taxonomy-ontology-map/) and
+  drydocs.doc-outline.v1 (docs/design/templates/*.outline.yaml) - listed by family, so a
+  version bump inside one does not stale the line; `relationship_vocabulary/` is a
+  directory of fragments; CHANGELOG.md has `## [Unreleased]` and `## [0.3.0] - 2026-07-09`
+  in Keep-a-Changelog shape; the five ritual steps name no path that has moved; the
+  History paragraph (0.1.0 untagged, 0.2.0 skipped, v0.3.0 first tag) matches the tag list.
+  (c) Untouched, as required: the v0.3.0 tag, the version string, and whether Unreleased
+  has earned v0.4.0 - the user's release call, still open in the inbox (Idea-163).
+  Method note for the next currency item: grep the file's paths AND `git log -- <file>`
+  before claiming - the fix may have shipped under a different id.

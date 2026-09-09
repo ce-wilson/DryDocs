@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: done
 depends_on: []
 inputs:
 - knowledge/depgraph-snapshots/snapshot.ps1
@@ -42,3 +42,27 @@ notes: |
   Same script as J64 and deliberately a separate item - that one is about WHEN the scan runs and
   this one is about a step inside it failing invisibly. Neither should re-solve the other, and
   both say so.
+  DONE 2026-09-08 (desktop, Lane A).
+  (a) snapshot.ps1 clears an inherited VIRTUAL_ENV right after it resolves $repo, before
+      the first `poetry run`, and prints one DarkGray line naming the value it cleared.
+      Unconditional: the project's own environment resolves the same without the variable,
+      and any other environment could not have rendered correctly. Header block gains J53
+      and J65 lines.
+  (b) Already in place since J53 (Write-RefreshFailure reports the LAST non-empty line of
+      the merged output and the landed/stale split); verified by reading the function, not
+      re-solved. The reproduction here confirmed the cause line it would print.
+  (c) Venue desktop, PowerShell tool session (which inherits the leak) vs Bash. BEFORE the
+      fix, PowerShell: `poetry run python scripts/render_board.py` exit 1, last line
+      `ModuleNotFoundError: No module named 'drydocs'` (the leaked agents environment lacks
+      the project itself now; on 2026-08-28 it got as far as typer), nothing written. Bash
+      with the variable unset: exit 0 all day. AFTER the fix (the same clear the script now
+      performs, then the same command, from PowerShell with VIRTUAL_ENV pre-set to
+      agents\.venv): exit 0, all nine renders written.
+  (d) Consequence stated: the load-map surfaces never refreshed from THIS SCRIPT on this
+      machine. Checked: after the PowerShell render the only diffs were board.html and
+      roadmap.html status drift from the un-rendered claims (Y5), so the load-map renders
+      were current - every Bash-side render_board.py run today chains the load-map renderer,
+      which is what kept them current while the script's step failed. Nothing further to
+      commit beyond the ordinary re-render in this commit.
+  (e) Warn-only unchanged: the refresh steps still cannot block the snapshot; this changes
+      only whether they succeed.

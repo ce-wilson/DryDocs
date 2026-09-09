@@ -14,11 +14,30 @@ project to a Neo4j-style dependency model + machine-first JSON).
 .\snapshot.ps1 -CodeOnly  # -> drydocs-code-YYYYMMDD.json (legacy comparison shape: the 7 package roots, .py only)
 ```
 
+**It scans AFTER the commit it stamps, and refuses otherwise (J64).** The `meta.git` header
+names HEAD as the tree that was scanned, which is only true when no tracked file differs from
+HEAD. With tracked changes present the script REFUSES, lists the paths, and says what to do:
+commit (a stale render the refresh steps just rewrote is the usual case), then re-run. This
+replaced a silent `dirty: true` in the header that nothing read: the 20260805 snapshot carried
+it and was committed as if clean, and on 2026-08-29 a snapshot scanned from a tree predating
+main's rename sweep named a retired directory, tripped the J55 publish guard, and had to be
+regenerated against the merge commit. `-AllowDirty` downgrades the refusal to a warning for a
+deliberate mid-work comparison scan; the header still records `dirty: true`. Untracked paths
+never trigger it (the snapshot being written is one).
+
 **It reports CI before it writes (Idea-111).** Immediately before the snapshot, the script runs
-`gh run list --branch main` and prints the conclusion of the run **for HEAD's own sha** — so
-"GREEN" means green at what you just pushed, never green at somebody else's older commit. It is
-**warn-only** and never blocks the snapshot; if `gh` is missing or unauthenticated it says so and
-carries on. The reason it is a script step rather than a habit: CI blocks on `ruff check` and
+`gh run list --branch <the branch HEAD is on>` and prints the conclusion of the run **for HEAD's
+own sha** — so "GREEN" means green at what you just pushed, never green at somebody else's older
+commit. The branch comes from `git rev-parse --abbrev-ref HEAD` (U27, 2026-09-08): the check used
+to name `main` by literal, so from any branch HEAD could never appear in the list and the verdict
+read "no run yet" until merge — CI was green on a feature branch and the check could not see it. A
+detached HEAD has no branch to ask about and prints a named skip. It is **warn-only** and never
+blocks the snapshot; if `gh` is missing or unauthenticated it says so and carries on. The verdict
+itself is `Get-CiVerdict` in [`ci_verdict.ps1`](ci_verdict.ps1), a pure function of (runs, head,
+gh exit code, branch) that `snapshot.ps1` dot-sources; `tests/unit/test_ci_verdict.py` drives it
+under `pwsh` or `powershell` with five fixtures (green at HEAD, failed at HEAD with an older
+success in the list, in progress at HEAD, no run yet for HEAD, and an EMPTY list — the case behind
+the 2026-08-20 false GREEN) and skips, naming the missing shell, where neither is installed. The reason it is a script step rather than a habit: CI blocks on `ruff check` and
 `ruff format --check` (J10 stage 5) and ran red for a week (2026-08-05 → 08-12, 100+ consecutive
 failing runs) while the unit suite stayed green, so nothing local ever looked wrong.
 

@@ -76,6 +76,23 @@ moved 42 → 45 commits mid-hold and every prompt had to carry an awkward "verif
 producer is still committing". A tag is immutable and certified; if HEAD has moved past
 it, those commits ride the NEXT port, which is normal rather than a discrepancy.
 
+**A ROLL NAMES ITS RED COMMITS (J77, 2026-09-08).** Wherever a roll describes a
+commit range (the `LEDGER ROLLED` note, a roll relay, a `PORT-REPORT`), one sentence
+names the commits inside the range that were RED at push - CI failed at that sha, or
+the sha was never verified - or states that none were, written by the session that made
+them, the way the session that re-mints ids names the range it re-minted. The reason is
+`git bisect`: a red commit inside the range is one bisect will land on and misattribute,
+and the consumer's range is exactly the one that crosses it. This is a CONVENTION, NOT A
+GUARD, on purpose: a guard written red first and turned green in the same commit is
+normal practice here (J68 was written that way), so the fact that matters - was it green
+by the time the range closed - is one only the author knows. What mostly neutralizes it:
+`--no-ff` merges keep a branch's red commits off `main`'s first-parent line, so
+`git bisect --first-parent` never visits them; the exposure that remains is bisecting the
+branch itself, or a range that crosses the merge boundary, which a port range does. Starts
+forward with the eighth roll; the rolls before it carry no such line and none is added.
+Observed on `feat/ui-web` (2026-09-01): `e7e95f07` and `f44fb40d` red on
+`test_ui_components`, `e0c12d10` the green tip.
+
 **ONE OWNER PER PHASE (J41).** A port plan names exactly ONE owner per phase and NEVER
 crosses the repo boundary. If a phase's owner differs from the phase before it, the plan
 ENDS there and a new plan begins after the handoff. A plan that cannot name one owner per
@@ -3647,6 +3664,179 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   `55c2a204`, as RELAY-46 itself and the registry row have it. The postscript stands as
   written; this line is its correction. Nothing is asked back.
 
+- **RELAY-48 — THE ID CONVENTION, STATED WHOLE: 27 LETTERS FROZEN, THE SERIES IS THE
+  MODULE, THE EDITION IS A DECLARED SEGMENT, BOTH PARTITION RULES RETIRED — AND STEP
+  160'S MIRROR-ASSERTION ACTION IS WITHDRAWN** (new 2026-09-08, producer `main` after
+  `port-base-20260908` / `314b1715`, venue desktop; this is DOC2, the "freeze relay proper"
+  step 305 promised, and it takes the next free number as DOC2's note said it would).
+  `[VERIFIED-PRODUCER]` throughout except where marked. **Read this first: it changes no
+  file of yours.** Every mechanism it names is already in a base you have applied —
+  `port-base-20260902` carried PLAN1 (`375dd962`), the gate `39b90843` and PLAN3
+  (`e7dc4153`); `port-base-20260905` carried PLAN2 (`43fd345c`), CFG1, CFG2 and the rider
+  gate `de8159eb` — and your 0905 close-out reports them applied `[SME-REPORTED]`. What
+  was missing is one place where the convention is written as a whole rather than as
+  four ledger steps, two postscripts and two relays, and one withdrawal the ledger still
+  owes you. That is this entry.
+
+  **ONE — THE FREEZE HALF (PLAN1 + PLAN3).** The 27 legacy series are FROZEN at the
+  highest number each ever took on the producer's tree, refs and history, as of
+  `FROZEN_ON = "2026-09-02"`. The table is the constant in
+  `.claude/skills/groom-backlog/validate.py`, and this is it, quoted: A 4, B 5, C 44,
+  D 11, E 2, F 2, G 136, GN 2, H 8, I 8, J 78, K 30, L 29, M 4, MM 14, N 28, O 92, P 6,
+  Q 28, R 23, S 16, U 27, V 11, W 3, X 4, Y 7, Z 9. A letter recorded WHEN a phase opened,
+  not what an item is about — G alone absorbed 136 items across six epics — so the freeze
+  is not a cleanup, it is the end of a grouping axis that had stopped grouping.
+  `--next-id G` is refused, and the message names the replacement ("the G-series was
+  FROZEN on 2026-09-02 at G136 ... New ids take the module code: validate.py --next-id
+  --module <module>"); `--next-id DD` is refused, and its message names the retired
+  partition rule and the edition segment that replaced it. **The series is the module.**
+  `docs/restructure/backlog/modules.yaml` `series:` maps 20 module names to 20 codes —
+  CORE LOAD REV PLAN DOCGEN LIN DEEP REM WEB API AGENT META PORT LIBS REF TAX ONT CFG
+  GRAPH DOC — and `validate.py --next-id --module <module>` is the only mint. Codes are
+  three or more letters PRECISELY so a company mint can never be confused with a frozen
+  letter, and none is DD. The file's manifest row is per-entry, and as of this relay its
+  `entry_rule` says who owns the map: `series:` unions by module name, the producer's
+  codes for shared modules cross whole, and a module only you hold gets its code from
+  you and is never written by a port. Your `modules.yaml` equalled the producer's at 20
+  and 20 on 2026-09-04 (EIGHTH POSTSCRIPT (2)), so today that rule has no company-only
+  subject; it is written for the first one. **PLAN3 is why the freeze ported green.**
+  FROZEN_SERIES was measured on the producer's tree and admits nothing above G136, so
+  read against that table alone your `G10001`–`G10003` and `DD10001`–`DD10003` — legal
+  when minted under the band rule — fail `test_frozen_series_take_no_new_ids` the day
+  the freeze lands. `FROZEN_BAND = {G: 10003, DD: 10003}` judges a band-shaped number
+  against the band's own max, so the six pass and `G10004` / `DD10004` / `G137` are
+  strays. Your six band ids are READ and LISTED, never re-minted, and nothing you hold
+  moves. `test_backlog.py` is per-entry by its row: the freeze block (FROZEN_SERIES,
+  FROZEN_BAND, `_frozen_strays`, the agreement guards) is mechanism and crosses whole;
+  the band block stays yours, in your spelling.
+
+  **TWO — THE PREFIX HALF (PLAN2 + CFG2).** The id grammar is `[<EDITION>-]<MODULE><n>`
+  for an item and `[<EDITION>-]Idea-<n>` for an inbox entry: edition first, the BASE
+  edition unprefixed, so every existing id on either side parses unchanged. Which
+  edition a checkout mints into is DECLARED, never inferred — read from
+  `config/dev-environment.yaml` `edition:` and from nowhere else. That file is
+  canonical-company; nothing in any range writes it. **You mint your own code at your
+  own gate (§C3)**, into `config/taxonomy/editions.yaml`, whose per-entry row keeps your
+  real rows (keyed by `code`, each with its `area_product_id`) and lets the producer's
+  two `sample: true` rows never overwrite or shadow them. This relay names the file and
+  the columns, not the code: the producer cannot name your code (CFG2 c) and does not.
+  Both partition rules are RETIRED FORWARD-ONLY (§C4): the 2026-07-20 DD reserve and the
+  2026-08-18 number band (producer 1–9999, company 10000+) govern no new mint; every id
+  they produced stays readable — your `DD1`–`DD10`, `DD10001`–`DD10003`, `G10001`–`G10003`
+  and your band-shaped ideas. Between the roll that carried PLAN2 and your code mint you
+  mint no new ITEM — and that is a MECHANISM, not a request: the allocator reads the venue
+  file, finds no `edition:` key, refuses, and names the key and both files in the refusal.
+  Your idea channel stays open meanwhile, band-shaped above 9999 (rider
+  `idea-series-grammar` C1; the shape your 09-05 renumber already has). **The one line
+  you write once your code is minted** is `edition: <your-code>` in your
+  `config/dev-environment.yaml`; from then on your items mint `<code>-<MODULE><n>` and
+  your ideas `<code>-Idea-<n>`, counting from 1 in your own number space, and nothing
+  about the code is decided here. Your 0908 apply's "`edition:` deliberately unset until
+  your own mint" `[SME-REPORTED]` is exactly this state, read correctly.
+
+  **THREE — STEP 160 IS WITHDRAWN.** Step 160 in the ledger below says, in bold, "YOUR
+  ACTION: write the MIRROR assertion (`n >= 10000`, grandfathering your existing low ids as
+  a committed constant) and allocate new ids at 10000+." **Do not.** The band it mirrors
+  retired forward-only at §C4, and a mirror written today would declare `<code>-LOAD1`
+  illegal on your own tree the day you set `edition:`. The replacement is the
+  edition-segment check that PLAN2 already put in `validate.py` and
+  `drydocs_core/backlog_store.py`: a segment is legal only if `editions.yaml` declares
+  it, an undeclared segment is a typo and never a tenant, and a base id above 9999 is
+  refused as the retired rule's shape. Step 160 stays in the ledger as written (an
+  applied step is a record), and this paragraph is its withdrawal; the ledger's step 273
+  region reads the same way wherever it leans on the band. If you already wrote a mirror
+  assertion, keep it as the grandfathering constant it also is (your `COMPANY_BAND_FLOOR`
+  reading of the band block is that) and let FROZEN_BAND, not the mirror, be the guard
+  that reads your six.
+
+  **FOUR — TWO AXES, SO THAT "BOTH MACHINES AND BOTH REPOS" STOPS READING AS ONE THING.**
+  Axis 1 is REPOS: producer and company, disjoint histories, a one-way port. The edition
+  prefix separates THESE — your ids carry your segment, the producer's carry none. Axis 2
+  is CHECKOUTS: every machine, worktree or session on one side is a checkout of the same
+  trunk. The push-before-work claim (`status: in_progress`, pushed) and the `wip/` branch
+  rule separate THESE — two checkouts of one repo minting in the same second are what the
+  allocator's remote-ref union exists for. The number band was a repo-axis rule wearing a
+  checkout-axis shape (it never stopped two producer machines from minting one number;
+  the push-the-stub protocol does). "Both machines and both repos" meant axis 2 on our
+  side and axis 1 between us; an agent that reads them as one axis will either write a
+  mirror band (axis 1 by numbers) or skip the pushed stub (axis 2 by hope), and both have
+  happened.
+
+  **FIVE — WHERE THIS LIVES IN YOUR APPLY.** The APPLY BY DISPOSITION section above gains
+  one paragraph, "THE ID CONVENTION'S ROWS", naming the three per-entry rows
+  (`config/taxonomy/domains.yaml`, `config/taxonomy/editions.yaml`,
+  `docs/restructure/backlog/modules.yaml` `series:`), the one canonical-company key
+  (`edition:`), and the canonical-producer trio that reads them (`CLAUDE.md` section 0's
+  mint rule, `validate.py`, `backlog_store.py`) — the mint rule in `CLAUDE.md` now says
+  the edition segment and "declared in `config/dev-environment.yaml`, never inferred", so
+  a wholesale take of `CLAUDE.md` is right for you as written: its `base` is the
+  producer's declaration in the producer's venue file, not an instruction to yours. One
+  item that DOC2's acceptance said would ride this relay does not: MM13's correction to
+  the `data-flow-overview` gate prompt (nine MM3 sites that mean MM7) is still `todo` on
+  the producer, and a relay that tells you to correct your copy before the producer has
+  corrected its own would put your DRAFT ahead of the producer's; it rides with MM13's
+  build. Nothing is asked back.
+
+- **RELAY-49 — THREE LIVE-CONFIG COUNT PINS LEFT THEIR TESTS: THE NUMBERS ARE NOW A
+  `census:` BLOCK IN YOUR OWN `config/dev-environment.yaml`, AND THE THREE TEST FILES
+  CROSS BYTE-IDENTICAL FROM THE NEXT BASE ON** (new 2026-09-08, producer `main` after
+  `port-base-20260908` / `314b1715`, venue desktop; this is PLAN9, minted from your
+  sixteenth report's hand-merge list `[SME-REPORTED]`). `[VERIFIED-PRODUCER]` throughout.
+
+  **WHAT MOVED, AND WHY.** Three unit guards pinned a count over a REAL config file
+  so the picture could not drift silently, and each count was a fact about ONE
+  checkout's rows, because every file they count is `per-entry` in `PORT-MANIFEST.yaml`
+  and you hold rows the producer never sees. Checked into the TEST, the number collided
+  at every roll and you re-pinned it by hand — three times per port, as your list said.
+  The survey the item required found exactly these three and no others (the vocabulary
+  fragment count the item named as a candidate is not pinned anywhere; the
+  `ui-tests.yaml` pins in `test_ui_tests_ledger.py` count a `canonical-producer` file,
+  so they are the same on both sides after a take and are not this class):
+
+  | test | pinned over | producer value | your value at the 2026-09-03 apply |
+  |---|---|---|---|
+  | `tests/unit/test_docs_coverage.py::test_the_live_coverage_census_is_pinned` | `config/taxonomy/software-registry.yaml` + `config/doc-source-registry.yaml` | (17, 15, 10, 8) | your own tuple, hand-merged each roll |
+  | `tests/unit/test_schema.py::test_constraint_count` (`EXPECTED_CONSTRAINTS`) | `drydocs_core/schema/constraints.cypher` | 55 | ahead — your supplement blocks |
+  | `tests/unit/test_source_bindings.py::test_reports_cover_every_automated_dataset` | `config/source-registry.yaml` `acquisition.mode: automated` | 15 | 17 |
+
+  One shape for all three, the one `capability_assert` already uses in the same file:
+  the value lives in `config/dev-environment.yaml`, which is `canonical-company` — each
+  side keeps its own, a port never overwrites it — and the test READS it. The guard
+  keeps its teeth (a wrong number in the venue file fails the test with a message that
+  names the key), the test file carries no count of its own, and the history of each
+  number stays in the test's docstring and comments, where a reader looking at the guard
+  finds it. The producer's block, as shipped:
+
+  ```yaml
+  census:
+    docs_coverage:
+      products: 17
+      products_no_corpus: 15
+      corpora_total: 10
+      corpora_unclaimed: 8
+    schema_constraints: 55
+    automated_datasets: 15
+  ```
+
+  **WHAT TO DO AT THE NEXT BASE THAT CARRIES THIS** (it is not in `port-base-20260908`).
+  (1) Take the three test files wholesale — they fall to the `tests/**` default and carry
+  no number now, so there is nothing to hand-merge; `test_schema.py` and
+  `test_source_bindings.py` keep their `evaluate` rows for whatever ELSE your copies
+  carry, and both rows' notes now say the count is not one of those things. (2) Add the
+  `census:` block to YOUR `config/dev-environment.yaml` with YOUR numbers — the file is
+  yours, so this is the "new producer KEYS are ADAPTED BY HAND" case its own manifest row
+  already describes; a copy with no block fails all three guards with a message naming
+  the missing key, which is the same refusal shape as the allocator's `edition:`. The
+  numbers you write are the ones your current hand-merged pins hold today: read them off
+  your test files before the take, not after. (3) `tests/unit/test_dev_environment.py`
+  gains `test_census_declares_every_pin_the_guards_read`, a shape check on the block
+  (six integer keys) — it crosses with the file. (4) The generated
+  `drydocs_core/schema/schema_graph.cypher` moves two comment lines (the render no
+  longer names `EXPECTED_CONSTRAINTS`); it is a derived render, so re-run
+  `scripts/render_schema_graph.py` on your side rather than taking the file. From then
+  on, when your registries move, you edit `census:` and say why in the commit — never
+  the test. Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
@@ -3945,11 +4135,35 @@ reference. That is the right shape. This section makes it the file's shape too.
 applying FROM:
 
 ```
-PYTHONPATH=. python scripts/render_port_dispositions.py <your-base-tag>
+PYTHONPATH=. python scripts/render_port_dispositions.py <pre-apply-tag> <base-tag>
 ```
 
+Two arguments on your side, always: `<pre-apply-tag>` is your own ref for the tree
+BEFORE this apply, `<base-tag>` is the producer's `port-base-<date>`. One argument
+(`<base-tag>` alone) renders `<base-tag>..HEAD`, which is right on the producer and wrong
+on yours — HEAD is your apply branch, so it renders what you have already taken under a
+plausible "wrote N paths" line (Idea-250; the two-argument form is `eee64ce3`).
+
+**THE WORKPLAN RULE (PORT1 d, 2026-09-08). A chunk plan that names a script names the
+COMMIT the script needs.** Your chunk 1 of 2026-09-01 was told to run this renderer, and
+the renderer landed AFTER your base (J69 at `bed22549`); the two-argument form is
+`eee64ce3`, the unresolvable-ref refusal is `df7a57c3`, and the one-classifier import is
+`6f8c7825`. All four are in `port-base-20260908`; a plan written against an earlier base
+names the one it needs and takes that file first, wholesale — `scripts/**` is default_ok,
+so nothing else brings it. The second half of the rule is about WHICH MANIFEST does the
+classifying: **classify with the manifest AT THE BASE, never with your current one.**
+`PORT-MANIFEST.yaml` is canonical-producer, so `git checkout <base-tag> --
+PORT-MANIFEST.yaml` is the first wholesale take of class 1 anyway; do it BEFORE you
+render, or the table buckets the range by rows the range itself changed (the producer's
+519, above, was measured with the manifest at HEAD instead of at the tag — the same
+mistake from the other side). Then `git diff <pre-apply-tag> <base-tag> --
+PORT-MANIFEST.yaml`: the rows that differ ARE the port's own manifest rows for this range,
+and each one is a path class that moved — read them before the table, because they say
+where a path you handled last roll is handled differently this roll.
+
 It writes `docs/port/port-dispositions.md` — **gitignored working state, generated
-per apply and never committed.** Its range is `<base>..HEAD`, so a committed copy would
+per apply and never committed.** Its range is `<pre-apply-tag>..<base-tag>` on your side
+(`<base-tag>..HEAD` on the producer's), so a committed copy would
 be stale the moment anyone commits; the RENDERER is what carries guards. The file holds
 every changed path in the range, bucketed
 by the disposition `PORT-MANIFEST.yaml` resolves for it, with each row's `entry_rule`
@@ -3981,6 +4195,23 @@ path, check its row in `scripts/render_enforcement_matrix.py` SURFACES and
 `web/src/generated/enforcement-matrix.json` in the same breath — the three are one
 coupling in `PORT-MANIFEST.yaml`, and a slice that carries the surface without its row
 makes the derived file unproducible, not stale.
+
+**THE ID CONVENTION'S ROWS (DOC2 / RELAY-48, 2026-09-08):** the freeze, the module
+mint and the edition segment are one convention spread over three classes, and a slice
+that takes one class without reading the other two mints wrong or refuses forever.
+Per-entry, your rows stay: `config/taxonomy/domains.yaml` (rows by `id`; your
+`minted_by: company` mints are estate truth), `config/taxonomy/editions.yaml` (rows by
+`code`; the producer's rows are `sample: true` and never shadow yours) and
+`docs/restructure/backlog/modules.yaml` (`modules[]` unions by name, `series:` unions by
+module name; a company-only module's code is yours). Canonical-company, never written
+by a port: `config/dev-environment.yaml` — its `edition:` key is the ONE fact the
+allocator reads to know whose venue it is running in; absent, it mints no item and says
+so. Canonical-producer, take whole: `.claude/skills/groom-backlog/validate.py`,
+`drydocs_core/backlog_store.py` and `CLAUDE.md`, whose section 0 mint rule reads
+`[<EDITION>-]<MODULE><n>` and "declared in `config/dev-environment.yaml` `edition:`,
+never inferred" — the word `base` there is the producer's declaration in the producer's
+venue file, not an instruction to yours. Step 160's mirror-assertion action is
+withdrawn (RELAY-48 THREE).
 
 **MEASURED AT THIS ROLL** (`port-base-20260826..HEAD`, the full span since your last
 applied base): **519 changed paths across 8 classes** — canonical-producer 129,

@@ -271,8 +271,9 @@ def render_schema_graph(vocab_path: str | Path = DEFAULT_VOCAB_PATH) -> str:
     lines.append("// The only constraint this graph needs: one exemplar per label. It is")
     lines.append("// deliberately NOT in drydocs_core/schema/constraints.cypher — that file")
     lines.append("// constrains the operational graph, and the two databases do not share a")
-    lines.append("// constraint set. tests/unit/test_schema.py's EXPECTED_CONSTRAINTS")
-    lines.append("// therefore does not move.")
+    lines.append("// constraint set. The constraint count tests/unit/test_schema.py pins")
+    lines.append("// (census.schema_constraints in config/dev-environment.yaml) therefore")
+    lines.append("// does not move.")
     lines.append(
         "CREATE CONSTRAINT schemameta_name IF NOT EXISTS "
         "FOR (n:SchemaMeta) REQUIRE n.name IS UNIQUE;"

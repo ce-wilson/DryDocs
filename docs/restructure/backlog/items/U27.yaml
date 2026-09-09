@@ -8,7 +8,7 @@ phase: 16
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: done
 depends_on: []
 inputs:
 - knowledge/depgraph-snapshots/snapshot.ps1
@@ -32,3 +32,53 @@ notes: |
   Module graph-infra / phase 16 / epic self-documentation by the U7, U12, U15, U24, U25 and U26 precedent — every snapshot.ps1 item in this backlog lands there. Sibling of U26 (done) in the same script: that one lost the JSON write from a worktree, this one mis-reports the step immediately before it, and both are invisible from the main checkout. Mechanism only, no gate.
 
   p2 rather than p3 because the check exists precisely to stop a repeat of Idea-111 (CI red for 100+ consecutive runs while sessions pushed past it), and a check that structurally cannot see branch work is the same failure with a green-looking wrapper.
+  DONE 2026-09-08 (desktop, Lane A; built on wip/u27-desktop per J31, merged --no-ff).
+  (a) The caller reads `git rev-parse --abbrev-ref HEAD` and lists runs for THAT branch;
+      `gh run list --branch main` is gone from snapshot.ps1 (pinned by
+      test_the_caller_lists_runs_for_the_branch_head_is_on_never_main_by_literal, code only,
+      J66). A detached HEAD prints a DarkGray named skip - "no branch to list runs for" -
+      and points at `gh run list --commit <sha>`; nothing throws. The branch reaches the
+      verdict as -Branch, so "ZERO runs on main", "newest on main is" and "main is RED" now
+      name the branch that was actually asked about.
+  (b) Get-CiVerdict moved, unchanged in logic, to knowledge/depgraph-snapshots/ci_verdict.ps1
+      and snapshot.ps1 dot-sources it; the design comment's "pure function" claim is now
+      enforced (test_the_verdict_file_reads_nothing_but_its_arguments: no `& git`, `& gh`,
+      $LASTEXITCODE, Push-Location, Get-Content, Get-Command in its code). Five fixtures in
+      tests/unit/test_ci_verdict.py, each a JSON file fed through the live caller's own
+      `ConvertFrom-Json ... | ForEach-Object { $_ }` idiom so the PS 5.1 unrolling trap is
+      exercised rather than bypassed: green-at-head (Green, exact text);
+      failed-at-head-with-an-older-success-in-the-list (Red, the branch named, HEAD's verdict
+      not the list's); in-progress-at-head (Yellow); no-run-yet-for-head (Yellow UNVERIFIED,
+      newest run's state and the branch named); EMPTY runs (Yellow UNVERIFIED "ZERO runs on
+      <branch>", never GREEN). Two more the fixtures imply: gh exit 4 is a DarkGray named
+      skip distinct from an empty list (J76), and cancelled-at-head is UNVERIFIED not RED
+      (J78). Probed first on PS 5.1: ConvertFrom-Json "[]" piped through ForEach-Object
+      yields Count 0, so the EMPTY fixture reaches the ZERO-runs branch and not the
+      no-run-yet one.
+  (c) Harness is pytest running `pwsh` then `powershell` via shutil.which with -NoProfile
+      -NonInteractive -ExecutionPolicy Bypass; where neither is on PATH the file skips with a
+      message naming both shells (the U26 shape). Desktop runs it under Windows PowerShell
+      5.1.26100; the CI legs (ubuntu-latest and windows-latest) both carry pwsh, so the
+      fixtures execute there rather than skipping - the wip/u27-desktop run is the proof.
+      test_powershell_keeps_non_ascii_out_of_quoted_strings already rglobs
+      every *.ps1, so ci_verdict.ps1 is under the CP1252 guard without a change;
+      test_refusal_and_ci_messages_report_the_measurement_not_a_guess now reads both files
+      because the CI messages moved.
+  (d) Warn-only unchanged: the block is still inside the try/catch that downgrades any
+      failure to `ci check skipped`, the verdict is still Write-Host, and nothing between it
+      and the write reads it.
+  (e) Verified by re-run, both from the PowerShell tool on the desktop, README/snapshot.ps1
+      edited in the tree for the first and clean for the second:
+      - main checkout at 311d7386 (U27 code uncommitted, so the J64 refusal followed):
+        "ci: GREEN at HEAD 311d738"
+      - branch wip/u27-desktop at 8d769863, 47 seconds after the push, clean tree, full run
+        to the write: "ci: run for HEAD 8d76986 is in_progress - re-check before you close
+        the session" - the line the literal-main pin could never have produced, because
+        8d769863 was on no main run list. The snapshot that run wrote (header commit
+        8d769863, branch wip/u27-desktop) was discarded with the retention deletion and the
+        ledger row it made; the ritual snapshot is taken from main after the merge.
+  README's CI paragraph names the branch pin, the detached-HEAD skip, ci_verdict.ps1 and
+  the five fixtures. Guards: test_ci_verdict (10), test_depgraph_snapshots (13),
+  test_module_boundary, test_render_determinism, test_no_render_parsing, test_source_scan,
+  test_runbook_currency, test_probe_instrument, test_skip_guard_policy, test_backlog
+  (155 passed); ruff check and format --check clean at the 0.5.7 pin.

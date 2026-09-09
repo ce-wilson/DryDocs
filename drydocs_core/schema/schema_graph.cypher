@@ -47,8 +47,9 @@
 // The only constraint this graph needs: one exemplar per label. It is
 // deliberately NOT in drydocs_core/schema/constraints.cypher — that file
 // constrains the operational graph, and the two databases do not share a
-// constraint set. tests/unit/test_schema.py's EXPECTED_CONSTRAINTS
-// therefore does not move.
+// constraint set. The constraint count tests/unit/test_schema.py pins
+// (census.schema_constraints in config/dev-environment.yaml) therefore
+// does not move.
 CREATE CONSTRAINT schemameta_name IF NOT EXISTS FOR (n:SchemaMeta) REQUIRE n.name IS UNIQUE;
 
 // ── Node labels ─────────────────────────────────────────────────────────────

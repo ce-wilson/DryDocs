@@ -10,7 +10,7 @@
 # gitignored .env files, never in a committed file).
 schema: drydocs.dev-environment.v1
 classification: Internal-Public
-updated: 2026-09-05
+updated: 2026-09-08
 
 
 # WHICH EDITION THIS CHECKOUT RUNS AS (PLAN2 b, 2026-09-05; gate
@@ -50,6 +50,35 @@ venues:
   neo4j:
     available: true
     what: the local Enterprise container declared below - loaders, e2e and the MCP server
+
+# WHAT THIS CHECKOUT'S LIVE REGISTRIES COUNT TO (PLAN9, 2026-09-08). Three unit guards
+# pin a count over a REAL config file so the picture cannot drift silently - and each
+# count is a fact about ONE checkout's rows, because the files they count are per-entry
+# in PORT-MANIFEST.yaml and the company holds rows the producer never sees. Checked into
+# the TEST, the number collided at every roll and the consumer re-pinned it by hand
+# (2026-09-07 transcription, the hand-merge list). So the numbers live HERE, in the file
+# already ruled canonical-company, and the tests read them: the guard keeps its teeth,
+# the test file stays byte-identical on both sides, and a consumer edits THIS block -
+# never the test - when its own registries move. The same reason `capability_assert`
+# below lives here. The history of each number (why it moved, and when) stays in the
+# test's docstring and comments, where a reader looking at the guard finds it.
+census:
+  # tests/unit/test_docs_coverage.py::test_the_live_coverage_census_is_pinned -
+  # drydocs.docs_coverage.coverage() over config/taxonomy/software-registry.yaml
+  # products and config/doc-source-registry.yaml sources.
+  docs_coverage:
+    products: 17
+    products_no_corpus: 15
+    corpora_total: 10
+    corpora_unclaimed: 8
+  # tests/unit/test_schema.py::test_constraint_count - CREATE CONSTRAINT lines in
+  # drydocs_core/schema/constraints.cypher (a per-entry file: the company's copy carries
+  # its own supplement blocks, so its count is ahead of the producer's).
+  schema_constraints: 55
+  # tests/unit/test_source_bindings.py::test_reports_cover_every_automated_dataset -
+  # config/source-registry.yaml datasets with acquisition.mode: automated (the company
+  # had 17 at its 2026-09-03 apply, the two extra being company-only rows).
+  automated_datasets: 15
 
 neo4j:
   # Local Neo4j Enterprise container (EE required — ADR 0002 multi-DB + composite;

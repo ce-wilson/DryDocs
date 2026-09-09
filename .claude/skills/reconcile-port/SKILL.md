@@ -32,6 +32,13 @@ the accumulated lessons from prior ports. Read both.
    zero-fail acceptance contract and read as port-introduced.
    If producer HEAD has moved past the tag, that is NORMAL: those commits ride the
    next port, not this one.
+   **The roll names the commits in the range that were RED at push, or says none
+   were (J77, from the eighth roll on).** Read that line before any `git bisect`
+   through the range: a red commit inside it is one bisect lands on and blames, and
+   a port range crosses the `--no-ff` merge boundary that otherwise keeps such commits
+   off `main`'s first-parent line. It is a convention the producer session writes, not
+   a guard - a roll from the eighth on that lacks the line has an unverified range,
+   not a green one.
 2. **Read the manifest first:** `git show cewilson/main:PORT-MANIFEST.yaml` —
    the machine-readable disposition per path (first match wins; `**` spans
    separators, `*`/`?` do not; per-entry rows FORBID whole-file checkout).
@@ -191,10 +198,14 @@ stay skipped — confirm with the operator if a new one appears.
   e33f8d02 recorded dies at the next port; no per-line handling needed.
 
 - Verify command: company `m6-verify` vs producer `m3-verify`.
-- `EXPECTED_CONSTRAINTS`: company is ahead as a **superset** (base + snow-support
+- The constraint count: company is ahead as a **superset** (base + snow-support
   supplements; 45 ⊇ 40 at the 2026-07-20 bundle port). Counts drift every port —
-  trust the live `test_schema.py` / `constraints.cypher` on each side, not any
-  recorded number (66acea8 lesson: "trust the file, not the ledger").
+  trust the live `constraints.cypher` on each side, not any recorded number
+  (66acea8 lesson: "trust the file, not the ledger"). **Since PLAN9 (2026-09-08) the
+  number is not in `test_schema.py` at all**: it is `census.schema_constraints` in
+  `config/dev-environment.yaml` (canonical-company), beside `census.automated_datasets`
+  and `census.docs_coverage`, so the three test files cross byte-identical and each side
+  edits its own venue file.
 - Condition key: `scope_key` vs producer `folder_id`.
 - Suite size: company suite is much larger (scrapers/Confluence). **Do not chase
   the producer's `186 passed` full-suite number** — only zero *new* failures matters,

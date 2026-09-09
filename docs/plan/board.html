@@ -79,7 +79,7 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 .capture-status{font-size:.78rem;color:#166534;margin:.3rem 0 0;min-height:1.1em}</style>
 </head><body>
 <h1>DryDocs — project board</h1>
-<p class="subtitle">Rendered from <code>docs/restructure/backlog/</code> 711 items &middot; 114 todo / 6 in progress / 0 blocked / 591 done. The repo is the system of record; this page is a working aid.</p>
+<p class="subtitle">Rendered from <code>docs/restructure/backlog/</code> 711 items &middot; 104 todo / 7 in progress / 0 blocked / 600 done. The repo is the system of record; this page is a working aid.</p>
 <p class="subtitle">Location: <code id="board-url"></code> <button type="button" id="board-url-copy">copy</button></p>
 <script>document.getElementById('board-url').textContent=window.location.href;document.getElementById('board-url-copy').onclick=function(){navigator.clipboard.writeText(window.location.href);};</script>
 <p class="subtitle"><a class="capture-link" href="roadmap.html">Module roadmap &rarr;</a> <a class="capture-link" href="ideas.html">Idea inbox &rarr;</a></p>
@@ -92,7 +92,7 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P5</span><span class="status-badge status-todo">todo</span></div><h3>Orchestrator expansion</h3><p class="goal">AutoSys + Airflow land as BMC-baseline concepts via confirmed crosswalks (Epic F).</p><div class="progress"><div class="progress-bar" style="width:40%"></div></div><p class="progress-text">2 / 5</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P6</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Modular architecture / component topology</h3><p class="goal">ADR 0002 — core extraction, multi-DB topology, component packages (Epic G).</p><div class="progress"><div class="progress-bar" style="width:90%"></div></div><p class="progress-text">136 / 151</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P7</span><span class="status-badge status-done">done</span></div><h3>Review toolkit back-flow</h3><p class="goal">Company SME-review/HITL toolkit reproduced generically, offline (Epic H).</p><div class="progress"><div class="progress-bar" style="width:78%"></div></div><p class="progress-text">7 / 9</p></div>
-<div class="phase-card"><div class="phase-head"><span class="phase-id">P8</span><span class="status-badge status-in_progress">in_progress</span><span class="release">v0.3.0</span></div><h3>Planning &amp; release infrastructure</h3><p class="goal">Repo-native project board + capture loop; groundwork for versioned releases (Epic I).</p><div class="progress"><div class="progress-bar" style="width:79%"></div></div><p class="progress-text">97 / 123</p></div>
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P8</span><span class="status-badge status-in_progress">in_progress</span><span class="release">v0.3.0</span></div><h3>Planning &amp; release infrastructure</h3><p class="goal">Repo-native project board + capture loop; groundwork for versioned releases (Epic I).</p><div class="progress"><div class="progress-bar" style="width:85%"></div></div><p class="progress-text">105 / 123</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P9</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Application attribution</h3><p class="goal">Jobs attributed to SEAL applications (seal_app_ref) end-to-end — gate-confirmed match policy, loader, verify coverage (Epic K).</p><div class="progress"><div class="progress-bar" style="width:90%"></div></div><p class="progress-text">36 / 40</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P10</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Documentation infrastructure</h3><p class="goal">Every design doc (TDD/Runbook/BRD) conforms to a canonical outline; deterministic md→HTML/PDF render; HITL markup loop (digital + pen/paper) re-attaches to a requirement-traceability backbone (Epic L).</p><div class="progress"><div class="progress-bar" style="width:72%"></div></div><p class="progress-text">34 / 47</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P11</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Source governance ledgers</h3><p class="goal">Per-source governance as test-enforced config: audit envelope + edge diet (doc 06, Epic M) and column-mapping ledgers (doc 08, Epic N); property-term bindings via the gate.</p><div class="progress"><div class="progress-bar" style="width:68%"></div></div><p class="progress-text">23 / 34</p></div>
@@ -100,10 +100,10 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P13</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Runtime topology &amp; maintenance windows</h3><p class="goal">Control-M host topology (CM_HOSTS) + runtime-stats supplement (CM_AVG_RUN) loaded per their gates; the maintenance-window question (best patch window for a host/group) answerable from the graph (Epic P).</p><div class="progress"><div class="progress-bar" style="width:75%"></div></div><p class="progress-text">6 / 8</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P14</span><span class="status-badge status-in_progress">in_progress</span></div><h3>Document ingestion &amp; doc-graph benchmarks</h3><p class="goal">Unstructured documents as graph corpora (docmeta): the P0 benchmark verdict (traversal vs manifest-routed md vs vector RAG) with its evidence experiments, and the landing zone for the docmeta component&#x27;s P1+ phases once the verdict + docmeta ADR gate them (Epic Q).</p><div class="progress"><div class="progress-bar" style="width:89%"></div></div><p class="progress-text">24 / 27</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P15</span><span class="status-badge status-todo">todo</span></div><h3>Agentic Q&amp;A console</h3><p class="goal">Free-text questions answered by a tiered read-only agent (QuerySpec router → schema-grounded text2cypher → bounded graph-of-thoughts loop) with every executed Cypher exposed via ephemeral specs, per-run question/context/memory/token telemetry, and stale-source rescrape (Epic R; ADR 0007).</p><div class="progress"><div class="progress-bar" style="width:84%"></div></div><p class="progress-text">21 / 25</p></div>
-<div class="phase-card"><div class="phase-head"><span class="phase-id">P16</span><span class="status-badge status-todo">todo</span></div><h3>Self-documentation — DryDocs&#x27; own code in the graph</h3><p class="goal">DryDocs documents ITSELF the way it documents Control-M: the project&#x27;s code-dependency snapshot enters the knowledge graph under the software ontology (SWO), under an explicit :Project root, so &#x27;which module loads this job&#x27; is a query rather than a JSON file a human reads (Epic U).</p><div class="progress"><div class="progress-bar" style="width:83%"></div></div><p class="progress-text">24 / 29</p></div>
+<div class="phase-card"><div class="phase-head"><span class="phase-id">P16</span><span class="status-badge status-todo">todo</span></div><h3>Self-documentation — DryDocs&#x27; own code in the graph</h3><p class="goal">DryDocs documents ITSELF the way it documents Control-M: the project&#x27;s code-dependency snapshot enters the knowledge graph under the software ontology (SWO), under an explicit :Project root, so &#x27;which module loads this job&#x27; is a query rather than a JSON file a human reads (Epic U).</p><div class="progress"><div class="progress-bar" style="width:86%"></div></div><p class="progress-text">25 / 29</p></div>
 <div class="phase-card"><div class="phase-head"><span class="phase-id">P17</span><span class="status-badge status-todo">todo</span></div><h3>Mind-map — deepdoc leaves the placeholder</h3><p class="goal">The per-data-flow overview record and its first producer: a graph-seeded, mind-map-driven investigator over the SDLC/ops corpora (Jira, Bitbucket, Confluence, email, Control-M Output logs) whose every finding is :Uncertain, weighted, and carries a provenance breadcrumb to its source; promotion is an SME gate write (Epic MM; docs/design/deepdoc-data-flow-overview.md).</p><div class="progress"><div class="progress-bar" style="width:21%"></div></div><p class="progress-text">3 / 14</p></div>
 </div>
-<div class="ready-strip"><strong>Ready to pull</strong> (97; <code>todo</code> with every <code>depends_on</code> done and no <code>hold:</code> &mdash; derived, never stored): <a class="ready-id" href="#card-REF1"><code>REF1</code></a> <a class="ready-id" href="#card-C33"><code>C33</code></a> <a class="ready-id" href="#card-C39"><code>C39</code></a> <a class="ready-id" href="#card-C44"><code>C44</code></a> <a class="ready-id" href="#card-CFG4"><code>CFG4</code></a> <a class="ready-id" href="#card-G100"><code>G100</code></a> <a class="ready-id" href="#card-ONT2"><code>ONT2</code></a> <a class="ready-id" href="#card-ONT3"><code>ONT3</code></a> <a class="ready-id" href="#card-D11"><code>D11</code></a> <a class="ready-id" href="#card-G63"><code>G63</code></a> <a class="ready-id" href="#card-G65"><code>G65</code></a> <a class="ready-id" href="#card-G106"><code>G106</code></a> <a class="ready-id" href="#card-G116"><code>G116</code></a> <a class="ready-id" href="#card-G117"><code>G117</code></a> <a class="ready-id" href="#card-G118"><code>G118</code></a> <a class="ready-id" href="#card-G120"><code>G120</code></a> <a class="ready-id" href="#card-G132"><code>G132</code></a> <a class="ready-id" href="#card-G136"><code>G136</code></a> <a class="ready-id" href="#card-H8"><code>H8</code></a> <a class="ready-id" href="#card-REV1"><code>REV1</code></a> <a class="ready-id" href="#card-I5"><code>I5</code></a> <a class="ready-id" href="#card-I7"><code>I7</code></a> <a class="ready-id" href="#card-PLAN7"><code>PLAN7</code></a> <a class="ready-id" href="#card-PLAN8"><code>PLAN8</code></a> <a class="ready-id" href="#card-PLAN9"><code>PLAN9</code></a> <a class="ready-id" href="#card-PLAN10"><code>PLAN10</code></a> <a class="ready-id" href="#card-CFG6"><code>CFG6</code></a> <a class="ready-id" href="#card-CORE6"><code>CORE6</code></a> <a class="ready-id" href="#card-CORE7"><code>CORE7</code></a> <a class="ready-id" href="#card-CORE9"><code>CORE9</code></a> <a class="ready-id" href="#card-DOC2"><code>DOC2</code></a> <a class="ready-id" href="#card-DOC8"><code>DOC8</code></a> <a class="ready-id" href="#card-J54"><code>J54</code></a> <a class="ready-id" href="#card-J56"><code>J56</code></a> <a class="ready-id" href="#card-J59"><code>J59</code></a> <a class="ready-id" href="#card-J60"><code>J60</code></a> <a class="ready-id" href="#card-J61"><code>J61</code></a> <a class="ready-id" href="#card-J64"><code>J64</code></a> <a class="ready-id" href="#card-J65"><code>J65</code></a> <a class="ready-id" href="#card-J70"><code>J70</code></a> <a class="ready-id" href="#card-J77"><code>J77</code></a> <a class="ready-id" href="#card-PORT1"><code>PORT1</code></a> <a class="ready-id" href="#card-K23"><code>K23</code></a> <a class="ready-id" href="#card-K26"><code>K26</code></a> <a class="ready-id" href="#card-K29"><code>K29</code></a> <a class="ready-id" href="#card-LOAD7"><code>LOAD7</code></a> <a class="ready-id" href="#card-DOC6"><code>DOC6</code></a> <a class="ready-id" href="#card-DOC7"><code>DOC7</code></a> <a class="ready-id" href="#card-DOC9"><code>DOC9</code></a> <a class="ready-id" href="#card-L23"><code>L23</code></a> <a class="ready-id" href="#card-LIN3"><code>LIN3</code></a> <a class="ready-id" href="#card-CORE8"><code>CORE8</code></a> <a class="ready-id" href="#card-N17"><code>N17</code></a> <a class="ready-id" href="#card-N18"><code>N18</code></a> <a class="ready-id" href="#card-N19"><code>N19</code></a> <a class="ready-id" href="#card-N23"><code>N23</code></a> <a class="ready-id" href="#card-N24"><code>N24</code></a> <a class="ready-id" href="#card-N25"><code>N25</code></a> <a class="ready-id" href="#card-N28"><code>N28</code></a> <a class="ready-id" href="#card-DOC5"><code>DOC5</code></a> <a class="ready-id" href="#card-G85"><code>G85</code></a> <a class="ready-id" href="#card-G86"><code>G86</code></a> <a class="ready-id" href="#card-O23"><code>O23</code></a> <a class="ready-id" href="#card-O44"><code>O44</code></a> <a class="ready-id" href="#card-O48"><code>O48</code></a> <a class="ready-id" href="#card-O82"><code>O82</code></a> <a class="ready-id" href="#card-CFG5"><code>CFG5</code></a> <a class="ready-id" href="#card-LOAD3"><code>LOAD3</code></a> <a class="ready-id" href="#card-Q22"><code>Q22</code></a> <a class="ready-id" href="#card-Q24"><code>Q24</code></a> <a class="ready-id" href="#card-Q28"><code>Q28</code></a> <a class="ready-id" href="#card-R7"><code>R7</code></a> <a class="ready-id" href="#card-R11"><code>R11</code></a> <a class="ready-id" href="#card-R13"><code>R13</code></a> <a class="ready-id" href="#card-R17"><code>R17</code></a> <a class="ready-id" href="#card-S11"><code>S11</code></a> <a class="ready-id" href="#card-U10"><code>U10</code></a> <a class="ready-id" href="#card-U11"><code>U11</code></a> <a class="ready-id" href="#card-U16"><code>U16</code></a> <a class="ready-id" href="#card-U23"><code>U23</code></a> <a class="ready-id" href="#card-U27"><code>U27</code></a> <a class="ready-id" href="#card-REM2"><code>REM2</code></a> <a class="ready-id" href="#card-V4"><code>V4</code></a> <a class="ready-id" href="#card-V5"><code>V5</code></a> <a class="ready-id" href="#card-V6"><code>V6</code></a> <a class="ready-id" href="#card-V11"><code>V11</code></a> <a class="ready-id" href="#card-Y3"><code>Y3</code></a> <a class="ready-id" href="#card-Y6"><code>Y6</code></a> <a class="ready-id" href="#card-LOAD6"><code>LOAD6</code></a> <a class="ready-id" href="#card-GN2"><code>GN2</code></a> <a class="ready-id" href="#card-MM5"><code>MM5</code></a> <a class="ready-id" href="#card-MM6"><code>MM6</code></a> <a class="ready-id" href="#card-MM9"><code>MM9</code></a> <a class="ready-id" href="#card-MM11"><code>MM11</code></a> <a class="ready-id" href="#card-MM12"><code>MM12</code></a> <a class="ready-id" href="#card-MM13"><code>MM13</code></a> <a class="ready-id" href="#card-MM14"><code>MM14</code></a></div>
+<div class="ready-strip"><strong>Ready to pull</strong> (87; <code>todo</code> with every <code>depends_on</code> done and no <code>hold:</code> &mdash; derived, never stored): <a class="ready-id" href="#card-REF1"><code>REF1</code></a> <a class="ready-id" href="#card-C33"><code>C33</code></a> <a class="ready-id" href="#card-C39"><code>C39</code></a> <a class="ready-id" href="#card-C44"><code>C44</code></a> <a class="ready-id" href="#card-CFG4"><code>CFG4</code></a> <a class="ready-id" href="#card-G100"><code>G100</code></a> <a class="ready-id" href="#card-ONT2"><code>ONT2</code></a> <a class="ready-id" href="#card-ONT3"><code>ONT3</code></a> <a class="ready-id" href="#card-D11"><code>D11</code></a> <a class="ready-id" href="#card-G63"><code>G63</code></a> <a class="ready-id" href="#card-G65"><code>G65</code></a> <a class="ready-id" href="#card-G106"><code>G106</code></a> <a class="ready-id" href="#card-G116"><code>G116</code></a> <a class="ready-id" href="#card-G117"><code>G117</code></a> <a class="ready-id" href="#card-G118"><code>G118</code></a> <a class="ready-id" href="#card-G120"><code>G120</code></a> <a class="ready-id" href="#card-G132"><code>G132</code></a> <a class="ready-id" href="#card-G136"><code>G136</code></a> <a class="ready-id" href="#card-H8"><code>H8</code></a> <a class="ready-id" href="#card-REV1"><code>REV1</code></a> <a class="ready-id" href="#card-I7"><code>I7</code></a> <a class="ready-id" href="#card-PLAN7"><code>PLAN7</code></a> <a class="ready-id" href="#card-PLAN8"><code>PLAN8</code></a> <a class="ready-id" href="#card-PLAN10"><code>PLAN10</code></a> <a class="ready-id" href="#card-CFG6"><code>CFG6</code></a> <a class="ready-id" href="#card-CORE6"><code>CORE6</code></a> <a class="ready-id" href="#card-CORE7"><code>CORE7</code></a> <a class="ready-id" href="#card-CORE9"><code>CORE9</code></a> <a class="ready-id" href="#card-DOC8"><code>DOC8</code></a> <a class="ready-id" href="#card-J56"><code>J56</code></a> <a class="ready-id" href="#card-J60"><code>J60</code></a> <a class="ready-id" href="#card-J61"><code>J61</code></a> <a class="ready-id" href="#card-J70"><code>J70</code></a> <a class="ready-id" href="#card-K23"><code>K23</code></a> <a class="ready-id" href="#card-K26"><code>K26</code></a> <a class="ready-id" href="#card-K29"><code>K29</code></a> <a class="ready-id" href="#card-LOAD7"><code>LOAD7</code></a> <a class="ready-id" href="#card-DOC6"><code>DOC6</code></a> <a class="ready-id" href="#card-DOC7"><code>DOC7</code></a> <a class="ready-id" href="#card-DOC9"><code>DOC9</code></a> <a class="ready-id" href="#card-L23"><code>L23</code></a> <a class="ready-id" href="#card-LIN3"><code>LIN3</code></a> <a class="ready-id" href="#card-CORE8"><code>CORE8</code></a> <a class="ready-id" href="#card-N17"><code>N17</code></a> <a class="ready-id" href="#card-N18"><code>N18</code></a> <a class="ready-id" href="#card-N19"><code>N19</code></a> <a class="ready-id" href="#card-N23"><code>N23</code></a> <a class="ready-id" href="#card-N24"><code>N24</code></a> <a class="ready-id" href="#card-N25"><code>N25</code></a> <a class="ready-id" href="#card-N28"><code>N28</code></a> <a class="ready-id" href="#card-DOC5"><code>DOC5</code></a> <a class="ready-id" href="#card-G85"><code>G85</code></a> <a class="ready-id" href="#card-G86"><code>G86</code></a> <a class="ready-id" href="#card-O23"><code>O23</code></a> <a class="ready-id" href="#card-O44"><code>O44</code></a> <a class="ready-id" href="#card-O48"><code>O48</code></a> <a class="ready-id" href="#card-O82"><code>O82</code></a> <a class="ready-id" href="#card-CFG5"><code>CFG5</code></a> <a class="ready-id" href="#card-LOAD3"><code>LOAD3</code></a> <a class="ready-id" href="#card-Q22"><code>Q22</code></a> <a class="ready-id" href="#card-Q24"><code>Q24</code></a> <a class="ready-id" href="#card-Q28"><code>Q28</code></a> <a class="ready-id" href="#card-R7"><code>R7</code></a> <a class="ready-id" href="#card-R11"><code>R11</code></a> <a class="ready-id" href="#card-R13"><code>R13</code></a> <a class="ready-id" href="#card-R17"><code>R17</code></a> <a class="ready-id" href="#card-S11"><code>S11</code></a> <a class="ready-id" href="#card-U10"><code>U10</code></a> <a class="ready-id" href="#card-U11"><code>U11</code></a> <a class="ready-id" href="#card-U16"><code>U16</code></a> <a class="ready-id" href="#card-U23"><code>U23</code></a> <a class="ready-id" href="#card-REM2"><code>REM2</code></a> <a class="ready-id" href="#card-V4"><code>V4</code></a> <a class="ready-id" href="#card-V5"><code>V5</code></a> <a class="ready-id" href="#card-V6"><code>V6</code></a> <a class="ready-id" href="#card-V11"><code>V11</code></a> <a class="ready-id" href="#card-Y3"><code>Y3</code></a> <a class="ready-id" href="#card-Y6"><code>Y6</code></a> <a class="ready-id" href="#card-LOAD6"><code>LOAD6</code></a> <a class="ready-id" href="#card-GN2"><code>GN2</code></a> <a class="ready-id" href="#card-MM5"><code>MM5</code></a> <a class="ready-id" href="#card-MM6"><code>MM6</code></a> <a class="ready-id" href="#card-MM9"><code>MM9</code></a> <a class="ready-id" href="#card-MM11"><code>MM11</code></a> <a class="ready-id" href="#card-MM12"><code>MM12</code></a> <a class="ready-id" href="#card-MM13"><code>MM13</code></a> <a class="ready-id" href="#card-MM14"><code>MM14</code></a></div>
 <div class="held-strip"><strong>Held</strong> (2; a <code>hold:</code> field a human placed &mdash; the card says why): <a class="ready-id" href="#card-G64"><code>G64</code></a> <a class="ready-id" href="#card-O26"><code>O26</code></a></div>
 <div class="filters">
   <label>Module<select id="f-module"><option value="">All</option>
@@ -187,7 +187,7 @@ h3{font-size:1rem;margin:.3rem 0 .2rem}
   <button type="button" id="f-clear">Clear filters</button>
 </div>
 <div class="board">
-<div class="column" data-status="todo"><div class="column-head"><h2>To do</h2><span class="count" data-count-for="todo">114</span></div><div class="column-body"><div class="card ready" id="card-REF1" data-id="REF1" data-module="reference" data-phase="2" data-epic="reference-hygiene" data-type="task" data-status="todo" data-search="ref1 register spec-kit and the spec-driven-development write-up as external reference - the precedent the code/requirements split cites" tabindex="0"><div class="card-head"><span class="card-id">REF1</span><span class="card-title">Register spec-kit and the spec-driven-development write-up as External reference - the precedent the code/requirements split cites</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Gate ontology-domain-registry-and-edition-grain §B4 (SIGNED OFF 2026-09-02, &quot;split now&quot;): the split proceeds on the 2018 FCD
+<div class="column" data-status="todo"><div class="column-head"><h2>To do</h2><span class="count" data-count-for="todo">104</span></div><div class="column-body"><div class="card ready" id="card-REF1" data-id="REF1" data-module="reference" data-phase="2" data-epic="reference-hygiene" data-type="task" data-status="todo" data-search="ref1 register spec-kit and the spec-driven-development write-up as external reference - the precedent the code/requirements split cites" tabindex="0"><div class="card-head"><span class="card-id">REF1</span><span class="card-title">Register spec-kit and the spec-driven-development write-up as External reference - the precedent the code/requirements split cites</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P2</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Gate ontology-domain-registry-and-edition-grain §B4 (SIGNED OFF 2026-09-02, &quot;split now&quot;): the split proceeds on the 2018 FCD
 evidence and the reference is registered BEHIND it, not before it. This tree has never heard
 of spec-driven development - a case-insensitive grep for spec-kit or spec-driven is empty
 across every .md, .yaml and .py - and ONT1&#x27;s proposal cites it, so it must exist as a
@@ -1175,19 +1175,6 @@ verdicts were about another venue.
 
 FIRST id in the REV series.
 </p></div></div>
-<div class="card ready" id="card-I5" data-id="I5" data-module="docs" data-phase="8" data-epic="project-board" data-type="bug" data-status="todo" data-search="i5 two idea captures landed below the audit trail with a non-conforming header and were invisible to both ideas.md guards" tabindex="0"><div class="card-head"><span class="card-id">I5</span><span class="card-title">Two idea captures landed below the audit trail with a non-conforming header and were invisible to BOTH IDEAS.md guards</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">bug</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">project-board</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE GAP. `_inbox_entries()` slices `IDEAS.md` from the `## Inbox` heading to the next `## ` heading, so it never sees a capture filed after the audit-trail heading; `_all_idea_ids()` matches the full header grammar, so it never sees a capture that does not carry it. A capture that is both — appended at the end of the file in an ad-hoc shape — is invisible to the header guard AND to the uniqueness guard at once. A new test in `tests/unit/test_plan_ideas.py` fails on that case: any `Idea-&lt;n&gt;`-shaped capture ANYWHERE in the file that does not conform to the header grammar, or that carries the grammar but sits outside the two known sections, is reported by id and line.
-
-(b) THE UNIQUENESS SCAN SEES THE SAME SET. Whatever loose pattern (a) uses to find candidate captures also feeds `test_idea_ids_are_unique`, so a duplicate number cannot hide behind a malformed header. This is the union-append case the existing docstring already argues for and does not currently cover.
-
-(c) NO FALSE POSITIVES ON THE FILE&#x27;S OWN PROSE. The capture-format section documents the header shape with a literal `Idea-N` example, and the audit trail cites ids inside sentences. The guard distinguishes a CAPTURE from a CITATION and the test says how, in the docstring, rather than leaving the next reader to infer it from the regex.
-
-(d) GREEN ON THE TREE AS LEFT BY THE 2026-08-27 GROOM, which relocated the two offending entries into the inbox with conforming headers. The guard must be red against the pre-groom shape and green after — state that check in the close note, because a guard that was never observed failing has not been shown to guard anything.
-</p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-27, from the groom run itself. Idea-177 and Idea-178 were appended below `## Recently groomed (audit trail)` on 2026-08-26 in the shape `- **Idea-177 (2026-08-26, desktop):** ...`. `poetry run pytest tests/unit/test_plan_ideas.py -q` was 23-passed green over both of them, and this groom found them only because a commit message named an id the inbox scan did not return.
-
-Second instance, which is why it earns an item rather than a fix in place. Idea-170 records the identical failure company-side (a capture that landed with no id at all, minted only after the user asked where it was) and quotes the existing docstring&#x27;s own reasoning: &quot;the entry simply does not appear in the scan, which reads as &#x27;nothing to review here&#x27; rather than as a formatting slip&quot;. That is precisely what happened here, on the producer side, with all four guards green.
-
-Epic project-board / module docs / phase 8: `test_plan_ideas.py` guards the capture loop that I1-I4 built, and I3 is the groom skill that reads the file. The release-infrastructure lane was the other plausible home and is the wrong one — nothing here is about releasing.
-</p></div></div>
 <div class="card ready" id="card-I7" data-id="I7" data-module="docs" data-phase="8" data-epic="project-board" data-type="chore" data-status="todo" data-search="i7 fan-out orchestration puts several id allocators and several render writers inside one checkout - write the coordinator rule into the operating guide before a skill spawns workers" tabindex="0"><div class="card-head"><span class="card-id">I7</span><span class="card-title">Fan-out orchestration puts several id allocators and several render writers inside one checkout - write the coordinator rule into the operating guide before a skill spawns workers</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">project-board</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) ONE RULE, BESIDE THE PULL RULE IN THE OPERATING GUIDE&#x27;S SECTION 0 - the coordinator
 allocates every id up front and hands each worker a pre-assigned id, workers never mint and
 never re-render, and fan-out is restricted to units touching disjoint source files.
@@ -1293,39 +1280,6 @@ lane may pull. A note on a done item is a handoff nobody re-reads, so
 docs/restructure/backlog/items/REM1.yaml is now an inputs entry here (an item file is a
 legitimate input; CORE5 lists K30 and MM3 the same way). Whoever pulls PLAN8 finds the row
 without knowing to look for it.
-</p></div></div>
-<div class="card ready" id="card-PLAN9" data-id="PLAN9" data-module="drydocs-plan" data-phase="8" data-epic="project-board" data-type="task" data-status="todo" data-search="plan9 census pins are venue data: the coverage-census tuple in test_docs_coverage moves to a venue-owned config block the test reads, after a survey of the other pins of the same shape" tabindex="0"><div class="card-head"><span class="card-id">PLAN9</span><span class="card-title">Census pins are venue data: the coverage-census tuple in test_docs_coverage moves to a venue-owned config block the test reads, after a survey of the other pins of the same shape</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-plan</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">project-board</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> tests/unit/test_docs_coverage.py:358 test_the_live_coverage_census_is_pinned hard-codes the
-producer&#x27;s census tuple (products, products with no corpus, and two more counts) over the
-REAL registries. The test is right as a guard - the coverage picture must not drift
-silently - and the tuple inside it is a fact about ONE checkout&#x27;s corpus, so on every roll
-it collides, the consumer re-pins to its own numbers by hand, and any later producer edit
-to the same lines collides again (2026-09-07 transcription, sixteenth report, the
-hand-merges). Same family as any live-config count checked in as if it were code.
-
-(a) Survey first, in the item&#x27;s close note: every unit test that pins a count over a LIVE
-    config file (not a fixture - a grep for tuple equalities in tests/unit/ finds mostly
-    fixture pins, which are not this class) is listed with its file, line and the tuple.
-    The census pin is one; the constraint count over the schema and the vocabulary fragment
-    count are the candidates to check.
-(b) One shape is chosen for the class and applied to every pin the survey found. Preferred:
-    the tuple moves to config/dev-environment.yaml, which already declares `edition:` per
-    venue and is a per-entry manifest row, as a `census:` block the test reads - the guard
-    keeps its teeth, the DATA stops crossing. Alternative, if a pin cannot move: a per-entry
-    PORT-MANIFEST.yaml row for the test file whose entry_rule names the pin lines as
-    consumer-owned. The close note says which shape each pin took and why.
-(c) The test&#x27;s docstring keeps its history (the O81 15/13 -&gt; 16/14 note) and adds one line
-    saying where the numbers now live and that a consumer edits the venue file, never the
-    test.
-(d) A relay tells the consumer the pin moved and where its own numbers go. Nothing is
-    asked back.
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-07 from IDEAS.md Idea-292 (desktop, Lane A); the stub shipped in e0f2b799
-under a stale CFG5 message - see CORE6&#x27;s note. Source is the company&#x27;s carve-out I
-hand-merge list, transcribed to the machine-local back-flow file named in Idea-292.
-
-module drydocs-plan for the guard; the venue file is config and rides along - one item,
-because splitting the pin from the file it reads is how the two drift. Lands with PORT6 as
-a next-roll relay, not mid-apply. p2: it costs one hand-merge per roll today and no data is
-wrong.
 </p></div></div>
 <div class="card ready" id="card-PLAN10" data-id="PLAN10" data-module="drydocs-plan" data-phase="8" data-epic="project-board" data-type="bug" data-status="todo" data-search="plan10 render_gates.py emits a row for a self-declared gate prompt that has no accounting log entry, so a signed gate whose record never crossed a port is visible instead of silently skipped" tabindex="0"><div class="card-head"><span class="card-id">PLAN10</span><span class="card-title">render_gates.py emits a row for a self-declared gate prompt that has no accounting log entry, so a signed gate whose record never crossed a port is visible instead of silently skipped</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-plan</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">bug</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">project-board</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> scripts/render_gates.py emits NO row for a gate prompt that self-declares (a leading
 &quot;# SIGNED OFF&quot; or &quot;# DEFERRED&quot; banner) and has no entry in config/gate-log.md. The skip at
@@ -1522,56 +1476,6 @@ module drydocs-core because tests/unit/test_skip_guard_policy.py is the instrume
 owns it. depends_on CORE4, which is done, so this is startable now. p3: nothing is broken;
 the cost is that a guard protecting nothing reads as protection.
 </p></div></div>
-<div class="card ready" id="card-DOC2" data-id="DOC2" data-module="docs" data-phase="8" data-epic="release-infrastructure" data-type="task" data-status="todo" data-search="doc2 relay-23 - the frozen letters, mint by module code, the edition segment and the retired partition rules reach the company through the port-prompt" tabindex="0"><div class="card-head"><span class="card-id">DOC2</span><span class="card-title">RELAY-23 - the frozen letters, mint by module code, the edition segment and the retired partition rules reach the company through the port-prompt</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">release-infrastructure</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-PLAN2" data-target="card-PLAN2">PLAN2</a> <a class="dep-link" href="#card-PLAN3" data-target="card-PLAN3">PLAN3</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Gate ontology-domain-registry-and-edition-grain §E1 (SIGNED OFF 2026-09-02): a cross-repo convention change is inert until it
-reaches the other side, and the company&#x27;s allocator only WORKS once it holds an edition
-code. RELAY-24 carries PLAN1 + this gate to the company through the port-prompt, in the
-roll that carries commit 375dd962 (PLAN1 mechanism) and 39b90843 (this gate).
-
-(a) THE FREEZE HALF, which can go now: the 27 letters frozen at their all-time max
-(FROZEN_SERIES, FROZEN_ON 2026-09-02; the table is the constant, quoted); `--next-id G`
-and `--next-id DD` are refused, each message naming the replacement; the series is the
-module - modules.yaml `series:` arrives canonical-producer, so they inherit the 18 codes;
-`--next-id --module &lt;m&gt;` is the command; codes are three-plus letters precisely so a
-company mint can never be confused with a frozen letter, and none is DD. THE FREEZE HALF
-CARRIES FROZEN_BAND (review F3/F9, docs/reviews/restructure-design-review-2026-09-02.md): the frozen table
-was measured on the producer&#x27;s tree and admits nothing above G136, so the company&#x27;s G10001-G10003
-and DD10001-DD10003 fail test_frozen_series_take_no_new_ids the day this half lands.
-FROZEN_BAND = {G: 10003, DD: 10003} (a legacy band id is frozen at the band&#x27;s own max) is
-PLAN3 - a producer-side change to validate.py and test_backlog.py that ships BEFORE this
-relay rolls, not with PLAN2 (re-pointed 2026-09-02; this item now depends on PLAN3 for
-its freeze half) - a freeze relay that hands the company a red suite is worse than no
-relay. The relay says so, and says the company&#x27;s six band ids are read and listed, not
-re-minted.
-
-(b) THE PREFIX HALF, which waits on PLAN2 landing: `[&lt;EDITION&gt;-]&lt;MODULE&gt;&lt;n&gt;`; the company
-base is an edition and MINTS ITS OWN CODE at its own gate (CFG2 §C3) - the relay names the
-file and the columns, not the code; both partition rules are retired forward-only (§C4):
-their DD1-DD10 / DD10001-DD10003 / G10001-G10003 stay readable; the band mirror assertion
-the port-prompt asked them to write (steps 160, 273 region) is WITHDRAWN and replaced by
-the edition-segment check; between the roll and the company&#x27;s code mint the company mints nothing new -
-and that is a MECHANISM, not a request (review F2): the allocator reads the venue&#x27;s
-edition from config/dev-environment.yaml `edition:` (the company&#x27;s own canonical-company file),
-refuses to mint while the key is absent, and names the key. The relay tells the company the
-one line to write once its code is minted, and nothing else about the code itself.
-
-(c) THE TWO-AXES WORDING, verbatim from the 2026-09-02 review, so their agent stops
-conflating repos and checkouts: Axis 1 - repos (producer / company: disjoint histories,
-one-way port; the edition prefix separates THESE). Axis 2 - checkouts (every machine,
-worktree or session is a checkout; the push-before-work claim and the wip/ branch rule
-separate THESE). &quot;Both machines and both repos&quot; meant axis 2 on our side and axis 1
-between us.
-
-(d) J63 provenance block, the RELAY numbered, the APPLY BY DISPOSITION section updated for
-the new per-entry rows (domains.yaml, editions.yaml) and the CLAUDE.md mint-rule change.
-Idea-237&#x27;s gate-prompt correction (MM13) rides the same relay.
-
-Depends on PLAN2 for (b); (a) may ship first if a roll happens before PLAN2 lands, in which
-case the item stays in_progress and (b) is a second relay entry.
-</p><p class="notes"><strong>Notes:</strong> 2026-09-02: RELAY-23 was taken by the ADR 0018 subpackage move, which rolls first; this
-relay takes the next free relay number when it rolls (RELAY-23 and RELAY-24 were taken the same day by the ADR 0018 move and the S8 adoption). The title keeps its original number - a retitle after the stub
-push reads as a mint collision to the guard (I6); the number in the port-prompt is what
-counts.
-</p></div></div>
 <div class="card ready" id="card-DOC8" data-id="DOC8" data-module="docs" data-phase="8" data-epic="release-infrastructure" data-type="chore" data-status="todo" data-search="doc8 the 3.14 advisory leg&#x27;s warnings are read once: each class is fixed or filtered by name with its reason, and the 3.12 baseline with it" tabindex="0"><div class="card-head"><span class="card-id">DOC8</span><span class="card-title">The 3.14 advisory leg&#x27;s warnings are read once: each class is fixed or filtered by name with its reason, and the 3.12 baseline with it</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">release-infrastructure</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-J67" data-target="card-J67">J67</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The 3.14 advisory leg emits 37 warnings where the 3.12 leg emits 7, and nobody has read the
 extra thirty. An advisory leg that is never read is a leg that only costs. Thirty new
 warnings at a new interpreter are usually a handful of deprecations repeated across many
@@ -1598,17 +1502,6 @@ cheapest while the count is thirty and the leg is new.
 RELATED, SEPARATE: Idea-298 asks whether the Windows leg earns its 1.9x cost on every push.
 That is a user ruling on CI spend and stays in the inbox as a question.
 </p></div></div>
-<div class="card ready" id="card-J54" data-id="J54" data-module="docs" data-phase="8" data-epic="release-infrastructure" data-type="chore" data-status="todo" data-search="j54 versioning.md describes a backlog schema and a backlog file that no longer exist, so the release ritual instructs a reader to cite a tombstone" tabindex="0"><div class="card-head"><span class="card-id">J54</span><span class="card-title">VERSIONING.md describes a backlog schema and a backlog file that no longer exist, so the release ritual instructs a reader to cite a tombstone</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / main</span></div><div class="epic">release-infrastructure</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE TWO STALE FACTS. `VERSIONING.md` names the backlog config schema at its PREVIOUS version, and its release-notes section tells the author to cite epic and item ids from `docs/restructure/backlog.yaml`. The schema is now v3 (ADR 0013) and that file is a tombstone — the backlog is one item per file under `docs/restructure/backlog/items/`. Both are corrected, and the ids-to-cite instruction points at the sharded tree.
-
-(b) THE REST OF THE FILE IS READ, NOT JUST GREPPED. Any other statement in the ritual that names a path, a command or a guard is confirmed against the tree in the same pass; a currency fix that leaves the next stale line for the next reader has moved the problem rather than fixed it. The close note lists what was checked and found correct, not only what changed.
-
-(c) OUT OF SCOPE, DELIBERATELY: the v0.3.0 tag disposition and whether a v0.4.0 is owed. Those are release decisions for the user (see the inbox question groomed alongside this item) and this chore must not enact either — it does not push a tag, re-cut one, or change the version string in `pyproject.toml`.
-</p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-26 from Idea-163 clause 3, which offered the choice of folding this into the tag work or treating it as ordinary doc drift. Treated as doc drift because clauses 1 and 2 of that entry are user decisions with no default, and blocking a two-line currency fix behind a release call would leave the ritual actively misleading for as long as the call takes.
-
-Module `docs`, epic release-infrastructure, phase 8 — VERSIONING.md is release-ritual documentation.
-
-p3/haiku: two corrections against facts already established by ADR 0013.
-</p></div></div>
 <div class="card ready" id="card-J56" data-id="J56" data-module="docs" data-phase="8" data-epic="release-infrastructure" data-type="task" data-status="todo" data-search="j56 run the bmc-docs-example gate (the vendor-docs walkthrough page)" tabindex="0"><div class="card-head"><span class="card-id">J56</span><span class="card-title">Run the bmc-docs-example gate (the vendor-docs walkthrough page)</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">release-infrastructure</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-J24" data-target="card-J24">J24</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> A sign-off session for gate `bmc-docs-example` is HELD and its outcome recorded in
 config/gate-log.md as SIGNED, SME-DEFERRED with a named re-arm trigger, or
 BLOCKED with a named blocker -- silence is the one non-outcome. BEFORE the
@@ -1624,21 +1517,6 @@ drafted-unsigned gates had NO item owning the sign-off -- the drafting item
 closes done and the session is never scheduled. Drafting item J24 closed done when the prompt landed; nobody owned the RUN.
 This item is the sign-off session&#x27;s claim surface; the session itself is
 HITL (agent: main).
-</p></div></div>
-<div class="card ready" id="card-J59" data-id="J59" data-module="config" data-phase="8" data-epic="release-infrastructure" data-type="chore" data-status="todo" data-search="j59 the one freshness key the repo has lies — 16 of 24 dated yaml headers are stale against git, so the `updated:` field needs a check that compares it to something, and that check cannot live in ci" tabindex="0"><div class="card-head"><span class="card-id">J59</span><span class="card-title">The one freshness key the repo has LIES — 16 of 24 dated YAML headers are stale against git, so the `updated:` field needs a check that compares it to something, and that check cannot live in CI</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">release-infrastructure</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-J58" data-target="card-J58">J58</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE GUARD IS A PRODUCER-SIDE LOCAL HOOK, AND THE REASON IS RECORDED. Freshness is checked by comparing each governed file&#x27;s `updated:` value against `git log -1 --format=%as &lt;path&gt;`. That comparison is BLIND IN CI — the workflow uses a shallow checkout with no `fetch-depth` override (verified against `.github/workflows/ci.yml`), so per-file git dates are not available to the runner and a CI-hosted version of this check would report green while measuring nothing. It therefore ships as a pre-commit hook, which means creating the repo&#x27;s first `.pre-commit-config.yaml` (none exists today) plus the hook script, with installation named in the session ritual. A check that cannot run where it is installed is the exact failure this item exists to avoid repeating.
-
-(b) IT SOLVES THE LYING PROBLEM, NOT THE PRESENCE PROBLEM. Presence is J58&#x27;s. This one fails when `updated:` disagrees with the file&#x27;s git last-touch date beyond a stated tolerance, and the tolerance is written with its reason rather than picked. Worked example to close against, measured 2026-08-27: of 24 files carrying `updated:`, 16 are stale — `PORT-MANIFEST.yaml` itself reads `updated: 2026-08-20` against a git date of 2026-08-27. Re-measure at pull time.
-
-(c) `updated:` IS A PER-SIDE FIELD AT THE PORT MANIFEST, AND THIS SAYS SO. Git dates DO NOT survive the port: disjoint histories stamp every ported file with port day, so the company&#x27;s git date for a file is the day it arrived, not the day its content changed. That is precisely why the IN-FILE date is the cross-repo freshness mechanism and why `updated:` must be declared a per-side field in `PORT-MANIFEST.yaml` — the doc-source-registry field-split is the precedent. Without this clause the hook would make every ported file look freshly touched on their side.
-
-(d) THE HOOK IS ADVISORY-CAPABLE AND NEVER BLOCKS A COMMIT SILENTLY. It either fails loudly with the file list and the two dates per file, or it is bypassed with a recorded, deliberate flag. It never passes because it could not determine a date — an unresolvable file is reported, not skipped.
-
-(e) OUT OF SCOPE: adding `updated:` to files that lack it (J58 clause (c)), and the Python docstring standard (J60).
-</p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-28 from Idea-181 (captured 2026-08-27), the freshness half. Split from J58 on the entry&#x27;s own persona-review finding F3 — the git-compare guard is blind in CI — which turns &quot;one guard&quot; into two mechanisms with different homes. Keeping them in one item would have produced a guard that ships to CI, passes, and measures nothing, which is the same shape as the defect it is meant to catch.
-
-`depends_on: [J58]` is real, not decorative: there is nothing to compare until the `updated:` key is required and populated, and the schema J58 writes is what tells this hook which files it governs.
-
-Epic release-infrastructure / module config / phase 8 follows J58. Model sonnet; priority p3 rather than p2 because a stale in-file date is a smaller harm than a missing one, and because the hook is producer-machine-local and so cannot be enforced for anyone who has not installed it — which is itself worth stating in the close note as a known limit rather than discovered later.
 </p></div></div>
 <div class="card ready" id="card-J60" data-id="J60" data-module="docs" data-phase="8" data-epic="release-infrastructure" data-type="chore" data-status="todo" data-search="j60 module and package docstrings are enforced by nothing — enable ruff&#x27;s d100/d104 instead of writing a bespoke guard, and fill the modules that have no docstring at all" tabindex="0"><div class="card-head"><span class="card-id">J60</span><span class="card-title">Module and package docstrings are enforced by nothing — enable ruff&#x27;s D100/D104 instead of writing a bespoke guard, and fill the modules that have no docstring at all</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">release-infrastructure</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE RULE COMES FROM THE LINTER ALREADY IN THE GATE, NOT FROM A NEW TEST. `[tool.ruff.lint].select` currently reads `[&quot;E&quot;, &quot;F&quot;, &quot;W&quot;, &quot;I&quot;, &quot;B&quot;, &quot;UP&quot;, &quot;N&quot;, &quot;RUF&quot;]` — no `D` rules at all. Add `D100` (missing docstring in public module) and `D104` (missing docstring in public package) to `select`, with the pydocstyle convention set explicitly so the rest of the `D` family is not switched on by accident. CI already blocks on `ruff check` (J10 stage 5), so the enforcement point is free; a bespoke docstring test would be a second, weaker copy of a check the toolchain ships.
 
@@ -1677,58 +1555,6 @@ Epic release-infrastructure / module docs / phase 8 follows J52 and J57, the two
 Clause (b) is the half worth the item on its own. The ff-block has a workaround and everybody finds it; what nobody notices is that the workaround silently disarms the ONE guardrail section 0 calls out in capitals, because the command it names returns an empty string instead of failing. A guardrail that returns nothing reads as a guardrail that passed.
 
 This item was itself written and committed through the recipe it describes, from a detached worktree at origin slash main, which is the closest thing to a pre-verification the shape allows.
-</p></div></div>
-<div class="card ready" id="card-J64" data-id="J64" data-module="graph-infra" data-phase="8" data-epic="release-infrastructure" data-type="bug" data-status="todo" data-search="j64 a depgraph snapshot scanned before the commit it stamps is a claim about a tree that was never scanned - scan after, not before" tabindex="0"><div class="card-head"><span class="card-id">J64</span><span class="card-title">A depgraph snapshot scanned before the commit it stamps is a claim about a tree that was never scanned - scan after, not before</span></div><div class="chips"><span class="chip" data-kind="module">graph-infra</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">bug</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">release-infrastructure</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE ORDERING IS ENFORCED IN THE SCRIPT, NOT LEFT TO THE RITUAL&#x27;S PROSE. The snapshot stamps
-a git metadata header - commit, full sha, branch, describe, subject and dirty flag - so the scan
-must run against the tree of the commit it stamps. A scan taken before that commit exists makes
-the stamp a claim about a tree nobody scanned.
-
-(b) THE 2026-08-29 INCIDENT IS THE TEST CASE. A snapshot taken from the pre-merge tree recorded
-a directory that main had renamed on 2026-08-26, tripped the J55 publish-boundary guard, and had
-to be deleted and regenerated against the merge commit. Reproduce the ordering fault once,
-confirm the fix prevents it, and record both in the close note.
-
-(c) A DIRTY TREE AT SCAN TIME IS REPORTED AS SUCH rather than stamped silently, since the header
-already carries the flag and nothing reads it.
-
-(d) OUT OF SCOPE, DELIBERATELY - the CADENCE question. Thirty of the last thirty-three rolls
-carried no debt signal at all, and the four candidate directions are a user ruling that stays in
-the inbox. This item changes ordering only and rolls exactly as often as it does today.
-
-(e) SIBLING DEFECTS IN THE SAME SCRIPT ARE NOT RE-SOLVED HERE - the board refresh skipping
-silently is J65, and the session-close CI verdict&#x27;s detached-HEAD blindness is U27.
-</p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-30 (desktop, weekly groom) from Idea-206, taking ONLY its second clause. The
-entry states in terms that the cadence directions are deliberately not chosen, so grooming them
-would be guessing at a user decision; the ordering half is a plain defect with a reproduction.
-
-The cadence half stays in the inbox as an open question and is named in the groom report.
-</p></div></div>
-<div class="card ready" id="card-J65" data-id="J65" data-module="graph-infra" data-phase="8" data-epic="release-infrastructure" data-type="bug" data-status="todo" data-search="j65 the snapshot script&#x27;s board refresh has been silently skipping on this desktop, and the warning prints the word traceback instead of the module that is missing" tabindex="0"><div class="card-head"><span class="card-id">J65</span><span class="card-title">The snapshot script&#x27;s board refresh has been silently skipping on this desktop, and the warning prints the word Traceback instead of the module that is missing</span></div><div class="chips"><span class="chip" data-kind="module">graph-infra</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">bug</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">release-infrastructure</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE SCRIPT CLEARS THE VIRTUAL-ENVIRONMENT VARIABLE BEFORE IT CALLS POETRY, so a PowerShell
-caller that inherited this desktop&#x27;s leak - the shell pre-sets it to the agents environment -
-resolves the project environment instead. The failure today is a missing typer module raised
-from the load-map renderer; a Bash caller that unsets the variable succeeds and PowerShell
-inherits it and fails.
-
-(b) A FAILED STEP PRINTS THE LAST LINE OF THE TRACEBACK, NOT THE FIRST. This is the half that
-matters more than the first: the current output reads as noise, which is exactly why the skip
-survived unnoticed. After the change the warning names the module.
-
-(c) VERIFIED BY RUNNING THE STEP FROM BOTH SHELLS ON THIS DESKTOP and recording both outcomes in
-the close note, with the venue named (J18).
-
-(d) THE CONSEQUENCE IS STATED AND THEN CHECKED - the load-map surfaces never refreshed from the
-snapshot on this machine, so a stale render would not be caught by the step meant to catch it.
-Run the stale-render check once after the fix and commit any refresh it turns up.
-
-(e) WARN-ONLY STAYS WARN-ONLY. A failed board refresh still does not block the snapshot;
-recording repo structure and refreshing a render are unrelated jobs, and the failure being fixed
-is nobody seeing the warning.
-</p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-30 (desktop, weekly groom) from Idea-201, observed at the O77 close on
-2026-08-28.
-
-Same script as J64 and deliberately a separate item - that one is about WHEN the scan runs and
-this one is about a step inside it failing invisibly. Neither should re-solve the other, and
-both say so.
 </p></div></div>
 <div class="card ready" id="card-J70" data-id="J70" data-module="config" data-phase="8" data-epic="release-infrastructure" data-type="task" data-status="todo" data-search="j70 four registry-id rewrites were requested as a find-and-replace — two are id renames that owe a retired-id row, and one contradicts the signed j13 class-3 ruling" tabindex="0"><div class="card-head"><span class="card-id">J70</span><span class="card-title">Four registry-id rewrites were requested as a find-and-replace — two are id renames that owe a retired-id row, and one contradicts the signed J13 class-3 ruling</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">release-infrastructure</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE ESCALATION, FIRST, BECAUSE IT DECIDES WHETHER HALF THIS ITEM EXISTS.
 `controlm@[db].psgmgr.cm_avg_run` -&gt; `controlm@[db].[schema].cm_avg_run` asks to redact
@@ -1800,72 +1626,6 @@ inside that ruling (&quot;established public vocabulary&quot;) still holds for p
 Edition ships the tree outside this company. That framing is what keeps this an escalation
 rather than a reversal, and it is why the `gates:` field on this item points there: nothing
 in (a) is swept, renamed or redacted until it signs.
-</p></div></div>
-<div class="card ready" id="card-J77" data-id="J77" data-module="docs" data-phase="8" data-epic="release-infrastructure" data-type="chore" data-status="todo" data-search="j77 a branch tip can be green while commits inside it were red at push, so a bisect through the range fails on a ledger guard rather than the defect - have the roll say which commits were red" tabindex="0"><div class="card-head"><span class="card-id">J77</span><span class="card-title">A branch tip can be green while commits inside it were red at push, so a bisect through the range fails on a ledger guard rather than the defect - have the roll say which commits were red</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / main</span></div><div class="epic">release-infrastructure</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) ONE SENTENCE, in the ledger/roll convention wherever a roll describes a COMMIT RANGE:
-name the commits inside the range that were RED at push, or state that none were. Written
-by the session that made them, which already knows - the same way a roll step names which
-ids were re-minted.
-
-(b) NOT A GUARD, and say so on the line. A pre-push hook running the full suite would cost
-minutes on every push to buy a property nobody has needed yet, and a red intermediate
-commit is a legitimate way to work - J68&#x27;s own guard was written red first on purpose. The
-difference that matters is whether it goes green in the SAME commit.
-
-(c) SAY WHAT MOSTLY NEUTRALIZES IT, so the note is not read as bigger than it is: CLAUDE.md
-mandates --no-ff for branch merges, so once a branch lands, its red commits leave main&#x27;s
-FIRST-PARENT line and git bisect --first-parent never visits them. The exposure is
-bisecting the branch itself, or a range that crosses the merge boundary - which a PORT
-range does, since a port reads the full range and not the first-parent walk.
-
-(d) PASS/FAIL: the convention is written where a roll is authored, with the bisect
-consequence as its one-line reason.
-</p><p class="notes"><strong>Notes:</strong> Groomed 2026-09-02 from Idea-234 (desktop, backlog-groomer fork). p3 and haiku on purpose:
-this is one sentence in a doc, and the idea itself argues against anything larger.
-
-THE OBSERVATION: on feat/ui-web (2026-09-01), e7e95f07 and f44fb40d shipped two console
-components without their config/taxonomy/ui-components.yaml ledger rows and were RED on
-test_ui_components when pushed; e0c12d10 added the rows and the tip went green. The tip is
-the state anyone looks at, so the range reads as healthy. Reported by the session that made
-it, not found by anything - which is the gap.
-
-WHAT ALREADY WORKS AND IS NOT BEING CHANGED: the session ritual&#x27;s CI check matches on HEAD&#x27;s
-sha, warn-only, immediately before snapshot.ps1 writes. It does exactly what it claims,
-per push. Nothing aggregates the answers, and this item does not build an aggregator.
-Related: Idea-111, Idea-229 (the same verification channel, seen where a run has NO verdict).
-</p></div></div>
-<div class="card ready" id="card-PORT1" data-id="PORT1" data-module="drydocs-port" data-phase="8" data-epic="release-infrastructure" data-type="task" data-status="todo" data-search="port1 three back-flow adoptions from the company&#x27;s chunk-1 apply, plus the rule that a workplan naming a script names the commit it needs" tabindex="0"><div class="card-head"><span class="card-id">PORT1</span><span class="card-title">Three back-flow adoptions from the company&#x27;s chunk-1 apply, plus the rule that a workplan naming a script names the commit it needs</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-port</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">release-infrastructure</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Three back-flow adoptions from the company&#x27;s chunk-1 apply of port-base-20260901, plus
-one rule for the port workplan. The company holds the transcript; the producer holds the
-mechanisms, which is why these land here.
-
-(a) scripts/render_port_dispositions.py takes an OPTIONAL HEAD ref. The consumer&#x27;s HEAD is its
-    own tree, so a range on their side classifies tag..tag and never tag..HEAD; they patched
-    main()/render() for it and the shape is the one to adopt.
-(b) The fourth guard in tests/unit/test_port_dispositions.py (the APPLY-BY-DISPOSITION section
-    above STEP LEDGER in the port-prompt) is producer-only by nature - the company&#x27;s
-    port-prompt copy is retired and carries neither marker - so it SKIPS when the markers are
-    absent, with a message saying so, rather than forcing the consumer to drop a test. The
-    skip is TRACKED-content-based, never a directory probe.
-(c) scripts/port_rename_check.py spawns one git show per producer file across the whole tree.
-    Move it to git cat-file --batch on one pipe: minutes become seconds, and the whole-tree
-    look is what RELAY-20 asks for before every clean-add slice. Prove the speed-up with a
-    measured before/after on this tree, and prove the OUTPUT is unchanged on the same range.
-(d) THE WORKPLAN RULE: a chunk plan that names a script names the COMMIT the script needs.
-    The company was told to run a renderer that landed after their base (J69 at bed22549).
-    Chunk 1 should also say: classify with git show &lt;base&gt;:PORT-MANIFEST.yaml, not with the
-    consumer&#x27;s current manifest, and then diff the two manifests - the differences ARE the
-    port&#x27;s own manifest rows. Both rules land in the port-prompt.
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-07 from IDEAS.md Idea-250 (company session&#x27;s chunk-1 status, relayed by
-the SME 2026-09-02; the producer holds no transcript, so traceability to their id is
-one-directional).
-
-The entry&#x27;s fourth finding RESOLVED itself the same day in the company&#x27;s favour and is
-recorded here for the record, not as work: the producer&#x27;s 519 was measured ..HEAD three
-commits past the tag; tag..tag with the manifest at the tag is 516 / 130 / 150 / 4, and their
-123 is 130 minus the seven derived rows. That resolution is exactly why clause (d) exists -
-classifying with the wrong manifest is the mistake that produced the discrepancy.
-
-First item in the PORT series (module drydocs-port, added at CORE1). Filed
-release-infrastructure / phase 8 with the other port mechanisms (J34, J72).
 </p></div></div>
 <div class="card ready" id="card-K23" data-id="K23" data-module="taxonomy" data-phase="9" data-epic="seal-attribution" data-type="task" data-status="todo" data-search="k23 are servicenow kb articles linked at deployment module grain asserted or defaulted? -- the check that decides whether the kb_* family is a real pull candidate" tabindex="0"><div class="card-head"><span class="card-id">K23</span><span class="card-title">Are ServiceNow KB articles linked at Deployment Module grain ASSERTED or DEFAULTED? -- the check that decides whether the kb_* family is a real pull candidate</span></div><div class="chips"><span class="chip" data-kind="module">taxonomy</span><span class="chip" data-kind="phase">P9</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">seal-attribution</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> A recorded verdict in knowledge/upgrade-plans/servicenow-replica-evidence.md, where open questions 8 and 9 already sit, answering ONE question with evidence rather than plausibility: is the KB-article-to-Deployment-Module link ASSERTED by an author, or DEFAULTED by the form the way transactional records default their module? The check comes FIRST because the defect it looks for would hit KB articles identically to Changes and Incidents, and a graph built on a defaulted foreign key attaches documented fixes to the wrong deployment while looking perfectly populated. On the strength of that verdict, a RECOMMENDATION -- promote the kb_* family from ring 3 to a pull candidate, or leave it in ring 3 with the reason -- routed to the gate that rules the pull scope, never enacted here. NOTHING ACTIVATED: no source row written to config/source-registry.yaml, no loader, no edge. Any edge the recommendation implies is registered status: planned and goes through docs/RELATIONSHIP_GUIDE.md and the HITL gate. AMENDED 2026-08-19 by the export profile below. The ASSERTED-vs-DEFAULTED dichotomy is MOOT for the designed columns, because they are not populated at all -- an empty field is neither asserted nor defaulted. The live question the verdict must now answer is narrower and sharper: given that the only working SEAL link is at APPLICATION grain with 44% coverage and owning-not-subject semantics, does the kb_* family leave ring 3? The original question survives only for u_correlation_id itself: is that value authored per article, or defaulted from the article&#x27;s owning base/content owner? The illustrative rows suggest the latter, which is exactly the defect this item was written to look for -- arriving on a different field than the one it was aimed at.
 </p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-11 from Idea-102&#x27;s separate thread. The SME called KB articles at deployment grain &quot;more meaningful&quot;, and a documented fix attached to the deployment that has the incident is squarely what a production-support knowledge graph is for -- which is why it earns an item rather than a line inside K22. Deliberately an ASSESSMENT and not an ingestion: ring 3 is where the family sits today, and the value of the item is that it is allowed to come back &quot;leave it there&quot; with evidence. EVIDENCE ARRIVED 2026-08-19 (SME screenshots; profiling ran on the SME&#x27;s own machine against a dated CSV export of the KB view, NOT in this tree -- the file is not present here and these numbers could not be re-derived producer-side, J18). Shapes only per the publish boundary: the view&#x27;s real db/schema, the SEAL id values, the KB article numbers, the content-owner SID and the support-group names all stay out of this repo. Registry grammar for the object is snow@[db].[schema].v_kb_knowledge. THE HEADLINE, and it lands on K23&#x27;s premise rather than beside it: EVERY purpose-built SEAL/attribution column is 0-of-200 filled -- u_seal_id, u_do_you_have_seal_id, u_business_application, u_product_owner, u_assignment_group. The designed linkage does not exist in the export. Deployment grain in particular is unreachable: evidence-doc Q7 established that a deployment link shows as the composite app:deployment name (or the CI id), and every populated value here is a BARE app id with no deployment segment. So the SME&#x27;s &quot;KB articles at deployment grain&quot; premise is not merely unconfirmed -- this export cannot express it. WHAT DOES CARRY A LINK: u_correlation_id, 88 of 200 (44%), 77 distinct values, all numeric and 4-6 digits, i.e. SEAL-shaped at APPLICATION grain. 112 of 200 (56%) have no SEAL link on any field. Secondary signals, none of them a substitute: the KB base field is 100% filled with 15 distinct values (a base grouping, at best a coarse owning-domain proxy, and the top 3 hold 131 of 200); u_content_owner 48% as free text (person / SID / group, so it reaches an app only indirectly via the support group); ownership_group 4.5%. THE CAVEAT THAT DECIDES THE VERDICT: u_correlation_id looks like the OWNING app&#x27;s SEAL, not the article&#x27;s SUBJECT SEAL. Two sampled rows cite a different SEAL inside the article title than the one in u_correlation_id. If that generalises, then even the 44% is answering &quot;who owns this article&quot; rather than &quot;what is this article about&quot; -- and an edge built on it would attach documented fixes to the wrong application while looking well populated, which is the K23 defect exactly, one grain up from where the item expected it. NOT SETTLED, and the write-up must say so: whether the 200-article export is the whole KB or a projection (the same completeness doubt as evidence-doc Q9, one level down), and whether the owning-vs-subject reading holds beyond the two sampled rows. A subject-precise mapping would require parsing the SEAL out of the article title or body, which is a different and much weaker capture than a structured foreign key. DIRECTION OF TRAVEL: this evidence points at &quot;leave the kb_* family in ring 3, with the reason recorded&quot; rather than at promotion. The item is NOT closed by it -- the acceptance puts the verdict in knowledge/upgrade-plans/servicenow-replica-evidence.md beside Q8/Q9. VERDICT RECORDED 2026-08-19 as evidence-doc section 11 -- 11.1 why the ASSERTED-vs-DEFAULTED question dissolved, 11.2 what the export does carry, 11.3 the recommendation, 11.4 the surviving use case. Section 7.4&#x27;s NOT-TAKEN row now points at it, so a reader of the pull scope meets the ruling rather than the deferral. RECOMMENDATION: leave the kb_* family OUT as an attribution source, with the REASON recorded rather than the deferral -- routed to the gate that rules pull scope, not enacted here. Nothing activated: no registry row, no loader, no edge. K23 STAYS OPEN AND ITS SCOPE HAS MOVED (user direction 2026-08-19). The attribution question is answered; what remains is the named use case that keeps the family alive. THE REMEDIATION MODULE searches the existing KB for articles covering the same defect, DOWNLOADS them for reference and archiving, and only then authors a new article. That consumer is untouched by everything the profile found: it wants the article as a DOCUMENT to find, read, cite and retain, not as a node to attach to an application, and the KB SQL that already exists matches on short_description with a body-text fallback while ignoring the SEAL columns entirely. So the 0-of-200 finding does not reach it, the owning-vs-subject caveat does not reach it, and 44% coverage stops being a blocker because the denominator is articles that MATCH THE DEFECT, not articles that carry a key. WHAT THIS ITEM NOW OWES, per section 11.4, none of it settled: the READ PATH (the Snowflake view vs the ServiceNow API vs an offline export -- different freshness and permission consequences); WHERE A DOWNLOADED ARTICLE LANDS, which is a publish-boundary question with a ready answer -- a KB body is company prose, so it belongs in the out-of-repo data root as a DECLARED landing zone (drydocs_core/landing_zones.py) rather than an ad-hoc download directory; whether the archived copy is a CITATION (a convenience) or a SOURCE a fix package quotes (evidence, carrying a retention obligation -- the different ruling, and the one with consequences); and the DUPLICATE TEST, since &quot;search before authoring&quot; implies a bar for &quot;already covered&quot; that a LIKE pattern over short_description is a weak instrument for. MODULE NOTE: the work has moved out of taxonomy and into drydocs-remediation (detect -&gt; transform -&gt; prove -&gt; Jira, ADR 0002-B). Left at module: taxonomy for now because re-homing an item is a groom decision, not a side effect of recording a verdict -- flagged here so the next groom moves it deliberately. QUESTION 3 RULED 2026-08-19 (SME) -- recorded as evidence-doc section 11.5. The articles expected back are RUNBOOKS, FOUND BY CONTROL-M FOLDER, which is what the existing KB SQL already does: it builds its LIKE patterns from the folder/job name. A batch EXTRACTS the runbook, saves it to the fix Jira as a BASELINE, REPLACES it, and captures ACCURACY and STALENESS metrics to gauge cleanup effort and progress. So the archive is a SOURCE, not a citation -- three independent reasons, any one sufficient: it is the before-half of a before/after pair; the original is REPLACED, so the archived copy becomes the only surviving record of what the runbook said; and the metrics are measured against it, so a score that cannot be re-derived from the artifact it scored is an assertion rather than a measurement. THE RETENTION OBLIGATION IS STRONGER THAN THE EMAIL-EXTRACT PRECEDENT. That pair is a system of record because the upstream purges on a 6-18 month cycle; here WE overwrite the upstream ourselves, deliberately, as the last step of the fix. Two ordering rules follow: CAPTURE BEFORE REPLACE, treating a failed capture as a failed step (a batch that replaces a runbook it did not archive has destroyed its own baseline), and the archived copy is IMMUTABLE once written. Question 2 is decided by this rather than open beside it: the archive belongs in the out-of-repo data root as a DECLARED landing zone (drop_dir_base: data_root, guarded by tests/unit/test_landing_zones.py) -- a baseline a port-time git clean can reach is a baseline that disappears without a log. THE METRICS NEED DEFINITION AND ONE IS NEARLY FREE. The cheap reading of staleness is the one the SME already rejected -- Q11&#x27;s problem statement is that stale versions are distinguishable only BY DATE. A measured staleness is available because G68 profiles a folder set into four where-used censuses (shape, identity/FIDs/run-as/SEAL, variables, contacts), which is a ground truth for the same folder the runbook documents: ACCURACY = of the entities a runbook names, how many still exist and still mean what it says; STALENESS = the drift between the runbook&#x27;s picture and G68&#x27;s current one. That also gives cleanup a DENOMINATOR, which is exactly G93&#x27;s defect on the documentation axis -- so it should ride G93&#x27;s run-log contract, not grow a second reporting path. HANDS TO Q11, AND SOMEONE SHOULD DECIDE WHETHER TO AMEND THAT PROMPT: the document-supersession gate&#x27;s clause C asks who ASSERTS supersession -- a capture pipeline OBSERVING a replacement, or an SME RULING two captures are versions of one thing. Remediation is neither: it PERFORMS the replacement, so it does not infer supersession, it KNOWS it, and can name the fix id as the basis. That is the most reliable assertion class the edge will get, and clause C would be ruled without it unless the prompt is amended before signing. NOT amended here -- Q11 is done and its prompt is the deliverable, so touching it is a decision, not a side effect. HANDS TO G68: a candidate FIFTH census -- documentation, i.e. which folders in the set have a runbook, which do not, and how each scores. Proposed to that item, not assumed. STILL OPEN AFTER THIS RULING: the scoring rules (entity existence is tractable, &quot;still means what it says&quot; is a judgement -- rule the tractable subset and say the rest is unscored rather than inventing a similarity number); whether a folder with NO runbook at all is a finding, which is a GAP report rather than a staleness one and is arguably the more valuable output; and the section 11.4 question 4 duplicate/coverage bar, now sharper because a false negative in the LIKE search silently becomes &quot;this folder has no runbook&quot; in that same gap report.
@@ -2730,23 +2490,6 @@ path, the ceiling and the politeness delay are all untouched.
 <div class="card ready" id="card-U23" data-id="U23" data-module="ontology" data-phase="16" data-epic="self-documentation" data-type="task" data-status="todo" data-search="u23 nothing joins a loader to the cypher it executes — draft the gate rider for a loader-to-cypher-file edge, the .cypher nodes that carry zero edges" tabindex="0"><div class="card-head"><span class="card-id">U23</span><span class="card-title">Nothing joins a loader to the Cypher it executes — draft the gate rider for a loader-to-cypher-file edge, the .cypher nodes that carry zero edges</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P16</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">fable / ontology-mapper</span></div><div class="epic">self-documentation</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> A gate rider is DRAFTED and nothing else. Drafting decides nothing (the G27 / W1 / N10 / G95 precedent): no vocabulary entry leaves `planned`, no edge is written, and if the gate does not sit, the drafted rider IS the deliverable. VIA THE GATE is the whole point -- a new relationship type is an ontology decision under CLAUDE.md section 6, never an import convenience. It carries four things. (a) THE FACT, RE-MEASURED rather than copied from the 2026-08-02 note that raised it: `drydocs/loaders/` holds .py loaders, their .cypher files and their .sql side by side; the .cypher files are :CodeModule nodes with NO edges at all, while each loader names its Cypher as a literal path in Python (the CYPHER_DIR / &quot;&lt;name&gt;.cypher&quot; idiom). The prompt states the current counts and the date it counted them. (b) THE EDGE QUESTION, put as a question: what does the edge MEAN -- &quot;executes&quot;, &quot;reads as a resource&quot;, something narrower -- and does the .sql beside it carry the same edge or a different one? Direction, cardinality, and whether one label with a role property beats two labels (the documented RUNS_ON-overload risk is the standing worked example on this side). (c) THE EMITTER, because the edge has nowhere to come from today: the depgraph scanner does not emit it, so the prompt says where it would -- a static read of the CYPHER_DIR literal, in the instrument (the sibling repo, which means an expected_commit bump) or in the loader that reads the snapshot -- and what each costs. This is the clause that stops the rider being signed with no path to a first row. (d) WHAT IT UNLOCKS AND WHAT IT DOES NOT, stated plainly so the item is never judged against a promise it did not make: gate `self-documentation-code-graph` section H5 already records that :CodeModule to the OPERATIONAL graph -- &quot;which module loads this Control-M job&quot; -- is NOT delivered by that gate and needs a second item, precisely because the module-to-label mapping lives in the loaders&#x27; Cypher rather than in their imports. A loader-to-cypher edge is the FIRST half of that join and not the join; the prompt says so.
 </p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-13 (targeted groom -- node labels and Cypher loaders) from Idea-47, which had been parked with &quot;gate section H5&#x27;s named future item&quot; as its trigger. Promoted as a DRAFT and only a draft: the entry&#x27;s own two blockers are unchanged -- the instrument emits nothing and the loader could not load the edge if it did -- so what is groomable is the QUESTION, put to the SME with the evidence attached, rather than a build that would have no input. MODULE ontology: the deliverable is a relationship-vocabulary decision. The emitter change the rider scopes is drydocs-load / graph-infra work and belongs to whatever item the gate produces, not to this one. p3 on the entry&#x27;s own Low priority -- the nodes have sat edgeless since 2026-08-02 with no consequence beyond an unanswerable query, and the H5 question it feeds is not scheduled.
 </p></div></div>
-<div class="card ready" id="card-U27" data-id="U27" data-module="graph-infra" data-phase="16" data-epic="self-documentation" data-type="bug" data-status="todo" data-search="u27 snapshot.ps1&#x27;s ci check asks `gh run list --branch main`, so from any branch head can never appear and the verdict degrades to no-run-yet permanently — and the verdict function still has no tests" tabindex="0"><div class="card-head"><span class="card-id">U27</span><span class="card-title">snapshot.ps1&#x27;s CI check asks `gh run list --branch main`, so from any branch HEAD can never appear and the verdict degrades to no-run-yet permanently — and the verdict function still has no tests</span></div><div class="chips"><span class="chip" data-kind="module">graph-infra</span><span class="chip" data-kind="phase">P16</span><span class="chip" data-kind="type">bug</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">self-documentation</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE BRANCH PIN: the caller asks CI about the branch it is actually on — `git rev-parse --abbrev-ref HEAD` in place of the literal `main` (line 166 at this groom: `gh run list --branch main --limit 10 --json ...`). Today the script fetches main&#x27;s ten newest runs and matches the LOCAL HEAD sha against them, so from a worktree, an epic slice, an agent fork or any `feat/` branch — exactly the sessions CLAUDE.md tells you to branch for — HEAD is never in the answer and every run takes the yellow &quot;no run yet for HEAD&quot; path until merge. The worked example is the branch this was filed from: CI was GREEN on `feat/ui-workstream` and invisible to a query pinned to `main`. A detached HEAD degrades to something honest (a named skip), never a crash.
-
-(b) FIVE FIXTURES FOR `Get-CiVerdict`, which its own design comment already claims is &quot;a pure function of (runs, head) so every branch is exercisable without a network&quot; and which has NO tests: green-at-head, failed-at-head-with-an-older-success-in-the-list, in-progress-at-head, no-run-yet-for-head, and EMPTY runs. The empty case is the one that would have caught the 2026-08-20 false GREEN.
-
-(c) THE TESTS MUST NOT BREAK CI: there is no Pester in this repo and the CI runner&#x27;s PowerShell availability is not established, so the check SKIPS CLEANLY where no PowerShell is present, with a message naming what is missing (the U26 precedent for `test_probe_instrument.py`&#x27;s skip). The mechanism is the implementer&#x27;s — pytest invoking pwsh with the function dot-sourced, or extracting the verdict so it can be driven directly — the five named cases are the acceptance, not the harness.
-
-(d) WARN-ONLY IS UNCHANGED (U24 clause d): this reports, it never blocks the snapshot.
-
-(e) VERIFIED BY RE-RUN, NOT BY READING, with the venue named (J18): one snapshot run FROM A BRANCH whose printed verdict line is quoted in the close note, plus one from the main checkout.
-</p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-22 (laptop) from Idea-156. That entry was filed on `feat/ui-workstream` as that branch&#x27;s Idea-152 and re-filed at 156 on main, because 151 and 152 were both taken there by unrelated entries while the branch sat unmerged — the allocator-band hazard playing out inside one side.
-
-HALF OF THE ORIGINAL REPORT IS ALREADY FIXED AND IS NOT THIS ITEM. Recorded here only so it is not re-done: defect (1) — `Get-CiVerdict` never enumerating the runs array, so `$mine[0]` was the whole ten-run array and `conclusion -eq &quot;success&quot;` was truthy if ANY recent run passed — landed at 22b8ad7 and properly at 5c0308e / U24, which pins one run object and reads `status` and `conclusion` as scalar strings, with the PS 5.1 ConvertFrom-Json trap written down at the line.
-
-Module graph-infra / phase 16 / epic self-documentation by the U7, U12, U15, U24, U25 and U26 precedent — every snapshot.ps1 item in this backlog lands there. Sibling of U26 (done) in the same script: that one lost the JSON write from a worktree, this one mis-reports the step immediately before it, and both are invisible from the main checkout. Mechanism only, no gate.
-
-p2 rather than p3 because the check exists precisely to stop a repeat of Idea-111 (CI red for 100+ consecutive runs while sessions pushed past it), and a check that structurally cannot see branch work is the same failure with a green-looking wrapper.
-</p></div></div>
 <div class="card ready" id="card-REM2" data-id="REM2" data-module="drydocs-remediation" data-phase="10" data-epic="sme-runbooks" data-type="task" data-status="todo" data-search="rem2 a synthetic control-m folder-set export ships beside the other samples so the remediation runbook&#x27;s one verb can be demonstrated in a clone" tabindex="0"><div class="card-head"><span class="card-id">REM2</span><span class="card-title">A synthetic Control-M folder-set export ships beside the other samples so the remediation runbook&#x27;s one verb can be demonstrated in a clone</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-remediation</span><span class="chip" data-kind="phase">P10</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">sme-runbooks</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-V7" data-target="card-V7">V7</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The remediation runbook names exactly one CLI verb, drydocs profile-folder-set &lt;export-dir&gt;,
 and no synthetic Control-M XML export exists in the tree for it to read - so the runbook
 cannot be demonstrated in a clone. That is the J18 preference (sample-reproducible over
@@ -3007,10 +2750,25 @@ transcribed from seven company artifacts on an UNMERGED research branch and cite
 
 Related: MM2, MM3, MM6, MM10, MM12, R16, L28, G102, ADR 0007, ADR 0011, Idea-236.
 </p></div></div></div></div>
-<div class="column" data-status="in_progress"><div class="column-head"><h2>In progress</h2><span class="count" data-count-for="in_progress">6</span></div><div class="column-body"><div class="card" id="card-E1" data-id="E1" data-module="ontology" data-phase="4" data-epic="context-graph" data-type="task" data-status="in_progress" data-search="e1 register sosa/ssn observation terms via the gate" tabindex="0"><div class="card-head"><span class="card-id">E1</span><span class="card-title">Register SOSA/SSN observation terms via the gate</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P4</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / ontology-mapper</span></div><div class="epic">context-graph</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C1" data-target="card-C1">C1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> sosa:* terms present with IRIs; status planned-&gt;confirmed via gate</p><p class="notes"><strong>Notes:</strong> Registration step DONE (main, 2026-06-22): sosa/ssn prefixes in namespaces.py; terms seeded in drydocs_core/schema/sosa_experimental_supplement.cypher (opt-in `drydocs apply-sosa-supplement`, NOT in bootstrap; every term adoption:&quot;experimental&quot;); 4 context relationships in relationship_vocabulary.yaml (sosa_observes/has_result/ made_by_sensor/observed_property, status planned, domain context); README split into Declared-Adopted vs Experimental/Early-Adoption. REMAINING for ontology-mapper: take the `jobrun-observation` map entry through the HITL gate (resolve ControlMJobRun-as-Observation vs separate-Observation-node; run-history source), then planned-&gt;confirmed. GATE SESSION DEFERRED 2026-07-14 (SME: not ready yet) — page stays rendered/pending; nothing flips; re-present at a future session (see gate-log 2026-07-14 deferral note).
+<div class="column" data-status="in_progress"><div class="column-head"><h2>In progress</h2><span class="count" data-count-for="in_progress">7</span></div><div class="column-body"><div class="card" id="card-E1" data-id="E1" data-module="ontology" data-phase="4" data-epic="context-graph" data-type="task" data-status="in_progress" data-search="e1 register sosa/ssn observation terms via the gate" tabindex="0"><div class="card-head"><span class="card-id">E1</span><span class="card-title">Register SOSA/SSN observation terms via the gate</span></div><div class="chips"><span class="chip" data-kind="module">ontology</span><span class="chip" data-kind="phase">P4</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / ontology-mapper</span></div><div class="epic">context-graph</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-C1" data-target="card-C1">C1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> sosa:* terms present with IRIs; status planned-&gt;confirmed via gate</p><p class="notes"><strong>Notes:</strong> Registration step DONE (main, 2026-06-22): sosa/ssn prefixes in namespaces.py; terms seeded in drydocs_core/schema/sosa_experimental_supplement.cypher (opt-in `drydocs apply-sosa-supplement`, NOT in bootstrap; every term adoption:&quot;experimental&quot;); 4 context relationships in relationship_vocabulary.yaml (sosa_observes/has_result/ made_by_sensor/observed_property, status planned, domain context); README split into Declared-Adopted vs Experimental/Early-Adoption. REMAINING for ontology-mapper: take the `jobrun-observation` map entry through the HITL gate (resolve ControlMJobRun-as-Observation vs separate-Observation-node; run-history source), then planned-&gt;confirmed. GATE SESSION DEFERRED 2026-07-14 (SME: not ready yet) — page stays rendered/pending; nothing flips; re-present at a future session (see gate-log 2026-07-14 deferral note).
 </p></div></div>
 <div class="card" id="card-G62" data-id="G62" data-module="drydocs-lineage" data-phase="6" data-epic="component-topology" data-type="task" data-status="in_progress" data-search="g62 run the rua-bundle data-profile gate: the sme names the load population, the agent profiles it, and only the walked population enters the curated load" tabindex="0"><div class="card-head"><span class="card-id">G62</span><span class="card-title">Run the rua-bundle data-profile gate: the SME names the load population, the agent profiles it, and only the walked population enters the curated load</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-lineage</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">component-topology</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-G22" data-target="card-G22">G22</a> <a class="dep-link" href="#card-G23" data-target="card-G23">G23</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> USER-GATED START — the SME convenes the session; the pull loop SKIPS this item until then (the C12/J13 idiom). The drafted rua-bundle-data-profile page is walked in its ruled two-step order: section A the SME identifies the source data (which hosts&#x27; bundles, where they sit, which collector produced each — Internal, recorded company-side, never on the page), section B the agent profiles that population through the G20 extractor in STAGING with zero graph writes, and section C consumes the profile to admit or trim the population, dispose of the hash-absent and collision cases it counts, and clear the F1 sweep. Sign-off transcribed to config/gate-log.md; gates.json + the enforcement matrix regenerate. No population the page has not walked enters the G23 curated load.
 </p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-09 from Idea-85, which asked only for ids and scheduling — the four post-G22 data-profile prompts were drafted 2026-08-07 and unsigned, and an unsigned prompt with no backlog id is invisible to the pull loop. Sessions run COMPANY-SIDE because the identify-the-source-data step names real hosts and paths (Internal); what lands producer-side is the transcription and the regenerated gate surfaces. Model fable: the ruling decides what may be written to the graph.
+</p></div></div>
+<div class="card" id="card-J59" data-id="J59" data-module="config" data-phase="8" data-epic="release-infrastructure" data-type="chore" data-status="in_progress" data-search="j59 the one freshness key the repo has lies — 16 of 24 dated yaml headers are stale against git, so the `updated:` field needs a check that compares it to something, and that check cannot live in ci" tabindex="0"><div class="card-head"><span class="card-id">J59</span><span class="card-title">The one freshness key the repo has LIES — 16 of 24 dated YAML headers are stale against git, so the `updated:` field needs a check that compares it to something, and that check cannot live in CI</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">release-infrastructure</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-J58" data-target="card-J58">J58</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE GUARD IS A PRODUCER-SIDE LOCAL HOOK, AND THE REASON IS RECORDED. Freshness is checked by comparing each governed file&#x27;s `updated:` value against `git log -1 --format=%as &lt;path&gt;`. That comparison is BLIND IN CI — the workflow uses a shallow checkout with no `fetch-depth` override (verified against `.github/workflows/ci.yml`), so per-file git dates are not available to the runner and a CI-hosted version of this check would report green while measuring nothing. It therefore ships as a pre-commit hook, which means creating the repo&#x27;s first `.pre-commit-config.yaml` (none exists today) plus the hook script, with installation named in the session ritual. A check that cannot run where it is installed is the exact failure this item exists to avoid repeating.
+
+(b) IT SOLVES THE LYING PROBLEM, NOT THE PRESENCE PROBLEM. Presence is J58&#x27;s. This one fails when `updated:` disagrees with the file&#x27;s git last-touch date beyond a stated tolerance, and the tolerance is written with its reason rather than picked. Worked example to close against, measured 2026-08-27: of 24 files carrying `updated:`, 16 are stale — `PORT-MANIFEST.yaml` itself reads `updated: 2026-08-20` against a git date of 2026-08-27. Re-measure at pull time.
+
+(c) `updated:` IS A PER-SIDE FIELD AT THE PORT MANIFEST, AND THIS SAYS SO. Git dates DO NOT survive the port: disjoint histories stamp every ported file with port day, so the company&#x27;s git date for a file is the day it arrived, not the day its content changed. That is precisely why the IN-FILE date is the cross-repo freshness mechanism and why `updated:` must be declared a per-side field in `PORT-MANIFEST.yaml` — the doc-source-registry field-split is the precedent. Without this clause the hook would make every ported file look freshly touched on their side.
+
+(d) THE HOOK IS ADVISORY-CAPABLE AND NEVER BLOCKS A COMMIT SILENTLY. It either fails loudly with the file list and the two dates per file, or it is bypassed with a recorded, deliberate flag. It never passes because it could not determine a date — an unresolvable file is reported, not skipped.
+
+(e) OUT OF SCOPE: adding `updated:` to files that lack it (J58 clause (c)), and the Python docstring standard (J60).
+</p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-28 from Idea-181 (captured 2026-08-27), the freshness half. Split from J58 on the entry&#x27;s own persona-review finding F3 — the git-compare guard is blind in CI — which turns &quot;one guard&quot; into two mechanisms with different homes. Keeping them in one item would have produced a guard that ships to CI, passes, and measures nothing, which is the same shape as the defect it is meant to catch.
+
+`depends_on: [J58]` is real, not decorative: there is nothing to compare until the `updated:` key is required and populated, and the schema J58 writes is what tells this hook which files it governs.
+
+Epic release-infrastructure / module config / phase 8 follows J58. Model sonnet; priority p3 rather than p2 because a stale in-file date is a smaller harm than a missing one, and because the hook is producer-machine-local and so cannot be enforced for anyone who has not installed it — which is itself worth stating in the close note as a known limit rather than discovered later.
 </p></div></div>
 <div class="card" id="card-DOC4" data-id="DOC4" data-module="docs" data-phase="10" data-epic="doc-infrastructure" data-type="task" data-status="in_progress" data-search="doc4 standing module review sweep - ten sized slots on a two-day cadence, /system-design + /tech-debt per firing, reports accumulating on review/module-sweep with slot state derived not stored" tabindex="0"><div class="card-head"><span class="card-id">DOC4</span><span class="card-title">Standing module review sweep - ten sized slots on a two-day cadence, /system-design + /tech-debt per firing, reports accumulating on review/module-sweep with slot state derived not stored</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P10</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">opus / main</span></div><div class="epic">doc-infrastructure</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> A standing, rotating two-lens review of every first-party module, fenced as a third
 writer beside the two lanes. Built 2026-09-05; the item closes when the first slot
@@ -3134,7 +2892,7 @@ printed bearer token (redacted and counted). Real logs live under
 internal-local/controlm-output-logs/ (git-ignored). The Python extractor is still this
 item&#x27;s deliverable; the PoC fixed its field list and skip-reason set.</p></div></div></div></div>
 <div class="column" data-status="blocked"><div class="column-head"><h2>Blocked</h2><span class="count" data-count-for="blocked">0</span></div><div class="column-body"><p class="empty">(no items)</p></div></div>
-<div class="column" data-status="done"><div class="column-head"><h2>Done</h2><span class="count" data-count-for="done">591</span></div><div class="column-body"><div class="card" id="card-A1" data-id="A1" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a1 audit reference registry paths for staleness" tabindex="0"><div class="card-head"><span class="card-id">A1</span><span class="card-title">Audit reference registry paths for staleness</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every entry marked ok/stale; stale paths fixed or flagged</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All local mirrors + platform/standard doc paths resolve; no stale entries. verified: 2026-06-21 in REGISTRY.yaml.</p></div></div>
+<div class="column" data-status="done"><div class="column-head"><h2>Done</h2><span class="count" data-count-for="done">600</span></div><div class="column-body"><div class="card" id="card-A1" data-id="A1" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a1 audit reference registry paths for staleness" tabindex="0"><div class="card-head"><span class="card-id">A1</span><span class="card-title">Audit reference registry paths for staleness</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every entry marked ok/stale; stale paths fixed or flagged</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All local mirrors + platform/standard doc paths resolve; no stale entries. verified: 2026-06-21 in REGISTRY.yaml.</p></div></div>
 <div class="card" id="card-A2" data-id="A2" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a2 account for every bmc doc in the source manifest" tabindex="0"><div class="card-head"><span class="card-id">A2</span><span class="card-title">Account for every BMC doc in the source manifest</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> every .md in bmc-controlm/ accounted for in the manifest</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. All 26 bmc-controlm .md files are referenced in SOURCE-MANIFEST.md (0 uncovered).</p></div></div>
 <div class="card" id="card-A3" data-id="A3" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a3 seed the research index with linked rationale" tabindex="0"><div class="card-head"><span class="card-id">A3</span><span class="card-title">Seed the research index with linked rationale</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> &gt;=5 rows, each with a working link and a &#x27;why it matters&#x27;</p><p class="notes"><strong>Notes:</strong> Done 2026-06-21. 7 rows with working links (3 Neo4j blogs + PROV-O/SOSA/ORG/agent-memory) + why-it-matters.</p></div></div>
 <div class="card" id="card-A4" data-id="A4" data-module="reference" data-phase="0" data-epic="reference-hygiene" data-type="chore" data-status="done" data-search="a4 registry.yaml points the dcat row at a per-standard readme that was never written" tabindex="0"><div class="card-head"><span class="card-id">A4</span><span class="card-title">REGISTRY.yaml points the dcat row at a per-standard README that was never written</span></div><div class="chips"><span class="chip" data-kind="module">reference</span><span class="chip" data-kind="phase">P0</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / reference-librarian</span></div><div class="epic">reference-hygiene</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> reference/REGISTRY.yaml&#x27;s dcat row no longer cites a path that does not exist. Exactly one of two resolutions, and the choice is recorded in the close note: (a) write reference/standards/dcat/README.md following the dcmi-terms pattern from M4 — namespace, what we use it for, the specific terms we reference, source_url — or (b) re-point the row&#x27;s `docs:` at reference/standards/README.md the way the skos row already does. Nothing else in the registry changes.
@@ -6859,6 +6617,55 @@ unchanged by it.
 <div class="card" id="card-I4" data-id="I4" data-module="docs" data-phase="8" data-epic="project-board" data-type="chore" data-status="done" data-search="i4 regenerate the board in the session-end ritual" tabindex="0"><div class="card-head"><span class="card-id">I4</span><span class="card-title">Regenerate the board in the session-end ritual</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / main</span></div><div class="epic">project-board</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-I2" data-target="card-I2">I2</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The CLAUDE.md session ritual regenerates docs/plan/board.html at session end alongside the depgraph snapshot (render script wired next to snapshot.ps1), so the committed board can never go stale for more than one session.
 </p><p class="notes"><strong>Notes:</strong> Done 2026-07-01. snapshot.ps1 now refreshes the board first (best-effort try/catch, before the depgraph dependency, so it works even where depgraph is absent); CLAUDE.md §0 backlog pointer updated (board = human view, groom-backlog skill named) and ritual step 3 gains the regen + the deterministic stale-board check (re-render, git diff --quiet board.html). Epic I complete — the planning loop is closed.
 </p></div></div>
+<div class="card" id="card-I5" data-id="I5" data-module="docs" data-phase="8" data-epic="project-board" data-type="bug" data-status="done" data-search="i5 two idea captures landed below the audit trail with a non-conforming header and were invisible to both ideas.md guards" tabindex="0"><div class="card-head"><span class="card-id">I5</span><span class="card-title">Two idea captures landed below the audit trail with a non-conforming header and were invisible to BOTH IDEAS.md guards</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">bug</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">project-board</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE GAP. `_inbox_entries()` slices `IDEAS.md` from the `## Inbox` heading to the next `## ` heading, so it never sees a capture filed after the audit-trail heading; `_all_idea_ids()` matches the full header grammar, so it never sees a capture that does not carry it. A capture that is both — appended at the end of the file in an ad-hoc shape — is invisible to the header guard AND to the uniqueness guard at once. A new test in `tests/unit/test_plan_ideas.py` fails on that case: any `Idea-&lt;n&gt;`-shaped capture ANYWHERE in the file that does not conform to the header grammar, or that carries the grammar but sits outside the two known sections, is reported by id and line.
+
+(b) THE UNIQUENESS SCAN SEES THE SAME SET. Whatever loose pattern (a) uses to find candidate captures also feeds `test_idea_ids_are_unique`, so a duplicate number cannot hide behind a malformed header. This is the union-append case the existing docstring already argues for and does not currently cover.
+
+(c) NO FALSE POSITIVES ON THE FILE&#x27;S OWN PROSE. The capture-format section documents the header shape with a literal `Idea-N` example, and the audit trail cites ids inside sentences. The guard distinguishes a CAPTURE from a CITATION and the test says how, in the docstring, rather than leaving the next reader to infer it from the regex.
+
+(d) GREEN ON THE TREE AS LEFT BY THE 2026-08-27 GROOM, which relocated the two offending entries into the inbox with conforming headers. The guard must be red against the pre-groom shape and green after — state that check in the close note, because a guard that was never observed failing has not been shown to guard anything.
+</p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-27, from the groom run itself. Idea-177 and Idea-178 were appended below `## Recently groomed (audit trail)` on 2026-08-26 in the shape `- **Idea-177 (2026-08-26, desktop):** ...`. `poetry run pytest tests/unit/test_plan_ideas.py -q` was 23-passed green over both of them, and this groom found them only because a commit message named an id the inbox scan did not return.
+
+Second instance, which is why it earns an item rather than a fix in place. Idea-170 records the identical failure company-side (a capture that landed with no id at all, minted only after the user asked where it was) and quotes the existing docstring&#x27;s own reasoning: &quot;the entry simply does not appear in the scan, which reads as &#x27;nothing to review here&#x27; rather than as a formatting slip&quot;. That is precisely what happened here, on the producer side, with all four guards green.
+
+Epic project-board / module docs / phase 8: `test_plan_ideas.py` guards the capture loop that I1-I4 built, and I3 is the groom skill that reads the file. The release-infrastructure lane was the other plausible home and is the wrong one — nothing here is about releasing.
+DONE 2026-09-08 (desktop, Lane A).
+(a) tests/unit/test_plan_ideas.py gains _CANDIDATE, the loose net: a list item whose
+    leading bold token opens with an Idea id, backticked or not, so both
+    `- **`Idea-177`** ·` and `- **Idea-177 (2026-08-26, desktop):**` are candidates.
+    _capture_candidates(text) walks the WHOLE file tracking the `## ` heading each
+    candidate sits under; _misfiled_captures(text) holds _HEADER against every catch
+    and requires the section to be `## Inbox` or `## Recently groomed (audit trail)`,
+    reporting by id and line. test_every_capture_anywhere_conforms_and_sits_in_a_
+    capture_section runs it over the live file.
+(b) _all_idea_ids() now returns the ids of that same loose set, so
+    test_idea_ids_are_unique (and the band check, which reads the same helper) see a
+    capture with a malformed header. The fixture proves it: a second `Idea-2` in the
+    ad-hoc shape is reported as a duplicate.
+(c) Capture vs citation is stated in the test docstring and the _CANDIDATE comment: a
+    capture is an id at the head of a list item&#x27;s bold token; a citation is an id
+    anywhere else - inside a sentence, in [[...]], after a groom arrow - and is never
+    a candidate. The format section&#x27;s `Idea-N` example has no digits and does not
+    match. The fixture carries a [[Idea-1]] citation, an &quot;Idea-2&#x27;s&quot; inside a sentence
+    and the format example, and the guard names none of them.
+(d) Observed RED before green, two ways. test_the_capture_guard_is_red_on_the_pre_
+    groom_shape holds a fixture in the c0ae3004 shape (captures appended below the
+    audit trail as `- **Idea-N (date, machine):**`, plus a conforming header misfiled
+    under a third section) and asserts the exact ids and lines reported. And the
+    helpers were run against the real trees: `git show c0ae3004:docs/restructure/
+    IDEAS.md` reports Idea-177 at line 5195 and Idea-178 at line 5202 (the two this
+    item is about) - and also Idea-165 and Idea-161; `45f4f1e5` (the 2026-08-27 groom)
+    reports only Idea-165 and Idea-161.
+THIRD INSTANCE, FOUND BY THE GUARD. Idea-165 and Idea-161 sat in the audit trail with
+status `done (...)`, which is not a status the capture format defines (open, parked,
+groomed, merged, closed); they were groomed into the trail on 2026-08-24 in that shape
+and no guard read the trail&#x27;s headers. Both now read `closed (...)`, the format&#x27;s word
+for the same state, dates and machine note kept; docs/plan/ideas.html re-rendered.
+Live file: 309 candidates, 0 misfiled, 0 duplicates.
+Guards: test_plan_ideas (14), test_backlog, test_render_determinism, test_module_boundary,
+test_no_render_parsing, test_source_scan, test_runbook_currency all green; ruff check
+and format --check clean at the 0.5.7 pin.
+</p></div></div>
 <div class="card" id="card-I6" data-id="I6" data-module="drydocs-plan" data-phase="8" data-epic="project-board" data-type="task" data-status="done" data-search="i6 there is no id allocator - next free id is a sentence in a skill file and it has failed six times; make free mean free across every remote ref" tabindex="0"><div class="card-head"><span class="card-id">I6</span><span class="card-title">There is no id allocator - next free id is a sentence in a skill file and it has failed six times; make free mean free across every remote ref</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-plan</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">project-board</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) NEXT FREE MEANS FREE ACROSS EVERY REMOTE REF, NOT FREE IN MY TREE. The validator gains a
 next-id mode taking an epic letter: it fetches, then reads a tree listing over the remote refs -
 listing only, no checkout, cheap - and returns the next free number in that letter across all of
@@ -7611,6 +7418,86 @@ J50); tests/unit/test_dev_environment.py: every code carries a boolean available
 SKILL.md names the check and what it does not do: the file is committed, so two producer
 machines declare the same set - a per-machine difference stays the author&#x27;s ruling.
 </p></div></div>
+<div class="card" id="card-PLAN9" data-id="PLAN9" data-module="drydocs-plan" data-phase="8" data-epic="project-board" data-type="task" data-status="done" data-search="plan9 census pins are venue data: the coverage-census tuple in test_docs_coverage moves to a venue-owned config block the test reads, after a survey of the other pins of the same shape" tabindex="0"><div class="card-head"><span class="card-id">PLAN9</span><span class="card-title">Census pins are venue data: the coverage-census tuple in test_docs_coverage moves to a venue-owned config block the test reads, after a survey of the other pins of the same shape</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-plan</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">project-board</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> tests/unit/test_docs_coverage.py:358 test_the_live_coverage_census_is_pinned hard-codes the
+producer&#x27;s census tuple (products, products with no corpus, and two more counts) over the
+REAL registries. The test is right as a guard - the coverage picture must not drift
+silently - and the tuple inside it is a fact about ONE checkout&#x27;s corpus, so on every roll
+it collides, the consumer re-pins to its own numbers by hand, and any later producer edit
+to the same lines collides again (2026-09-07 transcription, sixteenth report, the
+hand-merges). Same family as any live-config count checked in as if it were code.
+
+(a) Survey first, in the item&#x27;s close note: every unit test that pins a count over a LIVE
+    config file (not a fixture - a grep for tuple equalities in tests/unit/ finds mostly
+    fixture pins, which are not this class) is listed with its file, line and the tuple.
+    The census pin is one; the constraint count over the schema and the vocabulary fragment
+    count are the candidates to check.
+(b) One shape is chosen for the class and applied to every pin the survey found. Preferred:
+    the tuple moves to config/dev-environment.yaml, which already declares `edition:` per
+    venue and is a per-entry manifest row, as a `census:` block the test reads - the guard
+    keeps its teeth, the DATA stops crossing. Alternative, if a pin cannot move: a per-entry
+    PORT-MANIFEST.yaml row for the test file whose entry_rule names the pin lines as
+    consumer-owned. The close note says which shape each pin took and why.
+(c) The test&#x27;s docstring keeps its history (the O81 15/13 -&gt; 16/14 note) and adds one line
+    saying where the numbers now live and that a consumer edits the venue file, never the
+    test.
+(d) A relay tells the consumer the pin moved and where its own numbers go. Nothing is
+    asked back.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-07 from IDEAS.md Idea-292 (desktop, Lane A); the stub shipped in e0f2b799
+under a stale CFG5 message - see CORE6&#x27;s note. Source is the company&#x27;s carve-out I
+hand-merge list, transcribed to the machine-local back-flow file named in Idea-292.
+
+module drydocs-plan for the guard; the venue file is config and rides along - one item,
+because splitting the pin from the file it reads is how the two drift. Lands with PORT6 as
+a next-roll relay, not mid-apply. p2: it costs one hand-merge per roll today and no data is
+wrong.
+DONE 2026-09-08 (desktop, Lane A).
+(a) Survey - every unit test pinning a count over a LIVE (non-fixture) file, found by
+    reading the tuple-equality and len()== hits in tests/unit/ against what they count:
+    1. tests/unit/test_docs_coverage.py:399 test_the_live_coverage_census_is_pinned -
+       (products, products_no-corpus, corpora_total, corpora_unclaimed) == (17, 15, 10, 8)
+       over software-registry.yaml + doc-source-registry.yaml, both per-entry.
+    2. tests/unit/test_schema.py:47 EXPECTED_CONSTRAINTS = 55 (test_constraint_count) over
+       drydocs_core/schema/constraints.cypher, per-entry; the company&#x27;s count is ahead
+       (its supplement blocks) and the manifest row has said &quot;keep consumer count&quot; since
+       the step-45 head.
+    3. tests/unit/test_source_bindings.py:392 total == expected == 15
+       (test_reports_cover_every_automated_dataset) over source-registry.yaml
+       acquisition.mode: automated, per-entry; company 17 at the 2026-09-03 apply.
+    Checked and NOT this class: the vocabulary fragment count the acceptance named is
+    pinned nowhere (test_domain_registry compares two derived sets, no literal);
+    test_ui_tests_ledger.py:143 (13, 13) and the 17/40 share count config/taxonomy/
+    ui-tests.yaml, which has no manifest row and falls to config/** canonical-producer,
+    so both sides hold the same file after a take; test_doc_traceability_loader.py:112
+    counts committed rows of a producer design doc, same reasoning.
+(b) One shape, applied to all three: the preferred one. The values live in
+    config/dev-environment.yaml as a `census:` block (docs_coverage.{products,
+    products_no_corpus, corpora_total, corpora_unclaimed}, schema_constraints,
+    automated_datasets) and each test reads its key, failing with a message that names
+    the key when the block is absent (the allocator&#x27;s edition: refusal shape). The
+    acceptance called the file a per-entry manifest row; it is canonical-company
+    (PORT-MANIFEST.yaml:523, and the file&#x27;s own header), which is BETTER for this
+    purpose - each side keeps its whole file - and is exactly the shape capability_assert
+    already uses there, so no manifest change was needed for the venue file. Negative
+    check run: products 17 -&gt; 16 in the block fails the census test with the new message.
+    tests/unit/test_dev_environment.py gains a shape check on the block. The two evaluate
+    rows for test_schema.py and test_source_bindings.py stay evaluate; their notes now
+    say the count is no longer among the things to hand-merge. No manifest row for
+    test_docs_coverage.py: it crosses byte-identical under tests/**, which is the point.
+(c) Docstrings keep every history line (O81 15/13 -&gt; 16/14, C25, C43, Q27, Q10) and each
+    adds the one line: where the number lives, and that a consumer edits the venue file,
+    never the test. EXPECTED_CONSTRAINTS is cited by name in signed gate-log entries and
+    the schema_graph.cypher render comment; the records stay as history, the generator
+    comment now names census.schema_constraints and the render was regenerated
+    (scripts/render_schema_graph.py). The reconcile-port skill&#x27;s EXPECTED_CONSTRAINTS
+    bullet points at the census key.
+(d) RELAY-49 in docs/port/port-prompt.md: the table of the three pins, the shipped
+    block, and the four steps at the next base that carries this (take the tests
+    wholesale, write YOUR numbers into YOUR file before the take, the new shape check,
+    re-render schema_graph.cypher). Nothing is asked back.
+Guards: test_docs_coverage, test_schema, test_source_bindings, test_dev_environment,
+test_schema_graph, test_constraint_drift, test_port_manifest, test_port_dispositions
+(118 passed) and every test that reads the port-prompt (240 passed).
+</p></div></div>
 <div class="card" id="card-CFG2" data-id="CFG2" data-module="config" data-phase="8" data-epic="release-infrastructure" data-type="task" data-status="done" data-search="cfg2 the edition registry - config/taxonomy/editions.yaml keyed to area_product_id, internal with a synthetic sample, per-entry manifest row; the company base mints its own code" tabindex="0"><div class="card-head"><span class="card-id">CFG2</span><span class="card-title">The edition registry - config/taxonomy/editions.yaml keyed to area_product_id, Internal with a synthetic sample, per-entry manifest row; the company base mints its own code</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">release-infrastructure</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-CFG1" data-target="card-CFG1">CFG1</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Gate ontology-domain-registry-and-edition-grain §C2-§C3 (SIGNED OFF 2026-09-02). The grain is the AREA PRODUCT, with the SME&#x27;s
 definition as the ruling of record: an Area Product is where two or three applications are
 delivering on the same business topic. That definition - not the Product Catalog tier name -
@@ -8147,6 +8034,82 @@ question; relates_to gains the gate log; docs/decisions/README.md index line upd
 D2/D3/D4/D6 original text untouched (e). Doc guards green (runbook currency, fences,
 560-test doc subset).
 </p></div></div>
+<div class="card" id="card-DOC2" data-id="DOC2" data-module="docs" data-phase="8" data-epic="release-infrastructure" data-type="task" data-status="done" data-search="doc2 relay-23 - the frozen letters, mint by module code, the edition segment and the retired partition rules reach the company through the port-prompt" tabindex="0"><div class="card-head"><span class="card-id">DOC2</span><span class="card-title">RELAY-23 - the frozen letters, mint by module code, the edition segment and the retired partition rules reach the company through the port-prompt</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">release-infrastructure</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-PLAN2" data-target="card-PLAN2">PLAN2</a> <a class="dep-link" href="#card-PLAN3" data-target="card-PLAN3">PLAN3</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Gate ontology-domain-registry-and-edition-grain §E1 (SIGNED OFF 2026-09-02): a cross-repo convention change is inert until it
+reaches the other side, and the company&#x27;s allocator only WORKS once it holds an edition
+code. RELAY-24 carries PLAN1 + this gate to the company through the port-prompt, in the
+roll that carries commit 375dd962 (PLAN1 mechanism) and 39b90843 (this gate).
+
+(a) THE FREEZE HALF, which can go now: the 27 letters frozen at their all-time max
+(FROZEN_SERIES, FROZEN_ON 2026-09-02; the table is the constant, quoted); `--next-id G`
+and `--next-id DD` are refused, each message naming the replacement; the series is the
+module - modules.yaml `series:` arrives canonical-producer, so they inherit the 18 codes;
+`--next-id --module &lt;m&gt;` is the command; codes are three-plus letters precisely so a
+company mint can never be confused with a frozen letter, and none is DD. THE FREEZE HALF
+CARRIES FROZEN_BAND (review F3/F9, docs/reviews/restructure-design-review-2026-09-02.md): the frozen table
+was measured on the producer&#x27;s tree and admits nothing above G136, so the company&#x27;s G10001-G10003
+and DD10001-DD10003 fail test_frozen_series_take_no_new_ids the day this half lands.
+FROZEN_BAND = {G: 10003, DD: 10003} (a legacy band id is frozen at the band&#x27;s own max) is
+PLAN3 - a producer-side change to validate.py and test_backlog.py that ships BEFORE this
+relay rolls, not with PLAN2 (re-pointed 2026-09-02; this item now depends on PLAN3 for
+its freeze half) - a freeze relay that hands the company a red suite is worse than no
+relay. The relay says so, and says the company&#x27;s six band ids are read and listed, not
+re-minted.
+
+(b) THE PREFIX HALF, which waits on PLAN2 landing: `[&lt;EDITION&gt;-]&lt;MODULE&gt;&lt;n&gt;`; the company
+base is an edition and MINTS ITS OWN CODE at its own gate (CFG2 §C3) - the relay names the
+file and the columns, not the code; both partition rules are retired forward-only (§C4):
+their DD1-DD10 / DD10001-DD10003 / G10001-G10003 stay readable; the band mirror assertion
+the port-prompt asked them to write (steps 160, 273 region) is WITHDRAWN and replaced by
+the edition-segment check; between the roll and the company&#x27;s code mint the company mints nothing new -
+and that is a MECHANISM, not a request (review F2): the allocator reads the venue&#x27;s
+edition from config/dev-environment.yaml `edition:` (the company&#x27;s own canonical-company file),
+refuses to mint while the key is absent, and names the key. The relay tells the company the
+one line to write once its code is minted, and nothing else about the code itself.
+
+(c) THE TWO-AXES WORDING, verbatim from the 2026-09-02 review, so their agent stops
+conflating repos and checkouts: Axis 1 - repos (producer / company: disjoint histories,
+one-way port; the edition prefix separates THESE). Axis 2 - checkouts (every machine,
+worktree or session is a checkout; the push-before-work claim and the wip/ branch rule
+separate THESE). &quot;Both machines and both repos&quot; meant axis 2 on our side and axis 1
+between us.
+
+(d) J63 provenance block, the RELAY numbered, the APPLY BY DISPOSITION section updated for
+the new per-entry rows (domains.yaml, editions.yaml) and the CLAUDE.md mint-rule change.
+Idea-237&#x27;s gate-prompt correction (MM13) rides the same relay.
+
+Depends on PLAN2 for (b); (a) may ship first if a roll happens before PLAN2 lands, in which
+case the item stays in_progress and (b) is a second relay entry.
+</p><p class="notes"><strong>Notes:</strong> 2026-09-02: RELAY-23 was taken by the ADR 0018 subpackage move, which rolls first; this
+relay takes the next free relay number when it rolls (RELAY-23 and RELAY-24 were taken the same day by the ADR 0018 move and the S8 adoption). The title keeps its original number - a retitle after the stub
+push reads as a mint collision to the guard (I6); the number in the port-prompt is what
+counts.
+DONE 2026-09-08 (desktop, Lane A) as RELAY-48 in docs/port/port-prompt.md, the number
+free when it rolled (RELAY-23..47 were taken in the meantime; the title keeps 23).
+State at build: both halves had ALREADY reached the company piecemeal - PLAN1 and the
+gate in port-base-20260902 (steps 305/306/308), PLAN2, CFG1, CFG2 and the rider gate in
+port-base-20260905 (step 332, FIFTEENTH POSTSCRIPT, RELAY-26 (1)-(2), RELAY-31/32) - and
+the company&#x27;s 0905 close-out reports them applied, with edition: deliberately unset.
+So the relay changes no company file; it states the convention whole and adds what the
+ledger still owed:
+(a) the freeze half - the 27-letter table quoted from FROZEN_SERIES, both refusal
+    messages, the 20 module codes, FROZEN_BAND so the six band ids read as legacy and
+    are listed, never re-minted; the modules.yaml per-entry row&#x27;s entry_rule now says
+    who owns series: (union by module name, company-only codes are the company&#x27;s).
+(b) the prefix half - grammar, the venue key, the company mints its own code at its
+    own gate into editions.yaml, both rules retired forward-only, the refusal as
+    mechanism, the one line to write once the code exists.
+(c) the two-axes wording, verbatim from the acceptance.
+(d) step 160&#x27;s &quot;write the MIRROR assertion&quot; ACTION is WITHDRAWN in the relay (the step
+    stays as an applied record); the APPLY BY DISPOSITION section gains &quot;THE ID
+    CONVENTION&#x27;S ROWS&quot; naming the three per-entry rows, the canonical-company key and
+    the canonical-producer trio incl. the CLAUDE.md mint rule.
+NOT done here, by choice: MM13&#x27;s gate-prompt correction does not ride this relay - MM13
+is still todo, and relaying a correction the producer has not made would put the
+company&#x27;s DRAFT ahead of the producer&#x27;s; it rides with MM13&#x27;s build (MM13 (d) says the
+relay line is required for MM13, so nothing is lost).
+Guards: test_port_manifest, test_port_dispositions, test_backlog and every test that
+reads the port-prompt (238 passed).
+</p></div></div>
 <div class="card" id="card-J1" data-id="J1" data-module="docs" data-phase="8" data-epic="release-infrastructure" data-type="chore" data-status="done" data-search="j1 sweep the iteration fragments (naming drift, superseded banners)" tabindex="0"><div class="card-head"><span class="card-id">J1</span><span class="card-title">Sweep the iteration fragments (naming drift, superseded banners)</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">haiku / main</span></div><div class="epic">release-infrastructure</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> DryDocs1 -&gt; DryDocs in CLAUDE.md:1 and 01-project-plan.md (title, repo URL; merged-branch line removed); drydocs1 -&gt; drydocs in knowledge/depgraph-snapshots/snapshot.ps1 + its README (existing drydocs1-*.json snapshot files left untouched as history); the stray &quot;@claude - &lt;Aura console URL&gt;&quot; line removed from README.md:1; a &quot;Superseded by the Phase 0-5 restructure plan&quot; banner on docs/reviews/drydocs-consolidated-plan.md and the persona/SDLC review docs; a README in SDLC-Docs/ marking it a frozen reference corpus that fed the ADRs. Tests stay green.
 </p><p class="notes"><strong>Notes:</strong> Done 2026-07-01 (haiku agent per the model matrix; opus review pass). 19 files: renames (CLAUDE.md, 01-project-plan.md incl. URL + merged-branch line, snapshot.ps1 + README + viewer.html, reference/REGISTRY.yaml — a residual the sweep caught beyond the checklist), README.md stray console-URL line removed, 11 docs/reviews/ superseded banners, SDLC-Docs/README.md created (frozen corpus). Residuals justified: historical drydocs1-*.json snapshots, the drydocs1-live-neo4j memory name, docs/history/. m1/m3-verify renames stay parked for the v1.0 window.
 </p></div></div>
@@ -8544,6 +8507,42 @@ the exact 2026-08-23 incident shape. Success path confirmed unchanged (exit 0, a
 wrote lines, no warning); only snapshot.ps1 changed, render byproducts reverted before
 commit; script parse-checked and test_depgraph_snapshots.py green.
 </p></div></div>
+<div class="card" id="card-J54" data-id="J54" data-module="docs" data-phase="8" data-epic="release-infrastructure" data-type="chore" data-status="done" data-search="j54 versioning.md describes a backlog schema and a backlog file that no longer exist, so the release ritual instructs a reader to cite a tombstone" tabindex="0"><div class="card-head"><span class="card-id">J54</span><span class="card-title">VERSIONING.md describes a backlog schema and a backlog file that no longer exist, so the release ritual instructs a reader to cite a tombstone</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / main</span></div><div class="epic">release-infrastructure</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE TWO STALE FACTS. `VERSIONING.md` names the backlog config schema at its PREVIOUS version, and its release-notes section tells the author to cite epic and item ids from `docs/restructure/backlog.yaml`. The schema is now v3 (ADR 0013) and that file is a tombstone — the backlog is one item per file under `docs/restructure/backlog/items/`. Both are corrected, and the ids-to-cite instruction points at the sharded tree.
+
+(b) THE REST OF THE FILE IS READ, NOT JUST GREPPED. Any other statement in the ritual that names a path, a command or a guard is confirmed against the tree in the same pass; a currency fix that leaves the next stale line for the next reader has moved the problem rather than fixed it. The close note lists what was checked and found correct, not only what changed.
+
+(c) OUT OF SCOPE, DELIBERATELY: the v0.3.0 tag disposition and whether a v0.4.0 is owed. Those are release decisions for the user (see the inbox question groomed alongside this item) and this chore must not enact either — it does not push a tag, re-cut one, or change the version string in `pyproject.toml`.
+</p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-26 from Idea-163 clause 3, which offered the choice of folding this into the tag work or treating it as ordinary doc drift. Treated as doc drift because clauses 1 and 2 of that entry are user decisions with no default, and blocking a two-line currency fix behind a release call would leave the ritual actively misleading for as long as the call takes.
+
+Module `docs`, epic release-infrastructure, phase 8 — VERSIONING.md is release-ritual documentation.
+
+p3/haiku: two corrections against facts already established by ADR 0013.
+DONE 2026-09-08 (desktop, Lane A). No edit to VERSIONING.md in this close, and that is
+the finding: (a) had ALREADY landed on 2026-08-31 in e0134168 (&quot;three stale pointers in
+the public-surface list&quot;), committed against Idea-163 rather than this item, so the item
+stayed open over a file that was current. That commit fixed both facts named here - the
+schema line reads `drydocs.backlog.v3` and the changelog cross-reference reads
+`docs/restructure/backlog/items/&lt;id&gt;.yaml` - and a third the item did not name: the
+graph-model surface pointed at `relationship_vocabulary.yaml` as one file, now the
+per-domain fragments directory (S5).
+(b) The rest of the file, read line by line against the tree at a5a8ad52 and found
+correct: `pyproject.toml` `[tool.poetry] version` is 0.3.0 (:1, :3); `v0.3.0` is an
+ANNOTATED tag (git cat-file -t = tag, 2026-07-09) and the only v* tag - the other 18
+tags are port-base-* and archive/*, outside this policy; `plan.yaml` phase 8 &quot;Planning &amp;
+release infrastructure&quot; carries `release: v0.3.0`, the example the file gives; the six
+schema families all exist - drydocs.backlog.v3 (backlog_store.py, test_backlog.py),
+drydocs.source-registry.v2, drydocs.taxonomy-ontology-map.v1, drydocs.classification.v1,
+drydocs.source-mapping.v1 (config/*.yaml, config/taxonomy-ontology-map/) and
+drydocs.doc-outline.v1 (docs/design/templates/*.outline.yaml) - listed by family, so a
+version bump inside one does not stale the line; `relationship_vocabulary/` is a
+directory of fragments; CHANGELOG.md has `## [Unreleased]` and `## [0.3.0] - 2026-07-09`
+in Keep-a-Changelog shape; the five ritual steps name no path that has moved; the
+History paragraph (0.1.0 untagged, 0.2.0 skipped, v0.3.0 first tag) matches the tag list.
+(c) Untouched, as required: the v0.3.0 tag, the version string, and whether Unreleased
+has earned v0.4.0 - the user&#x27;s release call, still open in the inbox (Idea-163).
+Method note for the next currency item: grep the file&#x27;s paths AND `git log -- &lt;file&gt;`
+before claiming - the fix may have shipped under a different id.
+</p></div></div>
 <div class="card" id="card-J55" data-id="J55" data-module="config" data-phase="8" data-epic="release-infrastructure" data-type="task" data-status="done" data-search="j55 nothing stops the retired org acronym coming back into the publishable tree — the rename sweep left a convention with no enforcement point" tabindex="0"><div class="card-head"><span class="card-id">J55</span><span class="card-title">Nothing stops the retired org acronym coming back into the publishable tree — the rename sweep left a convention with no enforcement point</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">release-infrastructure</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-J15" data-target="card-J15">J15</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE GUARD. A unit test in the classification/boundary family fails when the retired internal org acronym appears in any git-tracked file outside `internal/`. It reads the retired token from the internal mapping file (`internal/cdo-reference/README.md`, which is where the old-to-new mapping is written ONCE and which never publishes) — the test itself embeds NO literal of the retired string, exactly the J15 rule that lets a boundary guard exist without becoming the leak it protects against.
 
 (b) THE PUBLISHED-CLONE CASE IS STATED, NOT SILENT. A clone without `internal/` cannot read the token. The guard SKIPS with an explicit reason in that case and never passes silently — a boundary guard that reports green because it could not run is the &quot;succeeds loudly, does nothing&quot; failure this repo has already recorded twice.
@@ -8791,6 +8790,104 @@ the ruling already implicit in the entry.
 
 Priority p1 because the failure is recurrent, cross-repo and produces confident wrong findings,
 which is the most expensive kind.
+</p></div></div>
+<div class="card" id="card-J64" data-id="J64" data-module="graph-infra" data-phase="8" data-epic="release-infrastructure" data-type="bug" data-status="done" data-search="j64 a depgraph snapshot scanned before the commit it stamps is a claim about a tree that was never scanned - scan after, not before" tabindex="0"><div class="card-head"><span class="card-id">J64</span><span class="card-title">A depgraph snapshot scanned before the commit it stamps is a claim about a tree that was never scanned - scan after, not before</span></div><div class="chips"><span class="chip" data-kind="module">graph-infra</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">bug</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">release-infrastructure</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE ORDERING IS ENFORCED IN THE SCRIPT, NOT LEFT TO THE RITUAL&#x27;S PROSE. The snapshot stamps
+a git metadata header - commit, full sha, branch, describe, subject and dirty flag - so the scan
+must run against the tree of the commit it stamps. A scan taken before that commit exists makes
+the stamp a claim about a tree nobody scanned.
+
+(b) THE 2026-08-29 INCIDENT IS THE TEST CASE. A snapshot taken from the pre-merge tree recorded
+a directory that main had renamed on 2026-08-26, tripped the J55 publish-boundary guard, and had
+to be deleted and regenerated against the merge commit. Reproduce the ordering fault once,
+confirm the fix prevents it, and record both in the close note.
+
+(c) A DIRTY TREE AT SCAN TIME IS REPORTED AS SUCH rather than stamped silently, since the header
+already carries the flag and nothing reads it.
+
+(d) OUT OF SCOPE, DELIBERATELY - the CADENCE question. Thirty of the last thirty-three rolls
+carried no debt signal at all, and the four candidate directions are a user ruling that stays in
+the inbox. This item changes ordering only and rolls exactly as often as it does today.
+
+(e) SIBLING DEFECTS IN THE SAME SCRIPT ARE NOT RE-SOLVED HERE - the board refresh skipping
+silently is J65, and the session-close CI verdict&#x27;s detached-HEAD blindness is U27.
+</p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-30 (desktop, weekly groom) from Idea-206, taking ONLY its second clause. The
+entry states in terms that the cadence directions are deliberately not chosen, so grooming them
+would be guessing at a user decision; the ordering half is a plain defect with a reproduction.
+
+The cadence half stays in the inbox as an open question and is named in the groom report.
+DONE 2026-09-08 (desktop, Lane A).
+(a) Enforced in the script: at the point the header&#x27;s commit is read, tracked changes
+    (Get-WorktreeState.dirty, U15 - untracked paths never count) REFUSE the scan with the
+    paths listed and the fix stated (commit - a refreshed stale render is the usual way to
+    arrive here - then re-run). New switch -AllowDirty downgrades the refusal to a warning
+    for a deliberate mid-work comparison; the header still says dirty=true. README gains
+    the paragraph beside the CI-check one; header list gains J64. Guard:
+    test_a_dirty_tree_at_scan_time_is_refused_not_stamped in test_depgraph_snapshots.py.
+(b) The fault, reproduced by the record rather than by a destructive re-run: the header
+    path read dirty into meta.git and printed nothing, so the 20260805 snapshot was
+    committed carrying dirty=true (the U15 comment&#x27;s own case) and the 2026-08-29
+    snapshot scanned from a tree predating main&#x27;s 08-26 rename sweep named the retired
+    directory and was regenerated at 2b06c153. The fix, run live (desktop, PowerShell tool,
+    HEAD 4cb966c9, README.md and snapshot.ps1 modified): every refresh step ran, the CI
+    line printed, then `Refusing to scan - tracked changes present at scan time - the
+    header would name commit 4cb966c9 for a tree that commit does not describe.` with
+    the two paths; no file written, the committed drydocs-20260908-1839.json untouched.
+    The clean-tree run is the ritual at the end of this sitting.
+(c) Reported: the refusal names the paths; -AllowDirty prints them as a warning and the
+    header records dirty=true, which is now a flag that something read.
+(d) Cadence untouched; the script rolls when it is run, as before.
+(e) J65 landed in the commit before this one; U27 follows. Neither re-solved here.
+</p></div></div>
+<div class="card" id="card-J65" data-id="J65" data-module="graph-infra" data-phase="8" data-epic="release-infrastructure" data-type="bug" data-status="done" data-search="j65 the snapshot script&#x27;s board refresh has been silently skipping on this desktop, and the warning prints the word traceback instead of the module that is missing" tabindex="0"><div class="card-head"><span class="card-id">J65</span><span class="card-title">The snapshot script&#x27;s board refresh has been silently skipping on this desktop, and the warning prints the word Traceback instead of the module that is missing</span></div><div class="chips"><span class="chip" data-kind="module">graph-infra</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">bug</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">release-infrastructure</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE SCRIPT CLEARS THE VIRTUAL-ENVIRONMENT VARIABLE BEFORE IT CALLS POETRY, so a PowerShell
+caller that inherited this desktop&#x27;s leak - the shell pre-sets it to the agents environment -
+resolves the project environment instead. The failure today is a missing typer module raised
+from the load-map renderer; a Bash caller that unsets the variable succeeds and PowerShell
+inherits it and fails.
+
+(b) A FAILED STEP PRINTS THE LAST LINE OF THE TRACEBACK, NOT THE FIRST. This is the half that
+matters more than the first: the current output reads as noise, which is exactly why the skip
+survived unnoticed. After the change the warning names the module.
+
+(c) VERIFIED BY RUNNING THE STEP FROM BOTH SHELLS ON THIS DESKTOP and recording both outcomes in
+the close note, with the venue named (J18).
+
+(d) THE CONSEQUENCE IS STATED AND THEN CHECKED - the load-map surfaces never refreshed from the
+snapshot on this machine, so a stale render would not be caught by the step meant to catch it.
+Run the stale-render check once after the fix and commit any refresh it turns up.
+
+(e) WARN-ONLY STAYS WARN-ONLY. A failed board refresh still does not block the snapshot;
+recording repo structure and refreshing a render are unrelated jobs, and the failure being fixed
+is nobody seeing the warning.
+</p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-30 (desktop, weekly groom) from Idea-201, observed at the O77 close on
+2026-08-28.
+
+Same script as J64 and deliberately a separate item - that one is about WHEN the scan runs and
+this one is about a step inside it failing invisibly. Neither should re-solve the other, and
+both say so.
+DONE 2026-09-08 (desktop, Lane A).
+(a) snapshot.ps1 clears an inherited VIRTUAL_ENV right after it resolves $repo, before
+    the first `poetry run`, and prints one DarkGray line naming the value it cleared.
+    Unconditional: the project&#x27;s own environment resolves the same without the variable,
+    and any other environment could not have rendered correctly. Header block gains J53
+    and J65 lines.
+(b) Already in place since J53 (Write-RefreshFailure reports the LAST non-empty line of
+    the merged output and the landed/stale split); verified by reading the function, not
+    re-solved. The reproduction here confirmed the cause line it would print.
+(c) Venue desktop, PowerShell tool session (which inherits the leak) vs Bash. BEFORE the
+    fix, PowerShell: `poetry run python scripts/render_board.py` exit 1, last line
+    `ModuleNotFoundError: No module named &#x27;drydocs&#x27;` (the leaked agents environment lacks
+    the project itself now; on 2026-08-28 it got as far as typer), nothing written. Bash
+    with the variable unset: exit 0 all day. AFTER the fix (the same clear the script now
+    performs, then the same command, from PowerShell with VIRTUAL_ENV pre-set to
+    agents\.venv): exit 0, all nine renders written.
+(d) Consequence stated: the load-map surfaces never refreshed from THIS SCRIPT on this
+    machine. Checked: after the PowerShell render the only diffs were board.html and
+    roadmap.html status drift from the un-rendered claims (Y5), so the load-map renders
+    were current - every Bash-side render_board.py run today chains the load-map renderer,
+    which is what kept them current while the script&#x27;s step failed. Nothing further to
+    commit beyond the ordinary re-render in this commit.
+(e) Warn-only unchanged: the refresh steps still cannot block the snapshot; this changes
+    only whether they succeed.
 </p></div></div>
 <div class="card" id="card-J66" data-id="J66" data-module="docs" data-phase="8" data-epic="release-infrastructure" data-type="chore" data-status="done" data-search="j66 a source-reading guard that fails on its own explanation teaches people to stop explaining - three hand-rolled workarounds in one day, give them one helper" tabindex="0"><div class="card-head"><span class="card-id">J66</span><span class="card-title">A source-reading guard that fails on its own explanation teaches people to stop explaining - three hand-rolled workarounds in one day, give them one helper</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">release-infrastructure</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE THREE CALL SITES ARE MIGRATED, NOT JOINED BY A FOURTH. All three were written from
 scratch on 2026-08-30 and all three were verified in the tree at groom time: the tokenize-based
@@ -9886,6 +9983,56 @@ multi-line marker, the J66 comment case, the reference file), ruff clean, full s
 passed before the close. One of the nineteen was this lane&#x27;s own R9 test from two days
 ago, which is the point of a guard over a rule people already know.
 </p></div></div>
+<div class="card" id="card-J77" data-id="J77" data-module="docs" data-phase="8" data-epic="release-infrastructure" data-type="chore" data-status="done" data-search="j77 a branch tip can be green while commits inside it were red at push, so a bisect through the range fails on a ledger guard rather than the defect - have the roll say which commits were red" tabindex="0"><div class="card-head"><span class="card-id">J77</span><span class="card-title">A branch tip can be green while commits inside it were red at push, so a bisect through the range fails on a ledger guard rather than the defect - have the roll say which commits were red</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">chore</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">haiku / main</span></div><div class="epic">release-infrastructure</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) ONE SENTENCE, in the ledger/roll convention wherever a roll describes a COMMIT RANGE:
+name the commits inside the range that were RED at push, or state that none were. Written
+by the session that made them, which already knows - the same way a roll step names which
+ids were re-minted.
+
+(b) NOT A GUARD, and say so on the line. A pre-push hook running the full suite would cost
+minutes on every push to buy a property nobody has needed yet, and a red intermediate
+commit is a legitimate way to work - J68&#x27;s own guard was written red first on purpose. The
+difference that matters is whether it goes green in the SAME commit.
+
+(c) SAY WHAT MOSTLY NEUTRALIZES IT, so the note is not read as bigger than it is: CLAUDE.md
+mandates --no-ff for branch merges, so once a branch lands, its red commits leave main&#x27;s
+FIRST-PARENT line and git bisect --first-parent never visits them. The exposure is
+bisecting the branch itself, or a range that crosses the merge boundary - which a PORT
+range does, since a port reads the full range and not the first-parent walk.
+
+(d) PASS/FAIL: the convention is written where a roll is authored, with the bisect
+consequence as its one-line reason.
+</p><p class="notes"><strong>Notes:</strong> Groomed 2026-09-02 from Idea-234 (desktop, backlog-groomer fork). p3 and haiku on purpose:
+this is one sentence in a doc, and the idea itself argues against anything larger.
+
+THE OBSERVATION: on feat/ui-web (2026-09-01), e7e95f07 and f44fb40d shipped two console
+components without their config/taxonomy/ui-components.yaml ledger rows and were RED on
+test_ui_components when pushed; e0c12d10 added the rows and the tip went green. The tip is
+the state anyone looks at, so the range reads as healthy. Reported by the session that made
+it, not found by anything - which is the gap.
+
+WHAT ALREADY WORKS AND IS NOT BEING CHANGED: the session ritual&#x27;s CI check matches on HEAD&#x27;s
+sha, warn-only, immediately before snapshot.ps1 writes. It does exactly what it claims,
+per push. Nothing aggregates the answers, and this item does not build an aggregator.
+Related: Idea-111, Idea-229 (the same verification channel, seen where a run has NO verdict).
+DONE 2026-09-08 (desktop, Lane A).
+(a) One paragraph, A ROLL NAMES ITS RED COMMITS (J77), in docs/port/port-prompt.md
+    beside THE BASE IS A TAG, NOT HEAD (J41) - the block every roll is authored
+    against - and one bullet in .claude/skills/reconcile-port/SKILL.md Procedure step 1,
+    where the consumer checks the base before touching the range. The sentence: name
+    the commits inside the range that were RED at push (or never verified), or state
+    that none were, written by the session that made them, like a re-minted id range.
+(b) Says NOT A GUARD on the line, with the J68 reason: a guard written red and turned
+    green in the same commit is normal here, so only the author knows whether the
+    range closed green.
+(c) Names the neutralizer: --no-ff merges keep red commits off main&#x27;s first-parent
+    line, so git bisect --first-parent never visits them; the exposure is bisecting
+    the branch itself or a range crossing the merge boundary, which a port range does.
+(d) Written where a roll is authored, with the bisect consequence as the one-line
+    reason; starts forward with the eighth roll, no earlier roll is annotated. The
+    feat/ui-web observation (e7e95f07, f44fb40d red; e0c12d10 green tip) is cited
+    as the case. No script generates the roll paragraph (grep of drydocs/port/*.py and
+    scripts/port_preflight.py), so prose is the only place the convention can live.
+</p></div></div>
 <div class="card" id="card-J78" data-id="J78" data-module="graph-infra" data-phase="8" data-epic="release-infrastructure" data-type="bug" data-status="done" data-search="j78 a cancelled ci run is neither green nor red and the snapshot check has nothing to disagree with - treat no verdict as unverified and say so" tabindex="0"><div class="card-head"><span class="card-id">J78</span><span class="card-title">A cancelled CI run is neither green nor red and the snapshot check has nothing to disagree with - treat no verdict as UNVERIFIED and say so</span></div><div class="chips"><span class="chip" data-kind="module">graph-infra</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">bug</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">release-infrastructure</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE PRODUCER-SIDE HALF IS ONE SENTENCE OF LOGIC in snapshot.ps1&#x27;s CI check: a run whose
 conclusion is cancelled is UNVERIFIED - not green, not red - and the check says so by name.
 It stays WARN-ONLY and never blocks the snapshot, for the reason already recorded: recording
@@ -9984,6 +10131,65 @@ the marker stays as the final presence-only pin. Replayed against the NEW guard:
 predicate -&gt; fails on the absence assertion with the match named; reworded marker -&gt; fails
 only on the documentation pin, the join assertions hold. test_controlm_cypher 74 passed,
 test_source_scan + test_no_render_parsing 24 passed, ruff check/format clean.
+</p></div></div>
+<div class="card" id="card-PORT1" data-id="PORT1" data-module="drydocs-port" data-phase="8" data-epic="release-infrastructure" data-type="task" data-status="done" data-search="port1 three back-flow adoptions from the company&#x27;s chunk-1 apply, plus the rule that a workplan naming a script names the commit it needs" tabindex="0"><div class="card-head"><span class="card-id">PORT1</span><span class="card-title">Three back-flow adoptions from the company&#x27;s chunk-1 apply, plus the rule that a workplan naming a script names the commit it needs</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-port</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">release-infrastructure</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> Three back-flow adoptions from the company&#x27;s chunk-1 apply of port-base-20260901, plus
+one rule for the port workplan. The company holds the transcript; the producer holds the
+mechanisms, which is why these land here.
+
+(a) scripts/render_port_dispositions.py takes an OPTIONAL HEAD ref. The consumer&#x27;s HEAD is its
+    own tree, so a range on their side classifies tag..tag and never tag..HEAD; they patched
+    main()/render() for it and the shape is the one to adopt.
+(b) The fourth guard in tests/unit/test_port_dispositions.py (the APPLY-BY-DISPOSITION section
+    above STEP LEDGER in the port-prompt) is producer-only by nature - the company&#x27;s
+    port-prompt copy is retired and carries neither marker - so it SKIPS when the markers are
+    absent, with a message saying so, rather than forcing the consumer to drop a test. The
+    skip is TRACKED-content-based, never a directory probe.
+(c) scripts/port_rename_check.py spawns one git show per producer file across the whole tree.
+    Move it to git cat-file --batch on one pipe: minutes become seconds, and the whole-tree
+    look is what RELAY-20 asks for before every clean-add slice. Prove the speed-up with a
+    measured before/after on this tree, and prove the OUTPUT is unchanged on the same range.
+(d) THE WORKPLAN RULE: a chunk plan that names a script names the COMMIT the script needs.
+    The company was told to run a renderer that landed after their base (J69 at bed22549).
+    Chunk 1 should also say: classify with git show &lt;base&gt;:PORT-MANIFEST.yaml, not with the
+    consumer&#x27;s current manifest, and then diff the two manifests - the differences ARE the
+    port&#x27;s own manifest rows. Both rules land in the port-prompt.
+</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-07 from IDEAS.md Idea-250 (company session&#x27;s chunk-1 status, relayed by
+the SME 2026-09-02; the producer holds no transcript, so traceability to their id is
+one-directional).
+
+The entry&#x27;s fourth finding RESOLVED itself the same day in the company&#x27;s favour and is
+recorded here for the record, not as work: the producer&#x27;s 519 was measured ..HEAD three
+commits past the tag; tag..tag with the manifest at the tag is 516 / 130 / 150 / 4, and their
+123 is 130 minus the seven derived rows. That resolution is exactly why clause (d) exists -
+classifying with the wrong manifest is the mistake that produced the discrepancy.
+
+First item in the PORT series (module drydocs-port, added at CORE1). Filed
+release-infrastructure / phase 8 with the other port mechanisms (J34, J72).
+DONE 2026-09-08 (desktop, Lane A).
+(a) Was already on main before the claim, at eee64ce3 (2026-09-07, the same day this
+    item was minted): main() takes an optional second argument as the head, render()
+    takes it too, a third argument is refused, and test_port_dispositions.py pins the
+    pass-through. Nothing to adopt beyond recording that the adoption had landed.
+(b) The fourth guard now skips through git ls-files -- docs/port/port-prompt.md (never a
+    directory probe), and again when the tracked file carries neither marker (a retired
+    stub). This is the case PORT3&#x27;s guard exists for, and PORT3 had it WRONG: its fixture
+    allowance for test_port_dispositions.py said &quot;input to classify()&quot;, but the test opens
+    the file. The false allowance is removed here, and the PORT3 guard replayed on the
+    pre-(b) shape FINDS the citation and reads the post-(b) shape CLEAN - the two items lock.
+(c) scripts/port_rename_check.py reads the producer tree through one git cat-file --batch
+    pipe (_blobs), decoding exactly as _git did (UTF-8 replace, then universal newlines).
+    Measured on this tree, whole tree, --producer-ref port-base-20260905: 109 s before,
+    8 s after; the report output is byte-identical (diff of the two captures is empty).
+    tests/unit/test_port_rename_check.py (new, 3 tests) pins per-path equality with git
+    show, the missing-object skip, the decode, and that no _git(&quot;show&quot;, ...) call remains.
+(d) Both rules land in the APPLY BY DISPOSITION section of docs/port/port-prompt.md,
+    under the renderer command, which is now the consumer&#x27;s two-argument form: a chunk
+    plan that names a script names the commit the script needs (bed22549 / eee64ce3 /
+    df7a57c3 / 6f8c7825, all in port-base-20260908); classify with the manifest AT THE
+    BASE (git checkout &lt;base-tag&gt; -- PORT-MANIFEST.yaml is class 1&#x27;s first take anyway),
+    then git diff &lt;pre-apply-tag&gt; &lt;base-tag&gt; -- PORT-MANIFEST.yaml - the rows that differ
+    are the port&#x27;s own manifest rows for the range.
+The item&#x27;s inputs list docs/port-prompt.md; the file is docs/port/port-prompt.md.
 </p></div></div>
 <div class="card" id="card-PORT2" data-id="PORT2" data-module="drydocs-port" data-phase="8" data-epic="release-infrastructure" data-type="bug" data-status="done" data-search="port2 a feedback capture whose rev1 and rev11 normalize to one anchor set is either an unfilled template or a normalizer that discards the payload - find out which" tabindex="0"><div class="card-head"><span class="card-id">PORT2</span><span class="card-title">A feedback capture whose rev1 and rev11 normalize to one anchor set is either an unfilled template or a normalizer that discards the payload - find out which</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-port</span><span class="chip" data-kind="phase">P8</span><span class="chip" data-kind="type">bug</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">release-infrastructure</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> The rename detector scores
 docs/design/feedback/drydocs-startup-refresh-runbook-rev11.yaml and its rev1 sibling at 1.00
@@ -18812,6 +19018,73 @@ from the main checkout it wrote the same and printed `ci: GREEN at HEAD ff22f52`
 PS 5.1 reads the script as ANSI, so an em dash INSIDE a string literal decodes to bytes containing a
 smart quote that PowerShell honours as a string delimiter (parser error at first run) -- string
 literals kept ASCII, with a comment saying why. Worktree removed after the check.
+</p></div></div>
+<div class="card" id="card-U27" data-id="U27" data-module="graph-infra" data-phase="16" data-epic="self-documentation" data-type="bug" data-status="done" data-search="u27 snapshot.ps1&#x27;s ci check asks `gh run list --branch main`, so from any branch head can never appear and the verdict degrades to no-run-yet permanently — and the verdict function still has no tests" tabindex="0"><div class="card-head"><span class="card-id">U27</span><span class="card-title">snapshot.ps1&#x27;s CI check asks `gh run list --branch main`, so from any branch HEAD can never appear and the verdict degrades to no-run-yet permanently — and the verdict function still has no tests</span></div><div class="chips"><span class="chip" data-kind="module">graph-infra</span><span class="chip" data-kind="phase">P16</span><span class="chip" data-kind="type">bug</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">self-documentation</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE BRANCH PIN: the caller asks CI about the branch it is actually on — `git rev-parse --abbrev-ref HEAD` in place of the literal `main` (line 166 at this groom: `gh run list --branch main --limit 10 --json ...`). Today the script fetches main&#x27;s ten newest runs and matches the LOCAL HEAD sha against them, so from a worktree, an epic slice, an agent fork or any `feat/` branch — exactly the sessions CLAUDE.md tells you to branch for — HEAD is never in the answer and every run takes the yellow &quot;no run yet for HEAD&quot; path until merge. The worked example is the branch this was filed from: CI was GREEN on `feat/ui-workstream` and invisible to a query pinned to `main`. A detached HEAD degrades to something honest (a named skip), never a crash.
+
+(b) FIVE FIXTURES FOR `Get-CiVerdict`, which its own design comment already claims is &quot;a pure function of (runs, head) so every branch is exercisable without a network&quot; and which has NO tests: green-at-head, failed-at-head-with-an-older-success-in-the-list, in-progress-at-head, no-run-yet-for-head, and EMPTY runs. The empty case is the one that would have caught the 2026-08-20 false GREEN.
+
+(c) THE TESTS MUST NOT BREAK CI: there is no Pester in this repo and the CI runner&#x27;s PowerShell availability is not established, so the check SKIPS CLEANLY where no PowerShell is present, with a message naming what is missing (the U26 precedent for `test_probe_instrument.py`&#x27;s skip). The mechanism is the implementer&#x27;s — pytest invoking pwsh with the function dot-sourced, or extracting the verdict so it can be driven directly — the five named cases are the acceptance, not the harness.
+
+(d) WARN-ONLY IS UNCHANGED (U24 clause d): this reports, it never blocks the snapshot.
+
+(e) VERIFIED BY RE-RUN, NOT BY READING, with the venue named (J18): one snapshot run FROM A BRANCH whose printed verdict line is quoted in the close note, plus one from the main checkout.
+</p><p class="notes"><strong>Notes:</strong> Groomed 2026-08-22 (laptop) from Idea-156. That entry was filed on `feat/ui-workstream` as that branch&#x27;s Idea-152 and re-filed at 156 on main, because 151 and 152 were both taken there by unrelated entries while the branch sat unmerged — the allocator-band hazard playing out inside one side.
+
+HALF OF THE ORIGINAL REPORT IS ALREADY FIXED AND IS NOT THIS ITEM. Recorded here only so it is not re-done: defect (1) — `Get-CiVerdict` never enumerating the runs array, so `$mine[0]` was the whole ten-run array and `conclusion -eq &quot;success&quot;` was truthy if ANY recent run passed — landed at 22b8ad7 and properly at 5c0308e / U24, which pins one run object and reads `status` and `conclusion` as scalar strings, with the PS 5.1 ConvertFrom-Json trap written down at the line.
+
+Module graph-infra / phase 16 / epic self-documentation by the U7, U12, U15, U24, U25 and U26 precedent — every snapshot.ps1 item in this backlog lands there. Sibling of U26 (done) in the same script: that one lost the JSON write from a worktree, this one mis-reports the step immediately before it, and both are invisible from the main checkout. Mechanism only, no gate.
+
+p2 rather than p3 because the check exists precisely to stop a repeat of Idea-111 (CI red for 100+ consecutive runs while sessions pushed past it), and a check that structurally cannot see branch work is the same failure with a green-looking wrapper.
+DONE 2026-09-08 (desktop, Lane A; built on wip/u27-desktop per J31, merged --no-ff).
+(a) The caller reads `git rev-parse --abbrev-ref HEAD` and lists runs for THAT branch;
+    `gh run list --branch main` is gone from snapshot.ps1 (pinned by
+    test_the_caller_lists_runs_for_the_branch_head_is_on_never_main_by_literal, code only,
+    J66). A detached HEAD prints a DarkGray named skip - &quot;no branch to list runs for&quot; -
+    and points at `gh run list --commit &lt;sha&gt;`; nothing throws. The branch reaches the
+    verdict as -Branch, so &quot;ZERO runs on main&quot;, &quot;newest on main is&quot; and &quot;main is RED&quot; now
+    name the branch that was actually asked about.
+(b) Get-CiVerdict moved, unchanged in logic, to knowledge/depgraph-snapshots/ci_verdict.ps1
+    and snapshot.ps1 dot-sources it; the design comment&#x27;s &quot;pure function&quot; claim is now
+    enforced (test_the_verdict_file_reads_nothing_but_its_arguments: no `&amp; git`, `&amp; gh`,
+    $LASTEXITCODE, Push-Location, Get-Content, Get-Command in its code). Five fixtures in
+    tests/unit/test_ci_verdict.py, each a JSON file fed through the live caller&#x27;s own
+    `ConvertFrom-Json ... | ForEach-Object { $_ }` idiom so the PS 5.1 unrolling trap is
+    exercised rather than bypassed: green-at-head (Green, exact text);
+    failed-at-head-with-an-older-success-in-the-list (Red, the branch named, HEAD&#x27;s verdict
+    not the list&#x27;s); in-progress-at-head (Yellow); no-run-yet-for-head (Yellow UNVERIFIED,
+    newest run&#x27;s state and the branch named); EMPTY runs (Yellow UNVERIFIED &quot;ZERO runs on
+    &lt;branch&gt;&quot;, never GREEN). Two more the fixtures imply: gh exit 4 is a DarkGray named
+    skip distinct from an empty list (J76), and cancelled-at-head is UNVERIFIED not RED
+    (J78). Probed first on PS 5.1: ConvertFrom-Json &quot;[]&quot; piped through ForEach-Object
+    yields Count 0, so the EMPTY fixture reaches the ZERO-runs branch and not the
+    no-run-yet one.
+(c) Harness is pytest running `pwsh` then `powershell` via shutil.which with -NoProfile
+    -NonInteractive -ExecutionPolicy Bypass; where neither is on PATH the file skips with a
+    message naming both shells (the U26 shape). Desktop runs it under Windows PowerShell
+    5.1.26100; the CI legs (ubuntu-latest and windows-latest) both carry pwsh, so the
+    fixtures execute there rather than skipping - the wip/u27-desktop run is the proof.
+    test_powershell_keeps_non_ascii_out_of_quoted_strings already rglobs
+    every *.ps1, so ci_verdict.ps1 is under the CP1252 guard without a change;
+    test_refusal_and_ci_messages_report_the_measurement_not_a_guess now reads both files
+    because the CI messages moved.
+(d) Warn-only unchanged: the block is still inside the try/catch that downgrades any
+    failure to `ci check skipped`, the verdict is still Write-Host, and nothing between it
+    and the write reads it.
+(e) Verified by re-run, both from the PowerShell tool on the desktop, README/snapshot.ps1
+    edited in the tree for the first and clean for the second:
+    - main checkout at 311d7386 (U27 code uncommitted, so the J64 refusal followed):
+      &quot;ci: GREEN at HEAD 311d738&quot;
+    - branch wip/u27-desktop at 8d769863, 47 seconds after the push, clean tree, full run
+      to the write: &quot;ci: run for HEAD 8d76986 is in_progress - re-check before you close
+      the session&quot; - the line the literal-main pin could never have produced, because
+      8d769863 was on no main run list. The snapshot that run wrote (header commit
+      8d769863, branch wip/u27-desktop) was discarded with the retention deletion and the
+      ledger row it made; the ritual snapshot is taken from main after the merge.
+README&#x27;s CI paragraph names the branch pin, the detached-HEAD skip, ci_verdict.ps1 and
+the five fixtures. Guards: test_ci_verdict (10), test_depgraph_snapshots (13),
+test_module_boundary, test_render_determinism, test_no_render_parsing, test_source_scan,
+test_runbook_currency, test_probe_instrument, test_skip_guard_policy, test_backlog
+(155 passed); ruff check and format --check clean at the 0.5.7 pin.
 </p></div></div>
 <div class="card" id="card-V1" data-id="V1" data-module="docs" data-phase="10" data-epic="sme-runbooks" data-type="task" data-status="done" data-search="v1 sme-runbook coverage rule: every module in the registry maps to a governed runbook or sits on a frozen shrink-only runbook_pending list" tabindex="0"><div class="card-head"><span class="card-id">V1</span><span class="card-title">SME-runbook coverage rule: every module in the registry maps to a governed runbook or sits on a frozen shrink-only RUNBOOK_PENDING list</span></div><div class="chips"><span class="chip" data-kind="module">docs</span><span class="chip" data-kind="phase">P10</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">sme-runbooks</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> A unit test maps every entry in the backlog modules: registry to exactly one of three states, none silently absent: (1) COVERED — a governed docs/design/*-runbook.md names the module in its front matter; (2) EXEMPT — an explicit list with a reason per entry (work areas by rule: reference/taxonomy/ontology/config/graph-infra/docs are captures and registries, not operable components; placeholder modules with no code to operate: drydocs-plan, drydocs-docmeta, and drydocs-deepdoc if still placeholder); (3) RUNBOOK_PENDING — real modules awaiting authorship, frozen shrink-only per the N2 LEDGER_PENDING idiom. The map also dispositions the five existing runbooks (web-console -&gt; drydocs-web; mapping-store/mapping-demo -&gt; decide; lineage-mac + cmdline-resolution = chain-scoped, decide whether they satisfy drydocs-lineage or index under it; startup-refresh = system-level, decide whether it counts for drydocs-load). Suite green.
 </p><p class="notes"><strong>Notes:</strong> Groomed 2026-07-29 from the user directive &quot;create a SME-Runbook for each module&quot;. The mapping decisions here gate V2-V10&#x27;s scope (extend an existing runbook vs author a new one), which is why they depend on this. Module docs (the rule is about the doc corpus), phase 10 with Epic L — no plan change.

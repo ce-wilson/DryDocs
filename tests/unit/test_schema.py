@@ -44,7 +44,26 @@ VOCAB_FILE = ONTOLOGY_DIR / "relationship_vocabulary"
 # port_unique -> port_app_key (a DROP + a rename, so the CREATE count is
 # unchanged by that half — see the trap comment in constraints.cypher).
 # Bump this when you intentionally add/remove a CREATE CONSTRAINT.
-EXPECTED_CONSTRAINTS = 55
+# THE NUMBER LIVES IN config/dev-environment.yaml `census.schema_constraints`, NOT
+# HERE (PLAN9, 2026-09-08). constraints.cypher is per-entry in PORT-MANIFEST.yaml -
+# the company's copy carries its own supplement blocks, so its count is ahead of
+# the producer's - and a count checked in here collided at every roll (the manifest
+# row for this file has said 'keep consumer count, take producer logic' since the
+# step-45 head). A consumer edits the venue file, never this test; the history
+# above and below is the producer's.
+DEV_ENVIRONMENT = Path(__file__).resolve().parents[2] / "config" / "dev-environment.yaml"
+
+
+def _expected_constraints() -> int:
+    doc = yaml_fragments.load_yaml_source(DEV_ENVIRONMENT) or {}
+    value = (doc.get("census") or {}).get("schema_constraints")
+    assert isinstance(value, int), (
+        "config/dev-environment.yaml declares no census.schema_constraints - this "
+        "checkout's expected CREATE CONSTRAINT count lives there, not in the test (PLAN9)"
+    )
+    return value
+
+
 # 52 -> 53 at G31 (2026-08-18): dataasset_id moved HOME from the retired
 # 02_proxy_constraints.cypher (the G102 fold killed the cross-db charter; the
 # key itself never retired). Prior: 53 -> 52 at G99 (membership_id dropped
@@ -85,9 +104,11 @@ _DECLARATION_LINE = re.compile(r"^\s*CREATE CONSTRAINT\b")
 def test_constraint_count() -> None:
     text = CONSTRAINTS_FILE.read_text(encoding="utf-8")
     found = sum(1 for line in text.splitlines() if _DECLARATION_LINE.match(line))
-    assert found == EXPECTED_CONSTRAINTS, (
-        f"Expected {EXPECTED_CONSTRAINTS} constraints, found {found}. "
-        "Update EXPECTED_CONSTRAINTS if you intentionally added or removed constraints."
+    expected = _expected_constraints()
+    assert found == expected, (
+        f"Expected {expected} constraints, found {found}. Update census.schema_constraints "
+        "in config/dev-environment.yaml if you intentionally added or removed constraints "
+        "- never this test (PLAN9)."
     )
 
 

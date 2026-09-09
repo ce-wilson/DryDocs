@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-08T18:40:08",
+    "captured_at": "2026-09-08T21:14:45",
     "date": "20260908",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "1f54b5d4",
-      "full": "1f54b5d4cfc7fe34408a0b4478969fddbc1edc53",
+      "commit": "2673ae24",
+      "full": "2673ae247678232c6adeaebf6d5ce73a57317d9a",
       "branch": "main",
-      "describe": "port-base-20260908-13-g1f54b5d4",
-      "subject": "fix(port): RELAY-47 follow-through - matrix row, repo_root anchor, refreshed renders",
+      "describe": "port-base-20260908-37-g2673ae24",
+      "subject": "chore(plan): render catch-up for the I5 claim (Y5)",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -19630,6 +19630,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs/port/port_drops.py",
+      "name": "port_drops.py",
+      "extension": ".py",
+      "rel_path": "drydocs/port/port_drops.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs/port/port_preflight.py",
       "name": "port_preflight.py",
       "extension": ".py",
@@ -23230,6 +23239,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/knowledge/depgraph-snapshots/ci_verdict.ps1",
+      "name": "ci_verdict.ps1",
+      "extension": ".ps1",
+      "rel_path": "knowledge/depgraph-snapshots/ci_verdict.ps1",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/knowledge/depgraph-snapshots/debt-metrics.jsonl",
       "name": "debt-metrics.jsonl",
       "extension": ".jsonl",
@@ -23239,10 +23257,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260908.json",
-      "name": "drydocs-20260908.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260908-1839.json",
+      "name": "drydocs-20260908-1839.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260908.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260908-1839.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -24373,6 +24391,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/scripts/port_drop_check.py",
+      "name": "port_drop_check.py",
+      "extension": ".py",
+      "rel_path": "scripts/port_drop_check.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/scripts/port_preflight.py",
       "name": "port_preflight.py",
       "extension": ".py",
@@ -25241,6 +25268,15 @@
       "name": "test_chunk_search_spec.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_chunk_search_spec.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_ci_verdict.py",
+      "name": "test_ci_verdict.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_ci_verdict.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -26308,6 +26344,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_never_port_citations.py",
+      "name": "test_never_port_citations.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_never_port_citations.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_no_render_parsing.py",
       "name": "test_no_render_parsing.py",
       "extension": ".py",
@@ -26452,6 +26497,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_port_drops.py",
+      "name": "test_port_drops.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_port_drops.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_port_manifest.py",
       "name": "test_port_manifest.py",
       "extension": ".py",
@@ -26474,6 +26528,15 @@
       "name": "test_port_reconcile_guards.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_port_reconcile_guards.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_port_rename_check.py",
+      "name": "test_port_rename_check.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_port_rename_check.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -31262,6 +31325,14 @@
       "drydocs/drydocs/port/dispositions.py"
     ],
     [
+      "drydocs/drydocs/port/port_drops.py",
+      "drydocs/drydocs/port/dispositions.py"
+    ],
+    [
+      "drydocs/drydocs/port/port_drops.py",
+      "drydocs/drydocs/port/port_completeness.py"
+    ],
+    [
       "drydocs/drydocs/port/port_preflight.py",
       "drydocs/drydocs_core/repo_paths.py"
     ],
@@ -32556,6 +32627,10 @@
     [
       "drydocs/scripts/port_completeness_check.py",
       "drydocs/drydocs/port/port_completeness.py"
+    ],
+    [
+      "drydocs/scripts/port_drop_check.py",
+      "drydocs/drydocs/port/port_drops.py"
     ],
     [
       "drydocs/scripts/port_preflight.py",
@@ -34290,6 +34365,18 @@
       "drydocs/drydocs_core/ontology/namespaces.py"
     ],
     [
+      "drydocs/tests/unit/test_never_port_citations.py",
+      "drydocs/drydocs/port/dispositions.py"
+    ],
+    [
+      "drydocs/tests/unit/test_never_port_citations.py",
+      "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
+      "drydocs/tests/unit/test_never_port_citations.py",
+      "drydocs/tests/source_scan.py"
+    ],
+    [
       "drydocs/tests/unit/test_node_status_envelope.py",
       "drydocs/drydocs/loaders/base.py"
     ],
@@ -34404,6 +34491,26 @@
     [
       "drydocs/tests/unit/test_port_dispositions.py",
       "drydocs/drydocs/port/dispositions.py"
+    ],
+    [
+      "drydocs/tests/unit/test_port_drops.py",
+      "drydocs/drydocs/port/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_port_drops.py",
+      "drydocs/drydocs/port/dispositions.py"
+    ],
+    [
+      "drydocs/tests/unit/test_port_drops.py",
+      "drydocs/drydocs/port/port_drops.py"
+    ],
+    [
+      "drydocs/tests/unit/test_port_drops.py",
+      "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
+      "drydocs/tests/unit/test_port_drops.py",
+      "drydocs/tests/unit/test_port_reconcile_guards.py"
     ],
     [
       "drydocs/tests/unit/test_port_manifest.py",
@@ -48384,6 +48491,11 @@
     [
       "drydocs/drydocs/port",
       "CONTAINS",
+      "drydocs/drydocs/port/port_drops.py"
+    ],
+    [
+      "drydocs/drydocs/port",
+      "CONTAINS",
       "drydocs/drydocs/port/port_preflight.py"
     ],
     [
@@ -50304,12 +50416,17 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
+      "drydocs/knowledge/depgraph-snapshots/ci_verdict.ps1"
+    ],
+    [
+      "drydocs/knowledge/depgraph-snapshots",
+      "CONTAINS",
       "drydocs/knowledge/depgraph-snapshots/debt-metrics.jsonl"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260908.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260908-1839.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -50770,6 +50887,11 @@
       "drydocs/scripts",
       "CONTAINS",
       "drydocs/scripts/port_completeness_check.py"
+    ],
+    [
+      "drydocs/scripts",
+      "CONTAINS",
+      "drydocs/scripts/port_drop_check.py"
     ],
     [
       "drydocs/scripts",
@@ -51350,6 +51472,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_chunk_search_spec.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_ci_verdict.py"
     ],
     [
       "drydocs/tests/unit",
@@ -51944,6 +52071,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_never_port_citations.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_no_render_parsing.py"
     ],
     [
@@ -52024,6 +52156,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_port_drops.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_port_manifest.py"
     ],
     [
@@ -52035,6 +52172,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_port_reconcile_guards.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_port_rename_check.py"
     ],
     [
       "drydocs/tests/unit",
@@ -53981,13 +54123,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 3004,
-    "edges": 1840,
+    "files": 3011,
+    "edges": 1851,
     "circular_files": 5,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 3326,
+    "rels": 3333,
     "directories": 323
   }
 }

@@ -72,9 +72,6 @@ FIXTURE_LITERALS: dict[str, dict[str, str]] = {
         "docs/port/port-prompt.md": "synthetic ls-tree listing; classified, never opened",
         "docs/port/x.md": "synthetic ls-tree listing; classified, never opened",
     },
-    "test_port_dispositions.py": {
-        "docs/port/port-prompt.md": "input to classify(); the row match is the subject",
-    },
     "test_port_drops.py": {
         "PORT-MANIFEST.company.yaml": "written under tmp_path; the overlay slot under test",
         "PORT-MANIFEST.producer.yaml": "written under tmp_path; the overlay slot under test",

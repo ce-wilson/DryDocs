@@ -37,6 +37,7 @@ from drydocs_core.source_bindings import (
 REPO = Path(__file__).resolve().parents[2]
 REGISTRY = REPO / "config" / "source-registry.yaml"
 BINDINGS = REPO / "config" / "source-bindings.yaml"
+DEV_ENVIRONMENT = REPO / "config" / "dev-environment.yaml"
 
 
 def _registry() -> dict:
@@ -382,14 +383,32 @@ def test_live_registry_produces_no_broken_binding() -> None:
 
 
 def test_reports_cover_every_automated_dataset() -> None:
-    """15 automated rows, all accounted for by a profile."""
+    """Every automated row is accounted for by a profile, and the count is the one
+    this checkout declares.
+
+    15 on the producer. THE NUMBER LIVES IN config/dev-environment.yaml
+    `census.automated_datasets`, NOT HERE (PLAN9, 2026-09-08): source-registry.yaml
+    is per-entry in PORT-MANIFEST.yaml and the company holds rows the producer never
+    sees (17 at its 2026-09-03 apply), so a count checked in here collided at every
+    roll. A consumer edits the venue file, never this test.
+    """
     total = sum(r.datasets for r in reports())
     expected = sum(
         1
         for row in _registry()["datasets"]
         if (row.get("acquisition") or {}).get("mode") == "automated"
     )
-    assert total == expected == 15
+    doc = yaml.safe_load(DEV_ENVIRONMENT.read_text(encoding="utf-8"))
+    declared = (doc.get("census") or {}).get("automated_datasets")
+    assert isinstance(declared, int), (
+        "config/dev-environment.yaml declares no census.automated_datasets - this "
+        "checkout's expected automated-row count lives there, not in the test (PLAN9)"
+    )
+    assert total == expected == declared, (
+        f"{total} automated rows profiled, {expected} in the registry, {declared} declared. "
+        "Update census.automated_datasets in config/dev-environment.yaml deliberately and "
+        "say why in the commit - never this test (PLAN9)."
+    )
 
 
 # ---------------------------------------------------------------------------

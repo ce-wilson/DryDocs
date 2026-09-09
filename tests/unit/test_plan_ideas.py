@@ -110,11 +110,57 @@ def _inbox_entries() -> list[str]:
     return [line for line in lines[start:end] if line.startswith("- ")]
 
 
+#: A CAPTURE, loosely: a list item whose leading bold token opens with an Idea id,
+#: backticked or not - `- **`Idea-177`** ·` and `- **Idea-177 (2026-08-26, desktop):**`
+#: both match. This is deliberately looser than _HEADER: it is the net that finds a
+#: capture filed in the wrong shape, so that _HEADER can then be held against it (I5).
+#: A CITATION - an id inside a sentence, `[[Idea-N]]`, a groom note's "→ Idea-12" - is
+#: never at the head of a list item's bold token, so it is not a candidate. The
+#: capture-format section's own example is `Idea-N`, no digits, and does not match.
+_CANDIDATE = re.compile(rf"^- \*\*`?({_IDEA_ID})\b")
+
+#: The only two sections a capture may sit in. Anything else - the format section,
+#: the end of the file below the audit trail - is a misfiling, however it is shaped.
+_CAPTURE_SECTIONS = ("## Inbox", "## Recently groomed (audit trail)")
+
+
+def _capture_candidates(text: str) -> list[tuple[int, str, str, str | None]]:
+    """Every capture-shaped list item ANYWHERE in the file, as
+    (line number, id, line, the `## ` heading it sits under)."""
+    section: str | None = None
+    found: list[tuple[int, str, str, str | None]] = []
+    for n, line in enumerate(text.split("\n"), 1):
+        if line.startswith("## "):
+            section = line
+            continue
+        m = _CANDIDATE.match(line)
+        if m:
+            found.append((n, m.group(1), line, section))
+    return found
+
+
+def _misfiled_captures(text: str) -> list[str]:
+    """Captures that do not carry the header grammar, or carry it outside the two
+    capture sections - reported by id and line."""
+    bad = []
+    for n, ident, line, section in _capture_candidates(text):
+        if not _HEADER.match(line):
+            bad.append(f"{ident} at line {n}: header does not conform: {line[:90]!r}")
+        elif section not in _CAPTURE_SECTIONS:
+            bad.append(
+                f"{ident} at line {n}: filed under {section!r}, outside the inbox and audit trail"
+            )
+    return bad
+
+
 def _all_idea_ids() -> list[str]:
-    """Every `Idea-<n>` header in the file — inbox AND audit trail."""
-    return re.findall(
-        rf"^- \*\*`({_IDEA_ID})`\*\* ·", DEFAULT_IDEAS_PATH.read_text(encoding="utf-8"), re.M
-    )
+    """Every Idea id at the head of a capture in the file - inbox AND audit trail,
+    conforming header or not (I5 b: the uniqueness scan reads the same loose set the
+    misfiling guard does, so a duplicate number cannot hide behind a malformed header)."""
+    return [
+        ident
+        for _, ident, _, _ in _capture_candidates(DEFAULT_IDEAS_PATH.read_text(encoding="utf-8"))
+    ]
 
 
 def test_every_inbox_entry_carries_the_header() -> None:
@@ -124,6 +170,79 @@ def test_every_inbox_entry_carries_the_header() -> None:
     review here" rather than as a formatting slip."""
     bad = [line[:110] for line in _inbox_entries() if not _HEADER.match(line)]
     assert not bad, f"inbox entries missing or malforming the header: {bad}"
+
+
+#: The shape the two 2026-08-26 captures actually landed in (commit c0ae3004, lines 5195
+#: and 5202 of IDEAS.md): appended BELOW the audit-trail heading, in an ad-hoc header.
+#: `_inbox_entries()` never saw them (wrong section) and the header-only id scan never
+#: saw them (wrong shape), so 23 tests passed over two invisible captures. Groom
+#: 45f4f1e5 (2026-08-27) relocated them; this fixture keeps the shape so the guard is
+#: observed RED against it, not just green against the tree it left behind (I5 d).
+_PRE_GROOM_SHAPE = """# IDEAS — the idea board (inbox)
+
+## Capture format (loose)
+
+```
+- **`Idea-N`** · 2026-07-22 · `[idea]` · **open** · prio? **Med** —
+  <the entry text>
+```
+
+## Inbox
+
+- **`Idea-2`** · 2026-01-01 · `[idea]` · **open** · prio? **Med** — a thing. Related [[Idea-1]].
+
+## Recently groomed (audit trail)
+
+- **`Idea-1`** · 2026-01-01 · `[bug]` · **groomed → Z9** · prio? **Low** — see Idea-2.
+- 2026-01-01 — [chore] something → **Z8** (was Idea-2's sibling).
+
+- **Idea-177 (2026-08-26, desktop):** a capture in the old shape, below the trail.
+- **Idea-2 (2026-08-26, desktop):** a second capture reusing a live number.
+
+## Somewhere else
+
+- **`Idea-3`** · 2026-01-01 · `[idea]` · **open** · prio? **Med** — conforming, misfiled.
+"""
+
+
+def test_every_capture_anywhere_conforms_and_sits_in_a_capture_section() -> None:
+    """I5 (a): the two existing guards each cover half the file. `_inbox_entries()`
+    stops at the heading after `## Inbox`, so a capture appended below the audit trail
+    is outside its slice; `_HEADER`-shaped id scans see only conforming headers, so a
+    capture in an ad-hoc shape is outside theirs. A capture that is both - misfiled AND
+    malformed - was invisible to every guard here while 23 tests passed (Idea-177 and
+    Idea-178, 2026-08-26; Idea-170 records the same failure company-side).
+
+    So this test casts the LOOSE net (`_CANDIDATE`: any list item whose leading bold
+    token opens with an Idea id, backticked or not) over the WHOLE file, then holds the
+    strict grammar against every catch and requires it to sit under `## Inbox` or the
+    audit trail. Capture vs citation, in one line: a capture is an id at the head of a
+    list item's bold token; a citation is an id anywhere else - inside a sentence, in
+    `[[...]]`, after a `→` - and citations are never candidates. The format section's
+    `Idea-N` example carries no digits and is not one either.
+    """
+    bad = _misfiled_captures(DEFAULT_IDEAS_PATH.read_text(encoding="utf-8"))
+    assert not bad, (
+        "captures that are malformed or filed outside the inbox / audit trail:\n  "
+        + "\n  ".join(bad)
+    )
+
+
+def test_the_capture_guard_is_red_on_the_pre_groom_shape() -> None:
+    """I5 (d): a guard never observed failing has not been shown to guard anything.
+    The fixture is the 2026-08-26 shape; the guard must name both misfiled captures by
+    id and line, the conforming-but-misfiled one, and nothing else - not the format
+    example, not the `[[Idea-1]]` citation, not `Idea-2's` inside a sentence."""
+    bad = _misfiled_captures(_PRE_GROOM_SHAPE)
+    assert [b.split(" at line ")[0] for b in bad] == ["Idea-177", "Idea-2", "Idea-3"], bad
+    assert bad[0].startswith("Idea-177 at line 19:") and "does not conform" in bad[0]
+    assert bad[2].startswith("Idea-3 at line 24:") and "'## Somewhere else'" in bad[2]
+
+    ids = [ident for _, ident, _, _ in _capture_candidates(_PRE_GROOM_SHAPE)]
+    assert (
+        ids == ["Idea-2", "Idea-1", "Idea-177", "Idea-2", "Idea-3"]
+    ), "the uniqueness scan must read the loose set, so the malformed second Idea-2 is a duplicate here"
+    assert sorted({i for i in ids if ids.count(i) > 1}) == ["Idea-2"]
 
 
 def test_idea_ids_are_unique() -> None:

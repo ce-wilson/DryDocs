@@ -93,12 +93,49 @@ def producer_files(ref: str, prefix: str) -> dict[str, str]:
             f"exit 2: no readable files under {prefix!r} at {ref!r}. "
             "An empty producer side is a failure, not agreement — check the ref."
         )
+    return _blobs(ref, paths)
+
+
+def _decode(raw: bytes) -> str:
+    """The decode ``_git`` performs, applied to bytes read off one pipe: UTF-8 with
+    replacement, then universal newlines - so a blob read here compares equal to the
+    same file read through ``Path.read_text`` on the consumer side."""
+    return raw.decode("utf-8", errors="replace").replace("\r\n", "\n").replace("\r", "\n")
+
+
+def _blobs(ref: str, paths: list[str]) -> dict[str, str]:
+    """``{path: text}`` for every ``path`` at ``ref``, read through ONE ``git cat-file
+    --batch`` pipe rather than one ``git show`` process per file.
+
+    A whole-tree look (RELAY-20 asks for one before every clean-add slice) is ~1,900
+    readable files, and one process per file made it a two-minute run: measured
+    109 s on this tree at port-base-20260905 before this change, single-digit
+    seconds after (8 s), with byte-identical output on the same range (PORT1 c). The batch
+    protocol is ``<sha> <type> <size>\\n<bytes>\\n`` per object, or ``<name> missing\\n``
+    for one that does not resolve - which is skipped here exactly as the failed
+    ``git show`` was: unreadable, never fatal."""
+    result = subprocess.run(
+        ["git", "cat-file", "--batch"],
+        cwd=REPO,
+        input="".join(f"{ref}:{path}\n" for path in paths).encode("utf-8"),
+        capture_output=True,
+    )
+    if result.returncode != 0:
+        raise SystemExit(
+            f"git cat-file --batch failed:\n{result.stderr.decode('utf-8', 'replace')}"
+        )
     out: dict[str, str] = {}
+    buf = result.stdout
+    pos = 0
     for path in paths:
-        try:
-            out[path] = _git("show", f"{ref}:{path}")
-        except SystemExit:
-            continue  # unreadable blob; skipped rather than fatal
+        nl = buf.index(b"\n", pos)
+        header = buf[pos:nl].decode("utf-8", errors="replace").split()
+        pos = nl + 1
+        if header[-1] == "missing":
+            continue
+        size = int(header[2])
+        out[path] = _decode(buf[pos : pos + size])
+        pos += size + 1  # the trailing newline after the object body
     return out
 
 

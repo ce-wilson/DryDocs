@@ -6,6 +6,7 @@
     .\snapshot.ps1                       # FULL FILE TREE (repo root)       -> drydocs-YYYYMMDD.json
     .\snapshot.ps1 -CodeOnly             # legacy: the 7 package roots, .py -> drydocs-code-YYYYMMDD.json
     .\snapshot.ps1 -Project myproj       # override the project name
+    .\snapshot.ps1 -AllowDirty           # scan a tree with tracked changes anyway (header says dirty=true)
 
   THE FULL TREE IS THE DEFAULT (SME direction). It is a strict SUPERSET of the
   old roots-only scan: same import edges, plus directories, plus CONTAINS, plus
@@ -38,11 +39,25 @@
          delete it — which is exactly how a 101-file series accumulated once,
          and the sibling reappeared four times in the two days after the ruling.
          -CodeOnly comparison files keep their own name and are exempt.
+    J53 — a failed refresh step names its CAUSE (the traceback's last line, not
+         its "Traceback" banner) and lists which outputs landed and which are stale.
+    J65 — clear an inherited VIRTUAL_ENV before the first `poetry run`, so a
+         PowerShell caller with the desktop's leak resolves the project environment
+         instead of failing every refresh step on a missing module.
+    J64 — REFUSE to scan a tree with tracked changes: the header names HEAD as the
+         tree scanned, and with tracked changes that is a claim about a tree no
+         commit describes. Commit first, then scan. -AllowDirty downgrades it to
+         a warning for a deliberate mid-work comparison; the header says dirty=true.
+    U27 — the CI check asks `gh run list` about the branch HEAD is ON, never `main`
+         by literal (from a branch, HEAD could not appear and the verdict was
+         no-run-yet forever); detached HEAD is a named skip. The verdict function
+         moved to ci_verdict.ps1, dot-sourced, so pytest drives its five cases.
 #>
 [CmdletBinding()]
 param(
   [string]$Project = "drydocs",
-  [switch]$CodeOnly
+  [switch]$CodeOnly,
+  [switch]$AllowDirty
 )
 # The full tree is the default; $Tree stays as the internal name because it is
 # what depgraph's flag and the meta header are both called.
@@ -50,6 +65,26 @@ $Tree = -not $CodeOnly
 $ErrorActionPreference = "Stop"
 $here = $PSScriptRoot
 $repo = (Resolve-Path "$here\..\..").Path
+
+# --- the environment poetry resolves (J65, 2026-09-08) --------------------------
+# Every `poetry run` below must resolve the PROJECT environment. Poetry honours an
+# inherited VIRTUAL_ENV over its own resolution, and on this desktop the Claude
+# Code shell pre-sets it to agents\.venv (the "VIRTUAL_ENV Leak" project memory;
+# the company guide's S6 workaround is the same unset). A Bash caller that unsets
+# it succeeds; a PowerShell caller inherits it and the board refresh fails on the
+# first import the leaked environment lacks - `ModuleNotFoundError: No module
+# named 'typer'` at the O77 close (2026-08-28), `No module named 'drydocs'` when
+# reproduced from the PowerShell tool on 2026-09-08 - and the load-map surfaces
+# never refreshed from this script on this machine. Cleared unconditionally: a
+# caller who activated the project's own environment loses nothing, because
+# poetry resolves the same environment without the variable; a caller who
+# activated any OTHER environment was never going to get a correct render from
+# it. Printed when it was set, so a reader of the run knows the variable was
+# there and which one, rather than wondering why Bash and PowerShell disagree.
+if ($env:VIRTUAL_ENV) {
+  Write-Host ("env: VIRTUAL_ENV was set ({0}) - cleared so poetry resolves the project environment (J65)" -f $env:VIRTUAL_ENV) -ForegroundColor DarkGray
+  Remove-Item Env:VIRTUAL_ENV -ErrorAction SilentlyContinue
+}
 
 # --- worktree state: TRACKED changes and UNTRACKED presence, kept apart (U15) -
 # `git status --porcelain` with no flags lists untracked files too, so a single
@@ -231,63 +266,11 @@ if ($designDocs) {
 }
 
 # --- CI gate check (Idea-111) — runs BEFORE the snapshot ---------------------
-# The verdict is a pure function of (runs, head) so every branch is exercisable
-# without a network — the reporting half is the part that rots, and a check that
-# only ever prints GREEN on the machine that wrote it is how this got missed.
-function Get-CiVerdict {
-  param($Runs, [string]$Head, [int]$GhExit = 0)
-  $short = $Head.Substring(0, 7)
-  # Two empty-list cases, two different facts (J76, 2026-09-08). The old single
-  # message guessed a cause - "gh not authenticated?" - and on a remote whose
-  # workflow is registered but has NEVER executed (zero runs, ever: the company
-  # remote at its 2026-09-08 close-out) it named a cause that was false while the
-  # real one went unreported. Report the measurement; list the causes; pick none.
-  if ($GhExit -ne 0) {
-    return @{ Color = "DarkGray"; Text = ("ci: gh run list exited {0} - the run list could not be read (authentication, network, or no GitHub remote; 'gh auth status' tells which) - check skipped" -f $GhExit) }
-  }
-  if (@($Runs).Count -eq 0) {
-    return @{ Color = "Yellow"; Text = ("ci: UNVERIFIED at HEAD {0} - the remote reports ZERO runs on main. The workflow has never executed there (a fresh remote, or a workflow that is registered but has never triggered); nothing pushed to it has been checked." -f $short) }
-  }
-  # J78 (2026-09-06): three outcomes, not two. The sha match added after
-  # Idea-111 catches STALE GREEN - a green run that belongs to an older
-  # commit. A CANCELLED run (GitHub cancels a push run when the next push
-  # supersedes it) has a MATCHING sha and NO result, so the sha match sees
-  # nothing wrong and the old two-way split filed it under RED - which it is
-  # not. Different failure, same channel: the commit was never checked, and
-  # the next push that does run will attribute any failure to whoever made
-  # it. So no verdict is reported AS no verdict - UNVERIFIED, by name - and
-  # a MISSING run for HEAD is the same state whatever the reason (not yet
-  # scheduled, workflow skipped, run deleted). Still warn-only.
-  $unverified = "ci: UNVERIFIED at HEAD {0} - {1}. This commit has not been checked; the next push that runs will attribute its failure to whoever made it."
-  $mine = @($Runs | Where-Object { $_.headSha -eq $Head })
-  if ($mine.Count -eq 0) {
-    $newest = @($Runs)[0]
-    $newestState = [string]$newest.conclusion
-    if ([string]::IsNullOrEmpty($newestState)) { $newestState = [string]$newest.status }
-    return @{ Color = "Yellow"; Text = ($unverified -f $short, ("no run exists for it; newest on main is {0} ({1})" -f `
-      $newestState, [string]$newest.displayTitle)) }
-  }
-  # U24 (2026-08-21): the 2026-08-19 snapshot printed `ci: System.Object[] AT
-  # HEAD ...` - PS 5.1 member enumeration stringified a nested property as an
-  # array. Pin ONE run object and read each property as a scalar string; every
-  # branch below, not only the RED one that was observed, shares the hazard.
-  $first = @($mine)[0]
-  $status = [string]$first.status
-  $conclusion = [string]$first.conclusion
-  if ($status -ne "completed") {
-    return @{ Color = "Yellow"; Text = ("ci: run for HEAD {0} is {1} - re-check before you close the session" -f `
-      $short, $status) }
-  }
-  if ($conclusion -eq "success") {
-    return @{ Color = "Green"; Text = ("ci: GREEN at HEAD {0}" -f $short) }
-  }
-  if ($conclusion -eq "cancelled" -or $conclusion -eq "skipped" -or [string]::IsNullOrEmpty($conclusion)) {
-    $reason = if ([string]::IsNullOrEmpty($conclusion)) { "the run completed with no conclusion" } else { "the run was " + $conclusion }
-    return @{ Color = "Yellow"; Text = ($unverified -f $short, $reason) }
-  }
-  return @{ Color = "Red"; Text = ("ci: {0} AT HEAD {1} - main is RED. Run 'gh run view --log-failed' before you stop." -f `
-    $conclusion.ToUpper(), $short) }
-}
+# The verdict itself - Get-CiVerdict, a pure function of (runs, head, gh exit,
+# branch) - lives in ci_verdict.ps1 beside this file, dot-sourced here, so that
+# pytest can drive its five cases without a network (U27, 2026-09-08). This
+# block owns the MEASUREMENT: which branch, which sha, what gh returned.
+. (Join-Path $here "ci_verdict.ps1")
 
 # WARN-ONLY by design: this reports, it never blocks. A snapshot records repo
 # STRUCTURE; refusing to record it because a lint gate is red would couple two
@@ -314,20 +297,33 @@ try {
   } else {
     Push-Location $repo
     $head = (& git rev-parse HEAD).Trim()
-    $raw = & gh run list --branch main --limit 10 --json headSha,conclusion,status,displayTitle
-    $ghExit = $LASTEXITCODE
+    # U27 (2026-09-08): ask about the branch HEAD is ON, not `main` by literal.
+    # The literal fetched main's ten newest runs and matched the LOCAL sha
+    # against them, so from any branch - a worktree, an epic slice, an agent
+    # fork, exactly the sessions CLAUDE.md says to branch for - HEAD was never
+    # in the answer and every run took the yellow no-run-yet path until merge
+    # (CI was GREEN on feat/ui-workstream and invisible to the check, Idea-156).
+    # A detached HEAD has no branch to ask about and is a named skip, not a
+    # crash and not a guess.
+    $branchName = (& git rev-parse --abbrev-ref HEAD).Trim()
     Pop-Location
-    $runs = @()
-    if ($ghExit -eq 0 -and -not [string]::IsNullOrWhiteSpace($raw)) {
-      # PS 5.1 trap (false GREEN, 2026-08-20): ConvertFrom-Json emits a JSON
-      # array as ONE PSObject-wrapped item (argument form included), so the
-      # verdict's scalar tests become member-enumeration FILTERS - '-eq
-      # "success"' is truthy if ANY of the 10 runs succeeded, not if HEAD's
-      # did. Enumerating the parsed object is what actually unrolls it here.
-      $runs = @((ConvertFrom-Json ($raw -join "`n")) | ForEach-Object { $_ })
+    if ($branchName -eq "HEAD") {
+      Write-Host ("ci: detached HEAD at {0} - no branch to list runs for; check skipped. Check out the branch (or read 'gh run list --commit {0}') before you close." -f $head.Substring(0, 7)) -ForegroundColor DarkGray
+    } else {
+      $raw = & gh run list --branch $branchName --limit 10 --json headSha,conclusion,status,displayTitle
+      $ghExit = $LASTEXITCODE
+      $runs = @()
+      if ($ghExit -eq 0 -and -not [string]::IsNullOrWhiteSpace($raw)) {
+        # PS 5.1 trap (false GREEN, 2026-08-20): ConvertFrom-Json emits a JSON
+        # array as ONE PSObject-wrapped item (argument form included), so the
+        # verdict's scalar tests become member-enumeration FILTERS - '-eq
+        # "success"' is truthy if ANY of the 10 runs succeeded, not if HEAD's
+        # did. Enumerating the parsed object is what actually unrolls it here.
+        $runs = @((ConvertFrom-Json ($raw -join "`n")) | ForEach-Object { $_ })
+      }
+      $verdict = Get-CiVerdict -Runs $runs -Head $head -GhExit $ghExit -Branch $branchName
+      Write-Host $verdict.Text -ForegroundColor $verdict.Color
     }
-    $verdict = Get-CiVerdict -Runs $runs -Head $head -GhExit $ghExit
-    Write-Host $verdict.Text -ForegroundColor $verdict.Color
   }
 } catch {
   Pop-Location -ErrorAction SilentlyContinue
@@ -584,6 +580,42 @@ if (-not $describe) { $describe = $commit }
 $state     = Get-WorktreeState $repo
 $dirty     = $state.dirty
 $untracked = $state.untracked_present
+# --- scan AFTER the commit it stamps, never before (J64, 2026-09-08) ----------
+# The header names $commit as the tree that was scanned. That is true only when
+# no tracked file differs from HEAD: with tracked changes present, the scan
+# measures a tree that no commit describes, and the stamp becomes a claim about
+# a tree nobody scanned. `dirty` has recorded this since U15 and nothing read
+# it - the 20260805 snapshot carried dirty=true and was committed as if clean -
+# and on 2026-08-29 a snapshot scanned from a tree that predated main's
+# 2026-08-26 rename sweep named the retired org directory, tripped the J55
+# publish guard, and had to be deleted and regenerated against the merge commit
+# (2b06c153). So the ordering is ENFORCED here rather than left to the ritual's
+# prose: tracked changes at scan time REFUSE, naming the paths, and the fix is
+# the ritual's own order - commit (the refresh steps above may have just
+# rewritten a stale render, which is the usual way to land here), then re-run.
+# -AllowDirty downgrades the refusal to a warning for a deliberate mid-work
+# comparison scan; the header still records dirty=true, so the artifact says
+# what it is. Untracked paths do not trigger this: the snapshot being written is
+# itself untracked until it is added, and untracked_present records them anyway.
+if ($dirty) {
+  $dirtyPaths = @(git status --porcelain --untracked-files=no | ForEach-Object { "    " + $_ })
+  $shown = if ($dirtyPaths.Count -gt 12) { @($dirtyPaths[0..11]) + @("    ... and {0} more" -f ($dirtyPaths.Count - 12)) } else { $dirtyPaths }
+  $dirtyMsg = @"
+tracked changes present at scan time - the header would name commit $commit for a tree that commit does not describe.
+
+$($shown -join "`n")
+
+The scan must run against the tree of the commit it stamps: commit first (if the
+refresh steps above rewrote a stale render, that refresh is what to commit), then
+re-run this script. -AllowDirty scans anyway and records dirty=true in the header.
+"@
+  if ($AllowDirty) {
+    Write-Warning ("SCANNING A DIRTY TREE (-AllowDirty): " + $dirtyMsg)
+  } else {
+    Pop-Location
+    throw ("Refusing to scan - " + $dirtyMsg)
+  }
+}
 $pr = $null
 $m = [regex]::Match(((git log -20 --format="%s %b") -join "`n"), '(?:pull request |PR ?#|\(#)(\d+)')
 if ($m.Success) { $pr = [int]$m.Groups[1].Value }
