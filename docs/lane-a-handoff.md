@@ -2,14 +2,14 @@
 handoff: drydocs.lane-handoff.v1
 lane: A
 machine: desktop
-generated: 2026-09-08
-generated_at: 2dc38863 (main)
-queue: [PORT4, PORT3, PORT1, DOC2, PLAN9, J77, J64, J65, U27, I5, J54, N18, J70, Y3]
-other_queue: [G90, J59, LOAD7, CORE9, J61, Y6, I7, DOC7, J60, S11]
+generated: 2026-09-09
+generated_at: 7ed742d2 (main)
+queue: [PORT8, PLAN12, CFG7, CFG8, CORE10, GRAPH5, CORE18, PLAN13, MM13, WEB22, GRAPH2, GRAPH3, CORE11, CORE12, DOC10, DOC11, N23, J70, ONT5, GRAPH6, META1, MM7, Y3]
+other_queue: [LOAD13, LOAD14, DOC12, REV2, REM3, API5, LOAD8, LOAD9, LOAD10, LOAD12, LIN4, CORE13, CORE14, CORE15, CORE16, CORE17, GRAPH1, GRAPH4, META2, AGENT2, DEEP1, O48, Q28, N17, G86, G85]
 pens: [backlog, port, adr, gates, snapshot]
 ---
 
-# Lane A handoff — desktop, 2026-09-08
+# Lane A handoff — desktop, 2026-09-09
 
 **From:** Lane A (desktop). **To:** the Lane A session on the desktop.
 **Lifecycle:** a working handoff, not a durable record — the item files are. When
@@ -41,7 +41,7 @@ is the pen for a SURFACE.
 4. Per-machine facts are yours to verify: `DRYDOCS_DATA_ROOT`, `DRYDOCS_LOGDIR`, the
    `.env`, and whether Neo4j is reachable here. Venue-stamp any live claim (J18).
 
-## Your queue, in order (14 items) — claim one at a time
+## Your queue, in order (23 items) — claim one at a time
 
 Every item below is `todo` with every dependency `done` at the generating commit — the
 same rule the board's Ready strip uses (`derive_summary`). Re-check on pull: the other
@@ -50,44 +50,48 @@ since PLAN1), so two lanes minting in disjoint series cannot collide on a number
 
 | # | Id | Title | Type / prio | Module | Model | Notes from the check |
 |---|---|---|---|---|---|---|
-| 1 | **PORT4** | The port drop guard has no accepted-drop seam, so a retirement the port already ruled is reported as a finding at every chunk | task / p2 | `drydocs-port` | sonnet | overlap: PORT4 <-> J59: both name `PORT-MANIFEST.yaml`; overlap: PORT4 <-> S11: both name `PORT-MANIFEST.yaml`; overlap: PORT4 <-> S11: `scripts` (S11's input, coarse) covers `scripts/port_rename_check.py` |
-| 2 | **PORT3** | A canonical-producer test that pins a never-port path fails on every consumer tree by construction, and nothing checks the join | task / p2 | `drydocs-port` | sonnet | overlap: PORT3 <-> J59: both name `PORT-MANIFEST.yaml`; overlap: PORT3 <-> S11: both name `PORT-MANIFEST.yaml` |
-| 3 | **PORT1** | Three back-flow adoptions from the company's chunk-1 apply, plus the rule that a workplan naming a script names the commit it needs | task / p2 | `drydocs-port` | sonnet | overlap: PORT1 <-> S11: `scripts` (S11's input, coarse) covers `scripts/render_port_dispositions.py`; overlap: PORT1 <-> S11: `scripts` (S11's input, coarse) covers `scripts/port_rename_check.py` |
-| 4 | **DOC2** | RELAY-23 - the frozen letters, mint by module code, the edition segment and the retired partition rules reach the company through the port-prompt (after PLAN2, PLAN3) | task / p1 | `docs` | fable | gate-bound: ontology-domain-registry-and-edition-grain (an SME session, not a build); overlap: DOC2 <-> J59: both name `PORT-MANIFEST.yaml`; overlap: DOC2 <-> S11: both name `docs/port/port-prompt.md`; overlap: DOC2 <-> S11: both name `PORT-MANIFEST.yaml` |
-| 5 | **PLAN9** | Census pins are venue data: the coverage-census tuple in test_docs_coverage moves to a venue-owned config block the test reads, after a survey of the other pins of the same shape | task / p2 | `drydocs-plan` | sonnet | notes say machine-local; overlap: PLAN9 <-> J59: both name `PORT-MANIFEST.yaml`; overlap: PLAN9 <-> S11: both name `PORT-MANIFEST.yaml` |
-| 6 | **J77** | A branch tip can be green while commits inside it were red at push, so a bisect through the range fails on a ledger guard rather than the defect - have the roll say which commits were red | chore / p3 | `docs` | haiku | overlap: J77 <-> J61: both name `CLAUDE.md`; overlap: J77 <-> Y6: both name `CLAUDE.md`; overlap: J77 <-> I7: both name `CLAUDE.md`; overlap: J77 <-> DOC7: both name `CLAUDE.md`; overlap: J77 <-> S11: both name `docs/port/port-prompt.md` |
-| 7 | **J64** | A depgraph snapshot scanned before the commit it stamps is a claim about a tree that was never scanned - scan after, not before | bug / p2 | `graph-infra` | sonnet | clean |
-| 8 | **J65** | The snapshot script's board refresh has been silently skipping on this desktop, and the warning prints the word Traceback instead of the module that is missing | bug / p2 | `graph-infra` | sonnet | overlap: J65 <-> J61: both name `scripts/render_board.py`; overlap: J65 <-> S11: `scripts` (S11's input, coarse) covers `scripts/render_load_map.py`; overlap: J65 <-> S11: `scripts` (S11's input, coarse) covers `scripts/render_board.py` |
-| 9 | **U27** | snapshot.ps1's CI check asks `gh run list --branch main`, so from any branch HEAD can never appear and the verdict degrades to no-run-yet permanently — and the verdict function still has no tests | bug / p2 | `graph-infra` | sonnet | clean |
-| 10 | **I5** | Two idea captures landed below the audit trail with a non-conforming header and were invisible to BOTH IDEAS.md guards | bug / p2 | `docs` | sonnet | overlap: I5 <-> I7: both name `.claude/skills/groom-backlog/SKILL.md` |
-| 11 | **J54** | VERSIONING.md describes a backlog schema and a backlog file that no longer exist, so the release ritual instructs a reader to cite a tombstone | chore / p3 | `docs` | haiku | clean |
-| 12 | **N18** | Run the registry-wiring-readiness gate (the wired/ready split, Idea-81 close) (after N10) | task / p2 | `config` | fable | gate-bound: registry-wiring-readiness (an SME session, not a build) |
-| 13 | **J70** | Four registry-id rewrites were requested as a find-and-replace — two are id renames that owe a retired-id row, and one contradicts the signed J13 class-3 ruling | task / p2 | `config` | sonnet | gate-bound: schema-identifier-publish-ceiling-teams-edition (an SME session, not a build) |
-| 14 | **Y3** | Backlog graph vocabulary via the gate: :BacklogItem + DEPENDS_ON registered planned, gate prompt drafted — projection semantics, git stays the claim channel (after Y2) | task / p3 | `ontology` | sonnet | overlap: Y3 <-> G90: `drydocs_core/ontology/relationship_vocabulary` (Y3's input, coarse) covers `drydocs_core/ontology/relationship_vocabulary/20-property-terms.yaml`; overlap: Y3 <-> G90: `config/gate-prompts` (Y3's input, coarse) covers `config/gate-prompts/remediation-fix-tracking.yaml` |
+| 1 | **PORT8** | The port preflight certifies a base it could not read - _git discards the exit code, an unresolvable base yields an empty range, and both range checks pass on emptiness - so the preflight fails closed and reports NOT CHECKED | bug / p1 | `drydocs-port` | sonnet | clean |
+| 2 | **PLAN12** | An inputs: existence guard in tests/unit/test_backlog.py - non-done items only, against git ls-files, gitignore-aware, byte-safe - landing green with the five stale item files fixed in the same commit | task / p1 | `drydocs-plan` | sonnet | clean |
+| 3 | **CFG7** | One-off sweep, not a guard - the nineteen gate prompts and two sweepable items still citing the S5-retired file names get the current directory paths with dated AMENDED markers | chore / p2 | `config` | haiku | clean |
+| 4 | **CFG8** | Draft the source-descriptor-axes gate prompt - are the five axes the right five, where does wired live and how is it derived, do axis values reach the graph - as its own short page held in the same sitting as registry-wiring-readiness | task / p1 | `config` | fable | overlap: CFG8 <-> LOAD14: both name `config/source-descriptors.yaml` |
+| 5 | **CORE10** | ADR 0021 instrument: one three-outcome type in drydocs_core (checked-clean, findings, not-checked-with-reason), a declared probe registry, and a guard that reads code - the preflight and the doc-coverage report adopt it first | task / p1 | `drydocs-core` | sonnet | overlap: CORE10 <-> LOAD14: `drydocs_core` (CORE10's input, coarse) covers `drydocs_core/docs_verify.py`; overlap: CORE10 <-> LOAD14: both name `drydocs/docs_coverage.py`; overlap: CORE10 <-> LOAD9: `drydocs_core` (CORE10's input, coarse) covers `drydocs_core/run_log.py`; overlap: CORE10 <-> CORE13: `drydocs_core` (CORE10's input, coarse) covers `drydocs_core/neo4j_client.py`; overlap: CORE10 <-> CORE14: `drydocs_core` (CORE10's input, coarse) covers `drydocs_core/neo4j_client.py`; overlap: CORE10 <-> CORE15: `drydocs_core` (CORE10's input, coarse) covers `drydocs_core/run_log.py`; overlap: CORE10 <-> CORE16: `drydocs_core` (CORE10's input, coarse) covers `drydocs_core/adapters/csv_adapter.py`; overlap: CORE10 <-> CORE16: `drydocs_core` (CORE10's input, coarse) covers `drydocs_core/adapters/oracle_adapter.py`; overlap: CORE10 <-> CORE17: `drydocs_core` (CORE10's input, coarse) covers `drydocs_core/neo4j_client.py`; overlap: CORE10 <-> GRAPH1: `drydocs_core` (CORE10's input, coarse) covers `drydocs_core/component_map.py`; overlap: CORE10 <-> GRAPH4: both name `tests/source_scan.py`; overlap: CORE10 <-> O48: `drydocs_core` (CORE10's input, coarse) covers `drydocs_core/ontology/relationship_vocabulary` |
+| 6 | **GRAPH5** | Remove the eighteen ADR 0018 re-export shims in one item - the 'roll after next' trigger fired on 2026-09-08 and action item 6 is still unchecked - with the citation sweep and the relay line the company needs | task / p2 | `graph-infra` | sonnet | overlap: GRAPH5 <-> REV2: `drydocs/review` (GRAPH5's input, coarse) covers `drydocs/review/graph_verify.py`; overlap: GRAPH5 <-> GRAPH1: `drydocs/port` (GRAPH5's input, coarse) covers `drydocs/port/reconcile_before.py`; overlap: GRAPH5 <-> META2: `drydocs/review` (GRAPH5's input, coarse) covers `drydocs/review/sme_notes.py` |
+| 7 | **CORE18** | The data root's layout is declared in three places and only two are cross-checked - internal/server-inventory/ leaves the repo tree, bundle.py's hardcoded repo/ prefix moves into config/data-zones.yaml, and the non-overlap invariant covers all three | task / p2 | `drydocs-core` | sonnet | overlap: CORE18 <-> LOAD13: both name `drydocs/source_registration/bundle.py`; overlap: CORE18 <-> LOAD14: both name `config/source-registry.yaml`; overlap: CORE18 <-> LOAD14: both name `config/source-descriptors.yaml`; overlap: CORE18 <-> N17: both name `config/source-registry.yaml` |
+| 8 | **PLAN13** | lane-handoff learns three things - a pending-<branch>.md capture path carved out of the backlog pen, --mint-pending at Lane A's close, and a remote-ref pass so --suggest and --check see done-on-branch items and dead claims | task / p2 | `drydocs-plan` | sonnet | clean |
+| 9 | **MM13** | The data-flow-overview gate prompt names MM3 nine times for work that is MM7 - the item numbers moved at a groom after the prompt was drafted and nothing re-pointed it | chore / p2 | `config` | sonnet | gate-bound: data-flow-overview (an SME session, not a build) |
+| 10 | **WEB22** | Run the console-auth-boundary gate - the one drafted-unsigned prompt with no item owning its session - to a recorded outcome | task / p2 | `drydocs-web` | fable | gate-bound: console-auth-boundary (an SME session, not a build) |
+| 11 | **GRAPH2** | reconcile_before reaches into tests.unit.test_runbook_currency for three exemption tables - decide whether the tables move to a non-test home rather than declaring the crossing | task / p3 | `graph-infra` | sonnet | overlap: GRAPH2 <-> GRAPH1: both name `drydocs/port/reconcile_before.py` |
+| 12 | **GRAPH3** | No Python coverage threshold exists at all - test:coverage is declared only for the web console - decide whether one exists and what it is before any Python slot runs the tool | task / p3 | `graph-infra` | sonnet | clean |
+| 13 | **CORE11** | Raise drydocs_core.Neo4jClient to the level of its two younger siblings - a read access mode, captured driver notifications - and record in an ADR whether drydocs_api and the agents adopt it or stay separate | task / p2 | `drydocs-core` | fable | overlap: CORE11 <-> API5: both name `drydocs_api/app.py`; overlap: CORE11 <-> CORE13: both name `drydocs_core/neo4j_client.py`; overlap: CORE11 <-> CORE14: both name `drydocs_core/neo4j_client.py`; overlap: CORE11 <-> CORE17: both name `drydocs_core/neo4j_client.py`; overlap: CORE11 <-> AGENT2: `agents` (AGENT2's input, coarse) covers `agents/common/neo4j_tool.py`; overlap: CORE11 <-> AGENT2: `agents/common` (AGENT2's input, coarse) covers `agents/common/neo4j_tool.py`; overlap: CORE11 <-> O48: `drydocs_api` (O48's input, coarse) covers `drydocs_api/app.py` |
+| 14 | **CORE12** | Declare drydocs_core's public surface once - grow __all__ to match reality, mark internals by convention, or give the boundary test a second axis - so 22 of 34 core modules stop being imported outside any declared contract | task / p3 | `drydocs-core` | fable | overlap: CORE12 <-> GRAPH1: both name `tests/unit/test_module_boundary.py` |
+| 15 | **DOC10** | The review sweep's plan needs a declared environment step - poetry install and a drydocs_core.__file__ venue assertion before any measurement is trusted - closing the firing that measured another worktree's tree | chore / p3 | `docs` | haiku | clean |
+| 16 | **DOC11** | Regenerate the module-sweep plan's size column at cycle 2's open - six of seven measured slots moved from the 2026-09-05 snapshot, drydocs-web by 55 percent | chore / p3 | `docs` | haiku | clean |
+| 17 | **N23** | One SME gate for the whole id grammar - un-redact the database and schema, correct the carrier slot the derived URN builds from, and add the subset qualifier, because the four findings cannot be ruled apart | task / p1 | `config` | fable | gate-bound: registry-wiring-readiness (an SME session, not a build); overlap: N23 <-> LOAD14: both name `config/source-registry.yaml`; overlap: N23 <-> N17: both name `config/source-registry.yaml` |
+| 18 | **J70** | Four registry-id rewrites were requested as a find-and-replace — two are id renames that owe a retired-id row, and one contradicts the signed J13 class-3 ruling | task / p2 | `config` | sonnet | gate-bound: schema-identifier-publish-ceiling-teams-edition (an SME session, not a build); overlap: J70 <-> LOAD14: both name `config/source-registry.yaml`; overlap: J70 <-> O48: `drydocs_core/ontology/relationship_vocabulary` (O48's input, coarse) covers `drydocs_core/ontology/relationship_vocabulary/41-local-business-application.yaml`; overlap: J70 <-> N17: both name `config/source-registry.yaml` |
+| 19 | **ONT5** | Reserve the physical half of the G34 pattern - :CatalogField keyed field_id and one planned edge DataAsset-[:HAS_FIELD]->CatalogField - in the base, with the flip to confirmed riding ONT3's Logical Container prompt, never an edit to a deferred page | task / p2 | `ontology` | fable | overlap: ONT5 <-> O48: `drydocs_core/ontology/relationship_vocabulary` (O48's input, coarse) covers `drydocs_core/ontology/relationship_vocabulary/10-node-classifications.yaml`; overlap: ONT5 <-> O48: `drydocs_core/ontology/relationship_vocabulary` (O48's input, coarse) covers `drydocs_core/ontology/relationship_vocabulary/42-local-catalog.yaml` |
+| 20 | **GRAPH6** | duckdb is imported lazily and declared nowhere, and openpyxl sits in the dev group - declare the optional dependency group and decide openpyxl's group before a generator ships in-product | chore / p3 | `graph-infra` | haiku | clean |
+| 21 | **META1** | drydocs_docmeta has had no design-lens read - slot 7 confirmed hygiene only - so cycle 2 of the sweep gives it one rather than assuming it covered | task / p3 | `drydocs-docmeta` | sonnet | clean |
+| 22 | **MM7** | Control-M Output-tab log extractor — launcher job KIND, resolved arguments, placement handoff pair, landing prefix, compute target — joined onto :ETLProcess by pipeline GUID, dpl_mac-shaped, every skip counted (after G17) | task / p1 | `drydocs-lineage` | opus | input `internal-local/deepdoc/2026-08-20-session-1/transcripts/controlm-evidence-capture.md` is machine-local; notes say machine-local |
+| 23 | **Y3** | Backlog graph vocabulary via the gate: :BacklogItem + DEPENDS_ON registered planned, gate prompt drafted — projection semantics, git stays the claim channel (after Y2) | task / p3 | `ontology` | sonnet | overlap: Y3 <-> O48: both name `drydocs_core/ontology/relationship_vocabulary` |
 
 **Flags to rule before claiming** (the script flags; the author decides):
 
-- PLAN9: notes say machine-local — does the desktop have it? If not, this item belongs to the other lane or waits for the file to be copied over.
+- MM7: input `internal-local/deepdoc/2026-08-20-session-1/transcripts/controlm-evidence-capture.md` is machine-local — does the desktop have it? If not, this item belongs to the other lane or waits for the file to be copied over.
+- MM7: notes say machine-local — does the desktop have it? If not, this item belongs to the other lane or waits for the file to be copied over.
 
-**Ruled by the sender (2026-09-08, this machine):** PLAN9's machine-local note is the
-POINT of the item - the census tuple is venue data and this desktop is the venue that
-pinned it - so it stays here. DOC2, N18 and J70 are gate work and the SME sits at this
-machine; DOC2 is the RELAY (port pen) and reads the signed
-`ontology-domain-registry-and-edition-grain` record, N18 RUNS its gate, J70 drafts under
-a gate that is not yet signed. **This lane does not edit `CLAUDE.md` section 0 this
-burst** - Lane B holds J61, Y6, I7 and DOC7 as one cluster on `wip/j61-laptop` - so J77's
-sentence goes where a roll is authored (`.claude/skills/reconcile-port/SKILL.md` and the
-roll shape in `docs/port/port-prompt.md`), and a section-0 pointer, if wanted, lands after
-the merge. The `PORT-MANIFEST.yaml` overlaps with J59 and S11 are one-directional: Lane B
-reads it, this lane writes it, and S11's three package rows arrive in its close notes for
-the merge commit. The J64 / J65 / U27 trio is one sitting on `snapshot.ps1` - J65 first
-(the refresh that silently skips), then J64 (scan after the commit), then U27 (the
-branch-blind CI check plus the verdict tests) - and the ritual runs once after all three,
-not after each. Y3's planned entry touches no term G90 binds. Not queued, and why: GN2 is
-a wide rename that wants a single frozen unit and its own window; H8 needs the company
-tree; CFG6 waits on the snapshot trio because its consumer is `snapshot.ps1`. Not an
-item: the section-3 redaction ruling RELAY-47 is reserved for - it has no backlog item,
-and the natural home is PORT4's accepted-drop seam, so PORT4 is queued first.
+**Ruled by the sender (2026-09-09, this machine, at the mint-pass tip `7ed742d2`):** MM7's
+machine-local inputs are the reason it is HERE - the captured logs sit on this desktop, so the
+item never goes to the laptop. The order is the plan's: PORT8, PLAN12 and CFG7 first (the three
+build-now fixes), then the eighth port roll, then CFG8 (the descriptor-axes draft) and the
+stale-premise sweep of registry-wiring-readiness as N18's BEFORE clause, then sitting 1 (N18 and
+CFG9 in one session, with ADR 0021's acceptance and the deferral rulings in the same message);
+the wired BUILD is minted from that record and lands next, then CORE10 and CORE18. GRAPH5 waits
+for the eighth roll and for Lane B's REV2, META2 and GRAPH1 to merge. MM13 then ONT4 prepare
+sitting 3; N23 and J70 are sitting 2 and N23's draft waits for sitting 1 to sign (its own gate
+binding). CORE11, CORE12, GRAPH2, GRAPH3, DOC10, DOC11, GRAPH6, META1 and Y3 fill the gaps between
+sittings. The CORE10 overlaps with Lane B's core items are not collisions (CORE10 adds a module,
+it edits none of theirs); CFG8 and CORE18 both name config/source-descriptors.yaml and are
+sequenced draft-then-build on purpose.
 
 ## Surfaces — who holds which pen this burst
 
@@ -111,22 +115,10 @@ the change back through the sender.
 | `gates` (this skill's addition to §0) | `config/gate-log.md` | Lane A — the signed gate record |
 | `gates` (this skill's addition to §0) | `config/crosswalks/` | Lane A — orchestrator crosswalks — gate-bound config |
 | `snapshot` (this skill's addition to §0) | `knowledge/depgraph-snapshots/` | Lane A — the session snapshot — one writer per burst |
-| Lane B's queue | the items G90, J59, LOAD7, CORE9, J61, Y6, I7, DOC7, J60, S11 and their inputs | do not claim or edit |
+| Lane B's queue | the items LOAD13, LOAD14, DOC12, REV2, REM3, API5, LOAD8, LOAD9, LOAD10, LOAD12, LIN4, CORE13, CORE14, CORE15, CORE16, CORE17, GRAPH1, GRAPH4, META2, AGENT2, DEEP1, O48, Q28, N17, G86, G85 and their inputs | do not claim or edit |
 | `code:<module>` | everything an item in YOUR queue names in `inputs` | this lane, claimed per item |
+| `code:drydocs-web` | `config/taxonomy/ui-components.yaml` | this lane, with the module — the O42 ledger guard fails on any new .tsx, so every web item adds its row here (the 2026-09-05 Lane B close: five items touched it, none named it) |
 | — | `docs/plan/*.html`, `web/src/generated/**`, `docs/design/*.html` | derived renders — Lane A regenerates once at close; nobody merges them by hand (J43) |
-
-**About Lane B's queue, from the same check** (for the sender to rule — this lane
-does nothing with these):
-
-- G90: input `config/gate-prompts/remediation-fix-tracking.yaml` — pen `gates` (gate prompts — SME sessions run from Lane A)
-- G90: gate-bound: remediation-fix-tracking (an SME session, not a build)
-- J59: notes say machine-local
-- J59: input `PORT-MANIFEST.yaml` — pen `port` (port dispositions)
-- J61: input `docs/restructure/backlog/items/J48.yaml` — pen `backlog` (items, epics, plan — the board's sources)
-- J61: input `docs/restructure/backlog/items/U27.yaml` — pen `backlog` (items, epics, plan — the board's sources)
-- Y6: input `docs/restructure/backlog/items/Y5.yaml` — pen `backlog` (items, epics, plan — the board's sources)
-- S11: input `PORT-MANIFEST.yaml` — pen `port` (port dispositions)
-- S11: input `docs/port/port-prompt.md` — pen `port` (port prompt, relays, dossiers)
 
 ## Rules that have bitten — the durable ones live in CLAUDE.md
 
