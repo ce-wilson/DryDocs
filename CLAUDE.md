@@ -56,8 +56,13 @@ things share the word *port* — never conflate them:
   `docs/restructure/backlog/items/` whose every `depends_on` is `done` and that carries no
   `hold:` (the board's Ready-to-pull strip lists exactly these — a held item is excluded from
   it and shown under **Held** with its reason, Y7); **commit and push** `status: in_progress` in that one item file
-  **before starting work** — a claim ships NO render (Y5: the roadmap guard tolerates
-  status-only drift, so the claim sha stays green; renders catch up at session close); do exactly that item, staying inside your layer; meet its
+  **before starting work** — a claim on an EXISTING item ships NO render (Y5: the roadmap guard tolerates
+  status-only drift, so the claim sha stays green; renders catch up at session close), but **a claim that
+  MINTS a new item ships the board and roadmap render WITH it** (Y6): minting adds a row the roadmap never
+  had, so its source fingerprint moves for a STRUCTURAL reason and the status-only tolerance correctly does
+  not apply — the guard is right and the blanket sentence was incomplete. Evidence: the O75 claim commit
+  `49356d9a` followed the rule as written, shipped no render, and failed
+  `test_committed_roadmap_page_matches_its_sources` with "stale beyond a status-only change"; do exactly that item, staying inside your layer; meet its
   `acceptance`; set it `done`."* Anything ambiguous → the HITL
   gate ([`docs/restructure/03-hitl-sme-flow.md`](docs/restructure/03-hitl-sme-flow.md)), never auto-decided.
   **Pushed, not merely committed — why:** the item file's `status` is the only claim channel between
