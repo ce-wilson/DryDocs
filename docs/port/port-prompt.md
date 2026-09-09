@@ -3969,8 +3969,9 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   (9) 56 new backlog items and one new epic (`team-edition`, order 28 - per-side, seat yours as
   you like) are clean-adds by id; (10) three new module runbooks (`drydocs-lineage`,
   `drydocs-review`, `drydocs-docgen`) and their committed HTML arrive under `docs/design/**`
-  (evaluate on collision). RED AT PUSH: see the eighth footnote (J77) - none failed; the
-  cancelled runs are named there. Nothing is asked back.
+  (evaluate on collision). RED AT PUSH (J77): one - `5f0e730c`, RELAY-47's landing, failed three guards and
+  `1f54b5d4` fixed them one commit later; the eighth footnote names the cancelled runs. Nothing
+  is asked back.
 
 OWED COMPANY-SIDE:
 
@@ -7863,13 +7864,18 @@ hand-carried and nothing parked.
     36 read as ritual under the existing patterns (snapshots, claims, renders, grooms);
     136 are cited in steps 354–367. No pattern spelling drifted this roll.
     The disposition renderer at the roll's parent measured 294 changed paths in 8 classes (canonical-producer 70, canonical-company 20, never-port 6, per-entry 107, union-append 2, evaluate 17, default_ok 65, derived 7).
-    RED AT PUSH (J77, the first roll to carry this line): the following failed CI at their sha: `5f0e730c`.
+    RED AT PUSH (J77, the first roll to carry this line): ONE - `5f0e730c`, RELAY-47's landing
+    (2026-09-08), failed three guards at push: the enforcement-matrix SURFACES row for
+    `config/gate-log-redactions.yaml`, the stale roadmap render, and a `__file__` anchor
+    resolving repo content without `repo_root()`. `1f54b5d4`, the very next commit, is its fix
+    (its subject says so: matrix row, repo_root anchor, refreshed renders). A bisect that lands
+    on `5f0e730c` is blaming the relay's landing, not this range's content.
     UNVERIFIED (J78 - a run cancelled by the next push, or no run at all): `6836c0c8`, `a6323c79`, `6cd58802`, `41e018fc`, `7ed742d2`, `0736cae3`, `1bd22b50`, `fe557fce`, `bd593e4e`, `5207a0b2`, `7daa2804`, `d3090725`, `ee6fe516`, `fdde7b36`, `c69cf037`, `ea810179`, `57356d56`, `b0035af3`, `6c84ef87`, `a5a8ad52`, `b5c7fbd8`, `0521ee1c`, `2673ae24`, `7e1c0e44`, `4cb966c9`, `93a75bdb`, `0a4e9d53`, `ee55d8ca`, `772ecdb6`, `e48b7877`, `f877f47b`, `813ddfa9`, `87a9eeaa`, `90899048`, `220f293b`, `7341f0e0`, `d1016072`, `0bf7e0fc`, `9013fb72`, `f06a5f00`, `1226ae70`, `0f10c989`, `01143a9c`, `6f740ee6`, `c34ee93f`, `0fd80d97`, `22a50d07`, `c25bca79`, `97e2d5d3`, `e8196bf4`, `c3a53ce5`, `10e5b465`, `51c49658`, `e9304fba`, `97eb9f02`, `fcf3c00b`, `775248a7`
     - each was re-verified by the next run that completed green on its descendant, except one
     that was red BY CONSTRUCTION and says so in its own message: `0736cae3` (ADR 0021's stub
     rode a design-doc edit without its render; `981a76f6` is the fix, one commit later). The
     20 markdown documents this range ADDS resolve every path they cite (preflight check 4).
-    THE ROLL COMMIT: ROLL8_SHA — `docs(port):` outside the ritual pattern, cited here.
+    THE ROLL COMMIT: `8b7645f9` — `docs(port):` outside the ritual pattern, cited here.
 
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
