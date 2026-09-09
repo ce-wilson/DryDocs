@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-09T14:07:42",
+    "captured_at": "2026-09-09T16:14:16",
     "date": "20260909",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "903060e2",
-      "full": "903060e2a38a399f0187deaca511c919dc82fa11",
+      "commit": "321d0ae2",
+      "full": "321d0ae2084ae0b826289686bee5f98c8d4b1a4d",
       "branch": "main",
-      "describe": "port-base-20260908-169-g903060e2",
-      "subject": "feat(PLAN12): an inputs: existence guard for open items, landing green with the five stale item files fixed",
+      "describe": "port-base-20260909-28-g321d0ae2",
+      "subject": "fix(CFG13): the boolean travels and the reason does not - the wiring prose leaves the console's initial chunk (WEB23 minted for the headroom it exposed)",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -1079,6 +1079,42 @@
       "project": "drydocs",
       "circular": false,
       "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/controlm-runbook-automation-SDLC",
+      "name": "controlm-runbook-automation-SDLC",
+      "extension": "",
+      "rel_path": ".claude/skills/controlm-runbook-automation-SDLC",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/controlm-runbook-automation-SDLC/SKILL.md",
+      "name": "SKILL.md",
+      "extension": ".md",
+      "rel_path": ".claude/skills/controlm-runbook-automation-SDLC/SKILL.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/controlm-runbook-automation-SDLC/generate_runbook.py",
+      "name": "generate_runbook.py",
+      "extension": ".py",
+      "rel_path": ".claude/skills/controlm-runbook-automation-SDLC/generate_runbook.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/controlm-runbook-automation-SDLC/section-spec.yaml",
+      "name": "section-spec.yaml",
+      "extension": ".yaml",
+      "rel_path": ".claude/skills/controlm-runbook-automation-SDLC/section-spec.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
     },
     {
       "file_id": "drydocs/.claude/skills/controlm-runbook-automation-excel",
@@ -7057,6 +7093,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/config/gate-prompts/source-descriptor-axes.yaml",
+      "name": "source-descriptor-axes.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/gate-prompts/source-descriptor-axes.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/config/gate-prompts/source-registry-v2.yaml",
       "name": "source-registry-v2.yaml",
       "extension": ".yaml",
@@ -10769,6 +10814,15 @@
       "name": "CFG12.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/CFG12.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/CFG13.yaml",
+      "name": "CFG13.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/CFG13.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -16849,6 +16903,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/WEB23.yaml",
+      "name": "WEB23.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/WEB23.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/WEB3.yaml",
       "name": "WEB3.yaml",
       "extension": ".yaml",
@@ -21115,6 +21178,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs_core/check_outcome.py",
+      "name": "check_outcome.py",
+      "extension": ".py",
+      "rel_path": "drydocs_core/check_outcome.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs_core/component_map.py",
       "name": "component_map.py",
       "extension": ".py",
@@ -22047,7 +22119,7 @@
       "extension": ".py",
       "rel_path": "drydocs_core/source_descriptors.py",
       "project": "drydocs",
-      "circular": false,
+      "circular": true,
       "kind": "file"
     },
     {
@@ -22056,7 +22128,7 @@
       "extension": ".py",
       "rel_path": "drydocs_core/source_registry.py",
       "project": "drydocs",
-      "circular": false,
+      "circular": true,
       "kind": "file"
     },
     {
@@ -24580,10 +24652,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260909.json",
-      "name": "drydocs-20260909.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260909-1407.json",
+      "name": "drydocs-20260909-1407.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260909.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260909-1407.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -26623,6 +26695,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_check_outcome.py",
+      "name": "test_check_outcome.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_check_outcome.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_chunk_search_spec.py",
       "name": "test_chunk_search_spec.py",
       "extension": ".py",
@@ -28301,6 +28382,15 @@
       "name": "test_schema_meta_exclusion.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_schema_meta_exclusion.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_sdlc_runbook_generator.py",
+      "name": "test_sdlc_runbook_generator.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_sdlc_runbook_generator.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -31449,6 +31539,30 @@
   ],
   "edges": [
     [
+      "drydocs/.claude/skills/controlm-runbook-automation-SDLC/generate_runbook.py",
+      "drydocs/drydocs/cli.py"
+    ],
+    [
+      "drydocs/.claude/skills/controlm-runbook-automation-SDLC/generate_runbook.py",
+      "drydocs/drydocs/cli_shared.py"
+    ],
+    [
+      "drydocs/.claude/skills/controlm-runbook-automation-SDLC/generate_runbook.py",
+      "drydocs/drydocs_core/adapters/csv_adapter.py"
+    ],
+    [
+      "drydocs/.claude/skills/controlm-runbook-automation-SDLC/generate_runbook.py",
+      "drydocs/drydocs_core/entity_extract.py"
+    ],
+    [
+      "drydocs/.claude/skills/controlm-runbook-automation-SDLC/generate_runbook.py",
+      "drydocs/drydocs_core/orchestration/controlm/__init__.py"
+    ],
+    [
+      "drydocs/.claude/skills/controlm-runbook-automation-SDLC/generate_runbook.py",
+      "drydocs/drydocs_core/orchestration/shell.py"
+    ],
+    [
       "drydocs/.claude/skills/docx/scripts/office/pack.py",
       "drydocs/.claude/skills/docx/scripts/office/validators/__init__.py"
     ],
@@ -32274,6 +32388,10 @@
     ],
     [
       "drydocs/drydocs/docs_coverage.py",
+      "drydocs/drydocs_core/check_outcome.py"
+    ],
+    [
+      "drydocs/drydocs/docs_coverage.py",
       "drydocs/drydocs_core/docs_verify.py"
     ],
     [
@@ -32755,6 +32873,10 @@
     [
       "drydocs/drydocs/port/port_drops.py",
       "drydocs/drydocs/port/port_completeness.py"
+    ],
+    [
+      "drydocs/drydocs/port/port_preflight.py",
+      "drydocs/drydocs_core/check_outcome.py"
     ],
     [
       "drydocs/drydocs/port/port_preflight.py",
@@ -33641,6 +33763,10 @@
       "drydocs/drydocs_core/repo_paths.py"
     ],
     [
+      "drydocs/drydocs_core/source_registry.py",
+      "drydocs/drydocs_core/source_descriptors.py"
+    ],
+    [
       "drydocs/drydocs_core/ui_concepts.py",
       "drydocs/drydocs_core/repo_paths.py"
     ],
@@ -34470,6 +34596,10 @@
     ],
     [
       "drydocs/scripts/render_load_map.py",
+      "drydocs/drydocs_core/source_descriptors.py"
+    ],
+    [
+      "drydocs/scripts/render_load_map.py",
       "drydocs/drydocs_core/yaml_fragments.py"
     ],
     [
@@ -34883,6 +35013,14 @@
     [
       "drydocs/tests/unit/test_chain_inputs.py",
       "drydocs/drydocs_core/source_registry.py"
+    ],
+    [
+      "drydocs/tests/unit/test_check_outcome.py",
+      "drydocs/drydocs_core/check_outcome.py"
+    ],
+    [
+      "drydocs/tests/unit/test_check_outcome.py",
+      "drydocs/tests/source_scan.py"
     ],
     [
       "drydocs/tests/unit/test_chunk_search_spec.py",
@@ -36033,6 +36171,10 @@
       "drydocs/tests/unit/test_load_map_declarations.py"
     ],
     [
+      "drydocs/tests/unit/test_load_map_wiring_key.py",
+      "drydocs/drydocs_core/source_descriptors.py"
+    ],
+    [
       "drydocs/tests/unit/test_load_sequence_surfaces.py",
       "drydocs/drydocs/__init__.py"
     ],
@@ -36765,6 +36907,10 @@
       "drydocs/drydocs_api/query_specs.py"
     ],
     [
+      "drydocs/tests/unit/test_sdlc_runbook_generator.py",
+      "drydocs/drydocs/docgen/doc_outline.py"
+    ],
+    [
       "drydocs/tests/unit/test_seal_agreement.py",
       "drydocs/drydocs/loaders/seal_contacts.py"
     ],
@@ -36906,6 +37052,14 @@
     ],
     [
       "drydocs/tests/unit/test_source_descriptors.py",
+      "drydocs/drydocs/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_source_descriptors.py",
+      "drydocs/drydocs/cli.py"
+    ],
+    [
+      "drydocs/tests/unit/test_source_descriptors.py",
       "drydocs/drydocs_core/source_descriptors.py"
     ],
     [
@@ -36947,6 +37101,10 @@
     [
       "drydocs/tests/unit/test_source_registry.py",
       "drydocs/drydocs/loaders/base.py"
+    ],
+    [
+      "drydocs/tests/unit/test_source_registry.py",
+      "drydocs/drydocs_core/source_descriptors.py"
     ],
     [
       "drydocs/tests/unit/test_source_registry.py",
@@ -39613,6 +39771,11 @@
     [
       "drydocs/.claude/skills",
       "CONTAINS",
+      "drydocs/.claude/skills/controlm-runbook-automation-SDLC"
+    ],
+    [
+      "drydocs/.claude/skills",
+      "CONTAINS",
       "drydocs/.claude/skills/controlm-runbook-automation-excel"
     ],
     [
@@ -40284,6 +40447,21 @@
       "drydocs/.claude/skills/controlm-runbook-automation",
       "CONTAINS",
       "drydocs/.claude/skills/controlm-runbook-automation/references"
+    ],
+    [
+      "drydocs/.claude/skills/controlm-runbook-automation-SDLC",
+      "CONTAINS",
+      "drydocs/.claude/skills/controlm-runbook-automation-SDLC/SKILL.md"
+    ],
+    [
+      "drydocs/.claude/skills/controlm-runbook-automation-SDLC",
+      "CONTAINS",
+      "drydocs/.claude/skills/controlm-runbook-automation-SDLC/generate_runbook.py"
+    ],
+    [
+      "drydocs/.claude/skills/controlm-runbook-automation-SDLC",
+      "CONTAINS",
+      "drydocs/.claude/skills/controlm-runbook-automation-SDLC/section-spec.yaml"
     ],
     [
       "drydocs/.claude/skills/controlm-runbook-automation-excel",
@@ -43398,6 +43576,11 @@
     [
       "drydocs/config/gate-prompts",
       "CONTAINS",
+      "drydocs/config/gate-prompts/source-descriptor-axes.yaml"
+    ],
+    [
+      "drydocs/config/gate-prompts",
+      "CONTAINS",
       "drydocs/config/gate-prompts/source-registry-v2.yaml"
     ],
     [
@@ -45414,6 +45597,11 @@
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
       "drydocs/docs/restructure/backlog/items/CFG12.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/CFG13.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -48793,6 +48981,11 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/WEB23.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/WEB3.yaml"
     ],
     [
@@ -51043,6 +51236,11 @@
     [
       "drydocs/drydocs_core",
       "CONTAINS",
+      "drydocs/drydocs_core/check_outcome.py"
+    ],
+    [
+      "drydocs/drydocs_core",
+      "CONTAINS",
       "drydocs/drydocs_core/component_map.py"
     ],
     [
@@ -53013,7 +53211,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260909.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260909-1407.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -54078,6 +54276,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_check_outcome.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_chunk_search_spec.py"
     ],
     [
@@ -55009,6 +55212,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_schema_meta_exclusion.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_sdlc_runbook_generator.py"
     ],
     [
       "drydocs/tests/unit",
@@ -56755,13 +56963,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 3156,
-    "edges": 1963,
-    "circular_files": 32,
+    "files": 3165,
+    "edges": 1980,
+    "circular_files": 34,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 3489,
-    "directories": 334
+    "rels": 3499,
+    "directories": 335
   }
 }
