@@ -3837,6 +3837,31 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   on, when your registries move, you edit `census:` and say why in the commit — never
   the test. Nothing is asked back.
 
+- **RELAY-48 — THE `updated:` HEADER KEY IS PER-SIDE: A PORT NEVER WRITES IT, AND THE
+  MANIFEST NOW SAYS SO** (new 2026-09-09, producer `main` after `port-base-20260908` /
+  `314b1715`, venue desktop). `[VERIFIED-PRODUCER]` throughout. J59 (built on the laptop
+  lane, merged 2026-09-09) adds a commit-time check, `scripts/check_header_freshness.py`
+  behind `.pre-commit-config.yaml`, that holds the `updated:` header key J58 made required
+  against the file's actual change: a staged governed file must say today. The hook is
+  machine-local and only runs where `pre-commit install` has been run (the J62 step in the
+  session ritual). The half that concerns a port is clause (c), landed in this commit: git
+  dates DO NOT survive the port. The two repos have disjoint histories, so on your side a
+  ported file's git date is the day it arrived, not the day its content changed - which is
+  why the IN-FILE date is the cross-repo freshness mechanism, and why a port that copied
+  the producer's `updated:` would make every ported file look freshly touched on your side
+  and hand the hook a lie to check. `PORT-MANIFEST.yaml` therefore gains a top-level
+  `per_side_fields:` block declaring `updated` per-side on every governed file: a take
+  applies CONTENT and leaves the key as your side last wrote it, and your side refreshes
+  it when the applied content changed your tree - that is a change on your side. The block
+  WINS over any per-entry row's "UNNAMED FIELDS: producer-owned" default; the rows that
+  already say "`updated` is the row owner's" are consistent with it and are unchanged.
+  What this changes for your apply: one hand step, because the apply is hand-merged by
+  the reconcile-port ledger and no script writes governed files for you - at a
+  canonical-producer take of a governed file whose content changed, set `updated:` to your
+  apply date instead of accepting the producer's; where nothing changed, leave it. The
+  J59 hook, once you have run `pre-commit install`, then holds you to the same rule on your
+  own edits. Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has

@@ -48,7 +48,9 @@
 # =============================================================================
 schema: drydocs.port-manifest.v1
 classification: Internal-Public
-updated: 2026-09-08   # 2026-09-08 (J75): the config-surface / SURFACES-row / derived-artifact
+updated: 2026-09-09   # 2026-09-09 (J59 c): `per_side_fields:` block - the `updated:` header key is
+                      # PER-SIDE on every governed file; a port never writes it.
+                      # 2026-09-08 (J75): the config-surface / SURFACES-row / derived-artifact
                       # triple named on three rows; scripts/render_enforcement_matrix.py per-entry.
                       # 2026-08-20 (J51): six PER-ENTRY rows for canonical-producer paths the
                       # company legitimately EXTENDS (Idea-142's class): description_tokens
@@ -121,6 +123,37 @@ updated: 2026-09-08   # 2026-09-08 (J75): the config-surface / SURFACES-row / de
                       # print.html} canonical-company — consumer's TDD is finalized/ahead.
 direction: "producer -> company (one-way; back-flow only as sanitized reproduction)"
 default: "clean-add when absent on consumer; evaluate when both sides created the path"
+
+# ---- per-side fields (J59 clause c, 2026-09-09) ------------------------------
+# A field that is PER-SIDE on EVERY file that carries it, whatever the file's row
+# says. This is the cross-cutting form of the field splits the per-entry rows below
+# declare per file (doc-source-registry, source-bindings, editions): those name
+# owners per field per file; this names one field once, for all of them. It WINS
+# over any row's "UNNAMED FIELDS: producer-owned" default - that default is about
+# the WHAT of a row, and a per-side field is not a WHAT.
+#
+# `updated` is the header key J58 made REQUIRED on every governed file and J59
+# checks at commit (scripts/check_header_freshness.py). It is the cross-repo
+# freshness mechanism precisely WHERE git cannot be: the two repos have disjoint
+# histories, so on the consumer every ported file's git date is the day it ARRIVED,
+# not the day its content changed - the in-file date is the only date that
+# survives the port with its meaning. A port that copied the producer's `updated:`
+# would make every ported file look freshly touched on the receiving side and the
+# J59 hook would then be checking a lie. So: each side writes its own, when IT
+# changes the file; a port applies content and leaves the key as the receiving
+# side last wrote it (the receiving side refreshes it at apply time if the content
+# changed - that is a change on that side). The per-entry rows that already say
+# "`updated` is the row owner's" (editions) are consistent with this and stay.
+per_side_fields:
+  - field: updated
+    scope: "every file the header-identity rule governs (tests/unit/test_config_identity_header.py CLASSES)"
+    rule: >
+      Never overwritten by a port, in either direction. The receiving side sets it
+      when the applied content changed on its tree; a take that changes nothing
+      leaves it. It is the cross-repo freshness date because git dates do not
+      survive a port between disjoint histories.
+    since: 2026-09-09
+    source: "J59 clause (c); precedent = the config/doc-source-registry.yaml field split"
 
 # ---- the overlay seam (J34, 2026-08-09) -------------------------------------
 # Each side may keep ONE side-local overlay file. The J16 fall-through guard
