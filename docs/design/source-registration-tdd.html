@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Technical Design — source registration (five-axis descriptors, synthetic stand-ins, DuckDB and DataHub)</title>
+<style>
+:root { color-scheme: light dark; --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+@media (prefers-color-scheme: dark) { :root { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; } }
+:root[data-theme="dark"] { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; }
+:root[data-theme="light"] { --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+* { box-sizing: border-box; }
+body { font: 15px/1.6 "Segoe UI", system-ui, Arial, sans-serif; color: var(--ink); background: var(--bg); margin: 0; }
+main { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+h1 { font-size: 28px; margin: 0 0 6px; letter-spacing:-0.3px; }
+h2 { font-size: 20px; margin: 34px 0 10px; padding-bottom:5px; border-bottom: 2px solid var(--ink); }
+h3 { font-size: 16px; margin: 22px 0 8px; }
+h4,h5,h6 { font-size: 14px; margin: 16px 0 6px; }
+p { margin: 10px 0; } strong { font-weight: 700; }
+a { color: var(--link); } a:hover { text-decoration: underline; }
+code { font-family: "Cascadia Mono","Consolas",monospace; font-size: 0.88em; background: var(--faint); padding: 1px 4px; border-radius: 3px; }
+pre { font-family: "Cascadia Mono","Consolas",monospace; font-size: 12.5px; line-height:1.45; border:1px solid var(--line); background: var(--faint); padding: 12px 14px; border-radius: 6px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 14px 0; font-size: 13.5px; display:block; overflow-x:auto; }
+th,td { border:1px solid var(--line); padding: 6px 9px; text-align:left; vertical-align: top; }
+th { background: var(--faint); font-weight:700; }
+blockquote { margin: 14px 0; padding: 2px 16px; border-left: 4px solid var(--line); color: var(--mid); }
+ul,ol { margin: 10px 0; padding-left: 26px; } li { margin: 4px 0; }
+hr { border:none; border-top:1px solid var(--line); margin: 26px 0; }
+:target { scroll-margin-top: 12px; } :target > :first-child, h2:target, h3:target { outline: 2px solid var(--link); outline-offset: 4px; }
+.dd-margin-tag, .dd-print-footer { display: none; }
+
+.dd-note-btn { border:1px solid var(--line); background:var(--bg); color:var(--mid); cursor:pointer; font-size:12px; line-height:1; padding:2px 6px; border-radius:5px; margin-right:6px; }
+.dd-note-btn:hover { color:var(--link); border-color:var(--link); }
+.dd-note-box { margin:6px 0 10px; }
+.dd-note-box textarea { width:100%; min-height:56px; font:13px/1.4 "Segoe UI",system-ui,sans-serif; color:var(--ink); background:var(--faint); border:1px solid var(--line); border-radius:6px; padding:8px; resize:vertical; }
+.dd-annotated { box-shadow:-3px 0 0 var(--link); padding-left:8px; }
+.dd-fb-bar { position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:6px; align-items:stretch; background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:8px 12px; box-shadow:0 2px 10px rgba(0,0,0,.15); font-size:13px; z-index:50; }
+.dd-fb-row { display:flex; gap:8px; align-items:center; justify-content:space-between; }
+.dd-fb-bar button { cursor:pointer; border:1px solid var(--link); background:var(--link); color:#fff; border-radius:6px; padding:5px 10px; font-size:13px; }
+.dd-fb-bar .dd-badge { font-weight:700; }
+.dd-fb-file { cursor:pointer; font-size:11px; color:var(--mid); white-space:nowrap; }
+.dd-fb-file code { font-size:11px; }
+.dd-fb-file:hover code { color:var(--link); }
+.dd-toast { position:fixed; right:16px; bottom:64px; background:var(--ink); color:var(--bg); padding:8px 12px; border-radius:8px; font-size:13px; z-index:60; opacity:0; transition:opacity .2s; }
+.dd-toast.show { opacity:1; }
+.dd-sme-feedback ol li { margin: 6px 0; }
+@media print { .dd-note-btn, .dd-note-box, .dd-fb-bar, .dd-toast, .dd-sme-feedback, .dd-sme-divider { display:none !important; } }
+@page { size: Letter; margin: 0.6in 0.62in 0.55in 0.62in; }
+@media print {
+:root, :root[data-theme="dark"], :root[data-theme="light"] { color-scheme: light; --ink:#1a1a1a; --mid:#555; --line:#bdbdbd; --fill:#eee; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { font: 10.5px/1.45 "Segoe UI", system-ui, Arial, sans-serif; }
+main { max-width: 7.2in; margin: 0 auto; padding: 0 0 0 0.62in; position: relative; }
+h1 { font-size: 21px; margin: 0 0 2px; letter-spacing:-0.2px; }
+h2 { font-size: 14px; margin: 16px 0 8px; padding-bottom:4px; border-bottom: 2px solid var(--ink); text-transform: uppercase; letter-spacing: 0.6px; }
+h3 { font-size: 11.5px; margin: 13px 0 5px; padding-bottom:2px; border-bottom:1px solid var(--line); }
+h4,h5,h6 { font-size: 10.5px; margin: 9px 0 4px; }
+p { margin: 6px 0; }
+a { color: inherit; text-decoration: underline; }
+code { font-size: 9.2px; padding: 0 2px; border-radius: 2px; }
+table { display: table; width:100%; margin: 7px 0; font-size: 9.1px; overflow-x: visible; }
+th, td { padding: 3px 5px; }
+th { background: var(--fill); }
+td code, th code { background: transparent; padding: 0; }
+pre { font-size: 8.4px; line-height: 1.35; padding: 7px 9px; margin: 7px 0; white-space: pre; overflow: hidden; border-radius: 3px; }
+pre.sql { background:#fbfbfb; }
+blockquote { margin: 7px 0; padding: 2px 10px; border-left: 3px solid var(--line); break-inside: avoid; }
+ul,ol { margin: 6px 0 6px 16px; padding: 0; } li { margin: 3px 0; }
+hr { margin: 10px 0; }
+h2, h3, table, pre { break-inside: avoid; }
+
+/* L6 paper HITL: each anchored block sits in the left gutter (main's own padding-left,
+   reserved above) so a printed page carries the anchor id beside its section — no @page
+   margin-box support required, so headless Chromium print-to-pdf renders it reliably. */
+h1, h2, h3, h4, h5, h6, p, table, pre, ul, ol, blockquote { position: relative; }
+.dd-margin-tag {
+  display: block; position: absolute; left: -0.6in; top: 0.1em; width: 0.54in;
+  font: 6.2px/1.15 "Cascadia Mono","Consolas",monospace; text-align: right;
+  color: var(--mid); letter-spacing: 0.1px; word-break: break-word;
+}
+/* Rev/commit footer: `position: fixed` repeats on every printed page in Chromium's
+   headless print-to-pdf (the standard running-footer technique) without needing CSS
+   Paged-Media margin-box content(), which Chromium supports only partially. */
+.dd-print-footer {
+  display: block; position: fixed; left: 0.62in; right: 0.62in; bottom: 0.12in;
+  font-size: 8px; color: var(--mid); text-align: center;
+  border-top: 1px solid var(--line); padding-top: 3px;
+}
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Technical Design — source registration (five-axis descriptors, synthetic stand-ins, DuckDB and DataHub)</h1>
+<p id="front-matter"><span class="dd-margin-tag" aria-hidden="true">front-matter</span><strong>Status:</strong> DESCRIPTIVE — documents the built proof of concept as of <strong>Rev 1, 2026-09-09</strong>, authored against commit <code>de0eeb6f</code> on branch <code>feat/source-registration-poc</code> (one commit, based on <code>main</code> at <code>7e80f122</code>). Nothing here is prescriptive: every mechanism described is in the tree and covered by a test. · <strong>Classification:</strong> Internal-Public — mechanism only. Every value the generator emits is synthetic, and no connection coordinate appears in this document or in the files it describes. · <strong>Audience:</strong> engineers working on <code>drydocs_core/source_descriptors.py</code> or <code>drydocs/source_registration/</code>, and the SME deciding whether the descriptor axes are the right five and whether a catalog belongs in the picture at all. · <strong>Companion:</strong> <code>docs/decisions/0017-source-binding-substrate.md</code> (PROPOSED; the question this proof of concept answers a piece of); <code>docs/design/datahub-substrate-review.md</code> Rev 2 and <code>docs/design/catalog-substrate-review.md</code> (the reading behind the DataHub choice); <code>docs/design/controlm-ingestion-tdd.md</code> (the pipeline whose landing zones receive the stand-ins); <code>config/datahub/README.md</code> (the operator runbook for the two recipes).</p>
+<p>Worked example throughout: the dataset <code>controlm@[db].psgmgr.cm_def_vtab</code>. The registry says it is an automated, database-carried replica in the technology layer. The descriptor turns that into five axis values; the generator writes <code>controlm_folders.csv</code> as its stand-in; the bundle drops that file into a CSV mirror under the data root; DuckDB loads it as a table; and DataHub registers it as a dataset carrying those five values as both properties and tags.</p>
+<blockquote><p><strong>Read-me-first.</strong> This is a registration surface, not a load. Nothing here writes the graph, opens a database connection, or reaches the network. It reads two committed YAML files, writes CSV text, and emits one JSON file that an operator-side tool consumes in its own environment.</p></blockquote>
+<hr>
+<h2 id="purpose-scope"><span class="dd-margin-tag" aria-hidden="true">purpose-scope</span>Purpose &amp; scope</h2>
+<p><strong>Purpose.</strong> Give every registered dataset a machine-readable registration descriptor, and prove the descriptor is worth having by driving three consumers from it: a synthetic stand-in for each source, a project-local analytical copy, and a catalog registration.</p>
+<p><strong>The problem it answers.</strong> The source registry says what a source is, and the bindings say how to reach its carrier. Neither says how a source should be <em>registered</em> as a catalog asset, and neither gives a way to exercise the loaders without a production capture. Both gaps were being filled by prose a reader had to interpret.</p>
+<p><strong>In scope.</strong></p>
+<ul><li><code>config/source-descriptors.yaml</code> — the five closed axes, their derivation from the registry, the per-dataset overrides, the synthetic plan and the DataHub emission settings.</li><li><code>drydocs_core/source_descriptors.py</code> — the reader that derives, overrides, and refuses.</li><li><code>drydocs/source_registration/</code> — the seeded generator, the tracked bundle and its extraction, the optional DuckDB load, and the DataHub emitter.</li><li><code>scripts/build_synthetic_sources.py</code> — the one command that drives all four steps.</li><li><code>config/datahub/</code> — two operator-side recipes for the DataHub command-line tool.</li></ul>
+<p><strong>Out of scope.</strong> Any graph write; any real connection (the bindings own that, ADR 0017); a production DataHub deployment (the recipes target a local file-backed store); lineage emission of any kind; and the decision on whether a catalog product is adopted at all, which stays with ADR 0017 and its gate.</p>
+<h2 id="context-frame"><span class="dd-margin-tag" aria-hidden="true">context-frame</span>Where this sits — the four-layer frame</h2>
+<p>The descriptor is <strong>layer 1, taxonomy</strong>. It classifies a dataset on five closed axes and asserts no relationship between anything. That placement is deliberate: an axis value says what category a source falls into, and adding a value to an axis is a classification change, not an ontology change. Nothing here proposes an edge, so nothing here needs the relationship vocabulary.</p>
+<p>Upstream neighbors are <code>config/source-registry.yaml</code> (the system and dataset rows, ruled at gate <code>source-registry-v2</code>) and <code>config/source-bindings.yaml</code>, read only for the presence of a <code>binding:</code> key and never for its contents. Extraction adds one more: the landing-zone accessor, which resolves the registry&#x27;s own acquisition rows against the data root. Downstream neighbors are the loaders, which read the extracted CSVs in SOURCE mode exactly as they would read a real drop, and the operator&#x27;s DataHub environment.</p>
+<p>Layer 3 is untouched. The graph is neither read nor written at any point in this design.</p>
+<h2 id="definitions"><span class="dd-margin-tag" aria-hidden="true">definitions</span>Definitions, acronyms &amp; references</h2>
+<ul><li><strong>Descriptor</strong> — the five axis values for one dataset, plus the identity facts an emitter needs beside them (system, URN, whether the dataset is derived, whether it is confirmed).</li><li><strong>Axis</strong> — a named, closed list of permitted values. The five are <code>acquisition</code>, <code>format</code>, <code>authority</code>, <code>layer</code> and <code>access</code>.</li><li><strong>Derivation</strong> — the rule that computes an axis value from the registry rows. Written down so a registry edit moves the descriptor without a second edit here.</li><li><strong>Override</strong> — a per-dataset value that replaces the derivation. The only way to disagree with a derivation, and every override is itself checked against its axis.</li><li><strong>Registry-home dataset</strong> — a dataset whose row lives in the source registry. The document ledger shares the registry&#x27;s identifier space but carries no system row, so its entries have no carrier to register against and are excluded here.</li><li><strong>Stand-in</strong> — a generated CSV that occupies the place of a real capture. Every row carries <code>record_origin</code> set to <code>sample</code>.</li><li><strong>Bundle</strong> — the single tracked gzip file holding every stand-in as text.</li><li><strong>Landing zone</strong> — the directory a loader reads a manual drop from, under <code>DRYDOCS_DATA_ROOT</code>.</li><li><strong>Mirror</strong> — the substitute placement for a database-carried dataset, which has no drop directory.</li><li><strong>MCP file</strong> — the metadata-change-proposal file format, DataHub&#x27;s documented input to its file source and its local import path.</li><li><strong>DataHub Lite</strong> — DataHub&#x27;s file-backed local store, itself a DuckDB database. No server is involved anywhere in this design.</li><li><strong>ADR 0017</strong> — &quot;Source binding substrate&quot;, PROPOSED. Its acceptance is not assumed here.</li></ul>
+<h2 id="design-summary"><span class="dd-margin-tag" aria-hidden="true">design-summary</span>Design summary</h2>
+<pre><code> config/source-registry.yaml        config/source-descriptors.yaml
+   systems (19) + datasets (30)       axes . authority map . overrides
+              |                       synthetic plan . datahub settings
+              +-----------+-------------------+
+                          v
+        drydocs_core/source_descriptors.py   (derive -&gt; override -&gt; refuse)
+                          |  30 descriptors, five axis values each
+       +------------------+-------------------------------+
+       v                  v                               v
+  synthetic.py       datahub_emit.py                 (any future reader)
+  16 CSV tables      MCP file: 19 containers,
+       |             30 datasets, tags, schemas
+       v                  |
+  bundle.py  --&gt;  drydocs/data/samples/synthetic-sources.json.gz  (tracked, 4076 bytes)
+       | extract
+       v
+  DRYDOCS_DATA_ROOT/&lt;landing zone&gt;/*.csv        --&gt; the loaders, in SOURCE mode
+  DRYDOCS_DATA_ROOT/psgmgr-mirror/*.csv
+       | duckdb_load.py (optional)
+       v
+  DRYDOCS_DATA_ROOT/synthetic/drydocs-synthetic.duckdb   --&gt; the DataHub profiler recipe</code></pre>
+<p>One config file drives everything. The reader turns the registry into 30 descriptors. Three consumers read those descriptors and nothing else: a generator that writes CSV text, a packer that puts the text in one tracked file and extracts it where loaders look, and an emitter that writes a catalog registration. Each output is deterministic, and each has a test that says so.</p>
+<h2 id="detailed-design"><span class="dd-margin-tag" aria-hidden="true">detailed-design</span>Detailed design</h2>
+<h3 id="detailed-design--the-five-axes-and-how-a">The five axes and how a value is decided</h3>
+<p>Each axis is a closed list declared in <code>config/source-descriptors.yaml</code>:</p>
+<table><thead><tr><th>Axis</th><th>Values</th><th>What it answers</th></tr></thead><tbody><tr><td><code>acquisition</code></td><td><code>manual</code>, <code>automated</code></td><td>Does a person put the data there, or does a job?</td></tr><tr><td><code>format</code></td><td><code>csv</code>, <code>ascii</code>, <code>json</code>, <code>archive</code>, <code>db</code></td><td>What shape arrives?</td></tr><tr><td><code>authority</code></td><td><code>primary</code>, <code>replica</code></td><td>Is this the system of record, or a copy?</td></tr><tr><td><code>layer</code></td><td><code>human</code>, <code>business</code>, <code>data</code>, <code>technology</code></td><td>What kind of subject does it describe?</td></tr><tr><td><code>access</code></td><td><code>fid</code>, <code>human</code>, <code>repo</code></td><td>Which credential class reads it?</td></tr></tbody></table>
+<p>A value is decided in three steps, in this order. <strong>Derive</strong> from the registry rows. <strong>Override</strong> if the dataset names that axis in the override table. <strong>Refuse</strong> if the result is not on its axis, if the axis is not one of the five, or if an override names a dataset the registry does not have. The reader never guesses and never falls back to a default it invented.</p>
+<p>The derivations are literal. <code>acquisition</code> is the dataset&#x27;s acquisition mode, defaulting to <code>automated</code>. <code>format</code> is the declared format for a manual row and the transport for an automated one, so a database-carried dataset lands on <code>db</code>. <code>authority</code> maps the registry&#x27;s own vocabulary through a small table: a system of record becomes <code>primary</code>, an authorized distribution source becomes <code>replica</code>, and a derived store becomes <code>replica</code> because it copies. <code>layer</code> is the system row&#x27;s layer. <code>access</code> asks which credential class reads the dataset: a system with a binding is read by a functional identity, a repository-based zone is read by the checkout itself, an unbound manual drop is read by a person, and an unbound automated dataset is still read by a service identity rather than by a person.</p>
+<p>Two overrides exist, both on <code>layer</code>, both for the same reason: the dataset&#x27;s subject is people whatever carrier holds it. One is a phone-number extract that the derivation would otherwise call <code>data</code>, because its carrier is a database. The other is the team report.</p>
+<p>The override table is validated when the reader is constructed, not on first use, so a config that disagrees with the registry fails immediately rather than on whichever dataset happens to be asked for first.</p>
+<h3 id="detailed-design--which-datasets-get-a-descriptor">Which datasets get a descriptor</h3>
+<p>Registry-home datasets only, in registry order. The document ledger&#x27;s entries share the identifier space but have no system row, so there is no carrier to register against; they are cataloged by the document ledger instead. A test pins that exclusion so it stays a decision rather than an accident.</p>
+<h3 id="detailed-design--the-synthetic-generator">The synthetic generator</h3>
+<p>The generator is a pure function of the config and the seed. A single seeded random number generator decides the few genuine choices; everything else is arithmetic over fixed name lists. It produces 16 tables covering 10 of the 30 datasets, and it returns CSV <strong>text</strong> rather than files, so the same bytes reach the tracked bundle and the loader&#x27;s drop directory.</p>
+<p>Three fences keep a fixture from ever passing for a capture:</p>
+<ul><li>Every row carries <code>record_origin</code> set to <code>sample</code>, added by the one helper that builds every table, so a new table cannot forget it.</li><li>Application identifiers stay inside the reserved block already used by the existing sample generator, and person identifiers are a letter plus six digits in a block that resolves to nothing.</li><li>Every mail address ends in the synthetic domain, which cannot be registered.</li></ul>
+<p>The theme is the Neo4j Matrix sample graph: crew names as people, ships as product lines, programs as products and applications. Names are borrowed from a film, and no value describes anything real. The theme is not decoration. A reviewer who sees a hovercraft in a folder name knows immediately that the row is generated, which a plausible-looking corporate name would not tell them.</p>
+<p>The generator refuses to run past a mismatch. If the config plans a file the generator has no block for, it raises rather than quietly emitting a short set.</p>
+<h3 id="detailed-design--the-bundle-and-its-extraction">The bundle and its extraction</h3>
+<p>Everything is packed into one gzip file at <code>drydocs/data/samples/synthetic-sources.json.gz</code>, tracked in the repository at 4076 bytes. One tracked binary is one publish-boundary decision instead of a dozen. It is byte-stable by construction: the JSON is sorted and compact, and the gzip header carries a zero timestamp and no filename, so two runs over one config produce one file and any diff means the generator or the config changed.</p>
+<p>Extraction never writes into the repository tree. Each dataset&#x27;s target is decided from its placement:</p>
+<ul><li>A dataset with a manual landing zone is written to that zone under the data root.</li><li>A zone declared as repository-based is redirected under a <code>repo/</code> prefix inside the data root, so a fixture cannot land in a tracked directory.</li><li>A database-carried dataset has no drop directory, so it is written to a CSV mirror under the data root instead.</li></ul>
+<p>Files are written with newline translation disabled, so the bundled line endings survive on every platform and the loaders see the same bytes the generator produced.</p>
+<h3 id="detailed-design--the-duckdb-load">The DuckDB load</h3>
+<p>Optional, and imported lazily. DuckDB is not a repository dependency: the import happens inside the function, the driving script probes for the package and prints a skip line when it is absent, and the test skips on the same condition. A tree without the package loses this one step and nothing else.</p>
+<p>Every column is read as text. Type inference is the single thing that would make two loads of one CSV differ, and saying what the values look like is the profiler&#x27;s job rather than the loader&#x27;s.</p>
+<p>Two extra tables make the file self-describing. One holds a row per loaded table with that dataset&#x27;s five axis values, its identifier, its URN and its placement. The other holds the seed, the theme and the table count. Both are derived from the descriptors, and neither is typed by hand.</p>
+<h3 id="detailed-design--the-datahub-emission">The DataHub emission</h3>
+<p>The repository imports nothing from DataHub. The file-sink JSON is a documented, permissively licensed format, and writing it directly keeps DataHub an operator-side tool installed in its own environment. That is the whole coupling: one JSON file.</p>
+<p>Per system, one container carrying the row&#x27;s name, layer, classification and binding presence, its platform, a subtype marking it a source system, and a status. Per dataset, a properties aspect whose custom properties are the five axis values plus the DryDocs identifier, URN, system, and the confirmed and derived flags; a pointer to its container; its platform; a subtype chosen from the format; one tag per axis value plus a synthetic tag when a stand-in exists; a status; and, when a stand-in exists, a schema built from the generated CSV headers with every field typed as string because the files are text. Then one tag entity per tag used, each carrying a description that spells the axis value out.</p>
+<p>Determinism again: systems, then datasets, then tags, each in identifier order; a fixed observation timestamp read from the config rather than from the clock; and the JSON written sorted. Two runs over one config produce one file.</p>
+<p>The container identifier is a hash of a fixed string and the system identifier. The dataset name replaces every character outside a safe set, because the DryDocs identifier grammar contains brackets and an at-sign that a URN cannot carry. The true identifier rides in the custom properties, so nothing is lost.</p>
+<h3 id="detailed-design--the-two-recipes">The two recipes</h3>
+<p>Both are operator-side, and both target a local file-backed store, so no server exists in this design. The first imports the emitted file and registers the systems as containers and the datasets as assets. The second points DataHub&#x27;s own profiler at the synthetic DuckDB file and writes row counts, null and distinct counts, minimum and maximum values, and sample values into the same store.</p>
+<p>Every path in a recipe is relative to the data root, and that is a constraint rather than a preference: DataHub&#x27;s file source parses its path as a URL, so an absolute Windows path is read as a one-letter scheme and refused.</p>
+<p>The two sets of dataset identifiers differ on purpose. The registration describes the source; the profile describes the synthetic copy. Collapsing them would claim a profile of production data that nobody has measured.</p>
+<h3 id="design-data-mapping"><span class="dd-margin-tag" aria-hidden="true">design-data-mapping</span>Source → column-level field mapping</h3>
+<p><strong>N/A — no ingestion.</strong> This design writes no graph and maps no source column to a node or edge property. The column-level mapping for the datasets involved lives with the loaders that read them, in the per-source ledgers under <code>config/source-mappings/</code> and in <code>docs/design/controlm-ingestion-tdd.md</code>.</p>
+<p>What this design does map is a <em>registry row</em> to a <em>descriptor</em>, and that mapping is the derivation table in the detailed design above. The one place a column appears is the schema aspect, which is built from the generated CSV headers rather than authored.</p>
+<h2 id="classification-security"><span class="dd-margin-tag" aria-hidden="true">classification-security</span>Classification &amp; security</h2>
+<p>Everything introduced here is <strong>Internal-Public</strong>. The descriptor config carries a classification header and holds axis vocabulary, derivation rules and two overrides. No connection coordinate appears in it: the <code>access</code> axis names a credential <em>class</em>, never a credential, and the reader consults the bindings only for the presence of a binding key.</p>
+<p>The generated data is synthetic under three enforced fences, described in the detailed design and pinned by a test: the <code>record_origin</code> marker on every row, identifiers confined to the reserved blocks, and addresses in a domain that cannot be registered. The marker is the important one. It makes the fixture self-declaring inside any store it reaches, including the DuckDB file and the catalog, so a row cannot be mistaken for a capture after it leaves this repository.</p>
+<p>The tracked bundle sits under an existing never-port row, which is the correct disposition rather than an oversight: the bundle is generated from a committed config, so a consumer regenerates it with one command rather than receiving it. Every test that reads the bundle skips when it is absent, so a tree without it reports &quot;not tested&quot; and never a failure.</p>
+<p>Two port-manifest rows were added, both placed above the general configuration default so they win on first match. The descriptor config is per-entry from day one, because a consumer&#x27;s own datasets need their own override and synthetic entries and a wholesale copy would drop them. The recipes are producer-owned, because a consumer pointing them at a real deployment changes only the destination, and does that in its own overlay.</p>
+<h2 id="qa-tests"><span class="dd-margin-tag" aria-hidden="true">qa-tests</span>QA &amp; tests</h2>
+<p>Two test files, and each one pins a property rather than a snapshot.</p>
+<p><strong>Descriptors.</strong> The config carries its declared schema header. Every registry dataset resolves to a descriptor and every value is on its axis. Document-ledger entries are excluded. The derivations and both overrides produce the expected values. Three refusals are exercised: a value off its axis, an axis that does not exist, and an override for a dataset the registry does not have. The synthetic plan names only registered datasets. The platform map falls back to its default for an unlisted system.</p>
+<p><strong>Synthetic sources and emission.</strong> The generator is deterministic across two runs. It covers every planned file exactly, with no extras and no gaps. Every row carries the sample marker. Every identifier stays inside its fence. Packing is byte-stable. The committed bundle matches what the generator produces right now, which is the guard that catches a config change shipped without a rebuild. Extraction lands each file in the right zone, including the repository redirect and the mirror. The DuckDB load runs when the package is importable and skips when it is not. Dataset names are safe for a URN and unique. The emitted file registers every system and every dataset. Emission is deterministic.</p>
+<p>The skip behavior was verified rather than assumed. With the bundle moved aside, the file reports 8 passed and 3 skipped. A consumer tree has no data, and the verdict there must be &quot;not tested&quot;.</p>
+<p>The two recipes were run once on this desktop, against the local file-backed store. The import produced 283 events, and the profiler produced 137 events including 18 dataset profiles. That is a one-time operator verification, not an automated test, and it is recorded as such.</p>
+<p>The usual gates apply and were run: the unit suite, the root import, and the module-boundary test, which is default-deny and so required the new prefix and map rows in the same commit.</p>
+<h2 id="hitl-gate"><span class="dd-margin-tag" aria-hidden="true">hitl-gate</span>HITL gate &amp; open questions</h2>
+<p><strong>No gate is claimed and no gate is due.</strong> Nothing here proposes a relationship type, assigns meaning to an edge, or writes the graph, so the ontology gate has no subject. The two enforcement matrix rows added for these surfaces carry no gate reference for the same reason.</p>
+<p>Three questions are genuinely open, and they belong to the SME rather than to a later commit.</p>
+<ol><li id="hitl-gate--are-these-the-right-five-axes"><strong>Are these the right five axes?</strong> They were chosen because each one is already implied by a registry field and each one changes what an operator does. A sixth axis, or a different cut of <code>access</code>, is a reasonable disagreement. It would be cheap to make now and expensive later, once values are tagged in a catalog.</li><li id="hitl-gate--does-a-catalog-get-adopted-at"><strong>Does a catalog get adopted at all?</strong> ADR 0017 is PROPOSED and its acceptance is not assumed. This proof of concept deliberately proves the <em>shape</em> — a descriptor drives a registration — with a local file-backed store and no server, so the larger answer stays open.</li><li id="hitl-gate--should-the-axis-values-ever-reach"><strong>Should the axis values ever reach the graph?</strong> They are taxonomy, so they could be node properties. Nothing here does that, and doing it would be an ontology decision routed through the gate in the normal way.</li></ol>
+<p>One finding is worth recording because it closes a line of inquiry. OpenLineage was checked for the profiling job and has no profiler; its run events carry schema and lineage facets only. Profiling therefore stays with DataHub, and that is a fact about the two products rather than a preference.</p>
+<h2 id="traceability-matrix"><span class="dd-margin-tag" aria-hidden="true">traceability-matrix</span>Requirements traceability matrix</h2>
+<table><thead><tr><th>Requirement</th><th>Design section</th><th>Component</th><th>Test / verify</th><th>Status</th></tr></thead><tbody><tr><td>Every registry-home dataset carries five axis values, each drawn from a closed list</td><td>detailed-design</td><td>drydocs-core</td><td><code>test_source_descriptors.py</code> — every dataset on axis</td><td>done</td></tr><tr><td>An axis value is derived from the registry, so a registry edit moves it without a second edit</td><td>detailed-design</td><td>drydocs-core</td><td><code>test_source_descriptors.py</code> — derivations and overrides</td><td>done</td></tr><tr><td>An override is the only way to disagree with a derivation, and is itself checked</td><td>detailed-design</td><td>drydocs-core</td><td><code>test_source_descriptors.py</code> — override cases</td><td>done</td></tr><tr><td>An off-axis value, an unknown axis or an unknown dataset is refused, never guessed</td><td>detailed-design</td><td>drydocs-core</td><td><code>test_source_descriptors.py</code> — three refusal cases</td><td>done</td></tr><tr><td>Document-ledger entries are excluded, having no carrier to register against</td><td>detailed-design</td><td>drydocs-core</td><td><code>test_source_descriptors.py</code> — ledger exclusion</td><td>done</td></tr><tr><td>Generated data is a pure function of config and seed</td><td>detailed-design</td><td>drydocs-load</td><td><code>test_synthetic_sources.py</code> — determinism</td><td>done</td></tr><tr><td>Every planned file is generated exactly once, with no extras and no gaps</td><td>detailed-design</td><td>drydocs-load</td><td><code>test_synthetic_sources.py</code> — plan coverage</td><td>done</td></tr><tr><td>A generated row can never pass for a capture</td><td>classification-security</td><td>drydocs-load</td><td><code>test_synthetic_sources.py</code> — sample marker, identifier fences</td><td>done</td></tr><tr><td>The tracked bundle is byte-stable and matches the generator</td><td>detailed-design</td><td>drydocs-load</td><td><code>test_synthetic_sources.py</code> — pack stability, bundle parity</td><td>done</td></tr><tr><td>Extraction lands each file in the zone its loader reads, and never in the repository tree</td><td>detailed-design</td><td>drydocs-load</td><td><code>test_synthetic_sources.py</code> — extraction targets</td><td>done</td></tr><tr><td>A tree without the bundle reports &quot;not tested&quot;, never a failure</td><td>qa-tests</td><td>drydocs-load</td><td>measured: 8 passed / 3 skipped with the bundle moved aside</td><td>done</td></tr><tr><td>DuckDB is optional, and its absence costs one step only</td><td>detailed-design</td><td>drydocs-load</td><td><code>test_synthetic_sources.py</code> — load test skips on absence</td><td>done</td></tr><tr><td>Every system and every dataset is registered as a catalog asset carrying the five axes</td><td>detailed-design</td><td>drydocs-load</td><td><code>test_synthetic_sources.py</code> — emission coverage</td><td>done</td></tr><tr><td>A DryDocs identifier survives into the catalog despite a grammar a URN cannot carry</td><td>detailed-design</td><td>drydocs-load</td><td><code>test_synthetic_sources.py</code> — names urn-safe and unique</td><td>done</td></tr><tr><td>Two runs over one config emit one file</td><td>detailed-design</td><td>drydocs-load</td><td><code>test_synthetic_sources.py</code> — emission determinism</td><td>done</td></tr><tr><td>The new module is classified, mapped and port-dispositioned in the same commit</td><td>classification-security</td><td>drydocs-core, drydocs-load</td><td><code>test_module_boundary.py</code>; port-manifest rows; matrix re-render</td><td>done</td></tr><tr><td>The recipes run end to end against a local store</td><td>qa-tests</td><td>operator-side</td><td>one run on this desktop: 283 import events, 137 profile events, 18 profiles</td><td>done</td></tr><tr><td>The five axes are the right five</td><td>hitl-gate</td><td>—</td><td>SME question, open</td><td>open</td></tr><tr><td>A catalog product is adopted</td><td>hitl-gate</td><td>—</td><td>ADR 0017, PROPOSED</td><td>open</td></tr></tbody></table>
+<h2 id="decisions-discussions"><span class="dd-margin-tag" aria-hidden="true">decisions-discussions</span>Decisions &amp; discussions</h2>
+<p><strong>Why closed axes rather than a description field.</strong> A prose field is read by a person and interpreted differently each time. A closed axis is read by a consumer and refused when wrong. The emitter, the generator and the tests all read axis values, and none of them contains a rule for interpreting English.</p>
+<p><strong>Why derivation first and override second.</strong> The alternative is to write all 150 values by hand, which would be correct once and stale after the first registry edit. Derivation makes the registry the single place a fact is stated. The override table is short enough to read in one screen, and each entry says why it disagrees.</p>
+<p><strong>Why one tracked bundle rather than loose fixture files.</strong> The samples directory is ignored, and its tracked fixtures are grandfathered. Adding a dozen tracked CSVs would be a dozen publish-boundary decisions; one file is one. It also makes the parity test possible, because a single artifact can be compared against a fresh generation in one line.</p>
+<p><strong>Why DataHub is not a dependency.</strong> The file format is documented and permissively licensed, and the tool is an operator&#x27;s, installed in its own environment. Importing the package would put a large dependency tree behind a step that writes one JSON file. The cost of the choice is that the format is a contract this repository restates rather than imports, and the emission tests are what hold it.</p>
+<p><strong>Why a local file-backed store rather than a server.</strong> The question this proof of concept answers is whether the descriptor is worth having, and a server would not change that answer. It would only change the cost of reaching it.</p>
+<p><strong>Alternative weighed and rejected: emit lineage instead.</strong> OpenLineage was read for the profiling job and carries no profiler. Registration and profiling are what a source needs first. Lineage is a separate question, and it belongs with the ingestion pipeline that already knows the edges.</p>
+<h2 id="appendices"><span class="dd-margin-tag" aria-hidden="true">appendices</span>Appendices</h2>
+<p><strong>A. The command.</strong> One script drives every step, and reads the config for all of them.</p>
+<pre><code>python scripts/build_synthetic_sources.py --bundle
+python scripts/build_synthetic_sources.py --extract [--out-root DIR]
+python scripts/build_synthetic_sources.py --extract --duckdb
+python scripts/build_synthetic_sources.py --datahub-json PATH</code></pre>
+<p><strong>B. What the branch changed.</strong> One commit, nineteen files.</p>
+<table><thead><tr><th>Area</th><th>Files</th></tr></thead><tbody><tr><td>Config</td><td><code>config/source-descriptors.yaml</code>; <code>config/datahub/</code> (two recipes and a README)</td></tr><tr><td>Core</td><td><code>drydocs_core/source_descriptors.py</code>; <code>drydocs_core/component_map.py</code></td></tr><tr><td>Load</td><td><code>drydocs/source_registration/</code> (generator, bundle, DuckDB load, emitter); <code>scripts/build_synthetic_sources.py</code></td></tr><tr><td>Data</td><td><code>drydocs/data/samples/synthetic-sources.json.gz</code></td></tr><tr><td>Tests</td><td><code>tests/unit/test_source_descriptors.py</code>; <code>tests/unit/test_synthetic_sources.py</code></td></tr><tr><td>Governance</td><td><code>MODULE_MAP.md</code>; <code>PORT-MANIFEST.yaml</code>; <code>scripts/render_enforcement_matrix.py</code> and the re-rendered matrix</td></tr></tbody></table>
+<p><strong>C. Counts.</strong></p>
+<table><thead><tr><th>Thing</th><th>Count</th></tr></thead><tbody><tr><td>Systems in the registry</td><td>19</td></tr><tr><td>Datasets in the registry</td><td>30</td></tr><tr><td>Datasets with a stand-in</td><td>10</td></tr><tr><td>Generated tables</td><td>16</td></tr><tr><td>Bundle size, bytes</td><td>4076</td></tr></tbody></table>
+<hr class="dd-sme-divider">
+<section class="dd-sme-feedback" aria-label="SME - Feedback">
+<h2>SME - Feedback</h2>
+<p>How to return your notes on this document:</p>
+<ol>
+<li>Click the <strong>✎</strong> button beside any section (or numbered step) and type your note — notes save in your browser as you type.</li>
+<li>When finished, click <strong>Copy feedback</strong> in the bottom-right toolbar. Your notes are copied as anchor-keyed YAML.</li>
+<li>Create the feedback file (it is YAML, <em>not</em> markdown) — <strong>Copy To:</strong> <code>docs/design/feedback/</code> · <strong>File Name:</strong> <code>source-registration-tdd-rev1.yaml</code></li>
+<li>Paste the copied block into that file, save, and commit (or send the file back to the team).</li>
+</ol>
+</section>
+</main>
+<footer class="dd-print-footer">Rev 1 · commit de0eeb6f</footer>
+<script>
+
+(function(){
+  var DOC="source-registration-tdd", FILE="source-registration-tdd-rev1.yaml", DIR="docs/design/feedback/", KEY="drydocs-doc-feedback:"+DOC;
+  function load(){ try{return JSON.parse(localStorage.getItem(KEY)||"{}");}catch(e){return {};} }
+  function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+  var state=load(), badge;
+  function count(){ return Object.keys(state).filter(function(k){return (state[k]||"").trim();}).length; }
+  function refresh(){ if(badge) badge.textContent=count(); }
+  function toast(msg){ var t=document.createElement("div"); t.className="dd-toast"; t.textContent=msg; document.body.appendChild(t); requestAnimationFrame(function(){t.classList.add("show");}); setTimeout(function(){t.classList.remove("show"); setTimeout(function(){t.remove();},250);},1600); }
+  function exportYaml(){
+    var lines=["# design-doc feedback — paste into docs/design/feedback/"+DOC+"-rev<N>.yaml","doc: "+DOC,"notes:"];
+    Object.keys(state).forEach(function(a){
+      var note=(state[a]||"").replace(/\r/g,""); if(!note.trim()) return;
+      lines.push("  - anchor: "+a); lines.push("    note: |");
+      note.split("\n").forEach(function(l){ lines.push("      "+l); });
+    });
+    return lines.join("\n")+"\n";
+  }
+  function attach(el){
+    var id=el.id;
+    var btn=document.createElement("button"); btn.className="dd-note-btn"; btn.type="button"; btn.textContent="✎"; btn.title="Annotate #"+id;
+    var box=document.createElement("div"); box.className="dd-note-box"; box.style.display=(state[id]||"").trim()?"block":"none";
+    var ta=document.createElement("textarea"); ta.value=state[id]||""; ta.setAttribute("placeholder","note for #"+id+" …");
+    ta.addEventListener("input",function(){ state[id]=ta.value; save(); refresh(); el.classList.toggle("dd-annotated", !!ta.value.trim()); });
+    if((state[id]||"").trim()) el.classList.add("dd-annotated");
+    box.appendChild(ta);
+    btn.addEventListener("click",function(){ box.style.display=box.style.display==="none"?"block":"none"; if(box.style.display==="block") ta.focus(); });
+    if(el.tagName==="LI"){ el.insertAdjacentElement("afterbegin", btn); el.appendChild(box); }
+    else { el.insertAdjacentElement("afterend", box); el.insertAdjacentElement("beforebegin", btn); }
+  }
+  function copyText(txt, ok){
+    var done=function(){toast(ok);};
+    var fallback=function(){ var t=document.createElement("textarea"); t.value=txt; document.body.appendChild(t); t.select(); try{document.execCommand("copy"); toast(ok);}catch(e){toast("copy failed — select the box");} t.remove(); };
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done,fallback); } else { fallback(); }
+  }
+  function fileLine(label, value){
+    var d=document.createElement("div"); d.className="dd-fb-file"; d.title="click to copy";
+    var c=document.createElement("code"); c.textContent=value;
+    d.appendChild(document.createTextNode(label+" ")); d.appendChild(c);
+    d.addEventListener("click",function(){ copyText(value, label.replace(":","")+" copied"); });
+    return d;
+  }
+  document.addEventListener("DOMContentLoaded",function(){
+    document.querySelectorAll("main [id]").forEach(attach);
+    var bar=document.createElement("div"); bar.className="dd-fb-bar";
+    var row=document.createElement("div"); row.className="dd-fb-row";
+    var lbl=document.createElement("span"); lbl.innerHTML='notes <span class="dd-badge">0</span>'; badge=lbl.querySelector(".dd-badge");
+    var ex=document.createElement("button"); ex.type="button"; ex.textContent="Copy feedback";
+    ex.addEventListener("click",function(){ copyText(exportYaml(), "feedback copied — create "+DIR+FILE); });
+    row.appendChild(lbl); row.appendChild(ex);
+    bar.appendChild(row);
+    bar.appendChild(fileLine("file:", FILE));
+    bar.appendChild(fileLine("path:", DIR+FILE));
+    document.body.appendChild(bar); refresh();
+  });
+})();
+
+</script>
+</body>
+</html>
