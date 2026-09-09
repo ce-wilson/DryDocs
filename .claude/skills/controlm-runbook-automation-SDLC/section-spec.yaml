@@ -139,6 +139,16 @@ sor_citations:
       \ script paths for one folder is precisely what the clause forbids.\
       \ The RESOLVED-argument grain behind it (export -> resolve -> parse staging)\
       \ stays the -excel skill's and the lineage chain's, cited and not re-queried."
+  dataset-seams:
+    cite: ".claude/skills/controlm-runbook-automation-excel/SKILL.md — column map rows\
+      \ 'Dataset/pipeline GUIDs, source/target entities, error tables', 'Snowflake\
+      \ schema/table' and 'Glue table'"
+    detail: "WHERE the source/stage/target grain WILL come from, cited so the\
+      \ per-workflow block's empty rows point somewhere instead of just being\
+      \ empty. The sibling marks these seams graph-partial; none of them is a\
+      \ Control-M definition fact, which is why the Control-M-only bundle this\
+      \ skill reads cannot fill them today. Naming the seam is the difference\
+      \ between 'we have not built this' and 'nobody knows'."
   excel-workbook:
     cite: ".claude/skills/controlm-runbook-automation-excel/"
     detail: "The 2-tab folder-grain Excel runbook. Its 'Control M Job details' tab\
@@ -305,7 +315,7 @@ sections:
     source: graph-partial
     shape: table
     fill: etl_jobs
-    sor: [controlm-graph, conditions, cmd-line]
+    sor: [controlm-graph, conditions, cmd-line, dataset-seams]
     header_rows: ["Control-M job name", "Schedule Information", "Param File Path",
       "Src Schema/DB", "Stg Schema/DB", "Target Schema/DB", "Folder name",
       "Source Table", "Stage Table", "Target Table"]
