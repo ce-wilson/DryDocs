@@ -618,12 +618,17 @@ sections:
     columns: ["Escalation Level", "Role", "Primary Contact #", "Comments"]
     sor: [seal-contacts]
     derived: "The contact list, from the application's SEAL role attributions,\
-      \ ordered by escalation level where the role vocabulary declares one."
+      \ in a stable order by role name."
     residue: "The numbered guideline scenarios and their verbatim alert-email\
       \ templates are the run book's most valuable SME content and none of it is\
-      \ derivable. Contact NUMBERS are not in the SEAL sample either — the graph\
-      \ carries names, ids and email addresses, so the column is emitted with the\
-      \ contact point the graph has and the number left to capture."
+      \ derivable. Neither is the escalation LEVEL. No role vocabulary here\
+      \ declares a rank — L1 and L2 Operate Manager are three separate classes\
+      \ with no ordering attribute between them — so numbering the rows by their\
+      \ printed position would publish an alphabetical accident as a ladder. The\
+      \ level is captured, not derived. Contact NUMBERS are not in the SEAL\
+      \ sample either — the graph carries names, ids and email addresses, so the\
+      \ column is emitted with the contact point the graph has and the number\
+      \ left to capture."
 
   - anchor: security-admin-support
     heading: "Security Administration Support"
