@@ -139,7 +139,64 @@ does not read L1-1 as an isolated helper bug.
 
 ## Lens 2 — technical debt
 
-*(step 5)*
+**Perfect scores on every conventional axis, across all three modules** — and one finding
+that matters more than any count, because it turns Lens 1's finding from a house style
+into a single outlier.
+
+| hatch | `port` | `docgen` | `docmeta` |
+|---|---|---|---|
+| `# type: ignore` | **0** | **0** | **0** |
+| `# noqa` | **0** | **0** | **0** |
+| `cast(` | **0** | **0** | **0** |
+| `: Any` | **0** | **0** | **0** |
+| `# pragma: no cover` | **0** | **0** | **0** |
+| `TODO` / `FIXME` | **0** | **0** | **0** |
+
+Zero in every cell, 5,164 lines, `ruff` clean, 485 scoped tests green. No slot in this
+sweep has matched that.
+
+### L2-1 — `_git` is the ONE subprocess call in this slot that discards its exit code
+
+The slot makes four `subprocess.run(..., check=False)` calls. **Three of them read the
+return code and say so; the fourth does not — and the fourth is the one Lens 1 turns on.**
+
+| site | what it does with failure |
+|---|---|
+| `port_backlog_union.py:220` | `if result.returncode != 0:` → reports `stderr or stdout` with *"an unreadable producer side is a …"* |
+| `port_preflight.py:483` (render check) | `render.returncode == 0` gates the result; detail distinguishes *"renderer failed"* from *"no drift after re-render"* |
+| `port_preflight.py:502` (suite check) | reports `CheckResult("suite green", False, "SKIPPED — not a certification")` — **a skipped check is explicitly NOT a pass** |
+| **`port_preflight.py:359` (`_git`)** | **returns `.stdout.strip()` only; `returncode` and `stderr` discarded** |
+
+The third row is the important one. **This module already implements the exact remedy
+Lens 1 recommends** — it refuses to let an unrun check count as a passed one, and says so
+in the detail string a human reads. The vocabulary, the discipline and the precedent are
+all present, in the same file, sixty lines below the helper that lacks them.
+
+**Consequence.** This is not a module that does not know better; it is one place that was
+written before or apart from the rule the rest of the file follows. That changes the fix
+from "introduce a pattern" to "apply the file's own", and it changes the risk assessment:
+a reader auditing this module would see three correct sites and reasonably assume the
+fourth matched.
+
+**Cheapest correction:** `_git` returns the `CompletedProcess`, or raises on a non-zero
+exit. Callers in this module already assume success, so nothing downstream needs new
+branching — the failure simply stops being silent. Doing it in the same change as L1-1's
+`CheckResult` third state is natural but not required; the `_git` half alone removes the
+demonstrated vacuous pass.
+
+### What was checked and cut
+
+- **`port_rename_detect.py` at 638 lines is the slot's largest file.** Cut: no consequence
+  writable. It is a detector with a single job and the file carries no hatches at all.
+- **Seven ADR 0018 shims in scope.** Cut *here* deliberately — slot 6 found the trigger
+  fired and recommended one cross-component grooming for all eighteen. Re-reporting it
+  would produce a duplicate item for the same action, which is the outcome slot 6
+  explicitly warned against. Counted in Measurements, not re-derived.
+- **`drydocs_docmeta/` (1,105 lines) was not read line by line.** Stated plainly: this
+  firing spent its reading budget on the port half, because that is where the publish
+  boundary is and where the finding was. `docmeta` shows zero hatches, clean lint and green
+  tests, which is evidence of hygiene and not of design. A later firing wanting a docmeta
+  design read should not treat this slot as having done one.
 
 ## Ranked
 
