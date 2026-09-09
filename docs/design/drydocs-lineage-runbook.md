@@ -69,11 +69,12 @@ anything below.
 
 ### The awkward fact, stated rather than hidden
 
-**Three registered verbs reach four of the module's twelve extractors.** The other eight
-files — and the G58 archival report — are library seams with no CLI verb: reachable from
-Python, exercised by their unit tests, and not part of the chain. Appendix A is the
-census, because a runbook that implied a verb for each of them would be the easier
-document and the wrong one.
+**Of the module's eleven extractors, `lineage-extract` reaches four.** One more
+(`controlm_xml`) is reached by two verbs belonging to OTHER modules. The remaining six —
+and the G58 archival report, seven files in all — are library seams with no CLI verb:
+reachable from Python, exercised by their unit tests, and not part of any chain. Appendix
+A is the census, because a runbook that implied a verb for each of them would be the
+easier document and the wrong one.
 
 **In scope.** The three verbs (`lineage-extract`, `lineage-review`, `lineage-load`); the
 read/write zones each hop resolves and the refusal when a path sits outside one; the
@@ -96,7 +97,9 @@ TRUE: that is the SME's, at the review page.
 3. **The zones each hop reads.** Every lineage input resolves inside a *declared* read
    zone or the run refuses — there is no override flag, because a side door is exactly
    the undeclared acquisition route G81/G121 closed. `drydocs landing-zones` prints where
-   each one is on this machine; `config/data-zones.yaml` is the declaration.
+   each one is on this machine — it prints two tables, the manual landing zones keyed by
+   SOURCE id and the declared data zones keyed by ZONE id, and the lineage hops are split
+   across both.
 
    | Hop | Zone under `DRYDOCS_DATA_ROOT` | Required? | Helper in `drydocs_core/data_root.py` |
    |---|---|---|---|
@@ -106,9 +109,19 @@ TRUE: that is the SME's, at the review page.
    | 3 — AWS Glue base-table inventory | `glue-inventory/` | optional | `glue_inventory_dir` |
    | *output* — the staged artifact | `lineage/staged/` | write zone | `lineage_staged_dir` |
 
-   Note the registry path is `dpl-registry/`, not `dpl/`: the source registry declared
-   the wrong one from N12 until G81 corrected it, and an operator who followed the
-   registry had files nothing read.
+   Two notes on that table, both measured rather than inferred:
+
+   - **The registry hop is guarded differently from the other four.** Its four siblings
+     are declared read zones in `config/data-zones.yaml` (`controlm-exports`, `dpl-mac`,
+     `glue-inventory`, `lineage-staged`); there is no `dpl-registry` zone there. An
+     explicit `--registry-root` is checked against the MANUAL landing zones
+     `dpl:pipeline-registry` / `dpl:dataset-registry` instead. Both resolve to the same
+     `dpl-registry/` directory, so the path in the table is right for either route — but
+     if you go looking for the declaration, it is in the source registry and not in
+     `config/data-zones.yaml`.
+   - **The path is `dpl-registry/`, not `dpl/`:** the source registry declared the wrong
+     one from N12 until G81 corrected it, and an operator who followed the registry had
+     files nothing read.
 4. **Neo4j — for the `--write` step only.** Everything up to and including the plan runs
    with no database. Bring the container up per the startup/refresh companion when you
    reach step 4, not before.
@@ -133,16 +146,21 @@ the only state a run depends on.
    poetry run drydocs landing-zones
    ```
 
-   *Success:* every zone in the prerequisites table is listed with an absolute path. A
-   zone directory that does not exist yet is fine — an absent optional source is skipped
-   and counted, never silently dropped.
+   *Success:* two tables print and each zone in the prerequisites table appears in one of
+   them, with an absolute path and a state. `controlm-exports`, `dpl-mac`,
+   `glue-inventory` and `lineage-staged` are in the data-zone table;
+   `dpl:pipeline-registry` and `dpl:dataset-registry` are in the manual landing-zone
+   table above it. A zone whose state is `absent` is fine — an absent optional source is
+   skipped and counted, never silently dropped.
 3. **Check the environment.**
 
    ```powershell
    poetry run drydocs env-doctor
    ```
 
-   *Success:* no refusal about `DRYDOCS_DATA_ROOT`.
+   *Success:* it exits 0 and the `DRYDOCS_DATA_ROOT` row reads `set`. The many rows
+   reading `not used here` are other subsystems' variables and are not this chain's
+   concern.
 
 <!-- anchor: refresh-ingest -->
 ## Refresh / ingest
@@ -294,11 +312,18 @@ by the caller. See Verify for how to read that refusal.
 - **Plan** — reads only. This is the rollback-free step by design: it exists so the
   irreversible one can be inspected first.
 - **Load (`--write`)** — re-running the same plan is safe: MERGE on the node key
-  converges. To *withdraw* what a load wrote, the handle is the load run id printed with
-  the plan — every node and rel written carries it, so the blast radius of a targeted
-  cleanup is exactly one run. **The destructive last resort** is the module's own
-  database (`drydocs`) being reset per the startup/refresh companion, which discards
-  every loader's work, not just this one's — never reach for it to undo a lineage load.
+  converges. To *withdraw* what a load wrote, **the handle is the EXTRACT's run id, not
+  the load's**: every node and rel is stamped `extract_run_id` / `extract_code_commit`,
+  while the `load_run_id` printed with the plan keys the `:JobRun` node that brackets the
+  write and carries the artifact's sources block. Both are printed, and confusing them
+  selects the wrong rows.
+
+  **There is no withdraw verb.** Say that plainly rather than imply one: a targeted
+  cleanup is a hand-written `MATCH` on `extract_run_id` against the `drydocs` database,
+  reviewed before it runs like any other destructive statement. **The destructive last
+  resort** is resetting that database per the startup/refresh companion, which discards
+  every loader's work and not just this one's — never reach for it to undo a lineage
+  load.
 
 <!-- anchor: troubleshooting -->
 ## Troubleshooting
@@ -310,7 +335,7 @@ by the caller. See Verify for how to read that refusal.
 | `no staged lineage artifact in <dir>` | Step 3 ran before step 1, or `--out-dir` sent the artifact somewhere the load does not look | Run `lineage-extract`, or pass `--artifact <path>` |
 | The plan says `0 confirmed` and plans nothing | No `--confirmed` file, or a file in which nothing is marked `confirmed`. This is the gate working | Export decisions from the review page and pass the file |
 | `N decision(s) name a rel this artifact does not carry` | The review page was rendered from a DIFFERENT extract than the artifact being loaded | Re-render `lineage-review` from this artifact's sources and decide again |
-| `code … DIRTY TREE - staged from uncommitted code` | The extract ran against uncommitted changes, so its provenance cannot be reproduced from a commit | Commit, re-extract. Acceptable for a dev run; never for evidence |
+| `code … DIRTY TREE - staged from uncommitted code` | The extract ran against uncommitted changes, so the `extract_code_commit` it stamps cannot be resolved to a tree | Commit, re-extract. Acceptable for a dev run; never for evidence |
 | `GATE-BOUND: <LABEL> … not active` | The vocabulary entry is `planned`. The writer refuses it — the SME gate has not flipped it | Take it to the HITL gate (`docs/restructure/03-hitl-sme-flow.md`); the ruling lands in `config/gate-log.md`. Do not edit the registry to get past a refusal |
 | `N confirmed rel(s) not written` after a successful load | A `ControlMJob` endpoint is not in the graph (the M3 load owns those), or a file-op candidate had no owning job | Run the M3 load first, then re-run this one; check the plan's unresolved file-op count |
 | Hop 1 runs but no PRECMD/POSTCMD lineage appears | The variables CSV is absent — in a fresh clone the sample is untracked | Pass `--variables`, or land one in the `controlm-exports/` zone |
@@ -333,9 +358,10 @@ by the caller. See Verify for how to read that refusal.
 
 ### A. The extractor census — what a verb reaches, and what only Python reaches
 
-Twelve extractors plus the archival report. Four are in the `lineage-extract` chain; the
-rest are library seams with no CLI verb, reached by importing them. Listing them is the
-point: each one is a real, tested capability, and none of them is behind a command.
+Eleven extractors plus the archival report — twelve files. Four are in the
+`lineage-extract` chain, one is reached by other modules' verbs, and the remaining seven
+are library seams reached only by importing them. Listing them is the point: each one is a
+real, tested capability, and seven of them are behind no command at all.
 
 | File | Reached by | What it reads |
 |---|---|---|
@@ -343,7 +369,7 @@ point: each one is a real, tested capability, and none of them is behind a comma
 | `drydocs_lineage/extractors/dpl_mac.py` | **hop 2a** of `lineage-extract` | a DPL Metadata-As-Code root — per-pipeline JSON sets keyed by GUID |
 | `drydocs_lineage/extractors/dpl_registry.py` | **hop 2a** of `lineage-extract` | per-SEAL registry Swagger exports, taxonomy-first |
 | `drydocs_lineage/extractors/glue_tables.py` | **hop 3** of `lineage-extract` | AWS Glue base-table inventory exports |
-| `drydocs_lineage/extractors/controlm_xml.py` | the **cmdline-resolution** chain (its own runbook) | Control-M XML definition exports — folders, jobs, ordered variables |
+| `drydocs_lineage/extractors/controlm_xml.py` | `resolve-cmdline-staging` (the cmdline chain) and `profile-folder-set` (drydocs-remediation) — **other modules' verbs, not this one's** | Control-M XML definition exports — folders, jobs, ordered variables |
 | `drydocs_lineage/extractors/rua_inventory.py` | library only | one `rua_*.tar.gz` collector bundle from the `rua/incoming/` zone |
 | `drydocs_lineage/extractors/rua_code_ops.py` | library only | the script/profile CONTENT a rua bundle carried back |
 | `drydocs_lineage/extractors/code_repo.py` | library only | the code-repo provenance origin (repo + ref + commit + path) |

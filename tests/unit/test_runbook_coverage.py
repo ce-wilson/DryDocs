@@ -168,11 +168,13 @@ RUNBOOK_DISPOSITION: dict[str, tuple[str | None, str, str]] = {
         "their depth and this one routes to them in a table, because absorbing them would "
         "have produced one document at three different scopes. It is not only an index -- "
         "the measurement that settled it is that NEITHER chain runbook names lineage-extract "
-        "or lineage-load (both postdate lineage-mac Rev 3) and neither names eight of the "
-        "twelve extractors, so the module runbook OWNS the LIN1/LIN2 verb chain, the read "
+        "or lineage-load (both postdate lineage-mac Rev 3), and between them they name only "
+        "two of the eleven extractor modules (dpl_mac, controlm_xml) -- so the module runbook "
+        "OWNS the LIN1/LIN2 verb chain, the read "
         "zones, the curation gate and the write boundary. Like V7 it states the awkward fact "
-        "rather than hiding it: three verbs reach four of twelve extractors and the other "
-        "eight are library seams with no command, censused in Appendix A",
+        "rather than hiding it: lineage-extract reaches four of the eleven extractors, one "
+        "more is reached only by other modules' verbs, and the remaining six plus archival.py "
+        "are library seams with no command, censused in Appendix A",
     ),
     "drydocs-mapping-store-runbook.md": (
         None,
