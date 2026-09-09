@@ -7,7 +7,7 @@ phase: 10
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: [V7]
 inputs:
 - docs/design/drydocs-remediation-runbook.md
@@ -40,3 +40,79 @@ notes: |
   module drydocs-remediation because the profiler and its detectors are that component; epic
   sme-runbooks and phase 10 because the fixture exists to make V7 demonstrable. depends_on V7,
   which is done. p2.
+
+  DONE on wip/rem2-laptop (Lane B, laptop, 2026-09-09). 3 folders, 12 jobs, 21 findings,
+  and all 17 rules the detectors implement. The verb now runs end-to-end in a clone:
+  `poetry run drydocs profile-folder-set tests/fixtures/remediation/synthetic-folder-set-export`
+  reports folders=3 subfolders=2 jobs=12, 8/9 slots not-supplied, findings=21.
+
+  PLACEMENT CHANGED FROM THE ITEM'S inputs, AND THE ITEM'S OWN GOAL IS THE REASON. Clause
+  (a) says "beside the other samples" and inputs named drydocs/data/samples/. It went to
+  tests/fixtures/remediation/synthetic-folder-set-export/ instead. drydocs/data/** is
+  never-port, so a fixture there is in every clone of THIS repo and in NO consumer clone -
+  and the item exists so the runbook "can be demonstrated in a clone" for the support
+  audience, which is the consumer side. Three consequences decided it: the runbook would
+  print a path that audience does not have; clause (e)'s test would need a J8/CORE4 skip
+  guard and so would be vacuous on the side that matters; and that is precisely the ruling
+  Lane A made ONE DAY EARLIER at 97e2d5d3, restoring three skips CORE9 removed because a
+  tracked never-port sample is absent on every consumer. tests/** is `evaluate`, it
+  crosses, the module's other two synthetic fixtures already live in
+  tests/fixtures/remediation/, and the runbook already cited that directory for the
+  transcript fixture. Worth a groom correction to the item's inputs field.
+
+  (a) READABLE, NOT REPRESENTATIVE, and two design choices carry that. The four command
+  requirements are declared at FOLDER scope, so R32 fires twice on purpose rather than 40+
+  times as noise that buries every other rule; and JOB0130_DEMO_FEED_CTL is deliberately
+  COMPLIANT - a set where every job is broken teaches nothing about what right looks like,
+  and a test pins that it stays clean.
+
+  (a) TWO ACCIDENTS FOUND BY PROBING, BOTH KEPT because they are true consequences rather
+  than noise, and both now documented in the header:
+    - PIPELINE_ID raises R31 (orphan) as well as R33, and that IS R33's point: the command
+      already carries the fact as a literal, so the declared variable is referenced by
+      nothing.
+    - %%RUN-DATE raises R30 and R31 alongside R38, because a %% reference stops at the
+      illegal character: `%%RUN-DATE` reads as a reference to undeclared %%RUN and leaves
+      RUN-DATE itself referenced by nothing. The name is not merely non-standard - it
+      cannot be used. That is a better argument for R38's must-fix severity than the rule
+      text makes.
+  Two accidents were REMOVED as genuine noise: a cross-folder R35 pairing on FILE_EXTENSION
+  (two jobs in different folders happened to share name+value) and a second R37 on
+  JOB0070, which muddied the R1/R2 job.
+
+  (c) The header names the rule each job exercises, one line each, and a test asserts no
+  rule the detectors RAISE is missing from it. The coverage test reads
+  CONFORMANCE_RULE_IDS from the module (J37), never the header - so adding a rule to the
+  registry without adding a fixture case fails at the one moment anyone would think to
+  extend the fixture.
+
+  (b) VALUE SWEEP, not a field check. Every id-shaped run (5-6 digits) in the XML must fall
+  in the reserved 70001-70099 block; the fixture uses 70004 and 70005, and the demo samples
+  use 70001-70003, so the block read stays true with no collision. tests/fixtures/ is
+  OUTSIDE the publish-boundary guard's scan A, so that test IS the sweep for this file -
+  the J15 lesson, and the ids sit inside folder-name strings here on purpose.
+
+  (e) The report's TOP-LEVEL shape only: the eight artifact keys, the folder list, 12 jobs,
+  and that open slots carry a null rather than a default. No prose asserted. The CLI verb
+  gets one test on its actual contract - exit code plus the artifact it writes - and reads
+  none of its summary output (the J37 exception, stated).
+
+  FOR LANE A AT THE MERGE - ONE RENDER, AND IT IS NEW. This item edits
+  docs/design/drydocs-remediation-runbook.md, so its committed .html is now stale by 883
+  bytes (measured: 34545 committed vs 35428 fresh). docs/design/*.html is Lane A's render
+  pen, so it is deliberately NOT regenerated here. This matters more than usual THIS burst:
+  DOC9 (wip/doc9-laptop) adds test_committed_design_pages_match_their_sources, so once both
+  branches are merged, that guard FAILS on this stem until
+  `poetry run python scripts/render_design_doc.py docs/design/*.md` runs. On this branch
+  alone the full suite is green (3887 passed / 15 skipped / 0 failed) because DOC9's guard
+  is not here - so a green REM2 branch is not evidence about the merged tree. Render at the
+  merge and it is a non-event.
+
+  VERIFIED: full suite 3887 passed / 15 skipped / 0 failed; the J57 family plus
+  test_skip_guard_policy, test_never_port_citations, test_remediation_profile,
+  test_remediation_conformance and test_design_doc - 148 passed; ruff check and
+  ruff format --check clean. test_runbook_currency passes, which is what checks the
+  runbook's new path resolves.
+
+  No PORT-MANIFEST row to hand back: the new paths are under tests/**, already covered by
+  the `evaluate` row, and the fall-through guard is green.
