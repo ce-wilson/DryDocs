@@ -13,9 +13,14 @@
 # census, P2c multi-group membership, P3 DC-domain match vs CM_DEF_VTAB,
 # P4 BOTH-match collisions + P4c case-fold, P5 capture uniformity — plus the
 # 22-DC-vs-production SCOPE CALL (HITL; gate-log residual).
+# AMENDED 2026-09-09 (producer, S5 path sweep, CFG7) - a RIDER, not an edit: the text below
+# cites one or both pre-S5 monolith file names as they were when the page was written.
+# Since d84d86bc (S5, the per-domain shard) `config/taxonomy-ontology-map.yaml` is the directory `config/taxonomy-ontology-map/`.
+# Every clause reads as written (L25: signed pages get riders, never edits); the old names
+# are kept in the text on purpose so a citation of a signed record still matches it.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
-updated: 2026-07-22
+updated: 2026-09-09
 
 id: controlm-hosts-topology
 title: "SME Gate — CM_HOSTS host groups, execution hosts, and the job NODE_ID resolution rule"

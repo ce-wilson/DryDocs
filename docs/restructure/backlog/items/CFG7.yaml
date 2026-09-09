@@ -7,7 +7,7 @@ phase: 8
 agent: main
 model: haiku
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - config/gate-prompts/
@@ -22,3 +22,11 @@ acceptance: |
   guard would fail on the marker recording its own fix.
 notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). premise-drift-2026-09-09.md section 6 ask 2 (25 of 30 broken citations are this one pair).
+
+  DONE 2026-09-09 (Lane A, desktop). Nineteen prompts carry a dated header RIDER (a comment
+  block after each page's leading comment naming which of the two S5-retired file names the page
+  cites and what each is now); no clause text moved, so L25 holds on the signed pages; updated:
+  set to 2026-09-09 on all nineteen per the per-side rule. The three open items whose notes cite
+  the names (K26, E1, L19) were left alone as records of the past. RELAY-52 names the nineteen
+  for the company, whose canonical-company copies win. test_config_identity_header and
+  test_gate_pages green; the identity-header guard confirms the rider sits above the keys.

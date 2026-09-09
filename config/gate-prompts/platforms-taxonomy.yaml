@@ -9,9 +9,14 @@
 # note) and B5 (airflow row) are residual calls.
 # Mechanism-only: public vendor names only; internal tool values and deployed
 # instances stay company-side (PUBLISH-BOUNDARY.md).
+# AMENDED 2026-09-09 (producer, S5 path sweep, CFG7) - a RIDER, not an edit: the text below
+# cites one or both pre-S5 monolith file names as they were when the page was written.
+# Since d84d86bc (S5, the per-domain shard) `config/taxonomy-ontology-map.yaml` is the directory `config/taxonomy-ontology-map/`.
+# Every clause reads as written (L25: signed pages get riders, never edits); the old names
+# are kept in the text on purpose so a citation of a signed record still matches it.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
-updated: 2026-07-21
+updated: 2026-09-09
 
 id: platforms-taxonomy
 title: "SME Gate — retire :SchedulerKind into the software-registry model: no new classes (role over class), USES_SOFTWARE landing, REQUIRES_SCHEDULER retirement"

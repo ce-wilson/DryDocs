@@ -9,9 +9,14 @@
 # property→term binding at all. This gate decides both the terms AND the home.
 #
 # Mechanism-only: property names and CURIEs; no data values.
+# AMENDED 2026-09-09 (producer, S5 path sweep, CFG7) - a RIDER, not an edit: the text below
+# cites one or both pre-S5 monolith file names as they were when the page was written.
+# Since d84d86bc (S5, the per-domain shard) `drydocs_core/ontology/relationship_vocabulary.yaml` is the directory `drydocs_core/ontology/relationship_vocabulary/`.
+# Every clause reads as written (L25: signed pages get riders, never edits); the old names
+# are kept in the text on purpose so a citation of a signed record still matches it.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
-updated: 2026-08-04
+updated: 2026-09-09
 
 id: envelope-property-terms
 title: "SME Gate — standard-term bindings for the four audit-envelope properties (dct:/prov:), and where property-term bindings live"

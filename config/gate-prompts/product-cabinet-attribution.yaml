@@ -16,9 +16,14 @@
 # SIGNED OFF 2026-07-20 (SME in-session, §F) — transcribed to config/gate-log.md same day;
 # map entry product-cabinet-attribution proposed -> confirmed. The three catalog_cabinet_*
 # vocab entries stay planned until the K6 supplement lands (honest-lifecycle).
+# AMENDED 2026-09-09 (producer, S5 path sweep, CFG7) - a RIDER, not an edit: the text below
+# cites one or both pre-S5 monolith file names as they were when the page was written.
+# Since d84d86bc (S5, the per-domain shard) `config/taxonomy-ontology-map.yaml` is the directory `config/taxonomy-ontology-map/`; `drydocs_core/ontology/relationship_vocabulary.yaml` is the directory `drydocs_core/ontology/relationship_vocabulary/`.
+# Every clause reads as written (L25: signed pages get riders, never edits); the old names
+# are kept in the text on purpose so a citation of a signed record still matches it.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
-updated: 2026-07-20
+updated: 2026-09-09
 
 id: product-cabinet-attribution
 title: "SME Gate — Product Cabinet attribution model (Area Product Owner, Product Owner, Product Architect, Tech Partner, Data Owner, Data Certifier, Analytics Lead)"

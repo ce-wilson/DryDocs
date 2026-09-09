@@ -55,9 +55,14 @@
 # GATE-BOUND: no node class change, no edge, no loader, no pull until every section signs.
 # Mechanism-only: no real functional ids, names, SEAL ids, SIDs, or addresses in this
 # repo — real rows are Internal and live company-side.
+# AMENDED 2026-09-09 (producer, S5 path sweep, CFG7) - a RIDER, not an edit: the text below
+# cites one or both pre-S5 monolith file names as they were when the page was written.
+# Since d84d86bc (S5, the per-domain shard) `config/taxonomy-ontology-map.yaml` is the directory `config/taxonomy-ontology-map/`.
+# Every clause reads as written (L25: signed pages get riders, never edits); the old names
+# are kept in the text on purpose so a citation of a signed record still matches it.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
-updated: 2026-09-02
+updated: 2026-09-09
 
 id: fid-identity-and-scope
 title: "SME Gate — functional-id identity (FID vs FID name), ownership as an as-of fact, transfer detection, and the ingest scope"

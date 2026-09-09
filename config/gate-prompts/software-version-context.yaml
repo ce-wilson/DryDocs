@@ -21,9 +21,14 @@
 # until §G signs. Mechanism-only: no real SEAL ids, functional ids, install roots,
 # person names, or email addresses in this repo — real rows are Internal and live
 # company-side.
+# AMENDED 2026-09-09 (producer, S5 path sweep, CFG7) - a RIDER, not an edit: the text below
+# cites one or both pre-S5 monolith file names as they were when the page was written.
+# Since d84d86bc (S5, the per-domain shard) `config/taxonomy-ontology-map.yaml` is the directory `config/taxonomy-ontology-map/`.
+# Every clause reads as written (L25: signed pages get riders, never edits); the old names
+# are kept in the text on purpose so a citation of a signed record still matches it.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
-updated: 2026-08-09
+updated: 2026-09-09
 
 id: software-version-context
 title: "SME Gate — software VERSION as context: evidence grain, edge shape, version cardinality, and how an adhoc email attaches as evidence"

@@ -6,9 +6,14 @@
 # past status: proposed. Mechanism-only: publishable vendor-public launcher names
 # and synthetic examples only — no real CMD_LINE values, job names, or SEAL ids.
 # classification: Internal-Public.
+# AMENDED 2026-09-09 (producer, S5 path sweep, CFG7) - a RIDER, not an edit: the text below
+# cites one or both pre-S5 monolith file names as they were when the page was written.
+# Since d84d86bc (S5, the per-domain shard) `drydocs_core/ontology/relationship_vocabulary.yaml` is the directory `drydocs_core/ontology/relationship_vocabulary/`.
+# Every clause reads as written (L25: signed pages get riders, never edits); the old names
+# are kept in the text on purpose so a citation of a signed record still matches it.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
-updated: 2026-07-20
+updated: 2026-09-09
 
 id: software-usage-patterns
 title: "SME Gate — Control-M CMD_LINE invocation-pattern -> software product table (plan-07 Phase 3)"

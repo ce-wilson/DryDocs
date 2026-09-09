@@ -3919,6 +3919,28 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
 
   Nothing is asked back.
 
+- **RELAY-52 - NINETEEN GATE PROMPTS CARRY A DATED S5 PATH RIDER; YOUR COPIES WIN, SO TAKE THE
+  RIDER BLOCK BY HAND** [VERIFIED-PRODUCER] (2026-09-09, producer CFG7, venue desktop). The
+  premise-drift review measured 30 broken path citations across 19 of the 60 gate prompts, 25 of
+  them one pair: `config/taxonomy-ontology-map.yaml` and
+  `drydocs_core/ontology/relationship_vocabulary.yaml`, both DIRECTORIES of the same name since
+  `d84d86bc` (S5, the per-domain shard). CFG7 swept them ONCE, deliberately not with a guard: the
+  sanctioned edit shape keeps the old path in the text, so a bare-path guard would fail on the
+  marker recording its own fix. The sweep is a header RIDER - a dated comment block after each
+  page's leading comment, saying which of the two names the page cites and what each is now - and
+  NO clause text moved (L25: a signed page gets a rider, never an edit; a signed record's
+  citation still matches the text). `updated:` moved to 2026-09-09 on the nineteen, per the
+  per-side rule in `per_side_fields` (RELAY-50): set it to YOUR apply date if you take the rider.
+  `config/gate-prompts/**` is canonical-company, so nothing here reaches you by a take; the
+  nineteen are: bmc-docs-lexical-load, code-graph-package-layer, controlm-avg-run-supplement,
+  controlm-hosts-topology, controlm-q1q3-phase1, doc-traceability-feedback, email-dl-contact-point,
+  envelope-property-terms, fid-identity-and-scope, platforms-taxonomy, product-cabinet-attribution,
+  rua-load-shapes, seal-app-ref-edge-reshape, seal-attribution-match-policy,
+  seal-tom-attribution-reshape, self-documentation-code-graph, software-usage-patterns,
+  software-version-context, sosa-jobrun-observation. The three open items whose NOTES cite the
+  old names (K26, E1, L19) were left alone: a note describing 2026-06 or 2026-08 work names the
+  file as it was, which is a record, not a claim. Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has

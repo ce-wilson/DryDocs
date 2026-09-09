@@ -61,9 +61,14 @@
 # path (drydocs/cli.py and kin). There is no company data in a code snapshot — which
 # is itself part of why this item is cheap, and is stated here so the classification
 # is not re-derived later.
+# AMENDED 2026-09-09 (producer, S5 path sweep, CFG7) - a RIDER, not an edit: the text below
+# cites one or both pre-S5 monolith file names as they were when the page was written.
+# Since d84d86bc (S5, the per-domain shard) `drydocs_core/ontology/relationship_vocabulary.yaml` is the directory `drydocs_core/ontology/relationship_vocabulary/`.
+# Every clause reads as written (L25: signed pages get riders, never edits); the old names
+# are kept in the text on purpose so a citation of a signed record still matches it.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
-updated: 2026-09-02
+updated: 2026-09-09
 
 id: self-documentation-code-graph
 title: "SME Gate — Self-documentation: load the DryDocs code-dependency snapshot into `drydocs` under a Project root, binding the unused SWO terms"

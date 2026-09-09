@@ -16,9 +16,14 @@
 # RESIDUALS (HITL, at the P4-loader build): dedupe rule, sanity cap,
 # ctlm_id-absence join consequence. Coverage baseline per P4: stats→jobs
 # 85.7%, jobs→stats 29.6% (partial enrichment by construction).
+# AMENDED 2026-09-09 (producer, S5 path sweep, CFG7) - a RIDER, not an edit: the text below
+# cites one or both pre-S5 monolith file names as they were when the page was written.
+# Since d84d86bc (S5, the per-domain shard) `config/taxonomy-ontology-map.yaml` is the directory `config/taxonomy-ontology-map/`.
+# Every clause reads as written (L25: signed pages get riders, never edits); the old names
+# are kept in the text on purpose so a citation of a signed record still matches it.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
-updated: 2026-07-22
+updated: 2026-09-09
 
 id: controlm-avg-run-supplement
 title: "SME Gate — CM_AVG_RUN runtime-stats property supplement onto ControlMJob"
