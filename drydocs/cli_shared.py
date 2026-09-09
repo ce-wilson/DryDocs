@@ -79,6 +79,9 @@ from .loaders.email_extracts import EmailExtractsLoader
 from .loaders.essential_graphrag import (
     EssentialGraphragLoader,
 )
+from .loaders.fix_tracking import (
+    FixTrackingLoader,
+)
 from .loaders.folder_attribution import (
     FolderAttributionLoader,
 )
@@ -181,6 +184,12 @@ LOADER_SOURCE: dict[str, str] = {
 # Loaders with deliberately NO source-registry id — every entry needs a written
 # reason (silent omissions are the defect this exists to end).
 SOURCELESS_LOADERS: dict[type, str] = {
+    FixTrackingLoader: (
+        "the input is a drydocs.remediation.fix-tracking.v1 change-set THIS "
+        "system emits from a remediation session (gate remediation-fix-tracking "
+        "§C1), not a feed from an external source system — there is no "
+        "registry entry to bind and no crosswalk for the D3 gate to confirm"
+    ),
     ManualSealAttributionLoader: (
         "SME-authored tier-5 mapping CSVs gated by config/manual-loads/"
         "manifest.yaml (gate seal-attribution-match-policy §F) — a human "
@@ -342,6 +351,7 @@ COMMAND_LOADERS: dict[str, tuple[type, ...]] = {
     "load-folder-attribution": (FolderAttributionLoader,),
     "load-server-inventory": (ServerInventoryLoader,),
     "load-manual-mappings": (ManualSealAttributionLoader,),
+    "load-fix-tracking": (FixTrackingLoader,),
 }
 
 # Loader-running commands that are OPERATOR-DRIVEN, not sequence members:
@@ -352,7 +362,14 @@ COMMAND_LOADERS: dict[str, tuple[type, ...]] = {
 # sequence member — the three steps it delegates to are. Declaring it here is what
 # keeps "every loader-running command is placed" true without putting a fourth,
 # redundant step in the canonical sequence.
-AD_HOC_COMMANDS: frozenset[str] = frozenset({"load", "load-manual-mappings", "refresh-reference"})
+# `load-fix-tracking` is ad hoc BY RULING, not by omission: gate
+# remediation-fix-tracking §C1 chose a dedicated loader over a pass inside an
+# existing Control-M loader precisely so a fix is markable the hour its package
+# ships — putting it in a refresh cadence would re-create the coupling §C2 was
+# declined for.
+AD_HOC_COMMANDS: frozenset[str] = frozenset(
+    {"load", "load-manual-mappings", "load-fix-tracking", "refresh-reference"}
+)
 
 # ---- G80: no loader is silently outside every chain -------------------------
 # A LOADER_REGISTRY loader that no COMMAND_LOADERS command runs is reachable

@@ -1,0 +1,97 @@
+// =============================================================================
+// fix_tracking.cypher  —  drydocs.remediation.fix-tracking.v1 change-sets ->
+//   the three ruled remediation_* properties on :ControlMJob / :ControlMFolder
+//
+// Gate remediation-fix-tracking, SIGNED OFF 2026-08-12 (config/gate-log.md).
+// §C1 ruled a DEDICATED drydocs-load loader over C2's "a pass inside an
+// existing Control-M loader", because a fix must be markable the hour its
+// package ships and C2 would have coupled fix cadence to ingest cadence.
+//
+// MATCH, NEVER MERGE (§C1). A fix target that does not exist is an ERROR, not
+// a node to invent — the fix package cites the graph's own keys, so a MERGE
+// here would answer "which node did we fix?" by creating one. Note that MATCH
+// alone does not RAISE on a miss, it silently writes nothing: the all-or-
+// nothing preflight in fix_tracking.py is what turns a missing target into a
+// refusal, and this template is only ever reached once every target resolved.
+//
+// FIX TRACKING IS A FOURTH AXIS (§A1). It never reuses the envelope names —
+// source_created_by/at and source_updated_by/at stay source-system authorship
+// (fence ratified at controlm-q1q3-phase1 / envelope-property-terms) — and it
+// is not pull tracking (*_seen_at) or load provenance (WAS_GENERATED_BY). The
+// remediation_ prefix is what keeps the four readable apart on a node
+// inspector (§B1).
+//
+// TWO MODES, ONE TEMPLATE. $mode = 'apply' SETs the three properties;
+// $mode = 'reject' REMOVEs them. The ruled enum has no 'rejected' member
+// (§B2) — rejection is the caller's intent, not artifact content, so the same
+// v1 change-set that applied a fix is what un-applies it. The reject branch is
+// FENCED on remediation_fix_id: a stale rejection must never strip a NEWER
+// fix's marks off the node, which is the one way this loader could destroy a
+// fact it did not write.
+//
+// ONE DATE, THE LAST TRANSITION (§B3). remediation_status_date is overwritten
+// on every transition; the full history lives in the fix package, which is
+// where the alternative (per-status dates) was ruled out to avoid drift.
+//
+// Parameters: $batch (validated FixTrackingRow dicts — kind, label, folder_id,
+//             job_id, display_name, and the three ruled properties),
+//             $run_id, $loaded_at, $loader, $source_label, $mode.
+// =============================================================================
+
+UNWIND $batch AS row
+
+// The row's `kind` discriminator picks the branch; each branch MATCHes on that
+// label's NODE KEY verbatim (constraints.cypher). A UNION subquery rather than
+// two OPTIONAL MATCHes: this way a row that resolves to nothing produces no
+// output row at all, so the write clauses below cannot run against a null.
+CALL {
+  WITH row
+  WITH row WHERE row.kind = 'job'
+  MATCH (n:ControlMJob {folder_id: row.folder_id, job_id: row.job_id})
+  RETURN n
+  UNION
+  WITH row
+  WITH row WHERE row.kind = 'folder'
+  MATCH (n:ControlMFolder {folder_id: row.folder_id})
+  RETURN n
+}
+
+WITH row, n
+
+// §B1 — the three ruled names, applied together. A partial application would
+// leave a node claiming a status with no fix id to trace it to.
+FOREACH (_ IN CASE WHEN $mode = 'apply' THEN [1] ELSE [] END |
+  SET n.remediation_fix_id          = row.remediation_fix_id,
+      n.remediation_status          = row.remediation_status,
+      n.remediation_status_date     = date(row.remediation_status_date),
+      n.remediation_last_run_id     = $run_id,
+      n.remediation_last_loaded_at  = datetime($loaded_at)
+)
+
+// Rejection removes the axis (§B2). Fenced on the fix id: the node keeps
+// whatever a LATER fix wrote, and a rejection for a fix this node no longer
+// carries is a no-op rather than a silent erasure.
+FOREACH (_ IN CASE
+           WHEN $mode = 'reject' AND n.remediation_fix_id = row.remediation_fix_id
+           THEN [1] ELSE [] END |
+  REMOVE n.remediation_fix_id,
+         n.remediation_status,
+         n.remediation_status_date,
+         n.remediation_last_run_id,
+         n.remediation_last_loaded_at
+)
+
+// Standard :JobRun provenance (§C1). Unconditional, unlike the delta-only
+// WAS_GENERATED_BY the ingest loaders write (doc 06 Phase 2, provenance-edge
+// diet): a fix-tracking run is a HUMAN INTERVENTION on a handful of nodes, not
+// a nightly sweep over thousands, so there is no edge-count pressure to
+// diet against — and "which run marked this fix, and when" is the question
+// the axis exists to answer. It stays true for a rejection too, which is the
+// run that removed the properties and would otherwise leave no trace at all.
+WITH row, n
+MATCH (run:JobRun {run_id: $run_id})
+MERGE (n)-[r:WAS_GENERATED_BY {source: 'fix-tracking'}]->(run)
+  ON CREATE SET r.first_seen_at = datetime($loaded_at),
+                r.loader        = $loader,
+                r.mode          = $mode
+SET r.last_seen_at = datetime($loaded_at);

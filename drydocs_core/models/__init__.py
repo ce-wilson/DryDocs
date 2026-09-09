@@ -40,6 +40,7 @@ from .controlm import (
 from .docs import BmcDocChunkRow
 from .infrastructure import ServerInventoryRow
 from .registry import SoftwareProductRow
+from .remediation import FixTrackingRow
 from .seal import SealApplicationRow, SealContactRow
 
 __all__ = [
@@ -70,4 +71,6 @@ __all__ = [
     "ManualMappingRow",
     # Self-documentation code graph (G33 / Epic U)
     "CodeModuleRow",
+    # Fix tracking (gate remediation-fix-tracking; G90)
+    "FixTrackingRow",
 ]
