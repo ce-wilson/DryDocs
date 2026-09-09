@@ -498,7 +498,6 @@
         }
       ],
       "wired": true,
-      "wired_reason": null,
       "class_facts": {
         "layer": "data",
         "taxonomy_category": "Pipelines",
@@ -576,7 +575,6 @@
         }
       ],
       "wired": true,
-      "wired_reason": null,
       "class_facts": {
         "layer": "data",
         "taxonomy_category": "Pipelines",
@@ -663,7 +661,6 @@
         }
       ],
       "wired": true,
-      "wired_reason": null,
       "class_facts": {
         "layer": "data",
         "taxonomy_category": "Pipelines",
@@ -733,7 +730,6 @@
         }
       ],
       "wired": true,
-      "wired_reason": null,
       "class_facts": {
         "layer": "data",
         "taxonomy_category": "Pipelines",
@@ -784,7 +780,6 @@
       "ontology_mappings": [],
       "loaders": [],
       "wired": false,
-      "wired_reason": "no loader in LOADER_REGISTRY binds this id on this side; the meaning is signed (controlm-q1q3-phase1, the C3/C4 normalization gates) and the loader for the variable view is not built",
       "class_facts": {
         "layer": "data",
         "taxonomy_category": "Pipelines",
@@ -862,7 +857,6 @@
         }
       ],
       "wired": true,
-      "wired_reason": null,
       "class_facts": {
         "layer": "data",
         "taxonomy_category": "Infrastructure",
@@ -925,7 +919,6 @@
       ],
       "loaders": [],
       "wired": false,
-      "wired_reason": "no loader in LOADER_REGISTRY binds this id on this side; the meaning is signed (controlm-avg-run-supplement, 2026-07-14) and the P4 run-stats loader exists company-side only, a back-flow candidate here",
       "class_facts": {
         "layer": "data",
         "taxonomy_category": "Pipelines",
@@ -981,7 +974,6 @@
       ],
       "loaders": [],
       "wired": false,
-      "wired_reason": "no extractor or loader is built; the run-history feed is planned (jobrun-observation mapping, status proposed)",
       "class_facts": {
         "layer": "data",
         "taxonomy_category": "Pipelines",
@@ -1027,7 +1019,6 @@
       "ontology_mappings": [],
       "loaders": [],
       "wired": false,
-      "wired_reason": "no loader is built; the meaning is signed (K17, 2026-08-19, 33/33) and the build is K26 - this entry flips there, in the same commit as the flag (N13)",
       "class_facts": {
         "layer": "data",
         "taxonomy_category": "People & Org",
@@ -1073,7 +1064,6 @@
       "ontology_mappings": [],
       "loaders": [],
       "wired": false,
-      "wired_reason": "no extractor or loader, by design; registered as the replica GRAMMAR's worked example (the id shape) for a future feed",
       "class_facts": {
         "layer": "data",
         "taxonomy_category": "ITSM / Gov",
@@ -1119,7 +1109,6 @@
       "ontology_mappings": [],
       "loaders": [],
       "wired": false,
-      "wired_reason": "the G47 extractor stages only and no loader is bound; the precedence ruling against the psgmgr replica datasets (D11, controlm-definition-precedence, armed 2026-09-07) is open",
       "class_facts": {
         "layer": "technology",
         "taxonomy_category": "Pipelines",
@@ -1165,7 +1154,6 @@
       "ontology_mappings": [],
       "loaders": [],
       "wired": false,
-      "wired_reason": "the crosswalk is signed (autosys-crosswalk, 2026-07-14); the loader is unbuilt and separately gated, and no AutoSys export is ingested on this side",
       "class_facts": {
         "layer": "technology",
         "taxonomy_category": "Pipelines",
@@ -1211,7 +1199,6 @@
       "ontology_mappings": [],
       "loaders": [],
       "wired": false,
-      "wired_reason": "the crosswalk is signed (airflow-crosswalk, 2026-07-14); the loader is unbuilt and separately gated, and no Airflow DAG export is ingested on this side",
       "class_facts": {
         "layer": "technology",
         "taxonomy_category": "Pipelines",
@@ -1346,7 +1333,6 @@
         }
       ],
       "wired": true,
-      "wired_reason": null,
       "class_facts": {
         "layer": "business",
         "taxonomy_category": "Software / Apps",
@@ -1509,7 +1495,6 @@
         }
       ],
       "wired": true,
-      "wired_reason": null,
       "class_facts": {
         "layer": "business",
         "taxonomy_category": "Product",
@@ -1606,7 +1591,6 @@
         }
       ],
       "wired": true,
-      "wired_reason": null,
       "class_facts": {
         "layer": "business",
         "taxonomy_category": "People & Org",
@@ -1659,7 +1643,6 @@
       "ontology_mappings": [],
       "loaders": [],
       "wired": false,
-      "wired_reason": "no loader is built; the class export is a header-only sampled capture and no gate has ruled its meaning yet",
       "class_facts": {
         "layer": "technology",
         "taxonomy_category": "ITSM / Gov",
@@ -1715,7 +1698,6 @@
         }
       ],
       "wired": true,
-      "wired_reason": null,
       "class_facts": {
         "layer": "technology",
         "taxonomy_category": "Software / Apps",
@@ -1788,7 +1770,6 @@
         }
       ],
       "wired": true,
-      "wired_reason": null,
       "class_facts": {
         "layer": "technology",
         "taxonomy_category": "Architecture",
@@ -1873,7 +1854,6 @@
         }
       ],
       "wired": true,
-      "wired_reason": null,
       "class_facts": {
         "layer": "technology",
         "taxonomy_category": "Architecture",
@@ -1922,7 +1902,6 @@
       "ontology_mappings": [],
       "loaders": [],
       "wired": false,
-      "wired_reason": "the G20 extractor stages only; the curated load is G23 and the adapter stays unset - G22 (2026-08-07) is authority to load, not a loader",
       "class_facts": {
         "layer": "technology",
         "taxonomy_category": "Infrastructure",
@@ -1968,7 +1947,6 @@
       "ontology_mappings": [],
       "loaders": [],
       "wired": false,
-      "wired_reason": "the G25 extractor stages only and no loader is bound; the field contract is still assumed (T13) and the drop is a hand-exported Swagger file",
       "class_facts": {
         "layer": "technology",
         "taxonomy_category": "Pipelines",
@@ -2014,7 +1992,6 @@
       "ontology_mappings": [],
       "loaders": [],
       "wired": false,
-      "wired_reason": "the G25 extractor stages only and no loader is bound - the same condition as its sibling dpl:pipeline-registry",
       "class_facts": {
         "layer": "technology",
         "taxonomy_category": "Data Asset",
@@ -2060,7 +2037,6 @@
       "ontology_mappings": [],
       "loaders": [],
       "wired": false,
-      "wired_reason": "the G42 extractor stages only and no loader is bound; the activation gate snowflake-data-catalog is DEFERRED (2026-09-07) to the Logical Container trigger",
       "class_facts": {
         "layer": "data",
         "taxonomy_category": "Data Asset",
@@ -2106,7 +2082,6 @@
       "ontology_mappings": [],
       "loaders": [],
       "wired": false,
-      "wired_reason": "the G42 extractor stages only and no loader is bound - the same activation condition as the datasets view",
       "class_facts": {
         "layer": "data",
         "taxonomy_category": "Data Asset",
@@ -2152,7 +2127,6 @@
       "ontology_mappings": [],
       "loaders": [],
       "wired": false,
-      "wired_reason": "the G24 extractor stages and corroborates only; no loader is bound (G22 ruled identity and grain, not a loader)",
       "class_facts": {
         "layer": "technology",
         "taxonomy_category": "Software / Apps",
@@ -2208,7 +2182,6 @@
       ],
       "loaders": [],
       "wired": false,
-      "wired_reason": "no extractor or loader; the ingestion pipeline is planned (see backlog) and no gate has ruled the per-schema split",
       "class_facts": {
         "layer": "data",
         "taxonomy_category": "Data Asset",
@@ -2254,7 +2227,6 @@
       "ontology_mappings": [],
       "loaders": [],
       "wired": false,
-      "wired_reason": "no extractor or loader; an expansion placeholder with no pipeline planned yet on this side",
       "class_facts": {
         "layer": "data",
         "taxonomy_category": "Data Asset",
@@ -2318,7 +2290,6 @@
         }
       ],
       "wired": true,
-      "wired_reason": null,
       "class_facts": {
         "layer": "data",
         "taxonomy_category": "Software / Apps",
@@ -2379,7 +2350,6 @@
         }
       ],
       "wired": true,
-      "wired_reason": null,
       "class_facts": {
         "layer": "technology",
         "taxonomy_category": "Infrastructure",

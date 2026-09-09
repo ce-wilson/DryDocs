@@ -12,7 +12,9 @@ AMENDED 2026-09-09 (CFG13). The gate signed - registry-wiring-readiness 18/18, w
 source-descriptor-axes 13/13 in the same sitting - and ruled the fact a SIXTH
 DESCRIPTOR AXIS, `wired`, declared per side with a reason. So the load-map row for a
 registry-home dataset now CARRIES that declaration and the cross reads it. What stays
-forbidden is what was always forbidden: a wiring field on the REGISTRY row itself.
+forbidden is what was always forbidden: a wiring field on the REGISTRY row itself -
+and, from the same day, the REASON, which is prose and does not belong in the bytes
+every console persona downloads before anything renders (the third assertion says why).
 
 The second failure is divergence. The same cross renders on two surfaces — the
 console (web/src/loadmap/loadMapModel.ts) and N5's paper surface
@@ -90,15 +92,25 @@ def test_the_key_reports_and_never_rules() -> None:
     descriptors = SourceDescriptors.from_yaml()
     for s in _sources():
         if s["home"] == "source-registry":
-            declared, reason = descriptors.wired(s["id"])
-            assert s.get("wired") == declared and s.get("wired_reason") == reason, (
+            declared, _reason = descriptors.wired(s["id"])
+            assert s.get("wired") == declared, (
                 f"load-map row {s['id']} does not carry the descriptor's declaration "
-                f"({declared!r}, {reason!r}) - re-run scripts/render_load_map.py"
+                f"({declared!r}) - re-run scripts/render_load_map.py"
             )
         else:
             assert (
-                "wired" not in s and "wired_reason" not in s
+                "wired" not in s
             ), f"doc-ledger row {s['id']} carries a wiring value nobody declared"
+        assert "wired_reason" not in s, (
+            f"load-map row {s['id']} carries wired_reason. The BOOLEAN travels and the "
+            "REASON does not: this file sits in the console's INITIAL chunk (WEB7 - "
+            "lineage/laneBasis.ts imports it and /lineage is open to every role), so the "
+            "seventeen reasons are 2.3 KB of operator prose downloaded by every persona "
+            "before anything renders, and no console surface reads them. They are declared "
+            "in config/source-descriptors.yaml; a surface that renders them reads the "
+            "descriptor. Carrying them here put the entry chunk 1,999 bytes over its "
+            "ceiling on 2026-09-09 (web/scripts/checkBundleSize.mjs)."
+        )
 
 
 def test_both_axes_are_really_independent() -> None:

@@ -1,0 +1,56 @@
+id: WEB23
+epic: web-console
+title: "The initial-chunk ceiling has under a kilobyte of headroom, so the next generated-data change reds the web job for whoever makes it - re-measure, and rule on whether load-map.json still belongs in the entry chunk"
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- web/scripts/checkBundleSize.mjs
+- web/src/App.tsx
+- web/src/lineage/laneBasis.ts
+- web/src/generated/load-map.json
+acceptance: |
+  (a) The headroom is re-measured by command and recorded: on 2026-09-09 the initial chunk was
+  2,504,192 bytes against a 2,505,000 ceiling - 808 bytes, 0.03 percent. WEB7 set the ceiling
+  about three percent above its measurement so a whitespace-level change would not red the build;
+  that margin is gone, and what remains is smaller than a single added field.
+  (b) RULE on the cause, which is a decision and not a chore. WEB7 deliberately kept
+  web/src/generated/load-map.json (139 KB) in the entry chunk with a stated reason:
+  lineage/laneBasis.ts imports it and /lineage is open to every role, so by that item's own rule
+  it is admissible to a user. That reasoning is about ACCESS. The size question it does not answer
+  is whether laneBasis needs the whole artifact, or a projection of it - which fields it actually
+  reads, measured from the source, is the first thing this item finds out. Three outcomes are
+  legal and each is a decision someone writes down: split a projection (laneBasis reads a small
+  generated slice, the full file moves behind the lazy /load-map boundary); keep it whole and
+  RE-BASE the ceiling on a fresh measurement with the three-percent margin restored; or keep it
+  whole and raise the ceiling with the sentence WEB7's docstring asks for.
+  (c) Whichever is ruled, the ceiling ends the item with real margin, and its docstring carries
+  the dated line saying what was measured and why - the mechanism WEB7 built is that the number
+  moves when someone moves it and says why, and this item does not weaken it.
+  (d) NOT in scope: lowering the ceiling silently to whatever today's build happens to measure,
+  which would restore no margin and hide the finding; and re-litigating the WEB7 split itself.
+notes: |
+  Minted 2026-09-09 (Lane A, desktop; pen backlog) FROM a red build, not from a review. CFG13
+  added a declared `wired` value to each of the thirty registry-home rows in load-map.json, and
+  the seventeen `wired_reason` strings that came with it - 2.3 KB of operator prose - put the
+  entry chunk 1,999 bytes over the ceiling and reddened the web job at 5396ff37. The blocking
+  gates leg and snyk were green; web was the only failure.
+  The immediate cause is FIXED and is not this item: the reason strings no longer travel in the
+  artifact. The boolean the wiring cross needs does; the prose is declared in
+  config/source-descriptors.yaml and a surface that renders it reads the descriptor, which is
+  where it belonged - nothing in the console read those strings, so every persona was downloading
+  2.3 KB of explanation before anything rendered. tests/unit/test_load_map_wiring_key.py pins that
+  split with the reason, so the next person cannot re-add it without meeting the argument.
+  What is LEFT, and why it is an item rather than a note: the arithmetic says the budget was
+  already at 2,503,742 bytes before CFG13 touched it - 1,258 bytes of headroom, already past the
+  margin WEB7 set. So this was not CFG13's ceiling to exhaust; CFG13 is simply the change that
+  arrived when it was already gone. The next generated-data change of any size reds the web job
+  for whoever makes it, which is the ceiling reporting the wrong author - and a guard that names
+  the wrong author is the class the module sweep spent a cycle on. The web pen holds this
+  (code:drydocs-web); Lane A measured it and hands it over rather than redesigning the console's
+  chunk composition at a merge close.

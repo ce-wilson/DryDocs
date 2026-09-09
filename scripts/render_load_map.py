@@ -208,10 +208,21 @@ def build_load_map() -> dict:
                 "ontology_mappings": mappings_by_source.get(sid, []),
                 "loaders": loaders_by_source.get(sid, []),
                 # CFG13: the declared wiring fact (config/source-descriptors.yaml
-                # `wired:`), per side, with its reason when false. Doc-ledger rows
-                # carry none - no descriptor answers for them.
+                # `wired:`), per side. Doc-ledger rows carry none - no descriptor
+                # answers for them.
+                #
+                # THE BOOLEAN TRAVELS AND THE REASON DOES NOT, and that is a size
+                # decision made on purpose. This file is imported by
+                # web/src/lineage/laneBasis.ts, and /lineage is open to every role,
+                # so WEB7 keeps it in the console's INITIAL chunk - the bytes every
+                # persona downloads before anything renders. The seventeen reasons
+                # are 2.3 KB of operator prose that no console surface reads; they
+                # are declared in config/source-descriptors.yaml and belong to
+                # whichever surface renders them, which reads the descriptor. The
+                # cross needs the state, not the essay. Measured 2026-09-09: carrying
+                # them put the entry chunk 1,999 bytes over its ceiling
+                # (web/scripts/checkBundleSize.mjs) and reddened the web job.
                 "wired": descriptors.wired(sid)[0],
-                "wired_reason": descriptors.wired(sid)[1],
                 # N26: derived, never stored — layer (system's), category,
                 # acquisition, replica predicate + corroboration, ruled class.
                 "class_facts": registry_view.dataset_derivations(

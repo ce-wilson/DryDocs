@@ -84,3 +84,10 @@ notes: |
   (built = s.wired ?? s.loaders.length > 0), with a dated paragraph under the O90 comment.
   Until it lands the screen derives the same value the print reads, and
   test_wired_declaration_agrees_with_the_tree pins them equal.
+  AMENDED the same day, from a red build: the seventeen `wired_reason` strings were carried on
+  the load-map row too, and load-map.json sits in the console's INITIAL chunk (WEB7 - laneBasis
+  imports it and /lineage is open to every role), so they put the entry chunk 1,999 bytes over
+  its ceiling and reddened the web job at 5396ff37. The BOOLEAN travels and the REASON does not:
+  no console surface read those strings, they are declared in config/source-descriptors.yaml, and
+  a surface that renders them reads the descriptor. The guard pins the split with the reason. The
+  remaining headroom - 808 bytes, already past WEB7's margin before CFG13 touched it - is WEB23.
