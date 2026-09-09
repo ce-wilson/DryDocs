@@ -111,7 +111,8 @@ is the file named, not this skill:
 | Ownership and escalation contacts | the SEAL role-attribution chain (the `-excel` map's escalation row covers the queue/DL half, which this skill does **not** re-derive) |
 | Conditions and job-to-job dependencies | the BMC baseline's condition grammar |
 | Hosts and servers | the `-excel` map's Control-M row |
-| Average run time, SLA/SLO on ODATE | the `-excel` map's two graph-partial rows — this skill claims no more than the sibling does |
+| SLA/SLO on ODATE | the `-excel` spec's two `graph-partial` rows; this skill claims no more |
+| Average run time, job start time | the `-excel` spec marks both `graph`; this skill claims **less**, and on start time the two skills openly **disagree** — see `disagreement:` on the spec's `avg-run` citation, where the tiebreaker in the tree supports this skill and the ruling is handed back rather than taken |
 | Per-job definition detail | the `-excel` workbook itself; section 6.7 points at it rather than reproducing ~35 columns in markdown |
 
 Where a fact would need a query the sibling already owns, the run book **points

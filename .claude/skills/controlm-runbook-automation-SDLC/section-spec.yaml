@@ -93,12 +93,20 @@ sor_citations:
       \ (:Port {kind:'BatchProcessing'}), whose parent_app_id names the\
       \ :BusinessApplication. Folder grain, never job grain."
   seal-contacts:
-    cite: ".claude/skills/controlm-runbook-automation-excel/SKILL.md — column map row\
-      \ 'Severity, L2/L3 queues + DLs, escalation DB'"
-    detail: "SEAL role attribution — (:BusinessApplication)-[:QUALIFIED_ATTRIBUTION]->\
-      \ (:Attribution)-[:HAS_AGENT]->(:Employee), with -[:HAD_ROLE]->(:Role) naming\
-      \ the role. This spec reads the ownership half; the escalation-DB half\
-      \ (queues, DLs, severity) is the -excel skill's and is not re-derived here."
+    cite: "NOT the -excel column map — it has no ownership-contacts row (its nearest,\
+      \ 'Support Contact Information', is manual). The authority is the SEAL role\
+      \ attribution the K8 folder-grain work established, and this is said plainly\
+      \ because a citation is only useful if following it lands on the same\
+      \ population: the escalation-DB row names QUEUES and DISTRIBUTION LISTS,\
+      \ while the table this backs lists NAMED PEOPLE."
+    detail: "(:BusinessApplication)-[:QUALIFIED_ATTRIBUTION]->(:Attribution)\
+      \ -[:HAS_AGENT]->(:Employee), with -[:HAD_ROLE]-> naming the role. The role\
+      \ node is NOT constrained to a label in the query: the vocabulary's nodes\
+      \ carry :TOMRole, and asking for :Role matches nothing and renders every\
+      \ contact as 'unlabeled role' with no error anywhere."
+    related: ".claude/skills/controlm-runbook-automation-excel/SKILL.md — column map\
+      \ row 'Severity, L2/L3 queues + DLs, escalation DB' is the OTHER half: the\
+      \ queue and DL routing, which is the sibling's and is not derived here."
   conditions:
     cite: "external/orchestration/bmc-controlm/ — condition grammar (baseline vendor\
       \ semantics for IN/OUT conditions)"
@@ -139,9 +147,22 @@ sor_citations:
   avg-run:
     cite: ".claude/skills/controlm-runbook-automation-excel/SKILL.md — column map rows\
       \ 'Avg run time, availability' and 'SLA/SLO on ODATE'"
-    detail: "cm_avg_run (gated) plus the description-field metadata plan. Both are\
-      \ graph-partial in the -excel spec and stay graph-partial here — a sibling\
-      \ that claimed more would be the two-skills-disagreeing failure."
+    detail: "cm_avg_run (gated) plus the description-field metadata plan. Read the\
+      \ sibling's MACHINE-READABLE spec, not its prose: `SLO based on ODATE` and\
+      \ `SLA based on ODATE` are graph-partial there, while `Avg Run time` and `Job\
+      \ Start Time` are graph. This skill claims LESS than the sibling on those two\
+      \ and says so rather than rounding both to 'graph-partial'."
+    disagreement: "AN OPEN DISAGREEMENT BETWEEN THE TWO SKILLS, recorded rather than\
+      \ papered over, because naming it is what the sibling clause actually asks\
+      \ for. The -excel spec marks `Job Start Time` as `graph`; this skill's\
+      \ schedule section says schedule time is NOT in the Control-M definition\
+      \ tables DryDocs ingests. The tiebreaker in the tree is the phase-1 job\
+      \ loader's own SQL, which excludes the schedule-detail columns, and it\
+      \ supports THIS skill. Generate both artifacts for one folder company-side\
+      \ and the workbook's Job Start Time column is untinted while the run book's\
+      \ Expected Start Time reads 'not captured' — one folder, two answers. Whose\
+      \ label changes is a ruling about the -excel skill's data and is handed back\
+      \ rather than taken unilaterally: a third state helps nobody."
 
 sections:
 
