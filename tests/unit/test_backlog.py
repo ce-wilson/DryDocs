@@ -1058,17 +1058,32 @@ def test_declared_gates_are_lists_of_known_prompt_slugs() -> None:
     assert not failures, "\n".join(failures)
 
 
+def _declared_venue_codes() -> set[str]:
+    """The codes under `venues:` in config/dev-environment.yaml, empty if the block is
+    absent. Read in one place so the travelling guard and the producer-fact guard below
+    cannot drift apart."""
+    venue_doc = yaml.safe_load(
+        (REPO / "config" / "dev-environment.yaml").read_text(encoding="utf-8")
+    )
+    return set((venue_doc.get("venues") or {}).keys())
+
+
 def test_declared_venues_are_lists_of_codes_the_venue_file_declares() -> None:
     """PLAN6: `venue:` is optional; when present it is a list of codes declared under
     `venues:` in config/dev-environment.yaml. lane-handoff reads ONLY this field to flag
     an item the receiving machine cannot build, so an undeclared code is a wall the
-    check cannot see - hence the guard, on the `gates:` shape (J50)."""
+    check cannot see - hence the guard, on the `gates:` shape (J50).
+
+    This pins the SHAPE and the membership, so it holds on every tree. The membership
+    half is checked only where the block exists: `config/dev-environment.yaml` is
+    canonical-company and a consumer adopts new KEYS by hand, so between the roll that
+    ships this field and the hand-copy, a consumer tree has items carrying `venue:` and
+    no block to resolve them against. Asserting the block's PRESENCE here would fail on
+    that tree by construction - the shape RELAY-31 carved out of
+    `test_the_venue_is_declared_in_the_venue_file...` on 2026-09-07, one day before this
+    guard reintroduced it. The presence is the next test's, kept apart on purpose."""
     doc = _load()
-    venue_doc = yaml.safe_load(
-        (REPO / "config" / "dev-environment.yaml").read_text(encoding="utf-8")
-    )
-    codes = set((venue_doc.get("venues") or {}).keys())
-    assert codes, "config/dev-environment.yaml declares no venues: section"
+    codes = _declared_venue_codes()
     failures: list[str] = []
     for item in doc.get("items", []):
         venue = item.get("venue")
@@ -1078,11 +1093,21 @@ def test_declared_venues_are_lists_of_codes_the_venue_file_declares() -> None:
             failures.append(f"[{item['id']}] venue must be a list of code strings")
             continue
         for v in venue:
-            if v not in codes:
+            if codes and v not in codes:
                 failures.append(f"[{item['id']}] venue names undeclared code '{v}'")
         if len(set(venue)) != len(venue):
             failures.append(f"[{item['id']}] venue repeats a code")
     assert not failures, "\n".join(failures)
+
+
+def test_the_producer_declares_its_venues() -> None:
+    """PRODUCER-VENUE FACT (PLAN6), the pair to `test_the_producer_declares_itself_the_base`
+    above: the producer's own `config/dev-environment.yaml` carries a non-empty `venues:`
+    block, because it is where the KEYS are minted and lane-handoff's V mark reads them.
+    A consumer tree fails this by construction until it hand-copies the keys into its
+    canonical-company copy - the file's own header states that rule - so a per-entry take
+    drops THIS test deliberately and keeps the membership test above, which travels."""
+    assert _declared_venue_codes(), "config/dev-environment.yaml declares no venues: section"
 
 
 def test_dependencies_resolve_and_are_acyclic() -> None:

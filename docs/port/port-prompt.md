@@ -3837,9 +3837,13 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   on, when your registries move, you edit `census:` and say why in the commit — never
   the test. Nothing is asked back.
 
-- **RELAY-48 — THE `updated:` HEADER KEY IS PER-SIDE: A PORT NEVER WRITES IT, AND THE
+- **RELAY-50 — THE `updated:` HEADER KEY IS PER-SIDE: A PORT NEVER WRITES IT, AND THE
   MANIFEST NOW SAYS SO** (new 2026-09-09, producer `main` after `port-base-20260908` /
-  `314b1715`, venue desktop). `[VERIFIED-PRODUCER]` throughout. J59 (built on the laptop
+  `314b1715`, venue desktop; **renumbered from 48 to 50 on 2026-09-09** — it was drafted
+  the same day RELAY-48 and RELAY-49 landed and took a number already in use. Neither
+  colliding entry had shipped: both postdate `port-base-20260908`, so nothing you hold
+  cites either number. RELAY-48 is and stays the id convention). `[VERIFIED-PRODUCER]`
+  throughout. J59 (built on the laptop
   lane, merged 2026-09-09) adds a commit-time check, `scripts/check_header_freshness.py`
   behind `.pre-commit-config.yaml`, that holds the `updated:` header key J58 made required
   against the file's actual change: a staged governed file must say today. The hook is
@@ -3861,6 +3865,45 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   apply date instead of accepting the producer's; where nothing changed, leave it. The
   J59 hook, once you have run `pre-commit install`, then holds you to the same rule on your
   own edits. Nothing is asked back.
+
+- **RELAY-51 — THE `venues:` KEYS ARE A HAND-COPY YOU WERE NEVER TOLD TO MAKE, AND
+  RELAY-31'S "TWO TO ZERO" IS NOW "TWO TO ONE"** (new 2026-09-09, producer `main` after
+  `port-base-20260908` / `314b1715`, venue desktop; raised by your `port-base-20260908`
+  report's D5 `[SME-REPORTED]`). `[VERIFIED-PRODUCER]` throughout.
+
+  **THE CORRECTION FIRST, BECAUSE IT IS A PROMISE THIS PROMPT MADE AND CANNOT KEEP.**
+  RELAY-31 (2026-09-07) split two `test_backlog.py` tests so a producer-only fact would
+  stop being red on your tree by construction, and it told you that when the range landed
+  your edition-absent count "goes from two to zero." **That is now wrong, and the cause is
+  producer-side.** PLAN6 landed the next day (`de0e5b7c`, 2026-09-08) and added
+  `test_declared_venues_are_lists_of_codes_the_venue_file_declares` carrying an
+  unconditional `assert codes, "config/dev-environment.yaml declares no venues: section"`
+  — the same shape RELAY-31 had just carved out, reintroduced one commit after its own
+  fix. Your D5 named both standing failures correctly; the second one is ours, not yours.
+
+  **FIXED AT THE PRODUCER, IN THIS COMMIT, ON RELAY-31'S OWN PATTERN.** The guard is split
+  the way `test_the_venue_is_declared_in_the_venue_file...` was:
+  `test_declared_venues_are_lists_of_codes_the_venue_file_declares` keeps the SHAPE check
+  and the membership check, and holds on any tree — the membership half is checked only
+  where a `venues:` block exists, so a tree carrying ported items with `venue:` and no
+  block yet passes instead of failing on a fact about the producer. The presence assertion
+  moves to `test_the_producer_declares_its_venues`, which says in its docstring that it
+  carries a producer-only fact and that a per-entry take drops it. Both read one helper,
+  `_declared_venue_codes()`, so they cannot drift.
+
+  **WHAT TO DO WHEN THE RANGE LANDS.** Take the split guard; drop
+  `test_the_producer_declares_its_venues` the way you drop
+  `test_the_producer_declares_itself_the_base`. Your edition-absent count then does reach
+  zero. Separately and independently of the suite: `config/dev-environment.yaml` is
+  `canonical-company` and you adopt new KEYS by hand, so **copy the three `venues:` keys
+  in** — `controlm-server`, `oracle-replica`, `neo4j` — with **your** `available:` values,
+  not the producer's. The keys are the shared vocabulary; the availability is your local
+  fact, exactly as the block's own header says. Until they are in, the membership half of
+  the guard resolves nothing and `lane-handoff`'s V mark cannot see a venue wall — but
+  nothing goes red, which is the point of the split. `edition:` remains yours to mint at
+  your own gate and is untouched by this.
+
+  Nothing is asked back.
 
 OWED COMPANY-SIDE:
 

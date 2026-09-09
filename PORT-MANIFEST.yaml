@@ -307,9 +307,16 @@ rows:
   - path: "docs/restructure/backlog/epics/*.yaml"
     disposition: union-append
     note: >
-      `groom_log` is an audit trail both sides append to; `title`/`letter`/`order`
-      are producer-canonical (the company's epics are the producer's epics). A
-      company-only epic file is a clean-add.
+      `groom_log` is an audit trail both sides append to; `title`/`letter` are
+      producer-canonical (the company's epics are the producer's epics). A
+      company-only epic file is a clean-add. `order:` is PER-SIDE and the producer
+      never overwrites it (corrected 2026-09-09, from the port-base-20260908 report):
+      the producer's 28 epics carry a dense contiguous `order` 0..27 with no gap, so a
+      producer-canonical `order` is not merely awkward once a consumer holds epics the
+      producer does not - it is arithmetically unable to seat them. The company's two
+      (`servicenow-ingest`, `software-registry`) are exactly that case, and a wholesale
+      take would renumber them. `order` is a rendering fact about ONE side's board;
+      `title` and `letter` are facts about the epic, which is why the split falls here.
   - path: "docs/restructure/backlog/plan.yaml"
     disposition: per-entry
     entry_rule: "plan.phases keyed by id — union; phase `status` is per-repo like item status."
