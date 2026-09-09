@@ -133,6 +133,12 @@ default: "clean-add when absent on consumer; evaluate when both sides created th
 # docs/build_*, docs/site/*, docs/prompts/*, settings.json, …) into
 # PORT-MANIFEST.company.yaml ONCE — after that, taking this file wholesale is
 # safe and the re-append-after-every-port ritual retires.
+# An overlay may also carry an `accepted_drops:` block (PORT4, 2026-09-08): one row per
+# path a port apply REMOVED and this side has RULED — path, report, date, reason.
+# It is read by `scripts/port_drop_check.py` alone and is NOT unioned with this
+# manifest (it declares no disposition; it records one side's rulings about its own
+# tree, which is the J34 rule). A ruled drop is listed, never silenced; a row whose
+# path exists again, or that nothing dropped, is stale and fails the check.
 overlay:
   files:
     - path: "PORT-MANIFEST.company.yaml"

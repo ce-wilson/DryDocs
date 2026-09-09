@@ -7,7 +7,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - PORT-MANIFEST.yaml
@@ -47,3 +47,21 @@ notes: |
   file, config/gate-log-redactions.yaml (canonical-producer, so the consumer's fast-forwarded
   guard reads the same declaration), read by drydocs/port/gate_log_redactions.py - the same
   listed-not-silenced / stale-fails shape this item specifies, one level down.
+
+  DONE 2026-09-08 (desktop, Lane A). Built as drydocs/port/port_drops.py + the entry point
+  scripts/port_drop_check.py <pre-port-tag> + tests/unit/test_port_drops.py (24 tests).
+  (a) accepted_drops: is a block in the side-local overlay (PORT-MANIFEST.*.yaml), read through
+      the manifest's own overlay.files declaration, one row per path with report, date and
+      reason; a glob is refused (a ruling names ONE path), a duplicate path is refused, and the
+      block is deliberately NOT in the reconcile guards' UNIONED_BLOCKS - it declares no
+      disposition and adds no coverage; a test pins that.
+  (b) The check lists every path git diff --diff-filter=D <since> HEAD removed, by disposition
+      through the one classifier; a ruled drop is LISTED under its own heading with its
+      provenance and passes; an unruled drop is a finding; a clean run still prints what it
+      looked at ("none declared" is a statement, not silence).
+  (c) A stale row fails two ways: the path exists again, or nothing dropped it.
+  (d) Fixtures cover unruled, ruled, stale-exists-again, stale-never-dropped, plus a real
+      git repo round-trip through main() for exit 1 -> 0 -> 1.
+  Also: MODULE_MAP.md row; the overlay-seam comment in PORT-MANIFEST.yaml names the block; the
+  reconcile-port skill gained step 3c and a PORT-REPORT line beside the PORT6 completeness
+  check. Exit codes 0/1/2 on the port_completeness shape.

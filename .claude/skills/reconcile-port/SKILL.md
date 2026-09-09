@@ -496,6 +496,17 @@ poetry run python scripts/reconcile_before.py --describe "$env:TEMP/reconcile-be
 # the J7 guards' subject, not this one's. Paste its last line into the PORT-REPORT.
 poetry run python scripts/port_completeness_check.py <base-tag> --prev <previous-base-tag>
 
+# 3c. DROPS - what this apply REMOVED, against your own rulings (PORT4, 2026-09-08).
+# `git diff --name-only --diff-filter=D <pre-port-tag> HEAD` is cumulative: a path retired at
+# chunk 1 is still absent at chunk 5, so a retirement you already RULED read as a new
+# finding at every chunk (your chunk-5 apply of port-base-20260902). The drop check lists
+# every removed path by disposition and reads the `accepted_drops:` block of YOUR side-local
+# overlay (PORT-MANIFEST.company.yaml - path, report, date, reason, one row per ruled path).
+# A ruled drop is LISTED under its own heading, never silenced and never a failure; an
+# unruled drop is a finding; a row whose path exists again, or that nothing dropped, is
+# STALE and fails until you retire it. Rule a drop by adding its row; never by a glob.
+poetry run python scripts/port_drop_check.py <pre-port-tag>
+
 # 4. TEARDOWN — clear the variable AT EVERY SCOPE IT WAS SET, then drop the snapshot. Do
 # not skip this: skipping it is how a two-day-old before-dir produced the phantom 22nd
 # baseline failure on 2026-09-05. The second line is a no-op when the variable was never
@@ -565,6 +576,7 @@ Port Report: cewilson/main -> <company>/main
 - Backlog union (J42): <paste the scripts/port_backlog_union.py block WITH its command line — the --producer-ref <tag> it ran against, producer/consumer counts, missing ids, accepted differences, PASS|FAIL>
 - Reconcile guards (J7): <paste `scripts/reconcile_before.py --describe <before-dir>` — BASE.sha, date, commits behind HEAD — and the guard run's pass/fail>
 - Completeness (PORT6): <paste the last line of `scripts/port_completeness_check.py <base> --prev <prev>` — COMPLETE / NOT COMPLETE, owed paths, heading gaps — beside the `--numstat` attribution you used; the two answer different questions>
+- Drops (PORT4): <paste the RESULT line of `scripts/port_drop_check.py <pre-port-tag>` — unruled count, accepted count, stale count; an unruled drop is restored or ruled in your overlay's `accepted_drops:` before the close>
 - Track-2 status: <ran/blocked + CM_DEF_SETVAR_VW finding>
 - State: branch ahead of <company>/main by N; NOT pushed; backup tag pre-cewilson-port
 - New divergences observed: <add to the ledger if any>
