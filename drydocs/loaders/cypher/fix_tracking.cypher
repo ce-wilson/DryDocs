@@ -60,12 +60,17 @@ WITH row, n
 
 // §B1 — the three ruled names, applied together. A partial application would
 // leave a node claiming a status with no fix id to trace it to.
+//
+// THREE, AND ONLY THREE. No run id or timestamp rides along beside them: the
+// gate ruled three property names, and "which run marked this fix, and when"
+// is what the :JobRun edge below already answers. A fourth remediation_*
+// property would be an unruled name in a ruled namespace, and §D1 gives
+// property_terms entries to the ruled names — a property with no entry is
+// exactly the drift that section exists to prevent.
 FOREACH (_ IN CASE WHEN $mode = 'apply' THEN [1] ELSE [] END |
-  SET n.remediation_fix_id          = row.remediation_fix_id,
-      n.remediation_status          = row.remediation_status,
-      n.remediation_status_date     = date(row.remediation_status_date),
-      n.remediation_last_run_id     = $run_id,
-      n.remediation_last_loaded_at  = datetime($loaded_at)
+  SET n.remediation_fix_id      = row.remediation_fix_id,
+      n.remediation_status      = row.remediation_status,
+      n.remediation_status_date = date(row.remediation_status_date)
 )
 
 // Rejection removes the axis (§B2). Fenced on the fix id: the node keeps
@@ -76,9 +81,7 @@ FOREACH (_ IN CASE
            THEN [1] ELSE [] END |
   REMOVE n.remediation_fix_id,
          n.remediation_status,
-         n.remediation_status_date,
-         n.remediation_last_run_id,
-         n.remediation_last_loaded_at
+         n.remediation_status_date
 )
 
 // Standard :JobRun provenance (§C1). Unconditional, unlike the delta-only
