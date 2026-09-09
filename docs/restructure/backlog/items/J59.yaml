@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p3
-status: in_progress
+status: done
 depends_on:
 - J58
 inputs:
@@ -27,6 +27,101 @@ acceptance: |
 
   (e) OUT OF SCOPE: adding `updated:` to files that lack it (J58 clause (c)), and the Python docstring standard (J60).
 notes: |
+  CLOSED on wip/j59-laptop (Lane B, laptop), (a) (b) (d) built, (c) HANDED BACK.
+  Two rulings from the user before the build: clause (c) writes PORT-MANIFEST.yaml,
+  which is Lane A's `port` pen and fenced read-only for this lane, so it is handed
+  back rather than taken; and clause (a) is stale about the pre-commit config, so
+  the hook joins the existing file. Both are recorded below rather than quietly
+  worked around.
+
+  THE ITEM'S CORE PREMISE HAD EXPIRED, AND THAT IS THE MAIN FINDING. Clause (a)
+  states the git comparison is blind in CI because the workflow "uses a shallow
+  checkout with no `fetch-depth` override (verified against
+  .github/workflows/ci.yml)". That was true when the item was groomed on
+  2026-08-28. It is FALSE at this tree: the `gates` job checks out with
+  `fetch-depth: 0` for the commit-message ceiling guard, so per-file history IS
+  on the runner and a CI-hosted sweep would work. Shipping a check about lying
+  dates on top of a premise that had quietly stopped being true would have been
+  its own joke (J76 - check which VERSION of the instrument you hold).
+
+  HOW IT WAS FOUND MATTERS AS MUCH AS WHAT WAS FOUND. The first version of the
+  guard grepped ci.yml for the string "fetch-depth" and matched the COMMENT
+  explaining the setting - J66's exact disease - and so reported the opposite of
+  the truth. Reading ci.yml as PARSED YAML gave the real answer per job. The
+  guard now pins the real state that way, so the next reader inherits the fact
+  and not the sentence.
+
+  WHAT THIS DOES NOT CHANGE: the placement. The reason moved to the better J62
+  one - a hook fails the COMMIT, before the push, and this repo has already
+  proved what happens when a check only reports afterwards (a hundred
+  consecutive red ruff runs nobody looked at). A date is cheapest to fix in the
+  commit that moved the file, by the person who moved it.
+
+  OPEN DECISION, deliberately not taken here: whether to ALSO add an
+  `--all-files` sweep step to the `gates` job. It is now POSSIBLE, which it was
+  not when the item was written. Arguments both ways - a sweep in CI catches
+  drift the hook cannot (files changed by someone who never ran `pre-commit
+  install`), but it would fail the whole `gates` job on 104 pre-existing stale
+  files until they are fixed. Not Lane B's call mid-burst; worth an idea.
+
+  THE HOOK CAUGHT ITSELF A SECOND TIME, on its own first commit: `No module
+  named 'pytest'`, because pre-commit's `language: system` runs whatever `python`
+  PATH resolves to and that is not the project virtualenv. Aborting a commit for
+  a reason unrelated to freshness is a bad hook. It now re-execs once under the
+  in-project interpreter and FAILS with the fix named if none is usable - never
+  passes. Pinning the venv path in the config is not portable across the two
+  machines, and catching the ImportError to pass is the exact defect this item
+  exists to end. The bypass is honoured BEFORE any import, so it still works in
+  an environment the hook cannot load in.
+
+  RE-MEASURED BASELINE, and read it with care: 104 stale of 124 governed files
+  (`python scripts/check_header_freshness.py --all-files`, laptop, 2026-09-08).
+  The item's "16 of 24" was measured 2026-08-27, BEFORE J58 populated `updated:`
+  across the tree, so the two numbers count different populations and 104 is not
+  a regression against 16. It is also INFLATED as a measure of lying: J58's own
+  header-adding commits moved the git date of many files whose CONTENT did not
+  change, so a share of the 104 are "the header arrived on 2026-09-05" rather
+  than "this file's content moved and nobody said so". The staged-mode hook is
+  unaffected by that - it asks whether a file you are changing NOW says today.
+  Anyone using the 104 as a work estimate should re-read that sentence first.
+
+  KNOWN LIMIT, stated per the item's own instruction rather than discovered
+  later: a hook is machine-local and nothing installs it, so this is enforced
+  only for people who ran `pre-commit install`. The session ritual already names
+  that install (J62).
+
+  FOR LANE A - CLAUSE (c), the row to paste. `updated:` must be declared a
+  per-side field at PORT-MANIFEST.yaml, because git dates DO NOT survive the
+  port: disjoint histories stamp every ported file with port day, so the
+  company's git date for a file is the day it arrived, not the day its content
+  changed. Without this the hook makes every ported file look freshly touched on
+  their side. The precedent to follow is the field split already on
+  `config/doc-source-registry.yaml` (disposition: per-entry, producer-owned vs
+  company-owned field lists, UNNAMED FIELDS defaulting producer-owned). The
+  needed statement: `updated` is COMPANY-OWNED / per-side on every governed file
+  - never overwritten by a port - because it is the cross-repo freshness
+  mechanism precisely WHERE git cannot be. Lane B did not write it; the `port`
+  pen is Lane A's and PORT1/PORT3/PORT4 all name that file this burst.
+
+  FOR LANE A - the rest:
+  - No render needed. This item touches no plan source and no generated surface.
+  - PORT-MANIFEST fall-through: `scripts/check_header_freshness.py` and
+    `tests/unit/test_header_freshness.py` both fall under existing catch-all
+    rows (`scripts/` is drydocs-load in MODULE_MAP; `tests/**` has a row), so no
+    new row is needed for them. The clause (c) row above is a separate,
+    deliberate declaration.
+  - `.pre-commit-config.yaml` is TOOLING class (J58) and carries no `updated:`
+    key by design, so this item's own edit does not trip its own hook.
+  - IDEA (not taken): J58's CLASSES map now has TWO consumers. Promoting it to
+    shared test infrastructure (`tests/config_identity.py`, the
+    `tests/source_scan.py` shape) is the right long-term move BUT requires the
+    `tests/unit/test_config_identity_header.py` per-entry manifest row to move
+    with it in the SAME commit - that row exists so the `tests/**` default
+    cannot revert the company's per-side CLASSES entries at a port, and a move
+    without it would strand them. A `port`-pen change coupled to a `tests/**`
+    change, which is why Lane B left it. The hook pins the map by IDENTITY so
+    the move breaks a test first rather than the hook silently.
+
   Groomed 2026-08-28 from Idea-181 (captured 2026-08-27), the freshness half. Split from J58 on the entry's own persona-review finding F3 — the git-compare guard is blind in CI — which turns "one guard" into two mechanisms with different homes. Keeping them in one item would have produced a guard that ships to CI, passes, and measures nothing, which is the same shape as the defect it is meant to catch.
 
   `depends_on: [J58]` is real, not decorative: there is nothing to compare until the `updated:` key is required and populated, and the schema J58 writes is what tells this hook which files it governs.
