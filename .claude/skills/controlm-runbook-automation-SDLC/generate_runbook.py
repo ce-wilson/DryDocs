@@ -187,6 +187,10 @@ class FolderFacts:
     app_id_origin: str = "none"
     contacts: list[dict[str, str]] = field(default_factory=list)
     hosts: list[str] = field(default_factory=list)
+    #: host name -> what the host inventory says it is ("Host group" /
+    #: "Execution host"). Absent for a node the inventory does not resolve,
+    #: which the section reports rather than defaulting to one of them.
+    host_roles: dict[str, str] = field(default_factory=dict)
     server: str = ""
     #: condition name -> (folder that emits it, job that emits it). Built across
     #: the WHOLE estate, not just this folder: the bundled sample's own shape
@@ -447,6 +451,15 @@ def load_from_samples(folder_name: str, samples_dir: Path = SAMPLES_DIR) -> Fold
         contacts.sort(key=lambda c: (c["role"], c["name"]))
 
     hosts = sorted({j.get("node_id", "") for j in jobs if j.get("node_id")})
+    # The host inventory says whether a node_id is a GROUP or a single host. It
+    # ships with the other samples and was going unread, so every node rendered
+    # as "Execution host" — including the one that is only ever a group name.
+    host_roles: dict[str, str] = {}
+    for row in _read_csv(samples_dir / "controlm_hosts__sample.csv"):
+        if row.get("grpname"):
+            host_roles.setdefault(row["grpname"], "Host group")
+        if row.get("nodeid"):
+            host_roles.setdefault(row["nodeid"], "Execution host")
     rel = (
         samples_dir.relative_to(REPO).as_posix() if samples_dir.is_relative_to(REPO) else "samples"
     )
@@ -461,6 +474,7 @@ def load_from_samples(folder_name: str, samples_dir: Path = SAMPLES_DIR) -> Fold
         contacts=contacts,
         hosts=hosts,
         server=folder.get("data_center", ""),
+        host_roles=host_roles,
         emitters=emitters,
         consumers=consumers,
         provenance=f"bundled sample CSVs ({rel})",
@@ -563,7 +577,13 @@ RETURN coalesce(r.pref_label, r.id, 'unlabeled role') AS role,
 HOSTS_QUERY = """
 MATCH (f:ControlMFolder {sched_table: $folder})-[:CONTAINS_JOB]->(j:ControlMJob)
 OPTIONAL MATCH (j)-[:RUNS_ON]->(h)
-RETURN collect(DISTINCT coalesce(h.name, h.nodeid, j.node_id)) AS hosts
+RETURN DISTINCT coalesce(h.name, h.nodeid, j.node_id) AS host,
+       CASE
+         WHEN h IS NULL THEN ''
+         WHEN 'ControlMHostGroup' IN labels(h) THEN 'Host group'
+         WHEN 'ExecutionHost' IN labels(h) THEN 'Execution host'
+         ELSE ''
+       END AS role
 """
 
 
@@ -647,8 +667,12 @@ def load_from_graph(client, folder_name: str, venue: str) -> FolderFacts:
         ]
         contacts.sort(key=lambda c: (c["role"], c["name"]))
 
+    host_roles: dict[str, str] = {}
     host_rows = client.run(HOSTS_QUERY, {"folder": folder_name})
-    hosts = sorted({h for h in (host_rows[0]["hosts"] if host_rows else []) if h})
+    for row in host_rows:
+        if row["host"] and row["role"]:
+            host_roles.setdefault(row["host"], row["role"])
+    hosts = sorted({row["host"] for row in host_rows if row["host"]})
 
     return FolderFacts(
         folder_name=folder_name,
@@ -661,6 +685,7 @@ def load_from_graph(client, folder_name: str, venue: str) -> FolderFacts:
         contacts=contacts,
         hosts=hosts,
         server=str(server),
+        host_roles=host_roles,
         emitters=emitters,
         consumers=consumers,
         provenance="DryDocs graph",
@@ -813,7 +838,10 @@ def _coverage_table(facts: FolderFacts, meta: dict) -> str:
         ["`graph-partial` — part derived, part capture", str(counts["graph-partial"])],
         ["`manual` — SME-RESIDUE", str(counts["manual"])],
         ["of those, N/A for a pure-batch module", str(counts["na"])],
-        ["**Table rows filled from this bundle**", f"**{meta['filled_rows']}**"],
+        [
+            "**Table rows carrying a value from this bundle**",
+            f"**{meta['carrying_rows']} of {meta['total_rows']}**",
+        ],
         [
             "**Sections whose tables came back empty** (a shape awaiting capture)",
             f"**{meta['empty_table_sections']}**",
@@ -881,14 +909,31 @@ def _r_architecture_model(spec: dict, facts: FolderFacts, meta: dict) -> str:
         "The schedule sub-diagrams this folder needs, one per batch stream:",
         "",
     ]
+    # "Entry point(s)", not "Trigger job". The first version printed the
+    # lowest-ordered job, which is a sort position and not a trigger: for the
+    # refund folder the lowest-ordered job waits on three other folders, so
+    # calling it the trigger says the batch starts somewhere it does not. An
+    # entry point is derivable — a job with no IN conditions — and there can be
+    # more than one, or none at all when every job waits on another folder.
+    entry_points = [
+        job.get("job_name", "")
+        for job in facts.jobs
+        if not facts.conditions_for(job.get("job_id", ""))
+    ]
+    if entry_points:
+        trigger = ", ".join(entry_points)
+    elif facts.jobs:
+        trigger = "none — every job in this folder waits on a condition"
+    else:
+        trigger = UNKNOWN
     lines.append(
         table(
-            ["Batch stream", "Control-M folder", "Trigger job", "Jobs"],
+            ["Batch stream", "Control-M folder", "Entry point(s)", "Jobs"],
             [
                 [
                     facts.parsed_name.segments[-1] if facts.parsed_name.segments else UNKNOWN,
                     f"`{facts.folder_name}`",
-                    facts.jobs[0].get("job_name", UNKNOWN) if facts.jobs else UNKNOWN,
+                    trigger,
                     str(len(facts.jobs)),
                 ]
             ],
@@ -917,17 +962,36 @@ def _r_etl_process_overview(spec: dict, facts: FolderFacts, meta: dict) -> str:
     )
 
 
+def _wait_clauses(facts: FolderFacts, job: dict[str, str]) -> list[str]:
+    """One clause per IN condition, with its operator ALWAYS shown.
+
+    The first version printed the operator only from the second clause onward,
+    on the reasoning that an operator joins two things. Control-M carries
+    `and_or` on every row, so that silently discarded one input per job — and a
+    source change from AND to OR on the first condition rendered a byte-identical
+    document. An input that changes nothing on the page is an input the reader
+    cannot see.
+
+    What this does NOT do is assert precedence. Control-M carries a `parentheses`
+    field for grouping and it is empty on every sample row, so the grouping is
+    genuinely unknown here; the section says so rather than letting an implied
+    left-to-right reading stand as if it were the schedule's.
+    """
+    clauses = []
+    for wait in facts.conditions_for(job.get("job_id", "")):
+        name = wait["condition_name"]
+        emitter = facts.emitted_by(name)
+        joiner = (wait.get("and_or") or "").upper()
+        source = f"from {emitter}" if emitter else "external — no emitter in the estate"
+        marker = f"[{joiner}] " if joiner else ""
+        clauses.append(f"{marker}`{name}` ({source})")
+    return clauses
+
+
 def _r_schedule(spec: dict, facts: FolderFacts, meta: dict) -> str:
     rows = []
     for job in facts.jobs:
-        detail = []
-        for wait in facts.conditions_for(job.get("job_id", "")):
-            name = wait["condition_name"]
-            emitter = facts.emitted_by(name)
-            joiner = (wait.get("and_or") or "").upper()
-            prefix = f"{joiner} " if joiner and detail else ""
-            source = f"from {emitter}" if emitter else "external — no emitter in the estate"
-            detail.append(f"{prefix}`{name}` ({source})")
+        detail = _wait_clauses(facts, job)
         rows.append(
             [
                 job.get("job_name", ""),
@@ -939,6 +1003,12 @@ def _r_schedule(spec: dict, facts: FolderFacts, meta: dict) -> str:
     return "\n".join(
         [
             table(spec["columns"], rows),
+            "",
+            "_Every condition carries its own **[AND]** / **[OR]** marker, but the GROUPING "
+            "is not asserted. Control-M's `parentheses` field is what settles precedence and "
+            "it carries no value on any row here, so a mixed AND/OR list must be confirmed in "
+            "Control-M itself — do not read it left to right and do not assume the operators "
+            "bind the way ordinary boolean precedence would._",
             "",
             "_**Schedule Time** is not in the Control-M definition tables this graph ingests; "
             "it arrives with the average-run and ODATE-SLO seams the `-excel` sibling marks "
@@ -963,21 +1033,40 @@ def _r_end_to_end(spec: dict, facts: FolderFacts, meta: dict) -> str:
     blast radius are the two things they need before anything else in the document
     is useful.
     """
+    # The role is DERIVED from the folder's own condition edges, never from
+    # `end_folder != 'Y'`. The first version called anything non-terminal
+    # "intermediate", which read as a chain: for the refund folder, whose two jobs
+    # are independent and wait only on OTHER folders, it printed "intermediate"
+    # then "terminal" and an engineer restarting after the second job fails would
+    # hold for the first, which is not its predecessor at all.
+    in_folder_names = {job.get("job_name", "") for job in facts.jobs}
     order_rows = []
     for job in facts.jobs:
         waits = facts.conditions_for(job.get("job_id", ""))
-        upstream = []
-        for wait in waits:
-            emitter = facts.emitted_by(wait["condition_name"])
-            upstream.append(emitter or f"`{wait['condition_name']}` (no emitter in the estate)")
-        role = "terminal" if (job.get("end_folder") or "").upper() == "Y" else ""
+        upstream = _wait_clauses(facts, job)
+        local_predecessors = [
+            wait
+            for wait in waits
+            for folder, name in facts.emitters.get(wait["condition_name"], [])
+            if folder == facts.folder_name and name in in_folder_names
+        ]
+        roles = []
         if not waits:
-            role = ("entry point, " + role).strip(", ") if role else "entry point"
+            roles.append("entry point")
+        elif not local_predecessors:
+            # It waits, but on nothing inside this folder — so it does not follow
+            # any job on this page. "Parallel" says that; "intermediate" implies
+            # a predecessor above it in the table.
+            roles.append("parallel — waits only on other folders")
+        else:
+            roles.append("follows a job in this folder")
+        if (job.get("end_folder") or "").upper() == "Y":
+            roles.append("terminal")
         order_rows.append(
             [
                 str(job.get("job_order") or ""),
                 job.get("job_name", ""),
-                role or "intermediate",
+                ", ".join(roles),
                 "; ".join(upstream) if upstream else "nothing — starts on its own schedule",
             ]
         )
@@ -1038,6 +1127,33 @@ def _param_file_cell(facts: FolderFacts, job: dict[str, str]) -> str:
     return f"{UNKNOWN} — the command line `{raw}` names no parameter file"
 
 
+def etl_header_values(facts: FolderFacts, job: dict[str, str]) -> dict[str, str]:
+    """The per-workflow header block's values, keyed by the outline's row labels.
+
+    Public (no leading underscore) because a test asserts the spec's
+    `header_rows` are a subset of these keys. That subset is not automatic: the
+    row labels are DATA in the spec and these values are CODE, so adding a row
+    the documented way used to crash the renderer with a KeyError while the
+    drift guard passed — it compares a column against the outline's guidance and
+    has nothing to say about this dict.
+    """
+    return {
+        "Control-M job name": job.get("job_name", ""),
+        "Schedule Information": UNKNOWN,
+        # The outline mandates this row's LABEL, and a Control-M command line is
+        # not always a parameter file. Print what it actually is rather than
+        # letting the mandated label assert something about the value.
+        "Param File Path": _param_file_cell(facts, job),
+        "Src Schema/DB": UNKNOWN,
+        "Stg Schema/DB": UNKNOWN,
+        "Target Schema/DB": UNKNOWN,
+        "Folder name": f"`{facts.folder_name}`",
+        "Source Table": UNKNOWN,
+        "Stage Table": UNKNOWN,
+        "Target Table": UNKNOWN,
+    }
+
+
 def _r_etl_jobs(spec: dict, facts: FolderFacts, meta: dict) -> str:
     parts: list[str] = []
     inventory = [
@@ -1055,27 +1171,25 @@ def _r_etl_jobs(spec: dict, facts: FolderFacts, meta: dict) -> str:
         "",
     ]
     for job in facts.jobs:
-        header_values = {
-            "Control-M job name": job.get("job_name", ""),
-            "Schedule Information": UNKNOWN,
-            # The outline mandates this row's LABEL, and a Control-M command line
-            # is not always a parameter file. Print what it actually is rather
-            # than letting the mandated label assert something about the value.
-            "Param File Path": _param_file_cell(facts, job),
-            "Src Schema/DB": UNKNOWN,
-            "Stg Schema/DB": UNKNOWN,
-            "Target Schema/DB": UNKNOWN,
-            "Folder name": f"`{facts.folder_name}`",
-            "Source Table": UNKNOWN,
-            "Stage Table": UNKNOWN,
-            "Target Table": UNKNOWN,
-        }
+        header_values = etl_header_values(facts, job)
         # The label-less two-column shape the committed example uses for this
         # block: bold row labels down the left, values on the right.
         parts += [
             f"#### {job.get('job_name', '')}",
             "",
-            table(["", ""], [[f"**{k}**", header_values[k]] for k in spec["header_rows"]]),
+            # `.get`, not `[]`. `header_rows` is DATA in the spec and
+            # `header_values` is code here, so adding a row through the change
+            # path the SKILL.md documents — edit the outline, edit the spec —
+            # crashed the generator with a KeyError while the drift guard passed,
+            # because that guard checks the column against the outline's guidance
+            # and never against this dict. A new row now renders as an explicit
+            # unknown, which is the honest thing for a row nothing fills yet, and
+            # a test pins the subset so the gap is reported rather than met at
+            # render time.
+            table(
+                ["", ""],
+                [[f"**{k}**", header_values.get(k, UNKNOWN)] for k in spec["header_rows"]],
+            ),
             "",
             "Below is the description of each task in the workflow.",
             "",
@@ -1162,7 +1276,25 @@ def _r_unix_scripts(spec: dict, facts: FolderFacts, meta: dict) -> str:
 
 
 def _r_unix_servers(spec: dict, facts: FolderFacts, meta: dict) -> str:
-    rows = [[h, "Execution host", facts.parsed_name.environment or UNKNOWN] for h in facts.hosts]
+    """The hosts the folder's jobs run on, each labeled by WHAT IT IS.
+
+    A job's `node_id` can name a host GROUP or a single execution host, and to a
+    support reader those are different things: restarting on a group means
+    Control-M picks a member, and the member that failed need not be the one it
+    picks. The host inventory settles it — `grpname` versus `nodeid` — so this
+    reads it instead of calling everything an "Execution host". The distinction
+    is live in the bundled sample: `host-hldm-01` appears only ever as a
+    `grpname`, and it is the node most of these jobs run on.
+    """
+    rows = [
+        [
+            host,
+            facts.host_roles.get(host)
+            or f"{UNKNOWN} — absent from the host inventory, so group or host is unknown",
+            facts.parsed_name.environment or UNKNOWN,
+        ]
+        for host in facts.hosts
+    ]
     if facts.server:
         rows.append([facts.server, "Control-M server / data center", "—"])
     return "\n".join(
@@ -1394,14 +1526,20 @@ def _r_job_monitoring(spec: dict, facts: FolderFacts, meta: dict) -> str:
 
 
 def _r_tier2_escalation(spec: dict, facts: FolderFacts, meta: dict) -> str:
+    # The level column is NOT numbered. Numbering it would print a ladder the
+    # graph does not hold: the contacts are sorted by role name, so a number here
+    # makes "Backup Application Owner" level 1 and the two roles that ARE a
+    # ladder — L1 and L2 Operate Manager — levels 7 and 8, by alphabetical
+    # accident. An engineer escalating in the printed order at 03:00 would be
+    # following a fabrication under a GRAPH-DERIVED heading.
     rows = [
         [
-            str(i),
+            UNKNOWN,
             c["role"],
             c["email"] or UNKNOWN,
             f"SID {c['employee_id']}" if c["employee_id"] else "",
         ]
-        for i, c in enumerate(facts.contacts, start=1)
+        for c in facts.contacts
     ]
     return "\n".join(
         [
@@ -1546,19 +1684,46 @@ def _marker(entry: dict) -> str:
 _TABLE_RULE = re.compile(r"^\|(?:-+\|)+$")
 
 
-def _filled_rows(body: str) -> int:
-    """Data rows in ``body``'s tables — header and rule lines excluded.
+def _row_counts(body: str) -> tuple[int, int]:
+    """(rows carrying at least one value, total data rows) across ``body``'s tables.
 
-    The measure behind the cover's "table rows filled from this bundle". It is
-    deliberately crude and deliberately honest: it counts what a reader would
-    count. A section whose tables come back at zero is a shape waiting for a
-    person, and saying how many of those there are is the difference between a
-    coverage block and a boast.
+    The first number is the honest one, and the reason it exists is a defect this
+    counter had in its first version: it counted EVERY data row, so a row reading
+    `| Session log files | _not captured_ | _not captured_ |` scored as "filled
+    from this bundle". The cover then ranked documents backwards — a folder with
+    103 rows of which 46 were entirely unknown outranked one with 73 rows and
+    nine real ownership contacts, on a number SKILL.md tells the reader to trust
+    over the section labels.
+
+    So a row counts as CARRYING A VALUE only when some cell after the first is
+    neither empty nor the unknown token. The first cell is excluded because in
+    almost every table here it is the row's LABEL, which the generator wrote and
+    the bundle did not.
+
+    Header lines are EXCLUDED BY POSITION — a header is the line immediately
+    above a rule line — and not by discounting one per table at the end. The
+    difference is not cosmetic: the per-workflow block renders a label-less
+    two-column table whose header is `|  |  |`, which carries nothing and so was
+    never counted, yet the aggregate discount subtracted for it anyway. Three
+    such tables in the refund folder meant three real rows silently paid for
+    headers that had never been added — the same class of quiet miscount this
+    function was rewritten to remove.
     """
     lines = [ln for ln in body.splitlines() if ln.startswith("|")]
-    rules = sum(1 for ln in lines if _TABLE_RULE.match(ln))
-    # every table contributes one header line and one rule line
-    return max(0, len(lines) - 2 * rules)
+    rule_at = {i for i, ln in enumerate(lines) if _TABLE_RULE.match(ln)}
+    # a table contributes one header line (just above its rule) and one rule line
+    header_at = {i - 1 for i in rule_at if i > 0}
+    total = max(0, len(lines) - len(rule_at) - len(header_at))
+    carrying = 0
+    for i, line in enumerate(lines):
+        if i in rule_at or i in header_at:
+            continue
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if len(cells) < 2:
+            continue
+        if any(c and c != UNKNOWN for c in cells[1:]):
+            carrying += 1
+    return carrying, total
 
 
 def render(facts: FolderFacts, spec: dict, meta: dict) -> str:
@@ -1582,16 +1747,19 @@ def render(facts: FolderFacts, spec: dict, meta: dict) -> str:
             continue
         bodies[anchor] = RENDERERS[by_anchor[anchor]["fill"]](by_anchor[anchor], facts, meta)
 
-    filled = sum(_filled_rows(body) for body in bodies.values())
+    counted = {anchor: _row_counts(body) for anchor, body in bodies.items()}
+    carrying = sum(c for c, _ in counted.values())
+    total_rows = sum(t for _, t in counted.values())
     empty_tables = sum(
         1
         for anchor, body in bodies.items()
-        if "|---" in body and _filled_rows(body) == 0 and not by_anchor[anchor].get("na_for_batch")
+        if "|---" in body and counted[anchor][0] == 0 and not by_anchor[anchor].get("na_for_batch")
     )
     meta = {
         **meta,
         "counts": _counts(spec),
-        "filled_rows": filled,
+        "carrying_rows": carrying,
+        "total_rows": total_rows,
         "empty_table_sections": empty_tables,
     }
 

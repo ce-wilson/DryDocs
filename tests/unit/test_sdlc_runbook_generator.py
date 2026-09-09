@@ -439,6 +439,89 @@ def test_a_condition_with_two_emitters_names_both(generator, clone_samples: Path
     assert " or " in rendered, f"only one emitter named for {multi[0]}: {rendered}"
 
 
+def test_every_declared_header_row_has_a_value_the_renderer_can_supply(
+    generator, spec: dict, clone_samples: Path
+) -> None:
+    """`header_rows` is spec DATA; the values are code. Keep them in step.
+
+    Adding a row through the documented change path — edit the outline, edit the
+    spec — used to crash the renderer with a `KeyError` while the column-drift
+    guard passed, because that guard compares a column against the outline's
+    guidance and has nothing to say about the renderer's dict. The renderer now
+    falls back to the unknown token, and this pins the gap so it is reported here
+    rather than discovered at render time.
+    """
+    facts = generator.load_from_samples("PRARAG-HLDM-70002-PEX-RFND-DLY", samples_dir=clone_samples)
+    supplied = set(generator.etl_header_values(facts, facts.jobs[0]))
+    declared = {row for section in spec["sections"] for row in (section.get("header_rows") or [])}
+    assert declared <= supplied, (
+        "section-spec.yaml declares per-workflow header rows the renderer has no "
+        f"value for: {sorted(declared - supplied)}"
+    )
+
+
+def test_the_row_counter_charges_a_table_for_its_own_header_only(generator) -> None:
+    """A label-less header must not cost a real row its place in the count.
+
+    The cover's carrying/total figure is the number SKILL.md tells a reader to
+    trust over the section labels, so the way it is counted is a contract. Two
+    shapes pin it, and the first is the one that was wrong: the per-workflow
+    block renders a two-column table whose header is `|  |  |`, which carries
+    nothing, while the counter discounted one header per table in aggregate —
+    so every such table silently ate a genuine row. The second shape pins the
+    rule the counter was rewritten FOR: a row of nothing but unknown tokens is
+    not a row the bundle filled.
+    """
+    unknown = generator.UNKNOWN
+    label_less = "\n".join(["|  |  |", "|---|---|", f"| **Folder name** | `{'F1'}` |"])
+    assert generator._row_counts(label_less) == (
+        1,
+        1,
+    ), "a label-less header is not a carrying row and must not be discounted as one"
+
+    all_unknown = "\n".join(
+        ["| Item | A | B |", "|---|---|---|", f"| Session log files | {unknown} | {unknown} |"]
+    )
+    assert generator._row_counts(all_unknown) == (
+        0,
+        1,
+    ), "a row whose every value cell is the unknown token carries nothing"
+
+
+def test_a_job_waiting_only_on_other_folders_is_not_called_a_successor(
+    generator, spec: dict, clone_samples: Path
+) -> None:
+    """Run-order roles are derived from THIS folder's edges, not from `end_folder`.
+
+    An engineer restarting mid-batch reads this column to decide what has to be
+    back up first. Calling every non-terminal job "intermediate" told them a job
+    follows the row above it, which for a folder of independent jobs is false and
+    expensive at 03:00. Both branches are live in the bundled estate, so both are
+    asserted here rather than one being taken on faith: the refund folder's jobs
+    wait only on OTHER folders, and the trust folder genuinely chains internally.
+    """
+
+    fill = "end_to_end_process"
+    section = next(s for s in spec["sections"] if s.get("fill") == fill)
+
+    def roles_for(folder: str) -> str:
+        facts = generator.load_from_samples(folder, samples_dir=clone_samples)
+        return generator.RENDERERS[fill](section, facts, {})
+
+    independent = roles_for("PRARAG-HLDM-70002-PEX-RFND-DLY")
+    assert (
+        "parallel — waits only on other folders" in independent
+    ), "a job waiting only on other folders must not be presented as following the row above it"
+    assert (
+        "follows a job in this folder" not in independent
+    ), "the refund folder chains nothing internally; claiming it does invents a predecessor"
+
+    chained = roles_for("PRARAG-HLDM-70011-PEX-TRUST-DLY")
+    assert (
+        "follows a job in this folder" in chained
+    ), "the trust folder does chain internally — a real successor must still be named one"
+
+
 def test_every_na_section_carries_a_reason(spec: dict) -> None:
     """`N/A` on its own is an omission; `N/A — <reason>` is an answer."""
     for section in spec["sections"]:
