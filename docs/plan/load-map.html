@@ -222,7 +222,7 @@ td.empty{color:#d1d5db}
 <tr><td>20</td><td><code>drydocs m3-verify</code></td><td><span class="chip mode-standing">standing</span></td><td><code>cold-start</code>, <code>scheduled-ingest</code></td><td><span class="muted">—</span></td><td>M3 invariants</td></tr>
 <tr><td>21</td><td><code>drydocs docs-verify</code></td><td><span class="chip mode-standing">standing</span></td><td><code>cold-start</code></td><td><span class="muted">—</span></td><td>doc corpora declared vs loaded (registry-driven; non-zero on wrong-db)</td></tr>
 </table>
-<p class="sub">Operator-driven (not sequence members): <code>drydocs load</code>, <code>drydocs load-manual-mappings</code>, <code>drydocs refresh-reference</code>.</p>
+<p class="sub">Operator-driven (not sequence members): <code>drydocs load</code>, <code>drydocs load-fix-tracking</code>, <code>drydocs load-manual-mappings</code>, <code>drydocs refresh-reference</code>.</p>
 <h2>Systems — the things we connect to (v2)</h2>
 <p class="sub">SYSTEM rows carry connection/locator/classification; DATASET rows below carry the gate state. A taxonomy capture may join at either level (system when the hierarchy spans several datasets).</p>
 <table><tr><th>system</th><th>name</th><th>layer</th><th>classification</th><th>taxonomy captures</th></tr>
@@ -474,6 +474,7 @@ td.empty{color:#d1d5db}
 <tr><td><code>stg-app-fact</code></td><td><code>controlm@[db].drydocs_stg.stg_app_fact</code></td><td>derived-store grammar (Q3): origin controlm visible, carrier our own staging schema</td></tr>
 </table>
 <h2>Named sourceless loaders</h2>
+<p><code>fix_tracking.v1</code> (FixTrackingLoader) — runs in: <code>drydocs load-fix-tracking</code>.<br><em>the input is a drydocs.remediation.fix-tracking.v1 change-set THIS system emits from a remediation session (gate remediation-fix-tracking §C1), not a feed from an external source system — there is no registry entry to bind and no crosswalk for the D3 gate to confirm</em></p>
 <p><code>manual_seal_attribution.v1</code> (ManualSealAttributionLoader) — runs in: <code>drydocs load-manual-mappings</code>.<br><em>SME-authored tier-5 mapping CSVs gated by config/manual-loads/manifest.yaml (gate seal-attribution-match-policy §F) — a human source with its own manifest governance, not a registry feed</em></p>
 <h2>Map entries citing unregistered sources</h2>
 <div class="warn">These taxonomy-ontology-map entries name a <code>taxonomy.source</code> with no source-registry entry — surfaced here, never dropped; rule each at grooming (register the feed, re-point the entry, or record a source_exemption).<ul class="tight">

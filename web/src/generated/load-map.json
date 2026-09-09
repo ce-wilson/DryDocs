@@ -248,6 +248,7 @@
   ],
   "ad_hoc_commands": [
     "load",
+    "load-fix-tracking",
     "load-manual-mappings",
     "refresh-reference"
   ],
@@ -3132,6 +3133,14 @@
     }
   ],
   "sourceless_loaders": [
+    {
+      "name": "fix_tracking.v1",
+      "class": "FixTrackingLoader",
+      "reason": "the input is a drydocs.remediation.fix-tracking.v1 change-set THIS system emits from a remediation session (gate remediation-fix-tracking §C1), not a feed from an external source system — there is no registry entry to bind and no crosswalk for the D3 gate to confirm",
+      "commands": [
+        "load-fix-tracking"
+      ]
+    },
     {
       "name": "manual_seal_attribution.v1",
       "class": "ManualSealAttributionLoader",
