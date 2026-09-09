@@ -292,8 +292,11 @@ def test_refusal_and_ci_messages_report_the_measurement_not_a_guess() -> None:
     had simply never run. Report what was measured; list causes; pick none."""
     # Code, not the comments that explain the change (J66): the script's own
     # comment quotes the retired sentences to say why they went.
-    code = chr(10).join(ln for ln in _script().splitlines() if not ln.lstrip().startswith("#"))
-    script = _script()
+    # U27 moved Get-CiVerdict to ci_verdict.ps1 (dot-sourced); the CI messages
+    # live there now, the refusal still lives in snapshot.ps1 - read both.
+    both = _script() + (SNAP_DIR / "ci_verdict.ps1").read_text(encoding="utf-8")
+    code = chr(10).join(ln for ln in both.splitlines() if not ln.lstrip().startswith("#"))
+    script = both
     assert "stranded on an older revision is the likely cause" not in code
     assert "gh not authenticated?" not in code
     assert (
