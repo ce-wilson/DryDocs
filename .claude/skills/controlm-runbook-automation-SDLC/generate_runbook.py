@@ -63,6 +63,7 @@ blank, because a blank is visibly a blank.
 from __future__ import annotations
 
 import argparse
+import re
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -610,6 +611,11 @@ def _coverage_table(facts: FolderFacts, meta: dict) -> str:
         ["`graph-partial` — part derived, part capture", str(counts["graph-partial"])],
         ["`manual` — SME-RESIDUE", str(counts["manual"])],
         ["of those, N/A for a pure-batch module", str(counts["na"])],
+        ["**Table rows filled from this bundle**", f"**{meta['filled_rows']}**"],
+        [
+            "**Sections whose tables came back empty** (a shape awaiting capture)",
+            f"**{meta['empty_table_sections']}**",
+        ],
         ["Jobs in this folder's bundle", str(len(facts.jobs))],
         ["Distinct command lines", str(len(facts.scripts()))],
         ["IN / OUT conditions", f"{len(facts.conditions_in)} / {len(facts.conditions_out)}"],
@@ -1284,28 +1290,72 @@ def _marker(entry: dict) -> str:
     return "\n>\n".join(bits)
 
 
+_TABLE_RULE = re.compile(r"^\|(?:-+\|)+$")
+
+
+def _filled_rows(body: str) -> int:
+    """Data rows in ``body``'s tables — header and rule lines excluded.
+
+    The measure behind the cover's "table rows filled from this bundle". It is
+    deliberately crude and deliberately honest: it counts what a reader would
+    count. A section whose tables come back at zero is a shape waiting for a
+    person, and saying how many of those there are is the difference between a
+    coverage block and a boast.
+    """
+    lines = [ln for ln in body.splitlines() if ln.startswith("|")]
+    rules = sum(1 for ln in lines if _TABLE_RULE.match(ln))
+    # every table contributes one header line and one rule line
+    return max(0, len(lines) - 2 * rules)
+
+
 def render(facts: FolderFacts, spec: dict, meta: dict) -> str:
     by_anchor = {s["anchor"]: s for s in spec["sections"]}
-    meta = {**meta, "counts": _counts(spec)}
-    out: list[str] = []
-    for section in load_outline_sections():
-        entry = by_anchor.get(section["anchor"])
-        if entry is None:
+    sections = load_outline_sections()
+    for section in sections:
+        if section["anchor"] not in by_anchor:
             raise SystemExit(
                 f"section-spec.yaml has no entry for outline anchor {section['anchor']!r} — "
-                "the spec test should have caught this; run tests/unit/test_sdlc_runbook_spec.py"
+                "the spec test should have caught this; run "
+                "tests/unit/test_sdlc_runbook_generator.py"
             )
-        renderer = RENDERERS[entry["fill"]]
-        out.append(f"<!-- anchor: {section['anchor']} -->")
-        if section["anchor"] == "front-matter":
-            out.append(renderer(entry, facts, meta))
+
+    # Render the BODY sections first, so the cover's coverage block can report
+    # what this run actually produced rather than what the spec hopes for. The
+    # front matter is emitted last and placed first.
+    bodies: dict[str, str] = {}
+    for section in sections:
+        anchor = section["anchor"]
+        if anchor == "front-matter":
+            continue
+        bodies[anchor] = RENDERERS[by_anchor[anchor]["fill"]](by_anchor[anchor], facts, meta)
+
+    filled = sum(_filled_rows(body) for body in bodies.values())
+    empty_tables = sum(
+        1
+        for anchor, body in bodies.items()
+        if "|---" in body and _filled_rows(body) == 0 and not by_anchor[anchor].get("na_for_batch")
+    )
+    meta = {
+        **meta,
+        "counts": _counts(spec),
+        "filled_rows": filled,
+        "empty_table_sections": empty_tables,
+    }
+
+    out: list[str] = []
+    for section in sections:
+        anchor = section["anchor"]
+        entry = by_anchor[anchor]
+        out.append(f"<!-- anchor: {anchor} -->")
+        if anchor == "front-matter":
+            out.append(RENDERERS[entry["fill"]](entry, facts, meta))
         else:
             hashes = "#" * section["level"]
             out.append(f"{hashes} {section['number']} {section['heading']}")
             out.append("")
             out.append(_marker(entry))
             out.append("")
-            out.append(renderer(entry, facts, meta))
+            out.append(bodies[anchor])
         out.append("")
     return "\n".join(out).rstrip() + "\n"
 
