@@ -158,7 +158,50 @@ travel between components.
 
 ## Lens 2 — technical debt
 
-*(step 5)*
+**No finding meets the bar.** Three candidates were checked and all three are correct as
+they stand. The evidence, and then the reasons each was cut.
+
+| hatch | `plan` | `deepdoc` | `libs` |
+|---|---|---|---|
+| `# type: ignore` | **0** | **0** | **0** |
+| `cast(` | **0** | **0** | **0** |
+| `# pragma: no cover` | **0** | **0** | **0** |
+| `TODO` / `FIXME` | **0** | **0** | **0** |
+| `# noqa` | 0 | 1 | 0 |
+| `: Any` | 5 | 0 | 0 |
+
+`ruff` clean across all three, **268 scoped tests passing with zero skips** — the only
+slot in the sweep with no skipped test at all.
+
+### The three candidates, and why each was cut
+
+1. **`libs/oracle_kerberos/` is 553 lines with no production importer.** Cut, and the
+   reason is line 2 of its own docstring: *"Drop-in: copy this one file (plus a filled
+   `oracle_kerberos_connection.txt`) into any project. **No DryDocs imports.**"* It is a
+   standalone Kerberos login tool with an `argparse` `main()` (`:471`) and its own tests
+   (`tests/unit/test_oracle_kerberos_login.py`). Having no importer is the design, not a
+   symptom — and the file records that each of its constraints *"cost real troubleshooting
+   time"*, naming the RAC/ORA-12514 failure behind the TNS-alias rule. A later firing that
+   greps for unimported modules will find this one; it is not dead weight.
+2. **Five `: Any` in `plan`.** Cut. Three are escape helpers — `_esc(value: Any) -> str`
+   twice and `_prose(value: Any) -> str` — which accept anything by contract, since their
+   job is to make arbitrary values safe for HTML. The remaining two are render-model
+   dataclass fields (`id: Any`, `phase: Any = None`). Loose, but every value reaches output
+   through `_esc`, so no consequence is writable. A tightening would be a preference.
+3. **The `noqa: F401` in `deepdoc/investigate.py:13`.** Cut as a Lens 2 item — it is an
+   explained re-export of the shared parser surface. But note it is re-exported *"for the
+   on-failure analysis bodies (G4)"*, and those bodies belong to the charter L1-1 found
+   retired. **It should be re-examined when L1-1's docstring is fixed**, not before: if the
+   on-failure model is gone, the re-export may have no remaining purpose. Flagged rather
+   than claimed, because this firing did not establish that MM10's `investigate()` will not
+   want it.
+
+### The slot 7 carry-over, restated here because it is a Lens 2 result
+
+The `_git` shape does not recur (full evidence in Measurements). Two sites outside
+`drydocs/port/`, both correct; zero in this slot. That is a **negative** result and worth
+as much as a positive one: it converts slot 7's open-ended "sweep the repo" candidate into
+a closed one-line fix, and it means the repo's subprocess handling is otherwise sound.
 
 ## Ranked
 
