@@ -7,7 +7,7 @@ phase: 11
 agent: main
 model: fable
 priority: p2
-status: in_progress
+status: done
 depends_on: [N10]
 gates: [registry-wiring-readiness]
 inputs:
@@ -40,3 +40,12 @@ notes: |
   sibling page source-descriptor-axes (CFG8) is held in the same sitting. The extract-vintage
   precondition does not apply: the page keys on a committed file. AFTER clause: the session
   itself, then the follow-ups minted from the record.
+
+  DONE 2026-09-09 (Lane A, desktop). The session was HELD in-chat in one sitting with
+  source-descriptor-axes; outcome SIGNED OFF 18/18, recorded in config/gate-log.md. Rulings
+  that mattered: a second fact is warranted and lives as a sixth DESCRIPTOR axis (not a
+  registry field), named `wired`, declared per side with a written reason when false, required
+  for every registry-home dataset; clause C confirmed on the corrected footing (confirmed
+  crosses again as the signed WHAT; wired stays per side in per_side_fields); the connection
+  page deferred with a named re-arm (E2). Follow-ups minted from the record: CFG13 (the build).
+  The AFTER clause is met: every flip the ruling authorizes has an item.

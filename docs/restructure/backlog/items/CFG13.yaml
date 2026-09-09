@@ -1,0 +1,58 @@
+id: CFG13
+epic: source-column-mappings
+title: "The wired axis - a sixth descriptor axis declared per side with a written reason, named in per_side_fields, read by require_confirmed which then says WHICH of confirmed or wired failed, with O90's guard and the J71 entry_rule amended by the ruling"
+type: task
+module: config
+phase: 11
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on: []
+gates: [registry-wiring-readiness, source-descriptor-axes]
+inputs:
+- config/source-descriptors.yaml
+- drydocs_core/source_descriptors.py
+- drydocs_core/source_registry.py
+- config/source-registry.yaml
+- PORT-MANIFEST.yaml
+- scripts/render_load_map.py
+- tests/unit/test_load_map_wiring_key.py
+- tests/unit/test_source_descriptors.py
+- config/gate-log.md
+acceptance: |
+  Exactly the shape the two SIGNED records of 2026-09-09 rule (registry-wiring-readiness
+  18/18, source-descriptor-axes 13/13), and nothing the drafts proposed that was not signed:
+  (a) `wired` joins the axes in config/source-descriptors.yaml as a DECLARED per-side value
+      (true | false), never derived: a `wired:` block keyed by dataset id, REQUIRED for every
+      registry-home dataset (a missing entry is refused at construction - a new row must
+      answer), and a false carries a `reason` of at least forty characters, refused otherwise.
+      The 21 loading rows declare true; the 4 wiring holds (cm_hist_vw, oracle:schema-inventory,
+      snowflake:schema-inventory, hr_phone_exp) declare false with the reason their YAML
+      comment carries today; the 4 semantic holds and cm_escalation_db declare what is true
+      of THEIR pipeline. The wiring-fact comments retire in the same commit; comments carrying
+      ruling citations (hr_phone_exp's K17/K26 record) stay.
+  (b) PORT-MANIFEST.yaml: `per_side_fields` gains `wired` (and its `reason`), never
+      overwritten by a port in either direction, in the SAME commit (C3); and the
+      source-registry row's entry_rule is amended per E1 so `confirmed` and its stamps CROSS as
+      the producer's signed WHAT on shared rows while company-only rows stay theirs.
+  (c) require_confirmed() refuses unless confirmed AND wired, reading the descriptor for the
+      dataset, and its message names WHICH failed and what clears it - find an SME, or build
+      a loader. Every row that loaded before loads after (D1), pinned by a test over the
+      registry.
+  (d) tests/unit/test_load_map_wiring_key.py::test_the_key_reports_and_never_rules is
+      AMENDED by the ruling: it keeps forbidding a wiring field on the registry row and admits
+      the descriptor axis; the load map's cross reads the axis instead of deriving it, and the
+      DataHub emission carries `wired` as its own tag while the `confirmed` property means the
+      semantic ruling only (C2).
+  (e) A RELAY for the ninth roll: the axis is per side, the two standing company pins
+      (cm_hosts, deftable-xml-export) retire - the company's gate-log records the retirement
+      rather than deleting the entries (C4) - and `confirmed` crosses again on shared rows.
+  (f) tests/unit/test_source_descriptors.py covers the new axis (declared, required, reason
+      length, refusal); the J57 family and the full unit suite green.
+notes: |
+  Minted 2026-09-09 (Lane A, desktop) FROM the sitting-1 records, as the wiring page's own D2
+  requires ("the build is its own backlog item with its own acceptance") - deliberately not in
+  the same day's mint pass, because a drafted gate decides nothing and B1/B2/B5 decided this
+  shape. Lane A: every input is a config, core or port surface. CORE18 (the data root declared
+  once) lands after this so the two do not collide on config/source-descriptors.yaml.

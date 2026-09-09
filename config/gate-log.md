@@ -4555,3 +4555,131 @@ correction; the Counts line's 25 becomes 26 by the same report.
 - **Registry-table correction, same day:** the `snowflake-data-catalog` row in the 2026-07-31
   registry table read 'gate prompt not drafted'; the prompt exists, and the row now carries a
   dated correction in place (G119's stale-record clause, done rather than deferred).
+## 2026-09-09 — GATE: registry-wiring-readiness — SIGNED OFF 18/18 (N18)
+
+**Prompt:** `config/gate-prompts/registry-wiring-readiness.yaml` (drafted 2026-08-21 by N10;
+swept 2026-09-09 with dated markers and a new section E as N18's BEFORE clause) ·
+**Backlog:** N18 (the run; closes on this record); N23, N24, N25 (gate-bound here; their
+drafting proceeds); the `wired` build minted from this record as CFG13 · **Session:**
+producer desktop, in-chat, held in ONE sitting with `source-descriptor-axes` (the sibling
+page CFG8 drafted because this page's own D3 refuses fold-ins). The SME answered the rulings
+that decide the shape in one message; every other clause is recorded confirmed-as-drafted,
+reopenable under C40. No row's load state changes at this gate (D1).
+
+- **§A1–§A3 — CONFIRMED.** One field answered two questions; the census is evidence, not
+  argument; the YAML comments were doing the field's job. The census was RE-COUNTED by
+  command before the session (30 dataset rows, 21 true / 9 false; the 9 regrouped 4 wiring
+  / 4 semantic / 1 neither - `hr_phone_exp` moved to the wiring group when K17 signed).
+- **§B1 — RULED: A SECOND FACT IS WARRANTED, and its HOME is ruled on the sibling page:**
+  NOT a field on the registry row - a SIXTH DESCRIPTOR AXIS in
+  `config/source-descriptors.yaml` (source-descriptor-axes §B2), so the registry stays the
+  gate-signed WHAT and registration state lives where the PoC put it. The single-field
+  alternative (one flag plus a required `hold_reason`) is REJECTED explicitly: O90's cross
+  renders the fact without a field, but a rendered cross is not a queryable, portable value
+  with a reason.
+- **§B2 — RULED: the name is `wired`, polarity true | false** (a fact about the pipeline,
+  never `ready`, never a `stage:` enum).
+- **§B3 — CONFIRMED.** `require_confirmed()` refuses unless `confirmed` AND `wired`, and its
+  message names WHICH failed and what clears it (go find an SME, or go build a loader).
+- **§B4 — CONFIRMED: a false carries a written reason of at least forty characters**
+  (the SOURCELESS_LOADERS idiom); a bare false is refused at construction.
+- **§B5 — RULED at the drafter's default, reopenable under C40: DECLARED FOR EVERY
+  registry-home dataset, never silent.** A new row must answer; the 21 loading rows declare
+  true, the 4 wiring holds declare false with their reason, the 4 semantic holds and the one
+  `neither` row declare whatever is true of THEIR pipeline, independently of `confirmed`.
+- **§C1–§C4 — CONFIRMED on the corrected footing of §E1.** The two facts have opposite
+  dispositions; `wired` is PER SIDE and named in `PORT-MANIFEST.yaml`'s `per_side_fields`
+  block in the SAME change as the axis (C3); the two standing company pins (`cm_hosts`,
+  `controlm:deftable-xml-export`) retire once the axis lands - by relay, and the company's
+  gate-log records the retirement rather than deleting the entries (C4).
+- **§D1–§D3 — CONFIRMED.** No row's load state changes; the schema moves only now that this
+  page has signed (D2, already SCOPED by the 2026-08-30 ruling); D3's separate item was O90,
+  whose guard `test_the_key_reports_and_never_rules` is AMENDED by this ruling to admit the
+  descriptor axis and keep forbidding a wiring field on the registry row.
+- **§E1 — CONFIRMED: the split lets the SEMANTIC ruling travel again.** Since J71
+  `confirmed` never crosses; at the build the source-registry entry_rule is amended so
+  `confirmed` and its stamps cross as the producer's signed WHAT on shared rows (Q6), while
+  `wired` stays per side in the descriptor. Company-only rows stay theirs, as per-entry already
+  rules.
+- **§E2 — RULED: `source-connection-and-run-identity` is DEFERRED**, re-armed by the
+  data-flow gate's clause G4 (does parity evidence need a run digest) or by the first
+  automated DB-backed source the base needs - recorded in the DEFERRED entry below.
+- **§E3 — CONFIRMED.** Counts by command, never carried.
+- **Follow-ups minted from this record:** CFG13 (the axis, the per-side manifest entry, the
+  `require_confirmed` message, the guard amendment, the entry_rule amendment, the relay).
+  N23's draft (the id grammar, carrying ADR 0015's Phase 0 as clauses (h) and (i)) proceeds.
+
+## 2026-09-09 — GATE: source-descriptor-axes — SIGNED OFF 13/13 (CFG9)
+
+**Prompt:** `config/gate-prompts/source-descriptor-axes.yaml` (CFG8, drafted 2026-09-09) ·
+**Backlog:** CFG9 (the run; closes here); CFG13 (the build); CFG10 (`xlsx` joins the format
+axis, a classification change made now that the five are confirmed) · **Session:** the same
+sitting as registry-wiring-readiness above; the SME ruled §B1/§B2 (home), §B3/§B4
+(derivation) and §B5 (the port outcome) in one message; the rest confirmed-as-drafted,
+reopenable under C40.
+
+- **§A1 — CONFIRMED: the five axes are the closed set** - acquisition, format, authority,
+  layer, access - with `xlsx` joining `format` as a classification change (CFG10), not a
+  ruling. **§A2 — CONFIRMED:** derive, override, refuse, validated at construction, is what
+  "declared, never inferred" means here. **§A3 — CONFIRMED:** `access` stays the credential
+  CLASS; the N24 rider asks about the path and the principal WITHIN this axis, never as a
+  second vocabulary.
+- **§B1 / §B2 — RULED: HOME (ii), A SIXTH DESCRIPTOR AXIS.** `wired` lives in
+  `config/source-descriptors.yaml` and its reader; the registry row does not grow the field;
+  O90's guard is amended by this ruling, not worked around; `per_side_fields` names `wired`
+  because per-entry is not per-side.
+- **§B3 — RULED: DECLARED PER SIDE, with a written reason of at least forty characters when
+  false**, refused otherwise. **§B4 — the derived form (adapter set AND loader registered,
+  behind a load-component seam) is NOT chosen** and is recorded as the alternative: core cannot
+  read loader registration, and a declared value with a reason is the smaller mechanism.
+- **§B5 — CONFIRMED:** the outcome wanted is that the semantic half travels again and the
+  wiring half stays per side (registry-wiring-readiness §E1).
+- **§C1 — RULED: axis values do NOT reach the graph now;** any later yes is an ontology
+  decision for the ontology gate. **§C2 — RULED: the catalog tag `confirmed` means the
+  SEMANTIC ruling only;** `wired` becomes its own tag in the DataHub emission once the axis
+  lands, so no already-tagged asset is ambiguous.
+- **§D1–§D3 — CONFIRMED.** The catalog page stays deferred; `xlsx` is informational; nothing
+  applied by drafting - CFG13 is minted from these two records.
+
+## 2026-09-09 — ACCEPTED: ADR 0021 — a result names what it did not check (user ruling, in-chat, at sitting 1)
+
+- **What this records:** `docs/decisions/0021-not-checked-is-not-clean.md` (drafted 2026-09-09
+  at the Lane A close from the module sweep's cycle-1 conclusion) is ACCEPTED as drafted:
+  one three-outcome type in `drydocs_core` that never coerces to a boolean and renders every
+  state; a probe returns it, never a bare bool or a silent empty; a declared probe registry
+  with a guard that reads code (J66); adoption scoped to the port preflight and the
+  doc-coverage report, the six precedent sites keeping the name only; renders show NOT
+  CHECKED where a finding would appear. The ADR's status block and the decisions index carry
+  the date; its action items are live. CORE10 (the instrument) may build.
+
+## 2026-09-09 — DEFERRED: source-connection-and-run-identity, rua-bundle-data-profile, tech-partner-attach-level, standard-identity-and-carrier, replica-derivation-edge, email-dl-contact-point, document-supersession, controlm-folder-identity-grain, dpl-pipeline-registry-contract, dpl-dataset-registry-contract, dpl-dataset-identity-zone, repo-manifest-data-profile, script-provenance-gaps, etlprocess-kind-enum, software-usage-patterns, code-graph-package-layer, bmc-docs-example, software-version-context and console-auth-boundary — each with its named re-arm (user ruling, in-chat, sitting 1)
+
+- **What this records:** nineteen drafted-unsigned pages that are NOT blockers for the base
+  are SME-DEFERRED, on the 2026-09-07 shape: every page stays on disk unchanged, no ruling on
+  any of them is made or reopened, and each carries a NAMED re-arm so it leaves the owed list
+  honestly (C39). User ruling, producer desktop, in-chat, 2026-09-09, in the same sitting as
+  the two records above.
+- **The triggers, per page.** `source-connection-and-run-identity` (N19; N20, N21, CORE8
+  behind it): the data-flow gate's clause G4 rules that parity evidence needs a run digest,
+  OR the base registers its first automated DB-backed source - and the page is swept against
+  G125's `binding:` field before it is re-presented. `rua-bundle-data-profile` (G62, on hold):
+  the next rua bundle is pulled. `console-auth-boundary`: WEB22 owns its run and re-arms it
+  when the console's next auth practice is needed. `email-dl-contact-point`: C44 convenes it
+  with the MFTS route evidence, as folded 2026-09-07. `code-graph-package-layer`: U10.
+  `bmc-docs-example`: J56. `software-version-context`: C33. `software-usage-patterns`: G120.
+  `script-provenance-gaps`: G117. `etlprocess-kind-enum`: G118. `repo-manifest-data-profile`:
+  G63. `dpl-pipeline-registry-contract`, `dpl-dataset-registry-contract`,
+  `dpl-dataset-identity-zone`: G64, G65, G136 - a real DPL export in hand (company-side).
+  `document-supersession`: K23. `controlm-folder-identity-grain`: CFG5.
+  `tech-partner-attach-level`: K29. `standard-identity-and-carrier`: G116.
+  `replica-derivation-edge`: CORE8, with the connection page. In every case the re-arm is
+  the run item ALREADY minted for the page, claimed when its subject is next needed, after a
+  stale-premise sweep of the page.
+- **Deliberately NOT deferred:** `controlm-definition-precedence` (D11) stays ARMED for its
+  own session per the 2026-09-07 ruling that folded D9 into it; `data-flow-overview` (MM11) is
+  sitting 3; `schema-identifier-publish-ceiling-teams-edition` (J70) and N23's id-grammar
+  page are sitting 2; the three pages deferred on 2026-09-07 keep their Logical Container
+  trigger. `sosa-jobrun-observation` keeps its 2026-07-14 deferral.
+- **On the queue (C39):** this entry is ABOUT the nineteen by heading, so gates.json reads
+  them `deferred`; the board stops showing their run items as owed SME time; the lanes stop
+  queuing them until a trigger fires.

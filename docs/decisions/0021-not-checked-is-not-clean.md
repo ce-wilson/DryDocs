@@ -1,10 +1,10 @@
 # ADR 0021 — A result names what it did not check: one three-outcome type, and a probe that returns a bare boolean is refused
 
 ```yaml
-status: PROPOSED        # PROPOSED | ACCEPTED | SUPERSEDED — the drafting session never accepts its own ADR; acceptance is the SME's, scheduled for sitting 1 (registry-wiring-readiness) as one message
+status: ACCEPTED        # user ruling, in-chat, 2026-09-09 at sitting 1 (config/gate-log.md, the ACCEPTED entry); drafted PROPOSED the same day by the Lane A close
 date: 2026-09-09
 authored_by: Lane A close, desktop (Fable 5.1), from the module sweep's cycle-1 conclusion
-deciders: []            # acceptance requires the user's dated ruling; nothing here is pre-approved
+deciders: [chad.wilson] # accepted 2026-09-09 as drafted; action items live from that date
 layer: cross-cutting    # a return-type convention every component's probes follow; the type lives in core
 relates_to:
   - docs/reviews/modules/seams-2026-09-08.md          # slot 10: the cycle conclusion - seven recurrences, six independent correct answers, zero conventions

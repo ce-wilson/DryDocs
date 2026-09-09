@@ -7,7 +7,7 @@ phase: 11
 agent: main
 model: fable
 priority: p1
-status: in_progress
+status: done
 depends_on: [CFG8]
 gates: [source-descriptor-axes]
 inputs:
@@ -23,3 +23,10 @@ acceptance: |
 notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). Plan 2026-09-09, Phase 3 unit 3.3. gates: left empty at mint because the prompt file does not
   exist yet (a slug must resolve to a file at the commit).
+
+  DONE 2026-09-09 (Lane A, desktop). Held in the same sitting as registry-wiring-readiness;
+  SIGNED OFF 13/13, recorded in config/gate-log.md: the five axes confirmed; HOME (ii) the
+  descriptor axis; declared with a reason, the derived form recorded as the alternative; axis
+  values stay off the graph; the catalog tag confirmed means the semantic ruling only. ADR 0021
+  accepted in the same message; the nineteen non-blocker deferrals recorded. The build is
+  CFG13; CFG10 (xlsx) may now proceed.
