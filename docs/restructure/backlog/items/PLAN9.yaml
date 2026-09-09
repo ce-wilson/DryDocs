@@ -7,7 +7,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - tests/unit/test_docs_coverage.py
@@ -49,3 +49,50 @@ notes: |
   because splitting the pin from the file it reads is how the two drift. Lands with PORT6 as
   a next-roll relay, not mid-apply. p2: it costs one hand-merge per roll today and no data is
   wrong.
+  DONE 2026-09-08 (desktop, Lane A).
+  (a) Survey - every unit test pinning a count over a LIVE (non-fixture) file, found by
+      reading the tuple-equality and len()== hits in tests/unit/ against what they count:
+      1. tests/unit/test_docs_coverage.py:399 test_the_live_coverage_census_is_pinned -
+         (products, products_no-corpus, corpora_total, corpora_unclaimed) == (17, 15, 10, 8)
+         over software-registry.yaml + doc-source-registry.yaml, both per-entry.
+      2. tests/unit/test_schema.py:47 EXPECTED_CONSTRAINTS = 55 (test_constraint_count) over
+         drydocs_core/schema/constraints.cypher, per-entry; the company's count is ahead
+         (its supplement blocks) and the manifest row has said "keep consumer count" since
+         the step-45 head.
+      3. tests/unit/test_source_bindings.py:392 total == expected == 15
+         (test_reports_cover_every_automated_dataset) over source-registry.yaml
+         acquisition.mode: automated, per-entry; company 17 at the 2026-09-03 apply.
+      Checked and NOT this class: the vocabulary fragment count the acceptance named is
+      pinned nowhere (test_domain_registry compares two derived sets, no literal);
+      test_ui_tests_ledger.py:143 (13, 13) and the 17/40 share count config/taxonomy/
+      ui-tests.yaml, which has no manifest row and falls to config/** canonical-producer,
+      so both sides hold the same file after a take; test_doc_traceability_loader.py:112
+      counts committed rows of a producer design doc, same reasoning.
+  (b) One shape, applied to all three: the preferred one. The values live in
+      config/dev-environment.yaml as a `census:` block (docs_coverage.{products,
+      products_no_corpus, corpora_total, corpora_unclaimed}, schema_constraints,
+      automated_datasets) and each test reads its key, failing with a message that names
+      the key when the block is absent (the allocator's edition: refusal shape). The
+      acceptance called the file a per-entry manifest row; it is canonical-company
+      (PORT-MANIFEST.yaml:523, and the file's own header), which is BETTER for this
+      purpose - each side keeps its whole file - and is exactly the shape capability_assert
+      already uses there, so no manifest change was needed for the venue file. Negative
+      check run: products 17 -> 16 in the block fails the census test with the new message.
+      tests/unit/test_dev_environment.py gains a shape check on the block. The two evaluate
+      rows for test_schema.py and test_source_bindings.py stay evaluate; their notes now
+      say the count is no longer among the things to hand-merge. No manifest row for
+      test_docs_coverage.py: it crosses byte-identical under tests/**, which is the point.
+  (c) Docstrings keep every history line (O81 15/13 -> 16/14, C25, C43, Q27, Q10) and each
+      adds the one line: where the number lives, and that a consumer edits the venue file,
+      never the test. EXPECTED_CONSTRAINTS is cited by name in signed gate-log entries and
+      the schema_graph.cypher render comment; the records stay as history, the generator
+      comment now names census.schema_constraints and the render was regenerated
+      (scripts/render_schema_graph.py). The reconcile-port skill's EXPECTED_CONSTRAINTS
+      bullet points at the census key.
+  (d) RELAY-49 in docs/port/port-prompt.md: the table of the three pins, the shipped
+      block, and the four steps at the next base that carries this (take the tests
+      wholesale, write YOUR numbers into YOUR file before the take, the new shape check,
+      re-render schema_graph.cypher). Nothing is asked back.
+  Guards: test_docs_coverage, test_schema, test_source_bindings, test_dev_environment,
+  test_schema_graph, test_constraint_drift, test_port_manifest, test_port_dispositions
+  (118 passed) and every test that reads the port-prompt (240 passed).

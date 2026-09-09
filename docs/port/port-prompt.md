@@ -3760,6 +3760,66 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   corrected its own would put your DRAFT ahead of the producer's; it rides with MM13's
   build. Nothing is asked back.
 
+- **RELAY-49 — THREE LIVE-CONFIG COUNT PINS LEFT THEIR TESTS: THE NUMBERS ARE NOW A
+  `census:` BLOCK IN YOUR OWN `config/dev-environment.yaml`, AND THE THREE TEST FILES
+  CROSS BYTE-IDENTICAL FROM THE NEXT BASE ON** (new 2026-09-08, producer `main` after
+  `port-base-20260908` / `314b1715`, venue desktop; this is PLAN9, minted from your
+  sixteenth report's hand-merge list `[SME-REPORTED]`). `[VERIFIED-PRODUCER]` throughout.
+
+  **WHAT MOVED, AND WHY.** Three unit guards pinned a count over a REAL config file
+  so the picture could not drift silently, and each count was a fact about ONE
+  checkout's rows, because every file they count is `per-entry` in `PORT-MANIFEST.yaml`
+  and you hold rows the producer never sees. Checked into the TEST, the number collided
+  at every roll and you re-pinned it by hand — three times per port, as your list said.
+  The survey the item required found exactly these three and no others (the vocabulary
+  fragment count the item named as a candidate is not pinned anywhere; the
+  `ui-tests.yaml` pins in `test_ui_tests_ledger.py` count a `canonical-producer` file,
+  so they are the same on both sides after a take and are not this class):
+
+  | test | pinned over | producer value | your value at the 2026-09-03 apply |
+  |---|---|---|---|
+  | `tests/unit/test_docs_coverage.py::test_the_live_coverage_census_is_pinned` | `config/taxonomy/software-registry.yaml` + `config/doc-source-registry.yaml` | (17, 15, 10, 8) | your own tuple, hand-merged each roll |
+  | `tests/unit/test_schema.py::test_constraint_count` (`EXPECTED_CONSTRAINTS`) | `drydocs_core/schema/constraints.cypher` | 55 | ahead — your supplement blocks |
+  | `tests/unit/test_source_bindings.py::test_reports_cover_every_automated_dataset` | `config/source-registry.yaml` `acquisition.mode: automated` | 15 | 17 |
+
+  One shape for all three, the one `capability_assert` already uses in the same file:
+  the value lives in `config/dev-environment.yaml`, which is `canonical-company` — each
+  side keeps its own, a port never overwrites it — and the test READS it. The guard
+  keeps its teeth (a wrong number in the venue file fails the test with a message that
+  names the key), the test file carries no count of its own, and the history of each
+  number stays in the test's docstring and comments, where a reader looking at the guard
+  finds it. The producer's block, as shipped:
+
+  ```yaml
+  census:
+    docs_coverage:
+      products: 17
+      products_no_corpus: 15
+      corpora_total: 10
+      corpora_unclaimed: 8
+    schema_constraints: 55
+    automated_datasets: 15
+  ```
+
+  **WHAT TO DO AT THE NEXT BASE THAT CARRIES THIS** (it is not in `port-base-20260908`).
+  (1) Take the three test files wholesale — they fall to the `tests/**` default and carry
+  no number now, so there is nothing to hand-merge; `test_schema.py` and
+  `test_source_bindings.py` keep their `evaluate` rows for whatever ELSE your copies
+  carry, and both rows' notes now say the count is not one of those things. (2) Add the
+  `census:` block to YOUR `config/dev-environment.yaml` with YOUR numbers — the file is
+  yours, so this is the "new producer KEYS are ADAPTED BY HAND" case its own manifest row
+  already describes; a copy with no block fails all three guards with a message naming
+  the missing key, which is the same refusal shape as the allocator's `edition:`. The
+  numbers you write are the ones your current hand-merged pins hold today: read them off
+  your test files before the take, not after. (3) `tests/unit/test_dev_environment.py`
+  gains `test_census_declares_every_pin_the_guards_read`, a shape check on the block
+  (six integer keys) — it crosses with the file. (4) The generated
+  `drydocs_core/schema/schema_graph.cypher` moves two comment lines (the render no
+  longer names `EXPECTED_CONSTRAINTS`); it is a derived render, so re-run
+  `scripts/render_schema_graph.py` on your side rather than taking the file. From then
+  on, when your registries move, you edit `census:` and say why in the commit — never
+  the test. Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has

@@ -66,6 +66,19 @@ def test_venues_declare_availability_and_purpose():
         assert str(spec.get("what", "")).strip(), code
 
 
+def test_census_declares_every_pin_the_guards_read():
+    """PLAN9 (2026-09-08): the three live-config count pins read their expected value
+    from `census:` here, so the test files stay byte-identical across the port and a
+    consumer declares its own numbers in the file already ruled canonical-company.
+    This is the shape check; the three guards do the counting."""
+    census = _load()["census"]
+    dc = census["docs_coverage"]
+    for key in ("products", "products_no_corpus", "corpora_total", "corpora_unclaimed"):
+        assert isinstance(dc.get(key), int) and dc[key] >= 0, f"census.docs_coverage.{key}"
+    for key in ("schema_constraints", "automated_datasets"):
+        assert isinstance(census.get(key), int) and census[key] >= 0, f"census.{key}"
+
+
 def test_databases_match_provisioning_script():
     """The topology names here must be exactly what 01_databases.cypher creates.
 

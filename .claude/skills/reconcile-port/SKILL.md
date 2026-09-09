@@ -191,10 +191,14 @@ stay skipped — confirm with the operator if a new one appears.
   e33f8d02 recorded dies at the next port; no per-line handling needed.
 
 - Verify command: company `m6-verify` vs producer `m3-verify`.
-- `EXPECTED_CONSTRAINTS`: company is ahead as a **superset** (base + snow-support
+- The constraint count: company is ahead as a **superset** (base + snow-support
   supplements; 45 ⊇ 40 at the 2026-07-20 bundle port). Counts drift every port —
-  trust the live `test_schema.py` / `constraints.cypher` on each side, not any
-  recorded number (66acea8 lesson: "trust the file, not the ledger").
+  trust the live `constraints.cypher` on each side, not any recorded number
+  (66acea8 lesson: "trust the file, not the ledger"). **Since PLAN9 (2026-09-08) the
+  number is not in `test_schema.py` at all**: it is `census.schema_constraints` in
+  `config/dev-environment.yaml` (canonical-company), beside `census.automated_datasets`
+  and `census.docs_coverage`, so the three test files cross byte-identical and each side
+  edits its own venue file.
 - Condition key: `scope_key` vs producer `folder_id`.
 - Suite size: company suite is much larger (scrapers/Confluence). **Do not chase
   the producer's `186 passed` full-suite number** — only zero *new* failures matters,

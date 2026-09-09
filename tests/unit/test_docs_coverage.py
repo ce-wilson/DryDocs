@@ -34,6 +34,7 @@ from drydocs.docs_coverage import (
 ROOT = __import__("pathlib").Path(__file__).resolve().parents[2]
 SOFTWARE_REGISTRY = ROOT / "config" / "taxonomy" / "software-registry.yaml"
 DOC_REGISTRY = ROOT / "config" / "doc-source-registry.yaml"
+DEV_ENVIRONMENT = ROOT / "config" / "dev-environment.yaml"
 
 
 def _product(pid: str, **kw) -> dict:
@@ -355,6 +356,22 @@ def test_every_corpus_declares_the_one_database() -> None:
     )
 
 
+def _declared_census() -> dict:
+    """The numbers this checkout expects, from config/dev-environment.yaml `census:`.
+
+    Read here and nowhere else in this file, so the test file carries no count of
+    its own (PLAN9). A missing block is a venue that has not declared, and the
+    message says which key, on the allocator's `edition:` pattern.
+    """
+    doc = yaml.safe_load(DEV_ENVIRONMENT.read_text(encoding="utf-8"))
+    census = (doc.get("census") or {}).get("docs_coverage")
+    assert isinstance(census, dict), (
+        "config/dev-environment.yaml declares no census.docs_coverage block - this "
+        "checkout's expected coverage counts live there, not in the test (PLAN9)"
+    )
+    return census
+
+
 def test_the_live_coverage_census_is_pinned() -> None:
     """Known-state pin over the REAL config. Not a failure condition — a change
     to the coverage picture must be LOUD without being red.
@@ -364,41 +381,52 @@ def test_the_live_coverage_census_is_pinned() -> None:
     is Neo4j's hosted docs, and no corpus here has scraped them. Recording it as
     an uncovered product is the point of this census; quietly pointing it at the
     existing neo4j corpus would claim coverage that does not exist.
+
+    THE NUMBERS LIVE IN config/dev-environment.yaml `census.docs_coverage`, NOT
+    HERE (PLAN9, 2026-09-08). The two registries this counts are per-entry in
+    PORT-MANIFEST.yaml, so the tuple is a fact about one checkout's rows, and
+    checked in here it collided at every roll. A consumer whose picture differs
+    edits the venue file, never this test; the history below is the producer's.
     """
     software = yaml.safe_load(SOFTWARE_REGISTRY.read_text(encoding="utf-8"))
     doc = yaml.safe_load(DOC_REGISTRY.read_text(encoding="utf-8"))
     report = coverage(software["products"], doc["sources"])
     s = report.summary()
+    want = _declared_census()
     assert (
-        (
-            s["products"],
-            s["products_no-corpus"],
-            s["corpora_total"],
-            s["corpora_unclaimed"],
-            # PIN MOVED 2026-08-09 (C25): 13 -> 15 products and 12 -> 14 without a
-            # documentation pointer. Both deltas are the two prerequisite rows the
-            # software-version-context gate needed — `snowflake` and `dpl` — neither of
-            # which has a docs corpus. Corpora counts are unchanged.
-            # WORTH KNOWING, because the number looks like it should have moved: the
-            # same commit added an `evidence:` block to the `abinitio` row, and abinitio
-            # still counts as having NO documentation pointer. That is correct rather
-            # than a miss — `evidence:` points at hand-compiled rows that inform the
-            # product, `documentation:` points at a docs corpus that describes it. The
-            # gate's §C5 ruling turns on exactly that distinction.
-        )
-        == (
-            17,  # 16->17 at C43 (2026-09-03): the mfts product row (Axway SecureTransport, the white-label case)
-            # 15->16 at O81 (2026-08-31): the neo4j-nvl product row
-            15,  # 14->15 at C43: no vendor documentation captured for the platform yet — the research names
-            # Axway's public docs as the next rung (an External corpus), so this is a task, not a miss
-            # 13->14 at O81: NVL has no scraped corpus, so it counts as uncovered
-            # 14->13 at Q27 (2026-08-27): airflow gained its documentation pointer
-            10,  # 9->10 at Q27: mwaa-implementation-docs registered — prior moves: chase-leadership-scrape 2026-08-27, Q10 ops-email-extracts 2026-08-19
-            8,  # unclaimed 7->8 — org-structure gate evidence, not product documentation (same class as the email corpus before it)
-        )
+        s["products"],
+        s["products_no-corpus"],
+        s["corpora_total"],
+        s["corpora_unclaimed"],
+        # PIN MOVED 2026-08-09 (C25): 13 -> 15 products and 12 -> 14 without a
+        # documentation pointer. Both deltas are the two prerequisite rows the
+        # software-version-context gate needed — `snowflake` and `dpl` — neither of
+        # which has a docs corpus. Corpora counts are unchanged.
+        # WORTH KNOWING, because the number looks like it should have moved: the
+        # same commit added an `evidence:` block to the `abinitio` row, and abinitio
+        # still counts as having NO documentation pointer. That is correct rather
+        # than a miss — `evidence:` points at hand-compiled rows that inform the
+        # product, `documentation:` points at a docs corpus that describes it. The
+        # gate's §C5 ruling turns on exactly that distinction.
+    ) == (
+        # Producer history of each number, kept beside the key it moved (the
+        # value itself is in the venue file):
+        want["products"],
+        # 16->17 at C43 (2026-09-03): the mfts product row (Axway SecureTransport, the white-label case)
+        # 15->16 at O81 (2026-08-31): the neo4j-nvl product row
+        want["products_no_corpus"],
+        # 14->15 at C43: no vendor documentation captured for the platform yet — the research names
+        # Axway's public docs as the next rung (an External corpus), so this is a task, not a miss
+        # 13->14 at O81: NVL has no scraped corpus, so it counts as uncovered
+        # 14->13 at Q27 (2026-08-27): airflow gained its documentation pointer
+        want["corpora_total"],
+        # 9->10 at Q27: mwaa-implementation-docs registered — prior moves: chase-leadership-scrape 2026-08-27, Q10 ops-email-extracts 2026-08-19
+        want["corpora_unclaimed"],
+        # unclaimed 7->8 — org-structure gate evidence, not product documentation (same class as the email corpus before it)
     ), (
         f"coverage census changed: {s['products']} products, "
         f"{s['products_no-corpus']} with no documentation pointer, "
         f"{s['corpora_total']} corpora of which {s['corpora_unclaimed']} are claimed by no "
-        "product. Update this pin deliberately and say why in the commit."
+        "product. Update census.docs_coverage in config/dev-environment.yaml deliberately "
+        "and say why in the commit - never this test (PLAN9)."
     )
