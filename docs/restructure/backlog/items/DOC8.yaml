@@ -7,7 +7,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p3
-status: in_progress
+status: done
 depends_on: [J67]
 inputs:
 - .github/workflows/ci.yml
@@ -39,3 +39,70 @@ notes: |
 
   RELATED, SEPARATE: Idea-298 asks whether the Windows leg earns its 1.9x cost on every push.
   That is a user ruling on CI spend and stays in the inbox as a question.
+
+  DONE on wip/doc8-laptop (Lane B, laptop, 2026-09-09). Two named filters in
+  pyproject.toml; no ci.yml change, and the reason is measured rather than assumed.
+
+  (a) READ ONCE, DEDUPLICATED BY MESSAGE - and all FOUR legs, not the two the item names,
+  because the other two were free and they corroborate the baseline. Deduplicated, 37 is
+  TWO classes and the arithmetic is exact:
+
+      30x  'asyncio.iscoroutinefunction' is deprecated ... Python 3.16
+           neo4j/_meta.py:213 - a DEPENDENCY, re-entered once per driver construction
+       7x  SPIDERP_LOGDIR is deprecated ... (ADR 0014 clause 1)
+           drydocs_core/run_log.py:80 - OURS
+      ---
+      37   on py3.14; and the 7 alone on py3.12/ubuntu, py3.11/ubuntu, py3.12/windows.
+
+  So the entire 3.14 gap is ONE dependency deprecation, and the baseline every leg
+  carries is ONE class of ours. The class list is the finding; the totals were the symptom,
+  exactly as the item predicted.
+
+  (b) EACH CLASS ENDS IN A NAMED FILTER WITH ITS REASON - and, added beyond the clause,
+  ITS REMOVAL TRIGGER, because a filter that outlives its subject is the silent-drift
+  class this repo keeps paying for (see docs/reviews/premise-drift-2026-09-09.md, same
+  day). neo4j: not ours, and pinning or patching the driver to silence a warning would be
+  worse than the warning; trigger is a neo4j release using inspect.iscoroutinefunction.
+  SPIDERP_LOGDIR: NOT A DEFECT - seven tests exercise the legacy path on purpose, so the
+  warning fires BECAUSE the ADR 0014 deprecation works. Fixing it would mean not testing a
+  path that still ships. Trigger is ADR 0014's own: the port that removes the variable
+  takes this line with it. Neither class was a fix, and saying so is the disposition.
+
+  (c) THE 3.12 BASELINE OF 7 WAS READ IN THE SAME PASS and is the SAME single class as the
+  7 inside the 3.14 total - not a separate population. That is why one filter cleared
+  three legs at once.
+
+  (d) BEFORE AND AFTER, each naming its run (J18):
+        BEFORE - run 34372329929 (2026-09-09, main):
+          py3.14 advisory     3783 passed, 44 skipped, 18 deselected, 37 warnings
+          py3.12 BLOCKING     3783 passed, 44 skipped, 18 deselected,  7 warnings
+          py3.11 advisory     3783 passed, 44 skipped, 18 deselected,  7 warnings
+          py3.12 windows      3783 passed, 44 skipped, 18 deselected,  7 warnings
+        AFTER  - run 34374965778 (2026-09-09, wip/doc8-laptop), all six jobs green:
+          all four legs       3783 passed, 45 skipped, 18 deselected  - and ZERO
+                              "warnings summary" sections in any of the four logs.
+      37/7/7/7 -> 0/0/0/0. The skipped count moved 44 -> 45 because the tree moved
+      (Lane A's fe557fce came in at the rebase), not because of this change.
+
+  VERIFIED WITH A POSITIVE AND A NEGATIVE CONTROL, because the 3.14 class cannot be
+  reproduced on this laptop's 3.12 and a filter nobody proved is a filter nobody can
+  trust. Both patterns were checked against the messages CI printed VERBATIM, and a third
+  probe asserts an UNDISPOSITIONED message still gets through - so the list cannot
+  silently swallow the next real warning. Locally the SPIDERP class went 7 -> 0 and the
+  full suite's summary line stopped carrying a warnings count at all (3903 passed, 15
+  skipped, no warnings).
+
+  NO ci.yml CHANGE, measured: the warnings summary is ALREADY in the logs - pytest emits
+  it without -rw - so the item's -rw reference describes a triage technique, not a
+  required CI edit. Adding a flag that changes nothing would be cost without a finding.
+  The item's inputs list ci.yml; it needed nothing, and that is the answer rather than an
+  omission.
+
+  HANDED BACK, deliberately out of scope for a p3: a filter whose subject CHANGES WORDING
+  becomes a dead entry that silences nothing and nobody notices - the same class as the
+  premise-drift review, and tests/unit/test_runbook_currency.py's shrink-only exemption
+  idiom (an exemption nothing still cites fails the suite) is the mechanism that would fix
+  it. That is a guard, not a filter list, so it is a separate item.
+
+  Suite 3903 passed / 15 skipped / 0 failed; ruff clean; pyproject parses with 2
+  filterwarnings entries. No render, no new tracked path, no PORT-MANIFEST row.
