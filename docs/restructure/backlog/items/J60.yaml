@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - pyproject.toml
@@ -25,6 +25,49 @@ acceptance: |
 
   (e) OUT OF SCOPE: function and class docstrings (D101/D102/D103), any date or provenance key inside a docstring, and the YAML header standard — that is J58/J59. This item adds two rules and the prose they demand, nothing else.
 notes: |
+  DONE on wip/j60-laptop (Lane B, laptop). Two commits, kept separate per the sender:
+  the docstrings first, then the ruff config - so the rules never land on a tree they
+  would fail.
+
+  (c) RE-MEASURED AT PULL TIME, and both numbers reported as the clause asks. The item
+  records 31 modules with no docstring, measured 2026-08-27. At this tree it is 8, and
+  every one is D104 (a package) with ZERO D100 (a module). All 31 modules have been given
+  docstrings in the intervening fortnight; what was left is the package __init__ files,
+  which nobody had thought of as modules. Filling 8 rather than 31 is the real shape of
+  the work, and it is the reason the clause said to re-measure.
+
+  Each docstring says what the package is FOR rather than restating its path, and cites a
+  governing record where one genuinely exists: ADR 0007 for the four agent packages,
+  ADR 0002-A-1 for the drydocs remainder (with the placement test that decides what stays
+  on that side), CLAUDE.md section 1 layer 2 for drydocs_core/ontology. The two test
+  packages have no governing record and none was invented - they explain instead why they
+  are packages at all, which is the part a reader cannot infer.
+
+  (a) The rule comes from the linter already in the gate: D100 and D104 added to
+  [tool.ruff.lint].select. No bespoke test was written; CI blocks on `ruff check` already,
+  so the enforcement point was free.
+
+  THE CONVENTION IS THE LOAD-BEARING HALF, and clause (a) is right to require it.
+  Selecting any D rule without [tool.ruff.lint.pydocstyle].convention switches on a whole
+  pydocstyle style guide nobody ruled on. It is pinned to pep257 with the reason beside
+  it. D101/D102/D103 stay out per clause (e).
+
+  POSITIVE-CONTROLLED, and the first attempt was WRONG in an instructive way. The probe
+  files were named `_probe_mod.py` and `_probe_pkg/`, and ruff reported "All checks
+  passed" - which reads as "the rules are not working" and is actually the rules being
+  exactly right: D100 and D104 say "public module" and "public package", and a leading
+  underscore makes both private. Re-run with public names, both fire from the config:
+  D100 on drydocs_core/probemod.py and D104 on drydocs_core/probepkg/__init__.py. Worth
+  recording because the failing probe looked like a config defect and was not.
+
+  (b) The existing extend-exclude entries (the vendored Anthropic skill scripts, the two
+  captured experiment result trees) are untouched and the new rules inherit them. No
+  per-file-ignore was needed for tests or scripts: the first run came back clean, so none
+  was added - an ignore nobody needs is the kind of thing that reads as a decision later.
+
+  (d) `ruff check .` and `ruff format --check .` both exit 0 on the tree as left here,
+  verified locally before push, so CI's last two stages are green at this sha.
+
   Groomed 2026-08-28 from Idea-181 (captured 2026-08-27), prescription F4 of its python-architect persona review: enable ruff D100/D104 rather than build a bespoke docstring guard. Filed separately from J58/J59 because the language, the enforcement mechanism and the failure mode are all different — those two are JSON-Schema guards over governed YAML; this one is two lines of lint config plus the writing they oblige.
 
   Verified before grooming: `select` in `pyproject.toml` carries no `D` rules; the vendored-skill and captured-experiment ruff exclusions exist with their reasons recorded.

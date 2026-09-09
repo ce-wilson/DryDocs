@@ -117,7 +117,13 @@ extend-exclude = [
 ]
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I", "B", "UP", "N", "RUF"]
+# D100/D104 only (J60): a module and a package say what they are FOR. Enforced by
+# the linter CI already blocks on rather than by a bespoke test, which would be a
+# second, weaker copy of a check the toolchain ships. The CONVENTION below is what
+# keeps the rest of the D family off — without it, selecting any D rule switches on
+# a whole pydocstyle style guide nobody ruled on. D101/D102/D103 (class, method,
+# function) are deliberately OUT: J60 clause (e).
+select = ["E", "F", "W", "I", "B", "UP", "N", "RUF", "D100", "D104"]
 ignore = [
     # The formatter owns layout. What survives `ruff format` is prose inside
     # strings, comments and docstrings, which the formatter never wraps — by
@@ -145,6 +151,12 @@ ignore = [
     "RUF002",
     "RUF003",
 ]
+
+[tool.ruff.lint.pydocstyle]
+# Pinned so `select`'s two D rules cannot drag the rest of the family in behind
+# them. The repo's docstrings are prose-first summaries, not numpy/google
+# sections, and no item ruled a section format.
+convention = "pep257"
 
 [tool.ruff.lint.per-file-ignores]
 # Typer's API IS a call in the default: `def cmd(x: str = typer.Option(...))`.
