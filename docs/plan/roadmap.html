@@ -1,6 +1,6 @@
 <!doctype html>
 <html><head><meta charset="utf-8">
-<!-- sources-fingerprint: ffee1c62c25a34218893cb77b6b8ef1fac03b9cecf723144f70df8d28ca65ccf -->
+<!-- sources-fingerprint: c4f81441e273a333e3ff98eb1c87c1a0031830cd3ac8556351780dd447c8329e -->
 <title>DryDocs — module roadmap</title>
 <style>:root{color-scheme:light}
 body{font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#1a1a1a;
@@ -211,9 +211,7 @@ h2{font-size:1.1rem;margin:0}
 </ul><table class="ideas"><thead><tr><th>Idea</th><th>Size</th><th>What / trigger</th></tr></thead><tbody>
 <tr><td><a class="idea-link" href="ideas.html">Idea-28</a></td><td><span class="est est-S">S</span></td><td>Tier-1/tier-2 app-code rows — SME data entry, not a backlog item.</td></tr>
 </tbody></table></section>
-<section class="module" id="module-graph-infra"><div class="module-head"><h2>graph-infra</h2><span class="stage stage-active">active</span><span class="counts">34 done &middot; 1 open</span></div><div class="progress"><div class="progress-bar" style="width:97%"></div></div><p class="prose"><strong>Built:</strong> The runtime estate works: the EE container with multi-database provisioning, the depgraph snapshot ritual plus viewer, code-graph and doc-traceability loads, CI with testcontainers e2e (Ryuk default settled at J36), and the MCP server wiring.</p><p class="prose"><strong>Remaining:</strong> G32 (in progress) is the keystone — the document/content database residency ruling that several parked corpus registrations wait on. Behind it: G49 MCP post-APOC verify, G50 rollback-container deletion, G53 the single-database contingency plan, U15 the dirty-flag split.</p><ul class="open-items">
-<li><a class="item-link" href="board.html#card-U27">U27</a> <span class="status-badge status-in_progress">in_progress</span> snapshot.ps1&#x27;s CI check asks `gh run list --branch main`, so from any branch HEAD can never appear and the verdict degrades to no-run-yet permanently — and the verdict function still has no tests</li>
-</ul><table class="ideas"><thead><tr><th>Idea</th><th>Size</th><th>What / trigger</th></tr></thead><tbody>
+<section class="module" id="module-graph-infra"><div class="module-head"><h2>graph-infra</h2><span class="stage stage-active">active</span><span class="counts">35 done &middot; 0 open</span></div><div class="progress"><div class="progress-bar" style="width:100%"></div></div><p class="prose"><strong>Built:</strong> The runtime estate works: the EE container with multi-database provisioning, the depgraph snapshot ritual plus viewer, code-graph and doc-traceability loads, CI with testcontainers e2e (Ryuk default settled at J36), and the MCP server wiring.</p><p class="prose"><strong>Remaining:</strong> G32 (in progress) is the keystone — the document/content database residency ruling that several parked corpus registrations wait on. Behind it: G49 MCP post-APOC verify, G50 rollback-container deletion, G53 the single-database contingency plan, U15 the dirty-flag split.</p><table class="ideas"><thead><tr><th>Idea</th><th>Size</th><th>What / trigger</th></tr></thead><tbody>
 <tr><td><a class="idea-link" href="ideas.html">Idea-49</a></td><td><span class="est est-S">S</span></td><td>Recreate the desktop container or re-point — confirmed desktop-only; user ruling.</td></tr>
 <tr><td><a class="idea-link" href="ideas.html">Idea-17</a></td><td><span class="est est-S">S</span></td><td>Post-squash ref cleanup — destructive, user-run.</td></tr>
 <tr><td><a class="idea-link" href="ideas.html">Idea-16</a></td><td><span class="est est-S">S</span></td><td>Add the SNYK_TOKEN repo secret — user manual step.</td></tr>
