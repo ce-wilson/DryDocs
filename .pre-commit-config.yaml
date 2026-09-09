@@ -30,9 +30,36 @@
 #
 # CI keeps its own ruff steps unchanged (.github/workflows/ci.yml). The hook is a
 # faster first line, never a replacement for the gate.
+#
+# THE SECOND REPO IS A DIFFERENT KIND OF HOOK (J59). It compares each governed
+# file's `updated:` key against when that file's content actually moved — J58
+# made the key required and checked its SHAPE; this checks whether it is TRUE.
+#
+# It is here for the same reason the ruff hooks are, only more so: a hook fails
+# the COMMIT, and a date is fixed most cheaply in the commit that moved the file,
+# by the person who moved it. J59 originally argued it CANNOT run in CI (shallow
+# checkout, no per-file history); that was true when the item was groomed and is
+# not true now — the `gates` job sets `fetch-depth: 0`. The premise changed, the
+# placement did not, and tests/unit/test_header_freshness.py pins the real state
+# so the next reader inherits the fact rather than the stale sentence.
+#
+# It is local (`repo: local`), so it runs the checkout's own script with the
+# project interpreter rather than fetching a pinned upstream — there is no rev to
+# keep in step, because the code is the repo's.
+#
+# BYPASSING IT LEAVES A LINE. `--no-verify` skips every hook silently, which is
+# the habit this file exists to discourage; `DRYDOCS_FRESHNESS_SKIP=1 git commit`
+# skips just this one and prints that it did.
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.5.7
     hooks:
       - id: ruff
       - id: ruff-format
+  - repo: local
+    hooks:
+      - id: header-freshness
+        name: governed `updated:` dates are not lying (J59)
+        entry: python scripts/check_header_freshness.py
+        language: system
+        files: \.ya?ml$
