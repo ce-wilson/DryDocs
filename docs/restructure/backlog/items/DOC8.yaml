@@ -88,7 +88,7 @@ notes: |
   reproduced on this laptop's 3.12 and a filter nobody proved is a filter nobody can
   trust. Both patterns were checked against the messages CI printed VERBATIM, and a third
   probe asserts an UNDISPOSITIONED message still gets through - so the list cannot
-  silently swallow the next real warning. Locally the SPIDERP class went 7 -> 0 and the
+  silently swallow the next real warning. Locally the legacy env-prefix (SPIDERP_) warning class went 7 -> 0 and the
   full suite's summary line stopped carrying a warnings count at all (3903 passed, 15
   skipped, no warnings).
 

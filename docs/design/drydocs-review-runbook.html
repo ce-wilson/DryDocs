@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Runbook — operate drydocs-review: gate pages, graph acceptance, review pages, publishing</title>
+<style>
+:root { color-scheme: light dark; --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+@media (prefers-color-scheme: dark) { :root { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; } }
+:root[data-theme="dark"] { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; }
+:root[data-theme="light"] { --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+* { box-sizing: border-box; }
+body { font: 15px/1.6 "Segoe UI", system-ui, Arial, sans-serif; color: var(--ink); background: var(--bg); margin: 0; }
+main { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+h1 { font-size: 28px; margin: 0 0 6px; letter-spacing:-0.3px; }
+h2 { font-size: 20px; margin: 34px 0 10px; padding-bottom:5px; border-bottom: 2px solid var(--ink); }
+h3 { font-size: 16px; margin: 22px 0 8px; }
+h4,h5,h6 { font-size: 14px; margin: 16px 0 6px; }
+p { margin: 10px 0; } strong { font-weight: 700; }
+a { color: var(--link); } a:hover { text-decoration: underline; }
+code { font-family: "Cascadia Mono","Consolas",monospace; font-size: 0.88em; background: var(--faint); padding: 1px 4px; border-radius: 3px; }
+pre { font-family: "Cascadia Mono","Consolas",monospace; font-size: 12.5px; line-height:1.45; border:1px solid var(--line); background: var(--faint); padding: 12px 14px; border-radius: 6px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 14px 0; font-size: 13.5px; display:block; overflow-x:auto; }
+th,td { border:1px solid var(--line); padding: 6px 9px; text-align:left; vertical-align: top; }
+th { background: var(--faint); font-weight:700; }
+blockquote { margin: 14px 0; padding: 2px 16px; border-left: 4px solid var(--line); color: var(--mid); }
+ul,ol { margin: 10px 0; padding-left: 26px; } li { margin: 4px 0; }
+hr { border:none; border-top:1px solid var(--line); margin: 26px 0; }
+:target { scroll-margin-top: 12px; } :target > :first-child, h2:target, h3:target { outline: 2px solid var(--link); outline-offset: 4px; }
+.dd-margin-tag, .dd-print-footer { display: none; }
+
+.dd-note-btn { border:1px solid var(--line); background:var(--bg); color:var(--mid); cursor:pointer; font-size:12px; line-height:1; padding:2px 6px; border-radius:5px; margin-right:6px; }
+.dd-note-btn:hover { color:var(--link); border-color:var(--link); }
+.dd-note-box { margin:6px 0 10px; }
+.dd-note-box textarea { width:100%; min-height:56px; font:13px/1.4 "Segoe UI",system-ui,sans-serif; color:var(--ink); background:var(--faint); border:1px solid var(--line); border-radius:6px; padding:8px; resize:vertical; }
+.dd-annotated { box-shadow:-3px 0 0 var(--link); padding-left:8px; }
+.dd-fb-bar { position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:6px; align-items:stretch; background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:8px 12px; box-shadow:0 2px 10px rgba(0,0,0,.15); font-size:13px; z-index:50; }
+.dd-fb-row { display:flex; gap:8px; align-items:center; justify-content:space-between; }
+.dd-fb-bar button { cursor:pointer; border:1px solid var(--link); background:var(--link); color:#fff; border-radius:6px; padding:5px 10px; font-size:13px; }
+.dd-fb-bar .dd-badge { font-weight:700; }
+.dd-fb-file { cursor:pointer; font-size:11px; color:var(--mid); white-space:nowrap; }
+.dd-fb-file code { font-size:11px; }
+.dd-fb-file:hover code { color:var(--link); }
+.dd-toast { position:fixed; right:16px; bottom:64px; background:var(--ink); color:var(--bg); padding:8px 12px; border-radius:8px; font-size:13px; z-index:60; opacity:0; transition:opacity .2s; }
+.dd-toast.show { opacity:1; }
+.dd-sme-feedback ol li { margin: 6px 0; }
+@media print { .dd-note-btn, .dd-note-box, .dd-fb-bar, .dd-toast, .dd-sme-feedback, .dd-sme-divider { display:none !important; } }
+@page { size: Letter; margin: 0.6in 0.62in 0.55in 0.62in; }
+@media print {
+:root, :root[data-theme="dark"], :root[data-theme="light"] { color-scheme: light; --ink:#1a1a1a; --mid:#555; --line:#bdbdbd; --fill:#eee; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { font: 10.5px/1.45 "Segoe UI", system-ui, Arial, sans-serif; }
+main { max-width: 7.2in; margin: 0 auto; padding: 0 0 0 0.62in; position: relative; }
+h1 { font-size: 21px; margin: 0 0 2px; letter-spacing:-0.2px; }
+h2 { font-size: 14px; margin: 16px 0 8px; padding-bottom:4px; border-bottom: 2px solid var(--ink); text-transform: uppercase; letter-spacing: 0.6px; }
+h3 { font-size: 11.5px; margin: 13px 0 5px; padding-bottom:2px; border-bottom:1px solid var(--line); }
+h4,h5,h6 { font-size: 10.5px; margin: 9px 0 4px; }
+p { margin: 6px 0; }
+a { color: inherit; text-decoration: underline; }
+code { font-size: 9.2px; padding: 0 2px; border-radius: 2px; }
+table { display: table; width:100%; margin: 7px 0; font-size: 9.1px; overflow-x: visible; }
+th, td { padding: 3px 5px; }
+th { background: var(--fill); }
+td code, th code { background: transparent; padding: 0; }
+pre { font-size: 8.4px; line-height: 1.35; padding: 7px 9px; margin: 7px 0; white-space: pre; overflow: hidden; border-radius: 3px; }
+pre.sql { background:#fbfbfb; }
+blockquote { margin: 7px 0; padding: 2px 10px; border-left: 3px solid var(--line); break-inside: avoid; }
+ul,ol { margin: 6px 0 6px 16px; padding: 0; } li { margin: 3px 0; }
+hr { margin: 10px 0; }
+h2, h3, table, pre { break-inside: avoid; }
+
+/* L6 paper HITL: each anchored block sits in the left gutter (main's own padding-left,
+   reserved above) so a printed page carries the anchor id beside its section — no @page
+   margin-box support required, so headless Chromium print-to-pdf renders it reliably. */
+h1, h2, h3, h4, h5, h6, p, table, pre, ul, ol, blockquote { position: relative; }
+.dd-margin-tag {
+  display: block; position: absolute; left: -0.6in; top: 0.1em; width: 0.54in;
+  font: 6.2px/1.15 "Cascadia Mono","Consolas",monospace; text-align: right;
+  color: var(--mid); letter-spacing: 0.1px; word-break: break-word;
+}
+/* Rev/commit footer: `position: fixed` repeats on every printed page in Chromium's
+   headless print-to-pdf (the standard running-footer technique) without needing CSS
+   Paged-Media margin-box content(), which Chromium supports only partially. */
+.dd-print-footer {
+  display: block; position: fixed; left: 0.62in; right: 0.62in; bottom: 0.12in;
+  font-size: 8px; color: var(--mid); text-align: center;
+  border-top: 1px solid var(--line); padding-top: 3px;
+}
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Runbook — operate <code>drydocs-review</code>: gate pages, graph acceptance, review pages, publishing</h1>
+<ul id="front-matter"><span class="dd-margin-tag" aria-hidden="true">front-matter</span><li><strong>Module:</strong> drydocs-review — this runbook IS the module runbook for drydocs-review (V1 coverage rule; authored at V4). It covers the module&#x27;s whole operate surface: the gate-page renderer, the graph acceptance suites, the SME review page, the review backbone and column ledgers, the FID/run-as measurements, and the docs-publish chain.</li><li><strong>Status:</strong> DESCRIPTIVE — documents the working procedure. <strong>Rev 1, 2026-09-09</strong>, authored at commit <code>4ba761be</code>. Every command, count, error message and suite result below was RUN on this tree, and the live half names its venue (J18): <strong>laptop, <code>neo4jtest</code> container, database <code>drydocs</code></strong>. The four suite failures reported in Verify are that graph&#x27;s, not the code&#x27;s, and the section says how to tell.</li><li><strong>Classification:</strong> Internal-Public (mechanism only — every example value is synthetic and every app id comes from the reserved 70001–70099 block. Real gate rulings live in <code>config/gate-log.md</code>; real FID measurements and the Confluence coordinates are company-side and appear nowhere here)</li><li><strong>Audience:</strong> whoever runs an SME gate, proves a graph invariant, renders a review page for an SME to mark up, or publishes a review document</li><li><strong>Companion:</strong> <code>docs/restructure/03-hitl-sme-flow.md</code> (<strong>the process this module is the tooling for</strong> — read it first if you have not run a gate before); <code>docs/design/drydocs-core-runbook.md</code> (the vocabulary registry and run logs the enforcement points below read); <code>config/README.md</code> (what each <code>config/</code> surface is); <code>graph-tests/README.md</code> (the acceptance suites&#x27; own notes).</li></ul>
+<hr>
+<h2 id="purpose-scope"><span class="dd-margin-tag" aria-hidden="true">purpose-scope</span>Purpose &amp; scope</h2>
+<p><strong>Purpose.</strong> Operate the tooling that puts a <strong>person</strong> between derived data and the graph. Four surfaces, one job: render what an SME must decide (gate pages), prove what the graph already claims (acceptance suites), show an SME the rows themselves (review pages), and publish the result (the docs-publish chain).</p>
+<h3>The one rule to know before running anything</h3>
+<blockquote><p><strong>No graph write happens until the mapping is confirmed.</strong> The gate page <em>says</em> it; four separate places in the code <em>enforce</em> it, each by raising.</p></blockquote>
+<p>The distinction matters, because a sentence on a page is a claim and only code refuses:</p>
+<table><thead><tr><th>Enforcement point</th><th>Refuses when</th><th>Raises</th></tr></thead><tbody><tr><td><code>drydocs_core/manual_mappings.py</code></td><td><code>config/manual-loads/manifest.yaml</code> is not <code>status: confirmed</code></td><td><code>ManualLoadError</code></td></tr><tr><td><code>drydocs_core/orchestration/crosswalk.py</code></td><td>a <code>status: proposed</code> crosswalk is used at runtime (<code>require_confirmed</code>)</td><td><code>CrosswalkError</code></td></tr><tr><td><code>drydocs_core/registry_view.py</code></td><td>— classifies a dataset only from entries in a RULED status (<code>applied</code> / <code>confirmed</code>); <code>proposed</code> leaves it UNCLASSIFIED and counted</td><td><em>(reports, does not raise)</em></td></tr><tr><td><code>drydocs_lineage/writer.py</code></td><td>a relationship label&#x27;s vocabulary entry is not <code>active</code></td><td><code>GateBoundVocabularyError</code></td></tr></tbody></table>
+<p>If you are looking for where a refusal came from, look there — not at the gate page.</p>
+<h3>The awkward fact, stated rather than hidden</h3>
+<p><strong>This module has twelve modules and exactly one registered CLI verb.</strong> <code>fid-census</code> is the only <code>drydocs …</code> command that reaches any of it, and the CLI still imports it through the ADR 0018 D4 re-export shim rather than its real path. Everything else — rendering a gate page, running the acceptance suites, rendering a review page, assembling and publishing a document — is a <strong>library call</strong>, so the procedures below are written as Python.</p>
+<p>The sharpest case is the acceptance suites. <code>graph-tests/</code> is mapped to this module in <code>drydocs_core/component_map.py</code>, holds six suites and thirty cases, and has <strong>no runner</strong>: no verb, no <code>main()</code>, no script. Appendix B carries the loop that produced this page&#x27;s numbers, because there was nothing to cite.</p>
+<p><strong>In scope.</strong> Rendering a gate page from a <code>config/gate-prompts/*.yaml</code> spec and drafting its log entry; loading and running the <code>graph-tests/</code> suites and reading a failure correctly; rendering the SME review page; the review backbone (<code>review_labels</code>) and the per-source column ledgers (<code>source_mappings</code>); the FID and run-as measurements; the assemble → validate → preview → publish chain.</p>
+<p><strong>Out of scope.</strong> Deciding a gate — that is the SME&#x27;s, through <code>docs/restructure/03-hitl-sme-flow.md</code>, and the ruling is recorded in <code>config/gate-log.md</code> by a person. Loading anything into the graph (no module here writes one). The real Confluence push, which is not in this repo at all — see Refresh step 4. And the <code>m1-verify</code> / <code>m3-verify</code> / <code>verify-reference</code> commands, which read like this module&#x27;s job and are not: they are hand-written Cypher in the CLI root and never touch <code>graph_verify</code>.</p>
+<h2 id="prerequisites"><span class="dd-margin-tag" aria-hidden="true">prerequisites</span>Prerequisites</h2>
+<ol><li id="prerequisites--the-toolchain-poetry-install-every-comma"><strong>The toolchain.</strong> <code>poetry install</code>. Every command below runs as <code>poetry run …</code>.</li><li id="prerequisites--nothing-else-for-three-of-the"><strong>Nothing else, for three of the four surfaces.</strong> Gate pages, the review page and the publish chain are pure and offline: no database, no network, no data root, no credentials.</li><li id="prerequisites--a-loaded-graph-for-the"><strong>A loaded graph — for the acceptance suites only.</strong> The suites run Cypher, so they need a live Neo4j and a populated database. Bring the container up per the startup/refresh procedure in <code>docs/design/drydocs-startup-refresh-runbook.md</code>, and have <code>.env</code> at the repo root carrying the <code>NEO4J_*</code> names (names only — no secret appears in this document).</li><li id="prerequisites--know-which-graph-you-are-about"><strong>Know which graph you are about to assert against.</strong> A suite result is a statement about ONE database on ONE machine. Write it down before you run, and quote it with any number you report.</li></ol>
+<h2 id="startup"><span class="dd-margin-tag" aria-hidden="true">startup</span>Startup</h2>
+<p><strong>There is no service to start.</strong> This module is libraries and one verb; &quot;startup&quot; is proving that the pieces load and that you know which graph you are pointed at.</p>
+<ol><li><strong>The module imports.</strong></li></ol>
+<pre class="powershell"><code>poetry run python -c &quot;from drydocs.review import gate_pages, graph_verify, graph_review, review_labels; print(&#x27;ok&#x27;)&quot;</code></pre>
+<p><em>Success:</em> <code>ok</code>. Import the <code>drydocs.review.*</code> paths, never the flat ones — the old module paths are one-cycle re-export shims scheduled for removal at the roll after next, and new code that uses them will break then.</p>
+<ol><li><strong>The specs and suites are discoverable.</strong></li></ol>
+<pre class="powershell"><code>poetry run python -c &quot;from drydocs.review.graph_verify import load_suites; s=load_suites(&#x27;graph-tests&#x27;); print(len(s), sum(len(x.cases) for x in s))&quot;</code></pre>
+<p><em>Success:</em> measured on this tree, <code>6 30</code> — six suites, thirty cases. The count is the tree&#x27;s, not a constant: a new suite file changes it.</p>
+<ol><li><strong>For the suites only — confirm the graph.</strong> Note the container, the database name and roughly what is loaded, because Verify reads every failure against it.</li></ol>
+<h2 id="refresh-ingest"><span class="dd-margin-tag" aria-hidden="true">refresh-ingest</span>Refresh / ingest</h2>
+<p>Four procedures. Only step 2 needs a database.</p>
+<h3 id="refresh-ingest--step-1-render-a-gate">Step 1 — render a gate page from its prompt spec</h3>
+<pre class="python"><code>from drydocs.review.gate_pages import load_gate_spec, render_gate_page, draft_gate_log_entry
+
+spec = load_gate_spec(&quot;config/gate-prompts/&lt;slug&gt;.yaml&quot;)
+page = render_gate_page(spec, page_path=&quot;&lt;where you will save it&gt;&quot;)
+open(&quot;&lt;out&gt;.html&quot;, &quot;w&quot;, encoding=&quot;utf-8&quot;, newline=&quot;\n&quot;).write(page)</code></pre>
+<p>Measured on this tree: 60 prompt specs on disk; rendering <code>airflow-crosswalk.yaml</code> produced a 26,023-byte self-contained page. <code>page_path</code> is a <strong>label the footer prints</strong>, not a destination — the renderer returns a string and writes nothing, so you choose where it lands, and no directory convention exists for it in this repo.</p>
+<p>The page is the SME&#x27;s working surface: they tick confirmations, the browser saves progress in <code>localStorage</code> and restores it on return, and the page states in its own text that no graph write happens until the mapping is confirmed. <strong>The repo is the system of record and the browser is not</strong> — a page whose ticks were never carried into a written decision has recorded nothing.</p>
+<p><code>draft_gate_log_entry(spec, answers)</code> returns a <strong>string draft</strong> of the log entry (4,035 characters for the spec above, with an empty answer set). It is a draft for a person to edit and paste; nothing in this module appends to <code>config/gate-log.md</code>, and nothing should — the log is a signed record and a tool that writes it unattended would be forging a signature.</p>
+<h3 id="refresh-ingest--step-2-run-the-graph">Step 2 — run the graph acceptance suites</h3>
+<p>There is no verb. The loop is in Appendix B; run it against a named database and keep the output. What it does: <code>load_suites(&quot;graph-tests&quot;)</code> reads the YAML, each case&#x27;s Cypher runs against the live graph, and <code>evaluate(case.assertion, rows, case.expected)</code> returns <code>(passed, detail)</code> for one of three assertions — <code>empty</code>, <code>nonempty</code>, <code>equals</code>.</p>
+<p>Two notes for whoever runs it:</p>
+<ul><li><strong><code>evaluate</code> is pure and takes the assertion, not the case.</strong> <code>evaluate(case, rows)</code> raises <code>GraphVerifyError: unhandled assertion</code> — the signature is <code>evaluate(assertion, rows, expected=None)</code>.</li><li><strong>The driver prints <code>UnknownPropertyKeyWarning</code> on a partial graph, to stderr.</strong> A property the graph has never seen produces a warning per query. That is Neo4j telling you the graph is thin, not a failure; keep stdout and stderr separate or the results are lost in it.</li></ul>
+<h3 id="refresh-ingest--step-3-render-the-sme">Step 3 — render the SME review page</h3>
+<pre class="python"><code>from drydocs.review.graph_review import group_rows, render_review
+
+rows = [ ... ]                                   # node-property dicts, each with a `_label` key
+html = render_review(group_rows(rows), title=&quot;…&quot;, review_labels=None)</code></pre>
+<p>Pure — <strong>no Neo4j in this module</strong>: the caller fetches the rows and hands them in. <code>group_rows</code> keys on <code>_label</code> (not <code>label</code>); a row without it lands under <code>Unlabeled</code>, which is how a page silently comes out with one section. Passing a <code>ReviewLabels</code> orders the sections by the review backbone and puts each source&#x27;s provenance on the section header; <code>hidden_props</code> strips the plumbing columns from every card.</p>
+<p>Measured: three synthetic rows across two labels rendered a 1,483-byte page.</p>
+<h3 id="refresh-ingest--step-4-assemble-validate-preview">Step 4 — assemble, validate, preview, publish</h3>
+<pre class="python"><code>from drydocs.review.publishing import assembler, validator, preview, publisher
+
+body = assembler.assemble([fragment, ...])          # wraps in DEFAULT_TEMPLATE&#x27;s {body}
+validator.validate(body, raise_on_error=True)       # SEE THE WARNING BELOW
+preview.write_preview(body, &quot;&lt;out&gt;.html&quot;)
+result = publisher.LocalPublisher(out_dir=&quot;&lt;dir&gt;&quot;).publish(title=&quot;…&quot;, body=body)</code></pre>
+<blockquote><p><strong><code>validate()</code> RETURNS its errors and raises only when you ask it to.</strong> The default call returns a list — <code>[]</code> when clean — so <code>validator.validate(body)</code> on its own line is a no-op that reads like a check. Pass <code>raise_on_error=True</code>, or test the return value. This is the one trap in the module.</p></blockquote>
+<p>Measured: the allow-list is <code>code, expand, info, note, panel, status, tip, toc, warning</code>; a disallowed macro returns <code>macro &#x27;html&#x27; not in allow-list [...]</code>; malformed XHTML returns <code>not well-formed XML: mismatched tag: line 3, column 2</code>.</p>
+<p><strong>About the real Confluence push — it is not in this repo.</strong> The producer ships two offline publishers only: <code>NoopPublisher</code> (records what <em>would</em> go, <code>published=False</code>) and <code>LocalPublisher</code> (writes the page to a directory). The Confluence implementation — space coordinates, auth, the internal wrapper — is a company-side gitignored twin implementing the <code>Publisher</code> protocol. <strong>There is therefore no base-URL configuration key producer-side</strong>, and looking for one is looking for something that does not exist: the coordinates live in that implementation, not in this repo&#x27;s config.</p>
+<h2 id="verify"><span class="dd-margin-tag" aria-hidden="true">verify</span>Verify</h2>
+<ol><li><strong>A suite result is a statement about the graph it ran on.</strong> This is the section&#x27;s whole teaching point, so here is a real run rather than an idealized one — the same loop from Appendix B, on <strong>laptop / <code>neo4jtest</code> / database <code>drydocs</code></strong>, a partial development graph (2,802 nodes; 28 Documents, 417 Chunks, 17 jobs, 8 folders, 4 applications, 36 job runs, 0 people):</li></ol>
+<pre><code>bmc-docs-lexical                   5/5 passed
+bmc-docs-smoke                     2/3 passed      FAIL TC-03: expected 0 rows, got 8
+business-application-identity      4/5 passed      FAIL TC-01: expected 0 rows, got 4
+folder-attribution-coverage      12/12 passed
+provenance-diet                    1/2 passed      FAIL TC-02: expected 0 rows, got 3
+tom-required-contacts              2/3 passed      FAIL TC-01: expected &gt;=1 row, got 0
+TOTAL 26/30</code></pre>
+<p><strong>26/30 here is not 26/30 anywhere else, and the four failures are four different things.</strong> Reading each one is the skill this section is teaching:</p>
+<table><thead><tr><th>Failure</th><th>What it found</th><th>Reading</th></tr></thead><tbody><tr><td><code>business-application-identity</code> TC-01, 4 rows</td><td>four <code>:BusinessApplication</code> with a null <code>app_id</code> — 3 from <code>source: pat</code>, 1 from <code>source: registry</code></td><td><strong>Venue artifact.</strong> Pre-cutover loaders created them behind the uniqueness constraint&#x27;s back, because uniqueness ignores nulls. The case description says so. Expected on this machine</td></tr><tr><td><code>tom-required-contacts</code> TC-01, 0 rows</td><td>no required-and-active <code>:TOMRole</code>, though 7 <code>:TOMRole</code> nodes exist</td><td><strong>Venue artifact — and the guard working.</strong> This case is an explicit VACUITY guard: without it, TC-03 would pass on an unseeded graph and mean nothing. It is reporting a stale seed, exactly as designed</td></tr><tr><td><code>provenance-diet</code> TC-02, 3 rows</td><td><code>bmc_docs.v1</code> recorded 374 rows changed with 0 <code>WAS_GENERATED_BY</code> edges; <code>essential_graphrag.v1</code> twice recorded 43 with 0</td><td><strong>Not a venue artifact.</strong> Every mismatch has <code>actual = 0</code> and both are loader-wide, so this is a consistent statement about two loaders, not drift. Worth a look; not a runbook&#x27;s call</td></tr><tr><td><code>bmc-docs-smoke</code> TC-03, 8 rows</td><td>all 8 <code>:ControlMFolder</code> are nameless — and they carry no <code>name</code> property at all</td><td><strong>Not a venue artifact either.</strong> Every folder here came from <code>controlm_folders.v1</code>, which writes the folder name as <code>sched_table</code>. The case asserts on <code>f.name</code>, a property that loader never writes, so it cannot pass against this loader&#x27;s output. Whether the case or the loader is wrong is an SME/backlog question</td></tr></tbody></table>
+<p>The rule to carry away: <strong>before calling a suite failure a defect, ask what is loaded.</strong> Two of these four are the graph being partial and two are real disagreements — and no total tells you which is which.</p>
+<ol><li><strong>The offline surfaces verify without a graph.</strong> Each returns something checkable: <code>load_suites</code> returns 6 suites / 30 cases; <code>render_gate_page</code> returns a non-empty self-contained page; <code>validator.validate</code> returns <code>[]</code> on a clean body and a populated list on a bad one; <code>write_preview</code> returns the path it wrote.</li><li><strong>The unit contract.</strong> These pass on a clean tree with no database:</li></ol>
+<pre class="powershell"><code>poetry run pytest -q tests/unit/test_gate_pages.py tests/unit/test_graph_verify.py tests/unit/test_graph_review.py tests/unit/test_review_labels.py tests/unit/test_publishing.py tests/unit/test_sme_notes.py tests/unit/test_source_mappings.py tests/unit/test_fid_census.py tests/unit/test_run_as_detect.py</code></pre>
+<h2 id="rollback"><span class="dd-margin-tag" aria-hidden="true">rollback</span>Rollback</h2>
+<p><strong>Nothing in this module writes the graph, so there is nothing to roll back from one.</strong> That is the module&#x27;s defining property, not a happy accident, and the four enforcement points in Purpose &amp; scope are what keep it true elsewhere.</p>
+<p>What each surface does write, and how to undo it:</p>
+<ul><li><strong>Gate page</strong> — <code>render_gate_page</code> returns a string and writes nothing. You wrote the file; delete it and re-render. The SME&#x27;s ticks live in that browser&#x27;s <code>localStorage</code> and are lost with the file, which is why a decision is not final until a person has written it into <code>config/gate-log.md</code>.</li><li><strong>Acceptance suites</strong> — read-only Cypher. A suite that ran is a measurement; there is no state to undo. (A suite is not <em>guaranteed</em> read-only by the runner — it runs the Cypher the YAML carries — so review a new suite&#x27;s statements like any other.)</li><li><strong>Review page</strong> — one HTML file at the path you chose.</li><li><strong>Publishing</strong> — <code>NoopPublisher</code> sends nothing by construction. <code>LocalPublisher</code> writes one file per page into a directory you name; delete it. A real Confluence publisher is the company&#x27;s, and its undo is Confluence&#x27;s page history, not this repo&#x27;s.</li><li><strong><code>config/gate-log.md</code></strong> — the one thing here that must never be rolled back automatically. It is a signed record; a wrong entry is corrected by a new entry that says so, the way the log already does.</li></ul>
+<h2 id="troubleshooting"><span class="dd-margin-tag" aria-hidden="true">troubleshooting</span>Troubleshooting</h2>
+<table><thead><tr><th>Symptom</th><th>Diagnosis</th><th>Fix</th></tr></thead><tbody><tr><td><code>GraphVerifyError: unhandled assertion: Case(...)</code></td><td><code>evaluate</code> was passed the CASE; it takes the ASSERTION</td><td><code>evaluate(case.assertion, rows, case.expected)</code></td></tr><tr><td>The suite output is buried in <code>UnknownPropertyKeyWarning</code> text</td><td>The driver warns per query about properties this graph has never seen — a thin graph, not a failure</td><td>Keep stderr separate (<code>… 2&gt;$null</code> in PowerShell); read the warnings once, then ignore them</td></tr><tr><td>A review page renders one section called <code>Unlabeled</code></td><td><code>group_rows</code> keys on <code>_label</code>; the rows carry <code>label</code> or nothing</td><td>Add <code>_label</code> to each row</td></tr><tr><td>A page with a forbidden macro publishes anyway</td><td><code>validate()</code> RETURNS errors; the default call does not raise</td><td>Pass <code>raise_on_error=True</code>, or check the returned list</td></tr><tr><td><code>Missing option &#x27;--application&#x27;</code> from <code>fid-census</code></td><td>The verb has no default headers or scope, deliberately — the producer has never seen a functional-id directory export</td><td>Supply the real options; the column names are the caller&#x27;s to name</td></tr><tr><td><code>ManualLoadError: … is not status: confirmed</code></td><td>The manual-loads manifest is gate-bound and has not been confirmed</td><td>Take it to the gate; do not edit the status to get past the refusal</td></tr><tr><td><code>CrosswalkError: … is status &#x27;proposed&#x27;</code></td><td>A proposed crosswalk is a gate&#x27;s INPUT, not a runtime mapping</td><td>Confirm it at the gate, or pass <code>require_confirmed=False</code> only for gate tooling reviewing it</td></tr><tr><td>An import of <code>drydocs.gate_pages</code> (or any flat name) works today and you are unsure it will tomorrow</td><td>Those are one-cycle re-export shims from ADR 0018 D4, due for removal at the roll after next</td><td>Import <code>drydocs.review.&lt;name&gt;</code></td></tr><tr><td>A suite fails and you cannot tell whether it is the code or the graph</td><td>The question Verify step 1 exists for</td><td>Read what is loaded first; then read the case&#x27;s Cypher and description</td></tr></tbody></table>
+<h2 id="contacts-escalation"><span class="dd-margin-tag" aria-hidden="true">contacts-escalation</span>Contacts &amp; escalation</h2>
+<ul><li><strong>Procedure owner:</strong> the DryDocs producer (repo owner). Company-side runs against the real graph and the real Confluence space are the company session&#x27;s, in its own repo.</li><li><strong>Every decision this module surfaces routes to the HITL gate</strong> (<code>docs/restructure/03-hitl-sme-flow.md</code>), and the ruling is recorded by a person in <code>config/gate-log.md</code>. This module renders the question and drafts the entry; it never answers and never signs.</li><li><strong>A suite failure is escalated with its venue attached</strong> — the machine, the container and the database — or the next reader cannot tell a defect from a partial load. Two of the four failures above would be misread as defects without it.</li><li><strong>A disagreement between this page and the code:</strong> the code wins, and the fix is this page. Appendix B re-derives every count here.</li></ul>
+<h2 id="appendices"><span class="dd-margin-tag" aria-hidden="true">appendices</span>Appendices</h2>
+<h3>A. The module census — twelve modules, one verb</h3>
+<table><thead><tr><th>File</th><th>Reached by</th><th>What it does</th></tr></thead><tbody><tr><td><code>drydocs/review/gate_pages.py</code></td><td>library only</td><td>renders a <code>config/gate-prompts/*.yaml</code> spec into a self-contained interactive gate page; drafts its log entry</td></tr><tr><td><code>drydocs/review/graph_verify.py</code></td><td>library only — <strong>no runner exists</strong></td><td>loads the <code>graph-tests/</code> TC suites and evaluates their results; the loader and evaluator are pure</td></tr><tr><td><code>drydocs/review/graph_review.py</code></td><td>library only</td><td>renders grouped node rows into the SME review page; no Neo4j in the module</td></tr><tr><td><code>drydocs/review/review_labels.py</code></td><td>library only</td><td>typed accessor over <code>config/review-labels.yaml</code> — the review backbone that orders sections and supplies provenance</td></tr><tr><td><code>drydocs/review/source_mappings.py</code></td><td>library only</td><td>typed accessor over <code>config/source-mappings/&lt;id&gt;.yaml</code> — the per-source column ledger (project / filter-only / excluded / deferred)</td></tr><tr><td><code>drydocs/review/sme_notes.py</code></td><td>library only</td><td>harvests owner-attributed inline notes from the source into requirement buckets</td></tr><tr><td><code>drydocs/review/fid_census.py</code></td><td><strong><code>drydocs fid-census</code></strong> (through the flat shim)</td><td>the K16 phase-0 FID directory census the <code>fid-identity-and-scope</code> gate needed</td></tr><tr><td><code>drydocs/review/run_as_detect.py</code></td><td>library only</td><td>K25, <code>fid_census</code>&#x27;s sibling: cross-application run-as detection</td></tr><tr><td><code>drydocs/review/publishing/assembler.py</code></td><td>library only</td><td>joins XHTML fragments into one body via <code>DEFAULT_TEMPLATE</code></td></tr><tr><td><code>drydocs/review/publishing/validator.py</code></td><td>library only</td><td>well-formedness plus a macro allow-list; returns errors unless <code>raise_on_error=True</code></td></tr><tr><td><code>drydocs/review/publishing/preview.py</code></td><td>library only</td><td>writes an assembled body to a local file, LF endings</td></tr><tr><td><code>drydocs/review/publishing/publisher.py</code></td><td>library only</td><td>the <code>Publisher</code> protocol plus <code>NoopPublisher</code> and <code>LocalPublisher</code>; the Confluence implementation is company-side</td></tr></tbody></table>
+<p><code>graph-tests/</code> belongs to this module too — <code>drydocs_core/component_map.py</code> maps it to <code>drydocs-review</code>, because the suites are review&#x27;s acceptance data.</p>
+<h3>B. Re-derive one-liners — the code wins on disagreement</h3>
+<pre class="powershell"><code># the suites and their case counts
+poetry run python -c &quot;from drydocs.review.graph_verify import load_suites; s=load_suites(&#x27;graph-tests&#x27;); print(len(s), sum(len(x.cases) for x in s))&quot;
+
+# the publish macro allow-list
+poetry run python -c &quot;from drydocs.review.publishing.validator import DEFAULT_ALLOWED_MACROS; print(sorted(DEFAULT_ALLOWED_MACROS))&quot;
+
+# which registered verbs reach this module (read from Typer, never --help; J37)
+poetry run python -c &quot;import drydocs.cli as c; print(sorted(i.name for i in c.app.registered_commands if i.name))&quot;</code></pre>
+<p>And the suite runner this page used, since the module ships none. Save it outside the repo, point it at ONE named database, and quote that name with every number it prints:</p>
+<pre class="python"><code>import os
+from drydocs.cli import _client
+from drydocs.review.graph_verify import evaluate, load_suites
+
+db = os.environ.get(&quot;DRYDOCS_VERIFY_DB&quot;, &quot;drydocs&quot;)
+with _client(db) as client:
+    print(f&quot;venue: &lt;machine&gt;, &lt;container&gt;, database {db!r}&quot;)
+    for suite in load_suites(&quot;graph-tests&quot;):
+        for case in suite.cases:
+            rows = client.run(case.cypher, **(case.params or {}))
+            passed, detail = evaluate(case.assertion, rows, case.expected)
+            if not passed:
+                print(f&quot;FAIL {suite.name} {case.id}: {detail}&quot;)</code></pre>
+<hr class="dd-sme-divider">
+<section class="dd-sme-feedback" aria-label="SME - Feedback">
+<h2>SME - Feedback</h2>
+<p>How to return your notes on this document:</p>
+<ol>
+<li>Click the <strong>✎</strong> button beside any section (or numbered step) and type your note — notes save in your browser as you type.</li>
+<li>When finished, click <strong>Copy feedback</strong> in the bottom-right toolbar. Your notes are copied as anchor-keyed YAML.</li>
+<li>Create the feedback file (it is YAML, <em>not</em> markdown) — <strong>Copy To:</strong> <code>docs/design/feedback/</code> · <strong>File Name:</strong> <code>drydocs-review-runbook-rev1.yaml</code></li>
+<li>Paste the copied block into that file, save, and commit (or send the file back to the team).</li>
+</ol>
+</section>
+</main>
+<footer class="dd-print-footer">Rev 1 · commit 4ba761be</footer>
+<script>
+
+(function(){
+  var DOC="drydocs-review-runbook", FILE="drydocs-review-runbook-rev1.yaml", DIR="docs/design/feedback/", KEY="drydocs-doc-feedback:"+DOC;
+  function load(){ try{return JSON.parse(localStorage.getItem(KEY)||"{}");}catch(e){return {};} }
+  function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+  var state=load(), badge;
+  function count(){ return Object.keys(state).filter(function(k){return (state[k]||"").trim();}).length; }
+  function refresh(){ if(badge) badge.textContent=count(); }
+  function toast(msg){ var t=document.createElement("div"); t.className="dd-toast"; t.textContent=msg; document.body.appendChild(t); requestAnimationFrame(function(){t.classList.add("show");}); setTimeout(function(){t.classList.remove("show"); setTimeout(function(){t.remove();},250);},1600); }
+  function exportYaml(){
+    var lines=["# design-doc feedback — paste into docs/design/feedback/"+DOC+"-rev<N>.yaml","doc: "+DOC,"notes:"];
+    Object.keys(state).forEach(function(a){
+      var note=(state[a]||"").replace(/\r/g,""); if(!note.trim()) return;
+      lines.push("  - anchor: "+a); lines.push("    note: |");
+      note.split("\n").forEach(function(l){ lines.push("      "+l); });
+    });
+    return lines.join("\n")+"\n";
+  }
+  function attach(el){
+    var id=el.id;
+    var btn=document.createElement("button"); btn.className="dd-note-btn"; btn.type="button"; btn.textContent="✎"; btn.title="Annotate #"+id;
+    var box=document.createElement("div"); box.className="dd-note-box"; box.style.display=(state[id]||"").trim()?"block":"none";
+    var ta=document.createElement("textarea"); ta.value=state[id]||""; ta.setAttribute("placeholder","note for #"+id+" …");
+    ta.addEventListener("input",function(){ state[id]=ta.value; save(); refresh(); el.classList.toggle("dd-annotated", !!ta.value.trim()); });
+    if((state[id]||"").trim()) el.classList.add("dd-annotated");
+    box.appendChild(ta);
+    btn.addEventListener("click",function(){ box.style.display=box.style.display==="none"?"block":"none"; if(box.style.display==="block") ta.focus(); });
+    if(el.tagName==="LI"){ el.insertAdjacentElement("afterbegin", btn); el.appendChild(box); }
+    else { el.insertAdjacentElement("afterend", box); el.insertAdjacentElement("beforebegin", btn); }
+  }
+  function copyText(txt, ok){
+    var done=function(){toast(ok);};
+    var fallback=function(){ var t=document.createElement("textarea"); t.value=txt; document.body.appendChild(t); t.select(); try{document.execCommand("copy"); toast(ok);}catch(e){toast("copy failed — select the box");} t.remove(); };
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done,fallback); } else { fallback(); }
+  }
+  function fileLine(label, value){
+    var d=document.createElement("div"); d.className="dd-fb-file"; d.title="click to copy";
+    var c=document.createElement("code"); c.textContent=value;
+    d.appendChild(document.createTextNode(label+" ")); d.appendChild(c);
+    d.addEventListener("click",function(){ copyText(value, label.replace(":","")+" copied"); });
+    return d;
+  }
+  document.addEventListener("DOMContentLoaded",function(){
+    document.querySelectorAll("main [id]").forEach(attach);
+    var bar=document.createElement("div"); bar.className="dd-fb-bar";
+    var row=document.createElement("div"); row.className="dd-fb-row";
+    var lbl=document.createElement("span"); lbl.innerHTML='notes <span class="dd-badge">0</span>'; badge=lbl.querySelector(".dd-badge");
+    var ex=document.createElement("button"); ex.type="button"; ex.textContent="Copy feedback";
+    ex.addEventListener("click",function(){ copyText(exportYaml(), "feedback copied — create "+DIR+FILE); });
+    row.appendChild(lbl); row.appendChild(ex);
+    bar.appendChild(row);
+    bar.appendChild(fileLine("file:", FILE));
+    bar.appendChild(fileLine("path:", DIR+FILE));
+    document.body.appendChild(bar); refresh();
+  });
+})();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Runbook — operate drydocs-lineage: extract, review, curate, load</title>
+<style>
+:root { color-scheme: light dark; --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+@media (prefers-color-scheme: dark) { :root { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; } }
+:root[data-theme="dark"] { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; }
+:root[data-theme="light"] { --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+* { box-sizing: border-box; }
+body { font: 15px/1.6 "Segoe UI", system-ui, Arial, sans-serif; color: var(--ink); background: var(--bg); margin: 0; }
+main { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+h1 { font-size: 28px; margin: 0 0 6px; letter-spacing:-0.3px; }
+h2 { font-size: 20px; margin: 34px 0 10px; padding-bottom:5px; border-bottom: 2px solid var(--ink); }
+h3 { font-size: 16px; margin: 22px 0 8px; }
+h4,h5,h6 { font-size: 14px; margin: 16px 0 6px; }
+p { margin: 10px 0; } strong { font-weight: 700; }
+a { color: var(--link); } a:hover { text-decoration: underline; }
+code { font-family: "Cascadia Mono","Consolas",monospace; font-size: 0.88em; background: var(--faint); padding: 1px 4px; border-radius: 3px; }
+pre { font-family: "Cascadia Mono","Consolas",monospace; font-size: 12.5px; line-height:1.45; border:1px solid var(--line); background: var(--faint); padding: 12px 14px; border-radius: 6px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 14px 0; font-size: 13.5px; display:block; overflow-x:auto; }
+th,td { border:1px solid var(--line); padding: 6px 9px; text-align:left; vertical-align: top; }
+th { background: var(--faint); font-weight:700; }
+blockquote { margin: 14px 0; padding: 2px 16px; border-left: 4px solid var(--line); color: var(--mid); }
+ul,ol { margin: 10px 0; padding-left: 26px; } li { margin: 4px 0; }
+hr { border:none; border-top:1px solid var(--line); margin: 26px 0; }
+:target { scroll-margin-top: 12px; } :target > :first-child, h2:target, h3:target { outline: 2px solid var(--link); outline-offset: 4px; }
+.dd-margin-tag, .dd-print-footer { display: none; }
+
+.dd-note-btn { border:1px solid var(--line); background:var(--bg); color:var(--mid); cursor:pointer; font-size:12px; line-height:1; padding:2px 6px; border-radius:5px; margin-right:6px; }
+.dd-note-btn:hover { color:var(--link); border-color:var(--link); }
+.dd-note-box { margin:6px 0 10px; }
+.dd-note-box textarea { width:100%; min-height:56px; font:13px/1.4 "Segoe UI",system-ui,sans-serif; color:var(--ink); background:var(--faint); border:1px solid var(--line); border-radius:6px; padding:8px; resize:vertical; }
+.dd-annotated { box-shadow:-3px 0 0 var(--link); padding-left:8px; }
+.dd-fb-bar { position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:6px; align-items:stretch; background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:8px 12px; box-shadow:0 2px 10px rgba(0,0,0,.15); font-size:13px; z-index:50; }
+.dd-fb-row { display:flex; gap:8px; align-items:center; justify-content:space-between; }
+.dd-fb-bar button { cursor:pointer; border:1px solid var(--link); background:var(--link); color:#fff; border-radius:6px; padding:5px 10px; font-size:13px; }
+.dd-fb-bar .dd-badge { font-weight:700; }
+.dd-fb-file { cursor:pointer; font-size:11px; color:var(--mid); white-space:nowrap; }
+.dd-fb-file code { font-size:11px; }
+.dd-fb-file:hover code { color:var(--link); }
+.dd-toast { position:fixed; right:16px; bottom:64px; background:var(--ink); color:var(--bg); padding:8px 12px; border-radius:8px; font-size:13px; z-index:60; opacity:0; transition:opacity .2s; }
+.dd-toast.show { opacity:1; }
+.dd-sme-feedback ol li { margin: 6px 0; }
+@media print { .dd-note-btn, .dd-note-box, .dd-fb-bar, .dd-toast, .dd-sme-feedback, .dd-sme-divider { display:none !important; } }
+@page { size: Letter; margin: 0.6in 0.62in 0.55in 0.62in; }
+@media print {
+:root, :root[data-theme="dark"], :root[data-theme="light"] { color-scheme: light; --ink:#1a1a1a; --mid:#555; --line:#bdbdbd; --fill:#eee; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { font: 10.5px/1.45 "Segoe UI", system-ui, Arial, sans-serif; }
+main { max-width: 7.2in; margin: 0 auto; padding: 0 0 0 0.62in; position: relative; }
+h1 { font-size: 21px; margin: 0 0 2px; letter-spacing:-0.2px; }
+h2 { font-size: 14px; margin: 16px 0 8px; padding-bottom:4px; border-bottom: 2px solid var(--ink); text-transform: uppercase; letter-spacing: 0.6px; }
+h3 { font-size: 11.5px; margin: 13px 0 5px; padding-bottom:2px; border-bottom:1px solid var(--line); }
+h4,h5,h6 { font-size: 10.5px; margin: 9px 0 4px; }
+p { margin: 6px 0; }
+a { color: inherit; text-decoration: underline; }
+code { font-size: 9.2px; padding: 0 2px; border-radius: 2px; }
+table { display: table; width:100%; margin: 7px 0; font-size: 9.1px; overflow-x: visible; }
+th, td { padding: 3px 5px; }
+th { background: var(--fill); }
+td code, th code { background: transparent; padding: 0; }
+pre { font-size: 8.4px; line-height: 1.35; padding: 7px 9px; margin: 7px 0; white-space: pre; overflow: hidden; border-radius: 3px; }
+pre.sql { background:#fbfbfb; }
+blockquote { margin: 7px 0; padding: 2px 10px; border-left: 3px solid var(--line); break-inside: avoid; }
+ul,ol { margin: 6px 0 6px 16px; padding: 0; } li { margin: 3px 0; }
+hr { margin: 10px 0; }
+h2, h3, table, pre { break-inside: avoid; }
+
+/* L6 paper HITL: each anchored block sits in the left gutter (main's own padding-left,
+   reserved above) so a printed page carries the anchor id beside its section — no @page
+   margin-box support required, so headless Chromium print-to-pdf renders it reliably. */
+h1, h2, h3, h4, h5, h6, p, table, pre, ul, ol, blockquote { position: relative; }
+.dd-margin-tag {
+  display: block; position: absolute; left: -0.6in; top: 0.1em; width: 0.54in;
+  font: 6.2px/1.15 "Cascadia Mono","Consolas",monospace; text-align: right;
+  color: var(--mid); letter-spacing: 0.1px; word-break: break-word;
+}
+/* Rev/commit footer: `position: fixed` repeats on every printed page in Chromium's
+   headless print-to-pdf (the standard running-footer technique) without needing CSS
+   Paged-Media margin-box content(), which Chromium supports only partially. */
+.dd-print-footer {
+  display: block; position: fixed; left: 0.62in; right: 0.62in; bottom: 0.12in;
+  font-size: 8px; color: var(--mid); text-align: center;
+  border-top: 1px solid var(--line); padding-top: 3px;
+}
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Runbook — operate <code>drydocs-lineage</code>: extract, review, curate, load</h1>
+<ul id="front-matter"><span class="dd-margin-tag" aria-hidden="true">front-matter</span><li><strong>Module:</strong> drydocs-lineage — this runbook IS the module runbook for drydocs-lineage (V1 coverage rule; authored at V6). It covers the module&#x27;s whole operate surface: the three registered verbs, the read zones each hop resolves, the curation gate, the write boundary, and the library-only seams that no verb reaches.</li><li><strong>Status:</strong> DESCRIPTIVE — documents the working procedure. <strong>Rev 1, 2026-09-09</strong>, authored at commit <code>62589a41</code>. Every command, every count and every refusal message below was RUN on this tree — laptop, bundled samples, no Neo4j and no company data — not transcribed from the source (J18: the venue is named because a lineage claim that does not name one reads as a defect from the other machine).</li><li><strong>Classification:</strong> Internal-Public (mechanism only — the counts below come from the tracked synthetic samples. Real jobs CSVs, MAC sets, registry exports and Glue inventories are Internal and live out of the repo tree under <code>DRYDOCS_DATA_ROOT</code>, never in this document)</li><li><strong>Audience:</strong> whoever runs the lineage chain — producer-side against the bundled samples, company-side against real <code>psgmgr</code> extracts and DPL Metadata-As-Code sets</li><li><strong>Companion:</strong> the two CHAIN runbooks this page routes to, each of which keeps its own depth and is not restated here — <code>docs/design/drydocs-lineage-mac-runbook.md</code> (the jobs-CSV + DPL MAC input chain and the MAC field contract) and <code>docs/design/drydocs-cmdline-resolution-runbook.md</code> (the G39→G48→G40 <code>CMD_LINE</code> staging/resolve/parse chain, whose output is a SQLite evidence store, not this module&#x27;s graph). Also <code>docs/design/drydocs-startup-refresh-runbook.md</code> (container and schema bootstrap — a prerequisite for the <code>--write</code> step only) and <code>docs/restructure/03-hitl-sme-flow.md</code> (the gate that unlocks a planned label).</li></ul>
+<hr>
+<h2 id="purpose-scope"><span class="dd-margin-tag" aria-hidden="true">purpose-scope</span>Purpose &amp; scope</h2>
+<p><strong>Purpose.</strong> Operate the module that turns Control-M job definitions into <em>candidate</em> lineage — what a job invokes, what it reads, what it writes — and drives those candidates through the chain <strong>extract → review → curate → (gated) load</strong>. The module is <em>proactive/curated</em> (ADR 0002 D2): it proposes, a person decides, and only what a person confirmed may be written.</p>
+<h3 id="purpose-scope--the-one-rule-to-know-before">The one rule to know before running anything</h3>
+<blockquote><p><strong>Nothing reaches ground truth uncurated.</strong> With no decisions file the confirmed set is EMPTY, and the load says so rather than defaulting to &quot;write everything&quot;.</p></blockquote>
+<p>This is structure, not convention. <code>drydocs lineage-load</code> with no <code>--confirmed</code> prints:</p>
+<pre><code>no --confirmed decisions file: the confirmed set is EMPTY - nothing reaches ground truth
+uncurated. Export decisions from the lineage-review page.</code></pre>
+<p>...and plans zero statements. Curation is the gate, not a flag you may omit.</p>
+<h3 id="purpose-scope--where-to-go-this-page">Where to go — this page, or one of the two chain runbooks</h3>
+<p>An SME landing on the module starts here. Two procedures have their own pages because they have depth this one deliberately does not restate:</p>
+<table><thead><tr><th>If you are…</th><th>Read</th></tr></thead><tbody><tr><td>running the chain end to end; asking what the module operates at all</td><td><strong>this page</strong></td></tr><tr><td>preparing the jobs CSV or a DPL MAC root, or you need the MAC field contract and the promotion-repo clone layout</td><td><code>docs/design/drydocs-lineage-mac-runbook.md</code></td></tr><tr><td>turning verbatim <code>CMD_LINE</code>s into resolved, parseable text (stage → resolve → parse)</td><td><code>docs/design/drydocs-cmdline-resolution-runbook.md</code></td></tr></tbody></table>
+<p>The cmdline chain is a <strong>neighbour, not a hop</strong>: it borrows one extractor from this module (<code>drydocs_lineage/extractors/controlm_xml.py</code>, the G47 XML seam) and writes a SQLite store, never this module&#x27;s staged artifact. Running it is not a prerequisite for anything below.</p>
+<h3 id="purpose-scope--the-awkward-fact-stated-rather-than">The awkward fact, stated rather than hidden</h3>
+<p><strong>Of the module&#x27;s eleven extractors, <code>lineage-extract</code> reaches four.</strong> One more (<code>controlm_xml</code>) is reached by two verbs belonging to OTHER modules. The remaining six — and the G58 archival report, seven files in all — are library seams with no CLI verb: reachable from Python, exercised by their unit tests, and not part of any chain. Appendix A is the census, because a runbook that implied a verb for each of them would be the easier document and the wrong one.</p>
+<p><strong>In scope.</strong> The three verbs (<code>lineage-extract</code>, <code>lineage-review</code>, <code>lineage-load</code>); the read/write zones each hop resolves and the refusal when a path sits outside one; the staged artifact and its provenance header; the decisions file; the plan; the gated write and how to read its refusals; retention; the library-only seams and how to reach them.</p>
+<p><strong>Out of scope.</strong> Container startup and schema provisioning (the startup/refresh companion). The <code>CMD_LINE</code> staging chain (its own runbook, above). Attribution edges — Epic K owns those; this module records SEAL <em>facts</em> only. Deciding whether a candidate is TRUE: that is the SME&#x27;s, at the review page.</p>
+<h2 id="prerequisites"><span class="dd-margin-tag" aria-hidden="true">prerequisites</span>Prerequisites</h2>
+<ol><li id="prerequisites--the-toolchain-poetry-install-success-poe"><strong>The toolchain.</strong> <code>poetry install</code>. <em>Success:</em> <code>poetry run drydocs --help</code> prints without a traceback.</li><li id="prerequisites--drydocs-data-root-is-mandatory-g81-remov"><strong><code>DRYDOCS_DATA_ROOT</code> is MANDATORY</strong> — G81 removed the old <code>~/data/DryDocs</code> fallback, so an unset variable is a refusal and not a silent default. Set it in the shell before any command on this page.</li><li id="prerequisites--the-zones-each-hop-reads-every"><strong>The zones each hop reads.</strong> Every lineage input resolves inside a <em>declared</em> read zone or the run refuses — there is no override flag, because a side door is exactly the undeclared acquisition route G81/G121 closed. <code>drydocs landing-zones</code> prints where each one is on this machine — it prints two tables, the manual landing zones keyed by SOURCE id and the declared data zones keyed by ZONE id, and the lineage hops are split across both.</li></ol>
+<table><thead><tr><th>Hop</th><th>Zone under <code>DRYDOCS_DATA_ROOT</code></th><th>Required?</th><th>Helper in <code>drydocs_core/data_root.py</code></th></tr></thead><tbody><tr><td>1 — Control-M inventory (jobs CSV, + variables CSV for PRECMD/POSTCMD)</td><td><code>controlm-exports/</code></td><td><strong>required</strong></td><td><code>controlm_exports_dir</code></td></tr><tr><td>2a — DPL Metadata-As-Code root</td><td><code>dpl-mac/</code></td><td>optional</td><td><code>dpl_mac_dir</code></td></tr><tr><td>2a — DPL registry Swagger exports, per SEAL</td><td><code>dpl-registry/</code></td><td>optional</td><td><code>dpl_registry_dir</code></td></tr><tr><td>3 — AWS Glue base-table inventory</td><td><code>glue-inventory/</code></td><td>optional</td><td><code>glue_inventory_dir</code></td></tr><tr><td><em>output</em> — the staged artifact</td><td><code>lineage/staged/</code></td><td>write zone</td><td><code>lineage_staged_dir</code></td></tr></tbody></table>
+<p>Two notes on that table, both measured rather than inferred:</p>
+<ul><li><strong>The registry hop is guarded differently from the other four.</strong> Its four siblings are declared read zones in <code>config/data-zones.yaml</code> (<code>controlm-exports</code>, <code>dpl-mac</code>, <code>glue-inventory</code>, <code>lineage-staged</code>); there is no <code>dpl-registry</code> zone there. An explicit <code>--registry-root</code> is checked against the MANUAL landing zones <code>dpl:pipeline-registry</code> / <code>dpl:dataset-registry</code> instead. Both resolve to the same <code>dpl-registry/</code> directory, so the path in the table is right for either route — but if you go looking for the declaration, it is in the source registry and not in <code>config/data-zones.yaml</code>.</li><li><strong>The path is <code>dpl-registry/</code>, not <code>dpl/</code>:</strong> the source registry declared the wrong one from N12 until G81 corrected it, and an operator who followed the registry had files nothing read.</li></ul><ol><li><strong>Neo4j — for the <code>--write</code> step only.</strong> Everything up to and including the plan runs with no database. Bring the container up per the startup/refresh companion when you reach step 4, not before.</li></ol>
+<h2 id="startup"><span class="dd-margin-tag" aria-hidden="true">startup</span>Startup</h2>
+<p><strong>This module has no service to start.</strong> There is no daemon, no port and no long-running process — &quot;startup&quot; here means proving that the data root and the zones resolve, which is the only state a run depends on.</p>
+<ol><li><strong>Declare the data root.</strong></li></ol>
+<pre class="powershell"><code>$env:DRYDOCS_DATA_ROOT = &quot;&lt;your data root&gt;&quot;</code></pre>
+<p><em>Success:</em> the next step prints zones instead of a refusal.</p>
+<ol><li><strong>Read the zones back.</strong></li></ol>
+<pre class="powershell"><code>poetry run drydocs landing-zones</code></pre>
+<p><em>Success:</em> two tables print and each zone in the prerequisites table appears in one of them, with an absolute path and a state. <code>controlm-exports</code>, <code>dpl-mac</code>, <code>glue-inventory</code> and <code>lineage-staged</code> are in the data-zone table; <code>dpl:pipeline-registry</code> and <code>dpl:dataset-registry</code> are in the manual landing-zone table above it. A zone whose state is <code>absent</code> is fine — an absent optional source is skipped and counted, never silently dropped.</p>
+<ol><li><strong>Check the environment.</strong></li></ol>
+<pre class="powershell"><code>poetry run drydocs env-doctor</code></pre>
+<p><em>Success:</em> it exits 0 and the <code>DRYDOCS_DATA_ROOT</code> row reads <code>set</code>. The many rows reading <code>not used here</code> are other subsystems&#x27; variables and are not this chain&#x27;s concern.</p>
+<h2 id="refresh-ingest"><span class="dd-margin-tag" aria-hidden="true">refresh-ingest</span>Refresh / ingest</h2>
+<p>The chain is four steps. Steps 1–3 need no database.</p>
+<h3 id="refresh-ingest--step-1-extract-run-the">Step 1 — extract: run the chain into one staged artifact</h3>
+<pre class="powershell"><code>poetry run drydocs lineage-extract</code></pre>
+<p>With no options this is a <strong>dev run against the bundled package samples</strong>, and it works in any clone. Measured on this tree:</p>
+<pre><code>controlm           present   …\drydocs\data\samples\controlm_jobs__sample.csv
+controlm_variables absent - skipped   …\controlm_variables__sample.csv
+dpl_mac            absent - skipped   …\dataroot\dpl-mac
+dpl_registry       absent - skipped   …\dataroot\dpl-registry
+glue               absent - skipped   …\dataroot\glue-inventory
+graph: 33 processes, 0 data assets, 17 rels
+wrote …\lineage\staged\lineage-20260909T133705Z-&lt;run-id&gt;.json (run &lt;run-id&gt;)</code></pre>
+<p>Two things that output is telling you, and both are deliberate:</p>
+<ul><li><strong>The variables sample is absent in a fresh clone.</strong> Only the <em>named</em> samples are force-tracked and that one is not, so hop 1 runs without PRECMD/POSTCMD text. The artifact records the absence rather than pretending the file was never asked for.</li><li><strong>Every optional hop is skipped AND COUNTED.</strong> The artifact&#x27;s <code>sources</code> block names each hop with <code>present</code>/<code>absent</code> and the path it resolved to, so a reader can tell <em>&quot;nothing to read&quot;</em> from <em>&quot;never asked&quot;</em>. That is G11&#x27;s house rule one level up.</li></ul>
+<p>For a real run, name the sources — each must already sit inside its declared zone:</p>
+<pre class="powershell"><code>poetry run drydocs lineage-extract --jobs &lt;zone&gt;\jobs.csv --variables &lt;zone&gt;\variables.csv --mac-root &lt;zone&gt; --registry-root &lt;zone&gt; --glue &lt;zone&gt;</code></pre>
+<p><code>--out-dir</code> moves the artifact; <code>--keep N</code> (default 10) prunes the staged zone to the newest N after a successful write, and <code>--keep 0</code> keeps everything.</p>
+<p><strong>An input outside its zone is refused, with the fix in the message.</strong> Measured:</p>
+<pre><code>REFUSED: --jobs drydocs\data\samples\controlm_jobs__sample.csv is outside every declared
+read zone. An acquisition route is declared or it does not run (G121): --jobs reads from
+controlm-exports (`drydocs landing-zones` shows where that is on this machine). Land the
+file there, or declare a zone in config/data-zones.yaml.</code></pre>
+<p>Note that the <em>bundled sample path itself</em> is refused when passed explicitly. That is correct and not a bug: the default path is a dev convenience the command grants itself, while an explicit path is an acquisition claim and has to be declared.</p>
+<h3 id="refresh-ingest--step-2-review-render-the">Step 2 — review: render the SME page and export decisions</h3>
+<pre class="powershell"><code>poetry run drydocs lineage-review &lt;jobs.csv&gt; -o lineage-review.html</code></pre>
+<p>One self-contained HTML file — no server, no Neo4j, no external resources: a section per Control-M folder, a card per job, its INVOKES dependencies, and per-folder SME notes. The SME marks each candidate and the page&#x27;s <strong>Export</strong> writes a decisions file (<code>drydocs.lineage-decisions.v1</code>). Measured on the bundled sample: a 24 KB page, coverage <code>rows=17 jobs=17 invocations=17 (unresolved=0)</code>.</p>
+<p>The decision grain is one yes/no per rel, keyed by the graph&#x27;s own triple (<code>from</code>, <code>type</code>, <code>to</code>) — so a decision joins to a candidate by equality and nothing is re-derived. A rel the SME never touched is simply absent and stays <code>proposed</code>.</p>
+<h3 id="refresh-ingest--step-3-plan-what-a">Step 3 — plan: what a live load would do, without a database</h3>
+<pre class="powershell"><code>poetry run drydocs lineage-load --confirmed &lt;decisions.json&gt;</code></pre>
+<p>With no <code>--artifact</code> it reads the <strong>newest</strong> staged artifact — the UTC stamp leads the file name, so no file is opened to find it. It then prints, in order: the artifact and the extract run it names; the code commit (flagged <code>DIRTY TREE</code> if that extract was staged from uncommitted code); each source&#x27;s state; the graph&#x27;s counts; the decisions tally; and the plan. Measured with all 17 candidates confirmed:</p>
+<pre><code>decisions …\decisions-all-confirmed.json: 17 confirmed, 0 rejected, 0 undecided;
+          0 candidate(s) never decided
+plan      nodes: 6 Script, 10 ETLProcess, 0 DataAsset; rels: 17 confirmed, 17 INVOKES
+          8 statement(s) (load run &lt;load-run-id&gt;)
+plan only - pass --write to load against drydocs.</code></pre>
+<p>The plan is the review surface: it is the exact statement set a live load would run, and it is printed before anything can happen.</p>
+<h3 id="refresh-ingest--step-4-the-gated-write">Step 4 — the gated write</h3>
+<pre class="powershell"><code>poetry run drydocs lineage-load --confirmed &lt;decisions.json&gt; --write</code></pre>
+<p>This is the module&#x27;s <strong>only</strong> database write, and <code>drydocs_lineage/writer.py</code> is the only file in the module that performs one. It writes exactly one database — <code>drydocs</code>, the ground truth — via constraint-on-key MERGE, so a re-run of the same plan converges rather than duplicating. Every node and rel written carries the artifact&#x27;s run id and code commit, so a row in the graph names the extract it came from.</p>
+<p>A label whose vocabulary entry is not <code>active</code> is <strong>refused by the writer</strong>, not filtered by the caller. See Verify for how to read that refusal.</p>
+<h2 id="verify"><span class="dd-margin-tag" aria-hidden="true">verify</span>Verify</h2>
+<ol><li><strong>The extract asked for everything it should have.</strong> Open the artifact&#x27;s <code>sources</code> block, or re-read it from the plan print in step 3: five hops, each <code>present</code> or <code>absent</code> with the path it resolved to. A hop missing from that list is a defect; a hop <code>absent</code> is information.</li><li><strong>The load&#x27;s gate-bound refusals — read them, do not carry a copy.</strong> The plan prints one line per label whose vocabulary entry is not active:</li></ol>
+<pre><code>GATE-BOUND: &lt;LABEL&gt; (&lt;vocab id&gt;) is &lt;status&gt;, not active - a live load refuses this
+label until the HITL gate flips it</code></pre>
+<p><strong>The command is the authority on which labels those are</strong>, because it computes them from the vocabulary registry on every run. Measured at Rev 1 on this tree: of the five labels — <code>INVOKES</code>, <code>USES_ARTIFACT</code>, <code>READS_FROM</code>, <code>WRITES_TO</code>, <code>TRIGGERS</code> — four are active and only <code>TRIGGERS</code> (<code>scheduler_triggers</code>) is still <code>planned</code>. That state moves when a gate signs; <strong>re-run the plan rather than trusting this sentence</strong>, which is why the check is written as <em>run it and read the output</em> and not as an asserted list.</p>
+<ol><li><strong>Determinism.</strong> Two extracts over the same inputs produce byte-identical artifacts — sorted keys, <code>newline=&quot;\n&quot;</code>, no clock in the body. If two runs on two machines differ, the inputs differed.</li><li><strong>The unit contract.</strong> These pass on a clean tree with no database and no data root:</li></ol>
+<pre class="powershell"><code>poetry run pytest -q tests/unit/test_lineage_staging.py tests/unit/test_lineage_writer.py tests/unit/test_lineage_curation.py tests/unit/test_cli_lineage_extract.py tests/unit/test_cli_lineage_load.py</code></pre>
+<h2 id="rollback"><span class="dd-margin-tag" aria-hidden="true">rollback</span>Rollback</h2>
+<ul><li><strong>Extract</strong> — nothing to roll back. Each run writes a NEW artifact and mutates nothing; the previous artifacts stay until <code>--keep</code> prunes them, and the load never deletes. To undo a bad extract, run a good one: the load reads the newest.</li><li><strong>Review</strong> — writes one HTML file at the path you gave and touches nothing else. Delete it and re-render.</li><li><strong>Plan</strong> — reads only. This is the rollback-free step by design: it exists so the irreversible one can be inspected first.</li><li><strong>Load (<code>--write</code>)</strong> — re-running the same plan is safe: MERGE on the node key converges. To <em>withdraw</em> what a load wrote, <strong>the handle is the EXTRACT&#x27;s run id, not the load&#x27;s</strong>: every node and rel is stamped <code>extract_run_id</code> / <code>extract_code_commit</code>, while the <code>load_run_id</code> printed with the plan keys the <code>:JobRun</code> node that brackets the write and carries the artifact&#x27;s sources block. Both are printed, and confusing them selects the wrong rows.</li></ul>
+<p><strong>There is no withdraw verb.</strong> Say that plainly rather than imply one: a targeted cleanup is a hand-written <code>MATCH</code> on <code>extract_run_id</code> against the <code>drydocs</code> database, reviewed before it runs like any other destructive statement. <strong>The destructive last resort</strong> is resetting that database per the startup/refresh companion, which discards every loader&#x27;s work and not just this one&#x27;s — never reach for it to undo a lineage load.</p>
+<h2 id="troubleshooting"><span class="dd-margin-tag" aria-hidden="true">troubleshooting</span>Troubleshooting</h2>
+<table><thead><tr><th>Symptom</th><th>Diagnosis</th><th>Fix</th></tr></thead><tbody><tr><td>A command refuses naming <code>DRYDOCS_DATA_ROOT</code></td><td>Unset. G81 removed the old <code>~/data/DryDocs</code> default, so there is nothing to fall back to</td><td>Set it in the shell (Prerequisites 2)</td></tr><tr><td><code>REFUSED: --&lt;opt&gt; … is outside every declared read zone</code></td><td>The path is real but its acquisition route is not declared (G121). There is no override flag, deliberately</td><td>Land the file in the zone the message names, or declare a zone in <code>config/data-zones.yaml</code></td></tr><tr><td><code>no staged lineage artifact in &lt;dir&gt;</code></td><td>Step 3 ran before step 1, or <code>--out-dir</code> sent the artifact somewhere the load does not look</td><td>Run <code>lineage-extract</code>, or pass <code>--artifact &lt;path&gt;</code></td></tr><tr><td>The plan says <code>0 confirmed</code> and plans nothing</td><td>No <code>--confirmed</code> file, or a file in which nothing is marked <code>confirmed</code>. This is the gate working</td><td>Export decisions from the review page and pass the file</td></tr><tr><td><code>N decision(s) name a rel this artifact does not carry</code></td><td>The review page was rendered from a DIFFERENT extract than the artifact being loaded</td><td>Re-render <code>lineage-review</code> from this artifact&#x27;s sources and decide again</td></tr><tr><td><code>code … DIRTY TREE - staged from uncommitted code</code></td><td>The extract ran against uncommitted changes, so the <code>extract_code_commit</code> it stamps cannot be resolved to a tree</td><td>Commit, re-extract. Acceptable for a dev run; never for evidence</td></tr><tr><td><code>GATE-BOUND: &lt;LABEL&gt; … not active</code></td><td>The vocabulary entry is <code>planned</code>. The writer refuses it — the SME gate has not flipped it</td><td>Take it to the HITL gate (<code>docs/restructure/03-hitl-sme-flow.md</code>); the ruling lands in <code>config/gate-log.md</code>. Do not edit the registry to get past a refusal</td></tr><tr><td><code>N confirmed rel(s) not written</code> after a successful load</td><td>A <code>ControlMJob</code> endpoint is not in the graph (the M3 load owns those), or a file-op candidate had no owning job</td><td>Run the M3 load first, then re-run this one; check the plan&#x27;s unresolved file-op count</td></tr><tr><td>Hop 1 runs but no PRECMD/POSTCMD lineage appears</td><td>The variables CSV is absent — in a fresh clone the sample is untracked</td><td>Pass <code>--variables</code>, or land one in the <code>controlm-exports/</code> zone</td></tr></tbody></table>
+<h2 id="contacts-escalation"><span class="dd-margin-tag" aria-hidden="true">contacts-escalation</span>Contacts &amp; escalation</h2>
+<ul><li><strong>Procedure owner:</strong> the DryDocs producer (repo owner). Company-side runs against real extracts are the company session&#x27;s, in its own repo.</li><li><strong>Anything that changes what an edge MEANS</strong> — a new relationship label, a vocabulary status, whether a candidate is true — is not this procedure&#x27;s to decide. It routes to the HITL gate (<code>docs/restructure/03-hitl-sme-flow.md</code>), and the signed ruling lands in <code>config/gate-log.md</code>. A refusal from the writer is that boundary holding, not a bug to work around.</li><li><strong>A disagreement between this page and the code:</strong> the code wins, and the fix is this page. Every claim above is re-derivable from the one-liners in Appendix B.</li></ul>
+<h2 id="appendices"><span class="dd-margin-tag" aria-hidden="true">appendices</span>Appendices</h2>
+<h3>A. The extractor census — what a verb reaches, and what only Python reaches</h3>
+<p>Eleven extractors plus the archival report — twelve files. Four are in the <code>lineage-extract</code> chain, one is reached by other modules&#x27; verbs, and the remaining seven are library seams reached only by importing them. Listing them is the point: each one is a real, tested capability, and seven of them are behind no command at all.</p>
+<table><thead><tr><th>File</th><th>Reached by</th><th>What it reads</th></tr></thead><tbody><tr><td><code>drydocs_lineage/extractors/controlm_inventory.py</code></td><td><strong>hop 1</strong> of <code>lineage-extract</code></td><td>the jobs CSV (+ variables CSV); seeds every process node</td></tr><tr><td><code>drydocs_lineage/extractors/dpl_mac.py</code></td><td><strong>hop 2a</strong> of <code>lineage-extract</code></td><td>a DPL Metadata-As-Code root — per-pipeline JSON sets keyed by GUID</td></tr><tr><td><code>drydocs_lineage/extractors/dpl_registry.py</code></td><td><strong>hop 2a</strong> of <code>lineage-extract</code></td><td>per-SEAL registry Swagger exports, taxonomy-first</td></tr><tr><td><code>drydocs_lineage/extractors/glue_tables.py</code></td><td><strong>hop 3</strong> of <code>lineage-extract</code></td><td>AWS Glue base-table inventory exports</td></tr><tr><td><code>drydocs_lineage/extractors/controlm_xml.py</code></td><td><code>resolve-cmdline-staging</code> (the cmdline chain) and <code>profile-folder-set</code> (drydocs-remediation) — <strong>other modules&#x27; verbs, not this one&#x27;s</strong></td><td>Control-M XML definition exports — folders, jobs, ordered variables</td></tr><tr><td><code>drydocs_lineage/extractors/rua_inventory.py</code></td><td>library only</td><td>one <code>rua_*.tar.gz</code> collector bundle from the <code>rua/incoming/</code> zone</td></tr><tr><td><code>drydocs_lineage/extractors/rua_code_ops.py</code></td><td>library only</td><td>the script/profile CONTENT a rua bundle carried back</td></tr><tr><td><code>drydocs_lineage/extractors/code_repo.py</code></td><td>library only</td><td>the code-repo provenance origin (repo + ref + commit + path)</td></tr><tr><td><code>drydocs_lineage/extractors/snowflake_catalog.py</code></td><td>library only</td><td>the two Snowflake data-catalog views, from the <code>catalog/</code> zone</td></tr><tr><td><code>drydocs_lineage/extractors/catalog_crosscheck.py</code></td><td>library only</td><td>what the catalog and its neighbours disagree about — every bucket counted AND listed</td></tr><tr><td><code>drydocs_lineage/extractors/lb_resolution.py</code></td><td>library only</td><td>an <code>nslookup</code> transcript, for load-balancer alias → server evidence</td></tr><tr><td><code>drydocs_lineage/archival.py</code></td><td>library only</td><td>the G58 dead-script report — output drives DELETION, so its safety bar is structural</td></tr></tbody></table>
+<p>The rest of the module: <code>drydocs_lineage/model.py</code> (the graph and its identity rules), <code>drydocs_lineage/staging.py</code> (the chain and the artifact), <code>drydocs_lineage/review.py</code> (the SME page), <code>drydocs_lineage/curation.py</code> (the decisions file and its states), and <code>drydocs_lineage/writer.py</code> (the one write boundary).</p>
+<h3>B. Re-derive one-liners — the code wins on disagreement</h3>
+<p>A pointer cannot go stale; only a copy can. Each of these answers a question this page also answers in prose, and the command is the authority:</p>
+<pre class="powershell"><code># the registered verbs, read from Typer rather than from --help (J37)
+poetry run python -c &quot;import drydocs.cli as c; print(sorted(i.name for i in c.app.registered_commands if i.name and &#x27;lineage&#x27; in i.name))&quot;
+
+# which labels a live load would refuse today, and why
+poetry run python -c &quot;from drydocs_lineage.writer import gate_bound_labels, VOCAB_IDS; print(gate_bound_labels(VOCAB_IDS))&quot;
+
+# the one database this module writes
+poetry run python -c &quot;from drydocs_lineage.writer import DATABASE; print(DATABASE)&quot;
+
+# where every zone resolves on this machine
+poetry run drydocs landing-zones</code></pre>
+<hr class="dd-sme-divider">
+<section class="dd-sme-feedback" aria-label="SME - Feedback">
+<h2>SME - Feedback</h2>
+<p>How to return your notes on this document:</p>
+<ol>
+<li>Click the <strong>✎</strong> button beside any section (or numbered step) and type your note — notes save in your browser as you type.</li>
+<li>When finished, click <strong>Copy feedback</strong> in the bottom-right toolbar. Your notes are copied as anchor-keyed YAML.</li>
+<li>Create the feedback file (it is YAML, <em>not</em> markdown) — <strong>Copy To:</strong> <code>docs/design/feedback/</code> · <strong>File Name:</strong> <code>drydocs-lineage-runbook-rev1.yaml</code></li>
+<li>Paste the copied block into that file, save, and commit (or send the file back to the team).</li>
+</ol>
+</section>
+</main>
+<footer class="dd-print-footer">Rev 1 · commit 62589a41</footer>
+<script>
+
+(function(){
+  var DOC="drydocs-lineage-runbook", FILE="drydocs-lineage-runbook-rev1.yaml", DIR="docs/design/feedback/", KEY="drydocs-doc-feedback:"+DOC;
+  function load(){ try{return JSON.parse(localStorage.getItem(KEY)||"{}");}catch(e){return {};} }
+  function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+  var state=load(), badge;
+  function count(){ return Object.keys(state).filter(function(k){return (state[k]||"").trim();}).length; }
+  function refresh(){ if(badge) badge.textContent=count(); }
+  function toast(msg){ var t=document.createElement("div"); t.className="dd-toast"; t.textContent=msg; document.body.appendChild(t); requestAnimationFrame(function(){t.classList.add("show");}); setTimeout(function(){t.classList.remove("show"); setTimeout(function(){t.remove();},250);},1600); }
+  function exportYaml(){
+    var lines=["# design-doc feedback — paste into docs/design/feedback/"+DOC+"-rev<N>.yaml","doc: "+DOC,"notes:"];
+    Object.keys(state).forEach(function(a){
+      var note=(state[a]||"").replace(/\r/g,""); if(!note.trim()) return;
+      lines.push("  - anchor: "+a); lines.push("    note: |");
+      note.split("\n").forEach(function(l){ lines.push("      "+l); });
+    });
+    return lines.join("\n")+"\n";
+  }
+  function attach(el){
+    var id=el.id;
+    var btn=document.createElement("button"); btn.className="dd-note-btn"; btn.type="button"; btn.textContent="✎"; btn.title="Annotate #"+id;
+    var box=document.createElement("div"); box.className="dd-note-box"; box.style.display=(state[id]||"").trim()?"block":"none";
+    var ta=document.createElement("textarea"); ta.value=state[id]||""; ta.setAttribute("placeholder","note for #"+id+" …");
+    ta.addEventListener("input",function(){ state[id]=ta.value; save(); refresh(); el.classList.toggle("dd-annotated", !!ta.value.trim()); });
+    if((state[id]||"").trim()) el.classList.add("dd-annotated");
+    box.appendChild(ta);
+    btn.addEventListener("click",function(){ box.style.display=box.style.display==="none"?"block":"none"; if(box.style.display==="block") ta.focus(); });
+    if(el.tagName==="LI"){ el.insertAdjacentElement("afterbegin", btn); el.appendChild(box); }
+    else { el.insertAdjacentElement("afterend", box); el.insertAdjacentElement("beforebegin", btn); }
+  }
+  function copyText(txt, ok){
+    var done=function(){toast(ok);};
+    var fallback=function(){ var t=document.createElement("textarea"); t.value=txt; document.body.appendChild(t); t.select(); try{document.execCommand("copy"); toast(ok);}catch(e){toast("copy failed — select the box");} t.remove(); };
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done,fallback); } else { fallback(); }
+  }
+  function fileLine(label, value){
+    var d=document.createElement("div"); d.className="dd-fb-file"; d.title="click to copy";
+    var c=document.createElement("code"); c.textContent=value;
+    d.appendChild(document.createTextNode(label+" ")); d.appendChild(c);
+    d.addEventListener("click",function(){ copyText(value, label.replace(":","")+" copied"); });
+    return d;
+  }
+  document.addEventListener("DOMContentLoaded",function(){
+    document.querySelectorAll("main [id]").forEach(attach);
+    var bar=document.createElement("div"); bar.className="dd-fb-bar";
+    var row=document.createElement("div"); row.className="dd-fb-row";
+    var lbl=document.createElement("span"); lbl.innerHTML='notes <span class="dd-badge">0</span>'; badge=lbl.querySelector(".dd-badge");
+    var ex=document.createElement("button"); ex.type="button"; ex.textContent="Copy feedback";
+    ex.addEventListener("click",function(){ copyText(exportYaml(), "feedback copied — create "+DIR+FILE); });
+    row.appendChild(lbl); row.appendChild(ex);
+    bar.appendChild(row);
+    bar.appendChild(fileLine("file:", FILE));
+    bar.appendChild(fileLine("path:", DIR+FILE));
+    document.body.appendChild(bar); refresh();
+  });
+})();
+
+</script>
+</body>
+</html>

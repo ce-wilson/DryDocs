@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Runbook — operate drydocs-docgen: render the docs, validate the outline, close the feedback loop</title>
+<style>
+:root { color-scheme: light dark; --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+@media (prefers-color-scheme: dark) { :root { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; } }
+:root[data-theme="dark"] { --ink:#e6e6e6; --mid:#a0a0a0; --line:#3a3a3a; --faint:#1c1c1c; --bg:#141414; --link:#6ea8fe; }
+:root[data-theme="light"] { --ink:#1a1a1a; --mid:#555; --line:#d0d0d0; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+* { box-sizing: border-box; }
+body { font: 15px/1.6 "Segoe UI", system-ui, Arial, sans-serif; color: var(--ink); background: var(--bg); margin: 0; }
+main { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+h1 { font-size: 28px; margin: 0 0 6px; letter-spacing:-0.3px; }
+h2 { font-size: 20px; margin: 34px 0 10px; padding-bottom:5px; border-bottom: 2px solid var(--ink); }
+h3 { font-size: 16px; margin: 22px 0 8px; }
+h4,h5,h6 { font-size: 14px; margin: 16px 0 6px; }
+p { margin: 10px 0; } strong { font-weight: 700; }
+a { color: var(--link); } a:hover { text-decoration: underline; }
+code { font-family: "Cascadia Mono","Consolas",monospace; font-size: 0.88em; background: var(--faint); padding: 1px 4px; border-radius: 3px; }
+pre { font-family: "Cascadia Mono","Consolas",monospace; font-size: 12.5px; line-height:1.45; border:1px solid var(--line); background: var(--faint); padding: 12px 14px; border-radius: 6px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; margin: 14px 0; font-size: 13.5px; display:block; overflow-x:auto; }
+th,td { border:1px solid var(--line); padding: 6px 9px; text-align:left; vertical-align: top; }
+th { background: var(--faint); font-weight:700; }
+blockquote { margin: 14px 0; padding: 2px 16px; border-left: 4px solid var(--line); color: var(--mid); }
+ul,ol { margin: 10px 0; padding-left: 26px; } li { margin: 4px 0; }
+hr { border:none; border-top:1px solid var(--line); margin: 26px 0; }
+:target { scroll-margin-top: 12px; } :target > :first-child, h2:target, h3:target { outline: 2px solid var(--link); outline-offset: 4px; }
+.dd-margin-tag, .dd-print-footer { display: none; }
+
+.dd-note-btn { border:1px solid var(--line); background:var(--bg); color:var(--mid); cursor:pointer; font-size:12px; line-height:1; padding:2px 6px; border-radius:5px; margin-right:6px; }
+.dd-note-btn:hover { color:var(--link); border-color:var(--link); }
+.dd-note-box { margin:6px 0 10px; }
+.dd-note-box textarea { width:100%; min-height:56px; font:13px/1.4 "Segoe UI",system-ui,sans-serif; color:var(--ink); background:var(--faint); border:1px solid var(--line); border-radius:6px; padding:8px; resize:vertical; }
+.dd-annotated { box-shadow:-3px 0 0 var(--link); padding-left:8px; }
+.dd-fb-bar { position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:6px; align-items:stretch; background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:8px 12px; box-shadow:0 2px 10px rgba(0,0,0,.15); font-size:13px; z-index:50; }
+.dd-fb-row { display:flex; gap:8px; align-items:center; justify-content:space-between; }
+.dd-fb-bar button { cursor:pointer; border:1px solid var(--link); background:var(--link); color:#fff; border-radius:6px; padding:5px 10px; font-size:13px; }
+.dd-fb-bar .dd-badge { font-weight:700; }
+.dd-fb-file { cursor:pointer; font-size:11px; color:var(--mid); white-space:nowrap; }
+.dd-fb-file code { font-size:11px; }
+.dd-fb-file:hover code { color:var(--link); }
+.dd-toast { position:fixed; right:16px; bottom:64px; background:var(--ink); color:var(--bg); padding:8px 12px; border-radius:8px; font-size:13px; z-index:60; opacity:0; transition:opacity .2s; }
+.dd-toast.show { opacity:1; }
+.dd-sme-feedback ol li { margin: 6px 0; }
+@media print { .dd-note-btn, .dd-note-box, .dd-fb-bar, .dd-toast, .dd-sme-feedback, .dd-sme-divider { display:none !important; } }
+@page { size: Letter; margin: 0.6in 0.62in 0.55in 0.62in; }
+@media print {
+:root, :root[data-theme="dark"], :root[data-theme="light"] { color-scheme: light; --ink:#1a1a1a; --mid:#555; --line:#bdbdbd; --fill:#eee; --faint:#f6f6f6; --bg:#fff; --link:#0a58ca; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { font: 10.5px/1.45 "Segoe UI", system-ui, Arial, sans-serif; }
+main { max-width: 7.2in; margin: 0 auto; padding: 0 0 0 0.62in; position: relative; }
+h1 { font-size: 21px; margin: 0 0 2px; letter-spacing:-0.2px; }
+h2 { font-size: 14px; margin: 16px 0 8px; padding-bottom:4px; border-bottom: 2px solid var(--ink); text-transform: uppercase; letter-spacing: 0.6px; }
+h3 { font-size: 11.5px; margin: 13px 0 5px; padding-bottom:2px; border-bottom:1px solid var(--line); }
+h4,h5,h6 { font-size: 10.5px; margin: 9px 0 4px; }
+p { margin: 6px 0; }
+a { color: inherit; text-decoration: underline; }
+code { font-size: 9.2px; padding: 0 2px; border-radius: 2px; }
+table { display: table; width:100%; margin: 7px 0; font-size: 9.1px; overflow-x: visible; }
+th, td { padding: 3px 5px; }
+th { background: var(--fill); }
+td code, th code { background: transparent; padding: 0; }
+pre { font-size: 8.4px; line-height: 1.35; padding: 7px 9px; margin: 7px 0; white-space: pre; overflow: hidden; border-radius: 3px; }
+pre.sql { background:#fbfbfb; }
+blockquote { margin: 7px 0; padding: 2px 10px; border-left: 3px solid var(--line); break-inside: avoid; }
+ul,ol { margin: 6px 0 6px 16px; padding: 0; } li { margin: 3px 0; }
+hr { margin: 10px 0; }
+h2, h3, table, pre { break-inside: avoid; }
+
+/* L6 paper HITL: each anchored block sits in the left gutter (main's own padding-left,
+   reserved above) so a printed page carries the anchor id beside its section — no @page
+   margin-box support required, so headless Chromium print-to-pdf renders it reliably. */
+h1, h2, h3, h4, h5, h6, p, table, pre, ul, ol, blockquote { position: relative; }
+.dd-margin-tag {
+  display: block; position: absolute; left: -0.6in; top: 0.1em; width: 0.54in;
+  font: 6.2px/1.15 "Cascadia Mono","Consolas",monospace; text-align: right;
+  color: var(--mid); letter-spacing: 0.1px; word-break: break-word;
+}
+/* Rev/commit footer: `position: fixed` repeats on every printed page in Chromium's
+   headless print-to-pdf (the standard running-footer technique) without needing CSS
+   Paged-Media margin-box content(), which Chromium supports only partially. */
+.dd-print-footer {
+  display: block; position: fixed; left: 0.62in; right: 0.62in; bottom: 0.12in;
+  font-size: 8px; color: var(--mid); text-align: center;
+  border-top: 1px solid var(--line); padding-top: 3px;
+}
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Runbook — operate <code>drydocs-docgen</code>: render the docs, validate the outline, close the feedback loop</h1>
+<ul id="front-matter"><span class="dd-margin-tag" aria-hidden="true">front-matter</span><li><strong>Module:</strong> drydocs-docgen — this runbook IS the module runbook for drydocs-docgen (V1 coverage rule; authored at V5). It covers the module&#x27;s whole operate surface: the md-is-source / html-is-render contract, outline validation, the PDF path, the ideas render, and both halves of the HITL feedback loop.</li><li><strong>Status:</strong> DESCRIPTIVE — documents the working procedure. <strong>Rev 1, 2026-09-09</strong>, authored at commit <code>2453ac17</code>. Every command, count and exit code below was RUN on this tree — laptop, no Neo4j, no company data, every render written to a scratch directory so no committed page moved (J18: the venue is named, and the PDF step in particular is venue-dependent).</li><li><strong>Classification:</strong> Internal-Public (mechanism only — the renderer, the outline contract and the feedback file shape. A specific feedback file inherits the classification of the doc it annotates, and scans are Internal by default)</li><li><strong>Audience:</strong> whoever renders a design doc, adds a doc type, validates an outline, or runs an SME review round on paper or in the browser</li><li><strong>Companion:</strong> <code>docs/design/feedback/README.md</code> (<strong>read this before running a feedback round</strong> — it owns the two-loop contract and the <code>&lt;doc-id&gt;-rev&lt;N&gt;.yaml</code> naming rule); <code>docs/design/templates/</code> (the outline contracts themselves — <code>tdd.outline.yaml</code>, <code>runbook.outline.yaml</code>, <code>review.outline.yaml</code>, <code>sdlc-app-runbook.outline.yaml</code>); <code>.claude/skills/transcribe-doc-markup/SKILL.md</code> (the L6 scan-to-YAML step).</li></ul>
+<hr>
+<h2 id="purpose-scope"><span class="dd-margin-tag" aria-hidden="true">purpose-scope</span>Purpose &amp; scope</h2>
+<p><strong>Purpose.</strong> Operate the machinery every other design doc in this repo is rendered <em>by</em>. The module owns one contract and three procedures that follow from it.</p>
+<h3 id="purpose-scope--the-one-rule-to-know-before">The one rule to know before running anything</h3>
+<blockquote><p><strong>The <code>.md</code> is the source of truth. The <code>.html</code> is a deterministic render of it.</strong> Never hand-edit a rendered page; change the markdown and re-render.</p></blockquote>
+<p>&quot;Deterministic&quot; is measured, not asserted. Rendering the same source twice on this tree produced byte-identical output (<code>drydocs-core-runbook.md</code> → 30,829 bytes, two runs, same hash), and the PDF path normalizes its dates so re-runs are structurally identical too (243,073 bytes, two runs, same hash). That property is what lets a committed render be guarded for drift at all — see Verify.</p>
+<p><strong>One HTML surface, not two</strong> (L13): the page carries its print layout as an <code>@media print</code> sheet rather than shipping a separate print file. The same page is what an SME reads on screen and what comes out of the printer.</p>
+<h3 id="purpose-scope--the-awkward-fact-stated-rather-than">The awkward fact, stated rather than hidden</h3>
+<p><strong>Zero of the 55 registered <code>drydocs</code> verbs reach this module.</strong> Measured, not assumed — every one of the 55 callbacks was read and none imports <code>drydocs.docgen</code> (Appendix B has the command). The module is driven entirely by two scripts and one sub-renderer, so every procedure below is a <code>python scripts/…</code> invocation, never a <code>drydocs …</code> verb.</p>
+<p><strong>And two verbs that sound like this module&#x27;s are not.</strong> <code>docs-verify</code> and <code>docs-coverage</code> operate the doc <strong>corpus in the graph</strong> — <code>config/doc-source-registry.yaml</code>, loaded <code>Document</code>/<code>Chunk</code> counts, via <code>drydocs_core/docs_verify.py</code>. They have nothing to do with rendering a design doc. The names collide; the surfaces do not.</p>
+<h3 id="purpose-scope--why-the-board-render-is-described">Why the board render is described here</h3>
+<p><code>scripts/render_board.py</code> is <strong>drydocs-plan&#x27;s</strong> code, not this module&#x27;s. It appears in this runbook for two reasons, and the second is the load-bearing one:</p>
+<ol><li>Its default-paths run fires this module&#x27;s ideas render (<code>render_ideas</code> → <code>drydocs.docgen.plan_ideas</code>), so the two chains are joined whether or not that is convenient.</li><li><strong>drydocs-plan is EXEMPT from module-runbook coverage</strong> — <code>tests/unit/test_runbook_coverage.py</code> records the reason: <em>&quot;placeholder — no package. The board renderer is <code>scripts/render_board.py</code>, operated by the CLAUDE.md §0 session ritual, not by a module runbook.&quot;</em> So there is no plan runbook and there will not be one. If this page does not describe the run, nothing does.</li></ol>
+<p>This page therefore <strong>describes</strong> that run and <strong>routes</strong> the ritual to <code>CLAUDE.md</code> §0, which owns when to do it. It does not restate the ritual.</p>
+<p><strong>In scope.</strong> Rendering a design doc; the outline contract and its validator; adding a new doc type; the PDF path; the ideas render; the L5 digital and L6 paper feedback loops and the anchor-keyed YAML both produce; the stale-render check.</p>
+<p><strong>Out of scope.</strong> <em>When</em> to render — the <code>CLAUDE.md</code> §0 session ritual owns that. The content of any particular doc. The doc corpus in the graph (<code>docs-verify</code> / <code>docs-coverage</code>, above). Publishing to Confluence — that is drydocs-review&#x27;s.</p>
+<h2 id="prerequisites"><span class="dd-margin-tag" aria-hidden="true">prerequisites</span>Prerequisites</h2>
+<ol><li id="prerequisites--the-toolchain-poetry-install-nothing-els"><strong>The toolchain.</strong> <code>poetry install</code>. Nothing else for the render, validate and ideas procedures: no database, no network, no data root, no credentials.</li><li id="prerequisites--a-chromium-family-browser-for-the"><strong>A Chromium-family browser — for the PDF step only.</strong> <code>drydocs.docgen.doc_pdf</code> searches Brave, then Chrome, then Edge. Measured on this venue: it resolved <code>C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe</code>. A machine with none of the three cannot run step 4, and that is a venue limit rather than a defect.</li><li id="prerequisites--know-which-pen-you-hold-before"><strong>Know which pen you hold before you render.</strong> A default-paths run writes committed pages under <code>docs/plan/</code> and <code>web/src/generated/</code>. In a two-lane burst those belong to one lane (<code>docs/lane-b-handoff.md</code>); render to a scratch <code>--out-dir</code> if they are not yours. Every command in this runbook was run that way.</li></ol>
+<h2 id="startup"><span class="dd-margin-tag" aria-hidden="true">startup</span>Startup</h2>
+<p><strong>No service, no daemon.</strong> &quot;Startup&quot; is confirming the module imports and the outline contracts load.</p>
+<ol><li><strong>The module imports.</strong></li></ol>
+<pre class="powershell"><code>poetry run python -c &quot;from drydocs.docgen import design_doc, doc_outline, doc_pdf, plan_ideas; print(&#x27;ok&#x27;)&quot;</code></pre>
+<p><em>Success:</em> <code>ok</code>. Import <code>drydocs.docgen.*</code>, never the flat <code>drydocs.design_doc</code> etc. — those are one-cycle ADR 0018 D4 re-export shims due for removal at the roll after next.</p>
+<ol><li><strong>The outline contracts load.</strong></li></ol>
+<pre class="powershell"><code>poetry run python -c &quot;from drydocs.docgen.doc_outline import load_outline; import glob; print([load_outline(p).doc_type for p in sorted(glob.glob(&#x27;docs/design/templates/*.outline.yaml&#x27;))])&quot;</code></pre>
+<p><em>Success:</em> one <code>doc_type</code> per template. Measured on this tree: four templates — <code>review.outline.yaml</code>, <code>runbook.outline.yaml</code>, <code>sdlc-app-runbook.outline.yaml</code>, <code>tdd.outline.yaml</code>.</p>
+<h2 id="refresh-ingest"><span class="dd-margin-tag" aria-hidden="true">refresh-ingest</span>Refresh / ingest</h2>
+<p>Four procedures. None needs a database.</p>
+<h3 id="refresh-ingest--step-1-render-a-design">Step 1 — render a design doc</h3>
+<pre class="powershell"><code>poetry run python scripts/render_design_doc.py docs/design/&lt;doc&gt;.md
+poetry run python scripts/render_design_doc.py docs/design/*.md          # all 27 sources
+poetry run python scripts/render_design_doc.py docs/design/&lt;doc&gt;.md --out-dir &lt;scratch&gt;</code></pre>
+<p>Default output is <strong>beside each <code>.md</code></strong> — that is what makes the committed render the guarded surface. <code>--out-dir</code> sends it elsewhere, which is how to render without touching a committed page.</p>
+<p><strong><code>--out-dir</code> does not create the directory.</strong> Measured: pointing it at a missing path raises <code>FileNotFoundError</code> rather than creating one. Make the directory first.</p>
+<p>Measured on this tree: 27 sources under <code>docs/design/*.md</code>; one render of <code>drydocs-core-runbook.md</code> produced 30,829 bytes, and a second run to a different directory produced the identical bytes.</p>
+<h3 id="refresh-ingest--step-2-validate-a-doc">Step 2 — validate a doc against its outline</h3>
+<pre class="powershell"><code>poetry run python -m drydocs.docgen.doc_outline --outline docs/design/templates/runbook.outline.yaml --doc docs/design/&lt;doc&gt;.md</code></pre>
+<p>Both flags are <strong>required and named</strong> — a positional invocation exits 2 with a usage line. Measured on both paths:</p>
+<table><thead><tr><th>Outcome</th><th>Output</th><th>Exit</th></tr></thead><tbody><tr><td>Conforms</td><td><code>OK — &lt;doc&gt; conforms to &lt;outline&gt;</code></td><td><strong>0</strong></td></tr><tr><td>Does not</td><td><code>FAIL — &lt;doc&gt; does not conform…</code> then one bullet per missing anchor</td><td><strong>1</strong></td></tr></tbody></table>
+<p>The failure bullets are actionable rather than diagnostic — each names the exact marker to add, e.g. `<code>missing required section — add </code>&lt;!-- anchor: verify --&gt;<code> before its heading</code>`.</p>
+<p><strong>Anchors are the contract, not headings.</strong> The validator checks that each required section&#x27;s <code>&lt;!-- anchor: id --&gt;</code> marker is present; it does not check heading text. A required section may be satisfied by an explicit <code>N/A — &lt;reason&gt;</code> so long as the anchor is there. Anchors are authored and stable, never positional, and never contain <code>--</code> (L11 reserves the double hyphen for derived subsection anchors) — because the feedback loop in step 4 re-attaches notes by anchor, and a renumbered anchor silently orphans every note keyed to it.</p>
+<h3 id="refresh-ingest--step-3-the-pdf-path">Step 3 — the PDF path (for the paper loop)</h3>
+<pre class="powershell"><code>poetry run python scripts/doc_to_pdf.py docs/design/&lt;doc&gt;.html --out &lt;scratch&gt;/&lt;doc&gt;.pdf</code></pre>
+<p>Headless Chromium-family print-to-PDF over the page&#x27;s own <code>@media print</code> sheet, with the PDF dates normalized so re-runs are structurally identical. <strong>Verified rather than taken from the docstring:</strong> two runs of the same page produced byte-identical 243,073-byte files on this venue.</p>
+<p>The PDF is <strong>build-on-demand and never committed</strong> (PUBLISH-BOUNDARY) — regenerate before printing rather than reusing an old one.</p>
+<h3 id="refresh-ingest--step-4-a-feedback-round">Step 4 — a feedback round, both halves</h3>
+<p>Both loops produce the <em>same</em> artifact: anchor-keyed YAML at <code>docs/design/feedback/&lt;doc-id&gt;-rev&lt;N&gt;.yaml</code>.</p>
+<ul><li><strong>L5, digital.</strong> Open the doc&#x27;s <code>.html</code>, click <strong>✎</strong> on a section, type a note, then <strong>Copy feedback</strong> — it puts a paste-ready block on the clipboard. Notes are held in that browser&#x27;s <code>localStorage</code> until copied. <em>Verified present without clicking:</em> a freshly rendered page contains the <code>localStorage</code> handling, the &quot;Copy feedback&quot; control, the anchor markers and the <code>@media print</code> sheet.</li><li><strong>L6, paper.</strong> Print the same page (or the step-3 PDF). Each section&#x27;s anchor id prints in the left margin gutter and every page carries a <code>Rev N · commit &lt;hash&gt;</code> footer, both injected by <code>drydocs/docgen/design_doc.py</code>. Annotate by hand, scan into <code>docs/design/feedback/scans/</code> (<strong>Internal by default — never published</strong>), then run the <code>.claude/skills/transcribe-doc-markup</code> skill, which transcribes faithfully first and only then keys each note to the nearest margin anchor.</li></ul>
+<p>The file shape, from a real capture:</p>
+<pre class="yaml"><code>doc: drydocs-startup-refresh-runbook
+author: &lt;reviewer&gt;
+notes:
+  - anchor: front-matter
+    status: applied          # applied in Rev 2 (2026-07-20)
+    note: |
+      &lt;the reviewer&#x27;s words&gt;</code></pre>
+<p><strong>A later rev carries forward the earlier rev&#x27;s notes</strong> — a capture is meant to be the whole of what the reviewer sent, not the part still open. Keep the <code>&lt;doc-id&gt;-rev&lt;N&gt;.yaml</code> name: <code>drydocs/port/port_rename_detect.py</code> treats two files whose stems match modulo the <code>-rev&lt;N&gt;</code> suffix as one subject precisely because a rev file is a strict superset of its predecessor and scored 1.00 on the rename detector&#x27;s containment measure (PORT2). A capture named some other way loses that protection.</p>
+<h3 id="refresh-ingest--the-board-render-described-here">The board render — described here, owned elsewhere</h3>
+<pre class="powershell"><code>poetry run python scripts/render_board.py                      # DEFAULT PATHS: writes committed pages
+poetry run python scripts/render_board.py --backlog &lt;path&gt; --out &lt;path&gt;   # board only, no side effects</code></pre>
+<p><strong>A default-paths run fires eleven sub-renderers besides the board itself.</strong> Counted two ways on this tree — the <code>import render_*</code> lines and the <code>render_*.main()</code> calls in the same block, both 11: gates, enforcement-matrix, load-map, software-registry, context-types, ui-concepts, gazetteer, remediation-diff, remediation-profile, <strong>ideas</strong>, roadmap. Only <code>render_ideas</code> reaches this module.</p>
+<blockquote><p><strong>The count in the tool&#x27;s own docstring is stale.</strong> <code>scripts/render_board.py</code> says <em>&quot;One command refreshes all four&quot;</em> while enumerating roughly eight in the prose above it and calling eleven in the code. <code>CLAUDE.md</code> §0 names four as well. Neither is this module&#x27;s to fix; both are recorded here so a reader trusts the command over the sentence. The command is in Appendix B — run it rather than believing this paragraph either.</p></blockquote>
+<p>An explicit <code>--backlog</code>/<code>--out</code> run renders <strong>the board only</strong> and fires none of the eleven. That is the form to use for a test, a preview, or any session that does not hold the render pen.</p>
+<h2 id="verify"><span class="dd-margin-tag" aria-hidden="true">verify</span>Verify</h2>
+<ol><li><strong>The stale-render check — re-render, then diff.</strong> Renders are deterministic, so a diff after re-rendering means a committed page did not match its source:</li></ol>
+<pre class="powershell"><code>poetry run python scripts/render_design_doc.py docs/design/*.md
+git diff --quiet docs/design ; if ($?) { &quot;clean&quot; } else { &quot;STALE - commit the refresh&quot; }</code></pre>
+<p>Any diff is a committed render that drifted from its <code>.md</code>. Commit the refresh; never edit the <code>.html</code> to match.</p>
+<ol><li id="verify--the-same-check-for-everything-a"><strong>The same check for everything a default board run owns</strong>, per <code>CLAUDE.md</code> §0: <code>docs/plan/board.html</code>, the <code>docs/design/*.html</code> set, <code>web/src/generated/gates.json</code>, <code>web/src/generated/enforcement-matrix.json</code>, <code>web/src/generated/load-map.json</code> and <code>docs/plan/load-map.html</code>. The eleven-renderer list above is why: editing a gate prompt or a config taxonomy without re-rendering leaves a committed artifact describing something the source no longer says, and each has its own drift guard.</li><li id="verify--outline-conformance-is-swept-not-spot-ch"><strong>Outline conformance is swept, not spot-checked.</strong> <code>tests/unit/test_doc_outline.py</code> validates every <code>docs/design/*-runbook.md</code> against <code>runbook.outline.yaml</code> by glob, so a new runbook is covered the moment it exists — no registration step, and no way to add one that quietly is not checked.</li><li id="verify--the-unit-contract-these-pass-with"><strong>The unit contract.</strong> These pass with no database and no data root:</li></ol>
+<pre class="powershell"><code>poetry run pytest -q tests/unit/test_doc_outline.py tests/unit/test_design_doc.py tests/unit/test_render_determinism.py tests/unit/test_doc_pdf.py</code></pre>
+<h2 id="rollback"><span class="dd-margin-tag" aria-hidden="true">rollback</span>Rollback</h2>
+<p><strong>Nothing here writes a database, and every output is regenerable from its source.</strong> That is the module&#x27;s defining property: the render is a pure function of the <code>.md</code>.</p>
+<ul><li><strong>A bad render</strong> — fix the <code>.md</code> and re-render. <code>git checkout -- docs/design/&lt;doc&gt;.html</code> also works, but it is the weaker move: it restores the page while leaving the source that produced the bad one in place.</li><li><strong>A render written to the wrong place</strong> — a default-paths run wrote beside the sources. <code>git status</code> names exactly what moved; <code>git checkout --</code> the ones that were not yours. This is the failure mode <code>--out-dir</code> exists to prevent.</li><li><strong>A default-paths board run in a lane that did not hold the pen</strong> — eleven artifacts plus the board moved. Same recovery, larger blast radius, and the reason the explicit <code>--backlog</code>/<code>--out</code> form exists.</li><li><strong>A PDF</strong> — never committed. Delete and rebuild.</li><li><strong>A feedback capture</strong> — the one artifact here a person authored rather than a renderer produced, so it is the one thing that cannot be regenerated. Treat <code>docs/design/feedback/*.yaml</code> and the scans as source, not output: a lost capture means going back to the reviewer.</li></ul>
+<h2 id="troubleshooting"><span class="dd-margin-tag" aria-hidden="true">troubleshooting</span>Troubleshooting</h2>
+<table><thead><tr><th>Symptom</th><th>Diagnosis</th><th>Fix</th></tr></thead><tbody><tr><td><code>FileNotFoundError</code> from <code>render_design_doc.py --out-dir</code></td><td>The directory does not exist; the script does not create it</td><td><code>mkdir</code> it first</td></tr><tr><td><code>doc_outline.py: error: the following arguments are required: --outline, --doc</code> (exit 2)</td><td>It was invoked positionally</td><td>Both flags are named and required</td></tr><tr><td>The validator exits <code>-1</code> or <code>255</code> instead of <code>1</code></td><td>PowerShell&#x27;s display of the process exit code, not the value. Measured through bash it is <code>1</code></td><td>Read the exit code in a POSIX shell, or compare against <code>0</code> rather than against <code>1</code></td></tr><tr><td><code>FAIL — … missing required section</code> on a doc that looks complete</td><td>The heading is there and the <code>&lt;!-- anchor: id --&gt;</code> marker is not — anchors are the contract, headings are not</td><td>Add the marker before the heading</td></tr><tr><td>An SME&#x27;s notes stopped re-attaching after an edit</td><td>An anchor id was renamed or renumbered; feedback is keyed to anchors</td><td>Anchors are authored and stable — restore the id. Never use <code>--</code> inside one (L11)</td></tr><tr><td>A committed <code>.html</code> differs from a fresh render</td><td>The stale-render case Verify step 1 exists for</td><td>Commit the refresh; do not edit the <code>.html</code></td></tr><tr><td>A board render moved eleven files you did not expect</td><td>A default-paths run fires every sub-renderer; only an explicit <code>--backlog</code>/<code>--out</code> run does not</td><td>Use the explicit form when you do not hold the render pen</td></tr><tr><td><code>doc_to_pdf.py</code> cannot find a browser</td><td>No Brave/Chrome/Edge on this machine</td><td>Venue limit, not a defect. Print from the <code>.html</code> instead — it carries the same <code>@media print</code> sheet</td></tr><tr><td>An import of <code>drydocs.design_doc</code> (or another flat name)</td><td>ADR 0018 D4 re-export shim, due for removal at the roll after next</td><td>Import <code>drydocs.docgen.&lt;name&gt;</code></td></tr></tbody></table>
+<h2 id="contacts-escalation"><span class="dd-margin-tag" aria-hidden="true">contacts-escalation</span>Contacts &amp; escalation</h2>
+<ul><li><strong>Procedure owner:</strong> the DryDocs producer (repo owner).</li><li><strong>When to run any of this is the session ritual&#x27;s call</strong>, not this page&#x27;s — <code>CLAUDE.md</code> §0 owns the render-at-session-close rule and the stale-render check that follows it.</li><li><strong>Adding a doc type is a contract change, not a render.</strong> A new <code>*.outline.yaml</code> under <code>docs/design/templates/</code> defines a new anchor namespace, and the L5/L6 loops key feedback to those anchors — so it goes through the same review as any other contract, and the template&#x27;s own header comment is where the reasoning is recorded.</li><li><strong>A stale render found in the wild is reported with the command that found it</strong>, per the Verify step above. That is cheaper than an argument about whether a page is current.</li><li><strong>A disagreement between this page and the code:</strong> the code wins, and the fix is this page. Appendix B re-derives every count and every claim here.</li></ul>
+<h2 id="appendices"><span class="dd-margin-tag" aria-hidden="true">appendices</span>Appendices</h2>
+<h3>A. The module census — four modules, two scripts, no verbs</h3>
+<table><thead><tr><th>File</th><th>Reached by</th><th>What it does</th></tr></thead><tbody><tr><td><code>drydocs/docgen/design_doc.py</code></td><td><code>scripts/render_design_doc.py</code></td><td>the renderer: md → the single HTML surface, margin anchors, the <code>Rev N · commit</code> footer, the L5 feedback controls</td></tr><tr><td><code>drydocs/docgen/doc_outline.py</code></td><td>its own <code>-m</code> CLI; <code>tests/unit/test_doc_outline.py</code></td><td>the outline contract: loads a <code>*.outline.yaml</code>, checks required anchors and the traceability matrix</td></tr><tr><td><code>drydocs/docgen/doc_pdf.py</code></td><td><code>scripts/doc_to_pdf.py</code></td><td>browser discovery and headless print-to-PDF with normalized dates</td></tr><tr><td><code>drydocs/docgen/plan_ideas.py</code></td><td><code>scripts/render_ideas.py</code>, itself fired by a default-paths board run</td><td>renders the <code>IDEAS.md</code> inbox to its read view</td></tr></tbody></table>
+<p>Two thin CLIs — <code>scripts/render_design_doc.py</code> and <code>scripts/doc_to_pdf.py</code> — plus the four outline templates under <code>docs/design/templates/</code>. Both scripts exist <em>&quot;until the <code>drydocs/cli.py</code> entrypoint-boundary TODO is resolved&quot;</em>, which is why the module has no registered verb rather than that being a design choice.</p>
+<h3>B. Re-derive one-liners — the code wins on disagreement</h3>
+<pre class="powershell"><code># does ANY registered verb reach this module? (reads the callbacks, never --help; J37)
+poetry run python -c &quot;import inspect, drydocs.cli as c; print([ (i.name or i.callback.__name__) for i in c.app.registered_commands if any(n in inspect.getsource(i.callback) for n in (&#x27;docgen&#x27;,&#x27;doc_outline&#x27;,&#x27;design_doc&#x27;,&#x27;plan_ideas&#x27;,&#x27;doc_pdf&#x27;))] or &#x27;NONE&#x27;)&quot;
+
+# how many sub-renderers does a default-paths board run fire? (two independent counts)
+Select-String -Path scripts/render_board.py -Pattern &#x27;import render_[a-z_]*&#x27; | Measure-Object | ForEach-Object Count
+Select-String -Path scripts/render_board.py -Pattern &#x27;render_[a-z_]*\.main\(\)&#x27; | Measure-Object | ForEach-Object Count
+
+# the outline contracts on this tree
+poetry run python -c &quot;import glob; from drydocs.docgen.doc_outline import load_outline; print({p.split(&#x27;/&#x27;)[-1]: load_outline(p).doc_type for p in sorted(glob.glob(&#x27;docs/design/templates/*.outline.yaml&#x27;))})&quot;
+
+# is a render deterministic? render twice to two directories and compare
+poetry run python scripts/render_design_doc.py docs/design/&lt;doc&gt;.md --out-dir &lt;dir-a&gt;
+poetry run python scripts/render_design_doc.py docs/design/&lt;doc&gt;.md --out-dir &lt;dir-b&gt;
+
+# which browser the PDF path would use here
+poetry run python -c &quot;from drydocs.docgen.doc_pdf import find_browser; print(find_browser())&quot;</code></pre>
+<hr class="dd-sme-divider">
+<section class="dd-sme-feedback" aria-label="SME - Feedback">
+<h2>SME - Feedback</h2>
+<p>How to return your notes on this document:</p>
+<ol>
+<li>Click the <strong>✎</strong> button beside any section (or numbered step) and type your note — notes save in your browser as you type.</li>
+<li>When finished, click <strong>Copy feedback</strong> in the bottom-right toolbar. Your notes are copied as anchor-keyed YAML.</li>
+<li>Create the feedback file (it is YAML, <em>not</em> markdown) — <strong>Copy To:</strong> <code>docs/design/feedback/</code> · <strong>File Name:</strong> <code>drydocs-docgen-runbook-rev1.yaml</code></li>
+<li>Paste the copied block into that file, save, and commit (or send the file back to the team).</li>
+</ol>
+</section>
+</main>
+<footer class="dd-print-footer">Rev 1 · commit 2453ac17</footer>
+<script>
+
+(function(){
+  var DOC="drydocs-docgen-runbook", FILE="drydocs-docgen-runbook-rev1.yaml", DIR="docs/design/feedback/", KEY="drydocs-doc-feedback:"+DOC;
+  function load(){ try{return JSON.parse(localStorage.getItem(KEY)||"{}");}catch(e){return {};} }
+  function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+  var state=load(), badge;
+  function count(){ return Object.keys(state).filter(function(k){return (state[k]||"").trim();}).length; }
+  function refresh(){ if(badge) badge.textContent=count(); }
+  function toast(msg){ var t=document.createElement("div"); t.className="dd-toast"; t.textContent=msg; document.body.appendChild(t); requestAnimationFrame(function(){t.classList.add("show");}); setTimeout(function(){t.classList.remove("show"); setTimeout(function(){t.remove();},250);},1600); }
+  function exportYaml(){
+    var lines=["# design-doc feedback — paste into docs/design/feedback/"+DOC+"-rev<N>.yaml","doc: "+DOC,"notes:"];
+    Object.keys(state).forEach(function(a){
+      var note=(state[a]||"").replace(/\r/g,""); if(!note.trim()) return;
+      lines.push("  - anchor: "+a); lines.push("    note: |");
+      note.split("\n").forEach(function(l){ lines.push("      "+l); });
+    });
+    return lines.join("\n")+"\n";
+  }
+  function attach(el){
+    var id=el.id;
+    var btn=document.createElement("button"); btn.className="dd-note-btn"; btn.type="button"; btn.textContent="✎"; btn.title="Annotate #"+id;
+    var box=document.createElement("div"); box.className="dd-note-box"; box.style.display=(state[id]||"").trim()?"block":"none";
+    var ta=document.createElement("textarea"); ta.value=state[id]||""; ta.setAttribute("placeholder","note for #"+id+" …");
+    ta.addEventListener("input",function(){ state[id]=ta.value; save(); refresh(); el.classList.toggle("dd-annotated", !!ta.value.trim()); });
+    if((state[id]||"").trim()) el.classList.add("dd-annotated");
+    box.appendChild(ta);
+    btn.addEventListener("click",function(){ box.style.display=box.style.display==="none"?"block":"none"; if(box.style.display==="block") ta.focus(); });
+    if(el.tagName==="LI"){ el.insertAdjacentElement("afterbegin", btn); el.appendChild(box); }
+    else { el.insertAdjacentElement("afterend", box); el.insertAdjacentElement("beforebegin", btn); }
+  }
+  function copyText(txt, ok){
+    var done=function(){toast(ok);};
+    var fallback=function(){ var t=document.createElement("textarea"); t.value=txt; document.body.appendChild(t); t.select(); try{document.execCommand("copy"); toast(ok);}catch(e){toast("copy failed — select the box");} t.remove(); };
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done,fallback); } else { fallback(); }
+  }
+  function fileLine(label, value){
+    var d=document.createElement("div"); d.className="dd-fb-file"; d.title="click to copy";
+    var c=document.createElement("code"); c.textContent=value;
+    d.appendChild(document.createTextNode(label+" ")); d.appendChild(c);
+    d.addEventListener("click",function(){ copyText(value, label.replace(":","")+" copied"); });
+    return d;
+  }
+  document.addEventListener("DOMContentLoaded",function(){
+    document.querySelectorAll("main [id]").forEach(attach);
+    var bar=document.createElement("div"); bar.className="dd-fb-bar";
+    var row=document.createElement("div"); row.className="dd-fb-row";
+    var lbl=document.createElement("span"); lbl.innerHTML='notes <span class="dd-badge">0</span>'; badge=lbl.querySelector(".dd-badge");
+    var ex=document.createElement("button"); ex.type="button"; ex.textContent="Copy feedback";
+    ex.addEventListener("click",function(){ copyText(exportYaml(), "feedback copied — create "+DIR+FILE); });
+    row.appendChild(lbl); row.appendChild(ex);
+    bar.appendChild(row);
+    bar.appendChild(fileLine("file:", FILE));
+    bar.appendChild(fileLine("path:", DIR+FILE));
+    document.body.appendChild(bar); refresh();
+  });
+})();
+
+</script>
+</body>
+</html>

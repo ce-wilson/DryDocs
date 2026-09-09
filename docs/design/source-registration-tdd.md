@@ -12,7 +12,7 @@ synthetic, and no connection coordinate appears in this document or in the files
 **Audience:** engineers working on `drydocs_core/source_descriptors.py` or
 `drydocs/source_registration/`, and the SME deciding whether the descriptor axes are the right
 five and whether a catalog belongs in the picture at all. ·
-**Companion:** `docs/decisions/0017-source-binding-substrate.md` (PROPOSED; the question this
+**Companion:** `docs/decisions/0017-source-binding-substrate.md` (ACCEPTED 2026-08-30; the question this
 proof of concept answers a piece of); `docs/design/datahub-substrate-review.md` Rev 2 and
 `docs/design/catalog-substrate-review.md` (the reading behind the DataHub choice);
 `docs/design/controlm-ingestion-tdd.md` (the pipeline whose landing zones receive the stand-ins);
@@ -96,7 +96,7 @@ Layer 3 is untouched. The graph is neither read nor written at any point in this
   source and its local import path.
 - **DataHub Lite** — DataHub's file-backed local store, itself a DuckDB database. No server is
   involved anywhere in this design.
-- **ADR 0017** — "Source binding substrate", PROPOSED. Its acceptance is not assumed here.
+- **ADR 0017** — "Source binding substrate", ACCEPTED 2026-08-30 (corrected 2026-09-09; Rev 3 read it as PROPOSED). It rules the binding substrate; the catalog question below stays open.
 
 <!-- anchor: design-summary -->
 ## Design summary
@@ -390,7 +390,7 @@ Three questions are genuinely open, and they belong to the SME rather than to a 
    registry field and each one changes what an operator does. A sixth axis, or a different cut of
    `access`, is a reasonable disagreement. It would be cheap to make now and expensive later, once
    values are tagged in a catalog.
-2. **Does a catalog get adopted at all?** ADR 0017 is PROPOSED and its acceptance is not assumed.
+2. **Does a catalog get adopted at all?** ADR 0017 is ACCEPTED (2026-08-30) for the BINDING substrate and leaves the catalog product open.
    This proof of concept deliberately proves the *shape* — a descriptor drives a registration — with
    a local file-backed store and no server, so the larger answer stays open.
 3. **Should the axis values ever reach the graph?** They are taxonomy, so they could be node
@@ -426,7 +426,7 @@ therefore stays with DataHub, and that is a fact about the two products rather t
 | The recipes run end to end against a local store | qa-tests | operator-side | one run on this desktop: 283 import events, 137 profile events, 18 profiles | done |
 | Every tracked YAML is classified for the identity header, carrying it or exempt with a reason | qa-tests | drydocs-load | `test_config_identity_header.py` — the recipes classed as somebody else's schema | done |
 | The five axes are the right five | hitl-gate | — | SME question, open | open |
-| A catalog product is adopted | hitl-gate | — | ADR 0017, PROPOSED | open |
+| A catalog product is adopted | hitl-gate | — | ADR 0017 ACCEPTED 2026-08-30; catalog left open | open |
 
 <!-- anchor: decisions-discussions -->
 ## Decisions & discussions

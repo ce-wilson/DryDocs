@@ -7,7 +7,7 @@ phase: 10
 agent: main
 model: opus
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - docs/reviews/module-review-sweep-plan.md
@@ -119,3 +119,12 @@ notes: |
   merge 6743ee9d (docs-only). The plan itself took six fixes at 5f02599f (slug key, scope read
   from component_map, merge not rebase, resume a partial report, no trunk close ritual or
   snapshot in a firing, slot 9 report landed). Clause (i) still waits on the first firing.
+  DONE 2026-09-09 (Lane A close, desktop, merge f06a5f00). The first firing landed and the
+  protocol held: eleven reports on main under docs/reviews/modules/ - slots 1 to 10 of cycle 1
+  plus web's second pass - each stamped with its tree (J63), none minting an id. The cycle's
+  conclusion, from the seams report: one defect shape found seven times (a result that cannot
+  distinguish checked-and-clean from not-checked), the correct answer implemented independently
+  six times, zero written conventions. Follow-ups are ADR 0021 (the convention and its
+  instrument) and the mint pass over the reports' unminted candidates. Acceptance (f) stands:
+  review/module-sweep and its worktree stay as the standing venue; the next firing merges main
+  back and cycle 2 opens by re-measuring the size column.

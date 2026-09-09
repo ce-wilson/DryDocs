@@ -8,7 +8,7 @@ phase: 17
 agent: main
 model: opus
 priority: p1
-status: in_progress
+status: todo
 depends_on:
 - G17
 inputs:
@@ -35,4 +35,8 @@ notes: |-
   printed bearer token (redacted and counted). Real logs live under
   internal-local/controlm-output-logs/ (git-ignored). The Python extractor is still this
   item's deliverable; the PoC fixed its field list and skip-reason set.
-
+  RELEASED 2026-09-09 (Lane A close, desktop). git branch -r --list "wip/mm7-*" is empty
+  (J31 check, recorded); the PoC is on main under scripts/poc/controlm-output/ and the Python
+  extractor is still the deliverable. VENUE NOTE: the captured Output-tab logs this item reads
+  are machine-local on the desktop, so this is a Lane A item - never queued to the laptop
+  (lane-handoff --suggest marks it V).
