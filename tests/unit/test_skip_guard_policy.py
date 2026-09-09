@@ -257,13 +257,19 @@ def _has_guard(source: str) -> bool:
 
 # ---- the policy ----------------------------------------------------------------
 
+#: Files that QUOTE the local-tree paths they police - as fixture strings and
+#: exemption keys, never as reads - and so cannot be read by this policy as tests
+#: that open them. This file, and the PORT3 never-port citation guard that applies
+#: the same reading across the manifest's every never-port row.
+_QUOTES_THE_PATTERNS = frozenset({Path(__file__).name, "test_never_port_citations.py"})
+
 
 def test_gitignored_asset_references_carry_a_skip_guard() -> None:
     untracked_offenders: list[str] = []
     unresolvable_offenders: list[str] = []
     for path in sorted(TESTS_DIR.glob("*.py")):
-        if path.name == Path(__file__).name:
-            continue  # this file quotes the patterns it polices
+        if path.name in _QUOTES_THE_PATTERNS:
+            continue
         text = path.read_text(encoding="utf-8")
         if _has_guard(text):
             continue

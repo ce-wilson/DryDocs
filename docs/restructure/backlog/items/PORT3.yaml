@@ -7,7 +7,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: done
 depends_on: []
 inputs:
 - PORT-MANIFEST.yaml
@@ -42,3 +42,34 @@ notes: |
   retired stub, and the producer had no way to see it. The join between 'this test is
   producer-canonical' and 'this path never crosses' exists in two files today and in nobody's
   head.
+  DONE 2026-09-08 (desktop, Lane A). Built as tests/unit/test_never_port_citations.py (15 tests
+  with the two policy edits below), guard logic in the test file on the test_skip_guard_policy
+  precedent - no new drydocs/port module, so no MODULE_MAP row.
+  (a) "canonical-producer" is READ as "every test that crosses" (disposition != never-port),
+      because the incident tests classify default_ok / per-entry through tests/**, not
+      canonical-producer; a never-port test may cite anything. Every crossing test's CODE is
+      read through the syntax tree: whole path-like string constants, /-chains rooted at a
+      module-level __file__- or repo_root()-anchored binding (a chain rooted at tmp_path is not
+      a citation), skip CALLS through source_scan.called_names, and the ARGUMENT LIST of a
+      git ls-files call. Docstrings, globs and prose literals are not citations.
+  (b) The manifest through drydocs.port.dispositions.load_manifest / classify; never prose.
+  (c) Four allowances, in order: a FIXTURE literal (FIXTURE_LITERALS, keyed by test file, each
+      with a reason; a stale entry - test gone, path no longer cited, empty reason - fails); a
+      SEEDED path (in the root commit, so on every consumer cut from the seed - the demo
+      interlock reads three seeded samples and fails by CORE4 rather than skips;
+      controlm_hosts__sample.csv is NOT seeded and its test skips, pinned live); a GITIGNORED
+      zone path with a skip call (git check-ignore --no-index, so a force-tracked sample is
+      still read as an ignored zone); a TRACKED zone path with a tracked-content probe, read
+      as the argument list of ["git", "ls-files", <pathspec>] where the pathspec is a name or
+      a glob-free constant. A directory probe is not one, and neither is git ls-files "*.md":
+      the REAL pre-fix test_markdown_fences.py ran exactly that to ENUMERATE, so a check for the
+      literal "ls-files" in the code would have passed it; the argument-list reading fails it.
+  (d) Replayed on history through git show: 20449d47^ fences FINDINGS 1 / 20449d47 CLEAN;
+      84ef2d97^ runbook FINDINGS 1 / 84ef2d97 (the is_dir fix) STILL FINDINGS 1 - acceptance
+      (c) exactly / af9194c4^ FINDINGS 1 / af9194c4 CLEAN. test_database_names.py's citation
+      of internal/repo-README.md is default_ok (internal/** crosses), so that third incident
+      guard reads clean at both shas and is not a never-port case.
+  Sibling edit: tests/unit/test_skip_guard_policy.py's self-exclusion became _QUOTES_THE_PATTERNS
+  (itself + the new guard) because the new file quotes never-port fixture strings as data.
+  Not done, the user's call: adding the guard to CLAUDE.md's J57 family list - this lane does
+  not edit section 0 this burst.

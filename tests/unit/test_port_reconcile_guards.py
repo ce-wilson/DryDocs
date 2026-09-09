@@ -66,7 +66,7 @@ from typing import Any
 
 import pytest
 
-from drydocs.port import reconcile_before
+from drydocs.port import gate_log_redactions, reconcile_before
 from drydocs_core import backlog_store, yaml_fragments
 
 yaml = pytest.importorskip("yaml")
@@ -219,31 +219,22 @@ def unsigned_activations(
     return violations
 
 
-def append_only_violation(before_text: str, after_text: str) -> str | None:
+def append_only_violation(
+    before_text: str,
+    after_text: str,
+    redactions: list[gate_log_redactions.Redaction] | None = None,
+) -> str | None:
     """None if every line of ``before_text`` survives in ``after_text``, in order.
 
     Insertions anywhere are allowed — a dated postscript under any signed record,
     the other side's entries interleaved chronologically. A pre-merge line that
-    is missing or altered is the violation, and the message names it. The
-    byte-prefix case (pure append at EOF) is the fast path.
+    is missing or altered is the violation, and the message names it — UNLESS a
+    declared publish-boundary redaction stands where it was (RELAY-47, 2026-09-08):
+    that line is ruled, listed by the live test, and never a failure. The mechanism
+    is ``drydocs.port.gate_log_redactions`` so the consumer's guard (this file,
+    fast-forward) and the producer's read one declaration.
     """
-    if after_text.startswith(before_text):
-        return None
-    before = before_text.splitlines()
-    after = after_text.splitlines()
-    j = 0
-    for i, line in enumerate(before, start=1):
-        while j < len(after) and after[j] != line:
-            j += 1
-        if j == len(after):
-            return (
-                f"append-only violated: pre-merge line {i} is missing or altered in the "
-                f"merged file: {line!r} (every existing line must survive in order — "
-                "dropping or editing either side's audit entries is an audit violation; "
-                "inserting under a record, or between records, is not)"
-            )
-        j += 1
-    return None
+    return gate_log_redactions.append_only_violation(before_text, after_text, redactions)
 
 
 def vocab_entries(doc: dict) -> list[dict]:
@@ -452,6 +443,76 @@ def test_gate_log_append_only_mechanics() -> None:
     assert append_only_violation(two, reordered) is not None
 
 
+def test_gate_log_declared_redaction_is_ruled_not_failed() -> None:
+    """RELAY-47: a changed line is a failure until it is declared; declared, it is listed.
+
+    The declaration holds the AFTER text only (quoting the removed string would put
+    the name back), so the check is positional: the after-line standing where the
+    missing pre-merge line stood must be a declared replacement."""
+    before = "# log\n\n## 2026-07-23 - adr7\n- C: default (OLD-NAME-on-ADK implied)\n- Effect: R1\n"
+    redacted = before.replace("(OLD-NAME-on-ADK implied)", "(company-SDK-on-ADK implied)")
+    redacted += "- **POSTSCRIPT 2026-09-07:** redacted in place.\n"
+    decl = [
+        gate_log_redactions.Redaction(
+            commit="55c2a204",
+            date="2026-09-07",
+            record="adr7 clause C",
+            replacement="- C: default (company-SDK-on-ADK implied)",
+            reason="publish-boundary",
+        )
+    ]
+    # unruled: the same edit with nothing declared is the violation, naming the line
+    msg = append_only_violation(before, redacted)
+    assert msg is not None and "line 4" in msg and "gate-log-redactions.yaml" in msg
+    # ruled: declared, it is listed and nothing fails
+    result = gate_log_redactions.check_append_only(before, redacted, decl)
+    assert result.violation is None
+    assert result.ruled == [(4, "- C: default (company-SDK-on-ADK implied)")]
+    assert result.lines()[0].startswith("RULED REDACTIONS")
+    # a declaration never excuses a DIFFERENT edit of the same file
+    other = redacted.replace("- Effect: R1", "- Effect: R2")
+    assert "line 5" in (append_only_violation(before, other, decl) or "")
+    # nor a drop: the line must be REPLACED by the declared text, not removed
+    dropped = redacted.replace("- C: default (company-SDK-on-ADK implied)\n", "")
+    assert append_only_violation(before, dropped, decl) is not None
+    # stale: a declared replacement absent from the live file is reported
+    assert gate_log_redactions.stale_redactions(before, decl) == decl
+    assert gate_log_redactions.stale_redactions(redacted, decl) == []
+
+
+def test_gate_log_redaction_registry_is_well_formed_and_live() -> None:
+    """The declared registry parses, and every declared replacement is in the live
+    gate-log — a stale row protects nothing and the guard says so (RELAY-47 (c))."""
+    declared = gate_log_redactions.load_redactions()
+    live = GATE_LOG.read_text(encoding="utf-8")
+    stale = gate_log_redactions.stale_redactions(live, declared)
+    assert not stale, (
+        "STALE redaction declarations - the replacement line is no longer in "
+        "config/gate-log.md (reverted, or the record reworded; re-declare or remove):\n  "
+        + "\n  ".join(f"{r.commit} {r.record}: {r.replacement!r}" for r in stale)
+    )
+
+
+def test_gate_log_redaction_registry_rejects_what_it_cannot_use() -> None:
+    bad = {"schema": gate_log_redactions.SCHEMA, "redactions": [{"commit": "x"}]}
+    with pytest.raises(gate_log_redactions.RedactionDeclarationError, match="missing"):
+        gate_log_redactions.parse_redactions(bad)
+    rider = {
+        "schema": gate_log_redactions.SCHEMA,
+        "redactions": [
+            {"commit": "x", "date": "d", "record": "r", "replacement": "t", "reason": "typo"}
+        ],
+    }
+    with pytest.raises(gate_log_redactions.RedactionDeclarationError, match="rider"):
+        gate_log_redactions.parse_redactions(rider)
+    assert (
+        gate_log_redactions.parse_redactions(
+            {"schema": gate_log_redactions.SCHEMA, "redactions": []}
+        )
+        == []
+    )
+
+
 def test_current_files_pass_their_own_rules() -> None:
     """Sanity: each real file vs itself is violation-free (loaders + rules wire up)."""
     vocab = yaml_fragments.load_yaml_source(VOCAB_FILE)
@@ -587,8 +648,13 @@ def test_reconcile_vocab_gate_bound_activations_live() -> None:
 def test_reconcile_gate_log_append_only_live() -> None:
     before = before_text("gate-log.md")
     after = GATE_LOG.read_text(encoding="utf-8")
-    violation = append_only_violation(before, after)
-    assert violation is None, violation
+    result = gate_log_redactions.check_append_only(
+        before, after, gate_log_redactions.load_redactions()
+    )
+    # RELAY-47: a declared publish-boundary redaction is LISTED, never silence.
+    for line in result.lines():
+        print(line)
+    assert result.violation is None, "\n".join(result.lines())
 
 
 # --- J51 (2026-08-20): list-shaped per-entry rows — "never drop a name" as code ---------

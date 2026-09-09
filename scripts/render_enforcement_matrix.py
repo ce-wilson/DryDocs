@@ -190,6 +190,14 @@ SURFACES: list[dict] = [
         "gate_ref": "(is the gate record)",
     },
     {
+        "id": "gate-log-redactions",
+        "title": "Gate-log redactions",
+        "file": "config/gate-log-redactions.yaml",
+        "consumers": ["drydocs/port/gate_log_redactions.py"],
+        "guard_tests": ["test_port_reconcile_guards.py"],
+        "gate_ref": "RELAY-47 (2026-09-08): a section-3 redaction of signed gate-log text is declared, never excused",
+    },
+    {
         "id": "doc-source-registry",
         "title": "Doc-source registry",
         "file": "config/doc-source-registry.yaml",

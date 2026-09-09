@@ -3540,6 +3540,113 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   reserved for the §3-redaction ruling**; nothing in this postscript is that ruling.
   Nothing is asked back.
 
+  **SECOND POSTSCRIPT TO RELAY-46 - THREE CORRECTIONS TO YOUR 0908 APPLY, READ AT ITS PHASE 3
+  (2026-09-08, producer main `d1016072`, base `port-base-20260908`, venue desktop; your report of
+  the apply is `[SME-REPORTED]`, each correction is checked at the tag):** Your Phase 0, Phase 1
+  and the stale-step correction (`PRODUCER_BASELINE` gone, `edition:` deliberately unset until your
+  own mint) read correctly from here, and your correction-21 handling of `55c2a084` - stop, name
+  it, take producer text, reconstruct nothing, no local exemption - is the right handling; that
+  ruling is producer-owned and RELAY-47 stays reserved for it. Three things in your Phase 3 do not
+  survive a read of the producer tag. **One - the writer did not drop `--repo`.**
+  `[VERIFIED-PRODUCER]` `scripts/reconcile_before.py` at `port-base-20260908` declares it
+  (`--repo`, default the checkout containing the cwd, help text "the consumer checkout to
+  snapshot"), beside the positional before-dir and `--describe`; it arrived in producer `2aa90898`
+  on 2026-09-05 and the file is byte-identical between the tag and producer `main`. Your Phase 1
+  invocation - a detached worktree at the tag, then the writer with `--repo <worktree>` - is the
+  producer CLI's own documented shape. The "hand-merge in the diverged class" is a diff against
+  your 0905-era local copy reading the library-plus-CLI refactor as a drop (J76's fourth failure
+  mode, from the first postscript: `git log -1 -- <file>` against the tag before comparing text).
+  Take the fast-forward. **Two - there is no bootstrapping problem, so the stamp guard clears
+  today.** `[VERIFIED-PRODUCER]` The stamp your `BASE_SHA` names is `BASE.sha` - one line, the
+  40-hex sha, `drydocs/port/reconcile_before.py` - and the guard is
+  `test_reconcile_before_dir_stamp_describes_this_tree_live` in
+  `tests/unit/test_port_reconcile_guards.py`. The writer's refusal is narrower than "a dirty
+  tree": it is `git status --porcelain` over the snapshot's SOURCE files only, run in the `--repo`
+  checkout. Point it at a worktree detached at `pre-cewilson-port-20260908` and the sources are
+  clean by construction; the stamp it writes is `b73fd9d1`, which is an ancestor of
+  `port/20260908` and is where that branch left `main`, so every check the guard makes passes -
+  missing, unresolvable, not-an-ancestor, gate-log byte mismatch, not-the-fork-point. Nothing has
+  to land first; the library is already on your branch as a clean-add and the CLI is a
+  fast-forward. **Three - PORT6 is closed, and was never a home for owed-path rows.**
+  `[VERIFIED-PRODUCER]` PORT5, PORT6 and PORT7 are `done` on the producer; PORT6 was the clean-add
+  completeness check. The 87 owed paths already have a producer reading in
+  `docs/reviews/company-owed-path-review-2026-09-08.md` (first postscript: 73 ruled by the
+  manifest, 14 need the SME), and any new row for them is PORT4's accepted-drop seam or a fresh
+  mint - keeping the 87 out of this roll is the right scope call either way. **Two notes, not
+  corrections.** Your 2-of-3 interlock caution is the manifest's own rule: `MODULE_MAP.md`,
+  `drydocs_core/component_map.py` and `tests/unit/test_module_boundary.py` are one `per-entry`
+  classification in `PORT-MANIFEST.yaml` ("three files, one classification"), so a wholesale take
+  of any of the three is the defect the row exists to stop. And your closing lesson - the unit of
+  application is the dependency closure, not the disposition class - is now producer inbox
+  Idea-307, mechanism only: the classifier answers per path, the `pairs_with` column records the
+  closure by hand and nothing reads it, and the depgraph snapshot already holds the import edges
+  to derive it. Nothing is asked back.
+
+- **RELAY-47 — THE SECTION-3 REDACTION RULING: A PUBLISH-BOUNDARY REDACTION OF SIGNED
+  GATE-LOG TEXT IS DECLARED, NEVER EXCUSED** (new 2026-09-08, producer `main` after
+  `port-base-20260908` / `314b1715`, venue desktop; the commit that carries this relay also
+  carries the mechanism). `[VERIFIED-PRODUCER]` throughout. This is the ruling RELAY-46
+  reserved this number for, and it answers section 4 of
+  `docs/company-prompts/port-base-20260905-closeout-company-prompt.md`; that section stays as
+  written (L25) and is superseded by this text for the one line it names.
+  **THE RULING.** The reconcile guard for `config/gate-log.md` stays line-subsequence
+  append-only: every pre-merge line survives, in order, insertions free. It gains exactly one
+  ruled state and no exemption. A publish-boundary redaction (CLAUDE.md section 3) of a line
+  inside a signed record is DECLARED, one row per redacted line, in
+  `config/gate-log-redactions.yaml`: the redacting commit, the date, which signed record, the
+  REPLACEMENT line exactly as it now reads (leading spaces included), and `reason:
+  publish-boundary` - the only reason the schema accepts, because anything else is a rider
+  under the record (L25), never an edit of it. The registry holds the AFTER text only. It never
+  quotes what was removed, since a registry that quoted the removed string would put the name
+  back in tracked prose, which is what the redaction existed to take out. Three consequences,
+  each a guard and not a convention. **One - a declared redaction is LISTED, never silence and
+  never a failure.** `drydocs.port.gate_log_redactions.check_append_only` walks the before
+  lines as before; a pre-merge line that does not survive is ruled when the merged line
+  standing where it stood is a declared replacement, and the live test prints it under
+  `RULED REDACTIONS` (the `UNION_EXCLUSIONS` shape you already know from the backlog union).
+  The rule is positional on purpose: the replacement must stand exactly where the removed
+  line stood, so a declared line somewhere else in the file excuses no drop. **Two - an
+  undeclared change fails exactly as it did**, and the message now says where a redaction is
+  declared. Nothing about the guard softened; a second edit of the same record, a drop of the
+  redacted line, or a redaction nobody declared are all still the violation, and the mechanics
+  test (`test_gate_log_declared_redaction_is_ruled_not_failed`) asserts each of the three.
+  **Three - a STALE declaration fails.** `stale_redactions` reports any row whose replacement
+  is nowhere in the live file - the redaction was reverted or the record reworded, and the row
+  now protects nothing - and `test_gate_log_redaction_registry_is_well_formed_and_live` fails
+  on it in every checkout, before-dir or not. That clause is what makes the registry safe to
+  have. **WHERE IT LIVES AND WHY THERE.** Your before-snapshot carries the old line, so YOUR
+  guard is the one that fails, and you take `tests/unit/test_port_reconcile_guards.py` as a
+  fast-forward. A ruling inside the producer's test file reaches you; a ruling inside a
+  side-local overlay would not. So the registry is `canonical-producer` - a redaction is a
+  producer ruling about producer text - with its own row in `PORT-MANIFEST.yaml` directly
+  under the `config/gate-log.md` row, ahead of the `config/**` fall-through; the reader is
+  `drydocs/port/gate_log_redactions.py` (its `MODULE_MAP.md` row is in the same commit, the
+  boundary guard being default-deny); and the guard file imports it, its former local
+  `append_only_violation` now a wrapper over the library. A tree that predates the registry
+  has declared nothing and the guard behaves exactly as before - absent is not an error. **THE
+  ONE ROW TODAY** is `55c2a204` (2026-09-07): clause C of the ADR 0007 agentic-QA gate record,
+  signed 2026-07-23 - pre-merge line 795 in the producer's own reproduction, your snapshot's number for it is your union's - with the dated POSTSCRIPT under the
+  record that already said so. Reproduced from here against the pre-redaction text at
+  `55c2a204^`: with the registry, the live test passes and prints `pre-merge line 795 ->` the
+  replacement; with the registry removed, the original failure returns naming the line. This
+  is not PORT4's seam: PORT4 is an accepted DROP of a PATH, ruled in the side-local overlay;
+  this is a changed LINE in a file both sides hold, and it needed its own file. PORT4's notes
+  say so. **WHAT THIS MEANS AT YOUR CARVE-OUT.** Take producer text for the redacted line, as
+  RELAY-46 and section 4 already said. Reconstruct nothing. Invent no local exemption. The
+  mechanism lands after `port-base-20260908`, so the tag you are applying does not carry it
+  and your 0908 close still fails the live test on that one line, correctly; that failure is
+  the RULED state named by hand in your report, the way you already name the ruled
+  `HISTORICAL_PATHS` drops. The eighth base, when it is cut, carries the registry as a
+  clean-add, the library as a clean-add, and the guard as a fast-forward, and the line goes
+  from a named failure to a listed ruling with no action of yours beyond the apply. If the
+  guard still fails on that line after that base: check the instrument first (J76) - the
+  registry is present, `git log -1 -- tests/unit/test_port_reconcile_guards.py` reads the
+  base's version and not a superseded one, and the merged line is byte-identical to the
+  producer's, four leading spaces included. **ONE CORRECTION TO THIS SIDE'S OWN TEXT**, as a
+  rider: the SECOND POSTSCRIPT TO RELAY-46 wrote the redacting commit as `55c2a084`; it is
+  `55c2a204`, as RELAY-46 itself and the registry row have it. The postscript stands as
+  written; this line is its correction. Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has

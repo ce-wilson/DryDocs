@@ -1,0 +1,30 @@
+# =============================================================================
+# config/gate-log-redactions.yaml — publish-boundary redactions of signed gate-log text
+# =============================================================================
+# The reconcile guard for config/gate-log.md is append-only by line: every pre-merge
+# line must survive, in order. A publish-boundary redaction (CLAUDE.md section 3) is
+# the ONE legitimate in-place edit of a signed record — a company-internal name has
+# to leave the tracked text, and a postscript cannot remove anything — so each one is
+# DECLARED here and the guard lists it as ruled instead of failing on it. A declared
+# replacement that is no longer in the live file is STALE and fails the guard.
+#
+# Ruled by the SME 2026-09-08 (RELAY-47). Reader: drydocs/port/gate_log_redactions.py.
+# One row per redacted line. `replacement` is the line AS IT NOW READS, exactly
+# (leading spaces included); the removed text is never quoted here — quoting it
+# would put the name back. `reason` is `publish-boundary` only: anything else is a
+# rider under the record (L25), never an edit of it.
+#
+# Canonical-producer (PORT-MANIFEST.yaml): a redaction is a producer ruling about
+# producer text, and the consumer's guard reads this same file.
+schema: drydocs.gate-log-redactions.v1
+classification: Internal-Public
+updated: 2026-09-08
+redactions:
+  - commit: 55c2a204
+    date: 2026-09-07
+    record: "ADR 0007 agentic-QA architecture gate, signed 2026-07-23, clause C"
+    replacement: "    the runtime default — supersedes the 2026-07-03 IDEAS assumption (company-SDK-"
+    reason: publish-boundary
+    note: >
+      The company agent SDK's product name, quoted inside clause C, redacted in place;
+      the dated POSTSCRIPT under the record says so. No ruling changed.
