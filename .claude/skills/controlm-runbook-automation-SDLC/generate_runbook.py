@@ -121,6 +121,12 @@ UNKNOWN = "_not captured_"
 #: are the SME's to supply.
 CAPTURE_ROW_NOTE = "_SME capture — no ingested system of record; see the marker above._"
 
+#: A Control-M command line is not always a script. These two families are what
+#: the bundled sample actually contains, measured; anything else is reported as
+#: unclassified rather than filed under a heading it does not belong to.
+SHELL_SUFFIXES = (".ksh", ".sh", ".bash", ".csh")
+PARAM_SUFFIXES = (".pset", ".prm", ".param", ".parm")
+
 
 # --------------------------------------------------------------------------
 # facts
@@ -186,6 +192,28 @@ class FolderFacts:
             if cmd and cmd not in seen:
                 seen[cmd] = job.get("job_name", "")
         return sorted(seen.items())
+
+    def shell_scripts(self) -> list[tuple[str, str]]:
+        """Only the command lines that are SHELL SCRIPTS.
+
+        Section 6.3 is titled "UNIX Shell Scripts" and the outline asks for
+        "every .ksh invoked from Informatica workflows or Control-M". A Control-M
+        command line is not always a script: in the bundled sample, 10 of the 16
+        distinct command lines are Informatica parameter sets (`.pset`) and 6 are
+        `.ksh`. Listing a parameter set under "Unix Script Name" would put a value
+        in the wrong column — which is the failure mode a run book can least
+        afford, because the reader has no way to tell it happened.
+        """
+        return [(cmd, job) for cmd, job in self.scripts() if cmd.endswith(SHELL_SUFFIXES)]
+
+    def parameter_files(self) -> list[tuple[str, str]]:
+        """The command lines that are parameter sets rather than scripts."""
+        return [(cmd, job) for cmd, job in self.scripts() if cmd.endswith(PARAM_SUFFIXES)]
+
+    def unclassified_commands(self) -> list[tuple[str, str]]:
+        """Command lines that are neither — reported rather than silently dropped."""
+        known = set(self.shell_scripts()) | set(self.parameter_files())
+        return [pair for pair in self.scripts() if pair not in known]
 
     def conditions_for(self, job_id: str) -> list[dict[str, str]]:
         """This job's IN conditions, ordered as Control-M orders them.
@@ -819,6 +847,17 @@ def _r_end_to_end(spec: dict, facts: FolderFacts, meta: dict) -> str:
     return "\n".join(parts)
 
 
+def _param_file_cell(cmd: str) -> str:
+    """The Param File Path value, saying what the command line actually is."""
+    if cmd == UNKNOWN:
+        return UNKNOWN
+    if cmd.endswith(PARAM_SUFFIXES):
+        return f"`{cmd}`"
+    if cmd.endswith(SHELL_SUFFIXES):
+        return f"`{cmd}` — a shell script, not a parameter set; see section 6.3"
+    return f"`{cmd}` — command line of an unrecognized kind"
+
+
 def _r_etl_jobs(spec: dict, facts: FolderFacts, meta: dict) -> str:
     parts: list[str] = []
     inventory = [
@@ -840,7 +879,10 @@ def _r_etl_jobs(spec: dict, facts: FolderFacts, meta: dict) -> str:
         header_values = {
             "Control-M job name": job.get("job_name", ""),
             "Schedule Information": UNKNOWN,
-            "Param File Path": f"`{cmd}`" if cmd != UNKNOWN else UNKNOWN,
+            # The outline mandates this row's LABEL, and a Control-M command line
+            # is not always a parameter file. Print what it actually is rather
+            # than letting the mandated label assert something about the value.
+            "Param File Path": _param_file_cell(cmd),
             "Src Schema/DB": UNKNOWN,
             "Stg Schema/DB": UNKNOWN,
             "Target Schema/DB": UNKNOWN,
@@ -893,19 +935,43 @@ def _r_etl_adhoc(spec: dict, facts: FolderFacts, meta: dict) -> str:
 
 def _r_unix_scripts(spec: dict, facts: FolderFacts, meta: dict) -> str:
     rows = [
-        [f"`{cmd}`", UNKNOWN, f"{job} (scheduled in Control-M)"] for cmd, job in facts.scripts()
+        [f"`{cmd}`", UNKNOWN, f"{job} (scheduled in Control-M)"]
+        for cmd, job in facts.shell_scripts()
     ]
-    return "\n".join(
-        [
-            table(spec["columns"], rows),
+    parts = [table(spec["columns"], rows)]
+    if not rows:
+        parts += [
             "",
-            "_A path is not a description. What each script DOES — and the taxonomy the outline "
-            "asks for (environment setup, workflow wrappers, parameter-file generators, "
-            "validators, archival, SFTP movers, trigger waits, mailers, status updates, "
-            "mutual-exclusion checks) — is a reading of the script bodies, which this graph "
-            "does not hold._",
+            "No job in this folder runs a shell script directly — every command line is an "
+            "Informatica parameter set, listed with its workflow in section 6.1.",
         ]
-    )
+    params = facts.parameter_files()
+    if params:
+        parts += [
+            "",
+            f"_{len(params)} further command line(s) in this folder are Informatica parameter "
+            "sets rather than scripts; they appear as **Param File Path** in the per-workflow "
+            "blocks of section 6.1. A parameter set under 'Unix Script Name' would be a value "
+            "in the wrong column._",
+        ]
+    unclassified = facts.unclassified_commands()
+    if unclassified:
+        parts += [
+            "",
+            "_Command line(s) that are neither a known shell-script nor a known parameter-set "
+            "extension, reported rather than filed under a heading they may not belong to: "
+            + ", ".join(f"`{cmd}`" for cmd, _ in unclassified)
+            + "._",
+        ]
+    parts += [
+        "",
+        "_A path is not a description. What each script DOES — and the taxonomy the outline "
+        "asks for (environment setup, workflow wrappers, parameter-file generators, "
+        "validators, archival, SFTP movers, trigger waits, mailers, status updates, "
+        "mutual-exclusion checks) — is a reading of the script bodies, which this graph "
+        "does not hold._",
+    ]
+    return "\n".join(parts)
 
 
 def _r_unix_servers(spec: dict, facts: FolderFacts, meta: dict) -> str:
@@ -927,7 +993,7 @@ def _r_password_scripts(spec: dict, facts: FolderFacts, meta: dict) -> str:
         [
             "**Vault function call per script**",
             "",
-            table(spec["columns"], [[f"`{cmd}`", UNKNOWN] for cmd, _ in facts.scripts()]),
+            table(spec["columns"], [[f"`{cmd}`", UNKNOWN] for cmd, _ in facts.shell_scripts()]),
             "",
             "**Safe details**",
             "",

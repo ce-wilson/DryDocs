@@ -295,9 +295,14 @@ sections:
     fill: unix_shell_scripts
     columns: ["Unix Script Name", "Descriptions", "Invoking Workflow (session)"]
     sor: [cmd-line]
-    derived: "Every script a job's command line names, with the job that invokes it\
-      \ — that is the third column, filled as 'Scheduled in Control-M' for a job\
-      \ that calls the script directly."
+    derived: "Every SHELL SCRIPT a job's command line names, with the job that\
+      \ invokes it — the third column, filled as 'Scheduled in Control-M' for a\
+      \ job that calls the script directly. A Control-M command line is not always\
+      \ a script: parameter sets are counted, named as such, and left to the\
+      \ per-workflow blocks in 6.1, because a parameter set listed under 'Unix\
+      \ Script Name' is a value in the wrong column and a reader has no way to\
+      \ tell it happened. Anything matching neither family is reported as\
+      \ unclassified rather than filed under a heading it may not belong to."
     residue: "What each script DOES. A path is not a description, and the script\
       \ taxonomy the outline asks for (environment setup, workflow wrappers,\
       \ parameter-file generators, validators, archival, SFTP movers, trigger\
