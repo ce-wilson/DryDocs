@@ -73,7 +73,88 @@ Recorded here so slot 10 does not re-run the search.
 
 ## Lens 1 — system design
 
-*(step 4)*
+**The last module slot answers the sweep's recurring question correctly in both halves
+that face a reader** — and that is the finding, because it means the remedy is not rare,
+it is unwritten. One modest defect: a docstring at an entry point still describes a
+charter the package retired.
+
+### L1-1 — `investigate.py` documents the retired charter, and it is the file a reader opens first
+
+`drydocs_deepdoc/__init__.py` states the current charter, ruled at gate
+`document-content-topology` (G32, 2026-08-18) and restated at MM1 (2026-08-21): deepdoc is
+a **corpus-driven retriever seeded from the grounded graph**, and — explicitly —
+*"the earlier 'reactive on-failure deep dive' into a separate uncertain database is
+**retired**."*
+
+`drydocs_deepdoc/investigate.py` opens with:
+
+> *"On-demand deep dive — a failure names the job/folder; this derives context."*
+
+That is the retired model, stated as the module's purpose, in the module that holds the
+component's entry point (`investigate_failure(job_name, folder_name)`). The two documents
+in one package disagree about what the component is, and the stale one is the one whose
+name a reader reaches for.
+
+**Consequence, calibrated honestly.** Nothing can act on it wrongly — `investigate_failure`
+raises `NotImplementedError` and has no production caller (only two tests, one asserting
+the raise). The cost is orientation: in a repo whose method is *read the code and the
+prose beside it*, a reader or an agent seeded from `investigate.py` learns a model that a
+signed gate retired three weeks ago. This sweep has twice been slowed by exactly that class
+of thing, and both times the report recorded it so the next firing would not pay again.
+
+**Cheapest correction:** rewrite the one docstring to the G32/MM1 charter, or delete
+`investigate.py`'s prose down to a pointer at `__init__`. Two lines, no behaviour.
+
+### L1-2 — the scaffold states its own scaffold status, which is the honest version of this sweep's question
+
+`__init__.py` carries, verbatim:
+
+> **Scaffold status:** interfaces + contracts (G4, 2026-07-10); the `investigate` and
+> `writer` bodies raise `NotImplementedError` until MM10. `mindmap` and `search_log` (MM3)
+> are real.
+
+Checked and true on this tree: `investigate_failure` and `write_findings` both raise on
+their first line; `mindmap.py` (352) and `search_log.py` (203) are implemented. **A
+component that says which of its own parts are real is the completeness contract this
+sweep has been chasing, applied reflexively.** It is why L1-1 above is a docstring nit
+rather than a finding about a component pretending to be finished.
+
+### L1-3 — `plan_board` distinguishes "none done" from "nothing to do"
+
+`drydocs/plan/plan_board.py:203-204`:
+
+```python
+pct = round(100 * done / total) if total else 0
+progress_text = f"{done} / {total}" if total else "no items"
+```
+
+A phase with no items renders **"no items"**, not `0 / 0` and not a 0% bar. That is the
+third state, in the governed render a human actually reads, on the surface CLAUDE.md
+requires to be published verbatim.
+
+**This is the fifth independent in-repo remedy for the pattern this sweep has found in
+every slot**, after `equivalence.py`'s **not proven**, `archival.py`'s coverage-on-itself,
+`drydocs_api`'s declared `truncated`, and `port_preflight`'s *"SKIPPED — not a
+certification"*. Counting deepdoc's scaffold-status paragraph as a sixth. **Six correct
+implementations, zero written conventions** — which is the strongest form the argument for
+slot 10's rule can take: nobody needs convincing that this is right, and it still does not
+travel between components.
+
+### L1-4 — what else is right, recorded so no later firing re-audits it
+
+- **The board is deterministic and says why.** *"Given the same backlog tree,
+  `render_board` always produces byte-identical HTML — no build timestamps, no randomness.
+  The board is committed to git, so its diffs must reflect real backlog changes, not render
+  noise."* The header carries the item count **instead of** a build time (ADR 0013).
+- **The board names the system of record and its own status.** *"The repo (`backlog/`) is
+  the system of record; the browser is a working aid"* — `localStorage` is convenience
+  only, and quick-capture copies a line for a human to paste rather than writing to the
+  repo.
+- **deepdoc's write boundary is one module and says so.** `writer.py` is *"the ONLY module
+  in the component that writes a database"*; every node and edge carries `reliability` and
+  `trust` (*"a finding without stamps is a contract violation"*); proxy nodes MERGE on the
+  URN business key so ground-truth properties are never copied across the boundary; and
+  promotion is explicitly not its job.
 
 ## Lens 2 — technical debt
 
