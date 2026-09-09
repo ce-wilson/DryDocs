@@ -1,0 +1,591 @@
+# =============================================================================
+# section-spec.yaml — the long-form SDLC Application Run Book: machine-readable
+# source of truth for WHERE EACH SECTION'S CONTENT COMES FROM.
+#
+# generate_runbook.py renders one SDLC-Runbook markdown document per Control-M
+# folder from this spec plus a folder fact bundle. This file answers the
+# question the generator cannot: for each of the outline's sections, can the
+# graph supply it, partly supply it, or not supply it at all?
+#
+# THE OUTLINE IS NOT DUPLICATED HERE. docs/design/templates/sdlc-app-runbook.outline.yaml
+# owns the section set, the order, the headings and the guidance. This file adds
+# exactly one layer on top: provenance per section. Every `anchor` below must
+# exist in that outline and every required anchor in that outline must appear
+# below — tests/unit/test_sdlc_runbook_spec.py fails on either kind of drift, so
+# a section added to the outline cannot silently arrive unlabeled here.
+#
+# ---------------------------------------------------------------------------
+# THE `source:` VOCABULARY IS THE -excel SIBLING'S, DELIBERATELY.
+#
+# The backlog item that asked for this skill (L23) phrased the labeling
+# requirement as "GRAPH-DERIVED or SME-RESIDUE", and said it should work "the
+# way -excel's template-spec.yaml labels every column". Those two halves ask for
+# different things: -excel already ships a THREE-value vocabulary, and inventing
+# a two-value one here would leave the repo with two names for one concept —
+# which is the failure the item's own SHARED-or-CITED clause exists to prevent.
+#
+# So this file uses -excel's three values verbatim, and states the mapping once:
+#
+#   graph          — the DryDocs graph (or its staging stores) already holds it.
+#                    L23's GRAPH-DERIVED.
+#   graph-partial  — partly derivable; a named seam exists but the section still
+#                    needs enrichment before it is complete. L23's GRAPH-DERIVED
+#                    for the part that is derivable, SME-RESIDUE for the rest —
+#                    which is why the generated document marks these sections
+#                    with BOTH and names which columns fall on which side.
+#   manual         — SME capture. No system of record we ingest today.
+#                    L23's SME-RESIDUE.
+#
+# A section marked `na_for_batch: true` is one the source example itself marks
+# "N/A" for a pure-batch application. It is still REQUIRED by the outline and
+# still gets its anchor and an explicit N/A line with a reason — the outline's
+# rule, not an omission.
+#
+# ---------------------------------------------------------------------------
+# WHAT `source:` DESCRIBES, AND WHAT IT DOES NOT.
+#
+# `source:` is a claim about the SPEC — what the graph CAN supply for a section,
+# in general. It is NOT a claim about any particular run. A folder whose
+# attribution edge was never confirmed produces a document with an empty
+# ownership table even though `architecture-contacts` is marked `graph` here.
+# The generator keeps those distinct on purpose: the spec label rides in the
+# section marker, and the coverage report at the end of every generated document
+# says what THIS folder's bundle actually had. Read the report, not the label,
+# when asking whether a given run book is complete.
+#
+# ---------------------------------------------------------------------------
+# `columns:` IS TRANSCRIBED FROM THE OUTLINE'S GUIDANCE, VERBATIM.
+#
+# Where the outline says "Columns exactly: A | B | C", those columns appear here
+# in that order and the generator emits that header. They are repeated here
+# rather than parsed out of the guidance prose because the guidance is prose:
+# parsing it would be a render-parsing guard violation in spirit (J37) and would
+# break the first time someone rewords a sentence. The spec test asserts the
+# column lists still appear in their section's guidance text, so a reworded
+# outline fails loudly here instead of drifting quietly.
+#
+# ALL example values that reach a committed file are SYNTHESIZED — the bundled
+# sample universe (SEAL ids inside the reserved 70001-70099 block, example.invalid
+# addresses, host-hldm-* nodes). A FILLED run book for a real application is
+# Internal and belongs in internal/ or internal-local/, never here.
+# =============================================================================
+
+schema: drydocs.sdlc-runbook-section-spec.v1
+doc_type: SDLC-Runbook
+outline: docs/design/templates/sdlc-app-runbook.outline.yaml
+title: SDLC Application Run Book — section provenance
+classification: Internal-Public
+updated: 2026-09-09
+
+# Cited, not restated. Every graph-backed row below resolves through one of
+# these; the authority for each is the file named, not this spec.
+sor_citations:
+  controlm-graph:
+    cite: ".claude/skills/controlm-runbook-automation-excel/SKILL.md — column map row\
+      \ 'Folder, job names, descriptions, start times, CYCLIC, calendar'"
+    detail: "ingest-controlm graph — (:ControlMFolder)-[:CONTAINS_JOB]->(:ControlMJob),\
+      \ sourced from psgmgr.CM_DEF_VTAB / CM_DEF_VJOB."
+  folder-attribution:
+    cite: ".claude/skills/controlm-runbook-automation-excel/SKILL.md — column map row\
+      \ 'SEAL id/name, Product, Area-Product'"
+    detail: "K8 folder-grain attribution. The edge lands on the application's BATCH\
+      \ PORT, not on the application node: (:ControlMFolder)-[:BELONGS_TO_APPLICATION]->\
+      \ (:Port {kind:'BatchProcessing'}), whose parent_app_id names the\
+      \ :BusinessApplication. Folder grain, never job grain."
+  seal-contacts:
+    cite: ".claude/skills/controlm-runbook-automation-excel/SKILL.md — column map row\
+      \ 'Severity, L2/L3 queues + DLs, escalation DB'"
+    detail: "SEAL role attribution — (:BusinessApplication)-[:QUALIFIED_ATTRIBUTION]->\
+      \ (:Attribution)-[:HAS_AGENT]->(:Employee), with -[:HAD_ROLE]->(:Role) naming\
+      \ the role. This spec reads the ownership half; the escalation-DB half\
+      \ (queues, DLs, severity) is the -excel skill's and is not re-derived here."
+  conditions:
+    cite: "external/orchestration/bmc-controlm/ — condition grammar (baseline vendor\
+      \ semantics for IN/OUT conditions)"
+    detail: "(:ControlMJob)-[:REQUIRES_IN_CONDITION|EMITS_OUT_CONDITION]->(:Condition)\
+      \ and the job-to-job (:ControlMJob)-[:WAS_INFORMED_BY]->(:ControlMJob) edge\
+      \ derived from them."
+  hosts:
+    cite: ".claude/skills/controlm-runbook-automation-excel/SKILL.md — column map row\
+      \ 'Folder, job names, descriptions, start times, CYCLIC, calendar'"
+    detail: "(:ControlMJob)-[:RUNS_ON]->(:ControlMHostGroup|:ExecutionHost) and\
+      \ (:ControlMFolder)-[:SCHEDULED_ON]->(:ControlMServer)."
+  cmd-line:
+    cite: ".claude/skills/controlm-runbook-automation-excel/SKILL.md — column map row\
+      \ 'Command line, script/jar, param files'"
+    detail: "The job's cmd_line property, and behind it the cmd-line staging store\
+      \ (export -> resolve -> parse). This spec reads only the cmd_line string that\
+      \ ingest-controlm already carries; the resolved-argument grain is the -excel\
+      \ skill's and the lineage chain's, and is cited rather than re-queried."
+  excel-workbook:
+    cite: ".claude/skills/controlm-runbook-automation-excel/"
+    detail: "The 2-tab folder-grain Excel runbook. Its 'Control M Job details' tab\
+      \ is the authoritative per-job summary; this document points at it rather\
+      \ than reproducing its ~35 columns in markdown."
+  avg-run:
+    cite: ".claude/skills/controlm-runbook-automation-excel/SKILL.md — column map rows\
+      \ 'Avg run time, availability' and 'SLA/SLO on ODATE'"
+    detail: "cm_avg_run (gated) plus the description-field metadata plan. Both are\
+      \ graph-partial in the -excel spec and stay graph-partial here — a sibling\
+      \ that claimed more would be the two-skills-disagreeing failure."
+
+sections:
+
+  # --- cover and control -----------------------------------------------------
+  - anchor: front-matter
+    heading: "Front matter (cover)"
+    source: graph-partial
+    shape: table
+    fill: front_matter
+    sor: [folder-attribution, controlm-graph]
+    derived: "Application name and SEAL id (via the folder's batch port), the\
+      \ Control-M folder the book covers, the classification carried by the SEAL\
+      \ record, and the source commit the revision reflects."
+    residue: "Project name, document version and date are document metadata, not\
+      \ application facts — the generator takes them as parameters and a run that\
+      \ does not supply them says so on the cover."
+
+  - anchor: document-control
+    heading: "Document Control"
+    source: manual
+    shape: table
+    fill: document_control
+    columns: ["Version No.", "Name of Reviewer", "Role", "Date"]
+    residue: "The review ledger is a record of human reviews. Nothing in the graph\
+      \ knows who reviewed a document; the generator emits the header and a\
+      \ placeholder row per declared reviewer, or an empty table shape."
+
+  - anchor: change-history
+    heading: "Change History"
+    source: graph-partial
+    shape: table
+    fill: change_history
+    columns: ["Version No.", "Details of Change", "Changed Sections", "Prepared by", "Date"]
+    derived: "A generated revision can state its own row honestly: the version it\
+      \ was generated as, 'Generated from <source> at <commit>', and the date."
+    residue: "Every PRIOR row is history the generator did not witness. It never\
+      \ invents one; an existing book's rows are carried forward by the author."
+
+  # --- what this book is -----------------------------------------------------
+  - anchor: purpose
+    heading: "Purpose"
+    source: graph-partial
+    shape: prose
+    fill: purpose
+    derived: "The application and folder the book is about."
+    residue: "The sentence itself is the outline's boilerplate — one short\
+      \ paragraph naming the Tier 2 audience."
+
+  - anchor: target-audience
+    heading: "Target Audience"
+    source: manual
+    shape: prose
+    fill: target_audience
+    residue: "Which support tiers this application's book serves is an\
+      \ organizational fact about the support model, not a graph fact. The\
+      \ generator emits the outline's shape with the tiers left to confirm."
+
+  # --- architecture ----------------------------------------------------------
+  - anchor: architecture-model
+    heading: "Architecture Model"
+    source: manual
+    shape: prose
+    fill: architecture_model
+    residue: "The end-to-end system diagram. A diagram is the one artifact in this\
+      \ outline that a folder's job list cannot produce: it needs the source and\
+      \ target systems, the file exchanges and the downstream consumers, none of\
+      \ which the Control-M definition carries. The generator emits the section\
+      \ with a named placeholder and the schedule sub-diagram list it CAN name\
+      \ (one per batch stream, from the folder set)."
+
+  - anchor: etl-process-overview
+    heading: "ETL Process Overview"
+    source: graph-partial
+    shape: prose
+    fill: etl_process_overview
+    derived: "The cadence, from the folder's own naming segments and its cyclic\
+      \ jobs; the count of scheduled jobs; the lettered list of processing layers\
+      \ this document covers, which is fixed by the outline."
+    residue: "Which upstream systems feed the application, and the link to its TDD."
+
+  - anchor: schedule
+    heading: "Schedule"
+    source: graph-partial
+    shape: table
+    fill: schedule
+    columns: ["Task Name", "Type", "Schedule Time", "Event Wait Trigger Files/Dependencies"]
+    sor: [controlm-graph, conditions, avg-run]
+    derived: "Task Name and Type from the job rows (task_type distinguishes a job\
+      \ from a command/dummy); the dependency column from the IN conditions each\
+      \ job waits on and the jobs that emit them."
+    residue: "Schedule Time is NOT in the Control-M definition tables this graph\
+      \ ingests — it comes from cm_avg_run and the schedule metadata plan, both\
+      \ graph-partial in the -excel spec. The literal trigger-FILE paths, the\
+      \ alert cadence while waiting and the restart-after-window rule are SME\
+      \ capture: a condition name is not a file path, and treating one as the\
+      \ other is the kind of quiet wrong answer a run book must not carry."
+
+  - anchor: archival-file-management
+    heading: "Archival and File Management"
+    source: manual
+    shape: table
+    fill: archival_file_management
+    columns: ["Sl#", "Name", "Location (Folder/Schema)", "Type", "Retention Period"]
+    residue: "Retention policy has no ingested system of record — the -excel spec\
+      \ marks every retention row manual and this section is the same facts in\
+      \ long form."
+
+  # --- the estate, workflow by workflow --------------------------------------
+  - anchor: end-to-end-process
+    heading: "End-to-End Process Overview"
+    source: graph
+    shape: prose
+    fill: end_to_end_process
+    derived: "The umbrella: how many workflows the folder holds and how the\
+      \ subsections below are organized."
+
+  - anchor: etl-jobs
+    heading: "Informatica ETL Jobs"
+    source: graph-partial
+    shape: table
+    fill: etl_jobs
+    sor: [controlm-graph, conditions, cmd-line]
+    header_rows: ["Control-M job name", "Schedule Information", "Param File Path",
+      "Src Schema/DB", "Stg Schema/DB", "Target Schema/DB", "Folder name",
+      "Source Table", "Stage Table", "Target Table"]
+    task_columns: ["Task Name", "Task function"]
+    inventory_columns: ["Sl#", "Workflow Name", "Description"]
+    derived: "The workflow inventory (one row per job, with its description), and\
+      \ per workflow: the Control-M job name, the folder name, the param file path\
+      \ from cmd_line, and the task table's rows from the job's conditions and\
+      \ command line."
+    residue: "The source/stage/target SCHEMA@DB grain and the table-to-table moves\
+      \ are Informatica mapping facts. Control-M schedules the workflow; it does\
+      \ not know what the workflow reads and writes. That grain arrives with the\
+      \ lineage extractors or from the SME, and until it does these header rows\
+      \ carry an explicit unknown rather than a guess. The Control-M workspace\
+      \ screenshot the outline asks for is likewise an SME artifact."
+
+  - anchor: etl-adhoc-jobs
+    heading: "Informatica ETL Adhoc Jobs"
+    source: manual
+    shape: table
+    fill: etl_adhoc_jobs
+    columns: ["S.no", "Workflow Name", "Comments"]
+    residue: "The Control-M definition has no on-demand flag: an adhoc workflow is\
+      \ one a human runs, and nothing in the scheduled estate distinguishes it.\
+      \ The section is emitted with its shape and an explicit N/A when the folder\
+      \ has no adhoc entries declared."
+
+  - anchor: unix-shell-scripts
+    heading: "UNIX Shell Scripts"
+    source: graph-partial
+    shape: table
+    fill: unix_shell_scripts
+    columns: ["Unix Script Name", "Descriptions", "Invoking Workflow (session)"]
+    sor: [cmd-line]
+    derived: "Every script a job's command line names, with the job that invokes it\
+      \ — that is the third column, filled as 'Scheduled in Control-M' for a job\
+      \ that calls the script directly."
+    residue: "What each script DOES. A path is not a description, and the script\
+      \ taxonomy the outline asks for (environment setup, workflow wrappers,\
+      \ parameter-file generators, validators, archival, SFTP movers, trigger\
+      \ waits, mailers, status updates, mutual-exclusion checks) is a reading of\
+      \ the script bodies, which this graph does not hold."
+
+  - anchor: unix-servers
+    heading: "UNIX Servers"
+    source: graph
+    shape: table
+    fill: unix_servers
+    sor: [hosts]
+    derived: "The execution hosts and host groups the folder's jobs run on, and the\
+      \ Control-M server the folder is scheduled on."
+    residue: "The DNS alias and the per-environment physical/virtual split are\
+      \ infrastructure facts outside the orchestrator's definition tables."
+
+  - anchor: password-retrieval-scripts
+    heading: "Password Retrieval for UNIX Shell Scripts"
+    source: manual
+    shape: table
+    fill: password_retrieval_scripts
+    columns: ["Script Name", "Vault function call"]
+    safe_columns: ["Env", "Server", "Safe Name", "Provider Name", "Vault Server"]
+    account_columns: ["Sl#", "User", "Database", "Password object", "Comments"]
+    residue: "Vault safes, providers and password objects are credential-management\
+      \ facts with no ingested system of record. The section emits its four table\
+      \ shapes and NEVER a secret value — it records the function CALL a script\
+      \ makes, which is the outline's own rule."
+
+  - anchor: password-retrieval-adhoc
+    heading: "Password Retrieval for Adhoc Requests"
+    source: manual
+    shape: table
+    fill: password_retrieval_adhoc
+    columns: ["Sl#", "Maintenance FID", "Database"]
+    residue: "The break-glass path and the maintenance FIDs that release it are SME\
+      \ capture. FID variables co-located with the SEAL id in folder variables are\
+      \ a candidate source, but that seam is not built, so this stays manual\
+      \ rather than claiming a derivation that does not run."
+
+  - anchor: controlm-job-details
+    heading: "Control-M Job Details"
+    source: graph
+    shape: prose
+    fill: controlm_job_details
+    sor: [excel-workbook]
+    derived: "The pointer the outline asks for: the authoritative per-job artifact\
+      \ is the -excel sibling's 'Control M Job details' tab for this same folder.\
+      \ This section names it and its repository location; it does not reproduce\
+      \ the workbook's columns, because two renderings of one fact is exactly what\
+      \ the sibling clause forbids."
+
+  # --- service levels and ownership ------------------------------------------
+  - anchor: service-level-agreement
+    heading: "Service Level Agreement"
+    source: graph-partial
+    shape: table
+    fill: service_level_agreement
+    columns: ["DW Process", "Job Name", "Frequency", "Expected Start Time",
+      "Expected End Time", "SLA", "Inbound/Outbound"]
+    sor: [controlm-graph, avg-run]
+    derived: "DW Process and Job Name from the job rows; Frequency from the\
+      \ folder's cadence and the job's cyclic flag."
+    residue: "Expected start/end times and the SLA itself are the -excel spec's\
+      \ graph-partial rows (cm_avg_run, gated; the ODATE SLO metadata plan). The\
+      \ upstream-dependency SLAs the batch inherits are SME. Inbound/Outbound is a\
+      \ judgment about the job's role in the flow."
+
+  - anchor: architecture-contacts
+    heading: "High-Level Project Technical Architecture and Project Contact Information"
+    source: graph
+    shape: table
+    fill: architecture_contacts
+    columns: ["Project", "Name", "Role", "Areas of Responsibility"]
+    sor: [seal-contacts, folder-attribution]
+    derived: "The ownership table, from the application's SEAL role attributions —\
+      \ one row per confirmed role holder, with the role's preferred label."
+    residue: "'Areas of Responsibility' is free text the SEAL record does not\
+      \ carry; the generator fills it from the role where the role says it and\
+      \ leaves it open otherwise. The tool-stack list (ETL engine and version, OS,\
+      \ database) is application architecture, not orchestration metadata."
+
+  # --- deployment and environment (the source example's N/A run) -------------
+  - anchor: task-overview
+    heading: "Task Overview"
+    source: manual
+    shape: na
+    na_for_batch: true
+    fill: na_section
+    na_reason: "the source example marks this section N/A and the outline says to\
+      \ keep it present anyway"
+
+  - anchor: pre-installation-checklist
+    heading: "Pre-Installation Checklist"
+    source: manual
+    shape: na
+    na_for_batch: true
+    fill: na_section
+    na_reason: "deployment checklists live with the deployment pipeline, not in the\
+      \ support run book; the outline accepts a pointer or N/A"
+
+  - anchor: configuration-setup
+    heading: "Configuration & Setup"
+    source: manual
+    shape: prose
+    fill: configuration_setup
+    residue: "The umbrella for the environment subsections below. Present so the\
+      \ N/A rows underneath keep their place in the numbering."
+
+  - anchor: operating-system
+    heading: "Operating System"
+    source: manual
+    shape: na
+    na_for_batch: true
+    fill: na_section
+    na_reason: "OS-level setup is owned by the platform team, not by the\
+      \ application's batch estate"
+
+  - anchor: database-server
+    heading: "Database Server"
+    source: manual
+    shape: prose
+    fill: database_server
+    residue: "Per-environment connect descriptors and the access-request procedure.\
+      \ Connection metadata for the application's own databases is not part of the\
+      \ Control-M definition, and publishing real descriptors would cross the\
+      \ publish boundary in any case — the section carries the shape and the\
+      \ procedure, never live host/port/service values in a committed file."
+
+  - anchor: data-migration
+    heading: "Data Migration"
+    source: manual
+    shape: na
+    na_for_batch: true
+    fill: na_section
+    na_reason: "no migration procedure for a steady-state batch module"
+
+  - anchor: web-server
+    heading: "Web Server"
+    source: manual
+    shape: na
+    na_for_batch: true
+    fill: na_section
+    na_reason: "pure batch module — no web tier"
+
+  - anchor: application-server
+    heading: "Application Server"
+    source: manual
+    shape: na
+    na_for_batch: true
+    fill: na_section
+    na_reason: "pure batch module — no application server tier"
+
+  - anchor: front-end-gui-setup
+    heading: "Front-End / GUI Setup"
+    source: manual
+    shape: na
+    na_for_batch: true
+    fill: na_section
+    na_reason: "pure batch module — no front end"
+
+  - anchor: security-issues
+    heading: "Security Issues"
+    source: manual
+    shape: na
+    na_for_batch: true
+    fill: na_section
+    na_reason: "none tracked in the run book; security findings are tracked in the\
+      \ application's own risk record"
+
+  - anchor: other-packages
+    heading: "Other Packages"
+    source: manual
+    shape: na
+    na_for_batch: true
+    fill: na_section
+    na_reason: "none"
+
+  - anchor: application-login-ids
+    heading: "Application Login IDs"
+    source: graph-partial
+    shape: table
+    fill: application_login_ids
+    columns: ["Application", "Systems", "Login-id"]
+    sor: [controlm-graph]
+    derived: "The job owner is a login id and the graph carries it — every distinct\
+      \ owner across the folder's jobs, against the Control-M system."
+    residue: "Login ids on the OTHER systems the application touches (databases,\
+      \ file transfer, cloud) are not in the orchestrator's tables. Retired\
+      \ accounts stay as struck-through rows, which is a history the generator\
+      \ cannot reconstruct — it never removes a row an author added."
+
+  - anchor: directory-configuration
+    heading: "Content and Application Directory Configuration"
+    source: graph-partial
+    shape: table
+    fill: directory_configuration
+    columns: ["Components of Application", "Path", "Owner"]
+    sor: [cmd-line, controlm-graph]
+    derived: "The scripts location, from the directories the folder's command lines\
+      \ resolve to, with the job owner as the Owner column."
+    residue: "The ETL repository details (repository name, integration service,\
+      \ domain, gateway host and port), the session-log location and the source,\
+      \ target, FTP and archive file locations are Informatica and file-estate\
+      \ facts. The outline lists them as rows to cover, so the generator emits\
+      \ each row with an explicit unknown rather than dropping it — a missing row\
+      \ reads as 'not applicable', an empty one reads as 'not captured yet', and\
+      \ those are different answers."
+
+  # --- when it breaks --------------------------------------------------------
+  - anchor: recovery-procedures
+    heading: "Recovery Procedures"
+    source: manual
+    shape: table
+    fill: recovery_procedures
+    columns: ["Sr. No.", "Failure Category", "Probable Failure Reasons", "Action Required"]
+    residue: "The failure-category table is generic enough that the outline\
+      \ prescribes its shape, but the ACTIONS are application-specific and the\
+      \ special-case recovery per fragile workflow — same-day restart rules,\
+      \ multi-day missed-load recovery, the parameter-file override query, the\
+      \ hard cautions — is exactly the knowledge a run book exists to capture from\
+      \ people. The generator emits the table shape and the orchestrator-outage\
+      \ row it can name, and marks the rest as capture."
+
+  - anchor: production-support
+    heading: "Production Support"
+    source: manual
+    shape: prose
+    fill: production_support
+    residue: "The umbrella for the support playbook subsections below."
+
+  - anchor: alerts
+    heading: "Alerts Generated by System"
+    source: manual
+    shape: table
+    fill: alerts
+    columns: ["Sr. No.", "Failure Category", "Probable Failure Reasons", "Action Required"]
+    residue: "The two alert classes — Threshold Alert (not started or not ended on\
+      \ time) and Failure Alert (execution issue) — are definitions the outline\
+      \ fixes, so the generator emits them verbatim. Which alerts THIS application\
+      \ actually raises, and to whom, is the escalation-DB half that belongs to\
+      \ the -excel sibling and to SME capture."
+
+  - anchor: job-monitoring
+    heading: "ETL Job Monitoring / Visual Confirmation"
+    source: manual
+    shape: prose
+    fill: job_monitoring
+    residue: "How runs are watched, and the ETL-rejects configuration. Monitoring\
+      \ practice is a team fact."
+
+  - anchor: tier2-escalation
+    heading: "General Tier 2 Escalation Procedures"
+    source: graph-partial
+    shape: table
+    fill: tier2_escalation
+    columns: ["Escalation Level", "Role", "Primary Contact #", "Comments"]
+    sor: [seal-contacts]
+    derived: "The contact list, from the application's SEAL role attributions,\
+      \ ordered by escalation level where the role vocabulary declares one."
+    residue: "The numbered guideline scenarios and their verbatim alert-email\
+      \ templates are the run book's most valuable SME content and none of it is\
+      \ derivable. Contact NUMBERS are not in the SEAL sample either — the graph\
+      \ carries names, ids and email addresses, so the column is emitted with the\
+      \ contact point the graph has and the number left to capture."
+
+  - anchor: security-admin-support
+    heading: "Security Administration Support"
+    source: manual
+    shape: na
+    na_for_batch: true
+    fill: na_section
+    na_reason: "no application-specific security-admin path; requests go through\
+      \ the standard access process"
+
+  - anchor: server-database-support
+    heading: "Server/Database Support"
+    source: manual
+    shape: table
+    fill: server_database_support
+    columns: ["Escalation Level", "Role", "Primary Contact", "Alternate Contact"]
+    residue: "The platform-team contact table (Unix SA, DBA, ETL admin, vault IAM).\
+      \ These are queue names and rotas belonging to other teams; the application's\
+      \ own SEAL record does not name them."
+
+  - anchor: business-contact
+    heading: "Business Contact"
+    source: manual
+    shape: table
+    fill: business_contact
+    columns: ["Group", "Contact", "Role", "Primary Contact #", "Secondary Contact #",
+      "Responsibility"]
+    residue: "Business-side contacts are not in the technology ownership record."
+
+  - anchor: appendix
+    heading: "Appendix"
+    source: manual
+    shape: table
+    fill: appendix
+    columns: ["Sr. No.", "Name of Team", "Primary Contact", "Secondary Contact"]
+    residue: "External teams contacted for support or recovery — capture."
