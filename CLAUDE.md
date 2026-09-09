@@ -27,6 +27,13 @@ things share the word *port* — never conflate them:
 - **Branch guardrail (this is what prevents the main-vs-branch mix-ups):** ALWAYS run
   `git branch --show-current` immediately before committing and name the target branch — HEAD can change
   between turns, agents, worktrees, or forks, so never assume it persisted. Wrong branch → stop and confirm.
+  **In a DETACHED worktree that command prints an EMPTY string** (measured, J61), and
+  `git rev-parse --abbrev-ref HEAD` prints the literal `HEAD` — neither is a name to check, so the
+  guardrail as written produces nothing exactly where it is needed most. The substitute, run before
+  committing: **`git rev-parse HEAD` must equal `git rev-parse origin/main`** (after your first commit,
+  compare `HEAD^`). Equal means *detached at the tip you intend to push onto*; unequal means *detached
+  somewhere else* — stop and confirm, the same as a wrong branch. Those are the two outcomes the
+  guardrail exists to separate, and the empty string separates neither.
 
 **Where to work, by output type:**
 - output is a **commit** → **Claude Code** (CLI/desktop/IDE). All repo work, running the
@@ -97,6 +104,32 @@ The 27 legacy letters (A..Z, GN, MM) were FROZEN on 2026-09-02 — a letter reco
    ruff commands CI blocks on then run on the staged files at every commit, at the exact ruff pin —
    a fast first line, never the gate. Not installed for you, on purpose: `.pre-commit-config.yaml`
    explains itself so a hook failure on a fresh clone is never an unexplained one.
+   ***When that `git pull` ABORTS (J61) — the shared-checkout recovery.*** The case that actually
+   happens on the desktop: another live session in the SAME tree has an uncommitted file the incoming
+   merge touches, so the pull aborts **wholesale** even though nothing you intend to touch is involved.
+   Do not stash another session's work and do not wait. Work from a detached worktree instead — every
+   command below was run once against this tree at build time and its output recorded in J61's notes:
+   ```bash
+   git fetch origin
+   git worktree add --detach "$SCRATCH/wt" origin/main   # $SCRATCH = your scratchpad dir
+   cd "$SCRATCH/wt"
+   git rev-parse HEAD; git rev-parse origin/main         # the detached guardrail above — must match
+   # ... do the work ...
+   git add <explicit paths>                              # BY PATH: the worktree also holds renders
+   git commit -F <msgfile>                               #          and a .venv you did not intend
+   git push origin HEAD:main
+   cd - && git worktree remove --force "$SCRATCH/wt"
+   ```
+   Two things this recipe does NOT do, stated because a reader otherwise assumes both. **It unblocks
+   the WORK, not the TREE:** the push advances the remote while the blocked checkout's own `main` ref
+   stays put, so the shared tree ends the session *further behind* than it started, with the same dirty
+   file plus more commits to catch up on. Only the session holding that file can clear it. And **it
+   does not fix the close-time CI check's detached-HEAD blindness** — that is U27's, already captured;
+   do not re-solve it here. Renders ARE safe from a worktree: a default-paths `render_board.py` run
+   writes worktree-local (verified at build time — every reported output path sat under the worktree
+   root and the main checkout stayed clean), which is true because J48 fixed it and was not before.
+   Note the first `poetry run` inside a fresh worktree BUILDS a second in-project `.venv` there;
+   invoking the main checkout's interpreter by absolute path skips that.
 2. **During:** the in-session Task list is *ephemeral* working memory for the one item — distinct
    from the durable item file.
 3. **End:** update the item's `status`, **regenerate the board** (`poetry run python scripts/render_board.py`)

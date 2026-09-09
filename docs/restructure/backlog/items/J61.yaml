@@ -9,7 +9,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - CLAUDE.md
@@ -31,6 +31,59 @@ acceptance: |
 
   (g) NO CODE, NO GUARD. This item edits procedure only and ships no behaviour change and no test. Say so, and say why - the failing step is a human ritual reading a document, and there is no point in the sequence where a guard could observe it.
 notes: |
+  DONE on wip/j61-laptop (Lane B, laptop), first of the four-item CLAUDE.md section 0
+  cluster carried on ONE branch per the sender's ruling.
+
+  (a) THE RECIPE WAS RUN, NOT WRITTEN. Every command in it was executed once against
+  this tree while the item was being built, in order: git fetch origin; git worktree add
+  --detach <scratch>/j61-wt origin/main; the guardrail comparison; a default-paths
+  render_board.py; an explicit-path git add; a commit; a push of HEAD to a ref; the ref
+  deleted; git worktree remove --force. Observed output below.
+
+  (b) THE DETACHED GUARDRAIL, MEASURED. Inside the detached worktree
+  `git branch --show-current` printed an EMPTY string, exactly as the groom reported, and
+  `git rev-parse --abbrev-ref HEAD` printed the literal `HEAD` - neither is a name to
+  check. The substitute written into section 0 is `git rev-parse HEAD` against
+  `git rev-parse origin/main`, which distinguishes the two outcomes the clause requires:
+  at the probe both read ea810179 (detached AT the tip to push onto), and after the
+  rehearsal commit HEAD^ still read ea810179 while HEAD had moved to 05e6e2b0, which is
+  the same check one commit later. Unequal would mean detached somewhere else.
+
+  (d) RENDERS FROM A WORKTREE ARE SAFE, RE-VERIFIED AT BUILD TIME rather than trusted
+  from the clause. A default-paths render_board.py run inside the worktree reported
+  twelve output paths and EVERY one sat under ...scratchpad\j61-wt\ (board.html,
+  roadmap.html, ideas.html, load-map.html and the eight web/src/generated artifacts), and
+  `git status --porcelain` in the MAIN checkout stayed empty throughout. J48 is why that
+  is now true.
+
+  ONE THING THE RECIPE GAINED FROM RUNNING IT. The first `poetry run` inside a fresh
+  worktree does not fail - it silently BUILDS a second in-project .venv there, because
+  this repo configures in-project virtualenvs. That is slow and pure waste for a
+  throwaway tree, and it is also why the first render invocation produced no visible
+  output. Invoking the main checkout's interpreter by absolute path skips it. A recipe
+  written without executing it would have shipped `poetry run` with no such note.
+
+  THE ONE DEVIATION, STATED PLAINLY. The recipe's push step is `git push origin HEAD:main`.
+  Rehearsing that literally would have put a throwaway commit on the trunk mid-burst, so
+  the push was exercised against a temporary ref instead - `git push origin
+  HEAD:refs/heads/tmp/j61-recipe-probe`, which reported `* [new branch] HEAD ->
+  tmp/j61-recipe-probe`, then deleted with `git push origin --delete`. The mechanics
+  under test are identical (pushing a detached HEAD to a named remote ref); only the
+  destination differed, and it differed deliberately.
+
+  (c) The recipe says in as many words that it unblocks the WORK and not the TREE, and
+  that only the session holding the uncommitted file can clear it.
+  (f) Out of scope and untouched: any rule about sharing one working tree, and U27's
+  close-time CI detached-HEAD blindness, which section 0 now points AT rather than
+  re-solving.
+  (g) No code, no guard, no test - procedure only, and section 0 is prose a human reads,
+  so there is no point in the sequence where a guard could observe the failing step.
+  (e) The evidence is cited by artifact in the item, not summarized: commit 2946de82 and
+  the independent second occurrence hours later on the same file.
+
+  Teardown verified: `git worktree list` returned to the single main entry and the main
+  checkout's status stayed empty.
+
   Groomed 2026-08-28 (desktop, weekly groom) from a defect observed DURING the groom rather than from an inbox entry, which is why it carries no Idea id of its own. The IDEAS.md inbox held nothing ungroomed at this run - the 2026-08-28 groom at 206bab66 had already consumed it - and this is the one thing the run itself turned up.
 
   Epic release-infrastructure / module docs / phase 8 follows J52 and J57, the two direct precedents - a verification or operating discipline learned from a specific incident and written into the guide so the next session inherits it instead of rediscovering it. Same epic, same module, same phase, and the same reason for sonnet over haiku - clause (a) requires actually running the sequence and clause (b) requires choosing a substitute check, neither of which is transcription.
