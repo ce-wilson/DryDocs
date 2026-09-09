@@ -7,7 +7,7 @@ phase: 10
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on:
 - V1
 inputs:
@@ -19,4 +19,90 @@ inputs:
 - docs/design/templates/runbook.outline.yaml
 acceptance: |
   docs/design/drydocs-review-runbook.md (outline-conformant, rendered, stale-render-clean), drydocs-review off RUNBOOK_PENDING. Covers: generating a gate page from a gate prompt, the no-write-until-confirmed contract, graph_verify/review_labels runs and where their output lands, and the Confluence publishing path (mechanism only — base URL as config).
-notes: Groomed 2026-07-29 (Epic V).
+notes: |
+  Groomed 2026-07-29 (Epic V).
+
+  DONE on wip/v4-laptop (Lane B, laptop, 2026-09-09). docs/design/drydocs-review-runbook.md
+  (Rev 1, 293 lines) plus the two V1 map edits.
+
+  (a) THE MODULE HAS TWELVE MODULES AND ONE REGISTERED VERB, and the page says so rather
+  than implying commands that do not exist (V7's discipline, one step further). `fid-census`
+  is the only `drydocs ...` command that reaches any of it, and the CLI still imports it
+  through the ADR 0018 D4 re-export SHIM rather than its real path. So every procedure is
+  written as Python calls. Sharper still: `graph-tests/` is mapped to this module in
+  component_map.py, holds 6 suites and 30 cases, and has NO RUNNER - no verb, no main(), no
+  script. Appendix B ships the loop that produced this page's own numbers, because there was
+  nothing to cite.
+
+  (b) EVERY SURFACE WAS RUN. Offline: 60 gate-prompt specs on disk, airflow-crosswalk
+  rendered to 26023 bytes, draft_gate_log_entry to a 4035-char string; the publish chain
+  assemble -> validate -> preview with the measured allow-list (code expand info note panel
+  status tip toc warning) and both real failure messages; a 1483-byte review page. Live, and
+  the venue is named (J18): laptop, neo4jtest, database `drydocs` - a partial development
+  graph (2802 nodes; 28 Documents, 417 Chunks, 17 jobs, 8 folders, 4 apps, 36 JobRuns, 0
+  people), 26 of 30 cases passing.
+
+  (c) THE VERIFY SECTION TEACHES HOW TO READ A FAILURE, which is the thing this module most
+  needed written down: a suite result is a statement about THE GRAPH IT RAN ON, and 26/30 on
+  a partial laptop load is not 26/30 on the company graph. All four failures were READ, not
+  reported as a total:
+    - business-application-identity TC-01 (4 rows): 3 `source: pat` + 1 `source: registry`
+      apps with a null app_id, created behind the uniqueness constraint's back because
+      uniqueness ignores nulls. VENUE ARTIFACT, and the case description says so.
+    - tom-required-contacts TC-01 (nonempty, got 0): 7 TOMRole nodes exist but none is
+      required-and-active. VENUE ARTIFACT of a stale seed - and this case is an explicit
+      VACUITY guard, so it is doing exactly its job: without it TC-03 would pass on an
+      unseeded graph and mean nothing.
+    - provenance-diet TC-02 (3 rows): bmc_docs.v1 recorded 374 rows_changed with 0
+      WAS_GENERATED_BY edges, essential_graphrag.v1 twice recorded 43 with 0. Every mismatch
+      is actual=0 and both are loader-wide, so this is a consistent statement about two
+      loaders, NOT drift. Not a venue artifact.
+    - bmc-docs-smoke TC-03 (8 rows): all 8 ControlMFolder are nameless and carry no `name`
+      property at all. Every folder here came from controlm_folders.v1, which writes the
+      folder name as `sched_table`. The case asserts on f.name, so it CANNOT pass against
+      that loader's output. Not a venue artifact either.
+  The last two are SME/backlog questions and are recorded as such rather than resolved in a
+  runbook or hidden behind a passing total.
+
+  (d) "NO WRITE UNTIL CONFIRMED" POINTS AT THE CODE THAT REFUSES, not at the gate page's
+  sentence about itself. Four enforcement points, three of them raising: manual_mappings.py
+  (ManualLoadError), crosswalk.py (CrosswalkError via require_confirmed), registry_view.py
+  (RULED = applied|confirmed; proposed leaves a dataset UNCLASSIFIED and counted), and
+  writer.py (GateBoundVocabularyError, the V6 one). A claim on a page is not an enforcement.
+
+  (e) THE ITEM'S PREMISE WAS WRONG IN TWO PLACES, both corrected against the tree:
+    1. Every path in `inputs` is an ADR 0018 D4 re-export shim due for removal at the roll
+       after next. The page cites drydocs/review/** only and names the shims in PLAIN TEXT,
+       never backticked - a backtick is an existence claim, and the currency guard would go
+       red on the day the shims are deleted. The item wants a groom correction.
+    2. The acceptance asks for the Confluence "base URL as config". THERE IS NO SUCH KEY
+       producer-side: publisher.py ships NoopPublisher and LocalPublisher only, and the real
+       push is a company-side gitignored twin implementing the Publisher protocol. The page
+       says that instead of inventing a config path; the clause wants a groom correction too.
+
+  (f) BOTH V1 MAP EDITS SHIP IN ONE COMMIT because either alone reds the guard:
+  drydocs-review leaves RUNBOOK_PENDING (shrink-only), and the new file gains a
+  RUNBOOK_DISPOSITION row.
+
+  ONE OPERATOR TRAP FOUND AND WRITTEN UP: `validator.validate()` RETURNS its error list and
+  raises only with raise_on_error=True, so a bare `validate(body)` on its own line reads like
+  a check and is a no-op that publishes an invalid page. It is a troubleshooting row and the
+  procedure passes raise_on_error=True.
+
+  MEASURED CORRECTIONS TO MY OWN FIRST DRAFTS: evaluate() takes the ASSERTION, not the case
+  (evaluate(case, rows) raises GraphVerifyError); group_rows keys on `_label`, not `label`
+  (my first probe put every row under "Unlabeled"); assemble() takes no `title`; and
+  render_gate_page's page_path is a FOOTER LABEL, not a destination - the renderer writes
+  nothing. All four are in the page because each one costs a reader a run.
+
+  VERIFIED: full suite 3877 passed / 15 skipped / 0 failed. The J57 family +
+  test_skip_guard_policy + test_never_port_citations + test_doc_outline +
+  test_runbook_coverage = 100 passed. `ruff check .` and `ruff format --check .` clean
+  (604 files already formatted).
+
+  RENDER IS LANE A'S: drydocs-review-runbook renders to 39991 bytes and has NO committed
+  .html. With DOC9 merged, test_committed_design_pages_match_their_sources goes RED on this
+  stem until render_design_doc.py runs at the merge. That makes FIVE stems this burst -
+  REM2's remediation runbook, V6's three, and this one.
+
+  No new tracked code path, no PORT-MANIFEST row, no IDEAS.md append, no board render.
