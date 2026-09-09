@@ -1,0 +1,126 @@
+# SME gate-prompt spec — the registration descriptor's axes, and the home of the wiring
+# fact (backlog CFG8 drafts; CFG9 runs it in the SAME sitting as registry-wiring-readiness).
+# GATE-BOUND AND DECIDES NOTHING: drafting a page is not a ruling (the G27/W1/U11 precedent).
+# config/source-descriptors.yaml, config/source-registry.yaml and their readers change ONLY
+# when this page signs - and the `wired` BUILD item is minted from the signed record, never
+# before it, because clauses B1, B2 and B5 of the wiring page decide its shape.
+# A SEPARATE page on purpose: registry-wiring-readiness clause D3 refuses fold-ins ("any
+# change to what an SME gate page itself looks like ... is a separate item - say so and it
+# gets one"). Held in one sitting with it because they rule one subject.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+updated: 2026-09-09
+
+id: source-descriptor-axes
+title: "SME Gate — the five registration axes, the home and derivation of the wiring fact, and whether axis values ever reach the graph"
+step: "config/source-descriptors.yaml (fcc3c8bb, 2026-09-09) gives every registry-home dataset five values on closed axes, each DERIVED from the registry, OVERRIDDEN per dataset, REFUSED when off its axis - a consumer reads a value and never interprets a comment. Its TDD left three SME questions open. Beside them sits the wiring page's question B (a second field?), which this page restates in the descriptor idiom so the SME rules the SHAPE once. Nothing changes before both pages sign."
+summary: >
+  Section A asks the SME to confirm the five axes as the closed set, or to name the sixth.
+  Section B is the one that matters: WHERE the wiring fact lives (a registry field, or a
+  sixth descriptor axis), HOW it is decided (declared per side with a written reason, or
+  derived), with both homes stated at equal weight, the guard that forbids a field today
+  named, and the precedent for a per-side registry fact cited. Section C asks whether axis
+  values ever become graph properties and what the catalog tag `confirmed` means. Section D
+  fences what this page does not ask.
+meta:
+  Module: "config (config/source-descriptors.yaml, config/source-registry.yaml and their schemas) plus drydocs_core/source_descriptors.py; no ontology or graph surface is touched"
+  Source: "config/source-descriptors.yaml (5 axes, 2 overrides, 10 synthetic datasets) · config/source-registry.yaml (19 systems / 30 datasets, 21 confirmed / 9 not, counted by command at 9da9d617) · docs/design/source-registration-tdd.md Rev 3 §HITL gate · config/gate-prompts/registry-wiring-readiness.yaml (clauses B1-B5, C1-C4) · PORT-MANIFEST.yaml (the source-registry per-entry row, the descriptor per-entry row, the per_side_fields block) · tests/unit/test_load_map_wiring_key.py (test_the_key_reports_and_never_rules)"
+  Precedent: "source-registry-v2 D2 (SIGNED 2026-07-31) — the per-side loader-to-source overlay, per-repo config wins · O90 (done 2026-08-31) — the confirmed-by-loaders cross rendered as a pure function with NO new field · ADR 0017 (ACCEPTED 2026-08-30) — the WHAT crosses, the WHERE never does · J71 (2026-09-01) — `confirmed` and its stamps are SIDE-ruled fields on the registry row · G27/W1/U11 — a drafted prompt decides nothing"
+  Registry ref: "no axis value and no row changes at this gate; the descriptor's MECHANISM (derive, override, refuse) is what is on the table, and the wiring fact's HOME"
+  Classification: "Internal-Public — mechanism only. Axis vocabulary, derivation rules and field names; no connection coordinate, no company row, no value"
+  Vocabulary: "no relationship vocabulary is involved - the descriptor is layer 1 (taxonomy) by its own TDD; section C asks whether that stays true"
+  Source of record: "backlog CFG8 (draft) and CFG9 (run) · config/gate-log.md (transcription target) · registry-wiring-readiness (the sibling page, same sitting)"
+
+mapping:
+  - n: 1
+    element: "A registry-home dataset"
+    target: "five values: acquisition, format, authority, layer, access - each on a closed list"
+    edge: "section A: are these the right five; derive -> override -> refuse is the mechanism, not a proposal"
+  - n: 2
+    element: "The wiring fact - is the pipeline that reads this row BUILT on this side"
+    target: "TODAY: a YAML comment beside `confirmed: false` on 4 of 9 held rows, and a derived cross on the load map (O90); NEVER a field"
+    edge: "section B: a registry field or a sixth axis; declared or derived; per side in either home"
+  - n: 3
+    element: "The same fact, viewed from the port"
+    target: "per side and never crossing, in whichever home - a per_side_fields entry names it"
+    edge: "section B5: per-entry is NOT per-side, so the home alone does not settle the disposition"
+  - n: 4
+    element: "The five axis values, viewed from the graph and the catalog"
+    target: "not node properties today; published as catalog custom properties and tags by the DataHub emission"
+    edge: "section C: taxonomy that stays off the graph, or an ontology question routed to its gate"
+
+provenance:
+  - label: "The five axes as built (fcc3c8bb), and the two overrides that prove the pattern"
+    source_object: "config/source-descriptors.yaml"
+    key: "axes: acquisition [manual, automated] · format [csv, ascii, json, archive, db] · authority [primary, replica] · layer [human, business, data, technology] · access [fid, human, repo]"
+    loader: "drydocs_core/source_descriptors.py - derive from the registry row, apply an override if the dataset names the axis, refuse a value off its axis or an override for an unknown dataset; validated at construction"
+    properties:
+      - name: "the two overrides"
+        origin: source
+        from: "config/source-descriptors.yaml overrides:"
+        note: "both on `layer`, both to human, for hr@[db].psgmgr.hr_phone_exp and pat:people-report - the subject is people whatever carrier holds it. An override is the ONLY way to disagree with a derivation, and it is itself checked against its axis. This is the discipline section B proposes for the wiring fact."
+      - name: "the format axis has no xlsx value"
+        origin: derived
+        from: "the 2026-09-09 planning session, use case 2 (a devops team's field-level mapping workbook)"
+        note: "a classification change, not a ruling (the TDD's own rule: adding a value to an axis is layer 1). CFG10 adds it AFTER this page signs so a sixth value never reopens the five-axes question the day after. Named here for information only."
+  - label: "The wiring fact today - a comment doing a field's job, and a cross doing it without one"
+    source_object: "config/source-registry.yaml datasets[] at confirmed: false (9 rows at 9da9d617)"
+    key: "grouped by the row's own comment, re-counted 2026-09-09"
+    loader: "none - a read of the committed file, by command"
+    properties:
+      - name: "WIRING hold (4 rows) - meaning settled or never in doubt, pipeline not built"
+        origin: source
+        from: "cm_hist_vw ('no extractor/loader yet'), oracle:schema-inventory ('ingestion pipeline planned'), snowflake:schema-inventory ('Expansion placeholder'), hr@[db].psgmgr.hr_phone_exp ('K17 SIGNED 2026-08-19; the build is K26 and this flag flips at K26 close')"
+        note: "the fourth row moved INTO this group after the wiring page was drafted: its meaning is signed and only the build is owed. The comment carries the distinction the field cannot - not queryable, not portable, not testable."
+      - name: "SEMANTIC hold (4 rows) - no gate has ruled the meaning"
+        origin: source
+        from: "snow:cmdb-ci-classes ('no gate yet'), controlm:deftable-xml-export ('OPEN precedence ruling'), catalog datasets_v and distributions_v ('gate snowflake-data-catalog is the activation condition' - that page is DRAFTED and DEFERRED 2026-09-07 to the Logical Container trigger)"
+        note: "what `confirmed: false` was designed to say, and only this."
+      - name: "NEITHER (1 row)"
+        origin: source
+        from: "seal@[db].psgmgr.cm_escalation_db - registered as the id-grammar's worked example, explicitly not as an endorsement of the feed"
+        note: "a third meaning on one boolean; section B2's reason-when-false is what makes it sayable."
+      - name: "the cross that already renders the fact"
+        origin: derived
+        from: "O90 (done 2026-08-31): wiringState() in web/src/loadmap/loadMapModel.ts and _wiring_state() in scripts/render_load_map.py"
+        note: "confirmed x loader-present, computed from the committed row with NO field; at build 16 wired / 9 planned / 1 built-awaiting-gate / 14 registered-only over 40 source rows. Its guard tests/unit/test_load_map_wiring_key.py::test_the_key_reports_and_never_rules FAILS if any source row ever carries wired, wiring, wiring_state or ready - 'a wiring disposition is gate territory'. Whichever home section B rules, that guard is amended by the ruling, never around it."
+  - label: "The port premise, corrected - and why the home does not settle the disposition"
+    source_object: "PORT-MANIFEST.yaml"
+    key: "the source-registry per-entry row (J68/J71, 2026-09-01), the descriptor per-entry row (fcc3c8bb), the per_side_fields block (RELAY-50, 2026-09-09)"
+    loader: "drydocs.port.dispositions.classify - the one classifier"
+    properties:
+      - name: "confirmed is already per side"
+        origin: source
+        from: "the source-registry row's entry_rule: 'anything recording what a SIDE has ruled or observed (confirmed, and any _by / _at stamp beside it - the F4 per-repo rule)' is company-owned and never overwritten"
+        note: "the wiring page's clause C2 said the company's wiring hold was overwritten at every port. Since J71 it is not - and neither does a producer sign-off reach the company through the flag. The split's port value is therefore that SEMANTICS could travel again (canonical-producer half) while wiring stays per side; section B5 asks for that outcome by name."
+      - name: "per-entry is not per-side"
+        origin: source
+        from: "the descriptor row's entry_rule keys only `overrides:` and `synthetic.datasets:`; everything else 'is producer-owned MECHANISM and crosses whole'"
+        note: "a `wired` block in the descriptor would cross whole unless a per_side_fields entry names it - the same block RELAY-50 added for `updated`. So the descriptor home needs the manifest change too; the choice of home is about READERS and DERIVATION, not about the port."
+      - name: "the precedent for a per-side registry fact"
+        origin: source
+        from: "config/gate-log.md, GATE source-registry-v2, D2 'per-side loader->source_id overlay, ADOPTED: per-repo config wins' (2026-07-31)"
+        note: "a signed shape for exactly this kind of fact, on exactly this file, two months old."
+
+sections:
+  - title: "A. The five axes - confirm the closed set, or name the sixth"
+    confirmations:
+      - "A1. THE FIVE ARE THE RIGHT FIVE. acquisition (manual | automated), format (csv | ascii | json | archive | db), authority (primary | replica), layer (human | business | data | technology), access (fid | human | repo). Each is implied by a registry field today and each changes what an operator does. Confirm the set, or name what is missing - the TDD's own economics line: cheap now, expensive once values are tagged in a catalog."
+      - "A2. THE MECHANISM IS THE PROPOSAL, NOT THE VALUES. Derive from the registry row, override per dataset, refuse a value off its axis - and validate the override table at construction so a config that disagrees with the registry fails immediately. Confirm that this discipline is what a 'declared, never inferred' fact means in this repo, so section B can ask where the wiring fact lives without re-arguing how it is decided."
+      - "A3. A DIFFERENT CUT OF `access` IS A REASONABLE DISAGREEMENT. Today it names the credential CLASS that reads a dataset (functional id, a person, the checkout itself) and never a credential. The wiring page's N24 rider asks about the access PATH and the principal behind it; if the SME reads those as one axis, say so here, so N24 widens this one rather than minting a second vocabulary for one fact."
+  - title: "B. The wiring fact - its home and its derivation, both options at equal weight"
+    confirmations:
+      - "B1. HOME (i): A FIELD ON THE REGISTRY ROW, `wired: true | false`. The row is per-entry (J68/J71) and `confirmed` beside it is already side-ruled, so a field is the SMALLER conceptual change - one file says what the row is and whether this side reads it. Costs: a schema change in config/schemas/source-registry.schema.json and a 30-row migration (B5 of the wiring page decides required-vs-optional); a per_side_fields entry naming `wired` and its reason; and the retirement, BY THIS RULING, of test_the_key_reports_and_never_rules, which forbids exactly this field until the gate signs."
+      - "B2. HOME (ii): A SIXTH DESCRIPTOR AXIS IN config/source-descriptors.yaml. The registry stays the WHAT, the descriptor says how the dataset is REGISTERED here - and a declared-per-side value is registration state. Costs: the same per_side_fields entry (per-entry is not per-side - provenance above); a reader change in drydocs_core/source_descriptors.py; and the load-map cross and the DataHub emission then read the axis rather than the comment. Neither home is pre-picked; rule one."
+      - "B3. DECLARED, WITH A WRITTEN REASON WHEN FALSE (proposed default). In either home the value is DECLARED per side and a false carries a reason of at least forty characters, refused otherwise - the SOURCELESS_LOADERS idiom, and the wiring page's B4. A bare false is a fact; a false with a reason is a decision someone can re-read and reverse."
+      - "B4. DERIVED IS OFFERED ONLY BEHIND A SEAM, AND SAID SO. 'Wired = an adapter is set AND a loader is registered for the id' is computable - O90 computes it - but NOT in drydocs_core: loader registration and SOURCELESS_LOADERS live in the load component (drydocs/cli_shared.py), and core imports nothing from any component. A derived value therefore lives in the load component or behind a core seam the load component fills. Rule declared (B3) or derived-behind-a-seam; do not rule derived-in-core, which cannot be built."
+      - "B5. THE SINGLE-FIELD ALTERNATIVE, STATED WITH ITS EVIDENCE. The wiring page's B1 offers keeping one flag plus a required hold_reason. O90's cross is the shipped evidence that the fact can be RENDERED without a field. What a field adds over the cross is a queryable, portable, testable value with a reason - and the port outcome named in provenance: semantics travel again, wiring stays per side. Confirm that outcome is wanted; if the cross suffices, say so and only the wiring page's clause C remains."
+  - title: "C. Axis values, the graph, and the catalog tag"
+    confirmations:
+      - "C1. DO AXIS VALUES EVER BECOME NODE PROPERTIES? They are taxonomy, so they could. Nothing writes them today. A yes here is an ONTOLOGY decision and is routed to the ontology gate in the normal way - this page records the intent, never the edge."
+      - "C2. WHAT THE CATALOG TAG `confirmed` MEANS. The DataHub emission publishes `confirmed` and `derived` as custom properties beside the five axes today - the overloaded flag, exported before its meaning was split. Rule what a catalog reader should read `confirmed` as once section B signs (semantic only, with wiring beside it as its own tag), so the emitted property is not ambiguous for every already-tagged asset."
+  - title: "D. Fence - what this page does NOT ask"
+    confirmations:
+      - "D1. NOT ASKED: whether a catalog product is adopted. config/gate-prompts/snowflake-data-catalog.yaml is that page, DEFERRED 2026-09-07 to the Logical Container trigger; ADR 0017 rules the BINDING substrate and leaves the catalog open. Nothing here reopens either."
+      - "D2. NOT RULED: `xlsx` joining the format axis. A classification change (layer 1, the TDD's own rule) that CFG10 makes after this page signs; named in provenance for information."
+      - "D3. NOTHING IS APPLIED BY DRAFTING. The `wired` build item is minted FROM the signed record with the signed name, home, polarity and required-versus-optional - never before, because the wiring page's B1, B2 and B5 decide its shape. Both pages are canonical-company at the port; the company's copies win, and the ruling reaches it as a relay line."

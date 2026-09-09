@@ -1,15 +1,21 @@
 # SME gate-prompt spec — split PIPELINE-WIRING readiness out of the semantic
+# AMENDED 2026-09-09 (N18's BEFORE clause: the stale-premise sweep, desktop, at 9da9d617).
+# Every moved premise below carries a dated marker; no clause is re-asked, because none is
+# signed. Read with its sibling page source-descriptor-axes.yaml, held in the same sitting:
+# that page restates clause B in the descriptor idiom and names the guard that forbids a
+# wired field today. Section E (new) carries the corrected port premise and the sequencing
+# with source-connection-and-run-identity.
 # `confirmed` flag on source-registry rows (backlog N10). GATE-BOUND AND
 # DECIDES NOTHING: drafting a prompt is not a schema change (the G27/W1/U11
 # precedent). config/source-registry.yaml and its schema change ONLY when this
 # page signs — nothing in this file is applied by writing it.
 classification: Internal-Public
 schema: drydocs.gate-prompt.v1
-updated: 2026-08-21
+updated: 2026-09-09
 
 id: registry-wiring-readiness
 title: "SME Gate — one flag, two facts: does a source-registry row need a WIRED field separate from `confirmed`?"
-step: "config/source-registry.yaml v2 is live with a single boolean `confirmed` per DATASET row. It is the runtime load gate (require_confirmed -> exit 2) AND the record that an SME gate signed the row's meaning. Nine producer rows sit false today for at least four different reasons. Nothing changes before this page signs."
+step: "config/source-registry.yaml v2 is live with a single boolean `confirmed` per DATASET row. It is the runtime load gate (require_confirmed -> exit 2) AND the record that an SME gate signed the row's meaning. Nine producer rows sit false today for at least four different reasons. [AMENDED 2026-09-09 (N18 stale-premise sweep, desktop, at 9da9d617) - still nine, the same nine, but one changed CLASS: hr_phone_exp is a WIRING hold since K17 signed on 2026-08-19; the census below is regrouped 4 / 4 / 1]. Nothing changes before this page signs."
 summary: >
   `confirmed` is answering two questions that have different owners, different
   evidence, and — the part that costs real work — OPPOSITE port dispositions.
@@ -22,7 +28,7 @@ summary: >
   field cannot hold two dispositions. Clause D fences the scope.
 meta:
   Module: "config (the registry schema + drydocs_core/source_registry.py's gate) — no ontology or graph surface is touched"
-  Source: "config/source-registry.yaml (29 dataset rows, 20 true / 9 false) · config/schemas/source-registry.schema.json · drydocs_core/source_registry.py (require_confirmed) · docs/port/port-prompt.md (the a14a8028 fix session, decision 1)"
+  Source: "config/source-registry.yaml (29 dataset rows, 20 true / 9 false) [AMENDED 2026-09-09 (N18 stale-premise sweep, desktop, at 9da9d617) - 30 dataset rows, 21 true / 9 false, counted by command over datasets[]; infra:server-export was registered and flipped true on 2026-08-19] · config/schemas/source-registry.schema.json · drydocs_core/source_registry.py (require_confirmed) · docs/port/port-prompt.md (the a14a8028 fix session, decision 1)"
   Precedent: "Q6 — signed-off gates TRANSFER across renames (config/gate-log.md, source-registry-v2) · the SOURCELESS_LOADERS idiom — an exemption without a written reason is the silent omission a guard exists to end · G27/W1/U11 — a drafted prompt decides nothing"
   Registry ref: "no row's `confirmed` value changes at this gate; the field's MEANING is what is on the table"
   Classification: "Internal-Public — mechanism only. The motivating divergence is described by its shape (a company loader tier not yet built); no company host names, SIDs or server addresses appear here"
@@ -33,7 +39,7 @@ mapping:
   - n: 1
     element: "A row whose meaning an SME gate has signed AND whose loader is built"
     target: "loads today — `confirmed: true`"
-    edge: "no change proposed; 20 of 29 rows"
+    edge: "no change proposed; 20 of 29 rows [AMENDED 2026-09-09 (N18 stale-premise sweep, desktop, at 9da9d617) - 21 of 30]"
   - n: 2
     element: "A row whose meaning no gate has signed yet"
     target: "must not load — semantic hold"
@@ -60,17 +66,17 @@ provenance:
       - name: the cost, as paid
         origin: derived
         from: "the same session"
-        note: "the divergence had to be registered in the company gate-log and its guards PINNED with re-arm triggers. A SECOND, MASKED divergence of the same shape surfaced in the same pass (controlm:deftable-xml-export) — which is the argument that this is a mechanism fault, not a one-row accident: the first one was known and the second was not, and nothing distinguishes them."
+        note: "the divergence had to be registered in the company gate-log and its guards PINNED with re-arm triggers. A SECOND, MASKED divergence of the same shape surfaced in the same pass (controlm:deftable-xml-export) — which is the argument that this is a mechanism fault, not a one-row accident: the first one was known and the second was not, and nothing distinguishes them. [AMENDED 2026-09-09 (N18 stale-premise sweep, desktop, at 9da9d617) - the PIN is no longer needed and no longer exists as a port hazard: since J68/J71 (2026-09-01) config/source-registry.yaml has its own per-entry row under which confirmed and its _by/_at stamps are SIDE-ruled and never cross. The cost moved, it did not vanish - see section E1]"
   - label: "The census — the conflation is already live PRODUCER-side too, not only across the port"
     source_object: "the 9 producer rows reading confirmed: false, 2026-08-19"
     key: "grouped by the reason their own inline comment gives"
     loader: "none — this is a read of the committed file"
     properties:
-      - name: "SEMANTIC hold (5 rows)"
+      - name: "SEMANTIC hold (5 rows) [AMENDED 2026-09-09 (N18 stale-premise sweep, desktop, at 9da9d617) - 4 rows: hr_phone_exp left this group when K17 signed; the two catalog rows now wait on a DRAFTED page, snowflake-data-catalog, DEFERRED 2026-09-07 to the Logical Container trigger - the row comment's prompt-not-yet-drafted is stale]"
         origin: source
         from: "hr_phone_exp, snow:cmdb-ci-classes, catalog datasets_v, catalog distributions_v, controlm:deftable-xml-export"
         note: "'no gate', 'no gate yet', 'the gate is the activation condition', 'OPEN precedence ruling'. These are what the field was designed to say."
-      - name: "WIRING hold (3 rows)"
+      - name: "WIRING hold (3 rows) [AMENDED 2026-09-09 (N18 stale-premise sweep, desktop, at 9da9d617) - 4 rows: hr_phone_exp joins - meaning signed 2026-08-19 (K17, 33/33), the build is K26, the flag flips at K26 close per N13]"
         origin: source
         from: "cm_hist_vw, oracle:schema-inventory, snowflake:schema-inventory"
         note: "'no extractor/loader yet', 'ingestion pipeline planned', 'Expansion placeholder'. Nothing about meaning. The comment is carrying the distinction the field cannot — and a comment is not queryable, not portable, and not testable."
@@ -95,11 +101,16 @@ sections:
   - title: "C. The port half — the argument that makes this worth doing"
     confirmations:
       - "C1. THE TWO FACTS HAVE OPPOSITE PORT DISPOSITIONS, and that is not a preference. A signed gate ruling TRANSFERS across sides — Q6 says so, and it is the same ruling on the same data whichever repo reads it. Pipeline-wiring readiness is a fact about ONE side's tree and can never be true of the other by inference. Confirm this asymmetry."
-      - "C2. ONE FIELD CANNOT HAVE TWO DISPOSITIONS, so today the manifest is wrong in one direction on every port. config/source-registry.yaml falls under PORT-MANIFEST.yaml's `config/**` default, which is canonical-producer: the producer's file wins wholesale. So the company's cm_hosts wiring hold is OVERWRITTEN by the producer's confirmed: true at every port, and survives only because a human pinned it and armed a re-arm trigger. That manual pin is the recurring cost this gate would remove."
+      - "C2. ONE FIELD CANNOT HAVE TWO DISPOSITIONS, so today the manifest is wrong in one direction on every port. config/source-registry.yaml falls under PORT-MANIFEST.yaml's `config/**` default, which is canonical-producer: the producer's file wins wholesale. So the company's cm_hosts wiring hold is OVERWRITTEN by the producer's confirmed: true at every port, and survives only because a human pinned it and armed a re-arm trigger. That manual pin is the recurring cost this gate would remove. [AMENDED 2026-09-09 (N18 stale-premise sweep, desktop, at 9da9d617) - the premise INVERTED on 2026-09-01: the file has its own per-entry row (J68) and confirmed is a SIDE-ruled field under it (J71), so nothing overwrites the hold any more - and, the same rule the other way, a producer SIGN-OFF no longer reaches the company through the flag either. The manifest is now wrong in the OTHER direction on every port. Section E1 re-asks C on that footing]"
       - "C3. THE NEW FIELD'S OWN DISPOSITION must be ruled here and written into PORT-MANIFEST.yaml in the same change, or the fix reproduces the defect one field over. Proposed: `wired` is PER-SIDE and never ports — each repo states its own, and neither side's value is evidence about the other's. A registry row would then port its semantics (canonical-producer) while keeping its wiring (per-side), which is the first time the file's two halves could travel correctly."
       - "C4. WHAT HAPPENS TO THE EXISTING PINS. If this signs, the cm_hosts and controlm:deftable-xml-export divergences stop being divergences — both sides would hold the same `confirmed`, differing only in a field that is SUPPOSED to differ. Confirm that retiring those pins (and their re-arm triggers) is the intended outcome, and that the company gate-log records the retirement rather than the entries being deleted."
   - title: "D. Scope fence — what this gate does NOT do"
     confirmations:
       - "D1. NO ROW'S LOAD STATE CHANGES AT THIS GATE. Every row that loads today loads tomorrow; every row held today stays held. This gate rules a FIELD's meaning, and the migration that follows is mechanical and reversible."
-      - "D2. THE SCHEMA CHANGES ONLY WHEN THIS PAGE SIGNS. config/schemas/source-registry.schema.json, the registry file, and require_confirmed() are untouched until then — N10 drafts, it does not build. The build is its own backlog item with its own acceptance."
-      - "D3. NOT IN SCOPE: the acquisition.mode / drop_dir_base family (N12/N13's declared-acquisition work), the confirmed-gate's exit code, and any change to what an SME gate page itself looks like. If the SME wants the wiring fact surfaced on the rendered board or the load map, that is a separate item — say so and it gets one, rather than being folded in here."
+      - "D2. THE SCHEMA CHANGES ONLY WHEN THIS PAGE SIGNS. config/schemas/source-registry.schema.json, the registry file, and require_confirmed() are untouched until then — N10 drafts, it does not build. The build is its own backlog item with its own acceptance. [AMENDED 2026-09-09 (N18 stale-premise sweep, desktop, at 9da9d617) - RULED SCOPED by the user on 2026-08-30 (ADR 0017): this fence covers the wired/ready subject only; a binding: field landed on every SYSTEM row at G125 under that ruling. The sentence stands for its own subject]"
+      - "D3. NOT IN SCOPE: the acquisition.mode / drop_dir_base family (N12/N13's declared-acquisition work), the confirmed-gate's exit code, and any change to what an SME gate page itself looks like. If the SME wants the wiring fact surfaced on the rendered board or the load map, that is a separate item — say so and it gets one, rather than being folded in here. [AMENDED 2026-09-09 (N18 stale-premise sweep, desktop, at 9da9d617) - that item happened: O90, done 2026-08-31, renders the confirmed-by-loaders cross on the load map as a pure function of the committed row with NO new field, and its guard test_the_key_reports_and_never_rules FAILS if any source row grows a wired, wiring, wiring_state or ready field until this page signs. The sibling page source-descriptor-axes puts the descriptor-axis home beside the field home, at equal weight, for the same reason this clause refused a fold-in: it is a separate page]"
+  - title: "E. Rider 2026-09-09 - the corrected port premise, and the sequencing with the connection page"
+    confirmations:
+      - "E1. CLAUSE C, RE-ASKED ON THE CORRECTED FOOTING. Since J71 `confirmed` never crosses in either direction. So the value of the split at the port is no longer 'stop the producer overwriting the company's hold' - that is done - but 'let the SEMANTIC ruling travel again': a signed gate transfers (Q6), and today it cannot, because the one field that would carry it is side-ruled wholesale. Confirm the outcome wanted: the semantic half canonical-producer, the wiring half per side and named in per_side_fields (whichever home the sibling page rules), and the J71 entry_rule amended by the ruling to say so."
+      - "E2. SEQUENCING WITH source-connection-and-run-identity. That page (drafted 2026-08-28, WP-1 of the two-issue plan) proposes a `connection:` block on SYSTEM rows and a run-input identity; it was written after this one, on the same file, and neither states an order. Proposed: THIS page signs first and the wired build lands; the connection page is DEFERRED with a named re-arm - the data-flow gate's clause G4 (does parity evidence need a run digest) or the first automated DB-backed source the base needs - because use case 1 is file-drop and needs neither a connection block nor a digest. Confirm, or schedule it."
+      - "E3. THE CENSUS IS COUNTED BY COMMAND, NEVER CARRIED. Every number on this page was re-derived on 2026-09-09 from config/source-registry.yaml datasets[] (30 rows, 21 true, 9 false; the 9 grouped 4 wiring / 4 semantic / 1 neither by each row's own comment). A future re-presentation re-counts before it re-asks; a prose count that survived one sitting is the class of drift this page's D3 was found to carry."

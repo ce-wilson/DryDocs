@@ -1379,6 +1379,17 @@
       "unblocks": [
         "G120"
       ]
+    },
+    {
+      "kind": "prompt-only",
+      "date": null,
+      "title": "source-descriptor-axes (gate page rendered — session not yet run)",
+      "status": "open",
+      "prompt_files": [
+        "config/gate-prompts/source-descriptor-axes.yaml"
+      ],
+      "log_ref": null,
+      "unblocks": []
     }
   ]
 }

@@ -7,7 +7,7 @@ phase: 11
 agent: main
 model: fable
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - config/source-descriptors.yaml
@@ -33,3 +33,14 @@ acceptance: |
 notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). Plan 2026-09-09, Phase 3 unit 3.2. A separate page because registry-wiring-readiness clause D3
   refuses fold-ins ("a wanted addition is a separate item").
+
+  DONE 2026-09-09 (Lane A, desktop). config/gate-prompts/source-descriptor-axes.yaml drafted in the
+  drydocs.gate-prompt.v1 shape: A (the five axes, the mechanism, the access cut), B (the two homes
+  at equal weight - a registry field or a sixth axis - declared-with-reason as the default,
+  derived only behind a load-component seam, the single-field alternative with O90's cross as
+  its evidence, and the guard test_the_key_reports_and_never_rules named as the thing either
+  home retires by ruling), C (axis values to the graph; what the catalog tag confirmed means),
+  D (the fence: the catalog page stays deferred, xlsx is informational, nothing applies by
+  drafting). The precedent for a per-side registry fact cited (source-registry-v2 D2). Held in
+  ONE sitting with registry-wiring-readiness; CFG9 is the run item and now carries the slug.
+  Canonical-company at the port: reaches the company by relay line at the ninth roll.

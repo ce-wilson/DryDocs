@@ -513,6 +513,7 @@
         "config/gate-prompts/software-version-context.yaml",
         "config/gate-prompts/sosa-jobrun-observation.yaml",
         "config/gate-prompts/source-connection-and-run-identity.yaml",
+        "config/gate-prompts/source-descriptor-axes.yaml",
         "config/gate-prompts/source-registry-v2.yaml",
         "config/gate-prompts/standard-identity-and-carrier.yaml",
         "config/gate-prompts/tech-partner-attach-level.yaml",
