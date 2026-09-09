@@ -64,7 +64,11 @@ def _kinds(text: str) -> list[tuple[str, str]]:
             [(ex.DISTRIBUTION_LIST, "DL-Batch-Support@example.invalid")],
         ),
         ("page DL_ops_tier2 first", [(ex.DISTRIBUTION_LIST, "DL_ops_tier2")]),
-        ("the DL is on the thread", []),
+        # A bare `DL` is not a distribution list — the class needs the `DL-`/`DL_`/`DL.`
+        # prefix shape. Since MM12 it IS an acronym candidate, which is the right
+        # reading of it and does not weaken this case: the assertion is still that
+        # nothing here is a DISTRIBUTION_LIST.
+        ("the DL is on the thread", [(ex.ACRONYM, "DL")]),
         # application id — a standalone 4-to-7-digit run (CORE5), reported bare
         # only from 5 up. `700041` is an order number, not an id: at six digits
         # it IS a candidate and IS reported, uncued, for the caller to rank down.
@@ -280,4 +284,114 @@ def test_the_pass_order_is_the_declared_precedence() -> None:
         ex.TABLE_NAME,
         ex.DISTRIBUTION_LIST,
         ex.APPLICATION_ID,
+        ex.ACRONYM,
     )
+
+
+# ---- the acronym class (MM12) -----------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        # the plain shapes: letters, and letters with the digits vendors use
+        ("the ETL job failed", [(ex.ACRONYM, "ETL")]),
+        ("staged into S3 overnight", [(ex.ACRONYM, "S3")]),
+        ("runs on EC2 in the east", [(ex.ACRONYM, "EC2")]),
+        ("escalate to L2 first", [(ex.ACRONYM, "L2")]),
+        # six is the ceiling, seven is a word in caps rather than an acronym
+        ("the SIXCHR code", [(ex.ACRONYM, "SIXCHR")]),
+        ("the SEVENCH code", []),
+        # one character cannot be an acronym, and neither can pure digits: the
+        # shape needs two characters and at least one letter, so a bare 4-digit
+        # run is left to the application-id floor, which drops it uncued
+        ("drive X now", []),
+        ("count 4321 rows", []),
+        # a lower-case word is not one, and a mixed-case product name is not one
+        ("the etl job", []),
+        ("uses PowerShell here", []),
+    ],
+)
+def test_acronym_shapes(text: str, expected: list[tuple[str, str]]) -> None:
+    assert _kinds(text) == expected
+
+
+def test_the_acronym_carries_the_sentence_it_was_found_in() -> None:
+    """MM12 clause (b), the whole reason this class differs from the other six."""
+    text = "The load ran twice. SNOW is ServiceNow and explicitly NOT Snowflake. Then it cleared."
+    (snow,) = (m for m in extract_entities(text) if m.kind == ex.ACRONYM and m.value == "SNOW")
+    assert snow.attribute("evidence") == (
+        "SNOW is ServiceNow and explicitly NOT Snowflake."
+    ), "the evidence must be the sentence, not the whole document and not the token"
+
+
+def test_an_ambiguous_acronym_keeps_two_distinct_evidence_spans() -> None:
+    """The acceptance's named case. Two documents say SNOW and mean different
+    systems; collapsing them to one reading would destroy the finding, which is
+    that they disagree."""
+    text = (
+        "In the incident notes SNOW (ServiceNow) is where the ticket lives. "
+        "In the platform notes SNOW (Snowflake) is where the warehouse lives."
+    )
+    snow = [m for m in extract_entities(text) if m.kind == ex.ACRONYM and m.value == "SNOW"]
+    assert len(snow) == 2
+    assert {m.attribute("gloss") for m in snow} == {"ServiceNow", "Snowflake"}
+    assert len({m.attribute("evidence") for m in snow}) == 2
+    assert len({m.span for m in snow}) == 2
+
+
+@pytest.mark.parametrize(
+    ("text", "gloss"),
+    [
+        ("we raise it in ServiceNow (SNOW) today", "ServiceNow"),
+        ("we raise it in SNOW (ServiceNow) today", "ServiceNow"),
+        ("SNOW stands for ServiceNow here", None),
+        ("SNOW means ServiceNow here", None),
+        ("SNOW is short for ServiceNow", None),
+    ],
+)
+def test_a_glossed_acronym_is_cued_and_records_what_the_gloss_said(
+    text: str, gloss: str | None
+) -> None:
+    """A parenthetical either way round, or a naming verb. The verb forms mark
+    the token glossed without capturing an expansion — the sentence carries the
+    meaning, and inventing a span for it would be the guessing this module
+    refuses."""
+    (snow,) = (m for m in extract_entities(text) if m.kind == ex.ACRONYM)
+    assert snow.cued is True
+    assert snow.attribute("gloss") == gloss
+
+
+def test_an_unglossed_acronym_is_a_candidate_but_is_not_cued() -> None:
+    (etl,) = (m for m in extract_entities("the ETL job failed") if m.kind == ex.ACRONYM)
+    assert etl.cued is False and etl.attribute("gloss") is None
+
+
+def test_the_function_word_floor_drops_emphasis_caps_unless_they_are_glossed() -> None:
+    """The 4-digit floor's rule, at the other class. A closed class of function
+    words in caps for emphasis carries no information; glossed, it is emitted
+    anyway, so the floor cannot hide a real acronym that happens to collide."""
+    assert _kinds("THE ONLY thing that MUST NEVER happen is a silent write") == []
+    (nb,) = (
+        m for m in extract_entities("NO (Norwegian Ordering) is the feed") if m.kind == ex.ACRONYM
+    )
+    assert (nb.value, nb.cued, nb.attribute("gloss")) == ("NO", True, "Norwegian Ordering")
+
+
+def test_every_narrower_class_claims_its_span_before_the_acronym_pass_runs() -> None:
+    """The precedence the pass order exists for, at the widest shape. HLDM is a
+    project key, PSGMGR a schema, PRARAG a folder prefix — none of them may be
+    read a second time as an acronym."""
+    text = f"{_FOLDER} raised HLDM-4021; query PSGMGR.CMS_JOBS and page DL-ops@example.invalid"
+    acronyms = {m.value for m in extract_entities(text) if m.kind == ex.ACRONYM}
+    assert (
+        acronyms == set()
+    ), f"the acronym pass claimed {sorted(acronyms)} out of spans an earlier pass owned"
+
+
+def test_the_acronym_pass_reads_a_token_no_other_class_wanted() -> None:
+    """The other half of the same design: what is left over IS the class's job."""
+    text = "MFT moved the file to PSGMGR.CMS_JOBS overnight"
+    kinds = _kinds(text)
+    assert (ex.TABLE_NAME, "PSGMGR.CMS_JOBS") in kinds
+    assert (ex.ACRONYM, "MFT") in kinds

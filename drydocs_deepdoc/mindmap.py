@@ -94,9 +94,33 @@ RECORD_SLOTS: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("references", ("sdlc_anchors",)),
 )
 
+#: The trust axis, verbatim from the one place it is already declared —
+#: ``drydocs_core.models.docs``'s ``provenance`` Literal, which every doc-corpus
+#: row carries. Restated here rather than imported because those are pydantic
+#: row models and this module is plain dataclasses over YAML; the two are held
+#: together by a test that reads the Literal's arguments, so they cannot drift.
+TRUST_LEVELS: tuple[str, ...] = ("VERBATIM", "GROUNDED", "SYNTHESIZED")
+
+#: MM12 clause (d). A harvested acronym is read out of a corpus by a machine, so
+#: it is SYNTHESIZED and never anything else. The point is not the label: it is
+#: that a harvested candidate must never be indistinguishable from one an SME
+#: supplied, and the only way to guarantee that is for the harvester to be
+#: incapable of writing any other value (ADR 0006's corpus-consumer ruling, ADR
+#: 0011, tests/unit/test_uncertain_boundary.py for the graph-side half).
+HARVESTED_TRUST = "SYNTHESIZED"
+
 _SLOT_KEYS = frozenset({"name", "status", "evidence_ref", "filled_on", "value", "note"})
 _BRANCH_KEYS = frozenset({"name", "slots"})
-_MAP_KEYS = frozenset({"schema", "seed", "root_question", "branches"})
+_ACRONYM_KEYS = frozenset({"value", "evidence", "evidence_ref", "trust", "gloss"})
+#: ``acronyms`` is ADDITIVE on v1 rather than a v2: a file without the key loads
+#: exactly as before and a map with no candidates writes no key, so nothing that
+#: exists today changes shape. What it does cost is one direction of
+#: compatibility — an OLDER checkout reading a NEWER file refuses on the unknown
+#: key, because ``from_document`` rejects unknown top-level keys on purpose. That
+#: is acceptable here and is worth saying rather than discovering: the state file
+#: is machine-local and untracked (PUBLISH-BOUNDARY.md), so it never travels
+#: ahead of the code that reads it.
+_MAP_KEYS = frozenset({"schema", "seed", "root_question", "branches", "acronyms"})
 
 
 class MindMapError(ValueError):
@@ -147,6 +171,55 @@ class Slot:
 
 
 @dataclass(frozen=True)
+class AcronymCandidate:
+    """One acronym as it was found — the token, and the sentence that gives it meaning.
+
+    MM12. Every other extracted class is useful as a bare token: an issue key
+    resolves, a GUID resolves, an application id resolves. An acronym does not.
+    ``SNOW`` is worth something only because somebody wrote down that it means
+    ServiceNow and explicitly NOT Snowflake, and that sentence is the whole of
+    the evidence. So the sentence is a REQUIRED field here, not an optional
+    annotation: a candidate that arrived without one would be a string with no
+    way to judge it, which is the thing this class exists to avoid.
+
+    ``gloss`` is what a parenthetical said, when the text supplied one. Recorded,
+    never resolved — one acronym glossed two ways in two documents is a finding
+    to surface, not a conflict to settle here.
+
+    A CANDIDATE, NOT A FACT. Nothing in this dataclass decides what the acronym
+    IS. Whether a harvested acronym eventually becomes graph nodes or proposes
+    into the config glossary is an open fork nobody has ruled (see the MM12 item
+    notes), and the state file is deliberately a place a candidate can sit while
+    that stays unanswered.
+    """
+
+    value: str
+    evidence: str
+    evidence_ref: str
+    trust: str = HARVESTED_TRUST
+    gloss: str | None = None
+
+    def __post_init__(self) -> None:
+        if not self.value or not str(self.value).strip():
+            raise MindMapError("an acronym candidate with no value")
+        if not self.evidence or not str(self.evidence).strip():
+            raise MindMapError(
+                f"acronym {self.value!r} carries no evidence sentence — the sentence IS "
+                "the evidence for this class, so a candidate without one cannot be judged"
+            )
+        validate_evidence_ref(self.evidence_ref)
+        if self.trust not in TRUST_LEVELS:
+            raise MindMapError(
+                f"acronym {self.value!r}: trust {self.trust!r} is not in {list(TRUST_LEVELS)}"
+            )
+
+    @property
+    def is_harvested(self) -> bool:
+        """Machine-read out of a corpus, rather than supplied by a person."""
+        return self.trust == HARVESTED_TRUST
+
+
+@dataclass(frozen=True)
 class Branch:
     name: str
     slots: tuple[Slot, ...] = ()
@@ -165,6 +238,7 @@ class MindMap:
     root_question: str
     branches: tuple[Branch, ...] = field(default_factory=tuple)
     schema: str = SCHEMA
+    acronyms: tuple[AcronymCandidate, ...] = ()
 
     def __post_init__(self) -> None:
         if self.schema != SCHEMA:
@@ -234,6 +308,68 @@ class MindMap:
         )
         return replace(self, branches=branches)
 
+    # -- the acronym shelf ----------------------------------------------------
+
+    def with_acronyms(self, candidates: Iterable[AcronymCandidate]) -> MindMap:
+        """A new map carrying ``candidates`` alongside the ones already here.
+
+        DE-DUPLICATED ON (value, evidence_ref, evidence), which is the whole
+        design of this method rather than a detail of it. Collapsing on the VALUE
+        would keep one reading of ``SNOW`` and throw the other away — and the two
+        readings are the finding. Re-harvesting the same sentence from the same
+        document adds nothing and is dropped; the same acronym in a second
+        sentence, or in a second document, is a second candidate and is kept.
+
+        Order is first-seen, so the file reads in harvest order.
+        """
+        seen = {(a.value, a.evidence_ref, a.evidence) for a in self.acronyms}
+        added: list[AcronymCandidate] = []
+        for candidate in candidates:
+            key = (candidate.value, candidate.evidence_ref, candidate.evidence)
+            if key in seen:
+                continue
+            seen.add(key)
+            added.append(candidate)
+        if not added:
+            return self
+        return replace(self, acronyms=self.acronyms + tuple(added))
+
+
+# -- harvesting ---------------------------------------------------------------
+
+
+def harvest_acronyms(text: str, *, evidence_ref: str) -> tuple[AcronymCandidate, ...]:
+    """Acronym candidates in ``text``, each carrying the sentence it was found in.
+
+    The extraction is :func:`drydocs_core.entity_extract.extract_entities` — one
+    reading shared with the connectors and the novelty score (MM3), never a
+    second one here. This function is the adaptation: an ``EntityMatch`` into the
+    state file's row, with the trust the item requires and the breadcrumb the
+    module's one rule requires.
+
+    ``evidence_ref`` is REQUIRED and validated, so a harvest cannot happen
+    without saying which document it came from. That is the same discipline the
+    slot transition already enforces, reached one step earlier: a fact with no
+    breadcrumb is not written, and a candidate with no breadcrumb is not either.
+    """
+    from drydocs_core.entity_extract import ACRONYM, extract_entities
+
+    ref = validate_evidence_ref(evidence_ref)
+    out: list[AcronymCandidate] = []
+    for match in extract_entities(text):
+        if match.kind != ACRONYM:
+            continue
+        out.append(
+            AcronymCandidate(
+                value=match.value,
+                evidence=match.attribute("evidence") or "",
+                evidence_ref=ref,
+                trust=HARVESTED_TRUST,
+                gloss=match.attribute("gloss"),
+            )
+        )
+    return tuple(out)
+
 
 # -- construction -------------------------------------------------------------
 
@@ -300,6 +436,26 @@ def from_document(doc: Mapping[str, Any]) -> MindMap:
         root_question=str(doc.get("root_question") or ""),
         branches=tuple(branches),
         schema=str(doc.get("schema") or ""),
+        acronyms=tuple(_acronym_from(a) for a in doc.get("acronyms") or ()),
+    )
+
+
+def _acronym_from(raw: Mapping[str, Any]) -> AcronymCandidate:
+    if not isinstance(raw, Mapping):
+        raise MindMapError("an acronym entry is not a mapping")
+    unknown = set(raw) - _ACRONYM_KEYS
+    if unknown:
+        raise MindMapError(f"acronym entry has unknown keys {sorted(unknown)}")
+    # The trust default lives in the dataclass, not here: a row that omits it
+    # reads as harvested, which is the only thing this file ever writes. A row
+    # that NAMES a level keeps it, so an SME-supplied entry stays distinguishable
+    # once something starts writing one.
+    return AcronymCandidate(
+        value=str(raw.get("value") or ""),
+        evidence=str(raw.get("evidence") or ""),
+        evidence_ref=str(raw.get("evidence_ref") or ""),
+        trust=str(raw.get("trust") or HARVESTED_TRUST),
+        gloss=raw.get("gloss"),
     )
 
 
@@ -320,12 +476,27 @@ def to_document(mm: MindMap) -> dict[str, Any]:
                 row["note"] = s.note
             slots.append(row)
         branches.append({"name": b.name, "slots": slots})
-    return {
+    doc: dict[str, Any] = {
         "schema": mm.schema,
         "seed": mm.seed,
         "root_question": mm.root_question,
         "branches": branches,
     }
+    # Absent optionals omitted, as everywhere else in this document: a map with
+    # no candidates writes no `acronyms` key, so every file that exists today
+    # round-trips byte-identically through this change.
+    if mm.acronyms:
+        doc["acronyms"] = [
+            {
+                "value": a.value,
+                "evidence": a.evidence,
+                "evidence_ref": a.evidence_ref,
+                "trust": a.trust,
+                **({"gloss": a.gloss} if a.gloss is not None else {}),
+            }
+            for a in mm.acronyms
+        ]
+    return doc
 
 
 def loads(text: str) -> MindMap:

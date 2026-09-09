@@ -210,3 +210,160 @@ def test_value_objects_are_strict_on_construction_too() -> None:
         MindMap(seed="s", root_question="q", schema="other")
     ok = MindMap(seed="s", root_question="q", branches=(Branch("b", (Slot("x"),)),))
     assert ok.open_slots() == (("b", "x"),)
+
+
+# ---- MM12: the acronym shelf -------------------------------------------------
+
+_DOC = (
+    "The load failed overnight. SNOW (ServiceNow) is where the incident lives, "
+    "and MFT moved the file."
+)
+_MM12_REF = "confluence:page-4021"
+
+
+def _harvested() -> tuple[mm.AcronymCandidate, ...]:
+    return mm.harvest_acronyms(_DOC, evidence_ref=_MM12_REF)
+
+
+def test_harvest_reads_the_shared_extractor_and_carries_the_sentence() -> None:
+    """One reading, shared with the connectors and the novelty score (MM3) —
+    never a second regex here. The sentence is what makes a candidate judgeable."""
+    got = {c.value: c for c in _harvested()}
+    assert set(got) == {"SNOW", "MFT"}
+    assert got["SNOW"].evidence.startswith("SNOW (ServiceNow) is where")
+    assert got["SNOW"].gloss == "ServiceNow"
+    assert got["MFT"].gloss is None
+    assert all(c.evidence_ref == _MM12_REF for c in got.values())
+
+
+def test_every_harvested_candidate_is_marked_synthesized() -> None:
+    """MM12 clause (d), and the assertion the clause asks for by name. A
+    corpus-derived acronym must never be indistinguishable from one an SME
+    supplied, and the harvester is INCAPABLE of writing any other trust."""
+    assert all(c.trust == mm.HARVESTED_TRUST for c in _harvested())
+    assert all(c.is_harvested for c in _harvested())
+    assert mm.HARVESTED_TRUST == "SYNTHESIZED"
+
+
+def test_the_trust_vocabulary_is_the_one_the_doc_rows_already_declare() -> None:
+    """The tuple in mindmap.py restates a pydantic Literal rather than importing
+    it. This is what stops the two drifting — if the Literal grows a level, the
+    restatement fails here rather than quietly disagreeing."""
+    from typing import get_args
+
+    from drydocs_core.models.docs import BmcDocChunkRow
+
+    assert mm.TRUST_LEVELS == get_args(BmcDocChunkRow.model_fields["provenance"].annotation)
+
+
+def test_a_candidate_without_its_sentence_is_refused() -> None:
+    with pytest.raises(mm.MindMapError, match="evidence"):
+        mm.AcronymCandidate(value="SNOW", evidence="   ", evidence_ref=_MM12_REF)
+
+
+def test_a_candidate_without_a_breadcrumb_is_refused() -> None:
+    """The module's one rule, reached a step earlier: a fact with no breadcrumb
+    is not written, and neither is a candidate."""
+    with pytest.raises(mm.MindMapError):
+        mm.AcronymCandidate(value="SNOW", evidence="SNOW is ServiceNow.", evidence_ref="page-4021")
+    with pytest.raises(mm.MindMapError):
+        mm.harvest_acronyms(_DOC, evidence_ref="not-a-kind:x")
+
+
+def test_an_unknown_trust_level_is_refused() -> None:
+    with pytest.raises(mm.MindMapError, match="trust"):
+        mm.AcronymCandidate(
+            value="SNOW", evidence="SNOW is ServiceNow.", evidence_ref=_MM12_REF, trust="TRUSTED"
+        )
+
+
+def test_an_ambiguous_acronym_keeps_both_readings_on_the_shelf() -> None:
+    """The acceptance's named case, at the state file rather than the extractor.
+    De-duplication is on (value, ref, sentence) precisely so the two readings of
+    SNOW survive — collapsing on the value would keep one and destroy the finding.
+    """
+    incident = mm.harvest_acronyms("SNOW (ServiceNow) holds the ticket.", evidence_ref="jira:INC-1")
+    warehouse = mm.harvest_acronyms(
+        "SNOW (Snowflake) holds the table.", evidence_ref="confluence:wh-1"
+    )
+    shelf = mm.new_mindmap("seed-folder").with_acronyms(incident + warehouse)
+    snow = [c for c in shelf.acronyms if c.value == "SNOW"]
+    assert len(snow) == 2
+    assert {c.gloss for c in snow} == {"ServiceNow", "Snowflake"}
+    assert len({c.evidence for c in snow}) == 2
+
+
+def test_re_harvesting_the_same_sentence_adds_nothing() -> None:
+    """The other half of the same rule: a repeat of one reading is noise, and a
+    second reading is the signal."""
+    once = mm.new_mindmap("seed-folder").with_acronyms(_harvested())
+    twice = once.with_acronyms(_harvested())
+    assert twice.acronyms == once.acronyms
+    assert twice is once  # nothing added, nothing rebuilt
+
+
+def test_the_shelf_round_trips_through_the_file() -> None:
+    saved = mm.new_mindmap("seed-folder").with_acronyms(_harvested())
+    assert mm.loads(mm.dumps(saved)) == saved
+
+
+def test_a_map_with_no_candidates_writes_no_acronyms_key() -> None:
+    """Additive on v1: every file that exists today round-trips unchanged."""
+    doc = mm.to_document(mm.new_mindmap("seed-folder"))
+    assert "acronyms" not in doc
+    assert mm.loads(mm.dumps(mm.new_mindmap("seed-folder"))).acronyms == ()
+
+
+def test_a_file_written_before_this_change_still_loads() -> None:
+    """The compatibility direction that matters — the state file is machine-local
+    and an earlier session's map must not need a migration to be read."""
+    older = (
+        f"schema: {mm.SCHEMA}\n"
+        "seed: seed-folder\n"
+        "root_question: what is this flow?\n"
+        "branches:\n"
+        "- name: ownership\n"
+        "  slots:\n"
+        "  - name: owner_app\n"
+        "    status: open\n"
+    )
+    loaded = mm.loads(older)
+    assert loaded.acronyms == ()
+    assert loaded.open_slots() == (("ownership", "owner_app"),)
+
+
+def test_an_acronym_row_with_an_unknown_key_is_refused_not_repaired() -> None:
+    text = mm.dumps(mm.new_mindmap("seed-folder").with_acronyms(_harvested()))
+    with pytest.raises(mm.MindMapError, match="unknown keys"):
+        mm.loads(text.replace("  trust:", "  confidence: high\n  trust:", 1))
+
+
+def test_the_shelf_writes_no_graph_and_adds_no_uncertain_writer() -> None:
+    """MM12 clause (e), as a check rather than a promise. This module reaches no
+    driver and no graph client, and the allowlist that governs :Uncertain writes
+    is untouched — drydocs_deepdoc was already on it."""
+    from tests.source_scan import absent, code_only, imported_modules, source_text, without_prose
+    from tests.unit.test_uncertain_boundary import UNCERTAIN_WRITERS
+
+    assert UNCERTAIN_WRITERS == ("drydocs_deepdoc", "agents/common/agent_run_writer.py")
+    sources = {"mindmap.py": source_text(mm.__file__)}
+    assert not [m for m in imported_modules(sources["mindmap.py"]) if m.split(".")[0] == "neo4j"]
+    # Two scans, two STRIPPERS, and the split is the point (CORE2). A driver
+    # handle is CODE, so code_only is right for it. A Cypher clause is only ever
+    # a string LITERAL, which code_only deletes — scanning for it there would
+    # pass on any tree at all, including one that writes the graph on every line.
+    absent(
+        "GraphDatabase",
+        sources,
+        stripper=code_only,
+        positive_control="driver = GraphDatabase.driver(uri)",
+        because="the mind-map state file reaches no driver",
+    )
+    for clause in ("MERGE (", "CREATE ("):
+        absent(
+            clause,
+            sources,
+            stripper=without_prose,
+            positive_control=f'CYPHER = """{clause}n:Acronym) RETURN n"""',
+            because="this module writes a YAML shelf, never the graph (MM12 clause e)",
+        )

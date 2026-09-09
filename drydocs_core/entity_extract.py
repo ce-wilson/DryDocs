@@ -50,6 +50,47 @@ earlier pass claimed, so the folder wins and the issue-key reading never fires.
                           and small counts: at that width the class stops carrying
                           information and every document in the corpus would
                           contribute a handful of them to the novelty score.
+    7. acronym            MM12. A standalone run of 2 to 6 upper-case characters,
+                          at least one of them a letter, that no earlier pass
+                          claimed — so a project key inside an issue key, a
+                          schema inside a table name and a folder prefix are
+                          already taken and never read twice. It runs LAST
+                          because it is the widest shape, and the precedence
+                          order is the whole of what keeps it from stealing them.
+
+                          THE SENTENCE TRAVELS WITH THE TOKEN, which is what
+                          makes this class different from the six above. ``SNOW``
+                          is worth nothing on its own; it is worth something
+                          because a person wrote down that it means ServiceNow
+                          and explicitly NOT Snowflake, and that distinction
+                          lives in the prose rather than in the token. Every
+                          acronym match carries an ``evidence`` attribute holding
+                          the sentence it was found in, so two occurrences of one
+                          acronym are two matches with two sentences — never one
+                          collapsed reading.
+
+                          ``cued=True`` when the text GLOSSES it: an adjacent
+                          parenthetical either way round (``ServiceNow (SNOW)``,
+                          ``SNOW (ServiceNow)``) or a naming verb (``stands
+                          for``, ``means``, ``is short for``). A parenthetical
+                          records what it said in a ``gloss`` attribute, but only
+                          after ``_spells`` confirms the acronym's letters appear
+                          IN ORDER in it — so ``SNOW (Snowflake)`` glosses and
+                          ``SNOW (raised 2026-09-09)`` does not. That is a CHECK,
+                          not a resolution: two documents that gloss one acronym
+                          differently both pass it, which is exactly the finding
+                          this class exists to surface.
+
+                          THE FUNCTION-WORD FLOOR is the same rule as the 4-digit
+                          floor above, not a new kind of exception. A closed class
+                          of English function words — articles, conjunctions,
+                          auxiliaries — appears in caps for EMPHASIS in every
+                          corpus, and at that shape the class stops carrying
+                          information exactly as a bare ``2026`` does, so a
+                          function word is emitted only when the text glosses it.
+                          Closed class, not a blocklist of tokens that "look
+                          wrong": a real acronym is never an article, and if one
+                          ever is, the gloss cue emits it anyway.
 
 What this deliberately does not do: guess. No class is inferred from context
 beyond the cue flag, no token is normalized to a graph key, and no match is
@@ -85,6 +126,7 @@ ISSUE_KEY = "issue_key"
 TABLE_NAME = "table_name"
 DISTRIBUTION_LIST = "distribution_list"
 APPLICATION_ID = "application_id"
+ACRONYM = "acronym"
 
 #: Pass order == precedence (see the module docstring).
 KINDS: tuple[str, ...] = (
@@ -94,6 +136,7 @@ KINDS: tuple[str, ...] = (
     TABLE_NAME,
     DISTRIBUTION_LIST,
     APPLICATION_ID,
+    ACRONYM,
 )
 
 
@@ -178,6 +221,179 @@ _APP_ID_CUE_BEFORE = re.compile(r"(?i)(?:seal|app[_ ]?id|application)\W{0,4}$")
 #: ... or the landing-prefix shape after it: `<APP_ID>/raw/<flow>/...` (§2).
 _APP_ID_CUE_AFTER = re.compile(r"^/raw/")
 _CUE_WINDOW = 24
+
+#: MM12. Two to six upper-case characters, at least ONE of them a letter, so
+#: ``S3``, ``EC2``, ``DL`` and ``P12`` are candidates and ``70002`` is not.
+#: Digits are allowed inside the run because vendors put them there (S3, EC2)
+#: and because this estate's own codes carry them (the P12 data centre, an L2
+#: support tier) — not so that a number can qualify as an acronym. The
+#: lookarounds keep it off the tail of a longer word; overlap with a span an
+#: earlier pass CLAIMED is checked separately, because the claim is the
+#: authority here and a regex cannot see it.
+_ACRONYM_RE = re.compile(
+    r"(?<![A-Za-z0-9_-])(?=[A-Z0-9]{2,6}(?![A-Za-z0-9_-]))[A-Z0-9]*[A-Z][A-Z0-9]*(?![A-Za-z0-9_-])"
+)
+#: The closed class of English function words that appear in caps for emphasis.
+#: Articles, conjunctions, prepositions, auxiliaries, negations, quantifiers —
+#: the parts of speech a real acronym is never drawn from. Emitted only when the
+#: text glosses them (see the module docstring's function-word floor).
+_ACRONYM_FUNCTION_WORDS = frozenset(
+    {
+        "A",
+        "AN",
+        "THE",
+        "AND",
+        "OR",
+        "NOT",
+        "BUT",
+        "IF",
+        "THEN",
+        "ELSE",
+        "SO",
+        "AS",
+        "AT",
+        "BY",
+        "FOR",
+        "FROM",
+        "IN",
+        "INTO",
+        "OF",
+        "ON",
+        "TO",
+        "UP",
+        "WITH",
+        "IS",
+        "ARE",
+        "WAS",
+        "WERE",
+        "BE",
+        "BEEN",
+        "DO",
+        "DOES",
+        "DID",
+        "HAS",
+        "HAVE",
+        "HAD",
+        "CAN",
+        "MAY",
+        "MUST",
+        "WILL",
+        "WOULD",
+        "SHOULD",
+        "ALL",
+        "ANY",
+        "NO",
+        "YES",
+        "ONE",
+        "TWO",
+        "THIS",
+        "THAT",
+        "THESE",
+        "NEVER",
+        "ALWAYS",
+        "ONLY",
+        "EVERY",
+        "EACH",
+        "BOTH",
+        "SAME",
+        "NEW",
+    }
+)
+#: ``<expansion> (ACRONYM)`` — the gloss precedes the parenthesis. The words are
+#: captured loosely and then CHECKED by :func:`_spells`; a regex alone cannot
+#: tell an expansion from the rest of the clause, and the first draft of this
+#: read ``we raise it in ServiceNow`` as the expansion of ``SNOW``.
+_ACRONYM_GLOSS_BEFORE = re.compile(r"((?:[A-Za-z][\w-]*[ ]){0,7}[A-Za-z][\w-]*)[ ]*\($")
+#: ``ACRONYM (expansion)`` — the gloss follows, in the parenthesis. Checked the
+#: same way: ``SNOW (raised 2026-09-09)`` is a parenthesis, not a gloss.
+_ACRONYM_GLOSS_AFTER = re.compile(r"^[ ]*\(([^()]{1,80})\)")
+#: ``ACRONYM stands for ...`` — a naming verb marks the token as glossed without
+#: capturing an expansion; the sentence carries the meaning either way. The
+#: optional ``is`` covers ``SNOW is short for ServiceNow``, which the first draft
+#: missed because it only looked at the words immediately after the token.
+_ACRONYM_NAMING_VERB = re.compile(r"(?i)^\s*(?:is\s+)?(?:stands\s+for|short\s+for|means)\b")
+#: Below two letters the spelling check stops discriminating: ``S3`` reduces to
+#: ``s``, which every word beginning with an s would satisfy. A gloss is recorded
+#: only above this floor — the token is still a candidate either way.
+_ACRONYM_MIN_SPELLED = 2
+
+
+def _letters(value: str) -> str:
+    return "".join(c for c in value if c.isalpha()).lower()
+
+
+def _spells(acronym: str, phrase: str) -> bool:
+    """Could ``phrase`` be what ``acronym`` stands for?
+
+    The acronym's letters must appear IN ORDER inside the phrase, starting at the
+    phrase's own first letter — the short form of the Schwartz-Hearst test. So
+    ``ServiceNow`` and ``Snowflake`` both spell ``SNOW`` and ``we raise it in
+    ServiceNow`` does not, which is the distinction a word-count bound could not
+    make. Digits in the acronym are ignored: vendors put them in (``EC2``) and
+    they are not initials of anything.
+
+    This is a CHECK, not a resolution. It says a phrase is a plausible expansion;
+    it never says the expansion is correct, and two documents that gloss one
+    acronym differently both pass it — which is the point.
+    """
+    letters = _letters(acronym)
+    text = _letters(phrase)
+    if len(letters) < _ACRONYM_MIN_SPELLED or not text or text[0] != letters[0]:
+        return False
+    i = 0
+    for ch in text:
+        if ch == letters[i]:
+            i += 1
+            if i == len(letters):
+                return True
+    return False
+
+
+def _gloss_before(before: str, acronym: str) -> str | None:
+    """The shortest trailing word-run before the parenthesis that spells ``acronym``.
+
+    Shortest, walking outward: ``we raise it in ServiceNow (SNOW)`` has a
+    one-word answer and a five-word one, and the one-word answer is the
+    expansion. Taking the longest is how the first draft returned the clause.
+    """
+    m = _ACRONYM_GLOSS_BEFORE.search(before)
+    if not m:
+        return None
+    words = m.group(1).split()
+    for count in range(1, len(words) + 1):
+        phrase = " ".join(words[-count:])
+        if _spells(acronym, phrase):
+            return phrase
+    return None
+
+
+#: How far either side of an acronym the gloss is looked for.
+_ACRONYM_GLOSS_WINDOW = 60
+#: The most evidence one candidate carries. A sentence longer than this is a
+#: run-on or a table row, and the point is a readable breadcrumb, not the page.
+_EVIDENCE_MAX = 400
+_SENTENCE_END = re.compile(r"[.!?](?=[ \n\"')\]]|$)|\n")
+
+
+def _sentence_around(text: str, start: int, end: int) -> str:
+    """The sentence containing ``[start:end]``, as a reader would quote it.
+
+    An APPROXIMATION on purpose, and the docstring says so where the caller can
+    see it: the boundary is a terminator followed by a space or a newline, which
+    ``e.g.`` and ``No. 4`` both defeat. This is evidence for a person to read,
+    not a parse anything branches on — over-long is recoverable and a wrong
+    branch is not, so the window is capped rather than made clever.
+    """
+    left = 0
+    for m in _SENTENCE_END.finditer(text, 0, start):
+        left = m.end()
+    right = len(text)
+    tail = _SENTENCE_END.search(text, end)
+    if tail:
+        right = tail.end()
+    left = max(left, end - _EVIDENCE_MAX)
+    right = min(right, start + _EVIDENCE_MAX)
+    return text[left:right].strip()
 
 
 def _overlaps(start: int, end: int, claimed: list[tuple[int, int]]) -> bool:
@@ -299,6 +515,28 @@ def extract_entities(text: str) -> tuple[EntityMatch, ...]:
         take(
             EntityMatch(APPLICATION_ID, m.group(0), m.start(), m.end(), cued=cued, attributes=attrs)
         )
+
+    # 7. acronym — last, so every narrower class has already claimed its spans
+    for m in _ACRONYM_RE.finditer(text):
+        if _overlaps(m.start(), m.end(), claimed):
+            continue
+        value = m.group(0)
+        before = text[max(0, m.start() - _ACRONYM_GLOSS_WINDOW) : m.start()]
+        after = text[m.end() : m.end() + _ACRONYM_GLOSS_WINDOW]
+        gloss = _gloss_before(before, value)
+        if gloss is None and (paren := _ACRONYM_GLOSS_AFTER.match(after)) is not None:
+            candidate = paren.group(1).strip()
+            gloss = candidate if _spells(value, candidate) else None
+        cued = gloss is not None or _ACRONYM_NAMING_VERB.match(after) is not None
+        # The function-word floor, and the ONLY place an acronym candidate is
+        # dropped. Uncued and closed-class: not reported, and not claimed either
+        # — nothing runs after this pass, so the span simply stays free.
+        if not cued and value in _ACRONYM_FUNCTION_WORDS:
+            continue
+        attrs = (("evidence", _sentence_around(text, m.start(), m.end())),)
+        if gloss:
+            attrs += (("gloss", gloss),)
+        take(EntityMatch(ACRONYM, value, m.start(), m.end(), cued=cued, attributes=attrs))
 
     out.sort(key=lambda e: (e.start, e.end, KINDS.index(e.kind)))
     return tuple(out)
