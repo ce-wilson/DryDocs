@@ -282,7 +282,14 @@ rows:
     entry_rule: "plan.phases keyed by id — union; phase `status` is per-repo like item status."
   - path: "docs/restructure/backlog/modules.yaml"
     disposition: per-entry
-    entry_rule: "modules[] is a UNION of names; never drop one — test_runbook_coverage reads it as the census."
+    entry_rule: >
+      modules[] is a UNION of names; never drop one — test_runbook_coverage reads it
+      as the census. `series:` is a map keyed by module name and UNIONS by key (PLAN1,
+      2026-09-02: the series IS the module, so a code is a fact about a module, not
+      about a side): the producer's codes for the modules both sides hold cross
+      whole; a module only the company holds gets its code from the company, three or
+      more letters, never DD, never a frozen letter, and the producer never writes or
+      overwrites it. UNNAMED FIELDS: the producer owns them.
   - path: "docs/restructure/backlog/README.md"
     disposition: canonical-producer
     note: "prose about the mechanism; no side-local facts"

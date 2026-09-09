@@ -7,7 +7,7 @@ phase: 8
 agent: main
 model: fable
 priority: p1
-status: in_progress
+status: done
 depends_on:
 - PLAN2
 - PLAN3
@@ -71,3 +71,29 @@ notes: |
   relay takes the next free relay number when it rolls (RELAY-23 and RELAY-24 were taken the same day by the ADR 0018 move and the S8 adoption). The title keeps its original number - a retitle after the stub
   push reads as a mint collision to the guard (I6); the number in the port-prompt is what
   counts.
+  DONE 2026-09-08 (desktop, Lane A) as RELAY-48 in docs/port/port-prompt.md, the number
+  free when it rolled (RELAY-23..47 were taken in the meantime; the title keeps 23).
+  State at build: both halves had ALREADY reached the company piecemeal - PLAN1 and the
+  gate in port-base-20260902 (steps 305/306/308), PLAN2, CFG1, CFG2 and the rider gate in
+  port-base-20260905 (step 332, FIFTEENTH POSTSCRIPT, RELAY-26 (1)-(2), RELAY-31/32) - and
+  the company's 0905 close-out reports them applied, with edition: deliberately unset.
+  So the relay changes no company file; it states the convention whole and adds what the
+  ledger still owed:
+  (a) the freeze half - the 27-letter table quoted from FROZEN_SERIES, both refusal
+      messages, the 20 module codes, FROZEN_BAND so the six band ids read as legacy and
+      are listed, never re-minted; the modules.yaml per-entry row's entry_rule now says
+      who owns series: (union by module name, company-only codes are the company's).
+  (b) the prefix half - grammar, the venue key, the company mints its own code at its
+      own gate into editions.yaml, both rules retired forward-only, the refusal as
+      mechanism, the one line to write once the code exists.
+  (c) the two-axes wording, verbatim from the acceptance.
+  (d) step 160's "write the MIRROR assertion" ACTION is WITHDRAWN in the relay (the step
+      stays as an applied record); the APPLY BY DISPOSITION section gains "THE ID
+      CONVENTION'S ROWS" naming the three per-entry rows, the canonical-company key and
+      the canonical-producer trio incl. the CLAUDE.md mint rule.
+  NOT done here, by choice: MM13's gate-prompt correction does not ride this relay - MM13
+  is still todo, and relaying a correction the producer has not made would put the
+  company's DRAFT ahead of the producer's; it rides with MM13's build (MM13 (d) says the
+  relay line is required for MM13, so nothing is lost).
+  Guards: test_port_manifest, test_port_dispositions, test_backlog and every test that
+  reads the port-prompt (238 passed).
