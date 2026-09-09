@@ -337,6 +337,15 @@ one-time operator verification, not an automated test, and it is recorded as suc
 The usual gates apply and were run: the unit suite, the root import, and the module-boundary test,
 which is default-deny and so required the new prefix and map rows in the same commit.
 
+**One guard is red, and it is red about this branch.** The full unit suite reports 3895 passed and
+one failure: the identity-header guard rejects both recipe files under `config/datahub/`, each for
+the same three missing keys — `schema`, `classification` and `updated`. The guard is right. Both
+files are governed configuration and neither carries the identity block that every other governed
+file carries. The fix is not purely mechanical, because a DataHub recipe is parsed by DataHub and
+three unknown top-level keys may not survive that parse, so the choice is between adding the block
+and exempting the family with a written reason. Nothing in this design depends on the outcome, but
+the branch should not merge while the guard is red.
+
 <!-- anchor: hitl-gate -->
 ## HITL gate & open questions
 
@@ -383,6 +392,7 @@ therefore stays with DataHub, and that is a fact about the two products rather t
 | Two runs over one config emit one file | detailed-design | drydocs-load | `test_synthetic_sources.py` — emission determinism | done |
 | The new module is classified, mapped and port-dispositioned in the same commit | classification-security | drydocs-core, drydocs-load | `test_module_boundary.py`; port-manifest rows; matrix re-render | done |
 | The recipes run end to end against a local store | qa-tests | operator-side | one run on this desktop: 283 import events, 137 profile events, 18 profiles | done |
+| Governed config files carry the identity header | qa-tests | drydocs-load | `test_config_identity_header.py` — RED: both files under `config/datahub/` lack `schema`, `classification` and `updated` | open |
 | The five axes are the right five | hitl-gate | — | SME question, open | open |
 | A catalog product is adopted | hitl-gate | — | ADR 0017, PROPOSED | open |
 
