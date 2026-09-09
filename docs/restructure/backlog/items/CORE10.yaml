@@ -7,7 +7,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs_core/
@@ -33,3 +33,23 @@ notes: |
   most valuable output"). The CONVENTION half is ADR 0021 (docs/decisions/0021-not-checked-is-not-clean.md,
   drafted at the Lane A close); this item is the INSTRUMENT half its D3 names. Lane A builds it
   (core plus drydocs/port are Lane A surfaces this burst).
+  DONE 2026-09-09 (Lane A, desktop). (a) drydocs_core/check_outcome.py: Outcome (three values)
+  and the frozen CheckOutcome - findings, size, subject, reason, venue; the constructor
+  validates each state's invariants (a NOT_CHECKED reason of forty characters or more, a
+  FINDINGS list that is never empty, a CHECKED_CLEAN that carries none); bool() raises;
+  is_clean is true for CHECKED_CLEAN only; render() gives the operator line per state.
+  (b) PROBES, the declared registry, and tests/unit/test_check_outcome.py: each name must
+  resolve (shrink-only) and its return annotation, read from its source file through the
+  new tests/source_scan.return_annotation verb (J66; pinned in test_source_scan.py), must
+  be the type; positive and negative cases on inline source. (c) First adopters: the
+  preflight's base_resolves returns the type and is registered; CheckResult reads passed,
+  not_checked and verdict off its outcome (ok / failed / skipped / of constructors); the
+  skipped suite is NOT CHECKED with its reason rather than a FAIL; clean-over-zero is
+  visible (size 0 on an empty range). docs_coverage.graph_probe returns the type and is
+  registered; report.probe carries it, probed is read off it, as_dict adds probe and
+  probe_state, the verb prints the line. (d) Precedent comments: plan_board.py and the
+  preflight placed; the four under Lane B pens handed to REM3, LIN4, API5 and DEEP1 by note
+  (one pen per surface). (e) MODULE_MAP.md row and re-render; CLAUDE.md working-agreements
+  bullet (ADR action item 5); the ADR's five action items ticked. Found by the build itself:
+  the first CheckResult.ok wrote outcome-or-checked_clean and the type refused it - exactly
+  the shape D1 exists to make unwritable.

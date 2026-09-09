@@ -19,3 +19,6 @@ acceptance: |
   report dates the second so a third knows what it joins); this item does not extract a shared reader.
 notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). lineage-2026-09-08.md candidate 3 (L2-1, ranked 2).
+  HAND-BACK from CORE10 (Lane A, 2026-09-09; ADR 0021 action item 4, name only): when this
+  item is open, add ONE citing comment at drydocs_lineage/archival.py at the `report.coverage_statement = (` assignment (precedent 2: no axis proves absence) - the shape is
+  the line CORE10 placed in drydocs/plan/plan_board.py; do not rewrite the site (ADR 0021 D4).

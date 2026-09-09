@@ -18,3 +18,6 @@ acceptance: |
   noqa F401 parser re-export at investigate.py:13 still has a purpose and say so in the close note.
 notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). plan-deepdoc-libs-2026-09-08.md candidate 1 (L1-1, ranked 1).
+  HAND-BACK from CORE10 (Lane A, 2026-09-09; ADR 0021 action item 4, name only): when this
+  item is open, add ONE citing comment at drydocs_deepdoc/investigate.py above the `raise NotImplementedError(...)` in investigate_failure (precedent 6: the scaffold names which of its own bodies raise) - the shape is
+  the line CORE10 placed in drydocs/plan/plan_board.py; do not rewrite the site (ADR 0021 D4).

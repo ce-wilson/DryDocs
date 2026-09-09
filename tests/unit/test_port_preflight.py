@@ -427,12 +427,19 @@ def test_git_helper_raises_on_a_nonzero_exit(monkeypatch: pytest.MonkeyPatch) ->
 
 
 def test_a_not_checked_result_can_never_have_passed() -> None:
-    with pytest.raises(ValueError):
-        CheckResult("ledger coverage", True, "impossible", not_checked=True)
-    result = CheckResult("ledger coverage", False, "NOT CHECKED - why", not_checked=True)
-    assert result.verdict == "NOT CHECKED"
-    assert CheckResult("x", True, "").verdict == "PASS"
-    assert CheckResult("x", False, "").verdict == "FAIL"
+    """CORE10: the verdict is READ off the shared type (ADR 0021), so the impossible
+    state - not checked, yet passed - is not representable rather than refused."""
+    result = CheckResult.skipped(
+        "ledger coverage", "the base did not resolve, so the range could not be read"
+    )
+    assert result.verdict == "NOT CHECKED" and not result.passed and result.not_checked
+    assert result.detail.startswith("NOT CHECKED - ")
+    assert CheckResult.ok("x", "fine").verdict == "PASS"
+    assert CheckResult.failed("x", "one thing wrong").verdict == "FAIL"
+    with pytest.raises(ValueError):  # a skip with no written reason is refused by the type
+        CheckResult.skipped("x", "skipped")
+    with pytest.raises(TypeError):  # and the outcome itself never reads as a boolean
+        bool(result.outcome)
 
 
 def test_an_unresolvable_base_is_not_checked_never_clean(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -447,6 +454,7 @@ def test_an_unresolvable_base_is_not_checked_never_clean(monkeypatch: pytest.Mon
         assert r.not_checked, r.name
         assert not r.passed, r.name
         assert "NOT CHECKED" in r.detail, r.name
+        assert r.outcome.is_not_checked and r.outcome.reason, r.name
 
 
 def test_an_empty_range_on_a_real_base_is_still_a_clean_pass(
@@ -466,5 +474,7 @@ def test_an_empty_range_on_a_real_base_is_still_a_clean_pass(
     assert by_name["base resolves"].passed and not by_name["base resolves"].not_checked
     assert by_name["ledger coverage"].passed and not by_name["ledger coverage"].not_checked
     assert "all 0 commits" in by_name["ledger coverage"].detail
+    # clean over ZERO is visible on the type, never hidden behind "clean" (ADR 0021 D1)
+    assert by_name["ledger coverage"].outcome.size == 0
     assert by_name["cited paths resolve"].passed
     assert calls[0][0] == "rev-parse", "the base is resolved before the range is read"

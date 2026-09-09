@@ -33,6 +33,7 @@ from collections.abc import Callable, Container, Mapping
 from dataclasses import dataclass
 from pathlib import Path
 
+from drydocs_core.check_outcome import CheckOutcome, checked_clean, findings, not_checked
 from drydocs_core.repo_paths import repo_root
 
 REPO_ROOT = repo_root(Path(__file__).resolve().parents[1])
@@ -191,25 +192,55 @@ class Commit:
 
 @dataclass(frozen=True)
 class CheckResult:
-    """One check's verdict. Three states, not two (J78, and ADR 0021's subject).
+    """One check's verdict: a name, the :class:`CheckOutcome` behind it, and the
+    report body. Three states, not two (J78).
 
-    ``passed`` is the certification bit. ``not_checked`` is the third state: the
-    check could not evaluate its subject at all, which is a different fact from
-    "evaluated and failed" and must never render as a pass. PORT8 (2026-09-09):
-    ``_git`` used to swallow git's exit code, so an unresolvable base yielded an
-    empty commit range and BOTH range-derived checks passed on emptiness - the
-    worse the base, the greener the certification. A not-checked result is
-    refused the ``passed`` bit by construction, so that shape cannot come back.
+    PORT8 (2026-09-09) added the third state as a local ``not_checked`` bit after
+    ``_git`` was found swallowing git's exit code - an unresolvable base yielded an
+    empty commit range and BOTH range checks passed on emptiness, the worse the
+    base the greener the certification. CORE10 replaced that interim bit with the
+    shared type once ADR 0021 was ACCEPTED: ``passed``, ``not_checked`` and
+    ``verdict`` are now READ off the outcome, so a check that did not run cannot
+    have passed by construction, and the report cannot print a not-checked result
+    as PASS.
     """
 
     name: str
-    passed: bool
-    detail: str
-    not_checked: bool = False
+    outcome: CheckOutcome
+    detail: str = ""
 
-    def __post_init__(self) -> None:
-        if self.not_checked and self.passed:
-            raise ValueError(f"{self.name}: a check that did not run cannot have passed")
+    @classmethod
+    def ok(cls, name: str, detail: str, *, outcome: CheckOutcome | None = None) -> CheckResult:
+        """A check that ran over its whole subject and found nothing."""
+        # not `outcome or ...`: the type refuses boolean coercion, which is the point
+        if outcome is None:
+            outcome = checked_clean(subject=detail or None)
+        return cls(name, outcome, detail)
+
+    @classmethod
+    def failed(cls, name: str, detail: str) -> CheckResult:
+        """A check that ran and found something - the detail lines ARE the findings."""
+        lines = [ln for ln in detail.splitlines() if ln.strip()] or [detail or name]
+        return cls(name, findings(lines), detail)
+
+    @classmethod
+    def skipped(cls, name: str, reason: str) -> CheckResult:
+        """A check that could not evaluate its subject - never a pass, never a fail."""
+        return cls(name, not_checked(reason), f"NOT CHECKED - {reason}")
+
+    @classmethod
+    def of(cls, name: str, outcome: CheckOutcome) -> CheckResult:
+        """Wrap a probe's own outcome; the report body is its rendered line."""
+        return cls(name, outcome, outcome.render())
+
+    @property
+    def passed(self) -> bool:
+        """The certification bit: true ONLY for a checked-clean outcome."""
+        return self.outcome.is_clean
+
+    @property
+    def not_checked(self) -> bool:
+        return self.outcome.is_not_checked
 
     @property
     def verdict(self) -> str:
@@ -412,8 +443,9 @@ def _git(*args: str, cwd: Path | None = None) -> str:
     return proc.stdout.strip()
 
 
-def base_resolves(base: str, cwd: Path | None = None) -> CheckResult:
-    """The first check: is *base* a commit git can see here?
+def base_resolves(base: str, cwd: Path | None = None) -> CheckOutcome:
+    """The first check, and a registered probe (ADR 0021 D3): is *base* a commit
+    git can see here?
 
     A typo, a tag never fetched, or a sha from the other repo used to fail OPEN
     through the two range checks. Now it is a named verdict, and the range checks
@@ -423,13 +455,8 @@ def base_resolves(base: str, cwd: Path | None = None) -> CheckResult:
         sha = _git("rev-parse", "--verify", "--quiet", f"{base}^{{commit}}", cwd=cwd)
     except GitError as err:
         why = err.stderr or f"git exit {err.returncode}"
-        return CheckResult(
-            "base resolves",
-            False,
-            f"NOT CHECKED - {base!r} is not a commit here ({why})",
-            not_checked=True,
-        )
-    return CheckResult("base resolves", True, f"{base} -> {sha}")
+        return not_checked(f"the base {base!r} is not a commit git can see in this tree ({why})")
+    return checked_clean(subject=f"{base} -> {sha}")
 
 
 def range_checks(base: str, port_prompt_text: str, cwd: Path | None = None) -> list[CheckResult]:
@@ -441,46 +468,62 @@ def range_checks(base: str, port_prompt_text: str, cwd: Path | None = None) -> l
     it can resolve still yields a clean pass - "no commits" and "could not look"
     are different answers.
     """
-    resolved = base_resolves(base, cwd=cwd)
+    resolved = CheckResult.of("base resolves", base_resolves(base, cwd=cwd))
     results = [resolved]
     if resolved.not_checked:
-        reason = "NOT CHECKED - the base did not resolve, so the range could not be read"
-        results.append(CheckResult("ledger coverage", False, reason, not_checked=True))
-        results.append(CheckResult("cited paths resolve", False, reason, not_checked=True))
+        reason = "the base did not resolve, so the commit range could not be read at all"
+        results.append(CheckResult.skipped("ledger coverage", reason))
+        results.append(CheckResult.skipped("cited paths resolve", reason))
         return results
 
     try:
         commits = range_commits(base, cwd=cwd)
         docs = added_documents(base, cwd=cwd)
     except GitError as err:
-        reason = f"NOT CHECKED - git failed reading {base}..HEAD ({err.stderr})"
-        results.append(CheckResult("ledger coverage", False, reason, not_checked=True))
-        results.append(CheckResult("cited paths resolve", False, reason, not_checked=True))
+        reason = f"git failed reading {base}..HEAD, so the range was never read ({err.stderr})"
+        results.append(CheckResult.skipped("ledger coverage", reason))
+        results.append(CheckResult.skipped("cited paths resolve", reason))
         return results
 
     uncited = uncited_commits(commits, port_prompt_text)
-    results.append(
-        CheckResult(
-            "ledger coverage",
-            not uncited,
-            "\n".join(f"    UNCITED {c.sha} {c.subject}" for c in uncited)
-            or f"all {len(commits)} commits in {base}..HEAD are cited or ritual",
+    if uncited:
+        results.append(
+            CheckResult.failed(
+                "ledger coverage",
+                "\n".join(f"    UNCITED {c.sha} {c.subject}" for c in uncited),
+            )
         )
-    )
+    else:
+        results.append(
+            CheckResult.ok(
+                "ledger coverage",
+                f"all {len(commits)} commits in {base}..HEAD are cited or ritual",
+                outcome=checked_clean(
+                    size=len(commits), subject=f"{len(commits)} commits in {base}..HEAD"
+                ),
+            )
+        )
     root = cwd or REPO_ROOT
     unresolved = unresolved_citations(
         docs,
         repo_roots={entry.name for entry in root.iterdir()},
         exists=lambda rel: (root / rel).exists(),
     )
-    results.append(
-        CheckResult(
-            "cited paths resolve",
-            not unresolved,
-            "\n".join(f"    UNRESOLVED {doc}: `{path}`" for doc, path in unresolved)
-            or f"every path cited by the {len(docs)} document(s) this range adds resolves",
+    if unresolved:
+        results.append(
+            CheckResult.failed(
+                "cited paths resolve",
+                "\n".join(f"    UNRESOLVED {doc}: `{path}`" for doc, path in unresolved),
+            )
         )
-    )
+    else:
+        results.append(
+            CheckResult.ok(
+                "cited paths resolve",
+                f"every path cited by the {len(docs)} document(s) this range adds resolves",
+                outcome=checked_clean(size=len(docs), subject=f"{len(docs)} added document(s)"),
+            )
+        )
     return results
 
 
@@ -554,17 +597,19 @@ def run_checks(base: str, *, skip_tests: bool = False, will_tag: bool = False) -
     results: list[CheckResult] = []
 
     dirty = _git("status", "--porcelain")
-    results.append(CheckResult("tree clean", not dirty, dirty or "nothing staged or modified"))
+    results.append(
+        CheckResult.failed("tree clean", dirty)
+        if dirty
+        else CheckResult.ok("tree clean", "nothing staged or modified")
+    )
 
     text = PORT_PROMPT_PATH.read_text(encoding="utf-8")
 
     missing_relays = relays_missing_basis(text)
     results.append(
-        CheckResult(
-            "relay basis tags",
-            not missing_relays,
-            ", ".join(missing_relays) or "every live relay declares its basis",
-        )
+        CheckResult.failed("relay basis tags", ", ".join(missing_relays))
+        if missing_relays
+        else CheckResult.ok("relay basis tags", "every live relay declares its basis")
     )
 
     # PORT8: the base is resolved BEFORE the two range checks read it, and a base
@@ -579,16 +624,27 @@ def run_checks(base: str, *, skip_tests: bool = False, will_tag: bool = False) -
         check=False,
     )
     drift = _git("status", "--porcelain") if render.returncode == 0 else ""
-    results.append(
-        CheckResult(
-            "renders current",
-            render.returncode == 0 and not drift,
-            drift or ("renderer failed" if render.returncode else "no drift after re-render"),
+    if render.returncode != 0:
+        results.append(
+            CheckResult.skipped(
+                "renders current",
+                "the renderer itself failed, so whether the renders are current was never read",
+            )
         )
-    )
+    elif drift:
+        results.append(CheckResult.failed("renders current", drift))
+    else:
+        results.append(CheckResult.ok("renders current", "no drift after re-render"))
 
     if skip_tests:
-        results.append(CheckResult("suite green", False, "SKIPPED — not a certification"))
+        # ADR 0021 precedent 4, now on the type: a skipped check is explicitly not a pass,
+        # and since CORE10 it is not a FAIL either - it is the third state, with its reason.
+        results.append(
+            CheckResult.skipped(
+                "suite green",
+                "the suite was skipped by --skip-tests, and a skipped suite is not a certification",
+            )
+        )
     else:
         suite = subprocess.run(
             ["poetry", "run", "pytest", "tests/unit", "-q"],
@@ -598,28 +654,23 @@ def run_checks(base: str, *, skip_tests: bool = False, will_tag: bool = False) -
             check=False,
         )
         tail = [ln for ln in suite.stdout.splitlines() if ln.strip()]
+        summary = f"{tail[-1] if tail else 'no output'} ({venue_line()})"
         results.append(
-            CheckResult(
-                "suite green",
-                suite.returncode == 0,
-                f"{tail[-1] if tail else 'no output'} ({venue_line()})",
-            )
+            CheckResult.ok("suite green", summary, outcome=checked_clean(venue=venue_line()))
+            if suite.returncode == 0
+            else CheckResult.failed("suite green", summary)
         )
 
     tags = _git("tag", "--points-at", "HEAD").splitlines()
     base_tags = [t for t in tags if t.startswith("port-base-")]
-    results.append(
-        CheckResult(
-            "certified base tag",
-            bool(base_tags) or will_tag,
-            ", ".join(base_tags)
-            or (
-                "will be created on success (--tag)"
-                if will_tag
-                else "no port-base-* tag at HEAD — run with --tag"
-            ),
+    if base_tags:
+        results.append(CheckResult.ok("certified base tag", ", ".join(base_tags)))
+    elif will_tag:
+        results.append(CheckResult.ok("certified base tag", "will be created on success (--tag)"))
+    else:
+        results.append(
+            CheckResult.failed("certified base tag", "no port-base-* tag at HEAD — run with --tag")
         )
-    )
 
     return results
 

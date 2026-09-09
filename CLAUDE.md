@@ -401,6 +401,18 @@ units from `docs/restructure/backlog/items/`. Each backlog item names its agent 
   `tests/unit/test_source_scan.py`. The one exception is a guard whose subject IS the prose —
   asserting an error message or an operator-facing string — which reads raw source on purpose
   and says so.
+- **A result names what it did not check (ADR 0021, accepted 2026-09-09).** A PROBE — any
+  function whose answer depends on something it had to go and look at (a subprocess, a graph
+  query, a tree scan, a network call) — returns `drydocs_core.check_outcome.CheckOutcome`:
+  checked-clean, findings, or not-checked-with-a-reason of forty characters or more. Never a
+  bare boolean, never `None` or an empty list as the way of saying "nothing looked"; `bool()`
+  on the type raises, so `if outcome:` cannot be written, and every state renders itself so a
+  surface cannot show not-checked as `0` or as PASS. Adopters are DECLARED in `PROBES` there
+  and `tests/unit/test_check_outcome.py` imports each and reads its return annotation — the
+  guard finds nothing nobody registered, which is the point: registration is the act. The
+  module sweep found this one defect shape seven times in a single cycle, with the correct
+  answer already implemented six times and written down nowhere
+  (`docs/decisions/0021-not-checked-is-not-clean.md`).
 - **Tests gate every change:** `poetry run pytest -q`, `python -c "import drydocs.cli"`,
   `drydocs --help`. The root import is ONE of eight CLI entry points — the other seven
   (`cli_shared` + the six S8 command modules) are guarded by

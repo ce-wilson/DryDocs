@@ -58,6 +58,9 @@ from typing import Final
 #: for: an exemption marker placed on purpose. ``without_prose`` and ``absent``
 #: arrived together with CORE2 and are one idea, not two: the stripper a LITERAL
 #: subject needs, and the call shape that proves the right stripper was chosen.
+#: ``return_annotation`` arrived with CORE10 (ADR 0021 D3): a guard over a declared
+#: probe registry reads each probe's return annotation from the tree, never from
+#: the prose around the def and never by guessing from its name.
 __all__ = [
     "code_only",
     "without_prose",
@@ -67,6 +70,7 @@ __all__ = [
     "comment_lines",
     "source_text",
     "absent",
+    "return_annotation",
     "CallSite",
     "MISSING",
     "NOT_CONSTANT",
@@ -288,6 +292,34 @@ def call_sites(source: str, names: Collection[str]) -> list[CallSite]:
             )
         )
     return found
+
+
+def return_annotation(source: str, name: str) -> str | None:
+    """The return annotation of the function ``name`` in ``source``, as written.
+
+    ``name`` is a bare function name or a dotted ``Class.method`` path; the
+    lookup walks the tree, so a function named only in a comment, a docstring or
+    a string is never found (J66). Returns ``None`` for a function that carries no
+    annotation - a distinct answer from "no such function", which raises
+    ``LookupError``, because a guard that read the missing function as
+    "unannotated" would fail for the wrong reason and a guard that read it as
+    "annotated" would pass on nothing (ADR 0021 D3, the probe registry's guard).
+    """
+    parts = name.split(".")
+    scope: ast.AST = ast.parse(source)
+    for i, part in enumerate(parts):
+        found = None
+        for node in ast.iter_child_nodes(scope):
+            if isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef):
+                if node.name == part:
+                    found = node
+                    break
+        if found is None:
+            raise LookupError(f"no def or class named {'.'.join(parts[: i + 1])!r} in the source")
+        scope = found
+    if not isinstance(scope, ast.FunctionDef | ast.AsyncFunctionDef):
+        raise LookupError(f"{name!r} is a class, not a function")
+    return ast.unparse(scope.returns) if scope.returns is not None else None
 
 
 def comment_lines(source: str) -> dict[int, str]:

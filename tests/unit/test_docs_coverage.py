@@ -430,3 +430,43 @@ def test_the_live_coverage_census_is_pinned() -> None:
         "product. Update census.docs_coverage in config/dev-environment.yaml deliberately "
         "and say why in the commit - never this test (PLAN9)."
     )
+
+
+# --- CORE10 (ADR 0021): layer 2 is a probe and says what it did not check ---------
+
+
+def test_the_graph_probe_is_the_three_outcome_type() -> None:
+    from drydocs.docs_coverage import graph_probe
+
+    off = graph_probe(None)
+    assert off.is_not_checked and "no graph seam" in off.render()
+
+    def empty(_db, _cypher, _params):
+        return []
+
+    clean = graph_probe(empty)
+    assert clean.is_clean and clean.size == 0  # an empty graph, visibly empty
+
+    def answering(_db, cypher, _params):
+        if "SoftwareProduct) WHERE" in cypher and "DESCRIBES" not in cypher:
+            return [{"product_id": "p"}]
+        return [{"product_id": "p", "corpus_id": "c", "edges": 2}]
+
+    found = graph_probe(answering)
+    assert not found.is_clean and not found.is_not_checked
+    assert found.count == 2 and found.size == 2
+
+
+def test_the_report_carries_the_probe_and_probed_is_read_off_it() -> None:
+    unprobed = coverage([_product("p", documentation={"corpus": "c"})], [_corpus("c")], run=None)
+    assert not unprobed.probed and unprobed.probe.is_not_checked
+    assert unprobed.as_dict()["probe_state"] == "not-checked"
+    assert unprobed.as_dict()["probe"].startswith("NOT CHECKED - ")
+
+    probed = coverage(
+        [_product("p", documentation={"corpus": "c"})],
+        [_corpus("c")],
+        run=lambda _db, _cypher, _params: [],
+    )
+    assert probed.probed and probed.probe.is_clean
+    assert probed.as_dict()["probe_state"] == "checked-clean"

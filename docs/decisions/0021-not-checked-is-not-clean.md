@@ -220,9 +220,14 @@ fourth state is the trigger to amend D1 rather than to add a parallel type.
 
 ## Action items (after acceptance)
 
-1. [ ] The instrument item (minted in the Lane A mint pass): the type, the registry, the guard,
-       positive and negative cases; `MODULE_MAP.md` re-rendered.
-2. [ ] The preflight adopts the type (its `_git`/`CheckResult` fix ships first, independently).
-3. [ ] `drydocs/docs_coverage.py` adopts the type; its report renders `NOT_CHECKED` per class.
-4. [ ] One citing comment at each of the six precedent sites - name only.
-5. [ ] One sentence in CLAUDE.md's working agreements pointing at this record.
+1. [x] The instrument item (minted in the Lane A mint pass): the type, the registry, the guard,
+       positive and negative cases; `MODULE_MAP.md` re-rendered. - CORE10, 2026-09-09:
+       `drydocs_core/check_outcome.py`, `PROBES`, `tests/unit/test_check_outcome.py`.
+2. [x] The preflight adopts the type (its `_git`/`CheckResult` fix ships first, independently).
+       - CORE10: `base_resolves` returns it and is registered; `CheckResult` reads its verdict off it.
+3. [x] `drydocs/docs_coverage.py` adopts the type; its report renders `NOT_CHECKED` per class.
+       - CORE10: `graph_probe` (registered); `report.probe`; the verb prints its line.
+4. [x] One citing comment at each of the six precedent sites - name only. - CORE10 placed the two
+       Lane A sites (plan_board, and the preflight's skipped suite, which adopted the type); the four
+       under Lane B pens are handed to REM3, LIN4, API5 and DEEP1 by note (one pen per surface).
+5. [x] One sentence in CLAUDE.md's working agreements pointing at this record. - CORE10.

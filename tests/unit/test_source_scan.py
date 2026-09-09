@@ -260,6 +260,7 @@ def test_the_helper_holds_the_verbs_it_has_callers_for() -> None:
         "comment_lines",
         "source_text",
         "absent",
+        "return_annotation",
         "CallSite",
         "MISSING",
         "NOT_CONSTANT",
@@ -559,3 +560,46 @@ def test_the_exemption_list_says_why_and_stays_short() -> None:
     assert set(_NOT_GUARDS) == {"test_source_scan.py"}
     for reason in _NOT_GUARDS.values():
         assert len(reason) > 40, "an exemption without a reason is an exemption nobody can review"
+
+
+# ---- return_annotation: the probe registry's verb (CORE10, ADR 0021 D3) -----------
+
+
+_PROBE_SOURCE = """
+from drydocs_core.check_outcome import CheckOutcome
+
+# a comment that mentions def probe_named_only_here() -> bool
+def annotated_probe(x) -> CheckOutcome:
+    ...
+
+def bare_probe(x) -> bool:
+    ...
+
+def unannotated_probe(x):
+    ...
+
+class Holder:
+    def method(self) -> "CheckOutcome":
+        ...
+"""
+
+
+def test_return_annotation_reads_the_def_as_written() -> None:
+    from tests.source_scan import return_annotation
+
+    assert return_annotation(_PROBE_SOURCE, "annotated_probe") == "CheckOutcome"
+    assert return_annotation(_PROBE_SOURCE, "bare_probe") == "bool"
+    assert return_annotation(_PROBE_SOURCE, "Holder.method") == "'CheckOutcome'"
+
+
+def test_an_unannotated_function_is_none_and_a_missing_one_raises() -> None:
+    """Two different answers on purpose: a guard must not read "no such function"
+    as "unannotated" (it would fail for the wrong reason) or as "annotated" (it
+    would pass on nothing)."""
+    from tests.source_scan import return_annotation
+
+    assert return_annotation(_PROBE_SOURCE, "unannotated_probe") is None
+    with pytest.raises(LookupError):
+        return_annotation(_PROBE_SOURCE, "probe_named_only_here")  # a comment is not a def
+    with pytest.raises(LookupError):
+        return_annotation(_PROBE_SOURCE, "Holder")  # a class is not a function

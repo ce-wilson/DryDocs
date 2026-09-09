@@ -426,6 +426,10 @@ def docs_coverage(
         run=run,
     )
 
+    # ADR 0021 D5: the probe's state is READ off the type and printed where a
+    # finding would be - a not-checked graph layer is a line, never a column of 0.
+    console.print(f"[dim]graph probe: {report.probe.render()}[/]")
+
     rows = report.products
     if product:
         rows = [r for r in rows if r.product_id == product]

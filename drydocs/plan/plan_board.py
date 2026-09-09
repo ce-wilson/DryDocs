@@ -201,6 +201,7 @@ def _chip(label: str, value: str) -> str:
 def _render_phase_card(phase: Phase, items: tuple[WorkItem, ...]) -> str:
     done, total = _phase_progress(phase, items)
     pct = round(100 * done / total) if total else 0
+    # ADR 0021 precedent 5: 'no items' rather than 0 / 0 - a state, not a number. Name only.
     progress_text = f"{done} / {total}" if total else "no items"
     release = f'<span class="release">{_esc(phase.release)}</span>' if phase.release else ""
     return (

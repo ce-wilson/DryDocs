@@ -46,7 +46,12 @@ between honest reporting and calling a ruled topology "missing data".
 and reusing its :func:`~drydocs_core.docs_verify.count_query` verbatim so the two
 verbs can never disagree about whether a corpus is loaded. When it does not run,
 every graph-derived field is ``None`` — the explicit ``not-probed`` sentinel,
-**never 0**, because a 0 there is a false claim of absence.
+**never 0**, because a 0 there is a false claim of absence. Since CORE10 (ADR 0021)
+the probe itself is :func:`graph_probe`, a registered probe returning
+:class:`~drydocs_core.check_outcome.CheckOutcome`: NOT_CHECKED with the reason when
+no seam is given, FINDINGS carrying the rows when the graph answers, CHECKED_CLEAN
+over zero when it holds neither a product node nor an edge. ``None`` on the row is
+the same fact expressed through the type on the report (``report.probe``).
 
 THE LADDER. ``coverage`` is the GOVERNING state (first match wins); ``blockers``
 lists EVERY wall, so a row shows all of them rather than only the first.
@@ -72,6 +77,7 @@ from __future__ import annotations
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import asdict, dataclass, field
 
+from drydocs_core.check_outcome import CheckOutcome, checked_clean, findings, not_checked
 from drydocs_core.docs_verify import locator_of
 
 #: The database the software registry writes (`software_registry.cypher`).
@@ -228,6 +234,13 @@ class CoverageReport:
     systems: list[SystemRow] = field(default_factory=list)
     corpora_total: int = 0
     probed: bool = False
+    #: CORE10 (ADR 0021): layer 2's own answer, as the three-outcome type. `probed`
+    #: is READ off it - kept as a field because every consumer already reads it.
+    probe: CheckOutcome = field(
+        default_factory=lambda: not_checked(
+            "the report was built without a graph seam, so layer 2 never ran"
+        )
+    )
 
     def summary(self) -> dict[str, int]:
         by_state = {state: 0 for state in LADDER}
@@ -265,6 +278,8 @@ class CoverageReport:
             "corpora": [asdict(r) for r in self.corpora],
             "systems": [asdict(r) for r in self.systems],
             "probed": self.probed,
+            "probe": self.probe.render(),
+            "probe_state": self.probe.state.value,
             "summary": self.summary(),
             "reconciles": self.reconciles(),
         }
@@ -311,7 +326,8 @@ def coverage(
     registry_db: str = REGISTRY_DB,
 ) -> CoverageReport:
     """Build the coverage report. Layer 1 always; Layer 2 only when ``run`` is given."""
-    report = CoverageReport(probed=run is not None)
+    probe = graph_probe(run, registry_db)
+    report = CoverageReport(probed=not probe.is_not_checked, probe=probe)
 
     corpora_by_id = {}
     for entry in corpora:
@@ -340,19 +356,16 @@ def coverage(
         for key in keys:
             locators_by_product.setdefault(target, []).append(str(locator.get(key)))
 
-    # --- graph probe (Layer 2), once ------------------------------------------
+    # --- graph probe (Layer 2), once - read off the probe's findings ---------
     edges_by_product: dict[str, dict[str, int]] = {}
     product_nodes: set[str] = set()
-    if run is not None:
-        for row in run(registry_db, _PRODUCT_NODES_CYPHER, {}) or []:
-            pid = row.get("product_id")
-            if pid:
-                product_nodes.add(str(pid))
-        for row in run(registry_db, _EDGE_ATTRIBUTION_CYPHER, {}) or []:
-            pid = str(row.get("product_id") or "")
-            cid = str(row.get("corpus_id") or EDGE_CORPUS_UNKNOWN)
-            edges = int(row.get("edges") or 0)
-            edges_by_product.setdefault(pid, {})[cid] = edges
+    for found in probe.findings:
+        if found["kind"] == "product-node":
+            product_nodes.add(found["product_id"])
+        else:
+            edges_by_product.setdefault(found["product_id"], {})[found["corpus_id"]] = found[
+                "edges"
+            ]
 
     declared_corpora: set[str] = set()
 
@@ -413,6 +426,42 @@ def coverage(
         )
 
     return report
+
+
+def graph_probe(
+    run: Callable[[str, str, dict], list[dict]] | None, registry_db: str = REGISTRY_DB
+) -> CheckOutcome:
+    """Layer 2 as a probe (ADR 0021; registered in drydocs_core.check_outcome.PROBES).
+
+    NOT_CHECKED with the reason when there is no seam to run through - the report
+    then says "graph not probed" everywhere a count would go, never 0. FINDINGS
+    carrying every product node and every DESCRIBES attribution row when the graph
+    answers, with the size. CHECKED_CLEAN over zero when it answers and holds
+    neither - an honest empty graph, visibly empty.
+    """
+    if run is None:
+        return not_checked(
+            "no graph seam was given (--no-graph, or the database was unreachable), so "
+            f"layer 2 never queried {registry_db}"
+        )
+    rows: list[dict] = []
+    for row in run(registry_db, _PRODUCT_NODES_CYPHER, {}) or []:
+        pid = row.get("product_id")
+        if pid:
+            rows.append({"kind": "product-node", "product_id": str(pid)})
+    for row in run(registry_db, _EDGE_ATTRIBUTION_CYPHER, {}) or []:
+        rows.append(
+            {
+                "kind": "describes-edges",
+                "product_id": str(row.get("product_id") or ""),
+                "corpus_id": str(row.get("corpus_id") or EDGE_CORPUS_UNKNOWN),
+                "edges": int(row.get("edges") or 0),
+            }
+        )
+    subject = f"{registry_db}: product nodes and DESCRIBES attribution rows"
+    if not rows:
+        return checked_clean(size=0, subject=subject)
+    return findings(rows, size=len(rows), subject=subject)
 
 
 _PRODUCT_NODES_CYPHER = """
