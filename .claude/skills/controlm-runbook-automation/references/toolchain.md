@@ -67,11 +67,19 @@ attachment set) that a human pastes/attaches into it. No Jira API dependency
 now; an optional "post comment to existing issue key" automation is a later,
 separate decision.
 
-## §SKILLS — skill layer (no new skill needed yet)
+## §SKILLS — skill layer (two output-format siblings have since landed)
+
+The heading here read "no new skill needed yet" until 2026-09-09. Two did:
+`-excel` (2026-08-04) and `-SDLC` (2026-09-09), one per output format. Neither
+changes this skill's role — it still owns the plan, the toolchain and the
+fix-package contract — but a reader following the old heading would look for
+runbook generation in this directory and not find it.
 
 | Skill | Role in this build |
 |---|---|
 | `controlm-runbook-automation` (this) | owns the plan, this toolchain, and the fix-package contract |
+| `controlm-runbook-automation-excel` | the SHORT output format: the 2-tab folder-grain workbook |
+| `controlm-runbook-automation-SDLC` | the LONG output format: the SDLC Application Run Book document |
 | `controlm-db` | schema map + SQL patterns for every extract C1/C2 need |
 | `data-context-extractor` | `:DataAsset` conventions and edge vocabulary for C2's proposals |
 | `xlsx` / `docx` | artifact generation mechanics in C1 |
