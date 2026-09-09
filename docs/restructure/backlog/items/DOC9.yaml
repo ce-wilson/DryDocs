@@ -7,7 +7,7 @@ phase: 10
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - scripts/render_design_doc.py
@@ -42,3 +42,56 @@ notes: |
   lives beside tests/unit/test_design_doc.py and the surfaces are docs/design/. phase 10 /
   doc-infrastructure with the rest of Epic L. p2 - a stale governed render breaks HITL feedback
   re-attachment silently, which is the failure the ritual exists to prevent.
+
+  DONE on wip/doc9-laptop (Lane B, laptop, 2026-09-09). Six tests appended to
+  tests/unit/test_design_doc.py; all 26 committed pages were byte-identical at the claim,
+  so the guard arrives green rather than red-then-fixed.
+
+  (c) RULED STRICT, and the item's own test case is what settled it - in the opposite
+  direction from the way it was posed. A .md that changes only its `Rev N` line moves both
+  the printed footer and sme_feedback_filename (`<doc>-rev<N>.yaml`), so a stale page at a
+  rev bump hands the SME paper whose margin tags and feedback filename name the PREVIOUS
+  revision. Feedback attributed to the wrong rev is the exact failure the L5/L6 loop exists
+  to prevent, which makes the rev-only edit the WORST case for tolerance rather than the
+  candidate for it. Y5's relaxation does not transfer: a claim ships un-rendered because the
+  claim protocol REQUIRES it (it is the only channel between the two machines), and a design
+  doc has no equivalent one-key edit. The ruling is in the guard's docstring and pinned by
+  test_a_rev_bump_alone_is_drift_because_the_tolerance_is_strict.
+
+  (b) BYTES, with one case NAMED but not tolerated. The report says when a difference is CR
+  bytes only, because test_render_determinism::test_committed_surfaces_carry_no_cr_byte
+  already owns docs/design/*.html for that and a CRLF checkout must not read as a restyle.
+  Naming a case is diagnosis; tolerating it would be the normalization the clause forbids.
+
+  IN MEMORY AS ASKED, PLUS A PIN. _fresh_page restates write_doc's two choices (doc_id is the
+  .md stem, output is LF), so on its own it could drift from the writer and the guard would
+  compare happily against bytes nobody ships. test_the_in_memory_page_is_what_write_doc_commits
+  holds the two together on the real Control-M TDD, so the writer cannot move without breaking
+  a test first.
+
+  (d) The fixture hand-edit is ONE TRAILING NEWLINE, deliberately. A restyled <style> block
+  fails any comparison at all and would prove nothing about (b); only a whitespace-only edit
+  distinguishes byte-strict from whitespace-tolerant. Positive control also run on the real
+  guard: one appended newline on docs/design/drydocs-core-runbook.html turned
+  test_committed_design_pages_match_their_sources red with a readable report, then reverted.
+
+  VERIFIED: full suite 3883 passed / 15 skipped / 0 failed; the J57 family plus
+  test_skip_guard_policy and test_never_port_citations, 73 passed; ruff check and
+  ruff format --check clean.
+
+  FOR LANE A - A PORT CONSEQUENCE, NOT A MANIFEST WRITE (the `port` pen is Lane A's, so this
+  is a note as ruled). tests/** is `evaluate`, so this guard CROSSES. Company-side it will
+  demand that every committed docs/design/*.html equals a fresh render of the company's own
+  .md - which is precisely what PORT-MANIFEST.yaml already rules: docs/design/** is
+  `evaluate`, controlm-ingestion-tdd.md is `canonical-company` and AHEAD of the producer copy,
+  and its .html is `disposition: derived` with the note "regenerate consumer-side, never take
+  the producer render". So the guard makes that existing disposition executable for the first
+  time. The consequence to expect: if any consumer page was ever TAKEN rather than
+  regenerated, the first port after this lands goes red on that stem - a true finding, and the
+  fix is to run `poetry run python scripts/render_design_doc.py docs/design/*.md` on that
+  side, never to relax the guard. Worth a line in the port relay so it is not read as a
+  producer defect (J63: absent-here vs not-yet-ported, inverted).
+
+  NOT DONE, deliberately: docs/design/*.html is a derived render on Lane A's fence, and
+  nothing needed regenerating anyway. No new tracked path, so no PORT-MANIFEST row to hand
+  back. The fixtures live in tmp_path.
