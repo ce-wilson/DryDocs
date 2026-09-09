@@ -8,7 +8,7 @@ phase: 10
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on:
 - V1
 inputs:
@@ -17,4 +17,84 @@ inputs:
 - docs/design/drydocs-cmdline-resolution-runbook.md
 acceptance: |
   Per V1's disposition: a module-level drydocs-lineage runbook exists that either absorbs or explicitly indexes the two chain-scoped runbooks (lineage-mac, cmdline-resolution) so an SME landing on the module finds one entry point; outline-conformant, rendered, stale-render-clean; drydocs-lineage off RUNBOOK_PENDING. No procedure duplicated across the three — chain runbooks keep their depth, the module runbook routes.
-notes: Groomed 2026-07-29 (Epic V).
+notes: |
+  Groomed 2026-07-29 (Epic V).
+
+  DONE on wip/v6-laptop (Lane B, laptop, 2026-09-09). docs/design/drydocs-lineage-runbook.md
+  (Rev 1, 322 lines), the two V1 map edits, and reciprocal pointers in both chain runbooks.
+
+  (a) INDEX WAS THE RIGHT CALL, BUT THE PAGE IS NOT AN INDEX - and a measurement settled it
+  rather than the item's phrasing. NEITHER chain runbook names `lineage-extract` or
+  `lineage-load` (both postdate lineage-mac Rev 3, 2026-07-23), and between them they name
+  TWO of the eleven extractor modules. So the module page ROUTES to the two chains in a
+  three-row table and OWNS what no chain covers: the LIN1/LIN2 verb chain, the read zones,
+  the curation gate, the write boundary, retention and rollback. Absorbing the two would
+  have produced one document at three scopes; a pure index would have left the module's
+  actual operate surface undocumented, which is the state V1 put it in RUNBOOK_PENDING for.
+
+  (b) MEASURED, NOT TRANSCRIBED, and the venue is named (J18): laptop, bundled samples, no
+  Neo4j, no company data. 33 processes / 0 data assets / 17 rels staged; the plan with all
+  17 confirmed (6 Script, 10 ETLProcess, 8 statements); the G121 zone refusal verbatim; the
+  empty-confirmed-set refusal; the review page at 24 KB, coverage rows=17. Steps 1-3 need
+  no database, so a reader in any clone reproduces the page except the gated write.
+
+  (c) THE AWKWARD FACT IS STATED, as V7 did for remediation's single verb. `lineage-extract`
+  reaches FOUR of the eleven extractors; `controlm_xml` is reached by two OTHER modules'
+  verbs (resolve-cmdline-staging, profile-folder-set); and SEVEN files - six extractors plus
+  archival.py - are behind no command at all. Appendix A censuses all twelve files with what
+  each reads and what reaches it. Implying a verb per extractor was the easier document.
+
+  (d) ONE STALE CLAIM CORRECTED, AS A POINTER RATHER THAN A RESTATED STATUS. lineage-mac's
+  Rev 3 says the m3_* vocabulary is planned and "the live load REFUSES by design". Measured
+  through the importable object (`gate_bound_labels(VOCAB_IDS)`): four of five labels are
+  ACTIVE and only TRIGGERS (`scheduler_triggers`) is `planned`. The Rev note says so WITHOUT
+  listing labels, and the module page's Verify step is written as "run the plan and read the
+  GATE-BOUND lines" - the plan computes them from the registry every run, and J70/Y3 are
+  live in Lane A's queue, so any status hardcoded here could move before merge.
+
+  (e) BOTH V1 MAP EDITS SHIP IN ONE COMMIT because either alone reds the guard:
+  drydocs-lineage leaves RUNBOOK_PENDING (shrink-only, N2's LEDGER_PENDING idiom), and the
+  new file gains a RUNBOOK_DISPOSITION row. The two chain rows stay `satisfies: None` and
+  their files still carry no `- **Module:**` line - the guard checks that direction too.
+
+  FIVE CLAIMS I ASSERTED WITHOUT MEASURING; FOUR WERE WRONG (fixed at 749e06e1, which names
+  them rather than amending the pushed commit). All five sat in sentences the front matter
+  says were RUN, which is the point:
+
+    1. THE COUNT, IN THE PAGE'S OWN THESIS. `extractors/` holds ELEVEN modules - I counted a
+       directory listing that included `__init__.py`. The disposition reason carried the same
+       error and then GUESSED how many extractors the chain runbooks name; I corrected it
+       once to "seven" before measuring, which gave "two". Guessing twice about the same
+       number is worse than the original error.
+    2. THE REGISTRY HOP IS GUARDED DIFFERENTLY. I wrote that config/data-zones.yaml declares
+       all five hops. There is no `dpl-registry` data zone: an explicit --registry-root is
+       checked against the MANUAL landing zones dpl:pipeline-registry / dpl:dataset-registry.
+       Both resolve to the same directory, so the PATH was right and the DECLARATION was not.
+    3. `landing-zones` PRINTS TWO TABLES and the hops split across both.
+    4. DETERMINISM WAS OVERSTATED - transcribed from staging.py's docstring. Two extracts
+       differ, and must: run_id, captured_at, code_commit. The GRAPH block is identical and
+       the header difference IS the provenance a load names.
+    5. ROLLBACK NAMED THE WRONG ID, contradicting step 4 four sections earlier. Nodes carry
+       `extract_run_id`; `load_run_id` keys the :JobRun bracketing the write. It now also
+       states there is NO withdraw verb rather than implying one.
+
+  AND ONE THE REPO'S OWN GUARD CAUGHT FIRST: test_runbook_currency refused eleven backticked
+  census paths written relative to the table's `drydocs_lineage/` header. Backticks are an
+  existence claim about the REPO, not about a table's implied prefix. Same guard that caught
+  the S5 split in the document explaining the S5 split.
+
+  VERIFIED: full suite 3877 passed / 15 skipped / 0 failed. The J57 family +
+  test_skip_guard_policy + test_never_port_citations + test_doc_outline +
+  test_runbook_coverage + test_runbook_currency + test_design_doc = 135 passed, then 67
+  after the fix pass. The Verify one-liner run with DRYDOCS_DATA_ROOT UNSET: 77 passed.
+  `ruff check .` and `ruff format --check .` clean.
+
+  RENDER IS LANE A'S, AND THIS ITEM ADDS THREE STEMS. Proven to render in memory via
+  `render_doc` (no write - the pen is A's): drydocs-lineage-runbook 40269 bytes with NO
+  committed .html; drydocs-lineage-mac-runbook 32508 committed vs 33261 fresh;
+  drydocs-cmdline-resolution-runbook 27909 vs 28270. With DOC9 merged,
+  test_committed_design_pages_match_their_sources goes RED on all three until
+  render_design_doc.py runs at the merge - a green branch is not evidence about the merged
+  tree. The acceptance's "rendered, stale-render-clean" clause discharges at A's merge.
+
+  No new tracked code path, no PORT-MANIFEST row, no IDEAS.md append, no board render.

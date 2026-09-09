@@ -13,7 +13,11 @@
 - **Audience:** anyone turning verbatim Control-M `CMD_LINE`s into resolved,
   parseable, structured job detail — producer-side with synthetic data, or
   company-side against the real graph + XML exports
-- **Companion:** `drydocs/cmdline_staging.py` (the store + all three steps),
+- **Companion:** `docs/design/drydocs-lineage-runbook.md` — **the module runbook, and the
+  entry point**: this chain borrows ONE extractor from drydocs-lineage (the G47 XML seam)
+  and writes a SQLite store, never that module's staged artifact, so it is a neighbour
+  rather than a hop. The module page routes here and does not restate any of it. Also
+  `drydocs/cmdline_staging.py` (the store + all three steps),
   `drydocs_core/orchestration/controlm/resolver.py` (the ONE resolver, G46),
   `drydocs_lineage/extractors/controlm_xml.py` (the XML seam, G47),
   `config/gate-prompts/rua-load-shapes.yaml` (G22 — the terminus any load waits on)

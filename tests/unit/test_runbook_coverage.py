@@ -99,7 +99,6 @@ RUNBOOK_PENDING: frozenset[str] = frozenset(
     {
         "drydocs-review",  # V4
         "drydocs-docgen",  # V5
-        "drydocs-lineage",  # V6 — two chain-scoped runbooks exist; neither covers the module
         "drydocs-docmeta",  # BUILT at Q6; no V-item yet, so this list is where it is visible
     }
 )
@@ -161,6 +160,21 @@ RUNBOOK_DISPOSITION: dict[str, tuple[str | None, str, str]] = {
         "the module has exactly ONE registered CLI verb (profile-folder-set) and the batch "
         "is a library API, so the procedure is written as Python calls -- implying a verb "
         "that does not exist would have been the easier document and the wrong one",
+    ),
+    "drydocs-lineage-runbook.md": (
+        "drydocs-lineage",
+        "drydocs-lineage",
+        "V6 ruled INDEX-AND-OWN rather than absorb: the two chain-scoped runbooks keep "
+        "their depth and this one routes to them in a table, because absorbing them would "
+        "have produced one document at three different scopes. It is not only an index -- "
+        "the measurement that settled it is that NEITHER chain runbook names lineage-extract "
+        "or lineage-load (both postdate lineage-mac Rev 3), and between them they name only "
+        "two of the eleven extractor modules (dpl_mac, controlm_xml) -- so the module runbook "
+        "OWNS the LIN1/LIN2 verb chain, the read "
+        "zones, the curation gate and the write boundary. Like V7 it states the awkward fact "
+        "rather than hiding it: lineage-extract reaches four of the eleven extractors, one "
+        "more is reached only by other modules' verbs, and the remaining six plus archival.py "
+        "are library seams with no command, censused in Appendix A",
     ),
     "drydocs-mapping-store-runbook.md": (
         None,

@@ -15,12 +15,21 @@
   post-G14 file-ops pass, post-G15 launcher contract, post-G17 MAC ingest seam.
   The m3_* lineage vocabulary is `status: planned` — the live load REFUSES by
   design until the HITL gate flips it)
+- **Rev note, 2026-09-09 (V6):** that last clause was a blanket claim and is no longer
+  true of every label — measured on this tree, four of the five are active and one is
+  still `planned`, so a live load refuses SOME labels and writes the rest. Deliberately
+  not restated here as a list, because the status moves when a gate signs: the plan
+  print computes it from the registry on every run, and the module runbook's Verify
+  section says how to read it.
 - **Classification:** Internal-Public (mechanism only — every example value is
   synthetic; real jobs CSVs and MAC JSON exports are internal-confidential and live
   OUT of the repo tree, never in this doc)
 - **Audience:** whoever runs the lineage ingest — producer-side against synthetic
   fixtures, company-side against real psgmgr extracts and DPL Metadata-As-Code sets
-- **Companion:** `docs/design/drydocs-startup-refresh-runbook.md` (container, schema
+- **Companion:** `docs/design/drydocs-lineage-runbook.md` — **the module runbook, and the
+  entry point**: this page is CHAIN-scoped (jobs CSV + DPL MAC), and the module page owns
+  the verb chain, the read zones, the curation gate and the write boundary. Also
+  `docs/design/drydocs-startup-refresh-runbook.md` (container, schema
   bootstrap — prerequisite for the load step only),
   `docs/restructure/03-hitl-sme-flow.md` (the gate that unlocks the load),
   `drydocs_lineage/extractors/dpl_mac.py` (the assumed MAC field contract),
