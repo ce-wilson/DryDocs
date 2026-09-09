@@ -292,11 +292,15 @@ def test_sample_reproduces_depgraph_oracle() -> None:
     import csv
     from pathlib import Path
 
-    import pytest
-
-    sample = Path("drydocs/data/samples/controlm_jobs__sample.csv")
-    if not sample.exists():
-        pytest.skip("gitignored production sample not present")
+    # CORE9: the guard here is GONE, and its reason was wrong twice over — the
+    # file is neither a production sample nor absent. It is the TRACKED bundled
+    # fixture, present in every clone, so the skip could never fire and the
+    # assertions below were protected by nothing.
+    # Anchored at the repo rather than CWD for the same reason as
+    # test_email_concerns.py: the guard was masking the difference, and removing
+    # it without anchoring would trade a skip that never fired for a failure that
+    # depends on where pytest was launched.
+    sample = Path(__file__).resolve().parents[2] / "drydocs/data/samples/controlm_jobs__sample.csv"
     rows = list(csv.DictReader(sample.open(encoding="utf-8-sig")))
     invocations = []
     for row in rows:
