@@ -6,6 +6,7 @@
     .\snapshot.ps1                       # FULL FILE TREE (repo root)       -> drydocs-YYYYMMDD.json
     .\snapshot.ps1 -CodeOnly             # legacy: the 7 package roots, .py -> drydocs-code-YYYYMMDD.json
     .\snapshot.ps1 -Project myproj       # override the project name
+    .\snapshot.ps1 -AllowDirty           # scan a tree with tracked changes anyway (header says dirty=true)
 
   THE FULL TREE IS THE DEFAULT (SME direction). It is a strict SUPERSET of the
   old roots-only scan: same import edges, plus directories, plus CONTAINS, plus
@@ -43,11 +44,16 @@
     J65 — clear an inherited VIRTUAL_ENV before the first `poetry run`, so a
          PowerShell caller with the desktop's leak resolves the project environment
          instead of failing every refresh step on a missing module.
+    J64 — REFUSE to scan a tree with tracked changes: the header names HEAD as the
+         tree scanned, and with tracked changes that is a claim about a tree no
+         commit describes. Commit first, then scan. -AllowDirty downgrades it to
+         a warning for a deliberate mid-work comparison; the header says dirty=true.
 #>
 [CmdletBinding()]
 param(
   [string]$Project = "drydocs",
-  [switch]$CodeOnly
+  [switch]$CodeOnly,
+  [switch]$AllowDirty
 )
 # The full tree is the default; $Tree stays as the internal name because it is
 # what depgraph's flag and the meta header are both called.
@@ -609,6 +615,42 @@ if (-not $describe) { $describe = $commit }
 $state     = Get-WorktreeState $repo
 $dirty     = $state.dirty
 $untracked = $state.untracked_present
+# --- scan AFTER the commit it stamps, never before (J64, 2026-09-08) ----------
+# The header names $commit as the tree that was scanned. That is true only when
+# no tracked file differs from HEAD: with tracked changes present, the scan
+# measures a tree that no commit describes, and the stamp becomes a claim about
+# a tree nobody scanned. `dirty` has recorded this since U15 and nothing read
+# it - the 20260805 snapshot carried dirty=true and was committed as if clean -
+# and on 2026-08-29 a snapshot scanned from a tree that predated main's
+# 2026-08-26 rename sweep named the retired org directory, tripped the J55
+# publish guard, and had to be deleted and regenerated against the merge commit
+# (2b06c153). So the ordering is ENFORCED here rather than left to the ritual's
+# prose: tracked changes at scan time REFUSE, naming the paths, and the fix is
+# the ritual's own order - commit (the refresh steps above may have just
+# rewritten a stale render, which is the usual way to land here), then re-run.
+# -AllowDirty downgrades the refusal to a warning for a deliberate mid-work
+# comparison scan; the header still records dirty=true, so the artifact says
+# what it is. Untracked paths do not trigger this: the snapshot being written is
+# itself untracked until it is added, and untracked_present records them anyway.
+if ($dirty) {
+  $dirtyPaths = @(git status --porcelain --untracked-files=no | ForEach-Object { "    " + $_ })
+  $shown = if ($dirtyPaths.Count -gt 12) { @($dirtyPaths[0..11]) + @("    ... and {0} more" -f ($dirtyPaths.Count - 12)) } else { $dirtyPaths }
+  $dirtyMsg = @"
+tracked changes present at scan time - the header would name commit $commit for a tree that commit does not describe.
+
+$($shown -join "`n")
+
+The scan must run against the tree of the commit it stamps: commit first (if the
+refresh steps above rewrote a stale render, that refresh is what to commit), then
+re-run this script. -AllowDirty scans anyway and records dirty=true in the header.
+"@
+  if ($AllowDirty) {
+    Write-Warning ("SCANNING A DIRTY TREE (-AllowDirty): " + $dirtyMsg)
+  } else {
+    Pop-Location
+    throw ("Refusing to scan - " + $dirtyMsg)
+  }
+}
 $pr = $null
 $m = [regex]::Match(((git log -20 --format="%s %b") -join "`n"), '(?:pull request |PR ?#|\(#)(\d+)')
 if ($m.Success) { $pr = [int]$m.Groups[1].Value }

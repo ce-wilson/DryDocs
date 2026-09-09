@@ -14,6 +14,17 @@ project to a Neo4j-style dependency model + machine-first JSON).
 .\snapshot.ps1 -CodeOnly  # -> drydocs-code-YYYYMMDD.json (legacy comparison shape: the 7 package roots, .py only)
 ```
 
+**It scans AFTER the commit it stamps, and refuses otherwise (J64).** The `meta.git` header
+names HEAD as the tree that was scanned, which is only true when no tracked file differs from
+HEAD. With tracked changes present the script REFUSES, lists the paths, and says what to do:
+commit (a stale render the refresh steps just rewrote is the usual case), then re-run. This
+replaced a silent `dirty: true` in the header that nothing read: the 20260805 snapshot carried
+it and was committed as if clean, and on 2026-08-29 a snapshot scanned from a tree predating
+main's rename sweep named a retired directory, tripped the J55 publish guard, and had to be
+regenerated against the merge commit. `-AllowDirty` downgrades the refusal to a warning for a
+deliberate mid-work comparison scan; the header still records `dirty: true`. Untracked paths
+never trigger it (the snapshot being written is one).
+
 **It reports CI before it writes (Idea-111).** Immediately before the snapshot, the script runs
 `gh run list --branch main` and prints the conclusion of the run **for HEAD's own sha** — so
 "GREEN" means green at what you just pushed, never green at somebody else's older commit. It is
