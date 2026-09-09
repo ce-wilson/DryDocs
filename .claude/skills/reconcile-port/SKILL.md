@@ -32,6 +32,13 @@ the accumulated lessons from prior ports. Read both.
    zero-fail acceptance contract and read as port-introduced.
    If producer HEAD has moved past the tag, that is NORMAL: those commits ride the
    next port, not this one.
+   **The roll names the commits in the range that were RED at push, or says none
+   were (J77, from the eighth roll on).** Read that line before any `git bisect`
+   through the range: a red commit inside it is one bisect lands on and blames, and
+   a port range crosses the `--no-ff` merge boundary that otherwise keeps such commits
+   off `main`'s first-parent line. It is a convention the producer session writes, not
+   a guard - a roll from the eighth on that lacks the line has an unverified range,
+   not a green one.
 2. **Read the manifest first:** `git show cewilson/main:PORT-MANIFEST.yaml` —
    the machine-readable disposition per path (first match wins; `**` spans
    separators, `*`/`?` do not; per-entry rows FORBID whole-file checkout).

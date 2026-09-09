@@ -76,6 +76,23 @@ moved 42 → 45 commits mid-hold and every prompt had to carry an awkward "verif
 producer is still committing". A tag is immutable and certified; if HEAD has moved past
 it, those commits ride the NEXT port, which is normal rather than a discrepancy.
 
+**A ROLL NAMES ITS RED COMMITS (J77, 2026-09-08).** Wherever a roll describes a
+commit range (the `LEDGER ROLLED` note, a roll relay, a `PORT-REPORT`), one sentence
+names the commits inside the range that were RED at push - CI failed at that sha, or
+the sha was never verified - or states that none were, written by the session that made
+them, the way the session that re-mints ids names the range it re-minted. The reason is
+`git bisect`: a red commit inside the range is one bisect will land on and misattribute,
+and the consumer's range is exactly the one that crosses it. This is a CONVENTION, NOT A
+GUARD, on purpose: a guard written red first and turned green in the same commit is
+normal practice here (J68 was written that way), so the fact that matters - was it green
+by the time the range closed - is one only the author knows. What mostly neutralizes it:
+`--no-ff` merges keep a branch's red commits off `main`'s first-parent line, so
+`git bisect --first-parent` never visits them; the exposure that remains is bisecting the
+branch itself, or a range that crosses the merge boundary, which a port range does. Starts
+forward with the eighth roll; the rolls before it carry no such line and none is added.
+Observed on `feat/ui-web` (2026-09-01): `e7e95f07` and `f44fb40d` red on
+`test_ui_components`, `e0c12d10` the green tip.
+
 **ONE OWNER PER PHASE (J41).** A port plan names exactly ONE owner per phase and NEVER
 crosses the repo boundary. If a phase's owner differs from the phase before it, the plan
 ENDS there and a new plan begins after the handoff. A plan that cannot name one owner per

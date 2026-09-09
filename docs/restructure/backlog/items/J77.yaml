@@ -8,7 +8,7 @@ phase: 8
 agent: main
 model: haiku
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - docs/port/port-prompt.md
@@ -46,3 +46,21 @@ notes: |
   sha, warn-only, immediately before snapshot.ps1 writes. It does exactly what it claims,
   per push. Nothing aggregates the answers, and this item does not build an aggregator.
   Related: Idea-111, Idea-229 (the same verification channel, seen where a run has NO verdict).
+  DONE 2026-09-08 (desktop, Lane A).
+  (a) One paragraph, A ROLL NAMES ITS RED COMMITS (J77), in docs/port/port-prompt.md
+      beside THE BASE IS A TAG, NOT HEAD (J41) - the block every roll is authored
+      against - and one bullet in .claude/skills/reconcile-port/SKILL.md Procedure step 1,
+      where the consumer checks the base before touching the range. The sentence: name
+      the commits inside the range that were RED at push (or never verified), or state
+      that none were, written by the session that made them, like a re-minted id range.
+  (b) Says NOT A GUARD on the line, with the J68 reason: a guard written red and turned
+      green in the same commit is normal here, so only the author knows whether the
+      range closed green.
+  (c) Names the neutralizer: --no-ff merges keep red commits off main's first-parent
+      line, so git bisect --first-parent never visits them; the exposure is bisecting
+      the branch itself or a range crossing the merge boundary, which a port range does.
+  (d) Written where a roll is authored, with the bisect consequence as the one-line
+      reason; starts forward with the eighth roll, no earlier roll is annotated. The
+      feat/ui-web observation (e7e95f07, f44fb40d red; e0c12d10 green tip) is cited
+      as the case. No script generates the roll paragraph (grep of drydocs/port/*.py and
+      scripts/port_preflight.py), so prose is the only place the convention can live.
