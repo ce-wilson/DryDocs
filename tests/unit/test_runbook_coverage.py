@@ -97,7 +97,6 @@ MODULE_EXEMPT: dict[str, str] = {
 #: without a backlog item that says who writes it.
 RUNBOOK_PENDING: frozenset[str] = frozenset(
     {
-        "drydocs-review",  # V4
         "drydocs-docgen",  # V5
         "drydocs-docmeta",  # BUILT at Q6; no V-item yet, so this list is where it is visible
     }
@@ -175,6 +174,21 @@ RUNBOOK_DISPOSITION: dict[str, tuple[str | None, str, str]] = {
         "rather than hiding it: lineage-extract reaches four of the eleven extractors, one "
         "more is reached only by other modules' verbs, and the remaining six plus archival.py "
         "are library seams with no command, censused in Appendix A",
+    ),
+    "drydocs-review-runbook.md": (
+        "drydocs-review",
+        "drydocs-review",
+        "V4: the module WHOLE -- the gate-page renderer, the graph-acceptance suites, the "
+        "SME review page, the review backbone and column ledgers, the FID/run-as "
+        "measurements, and the docs-publish chain. Two facts it states rather than hides, "
+        "both measured: twelve modules share exactly ONE registered verb (fid-census, and "
+        "the CLI still imports it through the ADR 0018 D4 shim), so every procedure is "
+        "written as Python calls; and graph-tests/ -- mapped to this module in "
+        "component_map.py -- has NO runner at all, so the runbook ships the loop that "
+        "produced its own numbers. It also corrects its item's premise: the acceptance "
+        "asked for the Confluence base URL 'as config' and there is no such key "
+        "producer-side, because the real publisher is a company-side gitignored twin "
+        "implementing the Publisher protocol",
     ),
     "drydocs-mapping-store-runbook.md": (
         None,
