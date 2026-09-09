@@ -1,6 +1,6 @@
 ---
 name: controlm-runbook-automation-excel
-description: "COMPANY-SPECIFIC: produce or fill the MINIMUM VIABLE Control-M application runbook — the 2-tab Excel workbook (Technical_Details + Control M Job details) support teams exchange at the folder grain. Use when: (1) generating the 2-tab Excel runbook for a Control-M folder/application from the graph, (2) filling or auditing an existing workbook of this shape (which columns the graph answers vs which need SME capture), (3) changing the template itself (template-spec.yaml -> generate_template.py -> controlm-runbook-template.xlsx), or (4) mapping a workbook column to its system of record. Sibling of controlm-runbook-automation (the pipeline/fix-package skill; a future -SDLC sibling owns the long-form Word/markdown run book). Mechanism-only in committed files; FILLED workbooks are Internal and live in internal-local/ or internal/."
+description: "COMPANY-SPECIFIC: produce or fill the MINIMUM VIABLE Control-M application runbook — the 2-tab Excel workbook (Technical_Details + Control M Job details) support teams exchange at the folder grain. Use when: (1) generating the 2-tab Excel runbook for a Control-M folder/application from the graph, (2) filling or auditing an existing workbook of this shape (which columns the graph answers vs which need SME capture), (3) changing the template itself (template-spec.yaml -> generate_template.py -> controlm-runbook-template.xlsx), or (4) mapping a workbook column to its system of record. Sibling of controlm-runbook-automation (the pipeline/fix-package skill) and of controlm-runbook-automation-SDLC, which owns the long-form Word/markdown run book. Mechanism-only in committed files; FILLED workbooks are Internal and live in internal-local/ or internal/."
 ---
 
 # Control-M runbook automation — Excel (minimum viable runbook)
@@ -84,8 +84,8 @@ never silently overwrite either side.
 - The five non-minimum tabs (Overview, Recovery Details, Outages, Business
   Flow, Feedback) are out of scope here; the long-form equivalent content
   lives in the SDLC Run Book doc type (`docs/design/templates/
-  sdlc-app-runbook.outline.yaml`) and its planned `-SDLC` generator sibling
-  (inboxed 2026-08-04).
+  sdlc-app-runbook.outline.yaml`) and its generator sibling
+  `controlm-runbook-automation-SDLC` (landed 2026-09-09).
 
 ## Related
 
@@ -93,5 +93,8 @@ never silently overwrite either side.
   fix packages, SoR map §RB). This skill is its Excel output format.
 - `controlm-db` — CM_ replica schema map and query cookbook for every
   graph-backed column above.
+- `controlm-runbook-automation-SDLC` — the LONG-form generator for the same
+  folder. It cites the column map above rather than re-deriving it, and its
+  section 6.7 points readers back at this workbook for per-job detail.
 - `sdlc-app-runbook.outline.yaml` — the long-form document twin (Epic L doc
   type SDLC-Runbook).
