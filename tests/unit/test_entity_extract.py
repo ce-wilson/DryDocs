@@ -64,7 +64,11 @@ def _kinds(text: str) -> list[tuple[str, str]]:
             [(ex.DISTRIBUTION_LIST, "DL-Batch-Support@example.invalid")],
         ),
         ("page DL_ops_tier2 first", [(ex.DISTRIBUTION_LIST, "DL_ops_tier2")]),
-        ("the DL is on the thread", []),
+        # A bare `DL` is not a distribution list — the class needs the `DL-`/`DL_`/`DL.`
+        # prefix shape. Since MM12 it IS an acronym candidate, which is the right
+        # reading of it and does not weaken this case: the assertion is still that
+        # nothing here is a DISTRIBUTION_LIST.
+        ("the DL is on the thread", [(ex.ACRONYM, "DL")]),
         # application id — a standalone 4-to-7-digit run (CORE5), reported bare
         # only from 5 up. `700041` is an order number, not an id: at six digits
         # it IS a candidate and IS reported, uncued, for the caller to rank down.
@@ -280,4 +284,5 @@ def test_the_pass_order_is_the_declared_precedence() -> None:
         ex.TABLE_NAME,
         ex.DISTRIBUTION_LIST,
         ex.APPLICATION_ID,
+        ex.ACRONYM,
     )
