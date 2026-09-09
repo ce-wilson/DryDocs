@@ -7,6 +7,7 @@ together with the two guard fixes described under "QA & tests". Nothing here is 
 every mechanism described is in the tree and covered by a test. Two of those tests were red while
 the work sat on its branch and both are fixed here; "QA & tests" records what each one was, and why
 one of them could not fail on the machine that wrote it. ·
+**Branch retired 2026-09-09:** `feat/source-registration-poc` (tip `de0eeb6f`) was deleted locally and on origin after the landing; the scoped diff against `main` over the five PoC paths differed only in `tests/unit/test_synthetic_sources.py`, where `main` carries the later guard fix. `fcc3c8bb` is the landing of record. ·
 **Classification:** Internal-Public — mechanism only. Every value the generator emits is
 synthetic, and no connection coordinate appears in this document or in the files it describes. ·
 **Audience:** engineers working on `drydocs_core/source_descriptors.py` or
