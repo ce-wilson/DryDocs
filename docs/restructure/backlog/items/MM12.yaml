@@ -9,7 +9,7 @@ phase: 17
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on:
 - MM3
 inputs:
@@ -38,3 +38,80 @@ notes: |
   THE PROVENANCE FORK IS THE SAME FORK O68 CLAUSE (d) ALREADY FORCES, reached from the other direction. Whichever item lands first should settle it for both: two surfaces disagreeing about what makes an acronym trustworthy is worse than either gap.
 
   Mechanism only; no real acronym values from any company corpus land in a tracked file.
+
+  DONE on wip/mm12-laptop (Lane B, laptop, 2026-09-09). Pass 7 of the shared extractor,
+  plus an acronym shelf on the mind-map state file. 28 new tests; full suite 3911 passed /
+  15 skipped / 0 failed.
+
+  (a) THE CLASS RUNS LAST, and that is the design rather than an ordering detail. Acronym
+  is the widest shape in the module, so a project key inside an issue key (HLDM), a schema
+  inside a table name (PSGMGR) and a folder prefix (PRARAG) would all be re-read as
+  acronyms if it ran anywhere else. Every earlier pass has claimed its span by then, and a
+  test asserts the whole set of them stays unclaimed by this pass. The item's premise was
+  verified rather than trusted: the word acronym appeared nowhere in drydocs_deepdoc/,
+  entity_extract.py or the design doc.
+
+  (b) THE SENTENCE IS A REQUIRED FIELD, not an annotation. Every match carries an
+  `evidence` attribute holding the sentence it was found in, and AcronymCandidate REFUSES
+  a candidate without one - a bare string is exactly what cannot be judged. Sentence
+  boundaries are an acknowledged approximation (a terminator followed by space or newline,
+  which "e.g." defeats), capped at 400 chars, and the docstring says so where the caller
+  reads it: this is a breadcrumb for a person, not a parse anything branches on.
+
+  THE AMBIGUITY CASE IS PROTECTED AT BOTH LEVELS. In the extractor, two occurrences are two
+  matches with two spans and two sentences. In the state file, with_acronyms() de-duplicates
+  on (value, evidence_ref, evidence) - never on the value, because collapsing SNOW's two
+  readings would keep one and destroy the finding, which IS that they disagree. A repeat of
+  one reading is dropped as noise; a second reading is kept as signal.
+
+  (c) STATE FILE AND NOWHERE ELSE. `acronyms:` is ADDITIVE on drydocs.deepdoc.mindmap.v1
+  rather than a v2 bump: a file without the key loads unchanged, and a map with no
+  candidates writes no key, so every file that exists today round-trips byte-identically.
+  The one cost is stated in the code rather than left to be discovered - an OLDER checkout
+  reading a NEWER file refuses on the unknown key, which is acceptable only because the
+  state file is machine-local and untracked and so never travels ahead of its reader.
+
+  (d) TRUST IS MECHANICAL, NOT DOCUMENTED. harvest_acronyms is incapable of writing any
+  trust but SYNTHESIZED, AcronymCandidate refuses a value outside the axis, and a row that
+  NAMES a level keeps it - so an SME-supplied entry stays distinguishable if anything ever
+  writes one. TRUST_LEVELS restates the provenance Literal from drydocs_core.models.docs
+  rather than importing it (pydantic rows vs plain dataclasses), and a test reads that
+  Literal's arguments so the two cannot drift.
+
+  (e) NO WRITER LIST CHANGE and no graph write, asserted rather than promised: the test
+  pins UNCERTAIN_WRITERS unchanged and scans the module for a driver handle and for Cypher.
+
+  THREE DEFECTS FOUND BY THE INSTRUMENTS, NOT BY READING - worth recording because all
+  three were in work I had already convinced myself was right:
+
+    1. The first draft required TWO letters, which silently dropped S3 while keeping EC2 -
+       and the docstring I had written claimed S3 was a candidate. The rule is one letter;
+       the docstring was not the thing to fix.
+    2. The first gloss regex returned "we raise it in ServiceNow" as the expansion of SNOW.
+       A word-count bound cannot tell an expansion from the rest of a clause, so the gloss
+       is now CHECKED by _spells() - the acronym's letters must appear in order, starting
+       at the phrase's first letter (the short Schwartz-Hearst test) - and the shortest
+       word-run that passes wins. It also correctly rejects "SNOW (raised 2026-09-09)",
+       which the old code would have recorded as a meaning.
+    3. "SNOW is short for ServiceNow" was not cued: the naming-verb pattern read only the
+       words immediately after the token and missed the copula.
+
+  AND ONE THE REPO'S OWN GUARD CAUGHT, which is the best of the four.
+  test_source_scan's CORE2 rule refused my absence scan for "MERGE (" over code_only -
+  correctly, because a Cypher clause is only ever a string LITERAL and code_only deletes
+  string literals, so that scan would have passed on a module that wrote the graph on every
+  line. It is now two scans with two strippers and two positive controls: code_only for the
+  driver handle, which is code, and without_prose for the Cypher, which is a literal. Six of
+  six absence scans across two earlier bursts failed this exact way; this would have been
+  the seventh.
+
+  TWO EXISTING TESTS UPDATED, both keeping their original intent: the pass-order guard gains
+  ACRONYM (it exists to notice exactly this), and "the DL is on the thread" still asserts
+  that a bare DL is no DISTRIBUTION_LIST while recording that it is now an acronym.
+
+  FENCE RESPECTED: nothing under drydocs_core/ontology/relationship_vocabulary/ was read or
+  written, per the sender's ruling on the flagged J70/Y3 overlap. The open fork the item
+  parks - graph nodes vs a config-glossary proposal - is untouched, and the shelf is
+  deliberately a place a candidate can sit while it stays unruled.
+
+  No render, no new tracked path, no PORT-MANIFEST row.

@@ -72,12 +72,14 @@ earlier pass claimed, so the folder wins and the issue-key reading never fires.
                           ``cued=True`` when the text GLOSSES it: an adjacent
                           parenthetical either way round (``ServiceNow (SNOW)``,
                           ``SNOW (ServiceNow)``) or a naming verb (``stands
-                          for``, ``means``, ``short for``). A parenthetical also
-                          records what it said in a ``gloss`` attribute —
-                          recorded, never resolved. Whether the gloss is RIGHT is
-                          the reader's question, and one acronym glossed two ways
-                          in two documents is exactly the finding this class
-                          exists to surface.
+                          for``, ``means``, ``is short for``). A parenthetical
+                          records what it said in a ``gloss`` attribute, but only
+                          after ``_spells`` confirms the acronym's letters appear
+                          IN ORDER in it — so ``SNOW (Snowflake)`` glosses and
+                          ``SNOW (raised 2026-09-09)`` does not. That is a CHECK,
+                          not a resolution: two documents that gloss one acronym
+                          differently both pass it, which is exactly the finding
+                          this class exists to surface.
 
                           THE FUNCTION-WORD FLOOR is the same rule as the 4-digit
                           floor above, not a new kind of exception. A closed class
@@ -297,15 +299,74 @@ _ACRONYM_FUNCTION_WORDS = frozenset(
         "NEW",
     }
 )
-#: ``<expansion> (ACRONYM)`` — the gloss precedes, and group 1 is what it said.
-#: Bounded to six words so a whole clause before an unrelated parenthesis is not
-#: read as an expansion.
-_ACRONYM_GLOSS_BEFORE = re.compile(r"((?:[A-Za-z][\w-]*[ ]){0,5}[A-Za-z][\w-]*)[ ]*\($")
-#: ``ACRONYM (expansion)`` — the gloss follows, in the parenthesis.
+#: ``<expansion> (ACRONYM)`` — the gloss precedes the parenthesis. The words are
+#: captured loosely and then CHECKED by :func:`_spells`; a regex alone cannot
+#: tell an expansion from the rest of the clause, and the first draft of this
+#: read ``we raise it in ServiceNow`` as the expansion of ``SNOW``.
+_ACRONYM_GLOSS_BEFORE = re.compile(r"((?:[A-Za-z][\w-]*[ ]){0,7}[A-Za-z][\w-]*)[ ]*\($")
+#: ``ACRONYM (expansion)`` — the gloss follows, in the parenthesis. Checked the
+#: same way: ``SNOW (raised 2026-09-09)`` is a parenthesis, not a gloss.
 _ACRONYM_GLOSS_AFTER = re.compile(r"^[ ]*\(([^()]{1,80})\)")
 #: ``ACRONYM stands for ...`` — a naming verb marks the token as glossed without
-#: capturing an expansion; the sentence carries the meaning either way.
-_ACRONYM_NAMING_VERB = re.compile(r"(?i)^[ ]*(?:stands[ ]for|short[ ]for|means)\b")
+#: capturing an expansion; the sentence carries the meaning either way. The
+#: optional ``is`` covers ``SNOW is short for ServiceNow``, which the first draft
+#: missed because it only looked at the words immediately after the token.
+_ACRONYM_NAMING_VERB = re.compile(r"(?i)^\s*(?:is\s+)?(?:stands\s+for|short\s+for|means)\b")
+#: Below two letters the spelling check stops discriminating: ``S3`` reduces to
+#: ``s``, which every word beginning with an s would satisfy. A gloss is recorded
+#: only above this floor — the token is still a candidate either way.
+_ACRONYM_MIN_SPELLED = 2
+
+
+def _letters(value: str) -> str:
+    return "".join(c for c in value if c.isalpha()).lower()
+
+
+def _spells(acronym: str, phrase: str) -> bool:
+    """Could ``phrase`` be what ``acronym`` stands for?
+
+    The acronym's letters must appear IN ORDER inside the phrase, starting at the
+    phrase's own first letter — the short form of the Schwartz-Hearst test. So
+    ``ServiceNow`` and ``Snowflake`` both spell ``SNOW`` and ``we raise it in
+    ServiceNow`` does not, which is the distinction a word-count bound could not
+    make. Digits in the acronym are ignored: vendors put them in (``EC2``) and
+    they are not initials of anything.
+
+    This is a CHECK, not a resolution. It says a phrase is a plausible expansion;
+    it never says the expansion is correct, and two documents that gloss one
+    acronym differently both pass it — which is the point.
+    """
+    letters = _letters(acronym)
+    text = _letters(phrase)
+    if len(letters) < _ACRONYM_MIN_SPELLED or not text or text[0] != letters[0]:
+        return False
+    i = 0
+    for ch in text:
+        if ch == letters[i]:
+            i += 1
+            if i == len(letters):
+                return True
+    return False
+
+
+def _gloss_before(before: str, acronym: str) -> str | None:
+    """The shortest trailing word-run before the parenthesis that spells ``acronym``.
+
+    Shortest, walking outward: ``we raise it in ServiceNow (SNOW)`` has a
+    one-word answer and a five-word one, and the one-word answer is the
+    expansion. Taking the longest is how the first draft returned the clause.
+    """
+    m = _ACRONYM_GLOSS_BEFORE.search(before)
+    if not m:
+        return None
+    words = m.group(1).split()
+    for count in range(1, len(words) + 1):
+        phrase = " ".join(words[-count:])
+        if _spells(acronym, phrase):
+            return phrase
+    return None
+
+
 #: How far either side of an acronym the gloss is looked for.
 _ACRONYM_GLOSS_WINDOW = 60
 #: The most evidence one candidate carries. A sentence longer than this is a
@@ -462,11 +523,10 @@ def extract_entities(text: str) -> tuple[EntityMatch, ...]:
         value = m.group(0)
         before = text[max(0, m.start() - _ACRONYM_GLOSS_WINDOW) : m.start()]
         after = text[m.end() : m.end() + _ACRONYM_GLOSS_WINDOW]
-        gloss = None
-        if (bracket := _ACRONYM_GLOSS_BEFORE.search(before)) is not None:
-            gloss = bracket.group(1).strip()
-        elif (paren := _ACRONYM_GLOSS_AFTER.match(after)) is not None:
-            gloss = paren.group(1).strip()
+        gloss = _gloss_before(before, value)
+        if gloss is None and (paren := _ACRONYM_GLOSS_AFTER.match(after)) is not None:
+            candidate = paren.group(1).strip()
+            gloss = candidate if _spells(value, candidate) else None
         cued = gloss is not None or _ACRONYM_NAMING_VERB.match(after) is not None
         # The function-word floor, and the ONLY place an acronym candidate is
         # dropped. Uncued and closed-class: not reported, and not claimed either
