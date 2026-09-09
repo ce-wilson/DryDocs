@@ -27,11 +27,23 @@ Four classes of guard here, in the order they matter:
     anchor sets must be equal, every `fill:` must resolve to a renderer, and
     every renderer must be reachable from the spec.
 
-4.  **PUBLISH BOUNDARY.** Every application id the generator emits must sit
-    inside the reserved synthetic block 70001-70099. The sweep is over the
-    VALUE, not the field: the ids that survived an earlier cleanup were embedded
-    inside folder-name strings, and a generated run book prints folder names
-    everywhere.
+4.  **PUBLISH BOUNDARY**, two identifier classes and two rules. An APPLICATION id
+    must sit inside the reserved synthetic block 70001-70099; the sweep is over
+    the VALUE, not the field, because the ids that survived an earlier cleanup
+    were embedded inside folder-name strings and a run book prints folder names
+    everywhere. A PERSON identifier has no range to check, so its rule is
+    provenance: every employee SID in the output must be one the fixture put in
+    the input. Echoing an input is the job; emitting one from anywhere else is
+    the thing worth catching.
+
+    That second rule needed the fixture to grow. The SEAL sample pair is
+    untracked, so a clone-faithful fixture has no contacts at all — and with no
+    contacts the ownership and escalation renderers, the ONLY two that emit a
+    person, are never reached. The sweep was passing without rendering a single
+    one. The fixture now WRITES its own tiny synthetic SEAL bundle (still no
+    machine dependency), and a control test asserts the sweep actually sees a
+    person with it and none without it. A guard whose reach is not itself tested
+    is a guard that reports on the code it happens to touch.
 """
 
 from __future__ import annotations
@@ -96,10 +108,66 @@ def _tracked_sample_csvs() -> list[Path]:
     return [REPO_ROOT / line for line in out.splitlines() if line.endswith(".csv")]
 
 
+#: A tiny SEAL bundle written by the fixture, NOT copied from the machine.
+#:
+#: The real `seal_*__sample.csv` files are untracked and rebuilt per machine, so
+#: a clone has neither. Copying them would make the suite machine-dependent — the
+#: exact failure the clone fixture exists to prevent. But WITHOUT them,
+#: `facts.contacts` is always empty, and the two renderers that emit a person
+#: identifier (the ownership table and the escalation contact list) are never
+#: reached. The publish-boundary sweep would then be green because it never
+#: renders the values most worth sweeping, which is a guard lying to itself.
+#:
+#: So the fixture writes its own, inside the synthetic universe, and the sweep
+#: reaches the escalation rows. Two apps: 70002 (which a bundled folder name
+#: carries) and 70003 (which no folder does, so it never appears in output).
+_SEAL_APPS = (
+    "app_id,name,app_short_name,app_state,app_lob,info_classification,"
+    "app_owner_sid,app_owner_name,chief_tech_officer_sid,chief_tech_officer_name,"
+    "info_owner_sid,info_owner_name\n"
+    "70002,Fixture Reporting App,FIX-RPT,Operate,CCB,Internal,"
+    "K900001,Ada Fixture,K900002,Bo Fixture,K900003,Cy Fixture\n"
+    "70003,Fixture Unused App,FIX-UNU,Operate,CCB,Internal,"
+    "K900004,Di Fixture,K900004,Di Fixture,K900004,Di Fixture\n"
+)
+_SEAL_CONTACTS = (
+    "app_id,role_name,employee_sid,employee_name,employee_email\n"
+    "70002,L1 Operate Manager,K900001,Ada Fixture,ada.fixture@example.invalid\n"
+    "70002,L2 Operate Manager,K900002,Bo Fixture,bo.fixture@example.invalid\n"
+    "70002,Design Authority,K900003,Cy Fixture,cy.fixture@example.invalid\n"
+    "70003,L1 Operate Manager,K900004,Di Fixture,di.fixture@example.invalid\n"
+)
+
+#: Every employee identifier the fixture puts in reach of the renderers. The
+#: sweep asserts the generator emits NO person identifier that is not one of
+#: these — it may echo its input, never invent.
+_FIXTURE_SIDS = {"K900001", "K900002", "K900003", "K900004"}
+
+
 @pytest.fixture(scope="module")
 def clone_samples(tmp_path_factory) -> Path:
-    """A samples directory holding ONLY the tracked CSVs — a fresh clone's view."""
+    """The tracked CSVs plus a synthetic SEAL bundle — a clone's view, plus reach.
+
+    Tracked files are copied; the SEAL pair is WRITTEN here (see `_SEAL_APPS`)
+    rather than copied from the machine, so the directory is identical on every
+    checkout and the ownership and escalation renderers are actually exercised.
+    """
     target = tmp_path_factory.mktemp("clone_samples")
+    for path in _tracked_sample_csvs():
+        shutil.copy(path, target / path.name)
+    (target / "seal_application_data__sample.csv").write_text(
+        _SEAL_APPS, encoding="utf-8", newline="\n"
+    )
+    (target / "seal_contact_data__sample.csv").write_text(
+        _SEAL_CONTACTS, encoding="utf-8", newline="\n"
+    )
+    return target
+
+
+@pytest.fixture(scope="module")
+def tracked_only_samples(tmp_path_factory) -> Path:
+    """The tracked CSVs and nothing else — a fresh clone exactly as it arrives."""
+    target = tmp_path_factory.mktemp("tracked_only")
     for path in _tracked_sample_csvs():
         shutil.copy(path, target / path.name)
     return target
@@ -383,14 +451,29 @@ def test_every_na_section_carries_a_reason(spec: dict) -> None:
 # --------------------------------------------------------------------------
 
 
-_FIVE_PLUS_DIGITS = re.compile(r"(?<![0-9])\d{5,7}(?![0-9])")
+#: An application id. The negative lookbehind excludes a digit AND a `K`, so an
+#: employee SID is not read as an application id — they are different things with
+#: the same digit width and they get different rules below.
+_FIVE_PLUS_DIGITS = re.compile(r"(?<![0-9K])\d{5,7}(?![0-9])")
+
+#: A person. The one identifier class a generated run book must never invent.
+_EMPLOYEE_SID = re.compile(r"\bK\d{5,7}\b")
 
 
 def test_no_generated_document_carries_an_id_outside_the_reserved_block(
     generator, clone_samples: Path
 ) -> None:
-    """Sweep the VALUE, not the field — ids hide inside folder-name strings."""
-    offenders: list[str] = []
+    """Sweep the VALUE, not the field — ids hide inside folder-name strings.
+
+    Two rules, because there are two identifier classes and only one of them has
+    a reserved range. An APPLICATION id must sit inside 70001-70099. A PERSON
+    identifier has no range to check, so the rule is provenance instead: every
+    SID in the output must be one the fixture put in the input. A generator that
+    echoes its input is doing its job; one that emits a SID from anywhere else is
+    the thing this guard exists to catch.
+    """
+    app_offenders: list[str] = []
+    sid_offenders: list[str] = []
     for name in _sample_folder_names(clone_samples):
         document = generator.render(
             generator.load_from_samples(name, samples_dir=clone_samples),
@@ -399,11 +482,48 @@ def test_no_generated_document_carries_an_id_outside_the_reserved_block(
         )
         for token in _FIVE_PLUS_DIGITS.findall(document):
             if int(token) not in SYNTHETIC_BLOCK:
-                offenders.append(f"{name}: {token}")
-    assert offenders == [], (
+                app_offenders.append(f"{name}: {token}")
+        for sid in _EMPLOYEE_SID.findall(document):
+            if sid not in _FIXTURE_SIDS:
+                sid_offenders.append(f"{name}: {sid}")
+    assert app_offenders == [], (
         "a generated document carries a numeric id outside the reserved synthetic "
-        f"block 70001-70099: {sorted(set(offenders))}"
+        f"block 70001-70099: {sorted(set(app_offenders))}"
     )
+    assert sid_offenders == [], (
+        f"a generated document carries an employee SID that was not in its input: "
+        f"{sorted(set(sid_offenders))}"
+    )
+
+
+def test_the_sweep_actually_reaches_the_rows_that_carry_people(
+    generator, clone_samples: Path, tracked_only_samples: Path
+) -> None:
+    """The guard above is worthless unless the ownership rows are in its reach.
+
+    This is the control for it. With the fixture's SEAL bundle the escalation
+    table has rows and the sweep sees SIDs; with a bare clone it has none, which
+    is correct behaviour and also why the previous version of the boundary sweep
+    was green for the wrong reason — it never rendered a single contact.
+    """
+    name = "PRARAG-HLDM-70002-PEX-RFND-DLY"
+    with_seal = generator.render(
+        generator.load_from_samples(name, samples_dir=clone_samples), generator.load_spec(), _meta()
+    )
+    assert _EMPLOYEE_SID.findall(with_seal), (
+        "the fixture's SEAL bundle did not reach the rendered document — the "
+        "publish-boundary sweep would be passing without ever seeing a person"
+    )
+    assert set(_EMPLOYEE_SID.findall(with_seal)) <= _FIXTURE_SIDS
+
+    bare = generator.render(
+        generator.load_from_samples(name, samples_dir=tracked_only_samples),
+        generator.load_spec(),
+        _meta(),
+    )
+    assert not _EMPLOYEE_SID.findall(
+        bare
+    ), "a clone with no SEAL samples produced a person identifier from somewhere"
 
 
 def test_the_committed_skill_files_carry_no_real_looking_ids() -> None:
