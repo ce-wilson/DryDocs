@@ -294,6 +294,15 @@ FORCE_COLOR / Idea-101 findings that motivated J41.)
 > ref.** That fallback is the one failure guardrail 1 exists to prevent, and it cost a
 > cycle of "the producer tracker says…" answers that were two days stale.
 
+- **Producer base `port-base-20260908` (`314b1715`)**, the seventh roll, range
+  `port-base-20260905..port-base-20260908` = 407 commits / 493 changed paths. Company apply
+  REPORTED IN PROGRESS `[SME-REPORTED]`: Phases 0 and 1 and the Phase 3 corrections are read in
+  the SECOND POSTSCRIPT TO RELAY-46; no close-out has been reported, so the J35 four fields are
+  NOT here - no producer figure stands in for a company acceptance number. Re-certified on the
+  fixed preflight 2026-09-09 (THIRD POSTSCRIPT TO RELAY-46): base resolves, 407 commits, 0
+  uncited, 10 added documents, 0 unresolved. **NEXT-PORT BASE: `port-base-20260909`** - the
+  eighth roll, `port-base-20260908..port-base-20260909`, 172 commits, steps 354–367,
+  RELAY-53.
 - **Producer base `port-base-20260905` (`5cad5653`)**, reported applied company-side as
   **PORT-REPORT-port-base-20260905** (2026-09-08) — range
   `port-base-20260902..port-base-20260905` = **186 commits / 323 changed paths, REPORTED
@@ -3940,6 +3949,28 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   software-version-context, sosa-jobrun-observation. The three open items whose NOTES cite the
   old names (K26, E1, L19) were left alone: a note describing 2026-06 or 2026-08 work names the
   file as it was, which is a record, not a claim. Nothing is asked back.
+
+- **RELAY-53 - THE EIGHTH ROLL: `port-base-20260908..port-base-20260909`, 172 COMMITS, AND WHERE
+  RELAYS 47 TO 52 LAND** [VERIFIED-PRODUCER] (2026-09-09, venue desktop). A SMALL roll on
+  purpose, cut at the Lane A close so the per-side fixes reach you while your tech-debt work is
+  under way: the range is steps 354-367. 294 changed paths in 8 classes (canonical-producer 70, canonical-company 20, never-port 6, per-entry 107, union-append 2, evaluate 17, default_ok 65, derived 7) What it carries that your apply must know:
+  (1) `PORT-MANIFEST.yaml` gains the `per_side_fields:` block (RELAY-50) and the epics row's
+  `order:` is per-side (`fe557fce`); (2) the three `venues:` keys are a hand-copy (RELAY-51);
+  (3) the nineteen gate-prompt riders are a hand-take, your copies win (RELAY-52); (4) the
+  redaction registry `config/gate-log-redactions.yaml` and its reader arrive canonical-producer
+  (RELAY-47) - read RELAY-47's contract before your first §3 redaction; (5) PLAN9's `census:`
+  block in `config/dev-environment.yaml` wants YOUR numbers (RELAY-49); (6) the port preflight
+  now fails closed with a NOT CHECKED verdict (`2425c206`, step 366) - a certification quotes
+  the verdict word, and the seventh roll re-certified on the fixed instrument holds as issued;
+  (7) `S11` is closed as SUPERSEDED - no `drydocs_plan/`, `drydocs_docgen/` or `drydocs_port/`
+  package move is coming; the subpackages you already hold are the ruling (ADR 0018 D4); (8) the
+  eighteen ADR 0018 re-export shims are NOT removed in this range - that is GRAPH5, minted, and
+  it lands in the NINTH roll with its own relay, so nothing in this range breaks an import path;
+  (9) 56 new backlog items and one new epic (`team-edition`, order 28 - per-side, seat yours as
+  you like) are clean-adds by id; (10) three new module runbooks (`drydocs-lineage`,
+  `drydocs-review`, `drydocs-docgen`) and their committed HTML arrive under `docs/design/**`
+  (evaluate on collision). RED AT PUSH: see the eighth footnote (J77) - none failed; the
+  cancelled runs are named there. Nothing is asked back.
 
 OWED COMPANY-SIDE:
 
@@ -7625,6 +7656,220 @@ hand-carried and nothing parked.
     manifest row changed, because the disposition table at the roll's parent needed none
     (RELAY-46 says why). The tag sits on the `chore(port): roll` follow-up
     that writes this sha in.
+
+354. THE MODULE SWEEP, SLOTS 4 TO 10 AND WEB'S SECOND PASS — CYCLE 1 CLOSES ON ONE FINDING
+    [`docs/reviews/**` default_ok records — point-in-time, the side that ran them keeps them]
+    (`b6b0cb68` `68fc90eb` `28068704` `f4454344` `451d76ea` slot 4, api — a graph outage answers
+    500 and the console reads it as a bug, no query bound anywhere; `f1a59ef1` `553dc477`
+    `4fe80bee` `e3705f0f` `cf3bd014` slot 5, remediation — detect_all ships no rule denominator,
+    17 of 45 rules; `cdb3d125` `fde56b88` `cd861d63` `f4800fcd` `418d94e8` slot 6, review-agents —
+    four of six acceptance suites cannot fail on an empty graph, eighteen ADR 0018 shims past
+    their trigger; `edb9788e` `079327e7` `0c60a919` `7383fd40` `b8046668` slot 7,
+    port-docgen-docmeta — the preflight certifies a base it could not read, the most consequential
+    finding of the cycle (PORT8 in step 366 is its fix); `6c272ce7` `aa6e5181` `4d606e26`
+    `5767062d` `0272aa77` slot 8, plan-deepdoc-libs — the `_git` shape sweep answered negative;
+    `a24d640a` `7803e3d6` `957e926a` `8097e4ed` `e3c9722a` slot 10, seams — the boundary holds
+    against static imports only, and the cycle's conclusion: one defect shape seven times, six
+    independent correct answers, zero written conventions; `828ba7dc` `8d62ceeb` `c323e0f9`
+    `115008ba` `dcf41c32` slot 9 second pass, web — the completeness contract reached 3 of 8
+    consumers, caught with dates; `3da5dfbd` `191a71ab` `b7fb5f54` `9389f246` `4167e3c9` the
+    branch's merges of main into itself; `f06a5f00` the seven branch-only reports merged to main
+    `--no-ff` at the Lane A close, the branch and its worktree kept as DOC4's standing venue).
+    The eleven reports are the source of 41 of the 56 items minted in step 368; every candidate
+    line in them says "none minted" because the backlog pen was Lane A's.
+
+355. THE PREMISE-DRIFT REVIEW, THE OWED-PATH REVIEW, AND J76'S FOURTH MODE [`docs/reviews/**`
+    default_ok; `CLAUDE.md` canonical-producer] (`f02ae4a9` Lane B's review of why five of five
+    items in its burst had a premise wrong against the tree — three organs, not one: path drift
+    (an existence guard closes it, PLAN12 in step 366), contract non-propagation (a shared return
+    type, ADR 0021 in step 367), wrong at birth (an authoring rule only); measured 117 unresolved
+    `inputs:` entries of which 4 on open items are actionable, and two things NOT to build - an
+    `acceptance:` guard and a gate-prompt guard; `c25bca79` its merge; `775248a7` the company's
+    hand-carried owed-path carve-out read through `drydocs.port.dispositions.classify` — the
+    manifest already rules 73 of the 87, fourteen need the SME; `fcf3c00b` `05e365dd` J76 gains
+    its fourth failure mode, check which VERSION of the instrument you hold, `git log -1 --
+    <file>` against your base, and the fetch guardrail is recorded as its single-case form since
+    2026-08-06).
+
+356. RELAY-46'S TWO POSTSCRIPTS, RELAY-47, AND THE THREE PRODUCER DEFECTS THE 0908 REPORT
+    SURFACED [`docs/port/port-prompt.md` never-port; `PORT-MANIFEST.yaml` canonical-producer;
+    `config/gate-log-redactions.yaml` canonical-producer, its own row; `tests/unit/test_backlog.py`
+    canonical-producer] (`9013fb72` POSTSCRIPT — company main is `b73fd9d1` not `d527afce`, the
+    owed paths are already a list and 73 of 87 are ruled; `d5adcedc` SECOND POSTSCRIPT — three
+    corrections to the 0908 apply read at its Phase 3, the writer never dropped `--repo`;
+    `2dc38863` RELAY-6 corrected — the G35 walk was stopped by the SME relaying the company's
+    signed model, not by an image; `5f0e730c` RELAY-47 — a section-3 redaction of signed gate-log
+    text is DECLARED in `config/gate-log-redactions.yaml`, one row per redacted line, read by
+    `drydocs/port/gate_log_redactions.py`, never excused; `1f54b5d4` its matrix row, repo_root
+    anchor and refreshed renders; `fe557fce` the three producer-side defects the 0908 report
+    surfaced — PLAN6 had reintroduced the unconditional `venues:` presence assert RELAY-31 carved
+    out one commit earlier, split now into a travelling membership guard and a producer-only
+    presence guard; RELAY-51 tells the company to hand-copy the three `venues:` keys; the epics
+    row's `order:` is PER-SIDE because the producer's 28 epics carry a dense 0..27 that cannot
+    seat a company-only epic; and the duplicate RELAY-48 renumbered to RELAY-50).
+
+357. THE PORT INSTRUMENTS — THE DROP SEAM, THE NEVER-PORT PIN GUARD, THE CHUNK-1 BACK-FLOW,
+    THE FRESHNESS CHECK, AND J77 [`drydocs/port/**` and `scripts/port_*.py` canonical-producer;
+    `.claude/skills/reconcile-port/**` canonical-producer] (`220f293b` PORT4 — the port drop check
+    gains an `accepted_drops:` seam so a ruled retirement is listed once and never re-reported at
+    every chunk; `90899048` PORT3 — a crossing test that pins a never-port path now fails HERE,
+    not on the consumer, `test_no_test_is_more_portable_than_its_never_port_subject`; `87a9eeaa`
+    PORT1 — three back-flow adoptions from the company's chunk-1 apply, and the rule that a
+    workplan naming a script names the commit it needs; `ca824405` `b855782d` J59 — the header
+    freshness check `scripts/check_header_freshness.py`, and the premise it was built on had
+    expired: (a) (b) (d) built, (c) handed to the port pen; `7daa2804` J59 clause (c) — the
+    `updated:` header key is per-side, RELAY-50 says so and `PORT-MANIFEST.yaml` gains the
+    `per_side_fields:` block that wins over any per-entry row's unnamed-fields default; `0a4e9d53`
+    J77 — a roll names the commits that were red at push, convention not guard, and this roll's
+    line is in its footnote; `f877f47b` DOC2 — RELAY-48, the id convention stated whole; `e48b7877`
+    PLAN9 — the three live-config count pins move to a `census:` block in the venue file the
+    tests read, RELAY-49).
+
+358. THE SNAPSHOT TRIO, THE INBOX GUARD, AND VERSIONING [`knowledge/depgraph-snapshots/**`
+    snapshot pen, `snapshot.ps1` canonical-producer; `tests/**` default] (`93a75bdb` the three
+    snapshot.ps1 items claimed as one sitting; `4cb966c9` J65 — the script clears the leaked
+    VIRTUAL_ENV before it calls poetry, so the board refresh stops skipping silently; `311d7386`
+    J64 — the script refuses to scan a tree with tracked changes: scan after the commit, not
+    before; `8d769863` `d43be241` `e3b820c7` `7e1c0e44` U27 — the CI check asks about the branch
+    HEAD is on and Get-CiVerdict gets its five fixtures, merged `--no-ff` from `wip/u27-desktop`;
+    `b5c7fbd8` I5 — an IDEAS.md capture anywhere in the file must carry the header and sit in a
+    capture section; `6c84ef87` J54 closed — VERSIONING.md was already current, the fix shipped
+    under Idea-163).
+
+359. LANE B'S SEVENTH QUEUE — THE FIX-TRACKING LOADER, THE SKIP THAT COULD NEVER FIRE, THE
+    VESTIGIAL GUARDS, THE CLAUDE.md SECTION 0 CLUSTER, THE DOCSTRINGS [`drydocs/**` per the
+    manifest; `CLAUDE.md` canonical-producer] (`0b6d498c` `3f094b22` `438f14a6` `c6e6ac24` G90 —
+    the fix-tracking loader the remediation-fix-tracking gate authorized, three properties not
+    five, one resolution idiom shared with the preflight, the failing set named and confirmed as
+    render staleness only; `36f242a9` `a3c8b448` LOAD7 — a skip that could never fire on a clone
+    becomes a failure that can, and the path is resolved rather than guarded; `963e7cce` CORE9 —
+    four vestigial guards removed, one kept, the item's own example was wrong; `97e2d5d3` three
+    skips restored at the merge — a tracked never-port sample is absent on every consumer, and
+    the two skip policies that disagreed are Idea-308; `ca2e1677` J61 — the shared-checkout
+    recovery, executed before it was written; `4e1edb05` Y6 — a claim that MINTS ships its render;
+    `7774ea60` I7 — the coordinator rule for fan-out inside one checkout; `fd876788` DOC7 — when
+    the LOCAL wip branch goes; `dfd70efe` `2ca35267` `001d1621` the branch's merges of main;
+    `25568a1e` `a58700b1` J60 — the eight packages with no docstring get one, D100/D104 enabled
+    with the convention that keeps the rest off; `97eb9f02` `e9304fba` `51c49658` `10e5b465`
+    `c3a53ce5` `e8196bf4` the six `--no-ff` merges; `d3090725` the render catch-up).
+
+360. THE LANE HANDOFFS — THREE ISSUES FOR THE LAPTOP, TWO FOR THE DESKTOP [`docs/lane-*-handoff.md`
+    never-port; `.claude/skills/lane-handoff/**` never-port] (`8e75d682` Lane A and Lane B
+    handoffs closing the older base items in one burst; `776c216a` the laptop's queue, first
+    issue; `5207a0b2` the second issue, 8 to 14 items; `41e018fc` the third issue at the mint-pass
+    tip — 26 items for the laptop, 23 for the desktop, the overlap marks read as sequencing facts
+    and ruled in the file, no web items because those belong to the UI-testing session by user
+    ruling).
+
+361. LANE B'S EIGHTH QUEUE — THE DESIGN-PAGE BYTE GUARD, THE SYNTHETIC FOLDER SET, THE ACRONYM
+    CLASS, THREE MODULE RUNBOOKS, THE ADVISORY WARNINGS [`docs/design/**` evaluate on collision;
+    `drydocs/**` per the manifest] (`1b55831f` `4c08cf5f` DOC9 — the committed `docs/design/*.html`
+    get the roadmap guard's shape, on bytes, strict; `fe6e2fcc` `cac5c03c` REM2 — a synthetic
+    Control-M folder set so the census verb is demonstrable in a clone, all 17 rules; `01518821`
+    `eaaa2a9c` MM12 — acronym candidates as an extracted class with the sentence they were found
+    in, 28 tests and four defects the instruments found; `880812b2` `749e06e1` `0209479b` V6 — the
+    drydocs-lineage module runbook routes to the two chain runbooks and owns what neither covered,
+    four of five asserted claims were wrong before measuring; `76edac30` `cf2ac76b` V4 — the
+    drydocs-review module runbook, four surfaces, one verb, a live suite run; `1c3f22fd` `ef060af6`
+    V5 — the drydocs-docgen module runbook and a stale count in the drift-prevention tool;
+    `bda6e3d6` `71662cfc` DOC8 — the 3.14 advisory leg's 37 warnings are two classes, both
+    dispositioned by name, 37/7/7/7 to 0/0/0/0; `22a50d07` `0fd80d97` `c34ee93f` `6f740ee6`
+    `01143a9c` `0f10c989` `1226ae70` the seven `--no-ff` merges at the Lane A close, the V trio
+    hand-resolved once on `tests/unit/test_runbook_coverage.py`).
+
+362. THE SOURCE-REGISTRATION PROOF OF CONCEPT — FIVE AXES, SYNTHETIC STAND-INS, DUCKDB AND
+    DATAHUB [`config/source-descriptors.yaml` per-entry, its own row; `config/datahub/**`
+    canonical-producer; `drydocs/data/samples/**` never-port — the bundle is regenerated, never
+    received; `drydocs/source_registration/**` and `drydocs_core/source_descriptors.py`
+    canonical-producer] (`c3a2e2d7` `20e548dd` `5a5ede78` `bd593e4e` the TDD through Rev 2 — the
+    red identity-header guard recorded, the byte-stability claim withdrawn; `fcc3c8bb` the PoC
+    landed on main LINEARLY with both guard fixes — the recipes classed as somebody else's schema,
+    the bundle parity compared on the decompressed payload; the five closed axes, derive then
+    override then refuse, 30 descriptors, 16 stand-in tables for 10 datasets, one tracked bundle,
+    DuckDB optional, a DataHub file-sink emission with no DataHub dependency; `413ff03b` Idea-309 —
+    the data root is declared in three places and the one landing zone holding a payload sits in
+    the repo tree; `3aed3de8` the DataHub Airflow plugin vendored into the Airflow placeholder as
+    External reference; `0bf7e0fc` `d1016072` Idea-307 — a port applies by dependency closure, not
+    by disposition class). Three SME questions the TDD leaves open — the right five axes, the
+    catalog, axis values to the graph — are CFG8's page in step 368.
+
+363. THE LANE A CLOSE OF 2026-09-09 [`docs/restructure/backlog/items/*.yaml` per-entry;
+    `docs/plan/**` derived] (`1bd22b50` nine merges landed, six claims settled — E1 and G62 on
+    hold with their reasons (an SME-deferred page; a convened-but-unconcluded session), L19 and
+    MM7 back to todo under J31, DOC4 done on the first firing, S11 done as SUPERSEDED because it
+    asked for ADR 0018 Option C — one Lane B note reworded at the merge for the publish-boundary
+    values guard, the TDD's stale "ADR 0017 PROPOSED" mentions corrected, three new module
+    runbooks gain their committed HTML for DOC9's byte guard; `feat/source-registration-poc`
+    deleted local and remote on user ruling, the `../DryDocs-poc` worktree removed).
+
+364. ADR 0021 — A RESULT NAMES WHAT IT DID NOT CHECK [`docs/decisions/**` canonical-producer]
+    (`0736cae3` the number reserved by a pushed index line and stub; `981a76f6` the body —
+    PROPOSED, acceptance is the SME's at sitting 1: one three-outcome type in core that never
+    coerces to a boolean and renders every state; a probe returns it, never a bare bool or a
+    silent empty; a declared probe registry with a guard that reads code; adoption scoped to the
+    preflight and the doc-coverage report, the six precedent sites keep the name only; renders
+    show NOT CHECKED where a finding would appear. Options A (convention only), B (name-based
+    lint) and D (None-for-not-checked) rejected with reasons. `0736cae3` was red on DOC9's byte
+    guard by construction — its `.md` edit rode without the render — and `981a76f6` is the fix,
+    as its message says).
+
+365. THE ONE MINT PASS AND THE TEAM EDITION EPIC [`docs/restructure/backlog/**` per-entry;
+    `docs/restructure/backlog/epics/*.yaml` union-append, `order:` per-side; `plan.yaml`
+    per-entry] (`7ed742d2` 56 items from the eleven sweep reports, the premise-drift review and
+    the 2026-09-09 plan, every id from the allocator with one read per module and consecutive
+    numbers after it, the render in the same commit (Y6): the completeness instrument (CORE10),
+    the preflight defect (PORT8), graph_verify's anchorless suites (REV2), the boundary guard
+    blind to importlib (GRAPH1), the ADR 0018 shim removal minted once for all eighteen (GRAPH5),
+    the web completeness hook and its followers (WEB19 to WEB21), the `inputs:` guard (PLAN12),
+    the S5 gate-prompt sweep (CFG7), the base's finish-line test (LOAD13), the coverage report
+    (LOAD14), the Excel generator (DOC12), the lane-handoff mechanics (PLAN13), the
+    descriptor-axes prompt and its run (CFG8, CFG9), the console-auth-boundary run (WEB22),
+    Idea-309 (CORE18); epic `team-edition` (TE, order 28) with plan phase 18 — Phases 1, 2, 4 and
+    6 minted (CORE19, PORT9, LOAD16, META3) with the file-class render (PORT10), the
+    fragment-placement ruling (ONT6), the :CatalogField reservation (ONT5), use case 2's base
+    halves (CFG10, LOAD15), the XMPL rail (CFG11), use case 3's capture (META2) and rows (CFG12),
+    clause G for the data-flow gate (ONT4); Phase 0 rides N23 as clauses (h) and (i); Phases 3
+    and 3a deliberately not minted; the `wired` build NOT minted because a drafted gate decides
+    nothing). Your side keeps its own epics and `order:`; the 56 items are clean-adds by id.
+
+366. THE PREFLIGHT FAILS CLOSED, AND THE INPUTS GUARD [`drydocs/port/**` and `scripts/**`
+    canonical-producer; `tests/unit/test_backlog.py` canonical-producer; `.claude/skills/**`
+    canonical-producer] (`0ad0e8a0` `2425c206` PORT8 — `_git` raises GitError on a non-zero exit;
+    a base-resolves check runs first; `range_checks` turns an unresolvable base or a failed git
+    read into NOT CHECKED on both range checks; CheckResult carries the third state and refuses
+    `passed=True` with it; the CLI prints the verdict word and NOT CERTIFIED names the not-checked
+    checks so `--tag` never runs; four tests pin it; the reconcile-port checklist carries the
+    three-word verdict and the re-certification-postscript rule; the seventh roll re-run on the
+    fixed instrument holds as issued — 407 commits, 0 uncited, 10 added documents, 0 unresolved
+    (THIRD POSTSCRIPT TO RELAY-46); `6cd58802` `903060e2` PLAN12 — for every todo or in_progress
+    item every `inputs:` string resolves against `git ls-files -z`, gitignored inputs skipped by
+    `git check-ignore`, a malformed entry fails loudly, INPUT_EXEMPTIONS shrink-only and EMPTY at
+    landing because the four genuine failures were fixed in the same commit (C42, C44, CFG4,
+    DOC5, Y4), validate.py mirrors it, and it caught five fresh items citing test files they will
+    create).
+
+367. CFG7 — THE S5 PATH RIDER ON NINETEEN GATE PROMPTS, AND RELAY-52 [`config/gate-prompts/**`
+    canonical-company — the rider reaches you ONLY through RELAY-52; `docs/port/port-prompt.md`
+    never-port] (`6836c0c8` `e2bf8d53` — a dated header RIDER on each of the nineteen prompts still citing
+    the pre-S5 monolith file names `config/taxonomy-ontology-map.yaml` and
+    `drydocs_core/ontology/relationship_vocabulary.yaml`, both directories since `d84d86bc`; no
+    clause text edited (L25); `updated:` moved to 2026-09-09 per the per-side rule; the three open
+    items whose notes cite the names (K26, E1, L19) left alone as records of the past; RELAY-52
+    names the nineteen so your copies, which win, can take the rider block by hand).
+
+    LEDGER COVERAGE FOOTNOTE (2026-09-09, EIGHTH ROLL). 172 commits in
+    `port-base-20260908..HEAD` at the roll (`git rev-list --count`; the tag lands on the
+    `chore(port): roll` follow-up that writes the roll commit's sha in, as the seventh did);
+    36 read as ritual under the existing patterns (snapshots, claims, renders, grooms);
+    136 are cited in steps 354–367. No pattern spelling drifted this roll.
+    The disposition renderer at the roll's parent measured 294 changed paths in 8 classes (canonical-producer 70, canonical-company 20, never-port 6, per-entry 107, union-append 2, evaluate 17, default_ok 65, derived 7).
+    RED AT PUSH (J77, the first roll to carry this line): the following failed CI at their sha: `5f0e730c`.
+    UNVERIFIED (J78 - a run cancelled by the next push, or no run at all): `6836c0c8`, `a6323c79`, `6cd58802`, `41e018fc`, `7ed742d2`, `0736cae3`, `1bd22b50`, `fe557fce`, `bd593e4e`, `5207a0b2`, `7daa2804`, `d3090725`, `ee6fe516`, `fdde7b36`, `c69cf037`, `ea810179`, `57356d56`, `b0035af3`, `6c84ef87`, `a5a8ad52`, `b5c7fbd8`, `0521ee1c`, `2673ae24`, `7e1c0e44`, `4cb966c9`, `93a75bdb`, `0a4e9d53`, `ee55d8ca`, `772ecdb6`, `e48b7877`, `f877f47b`, `813ddfa9`, `87a9eeaa`, `90899048`, `220f293b`, `7341f0e0`, `d1016072`, `0bf7e0fc`, `9013fb72`, `f06a5f00`, `1226ae70`, `0f10c989`, `01143a9c`, `6f740ee6`, `c34ee93f`, `0fd80d97`, `22a50d07`, `c25bca79`, `97e2d5d3`, `e8196bf4`, `c3a53ce5`, `10e5b465`, `51c49658`, `e9304fba`, `97eb9f02`, `fcf3c00b`, `775248a7`
+    - each was re-verified by the next run that completed green on its descendant, except one
+    that was red BY CONSTRUCTION and says so in its own message: `0736cae3` (ADR 0021's stub
+    rode a design-doc edit without its render; `981a76f6` is the fix, one commit later). The
+    20 markdown documents this range ADDS resolve every path they cite (preflight check 4).
+    THE ROLL COMMIT: ROLL8_SHA — `docs(port):` outside the ritual pattern, cited here.
 
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
