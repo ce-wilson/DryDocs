@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-09T01:12:21",
+    "captured_at": "2026-09-09T14:07:42",
     "date": "20260909",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "776c216a",
-      "full": "776c216ac9871a20a370685599a8aee12a924b02",
+      "commit": "903060e2",
+      "full": "903060e2a38a399f0187deaca511c919dc82fa11",
       "branch": "main",
-      "describe": "port-base-20260908-78-g776c216a",
-      "subject": "docs(plan): Lane B handoff — build-lane queue for the laptop session",
+      "describe": "port-base-20260908-169-g903060e2",
+      "subject": "feat(PLAN12): an inputs: existence guard for open items, landing green with the five stale item files fixed",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -6490,6 +6490,42 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/config/datahub",
+      "name": "datahub",
+      "extension": "",
+      "rel_path": "config/datahub",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/config/datahub/README.md",
+      "name": "README.md",
+      "extension": ".md",
+      "rel_path": "config/datahub/README.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/datahub/duckdb-profile.dhub.yml",
+      "name": "duckdb-profile.dhub.yml",
+      "extension": ".yml",
+      "rel_path": "config/datahub/duckdb-profile.dhub.yml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/config/datahub/lite-import.dhub.yml",
+      "name": "lite-import.dhub.yml",
+      "extension": ".yml",
+      "rel_path": "config/datahub/lite-import.dhub.yml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/config/dev-environment.yaml",
       "name": "dev-environment.yaml",
       "extension": ".yaml",
@@ -7363,6 +7399,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/config/source-descriptors.yaml",
+      "name": "source-descriptors.yaml",
+      "extension": ".yaml",
+      "rel_path": "config/source-descriptors.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/config/source-mappings",
       "name": "source-mappings",
       "extension": "",
@@ -8128,6 +8173,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/decisions/0021-not-checked-is-not-clean.md",
+      "name": "0021-not-checked-is-not-clean.md",
+      "extension": ".md",
+      "rel_path": "docs/decisions/0021-not-checked-is-not-clean.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/decisions/README.md",
       "name": "README.md",
       "extension": ".md",
@@ -8290,6 +8344,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/design/drydocs-docgen-runbook.html",
+      "name": "drydocs-docgen-runbook.html",
+      "extension": ".html",
+      "rel_path": "docs/design/drydocs-docgen-runbook.html",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/drydocs-docgen-runbook.md",
+      "name": "drydocs-docgen-runbook.md",
+      "extension": ".md",
+      "rel_path": "docs/design/drydocs-docgen-runbook.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/design/drydocs-lineage-mac-runbook.html",
       "name": "drydocs-lineage-mac-runbook.html",
       "extension": ".html",
@@ -8303,6 +8375,24 @@
       "name": "drydocs-lineage-mac-runbook.md",
       "extension": ".md",
       "rel_path": "docs/design/drydocs-lineage-mac-runbook.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/drydocs-lineage-runbook.html",
+      "name": "drydocs-lineage-runbook.html",
+      "extension": ".html",
+      "rel_path": "docs/design/drydocs-lineage-runbook.html",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/drydocs-lineage-runbook.md",
+      "name": "drydocs-lineage-runbook.md",
+      "extension": ".md",
+      "rel_path": "docs/design/drydocs-lineage-runbook.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -8447,6 +8537,24 @@
       "name": "drydocs-remediation-tdd.md",
       "extension": ".md",
       "rel_path": "docs/design/drydocs-remediation-tdd.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/drydocs-review-runbook.html",
+      "name": "drydocs-review-runbook.html",
+      "extension": ".html",
+      "rel_path": "docs/design/drydocs-review-runbook.html",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/drydocs-review-runbook.md",
+      "name": "drydocs-review-runbook.md",
+      "extension": ".md",
+      "rel_path": "docs/design/drydocs-review-runbook.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -8627,6 +8735,24 @@
       "name": "openlineage-substrate-review.md",
       "extension": ".md",
       "rel_path": "docs/design/openlineage-substrate-review.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/source-registration-tdd.html",
+      "name": "source-registration-tdd.html",
+      "extension": ".html",
+      "rel_path": "docs/design/source-registration-tdd.html",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/design/source-registration-tdd.md",
+      "name": "source-registration-tdd.md",
+      "extension": ".md",
+      "rel_path": "docs/design/source-registration-tdd.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -10036,6 +10162,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/epics/team-edition.yaml",
+      "name": "team-edition.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/epics/team-edition.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/epics/web-console.yaml",
       "name": "web-console.yaml",
       "extension": ".yaml",
@@ -10099,6 +10234,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/AGENT2.yaml",
+      "name": "AGENT2.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/AGENT2.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/API1.yaml",
       "name": "API1.yaml",
       "extension": ".yaml",
@@ -10130,6 +10274,24 @@
       "name": "API4.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/API4.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/API5.yaml",
+      "name": "API5.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/API5.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/API6.yaml",
+      "name": "API6.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/API6.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -10585,6 +10747,33 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/CFG10.yaml",
+      "name": "CFG10.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/CFG10.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/CFG11.yaml",
+      "name": "CFG11.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/CFG11.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/CFG12.yaml",
+      "name": "CFG12.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/CFG12.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/CFG2.yaml",
       "name": "CFG2.yaml",
       "extension": ".yaml",
@@ -10630,10 +10819,127 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/CFG7.yaml",
+      "name": "CFG7.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/CFG7.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/CFG8.yaml",
+      "name": "CFG8.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/CFG8.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/CFG9.yaml",
+      "name": "CFG9.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/CFG9.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/CORE1.yaml",
       "name": "CORE1.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/CORE1.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/CORE10.yaml",
+      "name": "CORE10.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/CORE10.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/CORE11.yaml",
+      "name": "CORE11.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/CORE11.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/CORE12.yaml",
+      "name": "CORE12.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/CORE12.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/CORE13.yaml",
+      "name": "CORE13.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/CORE13.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/CORE14.yaml",
+      "name": "CORE14.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/CORE14.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/CORE15.yaml",
+      "name": "CORE15.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/CORE15.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/CORE16.yaml",
+      "name": "CORE16.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/CORE16.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/CORE17.yaml",
+      "name": "CORE17.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/CORE17.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/CORE18.yaml",
+      "name": "CORE18.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/CORE18.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/CORE19.yaml",
+      "name": "CORE19.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/CORE19.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -10810,10 +11116,46 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/DEEP1.yaml",
+      "name": "DEEP1.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/DEEP1.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/DOC1.yaml",
       "name": "DOC1.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/DOC1.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/DOC10.yaml",
+      "name": "DOC10.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/DOC10.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/DOC11.yaml",
+      "name": "DOC11.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/DOC11.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/DOC12.yaml",
+      "name": "DOC12.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/DOC12.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -12155,6 +12497,60 @@
       "name": "GN2.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/GN2.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/GRAPH1.yaml",
+      "name": "GRAPH1.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/GRAPH1.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/GRAPH2.yaml",
+      "name": "GRAPH2.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/GRAPH2.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/GRAPH3.yaml",
+      "name": "GRAPH3.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/GRAPH3.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/GRAPH4.yaml",
+      "name": "GRAPH4.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/GRAPH4.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/GRAPH5.yaml",
+      "name": "GRAPH5.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/GRAPH5.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/GRAPH6.yaml",
+      "name": "GRAPH6.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/GRAPH6.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -13555,10 +13951,82 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/LIN4.yaml",
+      "name": "LIN4.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/LIN4.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/LOAD1.yaml",
       "name": "LOAD1.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/LOAD1.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/LOAD10.yaml",
+      "name": "LOAD10.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/LOAD10.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/LOAD11.yaml",
+      "name": "LOAD11.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/LOAD11.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/LOAD12.yaml",
+      "name": "LOAD12.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/LOAD12.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/LOAD13.yaml",
+      "name": "LOAD13.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/LOAD13.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/LOAD14.yaml",
+      "name": "LOAD14.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/LOAD14.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/LOAD15.yaml",
+      "name": "LOAD15.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/LOAD15.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/LOAD16.yaml",
+      "name": "LOAD16.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/LOAD16.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -13618,6 +14086,24 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/LOAD8.yaml",
+      "name": "LOAD8.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/LOAD8.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/LOAD9.yaml",
+      "name": "LOAD9.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/LOAD9.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/M1.yaml",
       "name": "M1.yaml",
       "extension": ".yaml",
@@ -13649,6 +14135,33 @@
       "name": "M4.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/M4.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/META1.yaml",
+      "name": "META1.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/META1.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/META2.yaml",
+      "name": "META2.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/META2.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/META3.yaml",
+      "name": "META3.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/META3.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -14887,6 +15400,33 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/ONT4.yaml",
+      "name": "ONT4.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/ONT4.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/ONT5.yaml",
+      "name": "ONT5.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/ONT5.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/ONT6.yaml",
+      "name": "ONT6.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/ONT6.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/P1.yaml",
       "name": "P1.yaml",
       "extension": ".yaml",
@@ -14963,6 +15503,24 @@
       "name": "PLAN11.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/PLAN11.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/PLAN12.yaml",
+      "name": "PLAN12.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/PLAN12.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/PLAN13.yaml",
+      "name": "PLAN13.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/PLAN13.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -15049,6 +15607,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/PORT10.yaml",
+      "name": "PORT10.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/PORT10.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/PORT2.yaml",
       "name": "PORT2.yaml",
       "extension": ".yaml",
@@ -15098,6 +15665,24 @@
       "name": "PORT7.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/PORT7.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/PORT8.yaml",
+      "name": "PORT8.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/PORT8.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/PORT9.yaml",
+      "name": "PORT9.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/PORT9.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -15589,10 +16174,28 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/REM3.yaml",
+      "name": "REM3.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/REM3.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/REV1.yaml",
       "name": "REV1.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/REV1.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/REV2.yaml",
+      "name": "REV2.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/REV2.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -16201,10 +16804,46 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/WEB19.yaml",
+      "name": "WEB19.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/WEB19.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/WEB2.yaml",
       "name": "WEB2.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/WEB2.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/WEB20.yaml",
+      "name": "WEB20.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/WEB20.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/WEB21.yaml",
+      "name": "WEB21.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/WEB21.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/WEB22.yaml",
+      "name": "WEB22.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/WEB22.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -17137,6 +17776,15 @@
       "kind": "dir"
     },
     {
+      "file_id": "drydocs/docs/reviews/modules/api-2026-09-08.md",
+      "name": "api-2026-09-08.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/modules/api-2026-09-08.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/reviews/modules/core-2026-09-07.md",
       "name": "core-2026-09-07.md",
       "extension": ".md",
@@ -17164,10 +17812,64 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/reviews/modules/plan-deepdoc-libs-2026-09-08.md",
+      "name": "plan-deepdoc-libs-2026-09-08.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/modules/plan-deepdoc-libs-2026-09-08.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/reviews/modules/port-docgen-docmeta-2026-09-08.md",
+      "name": "port-docgen-docmeta-2026-09-08.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/modules/port-docgen-docmeta-2026-09-08.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/reviews/modules/remediation-2026-09-08.md",
+      "name": "remediation-2026-09-08.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/modules/remediation-2026-09-08.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/reviews/modules/review-agents-2026-09-08.md",
+      "name": "review-agents-2026-09-08.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/modules/review-agents-2026-09-08.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/reviews/modules/seams-2026-09-08.md",
+      "name": "seams-2026-09-08.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/modules/seams-2026-09-08.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/reviews/modules/web-2026-09-05.md",
       "name": "web-2026-09-05.md",
       "extension": ".md",
       "rel_path": "docs/reviews/modules/web-2026-09-05.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/reviews/modules/web-2026-09-09.md",
+      "name": "web-2026-09-09.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/modules/web-2026-09-09.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -17285,6 +17987,15 @@
       "name": "port-test-review-and-workplan-2026-09-02.md",
       "extension": ".md",
       "rel_path": "docs/reviews/port-test-review-and-workplan-2026-09-02.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/reviews/premise-drift-2026-09-09.md",
+      "name": "premise-drift-2026-09-09.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/premise-drift-2026-09-09.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -18482,6 +19193,15 @@
       "name": "products__sample.csv",
       "extension": ".csv",
       "rel_path": "drydocs/data/samples/products__sample.csv",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/data/samples/synthetic-sources.json.gz",
+      "name": "synthetic-sources.json.gz",
+      "extension": ".gz",
+      "rel_path": "drydocs/data/samples/synthetic-sources.json.gz",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -19945,6 +20665,60 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/drydocs/source_registration",
+      "name": "source_registration",
+      "extension": "",
+      "rel_path": "drydocs/source_registration",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/drydocs/source_registration/__init__.py",
+      "name": "__init__.py",
+      "extension": ".py",
+      "rel_path": "drydocs/source_registration/__init__.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/source_registration/bundle.py",
+      "name": "bundle.py",
+      "extension": ".py",
+      "rel_path": "drydocs/source_registration/bundle.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/source_registration/datahub_emit.py",
+      "name": "datahub_emit.py",
+      "extension": ".py",
+      "rel_path": "drydocs/source_registration/datahub_emit.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/source_registration/duckdb_load.py",
+      "name": "duckdb_load.py",
+      "extension": ".py",
+      "rel_path": "drydocs/source_registration/duckdb_load.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs/source_registration/synthetic.py",
+      "name": "synthetic.py",
+      "extension": ".py",
+      "rel_path": "drydocs/source_registration/synthetic.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/drydocs/staging.py",
       "name": "staging.py",
       "extension": ".py",
@@ -21263,6 +22037,15 @@
       "name": "source_bindings.py",
       "extension": ".py",
       "rel_path": "drydocs_core/source_bindings.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/drydocs_core/source_descriptors.py",
+      "name": "source_descriptors.py",
+      "extension": ".py",
+      "rel_path": "drydocs_core/source_descriptors.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -23797,10 +24580,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260908.json",
-      "name": "drydocs-20260908.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260909.json",
+      "name": "drydocs-20260909.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260908.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260909.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -24652,6 +25435,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/scripts/build_synthetic_sources.py",
+      "name": "build_synthetic_sources.py",
+      "extension": ".py",
+      "rel_path": "scripts/build_synthetic_sources.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/scripts/check_header_freshness.py",
       "name": "check_header_freshness.py",
       "extension": ".py",
@@ -25388,6 +26180,24 @@
       "project": "drydocs",
       "circular": false,
       "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/tests/fixtures/remediation/synthetic-folder-set-export",
+      "name": "synthetic-folder-set-export",
+      "extension": "",
+      "rel_path": "tests/fixtures/remediation/synthetic-folder-set-export",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/tests/fixtures/remediation/synthetic-folder-set-export/demo-folder-set.xml",
+      "name": "demo-folder-set.xml",
+      "extension": ".xml",
+      "rel_path": "tests/fixtures/remediation/synthetic-folder-set-export/demo-folder-set.xml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
     },
     {
       "file_id": "drydocs/tests/fixtures/remediation/synthetic-legacy-transcript.yaml",
@@ -27289,6 +28099,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_remediation_folder_set_fixture.py",
+      "name": "test_remediation_folder_set_fixture.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_remediation_folder_set_fixture.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_remediation_handoff.py",
       "name": "test_remediation_handoff.py",
       "extension": ".py",
@@ -27604,6 +28423,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_source_descriptors.py",
+      "name": "test_source_descriptors.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_source_descriptors.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_source_labels.py",
       "name": "test_source_labels.py",
       "extension": ".py",
@@ -27689,6 +28517,15 @@
       "name": "test_supplements.py",
       "extension": ".py",
       "rel_path": "tests/unit/test_supplements.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/tests/unit/test_synthetic_sources.py",
+      "name": "test_synthetic_sources.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_synthetic_sources.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -32044,6 +32881,50 @@
       "drydocs/drydocs/review/source_mappings.py"
     ],
     [
+      "drydocs/drydocs/source_registration/bundle.py",
+      "drydocs/drydocs/source_registration/synthetic.py"
+    ],
+    [
+      "drydocs/drydocs/source_registration/bundle.py",
+      "drydocs/drydocs_core/data_root.py"
+    ],
+    [
+      "drydocs/drydocs/source_registration/bundle.py",
+      "drydocs/drydocs_core/landing_zones.py"
+    ],
+    [
+      "drydocs/drydocs/source_registration/bundle.py",
+      "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
+      "drydocs/drydocs/source_registration/bundle.py",
+      "drydocs/drydocs_core/source_descriptors.py"
+    ],
+    [
+      "drydocs/drydocs/source_registration/datahub_emit.py",
+      "drydocs/drydocs/source_registration/synthetic.py"
+    ],
+    [
+      "drydocs/drydocs/source_registration/datahub_emit.py",
+      "drydocs/drydocs_core/source_descriptors.py"
+    ],
+    [
+      "drydocs/drydocs/source_registration/duckdb_load.py",
+      "drydocs/drydocs/source_registration/bundle.py"
+    ],
+    [
+      "drydocs/drydocs/source_registration/duckdb_load.py",
+      "drydocs/drydocs_core/source_descriptors.py"
+    ],
+    [
+      "drydocs/drydocs/source_registration/synthetic.py",
+      "drydocs/drydocs/seal_samples.py"
+    ],
+    [
+      "drydocs/drydocs/source_registration/synthetic.py",
+      "drydocs/drydocs_core/source_descriptors.py"
+    ],
+    [
       "drydocs/drydocs/staging.py",
       "drydocs/drydocs_core/models/__init__.py"
     ],
@@ -32748,6 +33629,14 @@
       "drydocs/drydocs_core/repo_paths.py"
     ],
     [
+      "drydocs/drydocs_core/source_descriptors.py",
+      "drydocs/drydocs_core/repo_paths.py"
+    ],
+    [
+      "drydocs/drydocs_core/source_descriptors.py",
+      "drydocs/drydocs_core/source_registry.py"
+    ],
+    [
       "drydocs/drydocs_core/source_registry.py",
       "drydocs/drydocs_core/repo_paths.py"
     ],
@@ -32758,6 +33647,10 @@
     [
       "drydocs/drydocs_deepdoc/investigate.py",
       "drydocs/drydocs_core/orchestration/controlm/__init__.py"
+    ],
+    [
+      "drydocs/drydocs_deepdoc/mindmap.py",
+      "drydocs/drydocs_core/entity_extract.py"
     ],
     [
       "drydocs/drydocs_deepdoc/search_log.py",
@@ -33390,6 +34283,34 @@
     [
       "drydocs/scripts/build_seal_samples.py",
       "drydocs/drydocs/seal_samples.py"
+    ],
+    [
+      "drydocs/scripts/build_synthetic_sources.py",
+      "drydocs/drydocs/source_registration/__init__.py"
+    ],
+    [
+      "drydocs/scripts/build_synthetic_sources.py",
+      "drydocs/drydocs/source_registration/bundle.py"
+    ],
+    [
+      "drydocs/scripts/build_synthetic_sources.py",
+      "drydocs/drydocs/source_registration/datahub_emit.py"
+    ],
+    [
+      "drydocs/scripts/build_synthetic_sources.py",
+      "drydocs/drydocs/source_registration/duckdb_load.py"
+    ],
+    [
+      "drydocs/scripts/build_synthetic_sources.py",
+      "drydocs/drydocs/source_registration/synthetic.py"
+    ],
+    [
+      "drydocs/scripts/build_synthetic_sources.py",
+      "drydocs/drydocs_core/data_root.py"
+    ],
+    [
+      "drydocs/scripts/build_synthetic_sources.py",
+      "drydocs/drydocs_core/source_descriptors.py"
     ],
     [
       "drydocs/scripts/check_header_freshness.py",
@@ -34289,11 +35210,23 @@
     ],
     [
       "drydocs/tests/unit/test_deepdoc_mindmap.py",
+      "drydocs/drydocs_core/models/docs.py"
+    ],
+    [
+      "drydocs/tests/unit/test_deepdoc_mindmap.py",
       "drydocs/drydocs_deepdoc/__init__.py"
     ],
     [
       "drydocs/tests/unit/test_deepdoc_mindmap.py",
       "drydocs/drydocs_deepdoc/mindmap.py"
+    ],
+    [
+      "drydocs/tests/unit/test_deepdoc_mindmap.py",
+      "drydocs/tests/source_scan.py"
+    ],
+    [
+      "drydocs/tests/unit/test_deepdoc_mindmap.py",
+      "drydocs/tests/unit/test_uncertain_boundary.py"
     ],
     [
       "drydocs/tests/unit/test_deepdoc_search_log.py",
@@ -35373,6 +36306,10 @@
     ],
     [
       "drydocs/tests/unit/test_port_preflight.py",
+      "drydocs/drydocs/port/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_port_preflight.py",
       "drydocs/drydocs/port/port_preflight.py"
     ],
     [
@@ -35582,6 +36519,30 @@
     [
       "drydocs/tests/unit/test_remediation_equivalence_verdict.py",
       "drydocs/drydocs_remediation/transform.py"
+    ],
+    [
+      "drydocs/tests/unit/test_remediation_folder_set_fixture.py",
+      "drydocs/drydocs/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_remediation_folder_set_fixture.py",
+      "drydocs/drydocs/cli.py"
+    ],
+    [
+      "drydocs/tests/unit/test_remediation_folder_set_fixture.py",
+      "drydocs/drydocs_lineage/extractors/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_remediation_folder_set_fixture.py",
+      "drydocs/drydocs_remediation/detect.py"
+    ],
+    [
+      "drydocs/tests/unit/test_remediation_folder_set_fixture.py",
+      "drydocs/drydocs_remediation/profile.py"
+    ],
+    [
+      "drydocs/tests/unit/test_remediation_folder_set_fixture.py",
+      "drydocs/drydocs_remediation/xml_bridge.py"
     ],
     [
       "drydocs/tests/unit/test_remediation_handoff.py",
@@ -35944,6 +36905,14 @@
       "drydocs/drydocs_core/source_bindings.py"
     ],
     [
+      "drydocs/tests/unit/test_source_descriptors.py",
+      "drydocs/drydocs_core/source_descriptors.py"
+    ],
+    [
+      "drydocs/tests/unit/test_source_descriptors.py",
+      "drydocs/drydocs_core/source_registry.py"
+    ],
+    [
       "drydocs/tests/unit/test_source_labels.py",
       "drydocs/drydocs/__init__.py"
     ],
@@ -36026,6 +36995,34 @@
     [
       "drydocs/tests/unit/test_supplements.py",
       "drydocs/drydocs_core/schema/supplements.py"
+    ],
+    [
+      "drydocs/tests/unit/test_synthetic_sources.py",
+      "drydocs/drydocs/seal_samples.py"
+    ],
+    [
+      "drydocs/tests/unit/test_synthetic_sources.py",
+      "drydocs/drydocs/source_registration/__init__.py"
+    ],
+    [
+      "drydocs/tests/unit/test_synthetic_sources.py",
+      "drydocs/drydocs/source_registration/bundle.py"
+    ],
+    [
+      "drydocs/tests/unit/test_synthetic_sources.py",
+      "drydocs/drydocs/source_registration/datahub_emit.py"
+    ],
+    [
+      "drydocs/tests/unit/test_synthetic_sources.py",
+      "drydocs/drydocs/source_registration/duckdb_load.py"
+    ],
+    [
+      "drydocs/tests/unit/test_synthetic_sources.py",
+      "drydocs/drydocs/source_registration/synthetic.py"
+    ],
+    [
+      "drydocs/tests/unit/test_synthetic_sources.py",
+      "drydocs/drydocs_core/source_descriptors.py"
     ],
     [
       "drydocs/tests/unit/test_taxonomy_ontology_map.py",
@@ -41991,6 +42988,11 @@
     [
       "drydocs/config",
       "CONTAINS",
+      "drydocs/config/datahub"
+    ],
+    [
+      "drydocs/config",
+      "CONTAINS",
       "drydocs/config/dev-environment.yaml"
     ],
     [
@@ -42076,6 +43078,11 @@
     [
       "drydocs/config",
       "CONTAINS",
+      "drydocs/config/source-descriptors.yaml"
+    ],
+    [
+      "drydocs/config",
+      "CONTAINS",
       "drydocs/config/source-mappings"
     ],
     [
@@ -42107,6 +43114,21 @@
       "drydocs/config/crosswalks",
       "CONTAINS",
       "drydocs/config/crosswalks/cdo-vocabulary.yaml"
+    ],
+    [
+      "drydocs/config/datahub",
+      "CONTAINS",
+      "drydocs/config/datahub/README.md"
+    ],
+    [
+      "drydocs/config/datahub",
+      "CONTAINS",
+      "drydocs/config/datahub/duckdb-profile.dhub.yml"
+    ],
+    [
+      "drydocs/config/datahub",
+      "CONTAINS",
+      "drydocs/config/datahub/lite-import.dhub.yml"
     ],
     [
       "drydocs/config/gate-prompts",
@@ -42986,6 +44008,11 @@
     [
       "drydocs/docs/decisions",
       "CONTAINS",
+      "drydocs/docs/decisions/0021-not-checked-is-not-clean.md"
+    ],
+    [
+      "drydocs/docs/decisions",
+      "CONTAINS",
       "drydocs/docs/decisions/README.md"
     ],
     [
@@ -43071,12 +44098,32 @@
     [
       "drydocs/docs/design",
       "CONTAINS",
+      "drydocs/docs/design/drydocs-docgen-runbook.html"
+    ],
+    [
+      "drydocs/docs/design",
+      "CONTAINS",
+      "drydocs/docs/design/drydocs-docgen-runbook.md"
+    ],
+    [
+      "drydocs/docs/design",
+      "CONTAINS",
       "drydocs/docs/design/drydocs-lineage-mac-runbook.html"
     ],
     [
       "drydocs/docs/design",
       "CONTAINS",
       "drydocs/docs/design/drydocs-lineage-mac-runbook.md"
+    ],
+    [
+      "drydocs/docs/design",
+      "CONTAINS",
+      "drydocs/docs/design/drydocs-lineage-runbook.html"
+    ],
+    [
+      "drydocs/docs/design",
+      "CONTAINS",
+      "drydocs/docs/design/drydocs-lineage-runbook.md"
     ],
     [
       "drydocs/docs/design",
@@ -43161,6 +44208,16 @@
     [
       "drydocs/docs/design",
       "CONTAINS",
+      "drydocs/docs/design/drydocs-review-runbook.html"
+    ],
+    [
+      "drydocs/docs/design",
+      "CONTAINS",
+      "drydocs/docs/design/drydocs-review-runbook.md"
+    ],
+    [
+      "drydocs/docs/design",
+      "CONTAINS",
       "drydocs/docs/design/drydocs-source-files-map.html"
     ],
     [
@@ -43232,6 +44289,16 @@
       "drydocs/docs/design",
       "CONTAINS",
       "drydocs/docs/design/openlineage-substrate-review.md"
+    ],
+    [
+      "drydocs/docs/design",
+      "CONTAINS",
+      "drydocs/docs/design/source-registration-tdd.html"
+    ],
+    [
+      "drydocs/docs/design",
+      "CONTAINS",
+      "drydocs/docs/design/source-registration-tdd.md"
     ],
     [
       "drydocs/docs/design",
@@ -44016,6 +45083,11 @@
     [
       "drydocs/docs/restructure/backlog/epics",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/epics/team-edition.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/epics",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/epics/web-console.yaml"
     ],
     [
@@ -44046,6 +45118,11 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/AGENT2.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/API1.yaml"
     ],
     [
@@ -44062,6 +45139,16 @@
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
       "drydocs/docs/restructure/backlog/items/API4.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/API5.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/API6.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -44316,6 +45403,21 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/CFG10.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/CFG11.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/CFG12.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/CFG2.yaml"
     ],
     [
@@ -44341,7 +45443,72 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/CFG7.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/CFG8.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/CFG9.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/CORE1.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/CORE10.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/CORE11.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/CORE12.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/CORE13.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/CORE14.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/CORE15.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/CORE16.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/CORE17.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/CORE18.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/CORE19.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -44441,7 +45608,27 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/DEEP1.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/DOC1.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/DOC10.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/DOC11.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/DOC12.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -45187,6 +46374,36 @@
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
       "drydocs/docs/restructure/backlog/items/GN2.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/GRAPH1.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/GRAPH2.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/GRAPH3.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/GRAPH4.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/GRAPH5.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/GRAPH6.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -45966,7 +47183,47 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/LIN4.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/LOAD1.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/LOAD10.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/LOAD11.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/LOAD12.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/LOAD13.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/LOAD14.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/LOAD15.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/LOAD16.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -46001,6 +47258,16 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/LOAD8.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/LOAD9.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/M1.yaml"
     ],
     [
@@ -46017,6 +47284,21 @@
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
       "drydocs/docs/restructure/backlog/items/M4.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/META1.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/META2.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/META3.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -46706,6 +47988,21 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/ONT4.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/ONT5.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/ONT6.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/P1.yaml"
     ],
     [
@@ -46747,6 +48044,16 @@
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
       "drydocs/docs/restructure/backlog/items/PLAN11.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/PLAN12.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/PLAN13.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -46796,6 +48103,11 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/PORT10.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/PORT2.yaml"
     ],
     [
@@ -46822,6 +48134,16 @@
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
       "drydocs/docs/restructure/backlog/items/PORT7.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/PORT8.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/PORT9.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -47096,7 +48418,17 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/REM3.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/REV1.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/REV2.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -47436,7 +48768,27 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/WEB19.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/WEB2.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/WEB20.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/WEB21.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/WEB22.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -47771,6 +49123,11 @@
     [
       "drydocs/docs/reviews",
       "CONTAINS",
+      "drydocs/docs/reviews/premise-drift-2026-09-09.md"
+    ],
+    [
+      "drydocs/docs/reviews",
+      "CONTAINS",
       "drydocs/docs/reviews/restructure-design-review-2026-09-02.md"
     ],
     [
@@ -48041,6 +49398,11 @@
     [
       "drydocs/docs/reviews/modules",
       "CONTAINS",
+      "drydocs/docs/reviews/modules/api-2026-09-08.md"
+    ],
+    [
+      "drydocs/docs/reviews/modules",
+      "CONTAINS",
       "drydocs/docs/reviews/modules/core-2026-09-07.md"
     ],
     [
@@ -48056,7 +49418,37 @@
     [
       "drydocs/docs/reviews/modules",
       "CONTAINS",
+      "drydocs/docs/reviews/modules/plan-deepdoc-libs-2026-09-08.md"
+    ],
+    [
+      "drydocs/docs/reviews/modules",
+      "CONTAINS",
+      "drydocs/docs/reviews/modules/port-docgen-docmeta-2026-09-08.md"
+    ],
+    [
+      "drydocs/docs/reviews/modules",
+      "CONTAINS",
+      "drydocs/docs/reviews/modules/remediation-2026-09-08.md"
+    ],
+    [
+      "drydocs/docs/reviews/modules",
+      "CONTAINS",
+      "drydocs/docs/reviews/modules/review-agents-2026-09-08.md"
+    ],
+    [
+      "drydocs/docs/reviews/modules",
+      "CONTAINS",
+      "drydocs/docs/reviews/modules/seams-2026-09-08.md"
+    ],
+    [
+      "drydocs/docs/reviews/modules",
+      "CONTAINS",
       "drydocs/docs/reviews/modules/web-2026-09-05.md"
+    ],
+    [
+      "drydocs/docs/reviews/modules",
+      "CONTAINS",
+      "drydocs/docs/reviews/modules/web-2026-09-09.md"
     ],
     [
       "drydocs/docs/style",
@@ -48312,6 +49704,11 @@
       "drydocs/drydocs",
       "CONTAINS",
       "drydocs/drydocs/source_mappings.py"
+    ],
+    [
+      "drydocs/drydocs",
+      "CONTAINS",
+      "drydocs/drydocs/source_registration"
     ],
     [
       "drydocs/drydocs",
@@ -48792,6 +50189,11 @@
       "drydocs/drydocs/data/samples",
       "CONTAINS",
       "drydocs/drydocs/data/samples/products__sample.csv"
+    ],
+    [
+      "drydocs/drydocs/data/samples",
+      "CONTAINS",
+      "drydocs/drydocs/data/samples/synthetic-sources.json.gz"
     ],
     [
       "drydocs/drydocs/data/samples/email-extracts",
@@ -49464,6 +50866,31 @@
       "drydocs/drydocs/snapshots/writer.py"
     ],
     [
+      "drydocs/drydocs/source_registration",
+      "CONTAINS",
+      "drydocs/drydocs/source_registration/__init__.py"
+    ],
+    [
+      "drydocs/drydocs/source_registration",
+      "CONTAINS",
+      "drydocs/drydocs/source_registration/bundle.py"
+    ],
+    [
+      "drydocs/drydocs/source_registration",
+      "CONTAINS",
+      "drydocs/drydocs/source_registration/datahub_emit.py"
+    ],
+    [
+      "drydocs/drydocs/source_registration",
+      "CONTAINS",
+      "drydocs/drydocs/source_registration/duckdb_load.py"
+    ],
+    [
+      "drydocs/drydocs/source_registration",
+      "CONTAINS",
+      "drydocs/drydocs/source_registration/synthetic.py"
+    ],
+    [
       "drydocs/drydocs_api",
       "CONTAINS",
       "drydocs/drydocs_api/AUTHORING.md"
@@ -49767,6 +51194,11 @@
       "drydocs/drydocs_core",
       "CONTAINS",
       "drydocs/drydocs_core/source_bindings.py"
+    ],
+    [
+      "drydocs/drydocs_core",
+      "CONTAINS",
+      "drydocs/drydocs_core/source_descriptors.py"
     ],
     [
       "drydocs/drydocs_core",
@@ -51581,7 +53013,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260908.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260909.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -51987,6 +53419,11 @@
       "drydocs/scripts",
       "CONTAINS",
       "drydocs/scripts/build_seal_samples.py"
+    ],
+    [
+      "drydocs/scripts",
+      "CONTAINS",
+      "drydocs/scripts/build_synthetic_sources.py"
     ],
     [
       "drydocs/scripts",
@@ -52426,12 +53863,22 @@
     [
       "drydocs/tests/fixtures/remediation",
       "CONTAINS",
+      "drydocs/tests/fixtures/remediation/synthetic-folder-set-export"
+    ],
+    [
+      "drydocs/tests/fixtures/remediation",
+      "CONTAINS",
       "drydocs/tests/fixtures/remediation/synthetic-legacy-transcript.yaml"
     ],
     [
       "drydocs/tests/fixtures/remediation",
       "CONTAINS",
       "drydocs/tests/fixtures/remediation/synthetic-modern-transcript.yaml"
+    ],
+    [
+      "drydocs/tests/fixtures/remediation/synthetic-folder-set-export",
+      "CONTAINS",
+      "drydocs/tests/fixtures/remediation/synthetic-folder-set-export/demo-folder-set.xml"
     ],
     [
       "drydocs/tests/fixtures/server_inventory",
@@ -53451,6 +54898,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_remediation_folder_set_fixture.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_remediation_handoff.py"
     ],
     [
@@ -53626,6 +55078,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_source_descriptors.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_source_labels.py"
     ],
     [
@@ -53672,6 +55129,11 @@
       "drydocs/tests/unit",
       "CONTAINS",
       "drydocs/tests/unit/test_supplements.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
+      "drydocs/tests/unit/test_synthetic_sources.py"
     ],
     [
       "drydocs/tests/unit",
@@ -55293,13 +56755,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 3066,
-    "edges": 1923,
-    "circular_files": 14,
+    "files": 3156,
+    "edges": 1963,
+    "circular_files": 32,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 3396,
-    "directories": 331
+    "rels": 3489,
+    "directories": 334
   }
 }
