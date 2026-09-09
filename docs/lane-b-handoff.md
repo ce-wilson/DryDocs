@@ -2,16 +2,16 @@
 handoff: drydocs.lane-handoff.v1
 lane: B
 machine: laptop
-generated: 2026-09-08
-generated_at: 2dc38863 (main)
-queue: [G90, J59, LOAD7, CORE9, J61, Y6, I7, DOC7, J60, S11]
-other_queue: [PORT4, PORT3, PORT1, DOC2, PLAN9, J77, J64, J65, U27, I5, J54, N18, J70, Y3]
-pens: [code:drydocs-load, code:config, code:drydocs-core, code:docs, code:drydocs-docgen]
+generated: 2026-09-09
+generated_at: 7daa2804 (main)
+queue: [DOC9, REM2, MM12, V6, V4, V5, DOC8, S11]
+other_queue: [N18, J70, Y3]
+pens: [code:docs, code:drydocs-remediation, code:drydocs-deepdoc, code:drydocs-docgen]
 ---
 
-# Lane B handoff — laptop, 2026-09-08
+# Lane B handoff — laptop, 2026-09-09
 
-**From:** Lane A (desktop). **To:** the Lane B session on the laptop.
+**From:** the Lane A session. **To:** the Lane B session on the laptop.
 **Lifecycle:** a working handoff, not a durable record — the item files are. When
 the queue below is empty, delete this file in the closing commit
 (`python .claude/skills/lane-handoff/scripts/handoff.py --check <this file>` says when).
@@ -22,7 +22,7 @@ Collisions come from two sessions writing the same surface, not from two session
 existing. Your first commit message (or your `wip/` branch name) names what you hold:
 
 ```text
-pen: code:drydocs-load · code:config · code:drydocs-core · code:docs · code:drydocs-docgen
+pen: code:docs · code:drydocs-remediation · code:drydocs-deepdoc · code:drydocs-docgen
 ```
 
 Lane A holds: `backlog · port · adr · gates · snapshot`. Anything not declared by either lane
@@ -41,7 +41,7 @@ is the pen for a SURFACE.
 4. Per-machine facts are yours to verify: `DRYDOCS_DATA_ROOT`, `DRYDOCS_LOGDIR`, the
    `.env`, and whether Neo4j is reachable here. Venue-stamp any live claim (J18).
 
-## Your queue, in order (10 items) — claim one at a time
+## Your queue, in order (8 items) — claim one at a time
 
 Every item below is `todo` with every dependency `done` at the generating commit — the
 same rule the board's Ready strip uses (`derive_summary`). Re-check on pull: the other
@@ -50,61 +50,42 @@ since PLAN1), so two lanes minting in disjoint series cannot collide on a number
 
 | # | Id | Title | Type / prio | Module | Model | Notes from the check |
 |---|---|---|---|---|---|---|
-| 1 | **G90** | Build the fix-tracking loader the remediation-fix-tracking gate authorized (§C1) | requirement / p2 | `drydocs-load` | fable | input `config/gate-prompts/remediation-fix-tracking.yaml` — pen `gates` (gate prompts — SME sessions run from Lane A); gate-bound: remediation-fix-tracking (an SME session, not a build); overlap: G90 <-> Y3: `config/gate-prompts` (Y3's input, coarse) covers `config/gate-prompts/remediation-fix-tracking.yaml`; overlap: G90 <-> Y3: `drydocs_core/ontology/relationship_vocabulary` (Y3's input, coarse) covers `drydocs_core/ontology/relationship_vocabulary/20-property-terms.yaml` |
-| 2 | **J59** | The one freshness key the repo has LIES — 16 of 24 dated YAML headers are stale against git, so the `updated:` field needs a check that compares it to something, and that check cannot live in CI (after J58) | chore / p3 | `config` | sonnet | notes say machine-local; input `PORT-MANIFEST.yaml` — pen `port` (port dispositions); overlap: J59 <-> PORT4: both name `PORT-MANIFEST.yaml`; overlap: J59 <-> PORT3: both name `PORT-MANIFEST.yaml`; overlap: J59 <-> DOC2: both name `PORT-MANIFEST.yaml`; overlap: J59 <-> PLAN9: both name `PORT-MANIFEST.yaml` |
-| 3 | **LOAD7** | test_pat_projection stops skipping on a tracked sample fixture - a missing PAT product-mapping sample fails the test loudly | bug / p3 | `drydocs-load` | sonnet | clean |
-| 4 | **CORE9** | Delete the five skip guards the rewritten skip-guard policy no longer asks for, so every remaining skip is one the policy would refuse to drop (after CORE4) | chore / p3 | `drydocs-core` | sonnet | clean |
-| 5 | **J61** | A shared checkout blocked by another live session's uncommitted file can neither pull nor push, and the branch guardrail returns EMPTY in the detached worktree that is the only way out — write the recovery down instead of improvising it once per session | chore / p2 | `docs` | sonnet | input `docs/restructure/backlog/items/J48.yaml` — pen `backlog` (items, epics, plan — the board's sources); input `docs/restructure/backlog/items/U27.yaml` — pen `backlog` (items, epics, plan — the board's sources); overlap: J61 <-> J77: both name `CLAUDE.md`; overlap: J61 <-> J65: both name `scripts/render_board.py` |
-| 6 | **Y6** | The pull rule says a claim ships no render, which is true when you claim an existing item and false when you mint a new one — state the distinction in CLAUDE.md before it turns CI red again | chore / p2 | `docs` | sonnet | input `docs/restructure/backlog/items/Y5.yaml` — pen `backlog` (items, epics, plan — the board's sources); overlap: Y6 <-> J77: both name `CLAUDE.md` |
-| 7 | **I7** | Fan-out orchestration puts several id allocators and several render writers inside one checkout - write the coordinator rule into the operating guide before a skill spawns workers | chore / p2 | `docs` | sonnet | overlap: I7 <-> J77: both name `CLAUDE.md`; overlap: I7 <-> I5: both name `.claude/skills/groom-backlog/SKILL.md` |
-| 8 | **DOC7** | The J31 wip-branch rule says when the LOCAL branch is deleted, in CLAUDE.md and in the lane-handoff close | chore / p3 | `docs` | haiku | overlap: DOC7 <-> J77: both name `CLAUDE.md` |
-| 9 | **J60** | Module and package docstrings are enforced by nothing — enable ruff's D100/D104 instead of writing a bespoke guard, and fill the modules that have no docstring at all | chore / p3 | `docs` | sonnet | clean |
-| 10 | **S11** | Extract drydocs_plan/, drydocs_docgen/ and drydocs_port/ — the three declared components that never got a package (after S8) | chore / p3 | `drydocs-docgen` | sonnet | input `PORT-MANIFEST.yaml` — pen `port` (port dispositions); input `docs/port/port-prompt.md` — pen `port` (port prompt, relays, dossiers); overlap: S11 <-> PORT4: `scripts` (S11's input, coarse) covers `scripts/port_rename_check.py`; overlap: S11 <-> PORT4: both name `PORT-MANIFEST.yaml`; overlap: S11 <-> PORT3: both name `PORT-MANIFEST.yaml`; overlap: S11 <-> PORT1: `scripts` (S11's input, coarse) covers `scripts/render_port_dispositions.py`; overlap: S11 <-> PORT1: `scripts` (S11's input, coarse) covers `scripts/port_rename_check.py`; overlap: S11 <-> DOC2: both name `PORT-MANIFEST.yaml`; overlap: S11 <-> DOC2: both name `docs/port/port-prompt.md`; overlap: S11 <-> PLAN9: both name `PORT-MANIFEST.yaml`; overlap: S11 <-> J77: both name `docs/port/port-prompt.md`; overlap: S11 <-> J65: `scripts` (S11's input, coarse) covers `scripts/render_load_map.py`; overlap: S11 <-> J65: `scripts` (S11's input, coarse) covers `scripts/render_board.py` |
+| 1 | **DOC9** | The committed docs/design/*.html renders get a committed-vs-source guard on the roadmap guard's shape, comparing renderer bytes rather than a normalized form | task / p2 | `docs` | sonnet | clean |
+| 2 | **REM2** | A synthetic Control-M folder-set export ships beside the other samples so the remediation runbook's one verb can be demonstrated in a clone (after V7) | task / p2 | `drydocs-remediation` | sonnet | clean |
+| 3 | **MM12** | Acronyms are the one thing every corpus in the deepdoc investigation is dense with and the extractor has no class for them — add acronym candidates, with the sentence they were found in, to the mind-map state file (after MM3) | task / p2 | `drydocs-deepdoc` | sonnet | overlap: MM12 <-> J70: `drydocs_core` (MM12's input, coarse) covers `drydocs_core/ontology/relationship_vocabulary/41-local-business-application.yaml`; overlap: MM12 <-> Y3: `drydocs_core` (MM12's input, coarse) covers `drydocs_core/ontology/relationship_vocabulary` |
+| 4 | **V6** | SME runbook: drydocs-lineage — module-wide operate surface; index or absorb the chain-scoped lineage-mac and cmdline-resolution runbooks (after V1) | task / p2 | `docs` | sonnet | clean |
+| 5 | **V4** | SME runbook: drydocs-review — gate pages, graph verify, review labels, publishing flow (after V1) | task / p2 | `docs` | sonnet | clean |
+| 6 | **V5** | SME runbook: drydocs-docgen — design-doc render chain, outline validation, the L5/L6 feedback loop (after V1) | task / p2 | `docs` | sonnet | clean |
+| 7 | **DOC8** | The 3.14 advisory leg's warnings are read once: each class is fixed or filtered by name with its reason, and the 3.12 baseline with it (after J67) | chore / p3 | `docs` | sonnet | clean |
+| 8 | **S11** | Extract drydocs_plan/, drydocs_docgen/ and drydocs_port/ — the three declared components that never got a package (after S8) | chore / p3 | `drydocs-docgen` | sonnet | input `PORT-MANIFEST.yaml` — pen `port` (port dispositions); input `docs/port/port-prompt.md` — pen `port` (port prompt, relays, dossiers) |
 
 **Flags to rule before claiming** (the script flags; the author decides):
 
-- G90: input `config/gate-prompts/remediation-fix-tracking.yaml` — pen `gates` (gate prompts — SME sessions run from Lane A) — Lane A's pen; coordinate before editing.
-- J59: notes say machine-local — does the laptop have it? If not, this item belongs to the other lane or waits for the file to be copied over.
-- J59: input `PORT-MANIFEST.yaml` — pen `port` (port dispositions) — Lane A's pen; coordinate before editing.
-- J61: input `docs/restructure/backlog/items/J48.yaml` — pen `backlog` (items, epics, plan — the board's sources) — Lane A's pen; coordinate before editing.
-- J61: input `docs/restructure/backlog/items/U27.yaml` — pen `backlog` (items, epics, plan — the board's sources) — Lane A's pen; coordinate before editing.
-- Y6: input `docs/restructure/backlog/items/Y5.yaml` — pen `backlog` (items, epics, plan — the board's sources) — Lane A's pen; coordinate before editing.
 - S11: input `PORT-MANIFEST.yaml` — pen `port` (port dispositions) — Lane A's pen; coordinate before editing.
 - S11: input `docs/port/port-prompt.md` — pen `port` (port prompt, relays, dossiers) — Lane A's pen; coordinate before editing.
 
-**Ruled by the sender (2026-09-08):** every pen flag above is a READ, and the overlaps
-are sequencing, not blocks. **G90** reads the signed gate prompt as its spec and reads
-`20-property-terms.yaml` for the terms it binds; it writes neither. "Gate-bound" here
-means the gate is SIGNED (10/10, 2026-08-12) and the build is authorized, not that a
-session is owed. Y3 adds a PLANNED vocabulary entry on Lane A and touches no term G90
-uses. The acceptance is unit tests against the recorded-Cypher fake; a live run is a
-bonus and is venue-stamped if made. **J59** is machine-local BY DESIGN - a local hook is
-each machine's own install - so build it on the laptop and say so; `PORT-MANIFEST.yaml`
-is one of the 24 dated headers it CHECKS and is never edited by it - a stale `updated:`
-in a port-pen file goes in the close report, Lane A fixes it. **J61, Y6, I7, DOC7 are one
-cluster on CLAUDE.md section 0**, so this burst fences `CLAUDE.md` section 0 to Lane B:
-Lane A does not edit section 0 until the cluster merges, and J77's convention sentence
-lands in the port-pen surfaces where a roll is authored, not in CLAUDE.md. Carry the four
-on ONE branch, `wip/j61-laptop`, four claims and four commits in queue order - four
-branches off one paragraph set would conflict with each other at merge, and one branch
-is the exception to J31's per-id shape that the same-file case earns; name it in the
-close report. The item files J48, U27 and Y5 are read as evidence and cited, never
-edited; J61 reads `render_board.py` to re-verify clause (d) and does not change it. I7
-edits section 0 only - if a groom-skill sentence is wanted, hand it back (I5 holds
-`.claude/skills/groom-backlog/SKILL.md` this burst). **J60 runs after the cluster and
-before S11**, from a fresh pull of `main`: the docstring commit is separate from the ruff
-config commit, and a top-of-file docstring on a module Lane A also edited is a merge Lane
-A resolves - expected, not a defect. **S11 is last and is the long tail**; if it does not
-close this burst, that is fine and the branch stays on `wip/s11-laptop`. Its
-`MODULE_MAP.md` rows land in the SAME commit as the move (the boundary guard is
-default-deny); its `PORT-MANIFEST.yaml` rows for the three new packages are handed back
-in the notes on the standing rule below (branch red on the fall-through guard, Lane A
-adds the rows at merge); `docs/port/port-prompt.md` is read for the citations that name
-`drydocs/port_preflight.py` and NOT edited - Lane A repoints them under the `port` pen at
-merge. The `scripts/` overlaps are import lines that follow the move; if Lane A's PORT1 or
-PORT4 touched the same script, the conflict is an import line and Lane A resolves it. The
-laptop has its own Neo4j container and independent graph - verify before any live claim
-and stamp the venue (J18). No flag blocks a claim.
+**Sender rulings on the flags and the order** (Lane A, desktop, 2026-09-09):
+
+- **S11 and the `port` pen: one-directional, as ruled for the last queue.** Read
+  `PORT-MANIFEST.yaml` and `docs/port/port-prompt.md` freely; write neither. A row the
+  extraction needs (a new package path, a moved one) goes in S11's notes as path,
+  disposition, one-line reason, and Lane A pastes it at the merge - the J59 clause (c)
+  hand-back is the worked example (`7daa2804`). `MODULE_MAP.md` and `pyproject.toml` are
+  yours for S11 (both auto-merged cleanly last burst).
+- **MM12's coarse `drydocs_core` input does not reach `relationship_vocabulary/`.** The
+  script flags an overlap with J70 and Y3 on that directory; MM12's build is the deepdoc
+  extractor, and a new acronym class proposes into the state file, never into a vocabulary
+  fragment (that is an ontology decision, Lane A's `gates` pen). Stay out of it.
+- **V5 before S11, on purpose.** V5 documents the docgen render chain at its current
+  paths; S11 moves that code into `drydocs_docgen/`. Write the runbook first, then let the
+  extraction update its paths in the same S11 commit.
+- **MM14 is deliberately not here.** It needs a throwaway Neo4j database and the laptop's
+  venue for that is unruled; it goes to whichever machine the user says.
+- **Run the whole J57 family before every push, and two more.** CORE9 verified 103
+  targeted tests and its branch failed `tests/unit/test_never_port_citations.py` at the
+  merge (fixed in `97e2d5d3`; Idea-308 carries the policy question). CLAUDE.md section 6's
+  list does not yet name `test_skip_guard_policy.py` or `test_never_port_citations.py` -
+  both read EVERY test file, so a change anywhere can fail them. Run them.
 
 ## Surfaces — who holds which pen this burst
 
@@ -128,16 +109,14 @@ the change back through the sender.
 | `gates` (this skill's addition to §0) | `config/gate-log.md` | Lane A — the signed gate record |
 | `gates` (this skill's addition to §0) | `config/crosswalks/` | Lane A — orchestrator crosswalks — gate-bound config |
 | `snapshot` (this skill's addition to §0) | `knowledge/depgraph-snapshots/` | Lane A — the session snapshot — one writer per burst |
-| Lane A's queue | the items PORT4, PORT3, PORT1, DOC2, PLAN9, J77, J64, J65, U27, I5, J54, N18, J70, Y3 and their inputs | do not claim or edit |
+| Lane A's queue | the items N18, J70, Y3 and their inputs | do not claim or edit |
 | `code:<module>` | everything an item in YOUR queue names in `inputs` | this lane, claimed per item |
 | — | `docs/plan/*.html`, `web/src/generated/**`, `docs/design/*.html` | derived renders — Lane A regenerates once at close; nobody merges them by hand (J43) |
 
 **About Lane A's queue, from the same check** (for the sender to rule — this lane
 does nothing with these):
 
-- DOC2: gate-bound: ontology-domain-registry-and-edition-grain (an SME session, not a build)
-- PLAN9: notes say machine-local
-- N18: gate-bound: registry-wiring-readiness (an SME session, not a build)
+- N18: status is 'in_progress', a queue lists todo items only
 - J70: gate-bound: schema-identifier-publish-ceiling-teams-edition (an SME session, not a build)
 
 **Lane B claims status-only and never renders.** A claim is one item file, pushed;
