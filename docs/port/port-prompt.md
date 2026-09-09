@@ -3931,8 +3931,8 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
 - **RELAY-52 - NINETEEN GATE PROMPTS CARRY A DATED S5 PATH RIDER; YOUR COPIES WIN, SO TAKE THE
   RIDER BLOCK BY HAND** [VERIFIED-PRODUCER] (2026-09-09, producer CFG7, venue desktop). The
   premise-drift review measured 30 broken path citations across 19 of the 60 gate prompts, 25 of
-  them one pair: `config/taxonomy-ontology-map.yaml` and
-  `drydocs_core/ontology/relationship_vocabulary.yaml`, both DIRECTORIES of the same name since
+  them one pair: config/taxonomy-ontology-map.yaml and
+  drydocs_core/ontology/relationship_vocabulary.yaml, both DIRECTORIES of the same name since
   `d84d86bc` (S5, the per-domain shard). CFG7 swept them ONCE, deliberately not with a guard: the
   sanctioned edit shape keeps the old path in the text, so a bare-path guard would fail on the
   marker recording its own fix. The sweep is a header RIDER - a dated comment block after each
@@ -7852,15 +7852,16 @@ hand-carried and nothing parked.
 367. CFG7 — THE S5 PATH RIDER ON NINETEEN GATE PROMPTS, AND RELAY-52 [`config/gate-prompts/**`
     canonical-company — the rider reaches you ONLY through RELAY-52; `docs/port/port-prompt.md`
     never-port] (`6836c0c8` `e2bf8d53` — a dated header RIDER on each of the nineteen prompts still citing
-    the pre-S5 monolith file names `config/taxonomy-ontology-map.yaml` and
-    `drydocs_core/ontology/relationship_vocabulary.yaml`, both directories since `d84d86bc`; no
+    the pre-S5 monolith file names config/taxonomy-ontology-map.yaml and
+    drydocs_core/ontology/relationship_vocabulary.yaml, both directories since `d84d86bc`; no
     clause text edited (L25); `updated:` moved to 2026-09-09 per the per-side rule; the three open
     items whose notes cite the names (K26, E1, L19) left alone as records of the past; RELAY-52
     names the nineteen so your copies, which win, can take the rider block by hand).
 
     LEDGER COVERAGE FOOTNOTE (2026-09-09, EIGHTH ROLL). 172 commits in
     `port-base-20260908..HEAD` at the roll (`git rev-list --count`; the tag lands on the
-    `chore(port): roll` follow-up that writes the roll commit's sha in, as the seventh did);
+    `chore(port): ledger` fix one commit past the roll follow-up - the currency guard caught two
+    retired names quoted in backticks in this very roll, the premise-drift review's own convention);
     36 read as ritual under the existing patterns (snapshots, claims, renders, grooms);
     136 are cited in steps 354–367. No pattern spelling drifted this roll.
     The disposition renderer at the roll's parent measured 294 changed paths in 8 classes (canonical-producer 70, canonical-company 20, never-port 6, per-entry 107, union-append 2, evaluate 17, default_ok 65, derived 7).
