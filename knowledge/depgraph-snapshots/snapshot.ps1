@@ -38,6 +38,11 @@
          delete it — which is exactly how a 101-file series accumulated once,
          and the sibling reappeared four times in the two days after the ruling.
          -CodeOnly comparison files keep their own name and are exempt.
+    J53 — a failed refresh step names its CAUSE (the traceback's last line, not
+         its "Traceback" banner) and lists which outputs landed and which are stale.
+    J65 — clear an inherited VIRTUAL_ENV before the first `poetry run`, so a
+         PowerShell caller with the desktop's leak resolves the project environment
+         instead of failing every refresh step on a missing module.
 #>
 [CmdletBinding()]
 param(
@@ -50,6 +55,26 @@ $Tree = -not $CodeOnly
 $ErrorActionPreference = "Stop"
 $here = $PSScriptRoot
 $repo = (Resolve-Path "$here\..\..").Path
+
+# --- the environment poetry resolves (J65, 2026-09-08) --------------------------
+# Every `poetry run` below must resolve the PROJECT environment. Poetry honours an
+# inherited VIRTUAL_ENV over its own resolution, and on this desktop the Claude
+# Code shell pre-sets it to agents\.venv (the "VIRTUAL_ENV Leak" project memory;
+# the company guide's S6 workaround is the same unset). A Bash caller that unsets
+# it succeeds; a PowerShell caller inherits it and the board refresh fails on the
+# first import the leaked environment lacks - `ModuleNotFoundError: No module
+# named 'typer'` at the O77 close (2026-08-28), `No module named 'drydocs'` when
+# reproduced from the PowerShell tool on 2026-09-08 - and the load-map surfaces
+# never refreshed from this script on this machine. Cleared unconditionally: a
+# caller who activated the project's own environment loses nothing, because
+# poetry resolves the same environment without the variable; a caller who
+# activated any OTHER environment was never going to get a correct render from
+# it. Printed when it was set, so a reader of the run knows the variable was
+# there and which one, rather than wondering why Bash and PowerShell disagree.
+if ($env:VIRTUAL_ENV) {
+  Write-Host ("env: VIRTUAL_ENV was set ({0}) - cleared so poetry resolves the project environment (J65)" -f $env:VIRTUAL_ENV) -ForegroundColor DarkGray
+  Remove-Item Env:VIRTUAL_ENV -ErrorAction SilentlyContinue
+}
 
 # --- worktree state: TRACKED changes and UNTRACKED presence, kept apart (U15) -
 # `git status --porcelain` with no flags lists untracked files too, so a single
