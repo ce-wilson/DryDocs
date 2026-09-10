@@ -8313,10 +8313,17 @@ hand-carried and nothing parked.
     waits on. Take it with the rest of `drydocs/port/**` if you run the preflight; the two
     corrections riding with it are producer-side documents.
 
-    LEDGER COVERAGE FOOTNOTE (2026-09-10, NINTH ROLL). 142 commits in
-    `port-base-20260909..HEAD` at the roll; 37 read as ritual under the existing
-    patterns (claims, one snapshot); 105 are cited in steps 368-386. No pattern spelling
-    drifted this roll. The disposition renderer at HEAD measured 228 changed paths in 8 classes
+    LEDGER COVERAGE FOOTNOTE (2026-09-10, NINTH ROLL). **144 commits in
+    `port-base-20260909..port-base-20260910`, 39 ritual, 105 cited in steps 368-386**, and
+    those are the numbers AT THE TAG. Read once as 142 / 37 / 105, which was true when the
+    count ran and false two commits later, because A COVERAGE FOOTNOTE CANNOT COUNT ITSELF:
+    the count is taken before the commit that writes it, so the roll's own
+    `chore(port): ledger` commits are always outside it - here `327f2ec9` and `bb73c182`,
+    both ritual, which is why the CITED number was right at both readings and only the
+    totals moved. The eighth roll met the same thing and worked around it in prose ("the tag
+    lands on the `chore(port): ledger` fix one commit past the roll follow-up"); stating the
+    rule is cheaper than re-deriving it every roll. Take the totals as as-of the tag and the
+    cited count as exact. No pattern spelling drifted this roll. The disposition renderer at HEAD measured 228 changed paths in 8 classes
     (canonical-producer 40, canonical-company 12, never-port 6, per-entry 52, union-append 2,
     evaluate 5, default_ok 102, derived 9).
     RED AT PUSH (J77): FIVE on the trunk, and the number needs its denominator or it reads far
