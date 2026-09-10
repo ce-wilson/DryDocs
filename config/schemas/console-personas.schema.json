@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "drydocs:config/schemas/console-personas.schema.json",
+  "title": "config/console-personas.yaml (drydocs.console-personas.v1)",
+  "description": "Shape only (S6): the console's demo roster - the seats that may sign in to a demo, the role each maps to, and the claim-to-role mapping declared and deferred rather than absent (CFG14; gate console-auth-boundary sC P4). NOT an authorization source - the server re-resolves the real role from the bearer token on every request (ADR 0005 decision 3), so the role a browser holds drives nav rendering only. Semantics - a role must be on the roles list, a tower_key above the user tier contradicts itself, and the claim block's status must agree with its contents - live in drydocs_core/console_personas.py and tests/unit/test_console_personas.py.",
+  "type": "object",
+  "required": [
+    "schema",
+    "classification",
+    "updated",
+    "roles",
+    "personas",
+    "claims"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "drydocs.console-personas.v1"
+    },
+    "classification": {
+      "type": "string"
+    },
+    "updated": {
+      "description": "date or string (YAML parses bare dates)"
+    },
+    "roles": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "The closed set of tiers. A fourth tier is an edit here and in the guard, never a value that widens the set by arriving."
+    },
+    "personas": {
+      "type": "object",
+      "minProperties": 1,
+      "description": "One entry per seat, keyed by the id a sign-in names. An empty roster would make every sign-in fail and every guard over it vacuous.",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "display_name",
+          "role"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "display_name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "role": {
+            "type": "string",
+            "minLength": 1
+          },
+          "chip": {
+            "type": "string"
+          },
+          "tower_key": {
+            "type": "string",
+            "minLength": 1,
+            "description": "User tier only: scopes the area cascade's default. A steward or admin is not scoped to one tower, so the reader refuses it above that tier."
+          }
+        }
+      }
+    },
+    "claims": {
+      "type": "object",
+      "required": [
+        "status",
+        "mapping"
+      ],
+      "additionalProperties": false,
+      "description": "The claim-to-role mapping. Declared and deferred, never absent. The status and the contents must agree; the reader refuses them when they do not, because a declaration whose halves disagree is asserting something nobody checked.",
+      "properties": {
+        "status": {
+          "enum": [
+            "deferred",
+            "adopted"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "description": "Required when deferred, forty characters or more: a bare deferral is a fact with no owner, a reasoned one is a decision someone can re-read and reverse. Length is enforced by the reader, not here."
+        },
+        "mapping": {
+          "type": "object",
+          "description": "Directory group name to application role. Empty when deferred.",
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

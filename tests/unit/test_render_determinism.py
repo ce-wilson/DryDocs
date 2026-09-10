@@ -174,6 +174,10 @@ COMMITTED_SURFACE_WRITERS = (
     # G129 (2026-08-30): `.env.example` stopped being hand-maintained and became a
     # render of DECLARED_VARIABLES. It is a committed surface like any other.
     "scripts/render_env_example.py",
+    # CFG14 (2026-09-10): the console's demo roster. Declared once in
+    # config/console-personas.yaml and rendered for the console, which is what
+    # retires the regex that parsed auth.ts to catch drift between two declarations.
+    "scripts/render_console_personas.py",
 )
 
 #: Globs whose CONTENT is committed and must be byte-identical across platforms.

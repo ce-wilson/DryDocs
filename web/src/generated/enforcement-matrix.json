@@ -705,6 +705,31 @@
       "extra_contents": {}
     },
     {
+      "id": "console-personas",
+      "title": "Console demo roster and claim mapping",
+      "file": "config/console-personas.yaml",
+      "code_resident": false,
+      "symbols": [],
+      "consumers": [
+        "drydocs_core/console_personas.py",
+        "drydocs_api/personas.py",
+        "scripts/render_console_personas.py",
+        "web/src/generated/console-personas.json"
+      ],
+      "guard_tests": [
+        "test_console_personas.py"
+      ],
+      "gate_ref": "console-auth-boundary (SIGNED OFF 2026-09-10; P4 deferred, re-arm = federation onboarding)",
+      "status": "enforced",
+      "pending_entries": 0,
+      "env_refs": [],
+      "files": [
+        "config/console-personas.yaml"
+      ],
+      "content": "# =============================================================================\n# config/console-personas.yaml — the console's demo roster, and the role each seat maps to\n# =============================================================================\n# CFG14, 2026-09-10. ONE declaration. Before this the roster was written twice —\n# once in `web/src/lib/auth.ts` and once in `drydocs_api/personas.py` — with a\n# unit test that parsed the TypeScript with a regular expression to catch the\n# drift that duplication guarantees. The duplication was the defect; the regex\n# was the symptom. Both sides now read this file: Python through\n# `drydocs_core/console_personas.py`, the console through the rendered\n# `web/src/generated/console-personas.json`.\n#\n# THIS IS THE DEMO ROSTER. IT IS NOT AN AUTHORIZATION SOURCE, and the distinction\n# is the whole reason a config file is safe here. The server re-resolves the real\n# role from the bearer token on every request (ADR 0005 decision 3); the role a\n# browser holds drives which nav entries render and nothing else. Editing this\n# file changes who can SIGN IN to a demo and what the nav looks like. It does not\n# grant anything, and a hand-edited session blob still buys nothing.\n#\n# THE IDS ARE OBVIOUSLY FICTIONAL, and that is a decision rather than a joke.\n# They were SID-shaped until 2026-08-28, which read as realistic in a demo and\n# carried a standing risk with it: an id that looks like a real corporate SID is\n# an id somebody can mistake for one — in a screenshot, a bug report, or a file\n# that escapes the publish boundary. A name no directory could issue cannot be\n# misread that way. The one thing the naming must not do is imply these are\n# people: they are three access levels and four seats at the lowest of them.\n#\n# WHY FOUR USER-TIER SEATS. Several console behaviours are scoped per PERSONA\n# rather than per role — the Ask panel's stored last turn is the case O64 tested —\n# and proving that isolation needs two accounts differing in nothing but\n# identity. A later tidy-up that collapses them to one would silently delete the\n# only way that property is testable, so a guard asserts more than one.\n#\n# Reader: drydocs_core/console_personas.py. Schema:\n# config/schemas/console-personas.schema.json. Guard:\n# tests/unit/test_console_personas.py.\n# =============================================================================\nschema: drydocs.console-personas.v1\nclassification: Internal-Public\nupdated: 2026-09-10\n\n# The closed set. `user` < `steward` < `admin`. Adding a fourth tier is an edit\n# HERE and in the guard, never a value that appears on a seat and widens the set\n# by arriving — the same closed-axis discipline config/source-descriptors.yaml\n# uses. SME is deliberately NOT a role: it is WHO a persona is, and /intake gates\n# on the id, because a fourth tier would ripple through canAccessModule for one\n# page (O47).\nroles: [user, steward, admin]\n\npersonas:\n  morpheus:\n    display_name: Morpheus\n    role: admin\n    chip: \"platform admin · all towers\"\n  trinity:\n    display_name: Trinity\n    role: steward           # the O13 power-user tier: sees /mappings, not /admin/config, not raw Cypher\n    chip: \"mapping steward · manual tiers (O13)\"\n  neo:\n    display_name: Neo\n    role: user              # O47: SME is a persona, not a role tier\n    chip: \"app-support SME · context intake\"\n    tower_key: home         # scopes the area cascade's default, as it does for the other user seats\n  mouse:\n    display_name: Mouse\n    role: user\n    chip: \"app access derived from ServiceNow\"\n    tower_key: home\n  tank:\n    display_name: Tank\n    role: user\n    chip: \"app access derived from ServiceNow · second seat\"\n    tower_key: home\n  dozer:\n    display_name: Dozer\n    role: user\n    chip: \"app access derived from ServiceNow · third seat\"\n    tower_key: home\n\n# ---------------------------------------------------------------------------\n# THE CLAIM MAPPING — DECLARED AND DEFERRED, never absent.\n# ---------------------------------------------------------------------------\n# Gate `console-auth-boundary` SIGNED OFF 2026-09-10 (config/gate-log.md).\n# Its §C P4 was DEFERRED, and the build it defers is NOT an account system: an\n# application in the target estate owns no accounts, no storage and no\n# create/disable/rotate lifecycle. The directory owns the principal; the\n# application owns the MAPPING from role claim to application role. This block is\n# where that mapping lands, and it is empty on purpose rather than missing —\n# a bare absence is a fact with no owner, a reasoned deferral is a decision\n# someone can re-read and reverse. The `wired` axis's shape (CFG13), applied to\n# entitlements.\n#\n# The reader REFUSES a `deferred` block carrying a non-empty mapping, and an\n# `adopted` block carrying an empty one: the status and the contents must agree,\n# or the declaration is asserting something nobody checked.\nclaims:\n  status: deferred\n  reason: >-\n    Entitlements arrive as role claims carried on directory groups whose names\n    encode the application and the environment, and roles are application-specific\n    by design. Nothing maps until the console is onboarded to the identity\n    federation, which is this deferral's named re-arm in the signed gate record.\n  mapping: {}\n",
+      "extra_contents": {}
+    },
+    {
       "id": "launcher-registry",
       "title": "Launcher registry",
       "file": "config/launcher-registry.yaml",
@@ -770,6 +795,7 @@
       "env_refs": [],
       "files": [
         "config/schemas/classification.schema.json",
+        "config/schemas/console-personas.schema.json",
         "config/schemas/data-centers.schema.json",
         "config/schemas/domains.schema.json",
         "config/schemas/editions.schema.json",

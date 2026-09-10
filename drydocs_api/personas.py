@@ -1,28 +1,28 @@
-"""Server-side synthetic personas — the console's identity source.
+"""Server-side personas — the console's identity source, READ from the declaration.
 
-Mirrors ``web/src/lib/auth.ts``: same ids, same roles. A unit test parses the
-TS file and fails on drift. Enterprise OIDC (SID + roles-from-claims) replaces
-this module company-side per ADR 0005's Evidence — a gitignored twin, never
-here. The secrets that back these ids are machine-local and never committed
-(``drydocs_api/credentials.py``).
+The roster itself lives in ``config/console-personas.yaml`` and is read through
+:mod:`drydocs_core.console_personas` (CFG14, 2026-09-10). It used to be declared
+here AND in ``web/src/lib/auth.ts``, with a unit test parsing the TypeScript to
+catch the drift two declarations guarantee; the duplication was the defect and
+the regex was the symptom. This module keeps its CONTRACT — ``Persona``,
+``PERSONAS``, ``persona()``, ``UnknownPersonaError`` — and loses the data.
 
-THE IDS ARE OBVIOUSLY FICTIONAL, and that is the point rather than a joke. They
-were SID-shaped until 2026-08-28 (``jdoe4821``, ``asmith7734``, ``kchen2190``),
-which read as realistic in a demo and carried a standing risk with it: an id
-that looks like a real corporate SID is an id somebody can mistake for one, in a
-screenshot, a bug report, or a file that escapes the publish boundary. A name no
-directory could ever issue cannot be mistaken that way. The one thing the rename
-must not do is imply these are people — they are four access levels and three
-seats at the lowest of them.
+Enterprise OIDC (SID + roles-from-claims) replaces this module company-side per
+ADR 0005's Evidence — a gitignored twin, never here. The secrets that back these
+ids are machine-local and never committed (``drydocs_api/credentials.py``); this
+change moves no secret.
 
-WHY THREE USER-TIER ACCOUNTS: several console behaviours are scoped PER PERSONA
-rather than per role — the Ask panel's stored last turn is the case O64 tested —
-and proving isolation needs two accounts that differ in nothing but identity.
+THE IDS ARE OBVIOUSLY FICTIONAL, and the reasoning now lives beside the roster in
+the declaration rather than in this docstring, so it is read by whoever edits the
+seats rather than by whoever imports them.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
+from functools import lru_cache
+
+from drydocs_core.console_personas import ConsolePersonas
 
 ROLES = ("user", "steward", "admin")
 
@@ -33,30 +33,59 @@ class Persona:
     role: str  # 'user' | 'steward' | 'admin'
 
 
-PERSONAS: dict[str, Persona] = {
-    "morpheus": Persona(id="morpheus", role="admin"),
-    # steward = the O13 power-user tier (user < steward < admin): sees
-    # /mappings, not /admin/config and not raw Cypher.
-    "trinity": Persona(id="trinity", role="steward"),
-    # O47: the intake persona. Role 'user' on purpose — SME is a persona, not
-    # a fourth role tier; the /intake page gate is client-side (auth.ts
-    # canAccessIntake) and the intake API's own transition map is role-based,
-    # so an SME holds exactly the user-tier server rights.
-    "neo": Persona(id="neo", role="user"),
-    # Three plain user-tier seats, identical in rights and distinct only in
-    # identity — which is what makes per-persona isolation testable at all.
-    "mouse": Persona(id="mouse", role="user"),
-    "tank": Persona(id="tank", role="user"),
-    "dozer": Persona(id="dozer", role="user"),
-}
-
-
 class UnknownPersonaError(KeyError):
     """Raised when a login names a persona the server does not know."""
 
 
+@lru_cache(maxsize=1)
+def _roster() -> dict[str, Persona]:
+    """The declared roster, read once.
+
+    Cached because the declaration is a committed file that cannot change under a
+    running server, and a per-login YAML parse would be a cost paid for nothing.
+    Tests that write a different declaration clear it with ``_roster.cache_clear()``.
+    """
+    declared = ConsolePersonas.from_yaml()
+    return {p.id: Persona(id=p.id, role=p.role) for p in declared.personas.values()}
+
+
+def personas() -> dict[str, Persona]:
+    """The roster as a mapping — the callable form, for anything that may run
+    before or after a test swaps the declaration."""
+    return dict(_roster())
+
+
 def persona(persona_id: str) -> Persona:
     try:
-        return PERSONAS[persona_id]
+        return _roster()[persona_id]
     except KeyError as exc:
         raise UnknownPersonaError(persona_id) from exc
+
+
+def __getattr__(name: str) -> object:
+    """``PERSONAS``, resolved on first access rather than at import.
+
+    Callers and tests read ``PERSONAS`` directly and keep doing so - CFG14 moved
+    where the data comes from, not the shape the server offers it in. What it
+    must NOT do is turn importing this module into a filesystem read.
+
+    ``drydocs_api.intake`` imports ``sessions``, which imports this module, so a
+    module-level ``PERSONAS = _roster()`` would make an unreadable roster abort an
+    import four modules away with a traceback naming neither the roster nor the
+    caller. Measured, not supposed: the J48 worktree probe in
+    ``tests/unit/test_repo_paths.py`` imports ``drydocs_api.intake`` and failed
+    exactly that way while the declaration was still uncommitted.
+
+    The refusal itself is right and is kept - a roster that cannot be read is not
+    an empty roster. It now fires at whoever asked for the roster. PEP 562: this
+    runs only for names the module does not define, so it costs nothing per access
+    after the first, and ``_roster`` is cached besides.
+    """
+    if name == "PERSONAS":
+        return _roster()
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+
+def __dir__() -> list[str]:
+    """``PERSONAS`` is reachable but not in the module dict, so name it here."""
+    return sorted([*globals(), "PERSONAS"])

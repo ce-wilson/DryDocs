@@ -107,7 +107,23 @@ def test_unknown_persona_rejected():
 
 
 def test_personas_match_web_auth_ts():
-    """Drift guard: the server stub's personas mirror web/src/lib/auth.ts."""
+    """Drift guard: the server's personas mirror web/src/lib/auth.ts.
+
+    CFG14 (2026-09-10) retires this test, in two halves that land in two sessions.
+    Lane A's half shipped: the roster is declared once in
+    ``config/console-personas.yaml`` and ``drydocs_api.personas`` READS it, so the
+    Python side no longer declares the data this regex was written to compare
+    against. The UI session's half — ``auth.ts`` importing the generated
+    ``web/src/generated/console-personas.json`` instead of declaring ``PERSONAS``
+    — has not landed yet.
+
+    Until it does, this is the SAFETY NET rather than the drift guard it was: it
+    now proves the config matches the TypeScript that is still hand-written, which
+    is exactly the check worth keeping while one side has moved and the other has
+    not. It is deleted in the commit that changes ``auth.ts``; parsing TypeScript
+    with a regular expression is the symptom CFG14 exists to remove, and keeping
+    it after both sides read one declaration would guard nothing.
+    """
     ts = (REPO_ROOT / "web" / "src" / "lib" / "auth.ts").read_text(encoding="utf-8")
     ts_ids = dict(
         zip(re.findall(r"id: '([^']+)'", ts), re.findall(r"role: '([^']+)'", ts), strict=True)

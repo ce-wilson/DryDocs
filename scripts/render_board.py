@@ -54,6 +54,7 @@ def main() -> None:
     print(f"wrote {out_path}")
 
     if args.backlog == DEFAULT_BACKLOG_PATH and args.out == DEFAULT_BOARD_PATH:
+        import render_console_personas
         import render_context_types
         import render_enforcement_matrix
         import render_gates
@@ -71,6 +72,7 @@ def main() -> None:
         render_load_map.main()
         render_software_registry.main()
         render_context_types.main()
+        render_console_personas.main()
         # WEB18 (2026-09-08): the UI-concept provenance artifact, here for the
         # same J20 reason as context-types — it is generated from a config
         # taxonomy the console reads, so editing ui-concepts.yaml without a

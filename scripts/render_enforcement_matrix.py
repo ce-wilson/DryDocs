@@ -294,6 +294,27 @@ SURFACES: list[dict] = [
         "gate_ref": None,
     },
     {
+        "id": "console-personas",
+        "title": "Console demo roster and claim mapping",
+        "file": "config/console-personas.yaml",
+        # CFG14: the roster was declared twice, in TypeScript and in Python, with a
+        # unit test parsing the TypeScript to catch the drift duplication
+        # guarantees. One declaration removes the drift; the render replaces the
+        # parse. NOT an authorization surface - the server re-resolves the real role
+        # from the bearer token on every request (ADR 0005 decision 3), so what this
+        # file decides is who may sign in to a demo and what the nav looks like.
+        # The claims block is declared and deferred rather than absent, and the
+        # reader refuses a status that disagrees with its contents.
+        "consumers": [
+            "drydocs_core/console_personas.py",
+            "drydocs_api/personas.py",
+            "scripts/render_console_personas.py",
+            "web/src/generated/console-personas.json",
+        ],
+        "guard_tests": ["test_console_personas.py"],
+        "gate_ref": "console-auth-boundary (SIGNED OFF 2026-09-10; P4 deferred, re-arm = federation onboarding)",
+    },
+    {
         "id": "launcher-registry",
         "title": "Launcher registry",
         "file": "config/launcher-registry.yaml",

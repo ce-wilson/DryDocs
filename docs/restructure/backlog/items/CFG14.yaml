@@ -66,3 +66,17 @@ notes: |
   drydocs_api/personas.py's own docstring already anticipates the end state - "Enterprise OIDC
   (SID + roles-from-claims) replaces this module company-side ... a gitignored twin, never here."
   This item does not change that: the company's twin stays theirs.
+  SPLIT ACROSS TWO SESSIONS, 2026-09-10. Lane A built the half that owns no web file:
+  the declaration, its schema, the reader, the API side and the renderer, plus the guard
+  covering acceptance (a), (b), (e), (f) and (g). Acceptance (c) and (d) belong to the UI
+  session on feat/web-completeness, which owns the web pen: auth.ts stops declaring its
+  roster and imports the generated JSON, keeping its types and its predicates, and the
+  regex-over-TypeScript drift test goes with it. The item stays in_progress until that
+  lands, because closing it here would mark two unmet clauses done.
+  WHY THE OLD DRIFT TEST STAYS FOR NOW. It was written to hold two declarations equal.
+  One side now reads the declaration, so until the other does, the same test proves the
+  config matches the hand-written TypeScript - a safety net over exactly the window where
+  the two halves disagree. Deleting it early would leave that window unguarded, which is
+  the opposite of what retiring it is for.
+  The generated artifact is on main so the UI session can import it without waiting for a
+  merge, and no Lane A commit touches web/src/lib.

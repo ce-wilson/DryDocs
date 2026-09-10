@@ -73,6 +73,10 @@ FAMILIES: dict[str, tuple[str, list[Path]]] = {
         "data-centers.schema.json",
         [REPO / "config" / "taxonomy" / "data-centers.yaml"],
     ),
+    "console-personas": (
+        "console-personas.schema.json",
+        [REPO / "config" / "console-personas.yaml"],
+    ),
 }
 
 

@@ -1086,11 +1086,11 @@ rows:
     disposition: derived
     note: >
       Every file here is written by a scripts/render_*.py renderer from committed
-      sources (render_board.py refreshes gates.json, enforcement-matrix.json and
-      load-map.json in one run; render_world_map.py, render_gazetteer.py,
-      render_context_types.py, render_software_registry.py, render_remediation_*.py
-      the rest), and each has a drift guard asserting the committed copy matches a
-      fresh render. REGENERATE, NEVER CARRY — the J43 rule, and the same row shape
+      sources (render_board.py refreshes gates.json, enforcement-matrix.json,
+      load-map.json and console-personas.json in one run; render_world_map.py,
+      render_gazetteer.py, render_context_types.py, render_software_registry.py,
+      render_remediation_*.py the rest), and each has a drift guard asserting the
+      committed copy matches a fresh render. REGENERATE, NEVER CARRY — the J43 rule, and the same row shape
       docs/plan/*.html already has. J68-family omission, found 2026-09-02 when the
       company's slice-E apply hit +83 failures on tests asserting these artifacts
       exist: the directory had NO row and fell through to web/** canonical-producer,

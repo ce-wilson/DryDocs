@@ -1,0 +1,102 @@
+# =============================================================================
+# config/console-personas.yaml — the console's demo roster, and the role each seat maps to
+# =============================================================================
+# CFG14, 2026-09-10. ONE declaration. Before this the roster was written twice —
+# once in `web/src/lib/auth.ts` and once in `drydocs_api/personas.py` — with a
+# unit test that parsed the TypeScript with a regular expression to catch the
+# drift that duplication guarantees. The duplication was the defect; the regex
+# was the symptom. Both sides now read this file: Python through
+# `drydocs_core/console_personas.py`, the console through the rendered
+# `web/src/generated/console-personas.json`.
+#
+# THIS IS THE DEMO ROSTER. IT IS NOT AN AUTHORIZATION SOURCE, and the distinction
+# is the whole reason a config file is safe here. The server re-resolves the real
+# role from the bearer token on every request (ADR 0005 decision 3); the role a
+# browser holds drives which nav entries render and nothing else. Editing this
+# file changes who can SIGN IN to a demo and what the nav looks like. It does not
+# grant anything, and a hand-edited session blob still buys nothing.
+#
+# THE IDS ARE OBVIOUSLY FICTIONAL, and that is a decision rather than a joke.
+# They were SID-shaped until 2026-08-28, which read as realistic in a demo and
+# carried a standing risk with it: an id that looks like a real corporate SID is
+# an id somebody can mistake for one — in a screenshot, a bug report, or a file
+# that escapes the publish boundary. A name no directory could issue cannot be
+# misread that way. The one thing the naming must not do is imply these are
+# people: they are three access levels and four seats at the lowest of them.
+#
+# WHY FOUR USER-TIER SEATS. Several console behaviours are scoped per PERSONA
+# rather than per role — the Ask panel's stored last turn is the case O64 tested —
+# and proving that isolation needs two accounts differing in nothing but
+# identity. A later tidy-up that collapses them to one would silently delete the
+# only way that property is testable, so a guard asserts more than one.
+#
+# Reader: drydocs_core/console_personas.py. Schema:
+# config/schemas/console-personas.schema.json. Guard:
+# tests/unit/test_console_personas.py.
+# =============================================================================
+schema: drydocs.console-personas.v1
+classification: Internal-Public
+updated: 2026-09-10
+
+# The closed set. `user` < `steward` < `admin`. Adding a fourth tier is an edit
+# HERE and in the guard, never a value that appears on a seat and widens the set
+# by arriving — the same closed-axis discipline config/source-descriptors.yaml
+# uses. SME is deliberately NOT a role: it is WHO a persona is, and /intake gates
+# on the id, because a fourth tier would ripple through canAccessModule for one
+# page (O47).
+roles: [user, steward, admin]
+
+personas:
+  morpheus:
+    display_name: Morpheus
+    role: admin
+    chip: "platform admin · all towers"
+  trinity:
+    display_name: Trinity
+    role: steward           # the O13 power-user tier: sees /mappings, not /admin/config, not raw Cypher
+    chip: "mapping steward · manual tiers (O13)"
+  neo:
+    display_name: Neo
+    role: user              # O47: SME is a persona, not a role tier
+    chip: "app-support SME · context intake"
+    tower_key: home         # scopes the area cascade's default, as it does for the other user seats
+  mouse:
+    display_name: Mouse
+    role: user
+    chip: "app access derived from ServiceNow"
+    tower_key: home
+  tank:
+    display_name: Tank
+    role: user
+    chip: "app access derived from ServiceNow · second seat"
+    tower_key: home
+  dozer:
+    display_name: Dozer
+    role: user
+    chip: "app access derived from ServiceNow · third seat"
+    tower_key: home
+
+# ---------------------------------------------------------------------------
+# THE CLAIM MAPPING — DECLARED AND DEFERRED, never absent.
+# ---------------------------------------------------------------------------
+# Gate `console-auth-boundary` SIGNED OFF 2026-09-10 (config/gate-log.md).
+# Its §C P4 was DEFERRED, and the build it defers is NOT an account system: an
+# application in the target estate owns no accounts, no storage and no
+# create/disable/rotate lifecycle. The directory owns the principal; the
+# application owns the MAPPING from role claim to application role. This block is
+# where that mapping lands, and it is empty on purpose rather than missing —
+# a bare absence is a fact with no owner, a reasoned deferral is a decision
+# someone can re-read and reverse. The `wired` axis's shape (CFG13), applied to
+# entitlements.
+#
+# The reader REFUSES a `deferred` block carrying a non-empty mapping, and an
+# `adopted` block carrying an empty one: the status and the contents must agree,
+# or the declaration is asserting something nobody checked.
+claims:
+  status: deferred
+  reason: >-
+    Entitlements arrive as role claims carried on directory groups whose names
+    encode the application and the environment, and roles are application-specific
+    by design. Nothing maps until the console is onboarded to the identity
+    federation, which is this deferral's named re-arm in the signed gate record.
+  mapping: {}
