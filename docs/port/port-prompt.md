@@ -4050,7 +4050,7 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   no opinion on it. Nothing is asked back.
 
 - **RELAY-56 - `drydocs bootstrap` RAISES AN AttributeError ON YOUR INSTANCE, AND IT IS ONE
-  MISSING METHOD, NOT A CONSTRAINT PROBLEM** [SME-REPORTED, PRODUCER-VERIFIED] (2026-09-10,
+  MISSING METHOD, NOT A CONSTRAINT PROBLEM** [SME-REPORTED] [VERIFIED-PRODUCER] (2026-09-10,
   producer verification venue desktop, by command over this tree). You reported
   `AttributeError: 'Neo4jClient' object has no attribute 'constraints_detail'` at
   `drydocs/cli_schema.py:346`. FIRST, the reassuring half: your declared constraints are fine.

@@ -13,7 +13,10 @@ import pytest
 from drydocs.port import port_preflight as _pf
 from drydocs.port.port_preflight import (
     BASIS_TAGS,
+    FOREIGN_PATHS,
+    PLANNED_PATHS,
     RECORD_PREFIXES,
+    REPO_ROOT,
     CheckResult,
     Commit,
     GitError,
@@ -364,6 +367,66 @@ def test_a_document_outside_every_record_prefix_is_still_checked() -> None:
     """The negative case for the table: near-misses must not inherit the exemption."""
     assert not is_record_document("docs/review-notes.md", IDLE_DOC)
     assert not is_record_document("internal/controlm-config/plan.md", IDLE_DOC)
+
+
+# ---- the per-path tables, and the two ways each can rot ----------------------
+
+
+def test_a_declared_foreign_or_planned_path_is_not_reported() -> None:
+    """The positive control, written so it cannot pass by scanning nothing.
+
+    The document names one exempt path from each table AND one ordinary missing
+    path. Reporting exactly the ordinary one proves the document was scanned and
+    the two skips are the tables' doing — a filter that dropped the document would
+    report nothing and read identically.
+    """
+    foreign = next(iter(FOREIGN_PATHS))
+    planned = next(iter(PLANNED_PATHS))
+    text = (
+        f"Edit your `{foreign}`, then unit 5.8 builds `{planned}`, "
+        "and see `docs/design/ui-exploration/drydocs-mark.svg`."
+    )
+    roots = ROOTS | {foreign.split("/")[0], planned.split("/")[0]}
+    assert {foreign, planned} <= cited_paths(text, roots), "the tables must be reached"
+    assert unresolved_citations({"d.md": text}, repo_roots=roots, exists=_exists) == [
+        ("d.md", "docs/design/ui-exploration/drydocs-mark.svg")
+    ]
+
+
+@pytest.mark.parametrize(
+    ("label", "path"),
+    [("FOREIGN_PATHS", p) for p in sorted(FOREIGN_PATHS)]
+    + [("PLANNED_PATHS", p) for p in sorted(PLANNED_PATHS)],
+)
+def test_every_path_exemption_carries_a_reason(label: str, path: str) -> None:
+    """An exemption without a reason outlives the person who knew why."""
+    table = FOREIGN_PATHS if label == "FOREIGN_PATHS" else PLANNED_PATHS
+    assert len(table[path].strip()) >= 40, f"{label}[{path!r}] needs a real reason"
+
+
+@pytest.mark.parametrize("path", sorted(FOREIGN_PATHS))
+def test_a_foreign_path_is_genuinely_absent_here(path: str) -> None:
+    """The entry claims the path is ANOTHER tree's. If it turns up in this one the
+    claim is false, and the check must go back to reading it."""
+    assert not (
+        REPO_ROOT / path
+    ).exists(), (
+        f"{path!r} exists in this tree, so it is not foreign — remove the FOREIGN_PATHS entry"
+    )
+
+
+@pytest.mark.parametrize("path", sorted(PLANNED_PATHS))
+def test_a_planned_path_that_has_landed_leaves_the_table(path: str) -> None:
+    """This table's whole difference from FOREIGN_PATHS is that it EXPIRES.
+
+    A planned path resolves the moment its unit lands, and from then on the
+    exemption is hiding a live citation from a live check. The condition is
+    observable, so it is asserted rather than trusted to a future reader.
+    """
+    assert not (REPO_ROOT / path).exists(), (
+        f"{path!r} has landed — delete its PLANNED_PATHS entry; the citation now resolves "
+        "on its own and the exemption is suppressing a real check"
+    )
 
 
 def test_the_documents_the_suite_already_resolves_are_not_reported_twice() -> None:

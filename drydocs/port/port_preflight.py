@@ -163,6 +163,62 @@ RECORD_PREFIXES: dict[str, str] = {
 #: never-port, so the consumer never receives the file whether or not it exists here.
 NEVER_PORT_ZONES: tuple[str, ...] = ("internal/",)
 
+#: THE PER-PATH HALF OF THE SAME RULE, added 2026-09-10 at the ninth roll.
+#: ``RECORD_PREFIXES`` above exempts a whole DOCUMENT; these exempt a single PATH,
+#: and until now the module had only the first. That gap is not theoretical: the
+#: ninth roll's range added two documents that each legitimately name a path which
+#: is not in this tree and must not be, and the only escapes available were
+#: whole-document ones. Taking either would have muted the check across a document
+#: whose remaining citations DO need to resolve — a company prompt's producer-side
+#: paths above all, since a wrong one sends the other team to a file that is not
+#: there. The idiom, the split and the shrink-only discipline are
+#: ``tests/unit/test_runbook_currency.py``'s HISTORICAL_PATHS / FOREIGN_PATHS, which
+#: RECORD_PREFIXES already cites as its model; this module copied the whole-document
+#: half of it and not this one. Held as literals here rather than imported, for the
+#: stdlib-only reason ``_CITED_EXTENSIONS`` gives.
+
+#: Paths in ANOTHER tree — the consumer's. These can never resolve here, so an
+#: entry is permanent until the document that cites it retires.
+FOREIGN_PATHS: dict[str, str] = {
+    "drydocs_core/schema/platforms_supplement.cypher": (
+        "the CONSUMER's file, and the producer has never had one. The AIS class layer is a "
+        "company-local artifact of their 2026-06-29 gate; the producer reached the same place "
+        "by a different route (C12 retired :SchedulerKind straight into the software-registry "
+        "model, with no Ais* layer in between). The measurement is not recalled — "
+        "docs/company-prompts/port-ais-supplement-company-prompt.md carries the producer-tree "
+        "search table that says this file 'does not exist' here, in a row of its own. The "
+        "premerge prompt tells that side to edit THEIR copy, so naming their path IS the "
+        "instruction, exactly as FOREIGN_PATHS' docs/port-prompt.md entry is"
+    ),
+    "scripts/writeApiTypes.ts": (
+        "not a path claim at all — it is a QUOTATION of how web/README.md names the writer, "
+        "relative to its own directory, and the row below it in the same table gives what the "
+        "producer actually ships (web/scripts/writeApiTypes.ts). The two spellings side by side "
+        "ARE the finding: they are what shows the company's finding 12 was a misread and that "
+        "nothing is owed upstream. Collapsing them to the resolving path would delete the "
+        "evidence the section exists to present"
+    ),
+}
+
+#: Paths in THIS tree, LATER — a plan naming a file the unit it describes will create.
+#: The opposite direction from FOREIGN_PATHS, and it retires on its own terms: when the
+#: unit lands, the path resolves and the entry must go. The guard below enforces exactly
+#: that, so this table cannot quietly outlive the work it is waiting on.
+PLANNED_PATHS: dict[str, str] = {
+    "drydocs/loaders/field_map_xlsx.py": (
+        "docs/restructure/EndGoalTeamsEdition.md unit 5.8, HELD for the 2026-09-14 Fable reset: "
+        "a stage-only field-map extractor that writes nothing to the graph. The plan's Files "
+        "column names what a unit will build, which is the column's job; a plan that could only "
+        "name files that already exist could not plan"
+    ),
+    "tests/unit/test_field_map_xlsx.py": (
+        "the same unit 5.8, and named twice — in its Files column and in Phase 5's exit criteria, "
+        "where it is the guard that pins the extractor to ZERO graph writes. That is the clause "
+        "the unit is accepted on, so the plan has to name the file that carries it"
+    ),
+}
+
+
 #: A document may also declare itself a record in its own header, which beats a
 #: table entry here on both counts that matter: the caveat is visible to whoever
 #: READS the document, and it cannot rot out of sight inside a module nobody opens.
@@ -404,6 +460,12 @@ def unresolved_citations(
                 # NOT here — J71 (`c5ebd2ce`): a backticked machine-local path is an
                 # existence claim that holds on one machine, and a document that carries
                 # one is wrong on every other machine, ported or not.
+                continue
+            if path in FOREIGN_PATHS or path in PLANNED_PATHS:
+                # Declared above, each with its reason: another tree's path, or one
+                # this tree will have once a named unit lands. Both are deliberate
+                # citations rather than stale ones, and the guards on those two
+                # tables keep them from becoming stale in turn.
                 continue
             if not exists(path):
                 findings.append((rel_path, path))
