@@ -45,9 +45,17 @@ import './App.css'
 // derives the set from the registry and fails when the two disagree, so a new
 // gated module cannot arrive shipped-to-everyone.
 //
-// WHAT IS DELIBERATELY NOT SPLIT: load-map.json (56 KB) is imported by
-// lineage/laneBasis.ts, and /lineage is open to every role. It is admissible to
-// a user, so by this item's own rule it stays in the initial chunk.
+// WHAT WAS DELIBERATELY NOT SPLIT, AND WHY IT IS SPLIT NOW (WEB23, 2026-09-10):
+// load-map.json was imported by lineage/laneBasis.ts, and /lineage is open to
+// every role, so by THIS item's rule — admissibility — it stayed in the initial
+// chunk. That rule is unchanged and the artifact is still admissible to a user.
+// Admissibility is not arrival order, though, and the file had grown to 79 KB in
+// the bundle: it is read only by the BDAT lane basis, behind a picker most
+// sessions never touch, so lineage/layerSystems.ts fetches it on demand and it
+// shares a chunk with the two lazy routes that already read it. The entry chunk
+// went from 2,506,022 to 2,427,507 bytes. Nothing became less visible to anyone;
+// 79 KB stopped arriving before anything rendered. lineage/entryChunk.test.ts
+// fails if a static import comes back.
 const MappingsRoute = lazy(() => import('./routes/MappingsRoute'))
 const AdminConfigRoute = lazy(() => import('./routes/AdminConfigRoute'))
 const ConsoleRoute = lazy(() => import('./routes/ConsoleRoute'))

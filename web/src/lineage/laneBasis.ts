@@ -31,7 +31,18 @@
 // because making the skew VISIBLE is the point. Said on the surface, not only
 // here.
 
-import loadMap from '../generated/load-map.json'
+// NO STATIC IMPORT OF THE GENERATED LOAD MAP, and that is the WEB23 ruling
+// rather than an omission. This module is reachable from /lineage, which is open
+// to every role, so a static `import loadMap from '../generated/load-map.json'`
+// here put 79 KB of registry artifact in the ENTRY CHUNK - downloaded by every
+// persona before anything renders, to answer a question only the BDAT basis
+// asks and only when someone picks it. WEB7 kept it there deliberately and gave
+// an ACCESS reason: the file is admissible to a user. That reason is still
+// correct and it was never the whole question - admissible does not mean it has
+// to arrive first. The systems arrive as a PARAMETER now, the same shape the
+// source-kind items already had, and the view fetches them on demand
+// (lineage/layerSystems.ts). Measured: entry chunk 2,506,022 -> 2,426,767 bytes.
+// lineage/laneBasis.noStaticLoadMap.test.ts fails if the import comes back.
 
 export type LaneBasisId = 'source-kind' | 'layer'
 
@@ -95,20 +106,19 @@ export const BDAT_LANES: LaneDef[] = [
   },
 ]
 
-interface LoadMapSystem {
+/** A registry system, as the generated load map carries it. */
+export interface LoadMapSystem {
   id: string
   name: string
   layer?: string
   classification?: string
 }
 
-/** Registry systems, as the generated load-map carries them. */
-function systems(): LoadMapSystem[] {
-  return ((loadMap as { systems?: LoadMapSystem[] }).systems ?? []).slice()
-}
-
-function layerItems(): LaneItem[] {
-  return systems().map((s) => ({
+/** The BDAT lane items for a set of registry systems. Exported because the
+ *  systems now arrive from outside this module, so the mapping is the part that
+ *  is testable without a fetch. */
+export function layerItems(systems: readonly LoadMapSystem[]): LaneItem[] {
+  return systems.map((s) => ({
     id: s.id,
     label: s.name,
     sub: s.classification ? `system · ${s.classification}` : 'system',
@@ -139,9 +149,17 @@ export function undeclaredLanes(items: LaneItem[], declared: LaneDef[]): LaneDef
  * The lane assignment for a basis. The view calls this and lays out whatever it
  * gets back; it never branches on the basis id itself.
  */
-export function resolveLanes(basis: LaneBasisId, sourceKindItems: LaneItem[]): LaneBasis {
+export function resolveLanes(
+  basis: LaneBasisId,
+  sourceKindItems: LaneItem[],
+  /** The registry systems the BDAT basis groups. Defaults to NONE, which is
+   *  honest for a caller that has not fetched them - and the view must not
+   *  render that as the empty-lane FINDING, which is why it holds a reading
+   *  state of its own rather than passing an empty list through. */
+  layerSystems: readonly LoadMapSystem[] = [],
+): LaneBasis {
   if (basis === 'layer') {
-    const items = layerItems()
+    const items = layerItems(layerSystems)
     return {
       id: 'layer',
       label: 'BDAT layer',
