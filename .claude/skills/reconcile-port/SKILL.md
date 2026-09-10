@@ -17,8 +17,26 @@ the accumulated lessons from prior ports. Read both.
 
 ## Procedure
 
-1. **Preflight.** Clean tree, on `main`. Set a backup tag:
-   `git tag -f pre-cewilson-port`. Add/refresh the remote and fetch:
+1. **Preflight.** Clean tree, on `main`.
+   **FIRST, CLEAR OR REPOINT `RECONCILE_BEFORE_DIR` — before you measure anything.**
+   ```powershell
+   [Environment]::GetEnvironmentVariable('RECONCILE_BEFORE_DIR','User')   # expect blank
+   ```
+   The teardown at the end of this skill clears it, but an apply that was interrupted,
+   rebooted through, or simply not finished leaves it set at USER scope, where it
+   survives into the NEXT port — and this roll's own plan asks for a before-dir that
+   survives a reboot, so persistence is the design, not an accident. A variable pointing
+   at the PREVIOUS port's before-dir is set-but-unusable, and the `*_live` guards then
+   FAIL rather than skip (deliberately — see the asymmetry note below).
+   **WHY THIS IS WORTH A STEP OF ITS OWN, measured company-side 2026-09-10:** a stale
+   User-scope value put SEVEN failures into a fresh acceptance baseline, six of them pure
+   instrument artifacts. Repointing at the current snapshot, with NO change to the tree,
+   took `test_port_reconcile_guards` from 7 failed to **1 failed / 49 passed**. Left in the
+   baseline those six would have vanished when the port repointed the variable — and read
+   at close-out as **six port-caused improvements**. A false positive in the flattering
+   direction is the one nobody investigates, which is what makes this worse than a phantom
+   regression rather than better. (The 7th was a genuine J16 fall-through and stayed in.)
+   Then set a backup tag: `git tag -f pre-cewilson-port`. Add/refresh the remote and fetch:
    `git remote add cewilson https://github.com/ce-wilson/DryDocs.git` (ignore if
    it exists), then `git fetch cewilson main --tags`.
    **THEN CHECK THE BASE IS CERTIFIED (J41).** Port

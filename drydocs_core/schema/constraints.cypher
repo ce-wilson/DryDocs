@@ -2,11 +2,19 @@
 // constraints.cypher  —  M0
 //
 // Combined constraint + index DDL from v2 §5 and v3 §J. Idempotent; safe to
-// re-run.  Syntax: the 5.x-and-later form, `CREATE CONSTRAINT <name> IF NOT EXISTS
-// FOR (n:L) REQUIRE ...` — never the 4.x `ON ... ASSERT`. The server this runs
-// against is pinned at 2026.05.0-enterprise (config/dev-environment.yaml); the form
-// below is valid there and on 5.x, which is why it is described by shape and not by
-// a version number that goes stale.
+// re-run.  TWO DDL SHAPES LIVE HERE AND ONLY ONE OF THEM RETIRED `ON` — read both
+// before "fixing" anything:
+//   CONSTRAINTS  CREATE CONSTRAINT <name> IF NOT EXISTS FOR (n:L) REQUIRE ...
+//                the 4.x `ON (n:L) ASSERT ...` is retired and must not come back.
+//   INDEXES      CREATE INDEX <name> IF NOT EXISTS FOR (n:L) ON (n.prop)
+//                `ON` HERE IS CORRECT AND CURRENT. Two live examples below. A blanket
+//                ON->REQUIRE sweep breaks them, which is why this note names the shape
+//                that keeps `ON` rather than only the one that lost it.
+// The server is pinned at 2026.05.0-enterprise (config/dev-environment.yaml); both
+// forms are valid there and on 5.x, which is why they are described by SHAPE and not
+// by a version number that goes stale. [The index half was missing until 2026-09-10 -
+// a consumer applying the port declined to take this header wholesale for exactly that
+// reason, and made a union instead. They were right; this is the union.]
 // =============================================================================
 
 // --- Ontology backbone -------------------------------------------------------
