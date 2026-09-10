@@ -34,7 +34,9 @@ from pathlib import Path
 from typing import Any
 
 from neo4j import GraphDatabase, Query, unit_of_work
+from neo4j import exceptions as neo4j_exceptions
 
+from drydocs_core.check_outcome import CheckOutcome, checked_clean, findings, not_checked
 from drydocs_core.config import Neo4jDriverBounds, load_driver_bounds
 from drydocs_core.notifications import Neo4jNotification, from_summary, to_payload
 
@@ -253,13 +255,72 @@ class Neo4jClient:
         )
         return rows[0]["v"] if rows else "unknown"
 
-    def apoc_available(self) -> bool:
-        """Return ``True`` if APOC procedures are reachable."""
+    def apoc_available(self) -> CheckOutcome:
+        """Is APOC installed on the server? A PROBE — ADR 0021, CORE14.
+
+        THE BUG THIS REPLACES. The body was ``try: … except Exception: return
+        False``, so four different worlds produced the same ``False``: APOC
+        genuinely not installed; the server unreachable; the credentials wrong;
+        the query refused for some fifth reason nobody had thought of. A caller
+        reading ``False`` could not tell "install the plugin" from "start the
+        container", and ``drydocs bootstrap`` printed ``APOC required`` at a
+        person whose actual problem was a stopped database. That is the
+        checked-vs-not-checked family exactly (ADR 0021), so the answer is the
+        type rather than a better boolean.
+
+        The three states map cleanly and that is the argument for the type here:
+
+        * the call succeeds — CHECKED_CLEAN. The probe ran; APOC is there.
+        * the server answers and says the procedure does not exist — FINDINGS.
+          The probe RAN, and what it found is a missing plugin. This is the only
+          state in which "install APOC" is the right advice.
+        * anything else — NOT_CHECKED, with the reason naming the class. The
+          probe never got an answer, so it has nothing to report about APOC.
+
+        Never raises. ``bool()`` on the result raises instead, which is what
+        turns a caller that still writes ``if not client.apoc_available()`` into
+        a loud failure rather than a silently inverted one.
+        """
+        subject = "apoc.version() on " + (self._database or "(home)")
         try:
             self.read("RETURN apoc.version() AS v")
-            return True
-        except Exception:
-            return False
+        except neo4j_exceptions.AuthError as exc:
+            # BEFORE ClientError, which AuthError subclasses. Caught the other
+            # way round, bad credentials would be reported as "the server
+            # refused the probe" — true, but it buries the one word that tells
+            # the operator what to fix. A test pins the order.
+            return not_checked(
+                f"authentication failed ({type(exc).__name__}), so the probe never ran - this "
+                "says nothing about whether APOC is installed, only about the credentials",
+            )
+        except neo4j_exceptions.ClientError as exc:
+            # The server ANSWERED. A missing procedure is the one answer that
+            # means "APOC is not installed" — code first, because the message is
+            # localized and version-dependent while the code is the contract.
+            code = getattr(exc, "code", "") or ""
+            if code.endswith("ProcedureNotFound") or "apoc.version" in str(exc):
+                return findings(
+                    (f"APOC is not installed on this server ({code or 'ProcedureNotFound'})",),
+                    subject=subject,
+                )
+            return not_checked(
+                f"the server refused the APOC probe with {code or type(exc).__name__}, which is "
+                "neither a missing plugin nor an unreachable server - APOC's presence is unknown",
+            )
+        except neo4j_exceptions.DriverError as exc:
+            # ServiceUnavailable, SessionExpired, ConfigurationError, the CORE13
+            # timeouts: the driver could not get an answer out of the server.
+            return not_checked(
+                f"the server could not be reached ({type(exc).__name__}), so the probe never "
+                "ran - start or reach the database before concluding anything about APOC",
+            )
+        except Exception as exc:  # a probe reports, it never raises
+            return not_checked(
+                f"the APOC probe failed with an unexpected {type(exc).__name__}, so its result "
+                "is unknown rather than negative - this branch exists so a fifth world is "
+                "reported as a fifth world instead of joining the other four in a False",
+            )
+        return checked_clean(subject=subject)
 
     def constraint_names(self) -> frozenset[str]:
         """Names from ``SHOW CONSTRAINTS`` — the D8 bootstrap guard keys on these."""

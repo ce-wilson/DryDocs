@@ -19,3 +19,51 @@ acceptance: |
 notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). core-2026-09-07.md candidate 3 (S5), "very small". The console's O85 probe pattern, uncorrected
   in core - an instance of the checked-vs-not-checked family ADR 0021 names.
+
+  CLOSED 2026-09-10 (Lane B, laptop, wip/core14-laptop, BASED ON wip/core13-laptop, itself based
+  on wip/core11-laptop - all three write neo4j_client.py. Merge order: CORE11, CORE13, CORE14).
+  Venue (J18): offline unit suite; every failure class is driven through an injected exception, so
+  no server is needed and it reproduces from a clean clone.
+
+  THE ACCEPTANCE'S CONDITIONAL RESOLVED: ADR 0021 was ACCEPTED 2026-09-09, so this is a probe and
+  returns CheckOutcome rather than a bool carrying a class. Registered in check_outcome.PROBES,
+  which is the act that makes it one (D3) - the guard imports it and reads its return annotation,
+  and finds nothing nobody registered.
+
+  MEASURED BOTH WAYS by driving the OLD body over the same four worlds:
+    OLD  apoc present -> True | apoc NOT installed -> False | server unreachable -> False |
+    bad credentials -> False.   2 distinct answers over 4 worlds.
+  Now 4. The two that shared an answer needed OPPOSITE actions from the operator - install a
+  plugin, or start a database - and `drydocs bootstrap` printed "APOC required." at both.
+
+  THE MAPPING IS THE ARGUMENT FOR THE TYPE, not decoration. The server answering "no such
+  procedure" is the probe RUNNING and finding something: FINDINGS, and the only state in which
+  "install APOC" is correct advice. Unreachable, unauthorized, or an unexpected class is the probe
+  NOT RUNNING: NOT_CHECKED, with a reason that deliberately says nothing about APOC.
+
+  A BUG THE TESTS CAUGHT WHILE WRITING THEM, worth recording because it is the kind that survives
+  review: `neo4j.exceptions.AuthError` SUBCLASSES `ClientError`, so the first draft's except-order
+  reported bad credentials as "the server refused the probe" - true, but it buries the one word
+  that tells the operator what to fix. AuthError is now caught first and a test pins the order.
+
+  Two test-construction notes for whoever edits these next. Building a coded server error by
+  assigning `.code` is deprecated in driver 5.28 ("Altering the code of a Neo4jError"), and
+  `Neo4jError.hydrate` warns that it is internal - so the tests declare the code as a CLASS
+  attribute on a throwaway ClientError subclass, which shadows the property for reads and touches
+  no internals. And the probe reads `exc.code` FIRST, falling back to the message only if there is
+  no code: the code is the contract, the message is localized and version-dependent.
+
+  BEYOND THE DECLARED INPUTS, and named so the diff is not a surprise: the item declared only
+  drydocs_core/neo4j_client.py, but a probe that no longer coerces to a bool forces its callers to
+  change - `drydocs/cli_schema.py` (both sites, `check` and `bootstrap`) and the fake client in
+  tests/unit/test_bootstrap_guard.py. That is the fix working as intended rather than scope creep:
+  `bool()` on the type RAISES, so any caller this change did not reach fails loudly instead of
+  silently reading not-checked as failure. Both CLI sites now print `outcome.render()`, which is
+  ADR 0021 D5 - a surface must not show a not-checked result as a failure of the thing it did not
+  check. Exit codes are unchanged (2 for any non-clean state): changing the CLI's exit contract is
+  a bigger decision than this item, and the reason now travels in the message where the operator
+  reads it.
+
+  For Lane A at merge: the same two reds as CORE13 and for the same reasons - the enforcement
+  matrix (it embeds config/dev-environment.yaml, which CORE13 edits) and the roadmap guard (these
+  notes). Both are the ordinary default-paths render_board.py run.

@@ -419,3 +419,126 @@ def test_an_unreachable_server_gives_up_within_the_ceiling():
     assert type(info.value).__name__ in ("ServiceUnavailable", "SessionExpired")
     # …and it says so within the wait we declared, with slack for a slow runner
     assert elapsed < 20, f"gave up after {elapsed:.1f}s - the ceiling did not hold"
+
+
+# ── CORE14: four worlds stop being one False ─────────────────────────────────
+#
+# `apoc_available` was `try: ... except Exception: return False`. APOC absent,
+# the server unreachable, the credentials wrong and any unexpected fifth thing
+# all produced the same answer, so `drydocs bootstrap` printed "APOC required."
+# at people whose database was merely stopped. ADR 0021 was ACCEPTED on
+# 2026-09-09, which resolves the item's conditional: this is a probe and it
+# returns CheckOutcome.
+
+
+class _RaisingClient(Neo4jClient):
+    """A client whose read() raises whatever the test hands it."""
+
+    def __init__(self, exc: Exception) -> None:
+        super().__init__("bolt://fake", "u", "p", bounds=Neo4jDriverBounds())
+        self._exc = exc
+
+    def read(self, *a, **k):
+        raise self._exc
+
+
+def _server_error(code: str, message: str) -> neo4j.exceptions.ClientError:
+    """A ClientError carrying a server code, by the one route driver 5.28 does
+    not deprecate. Assigning `.code` on an instance warns ("Altering the code of
+    a Neo4jError is deprecated") and `Neo4jError.hydrate` warns that it is
+    internal - so the code is declared as a CLASS attribute on a throwaway
+    subclass, which shadows the property for reads and touches no internals.
+    What the probe reads is `exc.code`, and that is what this provides."""
+    subclass = type("_ServerSaid", (neo4j.exceptions.ClientError,), {"code": code})
+    return subclass(message)
+
+
+def _procedure_not_found() -> neo4j.exceptions.ClientError:
+    return _server_error(
+        "Neo.ClientError.Procedure.ProcedureNotFound",
+        "There is no procedure with the name `apoc.version`",
+    )
+
+
+def test_apoc_present_is_checked_clean():
+    client, _, _ = _client(rows=[{"v": "5.28.0"}])
+    outcome = client.apoc_available()
+    assert outcome.is_clean
+    assert "apoc.version()" in (outcome.subject or "")
+
+
+def test_apoc_absent_is_a_finding_not_a_silence():
+    """The ONE state in which 'install APOC' is the right advice. The server
+    answered; what it said is that the procedure does not exist."""
+    outcome = _RaisingClient(_procedure_not_found()).apoc_available()
+    assert not outcome.is_clean
+    assert not outcome.is_not_checked, "a server that ANSWERED did not fail to check"
+    assert outcome.count == 1
+    assert "not installed" in outcome.findings[0]
+
+
+def test_an_unreachable_server_is_not_checked_and_says_so():
+    outcome = _RaisingClient(
+        neo4j.exceptions.ServiceUnavailable("Couldn't connect to 127.0.0.1:7687")
+    ).apoc_available()
+    assert outcome.is_not_checked
+    assert "could not be reached" in outcome.reason
+    assert "ServiceUnavailable" in outcome.reason
+    # the reason must not claim anything about APOC itself
+    assert "not installed" not in outcome.reason
+
+
+def test_bad_credentials_are_not_checked_and_are_their_own_class():
+    outcome = _RaisingClient(
+        neo4j.exceptions.AuthError("The client is unauthorized due to authentication failure.")
+    ).apoc_available()
+    assert outcome.is_not_checked
+    assert "authentication" in outcome.reason
+
+
+def test_a_server_side_refusal_that_is_not_a_missing_procedure_is_not_checked():
+    """A ClientError that is NOT ProcedureNotFound - a forbidden procedure on a
+    locked-down server, say. The server answered, but not about APOC's presence."""
+    exc = _server_error(
+        "Neo.ClientError.Security.Forbidden",
+        "Executing procedure is not allowed for user 'reader'.",
+    )
+    outcome = _RaisingClient(exc).apoc_available()
+    assert outcome.is_not_checked
+    assert "Forbidden" in outcome.reason
+
+
+def test_an_unexpected_class_is_reported_as_unknown_rather_than_negative():
+    outcome = _RaisingClient(RuntimeError("something nobody predicted")).apoc_available()
+    assert outcome.is_not_checked
+    assert "RuntimeError" in outcome.reason
+
+
+def test_the_four_classes_are_actually_distinguishable():
+    """The point of the item in one assertion, and MEASURED both ways on the
+    laptop, 2026-09-10, by driving the old body over these same four worlds:
+
+        OLD  apoc present           -> True
+        OLD  apoc NOT installed     -> False
+        OLD  server unreachable     -> False
+        OLD  bad credentials        -> False       2 distinct answers of 4
+
+    Three worlds shared one answer, and the two that shared it needed opposite
+    actions from the operator: install a plugin, or start a database. Now: 4.
+    """
+    answers = [
+        _client(rows=[{"v": "5.28.0"}])[0].apoc_available(),
+        _RaisingClient(_procedure_not_found()).apoc_available(),
+        _RaisingClient(neo4j.exceptions.ServiceUnavailable("x")).apoc_available(),
+        _RaisingClient(neo4j.exceptions.AuthError("x")).apoc_available(),
+    ]
+    assert len({a.render() for a in answers}) == 4
+
+
+def test_the_probe_never_raises_and_never_coerces():
+    outcome = _RaisingClient(neo4j.exceptions.ServiceUnavailable("x")).apoc_available()
+    # ADR 0021 D1: `if not client.apoc_available()` must fail LOUDLY rather than
+    # read not-checked as either clean or failed. That is what protects a caller
+    # this change did not reach.
+    with pytest.raises(TypeError, match="three states"):
+        bool(outcome)

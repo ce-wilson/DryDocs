@@ -182,4 +182,9 @@ PROBES: tuple[str, ...] = (
     # CORE10, the first adopters (ADR 0021 D4, in order):
     "drydocs.port.port_preflight.base_resolves",  # is the base a commit git can see here
     "drydocs.docs_coverage.graph_probe",  # layer 2 of the coverage report
+    # CORE14 (2026-09-10): the sweep's recurrence in core's own driver. Four
+    # worlds - APOC absent, server unreachable, auth wrong, and an unexpected
+    # fifth - all returned the same False, so `drydocs bootstrap` said "APOC
+    # required" to people whose database was simply stopped.
+    "drydocs_core.neo4j_client.Neo4jClient.apoc_available",
 )
