@@ -604,10 +604,16 @@ RAW_READ_EXEMPTIONS: Final = {
         "the subject is the comment STATING the label collision on the enum - "
         "the test name says so, and the stripper would remove it."
     ),
-    ("test_intake_api.py", "test_no_graph_writes_no_neo4j_import"): (
-        "code-subject and convertible to imported_modules, but this file is held "
-        "by wip/api7-laptop in the same Lane B burst; converting it here would "
-        "hand Lane A a hand-merge. Convert when API7 lands - GRAPH4 close notes."
+    (
+        "test_excel_runbook_generator.py",
+        "test_the_committed_generator_carries_no_real_looking_ids",
+    ): (
+        "a PUBLISH-BOUNDARY sweep, where the whole file text is the subject on "
+        "purpose. A real five-digit id or SID shape inside a comment or a "
+        "docstring is still a real id in a committed file, so routing this "
+        "through a stripper would not fix a false match - it would delete half "
+        "the surface the check exists to sweep. The J66 exception in its other "
+        "direction: not prose-as-subject, but prose-as-hiding-place."
     ),
 }
 
@@ -840,25 +846,36 @@ def test_every_raw_read_exemption_still_points_at_a_real_test() -> None:
     )
 
 
-def test_the_exemptions_cover_the_shapes_graph4_measured() -> None:
+def test_the_detector_still_sees_every_site_the_table_exempts() -> None:
     """Anti-vacuity, the other direction (the CORE12 shape).
 
-    If the detector silently stopped finding anything, every test above would
-    still pass. These three are the ones GRAPH4 triaged and KEPT, so the scan
-    must still see them.
+    If the detector silently stopped finding anything, every test above would still
+    pass - an exemption table over a scan that finds nothing is pure theatre.
+
+    The subject is the TABLE rather than a hand-written list of sites, and that is a
+    correction made at the 2026-09-10 merge. GRAPH4 pinned three sites as the ones it
+    "triaged and KEPT"; one of them, test_intake_api, was not kept - its own exemption
+    reason deferred it until API7 landed, API7 landed at that merge, and the
+    conversion made the hand list wrong the moment it happened. Deriving from the
+    table is stronger and cannot go stale the same way: every entry is by construction
+    a site the detector flags, so an entry it cannot see is either a stale row or a
+    regressed detector, and both are worth hearing about. Adding an exemption now adds
+    its own anti-vacuity case for free.
     """
-    for filename, test_name in (
-        ("test_first_party_queries.py", "test_the_comment_naming_the_rejected_label_is_not_read"),
-        ("test_source_labels.py", "test_the_collision_is_stated_on_the_enum"),
-        ("test_intake_api.py", "test_no_graph_writes_no_neo4j_import"),
-    ):
-        source = (TESTS / "unit" / filename).read_text(encoding="utf-8")
-        found = {name for name, _ in _raw_python_source_reads(source)}
-        assert test_name in found, (
-            f"the raw-read scan no longer sees {filename}::{test_name}, which GRAPH4 "
-            "measured as a raw Python-source read. The detector regressed, and every "
-            "other guard here would still be green."
-        )
+    assert RAW_READ_EXEMPTIONS, "an empty table would make this guard vacuous"
+    blind: list[str] = []
+    for filename, test_name in RAW_READ_EXEMPTIONS:
+        path = TESTS / "unit" / filename
+        if not path.exists():
+            continue  # the staleness guard above owns a missing file
+        found = {name for name, _ in _raw_python_source_reads(path.read_text(encoding="utf-8"))}
+        if test_name not in found:
+            blind.append(f"{filename}::{test_name}")
+    assert not blind, (
+        f"the raw-read scan no longer sees exempted sites: {blind}. Either the entry "
+        "is stale - the test was converted or removed, so delete the row - or the "
+        "detector regressed, and every other guard here would still be green."
+    )
 
 
 # ---- return_annotation: the probe registry's verb (CORE10, ADR 0021 D3) -----------

@@ -7,7 +7,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - tests/unit/test_module_boundary.py
@@ -75,3 +75,13 @@ notes: |
   drydocs/port/reconcile_before.py and starts after GRAPH1 has merged. Note that GRAPH1 does not
   MODIFY that file; it only reads it (the crossing was already there). So the ordering matters for
   GRAPH2's own edits, not for a conflict this branch creates.
+  STATUS CLOSED BY LANE A AT MERGE, 2026-09-10 - the build closed itself, the status line
+  did not. This item was built on a branch cut from its PARENT branch's tip rather than
+  from main, and that tip predated this item's own claim commit, so the item file on the
+  branch still read `todo`. The close then replaced in_progress with done, matched
+  nothing, and left the status behind while the close notes above landed normally. The
+  merge took main's `in_progress` correctly, because the branch never changed that line.
+  Nothing about the work is in question: the code, its tests and its notes all merged.
+  The mechanism is worth keeping because it is silent by construction - a status replace
+  that matches nothing reports nothing - and it caught five of the seven stacked branches
+  in this burst (the build lane caught the other two by hand and said so).

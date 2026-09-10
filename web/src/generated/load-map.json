@@ -3029,6 +3029,114 @@
           "reason": "no map entry - asset_type default only"
         }
       }
+    },
+    {
+      "id": "legacy-process-capture",
+      "home": "doc-registry",
+      "system": null,
+      "origin": null,
+      "kind": "doc-corpus",
+      "authority": null,
+      "derived": false,
+      "urn": null,
+      "replaces": null,
+      "classification": "Internal",
+      "confirmed": false,
+      "ledger": {
+        "state": "placeholder",
+        "path": null
+      },
+      "tier": "T4",
+      "curation": "sme-confirm",
+      "connector": "filedrop",
+      "target_db": "drydocs",
+      "trust_default": "VERBATIM",
+      "graph_locator": {
+        "match": "corpus_id",
+        "value": "legacy-process-capture"
+      },
+      "taxonomy_path": null,
+      "taxonomy_captures": [],
+      "ontology_mappings": [],
+      "loaders": [],
+      "class_facts": {
+        "layer": null,
+        "taxonomy_category": null,
+        "acquisition": {
+          "mode": "undeclared",
+          "via": null,
+          "format": null,
+          "drop_dir": null,
+          "drop_dir_base": null
+        },
+        "replica": {
+          "state": "original",
+          "origin": null,
+          "carrier": null,
+          "corroboration": null
+        },
+        "ontology_class": {
+          "state": "UNCLASSIFIED",
+          "classes": [],
+          "relationships": [],
+          "pending": 0,
+          "reason": "no map entry - asset_type default only"
+        }
+      }
+    },
+    {
+      "id": "bmc-docs-controlm-parameters",
+      "home": "doc-registry",
+      "system": null,
+      "origin": null,
+      "kind": "doc-corpus",
+      "authority": null,
+      "derived": false,
+      "urn": null,
+      "replaces": null,
+      "classification": "External",
+      "confirmed": false,
+      "ledger": {
+        "state": "placeholder",
+        "path": null
+      },
+      "tier": "T1",
+      "curation": "none",
+      "connector": "web",
+      "target_db": "drydocs",
+      "trust_default": "VERBATIM",
+      "graph_locator": {
+        "match": "corpus_id",
+        "value": "bmc-docs-controlm-parameters"
+      },
+      "taxonomy_path": "technology/orchestration/control-m",
+      "taxonomy_captures": [],
+      "ontology_mappings": [],
+      "loaders": [],
+      "class_facts": {
+        "layer": null,
+        "taxonomy_category": null,
+        "acquisition": {
+          "mode": "undeclared",
+          "via": null,
+          "format": null,
+          "drop_dir": null,
+          "drop_dir_base": null
+        },
+        "replica": {
+          "state": "original",
+          "origin": null,
+          "carrier": null,
+          "corroboration": null
+        },
+        "ontology_class": {
+          "state": "UNCLASSIFIED",
+          "classes": [],
+          "relationships": [],
+          "pending": 0,
+          "reason": "no map entry - asset_type default only"
+        }
+      }
     }
   ],
   "retired": [
@@ -4154,7 +4262,7 @@
             "name": "doc-ledger corpora (config/doc-source-registry.yaml)",
             "application_id": null,
             "application_id_state": "absent",
-            "dataset_count": 10,
+            "dataset_count": 12,
             "classes": [
               {
                 "ontology_class": "BusinessApplication + Document",
@@ -4282,6 +4390,22 @@
                     }
                   },
                   {
+                    "id": "bmc-docs-controlm-parameters",
+                    "taxonomy_category": null,
+                    "acquisition_mode": "undeclared",
+                    "authority": null,
+                    "replica": "original",
+                    "confirmed": false,
+                    "loader_count": 0,
+                    "ontology_class": {
+                      "state": "UNCLASSIFIED",
+                      "classes": [],
+                      "relationships": [],
+                      "pending": 0,
+                      "reason": "no map entry - asset_type default only"
+                    }
+                  },
+                  {
                     "id": "cdo-frameworks",
                     "taxonomy_category": null,
                     "acquisition_mode": "undeclared",
@@ -4315,6 +4439,22 @@
                   },
                   {
                     "id": "jpmc-reports",
+                    "taxonomy_category": null,
+                    "acquisition_mode": "undeclared",
+                    "authority": null,
+                    "replica": "original",
+                    "confirmed": false,
+                    "loader_count": 0,
+                    "ontology_class": {
+                      "state": "UNCLASSIFIED",
+                      "classes": [],
+                      "relationships": [],
+                      "pending": 0,
+                      "reason": "no map entry - asset_type default only"
+                    }
+                  },
+                  {
+                    "id": "legacy-process-capture",
                     "taxonomy_category": null,
                     "acquisition_mode": "undeclared",
                     "authority": null,
@@ -4535,7 +4675,7 @@
     "inputs": [
       {
         "path": "config/doc-source-registry.yaml",
-        "blob": "8c83ccff2c80e009f271494954126f6b0bc7bf06"
+        "blob": "0ea864d73a2b63154688644c64e14ced6a3dc98a"
       },
       {
         "path": "config/source-registry.yaml",
@@ -4631,7 +4771,7 @@
       },
       {
         "path": "config/taxonomy/ui-components.yaml",
-        "blob": "f30b4665bbae1432876ebcfd583774b0bce218bc"
+        "blob": "9c6b8ab518a56f530f81680b7521bc35567f2c3c"
       },
       {
         "path": "config/taxonomy/ui-concepts.yaml",
@@ -4642,7 +4782,7 @@
         "blob": "4773ab3e5c0f8c4d039718628097530411f786f5"
       }
     ],
-    "digest": "3f955da9b393241d90176c3b30b70f2c76f7c80b",
+    "digest": "9353b1d02ea310a2743bd953f6de27be2c7f0b2c",
     "how_to_resolve": "git log --find-object=<blob> names the commits that carry an input"
   }
 }

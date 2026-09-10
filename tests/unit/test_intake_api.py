@@ -39,6 +39,7 @@ from drydocs_api.intake import (
     unblock_persona,
 )
 from drydocs_api.sessions import InMemorySessionStore
+from tests.source_scan import absent, imported_modules
 
 REPO = Path(__file__).resolve().parent.parent.parent
 
@@ -417,8 +418,31 @@ def test_unknown_intake_raises(sessions, store):
 
 
 def test_no_graph_writes_no_neo4j_import():
-    src = (REPO / "drydocs_api" / "intake.py").read_text(encoding="utf-8")
-    assert "import neo4j" not in src and "GraphDatabase" not in src
+    """The intake store writes files, never the graph - read as CODE (J66).
+
+    Converted from a raw substring sweep at the 2026-09-10 merge, when GRAPH4's
+    exemption for this test fired its own stated trigger (API7 had landed, so the
+    file was no longer held by another lane). The substring version matched the
+    module name anywhere, including a comment explaining why the graph is not
+    written here - the exact defect J66 names. `imported_modules` answers the
+    question actually being asked, and `code_only` covers the driver handle, which
+    is a NAME rather than an import and so is not visible to the first check.
+    """
+    target = REPO / "drydocs_api" / "intake.py"
+    source = target.read_text(encoding="utf-8")
+
+    # The import question, answered by reading imports rather than by matching a
+    # name: naming neo4j in a comment is not importing it (G129 was exactly that).
+    assert not {m for m in imported_modules(source) if m == "neo4j" or m.startswith("neo4j.")}
+
+    # The driver HANDLE is a name, not an import, so it needs a second question -
+    # and an absence scan needs its mutation probe or it passes when it is broken.
+    absent(
+        "GraphDatabase",
+        {"drydocs_api/intake.py": source},
+        positive_control="from neo4j import GraphDatabase\nd = GraphDatabase.driver(uri)\n",
+        because="the intake store writes files; a graph write here would cross ADR 0005's read-only line",
+    )
 
 
 def test_records_reference_the_data_root_seam():
