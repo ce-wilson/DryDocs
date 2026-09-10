@@ -2,30 +2,33 @@
 
 _Planning session 2026-09-09, desktop (Lane A), Fable 5.1. Planning, every gate sitting, every ADR and the one grooming pass run on Fable 5.1; build units carry `model: sonnet` unless stated; chores `haiku`; the two existing `opus` items keep their tier. Adversarially reviewed: three design perspectives, six refuters; the corrections are folded in and named where they changed a decision._
 
-## STATUS — measured 2026-09-10 at `9c427293`, not carried
+## STATUS — measured 2026-09-10 at `47c29129`, not carried
 
 This section is re-derived by command at every update; nothing in it is remembered. It exists
 because the plan was written into a file that was never committed, and a later session reading
 the repo could therefore see only the eleven `docs/reviews/modules/` sweep reports and concluded
 that was all there was. The plan, and both ultra-review records, are committed with this edit.
 
-**Phases 0, 1 and 3 are COMPLETE. Phase 2 is PARTIAL and Phase 4 is three-quarters done.**
-`9c427293` is level with `origin/main`. Three `wip/*-laptop` branches are open on the remote,
-which is the Phase 2 residue: that phase runs across both lanes, and only Lane A's half landed.
+**Phases 0 through 3 are COMPLETE. Phase 4 is three-quarters done.** `47c29129` is level with
+`origin/main`, and `git branch -r --list "origin/wip/*"` is empty: twenty-six build-lane
+branches covering thirty items merged `--no-ff` on 2026-09-10, plus `feat/web-completeness`.
 
-**The correction, stated because the block it replaces was wrong in a way worth naming.** The
-2026-09-09 measurement read Phase 2 as done on the strength of PORT8, PLAN12 and CFG7 — which
-are units 2.1 through 2.4, every one of them Lane A's. The phase's own heading is "THE BASE:
-the finish line and the build-now fixes (A parallel B)", and its finish line is a test that does
-not exist: `tests/integration/test_e2e_synthetic.py` is unwritten, and LOAD13, LOAD14 and DOC12
-are `in_progress` on the laptop with branches to match. Reading a two-lane phase off one lane's
-commits is how a phase gets marked done while its deliverable is still being built.
+**PHASE 2 CLOSED ON THAT MERGE, and the correction it went through is worth keeping.** The
+2026-09-09 measurement read it as done on PORT8, PLAN12 and CFG7 — units 2.1 through 2.4, every
+one of them Lane A's — while the phase's own heading is "THE BASE: the finish line and the
+build-now fixes (A parallel B)" and its finish line had not been written. Earlier today this
+block read PARTIAL for that reason. It is now genuinely complete: LOAD13, LOAD14 and DOC12 are
+merged and `done`. Note the finish line landed under a different name than this plan predicted —
+`tests/integration/test_e2e_base_finish_line.py`, not `test_e2e_synthetic.py` — so the plan's
+later references to that filename are to a file that was built, renamed by its builder.
+The lesson survives the phase: reading a two-lane phase off one lane's commits is how a phase
+gets marked done while its deliverable is still being built.
 
 | Phase | State | Evidence |
 |---|---|---|
 | 0 — close the burst | **done** | nine `--no-ff` merges (`c25bca79`..`f06a5f00`), six claims settled at `1bd22b50`; DOC4 and S11 `done`, E1 and G62 on `hold:`, L19 and MM7 released |
 | 1 — ADR 0021, ultra review, one mint pass | **done, one tail** | ADR 0021 drafted `981a76f6` and **ACCEPTED** at sitting 1; 58 items minted `7ed742d2`; the Team Edition epic exists; both handoffs reissued `41e018fc`. TAIL: the grooming pass over the two ultra-review records is not run |
-| 2 — the base: finish line and build-now fixes (A ∥ B) | **partial — Lane A done, Lane B in flight** | LANE A done: PORT8 `2425c206`, PLAN12 `903060e2`, CFG7 `e2bf8d53`; tag `port-base-20260909` at `9da9d617`. LANE B open: LOAD13 (the finish-line test), LOAD14 (the coverage report) and DOC12 (the Excel run book from the graph) all `in_progress`, branches `origin/wip/{load13,load14,doc12}-laptop`; `tests/integration/test_e2e_synthetic.py` does not exist yet |
+| 2 — the base: finish line and build-now fixes (A ∥ B) | **done** | LANE A: PORT8 `2425c206`, PLAN12 `903060e2`, CFG7 `e2bf8d53`; tag `port-base-20260909` at `9da9d617`. LANE B, merged 2026-09-10: LOAD13 the finish-line test (`tests/integration/test_e2e_base_finish_line.py`, 478 lines), LOAD14 the coverage report over the stand-ins' object classes, DOC12 the Excel run book generated from the graph |
 | 3 — SITTING 1 | **done** | `783a7a4e`: `registry-wiring-readiness` SIGNED 18/18, `source-descriptor-axes` SIGNED 13/13, ADR 0021 ACCEPTED, nineteen gates DEFERRED with named re-arms |
 | 4 — post-sitting builds | **3 of 4** | CFG13 `df068d46` (+ `321d0ae2`), CORE10 `eb18afde`, CORE18 `done`. REMAINS: unit 4.4 (the duckdb/openpyxl dependency groups and the base-finish tag), which closes on Phase 2's finish line rather than on its own |
 | 5 — SITTING 2, the identifier | **not started** | N23, J70 both `todo`; needs SME time. Units 5.1 and 5.2 are drafting and can run before the sitting |
@@ -270,4 +273,4 @@ One structural roll instead of two back-to-back applies while the company is mid
 
 ## Critical files
 
-`docs/lane-a-handoff.md`, `docs/lane-b-handoff.md`, `.claude/skills/lane-handoff/scripts/handoff.py` · `config/gate-prompts/registry-wiring-readiness.yaml`, `source-descriptor-axes.yaml` (new), `<n23-slug>.yaml` (new), `schema-identifier-publish-ceiling-teams-edition.yaml`, `data-flow-overview.yaml`, `config/gate-log.md` · `config/source-registry.yaml`, `config/source-descriptors.yaml`, `drydocs_core/source_registry.py`, `drydocs_core/source_descriptors.py` · `drydocs/port/port_preflight.py` · `tests/unit/test_backlog.py` · `tests/integration/test_e2e_synthetic.py` (new), `drydocs/docs_coverage.py` · `docs/decisions/0015-team-edition-template.md`, `docs/decisions/0021-*.md` (new) · `PORT-MANIFEST.yaml` (rows + `per_side_fields`), `docs/port/port-prompt.md` · `drydocs_core/component_map.py`, `tests/unit/test_module_boundary.py` · `.claude/skills/controlm-runbook-automation-excel/` · `drydocs_core/ontology/relationship_vocabulary/{10-node-classifications,42-local-catalog,43-local-architecture}.yaml` · `config/taxonomy/{editions,domains}.yaml`.
+`.claude/skills/lane-handoff/scripts/handoff.py` (the handoff files themselves are generated per burst and self-delete) · `config/gate-prompts/registry-wiring-readiness.yaml`, `source-descriptor-axes.yaml` (new), `<n23-slug>.yaml` (new), `schema-identifier-publish-ceiling-teams-edition.yaml`, `data-flow-overview.yaml`, `config/gate-log.md` · `config/source-registry.yaml`, `config/source-descriptors.yaml`, `drydocs_core/source_registry.py`, `drydocs_core/source_descriptors.py` · `drydocs/port/port_preflight.py` · `tests/unit/test_backlog.py` · `tests/integration/test_e2e_synthetic.py` (new), `drydocs/docs_coverage.py` · `docs/decisions/0015-team-edition-template.md`, `docs/decisions/0021-*.md` (new) · `PORT-MANIFEST.yaml` (rows + `per_side_fields`), `docs/port/port-prompt.md` · `drydocs_core/component_map.py`, `tests/unit/test_module_boundary.py` · `.claude/skills/controlm-runbook-automation-excel/` · `drydocs_core/ontology/relationship_vocabulary/{10-node-classifications,42-local-catalog,43-local-architecture}.yaml` · `config/taxonomy/{editions,domains}.yaml`.
