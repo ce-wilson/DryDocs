@@ -38,6 +38,59 @@ The session then reported, after checking its own tree:
 own. That sentence assumes a venue which reads `skillOverrides`. In theirs the claim is not
 merely stale, it is inapplicable — there is no override layer to read.
 
+## 1b. The venue split, as that machine measured it `[SME-REPORTED]`
+
+Their session wrote its own findings to a durable memory file and the SME shared it. This is
+more specific than section 1 and supersedes it where they differ. Verified on their machine
+2026-09-10; unverifiable from here.
+
+- **No Claude Code at all.** `claude` is not on PATH and `~/.claude/plugins/` does not exist.
+  What does exist under `~/.claude/` is `{backups, plans, projects, sessions, skills}`.
+- **THE FACT WITH THE MOST LEVERAGE, and it is new: that venue loads filesystem skills from
+  TWO roots — `.claude/skills/**/SKILL.md` AND `.github/skills/**/SKILL.md`.** There is no
+  plugin loader, so any `plugin:skill` route — every `neo4j-skills:*` in this repo — resolves
+  to nothing and the session runs with no lens and no error. The second root matters for the
+  Teams Edition: `.github/skills/` is a GitHub-native location, which a team on that stack
+  would already have, and this repo ships nothing there.
+- **`skillOverrides` is a Claude Code mechanism and that venue never reads it.**
+  `.claude/settings.local.json` does not exist on that machine in any case. The consequence
+  is the inverse of what `CLAUDE.md` §2 describes: **`oracle-db` was always ON there**, and
+  had been for as long as the skill has existed, while §2 said it was off.
+- Nothing was ever set to un-set: their `~/.claude/settings.json` is `{"env": {}}` — 15 bytes,
+  no `enabledPlugins` — and `~/.claude.json` has no `enabledPlugins` either. There is no
+  "reset" that would change any of the above.
+- **The fix is APPLIED on their side, 2026-09-10**: they authored
+  `.claude/skills/neo4j-db/SKILL.md` as the every-venue Neo4j route and repointed
+  `CLAUDE.md` §2, `reference/platforms/README.md`, `reference/platforms/neo4j/README.md` and
+  `reference/REGISTRY.yaml` at it. Their `reference/platforms/README.md` now reads, correctly:
+  start with the repo-local `neo4j-db` skill because it is authoritative for THIS graph's
+  topology and failure modes; *under Claude Code, add the matching `neo4j-skills:` plugin skill
+  for version-current Neo4j; under VS Code the plugin does not load at all.* That is the right
+  shape — repo-local first, plugin as an additive — and it is the shape the producer should
+  copy rather than reinvent. All five paths are canonical-producer (§4).
+
+### Two venue hazards worth carrying, neither of which is a DryDocs defect
+
+**A worktree can hold `main` hostage, and that is a DIFFERENT cause of detached HEAD than the
+one `CLAUDE.md` §0 documents.** Their main clone sat detached because a `research` worktree had
+`main` checked out; `git checkout main` then fails with *"already used by worktree at …"*. The
+fix is to give the worktree its own branch first (`git switch -c <own-branch>` inside it), then
+`git checkout main` in the main checkout. **`git worktree list` is the diagnostic** — it prints
+which path holds which branch. Producer-side this specific trap is already avoided rather than
+handled: §0's J61 recovery recipe uses `git worktree add --detach`, and a detached worktree
+holds no branch to steal. But the producer runs two NON-detached worktrees
+(`review/module-sweep`, `feat/web-completeness`), so the trap is reachable here the moment one
+of them is pointed at `main`. §0 documents the empty-string symptom of a detached worktree and
+never names `git worktree list`; adding one line would close it.
+
+**A multi-file replace matched FUZZILY.** They ran an `oldString` carrying a deliberate typo
+(`neo4js-skills` for `neo4j-skills`) as a control, and it matched and replaced anyway — so the
+control failed open and a placeholder landed in a real file. Whatever the venue's edit tool
+does, it is not exact-match. The mitigation is the one this repo already practises for its own
+scripted edits: assert the occurrence COUNT before replacing and re-read after
+(`assert text.count(old) == 1`), which turns a fuzzy match into a loud failure instead of a
+silent one.
+
 ## 2. What is true producer-side `[VERIFIED-PRODUCER]`
 
 Measured at `6ae7a0e9`, 2026-09-10, by `dispositions.classify` against `PORT-MANIFEST.yaml`

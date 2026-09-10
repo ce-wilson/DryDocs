@@ -133,6 +133,19 @@ question a 1,000-line file with the trail at the bottom could not answer.
   `[SME-REPORTED]` / `[VERIFIED-PRODUCER]` split are in `internal/agent-platform/company-assistant-venue.md`.
   **Target: the Teams Edition plan's agent/skill/workflow phase — read this BEFORE that phase is
   written, not after.**
+  **KEPT-UPDATED 2026-09-10 — a second skills root, and it is the fact with the most leverage.**
+  That venue loads filesystem skills from TWO places: `.claude/skills/**/SKILL.md` AND
+  `.github/skills/**/SKILL.md`. This repo ships nothing under the second, and `.github/skills/` is
+  a GitHub-native location a team on that stack would already have. So the reachability question
+  is not only "does this venue run plugins" but "which skills ROOT does it read" — an edition
+  targeting an unknown team may need to ship to both, or to declare which root it populates. Two
+  more measurements from the same source, both narrowing what a declaration has to cover: their
+  `~/.claude/settings.json` is `{"env": {}}` with no `enabledPlugins` and `~/.claude.json` has none
+  either, so there is no enablement state to carry even in principle; and the practical consequence
+  of `skillOverrides` being unread there is the INVERSE of what `CLAUDE.md` §2 asserts — `oracle-db`
+  has been ON in that venue the whole time §2 said it was off. A capability the tree believes it has
+  disabled is worse than one it never declared. Detail in
+  `internal/agent-platform/company-assistant-venue.md` §1b.
 
 - **`Idea-312`** · 2026-09-10 · `[bug]` · **open** · prio? **High** —
   **`CLAUDE.md` §2 routes EVERY Neo4j task to a plugin, unconditionally, and that route is dead in
