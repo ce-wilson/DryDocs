@@ -224,6 +224,67 @@ class SystemRow:
     status: str = "unregistered-software"
 
 
+# --- LOAD14: the synthetic stand-ins' object classes --------------------------
+#
+# The same three-part shape the product rows already use — declared / loaded /
+# blocker, with None for not-probed — asked of a different subject: the object
+# classes the synthetic stand-ins generate. The base's own statement of what it
+# reached and why the rest is out of reach.
+
+CLASS_LOADED = "loaded"
+CLASS_WIRING_HOLD = "wiring-hold"
+CLASS_SEMANTIC_HOLD = "semantic-hold"
+
+#: Governing state, first match wins — the same reading as LADDER above.
+CLASS_LADDER: tuple[str, ...] = (CLASS_LOADED, CLASS_WIRING_HOLD, CLASS_SEMANTIC_HOLD)
+
+#: The two axes, and the rule that tells them apart. DERIVED from two declared
+#: booleans, never from the prose of a reason string:
+#:
+#:   confirmed=false            -> SEMANTIC hold. No gate has ruled the meaning,
+#:                                 so no loader could be correct yet.
+#:   confirmed=true, wired=false -> WIRING hold. The meaning is signed and the
+#:                                 pipeline is not built on this side.
+#:
+#: Which axis holds a class is the question an operator actually has, because the
+#: two have different owners: a semantic hold waits on the SME gate, a wiring
+#: hold waits on a build. Collapsing them into one "not loaded" is what this row
+#: exists to stop.
+
+
+@dataclass
+class ClassCoverageRow:
+    """One synthetic dataset, the classes it generates, and what became of them.
+
+    ``loaded`` is ``None`` for NOT PROBED and never ``0``: a graph nobody asked
+    is not a graph that answered zero. That distinction is the whole reason this
+    row carries a probe outcome rather than an int.
+    """
+
+    dataset_id: str = ""
+    #: The stand-in's DECLARATION: the files it generates for this dataset.
+    #: Declaration is per dataset; the generator's row knobs are per object class
+    #: (``folders``, ``jobs``, ``hosts``…) and no mapping between the two is
+    #: declared anywhere, so this row does not invent one — the same reason
+    #: :func:`_loader_labels` derives its labels instead of restating them.
+    files: tuple[str, ...] = ()
+    #: The graph label the bound loader sweeps, when one binds this dataset.
+    label: str | None = None
+    #: Nodes carrying ``label`` in the probed graph. None = not counted.
+    loaded: int | None = None
+    #: WHY ``loaded`` is None, empty when it carries a count. A bare None is the
+    #: same shrug as a bare skip: it says a number is missing without saying who
+    #: is owed one. Two distinct causes reach it — nobody asked the graph, and
+    #: the dataset's loader declares no node label to ask about (its subject is
+    #: edges, or it sweeps nothing) — and an operator reading the report needs
+    #: to tell them apart, because only the first is fixed by running again.
+    count_note: str = ""
+    coverage: str = CLASS_SEMANTIC_HOLD
+    blocker: str = ""
+    #: The project's own declared reason, read from config — never restated here.
+    blocker_reason: str = ""
+
+
 @dataclass
 class CoverageReport:
     products: list[ProductCoverageRow] = field(default_factory=list)
@@ -232,6 +293,8 @@ class CoverageReport:
     #: apart so a reader cannot mistake the orphan list for the registry.
     corpora: list[UnclaimedCorpusRow] = field(default_factory=list)
     systems: list[SystemRow] = field(default_factory=list)
+    #: LOAD14: one row per synthetic stand-in dataset.
+    classes: list[ClassCoverageRow] = field(default_factory=list)
     corpora_total: int = 0
     probed: bool = False
     #: CORE10 (ADR 0021): layer 2's own answer, as the three-outcome type. `probed`
@@ -239,6 +302,16 @@ class CoverageReport:
     probe: CheckOutcome = field(
         default_factory=lambda: not_checked(
             "the report was built without a graph seam, so layer 2 never ran"
+        )
+    )
+    #: LOAD14's own probe, kept SEPARATE from `probe` on purpose: the two ask
+    #: different databases different questions, and one having run is no evidence
+    #: about the other. Sharing a single outcome would let a reachable registry
+    #: database report the class counts as checked when nothing counted them.
+    classes_probe: CheckOutcome = field(
+        default_factory=lambda: not_checked(
+            "the report was built without a graph seam, so the stand-in classes "
+            "were never counted"
         )
     )
 
@@ -256,6 +329,15 @@ class CoverageReport:
                 1 for c in self.corpora if c.attribution == "edge-without-declaration"
             ),
             "systems_without_a_product_row": len(self.systems),
+            "classes": len(self.classes),
+            **{
+                f"classes_{state}": sum(1 for r in self.classes if r.coverage == state)
+                for state in CLASS_LADDER
+            },
+            # Counted, not summed: a not-probed class contributes no number at
+            # all, and reporting it as 0 loaded objects is the exact falsehood
+            # this section was built to avoid.
+            "classes_not_probed": sum(1 for r in self.classes if r.loaded is None),
         }
 
     def reconciles(self) -> bool:
@@ -264,7 +346,15 @@ class CoverageReport:
         s = self.summary()
         states = sum(v for k, v in s.items() if k.startswith("products_"))
         corpora = s["corpora_declared_by_a_product"] + s["corpora_unclaimed"]
-        return states == s["products"] and corpora == s["corpora_total"]
+        # `classes_not_probed` is deliberately excluded from this sum: it counts
+        # a DIFFERENT axis (was the graph asked) across the same rows the ladder
+        # already partitions, so adding it would double-count every row.
+        class_states = sum(s[f"classes_{state}"] for state in CLASS_LADDER)
+        return (
+            states == s["products"]
+            and corpora == s["corpora_total"]
+            and class_states == s["classes"]
+        )
 
     def failing(self) -> list[ProductCoverageRow]:
         return [r for r in self.products if r.coverage in FAILING or r.currency == DRIFTED]
@@ -277,9 +367,12 @@ class CoverageReport:
             "products": [asdict(r) for r in self.products],
             "corpora": [asdict(r) for r in self.corpora],
             "systems": [asdict(r) for r in self.systems],
+            "classes": [asdict(r) for r in self.classes],
             "probed": self.probed,
             "probe": self.probe.render(),
             "probe_state": self.probe.state.value,
+            "classes_probe": self.classes_probe.render(),
+            "classes_probe_state": self.classes_probe.state.value,
             "summary": self.summary(),
             "reconciles": self.reconciles(),
         }
@@ -322,12 +415,25 @@ def coverage(
     *,
     systems: Iterable[Mapping] = (),
     platforms: Iterable[Mapping] = (),
+    descriptors=None,
+    registry=None,
     run: Callable[[str, str, dict], list[dict]] | None = None,
     registry_db: str = REGISTRY_DB,
 ) -> CoverageReport:
-    """Build the coverage report. Layer 1 always; Layer 2 only when ``run`` is given."""
+    """Build the coverage report. Layer 1 always; Layer 2 only when ``run`` is given.
+
+    ``descriptors`` and ``registry`` add LOAD14's stand-in class section. They
+    are OPTIONAL so every existing caller keeps working unchanged: a report built
+    without them carries no class rows and a classes_probe that says so, which is
+    the honest reading — not-asked, rather than nothing-found.
+    """
     probe = graph_probe(run, registry_db)
     report = CoverageReport(probed=not probe.is_not_checked, probe=probe)
+
+    if descriptors is not None and registry is not None:
+        report.classes, report.classes_probe = class_coverage(
+            descriptors, registry, run=run, registry_db=registry_db
+        )
 
     corpora_by_id = {}
     for entry in corpora:
@@ -462,6 +568,127 @@ def graph_probe(
     if not rows:
         return checked_clean(size=0, subject=subject)
     return findings(rows, size=len(rows), subject=subject)
+
+
+def _loader_labels() -> dict[str, str]:
+    """dataset id -> the graph label its bound loader sweeps.
+
+    DERIVED from the loaders themselves — each declares ``source_id`` and
+    ``sweep_label`` as ClassVars — rather than restated as a mapping here. A
+    hand-written dataset-to-label table is a second place to update and so a
+    second place to be wrong; this one cannot drift from the loaders because it
+    IS the loaders.
+
+    Imported inside the function on purpose: ``cli_shared`` pulls in every
+    loader module, and this module is imported by the CLI that imports
+    ``cli_shared``. A module-level import would add an edge to that cycle, which
+    is the shape S13 shipped once already.
+    """
+    from drydocs.cli_shared import LOADER_REGISTRY
+
+    labels: dict[str, str] = {}
+    for loader in LOADER_REGISTRY.values():
+        source_id = getattr(loader, "source_id", None)
+        label = getattr(loader, "sweep_label", None)
+        if source_id and label:
+            labels.setdefault(str(source_id), str(label))
+    return labels
+
+
+_CLASS_COUNT_CYPHER = "MATCH (n:`{label}`) RETURN count(n) AS n"
+
+
+def class_probe(
+    run: Callable[[str, str, dict], list[dict]] | None,
+    labels: Iterable[str],
+    registry_db: str = REGISTRY_DB,
+) -> CheckOutcome:
+    """Count the nodes behind each stand-in class (ADR 0021; registered in PROBES).
+
+    NOT_CHECKED with the reason when there is no seam — every ``loaded`` then
+    stays ``None`` and the report says "not probed" where a count would go.
+    CHECKED_CLEAN over zero when the graph answers and holds none of them, which
+    is an honest empty graph and a different fact from never having asked.
+    """
+    wanted = sorted({str(label) for label in labels if label})
+    if run is None:
+        return not_checked(
+            "no graph seam was given (--no-graph, or the database was unreachable), "
+            f"so the {len(wanted)} stand-in class labels were never counted"
+        )
+    rows: list[dict] = []
+    for label in wanted:
+        # The label is interpolated because Cypher cannot parameterise a label;
+        # every value here comes from a loader's own ClassVar, never from input.
+        answered = run(registry_db, _CLASS_COUNT_CYPHER.format(label=label), {}) or []
+        count = int(answered[0]["n"]) if answered else 0
+        if count:
+            rows.append({"label": label, "nodes": count})
+    subject = f"{registry_db}: node counts for {len(wanted)} stand-in class labels"
+    if not rows:
+        return checked_clean(size=0, subject=subject)
+    return findings(rows, size=len(rows), subject=subject)
+
+
+def class_coverage(
+    descriptors,
+    registry,
+    *,
+    run: Callable[[str, str, dict], list[dict]] | None = None,
+    registry_db: str = REGISTRY_DB,
+) -> tuple[list[ClassCoverageRow], CheckOutcome]:
+    """The stand-ins' object classes: what the base reached, and what holds the rest.
+
+    Reads ``config/source-descriptors.yaml`` (the synthetic block and the
+    ``wired`` axis) and ``config/source-registry.yaml`` (``confirmed``). Writes
+    nothing. The axis that holds a class is derived from those two booleans, for
+    the reason given at :data:`CLASS_LADDER`.
+    """
+    labels_by_dataset = _loader_labels()
+    probe = class_probe(run, labels_by_dataset.values(), registry_db)
+    # `.findings` is an empty tuple for both CHECKED_CLEAN and NOT_CHECKED, so
+    # this reads correctly in every state without asking which one it is.
+    counted = {str(r["label"]): int(r["nodes"]) for r in probe.findings}
+
+    rows: list[ClassCoverageRow] = []
+    for plan in descriptors.synthetic_plans():
+        wired, wired_reason = descriptors.wired(plan.source_id)
+        confirmed = registry.is_confirmed(plan.source_id)
+        label = labels_by_dataset.get(plan.source_id)
+        if not confirmed:
+            coverage, blocker = CLASS_SEMANTIC_HOLD, CLASS_SEMANTIC_HOLD
+        elif not wired:
+            coverage, blocker = CLASS_WIRING_HOLD, CLASS_WIRING_HOLD
+        else:
+            coverage, blocker = CLASS_LOADED, ""
+        # Not probed stays None, and so does "no node label to count": in both
+        # cases nothing counted, and a 0 would read as a graph that answered none.
+        # Each carries the reason it is None, so the gap names its own cause.
+        if probe.is_not_checked:
+            loaded, note = None, "the graph was not probed, so nothing counted this class"
+        elif not label:
+            loaded, note = (
+                None,
+                (
+                    f"no loader bound to {plan.source_id} declares a sweep label, so this "
+                    "dataset's subject cannot be counted by node label"
+                ),
+            )
+        else:
+            loaded, note = counted.get(label, 0), ""
+        rows.append(
+            ClassCoverageRow(
+                dataset_id=plan.source_id,
+                files=tuple(plan.files),
+                label=label,
+                loaded=loaded,
+                count_note=note,
+                coverage=coverage,
+                blocker=blocker,
+                blocker_reason=(wired_reason or "") if blocker else "",
+            )
+        )
+    return rows, probe
 
 
 _PRODUCT_NODES_CYPHER = """

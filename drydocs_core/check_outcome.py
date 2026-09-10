@@ -182,4 +182,8 @@ PROBES: tuple[str, ...] = (
     # CORE10, the first adopters (ADR 0021 D4, in order):
     "drydocs.port.port_preflight.base_resolves",  # is the base a commit git can see here
     "drydocs.docs_coverage.graph_probe",  # layer 2 of the coverage report
+    # LOAD14: the stand-ins' object classes. A SECOND probe in the same module
+    # rather than an extension of the first, because the two ask different
+    # questions and one having run says nothing about the other.
+    "drydocs.docs_coverage.class_probe",
 )

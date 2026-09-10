@@ -7,7 +7,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs/docs_coverage.py
@@ -24,3 +24,15 @@ acceptance: |
   loaded; Team Edition Phase 4 generalizes it later.
 notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). Plan 2026-09-09, Phase 2 row 2.
+
+  CLOSED 2026-09-10 (Lane B, laptop, wip/load14-laptop). A fourth SECTION on the existing report and the existing verb — drydocs docs-coverage --section classes — not a second verb: ClassCoverageRow joins ProductCoverageRow, UnclaimedCorpusRow and SystemRow on CoverageReport, and summary(), reconciles() and as_dict() each grew the section rather than gaining a sibling. Passing descriptors/registry is OPTIONAL, so every existing caller keeps working and a report built without them carries a classes_probe that says not-asked rather than an empty list that reads as nothing-found.
+
+  THE AXIS IS DERIVED FROM TWO DECLARED BOOLEANS, never from the prose of a reason string (which would be the J66 guard-reads-prose mistake in a report). confirmed=false is a SEMANTIC hold: no gate has ruled the meaning, so no loader could be correct yet. confirmed=true with wired=false is a WIRING hold: the meaning is signed and the pipeline is not built on this side. The distinction is the operator's actual question because the two have different owners — a semantic hold waits on the SME gate, a wiring hold waits on a build — and collapsing them into one not-loaded says nothing about who is holding it. Measured across the real estate at close: 13 loaded, 8 wiring holds, 9 semantic holds.
+
+  GRAPH LABELS ARE DERIVED FROM THE LOADERS, not restated. Each loader declares source_id and sweep_label as ClassVars, so _loader_labels() reads dataset -> label off LOADER_REGISTRY and cannot drift from the loaders because it IS the loaders; a hand-written table would have been a second place to update and so a second place to be wrong. The import is function-local: cli_shared pulls in every loader and the CLI that imports it also imports this module, so a module-level import would add an edge to the S13 cycle.
+
+  NOT-PROBED IS NONE AND SAYS WHY. loaded is None, never 0, and count_note carries the cause — a bare None is the same shrug as a bare skip, naming a missing number without naming who is owed one. Two distinct causes reach it and an operator must tell them apart because only the first is fixed by running again: nobody asked the graph, and the dataset's bound loader declares no node label (its subject is edges, or it sweeps nothing — cm_def_lnki_p_vw and cm_def_lnko_p_vw are the live case). On the operator surface a class nothing counted prints a dash.
+
+  class_probe is REGISTERED in drydocs_core.check_outcome.PROBES (ADR 0021 D3). That registration is the act: the guard imports each declared name and reads its return annotation, so it finds nothing nobody registered — adding the probe without the line would have passed the guard while violating the ADR. Kept as a SECOND probe beside graph_probe rather than folded into it, because the two ask different questions and one having run is no evidence about the other.
+
+  For Lane A, a discrepancy this report surfaces rather than creates: hr@[db].psgmgr.hr_phone_exp is confirmed: false in config/source-registry.yaml while its own wired: reason in config/source-descriptors.yaml says "the meaning is signed (K17, 2026-08-19, 33/33)". By the two-boolean rule it therefore reports as a SEMANTIC hold, though its reason describes a WIRING hold. Either the registry flag was never flipped after K17 signed — the did-the-gate-land failure mode — or confirmed and signed are deliberately distinct for that row. Nothing was changed here; the row is reported as the flags declare it.
