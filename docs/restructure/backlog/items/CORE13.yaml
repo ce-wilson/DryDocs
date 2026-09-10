@@ -20,3 +20,59 @@ acceptance: |
 notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). core-2026-09-07.md candidate 2 (S4). Cross-linked by the report to the console's S5 (the other
   end of the same system).
+
+  CLOSED 2026-09-10 (Lane B, laptop, wip/core13-laptop, BASED ON wip/core11-laptop - both items
+  write neo4j_client.py and CORE11 is unmerged, so Lane A merges CORE11 first). Venue (J18):
+  laptop, offline - the driving test binds a local socket and needs no Neo4j, so it reproduces from
+  a clean clone anywhere.
+
+  THE NUMBER THAT MATTERS, MEASURED BOTH WAYS against a socket that accepts and never speaks bolt:
+  the pre-CORE13 construction waited 102.9 SECONDS before ServiceUnavailable (a 60s handshake
+  deadline, then five retries with backoff, all on the driver's own defaults); with the declared
+  bounds, under 5. `test_an_unreachable_server_gives_up_within_the_ceiling` drives it and its
+  docstring carries both numbers. The assertion is generous (20s) against a slow runner rather than
+  tuned to the measurement.
+
+  FOUR WAITS, NOT ONE, because they fail at different layers: connection_timeout (TCP/handshake),
+  connection_acquisition_timeout (a saturated pool), max_transaction_retry_time (the retry ceiling)
+  and transaction_timeout (a slow statement, not an absent server). Declared in
+  config/dev-environment.yaml under `neo4j.driver` with the reasoning attached; never a literal in
+  the client (ADR 0014); the constructor overrides.
+
+  THE ONE REAL DESIGN FINDING. `execute_read` / `execute_write` take NO timeout argument in driver
+  5.28 - measured, not assumed: their signature is `(transaction_function, *args, **kwargs)` and
+  the kwargs go to the function. So a per-transaction timeout on a MANAGED transaction reaches it
+  through `neo4j.unit_of_work`, which is precisely what `Driver.execute_query` applies internally
+  when handed a `Query` carrying one. The obvious alternative, `begin_transaction(timeout=)`, buys
+  the same ceiling by surrendering the driver's retry - which is the other half of S4, so it would
+  have closed half the item by opening the other half. `run_script` is auto-commit and gets the
+  ceiling on a `neo4j.Query` instead.
+
+  A MISSING BLOCK FALLS BACK RATHER THAN REFUSING, deliberately. dev-environment.yaml is
+  canonical-company in PORT-MANIFEST.yaml, so a port does NOT carry the producer's copy across; a
+  loader that raised on the absent block would turn an optional config addition into a broken tree
+  on the far side of the next port. The fallback is one named mapping in drydocs_core.config with
+  the reason attached - a declaration, which is what ADR 0014 asks for, rather than a value buried
+  in code, which is what it forbids.
+
+  ACCEPTANCE CLAUSE 2, HONESTLY: "settled TOGETHER with the drydocs-api query-bound decision".
+  API6 is `todo` and in NEITHER lane's queue today, so it was not settled beside this. What was
+  done instead is stronger than simultaneity and is why this is closed rather than held: both ends
+  now read ONE declared block, so they cannot contradict even if different sessions edit them
+  months apart. API6 still owns its own half - the ceiling shape (global vs per-spec) and what the
+  caller is TOLD when it trips, which must be distinguishable from "service down" (API5's subject).
+  It should read `neo4j.driver` rather than choose its own numbers, and the config comment says so
+  in the file where its author will be looking.
+
+  For Lane A, THREE THINGS at merge:
+  (1) `web/src/generated/enforcement-matrix.json` is STALE on this branch and
+  `test_enforcement_matrix.py::test_committed_matrix_matches_regeneration` is red because of it.
+  The matrix EMBEDS the full text of config/dev-environment.yaml, so any edit to that file moves
+  it. Lane B does not render and `web/src/**` is the UI session's pen this burst; the writer is the
+  default-paths `scripts/render_board.py` run, which refreshes the matrix (CLAUDE.md §0). It is the
+  ordinary close render, not an extra step.
+  (2) The roadmap guard is red for the usual reason - these notes moved the source fingerprint.
+  (3) The COMPANY's config/dev-environment.yaml will not receive the `neo4j.driver` block, that
+  file being canonical-company. It needs adding by hand there, or the company runs on the declared
+  fallback - which is correct behaviour, but its numbers are a laptop's, not a corporate network's.
+  Worth an idea/item on the company side rather than silence.
