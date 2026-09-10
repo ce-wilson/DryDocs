@@ -310,7 +310,13 @@ def _record_runbook_sdlc(ledger: Ledger) -> None:
 
 
 def _record_runbook_excel(ledger: Ledger) -> None:
-    """DOC12's two-tab workbook generator — the step that is expected to skip today."""
+    """DOC12's two-tab workbook generator, run against this chain's own graph.
+
+    Presence is NOT the test. An earlier version recorded "generator present"
+    once the file existed, which would have reported the step green while the
+    generator was incapable of producing anything — the same silence the ledger
+    exists to remove, one level up. It generates, or it says why it could not.
+    """
     gen = _skill_generator("controlm-runbook-automation-excel")
     if not gen.exists():
         ledger.add(
@@ -322,7 +328,29 @@ def _record_runbook_excel(ledger: Ledger) -> None:
             ),
         )
         return
-    ledger.add("runbook-excel", True, detail="generator present")
+    folder = _first_loaded_folder(ledger)
+    if folder is None:
+        ledger.add(
+            "runbook-excel",
+            False,
+            reason=(
+                "the loaded graph holds no Control-M folder to fill a workbook for, "
+                "so the generator has nothing to be run against"
+            ),
+        )
+        return
+    excel = _load_by_path(gen, "_load13_excel_generator")
+    sdlc = _load_by_path(_skill_generator("controlm-runbook-automation-SDLC"), "_load13_sdlc_facts")
+    with _client(ledger.env) as cli:
+        facts = sdlc.load_from_graph(cli, folder, "testcontainers Neo4j (LOAD13 e2e)")
+    run = excel.generate(folder, facts=facts, venue="testcontainers Neo4j (LOAD13 e2e)")
+    reached = sum(t.filled for t in run.tallies.values())
+    declared = sum(t.declared_graph for t in run.tallies.values())
+    ledger.add(
+        "runbook-excel",
+        True,
+        detail=f"{reached}/{declared} graph-declared fields filled across {len(run.tallies)} tabs",
+    )
 
 
 def _load_by_path(path: Path, name: str):
@@ -416,24 +444,31 @@ def test_the_semantic_hold_is_named_with_the_projects_own_reason(finish_line: Le
     ), "the residual's reason has drifted from config/source-descriptors.yaml"
 
 
-def test_the_excel_runbook_step_says_why_it_cannot_run_yet(finish_line: Ledger) -> None:
-    """Today's expected skip, and the one DOC12 turns green.
+def test_the_excel_runbook_step_reports_its_state_either_way(finish_line: Ledger) -> None:
+    """DOC12's generator: green when it is here, a reasoned skip when it is not.
 
-    Named explicitly rather than covered only by the blanket reason guard: this
-    is the step whose absence the acceptance calls out, so it gets an assertion
-    that will start failing — correctly — the moment DOC12 lands and the
-    generator appears.
+    Written for BOTH worlds deliberately. The first version asserted only the
+    skip and failed the moment DOC12 landed — a correct tripwire and a wrong
+    permanent guard, because the batch that adds the generator then has to edit
+    a test belonging to another item to get green, and it found out at the merge
+    rather than at the build. What has to hold in either world is the property
+    this whole file is about: the step reports its state and never goes silent.
     """
     step = finish_line.named("runbook-excel")
     if step.ran:
-        pytest.fail(
-            "the -excel generator now exists, so this step should be asserted "
-            "green here and removed from the expected-skip list (DOC12 landed)"
+        assert step.detail.strip(), (
+            "a green step must say what it produced; 'it ran' with no detail is "
+            "the silence this ledger exists to remove"
         )
-    assert "DOC12" in step.reason, (
-        "the skip should name the item that resolves it, so a reader knows "
-        f"where the work is: {step.reason!r}"
-    )
+        assert "/" in step.detail, (
+            "the workbook step reports how much of the template it filled, so a "
+            f"reader sees reach rather than a bare success: {step.detail!r}"
+        )
+    else:
+        assert "DOC12" in step.reason, (
+            "the skip should name the item that resolves it, so a reader knows "
+            f"where the work is: {step.reason!r}"
+        )
 
 
 def test_the_sdlc_runbook_generates_off_this_chain(finish_line: Ledger) -> None:
