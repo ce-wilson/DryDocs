@@ -55,6 +55,7 @@ from drydocs_core.component_map import (  # noqa: E402
     DECLARED_COMPONENT_IMPORTS,
     ENTRYPOINT_MODULES,
     NON_PYTHON_MODULES,
+    PUBLIC_MODULES,
     SURFACE_OWNERS,
 )
 
@@ -385,3 +386,82 @@ def test_the_vendor_package_actually_sits_beneath_the_parent() -> None:
         "drydocs_core/controlm/ is back at the top level — S2 moved it under "
         "orchestration/ so a second orchestrator has a sibling slot"
     )
+
+
+# ── CORE12: the second axis — WHICH of core a component may name ─────────────
+#
+# The first axis (above) asks whether a component may import core at all, and
+# the answer has always been yes. It never asked WHICH of core's 39 modules,
+# so the answer to that was "all of them, by omission". Measured at CORE12: 32
+# of the 39 were imported from outside core while sitting outside `__all__`,
+# and the other seven were the ones `__all__` happened to name — there were no
+# internals to protect, only no line at all.
+#
+# Default-deny, the same way `test_every_module_is_classified` is: a core module
+# a component names must appear in PUBLIC_MODULES, and the failure names it. The
+# point is not today's 39 — it is that the fortieth cannot arrive undeclared.
+
+
+def _core_submodule(imported: str) -> str | None:
+    """``drydocs_core.repo_paths.repo_root`` -> ``repo_paths``; ``drydocs_core`` -> None.
+
+    Only the FIRST segment after the package root matters: the contract is at
+    module granularity, so a component reaching a symbol inside a public module
+    is inside the contract, and one reaching into an undeclared module is not,
+    however deep it goes.
+    """
+    if not imported.startswith("drydocs_core."):
+        return None
+    return imported.split(".")[1]
+
+
+def test_components_import_only_declared_core_modules():
+    violations: list[str] = []
+    for path in _iter_py_files():
+        module = _module_name(path)
+        if _matches(module, CORE_PREFIXES):
+            continue  # core naming its own modules is not a contract question
+        for imported in sorted(_imported_drydocs_modules(path)):
+            name = _core_submodule(imported)
+            if name is not None and name not in PUBLIC_MODULES:
+                violations.append(f"{module}  ->  {imported}   (core module {name!r})")
+    assert not violations, (
+        "A component imported a core module that core does not declare public. Either add the "
+        "name to PUBLIC_MODULES in drydocs_core/component_map.py — WITH the reason, in the group "
+        "it belongs to — or stop importing it. Adding the name is a decision about core's "
+        "contract, which is the decision CORE12 exists to make someone take.\n  "
+        + "\n  ".join(violations)
+    )
+
+
+def test_every_declared_public_module_exists():
+    """Shrink-only in the other direction, like check_outcome.PROBES: a name that
+    no longer resolves fails here rather than sitting in the contract forever."""
+    core_dir = REPO_ROOT / "drydocs_core"
+    real = {p.stem for p in core_dir.glob("*.py") if p.stem != "__init__"} | {
+        d.name
+        for d in core_dir.iterdir()
+        if d.is_dir() and d.name != "__pycache__" and any(d.glob("*.py"))
+    }
+    missing = sorted(PUBLIC_MODULES - real)
+    assert not missing, (
+        "PUBLIC_MODULES names core modules that do not exist: "
+        + ", ".join(missing)
+        + " — remove them, or restore the module."
+    )
+
+
+def test_the_public_contract_covers_what_components_actually_import():
+    """The inverse of the guard above, and the reason it can be trusted: if a
+    core module is imported by a component it MUST be declared, so a green
+    default-deny guard cannot be green because nothing was scanned."""
+    imported: set[str] = set()
+    for path in _iter_py_files():
+        if _matches(_module_name(path), CORE_PREFIXES):
+            continue
+        for name in _imported_drydocs_modules(path):
+            sub = _core_submodule(name)
+            if sub:
+                imported.add(sub)
+    assert imported, "no component imports of core were seen at all - the scan found nothing"
+    assert imported <= PUBLIC_MODULES
