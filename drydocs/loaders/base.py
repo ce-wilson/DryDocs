@@ -147,6 +147,18 @@ class LoadSummary:
     unresolved_parents: int = 0
     rejects: list[dict] = field(default_factory=list)
     status: str = "STARTED"
+    #: LOAD9. Why this run has NO per-run log, or None when it has one. A run log
+    #: is best-effort by contract — the audit trail is never the reason a load
+    #: fails — and that contract was being used to justify saying nothing at all,
+    #: so a load whose audit trail was missing looked exactly like one whose
+    #: audit trail was fine. Non-fatal and silent are different things.
+    #:
+    #: None means A LOG WAS WRITTEN. Deliberately disabling the log
+    #: (`run_log=False`) also lands here, with that as its reason, because "there
+    #: is no log and it was a choice" and "there is no log and something broke"
+    #: are both things the operator wants said — they simply need different
+    #: words, which is why this is a REASON and not a boolean.
+    run_log_unavailable: str | None = None
 
     def as_dict(self) -> dict:
         return {
@@ -162,6 +174,7 @@ class LoadSummary:
             "edges_retracted": self.edges_retracted,
             "unresolved_parents": self.unresolved_parents,
             "status": self.status,
+            "run_log_unavailable": self.run_log_unavailable,
         }
 
 
@@ -329,6 +342,8 @@ class BaseLoader:
         # false` for an unscoped run, because absent reading as full is the
         # defect the item exists to close.
         self.scope_meta: dict[str, object] = dict(scope_meta or {})
+        # LOAD9: set by `_open_run_log`; copied onto the summary in `load()`.
+        self._run_log_unavailable: str | None = None
         self._scope_values: set = set()  # distinct sweep_scope_property values seen
 
     # ---- entrypoint ------------------------------------------------------
@@ -340,6 +355,9 @@ class BaseLoader:
             started_at=self.loaded_at,
         )
         run_log = self._open_run_log()
+        # LOAD9: whatever `_open_run_log` decided, the summary carries it — set
+        # BEFORE `_load` runs so a load that raises still reports it.
+        summary.run_log_unavailable = self._run_log_unavailable
         error: BaseException | None = None
         try:
             return self._load(summary, run_log)
@@ -406,6 +424,7 @@ class BaseLoader:
         the reason a load fails.
         """
         if not self.run_log:
+            self._run_log_unavailable = "disabled for this run (run_log=False)"
             return None
         source_detail = getattr(self.adapter, "path", None)
         source = f"{self.source_label} ({source_detail or type(self.adapter).__name__})"
@@ -425,6 +444,11 @@ class BaseLoader:
         try:
             path = log.open()
         except OSError as exc:
+            # LOAD9: the WARNING stays, and the reason now also travels on the
+            # summary. A warning goes to a log stream the operator may not be
+            # watching; the summary line is the thing they actually read at the
+            # end of a load, and a missing audit trail has to be visible there.
+            self._run_log_unavailable = f"{type(exc).__name__}: {exc}"
             LOGGER.warning(
                 "Loader %s: run log unavailable (%s) — continuing without",
                 self.name,

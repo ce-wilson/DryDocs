@@ -1184,6 +1184,12 @@ def ingest_controlm(
                 scope_meta=scope_run_meta(scope),
             ).load()
             line = f"   rows={summary.rows_processed} rejected={summary.rows_rejected}"
+            if summary.run_log_unavailable:
+                # LOAD9: the missing audit trail goes in the line the operator
+                # actually reads, not only in a log stream they may not be
+                # watching. Yellow because the load SUCCEEDED - this is a gap in
+                # the record, not a failure of the work.
+                line += f" [yellow]no run log written: {summary.run_log_unavailable}[/]"
             if summary.nodes_marked_removed or summary.nodes_reactivated:
                 line += (
                     f" marked_removed={summary.nodes_marked_removed}"

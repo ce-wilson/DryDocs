@@ -21,6 +21,7 @@ from pydantic import BaseModel
 from drydocs.cli_shared import _scope_binds, scope_run_meta
 from drydocs.loaders.base import BaseLoader
 from drydocs_core.neo4j_client import Neo4jClient
+from drydocs_core.run_log import LoaderRunLog
 
 # ---- in-memory fakes -------------------------------------------------------
 
@@ -418,3 +419,77 @@ def test_scope_run_meta_is_the_only_shape_that_reaches_the_node() -> None:
     decides is what the node carries, so the exposure decision has ONE home."""
     decided = scope_run_meta(_scope_binds(folder="A%", run_as="svc-fid"))
     assert decided == {"scope_folder": "A%", "scope_by_run_as": True, "scoped": True}
+
+
+# ---- LOAD9: a missing audit trail is said out loud -------------------------
+#
+# A run log is best-effort by contract - it is never the reason a load fails -
+# and that contract was being used to justify saying nothing at all. A load whose
+# audit trail was missing therefore looked exactly like one whose audit trail was
+# fine. Non-fatal and silent are different things; this is the summary half.
+# (CORE15 is the same distinction inside run_log.py itself.)
+
+
+class _UnwritableLog(LoaderRunLog):
+    """A run log whose open() fails the way an unwritable DRYDOCS_LOGDIR does."""
+
+    def open(self):
+        raise OSError("no space left on device")
+
+
+def test_a_load_whose_run_log_failed_still_completes(smoke_cypher_files: None, monkeypatch) -> None:
+    """The contract this must not break, asserted first."""
+    monkeypatch.setattr("drydocs.loaders.base.LoaderRunLog", _UnwritableLog)
+    summary = _SingleStatementLoader(
+        _FakeNeo4jClient(), _FakeAdapter([{"id": "a", "value": 1}])
+    ).load()
+    assert summary.status == "OK"
+    assert summary.rows_processed == 1
+
+
+def test_the_summary_says_why_there_is_no_run_log(smoke_cypher_files: None, monkeypatch) -> None:
+    monkeypatch.setattr("drydocs.loaders.base.LoaderRunLog", _UnwritableLog)
+    summary = _SingleStatementLoader(
+        _FakeNeo4jClient(), _FakeAdapter([{"id": "a", "value": 1}])
+    ).load()
+    assert summary.run_log_unavailable
+    assert "OSError" in summary.run_log_unavailable
+    assert "no space left on device" in summary.run_log_unavailable
+    # …and it reaches the dict the `run-loader` verb prints
+    assert summary.as_dict()["run_log_unavailable"] == summary.run_log_unavailable
+
+
+def test_a_load_with_a_run_log_reports_none(
+    smoke_cypher_files: None, tmp_path, monkeypatch
+) -> None:
+    """The control. None means A LOG WAS WRITTEN - if this said something on the
+    happy path the field would be noise and would stop being read."""
+    monkeypatch.setenv("DRYDOCS_LOGDIR", str(tmp_path / "logs"))
+    summary = _SingleStatementLoader(
+        _FakeNeo4jClient(), _FakeAdapter([{"id": "a", "value": 1}])
+    ).load()
+    assert summary.run_log_unavailable is None
+    assert summary.as_dict()["run_log_unavailable"] is None
+
+
+def test_a_deliberately_disabled_log_says_so_in_its_own_words(smoke_cypher_files: None) -> None:
+    """ "No log because you asked for none" and "no log because something broke"
+    are both worth saying and need different words - which is why this is a
+    REASON and not a boolean."""
+    summary = _SingleStatementLoader(
+        _FakeNeo4jClient(), _FakeAdapter([{"id": "a", "value": 1}]), run_log=False
+    ).load()
+    assert summary.run_log_unavailable == "disabled for this run (run_log=False)"
+    assert "OSError" not in summary.run_log_unavailable
+
+
+def test_a_load_that_raises_still_reports_the_missing_log(
+    smoke_cypher_files: None, monkeypatch
+) -> None:
+    """The reason is set BEFORE the work runs, so a failed load does not lose it -
+    which is when an operator most wants to know the audit trail is missing."""
+    monkeypatch.setattr("drydocs.loaders.base.LoaderRunLog", _UnwritableLog)
+    loader = _SingleStatementLoader(_FakeNeo4jClient(), _FakeAdapter([{"id": "a", "value": 1}]))
+    assert loader._open_run_log() is None
+    assert loader._run_log_unavailable
+    assert "no space left on device" in loader._run_log_unavailable
