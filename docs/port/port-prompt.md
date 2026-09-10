@@ -314,6 +314,28 @@ FORCE_COLOR / Idea-101 findings that motivated J41.)
 > ref.** That fallback is the one failure guardrail 1 exists to prevent, and it cost a
 > cycle of "the producer tracker says…" answers that were two days stale.
 
+- **Producer base `port-base-20260910b` (`6da347ae`), the TENTH roll — CERTIFIED 2026-09-10,
+  venue desktop (MSI). A same-day RE-ROLL, cut before the ninth was applied, and the reason is
+  the whole point of it.** Range `port-base-20260910..port-base-20260910b` = 11 commits, steps
+  387–388. All eight preflight checks green, CI green at the sha before the tag was cut, and the
+  split-pair check reports CHECKED CLEAN over the range.
+  **WHY IT EXISTS:** `CLAUDE.md` §2 routed every Neo4j task to a Claude Code PLUGIN, which loads
+  in no venue without a plugin loader — it resolves to nothing, with no error and no lens. A
+  company-side session hit exactly that, diagnosed it correctly, and began repairing it on FIVE
+  canonical-producer paths. Applying the ninth roll would therefore have reverted their work AND
+  reinstated the dead route: a regression, not a fix. Rolling again before the apply costs one
+  preflight. Step 387 is the producer-side repair — a filesystem `neo4j-db` skill that loads
+  everywhere, five pre-existing dead plugin routes swept, four `apoc.cypher.runMany` claims that
+  had been wrong for eight weeks, a server-version fact that would have crossed wrong, seven dead
+  local-mirror citations, and `reference/**` brought under the currency guard that ADR 0018 D5
+  never extended to it.
+  **THE NINTH ROLL'S STEPS 368–386 STAND UNCHANGED** — this range only adds — so the consumer
+  still applies ONE range, now **`port-base-20260908..port-base-20260910b` = 330 commits / 459
+  changed paths**, with the eighth, ninth and tenth rolls inside it and nothing parked or
+  hand-carried. The three live relays (55, 56, 57 with its first roll-close postscript) are
+  unchanged and all act in it. The seventh roll's apply stays IN PROGRESS; no company figure is
+  claimed here. **NEXT-PORT BASE: `port-base-20260910b`.**
+
 - **Producer base `port-base-20260910` (`bb73c182`), the NINTH roll — CERTIFIED 2026-09-10,
   venue desktop (MSI).** Range `port-base-20260909..port-base-20260910` = 144 commits, 228
   changed paths in 8 classes, steps 368–386. All eight preflight checks green at the tag,
