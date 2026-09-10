@@ -31,6 +31,7 @@ from __future__ import annotations
 
 import shutil
 import subprocess
+from functools import lru_cache
 from pathlib import Path
 
 import pytest
@@ -59,7 +60,17 @@ def _neo4j_image() -> str:
 NEO4J_IMAGE = _neo4j_image()
 
 
+@lru_cache(maxsize=1)
 def _docker_available() -> bool:
+    """Is a Docker daemon reachable? Cached — this runs at COLLECTION time.
+
+    Every integration module that gates on Docker calls this while pytest is
+    merely collecting, including on a plain ``pytest -q`` run that deselects
+    them all. Measured at ~500 ms per call on the producer laptop when the
+    daemon is up, and up to the 30-second timeout when it is hung, so the cost
+    is paid by every developer on every run and multiplies by the number of
+    gated modules. One probe per process answers all of them.
+    """
     if shutil.which("docker") is None:
         return False
     try:

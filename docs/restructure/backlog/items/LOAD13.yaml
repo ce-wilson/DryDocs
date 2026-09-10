@@ -7,7 +7,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - tests/integration/test_e2e_load.py
@@ -25,3 +25,11 @@ acceptance: |
 notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). Plan 2026-09-09, Phase 2 row 1 (the base finish line). Lane B: it reads config, writes tests and
   the load module only.
+
+  CLOSED 2026-09-09 (Lane B, laptop, wip/load13-laptop). tests/integration/test_e2e_base_finish_line.py, RUN GREEN, not merely written. Venue (J18): an ephemeral Neo4j Enterprise container via testcontainers, image from config/dev-environment.yaml — NOT either machine's local neo4jtest, which is what makes the result reproducible from a clean clone. Ledger from the run: extract-stand-ins 16 CSVs into 5 landing zones; bootstrap, apply-supplements, ingest-controlm (SOURCE mode), m3-verify, docs-coverage all exit 0; runbook-sdlc 633 lines for PRARAG-HLDM-70002-PEX-RFND-DLY generated FROM THE GRAPH this chain loaded, not from the bundled samples. Two skips, both carrying reasons: runbook-excel (names DOC12 as the item that resolves it) and the named residual snow:cmdb-ci-classes.
+
+  A LEDGER rather than a sequence of asserts, and that is the design decision worth keeping. The failure this item exists to prevent is a step that quietly stops being in the chain, which a hand-written sequence cannot catch — DECLARED_STEPS is the contract and the guard compares the recorded SET against it. A skipped step needs a reason of at least forty characters, the same bar drydocs_core.check_outcome asks of a NOT_CHECKED reason and for the same argument. The residual's reason is READ from config/source-descriptors.yaml's wired: block, never restated, so the day a gate rules snow's meaning this test fails until the step is built. Both generators are probed dynamically, so DOC12 flips its step green without editing this file.
+
+  Three things measured rather than assumed. (1) --out-root does NOT make DRYDOCS_DATA_ROOT optional: the extraction resolves landing zones through manual_zones() -> resolve_data_root() regardless, so an unset variable raises DataRootNotSetError before --out-root is consulted. The test sets it in the CLI env dict, pointed at a tmp root, never the machine's. (2) The ledger details were verified by dumping them, not inferred from "7 passed" — a green test is not evidence its steps did work. (3) The Docker availability probe costs ~500ms and runs at COLLECTION time in every gated module, including on a plain pytest -q that deselects them all; adding this module would have doubled it, and up to the 30s timeout on a hung daemon. Fixed at the source with lru_cache in test_e2e_load.py so one probe answers every gated module; the sibling still passes (11 tests across both modules).
+
+  For Lane A, not this item: tests/unit/test_skip_guard_policy.py scans TESTS_DIR.glob("*.py") where TESTS_DIR is tests/unit, non-recursive — so it never reaches tests/integration/, and its green says nothing about the skip guards in any integration module. That is a coverage gap in a guard the handoff names at every close, and it is GRAPH4-shaped (the eighteen-guard triage) rather than LOAD13's to fix.
