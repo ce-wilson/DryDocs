@@ -7,7 +7,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - config/gate-log-redactions.yaml
@@ -49,3 +49,27 @@ notes: |
   The general shape is one the repo already has twice: `wired` and `confirmed` are per-side
   because two venues legitimately hold different values for one field. A redaction is the same
   class, and the registry was written before that pattern existed.
+  BUILT 2026-09-10 (Lane A, desktop; pens backlog, port, adr, gates). Each row in
+  config/gate-log-redactions.yaml declares `side`, the vocabulary is closed at producer
+  and company, and the reader refuses a missing or off-vocabulary value at parse. The
+  stale rule is scoped to the owning side and keeps its full strength there, which is
+  the clause acceptance (b) said must not weaken.
+  WHICH SIDE A CHECKOUT IS is a new `side:` key in config/dev-environment.yaml, chosen
+  over the alternatives because that file is already canonical-company and already
+  carries this exact class of per-side fact - edition, capability_assert, the census
+  counts - so the company's copy answers for the company and a port never overwrites
+  it. The alternatives were rejected by name: PORT-MANIFEST.yaml is canonical-producer
+  and crosses whole, so a side declared there would be the producer's answer on both
+  trees; and inferring the side from the overlay file's presence, a remote name or a
+  hostname is the guess that `edition:` was made declared to avoid.
+  THE UNDECLARED CHECKOUT IS THE STATE THAT EARNED A THIRD ANSWER. A tree that took
+  the roll and has not adopted the key yet cannot say which rows are its own to keep
+  current. Reporting that as clean would hide exactly the consumer this item exists
+  for, and reporting it as stale would be the failure being removed, so
+  stale_redaction_check returns a CheckOutcome and the registry gains its third probe
+  (ADR 0021). Acceptance (c) is met by that rather than by an exemption: both states a
+  consumer can legitimately be in are green, and the declaration says which one it is.
+  Four tests for the four states of (d), plus the mirror case where a company-owned row
+  is not the producer's business either. RELAY-55 carries (e) and says plainly that the
+  company may restore the true name under a dated postscript once it declares its side,
+  or leave the producer's text - both legal, their call, no opinion held here.

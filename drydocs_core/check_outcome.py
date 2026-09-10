@@ -182,4 +182,9 @@ PROBES: tuple[str, ...] = (
     # CORE10, the first adopters (ADR 0021 D4, in order):
     "drydocs.port.port_preflight.base_resolves",  # is the base a commit git can see here
     "drydocs.docs_coverage.graph_probe",  # layer 2 of the coverage report
+    # PORT11: are this side's gate-log redaction declarations still current. Its
+    # not-checked state is the one that earned the type here - a checkout that has
+    # not declared which side of the port it is cannot say which rows are its own,
+    # and calling that clean would hide the consumer the item exists for.
+    "drydocs.port.gate_log_redactions.stale_redaction_check",
 )

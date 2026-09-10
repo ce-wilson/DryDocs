@@ -16,15 +16,32 @@
 #
 # Canonical-producer (PORT-MANIFEST.yaml): a redaction is a producer ruling about
 # producer text, and the consumer's guard reads this same file.
+#
+# EACH ROW DECLARES WHOSE ACT IT WAS (`side:`, PORT11, 2026-09-10), and the stale
+# rule above is scoped to that side. A publish-boundary redaction is a PRODUCER-venue
+# action, because the producer is the side that publishes; company-side there is no
+# publish boundary, and the redacted string is a company-internal name in a private
+# repo, which is the venue entitled to hold it. So a consumer keeping the true name is
+# not out of date - the row describes an edit that side did not make and should not
+# make - and only the OWNING side's declaration can go stale. On that side the check
+# is exactly as strict as it was before this field existed, which is the clause that
+# makes the registry safe to have.
+# The vocabulary is closed (`producer`, `company`) and an undeclared value is refused:
+# a redaction whose owner is a guess has a stale check that is a guess.
+# WHICH SIDE A CHECKOUT IS runs on `side:` in config/dev-environment.yaml - declared,
+# never inferred, in the file already ruled canonical-company so each side answers for
+# itself. A checkout that has not answered is NOT CHECKED, never assumed producer.
+# Owed to the company by name at the close of port-base-20260908.
 schema: drydocs.gate-log-redactions.v1
 classification: Internal-Public
-updated: 2026-09-08
+updated: 2026-09-10
 redactions:
   - commit: 55c2a204
     date: 2026-09-07
     record: "ADR 0007 agentic-QA architecture gate, signed 2026-07-23, clause C"
     replacement: "    the runtime default — supersedes the 2026-07-03 IDEAS assumption (company-SDK-"
     reason: publish-boundary
+    side: producer
     note: >
       The company agent SDK's product name, quoted inside clause C, redacted in place;
       the dated POSTSCRIPT under the record says so. No ruling changed.

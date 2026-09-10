@@ -452,15 +452,7 @@ def test_gate_log_declared_redaction_is_ruled_not_failed() -> None:
     before = "# log\n\n## 2026-07-23 - adr7\n- C: default (OLD-NAME-on-ADK implied)\n- Effect: R1\n"
     redacted = before.replace("(OLD-NAME-on-ADK implied)", "(company-SDK-on-ADK implied)")
     redacted += "- **POSTSCRIPT 2026-09-07:** redacted in place.\n"
-    decl = [
-        gate_log_redactions.Redaction(
-            commit="55c2a204",
-            date="2026-09-07",
-            record="adr7 clause C",
-            replacement="- C: default (company-SDK-on-ADK implied)",
-            reason="publish-boundary",
-        )
-    ]
+    decl = [_redaction()]
     # unruled: the same edit with nothing declared is the violation, naming the line
     msg = append_only_violation(before, redacted)
     assert msg is not None and "line 4" in msg and "gate-log-redactions.yaml" in msg
@@ -475,21 +467,143 @@ def test_gate_log_declared_redaction_is_ruled_not_failed() -> None:
     # nor a drop: the line must be REPLACED by the declared text, not removed
     dropped = redacted.replace("- C: default (company-SDK-on-ADK implied)\n", "")
     assert append_only_violation(before, dropped, decl) is not None
-    # stale: a declared replacement absent from the live file is reported
-    assert gate_log_redactions.stale_redactions(before, decl) == decl
-    assert gate_log_redactions.stale_redactions(redacted, decl) == []
+    # stale, ON THE OWNING SIDE: a declared replacement absent from the live file
+    assert gate_log_redactions.stale_redactions(before, decl, "producer") == decl
+    assert gate_log_redactions.stale_redactions(redacted, decl, "producer") == []
+
+
+# ---- PORT11: a redaction is ONE venue's act, and the row says whose ----------
+
+
+def _redaction(side: str = "producer") -> gate_log_redactions.Redaction:
+    """The worked example, at the shape the live registry uses."""
+    return gate_log_redactions.Redaction(
+        commit="55c2a204",
+        date="2026-09-07",
+        record="adr7 clause C",
+        replacement="- C: default (company-SDK-on-ADK implied)",
+        reason="publish-boundary",
+        side=side,
+    )
+
+
+#: The live gate-log with the worked example's replacement line NOWHERE in it - the
+#: state a company tree is legitimately in, because it kept the true name.
+_WITHOUT_REPLACEMENT = "# log\n\n## 2026-07-23 - adr7\n- C: default (OLD-NAME-on-ADK implied)\n"
+_WITH_REPLACEMENT = "# log\n\n## 2026-07-23 - adr7\n- C: default (company-SDK-on-ADK implied)\n"
+
+
+def test_a_redaction_declares_the_side_that_made_it() -> None:
+    """PORT11 (a): the owner is declared and the vocabulary is closed.
+
+    An undeclared or off-vocabulary owner is REFUSED rather than defaulted, which is
+    what makes ``side`` a declaration instead of a convention: a redaction whose owner
+    is a guess has a stale check that is a guess, on both sides at once.
+    """
+    row = {
+        "commit": "55c2a204",
+        "date": "2026-09-07",
+        "record": "adr7 clause C",
+        "replacement": "- C: default (company-SDK-on-ADK implied)",
+        "reason": "publish-boundary",
+    }
+    base = {"schema": gate_log_redactions.SCHEMA, "redactions": [dict(row, side="producer")]}
+    assert gate_log_redactions.parse_redactions(base)[0].side == "producer"
+    assert (
+        gate_log_redactions.parse_redactions({**base, "redactions": [dict(row, side="company")]})[
+            0
+        ].side
+        == "company"
+    )
+
+    with pytest.raises(gate_log_redactions.RedactionDeclarationError, match="missing"):
+        gate_log_redactions.parse_redactions({**base, "redactions": [dict(row)]})
+    with pytest.raises(gate_log_redactions.RedactionDeclarationError, match="is not one of"):
+        gate_log_redactions.parse_redactions({**base, "redactions": [dict(row, side="both")]})
+
+
+def test_only_the_owning_side_can_go_stale() -> None:
+    """PORT11 (b) and (d): the four states, each measured rather than assumed.
+
+    The owning side with the replacement present is clean; the owning side without it
+    is STALE, and that clause does not weaken - it is the reason the registry is safe
+    to have. The NON-owning side without it is clean, because the row describes a
+    publish-boundary edit that side did not make and should not make: company-side
+    there is no publish boundary, and the redacted string is a company-internal name
+    in a private repo, which is the venue entitled to hold it. Before PORT11 that tree
+    had to adopt the producer's text or hold a declaration that read stale forever.
+    """
+    decl = [_redaction("producer")]
+    stale = gate_log_redactions.stale_redactions
+
+    assert stale(_WITH_REPLACEMENT, decl, "producer") == []  # owning side, present
+    assert stale(_WITHOUT_REPLACEMENT, decl, "producer") == decl  # owning side, stale
+    assert stale(_WITHOUT_REPLACEMENT, decl, "company") == []  # not theirs to make
+    assert stale(_WITH_REPLACEMENT, decl, "company") == []  # took it anyway: still fine
+
+    # and the mirror: a company-owned row is the producer's business in neither state
+    theirs = [_redaction("company")]
+    assert stale(_WITHOUT_REPLACEMENT, theirs, "producer") == []
+    assert stale(_WITHOUT_REPLACEMENT, theirs, "company") == theirs
+
+
+def test_an_undeclared_checkout_is_not_checked_rather_than_clean() -> None:
+    """PORT11 (c) via ADR 0021: three answers, because there are three.
+
+    A checkout that has not declared ``side:`` cannot say which rows are its own to
+    keep current. Reporting that as CLEAN would hide exactly the tree this item exists
+    for - a consumer that took the roll and has not adopted the key yet - and reporting
+    it as STALE would be the failure the item removes. It is NOT CHECKED, with the
+    reason naming the key that clears it.
+    """
+    decl = [_redaction("producer")]
+    check = gate_log_redactions.stale_redaction_check
+
+    undeclared = check(_WITHOUT_REPLACEMENT, decl, None)
+    assert undeclared.is_not_checked
+    assert not undeclared.is_clean
+    assert "dev-environment.yaml" in (undeclared.reason or "")
+    assert undeclared.render().startswith("NOT CHECKED")
+    with pytest.raises(TypeError):  # ADR 0021 D1: three states do not coerce
+        bool(undeclared)
+
+    assert check(_WITH_REPLACEMENT, decl, "producer").is_clean
+    assert check(_WITHOUT_REPLACEMENT, decl, "company").is_clean
+    found = check(_WITHOUT_REPLACEMENT, decl, "producer")
+    assert not found.is_clean and not found.is_not_checked
+    assert found.findings == tuple(decl)
+
+
+def test_this_checkout_declares_its_side() -> None:
+    """PORT11: declared, never inferred - and the value must be on the closed list.
+
+    ``config/dev-environment.yaml`` is canonical-company in the manifest, so this
+    assertion is about THIS tree and the company's copy answers for itself.
+    """
+    assert gate_log_redactions.local_side() == "producer"
+
+    missing = REPO / "does-not-exist.yaml"
+    assert gate_log_redactions.local_side(missing) is None
 
 
 def test_gate_log_redaction_registry_is_well_formed_and_live() -> None:
-    """The declared registry parses, and every declared replacement is in the live
-    gate-log — a stale row protects nothing and the guard says so (RELAY-47 (c))."""
+    """The declared registry parses, every row names a side on the closed list, and
+    every replacement THIS SIDE OWNS is in the live gate-log — a stale row protects
+    nothing and the guard says so (RELAY-47 (c), scoped per side by PORT11)."""
     declared = gate_log_redactions.load_redactions()
+    assert declared, "an empty registry would make the live check below vacuous"
+    for r in declared:
+        assert r.side in gate_log_redactions.SIDES, (r.commit, r.side)
+
     live = GATE_LOG.read_text(encoding="utf-8")
-    stale = gate_log_redactions.stale_redactions(live, declared)
-    assert not stale, (
+    outcome = gate_log_redactions.stale_redaction_check(
+        live, declared, gate_log_redactions.local_side()
+    )
+    assert not outcome.is_not_checked, outcome.render()
+    assert outcome.is_clean, (
         "STALE redaction declarations - the replacement line is no longer in "
         "config/gate-log.md (reverted, or the record reworded; re-declare or remove):\n  "
-        + "\n  ".join(f"{r.commit} {r.record}: {r.replacement!r}" for r in stale)
+        + "\n  ".join(f"{r.commit} {r.record}: {r.replacement!r}" for r in outcome.findings)
     )
 
 
@@ -500,7 +614,14 @@ def test_gate_log_redaction_registry_rejects_what_it_cannot_use() -> None:
     rider = {
         "schema": gate_log_redactions.SCHEMA,
         "redactions": [
-            {"commit": "x", "date": "d", "record": "r", "replacement": "t", "reason": "typo"}
+            {
+                "commit": "x",
+                "date": "d",
+                "record": "r",
+                "replacement": "t",
+                "reason": "typo",
+                "side": "producer",
+            }
         ],
     }
     with pytest.raises(gate_log_redactions.RedactionDeclarationError, match="rider"):

@@ -4002,6 +4002,33 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   and declare true, and 17 declare false with their reason (E3: counts by command, never
   carried). Nothing is asked back.
 
+- **RELAY-55 - A GATE-LOG REDACTION NOW DECLARES WHOSE ACT IT WAS, AND YOU MAY KEEP THE TRUE
+  NAME** [VERIFIED-PRODUCER] (2026-09-10, venue desktop; lands in the NINTH roll). You raised
+  this at the close of `port-base-20260908` and you were right: a publish-boundary redaction
+  (CLAUDE.md section 3) is a PRODUCER-venue act, because the producer is the side that
+  publishes. Company-side there is no publish boundary, and the string in question is a
+  company-internal system name in a private repo - which is exactly the venue entitled to hold
+  it. Importing the redaction removed a true name from the only tree allowed to keep it, and
+  you took it anyway because the alternative was worse: the registry's own header rules that a
+  declared replacement missing from the live file is STALE, so a tree keeping the true name
+  would have held a permanently failing declaration with no exemption path. That was a stopgap
+  and this removes it. What changes: (1) every row in `config/gate-log-redactions.yaml` carries
+  `side: producer | company`, and the reader refuses a missing or off-vocabulary value; (2) the
+  stale check is scoped to that side - only the OWNING side's declaration can go stale, and on
+  that side it is exactly as strict as before, which is the clause that makes the registry safe
+  to have; (3) which side a checkout is runs on a new `side:` key in
+  `config/dev-environment.yaml`, which is canonical-company, so YOUR copy declares `side:
+  company` - that file's entry_rule already says new producer keys are adapted by hand, and
+  this is one of them; (4) a checkout that has not declared reports NOT CHECKED with the reason
+  naming the key, never clean and never stale - assuming producer would recreate the failure
+  on the tree least able to notice, so it is not assumed. WHAT THIS MEANS FOR THE ONE EXISTING
+  ROW (`55c2a204`, the ADR 0007 clause C redaction, `side: producer`): once you declare `side:
+  company` you may restore the true name in your own `config/gate-log.md` under a dated
+  postscript on that record, and the guard stays green - the row is not yours and cannot go
+  stale on your tree. You may equally leave the producer's text in place; both states are legal
+  and your `side:` is what says which one you are in. The choice is yours and the producer holds
+  no opinion on it. Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has

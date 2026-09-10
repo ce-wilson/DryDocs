@@ -28,6 +28,24 @@ updated: 2026-09-08
 # until it declares (rider idea-series-grammar C1). The producer is the base.
 edition: base
 
+# WHICH SIDE OF THE ONE-WAY PORT THIS CHECKOUT IS (PORT11, 2026-09-10). The port runs
+# producer -> company (PORT-MANIFEST.yaml `direction:`), and some facts are true of one
+# venue and false of the other. The first of them is a publish-boundary redaction of
+# signed gate-log text: the producer publishes, so a company-internal name has to leave
+# the producer's tracked text; company-side there is no publish boundary and the name
+# belongs in the private repo. config/gate-log-redactions.yaml declares which side each
+# redaction was made by, and drydocs/port/gate_log_redactions.py reads THIS key to know
+# whether a given row is this checkout's to keep current.
+# DECLARED, NEVER INFERRED, for the same reason as `edition:` above - a side read off a
+# remote name, a hostname or the presence of an overlay file is a guess, and it guesses
+# wrongly on exactly the tree least able to notice. This file is canonical-company in
+# PORT-MANIFEST.yaml, so the company's copy says `company` and a port never overwrites
+# it; the manifest row already rules that new producer KEYS are adapted by hand.
+# A checkout with NO `side:` key has declared nothing, and the check reports NOT CHECKED
+# with that reason rather than assuming - assuming producer would recreate the failure
+# this key removes. Vocabulary: producer | company.
+side: producer
+
 # WHAT A BACKLOG ITEM MAY REQUIRE OF THE MACHINE THAT BUILDS IT (PLAN6, 2026-09-08). An
 # item's optional `venue:` list names codes from THIS map, and the backlog schema guard
 # (tests/unit/test_backlog.py) refuses a code that is not declared here - so the KEYS

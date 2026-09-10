@@ -28,6 +28,33 @@ consumer takes the guard as a fast-forward. A ruling inside the producer's test 
 would reach them; a ruling inside the producer's side-local overlay would not. The
 registry is canonical-producer and crosses whole (``PORT-MANIFEST.yaml``), so the
 consumer's guard reads the same declaration the producer's does.
+
+A REDACTION IS ONE VENUE'S ACT, AND THE ROW SAYS WHOSE (PORT11, 2026-09-10). The
+first version of this registry left that unsaid, and the omission had a cost the
+company named at the close of ``port-base-20260908``: a publish-boundary redaction
+is a PRODUCER-venue action, because the producer publishes. Company-side there is
+no publish boundary - the redacted string is a company-internal system name in a
+private repo, which is exactly the venue allowed to hold it - so importing the
+redaction removes a true name from the only tree entitled to keep it. Their choice
+on the day was to adopt the producer's text anyway, because the alternative was a
+declaration that reads STALE forever: the header rules a replacement missing from
+the live file stale, and a consumer keeping the true name never has that line.
+
+So each row declares its ``side``, and the stale check reads it: a declaration can
+only go stale on the side that OWNS it. That check does not weaken - on the owning
+side it is exactly as strict as before, which is the clause that makes the registry
+safe to have. On the other side there is nothing to be stale about, because the row
+describes an edit that side did not make and should not make.
+
+WHICH SIDE THIS CHECKOUT IS, is DECLARED and never inferred (:func:`local_side`).
+``config/dev-environment.yaml`` is canonical-company in the manifest and already
+carries this exact class of per-side fact - ``edition``, ``capability_assert``, the
+census counts - so the company's copy answers for the company and a port never
+overwrites it. Inferring the side from the presence of an overlay file, from a
+remote name or from a hostname is the failure mode ``edition:`` was made declared
+to avoid. A checkout that has not answered yet is NOT CHECKED, never assumed
+producer: assuming would re-create the very failure this item removes, on the tree
+least able to notice.
 """
 
 from __future__ import annotations
@@ -37,13 +64,20 @@ from pathlib import Path
 
 import yaml
 
+from drydocs_core.check_outcome import CheckOutcome, checked_clean, findings, not_checked
 from drydocs_core.repo_paths import repo_root
 
 REPO_ROOT = repo_root(Path(__file__).resolve().parents[2])
 REDACTIONS_FILE = REPO_ROOT / "config" / "gate-log-redactions.yaml"
+DEV_ENVIRONMENT_FILE = REPO_ROOT / "config" / "dev-environment.yaml"
 SCHEMA = "drydocs.gate-log-redactions.v1"
-REQUIRED_FIELDS = ("commit", "date", "record", "replacement", "reason")
+REQUIRED_FIELDS = ("commit", "date", "record", "replacement", "reason", "side")
 REASONS = ("publish-boundary",)
+
+#: The two venues of the one-way port (PORT-MANIFEST.yaml `direction:`). Closed, and
+#: an undeclared value is refused rather than defaulted: a redaction whose owner is a
+#: guess is a redaction whose stale check is a guess.
+SIDES = ("producer", "company")
 
 
 class RedactionDeclarationError(ValueError):
@@ -57,6 +91,9 @@ class Redaction:
     record: str
     replacement: str
     reason: str
+    #: The venue whose publish boundary required the edit. Only this side's tree
+    #: carries the replacement, and only this side's declaration can go stale.
+    side: str
 
 
 def parse_redactions(doc: object) -> list[Redaction]:
@@ -78,6 +115,12 @@ def parse_redactions(doc: object) -> list[Redaction]:
                 f"redactions[{i}] reason {row['reason']!r} is not one of {list(REASONS)} — "
                 "a redaction is a publish-boundary act; anything else is a rider (L25)"
             )
+        if row["side"] not in SIDES:
+            raise RedactionDeclarationError(
+                f"redactions[{i}] side {row['side']!r} is not one of {list(SIDES)} — "
+                "a publish-boundary redaction is ONE venue's act and the row says whose; "
+                "an undeclared owner makes the stale check a guess on both sides"
+            )
         replacement = str(row["replacement"]).rstrip("\r\n")
         if not replacement.strip():
             raise RedactionDeclarationError(f"redactions[{i}] replacement is blank")
@@ -88,6 +131,7 @@ def parse_redactions(doc: object) -> list[Redaction]:
                 record=str(row["record"]),
                 replacement=replacement,
                 reason=str(row["reason"]),
+                side=str(row["side"]),
             )
         )
     return out
@@ -167,12 +211,75 @@ def append_only_violation(
     return check_append_only(before_text, after_text, redactions).violation
 
 
-def stale_redactions(live_text: str, redactions: list[Redaction]) -> list[Redaction]:
-    """Declarations whose replacement line is nowhere in the live file.
+def local_side(path: Path = DEV_ENVIRONMENT_FILE) -> str | None:
+    """Which venue THIS checkout is, as declared - or ``None`` when it has not said.
+
+    ``config/dev-environment.yaml`` is canonical-company in ``PORT-MANIFEST.yaml``,
+    so each side's copy answers for itself and a port never overwrites the answer.
+    ``None`` is a real state and not a failure: the key arrives with this item, and a
+    tree that has not adopted it yet has declared nothing. Callers must treat that as
+    NOT CHECKED rather than as either side - see :func:`stale_redaction_check`.
+
+    An off-vocabulary value IS refused, because that is a wrong answer rather than a
+    missing one.
+    """
+    if not path.exists():
+        return None
+    doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+    if not isinstance(doc, dict):
+        raise RedactionDeclarationError(f"{path.name} is not a mapping")
+    raw = doc.get("side")
+    if raw is None:
+        return None
+    side = str(raw).strip()
+    if side not in SIDES:
+        raise RedactionDeclarationError(
+            f"{path.name} declares side {side!r}, which is not one of {list(SIDES)}"
+        )
+    return side
+
+
+def stale_redactions(
+    live_text: str, redactions: list[Redaction], side: str | None
+) -> list[Redaction]:
+    """Declarations OWNED BY ``side`` whose replacement line is nowhere in the live file.
 
     A stale declaration means the redaction was reverted or the record reworded; either
     way the row now protects nothing and the guard says so — this clause is what makes
-    the registry safe to have.
+    the registry safe to have, and on the owning side it is exactly as strict as it was
+    before ``side`` existed.
+
+    A row owned by the OTHER venue is not stale here and never can be: it describes a
+    publish-boundary edit that side made to its own tree, and this tree legitimately
+    carries the unredacted line instead (PORT11). ``side=None`` returns nothing,
+    because a checkout that has not declared cannot judge either way; the probe below
+    is what says so out loud, and callers should prefer it.
     """
+    if side is None:
+        return []
     live = set(live_text.splitlines())
-    return [r for r in redactions if r.replacement not in live]
+    return [r for r in redactions if r.side == side and r.replacement not in live]
+
+
+def stale_redaction_check(
+    live_text: str, redactions: list[Redaction], side: str | None
+) -> CheckOutcome:
+    """The stale check as a PROBE (ADR 0021): clean, findings, or not-checked-with-a-reason.
+
+    Three answers, because there are three. An undeclared side is NOT the same as a
+    clean registry, and rendering it as one would hide exactly the tree this item
+    exists for: a consumer that took the roll, has not yet declared ``side:``, and
+    would otherwise be told its declarations are fine.
+    """
+    if side is None:
+        return not_checked(
+            "config/dev-environment.yaml declares no `side:`, so this checkout cannot "
+            "say which redactions are its own to keep current; declare producer or "
+            "company there and the check runs (PORT11)"
+        )
+    owned = [r for r in redactions if r.side == side]
+    stale = [r for r in owned if r.replacement not in set(live_text.splitlines())]
+    subject = f"{len(owned)} {side}-owned redaction(s) of {len(redactions)} declared"
+    if stale:
+        return findings(stale, size=len(owned), subject=subject)
+    return checked_clean(size=len(owned), subject=subject)
