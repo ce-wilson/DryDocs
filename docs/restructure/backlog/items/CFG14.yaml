@@ -1,0 +1,68 @@
+id: CFG14
+epic: web-console
+title: "The console roster becomes a declared config file with a persona-to-role map and a DEFERRED claim block - one source both sides read, so the regex that parses TypeScript to catch drift retires with the duplication that made it necessary"
+type: task
+module: config
+phase: 12
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- web/src/lib/auth.ts
+- drydocs_api/personas.py
+- tests/unit/test_drydocs_api.py
+- config/schemas/
+acceptance: |
+  (a) `config/console-personas.yaml` is the ONE declaration: the identity header this repo's
+  config files carry (schema, classification, updated), a `roles:` closed list (`user`, `steward`,
+  `admin` - the three that exist; adding a fourth is a change to this file and to the guard, not a
+  silent widening), and a `personas:` block keyed by id carrying `display_name`, `role`, `chip`
+  and the optional `tower_key`. Its schema lands in `config/schemas/` like every other.
+  (b) A reader in `drydocs_core/` - pure config, no graph, imports nothing from a component -
+  validates at construction and REFUSES: an unknown role, a duplicate id, a persona with no role,
+  a `tower_key` on a non-user seat. `drydocs_api/personas.py` reads it instead of declaring the
+  roster; the dataclass and the `UnknownPersonaError` contract are unchanged for its callers.
+  (c) `web/src/generated/console-personas.json` is RENDERED from the YAML by a
+  `scripts/render_*.py` in the render_board chain, and `web/src/lib/auth.ts` imports it the way
+  `loadMapModel.ts` imports `load-map.json`. auth.ts keeps its TYPES and its predicates
+  (`canAccessIntake`, `SME_PERSONA_ID`); it stops carrying the DATA.
+  (d) `tests/unit/test_drydocs_api.py::test_personas_match_web_auth_ts` RETIRES, and the reason
+  goes in the commit rather than only here: it parses TypeScript with a regular expression to
+  catch a drift that only existed because the roster was declared twice. One source removes the
+  drift, and a render-determinism check replaces the parse.
+  (e) THE CLAIM BLOCK IS DECLARED AND DEFERRED, never absent. `claims:` carries
+  `status: deferred`, a `reason` of at least forty characters, and an empty `mapping`. The reader
+  REFUSES a deferred block with a non-empty mapping, and an adopted block with an empty one - the
+  same declare-or-refuse shape as the `wired` axis. The reason names the known target shape:
+  entitlements arrive as role claims from directory groups named
+  `<rolename>-<IDAP_ID>-<SEAL-ID>-<ENV>`, and nothing maps until the console is onboarded.
+  (f) TWO PROPERTIES THE CHANGE MUST NOT WEAKEN, each pinned by a test that fails if it does.
+  The file is the DEMO ROSTER, not an authorization source: the server still re-resolves the real
+  role from the token on every request (ADR 0005 decision 3), and the role in the browser's
+  session blob still drives nav rendering only. And per-PERSONA scoping survives - three
+  user-tier seats identical in rights and distinct only in identity is deliberate (O64), so a
+  guard asserts more than one `user` seat exists rather than letting a later tidy-up collapse them.
+  (g) No secret moves. The credentials backing these ids stay machine-local and uncommitted.
+notes: |
+  Minted 2026-09-10 (Lane A, desktop; pen backlog) on the SME ruling: map personas to roles now,
+  defer entitlements until needed, and make roles a configuration file for testing and demo.
+  WHY NOW, from the peer reference read the same day: the estate carries entitlements as role
+  claims on AD groups whose names encode the application and environment, and roles there are
+  application-specific by design. An application in that estate does not own accounts or their
+  lifecycle - it owns the MAPPING from claim to role. That mapping has to live somewhere declared
+  before it can be filled, and today the roster is hard-coded in two languages with a regex
+  holding them equal. This item builds the somewhere. It fills nothing in.
+  Notable, and the reason the deferral is honest rather than a shrug: the peer project HAS the
+  claims model in reach and still carries a hard-coded user list for roles. The gap is not
+  ignorance of the mechanism, it is that nobody has scoped the mapping. DryDocs is in the same
+  state by a different route, and this item makes that state declared instead of implicit.
+  BEARS ON THE GATE, does not pre-empt it: console-auth-boundary's P4 asks whether to build a
+  user model - accounts, storage, create/disable/rotate. This is NOT that build and must not be
+  read as adopting it. It is the smaller thing P4 turns into if the console is ever onboarded:
+  a declared claim-to-role map with nothing in it yet. Nothing here changes an auth mechanism, so
+  it needs no gate ruling; if the gate later rules P4 adopt, this file is where that lands.
+  drydocs_api/personas.py's own docstring already anticipates the end state - "Enterprise OIDC
+  (SID + roles-from-claims) replaces this module company-side ... a gitignored twin, never here."
+  This item does not change that: the company's twin stays theirs.
