@@ -17,21 +17,16 @@ context cost per call.
 
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 
 import yaml
+from common import _bootstrap
 
-_REPO_ROOT = Path(__file__).resolve().parents[2]
-if str(_REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(_REPO_ROOT))
+from drydocs_core.ui_concepts import not_graph_concept_lines
 
-from drydocs_core.ui_concepts import not_graph_concept_lines  # noqa: E402
-
-_REPO_ROOT = Path(__file__).resolve().parents[2]
 # S5 split the monolith into per-domain fragments; the directory is the source
 # and yaml_fragments is the one reader (a fragment need not parse standalone).
-VOCABULARY_PATH = _REPO_ROOT / "drydocs_core" / "ontology" / "relationship_vocabulary"
+VOCABULARY_PATH = _bootstrap.REPO_ROOT / "drydocs_core" / "ontology" / "relationship_vocabulary"
 
 MAX_VOCAB_ROWS = 80
 MAX_EXAMPLES = 6

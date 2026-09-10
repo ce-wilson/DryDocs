@@ -36,17 +36,11 @@ from __future__ import annotations
 
 import difflib
 import re
-import sys
 from collections.abc import Iterable
 from dataclasses import asdict, dataclass, field
-from pathlib import Path
 
-_REPO_ROOT = Path(__file__).resolve().parents[2]
-if str(_REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(_REPO_ROOT))
-
-from drydocs_core.glossary import GlossarySense, load_glossary  # noqa: E402
-from drydocs_core.ui_concepts import load_ui_concepts  # noqa: E402
+from drydocs_core.glossary import GlossarySense, load_glossary
+from drydocs_core.ui_concepts import load_ui_concepts
 
 #: The two choice ids every term carries besides its candidates. The console
 #: renders them as the free-text box and the "answer anyway" action; the agent
