@@ -28,6 +28,7 @@ from drydocs_core.docs_verify import exit_code as docs_verify_exit_code
 from drydocs_core.docs_verify import verify as verify_corpora
 from drydocs_core.neo4j_client import Neo4jClient
 
+from .docs_coverage import CLASS_LOADED, CLASS_SEMANTIC_HOLD, CLASS_WIRING_HOLD
 from .docs_coverage import NO_CORPUS as COVERAGE_NO_CORPUS
 from .docs_coverage import REGISTRY_DB as COVERAGE_REGISTRY_DB
 from .docs_coverage import coverage as build_docs_coverage
@@ -376,7 +377,9 @@ def docs_coverage(
         False, "--no-graph", help="Declaration layer only — never contacts Neo4j."
     ),
     product: str = typer.Option("", "--product", help="Filter to one product id."),
-    section: str = typer.Option("all", "--section", help="products | corpora | systems | all"),
+    section: str = typer.Option(
+        "all", "--section", help="products | corpora | systems | classes | all"
+    ),
 ) -> None:
     """What documentation do we hold per software product, and what is blocking it.
 
@@ -418,17 +421,53 @@ def docs_coverage(
                 f"[yellow]graph not probed ({type(exc).__name__}); declaration layer only[/]"
             )
 
+    from drydocs_core.source_descriptors import SourceDescriptors
+    from drydocs_core.source_registry import SourceRegistry
+
     report = build_docs_coverage(
         software.get("products", []),
         docs.get("sources", []),
         systems=sources.get("systems", []),
         platforms=platforms.get("platforms", []),
+        descriptors=SourceDescriptors.from_yaml(),
+        registry=SourceRegistry.from_yaml(),
         run=run,
     )
 
     # ADR 0021 D5: the probe's state is READ off the type and printed where a
     # finding would be - a not-checked graph layer is a line, never a column of 0.
     console.print(f"[dim]graph probe: {report.probe.render()}[/]")
+
+    if section in ("all", "classes"):
+        # LOAD14: what the synthetic stand-ins declare, and what the base reached.
+        console.print(f"[dim]class probe: {report.classes_probe.render()}[/]")
+        table = Table(title="synthetic stand-ins -> object-class coverage")
+        for col in ("dataset", "label", "loaded", "coverage", "blocker"):
+            table.add_column(col)
+        for c in report.classes:
+            colour = {
+                CLASS_LOADED: "green",
+                CLASS_WIRING_HOLD: "yellow",
+                CLASS_SEMANTIC_HOLD: "cyan",
+            }.get(c.coverage, "dim")
+            table.add_row(
+                c.dataset_id,
+                c.label or "-",
+                # ADR 0021 D5 on an operator surface: a class nothing counted
+                # prints a dash, never 0. The dash's own reason follows below.
+                "-" if c.loaded is None else str(c.loaded),
+                f"[{colour}]{c.coverage}[/]",
+                c.blocker or "-",
+            )
+        console.print(table)
+        for c in report.classes:
+            if c.count_note:
+                console.print(f"  [dim]{c.dataset_id}: {c.count_note}[/]")
+            if c.blocker_reason:
+                console.print(
+                    f"  [{'cyan' if c.blocker == CLASS_SEMANTIC_HOLD else 'yellow'}]"
+                    f"{c.dataset_id}[/]: {c.blocker} - {c.blocker_reason}"
+                )
 
     rows = report.products
     if product:

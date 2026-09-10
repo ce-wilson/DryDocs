@@ -187,4 +187,8 @@ PROBES: tuple[str, ...] = (
     # not declared which side of the port it is cannot say which rows are its own,
     # and calling that clean would hide the consumer the item exists for.
     "drydocs.port.gate_log_redactions.stale_redaction_check",
+    # LOAD14: the stand-ins' object classes. A SECOND probe in the same module
+    # rather than an extension of the first, because the two ask different
+    # questions and one having run says nothing about the other.
+    "drydocs.docs_coverage.class_probe",
 )

@@ -11,6 +11,10 @@ from __future__ import annotations
 import yaml
 
 from drydocs.docs_coverage import (
+    CLASS_LADDER,
+    CLASS_LOADED,
+    CLASS_SEMANTIC_HOLD,
+    CLASS_WIRING_HOLD,
     CROSS_DB_BLOCKED,
     CURRENT,
     DIVERGENCE_EDGE_CORPUS_UNKNOWN,
@@ -28,6 +32,8 @@ from drydocs.docs_coverage import (
     UNGATED,
     UNREGISTERED_CORPUS,
     UNVERIFIED,
+    _loader_labels,
+    class_coverage,
     coverage,
 )
 
@@ -470,3 +476,148 @@ def test_the_report_carries_the_probe_and_probed_is_read_off_it() -> None:
     )
     assert probed.probed and probed.probe.is_clean
     assert probed.as_dict()["probe_state"] == "checked-clean"
+
+
+# --- LOAD14: the synthetic stand-ins' object classes ---------------------------
+#
+# Pure, like everything above it: the class section's whole argument is that the
+# axis holding a class is DERIVED from two declared booleans, so it is provable
+# with the database switched off.
+
+
+class _FakePlan:
+    def __init__(self, source_id: str, files: tuple[str, ...]) -> None:
+        self.source_id = source_id
+        self.files = files
+        self.placement = "zone"
+
+
+class _FakeDescriptors:
+    """Only the surface class_coverage uses: the synthetic plans and the wired axis."""
+
+    def __init__(self, wired: dict[str, tuple[bool, str | None]]) -> None:
+        self._wired = wired
+
+    def synthetic_plans(self):
+        return tuple(_FakePlan(sid, ("a.csv",)) for sid in sorted(self._wired))
+
+    def wired(self, source_id: str):
+        return self._wired[source_id]
+
+
+class _FakeRegistry:
+    def __init__(self, confirmed: dict[str, bool]) -> None:
+        self._confirmed = confirmed
+
+    def is_confirmed(self, source_id: str) -> bool:
+        return self._confirmed[source_id]
+
+
+def _counting_run(counts: dict[str, int]):
+    """A seam that answers the class-count query and nothing else."""
+
+    def run(_db, cypher, _params):
+        for label, n in counts.items():
+            if f"(n:`{label}`)" in cypher:
+                return [{"n": n}]
+        return [{"n": 0}]
+
+    return run
+
+
+def test_the_axis_is_derived_from_two_booleans_not_from_the_reason_prose() -> None:
+    """confirmed=false is a SEMANTIC hold; confirmed+unwired is a WIRING hold.
+
+    The two have different owners — a semantic hold waits on the SME gate, a
+    wiring hold waits on a build — so collapsing them into one "not loaded" tells
+    an operator nothing about who is holding it. Derived from the flags, never by
+    reading the reason string, which is prose and would make this a guard that
+    parses prose (J66).
+    """
+    descriptors = _FakeDescriptors(
+        {
+            "meaning-unruled": (False, "no gate has ruled its meaning"),
+            "loader-unbuilt": (False, "the meaning is signed and the loader is not built"),
+            "fully-wired": (True, None),
+        }
+    )
+    registry = _FakeRegistry(
+        {"meaning-unruled": False, "loader-unbuilt": True, "fully-wired": True}
+    )
+    rows, _ = class_coverage(descriptors, registry)
+    by_id = {r.dataset_id: r for r in rows}
+    assert by_id["meaning-unruled"].coverage == CLASS_SEMANTIC_HOLD
+    assert by_id["loader-unbuilt"].coverage == CLASS_WIRING_HOLD
+    assert by_id["fully-wired"].coverage == CLASS_LOADED
+
+
+def test_a_class_nobody_counted_is_none_and_says_why() -> None:
+    """The item's own clause: not-probed is never rendered as zero.
+
+    And the None carries its cause, because a bare None is the same shrug as a
+    bare skip — it says a number is missing without saying who is owed one.
+    """
+    descriptors = _FakeDescriptors({"fully-wired": (True, None)})
+    registry = _FakeRegistry({"fully-wired": True})
+    rows, probe = class_coverage(descriptors, registry, run=None)
+    assert probe.is_not_checked
+    assert rows[0].loaded is None, "an unprobed class must not report a count"
+    assert rows[0].loaded != 0
+    assert "not probed" in rows[0].count_note
+
+
+def test_an_empty_graph_that_answered_is_not_the_same_as_never_asking() -> None:
+    """CHECKED_CLEAN over zero versus NOT_CHECKED — the ADR 0021 distinction.
+
+    A graph that answered "none" reports 0; a graph nobody asked reports None.
+    Reading both as 0 is what the type exists to prevent.
+    """
+    descriptors = _FakeDescriptors({"controlm@[db].psgmgr.cm_def_vtab": (True, None)})
+    registry = _FakeRegistry({"controlm@[db].psgmgr.cm_def_vtab": True})
+
+    asked, probe = class_coverage(descriptors, registry, run=_counting_run({}))
+    assert probe.is_clean, "a graph that answered and held none is CHECKED_CLEAN"
+    assert asked[0].loaded == 0 and asked[0].count_note == ""
+
+    never_asked, probe = class_coverage(descriptors, registry, run=None)
+    assert probe.is_not_checked and never_asked[0].loaded is None
+
+
+def test_the_graph_labels_come_from_the_loaders_not_a_hand_written_table() -> None:
+    """A dataset-to-label mapping restated here would be a second thing to drift.
+
+    The labels are read off the loaders' own ``source_id`` / ``sweep_label``
+    ClassVars, so this asserts the derivation reaches a loader that really
+    declares one rather than asserting a literal it also supplies.
+    """
+    labels = _loader_labels()
+    assert labels, "no loader declared both a source_id and a sweep_label"
+    assert labels.get("controlm@[db].psgmgr.cm_def_vtab") == "ControlMFolder"
+    for source_id, label in labels.items():
+        assert source_id and label and not label.startswith(":")
+
+
+def test_the_class_rows_reconcile_against_the_ladder() -> None:
+    """Every class lands in exactly one governing state, like the product rows."""
+    descriptors = _FakeDescriptors(
+        {"a": (False, "unruled"), "b": (False, "unbuilt"), "c": (True, None)}
+    )
+    registry = _FakeRegistry({"a": False, "b": True, "c": True})
+    report = coverage([], [], descriptors=descriptors, registry=registry)
+    s = report.summary()
+    assert s["classes"] == 3
+    assert sum(s[f"classes_{state}"] for state in CLASS_LADDER) == s["classes"]
+    assert report.reconciles()
+
+
+def test_a_report_built_without_descriptors_carries_no_class_claim() -> None:
+    """The section is additive: every existing caller keeps working unchanged.
+
+    And the absence reads as not-asked rather than nothing-found — the same
+    distinction the rows themselves make.
+    """
+    report = coverage([_product("p")], [])
+    assert report.classes == []
+    assert report.classes_probe.is_not_checked
+    assert report.as_dict()["classes_probe_state"] == "not-checked"
+    assert report.reconciles()
