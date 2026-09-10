@@ -11,7 +11,6 @@ status: todo
 depends_on: []
 inputs:
 - tests/unit/test_constraint_drift.py
-- docs/company-prompts/port-ais-supplement-company-prompt.md
 acceptance: |
   (a) tests/unit/test_constraint_drift.py::test_the_typo_labels_appear_nowhere_in_the_schema_tree
   is REMOVED, not narrowed, and the file's remaining tests stay green. The reason goes in the
@@ -52,3 +51,8 @@ notes: |
   exist at all, and the reason is the Team Edition inheritance decision (ADR 0015), not the
   guard-reading convention. Traceability to that decision is the point; GRAPH4 keeps the other
   seventeen.
+  docs/company-prompts/port-ais-supplement-company-prompt.md is the EVIDENCE that the guard's
+  docstring premise is false, and it is cited here rather than listed in inputs: that field names
+  what an item WRITES, the company prompts are the port pen's, and this item writes none of them.
+  Same convention the lane-handoff skill applies to docs/reviews/ (PLAN5) - provenance is not a
+  write target.

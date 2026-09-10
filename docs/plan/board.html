@@ -1257,6 +1257,11 @@ against J66 and would CONVERT this one to source_scan. The ruling here is that i
 exist at all, and the reason is the Team Edition inheritance decision (ADR 0015), not the
 guard-reading convention. Traceability to that decision is the point; GRAPH4 keeps the other
 seventeen.
+docs/company-prompts/port-ais-supplement-company-prompt.md is the EVIDENCE that the guard&#x27;s
+docstring premise is false, and it is cited here rather than listed in inputs: that field names
+what an item WRITES, the company prompts are the port pen&#x27;s, and this item writes none of them.
+Same convention the lane-handoff skill applies to docs/reviews/ (PLAN5) - provenance is not a
+write target.
 </p></div></div>
 <div class="card ready" id="card-LIN4" data-id="LIN4" data-module="drydocs-lineage" data-phase="6" data-epic="component-topology" data-type="bug" data-status="todo" data-search="lin4 rua_inventory reads a bundle envelope without checking its collector version, so a newer bundle parses silently at full apparent confidence - validate it the way lb_resolution.py already does" tabindex="0"><div class="card-head"><span class="card-id">LIN4</span><span class="card-title">rua_inventory reads a bundle envelope without checking its collector version, so a newer bundle parses silently at full apparent confidence - validate it the way lb_resolution.py already does</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-lineage</span><span class="chip" data-kind="phase">P6</span><span class="chip" data-kind="type">bug</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">component-topology</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> rua_inventory._read_envelope checks meta[&#x27;schema&#x27;] against KNOWN_COLLECTOR_VERSIONS as
 lb_resolution.py does, and a mismatch reaches the existing RuaCoverage notes channel rather than
