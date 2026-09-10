@@ -4,7 +4,7 @@
 # classification: Internal-Public (no internal counts/IDs — safe to publish).
 classification: Internal-Public
 schema: drydocs.graph-tests.v1
-updated: 2026-07-20
+updated: 2026-09-10
 
 suite: bmc-docs-smoke
 description: >
@@ -12,6 +12,15 @@ description: >
   every job is contained by a folder. Counts are NOT asserted here (they are
   environment-specific and would be Internal) — only shape/consistency.
 targets: [ControlMFolder, ControlMJob, Condition]
+# REV2 POSITIVE CONTROL. Read this before changing a case below: without it,
+# the smoke suite's subject is the folder/job/condition shape; with no
+  # folder loaded its two `empty` cases pass over nothing.
+# The runner evaluates the anchor FIRST and reports NOT RUN - never PASS -
+# when it finds nothing, so a suite can no longer certify an empty database.
+anchor:
+  label: ControlMFolder
+  min_count: 1
+
 cases:
   - id: TC-01
     description: at least one job folder exists

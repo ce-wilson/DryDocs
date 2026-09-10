@@ -187,4 +187,10 @@ PROBES: tuple[str, ...] = (
     # not declared which side of the port it is cannot say which rows are its own,
     # and calling that clean would hide the consumer the item exists for.
     "drydocs.port.gate_log_redactions.stale_redaction_check",
+    # REV2 (2026-09-10): the acceptance runner's per-suite verdict. Most cases in
+    # graph-tests/ assert `empty`, so on an unloaded graph every one of them
+    # passed - 28 of 30 negative assertions had no positive control. A suite
+    # whose anchor finds nothing is NOT_CHECKED, and the type is what makes that
+    # impossible to render as PASS.
+    "drydocs.review.graph_verify.suite_verdict",
 )

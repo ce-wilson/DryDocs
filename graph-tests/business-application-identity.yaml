@@ -25,7 +25,7 @@
 # looks like once it has set).
 classification: Internal-Public
 schema: drydocs.graph-tests.v1
-updated: 2026-08-22
+updated: 2026-09-10
 
 suite: business-application-identity
 description: >
@@ -33,6 +33,15 @@ description: >
   seal_id -> app_id cutover: the neutral key is present on every node, the
   deprecated seal_id alias never drifts from it while both are written, and the
   :Port NODE KEY (parent_app_id, kind) agrees with the parent it hangs off.
+# REV2 POSITIVE CONTROL. Read this before changing a case below: without it,
+# every case here is an identity invariant ON a :BusinessApplication, so
+  # zero of them is not a clean bill of health - it is an unloaded graph.
+# The runner evaluates the anchor FIRST and reports NOT RUN - never PASS -
+# when it finds nothing, so a suite can no longer certify an empty database.
+anchor:
+  label: BusinessApplication
+  min_count: 1
+
 cases:
   - id: TC-01
     description: every :BusinessApplication carries the canonical neutral key (§C1 — a node with a null app_id is one a pre-cutover loader created behind the constraint's back, since uniqueness ignores nulls)

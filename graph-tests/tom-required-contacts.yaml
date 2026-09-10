@@ -40,7 +40,7 @@
 # classification: Internal-Public (shape only — no counts, no real ids).
 classification: Internal-Public
 schema: drydocs.graph-tests.v1
-updated: 2026-08-27
+updated: 2026-09-10
 
 suite: tom-required-contacts
 description: >
@@ -50,6 +50,15 @@ description: >
   carry two caveats: Operate Manager assignments are mid-correction at source,
   and a count-to-one check cannot see geography/coverage-window gaps
   (signed residual 4).
+# REV2 POSITIVE CONTROL. Read this before changing a case below: without it,
+# the required-contact rules are about roles; an estate with no :TOMRole
+  # has no required contacts to be missing.
+# The runner evaluates the anchor FIRST and reports NOT RUN - never PASS -
+# when it finds nothing, so a suite can no longer certify an empty database.
+anchor:
+  label: TOMRole
+  min_count: 1
+
 cases:
   - id: TC-01
     description: >
