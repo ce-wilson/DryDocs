@@ -1,3 +1,4 @@
+import { completenessOf, type Completeness } from './completeness'
 import type { SpecResult } from '../lib/graph'
 
 // WEB6 — the one runtime check at the spec-result-to-typed-row seam.
@@ -47,6 +48,20 @@ import type { SpecResult } from '../lib/graph'
 export type RowShape<T> = readonly (keyof T & string)[]
 
 export type ShapeResult<T> = { ok: true; rows: T[] } | { ok: false; message: string }
+
+/** The QuerySpec case, and the difference is the whole of WEB19: the success
+ *  branch carries the COMPLETENESS of those rows as a required field.
+ *
+ *  This is the seam every spec consumer already passes through, which is why the
+ *  envelope is attached here rather than asked for politely in a convention
+ *  document. `checked.rows` used to be the whole answer; now it is half of one,
+ *  and the other half is a compile error away from being noticed. The
+ *  envelope-less `ShapeResult` above stays for `validateRowsOf`, whose sources
+ *  (the O13 mappings grid) have no ceiling to report and would otherwise have to
+ *  invent one. */
+export type CheckedRows<T> =
+  | { ok: true; rows: T[]; completeness: Completeness }
+  | { ok: false; message: string }
 
 /** How many rows to type-check. The presence check reads the RESULT's columns
  *  and is O(1); the value check is per row per column, and a 500-row grid times
@@ -136,9 +151,10 @@ export function validateRowsOf<T>(src: RowSource, required: RowShape<T>): ShapeR
   return { ok: true, rows: src.rows as T[] }
 }
 
-/** The QuerySpec case: types come from the result's own column declarations. */
-export function validateRows<T>(result: SpecResult, required: RowShape<T>): ShapeResult<T> {
-  return validateRowsOf<T>(
+/** The QuerySpec case: types come from the result's own column declarations,
+ *  and the completeness envelope comes back WITH the rows (WEB19). */
+export function validateRows<T>(result: SpecResult, required: RowShape<T>): CheckedRows<T> {
+  const checked = validateRowsOf<T>(
     {
       source: `QuerySpec ${result.spec_id}`,
       keys: result.keys,
@@ -150,4 +166,6 @@ export function validateRows<T>(result: SpecResult, required: RowShape<T>): Shap
     },
     required,
   )
+  if (!checked.ok) return checked
+  return { ok: true, rows: checked.rows, completeness: completenessOf(result) }
 }

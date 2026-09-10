@@ -17,13 +17,16 @@
 // reads as "nothing there" — the Z3 UNMATCHED discipline, one layer up. The
 // unplaceable count sits in the footer at all times, including when it is zero.
 
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { GraphAccess } from '../../lib/graph'
 import { COUNTRY_BY_ID, COUNTRY_SHAPES } from '../../generated/world-map'
 import { MapGlyph, type GlyphKind } from './MapGlyphs'
 import { frameFor, viewBox, WORLD_BOX, zoomOf, type Box } from './projection'
 import { COUNTRY_NAMES, resolveRows, type LocationRow, type PlacedSite } from './resolve'
-import { validateRows, type RowShape } from '../../data/rowShape'
+import type { RowShape } from '../../data/rowShape'
+import { useSpecRows } from '../../data/useSpecRows'
+import CompletenessNotice from '../ui/CompletenessNotice'
+import { completeOf, type Completeness } from '../../data/completeness'
 
 /** The shared map column shape, as MapDimension's own comment already
  *  requires of every dimension spec — now checked rather than assumed. */
@@ -57,10 +60,9 @@ export interface LocationMapProps {
   className?: string
 }
 
-type Load =
-  | { state: 'loading' }
-  | { state: 'error'; message: string }
-  | { state: 'ready'; rows: LocationRow[] }
+/** WEB19: the read is useSpecRows now, whose `ready` arm carries the completeness
+ *  envelope. The local three-state union is gone rather than extended — it had
+ *  nowhere to put the flag, which is why the flag was dropped here. */
 
 export default function LocationMap({
   access,
@@ -70,47 +72,32 @@ export default function LocationMap({
   className,
 }: LocationMapProps) {
   const [dimIndex, setDimIndex] = useState(0)
-  const [load, setLoad] = useState<Load>({ state: 'loading' })
   const [countryId, setCountryId] = useState<string | null>(null)
   const [selected, setSelected] = useState<string | null>(null)
 
   const dimension = dimensions[dimIndex]
-  const paramKey = JSON.stringify(params ?? {})
 
-  useEffect(() => {
-    let live = true
-    setLoad({ state: 'loading' })
-    access
-      .runSpec(dimension.specId, params)
-      .then((res) => {
-        if (!live) return
-        // WEB6: the map's whole job is placing rows on a globe, so a column it
-        // cannot read is the difference between "nothing is there" and "the
-        // query changed" — the two states this component's own comment below
-        // insists must never look alike. Checked, a mismatch takes the SAME
-        // loud path a failed query does.
-        const checked = validateRows<LocationRow>(res, LOCATION_COLUMNS)
-        setLoad(
-          checked.ok
-            ? { state: 'ready', rows: checked.rows }
-            : { state: 'error', message: checked.message },
-        )
-      })
-      .catch((err: unknown) => {
-        if (!live) return
-        // Loud, never a silent empty map: an empty map and a failed query look
-        // identical to a reader, and only one of them means "nothing is there".
-        setLoad({ state: 'error', message: err instanceof Error ? err.message : String(err) })
-      })
-    return () => {
-      live = false
-    }
-  }, [access, dimension.specId, paramKey, params])
+  // WEB6 is preserved by the hook: the map's whole job is placing rows on a
+  // globe, so a column it cannot read is the difference between "nothing is
+  // there" and "the query changed" — two states this component's own comment
+  // below insists must never look alike. A shape mismatch is an `error` here,
+  // the SAME loud path a failed query takes, and only a real answer with no rows
+  // draws an empty map.
+  const load = useSpecRows<LocationRow>(dimension.specId, LOCATION_COLUMNS, params ?? {}, { access })
 
   const resolved = useMemo(
     () => resolveRows(load.state === 'ready' ? load.rows : []),
     [load],
   )
+
+  /** WEB19: what the map DREW, not what the wire carried. The gazetteer places
+   *  some rows and refuses others, so `shown` is the placed count and the
+   *  unplaceable ones are already reported on their own line. A read that was
+   *  not truncated stays complete whatever the resolver did with it. */
+  const completeness: Completeness =
+    load.state === 'ready'
+      ? { ...load.completeness, shown: resolved.sites.length }
+      : completeOf(0)
 
   // Drilling into a country filters the sites; the frame then grows to include
   // whatever survived, so an outlying territory is never cropped.
@@ -276,6 +263,7 @@ export default function LocationMap({
         origins={resolved.total}
         unplaceable={resolved.unplaceable.length}
         loading={load.state === 'loading'}
+        completeness={completeness}
       />
 
       {active && <SiteDetail site={active} placeNoun={placeNoun} />}
@@ -312,11 +300,13 @@ function Coverage({
   origins,
   unplaceable,
   loading,
+  completeness,
 }: {
   placed: number
   origins: number
   unplaceable: number
   loading: boolean
+  completeness: Completeness
 }) {
   return (
     <p className="mt-2 font-mono text-xs/[1.5]" style={{ color: 'var(--muted)' }}>
@@ -330,6 +320,11 @@ function Coverage({
           <span style={{ color: unplaceable ? 'var(--yellow)' : 'var(--muted)' }}>
             {unplaceable} unplaceable
           </span>
+          {/* WEB19: a capped read draws a map that is SPARSE AND LOOKS
+              COMPLETE. The badge sits in the coverage line because that line is
+              already the map's own account of what it did and did not draw. */}
+          {completeness.truncated && ' · '}
+          <CompletenessNotice completeness={completeness} unit="rows" noun="row" />
         </>
       )}
     </p>
