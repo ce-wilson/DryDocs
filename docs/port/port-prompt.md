@@ -4107,8 +4107,10 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   importing, so EVERY command dies - `drydocs --help` included, and
   `python -c "import drydocs.cli"` with it. When you apply the ninth roll, take
   `drydocs/docs_coverage.py`'s new class block in the same sitting as `cli_docs.py`, or take
-  neither. Four more names from that same file - `blocker`, `classes_probe`, `count_note`,
-  `dataset_id`, `loaded` - are runtime rather than import-time, same file, same sitting.
+  neither. Six more names from that same file - `blocker`, `blocker_reason`, `classes_probe`,
+  `count_note`, `dataset_id`, `loaded` - are runtime rather than import-time, same file,
+  same sitting. (This sentence said FOUR and listed five until the roll-close run below
+  counted them; `blocker_reason` is the one it was missing.)
   **THEN THE ONES ALREADY ON YOUR TREE, worth a grep each rather than a project.** From
   `drydocs_core/data_root.py`: `dpl_mac_dir`, `glue_inventory_dir`, both reached from
   `drydocs/cli.py`. From `drydocs_lineage/curation.py`: `DecisionsError`, `load_decisions`, also
@@ -4130,6 +4132,26 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   **GOING FORWARD** the producer runs `scripts/port_split_pair_check.py <previous-base-tag>` at
   every roll close and each pair becomes a relay line, so this is the last time the list arrives
   as a backlog rather than as a paragraph. Nothing is asked back.
+
+- **POSTSCRIPT TO RELAY-57 - THE FIRST ROLL-CLOSE RUN, AND IT FOUND A FAMILY THE HAND TRIAGE
+  HAD COLLAPSED TO TWO NAMES** [VERIFIED-PRODUCER] (2026-09-10, venue desktop, at the ninth
+  roll's tag). The paragraph above promised a run per roll; this is it, over
+  `port-base-20260909..HEAD`: 18 pairs across 114 changed Python files, 12 names too
+  ambiguous to attribute, 6 new files carried whole as clean-adds. THE THREE CLI-KILLERS ARE
+  UNCHANGED and are the reason this roll went out - `CLASS_LOADED`, `CLASS_SEMANTIC_HOLD` and
+  `CLASS_WIRING_HOLD` in `drydocs/docs_coverage.py`, imported at MODULE SCOPE by
+  `drydocs/cli_docs.py`. Take that file's new class block in the same sitting as
+  `cli_docs.py`, or take neither.
+  WHAT IS NEW is the whole CORE13 bounds family, which the August sweep surfaced as two names
+  and is actually eight. `drydocs_core/config.py` (default_ok, so you hand-merge it) gains
+  `Neo4jDriverBounds`, `DRIVER_BOUND_DEFAULTS`, `load_driver_bounds`, `connection_timeout`,
+  `connection_acquisition_timeout`, `transaction_timeout` and `max_transaction_retry_time`,
+  and `drydocs_core/neo4j_client.py` gains `bounds` - every one of them reached only from
+  `tests/unit/test_neo4j_client.py`, which is also default_ok. So this one REDDENS A SUITE and
+  breaks no command: take the config block and the test together, or neither, and step 375
+  is the content. The reason the earlier list said two is that a hand triage reads the names
+  a human noticed and an instrument reads all of them, which is the whole argument for
+  running it per roll rather than per sweep. Nothing is asked back.
 
 OWED COMPANY-SIDE:
 
