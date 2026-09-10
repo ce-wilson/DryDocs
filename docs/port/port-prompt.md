@@ -4667,7 +4667,7 @@ depgraph snapshots in the range are ritual — per-entry backlog union, derived
 regeneration, never-port outputs — and get no step. **Steps 273–296 are the
 2026-09-01 (fourth) roll**, covering `port-base-20260829..port-base-20260901`;
 steps 241–272 remain live below them because that base was certified and never
-applied, so the two rolls are one range for the consumer. **Steps 297–312 are the 2026-09-02 (fifth) roll**, covering `port-base-20260901..port-base-20260902`, rolled BEFORE the company's retry so that the retry applies ONE range, `port-base-20260826..port-base-20260902`, with all seven live relays inside it and nothing hand-carried (RELAY-24; the 20260901 apply is parked unmerged). **Steps 313–333 are the 2026-09-05 (sixth) roll**, covering `port-base-20260902..port-base-20260905` — 186 commits at the tag, 132 cited, the first roll since 2026-08-26 to start from a range the company had already applied COMPLETE (its `4d9ddba7`), so nothing is parked and nothing is hand-carried; RELAY-26 is its one relay. **Steps 334–353 are the 2026-09-08 (seventh) roll**, covering `port-base-20260905..port-base-20260908` — 407 commits at the tag, 303 cited, one range again because the company reported the 0905 apply COMPLETE at its `d527afce` (`[SME-REPORTED]`); the nineteen relays written during that apply (27–45) all act in this range, RELAY-46 says where each lands, and it is the roll's one new relay. **Steps 368-386 are the 2026-09-10 (ninth) roll**, covering `port-base-20260909..port-base-20260910` - 141 commits at the roll, 105 cited, and the range in which the build lane's twenty-six branches merged. RELAY-55, RELAY-56 and RELAY-57 all act in it, and RELAY-57 is why it went out when it did: three of its twenty-one pairs had not shipped yet, and this roll carries both halves of each.
+applied, so the two rolls are one range for the consumer. **Steps 297–312 are the 2026-09-02 (fifth) roll**, covering `port-base-20260901..port-base-20260902`, rolled BEFORE the company's retry so that the retry applies ONE range, `port-base-20260826..port-base-20260902`, with all seven live relays inside it and nothing hand-carried (RELAY-24; the 20260901 apply is parked unmerged). **Steps 313–333 are the 2026-09-05 (sixth) roll**, covering `port-base-20260902..port-base-20260905` — 186 commits at the tag, 132 cited, the first roll since 2026-08-26 to start from a range the company had already applied COMPLETE (its `4d9ddba7`), so nothing is parked and nothing is hand-carried; RELAY-26 is its one relay. **Steps 334–353 are the 2026-09-08 (seventh) roll**, covering `port-base-20260905..port-base-20260908` — 407 commits at the tag, 303 cited, one range again because the company reported the 0905 apply COMPLETE at its `d527afce` (`[SME-REPORTED]`); the nineteen relays written during that apply (27–45) all act in this range, RELAY-46 says where each lands, and it is the roll's one new relay. **Steps 368-386 are the 2026-09-10 (ninth) roll**, covering `port-base-20260909..port-base-20260910` - 141 commits at the roll, 105 cited, and the range in which the build lane's twenty-six branches merged. RELAY-55, RELAY-56 and RELAY-57 all act in it, and RELAY-57 is why it went out when it did: three of its twenty-one pairs had not shipped yet, and this roll carries both halves of each. **Steps 387-388 are the 2026-09-10 (tenth) roll**, a same-day re-roll cut before the consumer began applying the ninth, covering `port-base-20260910..port-base-20260910b`: it repairs a Neo4j route that loads in no venue without a plugin loader, which the consumer had already had to fix on their own side, on paths a port would have reverted.
 
 124. LOCAL-INFRA CHORES + ONE ADR [venue-pinned / docs] (`8c4ee1e` G49, `5a6208e`
     G50, `3304666` G49 follow-up, `034eb70` G53). G49/G50 are DESKTOP-VENUE facts —
@@ -8350,6 +8350,72 @@ hand-carried and nothing parked.
     by resolving here - step 386 says which and why.
     THE ROLL COMMIT is cited in the follow-up `chore(port): ledger` commit, which is ritual and
     terminates the chain.
+
+387. THE NEO4J ROUTE THAT LOADS IN EVERY VENUE, AND THE FIVE DRIFT POINTS IT LANDED ON
+    [`.claude/skills/**`, `CLAUDE.md`, `reference/**` canonical-producer; `tests/unit/**`,
+    `drydocs/loaders/**`, `drydocs_core/schema/**` default_ok; `internal/**` never-port]
+    (`c4a3b16d` the skill and the sweep; `cff43145` the mirror citations).
+    **TAKE THIS ONE WHOLE, and it may be the most immediately useful thing in the roll for a
+    session that is not running Claude Code.** `CLAUDE.md` §2 routed every Neo4j task to the
+    `neo4j-skills` PLUGIN. A plugin loads only under Claude Code; in any other venue that route
+    resolves to NOTHING - no error, no lens, no signal - and a session can run a full sitting
+    doing Neo4j work with no reference at all. `.claude/skills/neo4j-db/SKILL.md` is a
+    FILESYSTEM skill, so it loads everywhere, and it carries what the vendor plugin cannot know:
+    the two-database topology and the three retired names, the Cypher-25 empty-statement
+    boundary and the client-side splitter that exists because of it, the `Neo4jClient` API with
+    `run()` as the WRITE path, the four CORE13 waits, and eleven failure modes already paid for.
+    The plugin route is NOT deleted - it is correct under Claude Code and stays as an additive.
+    FIVE PRE-EXISTING DRIFT POINTS went with it, all of them routes to skills that load nowhere:
+    the `aura-*` skills (deleted 2026-07-06), `agent-memory` and `snowflake-graph-analytics`
+    (outside the declared keep-10, the second also disabled), a REGISTRY entry listing twelve
+    plugin skills against CLAUDE.md's ten, and the Oracle row pointing at the disabled
+    `db@oracle-skills` vendor plugin rather than the repo-local `oracle-db` skill.
+    FOUR STALE `apoc.cypher.runMany` CLAIMS, wrong for eight weeks: that procedure has not been
+    called anywhere since D5 (2026-07-18), having been dropped because it splits on semicolons
+    inside comments AND silently no-ops DDL - the class that once printed "Constraints applied."
+    having created zero. If your tree still routes multi-statement templates through it, that is
+    the thing to check first.
+    AND THE VERSION, which is the one that would have crossed WRONG: the platform reference said
+    "Server: Neo4j 5.x" while the pin is `neo4j:2026.05.0-enterprise` with a store that cannot be
+    downgraded. `neo4j = "^5.20"` in `pyproject.toml` is the PYTHON DRIVER floor (resolves 5.28.4)
+    and is a different axis. `constraints.cypher`'s header now describes its DDL by SHAPE rather
+    than by a version number, because a version in a comment goes stale and a shape does not.
+    SEVEN DEAD LOCAL-MIRROR CITATIONS retired in `cff43145` (`llm-graph-builder`, `sdw-sosa-ssn` -
+    neither exists on any machine this repo has run on), including one under a `verified:` stamp
+    that asserted they resolved. J71 already rules the class: a machine-local path in a tracked
+    document is an existence claim that is wrong on every other machine.
+    THE GUARD IS THE PART THAT MATTERS TO YOU LONGER TERM. ADR 0018 D5 put four routing documents
+    under `tests/unit/test_runbook_currency.py`; `reference/**` routes every platform task to a
+    skill and was not among them, so nothing had looked at that tree since June. Four reference
+    documents are now under it, and it caught a real stale citation on its first run. STILL OPEN,
+    said so it is not mistaken for done: the cited-path checks resolve only paths carrying a known
+    EXTENSION, so a bare DIRECTORY citation is invisible to both this guard and the preflight's -
+    which is exactly how the seven mirror citations survived.
+
+388. THE VENUE FINDINGS AND THE PLAN'S CAPABILITY AXIS [`docs/restructure/**` per-entry;
+    `docs/restructure/EndGoalTeamsEdition.md` never-port; `internal/**` never-port]
+    (`89dcecba` `c8fd9b49` `84ecb090` `679f665c` the findings and the three ideas; `dea57a69` the
+    plan's close of the ninth roll).
+    Producer-side capture, nothing owed. Recorded here because ONE fact in it may matter on your
+    side: a capability layer has three reachability classes and this tree distinguishes none of
+    them - filesystem skills and sub-agents are tracked and cross WHOLESALE, a Claude Code plugin
+    lives outside the repo and crosses NEVER, and `skillOverrides` enablement is gitignored and
+    also crosses never. So `.claude/settings.local.json` saying a skill is "off" is a producer
+    machine's state and has never been yours; `oracle-db` is ON in any venue that does not read
+    that file. If your venue loads filesystem skills from `.github/skills/` as well as
+    `.claude/skills/`, note that this repo ships nothing under the former. Nothing is asked back.
+
+    LEDGER COVERAGE FOOTNOTE (2026-09-10, TENTH ROLL - a same-day re-roll). 10 commits in
+    `port-base-20260910..port-base-20260910b`, 3 ritual, 7 cited in steps 387-388. **WHY A
+    SECOND TAG THE SAME DAY**, since a reader will ask: the ninth roll was certified and the
+    consumer had not started applying it, and step 387 fixes a defect that would otherwise reach
+    them as a REGRESSION - their own session had already built the same fix on their side, on
+    five canonical-producer paths, so applying the ninth roll would have reverted their work AND
+    reinstated the dead route. Rolling again before the apply is the cheaper of the two, and it
+    is the shape the fifth roll used for the same reason. The ninth roll's steps 368-386 stand
+    unchanged; this range only adds to them, so the consumer applies ONE range,
+    `port-base-20260908..port-base-20260910b`.
+    RED AT PUSH (J77): none in this range. UNVERIFIED (J78): checked at the tag.
 
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
