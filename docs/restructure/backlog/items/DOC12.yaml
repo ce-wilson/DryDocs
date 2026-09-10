@@ -7,7 +7,7 @@ phase: 10
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - .claude/skills/controlm-runbook-automation-excel/template-spec.yaml
@@ -25,3 +25,15 @@ acceptance: |
 notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). Plan 2026-09-09, Phase 2 Lane B row 3. Today only the TEMPLATE renders; use case 1's "minimal docs"
   is this generator.
+
+  CLOSED 2026-09-10 (Lane B, laptop, wip/doc12-laptop). generate_runbook.py beside generate_template.py, run on the bundled samples for three folders including the retired zero-job one; the workbook writes and reads back, and Technical_Details carries the real folder name, SEAL id, application name, upstream dependency folders, script targets and parameter paths.
+
+  THE MEASURED ANSWER, and it corrects this item's own premise. The acceptance says "filling the 31 graph-derivable columns". 31 is right as a count of fields the template DECLARES source: graph (17 Technical_Details + 14 job columns) — but only 11 of them are reachable from what DryDocs ingests today: 6 and 5. The other 20 are declared graph-derivable and no feed reaches them. That is not a shortfall in the generator; it is the gap between what the template claims the graph holds and what the estate actually carries, and it was invisible until something tried to fill the workbook.
+
+  SO THERE ARE THREE OUTCOMES PER CELL, NOT TWO. manual and graph-partial tint yellow and say "needs capture" — the source workbook's own convention, and a request to a PERSON. A graph field the generator can fill gets its value. A graph field it cannot fill gets its own tint, its own marker and its own count, because blank would be indistinguishable from "this folder genuinely has no value here": one is a fact about the folder, the other is a fact about the project, and a support engineer must not have to guess which. Where the cause is DECLARED the cell cites it rather than guessing — Avg Run time names controlm@[db].psgmgr.cm_avg_run, confirmed but not wired, reading the reason from config/source-descriptors.yaml at run time so the note stops being produced the day the dataset is wired. That is LOAD14's wiring-hold vocabulary surfacing in the workbook.
+
+  THE SHARED-QUERY CLAUSE IS GUARDED, not merely intended. This generator issues no Cypher and constructs no client: it imports the -SDLC sibling's loaders by path and reads FolderFacts, so there is exactly one place in the repo that knows how to ask the graph what a folder is. The graph path works by INJECTION — the caller builds the client, calls the shared load_from_graph and hands the facts in — which is why no second place decides how the graph is reached.
+
+  Two instrument defects caught in the guards themselves rather than shipped. (1) The first Cypher guard upper-cased the source, so every Python `return` matched RETURN and the test failed on the generator's own control flow; it now matches case-sensitive Cypher shapes (MATCH\\s*\\(, MERGE\\s*\\(, OPTIONAL\\s+MATCH), verified against the -SDLC generator as a positive control — it trips two of them, this file trips none. (2) The execution-seam half was INERT: tests/source_scan.code_only normalises client.run( to CLIENT . RUN (, so a substring test for ".run(" could never match and the assertion could never fail. It now goes through called_names, which reports {'run'} for the -SDLC generator and nothing here — the guard is known to discriminate rather than assumed to.
+
+  For Lane A, not this item: the template-spec's source: graph labels are optimistic by 20 fields against today's estate. Re-labelling them is a claim about what the graph will hold, not a generator change, so nothing was re-labelled here; the per-run counts report the gap every time instead.
