@@ -76,6 +76,23 @@ RUA_PATH_KIND = "rua_path"
 RUA_PROFILE_KIND = "rua_profile"
 RUA_SCRIPT_KIND = "rua_script"
 
+#: The collector schema tags this parser was written against (LIN4).
+#:
+#: The envelope carried a `schema=` tag that was STAMPED and never READ, so a
+#: bundle from a newer collector parsed to completion and every record it
+#: produced looked exactly as trustworthy as one this parser understands. The
+#: sibling collector reader (`lb_resolution.py`) already checked its own tag the
+#: same way; this one simply never got it.
+#:
+#: A MISMATCH IS A NOTE, NEVER A REFUSAL, and that is not timidity - it is this
+#: module's existing contract. Section dispatch here is on PRESENCE, never on
+#: the tag (see `_read_mounts`: "a bundle that carries the section is read
+#: whatever it calls itself"), because real bundles have shipped a v2-shaped
+#: `scripts.csv` while still wearing the v1 tag. Refusing on the tag would
+#: reject bundles this parser reads correctly today. What was missing is not a
+#: gate; it is the reader being TOLD.
+KNOWN_COLLECTOR_VERSIONS = frozenset({"rua-inventory/v1", "rua-inventory/v2", "rua-inventory/v3"})
+
 #: meta.txt key → the rua_* property stamped on every record (the acceptance's
 #: envelope field list; anything else in meta.txt stays in coverage.meta)
 _ENVELOPE_KEYS = (
@@ -226,6 +243,13 @@ class RuaCoverage:
     cross_host_collisions: int = 0  # id already staged from a DIFFERENT host
     meta: dict[str, str] = field(default_factory=dict)  # the FULL parsed meta.txt
     # (G23's metadata-as-nodes raw material)
+    #: LIN4: free-text observations about the bundle that are not a count -
+    #: today, a collector schema tag this parser does not know. The same channel
+    #: `LbResolutionCoverage` has carried since it was written; LIN4's acceptance
+    #: called it "the existing RuaCoverage notes channel", and re-measured at
+    #: pull it did not exist here - the sibling had it and this one never got it,
+    #: which is the same shape as the missing version check itself.
+    notes: list[str] = field(default_factory=list)
 
     def as_dict(self) -> dict:
         return asdict(self)
@@ -247,6 +271,10 @@ class RuaCoverage:
             f"cross_host={self.cross_host_collisions} | "
             f"mounts={self.mounts_rows} "
             f"scope_unknown={self.mount_scope_unknown_fstype}+{self.mount_unresolved}"
+            # LIN4: a note is not a count, and it must not be silent in the one
+            # line an operator reads. Only rendered when there is one, so the
+            # summary is unchanged for every bundle this parser understands.
+            + (f" | notes={len(self.notes)}" if self.notes else "")
         )
 
 
@@ -375,7 +403,26 @@ class RuaInventoryExtractor:
                 props[prop] = value
             else:
                 coverage.meta_fields_missing += 1
+        self._check_collector_version(coverage)
         return props
+
+    def _check_collector_version(self, coverage: RuaCoverage) -> None:
+        """LIN4: say so when the bundle is newer than this parser.
+
+        Mirrors `lb_resolution.py`'s check deliberately rather than sharing it -
+        the item rules that the two copies of the envelope contract stay two, and
+        the report dates the second so a third knows what it joins.
+
+        An ABSENT tag is not flagged: a bundle with no `schema=` line already
+        counts a missing envelope field, and saying it twice would train the
+        reader to skim the notes channel this fix depends on.
+        """
+        schema_tag = coverage.meta.get("schema", "").strip()
+        if schema_tag and schema_tag not in KNOWN_COLLECTOR_VERSIONS:
+            coverage.notes.append(
+                f"collector schema {schema_tag!r} is newer than this parser knows "
+                f"({sorted(KNOWN_COLLECTOR_VERSIONS)}) - parsed on section presence, as designed"
+            )
 
     # -- mounts.tsv → the storage_scope derivation input (v3, OPTIONAL) ---------
     def _read_mounts(self, bundle_dir: Path, coverage: RuaCoverage) -> _MountTable | None:
