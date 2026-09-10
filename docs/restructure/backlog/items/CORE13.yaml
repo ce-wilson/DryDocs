@@ -75,4 +75,15 @@ notes: |
   (3) The COMPANY's config/dev-environment.yaml will not receive the `neo4j.driver` block, that
   file being canonical-company. It needs adding by hand there, or the company runs on the declared
   fallback - which is correct behaviour, but its numbers are a laptop's, not a corporate network's.
-  Worth an idea/item on the company side rather than silence.
+
+  VERIFIED IN THE MANIFEST rather than quoted from a docstring (§6: check which version of the
+  instrument you are holding). PORT-MANIFEST.yaml row `config/dev-environment.yaml` is
+  `disposition: canonical-company`, and its entry_rule names the exact mechanism this needs: "New
+  producer KEYS/SECTIONS are ADAPTED BY HAND, never adopted: surface the structural delta in the
+  PORT-REPORT and let the consumer fill in its own values." So this is not an idea for the company
+  side to notice - it is a PORT-REPORT line the next port owes it, and the row already carries two
+  live precedents of the same shape (the `plugins:` block in 2026-07-28's port, and PLAN6's
+  `venues:` block). `neo4j.driver` is the third. The values are the company's to decide: a
+  corporate network between a workstation and a database earns larger numbers than a laptop's local
+  container does, and the comment in the producer's file explains each one so that decision has
+  something to reason from.
