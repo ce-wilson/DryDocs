@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-10T13:51:17",
+    "captured_at": "2026-09-10T15:59:52",
     "date": "20260910",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "c78c9d3a",
-      "full": "c78c9d3a46de343cc3f307a6511f3d6c3f9bac23",
+      "commit": "af55a58f",
+      "full": "af55a58f9c38131364353fb6ccc207e70fa67089",
       "branch": "main",
-      "describe": "port-base-20260910-1-gc78c9d3a",
-      "subject": "chore(port): roll - the ninth base is certified, and the eighth joins it as one range",
+      "describe": "port-base-20260910b-1-gaf55a58f",
+      "subject": "chore(port): roll - the tenth base, and the consumer's range is now one of three rolls",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -2237,6 +2237,24 @@
       "name": "handoff.py",
       "extension": ".py",
       "rel_path": ".claude/skills/lane-handoff/scripts/handoff.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/neo4j-db",
+      "name": "neo4j-db",
+      "extension": "",
+      "rel_path": ".claude/skills/neo4j-db",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/.claude/skills/neo4j-db/SKILL.md",
+      "name": "SKILL.md",
+      "extension": ".md",
+      "rel_path": ".claude/skills/neo4j-db/SKILL.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -23851,6 +23869,15 @@
       "kind": "dir"
     },
     {
+      "file_id": "drydocs/internal/agent-platform/company-assistant-venue.md",
+      "name": "company-assistant-venue.md",
+      "extension": ".md",
+      "rel_path": "internal/agent-platform/company-assistant-venue.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/internal/agent-platform/company-sdk-3-adr0007-compatibility.md",
       "name": "company-sdk-3-adr0007-compatibility.md",
       "extension": ".md",
@@ -24805,10 +24832,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260909.json",
-      "name": "drydocs-20260909.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260910.json",
+      "name": "drydocs-20260910.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260909.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260910.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -40469,6 +40496,11 @@
     [
       "drydocs/.claude/skills",
       "CONTAINS",
+      "drydocs/.claude/skills/neo4j-db"
+    ],
+    [
+      "drydocs/.claude/skills",
+      "CONTAINS",
       "drydocs/.claude/skills/oracle-db"
     ],
     [
@@ -41640,6 +41672,11 @@
       "drydocs/.claude/skills/lane-handoff/scripts",
       "CONTAINS",
       "drydocs/.claude/skills/lane-handoff/scripts/handoff.py"
+    ],
+    [
+      "drydocs/.claude/skills/neo4j-db",
+      "CONTAINS",
+      "drydocs/.claude/skills/neo4j-db/SKILL.md"
     ],
     [
       "drydocs/.claude/skills/oracle-db",
@@ -53459,6 +53496,11 @@
     [
       "drydocs/internal/agent-platform",
       "CONTAINS",
+      "drydocs/internal/agent-platform/company-assistant-venue.md"
+    ],
+    [
+      "drydocs/internal/agent-platform",
+      "CONTAINS",
       "drydocs/internal/agent-platform/company-sdk-3-adr0007-compatibility.md"
     ],
     [
@@ -53924,7 +53966,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260909.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260910.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -57751,13 +57793,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 3197,
+    "files": 3199,
     "edges": 2065,
     "circular_files": 34,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 3531,
-    "directories": 335
+    "rels": 3534,
+    "directories": 336
   }
 }
