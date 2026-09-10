@@ -321,6 +321,53 @@ produces confident numbers nobody can trust is worse than no instrument.
 **What this does NOT claim.** Nothing reads this column. It is a decision recorded once so it
 is not re-litigated per session, which is the same and only value `model:` has.
 
+## Venue capability — the axis this plan does not have, and must before Phase 5
+
+**READ THIS BEFORE WRITING THE EDITION'S AGENT, SKILL OR WORKFLOW LAYER.** Added 2026-09-10
+after a company-side session ran into it live. The two sections above assign a MODEL and an
+EFFORT per unit. Both assume the work can be dispatched at all. That assumption is false in
+at least one venue this repo already ships to, and the plan has no place to say so.
+
+**The measurement** (`dispositions.classify` at `6ae7a0e9`): the capability layer has THREE
+reachability classes and the tree distinguishes none of them.
+
+| what | where it lives | reaches a consumer? |
+|---|---|---|
+| filesystem skills (`.claude/skills/**`, 47) and sub-agents (`.claude/agents/*.md`, 5) | tracked, canonical-producer | **yes**, wholesale |
+| `neo4j-skills` (the Neo4j reference this repo routes ALL Neo4j work to) | a Claude Code plugin, outside the repo | **no**, never |
+| `skillOverrides` enablement (`.claude/settings.local.json`) | untracked and gitignored | **no**, never |
+
+So an edition can ship five agent definitions and forty-seven skills to a team whose venue
+dispatches none of them, route every Neo4j task to a plugin they cannot install, and report
+success. **The failure is silent by construction** — a routing table that names an
+unreachable tool produces no error, just an absent lens.
+
+**The seam is one key wide and the precedent chain is already built.**
+`config/dev-environment.yaml` is the declared-never-inferred file — `edition:` (PLAN2),
+`side:` (PORT11), and a `venues:` map (PLAN6) whose entries are already `available:` plus
+prose naming the skill they gate (`oracle-replica` → "the oracle-db skill acts on it"). It
+has no code for the ASSISTANT venue: whether plugins load, whether sub-agents dispatch,
+whether an override file is read. It is canonical-company, so each side declares its own
+answer and a port never overwrites it. Its own header states the rule this is a worked
+example of: declared never inferred, because a guess *"guesses wrongly on exactly the tree
+least able to notice."*
+
+**And it has already cost work, which is the part that makes it urgent rather than tidy.** A
+company-side session diagnosed the dead Neo4j route itself and started fixing it — authoring
+a repo-local skill and correcting `CLAUDE.md` §2 and three `reference/` files. All five paths
+are canonical-producer, so the next apply replaces them silently. This is J41 check 3
+repeating with one difference that matters: check 3 covers producer actions the producer
+knows it owes, and **nobody asked them to do this** — the producer's own routing table sent a
+task to something unreachable and a competent session fixed it on the wrong side of a one-way
+port. No guard can see that shape. The standing rule to carry into the edition: **a dead route
+in a canonical-producer document is a producer defect that bills the consumer.**
+
+Captured as `Idea-311` (the three classes and the `venues:` seam), `Idea-312` (the dead Neo4j
+route, and the producer build it owes) and `Idea-313` (whether agent dispatch survives the
+port, plus the `model:` vs agent-frontmatter conflict noted above). Instance detail, with the
+`[SME-REPORTED]` / `[VERIFIED-PRODUCER]` split kept explicit, is in
+`internal/agent-platform/company-assistant-venue.md`.
+
 ## What this plan refuses
 
 - Building `wired`, the outcome type, or any TE code before its ruling: the D2 fence (scoped), ADR 0021 unaccepted, ADR 0015 unratified — the G125-depends-on-ADR shape.

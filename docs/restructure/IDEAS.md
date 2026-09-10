@@ -110,6 +110,82 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
+- **`Idea-311`** · 2026-09-10 · `[idea]` · **open** · prio? **High** —
+  **The capability layer has THREE reachability classes and the tree declares none of them —
+  and `config/dev-environment.yaml` `venues:` is already the right shape for the fix.** Measured
+  2026-09-10 at `6ae7a0e9`: `.claude/skills/**` (47) and `.claude/agents/*.md` (5) are tracked and
+  canonical-producer, so they cross WHOLESALE; `neo4j-skills` is a Claude Code PLUGIN living outside
+  the repo, so it crosses NEVER; and the `skillOverrides` enablement state in
+  `.claude/settings.local.json` classifies canonical-producer by the `.claude/**` glob while being
+  untracked and gitignored, so it also crosses never. Three classes, one undifferentiated tree. A
+  consumer receives every definition, no plugin and no enablement, and nothing tells them which is
+  which. **This is a Teams Edition question, not a company one**: the edition exists to be deployed
+  by a team whose assistant venue is unknown at authoring time, so an undeclared venue dependency
+  fails for them the way it already failed once — silently, by routing work to something that is not
+  there. THE SEAM IS ONE KEY WIDE and the precedent chain is already built: that file is the
+  declared-never-inferred file, carrying `edition:` (PLAN2), `side:` (PORT11) and a `venues:` map
+  (PLAN6) whose entries are literally `available:` plus prose naming the skill they gate
+  (`oracle-replica` → "the oracle-db skill acts on it"). It has no code for the ASSISTANT venue —
+  whether plugins load, whether sub-agents dispatch, whether an override file is read. It is
+  canonical-company, so each side declares its own answer and a port never overwrites it, and its own
+  header already states the rule this is a worked example of: declared never inferred, because a
+  guess "guesses wrongly on exactly the tree least able to notice". Instance detail and the
+  `[SME-REPORTED]` / `[VERIFIED-PRODUCER]` split are in `internal/agent-platform/company-assistant-venue.md`.
+  **Target: the Teams Edition plan's agent/skill/workflow phase — read this BEFORE that phase is
+  written, not after.**
+
+- **`Idea-312`** · 2026-09-10 · `[bug]` · **open** · prio? **High** —
+  **`CLAUDE.md` §2 routes EVERY Neo4j task to a plugin, unconditionally, and that route is dead in
+  any venue that is not Claude Code.** The §2 table's Neo4j row names `neo4j-skills` as how to call
+  the platform, and the trim note beneath it spends four paragraphs on keeping the plugin healthy —
+  all of it correct on a Claude Code venue and all of it unreachable elsewhere, with no condition in
+  the table saying so. The consequence is not a missing feature but a MISSING LENS that announces
+  nothing: a session in such a venue does Neo4j work with no reference at all and has no way to
+  notice, which is the same disease as the 2026-07-06 `aura-*` deletion that took all Neo4j reference
+  offline until 07-31 while this same table kept routing work to it. Note what §2 already gets right
+  and should be copied rather than reinvented: the `oracle-db` row DOES carry its venue reasoning
+  ("OFF producer-side ... the producer has no live Oracle connection"). The Neo4j row carries none.
+  Two candidate fixes, and they are not exclusive: (a) give the table a per-row venue condition
+  keyed to Idea-311's declaration; (b) author a repo-local `.claude/skills/neo4j-db/SKILL.md` from
+  what the repo already holds (`reference/platforms/neo4j/README.md`, `drydocs_core/schema/`,
+  `neo4j_client.py`, ADR 0005), which is the only route that gives a NON-Claude-Code venue a loadable
+  Neo4j lens and mirrors how `controlm-db` and `oracle-db` already work. **(b) is producer-side work
+  that needs no edition and should be done NOW**; (a) waits on 311. Do not delete the plugin route —
+  it is correct here.
+  **KEPT-UPDATED 2026-09-10 — this stopped being hypothetical the same afternoon.** A company-side
+  session diagnosed the dead route on its own and began building exactly (b): a repo-local
+  `neo4j-db` skill plus corrections to `CLAUDE.md` §2, `reference/REGISTRY.yaml`,
+  `reference/platforms/README.md` and `reference/platforms/neo4j/README.md`. All FIVE of those paths
+  are `canonical-producer` (measured by `dispositions.classify` at `6ae7a0e9`), so the next apply
+  takes each wholesale and the work is silently replaced — not conflicted, not flagged. That is J41
+  check 3 repeating ("every producer action triggered by company state is landed"), except that
+  check's motivating incident was a producer plan ASKING the company to edit a canonical-producer
+  file, and here nobody asked: the producer's own routing table sent a task to something
+  unreachable and a competent session fixed it on the wrong side of a one-way port. **No guard can
+  catch this shape** — check 3 is a producer-side check over producer-side intent and cannot see
+  work a consumer starts on its own initiative. The standing lesson is what this entry is really
+  for: **a dead route in a canonical-producer document is a producer defect that bills the
+  consumer**, in the one currency they cannot recover. Their draft is the spec for the producer
+  build; back-flow it as mechanism, not as an instance. Detail and the measured table in
+  `internal/agent-platform/company-assistant-venue.md` §5.
+
+- **`Idea-313`** · 2026-09-10 · `[question]` · **open** · prio? **Med** —
+  **Five agent definitions cross the port wholesale; whether the receiving venue can DISPATCH them
+  is unmeasured — and a second, separate defect means an item's `model:` is already a lie in one
+  case.** Two things that both live in the agent tier and should be groomed together. FIRST, the open
+  question: `.claude/agents/*.md` are canonical-producer and arrive on the consumer's tree whether or
+  not that venue runs sub-agents, so an edition may be shipping five inert files and calling it a
+  capability. Nobody has measured this — the producer cannot read the other tree and the session that
+  reported the venue did not test dispatch — so it is a question, not a finding, and Idea-311's
+  declaration is where the answer would be recorded. SECOND, a latent defect found 2026-09-10 while
+  checking what `model:` actually does: an item carrying `model: fable` whose `agent:` is
+  `backlog-groomer` RUNS ON OPUS, because `.claude/agents/backlog-groomer.md` pins opus in its
+  frontmatter and nothing reconciles the two. The item field is validated against a closed enum and
+  then only PRINTED (a board chip, a handoff-table column); the agent file is what the harness reads
+  at dispatch. So the board can display a model the run will not use. Cheapest honest fix is a guard
+  that fails when an item names both an `agent:` and a `model:` the agent file contradicts — the item
+  should say nothing, or say the same thing.
+
 - **`Idea-310`** · 2026-09-10 · `[chore]` · **open** · prio? **Med** —
   **`internal/` is twenty top-level entries with four different jobs, and no rule says which is
   which — the classification belongs in the Team Edition Phase 1 carve, not in a path fix.**
