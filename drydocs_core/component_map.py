@@ -244,6 +244,25 @@ DECLARED_COMPONENT_IMPORTS: dict[str, tuple[str, ...]] = {
     # query_specs + guard into drydocs_core, per MODULE_MAP's "Future, land in core"
     # list. This entry records today's reality until that ruling is made.
     "agents.common.specs_catalog": ("drydocs_api",),
+    # GRAPH1 (2026-09-10). The port's pre-merge snapshot writer runs the
+    # remediation detector so the "before" side of a reconcile carries the same
+    # conformance findings the "after" side will - comparing a port against a
+    # baseline that was measured with a different instrument would make every
+    # difference unattributable.
+    #
+    # It reaches it through `importlib.import_module("drydocs_remediation.detect")`,
+    # which is a real crossing and was invisible until this item taught the AST
+    # walk the dynamic form. The dynamic call is not an evasion: the snapshot
+    # writer treats the detector as OPTIONAL (the J51 list-shaped snapshots are
+    # written only where their module imports), and a static import would make a
+    # component that may legitimately be absent into a hard dependency of the
+    # port tier.
+    #
+    # DECLARED rather than removed, because the alternative is worse: routing the
+    # detector through core would put conformance RULES in core, and core holds
+    # no rules. The staleness test now protects this line, so the day the import
+    # goes the declaration fails rather than rotting.
+    "drydocs.port.reconcile_before": ("drydocs_remediation",),
 }
 
 # ---- the join to the backlog's module registry (ADR 0018 D2) ------------------------------
@@ -330,3 +349,105 @@ def module_of(component: str) -> str:
 
 def _matches(module: str, prefixes: tuple[str, ...]) -> bool:
     return any(module == p or module.startswith(p + ".") for p in prefixes)
+
+
+# ── CORE12 (2026-09-10): WHAT OF CORE IS PUBLIC ──────────────────────────────
+#
+# The third axis, and the one the core report (2026-09-07, S6/T5) said core did
+# not have: not who may import core (CORE_PREFIXES), not what a component owns
+# (COMPONENT_GROUPS), but WHICH OF CORE'S OWN MODULES a component may name.
+#
+# THE MEASUREMENT THAT DECIDED THE SHAPE. The report counted 22 of 34 modules
+# imported by components from outside `__all__`. Re-measured at HEAD, it is 32
+# of 39 - and the interesting half is the other seven: EVERY top-level module
+# and subpackage in core is imported from outside it. There are no internals.
+# So the question was never "sort the existing modules into public and private";
+# it is that core has no line at all, and every module added to it becomes
+# public by accident. The gap widened by ten in three days, which is the
+# report's "compounds fastest" playing out.
+#
+# WHY A REGISTRY AND NOT `__all__` (the ruling; the ADR draft is in CORE12's
+# item notes for Lane A to mint):
+#
+#   1. `__init__.py` EAGERLY imports the seven names in `__all__`. Growing that
+#      list to 39 would make `import drydocs_core` pull in yaml, neo4j,
+#      pydantic-settings and the rest - and this repo already guards import
+#      order and cost with a subprocess-per-import test (S13,
+#      tests/unit/test_cli_import_order.py) because that gap once shipped a
+#      cycle. A contract must not be paid for at import time.
+#   2. `__all__` governs `from drydocs_core import *`, which nothing in this
+#      repo does. It is the wrong instrument: it declares names for star-import,
+#      not an import contract between packages.
+#   3. A declared registry plus a default-deny guard is what this repo already
+#      does everywhere else it needs one - CORE_PREFIXES and COMPONENT_GROUPS
+#      above, `drydocs_core.check_outcome.PROBES` for probes, `MODULE_MAP.md`
+#      rows for placement. Registration is the act. A name that is not here is
+#      not importable by a component, and the guard says so by name.
+#
+# `__all__` in `__init__.py` therefore stays as it is - a correct star-import
+# surface - and its docstring points here for the contract.
+#
+# WHAT THIS LIST IS NOT: an endorsement that all 39 should be public. It is the
+# contract AS IT STANDS, recorded so it can be argued with. Narrowing it is a
+# later item and a real decision, per module, with the call sites in hand.
+# What it buys today is that module 40 cannot slip in undeclared: adding a core
+# module a component imports now means adding its name HERE, which is the moment
+# someone has to decide whether it belongs in the contract at all.
+#
+# Grouped by what each is FOR, so a new module lands in a group rather than at
+# the end of an alphabetical list - the group is the first question to answer
+# about it.
+PUBLIC_MODULES: frozenset[str] = frozenset(
+    {
+        # -- the historical contract: the seven `__init__.py` eagerly imports --
+        "adapters",
+        "config",
+        "models",
+        "ontology",
+        "orchestration",
+        "precedence",
+        "source_registry",
+        # -- paths and roots. `repo_paths` is the most-imported module in core
+        #    (31 component call sites) and was the report's headline: nothing
+        #    declared it was ever promised, so changing its signature was either
+        #    a routine edit or a breaking change to a third of the repo, and the
+        #    package did not say which. It says now.
+        "repo_paths",
+        "data_root",
+        "data_zones",
+        "landing_zones",
+        "env_refs",
+        "env_doctor",
+        # -- the graph seam --
+        "neo4j_client",
+        "notifications",
+        "cypher_split",
+        "schema",
+        # -- logging and run records --
+        "run_log",
+        "log_kinds",
+        "log_estate",
+        # -- declared configuration and registries --
+        "source_descriptors",
+        "source_bindings",
+        "registry_view",
+        "mapping_store",
+        "manual_mappings",
+        "data_centers",
+        "console_personas",
+        "edition_registry",
+        "component_map",
+        "yaml_fragments",
+        # -- planning and documentation surfaces --
+        "backlog_store",
+        "docs",
+        "docs_verify",
+        "doc_anchors",
+        "glossary",
+        "ui_concepts",
+        # -- typed results and analysis --
+        "check_outcome",
+        "entity_extract",
+        "fix_tracking",
+    }
+)

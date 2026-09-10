@@ -7,7 +7,7 @@ phase: 6
 agent: main
 model: fable
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs_core/__init__.py
@@ -23,3 +23,138 @@ notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). core-2026-09-07.md candidate 4 (S6/T5). Slot 10 (seams) was asked whether a second axis belongs
   beside who-may-import-core; its answer is that the invariant holds and the question is a ruling,
   not a defect.
+
+  CLOSED 2026-09-10 (Lane B, laptop, wip/core12-laptop, BASED ON MAIN - it writes __init__.py,
+  component_map.py and the boundary test, none of which the other five Lane B branches touch).
+  Venue (J18): offline; the guard is a source scan and needs nothing but the tree.
+
+  THE MEASUREMENT CHANGED THE QUESTION, so it goes first. The report counted 22 of 34 modules
+  imported by components from outside __all__. Re-measured at HEAD: 32 of 39 - the gap widened by
+  ten in three days, which is the report's own "compounds fastest" prediction happening while the
+  item sat in the backlog. But the number that decided the shape is the other one: EVERY top-level
+  module and subpackage in core, 39 of 39, is imported from outside core. There are no internals.
+  So this was never "sort the existing modules into public and private" - core has no line AT ALL,
+  and every module added to it becomes public by accident. That reframes what a fix is for: not
+  tidying today's list, but making the fortieth module a decision instead of an omission.
+
+  THE RULING - the boundary test gains the second axis, backed by a declared registry. Of the three
+  shapes the acceptance offered, this is the third, and the reasons the other two lose are concrete
+  rather than aesthetic.
+
+  (1) GROW __all__ - rejected on a cost this repo has already paid once. __init__.py EAGERLY
+  imports the seven names in __all__, so growing it to 39 makes `import drydocs_core` pull in yaml,
+  neo4j and pydantic-settings. The repo guards import order and cost with a subprocess-per-import
+  test (tests/unit/test_cli_import_order.py) precisely because that gap shipped a cycle (S13). A
+  contract must not be paid for at import time. There is a plain category error underneath it too:
+  __all__ governs `from drydocs_core import *`, which nothing in this repo does, so it declares
+  names for star-import rather than an import contract between packages.
+
+  (2) MARK INTERNALS BY CONVENTION - rejected because the measurement says there is nothing to
+  mark. Zero of core's 39 are internal today. A convention with no members is one nobody learns,
+  and it would still leave module 40 public by default, which is the actual defect.
+
+  (3) A DECLARED REGISTRY, DEFAULT-DENY - chosen. PUBLIC_MODULES sits in
+  drydocs_core/component_map.py beside CORE_PREFIXES and COMPONENT_GROUPS - the object that already
+  holds the other two axes and is already read by three consumers (the boundary test, the
+  MODULE_MAP renderer, the Team Edition copier). It is this repo's own idiom for exactly this kind
+  of question, where registration IS the act. __all__ stays as it is, a correct star-import
+  surface, and __init__.py's docstring now points at the contract so the two are not confused
+  again.
+
+  WHAT THE LIST IS NOT - an endorsement that all 39 should be public. It is the contract AS IT
+  STANDS, recorded so it can be argued with. Narrowing it is a later item and a real per-module
+  decision with the call sites in hand. repo_paths - 31 component call sites, the report's headline
+  - is now declared, which is what the acceptance asked for it: the package says it was promised,
+  so changing its signature is knowably a breaking change rather than ambiguously one.
+
+  THREE GUARDS, because a default-deny guard that scanned nothing is green - the ADR 0021 disease
+  applied to a test rather than to a probe:
+  - the deny path itself, MEASURED: removing repo_paths from the contract fires it with 54
+    violations, each naming the importing module and the import;
+  - shrink-only in the other direction, like check_outcome.PROBES - a declared name that no longer
+    resolves fails, so the contract cannot outlive its modules;
+  - an anti-vacuity check that the scan saw component imports of core at all.
+
+  THE RENDER DID NOT MOVE, checked rather than assumed: scripts/render_module_map.py reads
+  CORE_PREFIXES, COMPONENT_GROUPS, COMPONENT_MODULE and SURFACE_OWNERS only, so adding a fourth
+  name to component_map.py leaves MODULE_MAP.md byte-identical. No render rides with this item.
+
+  ADR DRAFT FOR LANE A, paste-ready. The acceptance nominates the title "what of core is public".
+  Lane A mints the number and the docs/decisions/README.md row - that index is the `adr` pen, so
+  this lane drafts only. Requested status line - PROPOSED, drafted 2026-09-10 by Lane B (laptop)
+  from docs/reviews/modules/core-2026-09-07.md S6/T5.
+
+  # ADR NNNN - What of core is public: a declared registry, not __all__
+
+  ## Context
+
+  drydocs_core is the one package every component may import (ADR 0002-a, enforced by
+  tests/unit/test_module_boundary.py). Until CORE12 the guard asked only WHETHER a component may
+  import core, never WHICH of its modules - so the answer to the second question was "all of them,
+  by omission".
+
+  Measured 2026-09-10: core has 39 top-level modules and subpackages and ALL 39 are imported from
+  outside core. __init__.py's __all__ names seven. The most-imported module in the package,
+  repo_paths with 31 component call sites, is not among them.
+
+  The consequence is not that the wrong things are public. It is that no refactor of a core module
+  can determine what it is allowed to break: changing repo_paths is either a routine internal edit
+  or a breaking change to a third of the repo, and nothing in the package says which.
+
+  ## Decision
+
+  D1 - The import contract is drydocs_core.component_map.PUBLIC_MODULES, a declared frozenset of
+  module names, grouped by purpose with the reason attached to each group.
+
+  D2 - tests/unit/test_module_boundary.py enforces it DEFAULT-DENY: a component importing
+  drydocs_core.<x> where <x> is not declared fails, and the failure names the module and every call
+  site. Adding the name is the decision; the guard is what forces someone to take it.
+
+  D3 - __all__ is NOT the contract and is not grown. It is the star-import surface - the seven
+  names __init__.py eagerly imports - and it stays correct as that. __init__.py's docstring points
+  at D1 so the two are not confused again.
+
+  D4 - The contract is at MODULE granularity. A component reaching a symbol inside a public module
+  is inside the contract however deep it goes; the unit of decision is the module, because that is
+  the unit a refactor moves.
+
+  D5 - Today's list is the contract AS IT STANDS, not an endorsement. Narrowing it is a later item,
+  per module, with the call sites in hand.
+
+  ## Options considered
+
+  A - Grow __all__ to 39 (rejected): __init__.py eagerly imports those names, so the contract would
+  be paid at import time, in a repo that already guards import cost with a subprocess-per-import
+  test after that gap shipped a cycle. And __all__ governs star-import, which nothing here does.
+
+  B - Mark internals by convention, underscore or otherwise (rejected): zero of 39 are internal
+  today, so the convention would have no members, and module 40 would still be public by default -
+  the actual defect.
+
+  C - A declared registry with a default-deny guard (chosen).
+
+  D - Do nothing; the invariant holds (rejected, but it is the honest baseline). Slot 10 was asked
+  whether a second axis belongs and answered that this is a ruling, not a defect. True - and a
+  ruling that is never made is how the count went from 22 to 32 in three days.
+
+  ## Consequences
+
+  - Adding a core module that a component imports now requires adding its name to PUBLIC_MODULES,
+    in a group, with a reason. That is the intended friction and the whole value.
+  - A core module can be made genuinely internal by leaving it out, and the guard enforces it.
+    Nothing is internal today; the mechanism exists for when something should be.
+  - The contract is 39 names wide, which is wide. It is honest rather than aspirational, and D5
+    leaves narrowing to a later decision rather than smuggling it in here.
+  - The Team Edition copier and the MODULE_MAP renderer read component_map.py and are unaffected -
+    verified: the renderer reads four other names and MODULE_MAP.md is byte-identical.
+
+  ## Action items (after acceptance)
+
+  1. A narrowing pass - for each of the 39, is it contract or accident? Per module, with call
+     sites. Needs a Lane A mint; not CORE12's.
+  2. When the first genuinely internal core module appears, leave it out of PUBLIC_MODULES and let
+     the guard hold the line. No new mechanism needed.
+
+  For Lane A, not this item: action item 1 needs MINTING. It is the only follow-on and it is
+  deliberately not attempted here - narrowing a 39-name contract module by module is a different
+  and larger piece of work than declaring it.

@@ -18,6 +18,16 @@ Usage::
     from drydocs_core import models, orchestration
     from drydocs_core.orchestration import controlm
     client = drydocs_core.Neo4jClient(uri, user, password, database="drydocs")
+
+WHAT OF CORE IS PUBLIC IS NOT ``__all__`` (CORE12, 2026-09-10). ``__all__`` below
+is the star-import surface and is correct as that; the IMPORT CONTRACT — which of
+core's 39 modules a component may name — is
+``drydocs_core.component_map.PUBLIC_MODULES``, enforced default-deny by
+``tests/unit/test_module_boundary.py``. The two are deliberately different
+objects: the seven names here are EAGERLY imported, so growing this list to the
+whole contract would make ``import drydocs_core`` pull in yaml, neo4j and
+pydantic-settings, and a contract must not be paid for at import time. The
+reasoning, and the measurement behind it, sit with the registry.
 """
 
 from . import adapters, config, models, ontology, orchestration, precedence, source_registry
