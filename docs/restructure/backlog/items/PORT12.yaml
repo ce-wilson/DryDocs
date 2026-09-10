@@ -7,13 +7,72 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: todo
 depends_on: []
 inputs:
 - PORT-MANIFEST.yaml
 - drydocs/port/port_completeness.py
+- drydocs/port/dispositions.py
 - tests/unit/test_port_reconcile_guards.py
 acceptance: |
-  PLACEHOLDER - body follows the stub push (mint rule I6).
+  (a) A producer-side check over a roll range reports every SPLIT PAIR: a name that the range
+  ADDS to a file the consumer must hand-merge, and that the same range also adds a reference to
+  from a file that crosses on its own. The two classes come from the ONE classifier in
+  `drydocs/port/dispositions.py`, never a second reading of the manifest: `canonical-producer`
+  and `clean-add` cross unattended; `evaluate` (including every path that falls to the default
+  through `default_ok`), `per-entry` and `canonical-company` need a hand. `derived` is neither -
+  it is regenerated - and `never-port` is excluded, as it already is in the completeness check.
+  (b) THE PRECISION IS THE POINT AND IT IS WHAT MAKES THIS BUILDABLE. A check that reported
+  every commit touching both `drydocs/**` and `drydocs_core/**` would report most commits in the
+  repo and be switched off within a week. The pair is: a symbol DEFINED (a new `def` or `class`
+  at module or class scope) in a hand-merge file inside the range, AND newly REFERENCED from an
+  unattended file inside the same range. Both halves are read as code through
+  `tests/source_scan.py` (J66), never as raw substrings over the diff.
+  (c) It REPORTS, never gates. A split commit is legitimate - the dispositions are right and
+  `drydocs_core/**` is evaluate-on-collision for a reason the manifest states - so what the
+  split owes is a RELAY LINE naming the pair, not a refusal. Three outcomes and no silence
+  (ADR 0021): pairs found, checked-clean over a named range, or NOT CHECKED with its reason (an
+  unresolvable base is the case `port_preflight` already had).
+  (d) THE POSITIVE CONTROL IS G130 AND THE ITEM IS NOT DONE WITHOUT IT. Run over the range that
+  carried `01761011`, the check must name `constraints_detail` - defined in
+  `drydocs_core/neo4j_client.py` (evaluate) and called from `drydocs/cli_schema.py`
+  (canonical-producer) in that one commit. A guard for a defect shape that cannot find the
+  instance the shape was drawn from has not been shown to work.
+  (e) The roll close runs it and the PORT-REPORT carries its verdict line, on the shape
+  `port_completeness_check.py` already uses; the `reconcile-port` skill's close step names it.
+  NOT in scope, and each refused for a stated reason. Re-dispositioning
+  `drydocs_core/neo4j_client.py` to canonical-producer: that is a ruling about a file both sides
+  authored, it needs to know how the company's copy diverges, and it belongs to the port
+  boundary rather than inside a guard item - if the answer is yes it is its own row with its own
+  reason. Making the check a gate. Extending it to non-Python surfaces. And repairing the
+  company's tree, which is theirs and is carried by relay.
 notes: |
-  Stub minted 2026-09-10 (Lane A, desktop; pen backlog). Body in the next commit.
+  Minted 2026-09-10 (Lane A, desktop; pen backlog) from a company-reported bootstrap failure,
+  producer-side verified by command the same day.
+  WHAT WAS REPORTED: `drydocs bootstrap` on the company instance raised
+  `AttributeError: 'Neo4jClient' object has no attribute 'constraints_detail'` at
+  `drydocs/cli_schema.py:346`. Their declared constraints were all present - the D8 guard's
+  missing list was empty - so this is not a schema defect and no constraint is wrong on either
+  side. The crash is in the INVERSE check G130 added, one line later.
+  WHAT IS TRUE HERE, by command rather than by inference: `01761011` (G130, 2026-08-30) added
+  all three halves of that call chain in ONE commit - `constraints_detail` on the client,
+  `undeclared_constraints` in `drydocs_core/schema/constraints.py`, and the caller in
+  `drydocs/cli_schema.py`. Producer-side 55 constraints are declared, `config/dev-environment.yaml`
+  pins 55, and the constraint guards are green.
+  THE MECHANISM, and it is a disposition split rather than a mistake by anyone. Their traceback
+  shows the import on the line above SUCCEEDING and the caller running, so their tree holds both
+  canonical-producer files and took them wholesale, exactly as the manifest says to. The fourth
+  file, `drydocs_core/neo4j_client.py`, resolves through `default_ok` to the DEFAULT, which is
+  evaluate-on-collision because both sides authored it - so it waits on a hand-merge, and the
+  sixteen-line method did not make it. Three quarters of one commit crossed unattended and the
+  quarter the other three need did not.
+  WHY THIS IS A CLASS AND NOT AN INCIDENT: the same shape is available to every commit whose
+  caller lives under a canonical-producer path and whose callee lives in core. G130 has been in
+  every roll since `port-base-20260901`, so the break sat latent for ten days and surfaced only
+  when someone ran `bootstrap` against a reachable database - there is no earlier signal,
+  because an unreferenced missing method raises nothing until it is called.
+  RELATED AND DELIBERATELY SEPARATE: the immediate unblock is one method on their client and
+  travels as a relay line, which does not wait on this build. PORT6's completeness check answers
+  a different question - whether a PATH ever arrived - and would never have seen this, because
+  every path involved is present on both sides. This is about what is INSIDE two files that
+  arrived by different routes.

@@ -4029,6 +4029,46 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   and your `side:` is what says which one you are in. The choice is yours and the producer holds
   no opinion on it. Nothing is asked back.
 
+- **RELAY-56 - `drydocs bootstrap` RAISES AN AttributeError ON YOUR INSTANCE, AND IT IS ONE
+  MISSING METHOD, NOT A CONSTRAINT PROBLEM** [SME-REPORTED, PRODUCER-VERIFIED] (2026-09-10,
+  producer verification venue desktop, by command over this tree). You reported
+  `AttributeError: 'Neo4jClient' object has no attribute 'constraints_detail'` at
+  `drydocs/cli_schema.py:346`. FIRST, the reassuring half: your declared constraints are fine.
+  The D8 guard ran and its missing list was empty, so every declaration landed; the crash is one
+  line later, in the INVERSE check G130 added - what is live that nobody declared. No constraint
+  is wrong on either side and nothing about your schema needs attention because of this.
+  THE FIX IS ONE METHOD on your `drydocs_core/neo4j_client.py`, and nothing else in that file
+  needs to move:
+
+  ```python
+  def constraints_detail(self) -> tuple[dict, ...]:
+      """Name, kind, entity, labels and properties for every live constraint (G130)."""
+      return tuple(
+          dict(r)
+          for r in self.run(
+              "SHOW CONSTRAINTS YIELD name, type, entityType, labelsOrTypes, properties "
+              "RETURN name, type, entityType, labelsOrTypes, properties ORDER BY name"
+          )
+      )
+  ```
+
+  WHY YOU HAVE THREE QUARTERS OF ONE COMMIT, because the reason is more useful than the patch.
+  `01761011` (G130, 2026-08-30) added all three halves of that call chain together:
+  `constraints_detail` on the client, `undeclared_constraints` in
+  `drydocs_core/schema/constraints.py`, and the caller in `drydocs/cli_schema.py`. Your
+  traceback shows the import on the line above succeeding and the caller running, so you hold
+  both of the canonical-producer files and took them wholesale - exactly as the manifest says
+  to. The fourth file resolves through `default_ok` to the DEFAULT, which is
+  evaluate-on-collision because both sides authored it, so it waited on a hand-merge and the
+  sixteen lines did not make it. Nobody did anything wrong; the commit was split across two
+  dispositions and only one of them crosses unattended. G130 has been in every roll since
+  `port-base-20260901`, and an uncalled missing method raises nothing until it is called, which
+  is why it sat this long.
+  PRODUCER-SIDE FOLLOW-UP, so you do not have to watch for the next one: PORT12 is minted to
+  report this shape at roll time - a name added to a hand-merge file in a range and newly
+  referenced from an unattended file in the same range - with G130 as its positive control. When
+  it lands, a split pair arrives as a relay line naming both halves. Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
