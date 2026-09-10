@@ -228,7 +228,7 @@ Index: [`reference/REGISTRY.yaml`](reference/REGISTRY.yaml)
 
 | Platform | What it is | How to call it |
 |----------|-----------|----------------|
-| **Neo4j** | the graph platform itself | `neo4j-skills` plugin — trimmed locally to 10 skills: cypher, modeling, import, document-import, graphrag, vector-index, gds, driver-python, query-tuning, security (see the trim note below) + [`reference/platforms/neo4j/`](reference/platforms/neo4j/README.md) |
+| **Neo4j** | the graph platform itself | **[`.claude/skills/neo4j-db/`](.claude/skills/neo4j-db/SKILL.md) FIRST — it is a filesystem skill, so it loads in EVERY venue** and is authoritative for THIS graph (topology, dialect boundary, client API, the failure modes already paid for). Then, **under Claude Code only**, the `neo4j-skills` plugin for version-current vendor Neo4j — trimmed locally to 10 skills: cypher, modeling, import, document-import, graphrag, vector-index, gds, driver-python, query-tuning, security (see the trim note below). They are COMPLEMENTS. A venue with no plugin loader (VS Code / Copilot) resolves every `neo4j-skills:*` route to NOTHING, with no error and no lens — which is why the repo-local skill is named first. + [`reference/platforms/neo4j/`](reference/platforms/neo4j/README.md) |
 | **Ontology standards** | PROV-O, W3C ORG, DPROD/EKGF, **SOSA/SSN**, DCAT, SKOS | [`reference/standards/`](reference/standards/README.md) |
 | **Academic research** | papers backing modeling choices | [`reference/research/`](reference/research/README.md) |
 

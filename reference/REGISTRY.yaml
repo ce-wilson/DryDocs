@@ -19,10 +19,16 @@ platforms:
   - id: neo4j
     role: graph-platform
     summary: >
-      The graph database DryDocs is built on. Primary reference is the neo4j-skills
-      plugin (cypher, modeling, import, document-import, graphrag, vector-index,
-      gds, aura-*, security, query-tuning, kafka, spark). Use those skills first.
-    skills_prefix: "neo4j-skills:"
+      The graph database DryDocs is built on. PRIMARY reference is the repo-local
+      skill .claude/skills/neo4j-db/ — a filesystem skill, so it loads in every venue,
+      and it is authoritative for THIS graph (topology, dialect boundary, client API,
+      known failure modes). SECONDARY, and Claude Code ONLY, is the neo4j-skills plugin
+      for version-current vendor Neo4j: cypher, modeling, import, document-import,
+      graphrag, vector-index, gds, driver-python, query-tuning, security. That list is
+      the local keep-10 declared in CLAUDE.md section 2 and is the authority; this entry
+      previously named twelve, including aura-* (deleted 2026-07-06), kafka and spark,
+      none of which are installed.
+    skills_prefix: "neo4j-skills:"      # Claude Code only; resolves to nothing elsewhere
     repos:
       - https://github.com/neo4j/neo4j
       - https://github.com/neo4j/neo4j-graphrag-python
@@ -61,8 +67,9 @@ platforms:
     role: data-platform-source
     status: placeholder            # expansion target — DryDocs INGESTS nothing from it yet
     summary: >
-      Future data platform for DryDocs' own use. Neo4j graph-analytics-on-Snowflake reference
-      available via neo4j-skills:neo4j-snowflake-graph-analytics-skill when activated.
+      Future data platform for DryDocs' own use. There is NO live reference route today:
+      neo4j-skills:neo4j-snowflake-graph-analytics-skill is outside the local keep-10 and
+      disabled, so it loads in no venue (corrected 2026-09-10).
       NON-OBVIOUS FACT, recorded so it is not re-derived (SME 2026-08-09): Snowflake is ALREADY
       LIVE in the estate as the CARRIER of the ServiceNow replica DryDocs will read. It holds
       the origin/carrier slot that Oracle `psgmgr` holds for Control-M, so a snow dataset is

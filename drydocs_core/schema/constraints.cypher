@@ -2,7 +2,11 @@
 // constraints.cypher  —  M0
 //
 // Combined constraint + index DDL from v2 §5 and v3 §J. Idempotent; safe to
-// re-run.  Neo4j 5.x syntax.
+// re-run.  Syntax: the 5.x-and-later form, `CREATE CONSTRAINT <name> IF NOT EXISTS
+// FOR (n:L) REQUIRE ...` — never the 4.x `ON ... ASSERT`. The server this runs
+// against is pinned at 2026.05.0-enterprise (config/dev-environment.yaml); the form
+// below is valid there and on 5.x, which is why it is described by shape and not by
+// a version number that goes stale.
 // =============================================================================
 
 // --- Ontology backbone -------------------------------------------------------

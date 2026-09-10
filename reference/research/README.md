@@ -14,7 +14,7 @@ matters"; do not paste copyrighted full texts.
 | Provenance | [W3C PROV-O Primer](https://www.w3.org/TR/prov-primer/) · [PROV-O](https://www.w3.org/TR/prov-o/) | the 9-row decision matrix (`reference/standards/prov-o/`) |
 | Sensor / observation / time | [W3C SSN/SOSA](https://www.w3.org/TR/vocab-ssn/) | the temporal context layer (`reference/standards/sosa-ssn/`) |
 | Org structure | [W3C ORG ontology](https://www.w3.org/TR/vocab-org/) | Membership/Role/OrgUnit for SEAL + LOB→Product→Team |
-| Agent memory on graphs | [Neo4j Agent Memory (POLE+O)](https://neo4j.com/labs/) — see `neo4j-skills:neo4j-agent-memory-skill` | context-graph retrieval pattern for layer 4 |
+| Agent memory on graphs | [Neo4j Agent Memory (POLE+O)](https://neo4j.com/labs/) | context-graph retrieval pattern for layer 4. NOTE: the `neo4j-skills:neo4j-agent-memory-skill` this row used to cite is outside the local keep-10 and is installed in no venue |
 | Semantic layer from a warehouse | [Neo4j: Build a Semantic Layer from GCP with NeoCarta](https://neo4j.com/blog/genai/build-a-semantic-layer-from-gcp-with-neocarta/) | Neo4j Labs build of exactly our data-catalog layer — crosswalk below |
 | GraphRAG (book) | [Essential GraphRAG — Knowledge Graph-Enhanced RAG](https://www.manning.com/books/essential-graphrag) (Bratanič & Hane, Manning 2025; Neo4j-sponsored ebook — local PDF gitignored at repo root, cite don't commit; link verified 2026-07-16) | worked lexical-graph + graph-retrieval patterns; input to the docmeta P0 benchmark verdict and the agent-traversal experiment (backlog Q1/Q2) |
 | Catalog + glossary as one governed object model | [Databricks Unity Catalog](https://docs.databricks.com/aws/en/data-governance/unity-catalog/) — full notes: [`databricks-unity-catalog.md`](databricks-unity-catalog.md) (links verified 2026-07-25) | vendor build of the layer in `docs/patterns/data-catalog/`; its Domains / Glossary / governed tags / classification land on our `CatalogDataDomain` / `CatalogBusinessTerm` / `CatalogTag` / `classification.yaml` — plus lineage derived from execution plans, never declared |
@@ -46,7 +46,7 @@ different source vendor (GCP instead of Control-M/Oracle).
 | `Database→Schema→Table→Column` | DataHub `Schema→Field→Element` (`docs/patterns/data-catalog/ontology-standard.md`) |
 | `Glossary→Category→BusinessTerm` + `TAGGED_WITH` | `CatalogBusinessTerm` / `CatalogTag` glossary terms |
 | Relationships inferred from query-log JOINs | our lineage from Control-M conditions / script reads-writes |
-| OSI YAML semantic-interchange files | our `config/taxonomy-ontology-map.yaml` bridge |
+| OSI YAML semantic-interchange files | our `config/taxonomy-ontology-map/` bridge (per-domain fragments since S5; it was a single `.yaml` when this row was written) |
 | Hybrid vector + full-text + term search | candidate retrieval pattern for the layer-4 context graph |
 
 **Takeaways for us:** (1) validates a **graph-native catalog + glossary, linked**, as

@@ -25,8 +25,10 @@ The graph spans four domains, loaded by independent command chains:
 ## Requirements
 
 - Python `^3.11` and [Poetry](https://python-poetry.org/)
-- Neo4j `5.x` with **APOC** installed (the loaders use `apoc.cypher.runMany` for
-  multi-statement templates; `drydocs check` verifies availability)
+- Neo4j **`2026.05.0-enterprise`** (the pin in `config/dev-environment.yaml`) with
+  **APOC** installed — `drydocs check` verifies availability. Multi-statement templates
+  split CLIENT-SIDE via `drydocs_core/cypher_split.py`; `apoc.cypher.runMany` has not
+  been called since D5 (2026-07-18)
 - For production ingest: Oracle access to the `psgmgr` views (via `python-oracledb`)
 
 ## Install & configure

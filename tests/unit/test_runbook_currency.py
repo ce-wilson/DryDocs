@@ -81,6 +81,30 @@ EXTRA_DOCS: dict[str, str] = {
         "the runnable-pipeline README - the first document a new machine follows, so a "
         "moved path here costs a session before anyone suspects the doc"
     ),
+    # 2026-09-10: the reference tree is a ROUTING surface and ADR 0018 D5 did not name
+    # it. Nothing had looked at it since June, and the cost was measured: four dead
+    # plugin routes (aura-* deleted 2026-07-06, agent-memory and snowflake-analytics
+    # outside the declared keep-10) and seven dead local-mirror citations, one of them
+    # under a `verified:` stamp asserting it resolved. Same class as the three docs
+    # above - a routing document that names something absent misdirects every reader
+    # who trusts it - so it belongs under the same guard.
+    "reference/platforms/README.md": (
+        "the platform routing table - it decides which skill a Neo4j, Oracle or "
+        "Snowflake task is sent to, and a row naming an unreachable skill produces no "
+        "error, just an absent lens"
+    ),
+    "reference/platforms/neo4j/README.md": (
+        "the Neo4j platform reference - the deepest routing document for the platform "
+        "the whole project is built on; it carried a dead Aura route for two months"
+    ),
+    "reference/research/README.md": (
+        "the research index - it routes layer-4 context-graph work, and cited a plugin "
+        "skill installed in no venue"
+    ),
+    "reference/standards/README.md": (
+        "the standards index - it routes ontology work to PROV-O, ORG, SOSA/SSN and "
+        "carried a local-mirror path that existed on no machine"
+    ),
 }
 
 #: EXTRA_DOCS entries that live under a never-port ZONE (PORT-MANIFEST.yaml rows

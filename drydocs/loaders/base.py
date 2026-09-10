@@ -524,12 +524,15 @@ class BaseLoader:
             "source_label": self.source_label,
             **self.extra_cypher_params(),
         }
-        # Use APOC runMany for multi-statement scripts; a single UNWIND
-        # template runs faster via plain run() — and runMany SPLITS on
-        # semicolons wherever they appear, so a ';' inside a // comment
-        # must not route us there (it would shear the statement mid-comment;
-        # found by the J9 e2e test on controlm_folders.cypher's audit-envelope
-        # comment). Count code semicolons only.
+        # run_script() for multi-statement scripts; a single UNWIND template runs
+        # faster via plain run(). COUNT CODE SEMICOLONS ONLY, and the reason outlived
+        # the mechanism: this used to route to apoc.cypher.runMany, which SPLITS on
+        # semicolons wherever they appear, so a ';' inside a // comment sheared the
+        # statement mid-comment (found by the J9 e2e test on controlm_folders.cypher's
+        # audit-envelope comment). D5 (2026-07-18) dropped runMany and run_script now
+        # splits client-side, comment-aware — but the dispatch still has to count code
+        # semicolons, because a comment ';' would otherwise send a single-statement
+        # template down the multi-statement path for no reason.
         if _code_semicolons(cypher) > 1:
             self.client.run_script(cypher, params=params)
         else:
