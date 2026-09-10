@@ -4627,7 +4627,7 @@ depgraph snapshots in the range are ritual — per-entry backlog union, derived
 regeneration, never-port outputs — and get no step. **Steps 273–296 are the
 2026-09-01 (fourth) roll**, covering `port-base-20260829..port-base-20260901`;
 steps 241–272 remain live below them because that base was certified and never
-applied, so the two rolls are one range for the consumer. **Steps 297–312 are the 2026-09-02 (fifth) roll**, covering `port-base-20260901..port-base-20260902`, rolled BEFORE the company's retry so that the retry applies ONE range, `port-base-20260826..port-base-20260902`, with all seven live relays inside it and nothing hand-carried (RELAY-24; the 20260901 apply is parked unmerged). **Steps 313–333 are the 2026-09-05 (sixth) roll**, covering `port-base-20260902..port-base-20260905` — 186 commits at the tag, 132 cited, the first roll since 2026-08-26 to start from a range the company had already applied COMPLETE (its `4d9ddba7`), so nothing is parked and nothing is hand-carried; RELAY-26 is its one relay. **Steps 334–353 are the 2026-09-08 (seventh) roll**, covering `port-base-20260905..port-base-20260908` — 407 commits at the tag, 303 cited, one range again because the company reported the 0905 apply COMPLETE at its `d527afce` (`[SME-REPORTED]`); the nineteen relays written during that apply (27–45) all act in this range, RELAY-46 says where each lands, and it is the roll's one new relay.
+applied, so the two rolls are one range for the consumer. **Steps 297–312 are the 2026-09-02 (fifth) roll**, covering `port-base-20260901..port-base-20260902`, rolled BEFORE the company's retry so that the retry applies ONE range, `port-base-20260826..port-base-20260902`, with all seven live relays inside it and nothing hand-carried (RELAY-24; the 20260901 apply is parked unmerged). **Steps 313–333 are the 2026-09-05 (sixth) roll**, covering `port-base-20260902..port-base-20260905` — 186 commits at the tag, 132 cited, the first roll since 2026-08-26 to start from a range the company had already applied COMPLETE (its `4d9ddba7`), so nothing is parked and nothing is hand-carried; RELAY-26 is its one relay. **Steps 334–353 are the 2026-09-08 (seventh) roll**, covering `port-base-20260905..port-base-20260908` — 407 commits at the tag, 303 cited, one range again because the company reported the 0905 apply COMPLETE at its `d527afce` (`[SME-REPORTED]`); the nineteen relays written during that apply (27–45) all act in this range, RELAY-46 says where each lands, and it is the roll's one new relay. **Steps 368-386 are the 2026-09-10 (ninth) roll**, covering `port-base-20260909..port-base-20260910` - 141 commits at the roll, 105 cited, and the range in which the build lane's twenty-six branches merged. RELAY-55, RELAY-56 and RELAY-57 all act in it, and RELAY-57 is why it went out when it did: three of its twenty-one pairs had not shipped yet, and this roll carries both halves of each.
 
 124. LOCAL-INFRA CHORES + ONE ADR [venue-pinned / docs] (`8c4ee1e` G49, `5a6208e`
     G50, `3304666` G49 follow-up, `034eb70` G53). G49/G50 are DESKTOP-VENUE facts —
@@ -8035,6 +8035,274 @@ hand-carried and nothing parked.
     rode a design-doc edit without its render; `981a76f6` is the fix, one commit later). The
     20 markdown documents this range ADDS resolve every path they cite (preflight check 4).
     THE ROLL COMMIT: `8b7645f9` — `docs(port):` outside the ritual pattern, cited here.
+
+368. L23 - THE SDLC LONG-FORM RUN BOOK GENERATOR [`.claude/skills/**` canonical-producer;
+    `tests/unit/**` default_ok] (`e361dc04` the generator, spec-driven and clone-provable;
+    `bd420478` section 6.0 carries the run order and the blast radius; `23c6528f` the cover
+    reports what THIS run produced rather than what the spec hopes for; `c73d4e71` a table cell
+    survives a pipe, a newline and a falsy zero; `612a1988` a parameter set is not a shell
+    script; `9c7b5a01` the run book says whether the folder is still scheduling; `bf48829f` the
+    command line is PARSED by the repo's own parser, not sliced; `cebb6571` the escalation label
+    outlived the thing it described; `0bf1430e` four defects an adversarial pass found, two of
+    them silent; `995b6836` three citations that survived a check without supporting their
+    claim; `1a02fd64` five assertions the run book made that its sources never said; `f3b82f9c`
+    the per-workflow block's empty rows say where the grain comes from; `a4d9d0d2` the parent
+    skill's "no new skill needed yet" was true for a month; `8fbceccb` and `90a9cb17` the two
+    guards; `5986da02` close; `1f1fa050` the merge; `5396ff37` the render catch-up).
+    A SIBLING SKILL, not a change to `controlm-runbook-automation`: it generates the long-form
+    SDLC run book from the graph, where the existing skill generates the template. Worth taking
+    whole if you generate run books at all - and worth reading either way for the four fix
+    commits above, each of which is a class of defect a generator makes that its own tests do
+    not catch. `1a02fd64` is the one to read first: the generator asserted five things about a
+    folder that no source it queried had said, which is what a template-shaped generator does
+    when a cell has no data and the template has no way to say so.
+
+369. SITTING 1 - TWO GATES SIGNED, ADR 0021 ACCEPTED, NINETEEN GATES DEFERRED WITH NAMED
+    TRIGGERS [`config/gate-prompts/**` canonical-company - the prompts reach you only by hand;
+    `config/gate-log.md` union-append; `docs/decisions/**` default_ok; `web/src/generated/**`
+    and `docs/plan/*.html` derived] (`61395d3e` the source-descriptor-axes gate page and the
+    wiring page swept for the sitting; `87bce0ec` CFG9 carries the slug, N18's BEFORE clause
+    recorded; `783a7a4e` SIGNED OFF - registry-wiring-readiness 18/18 and source-descriptor-axes
+    13/13, ADR 0021 ACCEPTED, nineteen non-blocker gates DEFERRED each with the trigger that
+    re-arms it, CFG13 minted from the record).
+    YOUR SIDE RUNS ITS OWN GATES and a producer sign-off is not yours - that rule is unchanged
+    and this changes nothing about it. What crosses is the union-append gate-log entry and the
+    two decisions the sitting made that have code behind them: the `wired` axis (step 370) and
+    ADR 0021 (step 371). The nineteen deferrals are producer scheduling.
+
+370. CFG13 - THE `wired` AXIS, A SIXTH DESCRIPTOR AXIS THAT IS PER SIDE [`PORT-MANIFEST.yaml`
+    canonical-producer; `config/source-descriptors.yaml` per-entry with a NEW per-side field;
+    `drydocs_core/**` default_ok; derived surfaces regenerate] (`df068d46` the axis declared per
+    side and read by the gate, the load map and the DataHub emission; `321d0ae2` the boolean
+    travels and the reason does not - the wiring prose leaves the console's initial chunk).
+    READ THE MANIFEST ROW BEFORE THE CODE. `wired` says whether the pipeline that reads a
+    dataset is BUILT, and that is a fact about ONE tree. `per_side_fields` now names it: the
+    entry is never overwritten by a port in either direction, a shared dataset id carries an
+    entry on BOTH sides, and a dataset with no entry is REFUSED by the reader until your side
+    answers - the refusal is the reminder, not a bug. On take, keep your block and add entries
+    only for ids that are new to you. TWO CONSEQUENCES FOR YOU SPECIFICALLY. Your two standing
+    pins, `cm_hosts` and `controlm:deftable-xml-export`, retire under this rule: each row
+    declares its own value and your gate-log records the retirement rather than the pinned
+    entries being deleted (C4). And the `confirmed` flag is AMENDED by the same sitting - it
+    leaves the per-side class and now crosses on shared rows as the producer's signed WHAT,
+    because the second fact it was carrying, whether the pipeline is built, has its own home
+    now. Company-only rows stay yours, as per-entry already rules; a producer sign-off you have
+    not ratified is recorded in your gate-log, never by holding the flag.
+
+371. CORE10 - ADR 0021's INSTRUMENT: A RESULT NAMES WHAT IT DID NOT CHECK [`drydocs_core/**`
+    and `tests/unit/**` default_ok; `docs/decisions/**` default_ok; `CLAUDE.md`
+    canonical-producer] (`eb18afde`).
+    ONE THREE-OUTCOME TYPE in core - checked-clean, findings, or not-checked with a reason of
+    forty characters or more - a DECLARED `PROBES` registry naming every adopter, and a guard
+    that reads each adopter's return annotation. `bool()` on the type RAISES, so `if outcome:`
+    cannot be written, and every state renders itself so a surface cannot show not-checked as
+    `0` or as PASS. WHY IT IS WORTH YOUR TIME: the module sweep that produced it found the same
+    defect shape SEVEN times in one cycle, with the correct answer already implemented six times
+    and written down nowhere. The registry is the point - the guard finds nothing nobody
+    registered, so registration is the act. Steps 375 through 378 are the first adopters.
+
+372. ADR 0015 - WHAT AN INSTANCE INHERITS OF THE RECORD [`docs/decisions/**` default_ok]
+    (`e9b22543`). A fourth file class, and the decision to ship requirements rather than
+    deliberation. Take or skip freely; it binds no code.
+
+373. CORE18 - THE DATA ROOT DECLARED ONCE [`PORT-MANIFEST.yaml` canonical-producer;
+    `drydocs_core/**` default_ok; `config/**` per-entry] (`dc8dee7e`). Three files declared
+    paths into one directory and the non-overlap invariant joined two of them; it now sees all
+    three sources. The payload zone leaves the tree and the redirect prefix is DECLARED rather
+    than inferred. Your data root is yours - what crosses is the invariant and the declaration
+    shape, not any path.
+
+374. THE BASE'S FINISH LINE, THE COVERAGE REPORT, AND THE EXCEL RUN BOOK [`tests/integration/**`
+    and `drydocs/**` default_ok; `.claude/skills/**` canonical-producer] (`defda280` `1adb98dc`
+    `d856b6ec` LOAD13 - from a clean clone, extract the synthetic stand-ins and run the chain to
+    a generated artifact, six steps and two reasoned skips, auto-skipping WITH ITS REASON when
+    Docker or the bundle is absent; `8b67f5ed` LOAD14 - the stand-ins' object classes on the
+    coverage report that already exists, rather than a second verb; `6bfc9fb7` DOC12 - the
+    two-tab workbook filled from the graph, and honest about the twenty columns it cannot fill).
+    THE FINISH-LINE TEST IS THE ONE TO TAKE. It is the producer's answer to "does the base
+    actually work end to end", it needs no company data, and it is the cheapest way for you to
+    tell a broken apply from a broken tree. It landed as
+    `tests/integration/test_e2e_base_finish_line.py`.
+
+375. THE CORE CLIENT SEAM - CORE11 THROUGH CORE17, SEVEN ITEMS ON ONE FILE [`drydocs_core/**`
+    and `tests/unit/**` default_ok; `config/dev-environment.yaml` canonical-company]
+    (`229b323a` `31ea7be1` CORE11 - core's client gets a read path and stops dropping the
+    driver's diagnostics; `6c14b941` `52281a74` CORE13 - four DECLARED waits, so an absent
+    server is answered in under five seconds where it took 102.9; `30b4b0a5` CORE14 - four
+    worlds stop being one `False` and the probe says which one it met; `81b0f783` CORE17 - the
+    pooled-connection comment reasons from the container we actually run, not a retired service;
+    `043fa44e` `b99af6d4` CORE15 - there were five silent handlers and the fifth was the one the
+    item was about; `952fc509` CORE16 - the adapter handles declare the lifecycle they have, and
+    a fourth site had it too; `6f5d33fd` `cd070767` CORE12 - what of core is public, declared as
+    a registry; `c3f3d885` the merge order, recorded because these stack on one file).
+    APPLY IN THE ORDER `c3f3d885` NAMES: core11, core13, core14, core17. They were built as
+    separate items on one file and the order is not incidental. CORE13's four waits are the one
+    with an operational payoff on your side; CORE14 is a first ADR 0021 adopter and turns "the
+    server is unreachable" and "APOC is not installed" back into two different answers.
+
+376. THE LOAD LANE - LOAD8, LOAD9, LOAD10, LOAD12 [`drydocs/**` and `tests/unit/**` default_ok]
+    (`95090df1` LOAD8 - a scoped run node says it was scoped, and a tenant FID never reaches it;
+    `c55bce86` LOAD9 - a missing audit trail is said in the line the operator reads, and a load
+    stays non-fatal when the log directory is unwritable; `80ecd53f` LOAD10 - eleven duplicated
+    field-validator wrappers become shared Annotated aliases, so a model that diverges from the
+    helper is inexpressible; `0b3d0b52` LOAD12 - the tier with no writer says NOT CHECKED rather
+    than reporting a bare `0`).
+    LOAD12 IS THE ONE THAT MATTERS TO A READER OF YOUR REPORTS: `matched_dns_resolved: 0` for a
+    tier that has no writer reads as "nothing matched" when it means "nothing looked", and that
+    is the whole of ADR 0021 in one field.
+
+377. THE NOT-CHECKED SWEEP ACROSS THE COMPONENTS - REV2, REM3, API5, LIN4 [`drydocs_api/**`,
+    `drydocs_lineage/**` and `drydocs/review/**` default_ok; `drydocs_remediation/**` per-entry;
+    `graph-tests/**` CANONICAL-COMPANY - YOURS WIN] (`e44af034` REV2 - an acceptance runner
+    that cannot fail on an empty graph reports NOT RUN, never PASS; `dbd925c1` REM3 - the
+    findings list gets its denominator, and unreadable stays unreadable; `0f416eec` API5 - a
+    graph outage answers 503, so the console reads "down" rather than "bug"; `099b6425` LIN4 - a
+    newer bundle is read AND said so about, instead of parsing silently at full apparent
+    confidence).
+    ONE CAUTION, AND IT IS THE ONLY PLACE IN THIS ROLL WHERE A WHOLESALE TAKE WOULD COST YOU
+    SOMETHING: REV2 edits six files under `graph-tests/`, which is canonical-company. Your real
+    specs win and are never overwritten. Take the `drydocs/review/graph_verify.py` half - the
+    mechanism, which is what makes an empty-graph suite report NOT RUN - and re-apply the same
+    shape to your own specs by hand. A wholesale `git checkout <producer-ref> -- graph-tests/`
+    would replace your estate's acceptance suites with the producer's synthetic ones.
+
+378. THE GUARD LANE - GRAPH1, GRAPH4, GRAPH7 [`tests/unit/**` and `drydocs_core/**` default_ok]
+    (`fb191309` GRAPH1 - the module-boundary guard reads `importlib.import_module` and
+    `__import__`, and the one real crossing is DECLARED with its reason; `e08f98cc` `6df8bb26`
+    `b167786d` GRAPH4 - twenty raw-source-reading guards triaged, twenty converted to
+    `source_scan`, six kept with written reasons and one deleted; `e70555a5` `30b375fd` GRAPH7 -
+    the AIS typo-label guard retired, and what it got wrong said out loud).
+    GRAPH7 IS THE PRODUCER PAYING A DEBT IT OWES YOU, and section 2 of the pre-merge prompt is
+    the other half of it: that guard asserted a fact about YOUR tree from the producer's, where
+    the labels never existed, so it passed vacuously here while being wrong. It is retired
+    rather than narrowed. After you remove the labels your side passes either version, so
+    nothing about this is blocking. GRAPH4 is worth reading if you maintain guards at all: a
+    guard that greps raw source also matches the comment explaining the rule, which is J66, and
+    the scanner built to detect that fell for it too.
+
+379. REGISTRATIONS AND THE AGENT TIER - META2, Q28, DEEP1, AGENT2
+    [`config/doc-source-registry.yaml` per-entry; `config/dev-environment.yaml`
+    canonical-company; `agents/**` and `drydocs_deepdoc/**` default_ok] (`b5a36361` META2 - the
+    legacy-capture corpus as a SHAPE, so an instance inherits decisions rather than restating
+    them; `86403cd8` Q28 - the BMC 9.0.21 Parameters tree registered, so the capture stops
+    refusing; `dfef7fd8` DEEP1 - investigate.py points at the charter instead of restating it;
+    `5bbb32fd` AGENT2 - one bootstrap for the agent tier, retiring eight copied `sys.path`
+    preambles and thirteen E402 suppressions).
+    Q28's registration is the one with a live effect: the scraper could always capture that tree
+    and the registry refused it. AGENT2 is a clean-add on eleven files under `agents/` and
+    touches nothing else.
+
+380. API7 AND THE CONSOLE'S COMPLETENESS PASS - WEB19, WEB20, WEB21, WEB23 [`drydocs_api/**`
+    default_ok; `web/**` canonical-producer BUT read divergence #K7-K15 first] (`068014ce`
+    `f00aa681` API7 - the intake write handlers authorize the record BEFORE the write, so a
+    cross-persona mutation cannot commit and then be found; `b36e908e` `420d90bf` WEB19/WEB20 -
+    the completeness envelope travels with the rows through one shared hook, five migrations,
+    and a guard that fails the sixth; `0f9b86d9` WEB23 - 79 KB stops arriving first, the load
+    map leaves the entry chunk; `affa37eb` WEB21 - the bundle ratchet was thirteen points under
+    the tree and is re-pinned to a measurement this venue could actually take).
+    API7 IS A REAL AUTHORIZATION FIX and is the one to take on its own terms: the handlers
+    committed, then checked ownership. Take `drydocs_api/**` by name. For the four web commits,
+    take files BY NAME rather than `git checkout <producer-ref> -- web/src`, which re-adopts the
+    held folder-attribution UI.
+
+381. CFG14 - THE CONSOLE ROSTER DECLARED ONCE, AND THE CONSOLE-AUTH GATE [`config/**` per-entry;
+    `PORT-MANIFEST.yaml` canonical-producer; `MODULE_MAP.md` per-entry; `config/gate-prompts/**`
+    canonical-company; derived surfaces regenerate] (`f48c5d7e` mint; `7ba7e2b8` gate
+    `console-auth-boundary` SIGNED OFF - P1 confirmed, P2/P3/P5 declined, P4 deferred to a claim
+    map, P6 added; `e02d844c` the roster declared once, the claim block DEFERRED rather than
+    absent).
+    The roster becomes a declared config file with a schema, and the derived row in the manifest
+    gains `console-personas.json` - a default-paths `render_board.py` run refreshes it with the
+    rest, so REGENERATE it, never carry it (J43). The claim block is deferred with its reason
+    recorded, which is the shape to copy: absent-with-a-reason, not absent.
+
+382. PORT11 - A GATE-LOG REDACTION DECLARES WHOSE ACT IT WAS [`config/gate-log-redactions.yaml`
+    canonical-producer; `config/dev-environment.yaml` canonical-company; `drydocs/port/**`
+    default_ok; `MODULE_MAP.md` per-entry] (`1e50820b` the gate-log close-out confirmed and
+    PORT11 minted; `23a22dd0` the build).
+    THIS IS RELAY-55, AND IT IS THE ONE THAT GIVES YOU SOMETHING BACK. Every row now carries
+    `side: producer | company` and the stale check is scoped to the owning side, so once you
+    declare `side: company` in `config/dev-environment.yaml` you may restore the true name in
+    your own `config/gate-log.md` under a dated postscript and stay green. A checkout that has
+    not declared reports NOT CHECKED with the reason naming the key - never clean and never
+    stale, because assuming producer would recreate the failure on the tree least able to notice
+    it. Both states are legal and the choice is yours.
+
+383. PORT12 - A COMMIT SPLIT ACROSS TWO DISPOSITIONS PORTS AS A BROKEN HALF [`drydocs/port/**`
+    and `scripts/**` default_ok; `docs/port/port-prompt.md` never-port; `MODULE_MAP.md`
+    per-entry] (`aa3ce109` mint; `0d9deb80` the body, and RELAY-56; `3bd1171d` the detector and
+    the class that has already landed).
+    THIS IS THE INSTRUMENT BEHIND RELAY-57, and the reason that relay could be written at all. A
+    range adds a definition to a file you hand-merge and a reference to it from a file that
+    reaches you unattended; the two halves are one commit and only one of them crosses on its
+    own. `scripts/port_split_pair_check.py <previous-base-tag>` REPORTS this rather than
+    refusing - deliberately outside the preflight's seven checks, because a split commit is
+    legitimate and what it owes is a relay line, not a blocked roll. G130 is its positive
+    control, pinned first in its test file so the instrument cannot go quiet.
+
+384. THE LANE MERGE OF 2026-09-10 - TWENTY-SIX BRANCHES, THIRTY ITEMS [merge commits; the
+    dispositions are those of the steps above] (`83c72484` `43cdc972` `77cb98ce` `90e55ea6`
+    `4402ecdc` `858b9ebd` `121aa4ed` `7ad51091` `91e5ef0d` `5ac451fc` `d66a25d7` `0016a73f`
+    `a937c55f` `4e9b144b` `5a1964c3` `701c3f12` `a011f559` `a6c08d2b` `07fccc19` the build
+    lane's `wip/*-laptop` branches; `d4abe8d1` `feat/web-completeness`; `2f14b064` the burst's
+    renders, five status corrections and the two things the merge itself exposed; `47c29129` the
+    handoff retires, 23 of 23 done).
+    NOTHING TO APPLY FROM THE MERGES THEMSELVES - they are here because the ledger's ritual
+    exemption is deliberately narrow and a merge is not on it. The CONTENT is steps 374 through
+    379. One thing worth knowing if you bisect: `47c29129` is RED on the trunk and its own next
+    commit is the fix (see the footnote).
+
+385. THE PLANNING AND HANDOFF DOCUMENTS [`docs/restructure/EndGoalTeamsEdition.md` NEVER-PORT
+    by a new manifest row; `docs/company-prompts/**` never-port; `docs/reviews/**` default_ok;
+    `docs/design/**` evaluate] (`03e903eb` the Teams Edition plan and both ultra-review records,
+    with a measured status block; `29247331` the pre-merge company prompt for `port/20260908`;
+    `0ad69e99` `ff5430d3` `52cc7cf5` the lane handoffs; `0e1620c6` two citations the handoff's
+    own retirement broke; `2c017f93` the plan gains an effort lever and records a
+    model-availability hold).
+    THE PLAN IS NEVER-PORT BY A NEW MANIFEST ROW and that is deliberate: it is the producer's
+    own sequencing, it names producer venues and producer budgets, and it would read as an
+    instruction on your side. `29247331` is the pre-merge prompt you already have. Nothing here
+    is asked back.
+
+386. THE PREFLIGHT LEARNS THAT A CITATION CAN BE DELIBERATE [`drydocs/port/**` and
+    `tests/unit/**` default_ok] (`1b24ba2d`). The cited-paths check had `RECORD_PREFIXES` for a
+    whole document and nothing for a single PATH, so it refused this roll over four correct
+    citations - two naming YOUR tree, two naming files a held plan unit will create. Two
+    declared tables now carry them, each entry with its reason, and the planned-path table
+    EXPIRES: a guard fails when the file appears, so an exemption cannot outlive the work it
+    waits on. Take it with the rest of `drydocs/port/**` if you run the preflight; the two
+    corrections riding with it are producer-side documents.
+
+    LEDGER COVERAGE FOOTNOTE (2026-09-10, NINTH ROLL). 142 commits in
+    `port-base-20260909..HEAD` at the roll; 37 read as ritual under the existing
+    patterns (claims, one snapshot); 105 are cited in steps 368-386. No pattern spelling
+    drifted this roll. The disposition renderer at HEAD measured 228 changed paths in 8 classes
+    (canonical-producer 40, canonical-company 12, never-port 6, per-entry 52, union-append 2,
+    evaluate 5, default_ok 102, derived 9).
+    RED AT PUSH (J77): FIVE on the trunk, and the number needs its denominator or it reads far
+    worse than it is - 34 further reds in this range sit on `wip/*-laptop` and
+    `feat/web-completeness` commits, where a mid-item red is the build lane working and the
+    merge is what settles it. The five on `main`: `550cec20` and `5b8d7289`, CLAIM commits that
+    MINTED an item and shipped no render, which is the Y6 case where the status-only tolerance
+    correctly does not apply (`df068d46` and `dc8dee7e` are their fixes); `5396ff37`, the web
+    job's initial-chunk ceiling, which is the measurement WEB23 then went and fixed properly;
+    `03e903eb`, a publish-boundary guard, and see the next line; and `47c29129`, where retiring
+    the lane handoff turned HEAD red because `docs/design/drydocs-docgen-runbook.md` cited the
+    self-deleting file (`0e1620c6` is its fix, one commit later).
+    ONE OF THOSE FIVE GETS A SENTENCE OF ITS OWN, because it is a publish-boundary event and
+    burying it in a count would be the wrong call. `03e903eb` added a review record carrying the
+    retired internal org acronym that the J55 guard exists to keep out of the publishable tree,
+    and `5b8d7289` inherited it. The window was three commits on `main`; `dc8dee7e` corrected
+    the path that carried it, and the guard has been green since. The producer tree at this tag
+    is clean, the file crosses as `default_ok`, and there is nothing here for you to act on - it
+    is recorded because a roll that hides its own boundary failures is not worth reading.
+    UNVERIFIED (J78 - a run cancelled by the next push, or no run at all): 55 of the 142,
+    32 cancelled and 23 with no run at all. Each was re-verified by the next run that completed
+    green on its descendant. The 7 markdown documents this range ADDS resolve every path they
+    cite (preflight check 4), two of them by a DECLARED exemption naming YOUR tree rather than
+    by resolving here - step 386 says which and why.
+    THE ROLL COMMIT is cited in the follow-up `chore(port): ledger` commit, which is ritual and
+    terminates the chain.
 
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
 - Track 1 (portable):
