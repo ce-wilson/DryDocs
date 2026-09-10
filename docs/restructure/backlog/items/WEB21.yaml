@@ -7,7 +7,7 @@ phase: 12
 agent: main
 model: haiku
 priority: p3
-status: todo
+status: done
 depends_on: []
 inputs:
 - web/package.json
@@ -19,3 +19,26 @@ acceptance: |
 notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). web-2026-09-09.md candidate 3 (L2-2). PEN: belongs to the UI-testing session's code:drydocs-web pen (user ruling 2026-09-09); the
   Lane B queue skips it and Lane A merges it like any wip branch.
+  DONE 2026-09-10 (UI workstream, ui-workstream worktree, desktop; branch feat/web-completeness).
+  The review's risk was real and the drift is larger than the tree growth alone would suggest.
+  COMMAND: npm run test:coverage, in web/, where the install exists (the review's venue did not
+  have it and correctly declined to assert - this venue does, so the numbers are measured).
+  MEASURED, all three read together as the acceptance requires: statements 23.06, branches 81.96,
+  functions 63.79, over 512 tests in 48 files. The floors they were being checked against were
+  9.8, 70 and 50, set on 2026-09-05 against a 22,715-line tree. Statements sat 13.26 points below
+  the tree - a floor a full refactor could fall through without anyone noticing, which is WEB13's
+  own definition of a ratchet that ratchets nothing.
+  RE-PINNED to 22.5 / 80 / 60. The gaps are deliberate and follow WEB13's stated rule rather than
+  reinventing one: a floor pinned exactly to the measured value fails on any refactor that adds
+  one uncovered line, and a floor that fails for reasons nobody caused is a floor people lower.
+  Statements takes half-point granularity (22.5 against 23.06), which is the granularity WEB13
+  named when it said to raise the floor once the measured number clears the next half point.
+  Branches and functions keep the wider gap WEB13 gave them for the reason it gave: they are the
+  two most likely to slide while statements climb, so 80 against 81.96 and 60 against 63.79.
+  THE DENOMINATORS ARE NOT THE SAME, which is why the acceptance asks for all three. Statements
+  and lines share one and read identically at 23.06; branch and function percentages are over
+  different populations, so the three numbers cannot be compared with each other and only each
+  against its own floor.
+  PROVEN TO GATE, not assumed, the same check WEB13 ran: npm run test:coverage exits 0, and the
+  same run with the statements threshold at 99 exits 1. A threshold silently ignored would look
+  identical from the outside.
