@@ -82,8 +82,20 @@ class Neo4jClient:
         return self._bounds
 
     def __enter__(self) -> Neo4jClient:
-        # liveness_check_timeout=0 forces the driver to re-validate pooled
-        # connections before use, preventing SessionExpired on Aura.
+        # liveness_check_timeout=0 forces the driver to re-validate every pooled
+        # connection before handing it out. A pooled connection can go stale
+        # while it is idle — the container restarts, Docker's NAT drops the
+        # mapping, the server closes an idle socket — and without the check the
+        # driver hands out a dead one and the caller gets SessionExpired on a
+        # query that never reached the database. Zero is the strict end of that
+        # setting: revalidate always, pay a round trip, never serve a corpse.
+        # Correct for the way this client is used — one context manager per CLI
+        # verb or loader run, where a stale first query costs more than the
+        # check does. The platform this is reasoned against is the local Neo4j
+        # Enterprise container declared in config/dev-environment.yaml (CORE17 —
+        # the item file carries which managed service this comment used to cite
+        # and when that service was ruled out; a hosting option that is not the
+        # one we run does not belong in the justification).
         #
         # CORE13: the three POOL-level waits come from the declared block. The
         # fourth, transaction_timeout, is not pool configuration — it reaches a

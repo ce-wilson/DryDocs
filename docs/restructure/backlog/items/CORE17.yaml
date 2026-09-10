@@ -17,3 +17,28 @@ acceptance: |
   Aura, which survives only as a future option in ADR 0015. One comment line; no behavior change.
 notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). core-2026-09-07.md candidate 7 (S8).
+
+  CLOSED 2026-09-10 (Lane B, laptop, wip/core17-laptop, based on wip/core14-laptop - fourth in the
+  neo4j_client.py chain. Merge order: CORE11, CORE13, CORE14, CORE17). No behavior change: the diff
+  is comment text only, and the full suite's failure set is unchanged from CORE14's.
+
+  THE PROVENANCE THE CODE NO LONGER CARRIES, kept here because the acceptance asked the comment not
+  to name it: the justification used to read "preventing SessionExpired on Aura". Neo4j Aura was
+  ruled out for this project on 2026-07-06 in favour of the local Docker Enterprise container (EE
+  is required for ADR 0002's multi-database topology), and survives only as a future hosting option
+  in ADR 0015. So the comment was defending a correct setting with a reason that had stopped
+  applying - the setting stayed right by luck rather than by argument.
+
+  It now reasons from the platform we actually run: a pooled connection goes stale while idle (the
+  container restarts, Docker's NAT drops the mapping, the server closes an idle socket), and
+  without revalidation the driver hands out a dead connection and the caller sees SessionExpired on
+  a query that never reached the database. Zero is the strict end of the setting, and it is correct
+  for the way THIS client is used - one context manager per CLI verb or loader run, where a stale
+  first query costs more than the revalidation round trip.
+
+  ONE JUDGEMENT CALL, recorded because the next reader may want to undo it. The first draft kept a
+  line saying "this used to cite Aura, do not put it back" - useful, and exactly the kind of note
+  this repo usually keeps in code. The acceptance says the comment must no longer NAME Aura, so
+  that line moved here instead. This is the J66 shape in miniature (a rule against a term also
+  forbids the explanation of the rule), but with no guard involved it is a wording choice rather
+  than a defect, and the item file is where this repo's whys live.
