@@ -23,15 +23,10 @@ over less data than it thinks.
 from __future__ import annotations
 
 import json
-import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
-_REPO_ROOT = Path(__file__).resolve().parents[2]
-if str(_REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(_REPO_ROOT))
-
-from drydocs_core.run_log import resolve_log_dir  # noqa: E402
+from drydocs_core.run_log import resolve_log_dir
 
 #: The day-file prefix the writer uses (llm_ledger.LEDGER_BASENAME).
 LEDGER_PREFIX = "qa.graph_qa"

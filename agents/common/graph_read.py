@@ -13,22 +13,17 @@ rejection against a live graph).
 from __future__ import annotations
 
 import os
-import sys
 import time
 from dataclasses import dataclass, field
-from pathlib import Path
 
 import neo4j
 
 from common.neo4j_tool import get_driver
 
 # R21: the notification shape lives in core so the API runner, this helper and
-# the :AgentRun writer cannot drift apart. Same REPO_ROOT idiom as llm_ledger.
-_REPO_ROOT = Path(__file__).resolve().parents[2]
-if str(_REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(_REPO_ROOT))
-
-from drydocs_core.notifications import from_summary, to_payload  # noqa: E402
+# the :AgentRun writer cannot drift apart. Reachable because importing `common`
+# runs common/_bootstrap.py (AGENT2) - there is no per-file preamble any more.
+from drydocs_core.notifications import from_summary, to_payload
 
 DEFAULT_ROW_CAP = 100
 DEFAULT_TIMEOUT_S = 15.0

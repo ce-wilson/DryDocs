@@ -7,7 +7,7 @@ phase: 15
 agent: main
 model: sonnet
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - agents/
@@ -18,3 +18,72 @@ acceptance: |
   agents/common/_bootstrap.py holding the depth constant once. The agents' own tests green either way.
 notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). review-agents-2026-09-08.md candidate 3 (L2-2).
+
+  ## Close (Lane B, laptop, 2026-09-10) - wip/agent2-laptop
+
+  THE PREFERRED PATH IS REFUSED BY A MEASURED FACT, so the acceptance's own
+  fallback applies - "if the two venvs must stay independent". They must, and by
+  DECLARATION rather than accident:
+
+    pyproject.toml            neo4j = "^5.20"      -> poetry env has 5.28.4
+    agents/requirements.txt   neo4j>=6.2,<7        -> agents/.venv has 6.2.0
+
+  and that file says it in as many words: "the agents venv is a SEPARATE
+  interpreter and may lead, but only by declaration". Installing the repo as a
+  path dependency would push `^5.20` into an environment deliberately at 6.2.0 -
+  either downgrading a declared lead or failing to resolve. Both interpreters
+  measured on this laptop (J18), both Python 3.12.10.
+
+  ## What was built, and why not the obvious shape
+
+  One `agents/common/_bootstrap.py` holding the depth ONCE. The obvious
+  follow-through - import it in each of the eight leaves - was measured first and
+  rejected: `_REPO_ROOT` is used ONLY by the preamble in seven of the eight, so
+  eight imports would have been seven unused ones. That trades 13 `# noqa: E402`
+  for 7 `# noqa: F401` and calls it a cleanup.
+
+  The load-bearing seam is the PACKAGE, not the leaf: `common/__init__.py` and
+  `graph_qa/__init__.py` import the bootstrap, so importing anything from either
+  package runs it FIRST, and every `drydocs_*` import in those modules is now an
+  ordinary top-of-file import with nothing between. That is what actually deletes
+  the suppressions rather than relocating them.
+
+    sys.path preambles in leaves   8  -> 0
+    hard-coded parents[2]          9  -> 1 (the bootstrap, verified at that depth)
+    # noqa: E402 in agents/       13  -> 0
+
+  `agents/serve.py` is deliberately NOT folded in: it is a different shape -
+  `Path(__file__).resolve().parent`, putting `agents/` itself on the path - and
+  it is the thing that MAKES the bootstrap reachable. Retiring it would be
+  circular.
+
+  FOUND WHILE THERE, not looked for: `graph_qa/schema_context.py` computed
+  `_REPO_ROOT` TWICE - once for the preamble and again for `VOCABULARY_PATH`.
+  That is the nine-copies defect happening inside a single file, and it is why
+  the count was 9 literals across 8 files. Both collapse to the one constant.
+
+  ## Verified at the real runtime, not only in the poetry env
+
+  The agents modules run under `agents/.venv`, so the poetry suite cannot prove
+  this. Run from `agents/` with that interpreter (J18 - laptop):
+
+    import common    -> repo root on sys.path: False -> True
+    import graph_qa  -> repo root on sys.path: False -> True
+
+  A PRE-EXISTING GAP, measured BOTH WAYS so it is not attributed here: all eight
+  modules fail in agents/.venv with `ModuleNotFoundError: pydantic_settings`,
+  identically before and after this change (checked against the stashed tree).
+  The venv carries google-adk, neo4j 6, litellm, dotenv and pyyaml but not the
+  repo's own dependency tree, so the preamble was necessary and never sufficient.
+  NOT fixed here - installing them is the path-dependency question this item
+  just ruled out, and it needs the SME's call on what the agents venv may carry.
+  FOLLOW-UP FOR LANE A (needs a mint).
+
+  Poetry suite: 4043 passed, ZERO failures. ruff check + format clean over
+  agents/ (34 files). The one remaining "E402" string in agents/ is prose inside
+  the bootstrap's own docstring describing what it retired - a grep matching the
+  comment that explains the thing, which is J66 one last time.
+
+  OUT OF SCOPE, named so nobody widens this: `tests/unit/test_tier2.py` carries
+  the same preamble shape, but it lives in `tests/`, not `agents/`. One copy
+  remains and it is deliberate.

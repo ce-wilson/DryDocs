@@ -13,17 +13,10 @@ of graph_qa use the API-grade read-only pre-flight without repeating it.
 
 from __future__ import annotations
 
-import sys
-from pathlib import Path
-
-_REPO_ROOT = Path(__file__).resolve().parents[2]
-if str(_REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(_REPO_ROOT))
-
-from common.scopes import in_scope  # noqa: E402
-from drydocs_api.epistemics import grade  # noqa: E402
-from drydocs_api.guard import WriteRejected, ensure_read_only  # noqa: E402
-from drydocs_api.query_specs import (  # noqa: E402
+from common.scopes import in_scope
+from drydocs_api.epistemics import grade
+from drydocs_api.guard import WriteRejected, ensure_read_only
+from drydocs_api.query_specs import (
     QUERY_SPECS,
     QuerySpec,
     is_watermarked,

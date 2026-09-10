@@ -59,15 +59,10 @@ silently. See the R8 close notes.
 from __future__ import annotations
 
 import json
-import sys
 from datetime import UTC, datetime
 from pathlib import Path
 
-_REPO_ROOT = Path(__file__).resolve().parents[2]
-if str(_REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(_REPO_ROOT))
-
-from drydocs_core.run_log import resolve_log_dir  # noqa: E402
+from drydocs_core.run_log import resolve_log_dir
 
 LEDGER_BASENAME = "qa.graph_qa"
 

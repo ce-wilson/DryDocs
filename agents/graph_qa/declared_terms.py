@@ -11,18 +11,11 @@ gate binds a term to the graph, the graph path owns it again.
 
 from __future__ import annotations
 
-import sys
 import time
 from collections.abc import Callable
-from pathlib import Path
 
+from drydocs_core.ui_concepts import answer_for, match
 from graph_qa.envelope import Envelope, SourceRecord, StepRecord
-
-_REPO_ROOT = Path(__file__).resolve().parents[2]
-if str(_REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(_REPO_ROOT))
-
-from drydocs_core.ui_concepts import answer_for, match  # noqa: E402
 
 
 def answer_declared(
