@@ -120,6 +120,22 @@ class Ledger:
                 return step
         raise AssertionError(f"the chain never recorded a step named {name!r}")
 
+    def report(self) -> str:
+        """The finish line as a readable report — one line per step, in run order.
+
+        This is the artifact the acceptance's "every step green or skipped with
+        its reason" actually names. It exists so a failure prints WHAT THE CHAIN
+        DID rather than only which assertion tripped: an operator reading a red
+        build wants the ledger, not a boolean. Every guard below attaches it.
+        """
+        width = max(len(s.name) for s in self.steps) if self.steps else 0
+        lines = []
+        for step in self.steps:
+            mark = "ok     " if step.ran else "SKIPPED"
+            tail = step.detail if step.ran else step.reason
+            lines.append(f"  {mark}  {step.name.ljust(width)}  {tail}")
+        return "\n".join(lines)
+
 
 #: Every step this finish line claims to cover. Declared UP FRONT so a step that
 #: is deleted or never reached is a failure rather than an absence — the ledger
@@ -228,11 +244,17 @@ def finish_line(neo4j_env) -> Ledger:
         ledger.add(name, code == 0, detail=f"exit {code}")
         assert code == 0, f"chain step {name} exited {code}:\n{out}"
 
-    # 5. The coverage report. Its exit code is a STATEMENT ABOUT THE WORLD (a
-    #    broken pointer or version drift), not a pass/fail of the chain, so the
-    #    ledger records the code and the guard below reads the output.
+    # 5. The coverage report. Its exit code is a STATEMENT ABOUT THE WORLD — it
+    #    exits non-zero on a broken corpus pointer or version drift, both of
+    #    which are true things about the estate rather than failures of this
+    #    chain. So a findings exit still counts as RAN. What does not is the
+    #    verb failing to produce a report at all: recording that as green would
+    #    be the exact silence this item exists to outlaw, so it is asserted like
+    #    any other chain step.
     code, out = _run(neo4j_env, "docs-coverage")
-    ledger.add("docs-coverage", True, detail=f"exit {code}")
+    assert code in (0, 1), f"docs-coverage did not produce a report, exited {code}:\n{out}"
+    assert out.strip(), "docs-coverage exited cleanly and printed nothing"
+    ledger.add("docs-coverage", True, detail=f"exit {code}, {len(out.splitlines())} lines")
     ledger.coverage_output = out
 
     # 6. The run books. Each generator is probed DYNAMICALLY so the sibling item
@@ -337,7 +359,8 @@ def test_the_chain_ran_every_step_it_declares(finish_line: Ledger) -> None:
     recorded = {step.name for step in finish_line.steps}
     assert recorded == set(DECLARED_STEPS), (
         f"chain steps missing: {sorted(set(DECLARED_STEPS) - recorded)}; "
-        f"undeclared: {sorted(recorded - set(DECLARED_STEPS))}"
+        f"undeclared: {sorted(recorded - set(DECLARED_STEPS))}\n"
+        f"{finish_line.report()}"
     )
 
 
@@ -353,7 +376,8 @@ def test_every_step_is_green_or_carries_its_reason(finish_line: Ledger) -> None:
         assert len(step.reason.strip()) >= REASON_MIN, (
             f"step {step.name!r} is skipped with a reason of "
             f"{len(step.reason.strip())} characters, under the {REASON_MIN} "
-            f"a reason has to reach: {step.reason!r}"
+            f"a reason has to reach: {step.reason!r}\n"
+            f"{finish_line.report()}"
         )
 
 
