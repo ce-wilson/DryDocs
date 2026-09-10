@@ -33,8 +33,9 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from neo4j import GraphDatabase
+from neo4j import GraphDatabase, Query, unit_of_work
 
+from drydocs_core.config import Neo4jDriverBounds, load_driver_bounds
 from drydocs_core.notifications import Neo4jNotification, from_summary, to_payload
 
 LOGGER = logging.getLogger("drydocs.neo4j_client")
@@ -50,24 +51,46 @@ _SEVERITY_LEVELS = {
 
 
 class Neo4jClient:
-    def __init__(self, uri: str, user: str, password: str, database: str | None = None) -> None:
+    def __init__(
+        self,
+        uri: str,
+        user: str,
+        password: str,
+        database: str | None = None,
+        bounds: Neo4jDriverBounds | None = None,
+    ) -> None:
         self._uri = uri
         self._user = user
         self._password = password
         self._database = database
+        #: CORE13. The constructor wins; otherwise the `neo4j.driver` block in
+        #: ``config/dev-environment.yaml``. Never a literal here (ADR 0014) —
+        #: the declared fallback lives in :mod:`drydocs_core.config`.
+        self._bounds = bounds if bounds is not None else load_driver_bounds()
         self._driver = None
         #: The notifications the LAST statement carried (R21 shape). ``[]`` is a
         #: clean run, never a missing field. Reset at the start of every
         #: statement, so it always describes the most recent one.
         self.last_notifications: list[Neo4jNotification] = []
 
+    @property
+    def bounds(self) -> Neo4jDriverBounds:
+        """The waits this client is running under — readable so a caller can say
+        what ceiling it was refused within, rather than guessing."""
+        return self._bounds
+
     def __enter__(self) -> Neo4jClient:
         # liveness_check_timeout=0 forces the driver to re-validate pooled
         # connections before use, preventing SessionExpired on Aura.
+        #
+        # CORE13: the three POOL-level waits come from the declared block. The
+        # fourth, transaction_timeout, is not pool configuration — it reaches a
+        # managed transaction through `unit_of_work` in `_execute` below.
         self._driver = GraphDatabase.driver(
             self._uri,
             auth=(self._user, self._password),
             liveness_check_timeout=0,
+            **self._bounds.pool_config(),
         )
         return self
 
@@ -109,6 +132,17 @@ class Neo4jClient:
             # once the stream has been read to the end.
             self._record(result.consume())
             return rows
+
+        # CORE13: the per-transaction timeout, and the ONLY way to set one on a
+        # MANAGED transaction in driver 5.28 — `execute_read`/`execute_write`
+        # take no timeout argument (measured: their signature is
+        # `(transaction_function, *args, **kwargs)` and the kwargs go to the
+        # function). `unit_of_work` is the driver's own mechanism for it:
+        # `Driver.execute_query` applies exactly this decorator when handed a
+        # `Query` carrying a timeout. Keeping the managed form matters — an
+        # unmanaged `begin_transaction(timeout=...)` would buy the same ceiling
+        # at the cost of the driver's retry, which is the other half of S4.
+        work = unit_of_work(timeout=self._bounds.transaction_timeout)(work)
 
         with self._driver.session(database=self._database) as session:
             runner = session.execute_write if write else session.execute_read
@@ -193,7 +227,12 @@ class Neo4jClient:
         self.last_notifications = []
         with self._driver.session(database=self._database) as session:
             for statement in split_statements(script):
-                self._record(session.run(statement, params or {}).consume())
+                # CORE13: auto-commit, so the timeout rides on a `Query` rather
+                # than through `unit_of_work` — the same ceiling by the route
+                # this path has. Bootstrap DDL is the usual caller and it is
+                # exactly the caller that must not hang.
+                bounded = Query(statement, timeout=self._bounds.transaction_timeout)
+                self._record(session.run(bounded, params or {}).consume())
 
     def execute_file(self, path: Path) -> None:
         """Read *path* and execute it via :meth:`run_script`."""

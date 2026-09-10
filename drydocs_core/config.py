@@ -7,12 +7,20 @@ Three settings groups, each loaded from environment variables (or .env):
 
 Use :func:`load_settings` to fetch all three at once. Loaders construct only
 what they need; the bootstrap CLI pulls Neo4jSettings first.
+
+A fourth group, :class:`Neo4jDriverBounds` (CORE13), comes from
+``config/dev-environment.yaml`` rather than the environment: the four waits are
+per-machine operational facts, and that file is the one already ruled
+canonical-company for exactly that class of value.
 """
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
+import yaml
 from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -119,3 +127,89 @@ class RuntimeSettings(BaseSettings):
 
 def load_settings() -> tuple[Neo4jSettings, OracleSettings, AppSettings]:
     return Neo4jSettings(), OracleSettings(), AppSettings()
+
+
+# ── CORE13: how long a caller waits before "the server is not there" ─────────
+
+#: The keys read from ``config/dev-environment.yaml`` ``neo4j.driver``, and the
+#: values used when that block is ABSENT. They are a declared fallback, not the
+#: literals ADR 0014 forbids — the distinction being that these are named once,
+#: in the module the config layer already owns, with the reason attached, and
+#: the file overrides every one of them.
+#:
+#: The block can legitimately be absent, which is why this is a fallback and not
+#: a refusal: ``dev-environment.yaml`` is ``canonical-company`` in
+#: ``PORT-MANIFEST.yaml``, so a port does NOT carry the producer's copy across.
+#: The company's file gains the block by hand, and until it does, a checkout
+#: that ports this module still gets bounded waits rather than the unbounded
+#: hang CORE13 exists to end. Raising instead would turn a missing optional
+#: block into a broken tree on the far side of a port.
+DRIVER_BOUND_DEFAULTS: dict[str, float] = {
+    "connection_timeout": 15.0,
+    "connection_acquisition_timeout": 30.0,
+    "max_transaction_retry_time": 30.0,
+    "transaction_timeout": 120.0,
+}
+
+
+@dataclass(frozen=True)
+class Neo4jDriverBounds:
+    """The four waits, in seconds, that keep an unreachable server from hanging
+    a caller (core report S4, 2026-09-07).
+
+    Four rather than one because they fail at different layers and one number
+    cannot express them — see the comment above ``neo4j.driver`` in
+    ``config/dev-environment.yaml``, which carries the reasoning and the values.
+
+    ``transaction_timeout`` is the only one the DRIVER does not take as pool
+    configuration: it reaches a managed transaction through
+    ``neo4j.unit_of_work``, which is what ``Driver.execute_query`` itself uses
+    when handed a ``Query`` carrying a timeout.
+    """
+
+    connection_timeout: float = DRIVER_BOUND_DEFAULTS["connection_timeout"]
+    connection_acquisition_timeout: float = DRIVER_BOUND_DEFAULTS["connection_acquisition_timeout"]
+    max_transaction_retry_time: float = DRIVER_BOUND_DEFAULTS["max_transaction_retry_time"]
+    transaction_timeout: float = DRIVER_BOUND_DEFAULTS["transaction_timeout"]
+
+    def pool_config(self) -> dict[str, float]:
+        """The subset ``GraphDatabase.driver`` accepts as configuration."""
+        return {
+            "connection_timeout": self.connection_timeout,
+            "connection_acquisition_timeout": self.connection_acquisition_timeout,
+            "max_transaction_retry_time": self.max_transaction_retry_time,
+        }
+
+
+def load_driver_bounds(path: Path | None = None) -> Neo4jDriverBounds:
+    """Read ``neo4j.driver`` from ``config/dev-environment.yaml``.
+
+    Repo CONTENT follows the caller (Idea-109), so the default path resolves
+    through :func:`drydocs_core.repo_paths.repo_root` — unlike ``_ENV_FILE``
+    above, which is untracked machine-local credentials and correctly anchors on
+    ``__file__``.
+
+    A missing file, a missing block or a missing key each falls back to the
+    declared default for that key alone; a value that is not a number is
+    ignored the same way rather than crashing a load on a typo in an optional
+    block. Every substitution is silent BY DESIGN here and only here: these are
+    waits, and a checkout with no block still gets bounded ones.
+    """
+    from drydocs_core.repo_paths import repo_root
+
+    if path is None:
+        path = repo_root(Path(__file__).resolve().parent) / "config" / "dev-environment.yaml"
+    block: Any = {}
+    if path.is_file():
+        try:
+            loaded = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+            block = ((loaded.get("neo4j") or {}).get("driver")) or {}
+        except (yaml.YAMLError, OSError, AttributeError):
+            block = {}
+    values = dict(DRIVER_BOUND_DEFAULTS)
+    if isinstance(block, dict):
+        for key in values:
+            raw = block.get(key)
+            if isinstance(raw, int | float) and not isinstance(raw, bool) and raw > 0:
+                values[key] = float(raw)
+    return Neo4jDriverBounds(**values)

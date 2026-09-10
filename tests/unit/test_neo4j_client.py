@@ -15,7 +15,15 @@ nothing).
 from __future__ import annotations
 
 import logging
+import math
+import socket
+import time
 
+import neo4j
+import pytest
+from neo4j import Query
+
+from drydocs_core.config import Neo4jDriverBounds
 from drydocs_core.neo4j_client import Neo4jClient
 
 
@@ -239,3 +247,175 @@ def test_run_with_diagnostics_returns_rows_and_the_payload():
         "position",
         "category",
     }
+
+
+# ── CORE13: the waits are declared, reach the driver, and actually bite ──────
+#
+# S4 of the 2026-09-07 core report: searched across all 74 core files, the only
+# `timeout` in drydocs_core was an unrelated `timeout=30` in landing_zones.py.
+# No transaction timeout, no retry ceiling, no acquisition timeout, no
+# cancellation path - so an unreachable server hung the caller with nothing to
+# read and nothing to cancel.
+
+
+def test_the_declared_block_is_what_the_client_runs_under():
+    """The values come from config/dev-environment.yaml, never a literal in the
+    client (ADR 0014). This reads the REAL file, so a future edit to the block
+    is reflected here rather than pinned to today's numbers."""
+    from drydocs_core.config import load_driver_bounds
+
+    declared = load_driver_bounds()
+    client = Neo4jClient("bolt://fake", "u", "p")
+    assert client.bounds == declared
+    # every wait is positive and finite - an unbounded value is the bug
+    for value in (
+        declared.connection_timeout,
+        declared.connection_acquisition_timeout,
+        declared.max_transaction_retry_time,
+        declared.transaction_timeout,
+    ):
+        assert 0 < value < math.inf
+
+
+def test_the_constructor_overrides_the_file():
+    bounds = Neo4jDriverBounds(
+        connection_timeout=1.0,
+        connection_acquisition_timeout=2.0,
+        max_transaction_retry_time=3.0,
+        transaction_timeout=4.0,
+    )
+    assert Neo4jClient("bolt://fake", "u", "p", bounds=bounds).bounds is bounds
+
+
+def test_a_missing_block_falls_back_rather_than_refusing(tmp_path):
+    """dev-environment.yaml is canonical-company in PORT-MANIFEST.yaml, so a
+    port does NOT carry this block across. A checkout whose file predates it
+    must still get bounded waits - raising would turn a missing optional block
+    into a broken tree on the far side of a port."""
+    from drydocs_core.config import DRIVER_BOUND_DEFAULTS, load_driver_bounds
+
+    empty = tmp_path / "dev-environment.yaml"
+    empty.write_text("neo4j:\n  container: x\n", encoding="utf-8")
+    assert load_driver_bounds(empty) == Neo4jDriverBounds(**DRIVER_BOUND_DEFAULTS)
+    assert load_driver_bounds(tmp_path / "absent.yaml") == Neo4jDriverBounds(
+        **DRIVER_BOUND_DEFAULTS
+    )
+
+
+def test_one_bad_value_does_not_take_the_others_with_it(tmp_path):
+    from drydocs_core.config import DRIVER_BOUND_DEFAULTS, load_driver_bounds
+
+    path = tmp_path / "dev-environment.yaml"
+    path.write_text(
+        "neo4j:\n"
+        "  driver:\n"
+        "    connection_timeout: 2.5\n"
+        "    connection_acquisition_timeout: not-a-number\n"
+        "    max_transaction_retry_time: 0\n"  # a zero wait is not a wait
+        "    transaction_timeout: true\n",  # bool is an int in Python; not a timeout
+        encoding="utf-8",
+    )
+    bounds = load_driver_bounds(path)
+    assert bounds.connection_timeout == 2.5
+    assert (
+        bounds.connection_acquisition_timeout
+        == DRIVER_BOUND_DEFAULTS["connection_acquisition_timeout"]
+    )
+    assert bounds.max_transaction_retry_time == DRIVER_BOUND_DEFAULTS["max_transaction_retry_time"]
+    assert bounds.transaction_timeout == DRIVER_BOUND_DEFAULTS["transaction_timeout"]
+
+
+def test_the_pool_waits_reach_the_real_driver_constructor(monkeypatch):
+    """Not "we passed something" - the driver ACCEPTS these three names, so a
+    typo here would be a TypeError from the driver rather than a silent no-op."""
+    captured: dict = {}
+    real = neo4j.GraphDatabase.driver
+
+    def spy(uri, **config):
+        captured.update(config)
+        return real(uri, **config)  # constructs; no connection is opened yet
+
+    monkeypatch.setattr("drydocs_core.neo4j_client.GraphDatabase.driver", spy)
+    bounds = Neo4jDriverBounds(
+        connection_timeout=1.0,
+        connection_acquisition_timeout=2.0,
+        max_transaction_retry_time=3.0,
+        transaction_timeout=4.0,
+    )
+    with Neo4jClient("bolt://localhost:1", "u", "p", bounds=bounds):
+        pass
+    assert captured["connection_timeout"] == 1.0
+    assert captured["connection_acquisition_timeout"] == 2.0
+    assert captured["max_transaction_retry_time"] == 3.0
+    # the fourth is NOT pool configuration - it rides on the transaction
+    assert "transaction_timeout" not in captured
+
+
+def test_the_transaction_timeout_rides_on_the_managed_transaction():
+    """`execute_read`/`execute_write` take no timeout argument in driver 5.28
+    (measured: their signature is `(transaction_function, *args, **kwargs)` and
+    the kwargs go to the function). `unit_of_work` is the driver's own route,
+    and it stamps the work function with the metadata the session reads."""
+    client, _, _ = _client()
+    client._bounds = Neo4jDriverBounds(transaction_timeout=7.5)
+    seen: list = []
+
+    class _Recorder(_FakeSession):
+        def _apply(self, mode, work):
+            seen.append(getattr(work, "timeout", None))
+            return super()._apply(mode, work)
+
+    client._driver.session = lambda database=None: _Recorder(
+        client._driver._log, [{"v": 1}], _FakeSummary(None)
+    )
+    client.read("MATCH (n) RETURN n")
+    assert seen == [7.5]
+
+
+def test_run_script_carries_the_same_ceiling_on_its_auto_commit_path():
+    client, _, log = _client()
+    client._bounds = Neo4jDriverBounds(transaction_timeout=9.0)
+    client.run_script("MERGE (a:A);\n")
+    (sent,) = (e for e in log if e[0] == "session.run")
+    assert isinstance(sent[1], Query)
+    assert sent[1].timeout == 9.0
+
+
+def test_an_unreachable_server_gives_up_within_the_ceiling():
+    """The failure CORE13 exists to end, driven rather than described: a socket
+    that ACCEPTS and never speaks bolt.
+
+    MEASURED both ways on the laptop, 2026-09-10, against this same silent
+    socket. Unbounded - the construction at the CORE11 tip, `liveness_check_
+    timeout=0` and nothing else - the driver's own defaults gave a 60s handshake
+    deadline and then retried five times with backoff: **102.9 seconds** before
+    `ServiceUnavailable`. With the bounds below: **under 5**. That ratio is the
+    finding; the assertion is generous against a slow runner, not tuned to it.
+
+    A listening-but-silent socket rather than a closed port on purpose - a
+    closed port is refused instantly and would prove nothing about a timeout.
+    """
+    listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    listener.bind(("127.0.0.1", 0))
+    listener.listen(1)  # never accept(): the handshake hangs
+    port = listener.getsockname()[1]
+    bounds = Neo4jDriverBounds(
+        connection_timeout=1.0,
+        connection_acquisition_timeout=2.0,
+        max_transaction_retry_time=1.0,
+        transaction_timeout=1.0,
+    )
+    started = time.monotonic()
+    try:
+        # DriverError, not Neo4jError: the server never answered, so there is no
+        # server-side error to carry - the driver is the one reporting.
+        with pytest.raises(neo4j.exceptions.DriverError) as info:
+            with Neo4jClient(f"bolt://127.0.0.1:{port}", "u", "p", bounds=bounds) as client:
+                client.read("RETURN 1 AS one")
+    finally:
+        listener.close()
+    elapsed = time.monotonic() - started
+    # NAMED, not a bare hang: the driver says what it could not do
+    assert type(info.value).__name__ in ("ServiceUnavailable", "SessionExpired")
+    # …and it says so within the wait we declared, with slack for a slow runner
+    assert elapsed < 20, f"gave up after {elapsed:.1f}s - the ceiling did not hold"
