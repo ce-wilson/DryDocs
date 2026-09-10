@@ -1,0 +1,241 @@
+"""CORE11 — the core driver seam: access mode and captured diagnostics.
+
+Offline. A duck-typed fake driver stands in for the real one (the pattern
+``test_cypher_split.py`` established), because the two facts under test are
+about WHICH driver call a method makes and WHAT it does with the summary — both
+observable without a server, and neither observable from a green loader run.
+
+The 2026-09-07 core report is the subject: S2 (every read ran inside a write
+transaction — ``execute_read`` appeared nowhere in the first-party tree) and S3
+(``run`` dropped the result summary, so a query naming a label that does not
+exist returned ``[]`` with no signal, the same value as a query that matched
+nothing).
+"""
+
+from __future__ import annotations
+
+import logging
+
+from drydocs_core.neo4j_client import Neo4jClient
+
+
+class _FakeSummary:
+    def __init__(self, notifications: list[dict] | None = None) -> None:
+        self.notifications = notifications or []
+
+
+class _FakeResult:
+    def __init__(self, rows: list[dict], summary: _FakeSummary) -> None:
+        self._rows = rows
+        self._summary = summary
+        self.consumed_after_rows: bool | None = None
+        self._drained = False
+
+    def __iter__(self):
+        self._drained = True
+        return iter(self._rows)
+
+    def consume(self) -> _FakeSummary:
+        # Records the ORDER, because a summary consumed before the stream is
+        # drained is incomplete — that is the bug this fake can catch.
+        self.consumed_after_rows = self._drained
+        return self._summary
+
+
+class _FakeTx:
+    def __init__(self, log: list, rows: list[dict], summary: _FakeSummary) -> None:
+        self._log = log
+        self._rows = rows
+        self._summary = summary
+        self.result: _FakeResult | None = None
+
+    def run(self, cypher: str, bind: dict) -> _FakeResult:
+        self._log.append(("tx.run", cypher, dict(bind)))
+        self.result = _FakeResult(self._rows, self._summary)
+        return self.result
+
+
+class _FakeSession:
+    def __init__(self, log: list, rows: list[dict], summary: _FakeSummary) -> None:
+        self._log = log
+        self._rows = rows
+        self._summary = summary
+        self.tx: _FakeTx | None = None
+
+    def __enter__(self) -> _FakeSession:
+        return self
+
+    def __exit__(self, *_: object) -> bool:
+        return False
+
+    def _apply(self, mode: str, work):
+        self._log.append((mode,))
+        self.tx = _FakeTx(self._log, self._rows, self._summary)
+        return work(self.tx)
+
+    def execute_read(self, work):
+        return self._apply("execute_read", work)
+
+    def execute_write(self, work):
+        return self._apply("execute_write", work)
+
+    def run(self, statement: str, params: dict) -> _FakeResult:
+        self._log.append(("session.run", statement, dict(params)))
+        return _FakeResult(self._rows, self._summary)
+
+
+class _FakeDriver:
+    def __init__(self, log: list, rows: list[dict], summary: _FakeSummary) -> None:
+        self._log = log
+        self._rows = rows
+        self._summary = summary
+        self.sessions: list[_FakeSession] = []
+
+    def session(self, database: str | None = None) -> _FakeSession:
+        session = _FakeSession(self._log, self._rows, self._summary)
+        self.sessions.append(session)
+        return session
+
+
+def _client(rows=None, notifications=None):
+    log: list = []
+    client = Neo4jClient("bolt://fake", "u", "p")
+    # `is None`, not `or`: an EMPTY row list is the interesting case for S3 —
+    # the point of that finding is that empty and empty-because-mistyped were
+    # the same value — and `rows or [...]` would substitute a row under it.
+    driver = _FakeDriver(log, [{"v": 1}] if rows is None else rows, _FakeSummary(notifications))
+    client._driver = driver
+    return client, driver, log
+
+
+def _modes(log: list) -> list[str]:
+    return [entry[0] for entry in log if entry[0] in ("execute_read", "execute_write")]
+
+
+# ── S2: the access mode is the caller's to choose ────────────────────────────
+
+
+def test_read_uses_a_read_transaction():
+    client, _, log = _client()
+    assert client.read("MATCH (n) RETURN n") == [{"v": 1}]
+    assert _modes(log) == ["execute_read"]
+
+
+def test_run_stays_the_write_path():
+    """Deliberately unchanged: `run` has ~40 call sites, most of them writes,
+    so flipping its default would silently convert them. The migration of the
+    read-shaped sites is an ADR action item, not a default change."""
+    client, _, log = _client()
+    assert client.run("MERGE (n:Thing) RETURN n") == [{"v": 1}]
+    assert _modes(log) == ["execute_write"]
+
+
+def test_every_read_helper_on_the_client_reads():
+    """S2 named four: server_version, apoc_available, constraint_names,
+    constraints_detail. All four demanded write access before CORE11."""
+    client, _, log = _client(rows=[{"v": "2026.05.0", "name": "n"}])
+    client.server_version()
+    client.apoc_available()
+    client.constraint_names()
+    client.constraints_detail()
+    assert _modes(log) == ["execute_read"] * 4
+
+
+def test_binds_reach_the_statement_by_either_route():
+    client, driver, log = _client()
+    client.read("MATCH (n {a: $a, b: $b}) RETURN n", {"a": 1}, b=2)
+    (call,) = (e for e in log if e[0] == "tx.run")
+    assert call[2] == {"a": 1, "b": 2}
+
+
+# ── S3: the driver's diagnostics are no longer dropped ───────────────────────
+
+
+_UNKNOWN_LABEL = {
+    "code": "Neo.ClientNotification.Statement.UnknownLabelWarning",
+    "title": "The provided label is not in the database.",
+    "severity": "WARNING",
+    "description": "One of the labels does not exist",
+    "position": {"line": 1, "column": 8},
+}
+
+
+def test_a_notification_survives_the_call():
+    client, _, _ = _client(rows=[], notifications=[_UNKNOWN_LABEL])
+    rows = client.read("MATCH (n:Typo) RETURN n")
+    assert rows == []
+    # …and the empty answer is no longer the whole story
+    (note,) = client.last_notifications
+    assert note.code.endswith("UnknownLabelWarning")
+    assert note.position == "1:8"
+
+
+def test_a_clean_run_records_an_empty_list_not_a_missing_field():
+    client, _, _ = _client()
+    client.run("MERGE (n:Thing)")
+    assert client.last_notifications == []
+
+
+def test_the_previous_statements_notifications_do_not_linger():
+    """`last_notifications` describes the MOST RECENT statement. A stale list
+    would be worse than none: it would attribute one query's warning to another."""
+    client, driver, _ = _client(rows=[], notifications=[_UNKNOWN_LABEL])
+    client.read("MATCH (n:Typo) RETURN n")
+    assert client.last_notifications
+    driver._summary = _FakeSummary([])
+    client.read("MATCH (n:Real) RETURN n")
+    assert client.last_notifications == []
+
+
+def test_the_summary_is_consumed_after_the_rows_are_drained():
+    client, driver, _ = _client()
+    client.read("MATCH (n) RETURN n")
+    assert driver.sessions[0].tx.result.consumed_after_rows is True
+
+
+def test_a_notification_is_logged_at_its_own_severity(caplog):
+    """Not flattened to one level. An INFORMATION notice logged as a warning
+    teaches readers the channel cries wolf — Idea-111's failure mode."""
+    client, _, _ = _client(
+        notifications=[
+            dict(_UNKNOWN_LABEL, severity="INFORMATION", code="Neo.Info.Thing"),
+            _UNKNOWN_LABEL,
+        ]
+    )
+    with caplog.at_level(logging.INFO, logger="drydocs.neo4j_client"):
+        client.read("MATCH (n) RETURN n")
+    levels = {r.levelno for r in caplog.records}
+    assert levels == {logging.INFO, logging.WARNING}
+
+
+def test_an_unknown_severity_logs_as_a_warning(caplog):
+    client, _, _ = _client(notifications=[dict(_UNKNOWN_LABEL, severity="")])
+    with caplog.at_level(logging.INFO, logger="drydocs.neo4j_client"):
+        client.read("MATCH (n) RETURN n")
+    assert [r.levelno for r in caplog.records] == [logging.WARNING]
+
+
+def test_run_script_records_what_its_statements_carried():
+    """`run_script` already called consume() and threw the summary away — the
+    same drop as `run`, in the method that runs the bootstrap DDL."""
+    client, _, log = _client(notifications=[_UNKNOWN_LABEL])
+    client.run_script("MERGE (a:A);\nMERGE (b:B);\n")
+    assert len([e for e in log if e[0] == "session.run"]) == 2
+    assert client.last_notifications
+
+
+def test_run_with_diagnostics_returns_rows_and_the_payload():
+    client, _, log = _client(rows=[{"v": 1}], notifications=[_UNKNOWN_LABEL])
+    rows, notes = client.run_with_diagnostics("MATCH (n) RETURN n", write=False)
+    assert rows == [{"v": 1}]
+    assert _modes(log) == ["execute_read"]
+    # plain dicts, the R21 payload shape the API and the agents already emit
+    assert notes[0]["code"].endswith("UnknownLabelWarning")
+    assert set(notes[0]) == {
+        "code",
+        "title",
+        "severity",
+        "description",
+        "position",
+        "category",
+    }
