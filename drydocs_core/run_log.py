@@ -221,6 +221,8 @@ class LoaderRunLog:
         self.meta = dict(meta or {})
         self.path: Path | None = None
         self._fh = None
+        #: CORE15: this log reports its own write failure ONCE per run (_write).
+        self._write_failed = False
         self._handler: _CaptureHandler | None = None
         self._rejects = 0
         self._warnings = 0
@@ -314,8 +316,28 @@ class LoaderRunLog:
             return
         try:
             self._fh.write(text)
-        except OSError:
-            pass
+        except OSError as exc:
+            # CORE15, AND THE ONE THE ITEM DID NOT LIST. Its acceptance named
+            # four handlers by line; re-measured at pull (which the item asked
+            # for), this is a FIFTH, and it is the one that swallows the case
+            # the item's own title is about — a run log that cannot report its
+            # own failure. A write failure never reaches `_CaptureHandler.emit`,
+            # because it is caught HERE first, one level below it. Fixing only
+            # the four would have left the headline case silent.
+            #
+            # Once per run, flag set before the warning, for the same reentrancy
+            # reason as the handler: this logger is under CAPTURE_NAMESPACES, so
+            # the warning comes back through emit() into this same method.
+            if self._write_failed:
+                return
+            self._write_failed = True
+            LOGGER.warning(
+                "run log %s could not be written (%s: %s) - the load continues and this file "
+                "is INCOMPLETE from here; it is an audit trail, never the reason a load fails",
+                self.path,
+                type(exc).__name__,
+                exc,
+            )
 
 
 @contextmanager
