@@ -1,0 +1,54 @@
+id: GRAPH7
+epic: component-topology
+title: "Retire the AIS typo-label guard - it asserts a fact about the company's tree from the producer's, passes vacuously here because the labels never existed, and has had no subject on either side since the company removed them"
+type: task
+module: graph-infra
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- tests/unit/test_constraint_drift.py
+- docs/company-prompts/port-ais-supplement-company-prompt.md
+acceptance: |
+  (a) tests/unit/test_constraint_drift.py::test_the_typo_labels_appear_nowhere_in_the_schema_tree
+  is REMOVED, not narrowed, and the file's remaining tests stay green. The reason goes in the
+  file where the test was, not only here: the labels are gone from both trees, so there is
+  nothing left for it to guard.
+  (b) The removal states the three separate defects it closes, because each is a class this
+  repo keeps re-finding and a bare deletion teaches none of them: it asserted a fact about the
+  COMPANY's tree from the producer's ("dropped company-side after a zero-node check") which the
+  producer's own docs/company-prompts/port-ais-supplement-company-prompt.md disproves; it passed
+  VACUOUSLY here for its whole life because the producer never had the labels, so it was green
+  while being wrong; and it is a raw p.read_text() substring scan in a file that already imports
+  without_prose from tests/source_scan.py, which is J66's exact failure mode and the reason 10 of
+  its 17 hits company-side were the comments explaining the supersession.
+  (c) The other tests in test_constraint_drift.py are left alone. The constraint-drift subject is
+  real and this item is not about it.
+  (d) NOT removed, and named so a later reader does not extend this: the AIS acronym row in
+  config/taxonomy/software-registry.yaml stays (SME 2026-09-10, and the platforms-taxonomy gate's
+  own Q6 preserved it as the only surviving spelling); config/gate-log.md is append-only and is
+  not edited; the platforms-taxonomy gate page takes riders, never edits (L25).
+  (e) Full unit suite green, and the J57 family run rather than a targeted file.
+notes: |
+  Minted 2026-09-10 (Lane A, desktop; pen backlog) on the SME's ruling that the Team Edition base
+  must not carry this. Measured at dc8dee7e: AIS exists in producer CODE nowhere -
+  drydocs_core/schema/platforms_supplement.cypher does not exist, the apply-platforms-supplement
+  verb does not exist, zero files under drydocs_core/schema/ carry the labels, and zero entries in
+  drydocs_core/ontology/ name them. Eleven backlog items reference AIS (C6, C11, C12, C13, C20,
+  C25, G34, G130, J38, J45, O79) and every one is done: C11 captured the company shape, C12 ran
+  the platforms-taxonomy gate that retired it, C13 was the build. This guard is the single
+  executable artifact left, and it is the whole of the debt.
+  The company closed its half on 2026-09-09 at the port-base-20260908 close-out: platforms_supplement.cypher
+  emptied of AIS content (not deleted - their CLI verb reads it by path and two vocabulary entries
+  point at it), on the SME ruling that their constraints are dropped and the database is fresh.
+  Their analysis also corrected a premise BOTH sides had been repeating: four of the eight
+  statements were MERGE, not MATCH, so the supplement was never the no-op its own header claimed -
+  it wrote four deprecated :OntologyTerm nodes carrying the label names on every apply.
+  Why its own item rather than folded into GRAPH4: GRAPH4 triages the eighteen raw-source guards
+  against J66 and would CONVERT this one to source_scan. The ruling here is that it should not
+  exist at all, and the reason is the Team Edition inheritance decision (ADR 0015), not the
+  guard-reading convention. Traceability to that decision is the point; GRAPH4 keeps the other
+  seventeen.
