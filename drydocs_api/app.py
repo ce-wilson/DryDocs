@@ -291,6 +291,7 @@ def create_app(
     The default credential store RE-READS its file when it changes (O73), so
     adding or rotating a secret takes effect without restarting the server."""
     from fastapi import Depends, FastAPI, Header, HTTPException, Request, UploadFile
+    from fastapi.responses import JSONResponse
 
     app = FastAPI(
         title="drydocs-api", description="Thin read API over the knowledge graph (ADR 0005)"
@@ -304,6 +305,30 @@ def create_app(
     # never named); an allowlist that cannot drift is one that does not exist.
     # DRYDOCS_CORS_ORIGINS is retired with it. A cross-origin caller is a deployment
     # defect this API refuses by default rather than a case to configure for.
+
+    # API5: A GRAPH OUTAGE IS 503, NOT 500. Every route that touches the graph
+    # used to let a driver failure escape as an unhandled exception, which
+    # FastAPI renders as 500 — and 500 means "this service has a bug". The
+    # console reads it that way too: `isUpstreamDown` in web/src/lib/
+    # reachability.ts already treats 502/503/504 as "the service is down, not
+    # this page", and 500 is deliberately not in that set. So a stopped Neo4j
+    # container presented to the operator as a console defect, which sends them
+    # to read our code instead of starting their database.
+    #
+    # DriverError, and NOT Neo4jError, is the line — the two mean opposite
+    # things. A DriverError is the driver failing to get an answer at all:
+    # unreachable, session expired, misconfigured, or one of CORE13's timeouts
+    # tripping. A Neo4jError is the SERVER answering with an error, which for a
+    # server-side query we wrote IS our bug and must stay a 500. Widening this
+    # to Neo4jError would hide real defects behind "service down".
+    #
+    # THE CLASS, NEVER THE MESSAGE (ADR 0020). A driver's message quotes the URI
+    # it dialled, so returning it would put a host and port on a page that must
+    # carry neither. The class is what actually distinguishes the cases, and it
+    # is what `get_graph_status` already returns for the same reason.
+    @app.exception_handler(neo4j.exceptions.DriverError)
+    def _graph_unreachable(request: Request, exc: neo4j.exceptions.DriverError) -> JSONResponse:
+        return JSONResponse(status_code=503, content={"detail": type(exc).__name__})
 
     sessions = store if store is not None else InMemorySessionStore()
     graph = runner if runner is not None else LiveRunner()
