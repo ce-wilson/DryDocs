@@ -317,7 +317,7 @@ def test_conformance_is_separate_from_the_m0_detector(drifted) -> None:
     """M0 pins detect_findings(modern) == []; a conformance pass legitimately
     has plenty to say about a minimal transcript. Keeping them apart preserves
     that contract, and detect_all composes them."""
-    combined = detect_all(drifted)
+    combined = detect_all(drifted).findings
     rules = {f.rule_id for f in combined}
     assert DOT_SMUGGLING_RULE_ID in rules
     assert len(combined) == len(detect_conformance(drifted)) + len(
@@ -328,12 +328,12 @@ def test_conformance_is_separate_from_the_m0_detector(drifted) -> None:
 def test_every_finding_is_unratified(drifted) -> None:
     """Rule ratification is gate territory until the registry is machine
     readable; hardcoding those judgments here would leak gate decisions."""
-    assert all(f.ratified is False for f in detect_all(drifted))
+    assert all(f.ratified is False for f in detect_all(drifted).findings)
 
 
 def test_findings_carry_the_registry_severity_vocabulary(drifted) -> None:
     allowed = {"must-fix", "should-fix", "advisory"}
-    assert {f.severity for f in detect_all(drifted)} <= allowed
+    assert {f.severity for f in detect_all(drifted).findings} <= allowed
 
 
 # == G69 — the four fan-out defect classes (R41-R44) =========================

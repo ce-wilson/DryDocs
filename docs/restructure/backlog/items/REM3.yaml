@@ -7,7 +7,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs_remediation/detect.py
@@ -24,3 +24,66 @@ notes: |
   HAND-BACK from CORE10 (Lane A, 2026-09-09; ADR 0021 action item 4, name only): when this
   item is open, add ONE citing comment at drydocs_remediation/equivalence.py above `class EquivalenceReport` (precedent 1: proven / diverged / not proven - no evidence is never evidence) - the shape is
   the line CORE10 placed in drydocs/plan/plan_board.py; do not rewrite the site (ADR 0021 D4).
+
+  CLOSED 2026-09-10 (Lane B, laptop, wip/rem3-laptop, based on main). Venue (J18): offline unit
+  suite against the bundled synthetic folder-set fixture - no Control-M, no graph, no machine-local
+  export. Full suite before this note: 4052 passed, 1 failed, and that one is the derived render
+  named below.
+
+  THE NUMBERS ARE REAL AND THEY MATCH THE ITEM: 17 rules evaluated - R1 plus the 16 in
+  CONFORMANCE_RULE_IDS - against 45 declared in internal/remediation/standards-rules-registry.md.
+  The two id sets line up exactly, including R39a/R39b, which the registry declares and the pass
+  implements as separate rules; so the complement is a clean 28 with nothing unmatched in either
+  direction, and a test asserts that rather than trusting it. `detect_all` on an empty definition
+  set now renders "checked, clean (17 of 45 registry rules)" where it used to return `[]`.
+
+  THE RETURN TYPE CHANGED RATHER THAN A SECOND FUNCTION BEING ADDED, and that is the decision worth
+  defending. A `detect_all_with_coverage` beside `detect_all` would have left the defective call
+  available and made the honest one opt-in - which is how the denominator went missing in the first
+  place. Now there is no way to obtain the findings while leaving the coverage behind: callers read
+  `.findings`, a one-word change at each of the six sites. `len(result)` returns the finding count,
+  so the one thing a bare list was actually used for still works unchanged.
+
+  THE NUMERATOR IS DERIVED, NOT RESTATED. `EVALUATED_RULE_IDS = (DOT_SMUGGLING_RULE_ID,
+  *CONFORMANCE_RULE_IDS)`, so a rule added to either declaration appears in the coverage without
+  anyone remembering a second list. A test pins that identity, because a hand-maintained copy is
+  the failure this whole item is about, one level up.
+
+  UNREADABLE IS NOT ZERO, AND NOT 45. The registry lives under internal/, which is excluded from
+  the public push, so any checkout built behind the publish boundary has no registry to read.
+  `registry_rule_ids()` returns None there, and that None TRAVELS: `not_evaluated_rule_ids` is None
+  rather than `()` - "unknown", not "nothing missing" - `registry_size` is None, and the verdict
+  renders "17 rules (registry unreadable here)". Reporting 45 would be this module asserting a
+  count it could not see; reporting 0 not-evaluated would claim every rule is implemented. Both
+  branches are tested, the second by monkeypatching the reader rather than by hoping for a checkout
+  without internal/.
+
+  THE PROFILE CARRIES BOTH (the acceptance's second half). `rule_coverage` sits beside `findings`
+  in FolderSetProfile, is JSON-transportable, and the summary line now reads
+  "findings=21 over 17 of 45 rules" - the count never travels without its denominator. The
+  top-level key list in test_remediation_folder_set_fixture.py names `rule_coverage` explicitly,
+  in the guard that declares the frame's sections rather than deriving them, so deleting it fails
+  a test instead of quietly restoring the old state.
+
+  ADR 0021: `conformance_outcome` is the registered probe name (the registry's guard reads a return
+  annotation, and the answer to "does this conform" is the outcome, not the rows). It IS a probe on
+  the record's own definition - its answer depends on something it had to go and look at, namely
+  whether internal/ exists in this checkout. That is also why "no gate" in the acceptance is right:
+  stating what was checked asserts nothing new about a job.
+
+  CORE10 HAND-BACK, DONE (ADR 0021 action item 4, name only): one citing comment above
+  `class EquivalenceReport` in equivalence.py, naming it as precedent 1 - proven / diverged / NOT
+  PROVEN, "no evidence is never evidence". The site is NOT rewritten (D4). One thing to note for
+  whoever does the next one of these: the comment must go ABOVE the `@dataclass` decorator, not
+  between it and the class. Placed between, it is still valid Python and the decorator still
+  applies, so nothing fails - it just reads as though the decorator belongs to the comment.
+
+  For Lane A at merge: `web/src/generated/remediation-profile.json` is STALE on this branch and
+  `test_remediation_profile_json.py::test_committed_profile_matches_regeneration` is red because of
+  it - the profile now carries a `rule_coverage` block. The writer is
+  `scripts/render_remediation_profile.py`, which a default-paths `render_board.py` run invokes.
+  Lane B does not render and `web/src/**` is the UI session's pen this burst. This is the same
+  shape as CORE13's enforcement-matrix red: one derived artifact, one known writer, named here.
+
+  Also for Lane A: this appends a line to `check_outcome.PROBES`, as REV2 and CORE14 do on their
+  branches. Additions to one tuple; the merge keeps every line.

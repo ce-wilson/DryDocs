@@ -307,6 +307,14 @@ class FolderSetProfile:
     #: about meaning, so the defect list stays the detector's output and is
     #: carried, not restated.
     findings: list[dict[str, Any]] = field(default_factory=list)
+    #: REM3: the DENOMINATOR for the list above. Without it an empty `findings`
+    #: reads as "this folder set conforms" when it means "no violations among
+    #: the rules that have detectors" — 17 of the registry's 45. Carried in the
+    #: same spirit as the findings: the detector computes it, the profile does
+    #: not restate or re-derive it. `not_evaluated_rule_ids: null` means the
+    #: registry was UNREADABLE in that checkout (it lives under internal/), not
+    #: that nothing was missing.
+    rule_coverage: dict[str, Any] = field(default_factory=dict)
 
     def as_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -320,7 +328,10 @@ class FolderSetProfile:
             f"variables={len(self.variables)} contacts={len(self.contacts)} | "
             f"wrappers={len(self.invocations)} (shared={shared}) | "
             f"slots: {slots_open}/{len(self.substitution_slots)} not-supplied | "
-            f"findings={len(self.findings)}"
+            # REM3: the count never travels without its denominator.
+            f"findings={len(self.findings)} over "
+            f"{len(self.rule_coverage.get('evaluated_rule_ids') or ())} of "
+            f"{self.rule_coverage.get('registry_size') or '?'} rules"
         )
 
 
@@ -329,6 +340,7 @@ class FolderSetProfile:
 
 def profile(definitions: DefinitionSet) -> FolderSetProfile:
     """Census one staged folder set. PURE — reads only, writes nothing."""
+    detection = detect_all(definitions)
     return FolderSetProfile(
         source=definitions.source or "",
         shape=_shape(definitions),
@@ -337,7 +349,8 @@ def profile(definitions: DefinitionSet) -> FolderSetProfile:
         contacts=_contacts(definitions),
         invocations=_invocations(definitions),
         substitution_slots=_slots(definitions),
-        findings=[asdict(f) for f in detect_all(definitions)],
+        findings=[asdict(f) for f in detection.findings],
+        rule_coverage=detection.coverage(),
     )
 
 

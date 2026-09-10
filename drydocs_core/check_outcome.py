@@ -187,4 +187,9 @@ PROBES: tuple[str, ...] = (
     # not declared which side of the port it is cannot say which rows are its own,
     # and calling that clean would hide the consumer the item exists for.
     "drydocs.port.gate_log_redactions.stale_redaction_check",
+    # REM3 (2026-09-10): the conformance detector's verdict. An empty findings
+    # list used to read as "this folder set conforms" when it meant "no
+    # violations among the 17 of 45 registry rules that have detectors". A probe
+    # because the answer depends on whether internal/ is in this checkout at all.
+    "drydocs_remediation.detect.conformance_outcome",
 )

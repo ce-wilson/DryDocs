@@ -32,7 +32,11 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
 
+from drydocs_core.check_outcome import CheckOutcome, checked_clean
+from drydocs_core.check_outcome import findings as findings_outcome
 from drydocs_core.orchestration.controlm import classify_job_variables
 from drydocs_core.orchestration.controlm.variables import (
     ADJACENT_REF_RE,
@@ -41,6 +45,7 @@ from drydocs_core.orchestration.controlm.variables import (
     KNOWN_SYSTEM_VARIABLES,
     PLAIN_REF_RE,
 )
+from drydocs_core.repo_paths import repo_root
 
 from .formats import DefinitionSet, JobDefinition
 
@@ -461,11 +466,6 @@ def _deduped(findings: list[Finding]) -> list[Finding]:
     return out
 
 
-def detect_all(definitions: DefinitionSet) -> list[Finding]:
-    """The M0 failure-pattern detector plus the conformance pass."""
-    return detect_findings(definitions) + detect_conformance(definitions)
-
-
 def _all_declarations(definitions: DefinitionSet):
     """(target, name, value) for every declaration anywhere in the set."""
     for folder in definitions.folders:
@@ -860,3 +860,137 @@ def _check_notifications(definitions: DefinitionSet) -> list[Finding]:
                 )
             )
     return findings
+
+
+# =============================================================================
+# REM3 (2026-09-10): the denominator
+# =============================================================================
+#
+# `detect_all` returned a bare list. An EMPTY list therefore read as "this folder
+# set conforms" when what it meant was "no violations among the 17 of 45
+# registry rules that have detectors" — and the reader had no way to tell those
+# apart, because nothing in the answer said 17, or 45, or which. That is the
+# checked-vs-not-checked family (ADR 0021), in the specific shape the record
+# calls out by name: "a denominator that is not stated (17 of 45 rules) is a
+# FINDINGS result that hides its own coverage."
+#
+# The module's own standard was already better: `equivalence.py`'s three-valued
+# proven / diverged / not-proven verdict, cited there as ADR 0021's precedent 1.
+# This brings the detector up to it.
+
+#: The registry lives under ``internal/`` and is Internal-classified, so it is
+#: absent from any checkout built behind the publish boundary. Reading it is
+#: therefore CONDITIONAL by design, and its absence is reported rather than
+#: guessed at — never as "45", which would be this file asserting a count it
+#: could not see.
+_RULES_REGISTRY_REL = "internal/remediation/standards-rules-registry.md"
+_REGISTRY_RULE_RE = re.compile(r"^## (R[0-9]+[a-z]?) ", re.M)
+
+
+def registry_rule_ids(path: Path | None = None) -> tuple[str, ...] | None:
+    """Every rule id the standards registry declares, or ``None`` if unreadable.
+
+    ``None`` is the honest answer for a checkout with no ``internal/`` tree, and
+    it travels: :func:`detect_all` then reports the evaluated ids with no
+    denominator rather than inventing one.
+    """
+    if path is None:
+        path = repo_root(Path(__file__).resolve().parent) / _RULES_REGISTRY_REL
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError:
+        return None
+    ids = tuple(dict.fromkeys(_REGISTRY_RULE_RE.findall(text)))
+    return ids or None
+
+
+#: The rules this module actually evaluates: the M0 dot-smuggling detector plus
+#: the G67 conformance pass. This is the numerator, and it is DERIVED from the
+#: two declarations rather than restated, so a rule added to either shows up
+#: here without anyone remembering to.
+EVALUATED_RULE_IDS: tuple[str, ...] = (DOT_SMUGGLING_RULE_ID, *CONFORMANCE_RULE_IDS)
+
+
+@dataclass(frozen=True)
+class DetectionResult:
+    """What the detector found, AND what it looked at (REM3).
+
+    ``findings`` is unchanged in content and order - callers that only want the
+    defect list read this and see exactly what ``detect_all`` used to return.
+    The rest is the coverage the old return value could not express.
+    """
+
+    findings: tuple[Finding, ...]
+    #: The rules that were evaluated - the numerator, always known.
+    evaluated_rule_ids: tuple[str, ...]
+    #: Registry rules with no detector here. ``None`` when the registry could
+    #: not be read, which is NOT the same as "none are missing".
+    not_evaluated_rule_ids: tuple[str, ...] | None
+    #: Total rules the registry declares, or ``None`` when unreadable.
+    registry_size: int | None
+
+    @property
+    def outcome(self) -> CheckOutcome:
+        """The three-state verdict (ADR 0021), with the denominator on it.
+
+        CHECKED_CLEAN over a stated size still means "clean over 17 of 45" - the
+        subject line says so, so a surface cannot render it as unqualified
+        conformance. That is the whole point: the state is honest AND the
+        coverage rides with it.
+        """
+        if self.registry_size is None:
+            subject = f"{len(self.evaluated_rule_ids)} rules (registry unreadable here)"
+        else:
+            subject = f"{len(self.evaluated_rule_ids)} of {self.registry_size} registry rules"
+        if self.findings:
+            return findings_outcome(
+                self.findings, size=len(self.evaluated_rule_ids), subject=subject
+            )
+        return checked_clean(size=len(self.evaluated_rule_ids), subject=subject)
+
+    def coverage(self) -> dict[str, Any]:
+        """The coverage block a profile carries, JSON-ready."""
+        return {
+            "evaluated_rule_ids": list(self.evaluated_rule_ids),
+            "not_evaluated_rule_ids": (
+                None if self.not_evaluated_rule_ids is None else list(self.not_evaluated_rule_ids)
+            ),
+            "registry_size": self.registry_size,
+            "verdict": self.outcome.render(),
+        }
+
+    def __len__(self) -> int:
+        return len(self.findings)
+
+
+def detect_all(definitions: DefinitionSet) -> DetectionResult:
+    """The M0 failure-pattern detector plus the conformance pass, WITH its coverage.
+
+    REM3 changed the return type deliberately rather than adding a second
+    function: a caller that wants the findings alone reads ``.findings``, which
+    is a one-word change at each site, and there is then no way to obtain the
+    findings while accidentally leaving the denominator behind - which is the
+    defect. ``len(result)`` is the finding count, so the one thing a bare list
+    was really used for still works.
+    """
+    found = tuple(detect_findings(definitions) + detect_conformance(definitions))
+    declared = registry_rule_ids()
+    evaluated = set(EVALUATED_RULE_IDS)
+    return DetectionResult(
+        findings=found,
+        evaluated_rule_ids=EVALUATED_RULE_IDS,
+        not_evaluated_rule_ids=(
+            None if declared is None else tuple(r for r in declared if r not in evaluated)
+        ),
+        registry_size=None if declared is None else len(declared),
+    )
+
+
+def conformance_outcome(definitions: DefinitionSet) -> CheckOutcome:
+    """:func:`detect_all`'s verdict alone - the registered probe (ADR 0021 D3).
+
+    A probe because the answer depends on something it had to go and look at:
+    whether ``internal/`` is in this checkout at all. The registry's presence is
+    a fact about the tree, not about the folder set.
+    """
+    return detect_all(definitions).outcome
