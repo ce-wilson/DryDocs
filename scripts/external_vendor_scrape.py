@@ -94,8 +94,14 @@ class VendorTree:
     #: DISTINCT from `id`, which names ONE fetch of ONE tree at ONE version —
     #: a corpus outlives its captures. Declared here rather than derived
     #: because the graph is keyed by it and `drydocs docs-verify` searches by
-    #: it (Q7). None = not registered yet; conversion refuses rather than
-    #: guessing (docmeta invariant 1).
+    #: it (Q7). None = not registered yet.
+    #:
+    #: WHAT `None` ACTUALLY COSTS, corrected at Q28: not "conversion refuses" -
+    #: THE FETCH NEVER STARTS. The Q23 run<->row join runs in `main()` straight
+    #: after the tree lookup, BEFORE the TOC request, so an unregistered tree is
+    #: INERT: it lists under `--list` and `--dry-run` exits 2 with "no registry
+    #: id and no resolvable purpose". The old wording understated it by a whole
+    #: pipeline stage, which is how this tree sat capturable-but-unusable.
     corpus_id: str | None = None
     toc_path: str = "toc.json"
     #: Only capture pages under this top-level book. None = the whole tree.
@@ -130,6 +136,7 @@ TREES: dict[str, VendorTree] = {
         ),
         VendorTree(
             id="bmc-controlm-9.0.21-parameters",
+            corpus_id="bmc-docs-controlm-parameters",
             vendor="BMC",
             product="Control-M",
             version="9.0.21",

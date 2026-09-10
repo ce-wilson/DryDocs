@@ -187,7 +187,15 @@ VERBATIM_RUNGS = {1, 2, 3, "unprobed"}
 
 #: Rows whose ladder has never been walked, PINNED so the finding stays counted:
 #: `unprobed` reads as a task, and a row joining this set does so on purpose.
-KNOWN_UNPROBED = {"seal-pat-scrape", "mwaa-implementation-docs"}
+KNOWN_UNPROBED = {
+    "seal-pat-scrape",
+    "mwaa-implementation-docs",
+    # Q28 (2026-09-10): joins this set ON PURPOSE. The row registers the 9.0.21
+    # Parameters tree so it stops being inert, and registration is explicitly not
+    # a capture — inheriting the 9.0.20 sibling's rung 3 would record a capture
+    # that never ran, which is the failure this field exists to make visible.
+    "bmc-docs-controlm-parameters",
+}
 
 
 def _ladder() -> dict:

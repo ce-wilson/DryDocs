@@ -10,7 +10,7 @@
 # gitignored .env files, never in a committed file).
 schema: drydocs.dev-environment.v1
 classification: Internal-Public
-updated: 2026-09-08
+updated: 2026-09-10
 
 
 # WHICH EDITION THIS CHECKOUT RUNS AS (PLAN2 b, 2026-09-05; gate
@@ -87,8 +87,17 @@ census:
   docs_coverage:
     products: 17
     products_no_corpus: 15
-    corpora_total: 10
-    corpora_unclaimed: 8
+    # 10->11 at META2 (2026-09-10): the legacy-process-capture SHAPE row.
+    # 11->12 at Q28 (2026-09-10): the bmc-docs-controlm-parameters row.
+    corpora_total: 12
+    # 8->9: a shape row is claimed by no product BY CONSTRUCTION - it describes
+    # a customer's legacy process, not a software product in this registry.
+    # 9->10 at Q28: UNCLAIMED is the honest state and a finding, not a miss -
+    # the controlm product row's documentation.corpus still names the 9.0.20
+    # utilities corpus (docs_version 9.0.20, current_for: []). Repointing it at
+    # the version-correct 9.0.21 tree is a separate decision and a separate
+    # edit; Q28 is two edits, atomic, and the software registry is not one.
+    corpora_unclaimed: 10
   # tests/unit/test_schema.py::test_constraint_count - CREATE CONSTRAINT lines in
   # drydocs_core/schema/constraints.cypher (a per-entry file: the company's copy carries
   # its own supplement blocks, so its count is ahead of the producer's).

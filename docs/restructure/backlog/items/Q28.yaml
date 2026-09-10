@@ -8,7 +8,7 @@ phase: 14
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - config/doc-source-registry.yaml
@@ -77,3 +77,60 @@ notes: |
   Module `config` as a CHOICE, following Q27: the substance is a registry declaration. The
   scraper edit is one field plus a comment correction, not a behavior change — the refusal
   path, the ceiling and the politeness delay are all untouched.
+
+  ## Close (Lane B, laptop, 2026-09-10) - wip/q28-laptop, stacked on wip/meta2-laptop
+
+  (a) TWO EDITS, ONE COMMIT: the `bmc-docs-controlm-parameters` row and
+  `corpus_id="bmc-docs-controlm-parameters"` on the tree, in one commit.
+  (b) The dataclass comment is CORRECTED, not merely supplemented: it said
+  "conversion refuses rather than guessing", and the refusal is a whole pipeline
+  stage earlier - the Q23 join runs in main() before the TOC request, so the
+  tree was INERT, not merely unconvertible.
+  (c) Field values per the sibling, departing only where the facts differ.
+  (d)(e) captured_at carries `not-yet-captured` - a STATE, because the External
+  branch of the doc-registry guard requires a TRUTHY captured_at, so `null`
+  would have failed and an invented date would have lied. Nothing parses it:
+  docs_verify._freshness string-compares it and reports "uncheckable" against an
+  empty graph. capture_rung is `unprobed`, NOT the sibling's 3 - inheriting the
+  rung would record a capture that never ran, the exact failure G134 added the
+  field to expose. confirmed: false with the reason on the row.
+
+  (f) THE OBSERVABLE, run on the laptop (J18 - venue named):
+
+      poetry run python scripts/external_vendor_scrape.py bmc-controlm-9.0.21-parameters --dry-run
+
+    corpus entry   : bmc-docs-controlm-parameters
+    PAGES TO FETCH : 251
+    --dry-run: nothing fetched.        exit 0
+
+  It reached the plan, printed tree / books / subtree filter / resolved page
+  count, and made exactly one network request (the TOC). NO CAPTURE RUN was
+  performed - clause (e) reserves that for the operator.
+
+  CORROBORATION worth recording: the TOC's six books total 1,965 pages
+  (1 + 218 + 471 + 251 + 1023 + 1), matching the sibling row's independently
+  written "6 books / 1,965 pages" note exactly. The 9.0.21 trim is real and the
+  two rows now agree on the numbers.
+
+  ## Census moved (PLAN9): corpora_total 11 -> 12, corpora_unclaimed 9 -> 10
+
+  UNCLAIMED IS A FINDING, NOT A MISS, and it is the follow-up this item found:
+  the controlm product row's `documentation.corpus` still names
+  bmc-docs-controlm-utilities at docs_version 9.0.20 with `current_for: []`, so
+  the estate's version-correct corpus is now registered and nothing points at it.
+  Repointing is a separate decision AND a third edit, and clause (a) is
+  explicitly two edits - so it is named here rather than taken.
+  FOLLOW-UP FOR LANE A (needs a mint): decide whether the controlm product's
+  documentation pointer moves to bmc-docs-controlm-parameters, or whether a
+  product may name two corpora at different versions.
+
+  ## Renders NOT run (Lane B renders nothing)
+
+  Six red at close, every one a committed render or the Y5 roadmap guard: the
+  four load-map / registry-view surfaces META2 already moved, plus
+  test_enforcement_matrix.py::test_committed_matrix_matches_regeneration, which
+  this item moves by editing tests/unit/test_doc_registry.py. Writer for all of
+  them: `poetry run python scripts/render_board.py`. Outputs are
+  web/src/generated/** (UI pen) and docs/plan/** (backlog pen). Lane A at merge.
+
+  Suite: 4036 passed.
