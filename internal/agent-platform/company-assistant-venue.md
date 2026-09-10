@@ -286,7 +286,57 @@ corporate-looking host outside `internal/` is a public-web hostname on an Extern
 source, and every other host-like string is an RFC placeholder or loopback. `.env` is
 gitignored and no `.env`-shaped file carrying values is tracked. **Nothing to remediate here.**
 
-## 6. What is NOT claimed here
+## 6. The file their rewrite sits on top of has FOUR defects in 35 lines, and one is ours
+
+Their rewritten `reference/platforms/neo4j/README.md` was shared, so it could be diffed against
+the producer's. **The rewrite is a real improvement**: it adds a venue routing table at the top
+that says plainly which route loads where, and it states the complement correctly — the
+repo-local skill carries what is true of *this* graph, the plugin carries version-current
+vendor Neo4j, "they are complements, not substitutes." That framing is the thing to keep.
+
+**But it is additive, so it inherits everything already wrong underneath it.** The producer's
+own copy of that file is 35 lines and carries four defects, measured 2026-09-10 at `84ecb090`:
+
+| line | defect | since |
+|---|---|---|
+| 22 | routes "Aura provisioning / agents / analytics" to `neo4j-skills:neo4j-aura-*-skill` | those directories were deleted **2026-07-06** |
+| 23 | routes agent-memory / context-graph work to `neo4j-skills:neo4j-agent-memory-skill` | not in the keep-10 that `CLAUDE.md:253-254` declares |
+| 29 | cites a local mirror at `../../../llm-graph-builder` | **the path does not exist**, is untracked and is not gitignored |
+| 32 | "Server: Neo4j 5.x with APOC … Target 2025.x/2026.x" | the pin is `neo4j:2026.05.0-enterprise` |
+
+Their rewrite keeps lines 22, 23 and 32 verbatim. Only the routing table above them is new.
+
+**Line 29 is worth its own note, because it explains why nobody caught it.** The preflight's
+cited-paths check only resolves backticked paths carrying a known EXTENSION
+(`_CITED_EXTENSIONS`); `llm-graph-builder` is a bare directory name, so it is invisible to the
+one guard that would have found it. A dead directory citation is exactly as misleading to a
+reader as a dead file citation and no instrument here sees it.
+
+### THE CORRECTION I OWE, and it moves the blame
+
+§5 attributed their `5.20.0-enterprise` grounding to a conflation of `pyproject.toml`'s
+`neo4j = "^5.20"` — the Python driver floor — with the server image tag. That conflation is
+real and the two ARE decoupled here (driver 5.28.4 against a 2026.05.0 server). **But there is
+a second and more likely source, and it is ours**: line 32 of the producer's own Neo4j
+reference document, the canonical-producer file whose entire job is to be authoritative about
+the platform, opens with "Server: Neo4j 5.x". A consumer reading our reference doc and
+concluding the server is 5.x has read it correctly. The doc is wrong.
+
+So the sentence to carry forward is not "they misread pyproject". It is: **our platform
+reference names the wrong server generation, and the consumer inherited it.** That is the same
+class as the dead Neo4j route — a canonical-producer document that bills the consumer — and it
+is the second instance in the same file.
+
+### One thing that is NOT a collision, stated because §4 implied a wider one
+
+Their `.claude/skills/oracle-db/SKILL.md` was also shared. Its frontmatter, description, domain
+blurb, directory tree and category-routing table match the producer's **exactly** in the
+visible portion, and the producer's own copy is the same 19-subdirectory tree
+(`admin/ agent/ appdev/ … sqlcl/`, tracked). That is ported producer content sitting where it
+should, not a divergence — so nothing is at risk there, and a port replacing it replaces it
+with itself. §4's list of six at-risk paths stands as written; this is not a seventh.
+
+## 7. What is NOT claimed here
 
 - That sub-agent dispatch is unavailable in that venue. Nobody measured it; the session did
   not test it and the producer cannot. `.claude/agents/*.md` cross wholesale either way, so

@@ -205,6 +205,23 @@ question a 1,000-line file with the trail at the bottom could not answer.
   retired to a tombstone). All checked claim-by-claim in
   `internal/agent-platform/company-assistant-venue.md` §5. **Take the draft's SHAPE, which is
   right, and re-derive every fact from this tree.**
+  **AND THE ATTRIBUTION ABOVE IS PARTLY WRONG — corrected 2026-09-10.** The line blaming the
+  consumer's 5.20 grounding on a `pyproject.toml` driver-floor conflation holds, but there is a
+  second and likelier source and it is OURS: `reference/platforms/neo4j/README.md:32`, the
+  canonical-producer document whose whole job is to be authoritative about the platform, opens
+  "Server: Neo4j 5.x with APOC … Target 2025.x/2026.x" while the pinned image is
+  `neo4j:2026.05.0-enterprise`. A consumer who read our platform reference and concluded the
+  server is 5.x read it correctly; the document is wrong. That file is 35 lines and carries FOUR
+  defects: line 22 routes to the `aura-*` skills deleted 2026-07-06, line 23 routes to an
+  `agent-memory` skill outside the declared keep-10, line 29 cites a local mirror at
+  `../../../llm-graph-builder` that DOES NOT EXIST (untracked, not gitignored), and line 32 names
+  the wrong server generation. **The consumer's rewrite keeps 22, 23 and 32 verbatim** and adds a
+  venue table above them — so the fix as drafted inherits three of the four. Line 29 also exposes
+  a real instrument gap worth its own item: the preflight's cited-paths check only resolves
+  backticked paths carrying a known EXTENSION, so a dead DIRECTORY citation is invisible to the
+  one guard that would catch it, while being exactly as misleading to a reader. **So this item is
+  not "repoint a routing row" — it is: rewrite that file from the tree, sweep the five drift
+  points, and decide whether bare-directory citations get guarded.**
 
 - **`Idea-313`** · 2026-09-10 · `[question]` · **open** · prio? **Med** —
   **Five agent definitions cross the port wholesale; whether the receiving venue can DISPATCH them
