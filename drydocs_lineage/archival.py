@@ -173,6 +173,10 @@ def archival_report(
     report.metadata_only = report.scripts_total > 0 and report.scripts_with_bodies == 0
     bodies = f"{report.scripts_with_bodies}/{report.scripts_total}"
     if report.metadata_only:
+        # ADR 0021 precedent 2 (cited, not rewritten - D4): "no axis proves
+        # absence" was decided here first. The statement below refuses to call a
+        # metadata-only listing evidence of anything about the bodies, which is
+        # the shape drydocs_core.check_outcome now carries repo-wide.
         report.coverage_statement = (
             f"body-copy coverage: {bodies} script(s) carried content — METADATA-ONLY RUN. "
             "Script-to-script calls are structurally invisible on this run, so "

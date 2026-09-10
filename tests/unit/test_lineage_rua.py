@@ -624,3 +624,88 @@ def test_storage_scope_map_is_exactly_the_amendment_set() -> None:
         assert storage_scope_for(local) == "local"
     for unknown in ("ext3", "btrfs", "tmpfs", "overlay", "zfs", "", "  "):
         assert storage_scope_for(unknown) == "unknown"
+
+
+# ---- LIN4: a newer bundle is READ, and said so about --------------------------
+#
+# The envelope carried a `schema=` tag that was STAMPED as `rua_schema` and never
+# READ, so a bundle from a newer collector parsed to completion and every record
+# it produced looked exactly as trustworthy as one this parser understands. The
+# sibling collector reader (lb_resolution.py) had checked its own tag from the
+# start; this one never got it.
+
+
+def _bundle_with_schema(root: Path, schema: str) -> Path:
+    bundle = _write_bundle(root, v2=True)
+    text = (bundle / "meta.txt").read_text(encoding="utf-8")
+    lines = [
+        f"schema={schema}" if line.startswith("schema=") else line for line in text.splitlines()
+    ]
+    (bundle / "meta.txt").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return bundle
+
+
+def test_an_unknown_collector_schema_is_noted(tmp_path: Path) -> None:
+    bundle = _bundle_with_schema(tmp_path, "rua-inventory/v9")
+    cov = RuaInventoryExtractor().extract(bundle, LineageGraph())
+    assert cov.notes, "a newer bundle parsed with nothing said about it"
+    (note,) = (n for n in cov.notes if "collector schema" in n)
+    assert "rua-inventory/v9" in note
+    assert "newer than this parser knows" in note
+
+
+def test_the_newer_bundle_is_still_parsed(tmp_path: Path) -> None:
+    """A note, never a refusal - and this is the assertion that keeps it one.
+    Section dispatch here is on PRESENCE, never on the tag, because real bundles
+    have shipped a v2-shaped scripts.csv while wearing the v1 tag. Refusing on
+    the tag would reject bundles this parser reads correctly today."""
+    bundle = _bundle_with_schema(tmp_path, "rua-inventory/v9")
+    graph = LineageGraph()
+    cov = RuaInventoryExtractor().extract(bundle, graph)
+    assert cov.directories_staged > 0
+    assert cov.sections_missing == []
+
+
+@pytest.mark.parametrize("schema", ["rua-inventory/v1", "rua-inventory/v2", "rua-inventory/v3"])
+def test_a_known_schema_is_silent(tmp_path: Path, schema: str) -> None:
+    """The control. If every bundle produced a note the channel would be noise,
+    and a noisy channel is one nobody reads - which is the state LIN4 started in."""
+    bundle = _bundle_with_schema(tmp_path, schema)
+    cov = RuaInventoryExtractor().extract(bundle, LineageGraph())
+    assert [n for n in cov.notes if "collector schema" in n] == []
+
+
+def test_an_absent_schema_tag_is_not_flagged_twice(tmp_path: Path) -> None:
+    """A bundle with no `schema=` line already counts a missing envelope field.
+    Saying it a second time in the notes would train the reader to skim the
+    channel this whole fix depends on."""
+    bundle = _write_bundle(tmp_path, v2=True)
+    text = (bundle / "meta.txt").read_text(encoding="utf-8")
+    kept = [line for line in text.splitlines() if not line.startswith("schema=")]
+    (bundle / "meta.txt").write_text("\n".join(kept) + "\n", encoding="utf-8")
+    cov = RuaInventoryExtractor().extract(bundle, LineageGraph())
+    assert [n for n in cov.notes if "collector schema" in n] == []
+    assert cov.meta_fields_missing > 0  # …counted where it belongs
+
+
+def test_the_note_reaches_the_line_an_operator_reads(tmp_path: Path) -> None:
+    bundle = _bundle_with_schema(tmp_path, "rua-inventory/v9")
+    cov = RuaInventoryExtractor().extract(bundle, LineageGraph())
+    assert "notes=1" in cov.summary()
+    # …and a clean bundle's summary is unchanged
+    clean = RuaInventoryExtractor().extract(
+        _bundle_with_schema(tmp_path / "clean", "rua-inventory/v2"), LineageGraph()
+    )
+    assert "notes=" not in clean.summary()
+
+
+def test_the_two_envelope_readers_stay_two(tmp_path: Path) -> None:
+    """The item rules that the two copies of the envelope contract stay two on
+    purpose - the report dates the second so a third knows what it joins. This
+    pins that they agree on the SHAPE of the answer without sharing code: both
+    expose KNOWN_COLLECTOR_VERSIONS and both append to a `notes` list."""
+    from drydocs_lineage.extractors import lb_resolution, rua_inventory
+
+    assert isinstance(rua_inventory.KNOWN_COLLECTOR_VERSIONS, frozenset)
+    assert isinstance(lb_resolution.KNOWN_COLLECTOR_VERSIONS, frozenset)
+    assert rua_inventory.KNOWN_COLLECTOR_VERSIONS != lb_resolution.KNOWN_COLLECTOR_VERSIONS

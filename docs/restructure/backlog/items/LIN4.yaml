@@ -7,7 +7,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs_lineage/extractors/rua_inventory.py
@@ -22,3 +22,42 @@ notes: |
   HAND-BACK from CORE10 (Lane A, 2026-09-09; ADR 0021 action item 4, name only): when this
   item is open, add ONE citing comment at drydocs_lineage/archival.py at the `report.coverage_statement = (` assignment (precedent 2: no axis proves absence) - the shape is
   the line CORE10 placed in drydocs/plan/plan_board.py; do not rewrite the site (ADR 0021 D4).
+
+  CLOSED 2026-09-10 (Lane B, laptop, wip/lin4-laptop, based on main). Venue (J18): offline; the
+  bundles are built in tmp_path, so no collector and no host are involved. Full suite: 4051 passed,
+  0 FAILED, both ruff gates clean.
+
+  THE ACCEPTANCE NAMED A CHANNEL THAT DID NOT EXIST, and re-measuring at pull is what found it. It
+  says the mismatch should reach "the existing RuaCoverage notes channel". RuaCoverage had no
+  `notes` field - `LbResolutionCoverage`, the sibling, has had one since it was written. That is
+  the same shape as the defect itself: the sibling collector reader got the facility and this one
+  never did. So the channel is ADDED here, matching the sibling's shape exactly, and the summary
+  line renders `notes=N` only when there is one - a channel that speaks on every bundle is noise,
+  and a noisy channel is one nobody reads, which is the state this item started in.
+
+  A NOTE, NEVER A REFUSAL, and that is this module's existing contract rather than caution. Section
+  dispatch here is on PRESENCE, never on the tag - `_read_mounts` says so in its own docstring, "a
+  bundle that carries the section is read whatever it calls itself" - because real bundles have
+  shipped a v2-shaped `scripts.csv` while still wearing the v1 tag (G45). Refusing on the tag would
+  reject bundles this parser reads correctly today. What was missing was never a gate; it was the
+  reader being told. `test_the_newer_bundle_is_still_parsed` is what keeps it a note.
+
+  AN ABSENT TAG IS NOT FLAGGED. A bundle with no `schema=` line already counts a missing envelope
+  field; saying it a second time in the notes would train the reader to skim the channel this fix
+  depends on. Tested, because it is the kind of thing a later "improvement" adds back.
+
+  THE TWO COPIES STAY TWO, as the item rules - this does NOT extract a shared reader. A test pins
+  that they agree on the SHAPE of the answer (both expose a `KNOWN_COLLECTOR_VERSIONS` frozenset,
+  both append to a `notes` list) while holding different values, so a third reader can see what it
+  would be joining without the two being fused.
+
+  THE KNOWN VERSIONS ARE READ FROM THE TREE, not invented: rua-inventory/v1, /v2 and /v3 are the
+  tags the fixtures and the e2e bundle actually carry.
+
+  MEASURED BOTH WAYS: 7 of the 8 new tests fail against main's rua_inventory.py - including the
+  three known-schema controls, which fail there for the honest reason that `cov.notes` does not
+  exist at all rather than because a note appears.
+
+  CORE10 HAND-BACK, DONE (ADR 0021 action item 4, name only): one citing comment at the
+  `report.coverage_statement = (` assignment in drydocs_lineage/archival.py, naming it precedent 2 -
+  "no axis proves absence". Site not rewritten (D4).
