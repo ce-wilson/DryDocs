@@ -562,6 +562,305 @@ def test_the_exemption_list_says_why_and_stays_short() -> None:
         assert len(reason) > 40, "an exemption without a reason is an exemption nobody can review"
 
 
+# ---- (e) a raw source read justifies itself in the exemption table (GRAPH4) -------
+#
+# J66 says a guard reads CODE, not the prose around it, and names ONE exception:
+# a guard whose subject IS the prose. That exception was a matter of judgment,
+# which meant every new raw read re-litigated it and eighteen of them accumulated
+# unreviewed. Here the exception becomes a REGISTERED one: a test that asserts a
+# substring against raw Python source is in this table with a reason, or it fails.
+#
+# The register is keyed by (file, test name) and never by line number - a line
+# moves the moment a neighbouring test is edited, and an exemption that drifts
+# onto the wrong test is worse than none.
+
+RAW_READ_EXEMPTIONS: Final = {
+    ("test_first_party_queries.py", "test_the_comment_naming_the_rejected_label_is_not_read"): (
+        "J66's stated exception, and the clearest instance of it: the ruling "
+        "lives in a COMMENT in both files, and this guard asserts the strippers "
+        "do not see it. Converting it would delete the subject it tests."
+    ),
+    (
+        "test_source_scan.py",
+        "test_the_cypher_stripper_is_still_there_and_is_still_a_different_thing",
+    ): (
+        "circular otherwise - a guard proving the Cypher stripper still exists "
+        "cannot run through the stripper whose existence is in question."
+    ),
+    ("test_constraint_drift.py", "test_nothing_in_the_drift_path_can_drop_a_constraint"): (
+        "two questions, two reads, and it says so: the DROP half already goes "
+        "through absent(); the 'drops NOTHING' half asserts the OUTPUT WORDING, "
+        "which is prose and is the subject."
+    ),
+    ("test_constraint_drift.py", "test_the_warning_carries_the_mechanism_and_the_human_check"): (
+        "the subject is the operator-facing warning text - the phrases a human "
+        "reads when a constraint drifts. An error message is prose by definition."
+    ),
+    ("test_env_refs_migration.py", "test_resolve_env_override_keeps_its_own_lookup_and_says_why"): (
+        "asserts the G128 RATIONALE stays recorded in the source, so a comment "
+        "is precisely what it is looking for; without_prose would erase it."
+    ),
+    ("test_source_labels.py", "test_the_collision_is_stated_on_the_enum"): (
+        "the subject is the comment STATING the label collision on the enum - "
+        "the test name says so, and the stripper would remove it."
+    ),
+    ("test_intake_api.py", "test_no_graph_writes_no_neo4j_import"): (
+        "code-subject and convertible to imported_modules, but this file is held "
+        "by wip/api7-laptop in the same Lane B burst; converting it here would "
+        "hand Lane A a hand-merge. Convert when API7 lands - GRAPH4 close notes."
+    ),
+}
+
+_SOURCE_READERS: Final = ("read_text", "read_bytes")
+#: The verbs that make a read sanctioned. `source_text` is NOT one: it is the
+#: reader, not the stripper, and `source_text(p)` substring-matched raw is the
+#: very shape this guard exists to find.
+_SANCTIONING: Final = (
+    "code_only",
+    "without_prose",
+    "imported_modules",
+    "called_names",
+    "call_sites",
+    "comment_lines",
+    "return_annotation",
+    "absent",
+)
+_EXTENSION = re.compile(r"""['"][^'"]*?(\.[A-Za-z0-9]{1,6})['"]""")
+
+
+def _value_texts(scope: ast.AST) -> dict[str, str]:
+    """name -> the CODE of its value. `ast.unparse`, never the raw slice: the
+    raw slice carries comments, and a comment naming a `.py` file made an early
+    version of this scan call a `.json` byte check a Python-source read. That is
+    J66 arriving inside the instrument built to enforce it."""
+    out: dict[str, str] = {}
+    for node in ast.walk(scope):
+        target = None
+        if isinstance(node, ast.Assign) and len(node.targets) == 1:
+            target = node.targets[0]
+        elif isinstance(node, ast.AnnAssign):
+            target = node.target
+        elif isinstance(node, ast.For):
+            target, node = node.target, node
+        if isinstance(target, ast.Name):
+            value = node.iter if isinstance(node, ast.For) else node.value
+            if value is not None:
+                out[target.id] = ast.unparse(value)
+    return out
+
+
+def _expand(expr: str, names: dict[str, str]) -> str:
+    seen: set[str] = set()
+    for _ in range(4):
+        grew = False
+        for ident in set(re.findall(r"\b([A-Za-z_][A-Za-z0-9_]*)\b", expr)):
+            if ident in names and ident not in seen:
+                expr, grew = expr + " " + names[ident], True
+                seen.add(ident)
+        if not grew:
+            break
+    return expr
+
+
+def _takes_python_source(call: ast.Call, names: dict[str, str]) -> bool:
+    """Does this call hand back PYTHON source?
+
+    The read's own filename decides, nearest first: `PKG / "README.md"` is a
+    Markdown read however its anchor was built. Only with no literal extension
+    anywhere does the dunder rule apply, and `__file__` followed by `.parent` or
+    `.parents` is a DIRECTORY anchor rather than a read.
+    """
+    func = call.func
+    name = getattr(func, "attr", "") or getattr(func, "id", "")
+    if name == "getsource":
+        return True
+    if name == "read" and isinstance(func, ast.Attribute):
+        inner = func.value
+        if not (isinstance(inner, ast.Call) and getattr(inner.func, "id", "") == "open"):
+            return False
+        raw = ", ".join(ast.unparse(a) for a in inner.args)
+    elif name in _SOURCE_READERS and isinstance(func, ast.Attribute):
+        raw = ast.unparse(func.value)
+    else:
+        return False
+    for expr in (raw, _expand(raw, names)):
+        found = _EXTENSION.findall(expr)
+        if found:
+            return any(e.lower() in (".py", ".pyi") for e in found)
+    full = _expand(raw, names)
+    if re.search(r"__file__\s*\)?\s*(?:\.\w+\(\))*\s*\.parents?\b", full):
+        return False
+    return "__file__" in full
+
+
+def _sanctioned(node: ast.AST, parents: dict[int, ast.AST]) -> bool:
+    """Is this read lexically inside a source_scan verb's call?"""
+    cur = parents.get(id(node))
+    while cur is not None:
+        if isinstance(cur, ast.Call):
+            name = getattr(cur.func, "attr", "") or getattr(cur.func, "id", "")
+            if name in _SANCTIONING:
+                return True
+        cur = parents.get(id(cur))
+    return False
+
+
+def _raw_python_source_reads(source: str) -> list[tuple[str, int]]:
+    """(test name, line) for every test asserting a substring on RAW Python source.
+
+    Reads the code, not the prose (J66) - this module's own explanations name
+    `read_text` and `getsource` repeatedly, and a substring version of this scan
+    would report itself.
+    """
+    tree = ast.parse(source)
+    parents: dict[int, ast.AST] = {}
+    for node in ast.walk(tree):
+        for child in ast.iter_child_nodes(node):
+            parents[id(child)] = node
+    module_names = _value_texts(tree)
+    hits: list[tuple[str, int]] = []
+    for fn in ast.walk(tree):
+        if not isinstance(fn, ast.FunctionDef) or not fn.name.startswith("test"):
+            continue
+        names = {**module_names, **_value_texts(fn)}
+        bound: set[str] = set()
+        raw_calls: set[int] = set()
+        for node in ast.walk(fn):
+            if not isinstance(node, ast.Call) or not _takes_python_source(node, names):
+                continue
+            if _sanctioned(node, parents):
+                continue
+            raw_calls.add(id(node))
+            parent = parents.get(id(node))
+            if isinstance(parent, ast.Assign):
+                bound.update(t.id for t in parent.targets if isinstance(t, ast.Name))
+        if not raw_calls:
+            continue
+        for node in ast.walk(fn):
+            if not isinstance(node, ast.Compare):
+                continue
+            if not any(isinstance(op, ast.In | ast.NotIn) for op in node.ops):
+                continue
+            for comparator in node.comparators:
+                # Identity, not a substring of the unparsed text: `open(p).read()`
+                # contains none of the reader NAMES, and that spelling is the one
+                # the item's own cited site used.
+                inline = any(id(n) in raw_calls for n in ast.walk(comparator))
+                text = ast.unparse(comparator)
+                if inline or any(re.search(rf"\b{re.escape(b)}\b", text) for b in bound):
+                    hits.append((fn.name, node.lineno))
+                    break
+    return sorted(set(hits))
+
+
+def test_a_raw_source_read_justifies_itself_in_the_exemption_table() -> None:
+    """GRAPH4 clause (e): the J66 exception stops being a matter of judgment.
+
+    An unregistered raw read is not necessarily WRONG - it is unreviewed, which
+    is how eighteen of them accumulated. The fix is that adding one costs a line
+    in the table and a sentence saying why.
+    """
+    offenders: dict[str, list[str]] = {}
+    for path in sorted(TESTS.rglob("test_*.py")):
+        for name, line in _raw_python_source_reads(path.read_text(encoding="utf-8")):
+            if (path.name, name) in RAW_READ_EXEMPTIONS:
+                continue
+            offenders.setdefault(path.name, []).append(f"{name}:{line}")
+    assert not offenders, (
+        f"raw Python-source reads with no entry in RAW_READ_EXEMPTIONS: {offenders}. "
+        "Either route it through tests/source_scan.py -- without_prose when the "
+        "subject is a literal, code_only when a match inside a string literal "
+        "would be wrong -- or add it to the table with the reason its subject IS "
+        "the prose (J66's one exception)."
+    )
+
+
+def test_the_raw_read_detector_can_see_the_shape_it_looks_for() -> None:
+    """The same treatment this file gives its other absence guards: a positive
+    control, as a test, because the subject is a code SHAPE. Driven over string
+    literals rather than files, so the probe is not itself a raw read."""
+    assert _raw_python_source_reads(
+        'def test_x():\n    s = (R / "m.py").read_text()\n    assert "a" in s\n'
+    ) == [("test_x", 3)]
+    assert _raw_python_source_reads(
+        'def test_x():\n    assert "a" in inspect.getsource(mod)\n'
+    ) == [("test_x", 2)]
+    assert _raw_python_source_reads(
+        'def test_x():\n    assert "a" not in open(mod.__file__).read()\n'
+    ) == [("test_x", 2)], "open(...).read() is the shape GRAPH4's own cited site used"
+    # ...and the shapes it must NOT flag
+    assert (
+        _raw_python_source_reads(
+            'def test_x():\n    s = without_prose(source_text(R / "m.py"))\n'
+            '    assert "a" in s\n'
+        )
+        == []
+    ), "a read through a stripper is the fixed shape, not the defect"
+    assert (
+        _raw_python_source_reads(
+            'def test_x():\n    s = (R / "README.md").read_text()\n    assert "a" in s\n'
+        )
+        == []
+    ), "a Markdown read is not a Python-source read"
+    assert (
+        _raw_python_source_reads(
+            "PKG = Path(mod.__file__).resolve().parent\n"
+            'def test_x():\n    s = (PKG / "API.md").read_text()\n    assert "a" in s\n'
+        )
+        == []
+    ), "a .__file__ anchored DIRECTORY is not a Python-source read"
+    assert (
+        _raw_python_source_reads(
+            'def test_x():\n    s = (R / "m.py").read_text()\n    assert len(s) > 3\n'
+        )
+        == []
+    ), "reading source without asserting a substring is a different thing"
+
+
+def test_every_raw_read_exemption_still_points_at_a_real_test() -> None:
+    """An exemption that has rotted exempts nothing and hides the next one.
+
+    A renamed or deleted test leaves its entry behind, and the entry then reads
+    like review that happened when it did not.
+    """
+    missing: list[str] = []
+    for (filename, test_name), reason in RAW_READ_EXEMPTIONS.items():
+        assert len(reason) > 40, f"{filename}::{test_name} has no reviewable reason"
+        path = TESTS / "unit" / filename
+        if not path.exists():
+            missing.append(f"{filename} (file gone)")
+            continue
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        names = {n.name for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)}
+        if test_name not in names:
+            missing.append(f"{filename}::{test_name}")
+    assert not missing, (
+        f"RAW_READ_EXEMPTIONS entries that no longer name a real test: {missing}. "
+        "Delete the entry, or fix the name it drifted off."
+    )
+
+
+def test_the_exemptions_cover_the_shapes_graph4_measured() -> None:
+    """Anti-vacuity, the other direction (the CORE12 shape).
+
+    If the detector silently stopped finding anything, every test above would
+    still pass. These three are the ones GRAPH4 triaged and KEPT, so the scan
+    must still see them.
+    """
+    for filename, test_name in (
+        ("test_first_party_queries.py", "test_the_comment_naming_the_rejected_label_is_not_read"),
+        ("test_source_labels.py", "test_the_collision_is_stated_on_the_enum"),
+        ("test_intake_api.py", "test_no_graph_writes_no_neo4j_import"),
+    ):
+        source = (TESTS / "unit" / filename).read_text(encoding="utf-8")
+        found = {name for name, _ in _raw_python_source_reads(source)}
+        assert test_name in found, (
+            f"the raw-read scan no longer sees {filename}::{test_name}, which GRAPH4 "
+            "measured as a raw Python-source read. The detector regressed, and every "
+            "other guard here would still be green."
+        )
+
+
 # ---- return_annotation: the probe registry's verb (CORE10, ADR 0021 D3) -----------
 
 

@@ -7,7 +7,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - tests/source_scan.py
@@ -24,3 +24,153 @@ acceptance: |
 notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). seams-2026-09-08.md candidate 2 (L2-1) with remediation-2026-09-08.md candidates 2 and 3 folded
   in, as the seams report asks.
+
+  ## The measurement (Lane B, laptop, 2026-09-10)
+
+  MEASURED, both ways, not asserted. A site is in the class when a read's path
+  names a `.py` file AND the text that read produced reaches an `in` / `not in`
+  comparison. **19 files, 20 sites** — 18 raw, 1 self-read, 1 already through
+  `source_scan`. That reconciles with the report's 18: the report counted at
+  2026-09-08 and this is two days and one Lane B burst later.
+
+  Four instrument defects had to be fixed before the number meant anything, and
+  they are recorded because each one is a way the NEXT measurement goes wrong
+  (J76 — check the instrument before the subject):
+
+  1. `__file__` inside `parents[...]` is a REPO ANCHOR, not a source read.
+     Matching it turned an 18-site class into a 60-site one.
+  2. `Path(mod.__file__).resolve().parent` is a DIRECTORY anchor — the three
+     `test_controlm_api.py` sites read `README.md`/`API-CALLS.md` through it and
+     are not in the class at all. **The read's own filename decides**, not its
+     anchor's.
+  3. The scanner expanded module constants using `ast.get_source_segment`, which
+     returns the raw slice — COMMENTS AND ALL. A comment on
+     `test_render_determinism.py:194` naming `env_refs.py` made a `.html`/`.json`
+     CR-byte check register as a Python-source read. **The instrument built to
+     measure J66 fell for J66.** `ast.unparse` reads the code; that is the fix,
+     and it is the sharpest single piece of evidence this item produced.
+  4. The item's own cited site is spelled `open(mod.__file__).read()`, not
+     `read_text()`. A scanner that knows only `read_text` cannot see it.
+
+  ## The table (path · subject · verdict · reason)
+
+  Verdict vocabulary: CONVERT = code-subject, goes through `tests/source_scan.py`.
+  KEEP = J66's stated exception, the subject IS the prose. DELETE = already
+  covered. DEFER = code-subject, but the file is held by another Lane B branch.
+
+  | # | site | subject | verdict | reason |
+  |---|---|---|---|---|
+  | 1 | test_agents_app_discovery.py:43 | `NestedAgentLoader`, `web=False` in serve.py | CONVERT | code constructs; nothing here needs the comments |
+  | 2 | test_config_schemas.py:305 | `import drydocs` absent from its OWN file | CONVERT | hand-rolls `src.split('\"\"\"', 2)[2]` to dodge its docstring — that hand-rolled stripper IS the thing source_scan replaces; `imported_modules` is exact |
+  | 3 | test_console_auth.py:525 | `target.with_name(`, `os.replace(`, `tempfile` absent | CONVERT | call and module names |
+  | 4 | test_controlm_cypher.py:309 | `\"grpname_filter\": None` in cli_ingest.py | CONVERT | subject is a dict-key LITERAL, so `without_prose`, never `code_only` |
+  | 5 | test_controlm_cypher.py:673 | `full_extract=folder is None and data_center is None` | CONVERT | kwarg expression; the function slice is kept |
+  | 6 | test_docmeta_pipeline.py:217 | `CapturePolicy` in two consumers | CONVERT | class name referenced |
+  | 7 | test_env_doctor.py:94 | `getpass` present | CONVERT | the AST half was already right; only the trailing substring moves |
+  | 8 | test_env_refs_migration.py:198 | a test name + `env_prefix`/`model_fields` | CONVERT | identifiers in a test module |
+  | 9 | test_first_party_queries.py:156 | **the comment naming the rejected label** | KEEP | J66's exception, verbatim: the guard exists BECAUSE the ruling lives in a comment, and asserts the strippers do not see it. Converting it would delete its subject. Already says so in its docstring |
+  | 10 | test_intake_api.py:419 | `import neo4j`, `GraphDatabase` absent | DEFER | code-subject and convertible, but this file is held by `wip/api7-laptop` (API7 edits it). Converting here hands Lane A a hand-merge. Listed in the exemption table with this reason; convert after API7 merges |
+  | 11 | test_lineage_inventory.py:912 | `resolve_command_line(layers, text)` called | CONVERT | hand-rolls a `#`-comment stripper inline |
+  | 12 | test_load_map_wiring_key.py:157 | the four state LABELS, in a .ts and a .py | CONVERT | subject is a literal — `without_prose`. (The `.ts` half is out of scope; `web/**` is the UI pen) |
+  | 13 | test_port_drops.py:219 | `from drydocs.port.port_drops import main` | CONVERT | an import; `imported_modules` is exact |
+  | 14 | test_provenance_migration.py:49 | Cypher embedded in Python string literals | CONVERT | literal subject — `without_prose` keeps it, `code_only` would erase it and the absence half would pass on nothing |
+  | 15 | test_remediation_changes.py:316 (assert at :323) | `execute_write` absent from changes.py | DELETE | `test_remediation_no_graph_write.py::test_no_write_transaction_markers` walks EVERY `*.py` under `drydocs_remediation` by AST for `execute_write`/`write_transaction`/`begin_transaction`. Strictly stronger, and comment-proof. VERIFIED by reading it, not assumed |
+  | 16 | test_seal_attribution.py:254 | `class SealAttributionLoader`, `BaseLoader` absent | CONVERT | code constructs |
+  | 17 | test_source_scan.py:202 | source_scan's OWN `_code_only` def line and docstring | KEEP | circular otherwise: a guard proving the stripper still exists cannot run through that stripper. Self-referential by necessity, which is its own exemption class |
+  | 18 | test_theme_vocabulary.py:195 | `MERGE`/`CREATE` absent from two modules | CONVERT | `without_prose` — Cypher would sit in a literal, so `code_only` would weaken it |
+  | 19 | test_tier2.py:191 | forbidden driver/Cypher tokens in task_graph.py | CONVERT | it hand-rolls comment-stripping AND docstring-dropping in two lines — it is `without_prose` written out longhand |
+  | 20 | test_ui_concepts_json.py:108 | `render_ui_concepts` + `.main()` in render_board.py | CONVERT | import and call |
+
+  ### Eight more, found after the first table was pushed
+
+  A fifth instrument defect: `inspect.getsource(obj)` hands back Python source
+  with NO PATH IN SIGHT, so a path-based scanner is structurally blind to it.
+  Seven sites use it. And `test_controlm_cypher.py` holds a THIRD read of
+  `cli_ingest.py` (line 144) that asserts presence through `.index()` rather
+  than `in` — the same read, the same subject, so it is converted with the
+  other two.
+
+  | # | site | subject | verdict | reason |
+  |---|---|---|---|---|
+  | 21 | test_cmdline_staging.py:528 | `Neo4jClient` absent (getsource) | CONVERT | class name; absence, so it goes onto `absent()` with a control |
+  | 22 | test_constraint_drift.py:134 | `drops NOTHING` in the output | KEEP | it already says so itself: the DROP half goes through `absent()`, this half asserts the OUTPUT WORDING |
+  | 23 | test_constraint_drift.py:166 | `outlive data wipes`, `62 constraints`, `a human checks` | KEEP | the operator-facing warning text — prose by definition |
+  | 24 | test_controlm_cypher.py:144 | the runs_on ordering, via `.index()` | CONVERT | third read of cli_ingest.py; `.index()` is a substring lookup wearing a different hat |
+  | 25 | test_env_refs_migration.py:213 | the `G128` RATIONALE recorded in the source | KEEP | it asserts a COMMENT survives; `without_prose` would erase its subject |
+  | 26 | test_schema_meta_exclusion.py:117 | `:SchemaMeta`, `IS NOT NULL` (getsource) | CONVERT | Cypher in literals — `without_prose` |
+  | 27 | test_source_labels.py:57 | the comment STATING the label collision | KEEP | the test name says it: the subject is the statement on the enum |
+  | 28 | test_standard_selection.py:312 | `open(`, `Path(`, `read_text` … absent | CONVERT | code constructs; five absence scans, five controls |
+
+  **Totals over 24 files / 28 sites: 20 CONVERT · 1 DEFER (API7) · 6 KEEP · 1 DELETE.**
+
+  ## What the conversion itself taught (measured, not predicted)
+
+  1. **A positive control is PARSED.** `absent(..., stripper=without_prose)`
+     runs the control through `without_prose`, which calls `ast.parse`, so the
+     control must be a COMPLETE Python statement. Three conversions failed on
+     this at once — bare Cypher, a `class X(Y):` header with no body, a `with`
+     with no body — and the failures read as `IndentationError` from inside
+     `ast.parse`, which is not obviously "your control is malformed".
+     `code_only` tokenizes and tolerates fragments; `without_prose` does not.
+     This deserves a line in `absent`'s docstring, which Lane A owns.
+  2. **A false positive in an existing guard.**
+     `test_every_absence_scan_over_a_stripper_goes_through_the_helper` collects
+     stripper-bound names across the WHOLE module, not per function. Naming a
+     converted variable `text` in one test made an unrelated `text` — a
+     `.cypher` raw read two functions above — report as an unguarded absence
+     scan. Worked around here by not reusing the name, and RECORDED rather than
+     fixed: the guard is Lane A's to widen, and the fix is scope-aware binding.
+  3. **`test_no_test_module_defines_its_own_python_source_stripper` only looks
+     for a `def` named `code_only`.** `test_tier2.py` hand-rolled a stripper in
+     two inline lines and was invisible to it. Named as a seam, deliberately not
+     widened here — that is a decision, not a patch.
+
+  ## The ruling the conversion turned on
+
+  `without_prose`, not `code_only`, is the right default. `code_only` strips
+  string literals and re-joins tokens with single spaces; six of the twenty
+  subjects ARE literals (a dict key, embedded Cypher, four UI labels), and
+  `code_only` would have made those guards pass on nothing — CORE2's exact
+  failure, six of six. `without_prose` removes only comments and docstrings,
+  which is precisely J66's defect, and preserves layout character-for-character.
+  A blanket "convert to code_only" would have been a regression dressed as a fix.
+
+  ## Note for CLAUDE.md section 6 — Lane A carries this (adr/backlog pen)
+
+  Ruling: source_scan is MANDATORY for a guard whose subject is code, and the
+  exception is now a REGISTERED one rather than a matter of judgment. Paste-ready:
+
+    A source-reading guard goes through `tests/source_scan.py`. This is not a
+    preference: a guard that reads raw source and asserts a substring is
+    registered in `RAW_READ_EXEMPTIONS` in `tests/unit/test_source_scan.py`
+    with a reason, or it does not exist. The exemptions are the two honest
+    shapes — a guard whose subject IS the prose (an error message, an
+    operator-facing string, a comment recording a ruling), and a guard on
+    source_scan itself, which cannot use the stripper it is proving exists.
+    Choose the stripper by SUBJECT: `without_prose` when the subject is a
+    literal (a path, a route, a Cypher statement, an import specifier),
+    `code_only` only when a match inside a string literal would be wrong.
+
+  ## Idea captured (not appended to IDEAS.md — Lane B does not hold that pen)
+
+  The TypeScript twin `web/src/test/sourceScan.ts` has no equivalent exemption
+  register, and `web/**` is the UI pen. Worth an item on that side.
+
+  ## Close (Lane B, laptop, 2026-09-10) - wip/graph4-laptop
+
+  All five acceptance clauses met. Suite 4045 passed; ruff check + ruff format
+  clean on all 21 changed files. The one red is
+  test_committed_roadmap_page_matches_its_sources, Y5 by design on a Lane B
+  close - this item's notes moved the sources fingerprint. Lane B renders
+  nothing; Lane A renders at merge.
+
+  Branch is based on `main` and touches only `tests/**` plus this item file, so
+  it is independent of every other Lane B branch in this burst. NOTE FOR LANE A:
+  GRAPH7 (test_constraint_drift.py) should be based on THIS branch, not main -
+  GRAPH4 registers two of that file's tests in RAW_READ_EXEMPTIONS.
+
+  Two follow-ups for Lane A, both needing a mint (backlog pen is A's):
+  1. Convert test_intake_api.py::test_no_graph_writes_no_neo4j_import to
+     imported_modules once API7 merges, and drop its exemption row.
+  2. Make test_every_absence_scan_over_a_stripper_goes_through_the_helper bind
+     stripper names per FUNCTION rather than per module (finding 2 above).

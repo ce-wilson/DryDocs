@@ -27,6 +27,7 @@ from drydocs.loaders.seal_attribution import (
 )
 from drydocs_core import yaml_fragments
 from drydocs_core.models import StgAppFactRow
+from tests.source_scan import absent, source_text, without_prose
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 VOCAB_FILE = REPO_ROOT / "drydocs_core" / "ontology" / "relationship_vocabulary"
@@ -255,6 +256,22 @@ def test_retired_job_grain_writer_files_are_gone() -> None:
     """§A1: no per-job application edge is authored — the module keeps only
     the resolver; the edge-writer cypher is deleted."""
     assert not (REPO_ROOT / "drydocs" / "loaders" / "cypher" / "seal_attribution.cypher").exists()
-    module = (REPO_ROOT / "drydocs" / "loaders" / "seal_attribution.py").read_text(encoding="utf-8")
-    assert "class SealAttributionLoader" not in module
-    assert "BaseLoader" not in module
+    module_path = REPO_ROOT / "drydocs" / "loaders" / "seal_attribution.py"
+    sources = {str(module_path): source_text(module_path)}
+    # without_prose PARSES the control, so it must be a complete statement -
+    # a bare `class X(Y):` header raises IndentationError, not a clean refusal.
+    control = "class SealAttributionLoader(BaseLoader):\n    pass\n"
+    absent(
+        "class SealAttributionLoader",
+        sources,
+        positive_control=control,
+        stripper=without_prose,
+        because="the retired per-job edge writer would be back",
+    )
+    absent(
+        "BaseLoader",
+        sources,
+        positive_control=control,
+        stripper=without_prose,
+        because="the module would be a loader again rather than a resolver",
+    )

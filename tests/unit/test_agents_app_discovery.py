@@ -10,6 +10,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from tests.source_scan import source_text, without_prose
+
 AGENTS = Path(__file__).resolve().parents[2] / "agents"
 REAL_APPS = {"graph_qa", "core_ingest", "controlm_fix", "graph_query"}
 
@@ -41,7 +43,7 @@ def test_the_shared_package_is_not_an_app_and_stays_importable_by_name() -> None
 
 
 def test_serve_launcher_uses_the_nested_loader_and_readme_states_the_convention() -> None:
-    serve = (AGENTS / "serve.py").read_text(encoding="utf-8")
+    serve = without_prose(source_text(AGENTS / "serve.py"))
     assert "NestedAgentLoader" in serve and "web=False" in serve
     readme = (AGENTS / "README.md").read_text(encoding="utf-8")
     assert "serve.py" in readme and "an APP is a directory with an `agent.py`" in readme

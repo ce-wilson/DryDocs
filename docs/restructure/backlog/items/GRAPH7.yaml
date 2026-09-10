@@ -7,7 +7,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - tests/unit/test_constraint_drift.py
@@ -56,3 +56,27 @@ notes: |
   what an item WRITES, the company prompts are the port pen's, and this item writes none of them.
   Same convention the lane-handoff skill applies to docs/reviews/ (PLAN5) - provenance is not a
   write target.
+
+  ## Close (Lane B, laptop, 2026-09-10) - wip/graph7-laptop, based on wip/graph4-laptop
+
+  All five clauses met. The parametrized pair is REMOVED, not narrowed, and the
+  three defects it closes are written where the test stood, not only here.
+
+  MEASURED before removing, rather than taken from the item: nine .cypher files
+  under drydocs_core/schema/, zero hits for AisCapability or AisTool - so the
+  guard had been passing vacuously, which is clause (b)'s second defect
+  confirmed rather than repeated. The file already imports without_prose at line
+  28, which is clause (b)'s third defect confirmed the same way.
+
+  Clause (d) honoured and re-verified: the AIS acronym row survives at
+  config/taxonomy/software-registry.yaml:71; gate-log.md untouched; the
+  platforms-taxonomy gate page untouched. The AisCapability/AisTool strings that
+  remain under config/ are all PROSE - two gate-prompt records, a comment, and a
+  resolved mapping note - so no executable artifact carries the labels now.
+
+  Suite: 4043 passed, exactly two fewer than GRAPH4's 4045 (the parametrized
+  pair). The one red is test_committed_roadmap_page_matches_its_sources, Y5 by
+  design on a Lane B close. J57 family run, not a targeted file: 64 passed.
+
+  BRANCH ORDER FOR LANE A: this branch contains GRAPH4. Merging wip/graph7-laptop
+  brings both; do NOT merge wip/graph4-laptop separately afterwards.

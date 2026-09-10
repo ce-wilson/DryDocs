@@ -16,6 +16,7 @@ import pytest
 from drydocs_core.orchestration.controlm import parse_command
 from drydocs_lineage.extractors import ControlMInventoryExtractor
 from drydocs_lineage.model import REL_ALIASES, REL_TYPES, LineageGraph
+from tests.source_scan import imported_modules, source_text, without_prose
 
 FIXTURE = Path(__file__).resolve().parents[1] / "fixtures" / "lineage" / "jobs.csv"
 
@@ -921,14 +922,12 @@ def test_the_extractor_has_no_second_substitution_engine() -> None:
     against SHELL_VAR_NAMES, and never touches a value.)"""
     import drydocs_lineage.extractors.controlm_inventory as mod
 
-    text = Path(mod.__file__).read_text(encoding="utf-8")
-    assert "resolve_command_line(layers, text)" in text  # the ONE resolver, called
-    code = [
-        line
-        for line in text.splitlines()
-        if not line.lstrip().startswith("#") and not line.lstrip().startswith("#:")
-    ]
-    assert not any(line.strip() in ("import re", "import regex") for line in code), (
+    source = source_text(Path(mod.__file__))
+    # GRAPH4: the hand-rolled `#`/`#:` line filter here was without_prose
+    # written longhand, and the import question is exact through
+    # imported_modules - a line filter never saw `import re as _re`.
+    assert "resolve_command_line(layers, text)" in without_prose(source)  # the resolver
+    assert not {"re", "regex"} & imported_modules(source), (
         "the extractor imported a regex module — a second substitution path is "
         "exactly what G92 clause (a) forbids"
     )

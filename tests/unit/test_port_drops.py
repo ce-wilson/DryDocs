@@ -27,6 +27,7 @@ from drydocs.port.port_drops import (
     parse_accepted_drops,
 )
 from drydocs_core.repo_paths import repo_root
+from tests.source_scan import imported_modules, source_text
 
 REPO = repo_root(Path(__file__).resolve().parents[2])
 
@@ -217,8 +218,9 @@ def test_the_block_is_side_local_and_never_unioned():
 
 
 def test_the_entry_script_is_an_entry_point_only():
-    src = (REPO / "scripts" / "port_drop_check.py").read_text(encoding="utf-8")
-    assert "from drydocs.port.port_drops import main" in src
+    assert "drydocs.port.port_drops" in imported_modules(
+        source_text(REPO / "scripts" / "port_drop_check.py")
+    )
 
 
 # ------------------------------------------------------------------ the git half

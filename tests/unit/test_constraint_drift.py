@@ -112,20 +112,36 @@ def test_the_membership_key_is_declared_nowhere_in_the_tree() -> None:
     )
 
 
-@pytest.mark.parametrize("label", ["AisCapability", "AisTool"])
-def test_the_typo_labels_appear_nowhere_in_the_schema_tree(label: str) -> None:
-    """Confirmed typo leftovers, dropped company-side after a zero-node check.
-
-    Verified here as ABSENT FROM THE DECLARATIONS, which is the only half producer
-    can verify -- what any given database still enforces is a fact about that
-    database, and the detector is what reports it.
-    """
-    hits = [
-        p.name
-        for p in sorted(SCHEMA_DIR.rglob("*.cypher"), key=lambda q: q.as_posix())
-        if label in p.read_text(encoding="utf-8")
-    ]
-    assert not hits, f"{label} is declared in {hits} -- it was a typo leftover"
+# ---------------------------------------------------------------------------
+# REMOVED (GRAPH7, 2026-09-10): test_the_typo_labels_appear_nowhere_in_the_schema_tree
+#
+# It parametrized over :AisCapability / :AisTool and scanned SCHEMA_DIR for them.
+# It is deleted rather than narrowed, because the labels are gone from BOTH trees
+# and there is nothing left for it to guard. The reason lives here, not only in
+# the item, because a bare deletion teaches none of the three defects it closes -
+# and each one is a class this repo keeps re-finding:
+#
+#   1. IT ASSERTED A FACT ABOUT THE COMPANY'S TREE FROM THE PRODUCER'S. Its
+#      docstring said "dropped company-side after a zero-node check", which
+#      docs/company-prompts/port-ais-supplement-company-prompt.md disproves. A
+#      guard here can only ever speak about THIS tree (J18, J63).
+#   2. IT PASSED VACUOUSLY FOR ITS WHOLE LIFE. The producer never had the
+#      labels - measured at this commit: nine .cypher files under
+#      drydocs_core/schema/, zero hits. Green and wrong are not exclusive, and
+#      an absence scan is the one shape where they coexist quietly (CORE2).
+#   3. IT WAS A RAW p.read_text() SUBSTRING SCAN in a file that already imports
+#      without_prose from tests/source_scan.py (line 28). That is J66's exact
+#      failure mode, and it is why 10 of its 17 hits company-side were the
+#      COMMENTS explaining the supersession rather than any declaration.
+#
+# What is deliberately NOT removed, so a later reader does not extend this: the
+# AIS acronym row in config/taxonomy/software-registry.yaml stays (SME
+# 2026-09-10; the platforms-taxonomy gate's Q6 preserved it as the only
+# surviving spelling), config/gate-log.md is append-only, and the
+# platforms-taxonomy gate page takes riders, never edits (L25). The remaining
+# AisCapability/AisTool strings under config/ are all PROSE - gate records and a
+# resolved mapping note - and no executable artifact carries them.
+# ---------------------------------------------------------------------------
 
 
 # ---------------------------------------------------------------------------

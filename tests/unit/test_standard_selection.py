@@ -34,6 +34,7 @@ from drydocs_core.orchestration.controlm.standard_selection import (
     select_standard,
     selection_coverage,
 )
+from tests.source_scan import absent, without_prose
 
 #: Real launcher spellings, taken from config/launcher-registry.yaml rather than
 #: invented, so a registry edit that breaks classification breaks this too.
@@ -317,10 +318,22 @@ def test_the_module_creates_no_carrier() -> None:
     """
     from drydocs_core.orchestration.controlm import standard_selection as mod
 
-    source = inspect.getsource(mod)
-    for forbidden in ("open(", "yaml.safe_load", "sqlite3", "Path(", "read_text"):
-        assert forbidden not in source, (
-            f"standard_selection.py contains {forbidden!r} — storage for a standard "
-            "identity is G95's subject, and inventing the carrier here is what its "
-            "clause E2 forbids."
+    sources = {mod.__name__: inspect.getsource(mod)}
+    controls = {
+        "open(": 'fh = open("carrier.yaml")',
+        "yaml.safe_load": "data = yaml.safe_load(fh)",
+        "sqlite3": "import sqlite3",
+        "Path(": 'p = Path("carrier.yaml")',
+        "read_text": 'text = p.read_text(encoding="utf-8")',
+    }
+    for forbidden, control in controls.items():
+        absent(
+            forbidden,
+            sources,
+            positive_control=control,
+            stripper=without_prose,
+            because=(
+                "storage for a standard identity is G95 clause E2's "
+                "subject, and inventing the carrier here is what it forbids"
+            ),
         )

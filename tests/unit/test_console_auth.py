@@ -60,6 +60,8 @@ SECRET = "a-test-console-secret"
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
 from set_console_credential import save_store  # noqa: E402
 
+from tests.source_scan import absent, source_text, without_prose  # noqa: E402
+
 
 def _store(*identities: str) -> CredentialStore:
     creds = CredentialStore()
@@ -525,10 +527,17 @@ def test_save_replaces_rather_than_truncating(tmp_path: Path):
 def test_the_writer_uses_a_sibling_temp_path(tmp_path: Path):
     """os.replace is only atomic within one filesystem, so the temp file must
     be a sibling of the target rather than somewhere in the system temp dir."""
-    source = (REPO_ROOT / "scripts" / "set_console_credential.py").read_text(encoding="utf-8")
+    path = REPO_ROOT / "scripts" / "set_console_credential.py"
+    source = without_prose(source_text(path))
     assert "target.with_name(" in source
     assert "os.replace(" in source
-    assert "tempfile" not in source
+    absent(
+        "tempfile",
+        {str(path): source_text(path)},
+        positive_control="import tempfile",
+        stripper=without_prose,
+        because="the temp file would leave the target's own filesystem",
+    )
 
 
 # ── the demo script's alias table ───────────────────────────────────────────
