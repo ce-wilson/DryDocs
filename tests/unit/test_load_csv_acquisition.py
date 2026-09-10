@@ -184,7 +184,14 @@ def test_run_meta_reaches_the_job_run_and_the_disk_log(tmp_path: Path) -> None:
     assert len(job_runs) == 1
     cypher, params = job_runs[0]
     assert "run += $run_meta" in cypher  # the record is ON the :JobRun, not beside it
-    assert params["run_meta"] == meta
+    # G121's acquisition facts reach the node. A SUBSET check rather than exact
+    # equality since LOAD8: the same map also carries the scope block, which is
+    # always present (`scoped: false` on an unscoped load, deliberately — absent
+    # reading as full is the defect LOAD8 closes). This test's subject is that
+    # the acquisition meta arrives, and pinning the whole dict made it fail on
+    # any addition to a map that is designed to be added to.
+    assert params["run_meta"].items() >= meta.items()
+    assert params["run_meta"]["scoped"] is False  # this load was not scoped
 
     log = loader._open_run_log()
     assert log is not None

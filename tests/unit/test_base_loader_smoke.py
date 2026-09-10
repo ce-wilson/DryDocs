@@ -18,6 +18,7 @@ from typing import Any, ClassVar
 import pytest
 from pydantic import BaseModel
 
+from drydocs.cli_shared import _scope_binds, scope_run_meta
 from drydocs.loaders.base import BaseLoader
 from drydocs_core.neo4j_client import Neo4jClient
 
@@ -326,3 +327,94 @@ def test_code_semicolons_ignores_comments_and_strings() -> None:
         / "controlm_folders.cypher"
     )
     assert _code_semicolons(folders.read_text(encoding="utf-8")) <= 1
+
+
+# ---- LOAD8: a scoped run node says it was scoped ---------------------------
+#
+# A folder-filtered or row-capped load wrote a :JobRun indistinguishable from a
+# full one, so downstream "the graph has 12 folders" and "the graph has 12
+# folders BECAUSE WE ASKED FOR ONE" were the same statement.
+#
+# The item's substance is what may go on the node. argv carries `--run-as <FID>`,
+# a tenant service account, and a run-node property is one QuerySpec export away
+# from a CSV that leaves the machine (CLAUDE.md section 3) - so identity-bearing
+# dimensions are recorded as a BOOLEAN PRESENCE and never as a value.
+
+
+def _open_run_bind(client: _FakeNeo4jClient) -> dict:
+    """The `run_meta` map `_open_run` wrote onto the :JobRun."""
+    cypher, bind = next((c, b) for c, b in client.run_calls if "MERGE (run:JobRun" in c)
+    return bind["run_meta"]
+
+
+def test_an_unscoped_run_says_scoped_false_rather_than_saying_nothing(
+    smoke_cypher_files: None,
+) -> None:
+    """ABSENT IS NOT FULL. A missing marker is also what an older run node looks
+    like, so silence cannot mean "full" - it has to be said."""
+    client = _FakeNeo4jClient()
+    _SingleStatementLoader(client, _FakeAdapter([{"id": "a", "value": 1}])).load()
+    assert _open_run_bind(client)["scoped"] is False
+
+
+def test_a_capped_run_records_the_cap(smoke_cypher_files: None) -> None:
+    client = _FakeNeo4jClient()
+    _SingleStatementLoader(
+        client,
+        _FakeAdapter([{"id": "a", "value": 1}]),
+        scope_meta=scope_run_meta(_scope_binds(folder="PRSYNG%", row_cap=500)),
+    ).load()
+    written = _open_run_bind(client)
+    assert written["scoped"] is True
+    assert written["scope_row_cap"] == 500
+    assert written["scope_folder"] == "PRSYNG%"
+
+
+def test_a_tenant_fid_never_reaches_the_run_node(smoke_cypher_files: None) -> None:
+    """The ruling, driven. The FID filtered the extract, so the node must say a
+    filter was applied - and must not say which account."""
+    fid = "svc-tenant-fid-0001"
+    client = _FakeNeo4jClient()
+    _SingleStatementLoader(
+        client,
+        _FakeAdapter([{"id": "a", "value": 1}]),
+        scope_meta=scope_run_meta(_scope_binds(run_as=fid, developer_sid="jdoe01")),
+    ).load()
+    written = _open_run_bind(client)
+    assert written["scope_by_run_as"] is True
+    assert written["scope_by_developer"] is True
+    assert written["scoped"] is True
+    # …and no identity anywhere in what was written
+    blob = repr(written)
+    assert fid not in blob
+    assert "jdoe01" not in blob
+
+
+def test_no_scope_bind_travels_by_value_unless_it_was_opted_in() -> None:
+    """A bind added to `_scope_binds` for a SQL statement must not reach the
+    graph because it happens to be in the dict. The mapping is an allowlist, and
+    this is what keeps it one."""
+    meta = scope_run_meta({"folder_filter": "X%", "some_new_bind": "a-new-value"})
+    assert "a-new-value" not in repr(meta)
+    assert set(meta) == {"scope_folder", "scoped"}
+
+
+def test_the_acquisition_meta_still_rides_alongside(smoke_cypher_files: None) -> None:
+    """The control: LOAD8 adds a block, it does not displace G121's."""
+    client = _FakeNeo4jClient()
+    _SingleStatementLoader(
+        client,
+        _FakeAdapter([{"id": "a", "value": 1}]),
+        run_meta={"acquisition": "declared-zone"},
+        scope_meta=scope_run_meta(_scope_binds(row_cap=10)),
+    ).load()
+    written = _open_run_bind(client)
+    assert written["acquisition"] == "declared-zone"
+    assert written["scope_row_cap"] == 10
+
+
+def test_scope_run_meta_is_the_only_shape_that_reaches_the_node() -> None:
+    """`_run_properties` merges; it does not invent. Whatever `scope_run_meta`
+    decides is what the node carries, so the exposure decision has ONE home."""
+    decided = scope_run_meta(_scope_binds(folder="A%", run_as="svc-fid"))
+    assert decided == {"scope_folder": "A%", "scope_by_run_as": True, "scoped": True}

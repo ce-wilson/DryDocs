@@ -301,6 +301,7 @@ class BaseLoader:
         full_extract: bool = False,
         run_log: bool = True,
         run_meta: Mapping[str, str] | None = None,
+        scope_meta: Mapping[str, object] | None = None,
     ) -> None:
         if not self.cypher_path:
             raise NotImplementedError(f"{type(self).__name__} must set cypher_path")
@@ -321,6 +322,13 @@ class BaseLoader:
         # _open_run_log puts it in the disk log's header meta block, so the two
         # can never disagree about how the input was acquired.
         self.run_meta: dict[str, str] = dict(run_meta or {})
+        # LOAD8: what this run LOOKED AT, as opposed to what it found. Built by
+        # `drydocs.cli_shared.scope_run_meta` from the extract's scope binds, so
+        # the bind vocabulary stays with the binds and this class stays ignorant
+        # of it. The default is NOT "no marker": `_open_run` writes `scoped:
+        # false` for an unscoped run, because absent reading as full is the
+        # defect the item exists to close.
+        self.scope_meta: dict[str, object] = dict(scope_meta or {})
         self._scope_values: set = set()  # distinct sweep_scope_property values seen
 
     # ---- entrypoint ------------------------------------------------------
@@ -585,6 +593,26 @@ class BaseLoader:
         )
         return rows[0].get("unresolved", 0) if rows else 0
 
+    def _run_properties(self) -> dict[str, object]:
+        """The free-form properties `_open_run` writes onto the :JobRun.
+
+        LOAD8: the acquisition meta (G121) plus the scope block, and the scope
+        block is ALWAYS present. `scoped: false` is written for a full load
+        rather than left out, because a reader cannot tell an unscoped run from
+        an older run node that predates this marker if the only signal is
+        absence - and "absent means full" is exactly the assumption that let a
+        sample pass for the population.
+
+        Never argv, never `caller_stamp()`: argv carries `--run-as <FID>`, and a
+        run-node property is one QuerySpec export away from a CSV that leaves
+        the machine (CLAUDE.md section 3). The identity-bearing binds are
+        recorded as booleans by `scope_run_meta`; this method only merges.
+        """
+        props: dict[str, object] = dict(self.run_meta)
+        props.update(self.scope_meta)
+        props.setdefault("scoped", False)
+        return props
+
     def _open_run(self) -> None:
         self.client.run(
             """
@@ -600,7 +628,7 @@ class BaseLoader:
             loader=self.name,
             source_label=self.source_label,
             loaded_at=self.loaded_at,
-            run_meta=self.run_meta,
+            run_meta=self._run_properties(),
         )
 
     def _close_run(self, *, status: str, summary: LoadSummary) -> None:

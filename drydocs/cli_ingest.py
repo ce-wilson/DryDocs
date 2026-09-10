@@ -49,6 +49,7 @@ from drydocs.cli_shared import (
     _scope_binds,
     _source_registry,
     console,
+    scope_run_meta,
 )
 from drydocs_core.data_root import DataRootNotSetError
 from drydocs_core.data_zones import read_zone_containing
@@ -1171,7 +1172,17 @@ def ingest_controlm(
             # removed-from-source mark pass. A data-center-scoped run is a
             # partial extract (G115) — marking the other data centers removed
             # would be exactly the source-outage-looks-like-deletion trap.
-            summary = cls(cli, adapter, full_extract=folder is None and data_center is None).load()
+            # LOAD8: the same scope that filtered the extract is recorded on
+            # the run node, so a folder- or row-capped load cannot be read as a
+            # full one. `scope_run_meta` decides what may travel: values for the
+            # dimensions already present in the graph, a boolean for the ones
+            # that carry an identity.
+            summary = cls(
+                cli,
+                adapter,
+                full_extract=folder is None and data_center is None,
+                scope_meta=scope_run_meta(scope),
+            ).load()
             line = f"   rows={summary.rows_processed} rejected={summary.rows_rejected}"
             if summary.nodes_marked_removed or summary.nodes_reactivated:
                 line += (

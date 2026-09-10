@@ -7,7 +7,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs/loaders/base.py
@@ -22,3 +22,56 @@ acceptance: |
 notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). load-2026-09-08.md candidate 1 (L1-1, ranked 1). The cheaper fallback (an absent run log made
   visible) is its own item.
+
+  CLOSED 2026-09-10 (Lane B, laptop, wip/load8-laptop, based on main). Venue (J18): offline unit
+  suite - the run node is asserted through the recording fake client the module already uses, so no
+  Neo4j is involved. Full suite before this note: 4049 passed, 0 FAILED, both ruff gates clean.
+
+  THE RULING, WHICH IS THE ITEM'S SUBSTANCE. The acceptance ruled out the raw argv and
+  `caller_stamp()` because argv carries `--run-as <FID>`, a tenant service account. The reason that
+  matters is worth stating plainly, because "it is only the graph" is the objection: a :JobRun
+  PROPERTY is one QuerySpec export away from a CSV that leaves the machine, so a FID on a run node
+  is not contained by the database. So the scope is recorded STRUCTURALLY and split by exposure:
+
+    scoped              always present, true or false
+    scope_folder        the folder-name LIKE pattern    } already node ids in the
+    scope_row_cap       the ROWNUM sample cap           } graph, so no new exposure
+    scope_data_center   the data-center filter          }
+    scope_by_run_as     TRUE if a tenant FID filtered the extract - never which
+    scope_by_developer  TRUE if a developer SID filtered it - never which
+
+  The two booleans are the whole ruling in miniature. What a reader of a run node needs is "was
+  this population narrowed by an identity?", and yes/no answers that completely. The identity
+  answers a different question nobody consuming a run node has asked, and it is the one value that
+  must not travel.
+
+  ABSENT IS NOT FULL, and this is why `scoped` is written even when false. A missing marker is
+  indistinguishable from a run node that predates the marker, so silence cannot be read as "full" -
+  which is the same mistake as the original defect, one level up. `_run_properties()` sets the
+  default rather than the caller, so a loader constructed anywhere still writes it.
+
+  THE MAPPING IS AN ALLOWLIST, not a pass-through. `scope_run_meta` ignores keys it does not name,
+  so a bind added to `_scope_binds` for a SQL statement cannot reach the graph by accident - a new
+  dimension is opted IN, which is the moment its exposure gets decided. A test drives that with an
+  invented bind.
+
+  WHERE THE CODE LIVES, and why not the obvious place. `scope_run_meta` sits in cli_shared.py beside
+  `_scope_binds`, whose vocabulary it reads, and BaseLoader takes the RESULT as `scope_meta`. The
+  loader therefore never learns the bind vocabulary and cli_shared never imports the loaders -
+  putting the mapping in base.py would have coupled the loader tier to the CLI's bind names, and
+  putting it in drydocs_core would have needed a PUBLIC_MODULES entry that collides with CORE12's
+  branch.
+
+  MEASURED BOTH WAYS: 4 of the 6 new tests fail against main's base.py. The two that pass either
+  way are the allowlist test and the shape test - both about `scope_run_meta`, which is new, so
+  they are controls for the decision rather than for the wiring.
+
+  ONE EXISTING TEST ADAPTED, named so the diff is not a surprise:
+  test_load_csv_acquisition.py::test_run_meta_reaches_the_job_run_and_the_disk_log asserted exact
+  dict equality on `run_meta`. Its subject is that G121's acquisition facts reach the node, and
+  that still holds; the equality was incidental and made the test fail on any addition to a map
+  designed to be added to. It is now a subset check plus an explicit `scoped is False`, so it
+  asserts MORE than it did.
+
+  What this item did NOT do, per its own note: the cheaper fallback - an absent run log made
+  visible - is LOAD9, which is next in this lane's queue.

@@ -22,6 +22,7 @@ nothing about import order).
 from __future__ import annotations
 
 import logging
+from collections.abc import Mapping
 from pathlib import Path
 from typing import NamedTuple
 
@@ -1020,3 +1021,81 @@ def _data_center_opt():
             f"columns as given. {_SCOPE_HELP}"
         ),
     )
+
+
+# =============================================================================
+# LOAD8 (2026-09-10): what a :JobRun says about its own scope
+# =============================================================================
+#
+# A scoped or sampled load wrote a :JobRun indistinguishable from a full one, so
+# a sample could pass for the population: the run node recorded the loader, the
+# source and the timestamps, and nothing about the fact that only one folder, or
+# only the first 500 rows, had been looked at. Downstream, "the graph has 12
+# folders" and "the graph has 12 folders BECAUSE WE ASKED FOR ONE" are the same
+# statement.
+#
+# WHAT GOES ON THE NODE, AND WHAT NEVER DOES - the item's own substance.
+#
+# NEVER the raw argv or `caller_stamp()`. argv carries `--run-as <FID>`, a tenant
+# service account, and CLAUDE.md section 3 keeps that off any publishable
+# surface. A :JobRun property is not "just the graph": QuerySpec exports write
+# node properties into CSVs that leave the machine, so a FID on a run node is one
+# export away from a file nobody screened. The convenience of "just store argv"
+# is exactly how such a value travels.
+#
+# So the scope is recorded STRUCTURALLY, and identity-bearing dimensions are
+# recorded as a BOOLEAN PRESENCE rather than a value:
+#
+#   scoped                a scope was applied at all - false on a full load, and
+#                         PRESENT either way, because absent must not be readable
+#                         as full (that is the defect, one level up)
+#   scope_folder          the folder-name LIKE pattern; folder names are already
+#                         node ids throughout the graph, so this adds no exposure
+#   scope_row_cap         the ROWNUM sample cap, or absent when uncapped
+#   scope_data_center     the data-center filter; likewise already graph data
+#   scope_by_run_as       TRUE if a tenant FID filtered the extract - never which
+#   scope_by_developer    TRUE if a developer SID filtered it - never which
+#
+# The two booleans are the whole ruling in miniature: what a reader needs is "was
+# this population narrowed by an identity?", and the answer to that is yes or no.
+# The identity itself answers a different question that no consumer of a run node
+# has asked, and it is the one value here that must not leak.
+
+#: Scope binds whose VALUE may go on the run node - they are already graph data.
+_SCOPE_VALUE_KEYS: dict[str, str] = {
+    "folder_filter": "scope_folder",
+    "row_cap": "scope_row_cap",
+    "data_center_filter": "scope_data_center",
+}
+
+#: Scope binds recorded as PRESENCE only. These carry identities (a tenant FID, a
+#: developer SID) and their values never reach the graph - see the block above.
+_SCOPE_PRESENCE_KEYS: dict[str, str] = {
+    "run_as": "scope_by_run_as",
+    "developer_sid": "scope_by_developer",
+}
+
+
+def scope_run_meta(scope: Mapping[str, object] | None) -> dict[str, object]:
+    """The :JobRun properties describing a load's scope (LOAD8).
+
+    Always returns ``scoped``, whether or not anything was scoped: an ABSENT
+    marker is what let a sample read as a population, so "this was a full load"
+    has to be said rather than inferred from silence.
+
+    ``scope`` is the dict :func:`_scope_binds` builds. Unknown keys are ignored
+    rather than passed through, so a bind added there for a SQL statement cannot
+    reach the graph by accident - a new dimension is opted IN here, with the
+    decision about its exposure made at the same time.
+    """
+    meta: dict[str, object] = {}
+    for bind, prop in _SCOPE_VALUE_KEYS.items():
+        value = (scope or {}).get(bind)
+        if value is not None and value != "":
+            meta[prop] = value
+    for bind, prop in _SCOPE_PRESENCE_KEYS.items():
+        value = (scope or {}).get(bind)
+        if value is not None and value != "":
+            meta[prop] = True
+    meta["scoped"] = bool(meta)
+    return meta
