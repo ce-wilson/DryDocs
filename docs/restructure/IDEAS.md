@@ -180,7 +180,31 @@ question a 1,000-line file with the trail at the bottom could not answer.
   for: **a dead route in a canonical-producer document is a producer defect that bills the
   consumer**, in the one currency they cannot recover. Their draft is the spec for the producer
   build; back-flow it as mechanism, not as an instance. Detail and the measured table in
-  `internal/agent-platform/company-assistant-venue.md` §5.
+  `internal/agent-platform/company-assistant-venue.md` §4.
+  **SCOPE, MEASURED 2026-09-10 at `c8fd9b49` — this is bigger than one table row, and the draft
+  cannot be copied as-is.** TWO findings change what the work is. (i) The routing tree is ALREADY
+  drifted from `CLAUDE.md`'s own keep-10 in FIVE places, independent of any venue question:
+  `reference/platforms/neo4j/README.md:22` still routes to the `aura-*` skills deleted 2026-07-06;
+  `:23` and `reference/research/README.md:17` route context-graph work to an `agent-memory` skill
+  outside the keep set; `reference/platforms/README.md:8` and `reference/REGISTRY.yaml:66` route
+  Snowflake to a skill outside the keep set that is ALSO explicitly `"off"`; and
+  `REGISTRY.yaml:23-24` lists twelve plugin skills against CLAUDE.md's ten, still naming `aura-*`.
+  So the fix lands on existing drift and should sweep all five rather than repoint one row — and
+  four of those five have been dead since 2026-07-06 or earlier, which is its own small verdict on
+  how visible a dead route is. (ii) **The consumer draft carries a version fact that is wrong for
+  this tree**: it is grounded in Neo4j `5.20.0-enterprise` while this repo pins
+  `neo4j:2026.05.0-enterprise` (`config/dev-environment.yaml:115`, guarded). Their container is
+  legitimately theirs — that file is canonical-company — but a skill authored from those notes
+  would cross as canonical-producer carrying 5.20 dialect and capability claims onto a 2026.05
+  tree, i.e. authoritatively wrong about exactly the thing it exists to be authoritative about.
+  The likely derivation is worth naming so it is not repeated: `pyproject.toml:18` reads
+  `neo4j = "^5.20"`, which is the PYTHON DRIVER floor, not a server tag — the resolved env runs
+  driver 5.28.4 against a 2026.05.0 server. Four more of the draft's facts are stale or foreign
+  (a 36-constraint count that was never true here — it is 55; supplement constraint counts for
+  five files that do not exist here; a smoke script deleted 2026-08-19; a provisioning step
+  retired to a tombstone). All checked claim-by-claim in
+  `internal/agent-platform/company-assistant-venue.md` §5. **Take the draft's SHAPE, which is
+  right, and re-derive every fact from this tree.**
 
 - **`Idea-313`** · 2026-09-10 · `[question]` · **open** · prio? **Med** —
   **Five agent definitions cross the port wholesale; whether the receiving venue can DISPATCH them

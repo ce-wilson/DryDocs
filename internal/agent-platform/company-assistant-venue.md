@@ -189,7 +189,104 @@ handles it — `sorted(i.name or i.callback.__name__.replace('_','-') for i in .
 returns 55 verbs cleanly here. Their version was a simplification of the documented one.
 Worth knowing only because the naive form is the one anybody writes from memory.
 
-## 5. What is NOT claimed here
+## 5. Their notes, checked claim-by-claim against THIS tree `[VERIFIED-PRODUCER]`
+
+Their draft is going to be the SPEC for the producer-side build (§4), so every factual claim
+in it was checked against this repo before any of it is copied. Verified 2026-09-10 at
+`c8fd9b49`, 33 claims across six areas, by file-and-line. **Most of it holds. Five things do
+not, and one of those would put a wrong fact into a canonical-producer skill.**
+
+### What holds, and it is the load-bearing majority
+
+The whole database-topology story is right: two live databases (`drydocs` ground truth,
+`ddschema` meta-graph, pinned to exactly that set by `tests/unit/test_database_names.py`);
+exemplars carrying real labels beside `:SchemaMeta`; the single `schemameta_name` constraint
+living in `schema_graph.cypher` and deliberately not in `constraints.cypher`; `ddschema`
+unaliased; `ddlineage` retired 2026-08-04 under ADR 0002 X1 having never been written;
+`ddcontext` retired 2026-08-18 under G32/G102 and ADR 0011, with the trust boundary moving to
+an `:Uncertain` label plus a mandatory trust property inside `drydocs`; `ddall` retired with
+its second constituent. ADRs 0002 X1, 0005 and 0011 and gates G32 and G102 all exist and say
+what they are said to say. The 5.x `FOR … REQUIRE` migration is complete, and `ontology.cypher`
+/ `ontology_supplement.cypher` really do carry no constraints. Their correction of their own
+stale memory was right.
+
+### THE ONE THAT MATTERS: the Neo4j version, and how it was probably derived
+
+**This tree pins `neo4j:2026.05.0-enterprise`** (`config/dev-environment.yaml:115`, repeated in
+`compose.yaml` and `provision.ps1`, guarded by `tests/unit/test_dev_environment.py:201`). The
+string `5.20.0-enterprise` appears NOWHERE in it, and no 5.20 server image ever did.
+
+Their container being 5.20.0 is **not a defect** — `config/dev-environment.yaml` is
+canonical-company precisely so each side declares its own container, ports and image, and
+`provision.ps1` says in prose that this step is re-created per environment and never copied.
+A divergent company container is expected. **The hazard is one level up:** a `neo4j-db` skill
+whose Cypher-dialect rules, capability notes and failure modes are grounded in 5.20 would cross
+as canonical-producer onto a tree running 2026.05.0. The skill is meant to be authoritative
+about *this* graph, and on that point their draft would be authoritatively wrong.
+
+Worse, the likely derivation is a conflation worth naming out loud: `pyproject.toml:18` reads
+`neo4j = "^5.20"` — the **Python driver** floor, not a server tag — and the resolved
+environment runs driver 5.28.4 against a 2026.05.0 SERVER. The two are decoupled here. And
+`dev-environment.yaml:115` carries a one-way door in its own comment: the existing
+`neo4j-testdata` store was written by 2026.05.0 and *cannot be downgraded*, so provisioning
+this tree against a 5.x image would fail on store format rather than merely differ.
+
+### Four more that would import stale or foreign facts
+
+- **`constraints.cypher` holds 55 constraints, not 36.** Measured with the repo's own
+  `declared_constraint_names()` parser rather than grep, and cross-checked commit by commit:
+  the count ran 40 → 46 → … → 55 at `a30dd952` (2026-08-19) and has been 55 since. It was
+  **never** 36 in reachable history, so this is not a stale-tree reading (J63) — it points at
+  a different tree, most likely theirs.
+- **Every supplement carries ZERO constraints, and the five files named do not exist here.**
+  No `resource_pools`, `contacts`, `locations`, `platforms` or `seal_deployments` supplement
+  is tracked. The real chain is declared as data in `drydocs_core/schema/supplements.py`
+  (`SUPPLEMENTS`, with an explicitly empty `CHAIN_EXCLUSIONS` and a guard that fails on any
+  unchained supplement-shaped file), and its members are MERGE-only term seeders. Their list
+  reads like the company tree.
+- **`smoke_drydocs_all.cypher` was DELETED 2026-08-19** at the G38 close (`50ed3589`). Their
+  provisioning recipe still pipes it. Recreating it is not the fix: it was a FEDERATED read
+  across the `ddall` composite and the fold to one content database left it nothing to
+  federate. The equivalent check is now `SHOW DATABASES` showing `drydocs` and `ddschema`
+  online.
+- **`02_proxy_constraints.cypher` is a TOMBSTONE**, retired at G31 (2026-08-18); `provision.ps1`
+  no longer runs it. Any "01, then 02, then smoke" sequence describes the pre-2026-08-18 tree.
+
+### Two attribution corrections, small but they will be cited
+
+`bootstrap_schema_graph` does **not create** `ddschema` — `01_databases.cypher:38` does; the
+verb writes the meta-graph into an already-provisioned database. That distinction is literally
+what item G51 fixed (the verb shipped naming a database nothing provisioned). And **G51 is a
+backlog item plus a gate-log RECORD, not a signed gate** ("Direction, not a gate session"); the
+two-graph decision and the verb are **C21**. Citing G51 as a gate ruling overstates it.
+
+Separately, "do not drop `neo4j` or `system`" is **not a producer ruling** — nothing in the tree
+says it. What the tree says is adjacent and different: `neo4j` is outside the topology, so
+loading into it puts data where no query surface looks (`dev-environment.yaml:158-161`). That
+is a LOAD warning, not a drop prohibition.
+
+### The scope finding, which is the producer's own problem and not theirs
+
+The routing tree is **already drifted from `CLAUDE.md`'s own keep-10 in five places**, before
+any venue question: `reference/platforms/neo4j/README.md:22` still routes to the `aura-*`
+skills deleted 2026-07-06; `:23` and `reference/research/README.md:17` route context-graph work
+to an `agent-memory` skill outside the keep set; `reference/platforms/README.md:8` and
+`reference/REGISTRY.yaml:66` route Snowflake to a skill that is outside the keep set AND
+explicitly `"off"`; and `REGISTRY.yaml:23-24` lists twelve plugin skills against `CLAUDE.md`'s
+ten, still naming `aura-*`. So the producer's routing fix is landing on existing drift, not on
+a clean baseline, and it should sweep all of it rather than repoint one row.
+
+### And the boundary sweep came back clean
+
+Swept the tracked tree at `c8fd9b49` for three classes: a private corporate container-registry
+hostname — **absent everywhere**, inside `internal/` and out; a hard-coded Neo4j password or
+auth pair — **absent everywhere**; a corporate internal domain suffix — present, and **confined
+entirely to `internal/`** (16 files), which is the tier that is allowed to hold it. Every
+corporate-looking host outside `internal/` is a public-web hostname on an External-classified
+source, and every other host-like string is an RFC placeholder or loopback. `.env` is
+gitignored and no `.env`-shaped file carrying values is tracked. **Nothing to remediate here.**
+
+## 6. What is NOT claimed here
 
 - That sub-agent dispatch is unavailable in that venue. Nobody measured it; the session did
   not test it and the producer cannot. `.claude/agents/*.md` cross wholesale either way, so
