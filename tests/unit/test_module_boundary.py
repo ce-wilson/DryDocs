@@ -20,6 +20,8 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 
+import pytest
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 # Packages scanned for the boundary: the component remainder, physical core, the
 # remediation component (G3 scaffold, 2026-07-10), and — added 2026-07-25 — the two
@@ -79,14 +81,64 @@ def _package_of(path: Path) -> str:
     return name.rsplit(".", 1)[0] if "." in name else "drydocs"
 
 
+#: GRAPH1: the dynamic-import call names this guard understands. Both take the
+#: module path as their first positional argument, and both are read ONLY when
+#: that argument is a string CONSTANT — see `_dynamic_import_target`.
+_DYNAMIC_IMPORT_CALLS = ("import_module", "__import__")
+
+
+def _dynamic_import_target(node: ast.Call) -> str | None:
+    """The module a dynamic import names, when it names one literally (GRAPH1).
+
+    Matches ``importlib.import_module("pkg.mod")``, a bare
+    ``import_module("pkg.mod")`` where the name was imported directly, and
+    ``__import__("pkg.mod")``.
+
+    THE RESIDUAL, STATED PLAINLY (acceptance c): an import built from a VARIABLE
+    stays invisible. ``importlib.import_module(name)`` where `name` is computed,
+    read from config, or f-string-assembled cannot be resolved by an AST walk
+    without executing the module, and executing component modules to enumerate
+    their imports is a far worse trade than an under-report the docstring names.
+    A crossing hidden that way is undeclarable BY THIS GUARD and stays a review
+    concern; what changed is that the LITERAL case — which is every dynamic
+    import in the tree today — is no longer among them.
+    """
+    func = node.func
+    if isinstance(func, ast.Attribute):
+        name = func.attr
+    elif isinstance(func, ast.Name):
+        name = func.id
+    else:
+        return None
+    if name not in _DYNAMIC_IMPORT_CALLS or not node.args:
+        return None
+    first = node.args[0]
+    if isinstance(first, ast.Constant) and isinstance(first.value, str):
+        return first.value
+    return None
+
+
 def _imported_drydocs_modules(path: Path) -> set[str]:
     """First-party modules imported by ``path`` (relative imports resolved; ``from pkg import
     name`` expanded to ``pkg.name`` so a component leaf-import like ``from drydocs import
-    loaders`` is caught, not just ``from drydocs.loaders import x``)."""
+    loaders`` is caught, not just ``from drydocs.loaders import x``).
+
+    GRAPH1: also reads ``importlib.import_module("<literal>")`` and
+    ``__import__("<literal>")``. Before that, the walk saw STATIC imports only,
+    so a component could reach across the boundary through a one-line dynamic
+    call and every guard here stayed green — which is not a hypothetical: it is
+    how `drydocs.port.reconcile_before` -> `drydocs_remediation.detect` went
+    undeclared. An import built from a VARIABLE is still invisible; see
+    `_dynamic_import_target` for why that trade is the right one.
+    """
     tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
     pkg = _package_of(path)
     mods: set[str] = set()
     for node in ast.walk(tree):
+        if isinstance(node, ast.Call):
+            target = _dynamic_import_target(node)
+            if target:
+                mods.add(target)
         if isinstance(node, ast.Import):
             for alias in node.names:
                 mods.add(alias.name)
@@ -465,3 +517,86 @@ def test_the_public_contract_covers_what_components_actually_import():
                 imported.add(sub)
     assert imported, "no component imports of core were seen at all - the scan found nothing"
     assert imported <= PUBLIC_MODULES
+
+
+# ── GRAPH1: the AST walk sees the dynamic import ─────────────────────────────
+#
+# The walk read STATIC imports only, so a component could reach across the
+# boundary in one line — `importlib.import_module("other_component.x")` — and
+# every guard above stayed green. Not hypothetical: that is exactly how
+# `drydocs.port.reconcile_before` -> `drydocs_remediation.detect` went
+# undeclared, and teaching the walk the literal form surfaced it immediately.
+
+
+def _dynamic_targets(source: str) -> set[str]:
+    """Every module a literal dynamic import in ``source`` names.
+
+    Drives `_dynamic_import_target` over a parsed tree rather than writing a
+    probe file: `_imported_drydocs_modules` resolves relative imports against
+    the repo, so a tmp_path file outside the tree cannot go through it. The
+    end-to-end case is covered on the REAL file below, which is the one that
+    matters anyway.
+    """
+    return {
+        target
+        for node in ast.walk(ast.parse(source))
+        if isinstance(node, ast.Call) and (target := _dynamic_import_target(node))
+    }
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        'import importlib\nimportlib.import_module("drydocs_remediation.detect")\n',
+        'from importlib import import_module\nimport_module("drydocs_remediation.detect")\n',
+        '__import__("drydocs_remediation.detect")\n',
+        # nested inside a function and a try — where a lazy import actually lives
+        'import importlib\ndef f():\n    try:\n        importlib.import_module("drydocs_remediation.detect")\n    except ImportError:\n        pass\n',
+    ],
+    ids=["attribute", "bare-name", "dunder", "nested-in-try"],
+)
+def test_a_literal_dynamic_import_is_an_import_edge(source: str) -> None:
+    assert "drydocs_remediation.detect" in _dynamic_targets(source)
+
+
+def test_a_variable_dynamic_import_stays_invisible_and_that_is_declared() -> None:
+    """The residual, asserted rather than only documented (acceptance c). An
+    import built from a variable cannot be resolved by an AST walk without
+    executing the module, and executing component modules to enumerate their
+    imports is a far worse trade than an under-report the docstring names."""
+    source = (
+        'import importlib\nname = "drydocs_remediation.detect"\nimportlib.import_module(name)\n'
+    )
+    assert _dynamic_targets(source) == set()
+    # …and the guard SAYS so, so a reader is not left to discover it
+    doc = _dynamic_import_target.__doc__ or ""
+    assert "VARIABLE" in doc and "invisible" in doc
+
+
+def test_a_third_party_dynamic_import_is_seen_but_filtered_out() -> None:
+    """Two layers, and the division matters. `_dynamic_import_target` reads the
+    literal whatever it names — it is a syntax reader, not a policy — and the
+    first-party filter in `_imported_drydocs_modules` is what drops a stdlib
+    target before it can reach the boundary comparison."""
+    assert _dynamic_targets('import importlib\nimportlib.import_module("json")\n') == {"json"}
+    assert not _is_first_party("json")
+
+
+def test_a_dynamic_call_with_no_literal_first_argument_is_ignored() -> None:
+    """`import_module()` with no args, and a same-named method on something else,
+    must not raise or invent an edge."""
+    source = (
+        "import importlib\n"
+        "class Loader:\n"
+        "    def import_module(self):\n"
+        "        return 1\n"
+        "Loader().import_module()\n"
+    )
+    assert _dynamic_targets(source) == set()
+
+
+def test_the_reconcile_before_crossing_is_the_one_the_item_names() -> None:
+    """End to end on the REAL file: the crossing exists, and it is declared."""
+    path = REPO_ROOT / "drydocs" / "port" / "reconcile_before.py"
+    assert "drydocs_remediation.detect" in _imported_drydocs_modules(path)
+    assert "drydocs_remediation" in DECLARED_COMPONENT_IMPORTS["drydocs.port.reconcile_before"]

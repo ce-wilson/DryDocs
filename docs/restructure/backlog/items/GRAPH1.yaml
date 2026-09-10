@@ -24,3 +24,54 @@ acceptance: |
 notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). seams-2026-09-08.md candidate 1 (L1-1, ranked 1). The copier will read component_map to decide
   what a component drags with it; an object that under-reports coupling produces a wrong carve.
+
+  CLOSED 2026-09-10 (Lane B, laptop, wip/graph1-laptop, BASED ON wip/core12-laptop - both write
+  tests/unit/test_module_boundary.py AND drydocs_core/component_map.py. Merge CORE12 first).
+  Venue (J18): offline; the guard is an AST walk over the tree. Full suite: 4052 passed, 1 failed,
+  and that one is the roadmap guard inherited from CORE12's close notes.
+
+  GATE (e) CHECKED, NOT ASSUMED. "Lane B may take it only after the port-preflight fix is on
+  origin": PORT8 (`fix(PORT8): the port preflight fails closed`, 2425c206) is on origin/main, with
+  CORE10 built on top of it. Verified before claiming rather than after.
+
+  (a) The walk now reads `importlib.import_module("<literal>")` and `__import__("<literal>")`,
+  including the bare-name form (`from importlib import import_module`) and nested inside a function
+  or a try - which is where a lazy import actually lives.
+
+  THE FIX FOUND THE BUG IMMEDIATELY, which is the best evidence it works: teaching the walk the
+  dynamic form turned `test_components_do_not_import_each_other` RED on exactly the crossing the
+  item names, before the declaration was added. It is the only dynamic import in the first-party
+  tree today, measured.
+
+  (b) `drydocs.port.reconcile_before -> drydocs_remediation` is declared with its reason, so the
+  load-bearing staleness test now protects it: the day that import goes, the declaration fails
+  rather than rotting into a silently widened boundary. The reason is worth reading in the entry -
+  the dynamic call is NOT an evasion. The snapshot writer treats the detector as OPTIONAL (the J51
+  list-shaped snapshots are written only where their module imports), so a static import would turn
+  a component that may legitimately be absent into a hard dependency of the port tier. Declared
+  rather than removed because routing it through core would put conformance RULES in core, and core
+  holds no rules.
+
+  (c) THE RESIDUAL, STATED AND TESTED. An import built from a VARIABLE stays invisible: resolving
+  it would mean executing the module to find out, and executing component modules to enumerate
+  their imports is a far worse trade than an under-report the docstring names. Both
+  `_dynamic_import_target`'s docstring and `_imported_drydocs_modules`' say so, and a test asserts
+  BOTH the invisibility and that the docstring says so - so a future reader cannot find the gap
+  without also finding the reasoning.
+
+  (d) MODULE_MAP.md RE-RENDERED, and the result is worth stating precisely rather than as a tick:
+  `scripts/render_module_map.py` reported "component-map section already current" and the file is
+  byte-identical. The renderer reads CORE_PREFIXES, COMPONENT_GROUPS, COMPONENT_MODULE and
+  SURFACE_OWNERS - not DECLARED_COMPONENT_IMPORTS - so adding a declaration correctly moves
+  nothing. No render rides with this item.
+
+  TWO LAYERS, AND THE DIVISION IS TESTED. `_dynamic_import_target` is a SYNTAX reader: it returns
+  whatever literal it finds, `json` included. The first-party filter in
+  `_imported_drydocs_modules` is what drops a stdlib target before it reaches the boundary
+  comparison. A test pins both halves, because collapsing them - filtering inside the syntax
+  reader - would make the reader silently policy-bearing.
+
+  For Lane A: the sender's ordering ruling stands and is now actionable - GRAPH2 writes the same
+  drydocs/port/reconcile_before.py and starts after GRAPH1 has merged. Note that GRAPH1 does not
+  MODIFY that file; it only reads it (the crossing was already there). So the ordering matters for
+  GRAPH2's own edits, not for a conflict this branch creates.

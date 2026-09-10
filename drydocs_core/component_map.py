@@ -244,6 +244,25 @@ DECLARED_COMPONENT_IMPORTS: dict[str, tuple[str, ...]] = {
     # query_specs + guard into drydocs_core, per MODULE_MAP's "Future, land in core"
     # list. This entry records today's reality until that ruling is made.
     "agents.common.specs_catalog": ("drydocs_api",),
+    # GRAPH1 (2026-09-10). The port's pre-merge snapshot writer runs the
+    # remediation detector so the "before" side of a reconcile carries the same
+    # conformance findings the "after" side will - comparing a port against a
+    # baseline that was measured with a different instrument would make every
+    # difference unattributable.
+    #
+    # It reaches it through `importlib.import_module("drydocs_remediation.detect")`,
+    # which is a real crossing and was invisible until this item taught the AST
+    # walk the dynamic form. The dynamic call is not an evasion: the snapshot
+    # writer treats the detector as OPTIONAL (the J51 list-shaped snapshots are
+    # written only where their module imports), and a static import would make a
+    # component that may legitimately be absent into a hard dependency of the
+    # port tier.
+    #
+    # DECLARED rather than removed, because the alternative is worse: routing the
+    # detector through core would put conformance RULES in core, and core holds
+    # no rules. The staleness test now protects this line, so the day the import
+    # goes the declaration fails rather than rotting.
+    "drydocs.port.reconcile_before": ("drydocs_remediation",),
 }
 
 # ---- the join to the backlog's module registry (ADR 0018 D2) ------------------------------
