@@ -550,3 +550,161 @@ def test_blocking_twice_is_refused_rather_than_stacking_rows(sessions, store):
     with pytest.raises(IntakeValidationError) as info:
         block_persona("mouse", "again", admin, sessions, store)
     assert "already blocked" in str(info.value)
+
+
+# ── API7: ownership is checked BEFORE the write, not after the commit ────────
+#
+# The defect these pin: `transition`, `thread_decision` and `add_evidence` used
+# to reach the per-record ownership test by RETURNING `get_intake(...)`, which
+# runs after their `commit()`. The write landed, then the caller got a 403 over
+# the top of it. A test asserting only `pytest.raises(Forbidden)` PASSES against
+# that bug — the refusal was real, it was just too late — so the subject here is
+# the STORE, snapshotted before and after.
+
+
+def _snapshot(store, intake_id):
+    """Everything a refused write must leave untouched: the record row, the
+    event log, the evidence rows, and the evidence directory on disk."""
+    record = dict(store._record(intake_id))
+    events = [
+        tuple(row)
+        for row in store.conn.execute(
+            "SELECT at, actor, action, detail FROM event WHERE intake_id = ? ORDER BY rowid",
+            (intake_id,),
+        ).fetchall()
+    ]
+    evidence = [
+        tuple(row)
+        for row in store.conn.execute(
+            "SELECT * FROM evidence WHERE intake_id = ? ORDER BY rowid", (intake_id,)
+        ).fetchall()
+    ]
+    directory = store.evidence_path(intake_id)
+    on_disk = sorted(p.name for p in directory.iterdir()) if directory.exists() else []
+    return record, events, evidence, on_disk
+
+
+def test_transition_refuses_a_stranger_without_moving_the_record(sessions, store):
+    """persona `neo` moving persona `mouse`'s intake: this is the exact drive
+    the adversarial verifier ran on 2026-09-09 — draft -> ontology-reviewed came
+    back Forbidden AND the status had changed anyway."""
+    owner, rec = _intake(sessions, store, token=_token(sessions, "mouse"))
+    iid = rec["intake_id"]
+    add_evidence(iid, "failure.msg", FIRST_MAIL, owner, sessions, store)
+    before = _snapshot(store, iid)
+
+    stranger = _token(sessions, "neo")  # user tier, not the owner
+    with pytest.raises(Forbidden):
+        transition(iid, "ontology-reviewed", "", stranger, sessions, store)
+
+    after = _snapshot(store, iid)
+    assert after[0]["status"] == "draft" == before[0]["status"]
+    assert after[1] == before[1], "the refused transition still wrote an event"
+    assert after == before
+
+
+def test_add_evidence_refuses_a_stranger_without_landing_the_file(sessions, store):
+    owner, rec = _intake(sessions, store, token=_token(sessions, "mouse"))
+    iid = rec["intake_id"]
+    add_evidence(iid, "failure.msg", FIRST_MAIL, owner, sessions, store)
+    before = _snapshot(store, iid)
+
+    stranger = _token(sessions, "neo")
+    with pytest.raises(Forbidden):
+        add_evidence(iid, "planted.txt", b"Subject: planted\nbody\n", stranger, sessions, store)
+
+    after = _snapshot(store, iid)
+    assert after[3] == before[3] == ["failure.msg"], "the stranger's bytes reached the disk"
+    assert after[2] == before[2], "the stranger's evidence row was inserted"
+    assert after == before
+
+
+def test_thread_decision_refuses_a_stranger_without_recording_the_call(sessions, store):
+    _, out, _ = _thread_pair(sessions, store)
+    iid = out["intake_id"]
+    before = _snapshot(store, iid)
+    assert before[0]["thread_decision"] is None
+
+    stranger = _token(sessions, "neo")
+    with pytest.raises(Forbidden):
+        thread_decision(iid, "no-new-value", stranger, sessions, store)
+
+    after = _snapshot(store, iid)
+    assert after[0]["thread_decision"] is None, "a stranger ruled on the thread"
+    assert after[0]["status"] == before[0]["status"]
+    assert after == before
+
+
+def test_the_upload_window_no_longer_answers_a_stranger(sessions, store):
+    """Ownership runs before the state machine, so a refusal stops telling a
+    stranger what status the record is in."""
+    owner, rec = _intake(sessions, store, token=_token(sessions, "mouse"))
+    iid = rec["intake_id"]
+    admin = _token(sessions, "morpheus")
+    for to in ("ontology-reviewed", "correlated", "sme-confirmed"):
+        transition(iid, to, "", owner, sessions, store)
+    transition(iid, "admin-accepted", "", admin, sessions, store)
+
+    stranger = _token(sessions, "neo")
+    with pytest.raises(Forbidden):  # not IllegalTransitionError('… is admin-accepted')
+        add_evidence(iid, "late.txt", b"Subject: late\nbody\n", stranger, sessions, store)
+
+
+def test_the_owner_and_the_queue_are_unaffected(sessions, store):
+    """The fix is ordering, not a new refusal: the owner still writes, and a
+    steward still works anyone's record."""
+    owner, rec = _intake(sessions, store, token=_token(sessions, "mouse"))
+    iid = rec["intake_id"]
+    assert transition(iid, "ontology-reviewed", "", owner, sessions, store)["status"] == (
+        "ontology-reviewed"
+    )
+    steward = _token(sessions, "trinity")
+    assert transition(iid, "correlated", "", steward, sessions, store)["status"] == "correlated"
+    assert add_evidence(iid, "s.txt", b"Subject: s\nbody\n", steward, sessions, store)["evidence"]
+
+
+# ── API7(c): the thread linkage stops naming other personas' intake ids ──────
+
+
+def _cross_persona_thread(sessions, store):
+    """`mouse` files first; `neo` (user tier) files a reply that threads to it."""
+    mouse = _token(sessions, "mouse")
+    first = create_intake("job-failure", {}, "", mouse, sessions, store)
+    add_evidence(first["intake_id"], "first.msg", FIRST_MAIL, mouse, sessions, store)
+    neo = _token(sessions, "neo")
+    second = create_intake("job-failure", {}, "", neo, sessions, store)
+    out = add_evidence(second["intake_id"], "reply.msg", REPLY_MAIL, neo, sessions, store)
+    return first, out, neo
+
+
+def test_a_user_tier_reader_is_not_told_another_personas_intake_id(sessions, store):
+    first, out, neo = _cross_persona_thread(sessions, store)
+    assert out["thread_flagged"] is True, "the flag itself is not withheld"
+    assert out["thread_of"] == [], "a stranger's intake id reached a user-tier reader"
+    assert first["intake_id"] not in str(out["thread_of"])
+    # the linkage is intact in the store — it is the READER that is filtered
+    row = store._record(out["intake_id"])
+    assert first["intake_id"] in row["thread_of_json"]
+    # …and it stays filtered on the list path too
+    (listed,) = list_intakes(neo, sessions, store)["intakes"]
+    assert listed["thread_of"] == []
+
+
+def test_the_queue_still_sees_the_whole_linkage(sessions, store):
+    first, out, _ = _cross_persona_thread(sessions, store)
+    steward = _token(sessions, "trinity")
+    assert get_intake(out["intake_id"], steward, sessions, store)["thread_of"] == [
+        first["intake_id"]
+    ]
+
+
+def test_a_persona_still_sees_its_own_prior_intake_in_the_thread(sessions, store):
+    """What the filter is for: the third-bounce view keeps working when the
+    prior intake is the reader's own — those are the ids the console can
+    actually resolve."""
+    mouse = _token(sessions, "mouse")
+    first = create_intake("job-failure", {}, "", mouse, sessions, store)
+    add_evidence(first["intake_id"], "first.msg", FIRST_MAIL, mouse, sessions, store)
+    second = create_intake("job-failure", {}, "", mouse, sessions, store)
+    out = add_evidence(second["intake_id"], "reply.msg", REPLY_MAIL, mouse, sessions, store)
+    assert out["thread_of"] == [first["intake_id"]]

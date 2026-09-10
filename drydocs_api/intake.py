@@ -79,6 +79,16 @@ STATUSES = (
 # status -> tuple of (to, action label, roles allowed to take it).
 # `loaded` appears as a STATUS but never as a transition target: the load is
 # Q10's, behind its gates — this API parks records at admin-accepted.
+#
+# API7(d), read once more with the ownership fix in place. Every non-admin edge
+# below is granted to `_ANY`, which is a ROLE test and says nothing about WHOSE
+# record is moving. That is sound only because ownership is enforced elsewhere,
+# and until API7 it was not: `_authorize_record` now runs in `transition` before
+# the UPDATE, so the pair reads correctly — the role decides which EDGES exist,
+# the record check decides WHOSE record you may walk them on. Widening a tuple
+# here still grants an edge to a tier; it never grants anyone another persona's
+# intake. Do not narrow these back to compensate for an ownership gap: that is
+# the check above, and it belongs there.
 TRANSITIONS: dict[str, tuple[tuple[str, str, tuple[str, ...]], ...]] = {
     "draft": (("ontology-reviewed", "Review for ontology", _ANY),),
     "ontology-reviewed": (
@@ -414,6 +424,67 @@ def _authorize(token: str, sessions: InMemorySessionStore) -> Session:
     return sessions.resolve(token)  # raises InvalidTokenError
 
 
+def _authorize_record(session: Session, record: sqlite3.Row | dict) -> None:
+    """Per-record ownership — a user-tier persona reaches only its own intake.
+
+    API7. Call this immediately after the record is loaded and BEFORE any
+    mutation, never as a handler's return value. Until API7 this test existed
+    once, inside ``get_intake``, and the three write handlers reached it by
+    RETURNING ``get_intake(...)`` — after their ``commit()``. A user-tier
+    persona acting on another persona's intake therefore had the write land and
+    then received a 403 over the top of it: the refusal was cosmetic and the
+    event log carried both actions. Measured twice (2026-09-09 ultra review,
+    re-verified 2026-09-10 while ruling the console-auth-boundary gate).
+
+    Ownership is checked before the state machine, the upload-window test and
+    the thread-decision test, so a refusal also stops telling a stranger what
+    status the record is in.
+    """
+    if session.role == "user" and record["created_by"] != session.persona_id:
+        raise Forbidden("users see their own intakes; the queue is steward/admin")
+
+
+def _own_intake_ids(store: IntakeStore, session: Session) -> set[str] | None:
+    """The intake ids this reader may be told about, or ``None`` for no filter.
+
+    A steward or admin works the whole queue, so nothing is withheld from them
+    and the answer is ``None``. A user-tier reader gets the set of ids they
+    created — see ``_filter_thread_of``.
+    """
+    if session.role != "user":
+        return None
+    rows = store.conn.execute(
+        "SELECT intake_id FROM intake WHERE created_by = ?", (session.persona_id,)
+    ).fetchall()
+    return {str(row["intake_id"]) for row in rows}
+
+
+def _filter_thread_of(record: dict, own_ids: set[str] | None) -> None:
+    """API7(c) — the thread linkage names OTHER personas' intake ids.
+
+    ``_check_thread`` matches new evidence against every prior intake in the
+    store, whoever filed it, and writes the matches into ``thread_of_json``;
+    ``_serialize`` publishes them as ``thread_of``. So a user-tier persona
+    reading their OWN intake learned the ids of intakes they have no path to:
+    ``get_intake`` refuses each one, and the console's ``refreshPriors`` already
+    swallows that refusal as ``decision: null``. The ids were never usable — only
+    leakable — so they are filtered rather than ruled acceptable.
+
+    What survives the filter is what the feature is actually for: a persona
+    bouncing their OWN thread a third time still sees both prior decisions,
+    because those ids are theirs. What the reader loses is a list of opaque
+    identifiers belonging to someone else. ``thread_flagged`` and
+    ``thread_decision_required`` are untouched, so the reader still learns that
+    their evidence continues a known thread — just not whose.
+
+    The response SHAPE is unchanged (``list[str]``), so ``drydocs_api.schemas``
+    and the generated console types stay as they are.
+    """
+    if own_ids is None:
+        return
+    record["thread_of"] = [iid for iid in record["thread_of"] if iid in own_ids]
+
+
 def create_intake(
     context_type: str,
     area: dict,
@@ -470,6 +541,7 @@ def add_evidence(
     """
     session = _authorize(token, sessions)
     record = store._record(intake_id)
+    _authorize_record(session, record)  # API7: before the write, not after the commit
     if record["status"] in _UPLOAD_CLOSED:
         raise IllegalTransitionError(
             f"intake {intake_id} is {record['status']} — evidence can no longer change"
@@ -633,8 +705,8 @@ def get_intake(
 ) -> dict:
     session = _authorize(token, sessions)
     record = _serialize(store._record(intake_id))
-    if session.role == "user" and record["created_by"] != session.persona_id:
-        raise Forbidden("users see their own intakes; the queue is steward/admin")
+    _authorize_record(session, record)  # the READ path keeps its own check (API7a)
+    _filter_thread_of(record, _own_intake_ids(store, session))
     evidence = []
     for row in store.evidence_rows(intake_id):
         e = dict(row)
@@ -654,9 +726,11 @@ def list_intakes(token: str, sessions: InMemorySessionStore, store: IntakeStore)
         q += " WHERE created_by = ?"
         params = (session.persona_id,)
     rows = store.conn.execute(q + " ORDER BY created_at", params).fetchall()
+    own_ids = _own_intake_ids(store, session)  # computed once, not per record
     records = []
     for row in rows:
         rec = _serialize(row)
+        _filter_thread_of(rec, own_ids)
         rec["legal_transitions"] = legal_transitions(rec, session.role)
         records.append(rec)
     return {"intakes": records}
@@ -787,6 +861,7 @@ def transition(
 ) -> dict:
     session = _authorize(token, sessions)
     record = store._record(intake_id)
+    _authorize_record(session, record)  # API7: before the write, not after the commit
     status = record["status"]
     row = next((t for t in TRANSITIONS[status] if t[0] == to), None)
     if row is None:
@@ -837,6 +912,7 @@ def thread_decision(
     but the record exists so a third bounce shows both prior decisions)."""
     session = _authorize(token, sessions)
     record = store._record(intake_id)
+    _authorize_record(session, record)  # API7: before the write, not after the commit
     if not record["thread_flagged"]:
         raise IntakeValidationError("no thread continuation was flagged on this intake")
     if record["thread_decision"] is not None:
