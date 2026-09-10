@@ -7,7 +7,7 @@ phase: 12
 agent: main
 model: fable
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 gates: [console-auth-boundary]
 inputs:
@@ -22,3 +22,16 @@ acceptance: |
 notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). Plan 2026-09-09; the 2026-08-27 run-the-gate sweep's class (a drafting item closes done and nobody
   owns the RUN) found one more instance. O71 drafted the page.
+  DONE 2026-09-10 (Lane A, desktop). The gate ran to a recorded outcome: SIGNED OFF, six practices
+  plus section B, in config/gate-log.md. P1 confirmed; P2, P3 and P5 declined; P4 deferred with a
+  named trigger; P6 added and deferred the same day. Section B was confirmed WITH a fifth bullet
+  the sweep found - the intake write handlers commit before the only ownership check - which is
+  minted as API7 rather than left in the record.
+  Two of the five rulings changed shape at the sitting because the sweep and two reference sets
+  reached it first. P3's trigger moved from "a second service appears" to onboarding to the
+  identity federation, because the console would join an SSO estate as a relying party rather than
+  choose between two of its own token schemes. P4's deferred BUILD changed from an account system
+  to a claim-to-role mapping, because applications in that estate own the mapping and the directory
+  owns the principal - which is what CFG14 was minted to hold.
+  The item's own framing that the console had "no item owning its session" is discharged: this was
+  the session, and the gate is no longer the one drafted-unsigned prompt without an owner.

@@ -4683,3 +4683,96 @@ reopenable under C40.
 - **On the queue (C39):** this entry is ABOUT the nineteen by heading, so gates.json reads
   them `deferred`; the board stops showing their run items as owed SME time; the lanes stop
   queuing them until a trigger fires.
+
+## 2026-09-10 — GATE: console-auth-boundary — SIGNED OFF 6/6 practices + B (WEB22)
+
+**Prompt:** `config/gate-prompts/console-auth-boundary.yaml` (drafted 2026-08-31 by the
+ui-workstream session that pulled O71; swept 2026-09-10 before this sitting, dated markers on
+every moved premise) · **Backlog:** WEB22 (the run; closes on this record); O71 (the item the
+prompt was drafted for); follow-ups minted here are API7 and the already-minted CFG14 ·
+**Session:** producer desktop, in-chat, Lane A. This gate was DEFERRED at sitting 1 on
+2026-09-09 with "WEB22 owns its run and re-arms it" as its named trigger; running it now is that
+trigger firing.
+
+**THE SWEEP FIRST, because three of its facts held and two moved.** Re-measured at `f48c5d7e`:
+the scrypt parameters are exactly as the page states them (`ALGORITHM = "scrypt"`,
+`SCRYPT_N = 2**14`, r=8, p=5, stored per-credential); the roster is still six deliberately
+fictional identities; the `?as=` seam is still DEV-only behind `import.meta.env.DEV`, requires
+`VITE_DEV_CONSOLE_SECRET`, and has no default and no fallback. What moved: **ADR 0019** (the
+agent tier authenticates itself) and **ADR 0020** (same-origin behind ONE reverse proxy) both
+landed after drafting and the page mentions neither, and **section B's measurement was found
+incomplete**. Two reference sets the drafter did not have were read into the sitting and are
+recorded machine-local, mechanism-only: the estate's own internal console (SAML SSO with a hidden
+WIA token-refresh iframe) and a peer project's two-plane auth architecture carrying the
+directory's Role Claims Model.
+
+- **§A — CONFIRMED as drafted.** The scaffold verdict stands and is not re-opened. Practices are
+  judged on whether the producer needs them, never on whether a template ships them. Declining
+  every practice would have been a valid sign-off.
+- **§B — CONFIRMED, WITH A FIFTH BULLET RULED IN.** The four drafted bullets hold. The fifth
+  records that the measurement was incomplete: in `drydocs_api/intake.py` the write handlers
+  `transition`, `thread_decision` and `add_evidence` authorize by ROLE only, and the sole
+  per-record ownership test sits inside `get_intake`, which they call as their RETURN VALUE —
+  after `store.conn.commit()`. A cross-persona write lands and the caller receives a 403 over the
+  top of it. Raised by the 2026-09-09 ultra review, confirmed by an adversarial verifier that
+  drove it rather than reading it, re-verified at HEAD on the day of this sitting. **Named, not
+  made a precondition** (the SME's ruling): the blast radius today is six fictional personas whose
+  secrets are machine-local. The fix is **API7**, minted here — a gate that names a defect and
+  mints nothing is how a finding becomes folklore.
+- **§C P1 — CONFIRMED.** Salted scrypt at OWASP parameters is the standing mechanism, and now a
+  recorded decision rather than an unchecked assumption.
+- **§C P2 — DECLINED.** The estate uses SSO, not a password grant; the interop it buys is with
+  tooling neither side runs.
+- **§C P3 — DECLINED, and RE-ARMED ON A DIFFERENT TRIGGER.** The page deliberately carried no
+  recommendation because the answer turns on an unstated requirement — does anything have to
+  verify a console token without asking the issuer? ADR 0020 puts everything on one origin behind
+  one proxy, so there is no second origin; ADR 0019 has the agent tier authenticating itself, so it
+  is not a consumer of a user token. Declining is therefore the low-cost answer and is recorded as
+  such, **not** as a rejection of JWT. The drafted trigger — "a second service appears" — is
+  replaced: the estate console runs SAML SSO and a peer project verifies a JWT and reads SID and
+  LOB claims, so in that world the console does not choose between its own opaque token and its own
+  JWT, it becomes a RELYING PARTY. **TRIGGER: the console is onboarded to the identity federation.**
+- **§C P4 — DEFERRED, and the build it defers is NOT the one drafted.** P4 describes accounts that
+  outlive a machine: a data model, storage, create/disable/rotate. Both reference sets show
+  applications in the target estate owning none of that — identity is federated, the directory owns
+  the principal and its lifecycle, and the application owns only the MAPPING from role claim to
+  application role, on groups whose names encode the application and the environment.
+  **TRIGGER: the console is onboarded to the identity federation. WHAT IS BUILT THEN: a declared
+  claim-to-role mapping, not an account system**, landing in **CFG14**, which moves the roster into
+  a declared config file and carries the claim block DEFERRED rather than absent on the `wired`-axis
+  shape. Recorded as evidence rather than colour: the peer project has the claims model in reach and
+  still carries a hard-coded user list for roles — the same state this console is in by a different
+  route, so the gap is not ignorance of the mechanism but that nobody has scoped the mapping.
+- **§C P5 — DECLINED with P4**, exactly as the page sequences it: it presupposes an account to
+  recover and a mail path that does not exist.
+- **§C2 P6 — ADDED AS DRAFTED AND DEFERRED THE SAME DAY.** A sixth practice the survey could not
+  have derived, because all five it did derive came from a web application template and are
+  therefore all END-USER auth. The peer project keeps a documented SECOND identity plane for
+  service and functional-ID auth on outbound calls: a functional account's secret fetched from an
+  enterprise vault at run time and exchanged for a token, certificate flows as the alternative,
+  the TOKEN cached rather than the password, and a per-target authenticated client. DryDocs needs
+  this plane and already half-models it — the descriptor `access` axis is `[fid, human, repo]` and
+  `config/source-bindings.yaml` names the environment variables a bound source reads, never a
+  credential. What is missing is how a functional identity PROVES itself when the value is not
+  something an environment variable can carry. Nothing built, no mechanism changed.
+  **TRIGGER: the first bound source needing a credential an environment variable cannot carry — a
+  vault fetch or a client certificate.**
+- **§D — CONFIRMED as drafted.** The ADR 0015 register row for the surveyed template records that
+  its trigger HAS FIRED, what fired it, and that the disposition is this gate. It records the
+  FIRING, never the outcome; this record is the record of record. The row is not deleted and the
+  watch is not closed — a rejected scaffold with a fired trigger is still worth watching.
+- **§E — CONFIRMED.** Nothing is built by this page. No dependency, no auth code, no user model,
+  no route change. Any adopted practice becomes its own item with its own acceptance; the company
+  side is not decided here and runs its own gate.
+- **§F — SIGNED OFF**, producer desktop, in-chat, 2026-09-10.
+
+**Follow-ups minted from this record:** **API7** (the intake ownership ordering, p1 — fix it while
+the only victims are test personas, because P4's own trigger is the day real principals sign in).
+**CFG14** was minted earlier the same day on the SME's separate ruling and is where P4's deferred
+build lands. No other item is owed; P3, P5 and P6 are deferrals with named triggers and no work.
+
+**What this gate did NOT decide, stated so it is not read wider than it is:** it ruled no
+presentation question. A component-library mapping for the sign-in screen was read into the sitting
+and is explicitly outside the auth boundary — whether to adopt a design system's provider and token
+set beside the console's existing tokens is a `code:drydocs-web` build call for the UI workstream,
+not an SME ruling.

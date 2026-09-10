@@ -1266,6 +1266,19 @@
       ]
     },
     {
+      "kind": "log-entry",
+      "date": "2026-09-10",
+      "title": "GATE: console-auth-boundary — SIGNED OFF 6/6 practices + B (WEB22)",
+      "status": "signed-off",
+      "prompt_files": [
+        "config/gate-prompts/console-auth-boundary.yaml"
+      ],
+      "log_ref": "config/gate-log.md:4687",
+      "unblocks": [
+        "WEB22"
+      ]
+    },
+    {
       "kind": "prompt-only",
       "date": null,
       "title": "controlm-definition-precedence (rulings/citations logged — gate sign-off not recorded)",

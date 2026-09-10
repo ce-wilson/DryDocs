@@ -1,0 +1,49 @@
+id: API7
+epic: web-console
+title: "The intake write handlers commit before the only ownership check, so a cross-persona mutation lands and the 403 the caller receives is cosmetic - move the check to before the write, not to the return value"
+type: task
+module: drydocs-api
+phase: 12
+agent: main
+model: sonnet
+priority: p1
+status: todo
+depends_on: []
+inputs:
+- drydocs_api/intake.py
+- tests/unit/test_intake_api.py
+acceptance: |
+  (a) `transition`, `thread_decision` and `add_evidence` authorize the RECORD before they write
+  it. The per-record ownership test that today lives only in `get_intake` moves into a shared
+  helper called immediately after the record is loaded and BEFORE any mutation or commit - not as
+  the handler's return value, which is where it sits now and is why the write survives the
+  refusal. `get_intake` keeps its own check for the read path.
+  (b) A test per handler that PROVES THE ORDERING rather than the message: a user-tier persona
+  acts on another persona's intake, and the assertion is that the record's status, its event log
+  and its evidence directory are UNCHANGED after the refusal. Asserting only that Forbidden was
+  raised passes today, against the bug.
+  (c) The thread-id leak is closed or ruled: `_check_thread` writes matched prior intake ids into
+  `thread_of_json` and `_serialize` publishes them as `thread_of`, so a user-tier persona can
+  learn another persona's intake id without the queue. Either the field is filtered for a
+  user-tier reader, or the exposure is ruled acceptable IN THE FILE with its reason.
+  (d) `TRANSITIONS` is re-read once with (a) in place: it grants every non-admin edge to
+  `_ANY = ("user","steward","admin")`, which is correct only if ownership is enforced elsewhere.
+  With ownership enforced before the write, that grant is sound and the file says so.
+notes: |
+  Minted 2026-09-10 (Lane A, desktop; pen backlog) from the console-auth-boundary gate, whose
+  section B names this defect as the fifth bullet of what the console does today (SME ruling, same
+  sitting). A gate that names a defect and mints nothing is how a finding becomes folklore.
+  MEASURED, twice. Raised by the 2026-09-09 ultra review (67 agents, 10 dimensions), CONFIRMED by
+  an adversarial verifier that drove it rather than reading it - persona `mouse` moved persona
+  `neo`'s intake from draft to ontology-reviewed, received Forbidden, and the status had changed
+  anyway; the event log carried both actions. Re-verified at HEAD on 2026-09-10 while ruling the
+  gate: five `store.conn.commit()` sites, the sole `created_by != session.persona_id` test at
+  intake.py:636 inside `get_intake`, and the write handlers calling it as their return value.
+  WHY p1 AND WHY IT DID NOT BLOCK THE GATE. The SME ruled it named in section B rather than made a
+  precondition of P4, which is right: the blast radius today is a fixed roster of six fictional
+  personas whose secrets are machine-local. What makes it p1 rather than p2 is the direction of
+  travel - P4 is deferred with onboarding to the identity federation as its trigger, and on the
+  day real directory principals sign in, this same ordering is a live cross-user write. Fix it
+  while it is cheap and while the only victims are test personas.
+  Not a duplicate of API5 (a graph outage answering 500 rather than 503) or API6 (no query
+  timeout); this is authorization ordering and shares no code path with either.
