@@ -11,9 +11,13 @@ Byte-stable: the JSON is sorted and compact, the gzip header carries
 ``mtime=0`` and no filename, so two runs over one config produce one file and a
 diff on the bundle means the generator or the config changed.
 
-Extraction never writes into the repo tree: a ``base: repo`` landing zone
-(``internal/server-inventory/``) is written under ``<out_root>/repo/<drop_dir>``
-instead, and a db-carried dataset's CSV mirror goes under ``<out_root>/<mirror_dir>``.
+Extraction never writes into the repo tree: a ``base: repo`` landing zone is
+written under ``<out_root>/<redirect>/<drop_dir>`` instead, and a db-carried
+dataset's CSV mirror goes under ``<out_root>/<mirror_dir>``. The redirect prefix is
+DECLARED (``config/data-zones.yaml``, zone ``synthetic-repo-redirect``) rather than
+spelled here, because it is a path the system writes and every other one is declared
+there — CORE18. No synthetic dataset maps to a repo zone today; ``infra:server-export``
+was the last and moved to the data root at the same item.
 """
 
 from __future__ import annotations
@@ -25,6 +29,7 @@ from pathlib import Path
 
 from drydocs.source_registration.synthetic import SyntheticSources, Table
 from drydocs_core.data_root import resolve_data_root
+from drydocs_core.data_zones import REPO_REDIRECT_ZONE_ID, DataZoneError, zone_by_id
 from drydocs_core.landing_zones import BASE_REPO, LandingZone, manual_zones
 from drydocs_core.repo_paths import repo_root
 from drydocs_core.source_descriptors import SourceDescriptors
@@ -79,12 +84,22 @@ def _targets(descriptors: SourceDescriptors, out_root: Path) -> dict[str, tuple[
     """source_id -> (directory, placement) for every planned dataset."""
     zones: dict[str, LandingZone] = {z.source_id: z for z in manual_zones()}
     mirror = out_root / descriptors.synthetic.get("mirror_dir", "psgmgr-mirror")
+    redirect = zone_by_id(REPO_REDIRECT_ZONE_ID)
+    if redirect is None:
+        raise DataZoneError(
+            f"zone {REPO_REDIRECT_ZONE_ID!r} is not declared in config/data-zones.yaml - "
+            "the extraction redirect is a path this writes, and an undeclared write path "
+            "is the class CORE18 closed. Declare it rather than restoring the literal."
+        )
     targets: dict[str, tuple[Path, str]] = {}
     for plan in descriptors.synthetic_plans():
         zone = zones.get(plan.source_id)
         if plan.placement == "zone" and zone is not None:
             if zone.base == BASE_REPO:
-                targets[plan.source_id] = (out_root / "repo" / zone.drop_dir, "zone")
+                targets[plan.source_id] = (
+                    out_root / redirect.path_spec.strip("/") / zone.drop_dir,
+                    "zone",
+                )
             else:
                 targets[plan.source_id] = (out_root / zone.drop_dir, "zone")
         else:

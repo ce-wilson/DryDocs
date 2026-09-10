@@ -77,6 +77,26 @@ zones:
   # was corrected from the over-broad `rua/` to `rua/incoming/` at G81 — the
   # narrowing this file's invariant requires, and what data_root.py's own module
   # docstring has said since G19.
+  # ---- the extraction redirect (CORE18) -------------------------------------
+  - id: synthetic-repo-redirect
+    mode: write
+    base: data_root
+    path: repo/
+    helper: ~
+    note: >
+      WHERE A `base: repo` LANDING ZONE'S SYNTHETIC STAND-INS GO. The bundle
+      extractor never writes into the working tree: a dataset whose drop zone is
+      repo-based (config/taxonomy/, knowledge/depgraph-snapshots/, docs/design/)
+      has its generated CSVs written under <data_root>/repo/<drop_dir> instead,
+      so a stand-in can never be mistaken for a committed artifact and `git
+      status` stays clean after an extract. Declared here rather than spelled as
+      a literal in drydocs/source_registration/bundle.py, which is where it lived
+      until CORE18 - the one path the system wrote that this file did not know
+      about. No synthetic dataset maps to a repo zone today (infra:server-export
+      was the last, and moved to the data root at CORE18); the redirect stays
+      because the next one to do so must land here rather than in the checkout.
+    rebuild: "poetry run python scripts/build_synthetic_sources.py --extract"
+
   - id: rua-extracted
     mode: write
     base: data_root

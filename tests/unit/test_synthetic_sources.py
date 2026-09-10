@@ -124,8 +124,25 @@ def test_extract_lands_in_the_loader_zones(descriptors, tmp_path):
     # SOURCE-mode chain steps read <step>.csv from the registry's drop_dir
     assert (tmp_path / "pat" / "catalog_lobs.csv").is_file()
     assert (tmp_path / "seal" / "seal_applications.csv").is_file()
-    # a base: repo zone is redirected under <out_root>/repo, never into the checkout
-    assert (tmp_path / "repo" / "internal" / "server-inventory" / "server_inventory.csv").is_file()
+    # CORE18: infra:server-export is a DATA-ROOT zone now, so its stand-in lands beside
+    # the other drops rather than under the redirect. Read from the registry's own
+    # declaration rather than spelled here, so a future move of the drop_dir moves this
+    # assertion with it instead of failing a day later.
+    from drydocs_core.landing_zones import BASE_DATA_ROOT, manual_zones
+
+    server_zone = next(z for z in manual_zones() if z.source_id == "infra:server-export")
+    assert server_zone.base == BASE_DATA_ROOT, (
+        "infra:server-export left the data root - it holds source payloads, and CORE18 "
+        "moved it out of the tree for that reason"
+    )
+    assert (tmp_path / server_zone.drop_dir / "server_inventory.csv").is_file()
+    # and the redirect prefix is DECLARED, not spelled: nothing lands under it today,
+    # because no synthetic dataset maps to a repo zone any more.
+    from drydocs_core.data_zones import REPO_REDIRECT_ZONE_ID, zone_by_id
+
+    redirect = zone_by_id(REPO_REDIRECT_ZONE_ID)
+    assert redirect is not None
+    assert not (tmp_path / redirect.path_spec.strip("/")).exists()
     # db-carried datasets get a CSV mirror
     mirror = tmp_path / descriptors.synthetic["mirror_dir"]
     assert (mirror / "controlm_jobs.csv").is_file()

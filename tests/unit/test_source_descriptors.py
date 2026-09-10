@@ -74,8 +74,10 @@ def test_doc_ledger_entries_are_not_registered_here(descriptors, registry):
         # db-carried replica read through a bound service identity; the layer is the
         # carrier schema's (psgmgr = data), not the source system's (controlm = technology)
         ("controlm@[db].psgmgr.cm_def_vtab", ("automated", "db", "replica", "data", "fid")),
-        # repo-based landing zone -> access repo
-        ("infra:server-export", ("manual", "csv", "primary", "technology", "repo")),
+        # CORE18: the drop left the tree for the data root, so `access` derives `human`
+        # rather than `repo` - and that is a CORRECTION, not just a consequence. The
+        # export is a hand download from a site UI; it was never read by the checkout.
+        ("infra:server-export", ("manual", "csv", "primary", "technology", "human")),
         # layer override: people data is the human layer whatever system carries it
         ("hr@[db].psgmgr.hr_phone_exp", ("automated", "db", "replica", "human", "fid")),
         ("pat:people-report", ("manual", "csv", "primary", "human", "human")),

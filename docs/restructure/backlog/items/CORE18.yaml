@@ -7,7 +7,7 @@ phase: 13
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - config/data-zones.yaml
@@ -28,3 +28,27 @@ acceptance: |
   on config/source-descriptors.yaml.
 notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). Groomed from Idea-309 (2026-09-09). Lane A: every input is a config surface this burst.
+  DONE 2026-09-10 (Lane A, desktop). (a) infra:server-export's drop moves from
+  internal/server-inventory/ (base: repo) to server-inventory/ (base: data_root). The row claimed
+  the in-tree exemption on the grounds that "the real exports commit under internal/"; measured at
+  this change the ONLY tracked file there was the README, so nothing ever did - a payload zone had
+  inherited the committed-artifact exemption by assertion. The README stays as the tracked
+  procedure pointer (locator.drop_readme, untouched) and landing_zones.py's "three named repo
+  exceptions" sentence is true for the first time since Z1, which the docstring now says with its
+  date. (b) The repo/ redirect prefix leaves bundle.py for config/data-zones.yaml as zone
+  synthetic-repo-redirect, with a rebuild line; bundle.py reads it through the new
+  data_zones.zone_by_id and refuses loudly if it is undeclared. Nothing lands under it today -
+  infra:server-export was the last synthetic dataset on a repo zone - and the zone stays so the
+  next one lands outside the checkout rather than in it. (c) data_zones.descriptor_zones() reads
+  the THIRD declaration source, config/source-descriptors.yaml, for the three write paths that
+  lived only there (synthetic.mirror_dir, synthetic.duckdb_file, datahub.lite_file); all_zones()
+  joins all three, so the non-overlap invariant now sees them and names both sides on a collision,
+  proven by an injected collision rather than asserted. A file declaration contributes its PARENT,
+  because the zone is the directory the writer creates. (d) psgmgr-mirror/, synthetic/ and
+  datahub/ are listed and left exactly where they were, pinned by a test that reads their paths
+  from the descriptor file. (e) The larger internal/ reorganisation is NOT here; it is Idea-310,
+  inboxed for the Team Edition Phase 1 carve, with the reason it waits for ADR 0015 D2's file-class
+  vocabulary. Found by the build: the first version of the redirect guard was VACUOUS - it scanned
+  with code_only, which strips string literals, and the subject IS a literal. tests/source_scan.absent
+  caught it on its own positive control, which is the sixth time that helper's docstring records
+  that exact shape; the guard now uses without_prose with a control that proves the scan can fail.

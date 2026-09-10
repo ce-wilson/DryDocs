@@ -110,6 +110,29 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
+- **`Idea-310`** · 2026-09-10 · `[chore]` · **open** · prio? **Med** —
+  **`internal/` is twenty top-level entries with four different jobs, and no rule says which is
+  which — the classification belongs in the Team Edition Phase 1 carve, not in a path fix.**
+  Inboxed by CORE18 clause (e), which deliberately did NOT do it. CORE18 moved the one entry that
+  was a LANDING ZONE (`internal/server-inventory/`, whose exports are source payloads) out to the
+  data root, and left everything else exactly where it was. What remains is not a path problem
+  and cannot be fixed by moving directories: measured 2026-09-10, `internal/` holds at least four
+  distinct classes under one name — vendor and standards REFERENCE corpora (`airflow-reference`,
+  `cdo-reference`, `datalens-reference`, `dsi-reference`, `standards`), captured EVIDENCE
+  (`pat-evidence`, `context-graph-analysis`, `registry-redesign`, `research`), OPERATIONAL config
+  and data (`controlm-config`, `org`, `glossary`, `server-inventory`), and loose PROSE
+  (`drydocs-ip-review-brief.md`, `repo-README.md`, two company-prompt files, a local-Neo4j
+  how-to). They share one property, that they are excluded from a public push, and nothing else.
+  **Why it waits for TE Phase 1.** ADR 0015 D2 is where the edition cut is DECLARED as a list a
+  reader can check, and the file classes (canonical-template / instance-owned / derived) are
+  exactly the vocabulary this needs: a reference corpus is template, captured evidence is
+  instance-owned, an operational config is instance-owned-and-per-side. Doing it before that
+  vocabulary exists means inventing a second one and reconciling them later. **What NOT to do
+  meanwhile:** do not move a directory for tidiness. Every one of these paths is cited somewhere
+  (`PUBLISH-BOUNDARY.md`, the registry's `locator.drop_readme`, gate prompts, skill references),
+  and an un-cited move is how a citation guard goes red on a tree that is otherwise correct.
+
+
 - **`Idea-309`** · 2026-09-09 · `[chore]` · **groomed → CORE18 (2026-09-09)** · prio? **Med** —
   **The data root's layout is declared in three places and only two of them are cross-checked,
   and the one landing zone that holds a source payload instead of a committed artifact is the

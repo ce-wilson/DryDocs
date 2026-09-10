@@ -2357,8 +2357,8 @@
           "mode": "manual",
           "via": null,
           "format": "csv",
-          "drop_dir": "internal/server-inventory/",
-          "drop_dir_base": "repo"
+          "drop_dir": "server-inventory/",
+          "drop_dir_base": "data_root"
         },
         "replica": {
           "state": "original",
@@ -4539,7 +4539,7 @@
       },
       {
         "path": "config/source-registry.yaml",
-        "blob": "760fe46e9f4f823b5a00ddfb99b599d320e44443"
+        "blob": "2ee5cc3e6f5b9827fa9b5335df3b89f5e9714075"
       },
       {
         "path": "config/taxonomy-ontology-map/00-header.yaml",
@@ -4642,7 +4642,7 @@
         "blob": "4773ab3e5c0f8c4d039718628097530411f786f5"
       }
     ],
-    "digest": "9efafdebd14781c583409afd2b9a066457c6301f",
+    "digest": "3f955da9b393241d90176c3b30b70f2c76f7c80b",
     "how_to_resolve": "git log --find-object=<blob> names the commits that carry an input"
   }
 }

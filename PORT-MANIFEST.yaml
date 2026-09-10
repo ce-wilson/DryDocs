@@ -1743,6 +1743,19 @@ rows:
 # every future file under it, which is the failure mode this block exists to end.
 # =============================================================================
 default_ok:
+  - path: "docs/restructure/EndGoalTeamsEdition.md"
+    reason: >
+      The producer's LIVE planning file for finishing the base and opening the Team
+      Edition. The default is right and this is why: its own status block is
+      RE-DERIVED BY COMMAND at every update and names producer commits, roll tags and
+      Lane A/B assignments, so a wholesale take would hand the consumer a measured
+      statement about somebody else's tree that is stale on arrival - and a clean-add
+      of it on a tree that has never had it is exactly what the default already does,
+      once, harmlessly. The durable half of what this file plans does NOT depend on it:
+      the Team Edition is ADR 0015 and the `team-edition` epic, the phase list is
+      docs/restructure/backlog/plan.yaml, and each has its own row. Added 2026-09-10
+      (CORE18) after the guard found it resolving to the default with nothing written
+      down - which is the guard doing its job on a file committed the day before.
   - path: "git-readme.md"
     reason: >
       THE STANDING DECISION, written down here for the first time (it lived only

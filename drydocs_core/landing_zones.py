@@ -24,7 +24,12 @@ operation of any strength can reach it. The single exception is a zone whose
 contents are COMMITTED repo artifacts rather than source payloads
 (``base: repo`` — ``config/taxonomy/``, ``knowledge/depgraph-snapshots/``,
 ``docs/design/``); tracked files survive every clean, so those are safe by the
-same mechanism that makes them publishable. ``tests/unit/test_landing_zones.py``
+same mechanism that makes them publishable. **Those three are the whole list, and
+that sentence was false from Z1 until CORE18 (2026-09-10)**: ``infra:server-export``
+declared ``base: repo`` for ``internal/server-inventory/`` on the argument that its
+exports commit there, and when the enumeration was finally checked the only tracked
+file under it was the README. A payload zone had inherited the artifact exemption by
+assertion. It now resolves under the data root like every other manual drop. ``tests/unit/test_landing_zones.py``
 enforces both halves, and the second half is the one that closes the hole: a
 ``repo``-based zone MUST be tracked, so an untracked data corpus can never be
 declared as a landing zone and inherit an in-tree home.

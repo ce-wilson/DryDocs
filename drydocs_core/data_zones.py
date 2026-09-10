@@ -39,7 +39,7 @@ Pure resolution: nothing here creates, moves or deletes a directory.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 from drydocs_core.data_root import resolve_data_root
 from drydocs_core.log_kinds import resolve_env_override
@@ -67,6 +67,21 @@ CREATABLE_MODES = (WRITE, SCRATCH)
 
 _REPO_ROOT = repo_root(Path(__file__).resolve().parent.parent)
 ZONES_FILE = _REPO_ROOT / "config" / "data-zones.yaml"
+#: The THIRD declaration source (CORE18). Read for its declared write paths only.
+DESCRIPTORS_FILE = _REPO_ROOT / "config" / "source-descriptors.yaml"
+
+#: The zone whose path is the extraction redirect prefix, read by
+#: ``drydocs/source_registration/bundle.py`` instead of spelling it as a literal.
+REPO_REDIRECT_ZONE_ID = "synthetic-repo-redirect"
+
+#: What ``config/source-descriptors.yaml`` declares that the system WRITES:
+#: (zone id, section, key, kind). ``file`` contributes its PARENT directory,
+#: because the zone is the directory the writer creates.
+_DESCRIPTOR_WRITE_PATHS: tuple[tuple[str, str, str, str], ...] = (
+    ("synthetic-mirror", "synthetic", "mirror_dir", "dir"),
+    ("synthetic-duckdb", "synthetic", "duckdb_file", "file"),
+    ("datahub-lite", "datahub", "lite_file", "file"),
+)
 
 
 class DataZoneError(RuntimeError):
@@ -275,11 +290,81 @@ def registry_read_zones(registry_path: Path | None = None) -> tuple[DataZone, ..
     return tuple(out)
 
 
+def descriptor_zones(descriptors_path: Path | None = None) -> tuple[DataZone, ...]:
+    """Write paths declared in ``config/source-descriptors.yaml`` — the THIRD source.
+
+    CORE18. Three paths the system writes lived only in that file: the CSV mirror a
+    db-carried dataset's stand-ins go to, the DuckDB the extracted CSVs load into,
+    and the DataHub lite file. Nothing joined them to the invariant, so a read zone
+    could have been declared on top of any of them and :func:`overlaps` would still
+    have reported all-clear. That is the same unenumerable-surface shape that let
+    the 2026-08-11 overwrite hide, one file over — the reason this module exists is
+    that a path nobody can enumerate is a path nobody can check.
+
+    The YAML is read directly rather than through
+    :class:`~drydocs_core.source_descriptors.SourceDescriptors`: only the declared
+    paths are wanted, that reader would construct a registry to produce them, and
+    since CFG13 the registry reads descriptors back for its own gate. A path is a
+    path, and this keeps the invariant free of that loop.
+
+    These are LISTED, not moved (Idea-309 clause 3): ``psgmgr-mirror/``,
+    ``synthetic/`` and ``datahub/`` are where they were, and now they are visible.
+    """
+    import yaml
+
+    src = descriptors_path or DESCRIPTORS_FILE
+    if not src.is_file():
+        raise DataZoneError(f"descriptor declaration missing: {src}")
+    doc = yaml.safe_load(src.read_text(encoding="utf-8")) or {}
+    out: list[DataZone] = []
+    for zid, section, key, kind in _DESCRIPTOR_WRITE_PATHS:
+        spec = str((doc.get(section) or {}).get(key) or "").strip()
+        if not spec:
+            continue  # an optional block a consumer tree may not declare
+        if kind == "file":
+            parent = str(PurePosixPath(spec).parent)
+            spec = "" if parent in (".", "") else parent
+            if not spec:
+                continue  # declared at the data root itself; not a zone of its own
+        out.append(
+            DataZone(
+                id=zid,
+                mode=WRITE,
+                base=BASE_DATA_ROOT,
+                path_spec=spec,
+                path=_resolve(BASE_DATA_ROOT, spec),
+                helper=None,
+                env=None,
+                note=f"declared in config/source-descriptors.yaml ({section}.{key}, CORE18)",
+            )
+        )
+    return tuple(out)
+
+
+def zone_by_id(zone_id: str, zones_path: Path | None = None) -> DataZone | None:
+    """One declared zone by id, or ``None`` — the lookup a consumer needs when a
+    path it used to spell as a literal is declared here instead (CORE18)."""
+    for zone in load_zones(zones_path):
+        if zone.id == zone_id:
+            return zone
+    return None
+
+
 def all_zones(
-    zones_path: Path | None = None, registry_path: Path | None = None
+    zones_path: Path | None = None,
+    registry_path: Path | None = None,
+    descriptors_path: Path | None = None,
 ) -> tuple[DataZone, ...]:
-    """The joined picture: declared zones + dataset drop zones."""
-    return load_zones(zones_path) + registry_read_zones(registry_path)
+    """The joined picture: declared zones + dataset drops + descriptor-declared writes.
+
+    All THREE declaration sources (CORE18). Two of them were joined here from G81;
+    the third was invisible to the invariant until this item.
+    """
+    return (
+        load_zones(zones_path)
+        + registry_read_zones(registry_path)
+        + descriptor_zones(descriptors_path)
+    )
 
 
 def _contains(outer: Path, inner: Path) -> bool:

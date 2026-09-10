@@ -160,6 +160,94 @@ def test_zone_paths_are_conventions_not_machine_paths() -> None:
     assert not bad, f"zone path(s) that look like real machine paths: {bad}"
 
 
+def test_the_invariant_sees_all_three_declaration_sources() -> None:
+    """CORE18 clause (c). The invariant is only as good as its enumeration, and
+    until this item it enumerated two of the three files that declare a path.
+
+    Asserted as SET MEMBERSHIP against each source, not as a total: a count would
+    pass while a whole source dropped out and another grew, which is the shape of
+    the bug this closes.
+    """
+    zones = dz.all_zones()
+    ids = {z.id for z in zones}
+    assert {z.id for z in dz.load_zones()} <= ids, "data-zones.yaml dropped out of the join"
+    assert {z.id for z in dz.registry_read_zones()} <= ids, "the registry dropped out"
+    declared = {z.id for z in dz.descriptor_zones()}
+    assert declared, "config/source-descriptors.yaml declares no write path — is it truncated?"
+    assert declared <= ids, "the descriptor declarations dropped out of the join"
+
+
+def test_the_descriptor_declared_writes_are_the_three_left_alone() -> None:
+    """Idea-309 clause 3: they are LISTED, not moved. Their paths are read from the
+    descriptor file, so this fails if one is renamed there without a decision."""
+    by_id = {z.id: z for z in dz.descriptor_zones()}
+    assert set(by_id) == {"synthetic-mirror", "synthetic-duckdb", "datahub-lite"}
+    assert all(z.mode == dz.WRITE for z in by_id.values())
+    assert all(z.base == dz.BASE_DATA_ROOT for z in by_id.values())
+    # A file declaration contributes its PARENT: the zone is the directory written.
+    assert by_id["synthetic-duckdb"].path_spec == "synthetic"
+    assert by_id["datahub-lite"].path_spec == "datahub"
+    assert by_id["synthetic-mirror"].path_spec == "psgmgr-mirror"
+
+
+def test_a_descriptor_write_colliding_with_a_read_zone_names_both(tmp_path: Path) -> None:
+    """PROVEN TO FAIL (J26). The third source has to be able to REPORT a collision,
+    not merely appear in the join — so the collision is injected and both sides are
+    named, the same contract the other two sources are held to."""
+    read = dz.DataZone(
+        id="a-drop",
+        mode=dz.READ,
+        base=dz.BASE_DATA_ROOT,
+        path_spec="psgmgr-mirror/",
+        path=tmp_path / "psgmgr-mirror",
+        helper=None,
+        env=None,
+        note="",
+    )
+    write = dz.DataZone(
+        id="synthetic-mirror",
+        mode=dz.WRITE,
+        base=dz.BASE_DATA_ROOT,
+        path_spec="psgmgr-mirror",
+        path=tmp_path / "psgmgr-mirror",
+        helper=None,
+        env=None,
+        note="declared in config/source-descriptors.yaml",
+    )
+    found = dz.overlaps((read, write))
+    assert len(found) == 1
+    assert "synthetic-mirror" in found[0] and "a-drop" in found[0]
+
+
+def test_the_extraction_redirect_is_declared_and_not_a_literal() -> None:
+    """CORE18 clause (b). The prefix bundle.py used to spell as "repo" is a path the
+    system writes; it is declared like every other one, and the consumer reads it."""
+    zone = dz.zone_by_id(dz.REPO_REDIRECT_ZONE_ID)
+    assert zone is not None, f"{dz.REPO_REDIRECT_ZONE_ID} is not declared"
+    assert zone.mode == dz.WRITE and zone.base == dz.BASE_DATA_ROOT
+    assert zone.path_spec.strip("/") == "repo"
+    assert zone.rebuild, "an in-data-root zone the extractor rebuilds states how"
+
+    # The subject IS a string literal, so `code_only` would strip it and the scan
+    # would pass on any tree — the vacuous shape `absent`'s own docstring records
+    # six of six times. `without_prose` keeps literals and drops the docstring that
+    # legitimately discusses the redirect, and the positive control proves it.
+    import re
+
+    from tests.source_scan import absent, source_text, without_prose
+
+    absent(
+        re.compile(r"""["']repo["']"""),
+        {"bundle.py": source_text(REPO / "drydocs" / "source_registration" / "bundle.py")},
+        positive_control='targets[sid] = (out_root / "repo" / zone.drop_dir, "zone")',
+        stripper=without_prose,
+        because=(
+            "the redirect prefix is declared in config/data-zones.yaml and read through "
+            "zone_by_id (CORE18) — an undeclared write path is what this item closed"
+        ),
+    )
+
+
 def test_declared_zones_do_not_duplicate_a_dataset_drop() -> None:
     """Read zones that ARE dataset drops live in source-registry.yaml; declaring
     one in both files is the drift this split exists to avoid."""

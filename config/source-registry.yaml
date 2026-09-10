@@ -1264,8 +1264,18 @@ datasets:
     acquisition:                        # how the data arrives (N12)
       mode: manual
       format: csv                       # expected; if the site hands another format, widen the enum at the first real drop (the `archive` precedent)
-      drop_dir: internal/server-inventory/
-      drop_dir_base: repo               # TRACKED in-tree zone — the real exports commit under internal/ (PUBLISH-BOUNDARY.md: raw extracts live there, excluded from any public push), which is what survives git clean
+      drop_dir: server-inventory/
+      drop_dir_base: data_root          # CORE18 (2026-09-10): OUTSIDE the tree, where no git operation can reach it.
+                                        # These exports are SOURCE PAYLOADS - real hostnames, racks, building locations -
+                                        # which is the class the landing-zone rule puts outside the working tree. The three
+                                        # remaining `base: repo` zones hold COMMITTED artifacts (config/taxonomy/,
+                                        # knowledge/depgraph-snapshots/, docs/design/) and that is what makes an in-tree
+                                        # zone safe. This row claimed the same exemption on the grounds that "the real
+                                        # exports commit under internal/"; measured at this change, the only tracked file
+                                        # under internal/server-inventory/ is the README, so nothing ever did. The README
+                                        # stays as the tracked procedure pointer (locator.drop_readme above); the drop
+                                        # itself moves to <DRYDOCS_DATA_ROOT>/server-inventory/ and is no longer
+                                        # publishable-by-accident, because it is no longer in the repo at all.
       # pulled PER BUSINESS APPLICATION from the site UI: the application list is
       # filtered on prod, and each download's rows carry BOTH prod and DR servers.
       # One file per application — that grain is the contract, never merged.
