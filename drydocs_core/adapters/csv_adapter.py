@@ -14,6 +14,7 @@ import csv
 import logging
 from collections.abc import Iterator
 from pathlib import Path
+from typing import IO
 
 LOGGER = logging.getLogger(__name__)
 
@@ -36,7 +37,14 @@ class CsvAdapter:
         self.encoding = encoding
         self.delimiter = delimiter
         self.name = f"csv:{self.path.name}"
-        self._fh = None  # type: ignore[assignment]
+        #: CORE16: Optional, because that is the lifecycle this handle HAS —
+        #: None before `__enter__` and after `__exit__`, a file in between. The
+        #: escape this replaces (`# type: ignore[assignment]`) declared the
+        #: attribute as the connected type and then silenced the checker for the
+        #: one line where it was not, which is the wrong half to suppress: the
+        #: unconnected state is real, `rows()` already guards for it, and the
+        #: type now says so instead of the guard being the only evidence.
+        self._fh: IO[str] | None = None
 
     def __enter__(self) -> CsvAdapter:
         if not self.path.exists():

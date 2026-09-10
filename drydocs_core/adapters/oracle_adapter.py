@@ -64,8 +64,16 @@ class OracleAdapter:
         self.arraysize = arraysize
         self.name = name or "oracle"
         self.run_log = run_log
-        self._conn = None  # type: ignore[assignment]
-        self._cursor = None  # type: ignore[assignment]
+        #: CORE16: Optional, matching the real lifecycle — None until
+        #: `__enter__` connects, None again after `__exit__` closes. `Any` for
+        #: the payload because `oracledb` is a LAZY import (the module docstring
+        #: and `__enter__` both say why: importing this module must not require
+        #: the driver), so its types are not available at annotation time and a
+        #: string annotation would only move the problem. What matters is the
+        #: `| None`: it is the half the old `type: ignore[assignment]` silenced,
+        #: and it is the half that is true for most of the object's life.
+        self._conn: Any | None = None
+        self._cursor: Any | None = None
         self._log: SqlRunLog | None = None
 
     def __enter__(self) -> OracleAdapter:
