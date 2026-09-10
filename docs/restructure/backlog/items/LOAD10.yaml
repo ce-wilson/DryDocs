@@ -7,7 +7,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs/loaders/catalog.py
@@ -17,3 +17,39 @@ acceptance: |
   row models. Existing tests cover the behavior; this is a refactor and the suite proves it.
 notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). load-2026-09-08.md candidate 3 (L2-2).
+
+  CLOSED 2026-09-10 (Lane B, laptop, wip/load10-laptop, based on main - catalog.py is disjoint from
+  base.py, so this does not queue behind the LOAD8/LOAD9 stack). Venue (J18): offline. Full suite:
+  4046 passed, 0 FAILED, both ruff gates clean.
+
+  FIFTEEN BLOCKS GONE, ACROSS EIGHT MODELS - the item said eleven; measured at HEAD it was fifteen
+  `@field_validator(..., mode="before")` + `@classmethod` + one-line-delegation blocks. Four
+  Annotated aliases replace them: CatalogId, OptionalCatalogId, SparseName, OptionalDate.
+
+  THE DUPLICATION WAS NOT THE COST; THE DIVERGENCE WAS. A model that named a field in the wrong
+  validator list, or omitted one, was a perfectly valid model - and the way you found out was a
+  rejected row in a load, which for a catalog grain means EVERY row rather than some of them (the
+  int-to-str case the helpers exist for). As an alias the coercion travels with the field's type,
+  so there is nowhere for the omission to live: the type IS the declaration. That is what
+  "inexpressible" means here, and it is the only thing this refactor buys that a tidier repetition
+  would not.
+
+  TWO VALIDATORS DELIBERATELY LEFT: `_normalize_seal_ids` and `_check_team_type` on
+  PatProductMappingRow. Neither is a delegation wrapper - each carries its own logic inline (a
+  delimiter swap, a vocabulary check that RAISES), so turning them into aliases would move real
+  behaviour into a type alias and buy nothing. The item's subject was the two-line delegation
+  blocks, and that is exactly what went.
+
+  BEHAVIOUR PROVED, NOT ASSERTED. `BeforeValidator` and `mode="before"` are the same hook, so this
+  is a spelling change - and the existing suite is the proof the acceptance asked for: 306
+  catalog-related tests pass with NO test edits. Driven directly as well, because "the suite passes"
+  is a weaker claim than it looks for a refactor whose failure mode is a silently missing coercion:
+  int 4021 -> '4021', float 70.0 -> '70' (not '70.0', which is the non-trivial part of
+  `_catalog_id`), '' name -> None, '' date -> None, optional id 99 -> '99'.
+
+  THREE GUARDS ADDED, and they read the MODELS rather than the source. A source scan for the
+  delegation pattern would match catalog.py's own explanatory comment, which necessarily contains
+  the pattern it explains - J66's disease exactly - so the guards ask pydantic instead: every key
+  field on every catalog model coerces a number, every sparse-name field treats '' as absent, and
+  every key field still carries validator metadata. The third is the one with teeth for the future:
+  re-declare a field as a plain `str` and the coercion silently vanishes, and that is what notices.

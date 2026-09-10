@@ -24,9 +24,9 @@ from collections.abc import Iterable
 from datetime import date
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
-from typing import Any, ClassVar
+from typing import Annotated, Any, ClassVar
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, field_validator
 
 from drydocs_core.precedence import Claim, PrecedenceResolver
 
@@ -135,6 +135,41 @@ def _date_or_none(v: Any) -> date | None:
     return date.fromisoformat(str(v).strip()[:10])
 
 
+# ── LOAD10 (2026-09-10): the coercions as TYPES, not as per-model delegation ──
+#
+# Every row model below repeated the same two-line block for the same three
+# helpers — `@field_validator(..., mode="before")` + `@classmethod` + a one-line
+# `return _helper(v)` — fifteen times across eight models. The duplication was
+# not the cost; the DIVERGENCE was. A model that named a field in the wrong
+# validator list, or omitted one, was a perfectly valid model, and the way you
+# found out was a rejected row in a load.
+#
+# As an Annotated alias the coercion travels WITH the field's type. A key that
+# is a `CatalogId` cannot be missing the coercion, because there is nowhere for
+# the omission to live: the type IS the declaration. That is what the item means
+# by "a model that diverges from the helper becomes inexpressible".
+#
+# `BeforeValidator` and `mode="before"` are the same hook — the value is coerced
+# before pydantic's own validation — so this is a spelling change and not a
+# behaviour change. The suite is the proof, unchanged.
+
+#: A catalog id: numeric at source (C17 §a), string as a node key. See
+#: :func:`_catalog_id` for why a blind ``str(v)`` is not enough.
+CatalogId = Annotated[str, BeforeValidator(_catalog_id)]
+
+#: The same coercion where the id itself is optional. Spelled separately rather
+#: than reusing ``CatalogId | None``, because the OPTIONALITY is a modelling
+#: statement about that field and reads better beside the required form.
+OptionalCatalogId = Annotated[str | None, BeforeValidator(_catalog_id)]
+
+#: A sparse-refresh enrichment value: absent OR empty means "no value carried",
+#: never "blank the stored one" (C22 §b). Never a key (C17 §a).
+SparseName = Annotated[str | None, BeforeValidator(_name_or_none)]
+
+#: A date column that may arrive empty from a CSV cell.
+OptionalDate = Annotated[date | None, BeforeValidator(_date_or_none)]
+
+
 class BusinessSegmentRow(BaseModel):
     """Business segment from the annual report (manual seed; M0 already
     seeded the four current segments). This model is for the rare case of
@@ -144,14 +179,9 @@ class BusinessSegmentRow(BaseModel):
 
     code: str = Field(..., min_length=1)  # 'CCB' | 'CIB' | 'AWM' | 'Corp'
     name: str = Field(..., min_length=1)
-    effective_from: date | None = None
-    effective_to: date | None = None
+    effective_from: OptionalDate = None
+    effective_to: OptionalDate = None
     retired: bool = False
-
-    @field_validator("effective_from", "effective_to", mode="before")
-    @classmethod
-    def _coerce_date(cls, v: Any) -> Any:
-        return _date_or_none(v)
 
 
 class CatalogLOBRow(BaseModel):
@@ -163,7 +193,7 @@ class CatalogLOBRow(BaseModel):
 
     model_config = ConfigDict(populate_by_name=True, str_strip_whitespace=True, extra="ignore")
 
-    lob_id: str = Field(..., min_length=1)
+    lob_id: CatalogId = Field(..., min_length=1)
     code: str | None = None  # e.g. 'AWMCIB', 'CCB', 'CT', 'HR', 'ET'
     name: str | None = None
     reconciles_to_segment: str | None = Field(
@@ -171,11 +201,6 @@ class CatalogLOBRow(BaseModel):
         description="BusinessSegment.code for the reconciliation edge.",
     )
     reconcile_confidence: float | None = Field(None, ge=0.0, le=1.0)
-
-    @field_validator("lob_id", mode="before")
-    @classmethod
-    def _ids(cls, v: Any) -> Any:
-        return _catalog_id(v)
 
 
 class ProductLineRow(BaseModel):
@@ -192,40 +217,20 @@ class ProductLineRow(BaseModel):
 
     model_config = ConfigDict(populate_by_name=True, str_strip_whitespace=True, extra="ignore")
 
-    product_line_id: str = Field(..., min_length=1)
+    product_line_id: CatalogId = Field(..., min_length=1)
     # Optional since C22 §b: a sparse refresh carries the id without the name.
     # The name is an ATTRIBUTE, never a key (§a) — optionality cannot weaken
     # the keying ruling.
-    name: str | None = None
-    parent_lob_id: str = Field(..., min_length=1)
-
-    @field_validator("product_line_id", "parent_lob_id", mode="before")
-    @classmethod
-    def _ids(cls, v: Any) -> Any:
-        return _catalog_id(v)
-
-    @field_validator("name", mode="before")
-    @classmethod
-    def _sparse_name(cls, v: Any) -> Any:
-        return _name_or_none(v)
+    name: SparseName = None
+    parent_lob_id: CatalogId = Field(..., min_length=1)
 
 
 class ProductRow(BaseModel):
     model_config = ConfigDict(populate_by_name=True, str_strip_whitespace=True, extra="ignore")
 
-    product_id: str = Field(..., min_length=1)
-    name: str | None = None  # sparse-refresh optional (C22 §b); never a key (C17 §a)
-    parent_product_line_id: str = Field(..., min_length=1)
-
-    @field_validator("product_id", "parent_product_line_id", mode="before")
-    @classmethod
-    def _ids(cls, v: Any) -> Any:
-        return _catalog_id(v)
-
-    @field_validator("name", mode="before")
-    @classmethod
-    def _sparse_name(cls, v: Any) -> Any:
-        return _name_or_none(v)
+    product_id: CatalogId = Field(..., min_length=1)
+    name: SparseName = None  # sparse-refresh optional (C22 §b); never a key (C17 §a)
+    parent_product_line_id: CatalogId = Field(..., min_length=1)
 
 
 class DevTeamRow(BaseModel):
@@ -235,30 +240,20 @@ class DevTeamRow(BaseModel):
 
     model_config = ConfigDict(populate_by_name=True, str_strip_whitespace=True, extra="ignore")
 
-    team_id: str = Field(..., min_length=1)
+    team_id: CatalogId = Field(..., min_length=1)
     # Optional since C24 (the C22 §b shape, applied here): a sparse refresh
     # carries the id without the name. A REQUIRED name is the worse failure —
     # the row rejects wholesale and last_seen_at never advances, so an
     # unrefreshed team is indistinguishable from a retired one. Never a key.
-    name: str | None = None
-    jira_board_id: str | None = None
-    parent_product_id: str | None = Field(
+    name: SparseName = None
+    jira_board_id: OptionalCatalogId = None
+    parent_product_id: OptionalCatalogId = Field(
         None,
         description=(
             "Optional. Catalog may anchor dev teams under a Product; if so, "
             "loader writes :Product->:HAS_DEV_TEAM->:DevTeam."
         ),
     )
-
-    @field_validator("team_id", "parent_product_id", "jira_board_id", mode="before")
-    @classmethod
-    def _ids(cls, v: Any) -> Any:
-        return _catalog_id(v)
-
-    @field_validator("name", mode="before")
-    @classmethod
-    def _sparse_name(cls, v: Any) -> Any:
-        return _name_or_none(v)
 
 
 class AreaProductRow(BaseModel):
@@ -273,19 +268,9 @@ class AreaProductRow(BaseModel):
 
     model_config = ConfigDict(populate_by_name=True, str_strip_whitespace=True, extra="ignore")
 
-    area_product_id: str = Field(..., min_length=1)
-    name: str | None = None  # sparse-refresh optional (C22 §b); never a key (C17 §a)
-    parent_product_id: str = Field(..., min_length=1)
-
-    @field_validator("area_product_id", "parent_product_id", mode="before")
-    @classmethod
-    def _ids(cls, v: Any) -> Any:
-        return _catalog_id(v)
-
-    @field_validator("name", mode="before")
-    @classmethod
-    def _sparse_name(cls, v: Any) -> Any:
-        return _name_or_none(v)
+    area_product_id: CatalogId = Field(..., min_length=1)
+    name: SparseName = None  # sparse-refresh optional (C22 §b); never a key (C17 §a)
+    parent_product_id: CatalogId = Field(..., min_length=1)
 
 
 _VALID_TEAM_TYPES = {"aligned", "flex", "dedicated"}
@@ -338,9 +323,9 @@ class PatProductMappingRow(BaseModel):
 
     model_config = ConfigDict(populate_by_name=True, str_strip_whitespace=True, extra="ignore")
 
-    team_id: str = Field(..., min_length=1)
-    product_id: str = Field(..., min_length=1)
-    area_product_id: str | None = Field(
+    team_id: CatalogId = Field(..., min_length=1)
+    product_id: CatalogId = Field(..., min_length=1)
+    area_product_id: OptionalCatalogId = Field(
         None, description="PAT Supporting Area Product — the team's alignment target (C17 §b)."
     )
     seal_ids: str | None = Field(
@@ -354,22 +339,10 @@ class PatProductMappingRow(BaseModel):
         "Type' — NOT 'Team Type Name', which is the discipline (see docstring).",
     )
     sponsored: bool = False
-    sponsored_product_id: str | None = None
-    sponsored_area_product_id: str | None = Field(
+    sponsored_product_id: OptionalCatalogId = None
+    sponsored_area_product_id: OptionalCatalogId = Field(
         None, description="PAT Sponsoring Area Product (C9 gate 2026-07-18)."
     )
-
-    @field_validator(
-        "team_id",
-        "product_id",
-        "area_product_id",
-        "sponsored_product_id",
-        "sponsored_area_product_id",
-        mode="before",
-    )
-    @classmethod
-    def _ids(cls, v: Any) -> Any:
-        return _catalog_id(v)
 
     @field_validator("seal_ids", mode="before")
     @classmethod
@@ -395,16 +368,11 @@ class PatTeamRoleRow(BaseModel):
 
     model_config = ConfigDict(populate_by_name=True, str_strip_whitespace=True, extra="ignore")
 
-    team_id: str = Field(..., min_length=1)
-    employee_sid: str = Field(..., min_length=1)
-    role_id: str = Field(..., min_length=1)
+    team_id: CatalogId = Field(..., min_length=1)
+    employee_sid: CatalogId = Field(..., min_length=1)
+    role_id: CatalogId = Field(..., min_length=1)
     valid_from: str | None = None
     valid_to: str | None = None
-
-    @field_validator("team_id", "employee_sid", "role_id", mode="before")
-    @classmethod
-    def _ids(cls, v: Any) -> Any:
-        return _catalog_id(v)
 
 
 class CatalogLOBsLoader(BaseLoader):
