@@ -69,6 +69,26 @@ performs all seven and refuses to certify on any failure:
    kept without pretending its paths are current.
 7. **Base tagged `port-base-YYYYMMDD` and pushed.**
 
+**AND ONE THAT REPORTS RATHER THAN REFUSES - THE SPLIT-PAIR CHECK (PORT12, 2026-09-10).**
+`python scripts/port_split_pair_check.py <previous-base-tag>` names every SPLIT PAIR in
+the range: a definition the range adds to a file the consumer reconciles BY HAND, and a
+reference the same range adds to it from a file that crosses unattended. Deliberately
+NOT one of the seven, and deliberately not inside `--tag`'s refusal set: a split commit
+is legitimate, the dispositions behind it are right, and what it owes is a RELAY LINE,
+not a blocked roll. Its verdict line goes in the PORT-REPORT beside the completeness
+check's, and each pair becomes a line in the roll's relay so the consumer knows which
+definitions their hand-merge has to carry.
+Born from G130 (`01761011`, 2026-08-30), which added `constraints_detail` to
+`drydocs_core/neo4j_client.py` and a call to it in `drydocs/cli_schema.py` in one
+commit. The caller is canonical-producer and crossed wholesale; the method's path falls
+to the manifest default, evaluate-on-collision for a file both sides authored, so it
+waited on a hand-merge. The consumer took the caller, the sixteen lines did not arrive,
+and `drydocs bootstrap` raised `AttributeError` ten days later. There was no earlier
+signal available: an uncalled missing method raises nothing until it is called, and the
+completeness check could not see it because every path involved is present on BOTH
+sides. Three outcomes, never silence: pairs found, clean over a named range, or NOT
+CHECKED with the revision that would not resolve (exit 2).
+
 **THE BASE IS A TAG, NOT `HEAD` (J41).** The company still fetches fresh — never a
 cached ref, the 2026-08-05 lesson stands — but ports `<last-ported>..port-base-YYYYMMDD`,
 not `..HEAD`. Producer `HEAD` moves while a session reads it: on 2026-08-09 the base
@@ -4068,6 +4088,48 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   report this shape at roll time - a name added to a hand-merge file in a range and newly
   referenced from an unattended file in the same range - with G130 as its positive control. When
   it lands, a split pair arrives as a relay line naming both halves. Nothing is asked back.
+
+- **RELAY-57 - THE SPLIT-PAIR CLASS, SWEPT ACROSS EVERY ROLL YOU HAVE APPLIED: TWENTY-ONE
+  CONFIRMED PAIRS, AND THREE OF THEM WOULD KILL YOUR CLI OUTRIGHT** [VERIFIED-PRODUCER]
+  (2026-09-10, venue desktop; the three CLI-killers land in the NINTH roll and are PREVENTABLE,
+  the rest are already on your tree). RELAY-56 gave you the one-method fix for
+  `constraints_detail`. This is the same defect shape swept across all seventeen roll ranges
+  with the PORT12 instrument, then triaged and adversarially refuted name by name: 82 candidate
+  pairs were examined, 61 were killed, and these 21 survived. Every one is a definition added to
+  a file YOU reconcile by hand while the same range added a reference to it from a file that
+  reaches you unattended.
+  **FIRST, THE THREE THAT HAVE NOT SHIPPED YET - the ninth roll can carry them and the break
+  never happens.** `drydocs/cli_docs.py` (canonical-producer, taken wholesale) gains a
+  MODULE-SCOPE import of three constants defined in `drydocs/docs_coverage.py` (which falls to
+  the manifest default, so you hand-merge it): `CLASS_LOADED`, `CLASS_SEMANTIC_HOLD`,
+  `CLASS_WIRING_HOLD`. This is worse than the G130 case in kind, not just degree. G130 gave an
+  AttributeError when one verb ran; this raises `ImportError` while `drydocs/cli.py` is still
+  importing, so EVERY command dies - `drydocs --help` included, and
+  `python -c "import drydocs.cli"` with it. When you apply the ninth roll, take
+  `drydocs/docs_coverage.py`'s new class block in the same sitting as `cli_docs.py`, or take
+  neither. Four more names from that same file - `blocker`, `classes_probe`, `count_note`,
+  `dataset_id`, `loaded` - are runtime rather than import-time, same file, same sitting.
+  **THEN THE ONES ALREADY ON YOUR TREE, worth a grep each rather than a project.** From
+  `drydocs_core/data_root.py`: `dpl_mac_dir`, `glue_inventory_dir`, both reached from
+  `drydocs/cli.py`. From `drydocs_lineage/curation.py`: `DecisionsError`, `load_decisions`, also
+  from `cli.py`. From `drydocs_lineage/writer.py`: `ExtractProvenance`, `gate_bound_labels`.
+  From `drydocs_api/exports.py`: `execute_spec`, reached from `drydocs_api/agent_query.py`.
+  Each is a one-line check on your side - does the name resolve in your copy of the defining
+  file - and if it does, there is nothing to do.
+  **AND SIX THAT ONLY REDDEN YOUR SUITE**, listed so a red test is attributable rather than
+  mysterious: `EXPORT_LIMIT_CEILING` and `execute_spec` (test_result_completeness,
+  test_agent_query), `BadCredentialsError` (test_console_auth), `Neo4jDriverBounds`
+  (test_neo4j_client), `bounds` (test_neo4j_client), `DECISIONS_SCHEMA`
+  (test_cli_lineage_load). A test file that is NEW in a range arrives as a clean-add while the
+  definition it exercises waits on your hand-merge, which is the same split one level down.
+  **WHAT WE ARE NOT CLAIMING.** The producer cannot read your tree, so every line above is
+  "this pair exists in the range" and not "this is broken on your instance". Several of the 61
+  we killed were killed precisely because your own apply reports showed the definition had
+  already crossed. Treat the list as where to look, not as a defect report - and if a name
+  resolves fine in your copy, that pair is closed with no action.
+  **GOING FORWARD** the producer runs `scripts/port_split_pair_check.py <previous-base-tag>` at
+  every roll close and each pair becomes a relay line, so this is the last time the list arrives
+  as a backlog rather than as a paragraph. Nothing is asked back.
 
 OWED COMPANY-SIDE:
 

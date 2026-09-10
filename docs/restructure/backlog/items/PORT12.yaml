@@ -7,7 +7,7 @@ phase: 8
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - PORT-MANIFEST.yaml
@@ -24,10 +24,25 @@ acceptance: |
   it is regenerated - and `never-port` is excluded, as it already is in the completeness check.
   (b) THE PRECISION IS THE POINT AND IT IS WHAT MAKES THIS BUILDABLE. A check that reported
   every commit touching both `drydocs/**` and `drydocs_core/**` would report most commits in the
-  repo and be switched off within a week. The pair is: a symbol DEFINED (a new `def` or `class`
-  at module or class scope) in a hand-merge file inside the range, AND newly REFERENCED from an
-  unattended file inside the same range. Both halves are read as code through
-  `tests/source_scan.py` (J66), never as raw substrings over the diff.
+  repo and be switched off within a week. The pair is: a symbol DEFINED at module or class scope
+  in a hand-merge file inside the range, AND newly REFERENCED from an unattended file inside the
+  same range. Both halves are read as code (AST), never as raw substrings over the diff (J66).
+  [AMENDED 2026-09-10; was "a new `def` or `class` at module or class scope"] A MODULE-LEVEL
+  CONSTANT IS A DEFINITION TOO, and excluding it would have missed the worst instance the sweep
+  found. `drydocs/cli_docs.py` imports three constants from `drydocs/docs_coverage.py` at MODULE
+  SCOPE, so a hand-merge that dropped them does not fail a verb the way G130 did - it raises
+  ImportError while `drydocs/cli.py` is still importing, and every command dies, `drydocs --help`
+  included. A def-and-class-only reading would have reported the milder half of the class and
+  stayed silent on the severe half. Scope is what matters, not the statement keyword: a local
+  inside a function body is reachable from nowhere and is not a definition for this purpose.
+  ALSO WHAT MAKES IT PRECISE, learned by measuring rather than by design - the first pass
+  reported 404 pairs. A name defined in two modules cannot be attributed to either, so it is
+  counted `ambiguous` rather than asserted. A name the using file defines itself resolves
+  locally. The test tree is not a definition side, because no production module imports from it.
+  And the manifest DEFAULT has TWO ARMS - clean-add when the consumer lacks the file, evaluate
+  when both sides have it - so a file the range CREATED arrives whole with its definitions in it
+  and is not a split, while only a pre-existing file can take the evaluate arm. That last one is
+  the difference between 133 findings and a list somebody will read.
   (c) It REPORTS, never gates. A split commit is legitimate - the dispositions are right and
   `drydocs_core/**` is evaluate-on-collision for a reason the manifest states - so what the
   split owes is a RELAY LINE naming the pair, not a refusal. Three outcomes and no silence
@@ -76,3 +91,47 @@ notes: |
   a different question - whether a PATH ever arrived - and would never have seen this, because
   every path involved is present on both sides. This is about what is INSIDE two files that
   arrived by different routes.
+  BUILT AND SWEPT 2026-09-10 (Lane A, desktop; pens backlog, port, adr, gates).
+  `drydocs/port/split_pairs.py` with `scripts/port_split_pair_check.py` as its entry point;
+  the roll close runs it and the port-prompt's opening sequence carries it as a step that
+  REPORTS rather than one of the seven that refuse.
+  THE INSTRUMENT TOOK FOUR PASSES AND EACH CORRECTION IS IN THE MODULE, because the next
+  person measuring this needs the corrections more than the result. Pass one used `ast.walk`
+  for definitions, which descends into function bodies, so three locals in one test file
+  reached the report; definitions are module and class scope only. Pass one also counted the
+  test tree as a definition side, and a fake client in a test defines `constraints_detail` too,
+  which duplicated a true finding. Pass two returned 404 pairs, nearly all of them one name
+  meaning two things - `row.description` matching a `description` field defined elsewhere - so
+  a name defined in more than one module is now counted `ambiguous` rather than attributed, and
+  a name the using file defines itself resolves locally. Pass three was still 133, and the
+  lever that mattered was the manifest DEFAULT's two arms: a file the range CREATED reaches a
+  consumer that lacks it as a clean-add and carries its definitions with it, while only a
+  pre-existing file can take the evaluate arm. That is the difference between a number and a
+  list somebody reads.
+  THE POSITIVE CONTROL IS PINNED FIRST IN THE TEST FILE, not last, because a detector for a
+  defect shape that cannot find the instance the shape was drawn from has not been shown to
+  work. It finds G130's `constraints_detail` and nothing else in that commit.
+  THE SWEEP, over all seventeen roll ranges: 82 candidate pairs triaged one defining file at a
+  time and each claimed break adversarially refuted. 61 were killed - most because the
+  definition and its use travelled in the same commit, or the definition predated the range and
+  had long since crossed, or both files were hand-merge and travel together. 21 survived.
+  THE HEADLINE IS THAT THREE OF THEM HAVE NOT SHIPPED YET. `drydocs/cli_docs.py` is
+  canonical-producer and gains a MODULE-SCOPE import of three constants defined in
+  `drydocs/docs_coverage.py`, which the consumer hand-merges. That is worse in KIND than G130,
+  not merely in degree: G130 raised AttributeError when one verb ran, and this raises
+  ImportError while `drydocs/cli.py` is still importing, so every command dies including
+  `drydocs --help`. It is in `port-base-20260909..HEAD`, so the ninth roll's relay prevents it
+  rather than reporting it after the fact - which is the whole point of the item.
+  Acceptance (b) was AMENDED the same day on that finding: it had said a definition was "a new
+  `def` or `class`", and a def-and-class-only reading would have reported the milder half of
+  the class and stayed silent on the severe half. A module-level constant is a definition.
+  RELAY-56 carried the immediate `constraints_detail` fix; RELAY-57 carries the swept list,
+  ranked, with the producer's own caveat stated in it: the producer cannot read the consumer's
+  tree, so every line is "this pair exists in the range" and never "this is broken on your
+  instance".
+  WHAT REMAINS OPEN, and it is the item's own fence rather than an omission: every single
+  finding defines through `default_ok` or an explicit hand-merge row, which means the root
+  cause is that most of `drydocs/**` and `drydocs_core/**` have no manifest row and inherit a
+  default whose two arms depend on a tree the producer cannot see. Whether those files should
+  be re-dispositioned is a ruling about files both sides authored, needs to know how the
+  company's copies diverge, and belongs to the port boundary - PORT13.

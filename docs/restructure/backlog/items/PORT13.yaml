@@ -1,0 +1,58 @@
+id: PORT13
+epic: release-infrastructure
+title: "Most of drydocs and drydocs_core have no manifest row, so a module's port disposition is inherited from a default whose two arms depend on a tree the producer cannot read - and every split pair PORT12 found came through it"
+type: task
+module: drydocs-port
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- PORT-MANIFEST.yaml
+- drydocs/port/dispositions.py
+- tests/unit/test_port_manifest.py
+acceptance: |
+  (a) A measured census, by command, of every tracked Python path that resolves through
+  `default_ok` or the bare `DEFAULT` rather than through a row of its own, grouped by package,
+  with the count of split pairs PORT12's sweep attributes to each. The census is the input to
+  the ruling, not a substitute for it.
+  (b) THE QUESTION PUT TO THE PORT BOUNDARY, not answered inside a guard item: should the code
+  packages carry explicit rows, and if so which disposition. The producer cannot answer it
+  alone - `drydocs_core/**` is evaluate-on-collision because BOTH SIDES AUTHORED those files,
+  and whether that is still true per file is a fact only the consumer holds. So this asks, and
+  what it must carry is the evidence for each option rather than a preference.
+  (c) The options stated with their costs. Explicit `canonical-producer` rows: the producer's
+  copy wins, split pairs stop existing for those paths, and any consumer divergence is silently
+  overwritten - which is the failure `drydocs_core/**` was made evaluate to prevent. Keeping
+  evaluate and relying on PORT12's report: no code moves, the consumer keeps its divergence,
+  and every roll owes relay lines forever. A per-file split: the honest answer if the
+  divergence is real in some files and dead in others, and the most work.
+  (d) Whatever is ruled, the manifest gains a note saying WHY the code packages resolve the way
+  they do, because today the `drydocs_core/**` default_ok entry's reason is one clause -
+  "the two explicit models rows set the precedent that evaluate-on-collision is the right
+  default here" - and that clause is now carrying more weight than it was written for.
+  NOT in scope: PORT12's detector, which is built and reports independently of this ruling; and
+  changing any single file's disposition without the ruling, which is the thing this exists to
+  produce.
+notes: |
+  Minted 2026-09-10 (Lane A, desktop; pen backlog) from PORT12's sweep, which fenced this out by
+  name and then produced the evidence for it.
+  THE MEASUREMENT THAT MADE IT A REAL QUESTION rather than a tidy-up: of the 161 candidate split
+  pairs the sweep found across seventeen roll ranges, EVERY ONE defines through `default_ok` or
+  an explicit hand-merge row. Not most - all. The class PORT12 detects exists because a Python
+  module's disposition here is usually inherited rather than declared, and the inherited default
+  has two arms whose selection depends on whether the consumer already holds the file. The
+  producer cannot see that, so it cannot know which arm applies, which is why PORT12's check
+  reports conservatively and why its report will never shrink on its own.
+  WHY THIS IS NOT A GUARD ITEM. Re-dispositioning `drydocs_core/neo4j_client.py` to
+  canonical-producer would have prevented the G130 break outright. It would also have
+  overwritten whatever the consumer's copy holds, and the manifest made that path
+  evaluate-on-collision precisely because both sides authored it. Trading a latent AttributeError
+  for a silent overwrite is not obviously the better deal, and it is not the producer's deal to
+  take alone.
+  THE SMALLER VERSION IS AVAILABLE if the full ruling is too much: the sweep names about a dozen
+  defining files that actually produced confirmed pairs, and a row for those alone would cover
+  the observed class without touching the rest of the tree. Recorded here so the option exists;
+  which one to take is (b)'s question.
