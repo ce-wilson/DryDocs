@@ -202,4 +202,9 @@ PROBES: tuple[str, ...] = (
     # whose anchor finds nothing is NOT_CHECKED, and the type is what makes that
     # impossible to render as PASS.
     "drydocs.review.graph_verify.suite_verdict",
+    # CORE14 (2026-09-10): the sweep's recurrence in core's own driver. Four
+    # worlds - APOC absent, server unreachable, auth wrong, and an unexpected
+    # fifth - all returned the same False, so `drydocs bootstrap` said "APOC
+    # required" to people whose database was simply stopped.
+    "drydocs_core.neo4j_client.Neo4jClient.apoc_available",
 )

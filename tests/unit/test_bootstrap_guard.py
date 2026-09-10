@@ -18,6 +18,7 @@ import pytest
 from typer.testing import CliRunner
 
 from drydocs import cli as cli_mod
+from drydocs_core.check_outcome import CheckOutcome, checked_clean
 from drydocs_core.schema.constraints import declared_constraint_names
 
 runner = CliRunner()
@@ -106,8 +107,10 @@ class _FakeClient:
     def __exit__(self, *exc):
         return False
 
-    def apoc_available(self) -> bool:
-        return True
+    def apoc_available(self) -> CheckOutcome:
+        # CORE14: a probe, not a bool (ADR 0021). The fake answers the way a
+        # server with APOC installed does.
+        return checked_clean(subject="apoc.version() on (fake)")
 
     def execute_file(self, path: Path) -> None:
         self.applied.append(path.name)

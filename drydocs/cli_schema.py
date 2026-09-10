@@ -43,10 +43,14 @@ def check() -> None:
     """Verify Neo4j connectivity, server version, and APOC availability."""
     with _client() as cli:
         console.print(f"[cyan]Server:[/] {cli.server_version()}")
-        if not cli.apoc_available():
-            console.print("[red]APOC not available.[/]")
+        # CORE14: the probe has three states and the operator gets to see which.
+        # `render()` is the type's own line (ADR 0021 D5) — a surface must not
+        # show a not-checked result as a failure of the thing it did not check.
+        apoc = cli.apoc_available()
+        if not apoc.is_clean:
+            console.print(f"[red]APOC: {apoc.render()}[/]")
             raise typer.Exit(2)
-        console.print("[green]APOC OK.[/]")
+        console.print(f"[green]APOC OK[/] — {apoc.render()}")
 
 
 @app.command(name="landing-zones")
@@ -504,8 +508,12 @@ def bootstrap(
 ) -> None:
     """Apply M0 constraints + ontology seed."""
     with _client() as cli:
-        if not cli.apoc_available():
-            console.print("[red]APOC required.[/]")
+        # CORE14: "APOC required." used to be printed at anyone whose database
+        # was merely stopped, because the probe collapsed four worlds into False.
+        # The reason now travels with the refusal.
+        apoc = cli.apoc_available()
+        if not apoc.is_clean:
+            console.print(f"[red]APOC required — {apoc.render()}[/]")
             raise typer.Exit(2)
         if not skip_constraints:
             cli.execute_file(CONSTRAINTS_FILE)

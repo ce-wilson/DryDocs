@@ -100,7 +100,11 @@ def test_run_script_sends_each_statement_once_with_params():
     client.run_script(SCRIPT, params={"x": 1})
 
     assert len(log) == 2  # two real statements, nothing sheared, nothing empty
-    sent = [stmt for stmt, _ in log]
+    # CORE13 wrapped each auto-commit statement in a `neo4j.Query` so it carries
+    # the declared transaction timeout; the TEXT is what this guard is about, and
+    # `.text` is where the Query keeps it. `getattr` rather than `.text` outright
+    # so the guard still reads a plain string if that wrapper is ever removed.
+    sent = [getattr(stmt, "text", stmt) for stmt, _ in log]
     assert sum("CREATE CONSTRAINT thing_id" in s for s in sent) == 1
     assert sum("MERGE (n:Thing" in s for s in sent) == 1
     assert all(params == {"x": 1} for _, params in log)

@@ -160,6 +160,42 @@ neo4j:
     puts data where no query surface looks. Set NEO4J_DATABASE to a topology
     database (normally `drydocs`).
 
+  # HOW LONG A CALLER WAITS BEFORE THE ANSWER IS "the server is not there"
+  # (CORE13, 2026-09-10; core-2026-09-07.md S4). Searched across all 74 core
+  # files, the only `timeout` in drydocs_core was an unrelated `timeout=30` in
+  # landing_zones.py: no transaction timeout, no retry ceiling, no acquisition
+  # timeout, no cancellation path. An unreachable server therefore hung the
+  # caller — a loader, a CLI verb, a test — with nothing to read and nothing to
+  # cancel.
+  #
+  # The values live HERE, never as a Python literal (ADR 0014: what the
+  # principle forbids is a value buried in code). They are SECONDS, and they are
+  # per-machine operational facts, which is why this canonical-company file is
+  # the right home: a company network and a laptop's local container do not
+  # deserve the same numbers, and a port must not overwrite the company's.
+  #
+  # THE OTHER END OF THE SAME SYSTEM IS API6, which is still `todo` and unqueued
+  # at the time of writing. CORE13's acceptance asked the two to be settled
+  # together so they cannot contradict; settling them in ONE declared file is
+  # the stronger form of that, because agreement then survives both items being
+  # edited by different sessions. API6 decides the API's query ceiling and what
+  # the caller is TOLD when it trips; whatever it decides, it reads these keys
+  # rather than choosing its own numbers.
+  #
+  # Why these four and not one. They fail at different layers and a single
+  # number cannot express them: `connection_timeout` is the TCP/handshake wait
+  # (a black-holed address), `connection_acquisition_timeout` is the wait for a
+  # pooled connection (a saturated pool), `max_transaction_retry_time` is the
+  # ceiling on the driver's own retry of a transient failure, and
+  # `transaction_timeout` is the server-side cap on one statement (a slow query,
+  # not an absent server). Chosen so a human waits at most ~30s for a verdict
+  # while a legitimate bulk MERGE inside a load is not cut off at the knees.
+  driver:
+    connection_timeout: 15.0
+    connection_acquisition_timeout: 30.0
+    max_transaction_retry_time: 30.0
+    transaction_timeout: 120.0
+
 services:
   # Local dev servers the web UI expects (see web/.env.example).
   adk_api: 8000           # agents ADK server; the console reaches it as /agent via the proxy (DRYDOCS_AGENT_UPSTREAM, ADR 0020)

@@ -7,7 +7,7 @@ phase: 6
 agent: main
 model: fable
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs_core/neo4j_client.py
@@ -26,3 +26,118 @@ notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). core-2026-09-07.md candidates 1 (S1/S2/S3), "large enough to want an ADR rather than a plain item".
   The report's S2 finding: every read in core runs inside execute_write. Fable because the ADR is a
   boundary decision; the code half follows it.
+
+  CLOSED 2026-09-10 (Lane B, laptop, wip/core11-laptop, based on main). Venue (J18): offline unit
+  suite - the new guard drives a duck-typed fake driver, so it needs no server and reproduces from
+  a clean clone on either machine. Clause (c) held: drydocs_api/app.py and agents/common/*.py were
+  READ and not written.
+
+  CLAUSE (b), BUILT AND MEASURED. `read()` is the second query method (execute_read) and the four
+  read helpers use it; every path now consumes the summary AFTER draining the rows, converts it
+  through drydocs_core.notifications, logs at the driver's OWN severity and keeps it on
+  `last_notifications`; `run_with_diagnostics` returns rows plus the R21 payload. `run_script` was
+  a second, quieter drop of the same summary and is fixed in the same pass.
+  tests/unit/test_neo4j_client.py, measured both ways: 11 of 12 FAIL against HEAD's client, and the
+  one that passes is `test_run_stays_the_write_path` - the control for the default that must not
+  move. `run` deliberately stays the write path: the report suggested defaulting to read, but there
+  are 54 `client.run(` call sites, most of them writes, and a default flip converts them silently.
+
+  CLAUSE (a) - ADR DRAFT FOR LANE A. This lane does not mint the number or write the
+  docs/decisions/README.md row (`adr` pen). The body below is paste-ready. Requested title: "the
+  graph driver seam". Requested status line: PROPOSED, drafted 2026-09-10 by Lane B (laptop) from
+  docs/reviews/modules/core-2026-09-07.md S1-S4.
+
+  ---
+  # ADR NNNN - The graph driver seam: three clients, one shape, and read is the caller's to ask for
+
+  ## Context
+
+  Three independent Neo4j driver constructions exist in first-party code. The 2026-09-07 core
+  report (S1) named core's as the declared shared surface and the weakest of the three. Measured at
+  2026-09-10, after CORE11's code half:
+
+  | seam | site | lifecycle | access mode | notifications | timeouts | close |
+  |---|---|---|---|---|---|---|
+  | `drydocs_core.Neo4jClient` | `drydocs_core/neo4j_client.py` | one per CLI verb / loader run, context-managed | `run` write, `read` read (CORE11) | captured + logged (CORE11) | NONE (CORE13) | `__exit__` |
+  | `drydocs_api.LiveRunner` | `drydocs_api/app.py` | lazy, process-lifetime | `RoutingControl.READ` pinned; `READ_ACCESS` on the export session | captured, returned in the response (R21) | none | explicit `close()` |
+  | the agents' driver | `agents/common/neo4j_tool.py` | module-level singleton, separate interpreter | `RoutingControl.READ` on `read_cypher` + a write-token refusal for LLM callers | NOT captured here; `agents/common/graph_read.py` does capture (R21) | none | explicit `close_driver()`, with the driver-6.0 `__del__` reason recorded |
+
+  Two things the table makes visible that prose did not. The agents tier is SPLIT: its read helper
+  converts to `Neo4jNotification`, its LLM-facing tool discards the same summary - so the R21 shape
+  is adopted in two of three agent paths, not one of three tiers. And core is the only seam that
+  runs multi-statement DDL+DML scripts (`run_script` / `execute_file`, 11 call sites), which is not
+  a gap in the other two but a job neither has.
+
+  ## Decision
+
+  **The three clients stay separate. What converges is the SHAPE, not the class.**
+
+  D1 - Core's `Neo4jClient` is the seam for anything with a CLI or loader lifecycle: one client per
+  invocation, closed by its context manager, able to run a bootstrap script. 19 first-party modules
+  import it.
+
+  D2 - `drydocs_api.LiveRunner` stays its own. Its driver is lazy (so a mapping-store-only session
+  serves without Neo4j configured), process-lifetime (so a request does not pay pool setup), and it
+  streams an export through a session held open for a generator's life. None of those three
+  properties belong in a per-invocation client, and folding them in would make core's client carry
+  a request lifecycle it has no caller for.
+
+  D3 - The agents' driver stays its own, on lifecycle rather than on import legality. It is a
+  process singleton in a SEPARATE interpreter (`agents/.venv`) with its own `.env` merge (G131) and
+  an LLM-facing write refusal. Note what is NOT the reason: `agents.common.specs_catalog` already
+  imports `drydocs_api.query_specs`, so "the agents cannot import first-party code" would be false.
+
+  D4 - What all three adopt is `drydocs_core.notifications`. It is already core-owned, already used
+  by the API runner and the agents' read helper, and as of CORE11 by core's client. A driver
+  summary is converted to that shape or it is dropped; there is no third option and no local
+  notification struct.
+
+  D5 - Read access is the CALLER's to ask for, not the client's to assume. Core exposes `read` and
+  `run` as separate methods rather than an `access=` argument, because `run`/`read` take bind values
+  as `**kwargs` and any option keyword would collide with a bind named after it. `run` keeps write
+  semantics for its 54 existing call sites; the read-shaped ones migrate as an action item below,
+  one component at a time, each with its own test.
+
+  ## Options considered
+
+  A - Fold the API and the agents onto core's client (rejected). It would move a request lifecycle
+  and a process singleton into a per-invocation context manager, and would give the LLM tool tier
+  an unguarded write path. The report itself says the other two are not worse implementations.
+
+  B - Make `run` default to read (rejected). It is the cheapest-looking correction and the most
+  dangerous: 54 call sites, most of them writes, would silently change transaction semantics with
+  no diagnostic. The report suggested it; this ADR declines it and says why.
+
+  C - Three clients, one notification shape, explicit read (chosen).
+
+  D - A fourth "unified" client all three adopt (rejected). It would be a fourth seam before it was
+  a replacement, and the tree already has three.
+
+  ## Consequences
+
+  - A least-privilege read credential now works through core for the four read helpers and any
+    caller that says `read`. It still fails for the 54 unmigrated `run` sites - the action item
+    below is what closes that, and until it is done the improvement is partial and should be
+    described that way.
+  - `last_notifications` is per-statement state on a client that is not thread-safe by contract.
+    Core's callers are single-threaded CLI verbs and loaders, which is why this is acceptable; a
+    threaded caller must use `run_with_diagnostics`, which returns the payload rather than storing
+    it. Stated here because it is the shape's one real limit.
+  - Core's client still has no timeout, no retry ceiling and no acquisition timeout (S4). That is
+    CORE13 and it is not closed by this ADR.
+
+  ## Action items (after acceptance)
+
+  1. Migrate the read-shaped `client.run(` call sites to `client.read(` - the loaders are the bulk
+     (`drydocs/loaders/base.py` and siblings). One item per component, `drydocs-load` first. NOT
+     CORE11's, and needs a Lane A mint.
+  2. `agents/common/neo4j_tool.read_cypher` converts its summary through
+     `drydocs_core.notifications` like `graph_read.py` already does, so the LLM tier stops being
+     the one path that drops it. Needs a Lane A mint.
+  3. CORE13 (queued) adds the timeout and retry policy S4 named.
+  4. Re-read this table at the next core sweep: the row that changes is the one to explain.
+  ---
+
+  For Lane A, not this item: two of the four action items above need MINTING (the read-site
+  migration and the agents' notification adoption). Both are named in the draft rather than left in
+  prose, so the mint pass can lift them straight out. Neither is queued anywhere today.
