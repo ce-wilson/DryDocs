@@ -36,9 +36,22 @@ half SME capture (MFTS routes, retentions, access steps, engagement model).
 | `template-spec.yaml` | **Source of truth**: both tabs, every row/column, per-field `source:` (graph / graph-partial / manual) + synthesized OrderHub example values |
 | `generate_template.py` | Deterministic-content renderer: spec → xlsx (`poetry run python .claude/skills/controlm-runbook-automation-excel/generate_template.py`) |
 | `controlm-runbook-template.xlsx` | The committed 2-tab template with example rows — hand to a team as-is |
+| `generate_runbook.py` | **DOC12**: fills the template for one real folder (`--folder <sched_table> [--out x.xlsx]`). Reads the `-SDLC` sibling's `FolderFacts` — the runbook queries are SHARED, never re-written here |
 
 Color convention (kept from the source workbook): **yellow-tinted = a human
-must capture or confirm it**; untinted = the graph fills it.
+must capture or confirm it**; untinted = the graph fills it. `generate_runbook.py`
+adds a THIRD tint for a field the template declares `source: graph` that no feed
+reaches today — a different request from yellow, because nobody can capture it by
+hand into a graph that has no field for it; it needs a feed, not a person.
+
+**What the generator actually reaches, measured on the bundled samples, not
+promised:** 11 of the template's 31 `source: graph` fields. Every run prints its
+own per-tab counts — filled / partial / manual / declared-graph-but-unreached —
+so the number is re-measured rather than quoted from here. The remaining 20 are
+the honest gap between what the template claims the graph holds and what DryDocs
+ingests today; where the cause is declared (`Avg Run time` waits on
+`controlm@[db].psgmgr.cm_avg_run`, confirmed but not wired) the cell cites the
+config's own reason.
 
 ## Column → system-of-record map (the generation contract)
 
