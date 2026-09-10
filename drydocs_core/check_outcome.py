@@ -196,4 +196,10 @@ PROBES: tuple[str, ...] = (
     # violations among the 17 of 45 registry rules that have detectors". A probe
     # because the answer depends on whether internal/ is in this checkout at all.
     "drydocs_remediation.detect.conformance_outcome",
+    # REV2 (2026-09-10): the acceptance runner's per-suite verdict. Most cases in
+    # graph-tests/ assert `empty`, so on an unloaded graph every one of them
+    # passed - 28 of 30 negative assertions had no positive control. A suite
+    # whose anchor finds nothing is NOT_CHECKED, and the type is what makes that
+    # impossible to render as PASS.
+    "drydocs.review.graph_verify.suite_verdict",
 )

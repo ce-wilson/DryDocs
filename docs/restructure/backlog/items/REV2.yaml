@@ -7,7 +7,7 @@ phase: 7
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs/review/graph_verify.py
@@ -24,3 +24,66 @@ acceptance: |
 notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). review-agents-2026-09-08.md candidate 1 (L1-1, ranked 1): 28 of 30 negative assertions have no
   anchor.
+
+  CLOSED 2026-09-10 (Lane B, laptop, wip/rev2-laptop, based on main). Venue (J18): offline - the
+  runner is driven through a fake graph, so no Neo4j is involved and it reproduces from a clean
+  clone. Full suite before the close note: 4061 passed, 0 failed; both ruff gates clean.
+
+  MEASURED BOTH WAYS, over the REAL committed suites rather than a fixture. Driving the PRE-REV2
+  runner against an empty graph:
+    bmc-docs-lexical                 5 cases   PASS (exit 0)
+    bmc-docs-smoke                   3 cases   fail
+    business-application-identity    5 cases   PASS (exit 0)
+    folder-attribution-coverage     12 cases   PASS (exit 0)
+    provenance-diet                  2 cases   PASS (exit 0)
+    tom-required-contacts            3 cases   fail
+  FOUR OF SIX certified an empty database, across 24 of the 30 cases - the item's title confirmed
+  rather than restated. And the two that "failed" are not a defence: each happened to carry a
+  `nonempty` case, neither DECLARED it as a positive control, so neither was protected on purpose
+  and either could have lost that case to an ordinary edit.
+
+  (a) A suite declares an `anchor:` in two forms. `label:` + `min_count:` generates the Cypher,
+  which is the safer form to write - a suite author cannot accidentally compose an anchor that
+  asserts nothing - and `cypher:` + `min_rows:` covers what a label count cannot express. Exactly
+  one of the two, validated at load: a minimum below 1 is refused with the reason ("an anchor of
+  zero is satisfied by an empty graph, which is what an anchor is for"), and a label that is not a
+  plain name is refused rather than interpolated into Cypher.
+
+  (b) `run_suite` evaluates the anchor FIRST and returns a `SuiteResult` whose verdict is a
+  CheckOutcome. When the anchor fails the cases are NOT RUN AT ALL - not run-and-ignored - because
+  an `empty` assertion over an absent graph answers a question nobody asked, and leaving the
+  results in the object would invite a caller to read them.
+
+  (c) All SIX committed suites gained anchors, not the four the acceptance named. The mechanism is
+  default-deny: a suite with no anchor is NOT RUN with that as its reason, so leaving the two
+  incidentally-protected suites unanchored would have left them reporting NOT RUN forever. Anchors
+  chosen per suite from what its cases actually reason about - :Chunk for the lexical suite,
+  :BusinessApplication for identity, :ControlMFolder for attribution and the smoke suite, :JobRun
+  for the provenance diet, :TOMRole for required contacts - each with a comment saying what the
+  suite would otherwise certify.
+
+  (d) Two empty-graph tests, one over a fixture suite and one over the six REAL committed suites,
+  each asserting NOT RUN and neither able to go vacuous (both fail if the suite list comes back
+  empty).
+
+  THE VERDICT IS CheckOutcome (ADR 0021, accepted 2026-09-09, so the acceptance's conditional
+  resolves). `suite_verdict` is the registered probe name because the registry's guard reads a
+  return annotation, and the answer to "did this suite pass" is the outcome rather than the rows;
+  `run_suite` carries the same outcome plus the case detail.
+
+  EXIT CODES ARE NOW 0/1/2, and that is a deliberate contract change. NOT RUN gets its own code:
+  sharing 0 is the bug this item exists to fix, and sharing 1 would tell an operator the invariants
+  were VIOLATED when in fact nothing was checked. J78 drew the same line for a CI verdict for the
+  same reason. Safe to change here - measured: nothing outside the tests calls `run_suite` or
+  `exit_code` today, so there is no CLI contract to break. `exit_code` still accepts a bare
+  iterable of CaseResult (the pre-REV2 shape) for a caller holding case results.
+
+  A KNOWN TRIVIAL CONFLICT FOR LANE A, flagged rather than avoided: this item appends a line to
+  `drydocs_core.check_outcome.PROBES`, and so does CORE14 on wip/core14-laptop - and Lane A's own
+  PORT11 already appended one to main while this was in flight. All three are additions to the same
+  tuple; the merge keeps every line. It is worth knowing that PROBES is now a surface both lanes
+  write, by design (ADR 0021 D3 makes registration the act, so every adopter touches it).
+
+  NOT TOUCHED: `drydocs/graph_verify.py`, the ADR 0018 re-export shim. That is GRAPH5's subject and
+  GRAPH5 is Lane A's, unstarted. The shim re-exports by module attribute, so the new names reach
+  through it without an edit - verified by importing through the shim.

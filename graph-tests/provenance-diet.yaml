@@ -5,7 +5,7 @@
 # classification: Internal-Public (shape/consistency only — no counts/IDs).
 classification: Internal-Public
 schema: drydocs.graph-tests.v1
-updated: 2026-07-20
+updated: 2026-09-10
 
 suite: provenance-diet
 description: >
@@ -16,6 +16,15 @@ description: >
   regression back to the pre-diet "blanket MERGE on every touched node"
   behavior (persona review Issue 3 — full-load :JobRun supernode).
 targets: [JobRun]
+# REV2 POSITIVE CONTROL. Read this before changing a case below: without it,
+# both cases are accounting invariants on :JobRun; no run node means no
+  # accounting to check, which is not the same as accounting that balances.
+# The runner evaluates the anchor FIRST and reports NOT RUN - never PASS -
+# when it finds nothing, so a suite can no longer certify an empty database.
+anchor:
+  label: JobRun
+  min_count: 1
+
 cases:
   - id: TC-01
     description: rows_changed never exceeds rows_processed on any completed JobRun

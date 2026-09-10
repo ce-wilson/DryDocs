@@ -14,7 +14,7 @@
 # classification: Internal-Public (shape/consistency only — no counts/IDs).
 classification: Internal-Public
 schema: drydocs.graph-tests.v1
-updated: 2026-08-22
+updated: 2026-09-10
 
 suite: folder-attribution-coverage
 description: >
@@ -29,6 +29,16 @@ description: >
 # No `targets:` — the review backbone (config/review-labels.yaml) has no entry
 # covering :Port, and declaring labels the backbone cannot check is the drift
 # the sibling business-application-identity suite documents.
+# REV2 POSITIVE CONTROL. Read this before changing a case below: without it,
+# twelve `empty` cases, every one of them about folders that lack
+  # something. With no folder loaded, twelve passes over nothing - the worst
+  # of the four the review counted.
+# The runner evaluates the anchor FIRST and reports NOT RUN - never PASS -
+# when it finds nothing, so a suite can no longer certify an empty database.
+anchor:
+  label: ControlMFolder
+  min_count: 1
+
 cases:
   - id: TC-01
     description: every folder edge carries the ruled shape props (§D2 — one shape everywhere)
