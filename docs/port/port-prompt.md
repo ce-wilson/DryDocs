@@ -314,6 +314,24 @@ FORCE_COLOR / Idea-101 findings that motivated J41.)
 > ref.** That fallback is the one failure guardrail 1 exists to prevent, and it cost a
 > cycle of "the producer tracker says…" answers that were two days stale.
 
+- **Producer base `port-base-20260910` (`bb73c182`), the NINTH roll — CERTIFIED 2026-09-10,
+  venue desktop (MSI).** Range `port-base-20260909..port-base-20260910` = 144 commits, 228
+  changed paths in 8 classes, steps 368–386. All eight preflight checks green at the tag,
+  including the suite (4199 passed / 16 skipped) and CI green at `bb73c182` before it was cut.
+  **THE EIGHTH ROLL (`port-base-20260909`, 175 commits, steps 354–367) WAS NEVER APPLIED**, so
+  the two are ONE RANGE for the consumer exactly as the fourth and fifth were: the next apply
+  is `port-base-20260908..port-base-20260910` = **319 commits / 447 changed paths**, and
+  nothing is parked or hand-carried between them. Three relays act in it — RELAY-55 (a gate-log
+  redaction declares whose act it was, so the consumer may keep the true name), RELAY-56 (the
+  one-method `constraints_detail` fix for the bootstrap `AttributeError`) and RELAY-57 with its
+  first roll-close postscript. **RELAY-57 IS WHY THIS ROLL WENT OUT WHEN IT DID**: three of its
+  split pairs had not shipped, and the worst of them puts a module-scope import in
+  canonical-producer `drydocs/cli_docs.py` against constants in a file the consumer
+  hand-merges — an `ImportError` while `drydocs/cli.py` is still importing, which kills every
+  command including `drydocs --help`. This roll carries both halves, so it PREVENTS that break
+  rather than reporting it afterwards. The seventh roll's apply stays IN PROGRESS and its
+  close-out is answered by `docs/company-prompts/port-base-20260908-premerge-company-prompt.md`;
+  no company figure is claimed here. **NEXT-PORT BASE: `port-base-20260910`.**
 - **Producer base `port-base-20260908` (`314b1715`)**, the seventh roll, range
   `port-base-20260905..port-base-20260908` = 407 commits / 493 changed paths. Company apply
   REPORTED IN PROGRESS `[SME-REPORTED]`: Phases 0 and 1 and the Phase 3 corrections are read in
