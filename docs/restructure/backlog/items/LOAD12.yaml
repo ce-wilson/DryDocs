@@ -7,7 +7,7 @@ phase: 13
 agent: main
 model: sonnet
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs/loaders/server_resolution.py
@@ -17,3 +17,46 @@ acceptance: |
   reason. Independent of the Z4 build - "a line, not a build" - and it may land first.
 notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). lineage-2026-09-08.md candidate 2.
+
+  CLOSED 2026-09-10 (Lane B, laptop, wip/load12-laptop, based on main - server_resolution.py is
+  disjoint from every other branch in this lane). Venue (J18): offline; the coverage dataclass is
+  pure, so no graph is involved. Full suite: 4048 passed, 0 FAILED, both ruff gates clean.
+
+  THE TIER'S VALUE IS NOW NOT_CHECKED WITH THE REASON, as the acceptance's conditional asked once
+  ADR 0021 existed (accepted 2026-09-09). `as_dict()["matched_dns_resolved"]` renders the sentence
+  rather than the bare 0 - both the printed summary and the :JobRun stamp read from that dict, and
+  both are SURFACES, which is D5's rule: a surface must not show a not-checked result as 0.
+
+  NOT_CHECKED EVEN WHEN THE COUNT IS NONZERO, and this is the design call worth defending. The
+  obvious implementation is "NOT_CHECKED when 0, a real count otherwise". It is wrong: the count
+  comes from RESOLVES_TO_SERVER edges already in the graph, which this pass did not create and
+  cannot vouch for. If the Z4 collector has never run, 0 means nobody looked; if it has, any number
+  is Z4's result reported second-hand by a pass that does not compute the tier. Neither is this
+  pass checking T3, and reporting somebody else's evidence as this pass's clean result is the same
+  category error one step along. The observed count travels in the REASON, so nothing is lost and
+  nothing is claimed.
+
+  THE INT SURVIVES, on purpose. `matched_dns_resolved` stays an int on the dataclass because
+  `reconciles()` has to add it up: a dns-resolved host written by Z4 is a real host, and rendering
+  the tier as a sentence must not quietly drop it from the census. A test pins the arithmetic AND
+  pins that a census which does not add up still fails, so the reconcile guard cannot go vacuous
+  behind this change.
+
+  THE REASON NAMES WHO WOULD CHECK. A not-checked that does not say who WOULD do the checking sends
+  the reader hunting, so the reason names `drydocs_lineage.extractors.lb_resolution` by module path.
+
+  NOT REGISTERED IN check_outcome.PROBES, deliberately, and the reasoning is worth recording
+  because the opposite call looks equally defensible. PROBES is a registry of probe FUNCTIONS - the
+  guard imports each name and reads its return annotation - and `dns_resolved_outcome` is a pure
+  accessor on a dataclass that has already been filled in. The looking happened in the census
+  query, one layer up, whose return is the coverage dataclass and not a CheckOutcome. Registering a
+  non-probe would dilute what the registry means; this is a FIELD-level adoption of the type, which
+  ADR 0021 D4 lists in its own words ("the dns-resolved tier reports its interim zero honestly")
+  without requiring registration.
+
+  MEASURED BOTH WAYS: 4 of the 5 new tests fail against main's server_resolution.py. The fifth is
+  the arithmetic control and passes either way, which is what makes it the control.
+
+  Independent of the Z4 build, as the acceptance says - "a line, not a build". When LOAD11 lands
+  the collector, this tier becomes something this pass could legitimately report on, and the
+  decision to revisit is exactly the one recorded above.

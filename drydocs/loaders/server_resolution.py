@@ -37,6 +37,8 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 
+from drydocs_core.check_outcome import CheckOutcome, not_checked
+
 LOGGER = logging.getLogger("drydocs.loaders.server_resolution")
 
 CYPHER_PATH = Path(__file__).resolve().parent / "cypher" / "server_resolution.cypher"
@@ -76,6 +78,10 @@ class ServerResolutionCoverage:
     null_nodeid: int = 0
     matched_exact: int = 0
     matched_normalized: int = 0
+    #: The T3 count OBSERVED in the graph. Kept as an int because `reconciles()`
+    #: has to add it up, and because a dns-resolved edge written by the Z4
+    #: collector is a real host that must not fall out of the arithmetic. What
+    #: it is NOT is this pass's answer about T3 - see `dns_resolved_outcome`.
     matched_dns_resolved: int = 0
     unmatched: int = 0
     #: T2's ambiguity guard: hosts whose short name matched >1 Server — left
@@ -93,13 +99,41 @@ class ServerResolutionCoverage:
         matched = self.matched_exact + self.matched_normalized + self.matched_dns_resolved
         return (self.null_nodeid + matched + self.unmatched) == self.total_hosts
 
+    def dns_resolved_outcome(self) -> CheckOutcome:
+        """T3's honest answer, which is NOT_CHECKED whatever the number (LOAD12).
+
+        THE DEFECT. The census reported `matched_dns_resolved: 0` beside two
+        tiers this pass really does compute, in this pass's own summary - so the
+        zero read as "T3 ran and matched nothing". T3 is NOT BUILT here: the
+        module docstring says so, and the Z4 nslookup collector
+        (`drydocs_lineage.extractors.lb_resolution`) is what writes that tier.
+        A reader had a number that looked like a measurement and was a placeholder.
+
+        WHY NOT_CHECKED EVEN WHEN THE COUNT IS NONZERO. The count comes from
+        edges already in the graph, which this pass did not create and cannot
+        vouch for: if Z4 has never run, 0 means "nobody looked", and if Z4 has
+        run, any number is Z4's result reported second-hand. Neither is this
+        pass checking T3, and CHECKED_CLEAN on somebody else's evidence is the
+        same category error one level along. The observed count travels in the
+        reason so nothing is lost.
+        """
+        return not_checked(
+            f"this pass does not compute the dns-resolved tier - the Z4 nslookup collector "
+            f"(drydocs_lineage.extractors.lb_resolution) writes it; {self.matched_dns_resolved} "
+            f"such edge(s) are present in this graph, none of them from this run",
+        )
+
     def as_dict(self) -> dict:
         return {
             "total_hosts": self.total_hosts,
             "null_nodeid": self.null_nodeid,
             "matched_exact": self.matched_exact,
             "matched_normalized": self.matched_normalized,
-            "matched_dns_resolved": self.matched_dns_resolved,
+            # LOAD12 / ADR 0021 D5 - renders follow the type. The summary and the
+            # :JobRun are both SURFACES, and a surface must not show a
+            # not-checked result as 0. The int is still reachable on the
+            # dataclass for the arithmetic; what a reader sees is the sentence.
+            "matched_dns_resolved": self.dns_resolved_outcome().render(),
             "unmatched": self.unmatched,
             "ambiguous_short_name": self.ambiguous_short_name,
             "reconciles": self.reconciles(),
