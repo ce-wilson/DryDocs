@@ -44,7 +44,6 @@ job-run freshness, last-success time, current health, observation windows. SOSA/
 for that. It is the bridge from the static knowledge graph (layers 1–3) to the context graph
 (layer 4). It **layers on top of PROV** — `ControlMJob` / `ControlMFolder` keep their PROV types
 and *additionally* play `sosa:FeatureOfInterest` — so nothing in the adopted model changes.
-Local mirror: `../../sdw-sosa-ssn`.
 
 ## Rule for agents
 Map to the **most precise valid term**, and record the mapping in `relationship_vocabulary.yaml`

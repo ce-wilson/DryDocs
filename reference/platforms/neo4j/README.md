@@ -26,7 +26,7 @@ The `neo4j-skills` plugin is the authoritative, version-current reference. Pick 
 - https://github.com/neo4j/neo4j
 - https://github.com/neo4j/neo4j-graphrag-python
 - https://github.com/neo4j/graph-data-science
-- https://github.com/neo4j-labs/llm-graph-builder  (mirrored locally at `../../../llm-graph-builder`)
+- https://github.com/neo4j-labs/llm-graph-builder
 
 ## DryDocs-specific Neo4j facts
 - Server: Neo4j 5.x with **APOC** (loaders use `apoc.cypher.runMany`). Target 2025.x/2026.x.

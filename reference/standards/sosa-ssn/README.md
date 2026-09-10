@@ -1,7 +1,7 @@
 # SOSA / SSN — the observation & temporal standard (context-graph layer)
 
 **Source:** W3C Spatio-Temporal Data on the Web Working Group — *Semantic Sensor Network* /
-*Sensor, Observation, Sample, and Actuator* ontologies. Local mirror: `../../../sdw-sosa-ssn`
+*Sensor, Observation, Sample, and Actuator* ontologies.
 (the `ssn/` and `ogcapi-sosa/` trees). IRI base: `http://www.w3.org/ns/sosa/`.
 
 ## Why DryDocs uses it

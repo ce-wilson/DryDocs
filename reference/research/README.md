@@ -12,7 +12,7 @@ matters"; do not paste copyrighted full texts.
 | Why context matters (2 of 3) | [Neo4j: Why graphs, knowledge graphs & context graphs matter](https://neo4j.com/blog/graph-database/2-of-3-why-graphs-knowledge-graphs-and-context-graphs-matter-to-customers/) | defines the **context graph** (layer 4) — "what matters right now" |
 | The graph ecosystem (3 of 3) | [Neo4j: The graph ecosystem — connected context for enterprise AI](https://neo4j.com/blog/graph-database/3-of-3-the-graph-ecosystem-bringing-connected-context-to-enterprise-ai/) | connected-context architecture; positions the KG as middleware to AI |
 | Provenance | [W3C PROV-O Primer](https://www.w3.org/TR/prov-primer/) · [PROV-O](https://www.w3.org/TR/prov-o/) | the 9-row decision matrix (`reference/standards/prov-o/`) |
-| Sensor / observation / time | [W3C SSN/SOSA](https://www.w3.org/TR/vocab-ssn/) (mirror: `../../../sdw-sosa-ssn`) | the temporal context layer (`reference/standards/sosa-ssn/`) |
+| Sensor / observation / time | [W3C SSN/SOSA](https://www.w3.org/TR/vocab-ssn/) | the temporal context layer (`reference/standards/sosa-ssn/`) |
 | Org structure | [W3C ORG ontology](https://www.w3.org/TR/vocab-org/) | Membership/Role/OrgUnit for SEAL + LOB→Product→Team |
 | Agent memory on graphs | [Neo4j Agent Memory (POLE+O)](https://neo4j.com/labs/) — see `neo4j-skills:neo4j-agent-memory-skill` | context-graph retrieval pattern for layer 4 |
 | Semantic layer from a warehouse | [Neo4j: Build a Semantic Layer from GCP with NeoCarta](https://neo4j.com/blog/genai/build-a-semantic-layer-from-gcp-with-neocarta/) | Neo4j Labs build of exactly our data-catalog layer — crosswalk below |
