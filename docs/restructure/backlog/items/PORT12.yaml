@@ -1,0 +1,19 @@
+id: PORT12
+epic: release-infrastructure
+title: "A commit split across two dispositions ports as a broken half - a canonical-producer caller crosses on its own while the core method it needs waits on a hand-merge, and nothing declares that the two must travel together"
+type: task
+module: drydocs-port
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: in_progress
+depends_on: []
+inputs:
+- PORT-MANIFEST.yaml
+- drydocs/port/port_completeness.py
+- tests/unit/test_port_reconcile_guards.py
+acceptance: |
+  PLACEHOLDER - body follows the stub push (mint rule I6).
+notes: |
+  Stub minted 2026-09-10 (Lane A, desktop; pen backlog). Body in the next commit.
