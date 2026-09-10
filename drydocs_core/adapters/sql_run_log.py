@@ -45,7 +45,7 @@ import time
 from collections.abc import Mapping, Sequence
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import IO, Any
 
 from drydocs_core.run_log import caller_stamp, claim_log_path
 
@@ -142,8 +142,17 @@ class SqlRunLog:
         self.target = target
         self.user = user
         self.path: Path | None = None
-        self._fh = None
-        self._csv = None
+        #: CORE16, the THIRD sibling of the same defect and the one the item did
+        #: not list. `self.path` above already declares the lifecycle correctly;
+        #: these two did not, so mypy inferred `None` and the assignment in
+        #: `open()` was an error rather than a narrowing. It carried no
+        #: `type: ignore`, which is why nobody had counted it - the escape is
+        #: what makes such a site greppable, and an unescaped one is invisible
+        #: until a checker runs. Same lifecycle as the other two: None, then a
+        #: handle, then None again, with `if self._fh is None` guards already
+        #: written for exactly that.
+        self._fh: IO[str] | None = None
+        self._csv: Any | None = None
         self._rows = 0
         self._started = time.monotonic()
 

@@ -7,7 +7,7 @@ phase: 6
 agent: main
 model: haiku
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs_core/adapters/csv_adapter.py
@@ -18,3 +18,34 @@ acceptance: |
   matches the unconnected-then-connected lifecycle. mypy and the suite green.
 notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). core-2026-09-07.md candidate 6 (T3), "trivial; good first item".
+
+  CLOSED 2026-09-10 (Lane B, laptop, wip/core16-laptop, BASED ON MAIN - the adapters are disjoint
+  from both the neo4j_client.py stack and CORE15's run_log.py, so this merges independently).
+  Venue (J18): offline - mypy and the unit suite, no Oracle connection needed or used.
+
+  THE THREE ESCAPES ARE GONE and the declared types now match the lifecycle each handle actually
+  has: None before `__enter__`, a handle in between, None again after `__exit__`. That lifecycle
+  was never in doubt - `rows()` in both adapters already raises "must be used as a context manager"
+  when the handle is None - so the old `# type: ignore[assignment]` was suppressing the checker on
+  the one line where the truth showed. The wrong half was silenced.
+
+  A FOURTH SITE, SAME DEFECT, AND IT IS WHY THE COUNT WAS THREE. `adapters/sql_run_log.py:145`
+  had `self._fh = None` with NO escape, so mypy inferred `None` and flagged the assignment in
+  `open()`. It carried no `type: ignore`, which is exactly why nobody had counted it: an escape is
+  what makes a site greppable, and an unescaped one is invisible until a checker runs. The item's
+  own acceptance instrument (mypy) is what surfaced it. Its sibling `self.path: Path | None` two
+  lines above was already declared correctly, so the file disagreed with itself.
+
+  MEASURED: `mypy drydocs_core/` went 49 -> 48 errors, and the three touched files report
+  "Success: no issues found". The remaining 48 are pre-existing and unrelated (10 of them a
+  `**kwargs` shape in adapters/controlm/api.py) - the repo is not mypy-clean overall, so
+  "mypy green" in the acceptance is read as green on the files this item touches, which they are.
+  Full suite 4043 passed / 0 failed before this note; both ruff gates clean.
+
+  ONE TYPING CHOICE WORTH THE NEXT READER'S ATTENTION: `_conn` and `_cursor` in the Oracle adapter
+  are `Any | None`, not the real `oracledb` types. `oracledb` is a LAZY import - the module
+  docstring and `__enter__` both say importing this module must not require the driver - so its
+  types are not available at annotation time, and a string annotation would only move the problem
+  to the checker's import. `| None` is the half that was being silenced and the half that is true
+  for most of the object's life; that is what this item was about. Precise driver types would need
+  the import made unconditional, which is a different decision with a real cost.
