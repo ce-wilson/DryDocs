@@ -35,6 +35,8 @@ from graph_qa import tier2 as t2  # noqa: E402
 from graph_qa.providers import LlmReply, LlmUsage  # noqa: E402
 from graph_qa.task_graph import TaskGraph  # noqa: E402
 
+from tests.source_scan import absent, source_text, without_prose  # noqa: E402
+
 TASK_GRAPH_SRC = REPO_ROOT / "agents" / "graph_qa" / "task_graph.py"
 
 
@@ -195,11 +197,28 @@ def test_the_task_graph_module_has_nothing_to_persist_with() -> None:
     persist this" is not a control. If someone later imports a driver or writes
     a MERGE here, this fails, and re-proposing persistence is a NEW gate.
     """
-    src = TASK_GRAPH_SRC.read_text(encoding="utf-8")
-    code = "\n".join(line for line in src.splitlines() if not line.lstrip().startswith("#"))
-    body = code.split('"""', 2)[-1]  # drop the module docstring, which NAMES the databases
-    for forbidden in ("neo4j", "driver", "session(", "MERGE", "CREATE ", "ddcontext", "ddlineage"):
-        assert forbidden not in body, f"task_graph.py must not reference {forbidden!r}"
+    sources = {str(TASK_GRAPH_SRC): source_text(TASK_GRAPH_SRC)}
+    # GRAPH4: the two lines that stood here hand-rolled a comment filter and
+    # a docstring split - without_prose is exactly both, and absent() adds
+    # the mutation probe these seven absence scans never had.
+    controls = {
+        "neo4j": "import neo4j",
+        "driver": "driver = GraphDatabase.driver(uri)",
+        # a complete statement: without_prose parses its control
+        "session(": "with driver.session() as s:\n    pass\n",
+        "MERGE": 'client.run("MERGE (n:Task) RETURN n")',
+        "CREATE ": 'client.run("CREATE (n:Task) RETURN n")',
+        "ddcontext": 'client.run("USE ddcontext MATCH (n) RETURN n")',
+        "ddlineage": 'client.run("USE ddlineage MATCH (n) RETURN n")',
+    }
+    for forbidden, control in controls.items():
+        absent(
+            forbidden,
+            sources,
+            positive_control=control,
+            stripper=without_prose,
+            because="task_graph.py is in-process only (R1 gate ruling A)",
+        )
 
 
 def test_the_loop_never_reaches_a_writer(monkeypatch: pytest.MonkeyPatch) -> None:

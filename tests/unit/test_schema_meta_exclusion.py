@@ -24,6 +24,7 @@ import re
 from pathlib import Path
 
 from drydocs_api.query_specs import QUERY_SPECS
+from tests.source_scan import without_prose
 
 REPO = Path(__file__).resolve().parents[2]
 SCHEMA_GRAPH = REPO / "drydocs_core" / "schema" / "schema_graph.cypher"
@@ -123,6 +124,6 @@ def test_loader_guard_probes_exclude_exemplars() -> None:
     from drydocs.loaders import batch_port_orchestrator, bmc_docs, doc_traceability
 
     for module in (batch_port_orchestrator, bmc_docs, doc_traceability):
-        source = inspect.getsource(module)
+        source = without_prose(inspect.getsource(module))
         assert ":SchemaMeta" in source, module.__name__
         assert "IS NOT NULL" in source, module.__name__

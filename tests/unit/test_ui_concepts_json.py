@@ -22,6 +22,8 @@ from pathlib import Path
 
 import pytest
 
+from tests.source_scan import source_text, without_prose
+
 yaml = pytest.importorskip("yaml", reason="PyYAML not installed")
 
 REPO = Path(__file__).resolve().parent.parent.parent
@@ -109,6 +111,6 @@ def test_the_render_step_rides_the_board_run():
     """The J20 lesson: a generated artifact whose regeneration is not wired into
     the one command is one somebody forgets, and the guard above then fails for
     a reason nobody caused."""
-    board = (REPO / "scripts" / "render_board.py").read_text(encoding="utf-8")
+    board = without_prose(source_text(REPO / "scripts" / "render_board.py"))
     assert "render_ui_concepts" in board
     assert "render_ui_concepts.main()" in board

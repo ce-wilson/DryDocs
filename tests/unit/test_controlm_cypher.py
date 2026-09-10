@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 from drydocs_core.cypher_split import strip_comments
+from tests.source_scan import source_text, without_prose
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 CYPHER_DIR = ROOT / "drydocs" / "loaders" / "cypher"
@@ -140,7 +141,7 @@ def test_ingest_chain_order_is_enforced() -> None:
     # The derived RUNS_ON resolution pass runs after ALL staged loads —
     # it reads the graph, not staging, so it sits after the stage loop.
     # S8: ingest-controlm lives in the ingest command module, not the root
-    cli_src = (ROOT / "drydocs" / "cli_ingest.py").read_text(encoding="utf-8")
+    cli_src = without_prose(source_text(ROOT / "drydocs" / "cli_ingest.py"))
     ingest = cli_src[cli_src.index("def ingest_controlm") :]
     assert ingest.index("runs_on_resolution") > ingest.index("for stage_name, cls,")
 
@@ -317,7 +318,7 @@ def test_hosts_sql_uses_its_own_scope_binds() -> None:
     # the folder-grained quartet does not apply at this grain (header comment
     # explains why — only code lines count here)
     assert ":folder_filter" not in code
-    cli_src = (ROOT / "drydocs" / "cli_ingest.py").read_text(encoding="utf-8")  # S8
+    cli_src = without_prose(source_text(ROOT / "drydocs" / "cli_ingest.py"))  # S8
     assert '"grpname_filter": None' in cli_src
 
 
@@ -675,6 +676,6 @@ def test_data_center_scoped_chain_is_a_partial_extract() -> None:
     mark pass (D7 extended by G115): marking the other data centers removed
     is the source-outage-looks-like-deletion trap. Pinned on the command
     source the same way the runs_on ordering pin reads it."""
-    cli_src = (ROOT / "drydocs" / "cli_ingest.py").read_text(encoding="utf-8")
+    cli_src = without_prose(source_text(ROOT / "drydocs" / "cli_ingest.py"))
     ingest = cli_src[cli_src.index("def ingest_controlm") :]
     assert "full_extract=folder is None and data_center is None" in ingest

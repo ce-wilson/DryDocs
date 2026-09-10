@@ -81,7 +81,49 @@ notes: |
   | 19 | test_tier2.py:191 | forbidden driver/Cypher tokens in task_graph.py | CONVERT | it hand-rolls comment-stripping AND docstring-dropping in two lines — it is `without_prose` written out longhand |
   | 20 | test_ui_concepts_json.py:108 | `render_ui_concepts` + `.main()` in render_board.py | CONVERT | import and call |
 
-  **Totals: 16 CONVERT now · 1 DEFER (API7) · 2 KEEP · 1 DELETE.**
+  ### Eight more, found after the first table was pushed
+
+  A fifth instrument defect: `inspect.getsource(obj)` hands back Python source
+  with NO PATH IN SIGHT, so a path-based scanner is structurally blind to it.
+  Seven sites use it. And `test_controlm_cypher.py` holds a THIRD read of
+  `cli_ingest.py` (line 144) that asserts presence through `.index()` rather
+  than `in` — the same read, the same subject, so it is converted with the
+  other two.
+
+  | # | site | subject | verdict | reason |
+  |---|---|---|---|---|
+  | 21 | test_cmdline_staging.py:528 | `Neo4jClient` absent (getsource) | CONVERT | class name; absence, so it goes onto `absent()` with a control |
+  | 22 | test_constraint_drift.py:134 | `drops NOTHING` in the output | KEEP | it already says so itself: the DROP half goes through `absent()`, this half asserts the OUTPUT WORDING |
+  | 23 | test_constraint_drift.py:166 | `outlive data wipes`, `62 constraints`, `a human checks` | KEEP | the operator-facing warning text — prose by definition |
+  | 24 | test_controlm_cypher.py:144 | the runs_on ordering, via `.index()` | CONVERT | third read of cli_ingest.py; `.index()` is a substring lookup wearing a different hat |
+  | 25 | test_env_refs_migration.py:213 | the `G128` RATIONALE recorded in the source | KEEP | it asserts a COMMENT survives; `without_prose` would erase its subject |
+  | 26 | test_schema_meta_exclusion.py:117 | `:SchemaMeta`, `IS NOT NULL` (getsource) | CONVERT | Cypher in literals — `without_prose` |
+  | 27 | test_source_labels.py:57 | the comment STATING the label collision | KEEP | the test name says it: the subject is the statement on the enum |
+  | 28 | test_standard_selection.py:312 | `open(`, `Path(`, `read_text` … absent | CONVERT | code constructs; five absence scans, five controls |
+
+  **Totals over 24 files / 28 sites: 20 CONVERT · 1 DEFER (API7) · 6 KEEP · 1 DELETE.**
+
+  ## What the conversion itself taught (measured, not predicted)
+
+  1. **A positive control is PARSED.** `absent(..., stripper=without_prose)`
+     runs the control through `without_prose`, which calls `ast.parse`, so the
+     control must be a COMPLETE Python statement. Three conversions failed on
+     this at once — bare Cypher, a `class X(Y):` header with no body, a `with`
+     with no body — and the failures read as `IndentationError` from inside
+     `ast.parse`, which is not obviously "your control is malformed".
+     `code_only` tokenizes and tolerates fragments; `without_prose` does not.
+     This deserves a line in `absent`'s docstring, which Lane A owns.
+  2. **A false positive in an existing guard.**
+     `test_every_absence_scan_over_a_stripper_goes_through_the_helper` collects
+     stripper-bound names across the WHOLE module, not per function. Naming a
+     converted variable `text` in one test made an unrelated `text` — a
+     `.cypher` raw read two functions above — report as an unguarded absence
+     scan. Worked around here by not reusing the name, and RECORDED rather than
+     fixed: the guard is Lane A's to widen, and the fix is scope-aware binding.
+  3. **`test_no_test_module_defines_its_own_python_source_stripper` only looks
+     for a `def` named `code_only`.** `test_tier2.py` hand-rolled a stripper in
+     two inline lines and was invisible to it. Named as a seam, deliberately not
+     widened here — that is a decision, not a patch.
 
   ## The ruling the conversion turned on
 

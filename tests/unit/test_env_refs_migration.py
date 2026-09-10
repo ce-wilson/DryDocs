@@ -202,7 +202,7 @@ def test_the_declared_variable_guard_still_reads_importable_objects() -> None:
     classes' ``env_prefix`` plus their fields — because no grep can see
     ``NEO4J_URI`` when the prefix composes it (J37). Assert that shape survives.
     """
-    source = (REPO / "tests" / "unit" / "test_source_bindings.py").read_text(encoding="utf-8")
+    source = without_prose(source_text(REPO / "tests" / "unit" / "test_source_bindings.py"))
     assert "test_every_variable_first_party_code_reads_is_declared" in source
     assert "env_prefix" in source and "model_fields" in source, (
         "the guard stopped reading the importable settings objects, which is the "

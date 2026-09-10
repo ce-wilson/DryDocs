@@ -22,6 +22,7 @@ from drydocs.cmdline_staging import (
     resolve_job_detail,
 )
 from drydocs_lineage.extractors import ControlMXmlDefsExtractor
+from tests.source_scan import absent, without_prose
 
 _GUID = "12345678-1234-1234-1234-123456789abc"
 
@@ -544,5 +545,10 @@ def test_module_never_writes_the_graph():
     assert q.lstrip().startswith("MATCH")
     for verb in ("MERGE", "CREATE", "DELETE", "SET "):
         assert verb not in q
-    source = inspect.getsource(cmdline_staging)
-    assert "Neo4jClient" not in source  # duck-typed read seam only
+    absent(
+        "Neo4jClient",
+        {"drydocs.cmdline_staging": inspect.getsource(cmdline_staging)},
+        positive_control="client = Neo4jClient(uri, auth)",
+        stripper=without_prose,
+        because="the staging module would hold a graph client",
+    )  # duck-typed read seam only

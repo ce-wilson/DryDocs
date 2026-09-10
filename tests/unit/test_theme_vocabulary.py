@@ -31,6 +31,7 @@ from drydocs_core.orchestration.controlm.description_tokens import (
 )
 from drydocs_docmeta.connectors.base import RawPage
 from drydocs_docmeta.manifest import CaptureManifest
+from tests.source_scan import absent, source_text, without_prose
 
 SCHEME = load_concept_scheme()
 CCB = f"{LOB_PRODUCT_TEAM_SCHEME}#CCB"
@@ -194,6 +195,18 @@ def test_theme_fields_round_trip_and_pre_g77_manifests_read_as_unclassified(tmp_
 
 def test_zero_graph_writes():
     """The field, its validation and the split — no Cypher anywhere near it."""
-    for module in ("drydocs_core/ontology/concept_scheme.py", "drydocs_docmeta/manifest.py"):
-        text = Path(module).read_text(encoding="utf-8")
-        assert "MERGE" not in text and "CREATE" not in text, module
+    sources = {
+        module: source_text(Path(module))
+        for module in (
+            "drydocs_core/ontology/concept_scheme.py",
+            "drydocs_docmeta/manifest.py",
+        )
+    }
+    for verb in ("MERGE", "CREATE"):
+        absent(
+            verb,
+            sources,
+            positive_control=f'session.run("{verb} (n:Theme) RETURN n")',
+            stripper=without_prose,
+            because="the theme vocabulary would write the graph",
+        )

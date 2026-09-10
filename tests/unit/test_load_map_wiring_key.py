@@ -35,6 +35,7 @@ from pathlib import Path
 import yaml
 
 from drydocs_core.source_descriptors import SourceDescriptors
+from tests.source_scan import source_text, without_prose
 
 REPO = Path(__file__).resolve().parents[2]
 LOAD_MAP = REPO / "web" / "src" / "generated" / "load-map.json"
@@ -161,7 +162,7 @@ def test_screen_and_paper_use_the_same_labels() -> None:
     console never showed, and a reviewer's note could not re-attach.
     """
     ts = MODEL_TS.read_text(encoding="utf-8")
-    py = RENDERER.read_text(encoding="utf-8")
+    py = without_prose(source_text(RENDERER))
     for label in ("wired", "planned", "built, awaiting gate", "registered"):
         assert f"'{label}'" in ts or f'"{label}"' in ts, f"console lost the {label!r} label"
         assert f'"{label}"' in py, f"print renderer lost the {label!r} label"

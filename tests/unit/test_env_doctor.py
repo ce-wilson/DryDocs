@@ -98,7 +98,7 @@ def test_the_writer_never_takes_a_value_from_the_command_line() -> None:
     scrollback a screen share is showing. The check reads the parser's declared
     arguments rather than the help text, because help text reflows (J37).
     """
-    source = (REPO / "scripts" / "set_env_var.py").read_text(encoding="utf-8")
+    source = source_text(REPO / "scripts" / "set_env_var.py")
     tree = ast.parse(source)
     added: list[str] = []
     for node in ast.walk(tree):
@@ -115,7 +115,7 @@ def test_the_writer_never_takes_a_value_from_the_command_line() -> None:
         f"scripts/set_env_var.py declares a value-shaped argument: {added}. "
         "The value is read from a prompt (getpass when the declaration says secret)."
     )
-    assert "getpass" in source, "the secret path must use a no-echo prompt"
+    assert "getpass" in imported_modules(source), "the secret path must use a no-echo prompt"
 
 
 # ---------------------------------------------------------------------------

@@ -27,6 +27,8 @@ jsonschema = pytest.importorskip("jsonschema", reason="jsonschema not installed 
 
 from jsonschema import Draft202012Validator, ValidationError  # noqa: E402
 
+from tests.source_scan import imported_modules, source_text  # noqa: E402
+
 REPO = Path(__file__).resolve().parents[2]
 SCHEMAS = REPO / "config" / "schemas"
 
@@ -303,10 +305,13 @@ def test_schemas_validate_without_importing_drydocs_core(tmp_path: Path) -> None
 
 
 def test_this_module_itself_stays_core_free() -> None:
-    src = Path(__file__).read_text(encoding="utf-8")
-    body = src.split('"""', 2)[2]  # ignore the docstring's prose mentions
-    needle = "import " + "drydocs"  # split so this line does not match itself
-    assert needle not in body, "the schema guard must not depend on the package"
+    # GRAPH4: the split-so-this-line-does-not-match-itself trick and the
+    # hand-rolled docstring skip are both gone - imported_modules answers the
+    # question exactly, and cannot match the prose that explains it.
+    imports = imported_modules(source_text(Path(__file__)))
+    assert not [
+        m for m in imports if m == "drydocs" or m.startswith("drydocs")
+    ], "the schema guard must not depend on the package"
 
 
 # --------------------------------------------------------------------------- #

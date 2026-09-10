@@ -12,6 +12,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from tests.source_scan import absent, source_text, without_prose
+
 REPO = Path(__file__).resolve().parents[2]
 CYPHER_DIR = REPO / "drydocs" / "loaders" / "cypher"
 FOLDERS_CYPHER = CYPHER_DIR / "controlm_folders.cypher"
@@ -47,6 +49,19 @@ def test_folders_cypher_writes_envelope_not_raw_names() -> None:
 
 
 def test_manual_loads_reads_first_seen_at() -> None:
-    text = (REPO / "drydocs" / "loaders" / "manual_loads.py").read_text(encoding="utf-8")
-    assert "n.first_seen_at IS NOT NULL" in text
-    assert "n.created_at" not in text
+    path = REPO / "drydocs" / "loaders" / "manual_loads.py"
+    # NOT named `text`: test_source_scan's absence-scan guard collects
+    # stripper-bound names across the WHOLE module, so a `text` here makes the
+    # unrelated `text` in test_folders_cypher_writes_envelope_not_raw_names —
+    # a .cypher read, not a stripped one — report as an unguarded absence scan.
+    code = without_prose(source_text(path))
+    assert "n.first_seen_at IS NOT NULL" in code
+    absent(
+        "n.created_at",
+        {str(path): source_text(path)},
+        # A control goes through without_prose, which PARSES it, so it must be
+        # valid Python and not a bare Cypher fragment.
+        positive_control='query = "MATCH (n) WHERE n.created_at IS NOT NULL RETURN n"',
+        stripper=without_prose,
+        because="the manual-load path would read the retired timestamp",
+    )

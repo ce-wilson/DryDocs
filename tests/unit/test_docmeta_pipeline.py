@@ -23,6 +23,7 @@ from drydocs_docmeta.policy import (
     TooManyPagesError,
 )
 from drydocs_docmeta.tokenizer import METHOD_ESTIMATE, METHOD_EXACT, estimate_tokens
+from tests.source_scan import source_text, without_prose
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
@@ -222,7 +223,7 @@ def test_neither_number_is_a_literal_in_either_consumer():
         REPO_ROOT / "scripts" / "external_vendor_scrape.py",
         REPO_ROOT / "drydocs_docmeta" / "connectors" / "web.py",
     ):
-        body = path.read_text(encoding="utf-8")
+        body = without_prose(source_text(path))
         assert "CapturePolicy" in body, f"{path.name} does not read the capture policy"
 
 

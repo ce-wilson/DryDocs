@@ -320,4 +320,9 @@ def test_no_graph_write_guards_still_green_after_this_module() -> None:
     from drydocs_remediation import changes
 
     assert not hasattr(changes, "write_transaction")
-    assert "execute_write" not in open(changes.__file__, encoding="utf-8").read()
+    # GRAPH4: the raw `"execute_write" not in open(changes.__file__).read()`
+    # that stood here is DELETED, not converted. The guard imported above,
+    # test_no_write_transaction_markers, walks every *.py under
+    # drydocs_remediation by AST for execute_write, write_transaction AND
+    # begin_transaction - strictly stronger, and it cannot match the comment
+    # that explains the rule. Verified by reading it, not assumed.
