@@ -581,6 +581,49 @@ sources:
       instance. Leaving them to be re-derived per instance is how two instances
       end up with the same corpus at two different tiers.
 
+  - id: bmc-docs-controlm-parameters
+    classification: External            # public BMC documentation, same publication as the 9.0.20 sibling
+    source: "NOT YET CAPTURED — the payload is absent from every tree. On capture it lands at DRYDOCS_DATA_ROOT/vendor-docs/bmc-controlm-9.0.21-parameters/pages/, OUT of the repo tree, for the same reason the sibling's is: a verbatim vendor scrape is BMC's copyrighted words, not our summary."
+    source_url: "https://documents.bmc.com/supportu/9.0.21/help/Main_help/en-US/ (Parameters book; per-topic URLs land in the capture manifest)"
+    captured_at: not-yet-captured       # a STATE, not an invented date (clause d). The Q27 precedent makes registering before the payload legal; saying so is what keeps the asymmetry with the sibling readable
+    connector: web
+    manifest: ~                         # describes a run that has not happened; the capture writes it at DRYDOCS_DATA_ROOT/vendor-docs/bmc-controlm-9.0.21-parameters/capture-manifest.json
+    trust_default: VERBATIM             # a scrape is BMC's OWN words — unlike bmc-docs, which is our lossy paraphrase
+    capture_rung: unprobed              # G134: nothing captured, the ladder never walked. NOT rung 3 by inheritance from the sibling — that would claim a capture that has not run
+    tier: T1
+    curation: none                      # T1 ladder (ADR 0006 §4)
+    target_db: drydocs                  # G102 fold — the one content database
+    refresh: on-demand
+    taxonomy_path: technology/orchestration/control-m
+    graph_locator:                      # the Q13 loader writes corpus_id on :Document/:Chunk/:DocSection
+      match: corpus_id
+      value: bmc-docs-controlm-parameters
+    confirmed: false                    # a DECLARATION. No loader writes from this entry until a gate signs the doc-graph shape, and the flip is its own follow-up (the Q24 precedent), never this item
+    notes: >
+      THE VERSION-CORRECT TREE. The estate runs 9.0.21.300; the registered
+      sibling is 9.0.20 only because BMC trimmed the 9.0.21 help publication so
+      it carries no Utilities book. This row is the other half of that trade —
+      9.0.21's Parameters book, at the version actually deployed.
+
+      WHY IT IS WORTH REGISTERING TWICE OVER: it overlaps the hand-converted
+      external/orchestration/bmc-controlm/ corpus, so once captured it doubles
+      as a DRIFT CHECK of our GROUNDED paraphrase against vendor VERBATIM. The
+      two corpora describe the same subject at different trust levels, which is
+      exactly the comparison the trust axis exists to support.
+
+      REGISTERED BEFORE ITS PAYLOAD, deliberately (Q27's precedent). The scraper
+      lists this tree under `--list` but the Q23 run<->row join sits BEFORE the
+      TOC request, so without a row the tree was INERT rather than merely
+      unconvertible — `--dry-run` exited 2. This row is what makes it
+      capturable; NO CAPTURE IS AUTHORIZED BY IT. Whether to spend 9.0.21's page
+      budget against a third party is the operator's call at a later, explicit
+      step, and `captured_at` stays `not-yet-captured` until one runs.
+
+      CAPTURE_RUNG IS `unprobed` AND NOT THE SIBLING'S 3. The ladder has not
+      been walked for this tree, and inheriting the sibling's rung would record
+      a capture that never happened — the precise failure the field was added to
+      make visible (G134).
+
 
 retired:
   - id: bmc-controlm-utilities
