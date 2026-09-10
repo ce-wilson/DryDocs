@@ -18,3 +18,42 @@ acceptance: |
   the fallback to the :JobRun-scope item, not its replacement.
 notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). load-2026-09-08.md candidate 2 (L1-2). "Cheaper than 1 and strictly less good".
+
+  CLOSED 2026-09-10 (Lane B, laptop, wip/load9-laptop, BASED ON wip/load8-laptop - both write
+  drydocs/loaders/base.py. Merge LOAD8 first). Venue (J18): offline unit suite; the unwritable log
+  is injected by subclassing LoaderRunLog, so no filesystem state is needed. Full suite: 4052
+  passed, 1 failed, and that one is the roadmap guard inherited from LOAD8's close notes.
+
+  THE SECOND DECLARED INPUT WAS NOT WRITTEN, deliberately. drydocs_core/run_log.py is untouched:
+  CORE15 (this lane, wip/core15-laptop) already made every silent degradation in that module
+  audible, and the reason LOAD9 needs was already available in base.py, where the OSError is
+  caught. Leaving run_log.py alone also keeps this branch off CORE15's file, so those two merge in
+  any order - which is worth more than a tidier-looking diff.
+
+  A REASON, NOT A BOOLEAN, and that is the one design call here. `run_log_unavailable` carries
+  WHY: an OSError with its message when the log could not be opened, and "disabled for this run
+  (run_log=False)" when there is no log because someone asked for none. Both are worth saying and
+  they need different words - a boolean would have collapsed them into the same "no log", which is
+  the same collapse CORE14 undid for apoc_available on a bigger scale.
+
+  None MEANS A LOG WAS WRITTEN. If the field said something on the happy path it would be noise,
+  and a field that is noise stops being read - which is how the original silence would come back
+  wearing a different hat.
+
+  SET BEFORE THE WORK RUNS, so a load that RAISES still reports the missing log. That is the moment
+  an operator most wants to know the audit trail is absent, and it is the ordering a later reader
+  is most likely to "simplify" by moving the assignment next to the successful return.
+
+  TWO SURFACES, because "the summary line every load prints" is two things in this tree: the
+  `run-loader` verb prints `summary.as_dict()`, which now carries the field, and the
+  ingest-controlm chain prints its own per-stage line, which now appends "no run log written:
+  <reason>" in yellow - yellow because the load SUCCEEDED, and this is a gap in the record rather
+  than a failure of the work.
+
+  MEASURED BOTH WAYS: 4 of the 5 new tests fail against the LOAD8 base. The fifth is the control
+  that a load whose run log failed still completes - the contract this item must not break - and it
+  passes either way, which is exactly what makes it a control.
+
+  Explicitly the FALLBACK to LOAD8, not its replacement, as the acceptance says: LOAD8 puts the
+  scope on the :JobRun so a sample cannot pass for a population; this says, in the line the
+  operator reads, when there is no per-run log at all.

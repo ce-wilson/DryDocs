@@ -147,6 +147,18 @@ class LoadSummary:
     unresolved_parents: int = 0
     rejects: list[dict] = field(default_factory=list)
     status: str = "STARTED"
+    #: LOAD9. Why this run has NO per-run log, or None when it has one. A run log
+    #: is best-effort by contract — the audit trail is never the reason a load
+    #: fails — and that contract was being used to justify saying nothing at all,
+    #: so a load whose audit trail was missing looked exactly like one whose
+    #: audit trail was fine. Non-fatal and silent are different things.
+    #:
+    #: None means A LOG WAS WRITTEN. Deliberately disabling the log
+    #: (`run_log=False`) also lands here, with that as its reason, because "there
+    #: is no log and it was a choice" and "there is no log and something broke"
+    #: are both things the operator wants said — they simply need different
+    #: words, which is why this is a REASON and not a boolean.
+    run_log_unavailable: str | None = None
 
     def as_dict(self) -> dict:
         return {
@@ -162,6 +174,7 @@ class LoadSummary:
             "edges_retracted": self.edges_retracted,
             "unresolved_parents": self.unresolved_parents,
             "status": self.status,
+            "run_log_unavailable": self.run_log_unavailable,
         }
 
 
@@ -301,6 +314,7 @@ class BaseLoader:
         full_extract: bool = False,
         run_log: bool = True,
         run_meta: Mapping[str, str] | None = None,
+        scope_meta: Mapping[str, object] | None = None,
     ) -> None:
         if not self.cypher_path:
             raise NotImplementedError(f"{type(self).__name__} must set cypher_path")
@@ -321,6 +335,15 @@ class BaseLoader:
         # _open_run_log puts it in the disk log's header meta block, so the two
         # can never disagree about how the input was acquired.
         self.run_meta: dict[str, str] = dict(run_meta or {})
+        # LOAD8: what this run LOOKED AT, as opposed to what it found. Built by
+        # `drydocs.cli_shared.scope_run_meta` from the extract's scope binds, so
+        # the bind vocabulary stays with the binds and this class stays ignorant
+        # of it. The default is NOT "no marker": `_open_run` writes `scoped:
+        # false` for an unscoped run, because absent reading as full is the
+        # defect the item exists to close.
+        self.scope_meta: dict[str, object] = dict(scope_meta or {})
+        # LOAD9: set by `_open_run_log`; copied onto the summary in `load()`.
+        self._run_log_unavailable: str | None = None
         self._scope_values: set = set()  # distinct sweep_scope_property values seen
 
     # ---- entrypoint ------------------------------------------------------
@@ -332,6 +355,9 @@ class BaseLoader:
             started_at=self.loaded_at,
         )
         run_log = self._open_run_log()
+        # LOAD9: whatever `_open_run_log` decided, the summary carries it — set
+        # BEFORE `_load` runs so a load that raises still reports it.
+        summary.run_log_unavailable = self._run_log_unavailable
         error: BaseException | None = None
         try:
             return self._load(summary, run_log)
@@ -398,6 +424,7 @@ class BaseLoader:
         the reason a load fails.
         """
         if not self.run_log:
+            self._run_log_unavailable = "disabled for this run (run_log=False)"
             return None
         source_detail = getattr(self.adapter, "path", None)
         source = f"{self.source_label} ({source_detail or type(self.adapter).__name__})"
@@ -417,6 +444,11 @@ class BaseLoader:
         try:
             path = log.open()
         except OSError as exc:
+            # LOAD9: the WARNING stays, and the reason now also travels on the
+            # summary. A warning goes to a log stream the operator may not be
+            # watching; the summary line is the thing they actually read at the
+            # end of a load, and a missing audit trail has to be visible there.
+            self._run_log_unavailable = f"{type(exc).__name__}: {exc}"
             LOGGER.warning(
                 "Loader %s: run log unavailable (%s) — continuing without",
                 self.name,
@@ -585,6 +617,26 @@ class BaseLoader:
         )
         return rows[0].get("unresolved", 0) if rows else 0
 
+    def _run_properties(self) -> dict[str, object]:
+        """The free-form properties `_open_run` writes onto the :JobRun.
+
+        LOAD8: the acquisition meta (G121) plus the scope block, and the scope
+        block is ALWAYS present. `scoped: false` is written for a full load
+        rather than left out, because a reader cannot tell an unscoped run from
+        an older run node that predates this marker if the only signal is
+        absence - and "absent means full" is exactly the assumption that let a
+        sample pass for the population.
+
+        Never argv, never `caller_stamp()`: argv carries `--run-as <FID>`, and a
+        run-node property is one QuerySpec export away from a CSV that leaves
+        the machine (CLAUDE.md section 3). The identity-bearing binds are
+        recorded as booleans by `scope_run_meta`; this method only merges.
+        """
+        props: dict[str, object] = dict(self.run_meta)
+        props.update(self.scope_meta)
+        props.setdefault("scoped", False)
+        return props
+
     def _open_run(self) -> None:
         self.client.run(
             """
@@ -600,7 +652,7 @@ class BaseLoader:
             loader=self.name,
             source_label=self.source_label,
             loaded_at=self.loaded_at,
-            run_meta=self.run_meta,
+            run_meta=self._run_properties(),
         )
 
     def _close_run(self, *, status: str, summary: LoadSummary) -> None:
