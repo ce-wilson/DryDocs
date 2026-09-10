@@ -191,4 +191,9 @@ PROBES: tuple[str, ...] = (
     # rather than an extension of the first, because the two ask different
     # questions and one having run says nothing about the other.
     "drydocs.docs_coverage.class_probe",
+    # REM3 (2026-09-10): the conformance detector's verdict. An empty findings
+    # list used to read as "this folder set conforms" when it meant "no
+    # violations among the 17 of 45 registry rules that have detectors". A probe
+    # because the answer depends on whether internal/ is in this checkout at all.
+    "drydocs_remediation.detect.conformance_outcome",
 )

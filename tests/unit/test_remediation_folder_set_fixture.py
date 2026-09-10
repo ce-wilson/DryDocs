@@ -31,11 +31,22 @@ import json
 import re
 from pathlib import Path
 
+import pytest
 from typer.testing import CliRunner
 
 from drydocs import cli as cli_mod
 from drydocs_lineage.extractors import ControlMXmlDefsExtractor
-from drydocs_remediation.detect import CONFORMANCE_RULE_IDS, DOT_SMUGGLING_RULE_ID, detect_all
+from drydocs_remediation.detect import (
+    CONFORMANCE_RULE_IDS,
+    DOT_SMUGGLING_RULE_ID,
+    EVALUATED_RULE_IDS,
+    conformance_outcome,
+    detect_all,
+    detect_conformance,
+    detect_findings,
+    registry_rule_ids,
+)
+from drydocs_remediation.formats import DefinitionSet
 from drydocs_remediation.profile import profile
 from drydocs_remediation.xml_bridge import to_definition_set
 
@@ -87,6 +98,12 @@ def test_the_artifact_has_the_two_halves_the_runbook_describes() -> None:
         "invocations",
         "substitution_slots",
         "findings",
+        # REM3: the denominator for `findings`. It is listed HERE, in the guard
+        # that names the frame's sections rather than deriving them, for the
+        # reason the comment above gives — deleting it must fail this test
+        # rather than silently returning the profile to a findings list with no
+        # coverage, which is the state REM3 was written to end.
+        "rule_coverage",
     ]
     assert json.loads(json.dumps(blob)), "the transport is a JSON artifact"
 
@@ -124,7 +141,9 @@ def test_the_fixture_carries_a_case_for_every_rule_the_detectors_implement() -> 
     """
     raised = {
         f.rule_id
-        for f in detect_all(to_definition_set(ControlMXmlDefsExtractor().extract(FIXTURE_DIR)))
+        for f in detect_all(
+            to_definition_set(ControlMXmlDefsExtractor().extract(FIXTURE_DIR))
+        ).findings
     }
     expected = set(CONFORMANCE_RULE_IDS) | {DOT_SMUGGLING_RULE_ID}
     assert expected <= raised, (
@@ -141,7 +160,9 @@ def test_the_header_comment_names_every_rule_the_fixture_raises() -> None:
     header = EXPORT.read_text(encoding="utf-8").split("-->", 1)[0]
     raised = {
         f.rule_id
-        for f in detect_all(to_definition_set(ControlMXmlDefsExtractor().extract(FIXTURE_DIR)))
+        for f in detect_all(
+            to_definition_set(ControlMXmlDefsExtractor().extract(FIXTURE_DIR))
+        ).findings
     }
     unnamed = sorted(rule for rule in raised if rule not in header)
     assert not unnamed, (
@@ -153,7 +174,9 @@ def test_the_header_comment_names_every_rule_the_fixture_raises() -> None:
 def test_one_job_is_compliant_so_the_fixture_is_not_all_defects() -> None:
     """A set where every job is broken teaches nothing about what right looks
     like. JOB0130 is the CTL watcher that cats the file it watched, correctly."""
-    findings = detect_all(to_definition_set(ControlMXmlDefsExtractor().extract(FIXTURE_DIR)))
+    findings = detect_all(
+        to_definition_set(ControlMXmlDefsExtractor().extract(FIXTURE_DIR))
+    ).findings
     assert not [f for f in findings if f.target.startswith("JOB0130_DEMO_FEED_CTL")]
 
 
@@ -191,3 +214,105 @@ def test_the_verb_exits_zero_and_writes_the_artifact(tmp_path: Path) -> None:
     )
     assert result.exit_code == 0, result.output
     assert json.loads(out.read_text(encoding="utf-8"))["shape"]["jobs"] == 12
+
+
+# ---- REM3: the denominator -------------------------------------------------
+#
+# `detect_all` returned a bare list, so an EMPTY list read as "this folder set
+# conforms" when it meant "no violations among the rules that have detectors" -
+# 17 of the registry's 45. Nothing in the answer said 17, or 45, or which. The
+# module's own equivalence.py had the better standard already (proven /
+# diverged / NOT PROVEN, ADR 0021's precedent 1).
+
+
+def _empty_set() -> DefinitionSet:
+    return DefinitionSet(folders=[], jobs=[])
+
+
+def test_a_clean_result_states_what_it_checked() -> None:
+    """The item in one assertion: zero findings no longer says 'conforms'."""
+    result = detect_all(_empty_set())
+    assert result.findings == ()
+    assert result.outcome.is_clean
+    rendered = result.outcome.render()
+    assert str(len(result.evaluated_rule_ids)) in rendered
+    assert str(result.registry_size) in rendered
+    assert "of" in rendered, f"the denominator is not in the operator line: {rendered!r}"
+
+
+def test_the_numerator_is_derived_from_the_declarations_not_restated() -> None:
+    """A rule added to either declaration must appear in the coverage without
+    anyone remembering to update a second list."""
+    assert EVALUATED_RULE_IDS == (DOT_SMUGGLING_RULE_ID, *CONFORMANCE_RULE_IDS)
+    assert detect_all(_empty_set()).evaluated_rule_ids == EVALUATED_RULE_IDS
+
+
+def test_the_not_evaluated_ids_are_the_registrys_complement() -> None:
+    declared = registry_rule_ids()
+    if declared is None:
+        pytest.skip(
+            "the standards registry lives under internal/ and is absent from this checkout - "
+            "the complement cannot be computed here, which is the case the None branch covers"
+        )
+    result = detect_all(_empty_set())
+    assert set(result.evaluated_rule_ids) | set(result.not_evaluated_rule_ids) == set(declared)
+    assert not set(result.evaluated_rule_ids) & set(result.not_evaluated_rule_ids)
+    assert result.registry_size == len(declared)
+
+
+def test_an_unreadable_registry_reports_no_denominator_rather_than_inventing_one(
+    monkeypatch,
+) -> None:
+    """internal/ is Internal-classified and absent from any checkout built behind
+    the publish boundary. The honest answer there is `None` - NOT 45, which would
+    be this module asserting a count it could not see, and not zero, which would
+    say every rule is implemented."""
+    monkeypatch.setattr("drydocs_remediation.detect.registry_rule_ids", lambda: None)
+    result = detect_all(_empty_set())
+    assert result.registry_size is None
+    assert result.not_evaluated_rule_ids is None, "None means UNKNOWN, not 'nothing missing'"
+    assert result.evaluated_rule_ids  # the numerator is always known
+    assert "unreadable" in result.outcome.render()
+
+
+def test_a_missing_registry_file_is_read_as_unreadable(tmp_path) -> None:
+    assert registry_rule_ids(tmp_path / "not-here.md") is None
+
+
+def test_findings_make_it_a_findings_outcome_with_the_same_denominator() -> None:
+    """Three states, and the denominator rides on all of them - a findings list
+    without one hides its own coverage exactly as a clean one does."""
+    definitions = to_definition_set(ControlMXmlDefsExtractor().extract(FIXTURE_DIR))
+    result = detect_all(definitions)
+    assert result.findings, "the fixture is supposed to raise findings"
+    assert not result.outcome.is_clean and not result.outcome.is_not_checked
+    assert result.outcome.count == len(result.findings)
+    assert result.outcome.size == len(result.evaluated_rule_ids)
+    assert str(result.registry_size) in result.outcome.render()
+
+
+def test_the_findings_themselves_are_unchanged() -> None:
+    """The control. REM3 adds coverage; it must not alter what was detected."""
+    definitions = to_definition_set(ControlMXmlDefsExtractor().extract(FIXTURE_DIR))
+    result = detect_all(definitions)
+    expected = detect_findings(definitions) + detect_conformance(definitions)
+    assert list(result.findings) == expected
+    assert len(result) == len(expected)
+
+
+def test_the_verdict_cannot_be_read_as_a_boolean() -> None:
+    with pytest.raises(TypeError, match="three states"):
+        bool(conformance_outcome(_empty_set()))
+
+
+def test_the_profile_carries_the_coverage_beside_the_findings() -> None:
+    """profile.py's one caller carries BOTH - the acceptance's second half."""
+    blob = profile(to_definition_set(ControlMXmlDefsExtractor().extract(FIXTURE_DIR))).as_dict()
+    coverage = blob["rule_coverage"]
+    assert coverage["evaluated_rule_ids"] == list(EVALUATED_RULE_IDS)
+    assert coverage["registry_size"] == detect_all(_empty_set()).registry_size
+    assert (
+        str(len(blob["findings"]))
+        in profile(to_definition_set(ControlMXmlDefsExtractor().extract(FIXTURE_DIR))).summary()
+    )
+    assert json.loads(json.dumps(blob)), "the coverage block must stay JSON-transportable"

@@ -44,6 +44,9 @@ _PROBE = "%%__DRYDOCS_PROBE__"
 _PROBE_NAME = "__DRYDOCS_PROBE__"
 
 
+# ADR 0021 precedent 1 (cited, not rewritten - D4): this report's three-valued
+# proven / diverged / NOT PROVEN is the shape drydocs_core.check_outcome now
+# carries repo-wide. "No evidence is never evidence" was decided here first.
 @dataclass
 class EquivalenceReport:
     """Outcome of the offline proof; attach to the Jira handoff.
