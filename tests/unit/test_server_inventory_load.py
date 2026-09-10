@@ -159,3 +159,59 @@ def test_coverage_reconciles_and_reports_the_ambiguity_guard() -> None:
     assert cov.as_dict()["ambiguous_short_name"] == 2
     cov.unmatched = 2  # a host went missing from the census
     assert not cov.reconciles()
+
+
+# ---- LOAD12: the tier with no writer stops reporting a bare zero ------------
+#
+# `matched_dns_resolved: 0` sat beside two tiers this pass really does compute,
+# in this pass's own summary, so the zero read as "T3 ran and matched nothing".
+# T3 is NOT BUILT here - the module docstring says so and the Z4 nslookup
+# collector writes it - so the number looked like a measurement and was a
+# placeholder.
+
+
+def test_the_dns_tier_reports_not_checked_rather_than_zero() -> None:
+    coverage = ServerResolutionCoverage(total_hosts=10, matched_exact=7, unmatched=3)
+    outcome = coverage.dns_resolved_outcome()
+    assert outcome.is_not_checked
+    assert not outcome.is_clean
+    rendered = coverage.as_dict()["matched_dns_resolved"]
+    assert rendered.startswith("NOT CHECKED")
+    assert rendered != 0 and rendered != "0"
+
+
+def test_the_reason_names_who_does_write_the_tier() -> None:
+    """A not-checked that does not say who WOULD check sends the reader hunting.
+    The reason names the collector by module path."""
+    reason = ServerResolutionCoverage().dns_resolved_outcome().reason
+    assert "lb_resolution" in reason
+    assert "does not compute" in reason
+
+
+def test_it_is_still_not_checked_when_edges_exist() -> None:
+    """The case that decides the design. The count comes from edges ALREADY in
+    the graph, which this pass did not create and cannot vouch for - reporting
+    somebody else's evidence as this pass's clean result is the same category
+    error one step along. The number travels in the reason instead."""
+    coverage = ServerResolutionCoverage(total_hosts=10, matched_dns_resolved=4, unmatched=6)
+    outcome = coverage.dns_resolved_outcome()
+    assert outcome.is_not_checked
+    assert "4 such edge(s)" in outcome.reason
+
+
+def test_the_arithmetic_still_counts_the_tier() -> None:
+    """The int survives for `reconciles()`: a dns-resolved host written by Z4 is
+    a real host and must not fall out of the census. Rendering the tier as a
+    sentence must not quietly drop it from the sum."""
+    coverage = ServerResolutionCoverage(
+        total_hosts=10, matched_exact=3, matched_dns_resolved=4, unmatched=3
+    )
+    assert coverage.matched_dns_resolved == 4
+    assert coverage.reconciles() is True
+    # …and a census that does NOT add up still fails, so this is not vacuous
+    assert not ServerResolutionCoverage(total_hosts=10, matched_exact=1).reconciles()
+
+
+def test_the_verdict_cannot_be_read_as_a_boolean() -> None:
+    with pytest.raises(TypeError, match="three states"):
+        bool(ServerResolutionCoverage().dns_resolved_outcome())
