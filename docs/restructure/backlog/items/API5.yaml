@@ -7,7 +7,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs_api/app.py
@@ -23,3 +23,42 @@ notes: |
   HAND-BACK from CORE10 (Lane A, 2026-09-09; ADR 0021 action item 4, name only): when this
   item is open, add ONE citing comment at drydocs_api/schemas.py above the `#: API1 (d): completeness, declared.` block (precedent 3: completeness DECLARED on the envelope, never inferred from the payload) - the shape is
   the line CORE10 placed in drydocs/plan/plan_board.py; do not rewrite the site (ADR 0021 D4).
+
+  CLOSED 2026-09-10 (Lane B, laptop, wip/api5-laptop, based on main). Venue (J18): offline - the
+  driver failures are injected through a fake runner, so no Neo4j is involved. Full suite before
+  this note: 4054 passed, 0 FAILED, both ruff gates clean. NOTHING to regenerate: an exception
+  handler adds no documented response to the OpenAPI schema, so openapi.json and api.d.ts do not
+  move, and the suite's own openapi guard confirms it.
+
+  ONE HANDLER, over `neo4j.exceptions.DriverError`, returning 503 with `{"detail": "<ClassName>"}`.
+  Registered on the app rather than written per route, so a route added tomorrow is covered without
+  anyone remembering - which was the acceptance's "one FastAPI exception handler".
+
+  THE LINE IS DriverError AND NOT Neo4jError, and that is the decision worth defending because
+  widening it is the obvious wrong "improvement". A DriverError is the driver failing to get an
+  answer at all - unreachable, session expired, misconfigured URI, or one of CORE13's new timeouts
+  tripping. A Neo4jError is the SERVER answering with an error, and for a query this service wrote
+  that IS our bug: calling it "service down" would hide a real defect behind an outage message.
+  `test_a_server_side_error_is_still_a_500` pins the refusal, and a bare ConnectionError stays 500
+  too - the handler is on the driver's own hierarchy, not on anything that smells like a network.
+
+  MEASURED BOTH WAYS: 7 of the 11 tests FAIL against main's app.py. The four that pass either way
+  are the controls - a server-side error stays 500, a non-driver exception stays 500, the console
+  reads 503 as down, and the unknown named-query route 404s before it can reach the graph.
+
+  THE MESSAGE RULE IS TESTED ON ITS PARTS, not on a substring of the whole. The injected errors
+  quote a deliberately recognisable fake URI, and the assertions check the host, the port and the
+  scheme are each absent from the response, plus that the full message is not there. Asserting only
+  `str(exc) not in text` would pass on a response that leaked half the URI.
+
+  "The console needs no change" is VERIFIED rather than taken on trust: a test reads
+  web/src/lib/reachability.ts and asserts `isUpstreamDown` contains 503 and does NOT contain 500 -
+  the second half being the load-bearing one, since 500 must stay the bug signal. That test is why
+  this item needed no `web/src/**` edit, which matters because that pen is the UI session's this
+  burst. It is a source read, not a render parse (J37's exception: the console's behaviour IS the
+  contract under test here, and there is no importable object to read from Python).
+
+  CORE10 HAND-BACK, DONE (ADR 0021 action item 4, name only): one citing comment above the
+  `#: API1 (d): completeness, declared.` block in drydocs_api/schemas.py, naming it precedent 3 -
+  completeness DECLARED on the envelope and READ by the console, never inferred from the payload.
+  Site not rewritten (D4).

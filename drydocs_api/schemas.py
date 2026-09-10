@@ -251,6 +251,9 @@ class SpecRunOut(_Declared):
     rows: list[dict[str, Any]]
     watermarked: bool
     ephemeral: bool
+    #: ADR 0021 precedent 3 (cited, not rewritten - D4): completeness DECLARED on
+    #: the envelope and READ by the console, never inferred from the payload.
+    #: This is the shape drydocs_core.check_outcome now carries repo-wide.
     #: API1 (d): completeness, declared. `truncated` says the spec's ceiling cut
     #: the answer; `limit` is the ceiling that applied, or null for a spec that
     #: has none. Both are modelled HERE so the generated client carries them as
