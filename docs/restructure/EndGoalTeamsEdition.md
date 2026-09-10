@@ -62,15 +62,28 @@ Phase 3 is already signed, so the live block is Phase 1's grooming tail and the 
 of Phases 5 and 6 (5.1, 5.2, 5.7, 5.9, 6.3, 6.4, 6.5). **Phases 2, 4 and 7 are unaffected**, and
 the board's Ready strip carries 84 pullable items.
 
-**Next, in order.** Close the NINTH ROLL — the preflight at `port-base-20260909` refuses on four
-fixable checks (ledger coverage for nineteen merge commits, basis tags for RELAY-56 and
-RELAY-57, two stale path citations, and the suite, already fixed at `0e1620c6`); the tag is a
-separate deliberate step after they clear. It goes first because its relay carries the three
-module-scope constants whose absence raises `ImportError` while `drydocs/cli.py` is still
-importing — every command on the consumer's tree dies, `drydocs --help` included — and that
-break has NOT shipped yet, so the roll prevents it rather than reporting it afterwards. Then
-unit 4.4, which closes Phase 4. Then the build queue. The grooming pass over both review
-records, and 5.1 / 5.2, wait for Fable on the 14th.
+**THE NINTH ROLL IS CLOSED (2026-09-10).** `port-base-20260910` at `bb73c182`, all eight
+preflight checks green and CI green at that sha before the tag was cut; ledger steps 368–386;
+the eighth roll was never applied, so the company's next apply is ONE range
+`port-base-20260908..port-base-20260910` = 319 commits / 447 paths. It went first because
+RELAY-57 carried three split pairs that had not shipped, the worst a module-scope import in
+canonical-producer `drydocs/cli_docs.py` against constants in a file the consumer hand-merges —
+an `ImportError` raised while `drydocs/cli.py` is still importing, killing every command,
+`drydocs --help` included. The roll carries both halves, so the break never happens.
+
+Three things the close changed that this plan should carry forward. The preflight's
+cited-paths check gained the PER-PATH half it was missing (`FOREIGN_PATHS` for another tree's,
+`PLANNED_PATHS` for a file a held unit will create) — it had refused the roll over four correct
+citations, and **unit 5.8's two files are in `PLANNED_PATHS` now, with a guard that fails when
+they land**, so that entry retires itself rather than hiding a live check. RELAY-57's own
+instrument, run at the tag for the first time, found the CORE13 bounds family is eight names
+where the hand triage had reported two — the argument for running it per roll rather than per
+sweep, now measured. And the J77 line for this roll names five trunk reds against the eighth's
+one, including a publish-boundary guard that did exactly its job.
+
+**Next, in order.** Unit 4.4 (the duckdb / openpyxl dependency groups and the base-finish tag),
+which closes Phase 4. Then the build queue — the board's Ready strip carries the pullable set.
+The grooming pass over both review records, and 5.1 / 5.2, wait for Fable on the 14th.
 
 
 ## Context
