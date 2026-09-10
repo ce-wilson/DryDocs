@@ -7,7 +7,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p1
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs_api/intake.py
@@ -47,3 +47,54 @@ notes: |
   while it is cheap and while the only victims are test personas.
   Not a duplicate of API5 (a graph outage answering 500 rather than 503) or API6 (no query
   timeout); this is authorization ordering and shares no code path with either.
+
+  CLOSED 2026-09-10 (Lane B, laptop, wip/api7-laptop). Venue (J18): offline unit suite only - this
+  module is framework-free and touches no Neo4j, so the result reproduces from a clean clone on
+  either machine. At the WORK commit, before this note existed: 4019 passed / 16 skipped / 0 failed
+  against a 4012-passed/0-failed baseline on main, both ruff gates green. At the CLOSE commit:
+  4017 passed / 1 failed, and the one failure is
+  `test_plan_roadmap.py::test_committed_roadmap_page_matches_its_sources` - the red the handoff
+  pre-authorizes for every Lane B close. Verified rather than assumed to be that: stashing THIS
+  note alone turns the guard green again, because `sources_fingerprint` normalizes only `status`
+  out, so a close that writes notes always moves it. Lane A's render at merge is the fix; Lane B
+  does not render.
+
+  (a) `_authorize_record` is the one ownership test, called immediately after the record loads and
+  before any mutation in `transition`, `thread_decision` and `add_evidence`; `get_intake` keeps its
+  own call for the read path. It also runs BEFORE the state machine and the upload-window test, so
+  a refusal stops telling a stranger what status the record is in - that was an unlisted second
+  leak, and `test_the_upload_window_no_longer_answers_a_stranger` pins it.
+
+  (b) THE TESTS WERE MEASURED BOTH WAYS, which is the only reason they are worth anything. Against
+  HEAD's unfixed intake.py the five defect tests FAIL and the two controls pass; with the fix all
+  seven pass. `_snapshot` is the mechanism: it captures the record row, the event log, the evidence
+  rows and the evidence DIRECTORY before and after a refused write, so the subject is the store
+  rather than the exception. The acceptance was right that `pytest.raises(Forbidden)` alone passes
+  against the bug - it does, and that is how this survived two reviews.
+
+  (c) RULED: FILTERED, not accepted-with-a-reason. The deciding fact was found by reading the
+  console rather than the API - `IntakeRoute.tsx` `refreshPriors` already GETs each `thread_of` id
+  and swallows the 403 as `decision: null`, so a user-tier reader could never resolve a stranger's
+  id. The ids were leakable and never usable, which makes filtering strictly better than a ruling.
+  `_filter_thread_of` narrows the list to the reader's own intakes on both the get and the list
+  path; `thread_flagged` and `thread_decision_required` are untouched, so the reader still learns
+  their evidence continues a known thread, just not whose, and a persona bouncing their OWN thread
+  a third time still sees both prior decisions - that is the case the feature exists for and it is
+  pinned by its own test.
+
+  NOTHING TO REGENERATE, and that was a design constraint rather than an accident. The response
+  SHAPE stays `list[str]`, so `drydocs_api/schemas.py` does not move and neither do
+  `web/src/generated/openapi.json` or `api.d.ts`. Adding the `thread_of_hidden` count I first
+  drafted would have moved all three - and `web/src/**` is the UI session's pen this burst - so the
+  count was dropped. Lane A: no `scripts/dump_openapi.py` or `npm run api:types` run rides with
+  this merge.
+
+  (d) The `TRANSITIONS` ruling is written above the table: the `_ANY` grants are a ROLE test that
+  says nothing about whose record is moving, which is sound now that ownership is enforced before
+  the UPDATE. The comment ends by naming what NOT to do - narrowing those tuples to compensate for
+  an ownership gap - because that is the plausible wrong fix the next reader will reach for.
+
+  For Lane A, not this item: the console's `refreshPriors` will now render fewer prior-decision
+  rows for a user-tier persona, because the ids it used to fetch-and-fail on are no longer sent.
+  That is the intended effect and no `.tsx` change is needed; it is noted because the behaviour is
+  visible in the UI and the web pen is not this lane's.
