@@ -7,7 +7,7 @@ phase: 13
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: in_progress
 depends_on: []
 inputs:
 - config/data-zones.yaml
