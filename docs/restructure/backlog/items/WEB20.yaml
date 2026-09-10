@@ -7,7 +7,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: done
 depends_on: []
 inputs:
 - web/src/routes/IntakeRoute.tsx
@@ -21,3 +21,21 @@ acceptance: |
 notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). web-2026-09-09.md candidate 2 (L1-1(a)). PEN: belongs to the UI-testing session's code:drydocs-web pen (user ruling 2026-09-09); the
   Lane B queue skips it and Lane A merges it like any wip branch.
+  DONE-BY-WEB19 2026-09-10 (UI workstream, ui-workstream worktree, desktop), which is the
+  outcome docs/lane-ui-handoff.md named as legitimate provided the measurement is stated.
+  This item asked for the three pre-contract surfaces to be retrofitted, and its own acceptance
+  says that if the shared hook lands first they migrate onto it rather than being patched twice.
+  The hook landed first, and all three - IntakeRoute, LocationMap, FileReport - migrated onto it
+  in the WEB19 commit rather than reading the flag in a second, separate way.
+  MEASURED, with the command, over the eight row-displaying surfaces the module review counted
+  on 2026-09-09 (docs/reviews/modules/web-2026-09-09.md, the propagation table):
+  for f in web/src/explorer/SpecGrid.tsx web/src/components/SpecGraphPane.tsx
+  web/src/components/GraphCanvas.tsx web/src/routes/AskRoute.tsx web/src/ask/FileReport.tsx
+  web/src/components/map/LocationMap.tsx web/src/components/map/RuntimeSpanMap.tsx
+  web/src/routes/IntakeRoute.tsx; do grep -cE truncated OR completeness OR CompletenessNotice OR
+  rowsTruncated OR SpecGrid OR SpecGraphPane on that file; done
+  Result 8 of 8, up from the review's 3 of 8: 19, 7, 12, 5, 3, 11, 3, 5. AskRoute counts by
+  delegation to SpecGrid and SpecGraphPane, the same basis the review used.
+  Nothing remained to build, so nothing was built. The guard added at WEB19 is what keeps the
+  count at 8 - a ninth surface that renders rows without naming completeness fails a test rather
+  than being found by the next review.
