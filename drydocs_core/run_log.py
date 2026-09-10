@@ -78,7 +78,21 @@ def resolve_log_dir() -> Path:
         from drydocs_core.log_kinds import resolve_root
 
         return resolve_root(default=DEFAULT_LOGDIR)
-    except Exception:  # — a broken declaration must not take the loaders with it
+    except Exception as exc:  # — a broken declaration must not take the loaders with it
+        # CORE15: still non-fatal, no longer silent. This branch means
+        # config/log-kinds.yaml could not be read, so the DECLARED root is not
+        # the one in use — and the fallback below can quietly land the run's log
+        # somewhere other than where the declaration says it goes. A reader
+        # hunting a missing log needs to know the declaration was skipped.
+        LOGGER.warning(
+            "log-kinds declaration unreadable (%s: %s) - falling back to %s/%s or %s; "
+            "the DECLARED log root is not in use for this run",
+            type(exc).__name__,
+            exc,
+            LOGDIR_ENV,
+            LEGACY_LOGDIR_ENV,
+            DEFAULT_LOGDIR,
+        )
         for env in (LOGDIR_ENV, LEGACY_LOGDIR_ENV):
             raw = os.environ.get(env, "").strip()
             if raw:
@@ -118,7 +132,20 @@ def claim_log_path(base_name: str, *, now: Callable[[], datetime] = datetime.now
         spec = declared_kind(kind_id)
         stamp = stamp_for(spec.rotation, now())
         suffix = spec.format
-    except Exception:  # — an unreadable declaration falls back to the old shape
+    except Exception as exc:  # — an unreadable declaration falls back to the old shape
+        # CORE15. What is LOST here is specific and worth naming: the kind's
+        # declared ROTATION and FORMAT. A per-day kind silently becomes
+        # per-run, and a `.jsonl` kind silently becomes `.log` — so a consumer
+        # parsing JSON lines finds text, and a day's runs stop collecting into
+        # one file. Both look like a data problem downstream rather than a
+        # configuration problem here.
+        LOGGER.warning(
+            "log kind %r could not be resolved (%s: %s) - falling back to per-run rotation "
+            "and a .log extension; the kind's declared rotation and format are not in use",
+            kind_id,
+            type(exc).__name__,
+            exc,
+        )
         stamp = now().strftime("%Y%m%d-%H%M%S")
         suffix = "log"
 
@@ -136,6 +163,8 @@ class _CaptureHandler(logging.Handler):
     def __init__(self, run_log: LoaderRunLog, level: int) -> None:
         super().__init__(level=level)
         self._run_log = run_log
+        #: CORE15: this handler reports its own failure ONCE per run. See emit().
+        self._write_failed = False
         self.setFormatter(logging.Formatter("%(levelname)s %(name)s: %(message)s"))
 
     def emit(self, record: logging.LogRecord) -> None:
@@ -143,8 +172,28 @@ class _CaptureHandler(logging.Handler):
             self._run_log._write(self.format(record) + "\n")
             if record.levelno >= logging.WARNING:
                 self._run_log._warnings += 1
-        except Exception:  # — audit trail, never the failure
-            pass
+        except Exception as exc:  # — audit trail, never the failure
+            # CORE15. The `pass` was the worst of the four: from here on the run
+            # log is missing records and NOTHING says so, so the file reads as a
+            # complete account of a run it stopped following. Still non-fatal —
+            # a broken audit trail is not a broken load.
+            #
+            # ONCE, and the flag is set BEFORE the warning on purpose. This
+            # logger sits under CAPTURE_NAMESPACES, so the warning below comes
+            # straight back into this same emit(); the flag is what stops that
+            # becoming unbounded recursion. The re-entrant call retries the
+            # write once, fails, sees the flag and returns — one wasted attempt,
+            # which is cheaper than any of the alternatives.
+            if self._write_failed:
+                return
+            self._write_failed = True
+            LOGGER.warning(
+                "run log %s stopped accepting records (%s: %s) - the load continues, but this "
+                "log is INCOMPLETE from here and later records are missing from it",
+                self._run_log.path,
+                type(exc).__name__,
+                exc,
+            )
 
 
 class LoaderRunLog:
@@ -172,6 +221,8 @@ class LoaderRunLog:
         self.meta = dict(meta or {})
         self.path: Path | None = None
         self._fh = None
+        #: CORE15: this log reports its own write failure ONCE per run (_write).
+        self._write_failed = False
         self._handler: _CaptureHandler | None = None
         self._rejects = 0
         self._warnings = 0
@@ -188,7 +239,17 @@ class LoaderRunLog:
         now = datetime.now().astimezone().isoformat(timespec="seconds")
         try:
             os_user = getpass.getuser()
-        except Exception:  # — some CI environments have no user
+        except Exception as exc:  # — some CI environments have no user
+            # CORE15. The header's `user:` field is provenance — who ran this
+            # load — and an empty one is indistinguishable from a user whose
+            # name is blank. Naming the reason in the log stream means the
+            # header's gap has an explanation somewhere in the same file.
+            LOGGER.warning(
+                "the OS user could not be determined (%s: %s) - this run log's `user:` header "
+                "will be empty, which is a missing attribution rather than an anonymous one",
+                type(exc).__name__,
+                exc,
+            )
             os_user = ""
         lines = [
             _RULE,
@@ -255,8 +316,28 @@ class LoaderRunLog:
             return
         try:
             self._fh.write(text)
-        except OSError:
-            pass
+        except OSError as exc:
+            # CORE15, AND THE ONE THE ITEM DID NOT LIST. Its acceptance named
+            # four handlers by line; re-measured at pull (which the item asked
+            # for), this is a FIFTH, and it is the one that swallows the case
+            # the item's own title is about — a run log that cannot report its
+            # own failure. A write failure never reaches `_CaptureHandler.emit`,
+            # because it is caught HERE first, one level below it. Fixing only
+            # the four would have left the headline case silent.
+            #
+            # Once per run, flag set before the warning, for the same reentrancy
+            # reason as the handler: this logger is under CAPTURE_NAMESPACES, so
+            # the warning comes back through emit() into this same method.
+            if self._write_failed:
+                return
+            self._write_failed = True
+            LOGGER.warning(
+                "run log %s could not be written (%s: %s) - the load continues and this file "
+                "is INCOMPLETE from here; it is an audit trail, never the reason a load fails",
+                self.path,
+                type(exc).__name__,
+                exc,
+            )
 
 
 @contextmanager

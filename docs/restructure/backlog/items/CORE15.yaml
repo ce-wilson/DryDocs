@@ -7,7 +7,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs_core/run_log.py
@@ -20,3 +20,48 @@ acceptance: |
 notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). core-2026-09-07.md candidate 5 (T1): the run log "cannot report its own failure". Line numbers are
   the review's; re-measure at pull.
+
+  CLOSED 2026-09-10 (Lane B, laptop, wip/core15-laptop, BASED ON MAIN - run_log.py is disjoint from
+  the neo4j_client.py stack, so this merges independently of core11/13/14/17). Venue (J18): offline
+  unit suite; every branch is driven through an injected failure, no filesystem tricks and no
+  server. Full suite on this branch: 4048 passed, 0 FAILED - it carries neither the config edit nor
+  (before this note) the close-notes fingerprint, so it is the one clean branch of the six.
+
+  THERE WERE FIVE HANDLERS, NOT FOUR, and the fifth is the one the item's own title is about.
+  The acceptance named lines 81, 121, 146 and 191 and asked for the line numbers to be re-measured
+  at pull. Re-measured, `_write` (line 312) carries `except OSError: pass` - and that is where a
+  write failure is actually caught. It never reaches `_CaptureHandler.emit` at 146, because `_write`
+  swallows it one level below. So fixing the four named handlers would have left "the run log
+  cannot report its own failure" (the T1 finding this item exists for) exactly as silent as it was.
+  All five now warn.
+
+  HOW THE FIFTH WAS FOUND, because the method matters more than the find. The first draft of the
+  test replaced `LoaderRunLog._write` with a raising stub - which is testing your own stub, and it
+  blew up in `close()` where `_write` is called directly rather than through the handler. That
+  failure is what pointed at the real catch site. The test now replaces the file HANDLE with one
+  whose `write()` raises, which is the shape a full disk actually has, and asserts the handle was
+  actually exercised so it cannot silently stop testing anything.
+
+  EACH WARNING NAMES WHAT WAS LOST, which is the difference between a warning worth reading and
+  noise: resolve_log_dir - the DECLARED log root is not in use, so a hunt for a missing log knows
+  the declaration was skipped; claim_log_path - the kind's declared ROTATION and FORMAT are not in
+  use, so a per-day kind silently became per-run and a .jsonl kind became .log, both of which
+  present downstream as data problems rather than as configuration problems here;
+  emit and _write - this file is INCOMPLETE from here; the header's user - a MISSING attribution
+  rather than an anonymous one.
+
+  ONCE PER RUN, AND THE ORDERING IS LOAD-BEARING. This module's logger sits under
+  CAPTURE_NAMESPACES, so a warning emitted from these paths comes straight back through the capture
+  handler into the same code. Both flags are set BEFORE their warning; without that ordering the
+  re-entrancy test does not fail, it recurses until the interpreter's stack gives out.
+  `test_the_incomplete_warning_is_emitted_once_and_does_not_recurse` is what pins it.
+
+  MEASURED BOTH WAYS: against main's run_log.py, 5 of the 6 new tests FAIL. The sixth,
+  `test_a_degraded_run_log_is_still_never_the_reason_a_load_fails`, passes either way - it is the
+  control for the contract these warnings must not break, and the module docstring's promise that
+  the log is "an audit trail, never the reason a load fails" is still kept.
+
+  What this item did NOT do, per its own acceptance: a load whose run log could not be written is
+  still non-fatal, and saying so in the END-OF-RUN SUMMARY the operator reads is LOAD9's, which is
+  in this lane's queue. This item makes the degradation audible in the log stream; LOAD9 puts it in
+  the report.
