@@ -105,7 +105,7 @@
 schema: drydocs.doc-source-registry.v1
 classification: Internal-Public
 
-updated: 2026-09-03
+updated: 2026-09-10
 
 # The capture ladder as DATA (G134): the vocabulary `capture_rung` draws from and
 # what each rung can yield. The header above is the explanation; this is what the
@@ -521,6 +521,65 @@ sources:
       MWAA. The internal address is only in the internal/ locator file; the
       airflow product row's documentation.corpus points here (atomic with this
       row — a dangling pointer is the one FAILING rung in docs-coverage).
+
+  - id: legacy-process-capture
+    classification: Internal            # a legacy process's own material: design notes, worked examples, and the SQL as it was run against named schemas
+    source: "SHAPE ONLY on the producer — a synthetic row carrying the field values a real capture would take, so the instance inherits a decided shape rather than a blank. The real row is INSTANCE-OWNED and company-side: the corpus IS the legacy process's own material and never leaves the instance (CLAUDE.md §3, PUBLISH-BOUNDARY)."
+    connector: filedrop                 # the artifacts are dropped as files; there is no system of record left to fetch from, which is what "before it is lost" means
+    manifest: ~                         # nothing is captured HERE, so there is no manifest here. A real instance's capture run writes one and the Q23 join reads it
+    trust_default: VERBATIM             # the design note and the SQL are the artifacts AS THEY WERE
+    capture_rung: 1                     # G134: the dropped file IS the artifact — served bytes, with no rendering or transcription between the process and the corpus
+    tier: T4                            # hand-compiled evidence with no system of record behind it — the adhoc-sme-email tier
+    curation: sme-confirm               # T4 ladder (ADR 0006 §4)
+    target_db: drydocs                  # G102 fold — the one content database
+    refresh: manual                     # a legacy process is captured once, deliberately; there is nothing to re-fetch
+    taxonomy_path: ~                    # deliberately unset: the path is the INSTANCE's, and a producer guess would be a fact about a tree this repo cannot see (J18)
+    graph_locator:
+      match: corpus_id                  # it IS on the Document->Chunk backbone — clause (d): SQL examples land as :Chunk rows citing their source
+      value: legacy-process-capture
+    confirmed: false                    # SHAPE only, and no loader exists. The flip belongs to the instance that owns the real row, never to this one
+    notes: >
+      USE CASE 3's GATE-FREE HALF: capture a legacy process as documents and SME
+      notes BEFORE it is lost. The structured record that follows is sitting 3's
+      (MM10) and is deliberately not presupposed here.
+
+      TRUST IS SPLIT, and the split is the point — the same one
+      adhoc-sme-email records. The DOCUMENT is VERBATIM: a design note is that
+      note, and the SQL is the text that was run. A FACT DERIVED FROM IT is
+      GROUNDED at best, because a legacy process's design note is frequently a
+      description of what someone INTENDED, and the SQL is the only thing that
+      says what ran.
+
+      SQL EXAMPLES ARE :Chunk ROWS CITING THEIR SOURCE, NEVER FACTS (clause d).
+      A query that ran in the legacy process is evidence of what that process
+      did; it is not a declaration about the graph, and loading it as one would
+      assert a lineage nobody confirmed. This is why graph_locator is corpus_id
+      rather than none: the material lands on the lexical Document->Chunk
+      backbone and is cited, not interpreted.
+
+      NO NEW VOCABULARY (clause d). Every term here is an active docs term.
+      No evidence-grammar choice is presupposed either — clause E of
+      data-flow-overview belongs to sitting 3, and a row that picked one now
+      would decide it by default.
+
+      CAPTURE METHOD IS THE RESEARCH-PROBE DISCIPLINE'S LEDGERS (clause b).
+      A legacy process is exactly the subject where "we could not find it" gets
+      recorded as "it does not exist", so every negative is paired with a
+      positive control against the same source and the same auth, and the
+      probe log carries the outcome vocabulary rather than a prose summary.
+      TRANSCRIPTS ARE MACHINE-LOCAL AND CITED BY FILE NAME, never by image:
+      the file is the citable artifact, and the medium it arrived in is not
+      provenance.
+
+      SME NOTES RIDE THE EXISTING HARVEST (clause c) — drydocs/review/sme_notes.py
+      routes `SME[<sid>] $FR`, `$UC` and `$OQ` (ROUTE_TAGS), so a capture
+      session's requirements, use cases and open questions reach the same place
+      every other review's do. Nothing new is built for this corpus.
+
+      WHY A SYNTHETIC ROW IS WORTH SHIPPING: the fields above are the decisions
+      — tier, trust, rung, locator, curation — and they are the same for every
+      instance. Leaving them to be re-derived per instance is how two instances
+      end up with the same corpus at two different tiers.
 
 
 retired:

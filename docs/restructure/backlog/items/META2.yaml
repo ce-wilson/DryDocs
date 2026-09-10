@@ -7,7 +7,7 @@ phase: 18
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - config/doc-source-registry.yaml
@@ -24,3 +24,46 @@ acceptance: |
 notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). Plan 2026-09-09, Phase 2 Lane B row 8. The "before it is lost" half of use case 3 needs no gate;
   the structured record follows sitting 3 (MM10).
+
+  ## Close (Lane B, laptop, 2026-09-10) - wip/meta2-laptop
+
+  (a) Row `legacy-process-capture` added to config/doc-source-registry.yaml as a
+  SHAPE: classification Internal, connector filedrop, trust_default VERBATIM at
+  capture_rung 1, tier T4 / curation sme-confirm (the ladder is fixed per tier,
+  ADR 0006 §4 - not chosen), target_db drydocs, refresh manual, taxonomy_path
+  deliberately unset because the path is the INSTANCE's, confirmed: false. The
+  real row stays instance-owned and company-side, and the row says so.
+
+  (b)(c)(d) carried in the row's own notes, so they travel with the field values
+  rather than living only in this item. (c) VERIFIED rather than asserted:
+  drydocs/review/sme_notes.py ROUTE_TAGS is ("FR", "UC", "OQ", "NOTES"), so the
+  $FR/$UC/$OQ harvest already exists and this corpus builds nothing new.
+  (d) graph_locator is `match: corpus_id` precisely because the SQL examples land
+  as :Chunk rows citing their source; no new vocabulary term, and clause E of
+  data-flow-overview is left to sitting 3 rather than decided by default.
+
+  ## Renders NOT run (Lane B renders nothing) - Lane A regenerates at merge
+
+  The new row moves four committed renders. MEASURED, not assumed: these four
+  are green on clean main and red with this change.
+
+    tests/unit/test_load_map_json.py::test_committed_load_map_matches_regeneration
+    tests/unit/test_load_map_json.py::test_committed_load_map_html_matches_regeneration
+    tests/unit/test_load_map_json.py::test_every_registered_source_has_a_row
+    tests/unit/test_registry_view.py::test_the_committed_load_map_carries_the_digest_of_its_inputs
+
+  THE WRITER, named because an item that moves a generated artifact must name it:
+  `poetry run python scripts/render_board.py`, which calls render_load_map.main()
+  at scripts/render_board.py:72. scripts/render_load_map.py reads
+  config/doc-source-registry.yaml (line 64) and writes web/src/generated/load-map.json
+  and docs/plan/load-map.html - the UI pen and the backlog pen respectively, so
+  neither is Lane B's to touch.
+
+  Also moved deliberately, with the reason in the file: census.docs_coverage in
+  config/dev-environment.yaml, corpora_total 10 -> 11 and corpora_unclaimed
+  8 -> 9. A shape row is claimed by no product BY CONSTRUCTION - it describes a
+  customer's legacy process, not a software product. PLAN9 puts these numbers in
+  the venue file precisely so a consumer edits them rather than the test.
+
+  Suite: 4038 passed. Five red - the four renders above plus
+  test_committed_roadmap_page_matches_its_sources (Y5, by design on a close).

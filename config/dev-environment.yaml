@@ -10,7 +10,7 @@
 # gitignored .env files, never in a committed file).
 schema: drydocs.dev-environment.v1
 classification: Internal-Public
-updated: 2026-09-08
+updated: 2026-09-10
 
 
 # WHICH EDITION THIS CHECKOUT RUNS AS (PLAN2 b, 2026-09-05; gate
@@ -87,8 +87,11 @@ census:
   docs_coverage:
     products: 17
     products_no_corpus: 15
-    corpora_total: 10
-    corpora_unclaimed: 8
+    # 10->11 at META2 (2026-09-10): the legacy-process-capture SHAPE row.
+    corpora_total: 11
+    # 8->9: a shape row is claimed by no product BY CONSTRUCTION - it describes
+    # a customer's legacy process, not a software product in this registry.
+    corpora_unclaimed: 9
   # tests/unit/test_schema.py::test_constraint_count - CREATE CONSTRAINT lines in
   # drydocs_core/schema/constraints.cypher (a per-entry file: the company's copy carries
   # its own supplement blocks, so its count is ahead of the producer's).
