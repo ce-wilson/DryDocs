@@ -302,3 +302,70 @@ def test_a_row_with_no_name_still_loads_and_carries_none() -> None:
     assert AreaProductRow(area_product_id=1, parent_product_id=2, name="").name is None
     # a row that DOES carry the name still loads it, stripped
     assert ProductRow(product_id=1, parent_product_line_id=2, name=" X ").name == "X"
+
+
+# ---- LOAD10: the coercion is the TYPE, so a model cannot omit it ------------
+#
+# Before LOAD10 each row model repeated a two-line `@field_validator(...,
+# mode="before")` + `@classmethod` delegation block per helper — fifteen of them
+# across eight models. The duplication was not the cost; the DIVERGENCE was: a
+# model that named a field in the wrong validator list, or left one out, was a
+# perfectly valid model, and you found out from a rejected row in a load.
+#
+# These read the MODELS, not the source (J37). A source scan would also be
+# defeated by the explanatory comment in catalog.py, which necessarily contains
+# the very pattern it explains — J66's disease exactly.
+
+
+def _catalog_models():
+    from drydocs.loaders import catalog
+
+    return {
+        catalog.CatalogLOBRow: {"lob_id": None},
+        catalog.ProductLineRow: {"product_line_id": None, "parent_lob_id": None},
+        catalog.ProductRow: {"product_id": None, "parent_product_line_id": None},
+        catalog.DevTeamRow: {"team_id": None},
+        catalog.AreaProductRow: {"area_product_id": None, "parent_product_id": None},
+        catalog.PatTeamRoleRow: {"team_id": None, "employee_sid": None, "role_id": None},
+    }
+
+
+def test_every_key_field_on_every_catalog_model_coerces_a_number() -> None:
+    """§a, model by model. The point of LOAD10 is that this can no longer be
+    true of six models and false of a seventh added next week."""
+    for model, keys in _catalog_models().items():
+        for key in keys:
+            payload = dict.fromkeys(keys, 1)
+            payload[key] = 4021  # the numeric shape the source actually sends
+            row = model(**payload)
+            assert getattr(row, key) == "4021", f"{model.__name__}.{key} did not coerce"
+
+
+def test_every_sparse_name_field_treats_empty_as_absent() -> None:
+    """C22 §b through the alias: '' means 'no value carried', never 'blank the
+    stored one'."""
+    from drydocs.loaders import catalog
+
+    for model, payload in (
+        (catalog.ProductLineRow, {"product_line_id": "1", "parent_lob_id": "2"}),
+        (catalog.ProductRow, {"product_id": "1", "parent_product_line_id": "2"}),
+        (catalog.DevTeamRow, {"team_id": "1"}),
+        (catalog.AreaProductRow, {"area_product_id": "1", "parent_product_id": "2"}),
+    ):
+        assert model(**payload, name="").name is None, model.__name__
+        assert model(**payload).name is None, model.__name__
+
+
+def test_the_aliases_are_what_the_models_are_declared_with() -> None:
+    """The inexpressibility claim, checked against pydantic's own view: each key
+    field carries a before-validator, so there is nowhere for an omission to
+    live. If a future edit re-declares one of these as a plain `str`, the
+    coercion silently disappears and THIS is what notices."""
+
+    for model, keys in _catalog_models().items():
+        for key in keys:
+            annotation = model.model_fields[key].metadata
+            assert annotation, (
+                f"{model.__name__}.{key} carries no validator metadata — it has been "
+                "re-declared as a plain type and its coercion is gone"
+            )
