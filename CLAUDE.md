@@ -158,6 +158,19 @@ The 27 legacy letters (A..Z, GN, MM) were FROZEN on 2026-09-02 — a letter reco
    root and the main checkout stayed clean), which is true because J48 fixed it and was not before.
    Note the first `poetry run` inside a fresh worktree BUILDS a second in-project `.venv` there;
    invoking the main checkout's interpreter by absolute path skips that.
+   ***AND IF YOU RUN THE SUITE FROM THE WORKTREE, THAT FAST PATH COSTS YOU ONE FALSE FAILURE***
+   (reproduced here 2026-09-10, main-checkout interpreter + worktree cwd).
+   `tests/unit/test_repo_paths.py::test_swept_defaults_resolve_inside_a_real_worktree` FAILS from
+   a worktree and passes from the main checkout, and three skips flip to passes with it. It is
+   not a regression and it is not yours. The mechanism is the recipe's own optimization: that
+   test's `REPO` resolves to whichever checkout it runs in, but the EDITABLE INSTALL still points
+   at the main checkout, so its control — `package:cli_samples`, which must stay pinned at the
+   install — resolves under the main checkout while `REPO` is the worktree, and
+   `path.is_relative_to(REPO)` is False. The assertion says this; the failure NAME does not, and
+   the name is what invites a phantom-regression report. **Never take an acceptance NUMBER from a
+   worktree run** — measure before and after in the SAME checkout. (A worktree-local `.venv`
+   should not have the problem, since the install would then point at the worktree: INFERRED from
+   the assertion, NOT measured.)
 2. **During:** the in-session Task list is *ephemeral* working memory for the one item — distinct
    from the durable item file.
 3. **End:** update the item's `status`, **regenerate the board** (`poetry run python scripts/render_board.py`)
@@ -268,11 +281,18 @@ Index: [`external/orchestration/README.md`](external/orchestration/README.md)
 Oracle (source DB) and Snowflake (future) are **data platforms**, indexed under
 [`reference/platforms/`](reference/platforms/README.md) and served by the
 [`oracle-db` skill](.claude/skills/oracle-db/SKILL.md) (general Oracle/PL-SQL/tuning guidance).
-**That skill is present and ported, but OFF producer-side** — `"off"` in `.claude/settings.local.json`
-`skillOverrides`, because the producer has no live Oracle connection for it to act on. The state is
-venue-specific and the enablement call is each repo's own (J18): `.claude/**` is `canonical-producer`,
-so the company inherits the skill tree while `settings.local.json` stays machine-local — the company
-side, which does have a live `psgmgr` connection, is expected to turn it on. Two adjacent pointers,
+**That skill is present and ported. It is OFF on THIS machine and ON everywhere that does not read
+an override file — which is most places, and the old wording here got that backwards.** `"off"` in
+`.claude/settings.local.json` `skillOverrides` is what holds it back here, because the producer has
+no live Oracle connection for it to act on. **`skillOverrides` is a CLAUDE CODE mechanism**: a venue
+without it — VS Code with Copilot, for one — loads every `.claude/skills/` entry unconditionally and
+never reads the file, which on that machine does not exist in the first place. So this line describes
+a gate that exists in one venue, and the honest reading is **off producer-side, on company-side**
+(corrected 2026-09-10 on the consumer's own measurement — the sentence had been asserting a
+tree-wide state from a machine-local file since the skill landed). The enablement call is each repo's
+own (J18): `.claude/**` is `canonical-producer`, so the company inherits the skill tree while
+`settings.local.json` stays machine-local and gitignored — it crosses NEVER, in either direction, so
+nothing this file says about `skillOverrides` was ever a statement about the other side's tree. Two adjacent pointers,
 so nobody re-fixes this line wrongly: the vendor plugin `db@oracle-skills` is a *different* thing and
 is `false` in `~/.claude/settings.json` `enabledPlugins`; and `reference/platforms/` currently carries
 **`neo4j/` only** — there is no `oracle/` directory behind that link yet. For the CM_ objects in the
@@ -426,6 +446,14 @@ units from `docs/restructure/backlog/items/`. Each backlog item names its agent 
   failing node ids (`pytest -q -rf`), never two totals: on 2026-08-27 two sessions agreed
   on a failing total and one failure was new — agreeing on a total is not agreeing on its
   contents (J18 made a claim name its venue; this makes it name its contents).
+  **AND THE TWO RUNS MUST USE THE SAME INVOCATION, which is the clause this rule was missing**
+  (company-side, 2026-09-10, during a pre-port baseline). `poetry run pytest -q` and
+  `python -m pytest tests/unit` COLLECT DIFFERENTLY — measured there at 18 deselected and a
+  different skip count — so the two runs do not even draw their ids from the same population,
+  and comparing the sets is as meaningless as comparing the totals. Set-vs-total was never the
+  whole rule; **same venue, same invocation, then compare the set.** The same session supplies
+  the worked example of why it matters: its first comparison crossed invocations, and had it
+  been trusted it would have reported a regression that did not exist.
 - **Secrets discipline:** architecture-level only. No real data values in commits.
 
 See `internal/repo-README.md` for the runnable pipeline and `docs/restructure/01-project-plan.md` for the founding narrative (the phase list itself is `docs/restructure/backlog/plan.yaml`, rendered on `docs/plan/roadmap.html`).
