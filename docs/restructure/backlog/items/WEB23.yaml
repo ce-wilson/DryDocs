@@ -7,7 +7,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p2
-status: todo
+status: done
 depends_on: []
 inputs:
 - web/scripts/checkBundleSize.mjs
@@ -54,3 +54,40 @@ notes: |
   the wrong author is the class the module sweep spent a cycle on. The web pen holds this
   (code:drydocs-web); Lane A measured it and hands it over rather than redesigning the console's
   chunk composition at a merge close.
+  DONE 2026-09-10 (UI workstream, ui-workstream worktree, desktop; branch feat/web-completeness).
+  RULED: split, which is outcome one of the three the acceptance allows - and the split is the
+  one that needed no renderer, so it stayed inside this lane's pen.
+  (a) MEASURED, by command, at each step. Entry chunk 2,506,022 bytes against a 2,505,000
+  ceiling - already OVER it when the item was picked up, not merely short of margin. The item
+  recorded 2,504,192 with 812 bytes of headroom on 2026-09-09; the pre-WEB19 tree here measures
+  2,504,188, so the trunk had barely moved and WEB19's own 1,834 bytes are what crossed the line.
+  That is the item's thesis happening to the next person, who was me.
+  (b) THE CAUSE, read from the source rather than assumed: laneBasis reads four fields off one
+  key of load-map.json - systems id, name, layer, classification - and nothing else. So the whole
+  artifact was in the entry chunk to answer a question one of two lane bases asks, behind a picker
+  most sessions never touch. WEB7's ACCESS reason for keeping it is still correct and was never
+  the whole question: admissible to a user is not the same claim as must arrive before anything
+  renders.
+  FIRST TRIED AND REJECTED, recorded because it looks obvious: importing the one key by name so
+  the bundler shakes the rest. Measured at 2,506,038 - no saving at all, because the JSON is
+  inlined whole rather than as tree-shakeable named exports. A projection would therefore have
+  needed a generated slice, which needs a renderer, which is Lane A's pen. The on-demand import
+  reaches the same delivery outcome with no new artifact and no renderer change.
+  BUILT: the registry systems are a PARAMETER of resolveLanes now, the same shape the source-kind
+  items already had, and the view fetches them through lineage/layerSystems.ts when the BDAT basis
+  is chosen. The one correctness risk in that is handled rather than accepted - an empty declared
+  lane on this basis is a FINDING the view exists to show, so SwimlaneView holds a reading notice
+  and refuses to draw lanes until the systems land. Drawing them would have presented a loading
+  state as evidence that no system carries a layer.
+  (c) THE CEILING RATCHETED DOWN to 2,500,000 against a fresh 2,427,507 - 72,493 bytes, 3.0 per
+  cent, the margin WEB7 set. Not raised, and not lowered to whatever today happens to build:
+  the margin was restored by moving 79 KB out, and the number follows that. The docstring carries
+  the dated line with what moved and why, and App.tsx's own not-split note is rewritten rather
+  than left to contradict the code.
+  GUARD: web/src/lineage/entryChunk.test.ts fails a static import of the generated load map from
+  anywhere but the two modules that are only reachable behind a lazy route, each named with its
+  route. It reads literals rather than code, deliberately - the subject IS the artifact path, and
+  the first draft used the code-only stripper and matched nothing, including both real importers.
+  Verified: tsc -b clean, oxlint clean, web suite 512 passed in 48 files, node
+  scripts/checkBundleSize.mjs reports 97.1 per cent of ceiling, and the J57 family plus
+  test_ui_components.py, test_load_map_console.py and test_console_delivery.py at 92 passed.

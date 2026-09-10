@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { GraphAccess } from '../../lib/graph'
 import { COUNTRY_SHAPES, MAP_HEIGHT, MAP_WIDTH } from '../../generated/world-map'
 import { viewBox, WORLD_BOX } from './projection'
 import { resolveRows, type LocationRow, type PlacedSite } from './resolve'
-import { validateRows, type RowShape } from '../../data/rowShape'
+import type { RowShape } from '../../data/rowShape'
+import { useSpecRows } from '../../data/useSpecRows'
+import CompletenessNotice from '../ui/CompletenessNotice'
 import type { DataCenterRow } from '../../lib/dataCentersApi'
 import { declaredDefaultByCode, longNameByCode } from '../../lib/dataCentersApi'
 import {
@@ -85,10 +87,12 @@ const DEFAULT_SEED_MINUTES = 60
 /** The two grains the acceptance names. */
 type Grain = 'job' | 'folder'
 
-type Load =
-  | { state: 'loading' }
-  | { state: 'error'; message: string }
-  | { state: 'ready'; rows: SpanRow[] }
+/** WEB19: the read's own three states now come from useSpecRows, and its
+ *  `ready` arm carries the completeness envelope this component used to drop one
+ *  line after the server sent it. The local `Load` union is gone rather than
+ *  extended — a union with nowhere to put the flag is what made dropping it the
+ *  path of least resistance. */
+const NO_PARAMS: Record<string, unknown> = {}
 
 /** The date the span is read against, in the SOURCE zone.
  *
@@ -144,34 +148,15 @@ export default function RuntimeSpanMap({
   viewerTimeZone,
   className,
 }: RuntimeSpanMapProps) {
-  const [load, setLoad] = useState<Load>({ state: 'loading' })
   const [selected, setSelected] = useState<string | null>(null)
   const [mode, setMode] = useState<Grain>('job')
 
-  useEffect(() => {
-    let live = true
-    setLoad({ state: 'loading' })
-    access
-      .runSpec(SPEC_ID, {})
-      .then((res) => {
-        if (!live) return
-        const checked = validateRows<SpanRow>(res, SPAN_COLUMNS)
-        setLoad(
-          checked.ok
-            ? { state: 'ready', rows: checked.rows }
-            : { state: 'error', message: checked.message },
-        )
-      })
-      .catch((err: unknown) => {
-        if (!live) return
-        // Loud, never a silent empty map — Z5's rule, and the reason is the
-        // same: an empty map and a failed query look identical to a reader.
-        setLoad({ state: 'error', message: err instanceof Error ? err.message : String(err) })
-      })
-    return () => {
-      live = false
-    }
-  }, [access])
+  // Loud, never a silent empty map — Z5's rule, and the reason is the same: an
+  // empty map and a failed query look identical to a reader. The hook keeps that
+  // distinction (a failed read is `error`, an empty answer is `ready` with no
+  // rows) and adds the deadline, the abort and the dedupe the hand-rolled effect
+  // here never had.
+  const load = useSpecRows<SpanRow>(SPEC_ID, SPAN_COLUMNS, NO_PARAMS, { access })
 
   // Memoized because the fallback is a fresh literal: an unmemoized `[]` makes
   // every derived useMemo below re-run on every render, which the hook linter
@@ -522,9 +507,15 @@ export default function RuntimeSpanMap({
         {SOURCE_ZONE_CLAIM}
       </p>
       {load.state === 'ready' && (
-        <p className="mt-1 text-xs/[1.5]" style={{ color: timingless ? 'var(--yellow)' : 'var(--muted)' }}>
-          {rows.length} job(s) returned; {timingless} with no timing data at all. Shown as a count
-          because a job the map cannot draw is a real gap, not an empty selection.
+        <p className="mt-1 flex flex-wrap items-center gap-2 text-xs/[1.5]" style={{ color: timingless ? 'var(--yellow)' : 'var(--muted)' }}>
+          <span>
+            {rows.length} job(s) returned; {timingless} with no timing data at all. Shown as a count
+            because a job the map cannot draw is a real gap, not an empty selection.
+          </span>
+          {/* WEB19: a capped read draws a SPARSE MAP THAT LOOKS COMPLETE, which
+              is the failure this badge exists to name. It sits beside the count
+              because the count is the sentence it qualifies. */}
+          <CompletenessNotice completeness={load.completeness} unit="jobs" noun="job" />
         </p>
       )}
     </section>

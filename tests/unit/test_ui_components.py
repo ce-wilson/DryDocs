@@ -456,10 +456,19 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     layout but whether a console-INVENTED term is presented beside "backs onto
     drydocs" with nothing separating the two, which is the adjacency that put a
     Tower question onto :TOMRole on 2026-08-20.
+    108 -> 109 at WEB19 (2026-09-10): CompletenessNotice, UNBOUND, bound stays
+    43. TruncationBadge's rule exactly, and for the same reason: it is a ui
+    primitive that takes a completeness envelope as a prop and knows nothing
+    about who read it. Its consumers today are a map, a report pane, an intake
+    route and a mappings route -- four modules -- so binding it to one would be
+    evidence-free, which is what unbound means here. It earns its own file
+    because the alternative was the same four-line conditional around
+    TruncationBadge in five places, which is how the completeness contract came
+    to be implemented six times and written down zero (module sweep, slot 10).
     """
     comps = _ui()["components"]
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
         43,
-        108,
+        109,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"

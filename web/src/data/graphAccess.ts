@@ -162,6 +162,15 @@ export interface GraphQueryOptions {
   /** Skip the read entirely (a tab that is not open, a param not chosen yet).
    *  The state stays `loading`, which is honest: nothing has been asked. */
   enabled?: boolean
+  /** The seam to read through, when it is not the session's own (WEB19).
+   *
+   *  DEFAULTS TO THE PROVIDER and every route leaves it alone. It exists for the
+   *  components that take `access` as a PROP — RuntimeSpanMap and LocationMap
+   *  are both drawn in tests against a hand-built fake with no provider above
+   *  them — because the alternative was those two keeping their own hand-rolled
+   *  fetch effects, which is exactly where the completeness envelope was being
+   *  dropped. A hook nothing can reach is a hook nothing migrates onto. */
+  access?: GraphAccess
 }
 
 /** Run a QuerySpec and get back a state, not a nullable.
@@ -179,8 +188,17 @@ export function useGraphQuery(
   params: Record<string, unknown> = {},
   opts: GraphQueryOptions = {},
 ): QueryState<SpecResult> {
-  const { access } = useGraphAccess()
-  const { deadlineMs = DEFAULT_DEADLINE_MS, enabled = true } = opts
+  const { deadlineMs = DEFAULT_DEADLINE_MS, enabled = true, access: given } = opts
+  // The context is read unconditionally — a hook cannot be skipped — and used
+  // only when no seam was handed in. Missing BOTH is the same error
+  // useGraphAccess() raises, and it is raised by name for the same reason.
+  const ctx = useContext(GraphAccessContext)
+  const access = given ?? ctx?.access
+  if (!access) {
+    throw new Error(
+      'useGraphQuery() outside <GraphAccessProvider> and with no access option — mount the provider above the routes, or pass { access }',
+    )
+  }
   const key = requestKey(specId, params)
   const [state, setState] = useState<QueryState<SpecResult>>({ status: 'loading' })
   // The params object is rebuilt every render at most call sites; the KEY is

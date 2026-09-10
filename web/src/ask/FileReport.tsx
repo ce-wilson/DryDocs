@@ -1,9 +1,9 @@
 import { useState } from 'react'
 
-import type { SpecResult } from '../lib/graph'
 import EmptyState from '../components/ui/EmptyState'
-import { useGraphAccess } from '../data/graphAccess'
-import { validateRows, type RowShape } from '../data/rowShape'
+import CompletenessNotice from '../components/ui/CompletenessNotice'
+import type { RowShape } from '../data/rowShape'
+import { useSpecRows } from '../data/useSpecRows'
 
 // The Ask file-name REPORT (O62): search a file, get the application, the
 // process, and who to escalate to.
@@ -80,35 +80,33 @@ const TD = 'border-b border-edge-soft px-2.5 py-1.5 align-top text-text'
 
 export default function FileReport() {
   const [term, setTerm] = useState('')
-  const [rows, setRows] = useState<ReportRow[] | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [busy, setBusy] = useState(false)
+  /** The term the report is FOR, which is not the term in the box: a search runs
+   *  on submit and the box keeps typing after it. Null before the first search,
+   *  which is the state the placeholder below reads. */
+  const [submitted, setSubmitted] = useState<string | null>(null)
 
-  const { access } = useGraphAccess()
+  // WEB19: the read is the shared hook, so the completeness envelope arrives
+  // with the rows instead of being dropped at the line that unpacked them.
+  // WEB6 survives it unchanged — this pane has an error channel, so a column
+  // mismatch comes back as `shape` and uses that channel rather than rendering a
+  // table of blanks. The spec is a registry one and not ephemeral, so its
+  // declared types are real and get checked too.
+  const load = useSpecRows<ReportRow>(
+    SPEC_ID,
+    REPORT_COLUMNS,
+    { term: submitted ?? '' },
+    { enabled: submitted !== null },
+  )
 
-  async function run(e: React.FormEvent) {
+  const busy = submitted !== null && load.state === 'loading'
+  const rows = load.state === 'ready' ? load.rows : null
+  const error = load.state === 'error' ? load.message : null
+
+  function run(e: React.FormEvent) {
     e.preventDefault()
     const q = term.trim()
     if (!q) return
-    setBusy(true)
-    setError(null)
-    setRows(null)
-    try {
-      const res: SpecResult = await access.runSpec(SPEC_ID, { term: q })
-      // WEB6: this pane already has an error channel, so a column mismatch uses
-      // it rather than rendering a table of blanks. The spec is a registry one
-      // and not ephemeral, so its declared types are real and get checked too.
-      const checked = validateRows<ReportRow>(res, REPORT_COLUMNS)
-      if (!checked.ok) {
-        setError(checked.message)
-        return
-      }
-      setRows(checked.rows)
-    } catch (err) {
-      setError((err as Error).message)
-    } finally {
-      setBusy(false)
-    }
+    setSubmitted(q)
   }
 
   return (
@@ -146,9 +144,21 @@ export default function FileReport() {
 
       {rows !== null && rows.length === 0 && (
         <EmptyState
-          title={`No asset matches “${term.trim()}”`}
+          title={`No asset matches “${submitted ?? ''}”`}
           hint={`not found via ${SPEC_ID}. The spec filtered on the term and the graph returned nothing — which is an answer, not an empty section.`}
         />
+      )}
+
+      {load.state === 'ready' && load.rows.length > 0 && (
+        <p className="flex shrink-0 items-center gap-2 font-mono text-[10px] text-muted">
+          <span>
+            {load.rows.length} match{load.rows.length === 1 ? '' : 'es'} via {SPEC_ID}
+          </span>
+          {/* WEB19: a capped search reads as "these are the matches" when it
+              means "these are the first of them", and this report is exactly
+              where a reader stops looking after the first screen. */}
+          <CompletenessNotice completeness={load.completeness} unit="matches" noun="match" />
+        </p>
       )}
 
       {rows !== null && rows.length > 0 && (
@@ -190,7 +200,7 @@ export default function FileReport() {
         </div>
       )}
 
-      {rows === null && !error && (
+      {(submitted === null || busy) && (
         <div className="min-h-0 flex-1 overflow-auto">
           <EmptyState
             title="Search a file or table name"

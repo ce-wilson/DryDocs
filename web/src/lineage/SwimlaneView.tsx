@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 
 import {
@@ -7,7 +7,9 @@ import {
   resolveLanes,
   type LaneBasisId,
   type LaneItem,
+  type LoadMapSystem,
 } from './laneBasis'
+import { loadLayerSystems } from './layerSystems'
 import { EDGE_BACKING, SWIMLANE_EDGES, SWIMLANE_ITEMS } from './demoSwimlane'
 
 // The /lineage swimlane (O60). Filename recorded at build: SwimlaneView.tsx, as
@@ -33,12 +35,42 @@ import { EDGE_BACKING, SWIMLANE_EDGES, SWIMLANE_ITEMS } from './demoSwimlane'
 
 const DEFAULT_BASIS: LaneBasisId = 'source-kind'
 
+/** WEB23: the registry systems arrive on demand, so this surface has a state the
+ *  resolver does not - "asked, not answered yet". It matters more here than a
+ *  spinner usually does: an empty declared lane on this basis is a FINDING the
+ *  view is built to show, so rendering the lanes before the systems land would
+ *  present a loading state as evidence that no system carries that layer. The
+ *  reading notice below exists to keep those two apart. */
+type Systems = { state: 'reading' } | { state: 'ready'; systems: LoadMapSystem[] }
+
 export default function SwimlaneView() {
   const [params, setParams] = useSearchParams()
   const raw = params.get('lanes')
   const basisId: LaneBasisId = isLaneBasis(raw) ? raw : DEFAULT_BASIS
 
-  const basis = useMemo(() => resolveLanes(basisId, SWIMLANE_ITEMS), [basisId])
+  const [layer, setLayer] = useState<Systems>({ state: 'reading' })
+
+  useEffect(() => {
+    // Only the BDAT basis needs them, and only once - the browser caches the
+    // chunk, so a second visit to this basis costs a resolved promise.
+    if (basisId !== 'layer' || layer.state === 'ready') return
+    let live = true
+    loadLayerSystems().then((systems) => {
+      if (live) setLayer({ state: 'ready', systems })
+    })
+    return () => {
+      live = false
+    }
+  }, [basisId, layer.state])
+
+  const basis = useMemo(
+    () => resolveLanes(basisId, SWIMLANE_ITEMS, layer.state === 'ready' ? layer.systems : []),
+    [basisId, layer],
+  )
+
+  /** The one case the lanes must not be drawn for: this basis reads the registry
+   *  and the registry has not answered. See the note on `Systems`. */
+  const reading = basisId === 'layer' && layer.state !== 'ready'
 
   const byLane = useMemo(() => {
     const map = new Map<string, LaneItem[]>()
@@ -89,9 +121,18 @@ export default function SwimlaneView() {
         {basis.axisNote}
       </p>
 
+      {reading && (
+        <p className="shrink-0 rounded border border-edge bg-panel-2 px-2.5 py-1 text-[11px] text-muted">
+          Reading the registry systems from the generated load map. The lanes are held back
+          rather than drawn empty: on this basis an empty lane is a finding, and a lane that is
+          empty because nothing has arrived yet is not one.
+        </p>
+      )}
+
       <div className="min-h-0 flex-1 overflow-auto">
         <div className="flex min-h-full gap-1.5">
-          {basis.lanes.map((lane) => {
+          {!reading &&
+          basis.lanes.map((lane) => {
             const items = byLane.get(lane.id) ?? []
             return (
               <section

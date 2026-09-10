@@ -7,7 +7,7 @@ phase: 12
 agent: main
 model: sonnet
 priority: p1
-status: todo
+status: done
 depends_on: []
 inputs:
 - web/src/components/map/RuntimeSpanMap.tsx
@@ -26,3 +26,24 @@ acceptance: |
 notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). web-2026-09-09.md candidate 1 (L1-1(b), ranked 1) and premise-drift ask 3. PEN: belongs to the UI-testing session's code:drydocs-web pen (user ruling 2026-09-09); the
   Lane B queue skips it and Lane A merges it like any wip branch.
+  DONE 2026-09-10 (UI workstream, ui-workstream worktree, desktop; branch feat/web-completeness).
+  The mechanism is a REQUIRED field rather than a convention: completeness rides on the success
+  branch of validateRows and on the ready arm of the new useSpecRows hook, so no type in the
+  console carries rows without it. Five surfaces migrated, not four - MappingsRoute joined
+  because the guard would otherwise have had to exempt a surface that renders rows, and an
+  exemption list holding the offenders is not a guard. Each migration deleted a hand-rolled
+  effect that had no deadline, no abort and no dedupe, and gained all three from useGraphQuery.
+  useGraphQuery took an access option, defaulting to the provider, so the two prop-injected maps
+  could reach the hook at all - a hook nothing can reach is a hook nothing migrates onto.
+  The guard enumerates every direct spec consumer and fails one that never names completeness.
+  Mutation-checked: removing the notice from RuntimeSpanMap fails two of its assertions by name.
+  O42 ledger row added for CompletenessNotice, count 108 to 109, bound stays 43.
+  Verified on this tree: tsc -b clean, oxlint clean, web suite 506 passed in 47 files (from 497
+  in 46), J57 family plus test_ui_components.py and test_load_map_console.py 80 passed.
+  EXPECTED RED for Lane A, not this lane: ui-components.yaml is a load-map provenance input, so
+  the ledger row moves the digest in the derived web/src/generated/load-map.json, which this lane
+  is fenced from rendering. Three tests are red until the merge render lands -
+  test_load_map_json.py::test_committed_load_map_matches_regeneration,
+  ::test_committed_load_map_html_matches_regeneration, and
+  test_registry_view.py::test_the_committed_load_map_carries_the_digest_of_its_inputs.
+  Attributed rather than assumed: reverting the one ledger row clears all three and nothing else.

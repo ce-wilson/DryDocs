@@ -15,6 +15,8 @@ import AppCodeCascadePane from './AppCodeCascadePane'
 import DomainGridTable from './DomainGridTable'
 import { isResolved, useGraphAccess, useGraphQuery } from '../data/graphAccess'
 import { validateRows, validateRowsOf, type RowShape } from '../data/rowShape'
+import CompletenessNotice from '../components/ui/CompletenessNotice'
+import { completeOf } from '../data/completeness'
 
 // /mappings — the O13 manual-mapping stewardship screen (wf-mapping-01).
 // Steward + admin only (server-enforced too — /mappings/* returns 403 below
@@ -298,12 +300,17 @@ function SealOverridePane({
   // blanks; it now names the column. ONE call, memoised on the query state —
   // the rows and the problem are two faces of one check, and computing them
   // separately would let them disagree.
+  // WEB19: the completeness envelope rides in the same memo as the rows and the
+  // problem, for the reason the comment above already gives — they are faces of
+  // one check, and computing them apart lets them disagree. A capped live read
+  // silently withholds SEAL attributions the committed grid below then appears
+  // to contradict.
   const live = useMemo(() => {
-    if (!isResolved(sealRoles)) return { rows: null, problem: null }
+    if (!isResolved(sealRoles)) return { rows: null, problem: null, completeness: completeOf(0) }
     const checked = validateRows<SealRoleRow>(sealRoles.data, SEAL_ROLE_COLUMNS)
     return checked.ok
-      ? { rows: checked.rows, problem: null }
-      : { rows: [] as SealRoleRow[], problem: checked.message }
+      ? { rows: checked.rows, problem: null, completeness: checked.completeness }
+      : { rows: [] as SealRoleRow[], problem: checked.message, completeness: completeOf(0) }
   }, [sealRoles])
   // A shape failure reads as "no live rows" HERE rather than blanking the pane:
   // the committed grid below is a real answer that does not depend on this read,
@@ -518,6 +525,19 @@ function SealOverridePane({
         <p className="shrink-0 rounded border border-red/50 bg-red/10 px-2 py-1 text-[11px] text-red">
           <b>Column mismatch.</b> {live.problem} Live SEAL attributions are not shown; the committed
           grid below is unaffected.
+        </p>
+      )}
+      {live.completeness.truncated && (
+        // WEB19: the live read hit the server's ceiling, so the attributions
+        // shown are the first of them. Said here rather than left to the reader
+        // to infer from a row count, because the committed grid beside it looks
+        // like the disagreement.
+        <p className="flex shrink-0 items-center gap-2 rounded border border-yellow/50 bg-yellow/10 px-2 py-1 text-[11px] text-yellow">
+          <span>
+            <b>Partial live read.</b> Live SEAL attributions were capped by the server; more exist
+            than are merged into the grid below.
+          </span>
+          <CompletenessNotice completeness={live.completeness} unit="rows" noun="attribution" />
         </p>
       )}
       {status && <p className="shrink-0 font-mono text-[10px] text-muted">{status}</p>}

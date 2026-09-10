@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import type { SpecResult } from '../lib/graph'
+import { useMemo, useRef, useState } from 'react'
 import { canReviewIntake, type Persona } from '../lib/auth'
 import { createIntakeApi, type IntakeRecord } from '../lib/intakeApi'
 import contextTypesData from '../generated/context-types.json'
@@ -9,7 +8,9 @@ import IntakeStepper from '../components/IntakeStepper'
 import IntakeReviewQueue from '../components/IntakeReviewQueue'
 import ThreadDiff from '../components/ThreadDiff'
 import { useGraphAccess } from '../data/graphAccess'
-import { validateRows, type RowShape } from '../data/rowShape'
+import type { RowShape } from '../data/rowShape'
+import { useSpecRows, type SpecRows } from '../data/useSpecRows'
+import CompletenessNotice from '../components/ui/CompletenessNotice'
 
 // O47 — the Context Intake page, slice 3 of docs/design/ui-exploration/sme-intake-page-plan.md.
 // Sections 1–3 are live against O45 (context-type artifact) and O46 (intake
@@ -110,54 +111,52 @@ function PlaceholderSection({ n, title, slice }: { n: number; title: string; sli
 }
 
 export default function IntakeRoute({ persona }: { persona: Persona }) {
-  const { access, apiUrl } = useGraphAccess()
+  const { apiUrl } = useGraphAccess()
   const intakeApi = useMemo(() => createIntakeApi(apiUrl, persona.id), [apiUrl, persona.id])
 
   // ── graph-backed pickers (degrade to empty-with-notice; never fabricate)
-  const [areaRows, setAreaRows] = useState<AreaRow[] | null>(null)
-  const [areaLive, setAreaLive] = useState(false)
-  const [apps, setApps] = useState<AppRow[] | null>(null)
-  const [backfill, setBackfill] = useState<BackfillRow[]>([])
-  // First mismatch wins: three pickers read three specs, and three copies of
-  // the same sentence would be noise where one is a report.
-  const [shapeProblem, setShapeProblem] = useState<string | null>(null)
+  //
+  // WEB19: three reads through the shared hook, replacing one hand-rolled effect
+  // that ran three specs and discarded three completeness envelopes. WEB6 is
+  // preserved by the hook rather than by this file: the shape travels WITH the
+  // type parameter, so a read cannot be started for a row type nobody declared
+  // columns for — which was how one generic cast covered three specs and checked
+  // none of them.
+  const area = useSpecRows<AreaRow>(AREA_TREE_SPEC, AREA_COLUMNS)
+  const appList = useSpecRows<AppRow>(APP_SPEC, APP_COLUMNS)
+  const backfillList = useSpecRows<BackfillRow>(BACKFILL_SPEC, BACKFILL_COLUMNS)
 
-  useEffect(() => {
-    const ctl = new AbortController()
-    // WEB6: the shape travels WITH the type parameter, so the helper cannot be
-    // called for a row type nobody declared columns for — which was how one
-    // generic cast covered three different specs and checked none of them.
-    const run = <T,>(
-      spec: string,
-      shape: RowShape<T>,
-      set: (rows: T[]) => void,
-      setLive?: (v: boolean) => void,
-    ) =>
-      access
-        .runSpec(spec, {}, { signal: ctl.signal })
-        .then((r: SpecResult) => {
-          if (ctl.signal.aborted) return
-          const checked = validateRows<T>(r, shape)
-          if (!checked.ok) {
-            // These are PICKERS. An empty picker with the page's existing
-            // "degrade to empty-with-notice" behaviour is the honest outcome;
-            // a picker populated from rows whose columns do not match would
-            // offer choices that submit the wrong ids.
-            setShapeProblem((prev) => prev ?? checked.message)
-            set([])
-            return
-          }
-          set(checked.rows)
-          setLive?.(checked.rows.length > 0)
-        })
-        .catch(() => {
-          if (!ctl.signal.aborted) set([])
-        })
-    run<AreaRow>(AREA_TREE_SPEC, AREA_COLUMNS, setAreaRows, setAreaLive)
-    run<AppRow>(APP_SPEC, APP_COLUMNS, setApps)
-    run<BackfillRow>(BACKFILL_SPEC, BACKFILL_COLUMNS, setBackfill)
-    return () => ctl.abort()
-  }, [access])
+  /** These are PICKERS. An empty picker with the page's existing
+   *  "degrade to empty-with-notice" behaviour is the honest outcome; a picker
+   *  populated from rows whose columns do not match would offer choices that
+   *  submit the wrong ids. Null while the read is still out, so the notices
+   *  below can tell "not answered yet" from "answered with nothing". */
+  function pickerRows<T>(load: SpecRows<T>): T[] | null {
+    if (load.state === 'loading') return null
+    return load.state === 'ready' ? load.rows : []
+  }
+
+  const areaRows = pickerRows(area)
+  const areaLive = area.state === 'ready' && area.rows.length > 0
+  const apps = pickerRows(appList)
+  const backfill = pickerRows(backfillList) ?? []
+
+  // First mismatch wins: three pickers read three specs, and three copies of the
+  // same sentence would be noise where one is a report. A transport failure is
+  // NOT one of these — it empties the picker and says nothing about the server's
+  // contract, which is the distinction WEB6 drew.
+  const shapeProblem =
+    [area, appList, backfillList].find((l) => l.state === 'error' && l.reason === 'shape') ?? null
+
+  /** A picker built from a CAPPED read offers a subset of the estate and looks
+   *  like the whole of it — the same defect as a sparse map, on a control that
+   *  submits an id. Reported per read, because which list is short is the part
+   *  a reader can act on. */
+  const cappedPickers = [
+    { label: 'Area tree', load: area },
+    { label: 'Applications', load: appList },
+    { label: 'Backfill', load: backfillList },
+  ].filter((p) => p.load.state === 'ready' && p.load.completeness.truncated)
 
   // ── §1 area cascade state
   const [productLineId, setProductLineId] = useState('')
@@ -316,13 +315,36 @@ export default function IntakeRoute({ persona }: { persona: Persona }) {
     <div>
       <ModuleToolbar crumbs={[{ label: 'Home', to: '/' }, { label: 'Context intake' }]} />
       <div className="flex flex-col gap-4 p-4">
-        {shapeProblem && (
+        {shapeProblem && shapeProblem.state === 'error' && (
           // WEB6 clause (c): distinct from the empty-tree notice below, because
           // "the load has not run" and "the columns moved" send a reader to two
           // different people.
           <p className="rounded border border-red/50 bg-red/10 p-2 text-xs text-red">
-            <b>Column mismatch.</b> {shapeProblem} The pickers below are empty rather than populated
-            from rows this page cannot read.
+            <b>Column mismatch.</b> {shapeProblem.message} The pickers below are empty rather than
+            populated from rows this page cannot read.
+          </p>
+        )}
+        {cappedPickers.length > 0 && (
+          // WEB19: a capped picker is a SHORT LIST THAT LOOKS COMPLETE, and the
+          // choice made from it submits a real id. Named per list, beside the
+          // badge that says the count is of what arrived.
+          <p className="flex flex-wrap items-center gap-2 rounded border border-yellow/50 bg-yellow/10 p-2 text-xs text-yellow">
+            <span>
+              <b>Partial pickers.</b>{' '}
+              {cappedPickers.map((p) => p.label).join(', ')} hit the server's row ceiling, so the
+              choices offered are the first of them and not all of them.
+            </span>
+            {cappedPickers.map(
+              (p) =>
+                p.load.state === 'ready' && (
+                  <CompletenessNotice
+                    key={p.label}
+                    completeness={p.load.completeness}
+                    unit="rows"
+                    noun="row"
+                  />
+                ),
+            )}
           </p>
         )}
         {!areaLive && areaRows !== null && (

@@ -31,8 +31,31 @@ import { fileURLToPath } from 'node:url'
  * measurement. RAISING it means the initial download grew, so the line that
  * raises it says what arrived and why it belongs in the entry chunk rather than
  * behind a lazy boundary — that sentence is the point of the number.
+ *
+ * 2026-09-10, WEB23: RATCHETED DOWN to 2,500,000, measured at 2,427,507 bytes —
+ * 72,493 of margin, 3.0%, which is the margin WEB7 set and which had been spent
+ * without anyone deciding to spend it. It was NOT lowered to today's build; the
+ * margin was restored by moving 79 KB out of the entry chunk, and this number
+ * follows that measurement.
+ *
+ * WHAT MOVED, because the docstring is where the decision lives.
+ * web/src/generated/load-map.json was in the entry chunk because
+ * lineage/laneBasis.ts imported it statically and /lineage is open to every
+ * role. WEB7 left it there on an ACCESS argument — the artifact is admissible to
+ * a user — and that argument is still correct. It answers whether a persona may
+ * have the file, not whether every persona must download it before anything
+ * renders. Only the BDAT lane basis reads it, behind a picker most sessions
+ * never touch, so it is fetched on demand now (lineage/layerSystems.ts) and
+ * shares a chunk with the two lazy routes that already read it. Nothing was
+ * hidden from anyone; 79 KB stopped arriving first.
+ *
+ * The ceiling was ALREADY EXCEEDED when this ran — 2,506,022 against 2,505,000 —
+ * which is the condition WEB23 was minted from: the budget had 812 bytes left on
+ * 2026-09-09 and the next change of any size was going to red the web job for
+ * whoever made it. That is a guard naming the wrong author, so the margin is the
+ * fix and not the number.
  */
-const CEILING_BYTES = 2_505_000
+const CEILING_BYTES = 2_500_000
 
 const here = dirname(fileURLToPath(import.meta.url))
 const assets = resolve(here, '../dist/assets')
