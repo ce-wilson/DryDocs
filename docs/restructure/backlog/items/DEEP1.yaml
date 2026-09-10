@@ -7,7 +7,7 @@ phase: 17
 agent: main
 model: haiku
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs_deepdoc/investigate.py
@@ -21,3 +21,45 @@ notes: |
   HAND-BACK from CORE10 (Lane A, 2026-09-09; ADR 0021 action item 4, name only): when this
   item is open, add ONE citing comment at drydocs_deepdoc/investigate.py above the `raise NotImplementedError(...)` in investigate_failure (precedent 6: the scaffold names which of its own bodies raise) - the shape is
   the line CORE10 placed in drydocs/plan/plan_board.py; do not rewrite the site (ADR 0021 D4).
+
+  ## Close (Lane B, laptop, 2026-09-10) - wip/deep1-laptop
+
+  The opening docstring is now a POINTER, not a second copy: "the charter is in
+  drydocs_deepdoc, and this module does not restate it". Restating it here is
+  what let the two drift - the retired reactive on-failure model survived in
+  this file for three weeks after G32 retired it, because a restatement has no
+  mechanism telling it the original moved. Two lines, no behaviour change; the
+  trust/reliability paragraph is untouched and still true.
+
+  HAND-BACK FROM CORE10 (ADR 0021 action item 4) DONE: one citing comment above
+  the `raise NotImplementedError(...)` in investigate_failure, shaped like the
+  line CORE10 placed in drydocs/plan/plan_board.py:204 -
+  `# ADR 0021 precedent 6: the scaffold NAMES which of its own bodies raise. Name only.`
+  The site itself is NOT rewritten (ADR 0021 D4).
+
+  ## The noqa F401 re-export: RE-EXAMINED, not decided
+
+  It still has a purpose, and it is not the one its comment claimed.
+
+  The comment said "re-exported for the on-failure analysis bodies (G4)" - the
+  retired model again, and those bodies do not exist (investigate_failure
+  raises). MEASURED: no production code imports parse_command or
+  extract_container_command FROM investigate; the only consumer is
+  tests/unit/test_lineage_deepdoc_scaffold.py::test_both_components_share_the_core_parser,
+  which asserts `investigate.parse_command is core_parser.parse_command`.
+
+  That is not a self-referential guard, which is what it looks like at first. It
+  is the executable evidence for ADR 0002 D2 - "they share the
+  command-line/lineage parser in drydocs-core" - and for the charter's own
+  sentence that the parser is an INPUT to an investigation rather than a rival
+  to it. The re-exported names BEING the core objects is what makes that
+  checkable at all.
+
+  So: KEPT, and its comment now states the live reason and names the test that
+  pins it. Whether the invariant is better expressed without a module-level
+  re-export is a real question and NOT this item's to answer - flagged, not
+  taken, per the acceptance's "re-examine, not decide".
+
+  Suite: 4043 passed, ZERO failures at the code commit - this item moves no
+  render. The roadmap guard goes red only on THIS close commit, Y5 by design,
+  because these notes move the sources fingerprint.
