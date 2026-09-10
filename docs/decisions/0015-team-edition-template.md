@@ -355,6 +355,88 @@ gate (the URN shared-vs-owned question), and the module cut is applied at Phase 
 Consequences section's second trade-off (the frozen class as a governance cost) stands
 and now carries its reason.
 
+### Amendment 2026-09-10 — what an instance INHERITS of the record, and the 1.0 form of it
+
+**Authority.** SME ruling in-chat 2026-09-10, prompted by the AIS worked example below and
+taken while closing the company's `port-base-20260908` apply. A dated section, not an edit of
+the decisions above, for the reason the 2026-09-04 amendment gives: the ADR is PROPOSED, and a
+reader of D4 as first written must find the change here rather than in a diff. **The gate
+surfaces are deliberately NOT ruled here** — see B5.
+
+**The question D4 does not answer.** D4 classifies files by who OWNS them: frozen, instance-owned,
+derived. It says nothing about what a generated instance inherits of the base's accumulated
+RECORD — the decision prose, the signed gate log, the backlog history, the port reports, the
+review artifacts. Read literally, all of it is `canonical-template`, so a team generating an
+instance inherits every line of the producer's deliberation, most of which is about decisions
+that were made before their team existed. Nothing in D4 is wrong; the class was simply never
+asked this question.
+
+**B1 — AIS, the worked example, measured.** The AIS class layer is a company-local artifact of a
+2026-06-29 company gate. It was captured producer-side at C11, retired at the
+`platforms-taxonomy` gate (C12) and built out at C13. Measured on the producer tree at
+`dc8dee7e`: **no code at all** — no `platforms_supplement.cypher`, no `apply-platforms-supplement`
+verb, zero files under `drydocs_core/schema/` and zero entries under `drydocs_core/ontology/`
+carrying the labels. **Eleven backlog items** reference it and **every one is `done`**. What
+remained was roughly thirty lines of prose across gate records, gate pages, a taxonomy README and
+a glossary row — plus exactly **one executable artifact**: a guard asserting the labels are absent
+from a schema tree that never had them, which passed vacuously for its whole life. That guard is
+retired at GRAPH7. The glossary row stays.
+
+**B2 — the rule the example generalises to.** For any line of accumulated record, three questions
+in order, and the first that applies decides:
+
+1. **Does it RUN?** If it executes and its subject no longer exists on either side, it leaves.
+   A guard with no subject is not conservative, it is a green light on a claim nobody is
+   checking — AIS's guard is the proof, and it was green and wrong simultaneously.
+2. **Is it a FACT the instance must READ?** A glossary expansion, a field contract, an id
+   grammar, a vocabulary term. These carry, whatever their age. The AIS acronym row carries for
+   exactly this reason: it is the only surviving spelling, and the platforms-taxonomy gate's own
+   Q6 preserved it on purpose.
+3. **Is it the RECORD OF ARRIVING at a decision?** Then it does not carry as prose. It carries
+   as a REQUIREMENT — see B3.
+
+**B3 — the 1.0 form: the record is retrofitted as a requirements document.** DryDocs Team Edition
+ships as **1.0**: the code, and the documentation that gives the code its context. It does not
+ship the accumulated deliberation that produced them. The decisions, the design prose and the
+backlog are compressed into a requirements document that states **what the system must do and
+why, with the deciding record cited** — rather than the chronological account of reaching it.
+
+The reason is not tidiness, and it is worth stating plainly because it will look like tidiness to
+a later reader. **The volume of text is itself a maintenance cost, and it degrades every search
+run over the tree.** Grep, awk and every text search an agent or a person runs pays for each line,
+and a corpus that only grows makes each answer noisier than the last — a term that occurs once in
+a requirement and forty times across the deliberation that produced it returns forty-one hits, of
+which one is the answer. A base that has been accumulating since 2026-06 is already at that point;
+an instance generated from it starts there on day one and never improves. 1.0 is the moment to
+take the compression, because it is the only moment where nothing downstream depends on the old
+shape.
+
+What this does NOT mean: the producer's own record is not deleted. It stays in the producer tree,
+which is its home and its audit trail. The compression is of what the TEMPLATE carries.
+
+**B4 — the fourth file class this implies.** D4's three classes get a fourth, and it is defined by
+what happens at generation rather than at update:
+
+| Class | Contents | Rule |
+|---|---|---|
+| `record-not-carried` | decision prose, the deliberation that produced a ruling, superseded design notes, port reports, review artifacts | Present in the base, EXCLUDED from the template. Its content reaches an instance only through the requirements document that supersedes it, which is `canonical-template` like any other frozen doc |
+
+The copier `_exclude` in Phase 2 is where this becomes mechanical. Until then it is a rule with no
+enforcement, and this section says so rather than implying otherwise.
+
+**B5 — what this amendment does NOT rule: the gate surfaces.** `config/gate-log.md` and
+`config/gate-prompts/**` are excluded from this ruling by the SME, and they are the hardest case
+precisely because they are neither dead prose nor a readable fact: they are signed records with
+their own standing rules — the log is append-only and never edited, and a signed page takes riders
+rather than edits (L25). Whether a generated instance inherits them whole, inherits a summary, or
+starts its own log with a pointer to the base's, is its own gate question. Nothing here decides
+it, and an implementer who reads B3 as covering the gates has over-read this section.
+
+**What this amendment does not do.** No code moves. GRAPH7 retires one guard on the SME's ruling
+and is minted, not built; the requirements document does not exist yet; the `record-not-carried`
+exclusion is not in a copier file, because there is no copier file. Phase 0 still gates the whole
+ADR.
+
 ## Options Considered
 
 ### Distribution shape
