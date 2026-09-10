@@ -7,7 +7,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - tests/source_scan.py
@@ -155,3 +155,22 @@ notes: |
 
   The TypeScript twin `web/src/test/sourceScan.ts` has no equivalent exemption
   register, and `web/**` is the UI pen. Worth an item on that side.
+
+  ## Close (Lane B, laptop, 2026-09-10) - wip/graph4-laptop
+
+  All five acceptance clauses met. Suite 4045 passed; ruff check + ruff format
+  clean on all 21 changed files. The one red is
+  test_committed_roadmap_page_matches_its_sources, Y5 by design on a Lane B
+  close - this item's notes moved the sources fingerprint. Lane B renders
+  nothing; Lane A renders at merge.
+
+  Branch is based on `main` and touches only `tests/**` plus this item file, so
+  it is independent of every other Lane B branch in this burst. NOTE FOR LANE A:
+  GRAPH7 (test_constraint_drift.py) should be based on THIS branch, not main -
+  GRAPH4 registers two of that file's tests in RAW_READ_EXEMPTIONS.
+
+  Two follow-ups for Lane A, both needing a mint (backlog pen is A's):
+  1. Convert test_intake_api.py::test_no_graph_writes_no_neo4j_import to
+     imported_modules once API7 merges, and drop its exemption row.
+  2. Make test_every_absence_scan_over_a_stripper_goes_through_the_helper bind
+     stripper names per FUNCTION rather than per module (finding 2 above).
