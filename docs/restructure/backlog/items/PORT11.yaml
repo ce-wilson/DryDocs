@@ -1,0 +1,51 @@
+id: PORT11
+epic: release-infrastructure
+title: "A gate-log redaction is a PRODUCER-VENUE act, so the registry declares which side it applies to - today the consumer must adopt a redaction whose reason does not hold in a private repo, or hold a declaration that reads stale forever"
+type: task
+module: drydocs-port
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- config/gate-log-redactions.yaml
+- drydocs/port/gate_log_redactions.py
+- tests/unit/test_port_reconcile_guards.py
+- PORT-MANIFEST.yaml
+acceptance: |
+  (a) `config/gate-log-redactions.yaml` gains a declared SIDE for each redaction, on the
+  `per_side_fields` shape the manifest already uses for `wired` and `confirmed`: a redaction is a
+  publish-boundary act of ONE venue, and the registry says which. The vocabulary is closed and the
+  reader refuses an undeclared value, the same way the descriptor axes do.
+  (b) `stale_redactions()` stops firing on a consumer whose live file legitimately never carried
+  the replacement, because the redaction was not theirs to make. A declaration still goes stale
+  the way it does today on the side that OWNS it - that check is the point and does not weaken.
+  (c) The append-only guard reads the side, so a consumer keeping the true name is GREEN rather
+  than exempted, and a consumer who took the producer's text is green too. Both states are legal
+  and the registry says which one this venue is in.
+  (d) A test for each: the owning side with the replacement present, the owning side gone stale,
+  the non-owning side that never had it, and an undeclared side refused. The last is the one that
+  makes the field a declaration rather than a default.
+  (e) A relay tells the company the field exists and that they may restore the true name under it.
+  NOT in scope: changing what was redacted producer-side, and re-opening any signed record.
+notes: |
+  Minted 2026-09-10 (Lane A, desktop; pen backlog) from the company's close-out of
+  port-base-20260908, and it is owed to them by name in the prompt that closed that roll.
+  THE ASYMMETRY, in their words: "the redaction is a producer-venue publish-boundary action.
+  Company-side there is no publish boundary - it is a company-internal system name in the private
+  repo, which is exactly where such names belong. So importing the redaction removes a true name
+  from the venue that is allowed to hold it." That is correct, and nothing in the registry can
+  express it today.
+  WHY THEY TOOK IT ANYWAY, and why this is p2 rather than p1: the registry is not at their base;
+  it arrives in the eighth roll. Its header rules that "a declared replacement that is no longer
+  in the live file is STALE and fails the guard", and the reader's docstring states the design
+  premise - the consumer's before-snapshot carries the old string, so the consumer's guard is the
+  one that fails, and the registry exists to tell it the edit is ruled. So a consumer who KEEPS
+  the true name holds a permanently stale declaration the moment the roll lands, with no exemption
+  path. Taking the producer's text was the only green option available on the day, ruled by the
+  SME 2026-09-10, and it is a stopgap this item removes rather than a settled position.
+  The general shape is one the repo already has twice: `wired` and `confirmed` are per-side
+  because two venues legitimately hold different values for one field. A redaction is the same
+  class, and the registry was written before that pattern existed.
