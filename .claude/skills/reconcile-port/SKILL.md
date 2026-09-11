@@ -18,10 +18,20 @@ the accumulated lessons from prior ports. Read both.
 ## Procedure
 
 1. **Preflight.** Clean tree, on `main`.
-   **FIRST, CLEAR OR REPOINT `RECONCILE_BEFORE_DIR` — before you measure anything.**
+   **FIRST, `RECONCILE_BEFORE_DIR`: SET IT INLINE, PER COMMAND — do not hold it in a scope.**
    ```powershell
-   [Environment]::GetEnvironmentVariable('RECONCILE_BEFORE_DIR','User')   # expect blank
+   $env:RECONCILE_BEFORE_DIR = "<this roll's before-dir>"; poetry run pytest ... # one shell
+   [Environment]::GetEnvironmentVariable('RECONCILE_BEFORE_DIR','User')          # expect blank
    ```
+   **A value that lives in USER scope reverts, and it reverts without telling you.** The
+   company's apply of `port-base-20260910b` hit this TWICE IN ONE DAY from two different
+   causes: once stale from the previous port at session start, and once mid-apply when the
+   terminal was recreated and the User-scope value came back — pointing at a 2026-09-05
+   directory that had since been DELETED. Six `*_live` guards went red **on the shell, not on
+   the tree**, and every figure taken while it was wrong would have been wrong with it. Inline
+   is the fix that covers both: a value passed per command cannot revert, cannot outlive the
+   session, and cannot be inherited by a terminal nobody configured. The check below is the
+   backstop for a value you did not set yourself.
    The teardown at the end of this skill clears it, but an apply that was interrupted,
    rebooted through, or simply not finished leaves it set at USER scope, where it
    survives into the NEXT port — and this roll's own plan asks for a before-dir that
