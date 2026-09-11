@@ -8,13 +8,61 @@ phase: 12
 agent: main
 model: sonnet
 priority: p3
-status: todo
+status: done
 depends_on: []
 inputs:
 - external/orchestration/bmc-controlm/controlm-calendars.md
 - drydocs_remediation/xml_io.py
 - tests/unit/fixtures_controlm_xml.py
+outputs:
+- config/taxonomy/ui-components.yaml
+- docs/reviews/g86-calendar-validation-and-rendering-ruling-2026-09-11.md
+- tests/unit/test_ui_components.py
+- web/src/calendar/RbcCalendarSpike.test.tsx
+- web/src/calendar/RbcCalendarSpike.tsx
+- web/src/calendar/rbcCalendar.test.ts
+- web/src/calendar/rbcCalendar.ts
 acceptance: |
   TWO QUESTIONS, ANSWERED SEPARATELY (a spike ruling counts; building both is not required to close this): (1) VALIDATION -- now that RULE_BASED_CALENDAR(S) elements survive import verbatim (xml_io splicing keeps them as bytes; the F3 fixture carries one), can a calendar definition be checked for internal consistency, and can a job's schedule be validated against the calendar it names? Deliverable: a written ruling with a worked synthetic example, or the validator itself. (2) RENDERING -- can it draw as an actual calendar in the console? CONSTRAINTS ALREADY KNOWN from the vendor corpus (controlm-calendars.md): three calendar types (Regular / Periodic / Rule-Based) with four RBC rule types and eight exception policies, so "render a calendar" is really three renderers -- scope a spike to RBC only first; and calendars are defined against EXPLICIT YEARS, so a projection may only extend as far as the calendar's year coverage -- a UI that silently projects past it is WRONG and the spike must show the boundary behavior. Related prior art: the calendar- projection plan (scheduling plane exact, prereq plane out of scope) and the data-center-naming default-time finding (DC names encode a default EST run time for folders without an explicit one; real DC names are Internal).
 notes: |
   Groomed from the 2026-08-12 user follow-up ("add a backlog task to test if the calenders can be validated or rendered as a calendar in the ui"). Split validate-vs-render on purpose: validation is graph/model work, rendering is a console surface, and either can ship without the other.
+  DONE 2026-09-11 (UI workstream, ui-workstream worktree, desktop; branch feat/web-completeness).
+  THE FINDING BOTH QUESTIONS TURN ON: this pipeline has never acquired an RBC's own rule
+  content. drydocs_remediation/xml_io.py never models calendar elements - its own docstring
+  says calendars "survive because nobody ever rewrites them, not because we modeled them" - and
+  the F3 fixture's RULE_BASED_CALENDARS element is the REFERENCE side only (which named
+  calendars a job/folder assigns, and their AND/OR combination), never the calendar's own rule
+  content. knowledge/standards/technology/calendar-resolution-projection-plan.md's Phase A
+  ("Acquire & normalize calendar data") is still status: planned. Full ruling and worked
+  synthetic example: docs/reviews/g86-calendar-validation-and-rendering-ruling-2026-09-11.md.
+  (1) VALIDATION: RULED, not built. Full internal-consistency validation needs the calendar's
+  rule content, which does not exist anywhere in this pipeline yet - building it now would be a
+  drydocs_core component authored against a premise the finding rules false, and drydocs_core
+  is outside this lane's pen regardless (code:drydocs-web only). What the acceptance's OTHER
+  deliverable option ("the validator itself") gets, as a worked spike rather than a production
+  artifact: web/src/calendar/rbcCalendar.ts implements all four RBC rule types (Specific Dates,
+  Weekdays with nth/last-occurrence, Month Days, Advanced AND/OR) as pure, tested functions -
+  the shape the production resolver takes once Phase A lands real data, per MODULE_MAP.md's
+  placement test (pure resolve logic -> drydocs_core, not written here).
+  (2) RENDERING: a real, scoped spike. web/src/calendar/RbcCalendarSpike.tsx takes a calendar
+  DEFINITION as a prop (not a fetch - there is nothing to fetch) and draws an RBC-only month
+  grid via the same resolver, per the acceptance's own scoping instruction (three calendar types
+  = three renderers, RBC first). Deliberately NOT wired into a route, nav entry, or the module
+  registry: routing a page backed by prop-only synthetic data would be the console's own
+  "never a blank state" convention pointed at itself. Registered in config/taxonomy/
+  ui-components.yaml regardless (O42 guard), UNBOUND - 'calendar' is not a registry module and
+  there is no route for it yet.
+  THE BOUNDARY BEHAVIOR THE ACCEPTANCE NAMES, proven rather than asserted: resolveRbcYear
+  returns a typed 'out-of-coverage' result (never a silently-empty 'resolved' one) when the
+  requested year is outside the calendar's declared years, and RbcCalendarSpike renders that as
+  a distinct EmptyState boundary message, never a blank or thinned grid - asserted directly in
+  both test files (an undeclared year: zero day cells rendered, not an empty set of matches; a
+  covered month with zero matches: every day still a cell, all non-match).
+  VERIFIED on this tree: tsc -b clean, oxlint clean (both scoped to web/src/calendar and repo-
+  wide), web suite 528 passed in 50 files (from 512 in 48 - 16 new tests, all in the two new
+  spec files), the J57 family plus test_ui_components.py and test_load_map_console.py 95 passed.
+  O42 ledger row added for RbcCalendarSpike, count 109 to 110, bound stays 43.
+  EXPECTED RED for Lane A, not this lane: the same load-map provenance mechanism WEB19 named -
+  ui-components.yaml is a load-map input, so this ledger row moves the digest in the derived
+  web/src/generated/load-map.json, which this lane is fenced from rendering. The three tests
+  WEB19 named stay red until the merge render lands.

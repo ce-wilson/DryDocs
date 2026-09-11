@@ -465,10 +465,20 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     because the alternative was the same four-line conditional around
     TruncationBadge in five places, which is how the completeness contract came
     to be implemented six times and written down zero (module sweep, slot 10).
+    109 -> 110 at G86 (2026-09-11): RbcCalendarSpike, UNBOUND, bound stays 43.
+    'calendar' is not a registry module, and the component is not wired into a
+    route at all -- MappingsRoute's and IntakeRoute's reason, one step earlier:
+    those are unbound because their module would have to be invented; this one
+    is unbound because there is no route yet for it to belong to. It takes a
+    calendar definition as a prop rather than fetching one, because the graph
+    carries no RULE_BASED_CALENDAR content today -- only the folder-level
+    reference attribute survives import, as unmodeled residue -- so the
+    component exists to prove the rendering approach and the year-boundary
+    refusal the acceptance names, not to ship a page with nothing behind it.
     """
     comps = _ui()["components"]
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
         43,
-        109,
+        110,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"
