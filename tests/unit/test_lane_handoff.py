@@ -262,6 +262,29 @@ def test_lane_pens_are_the_surface_pens_for_a_and_code_modules_for_b(h, items, r
     assert h.lane_pens("A", rows) == list(h.PENS)
 
 
+def test_a_third_lane_letter_is_a_build_lane_and_only_a_is_the_pen_holder(h, items, ready):
+    """The module branches on the ROLE, never on the letter (2026-09-11).
+
+    A burst can open a second build lane - a UI session, a desk session - on a
+    worktree or a third checkout. Lane A stays the one pen holder; C behaves
+    exactly as B, which is what makes rule 1 (partition by module) the thing that
+    keeps them apart rather than the letter count.
+    """
+    (c_row,), _ = h.check_queue(["GATE1"], items, ready, "C")
+    (b_row,), _ = h.check_queue(["GATE1"], items, ready, "B")
+    assert c_row["surfaces"] == b_row["surfaces"] != []
+
+    rows, _ = h.check_queue(["OPEN1", "READY2", "NOTED1"], items, ready, "C")
+    assert h.lane_pens("C", rows) == h.lane_pens("B", rows) != list(h.PENS)
+
+    text = h.render(lane="C", machine="desktop-ui", sender="A", rows=rows, other_queue=[])
+    assert "lane: C" in text
+    assert "**Lane C claims status-only and never renders.**" in text
+    assert "reach the inbox from Lane C)" in text
+    # its counterpart is still A, and A still holds every surface pen
+    assert "Lane A holds: `backlog · port · adr · gates · snapshot`" in text
+
+
 def test_render_declares_the_pens_in_front_matter_and_the_first_commit_line(h, items, ready):
     rows, _ = h.check_queue(["OPEN1"], items, ready, "B")
     text = h.render(lane="B", machine="laptop", sender="A", rows=rows, other_queue=["GATE1"])

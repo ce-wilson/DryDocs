@@ -43,7 +43,14 @@ that disagree. So:
 1. **Partition by module.** Since PLAN1 the id series IS the module, so Lane A takes items in
    one module set and Lane B another; two machines minting in disjoint series cannot collide
    on a number, and the title guard catches the one case they do. `--suggest` groups the
-   Ready strip by module for exactly this.
+   Ready strip by module for exactly this. **And this rule, not the letter count, is what
+   keeps lanes apart** — so a burst may open a SECOND build lane (`--lane C`, `--lane D`:
+   a UI session, a desk session, a third checkout or a worktree) whose queue is disjoint
+   by module. The script branches on the ROLE and never on the letter: Lane A is the one
+   pen holder, every other letter is a build lane with `code:<module>` pens, a `wip/`
+   branch and no render. Generalized 2026-09-11, when a UI lane and a desk lane opened
+   alongside a laptop lane that still had five items outstanding; `LANES` and
+   `test_a_third_lane_letter_is_a_build_lane_and_only_a_is_the_pen_holder` pin it.
 2. **One pen for `backlog`, and only that machine renders.** B claims status-only (an item
    file, pushed — Y5 tolerates it un-rendered) and never runs `render_board.py`; A renders once
    at close. The depgraph snapshot is the same: A only.

@@ -136,7 +136,13 @@ VENUE_MARKERS: tuple[str, ...] = ("internal-local/", "DRYDOCS_DATA_ROOT", "data/
 #: items on each lane named the same one, and none of them writes it.
 PROVENANCE_PREFIXES: tuple[str, ...] = ("docs/reviews/",)
 
-LANES = ("A", "B")
+#: Lane A is the PEN-HOLDING lane and every other letter is a build lane — the roles
+#: this module branches on, never the count. Two were enough while a burst meant two
+#: machines; a burst can open a second build lane (a UI session, a desk session) on a
+#: worktree or a third checkout, and rule 1 is what keeps them apart either way: the
+#: lanes partition BY MODULE, so N build lanes with disjoint queues collide no more
+#: than one does. A build lane's counterpart is always A, so ``other`` needs no change.
+LANES = ("A", "B", "C", "D")
 
 
 def _git(*args: str) -> str:
@@ -314,8 +320,8 @@ def check_queue(
 ) -> tuple[list[dict], list[str]]:
     """Validate an ordered queue: refusals stop the run; flags ride into the file.
 
-    Surface flags are a Lane B concern: Lane A OWNS those pens, so a Lane A queue
-    of gate sessions is the normal case, not a warning (the first eval run flagged
+    Surface flags are a BUILD lane's concern: Lane A OWNS those pens, so a Lane A
+    queue of gate sessions is the normal case, not a warning (the first eval run flagged
     G116-G119 for touching config/gate-prompts on a Lane A handoff — wrong).
     Overlap flags need ``other`` — the other lane's queue — and are a flag, not a
     refusal: Lane B took R12 and O68 knowingly on 2026-09-05, and that is the
@@ -361,7 +367,7 @@ def check_queue(
                 "model": item.get("model"),
                 "deps": [str(d) for d in item.get("depends_on") or []],
                 "venue": venue_flags(item, venues),
-                "surfaces": surface_flags(item) if lane == "B" else [],
+                "surfaces": surface_flags(item) if lane != "A" else [],
                 "gates": gate_flags(item),
                 "overlap": overlap_flags(iid, other or [], items),
             }
@@ -386,8 +392,8 @@ def other_queue_notes(
 
 
 def lane_pens(lane: str, rows: list[dict]) -> list[str]:
-    """What this lane declares in its first commit: Lane A the surface pens, Lane B one
-    ``code:<module>`` per module in its queue."""
+    """What this lane declares in its first commit: Lane A the surface pens, a BUILD
+    lane one ``code:<module>`` per module in its queue."""
     if lane == "A":
         return list(LANE_A_PENS)
     seen: dict[str, None] = {}
@@ -532,10 +538,10 @@ def render(
         ]
         out += [f"- {n}" for n in other_notes]
         out.append("")
-    if lane == "B":
+    if lane != "A":
         out += [
-            "**Lane B claims status-only and never renders.** A claim is one item file, pushed;",
-            "Y5 tolerates it un-rendered, and Lane A renders once at close. **Lane B does not",
+            f"**Lane {lane} claims status-only and never renders.** A claim is one item file, pushed;",
+            f"Y5 tolerates it un-rendered, and Lane A renders once at close. **Lane {lane} does not",
             "append to `IDEAS.md` while the inbox is one file** (until R6 shards it): even an",
             "allocator-minted id conflicts at the inbox top when both machines insert there in",
             "one burst (observed 2026-09-02, twice). Anything worth capturing goes back to the",
@@ -543,8 +549,8 @@ def render(
             "",
             "**Three things the 2026-09-03 burst learned the hard way** (six items, one laptop):",
             "",
-            "- **Every Lane B CLOSE commit is red on the roadmap guard, and that is expected.** Y5",
-            "  tolerates status-only drift; a close writes notes, and Lane B does not render, so",
+            f"- **Every Lane {lane} CLOSE commit is red on the roadmap guard, and that is expected.** Y5",
+            f"  tolerates status-only drift; a close writes notes, and Lane {lane} does not render, so",
             "  `test_committed_roadmap_page_matches_its_sources` fails on every `wip/` tip CI runs.",
             "  Read CI for the OTHER jobs and say so in the close report; Lane A's render at merge",
             "  is the fix.",
@@ -576,7 +582,7 @@ def render(
         "## Close — in this order",
         "",
     ]
-    if lane == "B":
+    if lane != "A":
         out += [
             "1. Every claimed item `done` and pushed; unfinished work on `wip/<id>-"
             + machine
@@ -585,13 +591,13 @@ def render(
             "2. `python .claude/skills/lane-handoff/scripts/handoff.py --check <this file>` — when it",
             "   reports the queue empty, delete this file in the same closing commit.",
             "3. Report back: what closed, what is on `wip/`, what you noticed (that is how ideas",
-            "   reach the inbox from Lane B). Lane A merges your `wip/` branches `--no-ff`, deletes",
+            f"   reach the inbox from Lane {lane}). Lane A merges your `wip/` branches `--no-ff`, deletes",
             "   them, renders once, snapshots once.",
             "",
         ]
     else:
         out += [
-            "1. Merge Lane B's `wip/<id>-*` branches `--no-ff` and delete them; then every item",
+            "1. Merge every build lane's `wip/<id>-*` branches `--no-ff` and delete them; then every item",
             "   `done` and pushed.",
             "2. Regenerate the renders ONCE (`render_board.py`, the design docs); `gh run list` at",
             "   YOUR sha; then the depgraph snapshot — the `snapshot` pen is yours.",
