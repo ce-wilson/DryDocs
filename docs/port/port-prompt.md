@@ -8439,7 +8439,13 @@ hand-carried and nothing parked.
     `port-base-20260908..port-base-20260910b`.
     RED AT PUSH (J77): none in this range. UNVERIFIED (J78): checked at the tag.
 
-ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
+ACCEPTANCE GATE (behavior is the contract, not a byte-compare). **THREE TRACKS, RUN IN
+ORDER, AND EACH ONE IS CHEAPER THAN THE ONE BELOW IT** — stop at the first that fails,
+because every figure a later track produces is a figure about a tree the earlier one
+already said is broken. The numbering was corrected 2026-09-10: this gate read
+"Track 1 (portable)" followed by an unlabelled full-suite bullet, so it named one track,
+implied a second, and delivered two — which is how the runtime smoke went missing for ten
+rolls without anyone noticing there was a slot for it.
 - Track 0 (RUNTIME SMOKE — added 2026-09-10, and it is FIRST because it is the cheapest
   and it is the one this gate has been missing):
     python -c "import drydocs.cli"
@@ -8464,7 +8470,7 @@ ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
   sample-backed tests skip without the CSV — at step 48 the CSV-absent figure was
   114 / 3). Company baseline is ABOVE the
   producer floor — compare against your own PORT-REPORT-e60822fc numbers, not these.
-- Full `pytest tests/unit/` — the contract is ZERO REGRESSIONS BY TEST ID against the
+- Track 2 (FULL SUITE) — `pytest tests/unit/`. The contract is ZERO REGRESSIONS BY TEST ID against the
   consumer's OWN prior PORT-REPORT, with every other failing id bucketed BY NAME in the
   PORT-REPORT (pre-existing / new test that crossed / unskipped) — a failure that is not
   bucketed is a failure, a count is not a bucket, and a deliberate remaining regression

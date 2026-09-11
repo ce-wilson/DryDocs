@@ -1112,6 +1112,27 @@ def test_the_producer_declares_its_venues() -> None:
     assert _declared_venue_codes(), "config/dev-environment.yaml declares no venues: section"
 
 
+# ─── PER-SIDE BLOCK: the two exemption tables below are PER-SIDE VALUES, not per-side code ───
+# EVERYTHING ABOUT THEM CROSSES EXCEPT THE ROWS. The guards, the reason-length rule and the
+# shrink-only rule are mechanism and are the same test on both trees; the ROWS are not, and a
+# port that takes either dict whole breaks whichever side it took from.
+#
+# The reason, so the next roll meets it before it diffs: both tables are guarded by
+# "every row must still be CITED by an item on THIS tree". A consumer's exemptions name paths
+# that are never-port here (`docs/port/**`, `.claude/skills/lane-handoff/**`); a producer's name
+# paths that do not exist there. Take the producer's dict whole and the consumer loses the rows
+# its own guard demands; UNION the two and each side inherits rows nothing on that side cites,
+# which the shrink-only guard then fails as dead weight. Both directions red. The dicts are
+# therefore SEPARATE VALUES behind one shared mechanism - the same split this file's
+# ALLOCATOR-BAND block already carries, and the same shape `test_plan_ideas.py` carries for
+# its band polarity.
+#
+# MEASURED 2026-09-10, company-side, during the port-base-20260910b apply: PLAN12's guard
+# arrived and reported 75 unresolved item inputs on that tree. The consumer correctly declined
+# to write 75 guessed exemption rows - "a guessed exemption is worse than a red guard" - and
+# will measure the true residue at close. This note exists so the roll after that one does not
+# re-derive any of it.
+#
 #: PLAN12 (2026-09-09) - `inputs:` entries a non-done item may carry that are NOT claims
 #: about the tracked tree. Shrink-only, on the runbook-currency guard's idiom: every entry
 #: carries a reason of at least forty characters, and an exemption no non-done item cites

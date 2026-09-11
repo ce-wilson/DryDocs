@@ -942,6 +942,17 @@ rows:
       already records why: "both sides run their own plan against OVERLAPPING
       ids". The bands remove the id collision; that rule still governs genuinely
       shared items.
+      THE TWO EXEMPTION TABLES ARE PER-SIDE VALUES TOO - PLAN12's INPUT_EXEMPTIONS and
+      PLAN14's OUTPUT_EXEMPTIONS - named here 2026-09-10 because both landed after this
+      rule was written and it was silent on them. The guards, the forty-character reason
+      rule and the shrink-only rule are MECHANISM and cross whole; the ROWS do not. Each
+      table is guarded by "every row must still be cited by an item on THIS tree", so
+      taking the producer's dict whole strands the consumer's rows, and unioning the two
+      gives each side rows nothing on that side cites - which the shrink-only guard then
+      fails as dead weight. Both directions red. Keep your own rows, take the mechanism.
+      Measured company-side at the port-base-20260910b apply: PLAN12's guard arrived and
+      reported 75 unresolved inputs there against ZERO producer rows, and that consumer
+      correctly declined to write 75 guessed exemptions rather than measure the residue.
   - path: "tests/unit/test_config_identity_header.py"
     disposition: per-entry
     entry_rule: >
