@@ -110,6 +110,24 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
+- **`Idea-314`** · 2026-09-11 · `[idea]` · **open** · prio? **Med** —
+  **A suite number taken on a DIRTY tree silently under-runs, and CLAUDE.md carries the worktree
+  twin of this rule but not this one.** Measured 2026-09-11 during the Lane A close of four merges:
+  the SAME merged tree, same venue, same `poetry run pytest -q` invocation, run twice —
+  `4210 passed / 18 skipped` with the renders and item edits UNCOMMITTED, then
+  `4212 passed / 16 skipped` once committed. Zero failures both times, so nothing was red and the
+  delta reads as noise until somebody looks. The cause is exactly two guards that skip BY DESIGN on
+  a dirty checkout: `tests/unit/test_port_reconcile_guards.py:938` and
+  `tests/unit/test_reconcile_port_skill_snapshot.py:85`, both "snapshot sources are dirty in this
+  checkout; the writer refuses by design" — correct behavior, since a half-edited gate-log is not a
+  test failure. The trap is structural: a close measures AFTER the work and BEFORE the commit, which
+  is precisely the dirty window, so the number a close records is always the under-run one. CLAUDE.md
+  section 0 already carries the worktree form ("Never take an acceptance NUMBER from a worktree run —
+  measure before and after in the SAME checkout"); the dirty-tree form is its twin and is written
+  down nowhere. Candidate: extend that sentence to name CLEANLINESS as well as checkout, and name the
+  two guards so the next reader does not re-derive them. The honest limit — neither guard is
+  defective and no code needs to change; this is a measurement rule.
+
 - **`Idea-311`** · 2026-09-10 · `[idea]` · **open** · prio? **High** —
   **The capability layer has THREE reachability classes and the tree declares none of them —
   and `config/dev-environment.yaml` `venues:` is already the right shape for the fix.** Measured
