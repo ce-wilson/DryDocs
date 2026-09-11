@@ -114,6 +114,34 @@ question a 1,000-line file with the trail at the bottom could not answer.
   **The J31 remote-branch check returns zero lines for every id, because `-r` lists
   `origin/wip/...` and the prescribed pattern is `wip/*` — four items record its emptiness as
   the evidence for releasing a claim.**
+  Found 2026-09-11 by an adversarial verify pass over the Lane C handoff, then measured directly
+  on this desktop against `main`: `git branch -r --list "wip/*"` returns **0 lines** while
+  `git branch -r --list "origin/wip/*"` returns **1** (`origin/wip/idea-192-desktop`), and
+  `*/wip/*` returns 1 as well. `-r` lists remote-TRACKING refs, whose shorthand carries the remote
+  name, so the pattern can never match. The command in CLAUDE.md §0 was corrected at both sites in
+  the same commit as this entry; the residue is what the entry is for.
+  **Why it matters more than a typo.** J31's whole purpose is to refuse a false negative — its own
+  words are "a claim with a wip branch behind it is not dead, it is someone's unmerged work" — and
+  the instrument prescribed to prove a claim dead reports *dead* for every id in the repo,
+  including ids with live pushed work. This is the C19/K9 double-build hazard arriving through the
+  check that exists to close it, and it is J76 on its own rule: check the instrument before the
+  subject.
+  **The residue, which is a ruling and not a sweep.** Four items already record the empty result as
+  evidence: `E1.yaml:20`, `G62.yaml:25`, `L19.yaml:21`, `MM7.yaml:38` each say
+  "`git branch -r --list "wip/<id>-*"` is empty" as the basis for releasing or closing a claim, and
+  that sentence was true of every id regardless of what was on the remote. Re-running the corrected
+  form today cannot settle it: Lane A's close deletes the remote branch after the merge (DOC7), so
+  an id whose work WAS merged and an id whose work was never pushed both read empty now. What can
+  be checked is the reflog and `git log --all --source`, per id, which is desk work. Decide whether
+  those four are re-verified or their notes simply amended to say the evidence line was vacuous.
+  Two more sites carry the pattern as a prescription rather than as evidence and should be
+  corrected with it: `DOC7.yaml:28` and `J31.yaml:17`/`:24`. A review finding also rests on it —
+  `docs/reviews/job-etl-binding-second-pass-review-2026-09-04.md:94` calls MM7's work "unpushed and
+  invisible" on the strength of an empty `wip/*` listing.
+  **Worth ruling alongside:** whether this belongs in a script rather than in prose at all. The
+  lane-handoff skill already reads remote refs correctly through the allocator's `remote_ids()`
+  pattern, and PLAN13 clause (b) proposes exactly that for `--suggest` and `--check` — so the
+  durable fix may be that no human ever types this command again, and the prose cites the tool.
 
 - **`Idea-319`** · 2026-09-11 · `[bug]` · **open** · prio? **High** —
   **Four open items say in their acceptance that the pull loop skips them and carry no `hold:`,

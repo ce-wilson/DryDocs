@@ -74,8 +74,15 @@ things share the word *port* — never conflate them:
   the **end of any session that did not close its item**; (2) WHERE — a branch named
   **`wip/<id>-<machine>`** (the shape the K9 recovery used, `wip/k9-laptop`), never `main`;
   (3) BEFORE RELEASING someone else's `in_progress` claim back to `todo`, run
-  **`git branch -r --list "wip/<id>-*"`** — a claim with a wip branch behind it is not dead, it is
-  someone's unmerged work. **The check reads the REMOTE, and the LOCAL branch is deleted once the
+  **`git branch -r --list "origin/wip/<id>-*"`** — a claim with a wip branch behind it is not dead,
+  it is someone's unmerged work. **The `origin/` prefix is not optional and this rule shipped
+  without it** (corrected 2026-09-11): `-r` lists REMOTE-TRACKING refs, whose shorthand is
+  `origin/wip/...`, so the pattern `wip/*` matches nothing on any tree, ever — measured here the
+  same day at 0 lines against 1 for `origin/wip/*`, with one branch live on the remote. That is a
+  false negative in the one check whose entire job is to refuse one, and four items
+  (E1, G62, L19, MM7) already record "`git branch -r --list "wip/<id>-*"` is empty" as the evidence
+  for releasing or closing a claim — a sentence that was true of every id in the repo. Use
+  `origin/wip/*`, or `*/wip/*` if a second remote is ever added. **The check reads the REMOTE, and the LOCAL branch is deleted once the
   merge is confirmed** (DOC7): Lane A's close already deletes the remote branch after the `--no-ff`
   merge, so the local tracking branches are residue — `git branch -d` each one (never `-D`: the
   refusal on an unmerged branch IS the check). Left alone they accumulate, and a bare `git branch`
@@ -92,8 +99,8 @@ things share the word *port* — never conflate them:
   `code:<module>` — in its first commit message or a `wip/` branch name. Any other live session
   stays off those surfaces until the pen moves, and asks rather than assumes. The item-file
   claim (`status: in_progress`, pushed) is the pen for ONE ITEM; this is the pen for a SURFACE.
-  The board's Ready strip and `git branch -r --list "wip/*"` are where you look before picking
-  one up. What this does NOT cover: a session that never says what it holds — that was the
+  The board's Ready strip and `git branch -r --list "origin/wip/*"` are where you look before
+  picking one up (the prefix matters — see the J31 clause above). What this does NOT cover: a session that never says what it holds — that was the
   coordination failure of 2026-09-02 (two sessions grooming and merging the same renders in one
   afternoon), and it is not a tooling gap. **For a planned two-machine burst, the
   [`lane-handoff` skill](.claude/skills/lane-handoff/SKILL.md) generates the queue, the pens
