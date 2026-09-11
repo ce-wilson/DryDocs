@@ -73,6 +73,7 @@ import {
 } from '../components/ui/tableControls'
 
 // Idea-192 PoC: /load-map with Salt DS leaf components; findings in docs/design/ui-exploration/salt-ds-poc.md.
+// Tailwind spacing sits on plain divs only: Salt's CSS is unlayered, so it overrides utility padding/margin on its own components.
 
 type SourceViewRow = LoadMapSource & { taxonomy: string }
 type Skin = 'current' | 'salt' | 'salt-branded'
@@ -213,44 +214,48 @@ function SaltLoadMap() {
   ]
 
   const graphPane = (
-    <StackLayout gap={1} className="h-full min-h-0 p-3">
-      <Banner status="info">
-        <BannerContent>
-          <strong>Declared, not observed.</strong> Every row comes from the registries via the generated{' '}
-          <code>load-map.json</code>. Whether a load actually ran is /loads; the {DOC_CORPUS_COUNT} doc-corpus sources
-          are rendered by /software.
-        </BannerContent>
-      </Banner>
-      <FlowLayout gap={1}>
-        {tiles.map((t) => (
-          <Card key={t.label} variant="secondary" className="salt-poc-tile">
-            <Text styleAs="display3">{t.value}</Text>
-            <Text styleAs="label" color="secondary">
-              {t.label}
-            </Text>
-          </Card>
-        ))}
-      </FlowLayout>
-      <Card className="min-h-0 flex-1 overflow-auto">
-        <Text styleAs="label" color="secondary">
-          Canonical load sequence
-        </Text>
-        <FlowLayout gap={0.5} align="center" className="mt-1">
-          {SEQUENCE.map((step, i) => (
-            <span key={`${step.command}-${i}`} className="inline-flex items-center gap-1">
-              <Tag title={step.note ?? undefined}>
-                {step.command}
-                {step.loaders.length ? ` ·${step.loaders.length}` : ''}
-              </Tag>
-              {i < SEQUENCE.length - 1 && <Text color="secondary">→</Text>}
-            </span>
+    <div className="h-full min-h-0 p-3">
+      <StackLayout gap={1} className="h-full min-h-0">
+        <Banner status="info">
+          <BannerContent>
+            <strong>Declared, not observed.</strong> Every row comes from the registries via the generated{' '}
+            <code>load-map.json</code>. Whether a load actually ran is /loads; the {DOC_CORPUS_COUNT} doc-corpus sources
+            are rendered by /software.
+          </BannerContent>
+        </Banner>
+        <FlowLayout gap={1}>
+          {tiles.map((t) => (
+            <Card key={t.label} variant="secondary" className="salt-poc-tile">
+              <Text styleAs="display3">{t.value}</Text>
+              <Text styleAs="label" color="secondary">
+                {t.label}
+              </Text>
+            </Card>
           ))}
         </FlowLayout>
-        <Text styleAs="notation" color="secondary" className="mt-1">
-          Outside the sequence, run by hand and never scheduled: {AD_HOC_COMMANDS.join(', ')}
-        </Text>
-      </Card>
-    </StackLayout>
+        <Card className="min-h-0 flex-1 overflow-auto">
+          <StackLayout gap={1}>
+            <Text styleAs="label" color="secondary">
+              Canonical load sequence
+            </Text>
+            <FlowLayout gap={0.5} align="center">
+              {SEQUENCE.map((step, i) => (
+                <span key={`${step.command}-${i}`} className="inline-flex items-center gap-1">
+                  <Tag title={step.note ?? undefined}>
+                    {step.command}
+                    {step.loaders.length ? ` ·${step.loaders.length}` : ''}
+                  </Tag>
+                  {i < SEQUENCE.length - 1 && <Text color="secondary">→</Text>}
+                </span>
+              ))}
+            </FlowLayout>
+            <Text styleAs="notation" color="secondary">
+              Outside the sequence, run by hand and never scheduled: {AD_HOC_COMMANDS.join(', ')}
+            </Text>
+          </StackLayout>
+        </Card>
+      </StackLayout>
+    </div>
   )
 
   function sourceRow(s: SourceViewRow) {
@@ -488,23 +493,25 @@ function SaltLoadMap() {
       <ModuleToolbar
         crumbs={[{ label: 'Home', to: '/' }, { label: loadMapModule.label, to: '/load-map' }, { label: 'Salt PoC' }]}
       />
-      <FlowLayout justify="space-between" align="end" className="px-4 pt-3">
-        <StackLayout gap={0.5}>
-          <Text as="h2" styleAs="h2" tabIndex={-1} data-view-heading className="outline-none">
-            {loadMapModule.label}
-          </Text>
-          <Text color="secondary">
-            {loadMapModule.tagline} · backs onto {loadMapModule.backsOnto}
-          </Text>
-        </StackLayout>
-        <FlowLayout gap={1}>
-          {['Layout', 'Fit', 'Refresh', 'Export'].map((label) => (
-            <Button key={label} appearance="bordered" sentiment="neutral" disabled>
-              {label}
-            </Button>
-          ))}
+      <div className="px-4 pt-3">
+        <FlowLayout justify="space-between" align="end">
+          <StackLayout gap={0.5}>
+            <Text as="h2" styleAs="h2" tabIndex={-1} data-view-heading className="outline-none">
+              {loadMapModule.label}
+            </Text>
+            <Text color="secondary">
+              {loadMapModule.tagline} · backs onto {loadMapModule.backsOnto}
+            </Text>
+          </StackLayout>
+          <FlowLayout gap={1}>
+            {['Layout', 'Fit', 'Refresh', 'Export'].map((label) => (
+              <Button key={label} appearance="bordered" sentiment="neutral" disabled>
+                {label}
+              </Button>
+            ))}
+          </FlowLayout>
         </FlowLayout>
-      </FlowLayout>
+      </div>
       <div className="min-h-0 flex-1 p-4">
         <div className="salt-poc-frame h-full min-h-[420px] overflow-hidden">
           <ResizableSplit storageKey="drydocs.split.salt-poc.v1" top={graphPane} bottom={tabs} />
@@ -623,26 +630,28 @@ function SaltWiringKey({ sources }: { sources: readonly LoadMapSource[] }) {
   const census = wiringCensus(sources)
   return (
     <Card variant="tertiary">
-      <Text styleAs="label">
-        <strong>Wiring key</strong>: has a gate ruled this source&rsquo;s meaning, crossed with is a loader built that
-        writes it.
-      </Text>
-      <FlowLayout gap={2} className="mt-1">
-        {WIRING_STATES.map((s) => {
-          const status = STATUS_FOR_TOKEN[s.token]
-          return (
-            <span key={s.id} className="inline-flex items-center gap-1">
-              {status ? <StatusIndicator status={status} /> : null}
-              <Text as="span" styleAs="code" color={status ?? 'secondary'}>
-                {s.label}
-              </Text>
-              <Text as="span" styleAs="notation" color="secondary">
-                {census[s.id]} · {s.meaning}
-              </Text>
-            </span>
-          )
-        })}
-      </FlowLayout>
+      <StackLayout gap={0.5}>
+        <Text styleAs="label">
+          <strong>Wiring key</strong>: has a gate ruled this source&rsquo;s meaning, crossed with is a loader built that
+          writes it.
+        </Text>
+        <FlowLayout gap={2}>
+          {WIRING_STATES.map((s) => {
+            const status = STATUS_FOR_TOKEN[s.token]
+            return (
+              <span key={s.id} className="inline-flex items-center gap-1">
+                {status ? <StatusIndicator status={status} /> : null}
+                <Text as="span" styleAs="code" color={status ?? 'secondary'}>
+                  {s.label}
+                </Text>
+                <Text as="span" styleAs="notation" color="secondary">
+                  {census[s.id]} · {s.meaning}
+                </Text>
+              </span>
+            )
+          })}
+        </FlowLayout>
+      </StackLayout>
     </Card>
   )
 }
@@ -660,13 +669,15 @@ function SaltSection({ title, children }: { title: string; children: ReactNode }
 
 function SaltEmpty({ title, hint }: { title: string; hint?: string }) {
   return (
-    <StackLayout gap={0.5} align="center" className="p-6 text-center">
-      <Text color="secondary">{title}</Text>
-      {hint && (
-        <Text styleAs="notation" color="secondary">
-          {hint}
-        </Text>
-      )}
-    </StackLayout>
+    <div className="p-6 text-center">
+      <StackLayout gap={0.5} align="center">
+        <Text color="secondary">{title}</Text>
+        {hint && (
+          <Text styleAs="notation" color="secondary">
+            {hint}
+          </Text>
+        )}
+      </StackLayout>
+    </div>
   )
 }

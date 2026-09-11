@@ -29,6 +29,8 @@
   --salt-text-notation-fontFamily: var(--sans);
   --salt-text-action-fontFamily: var(--sans);
   --salt-text-code-fontFamily: var(--mono);
+  /* Salt uppercases action text (buttons, toggles) in both themes; the house style is sentence case. */
+  --salt-text-action-textTransform: none;
 
   --salt-container-primary-background: var(--panel);
   --salt-container-secondary-background: var(--panel2);
