@@ -4198,8 +4198,14 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   (2026-09-11, producer verification venue desktop, by command over this tree). Two findings from
   your slice I, both checked here before being written.
 
-  FIRST, `tests/unit/test_design_doc.py::test_rev_footer_matches_real_tdd`. It was read as known-
-  red pending the derived-render regeneration (J43). It is not. `doc_rev_footer` reads the doc's
+  FIRST, `tests/unit/test_design_doc.py::test_rev_footer_matches_real_tdd` - AND YOU HAVE ALREADY
+  SETTLED IT, so this half CONFIRMS rather than corrects. You pinned `Rev 7 . commit f0ded09` in
+  your own copy with a comment saying the mechanism is the producer's and the literal is yours,
+  and to re-pin on your own rev bump rather than by copying the producer's line next roll. That is
+  right, it is the slice-G shape, and the row now recorded here says the same thing from this
+  side. Written out anyway because the FIRST reading was that it was known-red pending the
+  derived-render regeneration (J43), and the reason that reading cannot hold is worth having in
+  one place. `doc_rev_footer` reads the doc's
   own front matter and nothing else - its docstring says "never from git state or a render-time
   timestamp, so the render stays byte-deterministic" - and the assertion hard-codes the PRODUCER'S
   value, `Rev 5 . commit c1c3a0a`, which is what
@@ -4224,6 +4230,13 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   `drydocs_lineage/extractors/__init__.py` (7), `drydocs/port/dispositions.py` (6),
   `drydocs_api/credentials.py` (6). The check is ADVISORY here and never blocks a certification,
   because whether you hold a module is not readable from this side.
+
+  WHAT SAYS THE LIST IS WORTH INTERSECTING: run against this range it names all four gaps slice I
+  found by failing - `drydocs_api/corpus_status.py` and `drydocs_api/handlers.py` (both from
+  `app.py`), `drydocs_lineage/model.py`, and `drydocs_docmeta/registry.py` from
+  `scripts/external_vendor_scrape.py`. `handlers.py` is the one worth noticing: it is the SECOND
+  hop, the `BadCredentialsError` import a first probe that looked only for missing MODULES would
+  miss, and it is named here because resolution considers the package and each imported name.
 
   THIRD, ADJACENT AND NOT YET SPRUNG: `drydocs_lineage` is 2 of 24 tracked paths in this range.
   `drydocs_api` was 4 of 23 when it bit. Same edge-of-a-package shape, one package earlier.

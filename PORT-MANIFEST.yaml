@@ -1585,9 +1585,12 @@ rows:
       Recorded because the alternative is re-deciding it every roll. This is the
       SAME class as test_schema.py's constraint count above: a producer-measured
       literal pinned inside a producer-authored test. It reached the consumer as a
-      tests/** evaluate and was diagnosed there as a derived-render staleness
-      pending J43 regeneration - a reasonable read, and wrong, which is exactly the
-      cost a row removes. If the producer's TDD is ever revised, this row's quoted
+      tests/** evaluate, was first diagnosed there as a derived-render staleness
+      pending J43 regeneration, and was then correctly re-ruled by that session
+      itself - it now pins Rev 7 with a comment saying the mechanism is the
+      producer's and the literal theirs. So the row does not rescue anyone; it
+      removes the DETOUR, which is what an evaluate with no recorded answer costs
+      every roll. If the producer's TDD is ever revised, this row's quoted
       Rev moves with it; trust the live file over this note (the 66acea8 lesson
       that test_schema.py's row already carries).
   - path: "docs/restructure/roadmap.yaml"

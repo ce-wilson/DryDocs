@@ -53,5 +53,15 @@ notes: |
   what a disposition should say about a test whose subject the consumer will never hold - that is
   a policy question about default_ok, and the manifest is where policy lives.
 
+  THE MEASUREMENT THAT ARGUES FOR A RULING, from the slice's own close report: of 33 outstanding
+  default_ok paths in this range, 7 were takeable. 13 needed per-side company-divergence blocks
+  with gate-log citations (cm_hosts T15/P3, deftable-xml-export, the T19 load-map, local_side() ==
+  "company", the docs-coverage COMPANY PIN) and 13 were blocked on inherited gaps. Their words:
+  "the default_ok label is not trustworthy for this range". That is broader than clause (a) - two
+  thirds of a disposition's paths needing something else is a statement about the DISPOSITION, not
+  about those paths - and the ruling should say whether default_ok is too coarse for a package
+  under active divergence, or whether the 13 per-side ones simply owe per-entry rows nobody has
+  written. Both answers are defensible; guessing which is not.
+
   ADJACENT, NOT THIS ITEM: drydocs_lineage is currently 2 of 24 tracked paths in range, the same
   edge-of-a-package shape drydocs_api was in at 4 of 23. The trap is not sprung yet.
