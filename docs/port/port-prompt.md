@@ -4248,6 +4248,82 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   though `detect.py` beside it is in), and `test_dev_environment.py` asserts a census shape whose
   values can only come from guards you deferred. Nothing is asked back.
 
+
+- **RELAY-59 - THE J57 SET-COMPARISON COMMAND COULD NOT SEE ERRORS, AND THAT IS FIXED HERE;
+  PLUS THE ONE PRODUCER-SIDE THING THAT PREDICTS YOUR `schema_graph.py` FAILURE** (new
+  2026-09-11, after the slice-I report). `[VERIFIED-PRODUCER]` throughout - every measurement
+  below was taken on the producer tree, and nothing here states anything about yours.
+
+  **THE INSTRUMENT, and it is a method correction rather than a file correction, which is why
+  it is in a relay and not only in a commit.** J57 asks you to compare the sorted SET of failing
+  node ids. The command it prescribed for producing that set was `pytest -q -rf`, and `-rf`
+  cannot see errors: pytest's `-r` takes SEPARATE chars, `f` for failed and `E` for error, so
+  `-rf` enumerates failures and leaves errors unlisted. It is worse than a gap. This repo's
+  `pyproject.toml` already sets `addopts = "-ra ..."`, and `-ra` is all-except-passed, so it
+  covers errors - a command-line `-r` REPLACES that, which means the prescribed flag was
+  NARROWER than the default it overrode. Two of the five places that carried it also piped
+  through `grep "^FAILED"`, which drops ERROR lines whatever the flag says, so changing the flag
+  alone would have bought nothing and looked like a fix. All five are corrected producer-side to
+  `-rfE` with `grep -E "^(FAILED|ERROR)"` where a grep is present, and one of the five is the
+  PORT-REPORT template line in the reconcile-port skill - the line that renders an error figure
+  onto a report. Offered, not asserted: a report whose suite line reads four errors and whose
+  acceptance line reads zero is the exact signature this gap produces. Whether that is what
+  happened in your slice is yours to check and yours to rule on; the producer-side half is what
+  this fixes.
+
+  **THE `schema_graph.py` TAKE, and the producer can predict the collision without reading your
+  tree.** Your attribution was right and the revert was right. One thing in it is not: this side
+  never had role-discriminated duplicate-triple logic to drop. `_edge_statement` MERGEs on
+  `(a)-[r:LABEL]->(b)` with no role in the pattern and writes `r.role` as a SET property, so
+  `role` cannot distinguish two edges in this renderer at all - which is exactly what the
+  refusal's own comment says, that two entries "would MERGE into ONE edge and silently overwrite
+  vocab_id". Measured across this side's whole vocabulary: 53 entries, 10 carrying a role, 27
+  colliding triples, and every one of the 27 is a G87 rename pair whose deprecated half the
+  `RENDERED_STATUSES` filter drops. In every pair the two roles are IDENTICAL. So adding `role`
+  to the key would change nothing on this side, and on any side where the colliding pair also
+  shares a role it would silence the refusal rather than discriminate - the two entries would
+  still collapse into one edge, and the overwrite the refusal was warning about would be
+  untouched.
+
+  Which leads to the part worth your time. This side's own port instruction records that
+  company-side `m3_belongs_to_application` stays `planned` under the Tier-B
+  `seal-app-ref-edge-reshape` hold. Producer-side it is `deprecated`. Those two statuses are the
+  difference between rendering and not: `RENDERED_STATUSES` is `("active", "planned")`, so
+  `planned` renders and `deprecated` does not. `m3_belongs_to_application` and its G87 replacement
+  `scheduler_belongs_to_application` are the SAME triple, `(ControlMFolder,
+  BELONGS_TO_APPLICATION, Port)`, with the SAME role, `seal_app_ref`, differing only in status.
+  G87 landed 2026-08-21, before your last complete apply, and the vocabulary file has no commits
+  in this range at all - only `schema_graph.py` moved. So on a tree where that hold is in force
+  and the replacement is active, both entries render, the triple collides, and the refusal is
+  CORRECT: it is reporting the hold, not a divergence in the code. If that is what you are
+  looking at, the thing to resolve is the held entry's status, and by your own rule that hold
+  ends at a gate rather than at a port. One command on your side settles it, and no answer is
+  needed here.
+
+  **TWO PATHS THAT READ AS OPEN PRODUCER QUESTIONS AND ARE NOT.** `agents/**` is ruled at
+  `PORT-MANIFEST.yaml:1836-1837` and `drydocs_api/**` at `:1840-1841`, both added by the same
+  commit on 2026-07-28, both inside the `default_ok:` block, so both take the file's `default:` -
+  clean-add what is absent, hand-merge where both sides created the path, file by file. Take-whole
+  is not an open option for `drydocs_api/**`: the reconcile-port skill's apply rule 2 already
+  carries your own 2026-09-05 result, where the four-module unit moved the suite from 21 failures
+  to 102 and was reverted. One disambiguation so this does not recur: the `.claude/**` row's note
+  says "agents + skills are producer-maintained tooling", and the word "agents" there is
+  `.claude/agents/`, the sub-agent definition files, NOT the top-level `agents/` package. Row 1836
+  is the only `agents` path row in the manifest.
+
+  **TWO MEASUREMENTS, offered because both reduce the work rather than add to it.** The certified
+  range touches 4 `drydocs_api/` paths and 215 lines - `app.py`, `intake.py`, `personas.py`,
+  `schemas.py` - not 26 paths; 26 is this side's whole-package tracked count and the ~3,700-line
+  figure is the span since `port-base-20260902`, which is a much larger range than this one. Of
+  those 4, `schemas.py` and `personas.py` are standalone leaves and `app.py` is the hub, so the
+  hub is the only one that has to wait. And `agents/.env.example` is not among the 459 paths in
+  this range, so it is not one of the outstanding ones; the only in-range `agents` file carrying a
+  divergence note is `agents/common/llm_ledger.py`, whose price map records that the company Azure
+  models are deliberately absent, and whose in-range diff is a single preamble removal - a hunk to
+  hand-merge, never a file to check out.
+
+  Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has
