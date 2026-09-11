@@ -13,6 +13,8 @@ inputs:
 - pyproject.toml
 - web/package.json
 - .github/workflows/ci.yml
+outputs:
+- pyproject.toml
 acceptance: |
   A decision recorded before pytest --cov runs for any slot ("an impression wearing a number's
   clothes" otherwise): whether a floor exists, where it lives (pyproject.toml), what it is, and

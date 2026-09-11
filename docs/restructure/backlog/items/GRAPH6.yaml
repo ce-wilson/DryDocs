@@ -12,6 +12,10 @@ depends_on: []
 inputs:
 - pyproject.toml
 - drydocs/source_registration/duckdb_load.py
+outputs:
+- drydocs/source_registration/duckdb_load.py
+- poetry.lock
+- pyproject.toml
 acceptance: |
   duckdb declared in an optional extras group named for the source-registration step it serves;
   openpyxl's group decided (dev today; runtime if the Excel runbook generator ships in-product) and

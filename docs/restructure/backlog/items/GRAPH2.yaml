@@ -12,6 +12,9 @@ depends_on: []
 inputs:
 - drydocs/port/reconcile_before.py
 - tests/unit/test_runbook_currency.py
+outputs:
+- drydocs/port/reconcile_before.py
+- tests/unit/test_port_reconcile_guards.py
 acceptance: |
   A ruling, then the move it implies: HISTORICAL_PATHS, FOREIGN_PATHS and GENERATED_PATHS live where
   production code and the guard can both read them (a core or port module, or a config file the
