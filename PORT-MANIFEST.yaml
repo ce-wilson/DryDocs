@@ -1566,6 +1566,30 @@ rows:
   - path: "tests/unit/test_controlm_cypher.py"
     disposition: evaluate
     note: "consumer scope_key condition-key variant wins"
+  - path: "tests/unit/test_design_doc.py"
+    disposition: per-entry
+    entry_rule: >
+      TAKE the file, EXCEPT test_rev_footer_matches_real_tdd, whose expected string
+      is a per-side value and must keep YOUR doc's rev. The assertion hard-codes
+      the producer's own front matter - "Rev 5 · commit c1c3a0a" against
+      docs/design/controlm-ingestion-tdd.md, which reads "Rev 5, 2026-07-23 ...
+      reflects commit c1c3a0a" at the producer. doc_rev_footer reads that front
+      matter and NOTHING else - its docstring says "never from git state or a
+      render-time timestamp, so the render stays byte-deterministic" - so a
+      consumer whose copy of the TDD has advanced fails on the literal, and NO
+      amount of re-rendering changes it. Measured 2026-09-11 on the consumer's
+      slice I: it reads "Rev 7 · commit f0ded09", i.e. two company-authored
+      revisions past the producer's. Every other test in the file is shape-only
+      and crosses unchanged.
+    note: >
+      Recorded because the alternative is re-deciding it every roll. This is the
+      SAME class as test_schema.py's constraint count above: a producer-measured
+      literal pinned inside a producer-authored test. It reached the consumer as a
+      tests/** evaluate and was diagnosed there as a derived-render staleness
+      pending J43 regeneration - a reasonable read, and wrong, which is exactly the
+      cost a row removes. If the producer's TDD is ever revised, this row's quoted
+      Rev moves with it; trust the live file over this note (the 66acea8 lesson
+      that test_schema.py's row already carries).
   - path: "docs/restructure/roadmap.yaml"
     disposition: per-entry
     entry_rule: >

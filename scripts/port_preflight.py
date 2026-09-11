@@ -17,7 +17,12 @@ import datetime as _dt
 import subprocess
 import sys
 
-from drydocs.port.port_preflight import REPO_ROOT, next_base_tag, run_checks
+from drydocs.port.port_preflight import (
+    ADVISORY_CHECKS,
+    REPO_ROOT,
+    next_base_tag,
+    run_checks,
+)
 
 
 def main() -> int:
@@ -35,9 +40,19 @@ def main() -> int:
         print(f"  [{result.verdict}] {result.name}")
         for line in result.detail.splitlines():
             print(f"        {line.strip()}" if not line.startswith("    ") else line)
-    not_checked = [r for r in results if r.not_checked]
-    failed = [r for r in results if not r.passed and not r.not_checked]
+    # Advisory checks report and never block: their subject is the consumer's
+    # tree, which this side cannot read (see ADVISORY_CHECKS for the full reason).
+    # Split BEFORE counting, so an advisory finding cannot reach either tally.
+    advisory = [r for r in results if r.name in ADVISORY_CHECKS]
+    blocking = [r for r in results if r.name not in ADVISORY_CHECKS]
+    not_checked = [r for r in blocking if r.not_checked]
+    failed = [r for r in blocking if not r.passed and not r.not_checked]
     print()
+    for result in advisory:
+        if not result.passed:
+            print(f"ADVISORY — {result.name}: reported, does not block certification.")
+            print("Carry it to the consumer in this roll's relay; only that side can rule on it.")
+            print()
 
     # Three outcomes (J78, PORT8): a check that could not run is neither green
     # nor red, and it blocks the tag exactly as a failure does - the base was

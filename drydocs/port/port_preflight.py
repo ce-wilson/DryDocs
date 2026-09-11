@@ -27,6 +27,7 @@ so the guards can exercise them without one. Only :func:`run_checks` shells out.
 
 from __future__ import annotations
 
+import ast
 import re
 import subprocess
 from collections.abc import Callable, Container, Mapping
@@ -38,6 +39,20 @@ from drydocs_core.repo_paths import repo_root
 
 REPO_ROOT = repo_root(Path(__file__).resolve().parents[1])
 PORT_PROMPT_PATH = REPO_ROOT / "docs" / "port" / "port-prompt.md"
+
+#: Checks that REPORT but never block certification, and why that is not a
+#: weakened gate: their subject is the CONSUMER'S tree, which this side cannot
+#: read. `range import closure` is the only one - an in-range file importing an
+#: out-of-range module is NORMAL here (the module is almost always already on the
+#: other side from an earlier roll) and is a defect only where the consumer never
+#: received it. Failing on it would red every roll for a condition the producer
+#: cannot evaluate. So the probe reports FINDINGS honestly (ADR 0021 - the outcome
+#: carries the truth whatever the caller does with it) and the CALLER files it as
+#: advisory. What makes it worth running anyway: the list IS the deliverable. The
+#: consumer intersects it against its own tree in one pass, instead of finding the
+#: same gaps one ModuleNotFoundError at a time - which is how PORT12's cli_schema
+#: break and slice I's drydocs_api cluster were both found, after the take.
+ADVISORY_CHECKS: frozenset[str] = frozenset({"range import closure"})
 
 #: The ledger's own header exempts these: "Grooms, claims, board/design renders
 #: and depgraph snapshots in the range are ritual ... and get no step." Matched on
@@ -536,6 +551,7 @@ def range_checks(base: str, port_prompt_text: str, cwd: Path | None = None) -> l
         reason = "the base did not resolve, so the commit range could not be read at all"
         results.append(CheckResult.skipped("ledger coverage", reason))
         results.append(CheckResult.skipped("cited paths resolve", reason))
+        results.append(CheckResult.skipped("range import closure", reason))
         return results
 
     try:
@@ -545,6 +561,7 @@ def range_checks(base: str, port_prompt_text: str, cwd: Path | None = None) -> l
         reason = f"git failed reading {base}..HEAD, so the range was never read ({err.stderr})"
         results.append(CheckResult.skipped("ledger coverage", reason))
         results.append(CheckResult.skipped("cited paths resolve", reason))
+        results.append(CheckResult.skipped("range import closure", reason))
         return results
 
     uncited = uncited_commits(commits, port_prompt_text)
@@ -586,6 +603,20 @@ def range_checks(base: str, port_prompt_text: str, cwd: Path | None = None) -> l
                 outcome=checked_clean(size=len(docs), subject=f"{len(docs)} added document(s)"),
             )
         )
+    try:
+        edges, in_range_count = range_import_closure(base, cwd=cwd)
+    except GitError as err:
+        results.append(
+            CheckResult.skipped(
+                "range import closure",
+                f"git failed listing the range's .py files, so closure was never computed "
+                f"({err.stderr})",
+            )
+        )
+    else:
+        results.append(
+            CheckResult.of("range import closure", import_closure_outcome(edges, in_range_count))
+        )
     return results
 
 
@@ -622,6 +653,126 @@ def added_documents(base: str, head: str = "HEAD", cwd: Path | None = None) -> d
         if path.exists():
             docs[rel] = path.read_text(encoding="utf-8", errors="replace")
     return docs
+
+
+@dataclass(frozen=True)
+class ImportEdge:
+    """One in-range file importing a first-party module the RANGE does not carry."""
+
+    importer: str
+    module: str
+    target: str
+
+
+def first_party_target(module: str, tracked: Container[str]) -> str | None:
+    """The tracked file a dotted module name resolves to, or ``None``.
+
+    First-party-ness is DECIDED BY THE TREE rather than by a list of package
+    prefixes to keep in step: a module is ours exactly when its dotted name
+    resolves to a tracked file. A prefix list would have to name every package and
+    would silently stop covering the next one added.
+    """
+    rel = module.replace(".", "/")
+    for candidate in (f"{rel}.py", f"{rel}/__init__.py"):
+        if candidate in tracked:
+            return candidate
+    return None
+
+
+def import_edges(
+    in_range: set[str],
+    tracked: Container[str],
+    read: Callable[[str], str | None],
+) -> list[ImportEdge]:
+    """Every first-party import an in-range ``.py`` makes that the range omits.
+
+    Pure, like everything else above :func:`run_checks`: the caller supplies the
+    range, the tracked set and a reader, so the guards drive it with dictionaries
+    and no repository.
+
+    Relative imports are skipped on purpose. ``from . import x`` inside a package
+    resolves against the importer's own directory, so it can only reach a sibling -
+    and a sibling that the range omits is reported anyway via the absolute edges
+    its own module makes. Counting both would double-report one gap.
+    """
+    edges: list[ImportEdge] = []
+    for path in sorted(in_range):
+        source = read(path)
+        if source is None:
+            continue  # deleted in the range, or unreadable - nothing to parse
+        try:
+            tree = ast.parse(source, filename=path)
+        except SyntaxError:
+            continue
+        modules: set[str] = set()
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                modules.update(alias.name for alias in node.names)
+            elif isinstance(node, ast.ImportFrom) and node.module and node.level == 0:
+                # BOTH the package and each imported name, because `from pkg import
+                # mod` binds a SUBMODULE and `from pkg import func` binds a function,
+                # and the syntax cannot tell them apart. Resolution does: a name that
+                # is a function resolves to no tracked file and drops out. Taking
+                # only `node.module` here missed `from drydocs_core import repo_paths`
+                # entirely - found by this module's own guard, not by review.
+                modules.add(node.module)
+                modules.update(f"{node.module}.{alias.name}" for alias in node.names)
+        for module in sorted(modules):
+            target = first_party_target(module, tracked)
+            if target is not None and target not in in_range:
+                edges.append(ImportEdge(importer=path, module=module, target=target))
+    return edges
+
+
+def import_closure_outcome(edges: list[ImportEdge], in_range_count: int) -> CheckOutcome:
+    """FINDINGS when the range is not import-closed, checked-clean when it is.
+
+    Reported honestly and filed as advisory by the caller - see
+    :data:`ADVISORY_CHECKS` for why this side cannot turn it into a gate. The
+    lines are grouped BY TARGET rather than by importer because the consumer's
+    question is "do I have this module?", asked once per module, not once per
+    importing file.
+    """
+    if not edges:
+        return checked_clean(
+            size=in_range_count,
+            subject=f"{in_range_count} in-range .py file(s), every first-party import in range",
+        )
+    by_target: dict[str, list[str]] = {}
+    for edge in edges:
+        by_target.setdefault(edge.target, []).append(edge.importer)
+    lines = [
+        f"    OUT-OF-RANGE {target} <- {len(set(importers))} in-range importer(s), "
+        f"e.g. {sorted(set(importers))[0]}"
+        for target, importers in sorted(by_target.items(), key=lambda kv: (-len(kv[1]), kv[0]))
+    ]
+    lines.insert(
+        0,
+        f"    {len(edges)} edge(s) over {len(by_target)} module(s) the range does not carry - "
+        "the consumer must confirm each is already on its tree BEFORE taking the importers",
+    )
+    return findings(lines)
+
+
+def range_import_closure(
+    base: str, head: str = "HEAD", cwd: Path | None = None
+) -> tuple[list[ImportEdge], int]:
+    """:func:`import_edges` over ``<base>..<head>``, plus the in-range ``.py`` count."""
+    root = cwd or REPO_ROOT
+    in_range = {
+        rel
+        for rel in _git("diff", "--name-only", f"{base}..{head}", cwd=cwd).splitlines()
+        if rel.endswith(".py")
+    }
+    tracked = set(_git("ls-files", cwd=cwd).splitlines())
+
+    def read(rel: str) -> str | None:
+        path = root / rel
+        if not path.exists():
+            return None
+        return path.read_text(encoding="utf-8", errors="replace")
+
+    return import_edges(in_range, tracked, read), len(in_range)
 
 
 def venue_line() -> str:

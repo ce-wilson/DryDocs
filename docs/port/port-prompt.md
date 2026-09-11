@@ -4193,6 +4193,48 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   a human noticed and an instrument reads all of them, which is the whole argument for
   running it per roll rather than per sweep. Nothing is asked back.
 
+- **RELAY-58 - THE REV-FOOTER RED IS NOT A RENDER PROBLEM, AND RE-RENDERING WILL NEVER CLEAR IT;
+  AND THE RANGE IS NOT IMPORT-CLOSED, SO HERE IS THE LIST** [SME-REPORTED] [VERIFIED-PRODUCER]
+  (2026-09-11, producer verification venue desktop, by command over this tree). Two findings from
+  your slice I, both checked here before being written.
+
+  FIRST, `tests/unit/test_design_doc.py::test_rev_footer_matches_real_tdd`. It was read as known-
+  red pending the derived-render regeneration (J43). It is not. `doc_rev_footer` reads the doc's
+  own front matter and nothing else - its docstring says "never from git state or a render-time
+  timestamp, so the render stays byte-deterministic" - and the assertion hard-codes the PRODUCER'S
+  value, `Rev 5 . commit c1c3a0a`, which is what
+  `docs/design/controlm-ingestion-tdd.md` reads here. Your `Rev 7 . commit f0ded09` means your
+  copy of that TDD is two company-authored revisions ahead. No amount of regeneration changes a
+  literal. It is a per-side value pinned inside a producer-authored test, the same class as
+  `test_schema.py`'s constraint count, and it now has its own PORT-MANIFEST row saying so - take
+  the file, keep your rev in that one assertion. Every other test in it is shape-only.
+
+  SECOND, THE IMPORT CLOSURE, because you paid for this twice. PORT12's `cli_schema` break and
+  slice I's `drydocs_api/app.py` -> `corpus_status` break are one shape: a path inside the range
+  importing a first-party module NO range has ever carried, found by ModuleNotFoundError after the
+  take. The preflight now computes it before the tag (`range import closure`), and over
+  `port-base-20260908..port-base-20260910b` it reports 233 edges across 101 modules that this
+  range does not carry. THAT NUMBER IS NOT A DEFECT COUNT AND MUST NOT BE READ AS ONE: out-of-
+  range means only that this range omits the module, and nearly all of them are already on your
+  tree from earlier rolls. The gap is the intersection - modules you never received - and only
+  your side can compute it. The heaviest targets, so the intersection can be taken in one pass
+  rather than one ModuleNotFoundError at a time: `drydocs_core/repo_paths.py` (17 in-range
+  importers), `drydocs_core/data_root.py` (16), `drydocs_core/orchestration/controlm/__init__.py`
+  (8), `drydocs_core/yaml_fragments.py` (8), `drydocs_core/cypher_split.py` (7),
+  `drydocs_lineage/extractors/__init__.py` (7), `drydocs/port/dispositions.py` (6),
+  `drydocs_api/credentials.py` (6). The check is ADVISORY here and never blocks a certification,
+  because whether you hold a module is not readable from this side.
+
+  THIRD, ADJACENT AND NOT YET SPRUNG: `drydocs_lineage` is 2 of 24 tracked paths in this range.
+  `drydocs_api` was 4 of 23 when it bit. Same edge-of-a-package shape, one package earlier.
+
+  Your four deferrals in slice I were each checked here and each is correct:
+  `test_lineage_inventory` needs `drydocs_lineage/model.py` (out of range),
+  `test_lineage_rua` needs `drydocs_lineage/collect/rua_inventory.sh` (out of range),
+  `test_remediation_conformance` needs `drydocs_remediation/xml_bridge.py` (out of range, even
+  though `detect.py` beside it is in), and `test_dev_environment.py` asserts a census shape whose
+  values can only come from guards you deferred. Nothing is asked back.
+
 OWED COMPANY-SIDE:
 
 > **RATIFICATION EVIDENCE MUST NAME ITS PROVENANCE (new 2026-08-09, and it has

@@ -1,0 +1,57 @@
+id: PORT14
+epic: component-topology
+title: "a test whose subject is outside the port range is a take that buys PERMANENT red, and default_ok says take it anyway - rule on the disposition for a test/code split"
+type: task
+module: drydocs-port
+phase: 6
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- PORT-MANIFEST.yaml
+- drydocs/port/port_preflight.py
+- tests/unit/test_port_manifest.py
+acceptance: |
+  (a) A RULING on what disposition a test file gets when the code it exercises is outside the
+  range. The consumer met this four times in one slice on 2026-09-11 and reached the right answer
+  by hand each time; the manifest never expresses it, so the next roll re-decides it. State the
+  rule and where it lives - a new disposition value, a clause on the default_ok arm, or a
+  convention the entry_rule language already supports.
+  (b) THE DISTINCTION THE RULE MUST KEEP, because collapsing it is the actual failure mode. A test
+  ahead of IN-RANGE code is TRANSIENT - it goes green when the rest of the range lands, and slice
+  B shipped exactly that deliberately. A test ahead of OUT-OF-RANGE code is PERMANENT - nothing in
+  this port or any later one closes it, because no range carries the subject. Only the second is a
+  defect. The consumer's own words for it: "leaving these permanently red for a package we've
+  decided not to adopt isn't the same thing - those reds would never close."
+  (c) The ruling names what the consumer DOES with the second case, and "silently revert" is
+  ruled out by the same session: these are owed-back items blocked on unported code, and a revert
+  with no record loses the reason. Whether the record is a PORT-REPORT line, a manifest note or a
+  backlog item on their side is the open part.
+  (d) Whatever is ruled, a guard reads it rather than the prose (J66), or the item says in writing
+  why no guard can - the actor is a consumer-side human decision, which is a legitimate answer
+  here and must be an explicit one.
+notes: |
+  Minted 2026-09-11 (Lane A, desktop; pen backlog+port). From the consumer's slice I, reported by
+  screenshot and transcribed to this item - the images are not the source, this file is.
+
+  WHAT HAPPENED. drydocs_api/app.py is in range and dispositioned default_ok, so the manifest says
+  take it. It imports drydocs_api/corpus_status.py, which no roll's range has ever carried, so the
+  take could not import. Widening to close the gap would have meant adopting the whole drydocs_api
+  package - roughly 3,700 lines the consumer has never reviewed, backing a console UI it
+  deliberately holds - so the right call was to back the cluster out, which they did.
+
+  Then the same shape three more times, as TESTS rather than modules:
+  test_lineage_inventory needs drydocs_lineage/model.py (REL_TYPES, USES_ARTIFACT),
+  test_lineage_rua needs drydocs_lineage/collect/rua_inventory.sh, and
+  test_remediation_conformance needs drydocs_remediation/xml_bridge.py. All three subjects are
+  outside the range - verified producer-side 2026-09-11 - so all three deferrals were correct.
+
+  WHY A RULING AND NOT A GUARD-ONLY FIX. PORT9's closure check (built the same day) computes the
+  import closure and hands the consumer the list, which is the MEASUREMENT half. It cannot decide
+  what a disposition should say about a test whose subject the consumer will never hold - that is
+  a policy question about default_ok, and the manifest is where policy lives.
+
+  ADJACENT, NOT THIS ITEM: drydocs_lineage is currently 2 of 24 tracked paths in range, the same
+  edge-of-a-package shape drydocs_api was in at 4 of 23. The trap is not sprung yet.

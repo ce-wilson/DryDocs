@@ -8,10 +8,13 @@ is indistinguishable from one that has nothing to report.
 
 from __future__ import annotations
 
+import sys
+
 import pytest
 
 from drydocs.port import port_preflight as _pf
 from drydocs.port.port_preflight import (
+    ADVISORY_CHECKS,
     BASIS_TAGS,
     FOREIGN_PATHS,
     PLANNED_PATHS,
@@ -22,6 +25,9 @@ from drydocs.port.port_preflight import (
     GitError,
     cited_paths,
     cited_shas,
+    first_party_target,
+    import_closure_outcome,
+    import_edges,
     is_record_document,
     is_ritual,
     is_suite_guarded,
@@ -512,7 +518,12 @@ def test_an_unresolvable_base_is_not_checked_never_clean(monkeypatch: pytest.Mon
     monkeypatch.setattr(_pf, "_git", failing_git)
     results = range_checks("nosuchref", LEDGER)
     by_name = {r.name: r for r in results}
-    assert set(by_name) == {"base resolves", "ledger coverage", "cited paths resolve"}
+    assert set(by_name) == {
+        "base resolves",
+        "ledger coverage",
+        "cited paths resolve",
+        "range import closure",
+    }
     for r in results:
         assert r.not_checked, r.name
         assert not r.passed, r.name
@@ -541,3 +552,158 @@ def test_an_empty_range_on_a_real_base_is_still_a_clean_pass(
     assert by_name["ledger coverage"].outcome.size == 0
     assert by_name["cited paths resolve"].passed
     assert calls[0][0] == "rev-parse", "the base is resolved before the range is read"
+
+
+# ── PORT9: the range's import closure ────────────────────────────────────────
+# Slice I, 2026-09-11: the consumer took drydocs_api/app.py (in range, default_ok)
+# and it imported drydocs_api/corpus_status.py, which no roll's range had ever
+# carried - so the take could not import. PORT12's cli_schema break was the same
+# shape a roll earlier. Both were found by ModuleNotFoundError AFTER the take;
+# this computes the list BEFORE it, for the consumer to intersect against its tree.
+
+_TRACKED = {
+    "drydocs_api/app.py",
+    "drydocs_api/corpus_status.py",
+    "drydocs_api/intake.py",
+    "drydocs_core/repo_paths.py",
+}
+
+
+def _reader(sources: dict[str, str]):
+    return lambda rel: sources.get(rel)
+
+
+def test_a_dotted_name_is_ours_exactly_when_it_resolves_to_a_tracked_file() -> None:
+    tracked = {"drydocs_api/app.py", "drydocs_core/orchestration/__init__.py"}
+    assert first_party_target("drydocs_api.app", tracked) == "drydocs_api/app.py"
+    # a package resolves through its __init__
+    assert (
+        first_party_target("drydocs_core.orchestration", tracked)
+        == "drydocs_core/orchestration/__init__.py"
+    )
+    # third-party and stdlib resolve to nothing, with no prefix list to maintain
+    assert first_party_target("pytest", tracked) is None
+    assert first_party_target("ast", tracked) is None
+
+
+def test_an_out_of_range_import_is_reported_and_an_in_range_one_is_not() -> None:
+    in_range = {"drydocs_api/app.py", "drydocs_api/intake.py"}
+    sources = {
+        "drydocs_api/app.py": (
+            "import ast\n"
+            "from drydocs_api.corpus_status import corpus_status\n"  # OUT of range
+            "from drydocs_api.intake import block_history\n"  # IN range
+        ),
+        "drydocs_api/intake.py": "from drydocs_core import repo_paths\n",  # OUT of range
+    }
+    edges = import_edges(in_range, _TRACKED, _reader(sources))
+    assert [(e.importer, e.target) for e in edges] == [
+        ("drydocs_api/app.py", "drydocs_api/corpus_status.py"),
+        ("drydocs_api/intake.py", "drydocs_core/repo_paths.py"),
+    ]
+    # `ast` is stdlib and `intake` is in range - neither is a closure gap
+    assert not any(e.module == "ast" for e in edges)
+    assert not any(e.target == "drydocs_api/intake.py" for e in edges)
+
+
+def test_a_relative_import_is_not_counted_because_its_module_reports_its_own_gaps() -> None:
+    in_range = {"drydocs_api/app.py"}
+    sources = {"drydocs_api/app.py": "from . import corpus_status\nfrom .intake import x\n"}
+    assert import_edges(in_range, _TRACKED, _reader(sources)) == []
+
+
+def test_a_file_deleted_in_the_range_or_unparseable_is_skipped_rather_than_raising() -> None:
+    in_range = {"drydocs_api/app.py", "drydocs_api/gone.py", "drydocs_api/broken.py"}
+    sources = {
+        "drydocs_api/app.py": "from drydocs_core import repo_paths\n",
+        "drydocs_api/broken.py": "def (:\n",  # a syntax error is not a closure verdict
+        # "gone.py" is absent from the reader entirely - deleted in the range
+    }
+    edges = import_edges(in_range, _TRACKED, _reader(sources))
+    assert [e.target for e in edges] == ["drydocs_core/repo_paths.py"]
+
+
+def test_a_closed_range_is_clean_and_says_how_much_it_read() -> None:
+    outcome = import_closure_outcome([], in_range_count=7)
+    assert outcome.is_clean and not outcome.is_not_checked
+    # clean over a KNOWN size, never a bare pass (ADR 0021 D1)
+    assert outcome.size == 7
+
+
+def test_the_closure_check_can_actually_fail() -> None:
+    """The anti-vacuity control (J26), and it is load-bearing here.
+
+    This check is ADVISORY - it never blocks certification - so nothing else in
+    the suite would notice if it silently stopped reporting. A guard that cannot
+    fail is not a guard, and an advisory that cannot fire is worse: it reads as
+    "closure is fine" forever.
+    """
+    in_range = {"drydocs_api/app.py"}
+    sources = {"drydocs_api/app.py": "from drydocs_api.corpus_status import corpus_status\n"}
+    edges = import_edges(in_range, _TRACKED, _reader(sources))
+    assert edges, "the positive case must produce an edge or this control proves nothing"
+    outcome = import_closure_outcome(edges, in_range_count=1)
+    assert not outcome.is_clean and not outcome.is_not_checked
+    rendered = "\n".join(outcome.findings)
+    assert "drydocs_api/corpus_status.py" in rendered
+    assert "BEFORE taking the importers" in rendered
+
+
+def test_findings_are_grouped_by_target_because_that_is_the_consumers_question() -> None:
+    in_range = {"drydocs_api/app.py", "drydocs_api/intake.py"}
+    sources = dict.fromkeys(in_range, "from drydocs_core import repo_paths\n")
+    outcome = import_closure_outcome(
+        import_edges(in_range, _TRACKED, _reader(sources)), in_range_count=2
+    )
+    target_lines = [ln for ln in outcome.findings if "OUT-OF-RANGE" in ln]
+    assert len(target_lines) == 1, "one line per MODULE, not one per importing file"
+    assert "2 in-range importer(s)" in target_lines[0]
+
+
+def test_the_closure_check_is_declared_advisory_and_is_the_only_one() -> None:
+    """The declaration half. If another check is ever added here, that is a decision
+    to stop gating on it, and it should be hard to make by accident."""
+    assert ADVISORY_CHECKS == frozenset({"range import closure"})
+
+
+def test_an_advisory_finding_reports_without_blocking_certification() -> None:
+    """The WIRING half, asserted on BEHAVIOUR rather than on the CLI's source text.
+
+    The first draft of this grepped scripts/port_preflight.py for the split
+    expression and was caught by test_source_scan's raw-read guard - correctly, and
+    the behavioural version is the better test anyway: it would survive the line
+    being rewritten and would fail if the split were removed, which a substring
+    match has backwards.
+    """
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "port_preflight_cli", REPO_ROOT / "scripts" / "port_preflight.py"
+    )
+    assert spec and spec.loader
+    cli = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(cli)
+
+    advisory_finding = CheckResult.failed("range import closure", "    OUT-OF-RANGE a/b.py <- 1")
+    blocking_pass = CheckResult.ok("tree clean", "nothing staged or modified")
+
+    def fake_run_checks(base: str, *, skip_tests: bool = False, will_tag: bool = False):
+        return [blocking_pass, advisory_finding]
+
+    cli.run_checks = fake_run_checks
+    sys.argv = ["port_preflight.py", "--base", "deadbee"]
+    assert cli.main() == 0, "an advisory FINDINGS must not block certification"
+
+    # ...and the probe still told the truth about what it found (ADR 0021): the
+    # outcome is findings, not a pass dressed up as one to get past the gate.
+    assert not advisory_finding.passed
+    assert advisory_finding.verdict == "FAIL"
+
+    # the NEGATIVE control: the same finding on a NON-advisory name does block.
+    blocking_finding = CheckResult.failed("tree clean", "one modified file")
+
+    def fake_run_checks_blocking(base: str, *, skip_tests: bool = False, will_tag: bool = False):
+        return [blocking_finding]
+
+    cli.run_checks = fake_run_checks_blocking
+    assert cli.main() == 1, "a non-advisory finding must still refuse to certify"
