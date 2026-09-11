@@ -72,14 +72,17 @@ Each file carries its own **📑 Provenance** block after the version notice wit
 >
 > Confirmed 2026-06-11: the synthesized JSON is also **structurally wrong** vs the real API — canonical Automation API uses the object **name as the JSON key** (`"FolderSample": { "Type": "Folder", ... }`), jobs nested as named keys, types like `Job:Command`; my files invented a `"Name"` property + `"Jobs": []` array matching neither real form. Each API file carries a top-of-file warning.
 >
-> **GAP (acquisition STARTED 2026-07-02):** the XML-format definition docs (the real
-> source-of-record for 9.0.21.300 config) are now tracked in
-> `controlm-xml-definition-format.md` — an **acquisition stub**: exact fetch list
-> identified, fetch blocked by documents.bmc.com 403 bot-protection from the producer
-> environment; complete it from the company network, or better, from the local `.dtd`
-> files in `<EM home>\Default\data\Resource` + a real `exportdeftable` output. Key fact
-> already banked: XML definition files are **deprecated from 9.0.21.100, fully supported
-> until 9.0.22** — our 9.0.21.300 sits inside the supported-but-deprecated window.
+> **XML definition pages (ACQUIRED 2026-09-11, G85):** the XML-format definition docs (the
+> real source-of-record for 9.0.21.300 config) are in `controlm-xml-definition-format.md`: the
+> defjob, exportdefjob, deffolder, exportdeffolder and XML File Rules pages, fetched in a real
+> browser session (direct fetches still get the documents.bmc.com 403). All [GROUNDED]. Two
+> corrections to the old stub: the folder utilities are **deffolder / exportdeffolder** (not
+> deftable / exportdeftable), and **no captured page documents the `VARIABLE NAME` + `VALUE`
+> form** our exports use; defjob documents a form where NAME carries the whole expression.
+> Still missing: the `.dtd` files in `<EM home>\Default\data\Resource` (the schema that
+> settles the VARIABLE question) and two docs.bmc.com deprecation pages. Deprecation is
+> confirmed on every page: deprecated from **9.0.21.100**, support ends in **9.0.22**, so our
+> 9.0.21.300 sits inside the supported-but-deprecated window.
 
 ---
 

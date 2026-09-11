@@ -4,6 +4,7 @@ import ModuleTemplate from './ModuleTemplate'
 import MiniDag from '../components/MiniDag'
 import LinkedDemoFrame from '../components/LinkedDemoFrame'
 import FixDiff from '../remediation/FixDiff'
+import RemediationLookup from '../remediation/RemediationLookup'
 import ProfileFrame from '../remediation/ProfileFrame'
 import StandardsFindings from '../remediation/StandardsFindings'
 import Substitutions from '../remediation/Substitutions'
@@ -69,7 +70,17 @@ export default function RemediationRoute() {
         // The SME working-session diff (2026-08-12): generated-artifact-backed,
         // not a demo fixture — the frame is computed by the real xml_io
         // splice + self-check pipeline (over synthetic data) and drift-guarded.
-        'Fix diff': <FixDiff />,
+        // G85: the vendor -> standards -> team citation chain sits beside it.
+        'Fix diff': (
+          <div className="flex h-full min-h-0 flex-col gap-2 xl:flex-row">
+            <div className="min-h-0 min-w-0 flex-[3]">
+              <FixDiff />
+            </div>
+            <div className="min-h-0 min-w-0 flex-[2]">
+              <RemediationLookup />
+            </div>
+          </div>
+        ),
         'Jira handoffs': <LinkedDemoFrame frame={JIRA_FRAME} notice={NOTICE} {...frameProps} />,
       }}
     />

@@ -62,6 +62,7 @@ def main() -> None:
         import render_ideas
         import render_load_map
         import render_remediation_diff
+        import render_remediation_lookup
         import render_remediation_profile
         import render_roadmap
         import render_software_registry
@@ -93,6 +94,10 @@ def main() -> None:
         # so any change to that mechanism must re-render the committed frame
         # or the drift guard (test_remediation_diff_json) goes red.
         render_remediation_diff.main()
+        # G85 (2026-09-11): the citation chain beside that diff. It reads the
+        # diff's approved changes and cites the corpus by line, so a corpus edit
+        # that moves a cited line fails test_remediation_lookup_json until re-rendered.
+        render_remediation_lookup.main()
         # The remediation PROFILE frame (O59, 2026-08-31) rides here for the
         # same reason: it is G68's real profile() over a synthetic export, so a
         # change to any census -- or to the detector whose findings ride along
