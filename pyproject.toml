@@ -40,11 +40,23 @@ ruff = "0.5.7"        # EXACT, caret removed deliberately — J10 stage 0. Forma
                       # Authority: docs/ruff-format-convergence.md
 mypy = "^1.10"
 pypdf = "^6.14.2"
+jsonschema = "^4.26.0"
+
+# openpyxl STAYS IN dev (GRAPH6, 2026-09-10) — decided from its callers, not from
+# where it happened to sit. MEASURED: every importer is a skill script or a test —
+# .claude/skills/controlm-runbook-automation-excel/generate_runbook.py and
+# generate_template.py, .claude/skills/xlsx/scripts/recalc.py, and
+# tests/unit/test_excel_runbook_generator.py. NOTHING under drydocs*/ imports it,
+# so no shipped module can fail for want of it and a runtime group would install a
+# package the product never reaches for.
+# THE TRIGGER TO MOVE IT, stated so the next reader does not re-derive this: the
+# first import of openpyxl from a drydocs*/ module — i.e. when the Excel runbook
+# generator ships IN-PRODUCT rather than as a skill. Then it becomes a runtime
+# dependency of whichever component owns the generator, in that component's group.
+openpyxl = "^3.1.5"
 
 # drydocs-api wiring (ADR 0005): OPTIONAL so the default install and unit suite
 # stay framework-free — the component's handlers are pure. `poetry install --with api`.
-openpyxl = "^3.1.5"
-jsonschema = "^4.26.0"
 [tool.poetry.group.api]
 optional = true
 
@@ -70,6 +82,27 @@ optional = true
 
 [tool.poetry.group.remediation.dependencies]
 lxml = ">=5.3"
+
+# source-registration DuckDB load (GRAPH6): the `duckdb_load` step of
+# drydocs/source_registration/ — extracted synthetic CSVs into one project-local
+# DuckDB file, which the DataHub sqlalchemy profiler then reads over `duckdb:///`.
+# OPTIONAL, and the group is what makes that a DECLARATION rather than an absence:
+# duckdb was imported lazily and declared NOWHERE, so a tree without it lost the
+# step silently and no file said which package to install.
+# Still not installed by default, which is the contract the module's docstring and
+# the tests' `importorskip` both state — this names the package and the group, and
+# changes neither. `poetry install --with source-registration`.
+[tool.poetry.group.source-registration]
+optional = true
+
+[tool.poetry.group.source-registration.dependencies]
+duckdb = "^1.1"       # 1.5.5 is what `poetry lock` resolved here 2026-09-10 — recorded
+                      # as a measured fact, the way the agents' requirements.txt does it.
+                      # The floor is ^1.1 rather than the resolved version because nothing
+                      # in duckdb_load.py needs anything newer — read at this commit, not
+                      # assumed: connect, `CREATE OR REPLACE TABLE`, and
+                      # `read_csv(?, header = true, all_varchar = true)`. All long-standing
+                      # DuckDB surface.
 
 [tool.poetry.scripts]
 drydocs = "drydocs.cli:run"   # run() renders operator-config errors (G81) as exit 2, not a traceback

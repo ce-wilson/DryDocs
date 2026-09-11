@@ -7,7 +7,7 @@ phase: 6
 agent: main
 model: haiku
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - pyproject.toml
@@ -19,3 +19,87 @@ acceptance: |
 notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). Plan 2026-09-09, Phase 4 unit 4.4; the survey found the PoC's DuckDB leg resting on an undeclared
   package.
+
+  ## Close (Lane B, laptop, 2026-09-10) - wip/graph6-laptop
+
+  All four clauses met. Plan unit 4.4, so Phase 4 closes with it.
+
+  DUCKDB is now `[tool.poetry.group.source-registration]`, `optional = true`,
+  shaped like the `api` and `remediation` groups it sits beside (comment block
+  naming the step and the install line, then the group). Named for the STEP it
+  serves rather than for the package: the `duckdb_load` step of
+  `drydocs/source_registration/`, whose own `__init__.py` already lists it as the
+  optional one of four modules. `poetry install --with source-registration`.
+
+  `duckdb = "^1.1"`, and the floor is deliberate rather than the resolved value.
+  MEASURED at this commit by reading the module, not assumed: it connects, runs
+  `CREATE OR REPLACE TABLE`, and `read_csv(?, header = true, all_varchar = true)`.
+  All long-standing DuckDB surface, so a 1.1 floor is honest. `poetry lock`
+  resolved 1.5.5 here on 2026-09-10, recorded beside the pin as a measured fact
+  the way agents/requirements.txt records its own.
+
+  OPENPYXL STAYS IN dev, and the decision came from its CALLERS rather than from
+  where it happened to sit. MEASURED: every importer is a skill script or a test -
+  .claude/skills/controlm-runbook-automation-excel/generate_runbook.py and
+  generate_template.py, .claude/skills/xlsx/scripts/recalc.py, and
+  tests/unit/test_excel_runbook_generator.py. NOTHING under `drydocs*/` imports
+  it, so no shipped module can fail for want of it. The item's own condition -
+  "runtime if the Excel runbook generator ships in-product" - is therefore not met
+  today, and the TRIGGER is recorded beside the entry so the next reader does not
+  re-derive it: the first import of openpyxl from a `drydocs*/` module.
+
+  ## Found while there: the entry was stranded under another group's comment
+
+  `openpyxl` and `jsonschema` sat BELOW the comment introducing the api group
+  ("drydocs-api wiring (ADR 0005): OPTIONAL so the default install and unit suite
+  stay framework-free"), and above `[tool.poetry.group.api]`. So the file READ as
+  though both were api-group and optional. They are not - `tomllib` says both are
+  `dev`, non-optional, and that is what the resolver acts on.
+
+  This matters for THIS item specifically: the acceptance asks for openpyxl's
+  reason "recorded beside the entry", and beside the entry was a comment about a
+  different group saying the opposite of the truth. Both entries moved above the
+  comment, which now sits directly on the section it describes. No group
+  membership changed - verified by parsing before and after, not by reading.
+
+  ## The contract that had to survive, verified rather than asserted
+
+  Clause 4 is "the lazy import and its skip line unchanged", and the risk was
+  turning an optional package into an installed one by declaring it. It did not:
+
+    - duckdb importable in the default env : False (after the change)
+    - tests/unit/test_synthetic_sources.py : 1 skipped, same message,
+      "could not import 'duckdb': No module named 'duckdb'"
+
+  An optional group is a DECLARATION, not an install - which is the whole point.
+  `git diff --name-only` for the code commit is pyproject.toml + poetry.lock only.
+
+  ONE THING I DID CHANGE beyond those two files, named so it can be reverted if
+  read more strictly: `duckdb_load.py`'s module docstring said "DuckDB is NOT a
+  repo dependency" and named no way to get it. That sentence was the whole defect
+  in miniature - true, and useless to someone holding a tree without the package.
+  It now says duckdb is not installed by default AND names the group. The lazy
+  `import duckdb` line and the `importorskip` are untouched; only prose moved.
+
+  THREE lazy sites exist, not the one the item names, and all three are unchanged:
+  drydocs/source_registration/duckdb_load.py:40 (the lazy import),
+  scripts/build_synthetic_sources.py:55 (a `# noqa: F401 - probe only` guard that
+  prints "duckdb SKIPPED" to stderr), and tests/unit/test_synthetic_sources.py:153
+  (the importorskip). Worth knowing if the group is ever made non-optional.
+
+  ## Gates
+
+  `poetry check --lock` exit 0. `ruff check .` clean; `ruff format --check .`
+  clean over 630 files. Full suite, ONE invocation for the whole run per J57's
+  third clause (b484afc3): `poetry run pytest -q` -> 4213 passed, 15 skipped,
+  25 deselected, ZERO failures. No render moved, so no roadmap red at the code
+  commit - the Y5 red lands only on this close commit, as always.
+
+  ## Noticed, for the sender (Lane B does not append to IDEAS.md)
+
+  While reading ahead to GRAPH2 I found a live defect in its input and it is
+  recorded there rather than here, but it is worth the sender knowing early:
+  drydocs/port/reconcile_before.py:219 snapshots a table named DEFERRED_VERBS
+  that EXISTS NOWHERE in the repo, while GENERATED_PATHS - which does exist and
+  which GRAPH2's own acceptance names - is not read at all. `getattr(mod, table,
+  {}) or {}` is what makes the miss silent.
