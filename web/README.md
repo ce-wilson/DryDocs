@@ -83,10 +83,11 @@ previous version of this section denied outright:
 | Load map | `/load-map` | `sme` |
 | Under the Hood | `/under-the-hood` | `sme` |
 
-Three more surfaces are gated and are deliberately NOT nav modules
+Four more surfaces are gated and are deliberately NOT nav modules
 (`GATED_SURFACES` in the same file, same vocabulary): `/mappings` (`sme` — the
 write surface), `/admin/config` (`admin`) and `/console` (`admin` — the
-raw-Cypher sandbox, and steward does not get it).
+raw-Cypher sandbox, and steward does not get it), plus the Idea-192 research PoC
+`/lab/salt-poc` (`sme`, the same access as the `/load-map` page it re-skins with Salt DS).
 
 `/intake` is the one exception, and it is declared as one: it admits the SME
 PERSONA by id as well as steward and admin, which a ROLE vocabulary cannot

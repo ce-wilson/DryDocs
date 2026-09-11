@@ -64,6 +64,7 @@ const SoftwareRoute = lazy(() => import('./routes/SoftwareRoute'))
 const GatesRoute = lazy(() => import('./routes/GatesRoute'))
 const LoadMapRoute = lazy(() => import('./routes/LoadMapRoute'))
 const UnderTheHoodRoute = lazy(() => import('./routes/UnderTheHoodRoute'))
+const SaltPocRoute = lazy(() => import('./routes/SaltPocRoute'))
 
 
 // O8 rebuild: real react-router routes (deep-linkable, back-button safe —
@@ -181,6 +182,8 @@ export default function App() {
           <Route path="loads/run/:runId" element={<LoadsRoute />} />
           <Route path="load-map" element={<LoadMapRoute />} />
           <Route path="under-the-hood" element={<UnderTheHoodRoute />} />
+          {/* Idea-192: research PoC, /load-map re-skinned with Salt DS (wip branch). */}
+          <Route path="lab/salt-poc" element={<SaltPocRoute />} />
 
           {/* O47: the intake persona (?as=neo) plus steward/admin. This is the
               ONE route that keeps its own gate: `access` is a role vocabulary and

@@ -479,10 +479,14 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     directory evidence -- FixDiff's rule unchanged: it lives under remediation/
     and renders on exactly the one route whose Fix diff tab it sits beside. Both
     counts move by one.
+    111 -> 112 at Idea-192 (2026-09-11, wip branch): SaltPocRoute, UNBOUND, bound
+    stays 44. It is a GATED_SURFACE, not a registry module -- AdminConfigRoute's
+    reason -- and a research PoC re-skinning /load-map, so binding it to
+    `loadmap` would file an experiment as part of the module it compares against.
     """
     comps = _ui()["components"]
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
         44,
-        111,
+        112,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"

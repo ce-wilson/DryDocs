@@ -310,6 +310,11 @@ export const GATED_SURFACES: readonly GatedSurface[] = [
     access: 'admin',
     why: 'ADR 0005: the raw-Cypher sandbox. Admin only, and deliberately NOT opened to steward.',
   },
+  {
+    path: '/lab/salt-poc',
+    access: 'sme',
+    why: 'Idea-192 research PoC: /load-map re-skinned with Salt DS. Same access as the page it mirrors, and gated so its lazy chunk (the Salt stack) ships to no one who cannot open /load-map.',
+  },
 ]
 
 /** Paths whose gate is deliberately NOT expressible in the `access` vocabulary.

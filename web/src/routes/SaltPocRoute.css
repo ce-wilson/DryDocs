@@ -1,0 +1,92 @@
+/* Idea-192 PoC styles. Scoped to the PoC wrapper; var() only, no hex (ui-conventions.md). */
+
+.salt-poc-host > .salt-theme { height: 100%; }
+
+.salt-poc-frame {
+  border: 1px solid var(--salt-container-primary-borderColor);
+  border-radius: var(--salt-palette-corner-weak, 0);
+  background: var(--salt-container-primary-background);
+}
+.salt-poc-table { overflow: auto; border: 1px solid var(--salt-separable-tertiary-borderColor); }
+.salt-poc-mono { font-family: var(--salt-text-code-fontFamily); }
+.salt-poc-group { font-weight: 600; background: var(--salt-container-secondary-background); }
+.salt-poc-tile { min-width: 8rem; }
+
+/* "Salt + DryDocs tokens": Salt's characteristic tokens re-pointed at styles/tokens.css.
+   Leaf tokens only - Salt resolves its aliases on .salt-theme, so re-pointing a
+   foundation token here would not reach components. */
+.salt-poc-branded {
+  --salt-text-fontFamily: var(--sans);
+  --salt-text-h1-fontFamily: var(--sans);
+  --salt-text-h2-fontFamily: var(--sans);
+  --salt-text-h3-fontFamily: var(--sans);
+  --salt-text-h4-fontFamily: var(--sans);
+  --salt-text-display1-fontFamily: var(--mono);
+  --salt-text-display2-fontFamily: var(--mono);
+  --salt-text-display3-fontFamily: var(--mono);
+  --salt-text-display4-fontFamily: var(--mono);
+  --salt-text-label-fontFamily: var(--sans);
+  --salt-text-notation-fontFamily: var(--sans);
+  --salt-text-action-fontFamily: var(--sans);
+  --salt-text-code-fontFamily: var(--mono);
+
+  --salt-container-primary-background: var(--panel);
+  --salt-container-secondary-background: var(--panel2);
+  --salt-container-tertiary-background: var(--bg2);
+  --salt-container-primary-borderColor: var(--edge);
+  --salt-container-secondary-borderColor: var(--edge);
+  --salt-container-tertiary-borderColor: var(--edge-soft);
+  --salt-content-primary-foreground: var(--text);
+  --salt-content-secondary-foreground: var(--muted);
+  --salt-content-bold-foreground: var(--text);
+  --salt-separable-primary-borderColor: var(--edge);
+  --salt-separable-secondary-borderColor: var(--edge);
+  --salt-separable-tertiary-borderColor: var(--edge-soft);
+
+  --salt-editable-primary-background: var(--bg2);
+  --salt-editable-secondary-background: var(--bg2);
+  --salt-editable-borderColor: var(--edge);
+  --salt-editable-borderColor-hover: var(--faint);
+  --salt-editable-borderColor-active: var(--blue-br);
+
+  --salt-actionable-borderColor: var(--edge);
+  --salt-actionable-borderColor-hover: var(--faint);
+  --salt-actionable-foreground: var(--muted);
+  --salt-actionable-foreground-hover: var(--text);
+  --salt-actionable-accented-foreground: var(--blue-br);
+  --salt-actionable-accented-borderColor: var(--blue-br);
+  --salt-actionable-accented-bold-background: var(--blue);
+  --salt-actionable-accented-bold-borderColor: var(--blue);
+  --salt-selectable-background-selected: var(--panel2);
+  --salt-selectable-borderColor-selected: var(--blue-br);
+  --salt-accent-background: var(--blue);
+  --salt-accent-borderColor: var(--blue-br);
+  --salt-accent-foreground: var(--blue-br);
+  --salt-sentiment-accent-background: var(--blue);
+  --salt-focused-outlineColor: var(--blue-br);
+
+  --salt-status-success-foreground: var(--green);
+  --salt-status-success-foreground-decorative: var(--green);
+  --salt-status-success-foreground-informative: var(--green);
+  --salt-status-success-borderColor: var(--green);
+  --salt-status-success-background: color-mix(in srgb, var(--green) 10%, transparent);
+  --salt-status-warning-foreground: var(--yellow);
+  --salt-status-warning-foreground-decorative: var(--yellow);
+  --salt-status-warning-foreground-informative: var(--yellow);
+  --salt-status-warning-borderColor: var(--yellow);
+  --salt-status-warning-background: color-mix(in srgb, var(--yellow) 10%, transparent);
+  --salt-status-info-foreground: var(--blue-br);
+  --salt-status-info-foreground-decorative: var(--blue-br);
+  --salt-status-info-foreground-informative: var(--blue-br);
+  --salt-status-info-borderColor: var(--blue-br);
+  --salt-status-info-background: color-mix(in srgb, var(--blue-br) 10%, transparent);
+  --salt-status-error-foreground: var(--status-fail-soft);
+  --salt-status-error-foreground-decorative: var(--status-fail-soft);
+  --salt-status-error-foreground-informative: var(--status-fail-soft);
+  --salt-status-error-borderColor: var(--status-fail);
+  --salt-status-error-background: color-mix(in srgb, var(--status-fail) 10%, transparent);
+
+  /* The .salt-theme scope div already computed these from Salt's values, so re-root them. */
+  color: var(--salt-content-primary-foreground);
+  font-family: var(--salt-text-fontFamily);
+}
