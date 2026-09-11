@@ -1,0 +1,52 @@
+id: PLAN15
+epic: release-infrastructure
+title: "tag the base finish - plan unit 4.4's second half was never minted: a dated line in the project plan, the roadmap's module stages re-judged, and VERSIONING.md's next bump named"
+type: task
+module: drydocs-plan
+phase: 8
+agent: main
+model: sonnet
+priority: p2
+status: todo
+depends_on: []
+inputs:
+- docs/restructure/01-project-plan.md
+- docs/restructure/roadmap.yaml
+- VERSIONING.md
+- tests/unit/test_plan_roadmap.py
+acceptance: |
+  (a) docs/restructure/01-project-plan.md carries a dated base-finish line naming the tag that
+  carries it - port-base-20260909 at 9da9d617, Phase 2's finish line - and saying what "the base is
+  finished" does and does not mean. The file carries no such line today; that is measured, not
+  assumed - a case-insensitive search for "finish" returns nothing.
+  (b) The roadmap's module stages in docs/restructure/roadmap.yaml are re-judged against the tree as
+  it stands rather than carried forward, and every stage that CHANGES records why in the same edit. A
+  stage deliberately left alone is a judgment too, and says so, rather than leaving silence to mean
+  either thing.
+  (c) VERSIONING.md's next bump is named by that file's own bump rules, with the reason. Only the
+  bump is named here: cutting the tag and moving CHANGELOG's Unreleased section is the release ritual
+  VERSIONING.md already documents, and is not this item.
+  (d) tests/unit/test_plan_roadmap.py green, and the board and roadmap renders refreshed in the SAME
+  commit - a roadmap edit moves the source fingerprint for a structural reason, which the Y5
+  status-only tolerance does not cover.
+notes: |
+  Minted 2026-09-11 (Lane A, desktop; pen backlog). Plan 2026-09-09, Phase 4 unit 4.4, second half.
+
+  WHY IT EXISTS. Unit 4.4 is two jobs joined by a semicolon - declare the dependency groups, and tag
+  the base finish. Only the first was minted, as GRAPH6, whose acceptance runs to duckdb's extras
+  group, openpyxl's decision, a clean lock, and the lazy import left alone. The tag half reached no
+  item file, so the Lane B handoff said GRAPH6 closes Phase 4 and the branch commit repeated it. Lane
+  B built exactly what it was handed - the scope was wrong before the handoff was written. Found
+  2026-09-11 by listing the merge's contents instead of trusting the claim about them.
+
+  THE PRECONDITION IS MET. The plan's status row notes that unit 4.4 closes on Phase 2's finish line
+  rather than on its own. Phase 2 went done with the tag port-base-20260909 at 9da9d617, so this is
+  buildable now.
+
+  WHY PLAN14 IS SKIPPED, since a gap otherwise reads as an accident. PLAN14 is taken: commit 9e69e809
+  ships the outputs field and ADR 0013 Clause 3b under that id, and no item file was ever written for
+  it. The allocator unions the local items, every remote ref's tree and the ids added in history - it
+  reads no commit subjects, so a burned id of that shape is invisible to it, and it offers PLAN14.
+  Taking it would silently re-point a shipped feature, which is the burned-id failure the mint rule
+  names. Minting PLAN15 also retires the trap: the allocator returns max plus one, so once this file
+  exists PLAN14 is never offered again.
