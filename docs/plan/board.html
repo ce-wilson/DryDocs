@@ -2392,15 +2392,125 @@ and web (panel); it is filed against the surface the user asked for. The (b) sli
 in agents/, the (c) slice in web/ — the boundary guard&#x27;s classification is unaffected
 because agents/ is already scanned.
 </p></div></div>
-<div class="card ready" id="card-WEB24" data-id="WEB24" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web24 rule the five open salt ds second-track questions at a hitl gate, and land the poc findings on main first so the gate cites the tree rather than a branch" tabindex="0"><div class="card-head"><span class="card-id">WEB24</span><span class="card-title">Rule the five open Salt DS second-track questions at a HITL gate, and land the PoC findings on main first so the gate cites the tree rather than a branch</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> STUB - minted 2026-09-11 by the single-idea groom of Idea-192; the body lands in the next
-commit of the same groom run (the I6 mint protocol: final title first, pushed, then the body).
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-11 from docs/restructure/IDEAS.md Idea-192 and the PoC findings on
-wip/idea-192-desktop.
+<div class="card ready" id="card-WEB24" data-id="WEB24" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web24 rule the five open salt ds second-track questions at a hitl gate, and land the poc findings on main first so the gate cites the tree rather than a branch" tabindex="0"><div class="card-head"><span class="card-id">WEB24</span><span class="card-title">Rule the five open Salt DS second-track questions at a HITL gate, and land the PoC findings on main first so the gate cites the tree rather than a branch</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p2</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">web-console</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) THE FINDINGS LAND ON MAIN FIRST. docs/design/ui-exploration/salt-ds-poc.md is a tracked
+file on main, lifted from wip/idea-192-desktop, before the gate prompt is drafted - the DOC
+only; the PoC code stays on its branch until clause (c) has an answer. This is the defect
+Idea-192 was raised about: the only substantive Salt assessment we had ever written lived in
+git history at f9d0b2d0 and had to be recovered from it twice. A wip branch is that same
+defect one step up, and a gate prompt that cites a branch ref cites something the reader at
+the sitting cannot open.
+(b) A gate prompt exists at config/gate-prompts/salt-ds-second-track.yaml carrying the five
+rulings the PoC left open, each with the measurement behind it rather than the conclusion
+alone. R1 provider shape: a scoped provider per page, or one root provider for the console -
+a root SaltProvider writes the .salt-theme classes and data-mode onto the html element and
+Salt allows one per window, so the second answer ends styles/tokens.css&#x27;s role as the single
+palette. R2 status vocabulary: Salt has four statuses (success, warning, error, info) and
+ui-conventions.md section 1 has five tokens; running (teal) and inert (muted) map to none of
+them, pending currently lands on warning, which reads as caution, and the pill shape of
+StatusChip is lost. That section 1 table is the mapping every surface follows, which is why
+this is an SME ruling and not a styling choice. R3 grids: Salt Table with our existing
+tableControls, or the AG Grid data grid with the Salt AG Grid theme - the second is a new
+dependency and a larger decision than the skin, and it was not tested. R4 brand against Kept
+Orbit: density default, uppercase action text, type scale and corner shape - measured, an h2
+is 14px at high density and 18px at medium against the console&#x27;s 22.5px, and Salt uppercases
+action text through one variable that the branded skin already sets to none. R5 version
+policy: core 1.67.1 through 1.70.0 depend on an icons version npm has never published, so the
+newest clean install is core 1.67.0 and an internal registry mirroring npm inherits the gap.
+(c) THE FIRST QUESTION IS WHETHER A SECOND UI TRACK OPENS AT ALL, answered before R1 to R5,
+which are moot without it. The user ruled 2026-08-27 that Salt is preferred company-side and
+NOT mandated, so this is an option costed on its merits. The locked single-track stack in
+site-plan section 1 stands until the gate says otherwise, and nothing in this item changes it.
+(d) THE GATE RUNS to a recorded outcome in config/gate-log.md: SIGNED, SME-DEFERRED with a
+named re-arm trigger, or BLOCKED with a named blocker - silence is the one non-outcome. This
+is the WEB22 class stated in advance: a drafting item closes done and nobody owns the run.
+The item&#x27;s gates: field gains the slug once the prompt file exists; it is absent at the mint
+because the guard on that field requires the prompt to be on disk already.
+(e) AFTER: a follow-up item for every practice the ruling adopts, or an explicit none-needed
+note. One is named in advance because it is already measured: if any adoption lands npm
+packages, the locked-stack pin does not observe them.
+test_web_console_stack_matches_the_locked_site_plan asserts the SET of
+config/taxonomy/software-registry.yaml rows carrying stack web-console and never reads
+web/package.json, so the PoC&#x27;s five exact pins did not trip it - and an adoption that added
+Salt to package.json without a registry row would not trip it either.
+(f) NOT in scope: merging the PoC route, its npm pins or its ui-components ledger row onto
+main, which follows a ruling rather than making one; re-litigating the 2026-08-27
+preferred-not-mandated ruling; and editing the locked-stack pin, which is a consequence of a
+ruling and not a way of reaching one.
+</p><p class="paths"><strong>Inputs:</strong> <code>docs/restructure/IDEAS.md</code>, <code>docs/design/ui-exploration/site-plan.md</code>, <code>docs/design/ui-exploration/ui-conventions.md</code>, <code>docs/design/ui-exploration/kept-orbit-philosophy.md</code>, <code>docs/restructure/03-hitl-sme-flow.md</code>, <code>config/taxonomy/software-registry.yaml</code>, <code>tests/unit/test_software_registry.py</code></p><p class="notes"><strong>Notes:</strong> Minted 2026-09-11 by a single-idea groom of Idea-192 (desktop, pen backlog), against a PoC
+that exists and is green: branch wip/idea-192-desktop, CI green at 1e2023d8, findings at
+docs/design/ui-exploration/salt-ds-poc.md ON THAT BRANCH. /lab/salt-poc renders /load-map
+three ways over the same committed artifact - current, salt, salt-branded - behind the same
+sme-gated lazy boundary as /load-map, so the Salt chunk reaches nobody who cannot already
+open that page.
+WHY THIS IS A GATE ITEM AND NOT A BUILD ITEM: Idea-192 sat open for two weeks because a cost
+estimate was blocked on four unanswered questions. The PoC answers all four - (a) the
+component crosswalk, (b) the Tailwind ruling, (c) token mapping, (d) the offline install -
+and answering them produced five NEW questions that are rulings rather than measurements.
+What the PoC SETTLED, so the sitting does not re-ask it: the seam holds (shellConfig,
+useTableControls, useTableView, toCsv and the load-map model ported unchanged - only
+presentation moved, which is exactly the library-agnostic-shell mitigation the 2026-07-17
+assessment asked for); a scoped provider works and tears down cleanly after navigation; an
+offline install works with exact pins and self-hosted fonts; and the Tailwind rule is
+decided - Salt&#x27;s CSS is injected unlayered at runtime and wins every property it shares with
+Tailwind, measured (px-4 and p-3 on a Salt layout computed to zero, and the console&#x27;s own
+base input styles never reached Salt&#x27;s Input), so Tailwind stays for layout on plain elements
+and spacing moves to Salt props on anything that becomes a Salt component.
+THE STALE FIGURE, CORRECTED AT THE GROOM: Idea-192 costed the Tailwind coupling at 1,167
+className sites across 65 files, measured 2026-08-27 by a method the entry did not record.
+Measured on main 2026-09-11: 1,757 across 100 of 111 .tsx files, tests and generated files
+excluded. The largest single term in the estimate grew by half in two weeks, which is the
+argument for measuring the SUBSET on elements that would become Salt components rather than
+the total - that is WEB25, and it is why WEB25 exists as a separate item.
+INPUTS, deliberately: salt-ds-poc.md is NOT listed as an input, because it is not on main and
+the PLAN12 guard checks inputs of open items against the tracked tree. It is an OUTPUT of
+clause (a). Do not &quot;fix&quot; the list by adding the branch path.
+Model fable: the ruling decides whether a second component library enters the console&#x27;s
+stack, which is a boundary decision rather than a task with a written test. Priority p2 rather
+than the inbox&#x27;s proposed Low: the option is now blocked on exactly one thing, a sitting, and
+the evidence supporting it will go stale - R5&#x27;s version window in particular.
 </p></div></div>
-<div class="card" id="card-WEB25" data-id="WEB25" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web25 re-skin moduletemplate behind the same skin switch, so the salt cost term is a measured count of the classname sites on elements that become salt components" tabindex="0"><div class="card-head"><span class="card-id">WEB25</span><span class="card-title">Re-skin ModuleTemplate behind the same skin switch, so the Salt cost term is a measured count of the className sites on elements that become Salt components</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-WEB24" data-target="card-WEB24">WEB24</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> STUB - minted 2026-09-11 by the single-idea groom of Idea-192; the body lands in the next
-commit of the same groom run (the I6 mint protocol: final title first, pushed, then the body).
-</p><p class="notes"><strong>Notes:</strong> Minted 2026-09-11 from docs/restructure/IDEAS.md Idea-192, section 5 item 4 of the PoC
-findings on wip/idea-192-desktop.
+<div class="card" id="card-WEB25" data-id="WEB25" data-module="drydocs-web" data-phase="12" data-epic="web-console" data-type="task" data-status="todo" data-search="web25 re-skin moduletemplate behind the same skin switch, so the salt cost term is a measured count of the classname sites on elements that become salt components" tabindex="0"><div class="card-head"><span class="card-id">WEB25</span><span class="card-title">Re-skin ModuleTemplate behind the same skin switch, so the Salt cost term is a measured count of the className sites on elements that become Salt components</span></div><div class="chips"><span class="chip" data-kind="module">drydocs-web</span><span class="chip" data-kind="phase">P12</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p3</span><span class="chip" data-kind="model-agent">sonnet / main</span></div><div class="epic">web-console</div><div class="deps"><span class="deps-label">depends on:</span> <a class="dep-link" href="#card-WEB24" data-target="card-WEB24">WEB24</a></div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> (a) ModuleTemplate - the component every module page instantiates - renders under the same
+skin query switch the PoC established (current, salt, salt-branded), behind the same lazy
+sme-gated boundary, over the same data. No module page changes behavior, no route renders
+Salt by default, and the current skin stays the real component rather than a copy of it.
+(b) THE MEASUREMENT IS THE DELIVERABLE, not the re-skin. The item reports the count of
+className sites that sit on elements which BECOME Salt components, against the total measured
+the same day by the same command, with the command recorded so the next measurement is
+comparable. The total on main on 2026-09-11 was 1,757 across 100 of 111 .tsx files; the PoC
+page&#x27;s own 53 were all on plain elements and therefore all survive. The subset is the real
+cost term because of the Tailwind ruling WEB24 carries: Tailwind keeps working on plain
+elements and loses every shared property on a Salt component, so the total overstates the
+work and nobody has yet measured the part that does not.
+(c) THE RULING IS APPLIED, NOT RE-OPENED. R1&#x27;s provider shape, R2&#x27;s status mapping and R4&#x27;s
+brand settings are inputs to this build; a disagreement with any of them is a new question
+for the gate, not a local decision made in a component.
+(d) The initial chunk is unchanged and the Salt stack stays inside the lazy chunk:
+checkBundleSize.mjs reports against the 2,500,000-byte ceiling WEB23 ratcheted to with a
+three percent margin restored. The PoC measured 2,424,600 with Salt lazy; a re-skin of the
+component every module page instantiates is the most likely change to break that, so it is
+measured rather than assumed.
+(e) NOT in scope: adopting Salt on any default route; the graph canvases, which React Flow
+and NVL own either way; and the registry-versus-package.json question, which is WEB24 clause
+(e)&#x27;s follow-up rather than this item&#x27;s.
+</p><p class="paths"><strong>Inputs:</strong> <code>web/src/routes/ModuleTemplate.tsx</code>, <code>web/src/modules/registry.ts</code>, <code>web/src/layout/shellConfig.ts</code>, <code>web/scripts/checkBundleSize.mjs</code>, <code>config/taxonomy/ui-components.yaml</code>, <code>docs/design/ui-exploration/layout-anatomy-checklist.md</code>, <code>docs/design/ui-exploration/ui-conventions.md</code></p><p class="notes"><strong>Notes:</strong> Minted 2026-09-11 by the same single-idea groom of Idea-192 (desktop, pen backlog), from
+section 5 item 4 of the PoC findings - the one next measurable unit those findings name.
+WHY IT DEPENDS ON WEB24, deliberately rather than procedurally: R1 decides whether a page
+mounts its own scoped Salt provider or assumes a root one, and building this first would
+settle by accident the thing the gate exists to settle. If the gate defers, this item stays
+out of next_ready, which is the correct state for an option nobody has committed to - not a
+blockage to route around.
+THE STARTING ARTIFACT IS THE BRANCH, not a fresh start. wip/idea-192-desktop already carries
+SaltPocRoute.tsx and its CSS, the lazy route wiring, the gated-surface entry, five exact npm
+pins with their lock, and the ui-components ledger row with its guard pin moved from 111 to
+112 - verified green (CI at 1e2023d8; 535 vitest tests in 51 files, oxlint clean, 132 pytest
+across test_ui_components, test_software_registry, test_console_delivery, test_ui_tests_ledger
+and the J57 family, plus a browser pass on three skins in both themes).
+WHY ModuleTemplate and not another page: it is the one component every module page
+instantiates, so a single re-skin puts every module page up for side-by-side review at once.
+It also carries the Tabs idiom, whose one measured behavioral difference matters beyond
+presentation - Salt renders every tab panel and hides the inactive ones, which put 101 table
+rows in the DOM against 30 on the current page. Harmless on the PoC page; not harmless on a
+module page with a heavy pane.
 </p></div></div>
 <div class="card ready" id="card-CFG5" data-id="CFG5" data-module="config" data-phase="13" data-epic="runtime-topology" data-type="task" data-status="todo" data-search="cfg5 run the controlm-folder-identity-grain gate" tabindex="0"><div class="card-head"><span class="card-id">CFG5</span><span class="card-title">Run the controlm-folder-identity-grain gate</span></div><div class="chips"><span class="chip" data-kind="module">config</span><span class="chip" data-kind="phase">P13</span><span class="chip" data-kind="type">task</span><span class="chip" data-kind="priority">p1</span><span class="chip" data-kind="model-agent">fable / main</span></div><div class="epic">runtime-topology</div><div class="detail"><p class="acceptance"><strong>Acceptance:</strong> USER-GATED START (the SME sits company-side; this item is claimed only when the user
 opens the session). A sign-off session for gate `controlm-folder-identity-grain` is HELD

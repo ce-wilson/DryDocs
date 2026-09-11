@@ -10,10 +10,55 @@ priority: p3
 status: todo
 depends_on:
 - WEB24
-inputs: []
+inputs:
+- web/src/routes/ModuleTemplate.tsx
+- web/src/modules/registry.ts
+- web/src/layout/shellConfig.ts
+- web/scripts/checkBundleSize.mjs
+- config/taxonomy/ui-components.yaml
+- docs/design/ui-exploration/layout-anatomy-checklist.md
+- docs/design/ui-exploration/ui-conventions.md
 acceptance: |
-  STUB - minted 2026-09-11 by the single-idea groom of Idea-192; the body lands in the next
-  commit of the same groom run (the I6 mint protocol: final title first, pushed, then the body).
+  (a) ModuleTemplate - the component every module page instantiates - renders under the same
+  skin query switch the PoC established (current, salt, salt-branded), behind the same lazy
+  sme-gated boundary, over the same data. No module page changes behavior, no route renders
+  Salt by default, and the current skin stays the real component rather than a copy of it.
+  (b) THE MEASUREMENT IS THE DELIVERABLE, not the re-skin. The item reports the count of
+  className sites that sit on elements which BECOME Salt components, against the total measured
+  the same day by the same command, with the command recorded so the next measurement is
+  comparable. The total on main on 2026-09-11 was 1,757 across 100 of 111 .tsx files; the PoC
+  page's own 53 were all on plain elements and therefore all survive. The subset is the real
+  cost term because of the Tailwind ruling WEB24 carries: Tailwind keeps working on plain
+  elements and loses every shared property on a Salt component, so the total overstates the
+  work and nobody has yet measured the part that does not.
+  (c) THE RULING IS APPLIED, NOT RE-OPENED. R1's provider shape, R2's status mapping and R4's
+  brand settings are inputs to this build; a disagreement with any of them is a new question
+  for the gate, not a local decision made in a component.
+  (d) The initial chunk is unchanged and the Salt stack stays inside the lazy chunk:
+  checkBundleSize.mjs reports against the 2,500,000-byte ceiling WEB23 ratcheted to with a
+  three percent margin restored. The PoC measured 2,424,600 with Salt lazy; a re-skin of the
+  component every module page instantiates is the most likely change to break that, so it is
+  measured rather than assumed.
+  (e) NOT in scope: adopting Salt on any default route; the graph canvases, which React Flow
+  and NVL own either way; and the registry-versus-package.json question, which is WEB24 clause
+  (e)'s follow-up rather than this item's.
 notes: |
-  Minted 2026-09-11 from docs/restructure/IDEAS.md Idea-192, section 5 item 4 of the PoC
-  findings on wip/idea-192-desktop.
+  Minted 2026-09-11 by the same single-idea groom of Idea-192 (desktop, pen backlog), from
+  section 5 item 4 of the PoC findings - the one next measurable unit those findings name.
+  WHY IT DEPENDS ON WEB24, deliberately rather than procedurally: R1 decides whether a page
+  mounts its own scoped Salt provider or assumes a root one, and building this first would
+  settle by accident the thing the gate exists to settle. If the gate defers, this item stays
+  out of next_ready, which is the correct state for an option nobody has committed to - not a
+  blockage to route around.
+  THE STARTING ARTIFACT IS THE BRANCH, not a fresh start. wip/idea-192-desktop already carries
+  SaltPocRoute.tsx and its CSS, the lazy route wiring, the gated-surface entry, five exact npm
+  pins with their lock, and the ui-components ledger row with its guard pin moved from 111 to
+  112 - verified green (CI at 1e2023d8; 535 vitest tests in 51 files, oxlint clean, 132 pytest
+  across test_ui_components, test_software_registry, test_console_delivery, test_ui_tests_ledger
+  and the J57 family, plus a browser pass on three skins in both themes).
+  WHY ModuleTemplate and not another page: it is the one component every module page
+  instantiates, so a single re-skin puts every module page up for side-by-side review at once.
+  It also carries the Tabs idiom, whose one measured behavioral difference matters beyond
+  presentation - Salt renders every tab panel and hides the inactive ones, which put 101 table
+  rows in the DOM against 30 on the current page. Harmless on the PoC page; not harmless on a
+  module page with a heavy pane.

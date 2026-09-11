@@ -110,6 +110,42 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
+- **`Idea-317`** · 2026-09-11 · `[idea]` · **open** · prio? **Med** —
+  **The locked-stack guard reads the registry's own rows and never `web/package.json`, so it
+  checks that the registry agrees with itself and would not see the stack actually change.**
+  Found 2026-09-11 while grooming Idea-192, verified producer-side.
+  `tests/unit/test_software_registry.py::test_web_console_stack_matches_the_locked_site_plan`
+  asserts that the SET of `config/taxonomy/software-registry.yaml` products carrying
+  `stack: web-console` equals six named ids, pinning the locked stack of
+  `docs/design/ui-exploration/site-plan.md` section 1 "so a swap is deliberate". Its source of
+  truth is the declaration, not the tree: the Salt DS proof of concept added five exact
+  `@salt-ds/*` and font pins to `web/package.json` and the guard stayed green — correct by its
+  own design, and equally silent if an adoption ever added a runtime UI dependency without a
+  registry row. The adjacent guard's own docstring already names the other source ("answerable
+  only by reading comments or package.json — which is how the ReUI/Neo4j-driver membership got
+  missed in the first place"), so the blind spot is known one function away and nothing
+  reconciles the two surfaces. Candidate shapes, in increasing cost: the guard carries a dated
+  line stating what it does NOT observe (ADR 0021's class — a result names what it did not
+  check); or a reconciliation reads `web/package.json` dependencies against the registry rows
+  and fails an unregistered runtime UI dependency. The second needs a scope ruling first —
+  drivers deliberately stay out of that registry and font/dev packages are not stack members —
+  and that ruling is the user's, which is why this is an inbox entry and not an item.
+
+- **`Idea-318`** · 2026-09-11 · `[idea]` · **open** · prio? **Med** —
+  **A regex over a diff's added lines missed two multi-line parenthesised imports that the
+  AST line-range version catches — a ready-made test case for the requirement-to-code-to-test
+  graph once it is loaded.** Captured 2026-09-11. The prototype matched import statements
+  textually against the added lines of a diff; an import split across lines inside parentheses
+  presents its first line as an opening fragment and its names on the lines below, so the
+  added-line window saw a fragment and the match failed twice. The AST version resolves each
+  import node to a LINE RANGE and asks whether that range intersects the added lines, and
+  catches both. Worth keeping rather than merely fixing: it is a small, real, already-measured
+  case where two instruments disagree about the same change for a STRUCTURAL reason, which is
+  exactly the kind of question the requirement-to-code-to-test graph exists to answer — so it
+  is a test case that already has its expected answer the day that graph is loaded. It is also
+  J66 one level out: J66 says a guard reads code rather than the prose around it; this says a
+  guard reads the STRUCTURE rather than the lines it happens to be printed on.
+
 - **`Idea-315`** · 2026-09-11 · `[idea]` · **open** · prio? **High** —
   **A company-marker keyword scan measures LABELLING, not divergence, and the number it returns
   counts labels rather than coverage.** Reported by the consumer 2026-09-11 during the
@@ -2538,7 +2574,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
     it unfixed, all five servers would have been unplaceable and a successful load would still
     have drawn an empty world.
 
-- **`Idea-192`** · 2026-08-27 · `[question]` · **open — the mandate question is ANSWERED (not mandated, preferred); the residue is conditional on Salt ever being costed, so nothing was promoted at the 2026-08-28 groom** · prio? **Low** —
+- **`Idea-192`** · 2026-08-27 · `[question]` · **groomed → WEB24, WEB25 (2026-09-11; a proof of concept answered all four cost questions and produced five rulings for a gate)** · prio? **Low** —
   **Salt DS as a SECOND UI track: the standing open question is answered, and the only substantive
   assessment we ever wrote is not in the working tree.** Raised at a 2026-08-27 review of what the
   repo documents about the company design system (`@salt-ds/core`, Apache-2.0, public).
@@ -2576,6 +2612,30 @@ question a 1,000-line file with the trail at the bottom could not answer.
     any kind" intranet constraint, since Salt is a versioned npm dependency. The Kept Orbit brand
     constraint is the open design risk: Salt's aesthetic was called opposite to the dark-schematic
     spec and nobody has tested whether Salt theming can carry the brand.
+  - **KEPT-UPDATED 2026-09-11 — all four are ANSWERED, and this entry is groomed to WEB24 and
+    WEB25.** A proof of concept on branch `wip/idea-192-desktop` (CI green at `1e2023d8`) renders
+    `/load-map` three ways behind one `?skin=` switch — current, Salt's own theme, and Salt with
+    our leaf tokens — with its findings at `docs/design/ui-exploration/salt-ds-poc.md` on that
+    branch. (a) the crosswalk exists, and its headline is that raw HTML controls (81 buttons, 45
+    tables, 34 inputs) outnumber the twelve first-party primitives, so a Salt track is mostly a
+    rewrite of raw controls rather than a swap of primitives; (b) the Tailwind question is RULED by
+    measurement — Salt's CSS is injected unlayered at runtime and wins every property it shares
+    with Tailwind, so Tailwind stays for layout on plain elements and spacing moves to Salt props
+    on anything that becomes a Salt component; (c) token mapping works through leaf tokens only,
+    about 75 declarations, and carries IBM Plex and the DryDocs palette into Salt components in
+    both modes; (d) an offline install works with exact pins and self-hosted fonts, with one catch
+    that became a ruling of its own. The seam held: the shell, the table hooks and the models
+    ported unchanged, which is what the 2026-07-17 assessment asked the shell to make possible.
+    **The 1,167 `className=` figure above is STALE** — 1,757 across 100 of 111 `.tsx` files on
+    2026-09-11, so the largest term in the estimate grew by half in two weeks, which is why WEB25
+    measures the SUBSET on elements that would become Salt components rather than the total.
+    **The five questions left are rulings, not measurements** (provider shape, the status
+    vocabulary against `ui-conventions.md` section 1, Salt `Table` versus the AG Grid data grid,
+    brand against Kept Orbit, and version policy given that core 1.67.1 and later depend on an
+    icons version npm has never published), so they route through the HITL gate as WEB24 — whose
+    first clause lands the findings doc on `main`, because the complaint this entry was raised
+    about was that the only substantive Salt assessment lived in git history, and a branch is that
+    same defect one step up.
 
 - **`Idea-191`** · 2026-08-26 · `[idea]` · **open — NOT groomable: both readings mint ontology, so the first step is the three-clause gate question the entry states, not a build item (re-read 2026-08-28)** · prio? **Low** —
   **A per-column checkbox on a grid that promotes that column into a label node and lands it in the
@@ -3965,6 +4025,7 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Recently groomed (audit trail)
 
+- 2026-09-11 - [groom] Idea-192 -> WEB24, WEB25.
 - 2026-09-08 - [groom] Idea-306 -> CFG6.
 - 2026-09-08 - [groom] Idea-305 -> CORE8.
 - 2026-09-08 - [groom] Idea-304 -> LOAD6.

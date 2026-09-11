@@ -9,10 +9,89 @@ model: fable
 priority: p2
 status: todo
 depends_on: []
-inputs: []
+inputs:
+- docs/restructure/IDEAS.md
+- docs/design/ui-exploration/site-plan.md
+- docs/design/ui-exploration/ui-conventions.md
+- docs/design/ui-exploration/kept-orbit-philosophy.md
+- docs/restructure/03-hitl-sme-flow.md
+- config/taxonomy/software-registry.yaml
+- tests/unit/test_software_registry.py
 acceptance: |
-  STUB - minted 2026-09-11 by the single-idea groom of Idea-192; the body lands in the next
-  commit of the same groom run (the I6 mint protocol: final title first, pushed, then the body).
+  (a) THE FINDINGS LAND ON MAIN FIRST. docs/design/ui-exploration/salt-ds-poc.md is a tracked
+  file on main, lifted from wip/idea-192-desktop, before the gate prompt is drafted - the DOC
+  only; the PoC code stays on its branch until clause (c) has an answer. This is the defect
+  Idea-192 was raised about: the only substantive Salt assessment we had ever written lived in
+  git history at f9d0b2d0 and had to be recovered from it twice. A wip branch is that same
+  defect one step up, and a gate prompt that cites a branch ref cites something the reader at
+  the sitting cannot open.
+  (b) A gate prompt exists at config/gate-prompts/salt-ds-second-track.yaml carrying the five
+  rulings the PoC left open, each with the measurement behind it rather than the conclusion
+  alone. R1 provider shape: a scoped provider per page, or one root provider for the console -
+  a root SaltProvider writes the .salt-theme classes and data-mode onto the html element and
+  Salt allows one per window, so the second answer ends styles/tokens.css's role as the single
+  palette. R2 status vocabulary: Salt has four statuses (success, warning, error, info) and
+  ui-conventions.md section 1 has five tokens; running (teal) and inert (muted) map to none of
+  them, pending currently lands on warning, which reads as caution, and the pill shape of
+  StatusChip is lost. That section 1 table is the mapping every surface follows, which is why
+  this is an SME ruling and not a styling choice. R3 grids: Salt Table with our existing
+  tableControls, or the AG Grid data grid with the Salt AG Grid theme - the second is a new
+  dependency and a larger decision than the skin, and it was not tested. R4 brand against Kept
+  Orbit: density default, uppercase action text, type scale and corner shape - measured, an h2
+  is 14px at high density and 18px at medium against the console's 22.5px, and Salt uppercases
+  action text through one variable that the branded skin already sets to none. R5 version
+  policy: core 1.67.1 through 1.70.0 depend on an icons version npm has never published, so the
+  newest clean install is core 1.67.0 and an internal registry mirroring npm inherits the gap.
+  (c) THE FIRST QUESTION IS WHETHER A SECOND UI TRACK OPENS AT ALL, answered before R1 to R5,
+  which are moot without it. The user ruled 2026-08-27 that Salt is preferred company-side and
+  NOT mandated, so this is an option costed on its merits. The locked single-track stack in
+  site-plan section 1 stands until the gate says otherwise, and nothing in this item changes it.
+  (d) THE GATE RUNS to a recorded outcome in config/gate-log.md: SIGNED, SME-DEFERRED with a
+  named re-arm trigger, or BLOCKED with a named blocker - silence is the one non-outcome. This
+  is the WEB22 class stated in advance: a drafting item closes done and nobody owns the run.
+  The item's gates: field gains the slug once the prompt file exists; it is absent at the mint
+  because the guard on that field requires the prompt to be on disk already.
+  (e) AFTER: a follow-up item for every practice the ruling adopts, or an explicit none-needed
+  note. One is named in advance because it is already measured: if any adoption lands npm
+  packages, the locked-stack pin does not observe them.
+  test_web_console_stack_matches_the_locked_site_plan asserts the SET of
+  config/taxonomy/software-registry.yaml rows carrying stack web-console and never reads
+  web/package.json, so the PoC's five exact pins did not trip it - and an adoption that added
+  Salt to package.json without a registry row would not trip it either.
+  (f) NOT in scope: merging the PoC route, its npm pins or its ui-components ledger row onto
+  main, which follows a ruling rather than making one; re-litigating the 2026-08-27
+  preferred-not-mandated ruling; and editing the locked-stack pin, which is a consequence of a
+  ruling and not a way of reaching one.
 notes: |
-  Minted 2026-09-11 from docs/restructure/IDEAS.md Idea-192 and the PoC findings on
-  wip/idea-192-desktop.
+  Minted 2026-09-11 by a single-idea groom of Idea-192 (desktop, pen backlog), against a PoC
+  that exists and is green: branch wip/idea-192-desktop, CI green at 1e2023d8, findings at
+  docs/design/ui-exploration/salt-ds-poc.md ON THAT BRANCH. /lab/salt-poc renders /load-map
+  three ways over the same committed artifact - current, salt, salt-branded - behind the same
+  sme-gated lazy boundary as /load-map, so the Salt chunk reaches nobody who cannot already
+  open that page.
+  WHY THIS IS A GATE ITEM AND NOT A BUILD ITEM: Idea-192 sat open for two weeks because a cost
+  estimate was blocked on four unanswered questions. The PoC answers all four - (a) the
+  component crosswalk, (b) the Tailwind ruling, (c) token mapping, (d) the offline install -
+  and answering them produced five NEW questions that are rulings rather than measurements.
+  What the PoC SETTLED, so the sitting does not re-ask it: the seam holds (shellConfig,
+  useTableControls, useTableView, toCsv and the load-map model ported unchanged - only
+  presentation moved, which is exactly the library-agnostic-shell mitigation the 2026-07-17
+  assessment asked for); a scoped provider works and tears down cleanly after navigation; an
+  offline install works with exact pins and self-hosted fonts; and the Tailwind rule is
+  decided - Salt's CSS is injected unlayered at runtime and wins every property it shares with
+  Tailwind, measured (px-4 and p-3 on a Salt layout computed to zero, and the console's own
+  base input styles never reached Salt's Input), so Tailwind stays for layout on plain elements
+  and spacing moves to Salt props on anything that becomes a Salt component.
+  THE STALE FIGURE, CORRECTED AT THE GROOM: Idea-192 costed the Tailwind coupling at 1,167
+  className sites across 65 files, measured 2026-08-27 by a method the entry did not record.
+  Measured on main 2026-09-11: 1,757 across 100 of 111 .tsx files, tests and generated files
+  excluded. The largest single term in the estimate grew by half in two weeks, which is the
+  argument for measuring the SUBSET on elements that would become Salt components rather than
+  the total - that is WEB25, and it is why WEB25 exists as a separate item.
+  INPUTS, deliberately: salt-ds-poc.md is NOT listed as an input, because it is not on main and
+  the PLAN12 guard checks inputs of open items against the tracked tree. It is an OUTPUT of
+  clause (a). Do not "fix" the list by adding the branch path.
+  Model fable: the ruling decides whether a second component library enters the console's
+  stack, which is a boundary decision rather than a task with a written test. Priority p2 rather
+  than the inbox's proposed Low: the option is now blocked on exactly one thing, a sitting, and
+  the evidence supporting it will go stale - R5's version window in particular.
