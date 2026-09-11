@@ -1,8 +1,12 @@
 """Load the extracted synthetic CSVs into one project-local DuckDB file.
 
-DuckDB is NOT a repo dependency: the import is lazy and the tests
+DuckDB is not installed by default: the import is lazy and the tests
 ``importorskip`` it, so a tree without the package loses this step and nothing
-else. Every column is read as VARCHAR (``all_varchar``) — type inference is
+else. It IS declared, as of GRAPH6 — the optional
+``[tool.poetry.group.source-registration]`` group, so
+``poetry install --with source-registration`` is the answer to "where do I get
+it". Before that the package was named in no file at all, which is the same
+silence with none of the findability. Every column is read as VARCHAR (``all_varchar``) — type inference is
 the one thing that would make two loads of one CSV differ, and the profiler
 downstream (DataHub's sqlalchemy profiler over ``duckdb:///``) is what should
 say what the values look like.
