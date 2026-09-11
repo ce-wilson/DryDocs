@@ -1,0 +1,18 @@
+id: WEB24
+epic: web-console
+title: "Rule the five open Salt DS second-track questions at a HITL gate, and land the PoC findings on main first so the gate cites the tree rather than a branch"
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: fable
+priority: p2
+status: todo
+depends_on: []
+inputs: []
+acceptance: |
+  STUB - minted 2026-09-11 by the single-idea groom of Idea-192; the body lands in the next
+  commit of the same groom run (the I6 mint protocol: final title first, pushed, then the body).
+notes: |
+  Minted 2026-09-11 from docs/restructure/IDEAS.md Idea-192 and the PoC findings on
+  wip/idea-192-desktop.

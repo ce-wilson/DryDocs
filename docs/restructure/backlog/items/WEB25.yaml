@@ -1,0 +1,19 @@
+id: WEB25
+epic: web-console
+title: "Re-skin ModuleTemplate behind the same skin switch, so the Salt cost term is a measured count of the className sites on elements that become Salt components"
+type: task
+module: drydocs-web
+phase: 12
+agent: main
+model: sonnet
+priority: p3
+status: todo
+depends_on:
+- WEB24
+inputs: []
+acceptance: |
+  STUB - minted 2026-09-11 by the single-idea groom of Idea-192; the body lands in the next
+  commit of the same groom run (the I6 mint protocol: final title first, pushed, then the body).
+notes: |
+  Minted 2026-09-11 from docs/restructure/IDEAS.md Idea-192, section 5 item 4 of the PoC
+  findings on wip/idea-192-desktop.
