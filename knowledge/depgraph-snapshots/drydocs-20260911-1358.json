@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-11T02:44:34",
+    "captured_at": "2026-09-11T13:58:54",
     "date": "20260911",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "6b7f3e76",
-      "full": "6b7f3e767269f59bfd70ffc8ae4875f2dea3caa0",
+      "commit": "22e7e6fa",
+      "full": "22e7e6fa628150c54ebeaadc61085da1577dd902",
       "branch": "main",
-      "describe": "port-base-20260910b-24-g6b7f3e76",
-      "subject": "docs(ideas): Idea-314 - a suite number taken on a dirty tree under-runs by exactly two tests",
+      "describe": "port-base-20260910b-43-g22e7e6fa",
+      "subject": "fix(J31): the remote-branch check could not match a remote branch (pen: backlog)",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -9658,10 +9658,19 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/docs/lane-ui-handoff.md",
-      "name": "lane-ui-handoff.md",
+      "file_id": "drydocs/docs/lane-c-ui-handoff.md",
+      "name": "lane-c-ui-handoff.md",
       "extension": ".md",
-      "rel_path": "docs/lane-ui-handoff.md",
+      "rel_path": "docs/lane-c-ui-handoff.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/lane-d-handoff.md",
+      "name": "lane-d-handoff.md",
+      "extension": ".md",
+      "rel_path": "docs/lane-d-handoff.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -15823,6 +15832,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/PORT14.yaml",
+      "name": "PORT14.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/PORT14.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/PORT2.yaml",
       "name": "PORT2.yaml",
       "extension": ".yaml",
@@ -17060,6 +17078,24 @@
       "name": "WEB23.yaml",
       "extension": ".yaml",
       "rel_path": "docs/restructure/backlog/items/WEB23.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/WEB24.yaml",
+      "name": "WEB24.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/WEB24.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/restructure/backlog/items/WEB25.yaml",
+      "name": "WEB25.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/WEB25.yaml",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -24859,10 +24895,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260910-1559.json",
-      "name": "drydocs-20260910-1559.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260911.json",
+      "name": "drydocs-20260911.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260910-1559.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260911.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -26195,6 +26231,15 @@
       "name": "render_remediation_diff.py",
       "extension": ".py",
       "rel_path": "scripts/render_remediation_diff.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/scripts/render_remediation_lookup.py",
+      "name": "render_remediation_lookup.py",
+      "extension": ".py",
+      "rel_path": "scripts/render_remediation_lookup.py",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -28468,6 +28513,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/tests/unit/test_remediation_lookup_json.py",
+      "name": "test_remediation_lookup_json.py",
+      "extension": ".py",
+      "rel_path": "tests/unit/test_remediation_lookup_json.py",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/tests/unit/test_remediation_m0.py",
       "name": "test_remediation_m0.py",
       "extension": ".py",
@@ -30484,6 +30538,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/web/src/generated/remediation-lookup.json",
+      "name": "remediation-lookup.json",
+      "extension": ".json",
+      "rel_path": "web/src/generated/remediation-lookup.json",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/web/src/generated/remediation-profile.json",
       "name": "remediation-profile.json",
       "extension": ".json",
@@ -31361,6 +31424,24 @@
       "name": "ProfileFrame.tsx",
       "extension": ".tsx",
       "rel_path": "web/src/remediation/ProfileFrame.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/remediation/RemediationLookup.test.tsx",
+      "name": "RemediationLookup.test.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/remediation/RemediationLookup.test.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/remediation/RemediationLookup.tsx",
+      "name": "RemediationLookup.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/remediation/RemediationLookup.tsx",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -35027,6 +35108,10 @@
     ],
     [
       "drydocs/scripts/render_board.py",
+      "drydocs/scripts/render_remediation_lookup.py"
+    ],
+    [
+      "drydocs/scripts/render_board.py",
       "drydocs/scripts/render_remediation_profile.py"
     ],
     [
@@ -35104,6 +35189,18 @@
     [
       "drydocs/scripts/render_remediation_diff.py",
       "drydocs/drydocs_remediation/xml_io.py"
+    ],
+    [
+      "drydocs/scripts/render_remediation_lookup.py",
+      "drydocs/drydocs_remediation/changes.py"
+    ],
+    [
+      "drydocs/scripts/render_remediation_lookup.py",
+      "drydocs/drydocs_remediation/xml_io.py"
+    ],
+    [
+      "drydocs/scripts/render_remediation_lookup.py",
+      "drydocs/scripts/render_remediation_diff.py"
     ],
     [
       "drydocs/scripts/render_remediation_profile.py",
@@ -37310,6 +37407,10 @@
       "drydocs/drydocs_remediation/jira.py"
     ],
     [
+      "drydocs/tests/unit/test_remediation_lookup_json.py",
+      "drydocs/tests/source_scan.py"
+    ],
+    [
       "drydocs/tests/unit/test_remediation_m0.py",
       "drydocs/drydocs_remediation/detect.py"
     ],
@@ -39350,6 +39451,10 @@
       "drydocs/web/src/remediation/profileData.ts"
     ],
     [
+      "drydocs/web/src/remediation/RemediationLookup.test.tsx",
+      "drydocs/web/src/remediation/RemediationLookup.tsx"
+    ],
+    [
       "drydocs/web/src/remediation/StandardsFindings.tsx",
       "drydocs/web/src/remediation/findingClasses.ts"
     ],
@@ -39908,6 +40013,10 @@
     [
       "drydocs/web/src/routes/RemediationRoute.tsx",
       "drydocs/web/src/remediation/ProfileFrame.tsx"
+    ],
+    [
+      "drydocs/web/src/routes/RemediationRoute.tsx",
+      "drydocs/web/src/remediation/RemediationLookup.tsx"
     ],
     [
       "drydocs/web/src/routes/RemediationRoute.tsx",
@@ -44713,7 +44822,12 @@
     [
       "drydocs/docs",
       "CONTAINS",
-      "drydocs/docs/lane-ui-handoff.md"
+      "drydocs/docs/lane-c-ui-handoff.md"
+    ],
+    [
+      "drydocs/docs",
+      "CONTAINS",
+      "drydocs/docs/lane-d-handoff.md"
     ],
     [
       "drydocs/docs",
@@ -49128,6 +49242,11 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/PORT14.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/PORT2.yaml"
     ],
     [
@@ -49814,6 +49933,16 @@
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
       "drydocs/docs/restructure/backlog/items/WEB23.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/WEB24.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/WEB25.yaml"
     ],
     [
       "drydocs/docs/restructure/backlog/items",
@@ -54073,7 +54202,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260910-1559.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260911.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -54649,6 +54778,11 @@
       "drydocs/scripts",
       "CONTAINS",
       "drydocs/scripts/render_remediation_diff.py"
+    ],
+    [
+      "drydocs/scripts",
+      "CONTAINS",
+      "drydocs/scripts/render_remediation_lookup.py"
     ],
     [
       "drydocs/scripts",
@@ -56008,6 +56142,11 @@
     [
       "drydocs/tests/unit",
       "CONTAINS",
+      "drydocs/tests/unit/test_remediation_lookup_json.py"
+    ],
+    [
+      "drydocs/tests/unit",
+      "CONTAINS",
       "drydocs/tests/unit/test_remediation_m0.py"
     ],
     [
@@ -57228,6 +57367,11 @@
     [
       "drydocs/web/src/generated",
       "CONTAINS",
+      "drydocs/web/src/generated/remediation-lookup.json"
+    ],
+    [
+      "drydocs/web/src/generated",
+      "CONTAINS",
       "drydocs/web/src/generated/remediation-profile.json"
     ],
     [
@@ -57668,6 +57812,16 @@
     [
       "drydocs/web/src/remediation",
       "CONTAINS",
+      "drydocs/web/src/remediation/RemediationLookup.test.tsx"
+    ],
+    [
+      "drydocs/web/src/remediation",
+      "CONTAINS",
+      "drydocs/web/src/remediation/RemediationLookup.tsx"
+    ],
+    [
+      "drydocs/web/src/remediation",
+      "CONTAINS",
       "drydocs/web/src/remediation/StandardsFindings.tsx"
     ],
     [
@@ -57925,13 +58079,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 3206,
-    "edges": 2070,
+    "files": 3215,
+    "edges": 2077,
     "circular_files": 34,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 3542,
+    "rels": 3551,
     "directories": 337
   }
 }
