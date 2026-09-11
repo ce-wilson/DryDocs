@@ -1,16 +1,16 @@
 {
   "meta": {
     "project": "drydocs",
-    "captured_at": "2026-09-10T15:59:52",
-    "date": "20260910",
+    "captured_at": "2026-09-11T02:44:34",
+    "date": "20260911",
     "scan": "DryDocs",
     "tree": true,
     "git": {
-      "commit": "af55a58f",
-      "full": "af55a58f9c38131364353fb6ccc207e70fa67089",
+      "commit": "6b7f3e76",
+      "full": "6b7f3e767269f59bfd70ffc8ae4875f2dea3caa0",
       "branch": "main",
-      "describe": "port-base-20260910b-1-gaf55a58f",
-      "subject": "chore(port): roll - the tenth base, and the consumer's range is now one of three rolls",
+      "describe": "port-base-20260910b-24-g6b7f3e76",
+      "subject": "docs(ideas): Idea-314 - a suite number taken on a dirty tree under-runs by exactly two tests",
       "dirty": false,
       "untracked_present": false,
       "pr": null
@@ -9649,6 +9649,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/lane-b-handoff.md",
+      "name": "lane-b-handoff.md",
+      "extension": ".md",
+      "rel_path": "docs/lane-b-handoff.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/lane-ui-handoff.md",
       "name": "lane-ui-handoff.md",
       "extension": ".md",
@@ -15688,6 +15697,15 @@
       "kind": "file"
     },
     {
+      "file_id": "drydocs/docs/restructure/backlog/items/PLAN15.yaml",
+      "name": "PLAN15.yaml",
+      "extension": ".yaml",
+      "rel_path": "docs/restructure/backlog/items/PLAN15.yaml",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
       "file_id": "drydocs/docs/restructure/backlog/items/PLAN2.yaml",
       "name": "PLAN2.yaml",
       "extension": ".yaml",
@@ -17492,6 +17510,15 @@
       "name": "g81-data-path-reconstruction.md",
       "extension": ".md",
       "rel_path": "docs/reviews/g81-data-path-reconstruction.md",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/docs/reviews/g86-calendar-validation-and-rendering-ruling-2026-09-11.md",
+      "name": "g86-calendar-validation-and-rendering-ruling-2026-09-11.md",
+      "extension": ".md",
+      "rel_path": "docs/reviews/g86-calendar-validation-and-rendering-ruling-2026-09-11.md",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -24832,10 +24859,10 @@
       "kind": "file"
     },
     {
-      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260910.json",
-      "name": "drydocs-20260910.json",
+      "file_id": "drydocs/knowledge/depgraph-snapshots/drydocs-20260910-1559.json",
+      "name": "drydocs-20260910-1559.json",
       "extension": ".json",
-      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260910.json",
+      "rel_path": "knowledge/depgraph-snapshots/drydocs-20260910-1559.json",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -29516,6 +29543,51 @@
       "name": "vite.svg",
       "extension": ".svg",
       "rel_path": "web/src/assets/vite.svg",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/calendar",
+      "name": "calendar",
+      "extension": "",
+      "rel_path": "web/src/calendar",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "dir"
+    },
+    {
+      "file_id": "drydocs/web/src/calendar/RbcCalendarSpike.test.tsx",
+      "name": "RbcCalendarSpike.test.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/calendar/RbcCalendarSpike.test.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/calendar/RbcCalendarSpike.tsx",
+      "name": "RbcCalendarSpike.tsx",
+      "extension": ".tsx",
+      "rel_path": "web/src/calendar/RbcCalendarSpike.tsx",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/calendar/rbcCalendar.test.ts",
+      "name": "rbcCalendar.test.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/calendar/rbcCalendar.test.ts",
+      "project": "drydocs",
+      "circular": false,
+      "kind": "file"
+    },
+    {
+      "file_id": "drydocs/web/src/calendar/rbcCalendar.ts",
+      "name": "rbcCalendar.ts",
+      "extension": ".ts",
+      "rel_path": "web/src/calendar/rbcCalendar.ts",
       "project": "drydocs",
       "circular": false,
       "kind": "file"
@@ -38110,6 +38182,26 @@
       "drydocs/web/src/lib/qaTrace.ts"
     ],
     [
+      "drydocs/web/src/calendar/RbcCalendarSpike.test.tsx",
+      "drydocs/web/src/calendar/RbcCalendarSpike.tsx"
+    ],
+    [
+      "drydocs/web/src/calendar/RbcCalendarSpike.test.tsx",
+      "drydocs/web/src/calendar/rbcCalendar.ts"
+    ],
+    [
+      "drydocs/web/src/calendar/RbcCalendarSpike.tsx",
+      "drydocs/web/src/calendar/rbcCalendar.ts"
+    ],
+    [
+      "drydocs/web/src/calendar/RbcCalendarSpike.tsx",
+      "drydocs/web/src/components/ui/EmptyState.tsx"
+    ],
+    [
+      "drydocs/web/src/calendar/rbcCalendar.test.ts",
+      "drydocs/web/src/calendar/rbcCalendar.ts"
+    ],
+    [
       "drydocs/web/src/components/BrandMark.tsx",
       "drydocs/web/src/components/icons/HubGlyphs.tsx"
     ],
@@ -44616,6 +44708,11 @@
     [
       "drydocs/docs",
       "CONTAINS",
+      "drydocs/docs/lane-b-handoff.md"
+    ],
+    [
+      "drydocs/docs",
+      "CONTAINS",
       "drydocs/docs/lane-ui-handoff.md"
     ],
     [
@@ -48961,6 +49058,11 @@
     [
       "drydocs/docs/restructure/backlog/items",
       "CONTAINS",
+      "drydocs/docs/restructure/backlog/items/PLAN15.yaml"
+    ],
+    [
+      "drydocs/docs/restructure/backlog/items",
+      "CONTAINS",
       "drydocs/docs/restructure/backlog/items/PLAN2.yaml"
     ],
     [
@@ -49932,6 +50034,11 @@
       "drydocs/docs/reviews",
       "CONTAINS",
       "drydocs/docs/reviews/g81-data-path-reconstruction.md"
+    ],
+    [
+      "drydocs/docs/reviews",
+      "CONTAINS",
+      "drydocs/docs/reviews/g86-calendar-validation-and-rendering-ruling-2026-09-11.md"
     ],
     [
       "drydocs/docs/reviews",
@@ -53966,7 +54073,7 @@
     [
       "drydocs/knowledge/depgraph-snapshots",
       "CONTAINS",
-      "drydocs/knowledge/depgraph-snapshots/drydocs-20260910.json"
+      "drydocs/knowledge/depgraph-snapshots/drydocs-20260910-1559.json"
     ],
     [
       "drydocs/knowledge/depgraph-snapshots",
@@ -56466,6 +56573,11 @@
     [
       "drydocs/web/src",
       "CONTAINS",
+      "drydocs/web/src/calendar"
+    ],
+    [
+      "drydocs/web/src",
+      "CONTAINS",
       "drydocs/web/src/components"
     ],
     [
@@ -56632,6 +56744,26 @@
       "drydocs/web/src/assets",
       "CONTAINS",
       "drydocs/web/src/assets/vite.svg"
+    ],
+    [
+      "drydocs/web/src/calendar",
+      "CONTAINS",
+      "drydocs/web/src/calendar/RbcCalendarSpike.test.tsx"
+    ],
+    [
+      "drydocs/web/src/calendar",
+      "CONTAINS",
+      "drydocs/web/src/calendar/RbcCalendarSpike.tsx"
+    ],
+    [
+      "drydocs/web/src/calendar",
+      "CONTAINS",
+      "drydocs/web/src/calendar/rbcCalendar.test.ts"
+    ],
+    [
+      "drydocs/web/src/calendar",
+      "CONTAINS",
+      "drydocs/web/src/calendar/rbcCalendar.ts"
     ],
     [
       "drydocs/web/src/components",
@@ -57793,13 +57925,13 @@
     "projects": [
       "drydocs"
     ],
-    "files": 3199,
-    "edges": 2065,
+    "files": 3206,
+    "edges": 2070,
     "circular_files": 34,
     "processes": 0,
     "data_assets": 0,
     "hosts": 0,
-    "rels": 3534,
-    "directories": 336
+    "rels": 3542,
+    "directories": 337
   }
 }
