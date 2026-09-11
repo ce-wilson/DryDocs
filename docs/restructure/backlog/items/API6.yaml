@@ -7,11 +7,13 @@ phase: 12
 agent: main
 model: sonnet
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs_api/query_specs.py
 - drydocs_api/app.py
+outputs:
+- drydocs_api/query_specs.py
 acceptance: |
   A decision, recorded in the item and in the spec registry's own docstring: global versus per-spec
   ceiling, the value, and what the caller is told when it trips - which must be distinguishable
@@ -19,3 +21,62 @@ acceptance: |
   driver timeout item so the two ends of one system agree. The build that follows is its own item.
 notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). api-2026-09-08.md candidate 2 (L1-2).
+
+  DECIDED 2026-09-11 (Lane B, laptop, wip/api6-laptop; pen code:drydocs-api). The ruling is in
+  drydocs_api/query_specs.py's module docstring under "Query bound"; this is the same ruling with
+  its evidence and the inputs the build needs.
+
+  THE RULING. (1) One GLOBAL ceiling for every buffered read LiveRunner makes, bounding the REQUEST:
+  execute_spec runs the spec and then one probe per declared walk cause, so the runner hands each
+  statement the budget that remains. No per-spec field; one added later may only tighten. (2) 30
+  seconds, declared as `read_query_timeout` in `neo4j.driver` in config/dev-environment.yaml beside
+  CORE13's four waits. (3) HTTP 422 with a string `detail` starting `QueryTimeout` and naming the
+  ceiling. THE STATUS WAS THE USER'S RULING in this session, chosen over 408 (RFC 9110 lets a client
+  repeat it, which re-runs a 30s query) and 500 (reads as "this service has a bug", the reading API5
+  was built to stop). The accepted cost: 422 already means "invalid params" on these routes, so the
+  prefix is the only discriminator and the build pins it in a test. (4) A pool-acquisition timeout
+  is 503, not this. (5) Exports are outside the ceiling and stay under CORE13's transaction_timeout.
+
+  WHY NOT CORE13'S NUMBER, although the config comment above `neo4j.driver` says API6 "reads these
+  keys rather than choosing its own numbers". transaction_timeout (120s) is the LOAD ceiling, and
+  the nginx `/api` location in deploy/render_proxy_config.mjs sets no proxy_read_timeout, so nginx's
+  documented 60s default applies: an API bounded at 120s still loses to the proxy's 504, which is
+  L1-2 by another route. The new key keeps both ends in ONE declared block, which is what CORE13's
+  "settled together" asked for; the number differs because the wait differs.
+
+  MEASURED, NOT ARGUED. Venue (J18): laptop (NewThinkpad), container `neo4jtest`, default database,
+  neo4j driver 5.28.4, a scratchpad script using LiveRunner's own Neo4jSettings.
+  - Transaction timeout, buffered execute_query with Query(timeout=0.5): ClientError, code
+    Neo.ClientError.Transaction.TransactionTimedOutClientConfiguration, tripped at 1.52s (the same
+    statement untimed took 2.44s).
+  - The same on the streaming session.run path (the export shape): same class, same code, 0.95s.
+  - Pool acquisition with max_connection_pool_size=1 and the one connection held open: ClientError,
+    code None, 0.50s. The driver's _sync/io/_pool.py says "TODO: 6.0 - change this to be a
+    DriverError".
+  None of the three is a DriverError, so under API5's handler each one answers 500 today. NOT
+  measured: the server-configured variant (db.transaction.timeout, code ...TransactionTimedOut). It
+  means the same thing to the caller, and the build should map it the same way.
+
+  INPUTS FOR THE BUILD ITEM. Lane A mints it; Lane B does not mint.
+  (a) LiveRunner (app.py) builds its driver with auth only, so the API runs on the driver's defaults
+  and none of CORE13's waits. CORE13 measured 102.9s to give up on an unreachable server that way.
+  It should build from drydocs_core.config.load_driver_bounds().pool_config().
+  (b) Add `read_query_timeout: 30.0` to `neo4j.driver`, with a DRIVER_BOUND_DEFAULTS fallback, and
+  update that block's API6 paragraph to name the new key. config/dev-environment.yaml is
+  canonical-company, so this is a PORT-REPORT line for the company side, the same shape as CORE13's
+  block. Not written here, because the file is outside this item's inputs and `code:config` is
+  Lane D's pen this burst.
+  (c) Make the `/api` read timeout explicit in both proxies and guard the ordering: the waits one
+  request can stack (30 + 30 + 15 today) against the proxy's read timeout (an implicit 60 in nginx,
+  none in Vite's http-proxy).
+  (d) The 422 mapping, keyed on the measured code; and the acquisition-timeout 503, keyed on
+  ClientError with code None (a server error always carries a code), deleted at driver 6.
+  (e) TWO COMMENTS CONTRADICT THE MEASUREMENT; correct them with the handler. app.py's API5 block
+  lists "one of CORE13's timeouts tripping" as a DriverError, and so does the module docstring of
+  tests/unit/test_api_graph_outage.py. That holds for connection_timeout (ServiceUnavailable) and
+  is false for the acquisition and transaction timeouts. Left untouched here: this item records a
+  decision, and the handler that decides which of those comments is true belongs to the build.
+
+  CLOSE NOTES FOR LANE A. The close commit is red on the roadmap guard by design (Y5 covers a claim,
+  not a close; Lane B does not render). No new tracked path, so no manifest row is owed. No generated
+  artifact moved.
