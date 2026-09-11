@@ -52,6 +52,53 @@ the surface the first run's completeness critic declared unread, lineage SQL exc
 instruction). They are disjoint by construction and are the input to Phase 1's outstanding
 grooming pass. Nothing has been minted from either.
 
+**AMENDED 2026-09-11 — the cap measured against the actual tree, and the vehicle that fits under
+it.** The sentence above says the command "does not fit a whole-tree review of `main`" and leaves
+the reader to guess by how much. Measured: the diff from the repo's root commit `c5a84c37` to HEAD
+is **2,613 files and 556,482 changed lines** — five times the file cap and **seventy times the line
+cap**. No framing of the whole tree fits, and the empty-tree base is larger still at 3,215 files
+and ~723,000 lines. Anyone re-proposing a whole-project run should read that ratio first.
+
+**"The Phase 0 tip" in unit 1.2 has no git anchor, and this is why.** `plan.yaml`'s Phase 0
+(Restructure scaffolding) completed **2026-06-21** — twenty-nine days BEFORE the 2026-07-20 squash
+root, whose tree already contains phase 0's output (1,178 files, 304,436 lines, and that content
+has never been reviewed by anything). Phase-0-era code survives only on
+`archive/old-history-2026-07-20`, which has **no merge base with `main`**. So there is no commit on
+this trunk that means "the code at phase 0", and the unit's J63 phrasing was reaching for a tree
+that does not exist here. Read it as "the tip the review was run against", which the record states.
+
+**THE VEHICLE, built and verified 2026-09-11 (desktop, Lane A).** The cap is a bound on the DIFF,
+so the diff is the lever: a synthetic base whose tree is today's `origin/main` MINUS a chosen
+slice, and one commit on top whose tree is `origin/main`'s tree exactly. `base..tip` then renders
+that slice as whole-file additions and every other path diffs to zero, so the run spends its budget
+only on what was chosen. Built with `git commit-tree` plumbing — no checkout, no index write, no
+hook invocation at all, so the `--no-verify` rule is never engaged rather than bent — at a true
+cost of four objects (two commits, two trees; every blob and every untouched subtree is the
+identical object already in `origin/main`).
+
+Two properties that are load-bearing rather than incidental. **The base is a ROOT commit on
+purpose:** if the review tool derives its own base instead of using the one given, disjoint
+histories fail loudly, where a base parented on `origin/main` would yield an empty diff and a
+record that looks complete having reviewed nothing. And **the scaffolds are never pushed** —
+`.github/workflows/ci.yml` fires on `branches: ["**"]`, so a pushed base would run the full gates
+matrix against a tree with the slice missing and red out on a scaffold.
+
+**THE SLICE LEDGER.** The two local records above read ~61,000 lines, about 30% of the corpus and
+48% of application code, and both state what they did not read. Cycle 1 of the module sweep covers
+all ten slots. The uncovered ground they jointly name is what the slices buy, densest first:
+
+| # | date | slice | files / lines | record |
+|---|---|---|---|---|
+| 1 | 2026-09-11 | `drydocs/plan/`, `drydocs/docgen/`, `drydocs_docmeta/`, `drydocs_deepdoc/`, `libs/` — the three renderers read by NO dimension in either run, plus the two modules the sweep flagged as under-read (META1) | 27 / 4,872 (61% of the line cap) | `docs/reviews/ultra-review-2026-09-11-uncovered.md` |
+| 2 | — | the port apparatus: `drydocs/port/`, `PORT-MANIFEST.yaml`, `test_port_manifest.py`, `test_port_dispositions.py`, the reconcile-port skill | 16 / ~7,220 | not yet run |
+
+A slice record goes to `docs/reviews/ultra-review-<date>-<slug>.md` and **never** under
+`docs/reviews/modules/` with a sweep slug: slice 1 is exactly the module families of the live
+sweep's slots 7 and 8, another session holds that pen, and a same-named record there would collide.
+
+**What has NOT changed.** Phase 1's tail is still the grooming pass, it is still un-run, and it is
+still blocked on the Sept 14 reset. A slice record joins that one pass; it does not start a second.
+
 **BUDGET AND AVAILABILITY — measured 2026-09-10, and it decides the order below.** Fable is at
 100% of its weekly allowance until the **Sept 14 reset**; overall weekly is at 89%. Fourteen of
 this plan's fifty-two units are fable-primary, and the plan offers no fallback tier for any of
@@ -159,7 +206,7 @@ Exit: ADR 0021 drafted (PROPOSED — its acceptance is an SME touch, batched int
 | # | Unit | Model | Effort | Files | Done when |
 |---|---|---|---|---|---|
 | 1.1 | **ADR 0021** — a result names what it did not check: ONE shared three-outcome type in `drydocs_core` (checked-clean / findings / not-checked-with-reason) and the rule that a probe returning a bare bool is refused. Names the six existing correct sites as precedent (`drydocs_remediation/equivalence.py`, `drydocs_lineage/archival.py`, `drydocs_api/schemas.py` `truncated`, `port_preflight.py:495`, `plan_board.py`, deepdoc scaffold status); adoption scoped to first adopters, the six keep the NAME only. Index line reserved first (stub-then-body) | fable | max | `docs/decisions/0021-*.md`, `docs/decisions/README.md` | status PROPOSED; nothing implements it until sitting 1 accepts |
-| 1.2 | **`/code-review ultra`** — user-triggered on the Phase 0 tip (J63); saved as a dated record under `docs/reviews/` (`evaluate`, no manifest row owed); nothing minted from it before 1.3 | cloud (opus) | — | `docs/reviews/ultra-review-<date>.md` | findings deduped against the sweep's list by subject |
+| 1.2 | **`/code-review ultra`** — user-triggered on the Phase 0 tip (J63); saved as a dated record under `docs/reviews/` (`evaluate`, no manifest row owed); nothing minted from it before 1.3 | cloud (opus) | — | `docs/reviews/ultra-review-<date>.md` | findings deduped against the sweep's list by subject. AMENDED 2026-09-11: run per SLICE against a synthetic base, not on a whole tree - see the amendment under the ultra-review paragraph above, and the slice ledger there |
 | 1.3 | **The ONE mint pass** — allocator ids (`validate.py --next-id --module <m>`), stub commit with FINAL titles + render (Y6), then bodies; a sonnet pre-pass extracts one deduped candidate list from the 11 reports + the premise-drift review + the ultra record. Mint WORK units only: (a) the sweep's ~20 candidates by module series (dedupe: "completeness convention" ×5 → ADR 0021's instrument item; "shim removal" ×2 → one item for the 18 shims; "`_git` shape" → one item + slot 8's amendment); (b) the premise-drift three; (c) Idea-309 → item; (d) the **Team Edition EPIC** `epics/team-edition.yaml` with phase items 0 (draft the identifier prompt with the Phase 0 clauses), 1, 2, 4, 5, 6 from ADR 0015's table verbatim — items 1–6 carry `depends_on: [<phase-0 item>]` and NO `gates:` until the prompt file exists (a `gates:` slug must resolve to `config/gate-prompts/<slug>.yaml` at the commit or `test_declared_gates_are_lists_of_known_prompt_slugs` is red); phases 3 and 3a deliberately NOT minted (two real instances company-side; 3a recorded open); (e) the UC2/UC3 riders and the `source-descriptor-axes` prompt-drafting item; (f) the lane-mechanics items (1.5); (g) a run item for `console-auth-boundary` (the one drafted gate with no owner — the class the 2026-08-27 sweep exists to catch). Every gate-bound item whose prompt exists carries `gates:`; every item carries `model:`; `depends_on` never points base → instance. The `wired` BUILD item is NOT minted here — a drafted gate decides nothing, and B1/B2/B5 decide its shape; it is minted from sitting 1's record (D2: "the build is its own backlog item with its own acceptance") | fable (+ sonnet pre-pass) | max | `docs/restructure/backlog/items/*`, `epics/team-edition.yaml`, `IDEAS.md` (mark groomed), renders | `validate.py` ALL CHECKS PASS; `test_backlog.py` green at the stub and the body |
 | 1.4 | Regenerate both handoff files: `handoff.py --suggest`, then `handoff.py --lane B --machine laptop --queue <Phase 2 Lane B list> --other-queue <Lane A list>` (generation is the default mode; there is no `--generate`); snapshot ONCE after the body commit (J64) | sonnet | low | `docs/lane-{a,b}-handoff.md`, `knowledge/depgraph-snapshots/` | `--check` clean on both; CI green at the sha |
 | 1.5 | **Lane mechanics** (minted in 1.3): (i) the generated Lane B block tells the receiver to capture ideas in `docs/restructure/ideas/pending-<branch>.md` (PLAN4 d exists) and Lane A's close gains "run `validate.py --mint-pending` on each merged pending file before the render" — with `pending-<branch>.md` carved OUT of the `backlog` pen in the `PENS` table and the fence (today `docs/restructure/ideas/` is fenced to Lane A wholesale), so the minting bottleneck closes without a second pen; (ii) `--suggest`/`--check` gain a remote-ref pass (the allocator's `remote_ids()` pattern): items `done` on a pushed `wip/` branch, and claims older than 48 h with no branch, are printed; (iii) the no-mint rule graduates from the string literal at `handoff.py:456` to CLAUDE.md §0 with its derivation (mint → stub render → B holds no render pen); (iv) `test_lane_handoff.py` pins (i) and (ii) | sonnet (A — `handoff.py` is never-port and the skill is A's) | high | `.claude/skills/lane-handoff/scripts/handoff.py`, `SKILL.md`, `tests/unit/test_lane_handoff.py`, `CLAUDE.md` §0 | generated file carries both sentences; a test pins them |
