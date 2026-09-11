@@ -449,7 +449,12 @@ units from `docs/restructure/backlog/items/`. Each backlog item names its agent 
   `tests/unit/test_no_render_parsing.py`, `tests/unit/test_source_scan.py`,
   `tests/unit/test_runbook_currency.py` — their failures are the ones a targeted-file run
   cannot see. And when a verification compares failures, it compares the sorted SET of
-  failing node ids (`pytest -q -rf`), never two totals: on 2026-08-27 two sessions agreed
+  failing node ids (`pytest -q -rfE`), never two totals — and it is `-rfE` and not `-rf`
+  because `-r`'s chars are separate, `f` for failed and `E` for error, so `-rf` enumerates
+  failures and reports errors as not-looked-at; worse, a command-line `-r` REPLACES the
+  `-ra` in `pyproject.toml`'s addopts, so the flag this rule used to prescribe was narrower
+  than the default it overrode (found 2026-09-11 from a company report whose suite line read
+  4 errors and whose acceptance line read 0): on 2026-08-27 two sessions agreed
   on a failing total and one failure was new — agreeing on a total is not agreeing on its
   contents (J18 made a claim name its venue; this makes it name its contents).
   **AND THE TWO RUNS MUST USE THE SAME INVOCATION, which is the clause this rule was missing**

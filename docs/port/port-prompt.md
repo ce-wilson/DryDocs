@@ -3214,7 +3214,7 @@ shape, and whether to mechanise the trigger is a separate question, not proposed
   J57):** `[VERIFIED-PRODUCER]` Your eighteenth-postscript method — `--lf` on the branch, the
   main sha in a detached worktree, a set-compare of the two failure lists — is now written
   where the acceptance is asked for, not only where it was praised. The ACCEPTANCE GATE below
-  gains a bullet: the sorted `FAILED` node ids from `pytest tests/unit -q -rf`, diffed against
+  gains a bullet: the sorted `FAILED` and `ERROR` node ids from `pytest tests/unit -q -rfE`, diffed against
   your last PORT-REPORT's set, with the total kept beside it as the reading. The reconcile-port
   skill's Track-1 acceptance carries the same rule with its one-sentence reason (two sessions
   agreed on a failing total on 2026-08-27 and one failure was new), its report template gains
@@ -8595,7 +8595,7 @@ rolls without anyone noticing there was a slot for it.
   the transient "159" came from). Reconcile the three in your PORT-REPORT.
 - THE FAILING SET, NOT THE TOTAL (J57, 2026-09-08). Every figure in the bullet above is a
   reading; the acceptance is the sorted set of failing test node ids
-  (`poetry run pytest tests/unit -q -rf | grep "^FAILED" | sort`) diffed against the set in
+  (`poetry run pytest tests/unit -q -rfE | grep -E "^(FAILED|ERROR)" | sort`) diffed against the set in
   your last PORT-REPORT — added ids are the finding, removed ids are progress, and the total
   stays beside the set as the number people read. Reason, here because it is the rule: on
   2026-08-27 two sessions measured the same failing total on one tree and took the agreement

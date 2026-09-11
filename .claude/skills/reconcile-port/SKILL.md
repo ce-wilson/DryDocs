@@ -469,10 +469,12 @@ that owns the review commands passes as-is; do NOT extract a `review_cli.py` sub
 **THE SET, NOT THE COUNT (J57, 2026-09-08).** Every figure above is a reading, not the
 acceptance. The acceptance is the sorted set of failing test NODE IDS, diffed against the set
 your last PORT-REPORT recorded: added ids are the finding, removed ids are progress, and an
-unchanged total says nothing about either. Produce it with `-rf` and keep the total beside it:
+unchanged total says nothing about either. Produce it with `-rfE` and keep the total beside it
+(`-rf` lists FAILED only — `f` and `E` are separate `-r` chars — and the grep must widen with it,
+or the flag change buys nothing):
 
 ```
-poetry run pytest tests/unit -q -rf | grep "^FAILED" | sort
+poetry run pytest tests/unit -q -rfE | grep -E "^(FAILED|ERROR)" | sort
 ```
 
 Reason, at the point of use because a rule with no recorded reason is the first thing a later
@@ -620,7 +622,7 @@ Port Report: cewilson/main -> <company>/main
 - What conflicted + resolution: <per collision ledger>
 - What was skipped: <commits + why>
 - Track-1 result: <N passed, 3 skipped, 0 failed>
-- Failing set (J57): <the sorted `FAILED` node ids from `pytest tests/unit -q -rf`, or "none"; then the set diff against your last PORT-REPORT — added: [...] removed: [...] — that diff is the acceptance, the totals above are the reading>
+- Failing set (J57): <the sorted `FAILED` and `ERROR` node ids from `pytest tests/unit -q -rfE`, or "none"; then the set diff against your last PORT-REPORT — added: [...] removed: [...] — that diff is the acceptance, the totals above are the reading>
 - Clean-claim guard family (J57 c): <ran / not run — the repo-wide guards named in Track-1 acceptance>
 - Backlog union (J42): <paste the scripts/port_backlog_union.py block WITH its command line — the --producer-ref <tag> it ran against, producer/consumer counts, missing ids, accepted differences, PASS|FAIL>
 - Reconcile guards (J7): <paste `scripts/reconcile_before.py --describe <before-dir>` — BASE.sha, date, commits behind HEAD — and the guard run's pass/fail>
