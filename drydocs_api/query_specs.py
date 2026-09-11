@@ -35,6 +35,53 @@ rules a new spec must satisfy, with their rationale: consume gate-confirmed
 edges rather than re-deriving meaning from raw staged columns; the
 ``kind:namespace/name`` external-ref grammar; and the element-id rule enforced
 below.
+
+**Query bound (API6, decided 2026-09-11; the build is its own item).** No spec,
+runner or route bounds how long a read may run, so a slow query and a hung one
+look the same, and the first thing to give up is the proxy, whose 504 the
+console reads as "service down" (api-2026-09-08.md L1-2). The ruling:
+
+- **One global ceiling, no per-spec field.** It covers every buffered read
+  ``LiveRunner`` makes: spec runs, named queries, raw Cypher, ephemeral specs.
+  It bounds the REQUEST, not the statement: ``execute_spec`` runs the spec and
+  then one probe per declared walk cause (``epistemics.grade``), so the runner
+  hands each statement the budget that remains. A per-spec field, if a measured
+  spec ever needs one, may only tighten the ceiling, never raise it, so the
+  proxy invariant below holds by construction.
+- **30 seconds, declared as ``read_query_timeout`` in the ``neo4j.driver`` block
+  of ``config/dev-environment.yaml``,** beside CORE13's four waits and never a
+  literal here (ADR 0014). Deliberately NOT CORE13's ``transaction_timeout``:
+  that 120s is the load ceiling, and it exceeds the proxy's implicit 60s read
+  timeout on ``/api``, so an API bounded at 120s still loses to the proxy's
+  504. Thirty seconds is the block's own "a human waits at most ~30s".
+- **The proxy invariant, which the build guards:** the waits one request can
+  stack (this ceiling, ``connection_acquisition_timeout``, ``connection_timeout``)
+  stay under the proxy's ``/api`` read timeout. Today that is 30 + 30 + 15 = 75s
+  against nginx's implicit 60, so the build makes the ``/api`` read timeout
+  explicit in ``deploy/render_proxy_config.mjs`` and in ``web/vite.config.ts``,
+  whose http-proxy sets none.
+- **The caller is told 422, with a string ``detail`` that starts
+  ``QueryTimeout``** and names the ceiling ("QueryTimeout: stopped at the 30s
+  ceiling - narrow the parameters or export"). 422 because the caller can act
+  on it: the same spec with the same params on the same graph trips again.
+  Nothing retries a 4xx on its own, and 422 is outside 502/503/504, so
+  ``web/src/lib/apiClient.ts`` renders it through ``unwrap`` as
+  "<what> failed (422): <detail>" with no console change. The accepted cost:
+  422 already means "invalid params" on these routes, so the ``QueryTimeout``
+  prefix is the only thing that tells the two apart, and the build pins it in
+  a test. The trigger is ``neo4j.exceptions.ClientError`` with code
+  ``Neo.ClientError.Transaction.TransactionTimedOutClientConfiguration`` —
+  measured on driver 5.28.4 on both the buffered and the streaming path; it is
+  a ``Neo4jError``, so API5's ``DriverError`` handler does not see it.
+- **A pool-acquisition timeout is NOT a query timeout.** It means the API
+  cannot reach the graph right now, which is API5's 503. On driver 5.28.4 it
+  raises ``ClientError`` with ``code=None`` (measured), so it answers 500
+  today; the driver's ``_pool.py`` marks it "TODO: 6.0 - change this to be a
+  DriverError", and that upgrade is when the special case is deleted.
+- **Exports are outside this ceiling.** A streamed transaction lives as long as
+  the download does, so 30s would cut legitimate exports. They stay under
+  CORE13's ``transaction_timeout``, and a failure after streaming starts is the
+  export manifest's to reveal, as the export route already says.
 """
 
 from __future__ import annotations
