@@ -53,15 +53,46 @@ notes: |
   what a disposition should say about a test whose subject the consumer will never hold - that is
   a policy question about default_ok, and the manifest is where policy lives.
 
-  THE MEASUREMENT THAT ARGUES FOR A RULING, from the slice's own close report: of 33 outstanding
-  default_ok paths in this range, 7 were takeable. 13 needed per-side company-divergence blocks
-  with gate-log citations (cm_hosts T15/P3, deftable-xml-export, the T19 load-map, local_side() ==
-  "company", the docs-coverage COMPANY PIN) and 13 were blocked on inherited gaps. Their words:
-  "the default_ok label is not trustworthy for this range". That is broader than clause (a) - two
-  thirds of a disposition's paths needing something else is a statement about the DISPOSITION, not
-  about those paths - and the ruling should say whether default_ok is too coarse for a package
-  under active divergence, or whether the 13 per-side ones simply owe per-entry rows nobody has
-  written. Both answers are defensible; guessing which is not.
+  THE MEASUREMENT THAT ARGUES FOR A RULING: of 33 outstanding default_ok paths in this range,
+  6 were takeable. 14 needed per-side company-divergence blocks with gate-log citations (cm_hosts
+  T15/P3, deftable-xml-export, the T19 load-map, local_side() == "company", the docs-coverage
+  COMPANY PIN) and 13 were blocked on inherited gaps. Their words: "the default_ok label is not
+  trustworthy for this range". That is broader than clause (a) - 27 of 33 paths needing something
+  other than the default is a statement about the DISPOSITION, not about those paths - and the
+  ruling should say whether default_ok is too coarse for a package under active divergence, or
+  whether the 14 per-side ones simply owe per-entry rows nobody has written. Both answers are
+  defensible; guessing which is not.
+
+  THOSE FIGURES WERE 7/13/13 WHEN THIS ITEM WAS MINTED, AND THE CORRECTION IS THE ITEM'S OWN
+  SUBJECT. 7/13/13 was the mid-slice state; the close report says 6/14/13, because schema_graph.py
+  was taken, regressed its own test six ways, and moved to the per-side bucket before the slice
+  closed. One path crossed one bucket; the sum is the same 33. Recorded because the minted figures
+  were attributed to "the slice's own close report" and the close report never said them.
+
+  THE REMAINDER, for whoever rules this: 32 default_ok paths are left, which is the 27 above minus
+  nothing plus the 5 the slice-I triage never carried in its taken/per-side/blocked split -
+  4 drydocs_api/** and 1 agents/**, both of which their operator reads as gated on a producer scope
+  call. Neither is: agents/** is ruled at PORT-MANIFEST.yaml:1836-1837 and drydocs_api/** at
+  :1840-1841, both added by 0b7f391b (2026-07-28, J16), both saying clean-add what is absent and
+  hand-merge the rest, file by file. That two paths could look like open producer questions while
+  carrying a 45-day-old written ruling is itself evidence for clause (a): a disposition whose
+  reason nobody finds is not doing the job the disposition exists for.
 
   ADJACENT, NOT THIS ITEM: drydocs_lineage is currently 2 of 24 tracked paths in range, the same
   edge-of-a-package shape drydocs_api was in at 4 of 23. The trap is not sprung yet.
+
+  ADJACENT, NOT THIS ITEM (2): schema_graph.py is a DETECTION failure, not a disposition failure,
+  and clauses (a)-(d) do not reach it. Those clauses are about a test whose SUBJECT is out of
+  range; schema_graph.py's subject is in range (e48b7877) and the take regressed on DATA the code
+  reads rather than on anything missing. The seam producer-side: the relationship vocabulary is
+  per-entry and gate-bound at PORT-MANIFEST.yaml:200-202, so the manifest has already declared that
+  the two sides hold different rows - while schema_graph.py, the renderer that VALIDATES those
+  rows, carries no row of its own and falls to the drydocs_core/** default_ok at :1842. Data
+  declared per-side, code take-by-default, one seam. It names its dependency statically
+  (DEFAULT_VOCAB_PATH at schema_graph.py:74), so the class is computable, and it is the third
+  question in a family the manifest already asks twice: default_ok answers which paths match no
+  row (:1766), row_may_match_nothing answers which rows match no path (:1934), and nothing asks
+  which default_ok paths READ a non-default_ok path. Producer-side there is no defect to fix - the
+  role-blind duplicate key at :244 is correct against this side's data, where all 27 colliding
+  triples are G87 rename pairs whose deprecated half the RENDERED_STATUSES filter at :78 drops, and
+  whose roles are identical in every pair, so adding role to the key would change nothing here.

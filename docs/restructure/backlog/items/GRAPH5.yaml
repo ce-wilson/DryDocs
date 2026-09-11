@@ -8,6 +8,11 @@ agent: main
 model: sonnet
 priority: p2
 status: todo
+hold:
+  since: 2026-09-11
+  by: user
+  until: the company completes the port-base-20260908..port-base-20260910b apply and reports it
+  reason: 'The shims are the compatibility layer the consumer is standing on RIGHT NOW. Their 2026-09-11 remaining-work report puts the drydocs.graph_verify to drydocs.review.graph_verify relocation in the work still ahead of them, so removing the old paths producer-side sets a clock on a transition they have not finished. The trigger this item names has fired (2026-09-08) and the removal is correct - the ruling is only about WHEN, and the user ruled: after the port completes. Nothing blocks it technically; zero tracked modules import the old paths.'
 depends_on: []
 inputs:
 - docs/decisions/0018-component-identity-declared-not-directory.md
