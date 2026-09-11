@@ -15,6 +15,7 @@ inputs:
 - reference/standards/dprod-ekgf/README.md
 - reference/standards/w3c-org/README.md
 acceptance: DPROD/ORG terms cited; mappings confirmed
-output: config/taxonomy-ontology-map.yaml
+outputs:
+- config/taxonomy-ontology-map/
 notes: |
   Done 2026-06-21 via HITL gate. 4 confirmed (batch, reuse active seal_*): HAS_PORT (dprod), HAS_MEMBERSHIP (org), OF_ROLE (org), HELD_BY (org). Concept BusinessApplication / SEALID.

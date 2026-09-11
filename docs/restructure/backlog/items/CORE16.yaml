@@ -12,6 +12,10 @@ depends_on: []
 inputs:
 - drydocs_core/adapters/csv_adapter.py
 - drydocs_core/adapters/oracle_adapter.py
+outputs:
+- drydocs_core/adapters/csv_adapter.py
+- drydocs_core/adapters/oracle_adapter.py
+- drydocs_core/adapters/sql_run_log.py
 acceptance: |
   The three escapes (csv_adapter.py:39, oracle_adapter.py:67-68 at the review's tree) are gone:
   the handle attributes are declared Optional and connect() narrows them, so the declared type

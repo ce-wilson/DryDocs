@@ -14,6 +14,11 @@ inputs:
 - drydocs_core/docs_verify.py
 - config/source-registry.yaml
 - config/source-descriptors.yaml
+outputs:
+- drydocs/cli_docs.py
+- drydocs/docs_coverage.py
+- drydocs_core/check_outcome.py
+- tests/unit/test_docs_coverage.py
 acceptance: |
   drydocs/docs_coverage.py's existing shape (declared / loaded / blocker, None for not-probed) is
   extended from the document corpus to the classes the synthetic stand-ins declare; the blocker

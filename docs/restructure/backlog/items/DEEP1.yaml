@@ -12,6 +12,8 @@ depends_on: []
 inputs:
 - drydocs_deepdoc/investigate.py
 - drydocs_deepdoc/__init__.py
+outputs:
+- drydocs_deepdoc/investigate.py
 acceptance: |
   The docstring matches the __init__.py charter (G32 2026-08-18, restated MM1 2026-08-21) or is a
   pointer to it; two lines, no behavior change. While there, re-examine - not decide - whether the

@@ -14,6 +14,10 @@ inputs:
 - .claude/skills/controlm-runbook-automation-excel/generate_template.py
 - drydocs_api/query_specs.py
 - tests/integration/test_e2e_load.py
+outputs:
+- .claude/skills/controlm-runbook-automation-excel/SKILL.md
+- .claude/skills/controlm-runbook-automation-excel/generate_runbook.py
+- tests/unit/test_excel_runbook_generator.py
 acceptance: |
   A generate_runbook.py beside generate_template.py reads template-spec.yaml's per-field source
   (graph, graph-partial, manual) and fills the graph-derivable columns for one folder from the

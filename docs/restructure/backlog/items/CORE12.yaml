@@ -13,6 +13,10 @@ inputs:
 - drydocs_core/__init__.py
 - drydocs_core/repo_paths.py
 - tests/unit/test_module_boundary.py
+outputs:
+- drydocs_core/__init__.py
+- drydocs_core/component_map.py
+- tests/unit/test_module_boundary.py
 acceptance: |
   One ruling, recorded (the core report nominates an ADR titled "what of core is public"): which of
   the three shapes core's contract takes. Under whichever is chosen, repo_paths (24 importers, the

@@ -173,7 +173,13 @@ The 27 legacy letters (A..Z, GN, MM) were FROZEN on 2026-09-02 — a letter reco
    the assertion, NOT measured.)
 2. **During:** the in-session Task list is *ephemeral* working memory for the one item — distinct
    from the durable item file.
-3. **End:** update the item's `status`, **regenerate the board** (`poetry run python scripts/render_board.py`)
+3. **End:** update the item's `status` **and, in the same edit, its `outputs:`** — the repo-relative
+   paths the item produced or changed, computed rather than typed
+   (`git diff --name-only <merge>^1 <merge>`, or against the branch base). **Never the item's own
+   yaml**: claiming and closing both edit it, so it is true of every item and carries nothing, and it
+   is the item's ORIGIN rather than something it produced (ADR 0013 Clause 3b; the guard refuses it).
+   No sha is ever recorded — `outputs:` is checked on `done` items the way `inputs:` is checked on
+   open ones. Then **regenerate the board** (`poetry run python scripts/render_board.py`)
    **and the design docs** (`poetry run python scripts/render_design_doc.py docs/design/*.md` — `.md` is the
    source of truth, the single `.html` (screen + `@media print`; L13) is a deterministic render; Epic L) — `snapshot.ps1` does
    both — then commit + `git push`, then **check CI on what you just pushed** —

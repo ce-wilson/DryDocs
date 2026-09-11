@@ -42,7 +42,8 @@ recorded here so Y2 builds to a ruling rather than to taste.
 file a **standalone YAML mapping** whose top-level keys are the item's fields
 (`id`, `epic`, `title`, `type`, `module`, `phase`, `agent`, `model`, `priority`,
 `status`, `depends_on`, `inputs`, `acceptance`, `notes`, and the optional
-`progress`, `output`, `closed`, `close_note`). The filename is the `id`; the
+`outputs` (Clause 3b), `hold` (Clause 3a), `gates`, `venue`, `annotations`,
+`progress`, `closed`, `close_note`). The filename is the `id`; the
 file's `id` field must equal it (guard).
 
 **Standalone over S5 textual fragments.** S5's reader (`yaml_fragments.py`)
@@ -137,6 +138,43 @@ hold, and a false hold is invisible in the other direction. Only the declared ke
 and the guard can tell a hold from a note without reading English. The same commit
 converted O26's annotation to the field (text intact) and declared the second live
 instance, G64, whose hold had been the opening sentence of its acceptance.
+
+### Clause 3b — `outputs:` is a declared CLOSE record, and the item's own file is never in it (PLAN14, 2026-09-10)
+
+**Added 2026-09-10.** `drydocs.backlog.v3` gains one OPTIONAL item field, `outputs:` — a list
+of repo-relative paths the item produced or changed, written in the same edit that sets
+`status: done`. It is the symmetric partner of `inputs:` and it **replaces the singular
+`output:`** named in Clause 1, which was validated by nothing and read by nothing.
+
+**The scope inversion is the design.** `inputs:` is guarded on NON-done items because it is a
+premise the work is about to act on; `outputs:` is guarded on DONE items because it is a claim
+about work that happened. That line matters: the `inputs:` guard explicitly refuses to extend
+itself to `acceptance:` on the grounds that "a regex cannot tell a promise from a claim," and
+`status` is what tells it here. A `todo` item therefore carries no `outputs:` — its intent
+belongs in `acceptance:`.
+
+**The item's own yaml is excluded by rule.** Measured across five 2026-09-10 lane merges
+(LOAD13, LOAD14, DOC12, API5, CORE15), `items/<ID>.yaml` appears in **5 of 5** change sets —
+necessarily, because claiming and closing both edit it. An entry true of every item carries no
+information, and it is the wrong relation besides: the file is the item's ORIGIN, not an
+artifact the item produced. LOAD13 is the case that proves it — its three changed files are its
+own yaml plus two tests, so the honest record is two outputs and no implementation at all.
+
+**Why a declared field rather than derivation from git.** Measured before deciding: only
+**274 of 661** done items (41.5%) have their id in any commit subject; `git log --grep=CORE13`
+is 3-of-13 precision; `git log --grep=G1` returns 329 commits; `wip/` branches are deleted at
+close; and there is no commit-msg hook, CI subject check, trailer or note enforcing any of it.
+Derivation is ~97% reliable for the last three days and unusable for the corpus. **An absent
+`outputs:` means "not recorded", never "produced nothing"** — the guard's docstring says so,
+because the alternative is a record that quietly asserts 493 items produced no code.
+
+**What this field is FOR, stated so it is not mistaken for bookkeeping.** It is the join the
+requirement→code traceability star has been missing: `:Requirement -[:IMPLEMENTED_BY]-> :Component`
+and `-[:VERIFIED_BY]-> :TestCase` are declared, active and SIGNED OFF (gate
+`doc-traceability-feedback`, 2026-07-20), and a backlog item is a requirement proposition from a
+registered source. **No new relationship type, therefore no new gate for the edge.** Whether the
+backlog registers as a Requirement source or keeps the separate `:BacklogItem` projection of Y3
+is Y3's gate to settle; this clause takes no position on it and stores no commit sha either way.
 
 ## Clause 4 — Claim mechanics and the residual race
 

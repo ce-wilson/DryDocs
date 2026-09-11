@@ -13,6 +13,7 @@ inputs:
 - config/source-registry.yaml#oracle-schemas
 - internal/schemas/
 acceptance: structure present; no real schema/table/SID values committed outside internal/
-output: config/taxonomy/oracle-schemas.yaml
+outputs:
+- config/taxonomy/oracle-schemas.yaml
 notes: |
   Done 2026-06-20 as a SHAPE TEMPLATE (no sample; source confirmed:false). Schema ▸ Table; Script with placeholder ids; real names -> internal/schemas/ by id. classification: Internal-Confidential.

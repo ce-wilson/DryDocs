@@ -12,6 +12,12 @@ depends_on: []
 inputs:
 - drydocs/loaders/base.py
 - drydocs/cli_shared.py
+outputs:
+- drydocs/cli_ingest.py
+- drydocs/cli_shared.py
+- drydocs/loaders/base.py
+- tests/unit/test_base_loader_smoke.py
+- tests/unit/test_load_csv_acquisition.py
 acceptance: |
   _open_run sets the non-null scope binds from _scope_binds plus the row cap onto :JobRun. It is
   NEVER the raw caller_stamp() or argv string: argv can carry --run-as with a tenant FID, and

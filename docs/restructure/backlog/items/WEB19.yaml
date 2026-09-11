@@ -16,6 +16,20 @@ inputs:
 - web/src/ask/FileReport.tsx
 - drydocs_api/schemas.py
 - config/taxonomy/ui-components.yaml
+outputs:
+- config/taxonomy/ui-components.yaml
+- tests/unit/test_ui_components.py
+- web/src/ask/FileReport.tsx
+- web/src/components/map/LocationMap.tsx
+- web/src/components/map/RuntimeSpanMap.tsx
+- web/src/components/ui/CompletenessNotice.tsx
+- web/src/data/completeness.test.ts
+- web/src/data/completeness.ts
+- web/src/data/graphAccess.ts
+- web/src/data/rowShape.ts
+- web/src/data/useSpecRows.ts
+- web/src/routes/IntakeRoute.tsx
+- web/src/routes/MappingsRoute.tsx
 acceptance: |
   A shared hook or return type in web/src returns data and the completeness envelope together;
   RuntimeSpanMap, IntakeRoute, LocationMap and FileReport migrate onto it so the mechanism ships

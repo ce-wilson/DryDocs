@@ -15,6 +15,16 @@ inputs:
 - graph-tests/bmc-docs-lexical.yaml
 - graph-tests/business-application-identity.yaml
 - graph-tests/provenance-diet.yaml
+outputs:
+- drydocs/review/graph_verify.py
+- drydocs_core/check_outcome.py
+- graph-tests/bmc-docs-lexical.yaml
+- graph-tests/bmc-docs-smoke.yaml
+- graph-tests/business-application-identity.yaml
+- graph-tests/folder-attribution-coverage.yaml
+- graph-tests/provenance-diet.yaml
+- graph-tests/tom-required-contacts.yaml
+- tests/unit/test_graph_verify.py
 acceptance: |
   (a) A suite declares an anchor (a non-empty case, or a minimum row count on a named label).
   (b) graph_verify evaluates the anchor FIRST and reports NOT RUN, never PASS, when it fails.

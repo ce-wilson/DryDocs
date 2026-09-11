@@ -818,7 +818,10 @@ _ENTRY_HEAD_RE = re.compile(rf"^- \*\*`(?P<id>{_EDITION_SEGMENT}Idea-\d+[a-z]?)`
 #: Item-file fields that are venue-local (never a venue-edit finding) or bookkeeping.
 #: `hold` rides with `status` (Y7): both say whether THIS venue may pull the item, and a
 #: venue holding an item it did not mint is a ruling on its own pull, not an edit.
-_ITEM_FIELDS_OUT_OF_SCOPE = frozenset({"status", "annotations", "hold"})
+_ITEM_FIELDS_OUT_OF_SCOPE = frozenset({"status", "annotations", "hold", "outputs"})
+#: `outputs` joined them at PLAN14 (2026-09-10): it is written by whichever venue CLOSED
+#: the item, in the same edit that sets `status: done`, so treating it as a rewrite of
+#: another venue's item would flag every normal close across the lane boundary.
 #: Item-file fields the append rule governs; everything else is a REWRITE if it changes.
 _ITEM_APPEND_FIELDS = ("acceptance", "notes")
 
@@ -1140,7 +1143,8 @@ def _git_bytes(*args: str, stdin: bytes | None = None, check: bool = True) -> by
     return proc.stdout
 
 
-def _input_exemptions() -> set[str]:
+def _test_exemptions(name: str) -> set[str]:
+    """A shrink-only exemption table read OUT of the test module, never duplicated here."""
     try:
         import importlib.util
 
@@ -1149,22 +1153,32 @@ def _input_exemptions() -> set[str]:
         )
         mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)  # type: ignore[union-attr]
-        return set(getattr(mod, "INPUT_EXEMPTIONS", {}))
+        return set(getattr(mod, name, {}))
     except Exception:  # - a groom on a tree without pytest still validates
         return set()
 
 
-def check_inputs_resolve(items: list[dict]) -> list[str]:
+def _check_path_field(items: list[dict], *, field: str, statuses: set[str], exempt: set[str]):
+    """The shared body of the `inputs:` and `outputs:` checks.
+
+    PLAN14 (2026-09-10) generalized this rather than copying it: the two differ only in the
+    FIELD and the STATUSES they apply to, and two hand-kept copies of a path resolver is the
+    drift shape J68 exists to refuse. `inputs:` runs on non-done items (a premise), `outputs:`
+    on done ones (a claim).
+    """
     tracked = {p.decode("utf-8") for p in _git_bytes("ls-files", "-z").split(b"\0") if p}
-    exempt = _input_exemptions()
     fails: list[str] = []
     candidates: list[tuple[str, str]] = []
     for it in items:
-        if it.get("status") not in {"todo", "in_progress"}:
+        if it.get("status") not in statuses:
             continue
-        for raw in it.get("inputs") or []:
+        raws = it.get(field)
+        if raws is not None and not isinstance(raws, list):
+            fails.append(f"[{it.get('id')}] {field} must be a list")
+            continue
+        for raw in raws or []:
             if not isinstance(raw, str) or not _INPUT_PATH_RE.match(raw):
-                fails.append(f"[{it.get('id')}] malformed inputs entry {raw!r}")
+                fails.append(f"[{it.get('id')}] malformed {field} entry {raw!r}")
             elif raw not in exempt:
                 candidates.append((it.get("id"), raw))
     paths = sorted({raw for _, raw in candidates})
@@ -1180,7 +1194,40 @@ def check_inputs_resolve(items: list[dict]) -> list[str]:
             continue
         if rel in tracked or any(p.startswith(rel + "/") for p in tracked):
             continue
-        fails.append(f"[{iid}] inputs names `{raw}`, which git does not track here")
+        fails.append(f"[{iid}] {field} names `{raw}`, which git does not track here")
+    return fails
+
+
+def check_inputs_resolve(items: list[dict]) -> list[str]:
+    return _check_path_field(
+        items,
+        field="inputs",
+        statuses={"todo", "in_progress"},
+        exempt=_test_exemptions("INPUT_EXEMPTIONS"),
+    )
+
+
+def check_outputs_resolve(items: list[dict]) -> list[str]:
+    """PLAN14: `outputs:` on a DONE item resolves, and never names the item's own file.
+
+    The own-file rule is not tidiness. Every item edits its own yaml - claiming and closing
+    both do - so an entry true of every item carries no information, and it is the wrong
+    relation besides: the file is the requirement's ORIGIN, not an artifact it implements.
+    """
+    fails = _check_path_field(
+        items,
+        field="outputs",
+        statuses={"done"},
+        exempt=_test_exemptions("OUTPUT_EXEMPTIONS"),
+    )
+    for it in items:
+        iid = it.get("id")
+        own = f"docs/restructure/backlog/items/{iid}.yaml"
+        for raw in it.get("outputs") or []:
+            if isinstance(raw, str) and raw.rstrip("/") == own:
+                fails.append(
+                    f"[{iid}] outputs lists its own file - that is its origin, not an output"
+                )
     return fails
 
 
@@ -1265,6 +1312,7 @@ def main() -> int:
     # groomer can read next_ready without opening the board.
     derived = derive_summary(doc)
     fails.extend(check_inputs_resolve(items))
+    fails.extend(check_outputs_resolve(items))
 
     for path in sorted(BACKLOG.rglob("*.yaml")):
         d = yaml.safe_load(path.read_text(encoding="utf-8")) or {}

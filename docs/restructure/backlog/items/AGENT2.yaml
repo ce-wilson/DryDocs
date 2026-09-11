@@ -12,6 +12,18 @@ depends_on: []
 inputs:
 - agents/
 - agents/common/
+outputs:
+- agents/common/__init__.py
+- agents/common/_bootstrap.py
+- agents/common/graph_read.py
+- agents/common/ledger_read.py
+- agents/common/llm_ledger.py
+- agents/common/qa_trace.py
+- agents/common/specs_catalog.py
+- agents/graph_qa/__init__.py
+- agents/graph_qa/declared_terms.py
+- agents/graph_qa/schema_context.py
+- agents/graph_qa/term_resolution.py
 acceptance: |
   Preferred: the repo installed into agents/.venv as a path dependency, every sys.path preamble and
   every E402 suppression deleted. Fallback if the two venvs must stay independent: one

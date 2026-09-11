@@ -15,7 +15,9 @@ inputs:
 - tests/
 acceptance: |
   Per 0002-A done criteria: drydocs-core imports cleanly with NO component dependency; drydocs-load runs the existing pipeline unchanged; tests/unit/test_module_boundary.py passes; gates green (pytest -q, package import, --help).
-output: drydocs_core/ (physical core) + drydocs/ (component remainder — thin layout per ADR 0002-A-1)
+outputs:
+- drydocs_core/
+- drydocs/
 notes: |
   ADR 0002 follow-up #2; plan = 0002-A (thin, zero behavior change). BLOCKS G3 + G4. Shim/ re-export first, then relocate; borderline staging.py + snapshots/writer.py → load (0002-A §6).
 progress: |

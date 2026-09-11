@@ -11,6 +11,12 @@ status: done
 depends_on: []
 inputs:
 - drydocs_core/neo4j_client.py
+outputs:
+- drydocs/cli_schema.py
+- drydocs_core/check_outcome.py
+- drydocs_core/neo4j_client.py
+- tests/unit/test_bootstrap_guard.py
+- tests/unit/test_neo4j_client.py
 acceptance: |
   apoc_available() distinguishes connection, auth and network failures from a genuine
   missing-plugin condition and reports which; a caller that used to read False for both can read

@@ -12,6 +12,10 @@ depends_on: []
 inputs:
 - drydocs_lineage/extractors/rua_inventory.py
 - drydocs_lineage/extractors/lb_resolution.py
+outputs:
+- drydocs_lineage/archival.py
+- drydocs_lineage/extractors/rua_inventory.py
+- tests/unit/test_lineage_rua.py
 acceptance: |
   rua_inventory._read_envelope checks meta['schema'] against KNOWN_COLLECTOR_VERSIONS as
   lb_resolution.py does, and a mismatch reaches the existing RuaCoverage notes channel rather than

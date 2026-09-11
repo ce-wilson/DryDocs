@@ -84,6 +84,11 @@ class WorkItem:
     depends_on: tuple[str, ...] = ()
     acceptance: str = ""
     notes: str = ""
+    #: The declared path fields: `inputs` the premise the work acts on, `outputs` the close
+    #: record of what it produced (ADR 0013 Clause 3b). Neither was rendered before PLAN14 -
+    #: the board showed what an item WAS but never what it TOUCHED.
+    inputs: tuple[str, ...] = ()
+    outputs: tuple[str, ...] = ()
     #: The blessed hold (Y7): ``{since, reason[, by, until]}`` or None. Carried whole so
     #: the card can show the text; whether it HOLDS is derive_summary's call, not this
     #: renderer's.
@@ -165,6 +170,8 @@ def backlog_from_dict(doc: dict[str, Any]) -> Backlog:
                 depends_on=tuple(str(d) for d in deps),
                 acceptance=str(raw.get("acceptance", "")),
                 notes=str(raw.get("notes", "") or ""),
+                inputs=tuple(str(x) for x in (raw.get("inputs") or []) if isinstance(x, str)),
+                outputs=tuple(str(x) for x in (raw.get("outputs") or []) if isinstance(x, str)),
                 hold=dict(raw[HOLD_FIELD]) if isinstance(raw.get(HOLD_FIELD), dict) else None,
             )
         )
@@ -264,6 +271,13 @@ def _render_item_card(item: WorkItem, ready_ids: frozenset[str]) -> str:
     notes_html = (
         f'<p class="notes"><strong>Notes:</strong> {_esc(item.notes)}</p>' if item.notes else ""
     )
+    paths_html = "".join(
+        f'<p class="paths"><strong>{label}:</strong> '
+        + ", ".join(f"<code>{_esc(q)}</code>" for q in vals)
+        + "</p>"
+        for label, vals in (("Inputs", item.inputs), ("Outputs", item.outputs))
+        if vals
+    )
     return (
         f'<div class="{classes}" id="card-{_esc(item.id)}" data-id="{_esc(item.id)}" '
         f'data-module="{_esc(item.module)}" data-phase="{_esc(item.phase)}" '
@@ -279,6 +293,7 @@ def _render_item_card(item: WorkItem, ready_ids: frozenset[str]) -> str:
         f"{hold_html}"
         '<div class="detail">'
         f'<p class="acceptance"><strong>Acceptance:</strong> {_esc(item.acceptance)}</p>'
+        f"{paths_html}"
         f"{notes_html}"
         "</div>"
         "</div>"

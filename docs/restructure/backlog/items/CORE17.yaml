@@ -11,6 +11,8 @@ status: done
 depends_on: []
 inputs:
 - drydocs_core/neo4j_client.py
+outputs:
+- drydocs_core/neo4j_client.py
 acceptance: |
   The comment at neo4j_client.py:28 (review's tree) justifies liveness_check_timeout=0 in terms of
   the local Enterprise container and pooled-connection staleness generally, and no longer names

@@ -16,7 +16,9 @@ inputs:
 - docs/restructure/backlog.yaml
 acceptance: |
   docs/design/templates/tdd.outline.yaml defines the canonical TDD outline (schema drydocs.doc-outline.v1: ordered sections, each a STABLE authored anchor + required flag + guidance), modernized from the SDLC corpus (MERGES the enterprise Preface→…→Traceability-Matrix shape with the agile Background→DoR/DoD→Component- Changes→Tests shape) and adds the DryDocs-specific sections (four-layer frame, classification, HITL gate); a completeness validator asserts a given TDD contains every required anchor and fails listing gaps, plus a traceability rule (every requirement id appears once in the matrix section); docs/design/ controlm-ingestion-tdd.md is refit to the outline and passes; validator is test-enforced (tests/unit/test_doc_outline.py); full suite green.
-output: docs/design/templates/tdd.outline.yaml + drydocs/doc_outline.py
+outputs:
+- docs/design/templates/tdd.outline.yaml
+- drydocs/doc_outline.py
 notes: |
   Traceability matrix is first-class (the §6 both SDLC TDDs orbit). drydocs-docgen classified in test_module_boundary.py (docgen group) + MODULE_MAP.md.
 progress: |

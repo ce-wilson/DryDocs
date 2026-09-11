@@ -11,6 +11,8 @@ status: done
 depends_on: []
 inputs:
 - tests/unit/test_constraint_drift.py
+outputs:
+- tests/unit/test_constraint_drift.py
 acceptance: |
   (a) tests/unit/test_constraint_drift.py::test_the_typo_labels_appear_nowhere_in_the_schema_tree
   is REMOVED, not narrowed, and the file's remaining tests stay green. The reason goes in the

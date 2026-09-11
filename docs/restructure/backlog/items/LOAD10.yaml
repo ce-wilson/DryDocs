@@ -11,6 +11,9 @@ status: done
 depends_on: []
 inputs:
 - drydocs/loaders/catalog.py
+outputs:
+- drydocs/loaders/catalog.py
+- tests/unit/test_catalog_keying.py
 acceptance: |
   A CatalogId-style Annotated alias (and the equivalents for _sparse_name / _name_or_none)
   replaces the per-model two-line @field_validator/@classmethod delegation blocks across the seven

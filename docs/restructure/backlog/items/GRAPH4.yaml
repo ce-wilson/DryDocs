@@ -14,6 +14,27 @@ inputs:
 - tests/unit/test_source_scan.py
 - tests/unit/test_remediation_changes.py
 - tests/unit/test_remediation_no_graph_write.py
+outputs:
+- tests/unit/test_agents_app_discovery.py
+- tests/unit/test_cmdline_staging.py
+- tests/unit/test_config_schemas.py
+- tests/unit/test_console_auth.py
+- tests/unit/test_controlm_cypher.py
+- tests/unit/test_docmeta_pipeline.py
+- tests/unit/test_env_doctor.py
+- tests/unit/test_env_refs_migration.py
+- tests/unit/test_lineage_inventory.py
+- tests/unit/test_load_map_wiring_key.py
+- tests/unit/test_port_drops.py
+- tests/unit/test_provenance_migration.py
+- tests/unit/test_remediation_changes.py
+- tests/unit/test_schema_meta_exclusion.py
+- tests/unit/test_seal_attribution.py
+- tests/unit/test_source_scan.py
+- tests/unit/test_standard_selection.py
+- tests/unit/test_theme_vocabulary.py
+- tests/unit/test_tier2.py
+- tests/unit/test_ui_concepts_json.py
 acceptance: |
   A table in the item (path, subject, verdict, reason) over every site that reads raw Python source
   and asserts a substring; the code-subject ones converted in one commit; the prose-subject ones

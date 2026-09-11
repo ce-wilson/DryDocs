@@ -14,6 +14,9 @@ inputs:
 - drydocs_api/app.py
 - agents/common/neo4j_tool.py
 - docs/decisions/README.md
+outputs:
+- drydocs_core/neo4j_client.py
+- tests/unit/test_neo4j_client.py
 acceptance: |
   (a) An ADR (the core report nominates the title "the graph driver seam") that names the three
   driver implementations, what each does that the others do not (read mode, notification capture,

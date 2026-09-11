@@ -14,6 +14,9 @@ inputs:
 - scripts/build_synthetic_sources.py
 - drydocs/source_registration/bundle.py
 - drydocs/data/samples/
+outputs:
+- tests/integration/test_e2e_base_finish_line.py
+- tests/integration/test_e2e_load.py
 acceptance: |
   A sibling of tests/integration/test_e2e_load.py runs the chain: build_synthetic_sources.py
   --extract into the data root, bootstrap, apply-supplements, ingest-controlm in SOURCE mode on the

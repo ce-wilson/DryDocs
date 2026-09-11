@@ -11,6 +11,9 @@ status: done
 depends_on: []
 inputs:
 - drydocs/loaders/server_resolution.py
+outputs:
+- drydocs/loaders/server_resolution.py
+- tests/unit/test_server_inventory_load.py
 acceptance: |
   The summary marks the dns-resolved tier as not-written rather than reporting a bare zero that
   reads as "no matches"; once the ADR 0021 type exists the tier's value is NOT_CHECKED with the

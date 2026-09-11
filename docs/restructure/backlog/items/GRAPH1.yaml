@@ -13,6 +13,9 @@ inputs:
 - tests/unit/test_module_boundary.py
 - drydocs_core/component_map.py
 - drydocs/port/reconcile_before.py
+outputs:
+- drydocs_core/component_map.py
+- tests/unit/test_module_boundary.py
 acceptance: |
   (a) The AST walk treats importlib.import_module("<literal>") and __import__("<literal>") as
   import edges when the argument is a string constant. (b) drydocs.port.reconcile_before ->

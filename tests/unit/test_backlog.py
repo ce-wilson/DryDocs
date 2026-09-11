@@ -1119,6 +1119,24 @@ def test_the_producer_declares_its_venues() -> None:
 #: failures the premise-drift review measured were FIXED in the same commit, not exempted.
 INPUT_EXEMPTIONS: dict[str, str] = {}
 
+#: PLAN14 (2026-09-10) - `outputs:` entries a DONE item may carry that are NOT claims about
+#: the tracked tree. Same shrink-only discipline as INPUT_EXEMPTIONS above: a reason of at
+#: least forty characters, and an exemption no done item cites any more fails the suite.
+#: Empty at landing, for the reason that one was - an exemption is for a path that
+#: legitimately cannot resolve, never a parking space for one nobody fixed.
+OUTPUT_EXEMPTIONS: dict[str, str] = {}
+
+#: The one path an `outputs:` list may never contain: the item's OWN file.
+#: Measured 2026-09-10 across five lane merges (LOAD13, LOAD14, DOC12, API5, CORE15) - the
+#: item's own yaml is in 5 of 5 change sets, necessarily, because claiming and closing both
+#: edit it. An edge true of every item carries no information; worse, it is the wrong
+#: relation. The file is the requirement's ORIGIN - a property :Requirement already declares
+#: - not an artifact the requirement is implemented by. LOAD13 is the case that proves the
+#: rule: its three changed files are its own yaml plus two tests, so the honest answer is
+#: two verified-by edges and ZERO implemented-by, and a reader who counts the yaml
+#: manufactures an implementation that does not exist.
+_ITEMS_DIR_REL = "docs/restructure/backlog/items"
+
 #: The path grammar an `inputs:` entry must fit to be a claim the guard can test. Anything
 #: A leading dot is a path (`.claude/`, `.github/`); a `..` segment is not. Anything
 #: else on a non-done item - a prose annotation (`config/x (G26)`), a cross-repo reference
@@ -1230,6 +1248,101 @@ def test_input_exemptions_carry_a_reason_and_are_still_cited() -> None:
     assert not short, f"INPUT_EXEMPTIONS reason under forty characters: {short}"
     unused = [p for p in INPUT_EXEMPTIONS if p not in cited]
     assert not unused, f"INPUT_EXEMPTIONS names a path no open item cites - remove it: {unused}"
+
+
+def _done_outputs(doc: dict) -> list[tuple[str, str]]:
+    """``(item id, raw entry)`` for every ``outputs:`` string on a DONE item."""
+    pairs: list[tuple[str, str]] = []
+    for item in doc.get("items", []):
+        if item.get("status") != "done":
+            continue
+        for raw in item.get("outputs") or []:
+            if isinstance(raw, str):
+                pairs.append((item["id"], raw))
+    return pairs
+
+
+def test_outputs_of_done_items_resolve_against_the_tracked_tree() -> None:
+    """PLAN14: for every DONE item, every `outputs:` string resolves against `git ls-files`.
+
+    The MIRROR IMAGE of the `inputs:` guard above, and the scope inversion is the whole
+    design. `inputs:` is checked on NON-done items because it is a premise the work is about
+    to act on; `outputs:` is checked on DONE items because it is a claim about work that
+    happened. Checking `outputs:` on an open item would be checking a promise, which is
+    exactly why the `inputs:` guard's docstring refuses to extend itself to `acceptance:` -
+    "a regex cannot tell a promise from a claim". Here the status field tells it.
+
+    Same machinery deliberately: the `_INPUT_PATH` grammar, `git ls-files -z` with bytes on
+    both sides of the pipe (J76), gitignored entries skipped because a machine-local path is
+    absent on every clone by construction, and a malformed entry failing loudly rather than
+    being silently pre-filtered.
+    """
+    doc = _load()
+    tracked = _tracked_paths()
+    failures: list[str] = []
+    candidates: list[tuple[str, str]] = []
+    for iid, raw in _done_outputs(doc):
+        if not _INPUT_PATH.match(raw):
+            failures.append(
+                f"[{iid}] malformed outputs entry {raw!r} - a path, or an OUTPUT_EXEMPTIONS row"
+            )
+            continue
+        if raw in OUTPUT_EXEMPTIONS:
+            continue
+        candidates.append((iid, raw))
+    for item in doc.get("items", []):
+        outputs = item.get("outputs")
+        if outputs is not None and not isinstance(outputs, list):
+            failures.append(f"[{item['id']}] outputs must be a list")
+    ignored = _ignored_paths(sorted({raw for _, raw in candidates}))
+    for iid, raw in candidates:
+        if raw.rstrip("/") in ignored or raw in ignored:
+            continue  # machine-local by construction; the item's venue note says where it lives
+        if not _input_resolves(raw, tracked):
+            failures.append(f"[{iid}] outputs names `{raw}`, which git does not track here")
+    assert not failures, "\n".join(failures)
+
+
+def test_an_item_never_lists_its_own_file_as_an_output() -> None:
+    """The item's own yaml is its ORIGIN, not something it implements.
+
+    Every item edits its own file - claiming and closing both do - so an entry that is
+    always true carries no information, and it would make every item look like the
+    implementation of itself. See the _ITEMS_DIR_REL note for the measurement.
+    """
+    doc = _load()
+    offenders = [
+        f"[{iid}] outputs lists its own file `{raw}` - that is the item's origin, not an output"
+        for iid, raw in _done_outputs(doc)
+        if raw.rstrip("/") == f"{_ITEMS_DIR_REL}/{iid}.yaml"
+    ]
+    assert not offenders, "\n".join(offenders)
+
+
+def test_the_outputs_guard_can_actually_fail() -> None:
+    """The anti-vacuity control (J26). `outputs:` is new, so the guard above runs over few
+    items or none, and a guard that has nothing to look at is indistinguishable from one
+    that cannot look. These three assertions exercise the three ways it refuses, against
+    synthetic values, so its teeth are proven without waiting for a real offender."""
+    tracked = _tracked_paths()
+    assert _input_resolves("tests/unit/test_backlog.py", tracked), "control: a real path resolves"
+    assert not _input_resolves(
+        "tests/unit/no_such_guard_file.py", tracked
+    ), "a path git does not track must NOT resolve - if this passes the resolver is broken"
+    assert not _INPUT_PATH.match(
+        "drydocs/x.py (see LOAD13)"
+    ), "an annotated path must be MALFORMED, not silently accepted"
+
+
+def test_output_exemptions_carry_a_reason_and_are_still_cited() -> None:
+    """Shrink-only, the same idiom INPUT_EXEMPTIONS uses: an exemption for a path no done
+    item cites any more is dead weight that outlives the reason it was added."""
+    doc = _load()
+    cited = {raw for _, raw in _done_outputs(doc)}
+    short = [p for p, why in OUTPUT_EXEMPTIONS.items() if len(why.strip()) < 40]
+    assert not short, f"OUTPUT_EXEMPTIONS reason under forty characters: {short}"
+    unused = [p for p in OUTPUT_EXEMPTIONS if p not in cited]
+    assert not unused, f"OUTPUT_EXEMPTIONS names a path no done item cites - remove it: {unused}"
 
 
 def test_dependencies_resolve_and_are_acyclic() -> None:

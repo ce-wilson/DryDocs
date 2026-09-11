@@ -17,7 +17,9 @@ inputs:
 - docs/design/controlm-ingestion-tdd.md
 acceptance: |
   scripts/render_design_doc.py renders a doc .md -> .html + .print.html through a shared print-CSS template, PURE and deterministic (no build timestamps — Rev/commit passed in, like the board's `updated:`), emitting each outline section's stable anchor as the element id; offline unit tests on a fixture doc; the .md becomes the single committed source (the hand-maintained .print.html is retired); a stale-check (re-render + `git diff --quiet`) is wired into the session ritual beside the board regen; full suite green.
-output: scripts/render_design_doc.py + drydocs/design_doc.py
+outputs:
+- scripts/render_design_doc.py
+- drydocs/design_doc.py
 notes: |
   Renderer approach = B2 (user, 2026-07-08): stdlib hand-rolled markdown-SUBSET renderer, NO new dependency — determinism is intrinsic (no library version to drift) and matches the repo's hand-built-HTML pattern. Subset: headings, GFM tables, fenced code, bold, italic, inline code, links, blockquotes, ordered/unordered (nested) lists, hr, anchors.
 progress: |

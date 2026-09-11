@@ -11,6 +11,8 @@ status: done
 depends_on: []
 inputs:
 - web/package.json
+outputs:
+- web/package.json
 acceptance: |
   npm run test:coverage where the install exists; the three thresholds (statements, branches,
   functions) are read together because the denominators may differ; if statements are materially

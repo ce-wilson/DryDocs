@@ -14,6 +14,14 @@ inputs:
 - web/src/App.tsx
 - web/src/lineage/laneBasis.ts
 - web/src/generated/load-map.json
+outputs:
+- web/scripts/checkBundleSize.mjs
+- web/src/App.tsx
+- web/src/lineage/SwimlaneView.tsx
+- web/src/lineage/entryChunk.test.ts
+- web/src/lineage/laneBasis.test.ts
+- web/src/lineage/laneBasis.ts
+- web/src/lineage/layerSystems.ts
 acceptance: |
   (a) The headroom is re-measured by command and recorded: on 2026-09-09 the initial chunk was
   2,504,192 bytes against a 2,505,000 ceiling - 808 bytes, 0.03 percent. WEB7 set the ceiling

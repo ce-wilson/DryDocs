@@ -12,6 +12,9 @@ depends_on: []
 inputs:
 - drydocs_api/intake.py
 - tests/unit/test_intake_api.py
+outputs:
+- drydocs_api/intake.py
+- tests/unit/test_intake_api.py
 acceptance: |
   (a) `transition`, `thread_decision` and `add_evidence` authorize the RECORD before they write
   it. The per-record ownership test that today lives only in `get_intake` moves into a shared

@@ -15,6 +15,11 @@ inputs:
 - scripts/external_vendor_scrape.py
 - tests/unit/test_doc_registry.py
 - tests/unit/test_external_vendor_scrape.py
+outputs:
+- config/dev-environment.yaml
+- config/doc-source-registry.yaml
+- scripts/external_vendor_scrape.py
+- tests/unit/test_doc_registry.py
 acceptance: |
   (a) TWO EDITS, ONE COMMIT: a new `bmc-docs-controlm-parameters` row in
   `config/doc-source-registry.yaml` AND `corpus_id="bmc-docs-controlm-parameters"` on the

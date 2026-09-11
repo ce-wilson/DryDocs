@@ -15,6 +15,7 @@ inputs:
 - drydocs_core/ontology/relationship_vocabulary.yaml
 - docs/RELATIONSHIP_GUIDE.md
 acceptance: each Control-M edge type traces to a matrix row or recorded alias; gate run logged
-output: config/taxonomy-ontology-map.yaml
+outputs:
+- config/taxonomy-ontology-map/
 notes: |
   Done 2026-06-21. 4 edges confirmed via HITL gate (batch — all reuse active vocab terms): SCHEDULED_ON (null PROV, infra), REQUIRES_IN_CONDITION (prov:used), EMITS_OUT_CONDITION (prov:generated), WAS_INFORMED_BY (prov:wasInformedBy). CONTAINS_JOB already applied. Gate run logged in config/gate-log.md.

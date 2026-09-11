@@ -13,6 +13,9 @@ inputs:
 - config/doc-source-registry.yaml
 - drydocs/review/sme_notes.py
 - .claude/skills/research-probe-discipline/SKILL.md
+outputs:
+- config/dev-environment.yaml
+- config/doc-source-registry.yaml
 acceptance: |
   (a) A synthetic doc-source-registry row with trust_default and curation set, shaped for a corpus
   of legacy-process captures (design notes, worked examples, the SQL as it was run); the real row is
