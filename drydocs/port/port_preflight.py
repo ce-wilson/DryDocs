@@ -54,6 +54,9 @@ PORT_PROMPT_PATH = REPO_ROOT / "docs" / "port" / "port-prompt.md"
 #: break and slice I's drydocs_api cluster were both found, after the take.
 ADVISORY_CHECKS: frozenset[str] = frozenset({"range import closure"})
 
+#: ``@@ -a,b +c,d @@`` - only the NEW-file side is read, so only that group is captured.
+_HUNK = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@")
+
 #: The ledger's own header exempts these: "Grooms, claims, board/design renders
 #: and depgraph snapshots in the range are ritual ... and get no step." Matched on
 #: the commit SUBJECT, so a substantive commit can never hide behind a prefix.
@@ -679,16 +682,64 @@ def first_party_target(module: str, tracked: Container[str]) -> str | None:
     return None
 
 
+def added_line_numbers(diff: str) -> set[int]:
+    """New-file line numbers an added hunk covers, from ``git diff -U0`` output.
+
+    Reads only the ``@@ -a,b +c,d @@`` headers, so it never has to understand the
+    content. ``+c,d`` means d lines starting at c in the NEW file; ``d`` is omitted
+    when it is 1, and ``d == 0`` is a pure deletion, which covers nothing.
+    """
+    covered: set[int] = set()
+    for line in diff.splitlines():
+        if not line.startswith("@@"):
+            continue
+        match = _HUNK.match(line)
+        if match is None:
+            continue
+        start = int(match.group(1))
+        count = int(match.group(2) or 1)
+        covered.update(range(start, start + count))
+    return covered
+
+
 def import_edges(
     in_range: set[str],
     tracked: Container[str],
     read: Callable[[str], str | None],
+    scope: Mapping[str, set[int]] | None = None,
 ) -> list[ImportEdge]:
     """Every first-party import an in-range ``.py`` makes that the range omits.
 
     Pure, like everything else above :func:`run_checks`: the caller supplies the
     range, the tracked set and a reader, so the guards drive it with dictionaries
     and no repository.
+
+    ``scope`` IS THE CORRECTION THAT MAKES THIS ANSWER THE RIGHT QUESTION (2026-09-11).
+    A path listed there is read only at those line numbers - the lines the range
+    ADDED - because for a path BOTH sides already hold, the consumer applies a hunk
+    and not a file, so only an import the hunk INTRODUCES can be a new requirement.
+    A path absent from ``scope`` is read whole, which is right for a clean-add:
+    there the consumer has nothing, so taking the file whole IS the operation and
+    every import in it is required.
+
+    Measured on ``port-base-20260908..port-base-20260910b``: whole-file reading
+    reported 233 edges, of which ``drydocs_api/app.py`` alone contributed 17 -
+    ``corpus_status``, ``log_estate``, ``qa_trace_read`` and the rest, every one of
+    them an import that predates the range. Its in-range change is one 503 handler
+    and introduces no import at all. The company session hit the same figure from
+    the other end by running ``git checkout BASE -- path``, which applies the
+    CUMULATIVE diff, and read the resulting cascade as proof the package could not
+    be split. Same defect, two instruments: measuring the FILE when the question is
+    about the CHANGE. Under the rule above the same range reports 46 - 28 from
+    added files, 18 introduced by modified ones.
+
+    WHAT THIS DOES NOT CHECK, and the distinction matters because the answer looks
+    identical: a modified path assumes the consumer's copy already resolved the
+    imports that predate the range. When that is false the consumer is missing
+    content an EARLIER roll owed them - an inherited gap, not a closure gap - and
+    nothing on this side can see it. The consumer detects that class by comparing
+    their file's length against the base they last landed, which is how
+    ``tests/unit/test_intake_api.py`` surfaced at 335 lines against 427.
 
     Relative imports are skipped on purpose. ``from . import x`` inside a package
     resolves against the importer's own directory, so it can only reach a sibling -
@@ -704,8 +755,16 @@ def import_edges(
             tree = ast.parse(source, filename=path)
         except SyntaxError:
             continue
+        lines = None if scope is None else scope.get(path)
         modules: set[str] = set()
         for node in ast.walk(tree):
+            if lines is not None and isinstance(node, ast.Import | ast.ImportFrom):
+                # The node's whole LINE RANGE, not just its first line: a
+                # parenthesised multi-line `from x import (...)` grows by its
+                # inner lines, so a hunk can add a name without touching lineno.
+                last = getattr(node, "end_lineno", None) or node.lineno
+                if not lines.intersection(range(node.lineno, last + 1)):
+                    continue
             if isinstance(node, ast.Import):
                 modules.update(alias.name for alias in node.names)
             elif isinstance(node, ast.ImportFrom) and node.module and node.level == 0:
@@ -758,21 +817,37 @@ def range_import_closure(
     base: str, head: str = "HEAD", cwd: Path | None = None
 ) -> tuple[list[ImportEdge], int]:
     """:func:`import_edges` over ``<base>..<head>``, plus the in-range ``.py`` count."""
-    root = cwd or REPO_ROOT
-    in_range = {
-        rel
-        for rel in _git("diff", "--name-only", f"{base}..{head}", cwd=cwd).splitlines()
-        if rel.endswith(".py")
-    }
+    status: dict[str, str] = {}
+    for line in _git("diff", "--name-status", f"{base}..{head}", cwd=cwd).splitlines():
+        parts = line.split("	")
+        if len(parts) >= 2:
+            status[parts[-1]] = parts[0][:1]
+    in_range = {rel for rel in status if rel.endswith(".py")}
     tracked = set(_git("ls-files", cwd=cwd).splitlines())
 
-    def read(rel: str) -> str | None:
-        path = root / rel
-        if not path.exists():
-            return None
-        return path.read_text(encoding="utf-8", errors="replace")
+    # A path the range ADDS is absent from scope, so it is read whole - the
+    # consumer has nothing there and takes the file. A path the range MODIFIES is
+    # scoped to the lines the range added, because the consumer applies a hunk.
+    scope: dict[str, set[int]] = {}
+    for rel in sorted(in_range):
+        if status.get(rel) == "A":
+            continue
+        scope[rel] = added_line_numbers(_git("diff", "-U0", f"{base}..{head}", "--", rel, cwd=cwd))
 
-    return import_edges(in_range, tracked, read), len(in_range)
+    def read(rel: str) -> str | None:
+        # AT ``head``, never the working tree. ``scope``'s line numbers come from
+        # the ``base..head`` diff, so a file that moved AFTER the tag would be
+        # scoped by line numbers that no longer point at the same statements.
+        # Measured while building this: reading the working tree dropped
+        # ``tests/unit/test_port_preflight.py -> drydocs/port/__init__.py``,
+        # because that file gained lines after the tag was cut. Whole-file reading
+        # tolerated the mismatch; line-scoped reading cannot.
+        try:
+            return _git("show", f"{head}:{rel}", cwd=cwd)
+        except GitError:
+            return None  # deleted in the range, or not present at head
+
+    return import_edges(in_range, tracked, read, scope), len(in_range)
 
 
 def venue_line() -> str:

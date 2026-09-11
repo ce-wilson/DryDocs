@@ -78,6 +78,37 @@ notes: |
   carrying a 45-day-old written ruling is itself evidence for clause (a): a disposition whose
   reason nobody finds is not doing the job the disposition exists for.
 
+  A THIRD CATEGORY, AND IT CORRECTS THIS ITEM'S OWN FOUNDING PREMISE (2026-09-11, later the
+  same day). Clause (b) splits a test ahead of IN-RANGE code (transient) from one ahead of
+  OUT-OF-RANGE code (permanent). There is a third: a dependency the APPLY OPERATION
+  MANUFACTURED, which is neither. The paragraph above says drydocs_api/app.py "imports
+  drydocs_api/corpus_status.py, which no roll's range has ever carried, so the take could not
+  import". That is true of a wholesale checkout and false of the change: app.py's in-range diff
+  is one 503 handler plus a JSONResponse import, and introduces no first-party import at all.
+  The consumer found it operationally - git checkout BASE -- path applies the CUMULATIVE diff,
+  so the take dragged in corpus_status, log_estate, qa_trace_read, review_quality and
+  BadCredentialsError, every one of them an earlier roll's import - and read that self-inflicted
+  cascade as proof the package was indivisible. Their words: "the number wasn't the mistake, the
+  operation was".
+  PORT9 HAD THE SAME DEFECT FROM THE OTHER END and is fixed in the same commit as this note: it
+  read the whole in-range FILE when the question is about the CHANGE, and reported 17 edges from
+  app.py alone. Measured on port-base-20260908..port-base-20260910b: 233 whole-file edges against
+  48 under the corrected rule, which reads a path the range ADDS whole (the consumer has nothing
+  there and takes the file) and a path the range MODIFIES only at the lines the range added (the
+  consumer applies a hunk). The consumer reached the same reading independently and recorded the
+  figure as what they judge blockers against.
+  WHAT THE RULING STILL OWES, because this narrows the problem rather than dissolving it: the
+  triage that produced the 33-path split used the checkout operation, so a rejection whose
+  recorded reason is "applying it pulled in X" is a property of the operation and a rejection
+  whose reason is "the subject is not in the range" is a property of the range. Only the first
+  class needs re-checking. That rule was carried to the consumer and held: four of their
+  rejections stood untouched and two were re-run, of which one was pure artifact and one was
+  blocked by a different cause entirely.
+  AND A FOURTH CLASS THE RE-CHECK SURFACED, owed to no apply operation at all: an INHERITED GAP,
+  where the consumer's file is shorter than the base they last landed because an earlier roll
+  never delivered part of it. Nothing on this side can see that class - the detector is a
+  line-count comparison against their own last landed base, run by them.
+
   ADJACENT, NOT THIS ITEM: drydocs_lineage is currently 2 of 24 tracked paths in range, the same
   edge-of-a-package shape drydocs_api was in at 4 of 23. The trap is not sprung yet.
 

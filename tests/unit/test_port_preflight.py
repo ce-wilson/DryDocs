@@ -23,6 +23,7 @@ from drydocs.port.port_preflight import (
     CheckResult,
     Commit,
     GitError,
+    added_line_numbers,
     cited_paths,
     cited_shas,
     first_party_target,
@@ -560,6 +561,15 @@ def test_an_empty_range_on_a_real_base_is_still_a_clean_pass(
 # carried - so the take could not import. PORT12's cli_schema break was the same
 # shape a roll earlier. Both were found by ModuleNotFoundError AFTER the take;
 # this computes the list BEFORE it, for the consumer to intersect against its tree.
+#
+# CORRECTED 2026-09-11, and the correction is the point: app.py's IN-RANGE change
+# introduces no import at all - it is one 503 handler. corpus_status was dragged in
+# by ``git checkout BASE -- path``, which applies the CUMULATIVE diff, and the first
+# version of this check reproduced that same over-report by reading the whole
+# in-range FILE. Measured on the same range: 233 whole-file edges against 48 under
+# the rule below. A path the range ADDS is read whole, because the consumer has
+# nothing there and takes the file; a path the range MODIFIES is read only at the
+# lines the range added, because the consumer applies a hunk.
 
 _TRACKED = {
     "drydocs_api/app.py",
@@ -610,6 +620,95 @@ def test_a_relative_import_is_not_counted_because_its_module_reports_its_own_gap
     in_range = {"drydocs_api/app.py"}
     sources = {"drydocs_api/app.py": "from . import corpus_status\nfrom .intake import x\n"}
     assert import_edges(in_range, _TRACKED, _reader(sources)) == []
+
+
+def test_added_line_numbers_reads_only_the_new_side_of_a_hunk_header() -> None:
+    diff = "\n".join(
+        [
+            "@@ -1,3 +1,4 @@",  # four lines from 1
+            "@@ -20 +21 @@",  # an omitted count means one
+            "@@ -30,5 +40,0 @@",  # a pure DELETION covers nothing
+            "not a hunk header",
+        ]
+    )
+    assert added_line_numbers(diff) == {1, 2, 3, 4, 21}
+
+
+def test_a_modified_path_reports_only_the_imports_its_hunk_introduced() -> None:
+    """THE app.py CASE, which is the whole reason this rule exists.
+
+    The file imports an out-of-range module on line 2 and the range's hunk touches
+    line 5 only. The consumer applies that hunk to a copy that already resolved
+    line 2, so line 2 is not a new requirement, and reporting it sends them after a
+    dependency the change never asked for.
+    """
+    in_range = {"drydocs_api/app.py"}
+    sources = {
+        "drydocs_api/app.py": "\n".join(
+            [
+                "import ast",  # 1
+                "from drydocs_api.corpus_status import corpus_status",  # 2 PRE-EXISTING
+                "",  # 3
+                "def handler():",  # 4
+                "    return corpus_status()",  # 5 the hunk
+            ]
+        )
+    }
+    assert import_edges(in_range, _TRACKED, _reader(sources), {"drydocs_api/app.py": {5}}) == []
+    # Whole-file reading - what the first version of this check did - DOES report
+    # it, so this fails if the scope argument is accepted and then ignored.
+    assert [e.target for e in import_edges(in_range, _TRACKED, _reader(sources))] == [
+        "drydocs_api/corpus_status.py"
+    ]
+
+
+def test_a_modified_path_still_reports_a_gap_its_hunk_does_introduce() -> None:
+    """J26: the narrowed check must still be able to fail, or it is not a check."""
+    in_range = {"drydocs_api/app.py"}
+    sources = {
+        "drydocs_api/app.py": "\n".join(
+            [
+                "import ast",  # 1
+                "from drydocs_api.corpus_status import corpus_status",  # 2 the hunk ADDS this
+            ]
+        )
+    }
+    edges = import_edges(in_range, _TRACKED, _reader(sources), {"drydocs_api/app.py": {2}})
+    assert [(e.importer, e.target) for e in edges] == [
+        ("drydocs_api/app.py", "drydocs_api/corpus_status.py")
+    ]
+
+
+def test_a_multiline_import_counts_when_the_hunk_adds_a_name_inside_it() -> None:
+    """The node's LINE RANGE, not its first line - a name can arrive on line 3."""
+    in_range = {"drydocs_api/app.py"}
+    sources = {
+        "drydocs_api/app.py": "\n".join(
+            [
+                "from drydocs_api.corpus_status import (",  # 1
+                "    a,",  # 2
+                "    corpus_status,",  # 3 the only added line
+                ")",  # 4
+            ]
+        )
+    }
+    edges = import_edges(in_range, _TRACKED, _reader(sources), {"drydocs_api/app.py": {3}})
+    assert [e.target for e in edges] == ["drydocs_api/corpus_status.py"]
+
+
+def test_an_added_path_is_read_whole_because_the_consumer_takes_the_file() -> None:
+    """A path absent from ``scope`` is a clean-add: every import in it is required."""
+    in_range = {"drydocs_api/app.py", "drydocs_api/intake.py"}
+    sources = {
+        "drydocs_api/app.py": "from drydocs_api.corpus_status import corpus_status",
+        "drydocs_api/intake.py": "from drydocs_core import repo_paths",
+    }
+    # app.py is MODIFIED and its hunk touched no import line; intake.py is ADDED,
+    # so it is absent from scope and every import in it counts.
+    edges = import_edges(in_range, _TRACKED, _reader(sources), {"drydocs_api/app.py": set()})
+    assert [(e.importer, e.target) for e in edges] == [
+        ("drydocs_api/intake.py", "drydocs_core/repo_paths.py")
+    ]
 
 
 def test_a_file_deleted_in_the_range_or_unparseable_is_skipped_rather_than_raising() -> None:
