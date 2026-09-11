@@ -154,7 +154,7 @@ components:
   - { id: TaglineWithProvenance,   area: ui-primitive, path: components/ui/TaglineWithProvenance.tsx }
   - { id: TruncationBadge,         area: ui-primitive, path: components/ui/TruncationBadge.tsx }   # WEB2 one completeness vocabulary: the canvas's node ceiling and the grid's row ceiling
 
-  # --- component (26) ---
+  # --- component (27) ---
   - { id: BrandMark,               area: component,    path: components/BrandMark.tsx }
   - { id: CypherConsole,           area: component,    path: components/CypherConsole.tsx }
   # O81: the NVL canvas and its QuerySpec-bound frame. UNBOUND to any module on
@@ -210,6 +210,13 @@ components:
   - { id: TowerDrill,              area: component,    path: components/TowerDrill.tsx }
   - { id: ProvenanceNotice,        area: component,    path: components/ProvenanceNotice.tsx }
   - { id: TrustLegend,             area: component,    path: components/TrustLegend.tsx }
+  # G86: the RBC-only rendering spike. UNBOUND -- 'calendar' is not a registry
+  # module and this component is not wired into a route: the graph carries no
+  # RBC definitions yet (docs/reviews/g86-calendar-validation-and-rendering-
+  # ruling-2026-09-11.md), so it takes a calendar as a prop to prove the
+  # rendering approach and the year-boundary refusal, not to ship a page with
+  # nothing behind it.
+  - { id: RbcCalendarSpike,        area: component,    path: calendar/RbcCalendarSpike.tsx }
 
   # --- icon (2) ---
   - { id: MapGlyphs,               area: icon,         path: components/map/MapGlyphs.tsx }
