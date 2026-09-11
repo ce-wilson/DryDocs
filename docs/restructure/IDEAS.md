@@ -113,10 +113,58 @@ question a 1,000-line file with the trail at the bottom could not answer.
 - **`Idea-319`** · 2026-09-11 · `[bug]` · **open** · prio? **High** —
   **Four open items say in their acceptance that the pull loop skips them and carry no `hold:`,
   so the board's Ready strip lists them anyway — Y7 was applied to two of six.**
+  Found 2026-09-11 building the Lane C and Lane D handoffs, producer desktop, measured on `main`.
+  Ten items open their acceptance with the sentence "USER-GATED START — the SME convenes the
+  session; the pull loop SKIPS this item until then." Six are `done`. Of the four still open,
+  **G62 and G64 carry a `hold:` block and CFG5, G63, G65 and PLAN11 do not.** Y7 (2026-09-07) is
+  the mechanism that reads that sentence and declares the hold — G64's own hold block says so in
+  its reason — and a `hold:` is what `derive_summary` subtracts from `next_ready`, which is what
+  the board's Ready-to-pull strip renders. So the four unheld items assert in prose that they are
+  not pullable and appear on the strip as pullable, and the prose is the half nothing reads.
+  Two of them are not merely mis-shown but structurally unclosable on this side: G63's own notes
+  say "Company-side session (real repo names and Bitbucket access are Internal)", and G65's
+  section A needs a real DPL export, which `config/gate-log.md`'s 2026-09-09 deferral names as
+  its trigger. This is what made them read as ready to a user reading the board, and it cost a
+  handoff draft that had to be corrected on the evidence.
+  The fix is mechanical and small — apply Y7's declaration to the remaining four — but the
+  `by:` field names who gated the start, so it is a user ruling and not a sweep. Worth ruling
+  alongside it: whether the acceptance sentence should be the SOURCE a guard reads (a guard that
+  fails an item carrying the sentence without a hold), which would make the next four impossible
+  to miss, or whether the sentence is prose and the hold is the only authority (J68, one
+  authority per fact) — in which case the sentence should be removed from the four once their
+  holds land, not left as a second voice.
 
 - **`Idea-320`** · 2026-09-11 · `[idea]` · **open** · prio? **High** —
   **A backlog item has no typed home for the fact that its work was done on the other side of
   the port, so every cross-repo completion is carried in prose a guard cannot read.**
+  Measured 2026-09-11, producer desktop, while ruling which of N22, K23, K26, K29, G64 and G65
+  are company work. `PORT-MANIFEST.yaml` is a complete and guarded theory of how two TREES
+  reconcile: `docs/restructure/backlog/items/*.yaml` is per-entry and the F4 ruling (ADR 0013
+  clause 4) makes `status` per-repo — "a port never writes status, because the same id names the
+  same work with two independent completions" — while `config/gate-log.md` union-appends and
+  `config/gate-prompts/**` is canonical-company. All of that is correct and none of it is the
+  problem. The gap is one level up: ADR 0013 clause 1 enumerates every legal item key and **none
+  of them names the other repo**, so when an item's work happens company-side the producer's copy
+  stays `todo` with no field able to say why.
+  The three live workarounds are all prose, and all three are in the tree today. C27 records in
+  `notes:` that its external trigger "FIRED IN THE OPPOSITE DIRECTION" — a company gate reversal
+  a human read out of the company's gate-log and transcribed. GRAPH5 carries a `hold:` whose
+  `until:` is a sentence about the company completing an apply and reporting it. G74 says
+  "Route this ruling through the port rather than landing it one-sided." Each works because a
+  person read a report; none is readable by `derive_summary`, and the roadmap guard is
+  deliberately blind to exactly this field (`sources_fingerprint` normalises `status` out, so
+  `todo`, `in_progress` and `done` hash identically). The two boards therefore disagree
+  permanently, both correctly, and nothing on either side says so.
+  `venue:` (PLAN6) is the closest existing shape and shows the limit: it DECLARES a requirement
+  and flags an item this side cannot meet, and then nothing routes the item or brings an answer
+  back. Exactly one item carries the field. H8 is the nearest owner and by its own acceptance
+  produces "a TABLE, not a build".
+  Candidate shapes, in increasing cost and each needing a ruling first: a `venue:` code for
+  `company` so the existing flag covers it and `--suggest` stops offering those items to a
+  producer lane; or a declared `elsewhere:` block on the F4 shape (side, what was observed, the
+  report it came from, the date) that is information and never a status, so nothing can mark the
+  producer `done` on work it did not do — which is the exact failure F4 exists to prevent, and
+  the reason this must not be solved by copying the other side's status.
 
 - **`Idea-317`** · 2026-09-11 · `[idea]` · **open** · prio? **Med** —
   **The locked-stack guard reads the registry's own rows and never `web/package.json`, so it
