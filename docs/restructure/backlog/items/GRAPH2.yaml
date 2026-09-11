@@ -7,7 +7,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs/port/reconcile_before.py
@@ -19,3 +19,116 @@ acceptance: |
   out on purpose - it "probably wants a different answer than a declaration".
 notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). seams-2026-09-08.md candidate 1, the separated question (reconcile_before.py:216).
+
+  ## THE RULING: DECLARE. The crossing stays, and the reason is a manifest row.
+
+  The seams report guessed this "probably wants a different answer than a
+  declaration". It did not have PORT-MANIFEST.yaml:902 in front of it. With that
+  row read, the move loses its case and the declaration is the right answer - so
+  the acceptance's second branch is taken deliberately, not by default.
+
+  WHAT THE MOVE WOULD HAVE COST, measured rather than argued:
+
+  1. It fixes nothing about per-side data. The premise for moving was that
+     per-side values stranded in a test file get overwritten by a wholesale port.
+     tests/unit/test_runbook_currency.py has an EXPLICIT per-entry row whose
+     entry_rule unions by KEY, keeps each side's reasons verbatim, and carries the
+     never-port-zone drop rule. The current home strands nothing. The PORT RULE is
+     what makes that true, not the directory - which is the whole point.
+  2. It would break a retirement trigger somebody wrote down. That same row
+     records its own exit: when T19/T22 land company-side the exemptions go and it
+     reverts to the tests/** default. A move orphans that.
+  3. The company ADAPTED this file by hand at caa0406 on the SME's 2026-08-11
+     ruling. Moving its contents re-opens a hand-settled port decision.
+
+  WHAT THE MOVE WOULD HAVE BOUGHT: removing a `drydocs/port/` -> `tests.unit`
+  import. The inversion is real - `tests` is not in pyproject's `packages`, so the
+  crossing resolves only from a checkout. But reconcile_before is a port tool that
+  runs from a checkout on the receiving side and never from a wheel, so the
+  practical cost today is zero. A real inversion with no practical cost is a thing
+  to DECLARE. Three costs against one theoretical benefit.
+
+  The declaration lives in the CODE, above the crossing in reconcile_before.py -
+  the crossing, the manifest row that governs it, why the tables stay test-side,
+  and why the two silences are correct. Not only here, because the next person to
+  read that import will be standing in that file.
+
+  ## The defect this actually found, and it is not the one the title implies
+
+  GENERATED_PATHS landed producer-side at e6daa986 (J70a) and NO READER FOLLOWED.
+  Three artifacts still named three tables:
+
+    drydocs/port/reconcile_before.py:219     - FIXED here
+    tests/unit/test_port_reconcile_guards.py:808 - FIXED here
+    PORT-MANIFEST.yaml:906                   - HANDED BACK (port pen, Lane A)
+
+  MEASURED on this tree, before and after, with scripts/reconcile_before.py:
+
+    before : 12 keys - 4 HISTORICAL_PATHS, 8 FOREIGN_PATHS, zero GENERATED_PATHS
+    after  : 13 keys - the same 12 plus
+             GENERATED_PATHS:docs/port/port-dispositions.md
+
+  So the generated-path exemptions have been absent from EVERY port before-snapshot
+  between J70a and today. The no-drop guard was then re-run ARMED against the
+  pre-fix snapshot (RECONCILE_BEFORE_DIR=<before>): 57 passed, 0 skipped - the
+  eight consumer-side checks that normally skip were exercised, and they agree the
+  new key is an ADDITION and nothing was dropped.
+
+  ## A correction worth recording, because three readers in a row got it wrong
+
+  DEFERRED_VERBS is not a phantom. Reading only the producer tree it looks like a
+  table that exists nowhere - `grep` finds nothing, `git log -S` finds nothing -
+  and the obvious conclusion is that the tuple names a dead string. It is wrong.
+  DEFERRED_VERBS is a COMPANY-SIDE table carrying the T22 pair
+  (docs/reviews/port-review-7c18ff4b-20260820.md:67; J51's own notes). One tuple
+  names tables from BOTH trees, and `getattr(mod, table, {})` is precisely what
+  lets it: producer-side DEFERRED_VERBS yields nothing, company-side it yields the
+  T22 rows.
+
+  So BOTH silences are load-bearing and neither is sloppiness - the `getattr`
+  default AND the `except ImportError` (the consumer may not carry this guard).
+  That is now said in the code, because the cost of the silence being correct is
+  that a MISSING table is indistinguishable from an EMPTY one - which is exactly
+  how GENERATED_PATHS hid for as long as it did.
+
+  ## The new assertion is on the READ, never on the CONTENT
+
+  tests/unit/test_port_reconcile_guards.py's vacuity guard now also asserts
+  GENERATED_PATHS is in the table list - the mechanism, not the data. It must not
+  assert the table is non-empty: the manifest entry_rule has the CONSUMER DROP its
+  single entry, because the only citer (docs/port/port-prompt.md) sits in a
+  never-port zone. A non-empty assertion would red the company's suite for
+  obeying the rule it was given. HISTORICAL_PATHS, non-empty on both trees,
+  already covers the vacuous-import case the test exists for.
+
+  ## HAND-BACK FOR LANE A - PORT-MANIFEST.yaml is the port pen
+
+  PORT-MANIFEST.yaml:906, the per-entry row for
+  tests/unit/test_runbook_currency.py, says:
+
+    "the three EXEMPTION tables - HISTORICAL_PATHS, FOREIGN_PATHS and
+     DEFERRED_VERBS - are PER-SIDE DATA"
+
+  There are FOUR, and the fourth is producer-side. The row's parenthetical is
+  dated 2026-09-03, which PREDATES J70a - so it is not wrong about what it saw,
+  it is stale about what exists. Suggested edit: name GENERATED_PATHS alongside
+  the other three, and note it is producer-side today while DEFERRED_VERBS is
+  company-side. Everything else in that row - union by key, reasons verbatim, the
+  never-port-zone drop, the T19/T22 retirement trigger - stays exactly as written.
+  Without this the row's "UNNAMED FIELDS" default applies to GENERATED_PATHS and a
+  take would overwrite the company's rows in the one table the row does not name.
+
+  ## Scope held
+
+  The SIBLING crossing is real and is NOT this item's: .claude/skills/groom-backlog/validate.py
+  reads INPUT_EXEMPTIONS / OUTPUT_EXEMPTIONS out of tests/unit/test_backlog.py via
+  importlib.util.spec_from_file_location (lines 1206, 1221). Five tables across
+  two readers, as the handoff said. test_backlog.py has its own per-entry row
+  (PORT-MANIFEST.yaml:923) and neither file is in this item's inputs, so the same
+  ruling probably applies there and is NOT asserted here. Worth its own item.
+
+  ## Gates
+
+  ruff check . and ruff format --check . clean. Full suite in ONE invocation per
+  J57's third clause. Targeted: 94 passed / 8 skipped unarmed, then 57 passed /
+  0 skipped ARMED against the real snapshot.

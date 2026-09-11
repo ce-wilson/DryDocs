@@ -212,11 +212,52 @@ def write_snapshot(before_dir: Path, repo: Path) -> SnapshotReport:
         put("detect-rule-ids.txt", "\n".join(detect.CONFORMANCE_RULE_IDS))
     except ImportError:
         report.skipped.append("detect-rule-ids.txt")
+    # ---- THE TEST-MODULE CROSSING, DECLARED (GRAPH2, 2026-09-10) -------------
+    # Production code importing `tests.unit.*` is a layering inversion, and it is
+    # DELIBERATE here. The alternative — moving the tables to a core module — was
+    # measured and rejected:
+    #
+    #   * These are PER-SIDE DATA, and the split is already governed.
+    #     PORT-MANIFEST.yaml carries a per-entry row for
+    #     tests/unit/test_runbook_currency.py whose entry_rule unions by KEY and
+    #     keeps each side's reasons verbatim. The current home strands nothing;
+    #     the port rule is what makes that true, not the directory.
+    #   * That row records its own RETIREMENT TRIGGER — when T19/T22 land
+    #     company-side the exemptions go and the row reverts to the tests/**
+    #     default. Moving the tables would break a trigger somebody wrote down.
+    #   * The company ADAPTED this file by hand at caa0406 on the SME's ruling.
+    #
+    # What the move would buy is removing this import. `tests` is not in
+    # pyproject's `packages`, so the crossing works only from a checkout — and
+    # this is a port tool that runs from a checkout on the receiving side, never
+    # from a wheel. A real inversion with no practical cost is a thing to declare,
+    # not to pay three costs to remove.
+    #
+    # BOTH SILENCES BELOW ARE LOAD-BEARING. Neither is sloppiness:
+    #   * `getattr(mod, table, {})` — the tuple names tables from BOTH trees.
+    #     DEFERRED_VERBS is COMPANY-SIDE ONLY (it carries the T22 pair; it has
+    #     never existed producer-side), so producer-side it correctly yields
+    #     nothing. One tuple, two trees.
+    #   * `except ImportError` — the consumer may not carry this guard at all.
+    #
+    # GENERATED_PATHS was ADDED to the tuple at GRAPH2. It landed producer-side at
+    # e6daa986 (J70a) and no reader followed, so every port snapshot since has
+    # silently omitted it — measured on this tree: the before file carried twelve
+    # keys and not one GENERATED_PATHS line. The `getattr` default is exactly what
+    # made a missing table indistinguishable from an empty one, which is the cost
+    # of the silence being correct. PORT-MANIFEST.yaml:906 still names three
+    # tables and needs the same correction; that file is the port pen, so it is
+    # handed back in this item's notes rather than edited here.
     try:
         mod = importlib.import_module("tests.unit.test_runbook_currency")
         keys = [
             f"{table}:{k}"
-            for table in ("HISTORICAL_PATHS", "FOREIGN_PATHS", "DEFERRED_VERBS")
+            for table in (
+                "HISTORICAL_PATHS",
+                "FOREIGN_PATHS",
+                "GENERATED_PATHS",
+                "DEFERRED_VERBS",
+            )
             for k in sorted(getattr(mod, table, {}) or {})
         ]
         put("runbook-exemption-keys.txt", "\n".join(keys))
