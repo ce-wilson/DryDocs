@@ -110,6 +110,14 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
+- **`Idea-319`** · 2026-09-11 · `[bug]` · **open** · prio? **High** —
+  **Four open items say in their acceptance that the pull loop skips them and carry no `hold:`,
+  so the board's Ready strip lists them anyway — Y7 was applied to two of six.**
+
+- **`Idea-320`** · 2026-09-11 · `[idea]` · **open** · prio? **High** —
+  **A backlog item has no typed home for the fact that its work was done on the other side of
+  the port, so every cross-repo completion is carried in prose a guard cannot read.**
+
 - **`Idea-317`** · 2026-09-11 · `[idea]` · **open** · prio? **Med** —
   **The locked-stack guard reads the registry's own rows and never `web/package.json`, so it
   checks that the registry agrees with itself and would not see the stack actually change.**
