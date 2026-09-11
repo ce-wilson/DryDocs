@@ -110,6 +110,44 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
+- **`Idea-315`** · 2026-09-11 · `[idea]` · **open** · prio? **High** —
+  **A company-marker keyword scan measures LABELLING, not divergence, and the number it returns
+  counts labels rather than coverage.** Reported by the consumer 2026-09-11 during the
+  `port-base-20260910b` apply and confirmed producer-side. Grepping the tree for company markers
+  finds the files whose divergence somebody wrote down in a comment. The other class is
+  STRUCTURAL: the code is identical on both sides, the divergence lives in the DATA the code has
+  to handle, and there is no keyword to match. `drydocs_core/ontology/schema_graph.py` is the
+  worked example. Its duplicate-edge key is `(from_label, neo4j_label, to_label)` and ignores
+  `role` (`schema_graph.py:230`, `:244`), which is right against this side's vocabulary and wrong
+  against one that renders two entries on the same triple - and
+  `drydocs_core/ontology/relationship_vocabulary/**` is `per-entry` in `PORT-MANIFEST.yaml:200`,
+  so the per-entry row IS the statement that the two sides hold different rows, by rule. The file
+  carries no company marker and never will; adding one would be worse, because labelling the one
+  known case makes the scan look complete while leaving the class open. Candidate rule: use the
+  scan to ROUTE work, never to BOUND it, and treat any file that reads a per-entry surface as in
+  scope whether or not it carries a marker. This is the same shape `port_rename_detect.py` names
+  for paths (correct about the PATH, blind to the CONTENT) one level further in: correct about the
+  LABEL, blind to the DATA. Home if groomed: `.claude/skills/reconcile-port/SKILL.md`, because
+  `.claude/**` is canonical-producer and crosses whole - NOT `docs/port/port-prompt.md`, which is
+  never-port, where a durable method rule reaches the consumer as relay text for one roll and then
+  stops.
+
+- **`Idea-316`** · 2026-09-11 · `[idea]` · **open** · prio? **Med** —
+  **Run the touched file's OWN test, not just its neighbours - and the measured limit that stops
+  this from being automated as written.** The consumer's 2026-09-11 rule, earned: they ran
+  `test_schema.py` and never `test_schema_graph.py`, waved the file through on "let the tests
+  decide", and the tests decided six failures later. J57 is adjacent and does not cover this - J57
+  governs how two runs are COMPARED (same venue, same invocation, compare the set); this governs
+  whether the right test was run at all. THE LIMIT, measured producer-side 2026-09-11: the
+  same-stem `tests/**/test_<name>.py` convention resolves for only 97 of 246 first-party modules
+  (39 percent) - `drydocs/` 55 of 94, `drydocs_core/` 31 of 72, `drydocs_api/` 7 of 22,
+  `scripts/` 4 of 46, `drydocs_remediation/` 0 of 11. So a tool implementing the rule by name-match
+  finds nothing for three files in five, and "no test found" then reads as "no test needed", which
+  is the defect wearing the opposite sign. `schema_graph.py` sits inside the 39 percent, so the
+  rule would have caught this one. Home if groomed: the "Tests gate every change" bullet in
+  CLAUDE.md section 6, ahead of the J57 clause it floors - the rule is not port-specific, and
+  CLAUDE.md is canonical-producer so it crosses.
+
 - **`Idea-314`** · 2026-09-11 · `[idea]` · **open** · prio? **Med** —
   **A suite number taken on a DIRTY tree silently under-runs, and CLAUDE.md carries the worktree
   twin of this rule but not this one.** Measured 2026-09-11 during the Lane A close of four merges:
