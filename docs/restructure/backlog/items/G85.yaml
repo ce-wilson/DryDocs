@@ -7,7 +7,7 @@ phase: 12
 agent: main
 model: opus
 priority: p3
-status: todo
+status: in_progress
 depends_on: []
 inputs:
 - external/orchestration/bmc-controlm/SOURCE-MANIFEST.md
