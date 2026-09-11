@@ -2,7 +2,9 @@
 
 <!-- anchor: front-matter -->
 - **Status:** DESCRIPTIVE — documents the working procedure. **Rev 3, 2026-08-04** (S5: the ontology-map source is a fragment DIRECTORY, not a
-  monolith file — currency audit; on top of Rev 2, 2026-07-21)
+  monolith file — currency audit; on top of Rev 2, 2026-07-21). Reflects the repository at
+  commit `453f898c`, this file's last content revision (L19 clause (a): the doc carried no
+  commit citation at all until 2026-09-11)
   (L14 refit onto `runbook.outline.yaml`; relocated from `docs/runbook-mapping-demo.md`
   to `docs/design/` — the D6 either/or decided at execution: this doc now validates and
   renders through the Epic L pipeline. Content reflects the post-O24 five-domain state.)

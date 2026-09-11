@@ -2,8 +2,9 @@
 
 <!-- anchor: front-matter -->
 **Status:** DESCRIPTIVE — documents the built proof of concept as of **Rev 3, 2026-09-09**,
-authored against commit `de0eeb6f`, which was landed onto `main` linearly rather than merged,
-together with the two guard fixes described under "QA & tests". Nothing here is prescriptive:
+present on `main` at commit `fcc3c8bb`, the landing of record — the work was authored on the
+retired branch tip `de0eeb6f`, which is reachable from no branch and resolves in no fresh
+clone — together with the two guard fixes described under "QA & tests". Nothing here is prescriptive:
 every mechanism described is in the tree and covered by a test. Two of those tests were red while
 the work sat on its branch and both are fixed here; "QA & tests" records what each one was, and why
 one of them could not fail on the machine that wrote it. ·

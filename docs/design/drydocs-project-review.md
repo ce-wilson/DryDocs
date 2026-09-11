@@ -2,7 +2,9 @@
 
 <!-- anchor: front-matter -->
 - **Reviewed at:** commit `703c2019` on `main` (2026-08-24), port base `port-base-20260824`; venue MSI (producer desktop). *The commit is this file's own last revision, which is the tree the reading was done against; absent here reads as not-yet-ported, not as broken (`docs/style/review-provenance.md`, J63).*
-**Project review · Rev 1 · 2026-07-14 · commit `97ee81c` · Classification: Internal-Public
+**Project review · Rev 1 · 2026-07-14 · present on `main` from commit `c5a84c37` (the
+2026-07-20 initial import; authored pre-squash at `97ee81c9`, archived history only) ·
+Classification: Internal-Public
 (mechanism only — no customer names, hosts, schedules, SIDs, or real identifiers appear in
 this document).**
 
@@ -661,4 +663,5 @@ built-in annotation and this print surface with margin anchor tags. Renders are
 deterministic: same source, same bytes. Feedback — digital or pen-on-paper — keys to the
 anchor ids in the margins and lands in
 `docs/design/feedback/drydocs-project-review-rev1.yaml`. Facts reflect the repository at
-commit `97ee81c`, 2026-07-14.
+2026-07-14, present on `main` from commit `c5a84c37` (the 2026-07-20 initial import;
+authored pre-squash at `97ee81c9`, archived history only).

@@ -1,8 +1,10 @@
 # Technical Design — `drydocs-remediation` (Control-M fix packages: detect → transform → prove → Jira)
 
 <!-- anchor: front-matter -->
-**Status:** PRESCRIPTIVE — specifies an UNBUILT component. **Rev 1, 2026-07-08**, authored at
-commit `24d6a4b` (backlog **G3** `todo`, gated on **G2** core extraction; contract = ADR 0002-B). ·
+**Status:** PRESCRIPTIVE — specifies an UNBUILT component. **Rev 1, 2026-07-08**, present on
+`main` from commit `c5a84c37` (the 2026-07-20 initial import; authored pre-squash at
+`24d6a4b2`, archived history only) — backlog **G3** `todo`, gated on **G2** core
+extraction; contract = ADR 0002-B. ·
 **Classification:** Internal-Public — mechanism only; real folder/job names, fix-rule values,
 and Jira coordinates live company-side. ·
 **Audience:** the production-support SME (author of fixes) + the source-app dev teams who

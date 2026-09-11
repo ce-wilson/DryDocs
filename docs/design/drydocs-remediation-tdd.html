@@ -93,7 +93,7 @@ h1, h2, h3, h4, h5, h6, p, table, pre, ul, ol, blockquote { position: relative; 
 <body>
 <main>
 <h1>Technical Design — <code>drydocs-remediation</code> (Control-M fix packages: detect → transform → prove → Jira)</h1>
-<p id="front-matter"><span class="dd-margin-tag" aria-hidden="true">front-matter</span><strong>Status:</strong> PRESCRIPTIVE — specifies an UNBUILT component. <strong>Rev 1, 2026-07-08</strong>, authored at commit <code>24d6a4b</code> (backlog <strong>G3</strong> <code>todo</code>, gated on <strong>G2</strong> core extraction; contract = ADR 0002-B). · <strong>Classification:</strong> Internal-Public — mechanism only; real folder/job names, fix-rule values, and Jira coordinates live company-side. · <strong>Audience:</strong> the production-support SME (author of fixes) + the source-app dev teams who deploy them. · <strong>Companion:</strong> <code>docs/decisions/0002-b-spinoff-rebase-checklist.md</code> (the rebase contract this design realizes); <code>docs/design/controlm-ingestion-tdd.md</code> (the ingest chain that later <em>reflects</em> a landed fix); <code>MODULE_MAP.md</code> (&quot;C1 — failures → Jira; no graph write&quot;).</p>
+<p id="front-matter"><span class="dd-margin-tag" aria-hidden="true">front-matter</span><strong>Status:</strong> PRESCRIPTIVE — specifies an UNBUILT component. <strong>Rev 1, 2026-07-08</strong>, present on <code>main</code> from commit <code>c5a84c37</code> (the 2026-07-20 initial import; authored pre-squash at <code>24d6a4b2</code>, archived history only) — backlog <strong>G3</strong> <code>todo</code>, gated on <strong>G2</strong> core extraction; contract = ADR 0002-B. · <strong>Classification:</strong> Internal-Public — mechanism only; real folder/job names, fix-rule values, and Jira coordinates live company-side. · <strong>Audience:</strong> the production-support SME (author of fixes) + the source-app dev teams who deploy them. · <strong>Companion:</strong> <code>docs/decisions/0002-b-spinoff-rebase-checklist.md</code> (the rebase contract this design realizes); <code>docs/design/controlm-ingestion-tdd.md</code> (the ingest chain that later <em>reflects</em> a landed fix); <code>MODULE_MAP.md</code> (&quot;C1 — failures → Jira; no graph write&quot;).</p>
 <p>Worked example throughout (synthetic, mechanism-only): a FileWatcher job in folder <code>PRARAF-FW1D-…</code> fails repeatedly on a mis-declared watch path; its Description field carries no metadata block; ownership is ambiguous in <code>cm_escalation_db</code>. The remediation loop produces a greenfield definition + metadata supplement and hands it to the owning dev team.</p>
 <blockquote><p><strong>Read-me-first.</strong> This component <strong>writes no graph, deploys nothing</strong>. Separation of duties is the founding constraint: production support authors the fix; the source application&#x27;s dev team holds deploy rights. The only durable outputs are the greenfield definition artifact and the Jira ticket (the system of record for the handoff). Closure is observed, not performed: after the dev team lands the change, the next <code>ingest-controlm</code> load reflects it and the ticket closes.</p></blockquote>
 <hr>
@@ -168,7 +168,7 @@ h1, h2, h3, h4, h5, h6, p, table, pre, ul, ol, blockquote { position: relative; 
 </ol>
 </section>
 </main>
-<footer class="dd-print-footer">Rev 1 · commit 24d6a4b</footer>
+<footer class="dd-print-footer">Rev 1 · commit c5a84c37</footer>
 <script>
 
 (function(){

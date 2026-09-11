@@ -93,7 +93,7 @@ h1, h2, h3, h4, h5, h6, p, table, pre, ul, ol, blockquote { position: relative; 
 <body>
 <main>
 <h1>Why We&#x27;re Betting on Graph Traversal — A Retrieval Benchmark, Explained</h1>
-<p><strong>Explainer · Rev 2 · 2026-07-17 · commit <code>0e036ff</code> · Classification: Internal-Public (mechanism only — no customer names, hosts, schedules, SIDs, or real identifiers appear in this document).</strong></p>
+<p><strong>Explainer · Rev 2 · 2026-07-17 · present on <code>main</code> from commit <code>c5a84c37</code> (the 2026-07-20 initial import; authored pre-squash at <code>0e036ff6</code>, archived history only) · Classification: Internal-Public (mechanism only — no customer names, hosts, schedules, SIDs, or real identifiers appear in this document).</strong></p>
 <blockquote><p>On 2026-07-16 we ran a head-to-head benchmark of three ways an AI support agent can retrieve knowledge from our vendor documentation corpus, and the result — <em>&quot;traversal won 12/12 at ~27× manifest token efficiency&quot;</em> — decided that DryDocs will BUILD its document-ingestion component rather than shrink it. This document explains what that sentence means, how the test was run, and why the outcome matters for anyone building or supporting AI-assisted operations. The full scoring record is <a href="../../knowledge/upgrade-plans/docmeta-p0-verdict.md"><code>knowledge/upgrade-plans/docmeta-p0-verdict.md</code></a>; the script and raw results are committed beside it.</p></blockquote>
 <h2 id="the-question"><span class="dd-margin-tag" aria-hidden="true">the-question</span>1. The question we needed to answer</h2>
 <p>When a batch job fails at 3 a.m., a support engineer asks questions like <em>&quot;what does the %%LIBMEMSYM variable do?&quot;</em>, <em>&quot;how do I make a job wait for another job?&quot;</em>, or <em>&quot;which documents cover pool variables?&quot;</em>. DryDocs wants an AI agent to answer those questions from the vendor&#x27;s own documentation — in our case, a corpus of 26 Control-M reference documents (about 313,000 characters) that we converted to markdown and govern with per-chunk trust labels.</p>
@@ -147,7 +147,7 @@ h1, h2, h3, h4, h5, h6, p, table, pre, ul, ol, blockquote { position: relative; 
 </ol>
 </section>
 </main>
-<footer class="dd-print-footer">Rev 2 · commit 0e036ff</footer>
+<footer class="dd-print-footer">Rev 2 · commit c5a84c37</footer>
 <script>
 
 (function(){

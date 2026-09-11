@@ -2,8 +2,10 @@
 
 <!-- anchor: front-matter -->
 **Status:** DESCRIPTIVE — documents the built system as of **Rev 2, 2026-07-12** (Rev 1 +
-expanded module topology + C4-model views), authored at commit `ac2ea2e` (post G2 core
-extraction, G3 remediation component, G4 scaffolds, G9 lineage re-home). ·
+expanded module topology + C4-model views), present on `main` from commit `c5a84c37` (the
+2026-07-20 initial import; authored pre-squash at `ac2ea2e3`, which survives only in
+`archive/old-history-2026-07-20` and resolves in no fresh clone) — post G2 core
+extraction, G3 remediation component, G4 scaffolds, G9 lineage re-home. ·
 **Classification:** Internal-Public — mechanism only; real folder/job/host/SEAL values live
 company-side or in gitignored twins. ·
 **Audience:** engineers joining the project (any surface), and the company-side maintainer

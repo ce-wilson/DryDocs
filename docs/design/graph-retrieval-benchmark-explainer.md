@@ -1,6 +1,8 @@
 # Why We're Betting on Graph Traversal — A Retrieval Benchmark, Explained
 
-**Explainer · Rev 2 · 2026-07-17 · commit `0e036ff` · Classification: Internal-Public
+**Explainer · Rev 2 · 2026-07-17 · present on `main` from commit `c5a84c37` (the 2026-07-20
+initial import; authored pre-squash at `0e036ff6`, archived history only) ·
+Classification: Internal-Public
 (mechanism only — no customer names, hosts, schedules, SIDs, or real identifiers appear in
 this document).**
 

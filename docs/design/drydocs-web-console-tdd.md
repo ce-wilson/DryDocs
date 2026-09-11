@@ -1,9 +1,13 @@
 # Technical Design — DryDocs web console & thin API (the built UI: drydocs-web + drydocs-api)
 
 <!-- anchor: front-matter -->
-**Status:** DESCRIPTIVE — documents the built UI as of **Rev 1, 2026-07-18**, authored at
-commit `807e050` (branch `feat/mapping-store`; Epic O items O1–O7 done, plus the O13
-mapping-stewardship live demo). The O8–O12 site-plan rebuild (`docs/design/ui-exploration/site-plan.md`) is the
+**Status:** DESCRIPTIVE — documents the built UI as of **Rev 1, 2026-07-18**, present on
+`main` from commit `c5a84c37` (the 2026-07-20 initial import; authored pre-squash at
+`807e0502`, which survives only in `archive/old-history-2026-07-20` and resolves in no
+fresh clone) — branch `feat/mapping-store`; Epic O items O1–O7 done, plus the O13
+mapping-stewardship live demo. **Rev 2, 2026-09-11** corrects one statement the S3
+identity cutover made false — grid columns are projected to `app_id`, not surfaced
+verbatim (L19 clause (d)); the build described is still the Rev 1 build. The O8–O12 site-plan rebuild (`docs/design/ui-exploration/site-plan.md`) is the
 PRESCRIPTIVE successor and is **not** this document. ·
 **Classification:** Internal-Public — mechanism only; every persona, tower, app, and row
 shown by the console is SYNTHESIZED; real SIDs/schemas live company-side. ·
@@ -196,9 +200,14 @@ The console ingests nothing — the one materialization it reads is built by
 `config/manual-loads/*.csv` + manifest) → six SQLite tables + analytics views, with a
 source-hash meta row and deterministic byte-identical rebuilds; `dump_csv` writes the
 gate-reviewable text twin per table. Grid columns surfaced to the browser are the table
-columns verbatim (e.g. `manual_mapping`: `file, folder_id, job_id, seal_id,
-create_target_if_missing, authored_by, authored_on, note`). Otherwise: N/A — no
-source→graph ingestion happens in this design.
+columns, PROJECTED rather than verbatim: the S3 identity cutover (gate
+`business-app-identity`, signed 2026-07-27, §E1) made `app_id` the surface name, so the
+job-application and seal-contact-override grids `SELECT ... AS app_id` while the SQLite
+column and the committed CSV twin keep their own header. `manual_mapping`'s columns are
+`file, folder_id, job_id, seal_id, create_target_if_missing, authored_by, authored_on,
+note` in the store, and the grid built over them emits `app_id`. The rule is §E1's and it
+is standing: the console never surfaces an internal registry name, whatever the graph or
+the store holds. Otherwise: N/A — no source→graph ingestion happens in this design.
 
 <!-- anchor: classification-security -->
 ## Classification & security

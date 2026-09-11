@@ -1,9 +1,14 @@
 # Technical Design — Control-M Ingestion (the `ingest-controlm` M3 chain)
 
 <!-- anchor: front-matter -->
-**Status:** DESCRIPTIVE — **Rev 5, 2026-07-23** (folder property diet: naming-convention
-decode off the node, `app_code` kept as the join key — SME ruling 2026-07-23; on top of
-Rev 4's two-phase loader, same day; reflects commit `c1c3a0a`) ·
+**Status:** DESCRIPTIVE — **Rev 6, 2026-09-11** (attribution restated to the ruled state:
+folder grain, `BELONGS_TO_APPLICATION` to the application's `:Port`, verb
+`load-folder-attribution` — the K2 job-grain verb and its Cypher file no longer exist in
+the tree; and `Application.seal_id` corrected on both halves. L19 clause (d); measured
+from `drydocs.cli.app.registered_commands` and `drydocs/loaders/cypher/`, not from prose.
+On top of **Rev 5, 2026-07-23** — folder property diet: naming-convention decode off the
+node, `app_code` kept as the join key, SME ruling 2026-07-23; Rev 4's two-phase loader,
+same day; reflects commit `c1c3a0a`) ·
 **Classification:** Internal (mirrors `config/taxonomy/controlm.yaml`; uses only the
 committed sample fixtures — no real SIDs/servers) ·
 **Audience:** production-support / development-support engineers reading the graph. ·
@@ -70,9 +75,15 @@ Control-M scheduler definitions in the `psgmgr` replica become the DryDocs knowl
 dependencies), the source tables + filters, the field→node/edge mapping, the enforced
 load-order contract, and the taxonomy→ontology binding each edge traces to.
 
-**Out of scope.** SEAL application attribution (`WAS_ASSOCIATED_WITH {role: seal_app_ref}`)
-— separate, tracked as **K2** (now **live**: gate `seal-attribution-match-policy` confirmed
-2026-07-14, loader `drydocs load-seal-attribution`), running only after this chain;
+**Out of scope.** SEAL application attribution — separate, and now FOLDER-grain:
+`(:ControlMFolder)-[:BELONGS_TO_APPLICATION {role: 'seal_app_ref'}]->(:Port)`, the target
+being the application's BatchProcessing port and deliberately not `:BusinessApplication`
+(gate `seal-app-ref-edge-reshape`, signed 2026-08-03, §C1 — supernode avoidance). The verb
+is `drydocs load-folder-attribution` (**K8**); the K2 job-grain verb
+`load-seal-attribution` and its `seal_attribution.cypher` are GONE from the tree, not
+demoted, and the authored fallback is the `manual_seal_attribution.v1` loader, which writes
+the same folder-grain edge. Gate `seal-attribution-match-policy` (2026-07-14) still governs
+the match policy. It runs only after this chain;
 vector/embedding passes; and the live multi-DB deploy (**G7**). These are named where they
 touch the chain but specified elsewhere.
 
@@ -146,8 +157,11 @@ four objects — and, new in Rev 2, reads `CM_DEF_VJOB` a *second* way (the fold
 - Authoritative folder **name** = `CM_DEF_VTAB.SCHED_TABLE`; `CM_DEF_VJOB.PARENT_TABLE` carries
   it denormalized on the job — property only, never the FK.
 - `CM_DEF_VJOB.APPLICATION` is the **Control-M app code**, *not* the SEAL business app. It does
-  **not** reconcile to `Application.seal_id`. It *does* now become a `:ControlMApplication`
-  grouping node (a different concept from SEAL `:Application`).
+  **not** reconcile to `BusinessApplication.app_id` — the label became `:BusinessApplication`
+  at ADR 0003 / K4, and the property became `app_id` at S3 (gate `business-app-identity`,
+  2026-07-27; `seal_id` was a DryDocs-era coinage the source never used). It *does* now
+  become a `:ControlMApplication` grouping node (a different concept from the SEAL business
+  application).
 - The header-row `APPLICATION` (a *Control-M* grouping) is distinct again from the 3-char
   appcode parsed out of the folder name (positions 3–5). Keep the three apart.
 
@@ -193,7 +207,7 @@ missing endpoint surfaces instead of creating a ghost node.**
 | **2** | **jobs** | `:ControlMJob` | `CONTAINS_JOB` | `MATCH` folder (from pass 1); job dropped if folder absent |
 | **3** | **conditions in / out** | `:Condition` (shared `(folder_id, name)`) | `REQUIRES_IN_CONDITION`, `EMITS_OUT_CONDITION` | `MATCH` job `(folder_id, job_id)` |
 | **4** | **dependencies (DEFERRED `--phase relationships`, edge-only)** | *none* | `WAS_INFORMED_BY` | `MATCH` **both** endpoint jobs — pure edge pass, never creates nodes; **run once, UNSCOPED, after all nodes exist** |
-| later | SEAL attribution (K2, **live 2026-07-14**) | *none* | `WAS_ASSOCIATED_WITH {role: seal_app_ref}` | only after jobs **and** `:Application` exist |
+| later | SEAL attribution (**K8**, folder grain; supersedes K2's job grain) | *none* | `BELONGS_TO_APPLICATION {role: 'seal_app_ref'}` folder→`:Port` | only after folders **and** the application's `:Port` exist; `load-folder-attribution` MATCHes both endpoints and creates no nodes |
 
 Passes 1–3 are the `--phase nodes` set (self-contained rows — safe to repeat per folder);
 pass 4 is the `--phase relationships` set (Rev 4). `--phase all` (default) runs both;
@@ -342,9 +356,12 @@ gate); the loader that lands it is the **folder pass** (`controlm_folders.cypher
 terms seeded by `drydocs_core/schema/ontology.cypher`; the `m3_contains_folder` supplement in
 `ontology_supplement.cypher`.
 
-*Since gone live:* `WAS_ASSOCIATED_WITH` job→SEAL app (K2 — `confirmed` at gate
-`seal-attribution-match-policy`, 2026-07-14; loader `load-seal-attribution` active; the edge
-*shape* re-opens at the K4 `:Application` reclass gate). *Not yet live:* `OBSERVES` job-run
+*Since gone live:* `BELONGS_TO_APPLICATION {role: 'seal_app_ref'}` folder→`:Port` (K8 —
+the shape ruled at gate `seal-app-ref-edge-reshape`, 2026-08-03, after the K4 reclass
+re-opened it; match policy still gate `seal-attribution-match-policy`, 2026-07-14; loader
+`load-folder-attribution`, with `manual_seal_attribution.v1` as the authored fallback).
+K2's job-grain `WAS_ASSOCIATED_WITH` edge is retired: neither the verb nor its Cypher file
+is in the tree. *Not yet live:* `OBSERVES` job-run
 SOSA observation (`proposed`, gate not run).
 
 ---
@@ -483,7 +500,7 @@ ids are `FR/NFR-CMI-*`, scoped to this chain; the SEAL row is spec-level, gated 
 | FR-CMI-005 | Derive job→job `WAS_INFORMED_BY` from the IN=OUT condition seam, edge-only | design-data-mapping | `controlm_dependencies_derived.cypher` | `m3-verify` `via_condition` check | done |
 | FR-CMI-006 | Every edge traces to a HITL-confirmed taxonomy→ontology binding | hitl-gate | `config/taxonomy-ontology-map/`, `gate-log.md` | `test_schema.py` drift guard | done |
 | NFR-CMI-001 | No real SIDs/servers committed; Internal classification; SQL injection-safe | classification-security | `config/classification.yaml`, `oracle_adapter.py` | `test_classification.py` | done |
-| FR-CMI-007 | SEAL attribution runs only after jobs + `:Application` exist, gate-confirmed | hitl-gate | K2 loader (`seal_attribution.cypher`, `load-seal-attribution`) | gate `seal-attribution-match-policy` (2026-07-14); `graph-tests/seal-attribution-coverage.yaml` | done |
+| FR-CMI-007 | SEAL attribution runs only after folders + the application's `:Port` exist, gate-confirmed | hitl-gate | K8 loader (`folder_attribution.cypher`, `load-folder-attribution`); authored fallback `manual_seal_attribution.cypher` | gates `seal-app-ref-edge-reshape` (2026-08-03, edge shape) + `seal-attribution-match-policy` (2026-07-14, match policy); `graph-tests/seal-attribution-coverage.yaml` | done |
 | FR-CMI-008 | Cross-folder dependency edges load in a deferred, unscoped `--phase relationships` pass (direct pairs only; ctlm_id-keyed) | design-summary | `cli.ingest_controlm --phase`, `controlm_dependencies_recursive.sql` | `test_dependencies_sql_is_direct_only`, `test_dependencies_match_on_the_composite_node_key` | done |
 
 <!-- anchor: appendices -->
