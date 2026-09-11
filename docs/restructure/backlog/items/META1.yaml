@@ -7,7 +7,7 @@ phase: 14
 agent: main
 model: sonnet
 priority: p3
-status: in_progress
+status: done
 depends_on: []
 inputs:
 - drydocs_docmeta/
@@ -18,3 +18,38 @@ acceptance: |
   slot assumes the module was covered by slot 7's hygiene signals.
 notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). port-docgen-docmeta-2026-09-08.md candidate 4. Runs from the review-sweep venue (review:sweep pen).
+  DELIVERED 2026-09-11 (Lane B, laptop). VENUE: the review-sweep worktree on branch
+  review/module-sweep, pen review:sweep. The sweep changes no module code and no backlog
+  file - this close is the only backlog edit and it is made on main from the main checkout,
+  never from the sweep venue. THE REPORT is docs/reviews/modules/docmeta-2026-09-11.md at
+  27dce14a on review/module-sweep.
+  NO outputs: RECORDED, AND THE GUARD IS THE REASON. It was written first and PLAN14 refused
+  it, which is the guard working: every outputs: entry on a DONE item is checked against git
+  ls-files, and the report is not on main, because sweep plan section 6 rules that the branch
+  accumulates and a HUMAN merges it - this lane may not put it there. An OUTPUT_EXEMPTIONS row
+  would be wrong twice: that dict is for a path that legitimately CANNOT resolve, never one
+  that resolves at the next merge, and it lives in a guard file this pen does not hold.
+  Closing with no outputs: is also the norm rather than a gap - 619 of 667 done items carry
+  none, the field having landed 2026-09-10. LANE A ADDS THE LINE AT THE MERGE: outputs: with
+  the single entry docs/reviews/modules/docmeta-2026-09-11.md, once that path is on main.
+  NAMED docmeta-* DELIBERATELY - the sweep derives its next slot by matching a report filename
+  against each slot's slug, docmeta is not a slug, so this report neither advances nor resets
+  slot 7, which is right because it reviews one third of slot 7's subject.
+  WHAT IT FOUND, ranked. (1) capture-manifest.json has two incompatible writers and this
+  component is on neither end of the live path - measured both ways, one shared key of seven,
+  five top-level of nineteen - so ADR 0006 decision 4 and plan invariant 4, that a sha256
+  change on refetch re-queues curation, have correct tested code and no live instance.
+  (2) theme_coverage drops a page whose theme_status is outside the enum from all three
+  populations at once: two pages in, total 1, ratio 1.0, inside the one function written to
+  stop a single misleading number. (3) CaptureManifest.read does not validate its schema while
+  both sibling loaders do, and raises TypeError on an unknown key - strict where it should be
+  lenient and lenient where it should be strict. (4) six of eight public entry points have no
+  non-test caller, and tests/unit/test_runbook_coverage.py line 69 asserts live CLI verbs that
+  do not exist: measured 55 registered commands, none reaching drydocs_docmeta.
+  NINE CANDIDATES NAMED, NONE MINTED - the sweep never mints and the backlog pen is Lane A's.
+  Candidate 1, rule on the capture-manifest schema of record, is the p1 and is a ruling before
+  it is a build. The docmeta runbook gap is already filed (RUNBOOK_PENDING plus V11) and must
+  not be re-minted.
+  MEASURED, one venue and one invocation (laptop, main-checkout interpreter, worktree cwd):
+  65 passed scoped, 106 with the vendor-docs tests, coverage 92.38 percent over the module's
+  full test set against the 90 floor, ruff and ruff format clean, every hatch count zero.
