@@ -8,7 +8,7 @@ phase: 10
 agent: main
 model: sonnet
 priority: p2
-status: in_progress
+status: todo
 depends_on: []
 inputs:
 - docs/design/
@@ -22,5 +22,53 @@ notes: |
   (J31 check, recorded); the partial delivery of 2026-08-19 is on main and clauses (a), (b),
   (d) stay open as written above. Back to todo so the next session that takes it starts from
   the tree rather than from a claim nineteen days old.
+  PARTIAL DELIVERY 2026-09-11 (Lane B, laptop, wip/l19-laptop; pen code:docs). CLAUSES (a)
+  AND (d) DONE; (b) NOT DONE by the user's ruling this session, and the reason is a conflict
+  the clause could not have known. Back to todo with (b) the only clause open.
+  (a) SEVEN docs, not six. The five squash-orphaned pins now LEAD with c5a84c37 - the
+  2026-07-20 initial import, measured as the earliest commit on main carrying each text -
+  and name the pre-squash hash (807e0502, ac2ea2e3, 97ee81c9, 24d6a4b2, 0e036ff6) as
+  archived-history-only. The Rev and its date stay as written: they are true statements
+  about authorship, and only the pin was unresolvable. THE CLAUSE UNDERCOUNTED BY ONE -
+  source-registration-tdd.md cited the retired branch tip de0eeb6f, and its own front
+  matter already named fcc3c8bb as "the landing of record", so the doc supplied its own
+  fix. drydocs-mapping-demo-runbook gained 453f898c, its last content revision. NOT
+  TOUCHED, deliberately: drydocs-project-review.md's line-4 J63 provenance stamp
+  (703c2019) - reachable, and it means a different thing from the Rev 1 pin; and
+  drydocs-startup-refresh-runbook's a135a6d, which the clause lists but which IS reachable
+  from main and therefore passes the clause's own test.
+  (d) THE K8 RIDER UNDERSTATED THE DRIFT. It says the K2 policy was "demoted to the
+  disclosed fallback"; measured from drydocs.cli.app.registered_commands (55 commands) and
+  drydocs/loaders/cypher/, the load-seal-attribution verb and seal_attribution.cypher are
+  GONE - not demoted. Four passages plus the FR-CMI-007 row in controlm-ingestion-tdd
+  restated to folder-grain BELONGS_TO_APPLICATION -> the application's :Port via
+  load-folder-attribution (gate seal-app-ref-edge-reshape, 2026-08-03, C1: the target is
+  the BatchProcessing :Port, NOT :BusinessApplication - supernode avoidance), with
+  manual_seal_attribution.v1 as the authored fallback. Application.seal_id corrected on
+  both halves. web-console-tdd's "columns verbatim" restated to the S3 E1 surface
+  contract. Both docs Rev-bumped with the reason; the six clause (a) docs were NOT, because
+  a citation repair is not a content change.
+  ONE TEST MOVED WITH THE REV BUMP. tests/unit/test_design_doc.py::
+  test_rev_footer_matches_real_tdd pins the LIVE controlm TDD's derived footer, so Rev 5 ->
+  Rev 6 made it red; its expectation is updated in the same commit with a comment saying
+  why it tracks the doc. It is doing its job: it is what catches a front-matter edit that
+  forgets what derives from it.
+  (b) FOR LANE A TO RULE. Both sdlc reviews open with "STATUS: Superseded (2026-07-01) ...
+  Kept for historical reference", carry last_updated: 2026-06-25 and a frozen LOG. Their
+  paths (drydocs/schema/, drydocs/neo4j_client.py, tests/test_schema.py) are stale TODAY and
+  were correct when the docs were frozen, so regenerating their DEP tables from the current
+  tree would make a historical record describe a tree it was never written against - the
+  same reasoning these notes already apply to docs/history/controlm-loader-flow.md ("HISTORY
+  - leave it"). The user ruled: skip, hand back. The options put to them, if it is revisited:
+  a dated drift note under each DEP pointing at where the moved paths live now, versus
+  regenerating as the clause literally says.
+  CLOSE NOTES. Guards green in one venue and one invocation (laptop, poetry run pytest):
+  134 passed over the J57 family plus test_backlog, and 93 passed over the six doc guards
+  (test_design_doc, test_doc_outline, test_header_freshness, test_module_map_render,
+  test_config_identity_header, test_code_graph_freshness) once the pinned expectation moved.
+  Eight design docs re-rendered; re-running the renderer over docs/design/*.md leaves no
+  diff. No outputs: recorded - the guard checks outputs only on done items, and on an open
+  item it would be checking a promise; the delivered paths are the eight docs/design/*.md
+  and their .html renders, plus tests/unit/test_design_doc.py.
 annotations:
   priority: 'raised from p3 2026-08-09: second filing, drift worsened (see notes)'

@@ -209,8 +209,12 @@ def test_rev_footer_placeholder_when_undeclared() -> None:
 
 
 def test_rev_footer_matches_real_tdd() -> None:
+    # Pins the LIVE doc, not a fixture, so it moves when that doc's Rev legitimately
+    # moves — and it is the thing that notices when a Rev bump edits the front matter
+    # and forgets what derives from it. Rev 5 -> Rev 6 at L19 clause (d) (2026-09-11),
+    # which restated the attribution passages to the ruled folder-grain state.
     md = CONTROLM_TDD.read_text(encoding="utf-8")
-    assert doc_rev_footer(md) == "Rev 5 · commit c1c3a0a"
+    assert doc_rev_footer(md) == "Rev 6 · commit c1c3a0a"
 
 
 def test_render_is_still_deterministic_with_margins_and_footer() -> None:
