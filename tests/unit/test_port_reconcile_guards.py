@@ -800,12 +800,22 @@ def detect_rule_ids() -> list[str]:
     return list(detect.CONFORMANCE_RULE_IDS)
 
 
+#: The tables the before-snapshot carries, and the ONE place this list is spelled
+#: on the test side. GRAPH2 added GENERATED_PATHS: it landed producer-side at
+#: e6daa986 (J70a) and no reader followed, so every snapshot since omitted it.
+#: DEFERRED_VERBS is COMPANY-SIDE ONLY (the T22 pair) and has never existed
+#: producer-side — which is why the reader below keeps its `getattr` default:
+#: one tuple, two trees. Must stay in step with
+#: drydocs/port/reconcile_before.py, which declares the crossing in full.
+EXEMPTION_TABLES = ("HISTORICAL_PATHS", "FOREIGN_PATHS", "GENERATED_PATHS", "DEFERRED_VERBS")
+
+
 def runbook_exemption_keys() -> list[str]:
     import importlib
 
     mod = importlib.import_module("tests.unit.test_runbook_currency")
     keys: list[str] = []
-    for table in ("HISTORICAL_PATHS", "FOREIGN_PATHS", "DEFERRED_VERBS"):
+    for table in EXEMPTION_TABLES:
         keys += [f"{table}:{k}" for k in sorted(getattr(mod, table, {}) or {})]
     return keys
 
@@ -821,6 +831,15 @@ def test_list_shaped_rows_read_their_live_lists() -> None:
     assert "R30" in detect_rule_ids()
     keys = runbook_exemption_keys()
     assert any(k.startswith("HISTORICAL_PATHS:") for k in keys)
+    # GENERATED_PATHS is asserted as a READ, never as CONTENT. It is non-empty
+    # producer-side, but the manifest's entry_rule has the consumer DROP its one
+    # entry (the only citer is docs/port/port-prompt.md, a never-port zone), so a
+    # non-empty assertion here would red the company's suite for obeying the rule.
+    # HISTORICAL_PATHS above already covers the vacuous-import case on both trees.
+    assert "GENERATED_PATHS" in EXEMPTION_TABLES, (
+        "the generated-path exemptions must reach the before-snapshot; they were "
+        "absent from every one between J70a and GRAPH2"
+    )
 
 
 def _optional_before(name: str) -> list[str] | None:
