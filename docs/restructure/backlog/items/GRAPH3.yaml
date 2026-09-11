@@ -7,7 +7,7 @@ phase: 6
 agent: main
 model: sonnet
 priority: p3
-status: todo
+status: done
 depends_on: []
 inputs:
 - pyproject.toml
@@ -20,3 +20,123 @@ acceptance: |
   their own item.
 notes: |
   Minted 2026-09-09 (Lane A mint pass, desktop; pen backlog). load-2026-09-08.md candidate 4, deferred by the report to the seams slot's ownership.
+
+  ## THE DECISION
+
+  A floor EXISTS. It lives in pyproject.toml. It is 90. It only goes UP.
+
+  All four questions the acceptance asks, answered in order and recorded in the
+  file that holds the number, so the ruling and the value cannot drift apart.
+
+  ## (1) Whether a floor exists: YES
+
+  The premise was verified, not taken: no `[tool.coverage]` block, no
+  `fail_under`, and CI never passes `--cov` - it runs `poetry run pytest -q`
+  plus three targeted files. `pytest-cov = "^5.0"` has sat in the dev group and
+  is invoked NOWHERE in the tree - not CI, not a script, not the session ritual.
+
+  That is the same defect WEB13 closed on the web side, in its own words:
+  "@vitest/coverage-v8 was declared and never read - the instrument was bought
+  and the numbers went unlooked-at." This is its Python twin, and the answer that
+  leaves a declared-and-unread dependency in place is not a decision, it is the
+  status quo with a note attached.
+
+  ## (2) Where it lives: pyproject.toml - and the web side is why
+
+  The web floor's NUMBER lives in web/package.json (`statements=22.5`) and the
+  PROSE explaining it lives in .github/workflows/ci.yml. THEY HAVE ALREADY
+  DRIFTED: WEB21 (affa37eb) re-pinned the number to 22.5 "against a measurement
+  this venue could actually take", and the ci.yml comment from WEB13 (ebf9ca7d)
+  still reads "The floor is 9.8% statements". The ratchet moved; its reason did
+  not follow.
+
+  So the Python floor puts the number AND its reason in ONE file. This is not a
+  preference - it is the web precedent's own measured failure, avoided.
+
+  ## (3) What it is: 90, from a measurement, not an estimate
+
+  Laptop, 2026-09-11 (J18 - venue named), over the seven packages, with the SAME
+  addopts CI runs (`-m 'not integration'`; 25 deselected both places):
+
+      23468 statements, 2220 missed -> 21248 covered -> 90.5403%
+
+  THE TRAP THIS ITEM EXISTS FOR, MET WHILE SETTING THE NUMBER. `coverage`
+  printed `TOTAL ... 91%`. The precise value is 90.5403% - the display is
+  ROUNDED UP. A floor of 91 read off that line would have failed on its first
+  run, and the failure would have looked like a coverage regression rather than
+  a rounding artefact. "An impression wearing a number's clothes" is exactly
+  what a rounded display is, and the acceptance's phrase turned out to describe
+  the act of reading the instrument, not only the act of choosing the value.
+
+  90 sits 0.54 points under the measurement. That is a real gate with room for
+  venue-to-venue skip variance: duckdb, google-adk and the production sample
+  CSVs are absent on this machine (16 skipped here) and the skip set is not
+  identical everywhere.
+
+  `[tool.coverage.run] source` is declared alongside so `--cov` with no arguments
+  measures the SAME seven packages this number came from. J57's third clause is
+  about comparing runs across invocations; a floor is that comparison with one
+  side written down, so the invocation is pinned in the config rather than
+  respelled at each call site.
+
+  ## (4) Whether it ratchets: YES, upward only
+
+  The WEB13 (a) shape, adopted deliberately: the number moves UP by
+  RE-MEASURING, never by estimating. Lowering it is not a ratchet adjustment -
+  it is a decision to cover less, and belongs in an item of its own.
+
+  ## What this item deliberately did NOT do
+
+  NO CI STEP. The acceptance says "the CI step and the WEB13-shaped rule follow
+  as their own item", so wiring `--cov` into .github/workflows/ci.yml is not
+  taken here even though ci.yml is in this item's inputs. `addopts` is also left
+  alone - it carries no `--cov`, so a plain `poetry run pytest -q` gains no
+  coverage overhead and the default suite timing (J9) is untouched.
+
+  FOLLOW-UP FOR LANE A (needs a mint): add the CI step that runs the Python
+  suite under `--cov` and let `fail_under` gate it, mirroring the web leg. The
+  number and the ratchet rule already exist in pyproject.toml; that item is the
+  wiring, not the decision.
+
+  SECOND FOLLOW-UP, found here and not this item's to fix: the ci.yml comment at
+  the vitest coverage step still states the retired 9.8% floor. One line, but it
+  is the drift this ruling cites as its reason, still live on the web side.
+
+  ## Instrument note (J76)
+
+  `poetry run coverage report --precision=2` against the written .coverage db
+  FAILS with "No source for code:
+  <tmp>/pytest-of-chad_/pytest-2503/test_a_worktree_render_does_no0/wt/drydocs/__init__.py"
+  - a test builds a temporary git worktree, coverage records it, and the source
+  is gone by the time a post-hoc report runs. The TOTAL line from the pytest run
+  itself is unaffected and is what the number above comes from. Worth knowing
+  before anyone builds a report step on the db rather than on the run.
+
+  ## Gates
+
+  `poetry check` exit 0; the block parses (tomllib) and `addopts` is unchanged.
+
+  THE FLOOR WAS PROVEN TO BITE, and the proof is worth stating exactly because
+  the command that produced it was malformed:
+
+      FAIL Required test coverage of 90.0% not reached. Total coverage: 0.00%
+      exit 1
+
+  `fail_under` is read from this file and enforced - that is the claim, and it
+  holds. What the run was NOT is narrow. The command was
+  `pytest -q --cov tests/unit/test_source_scan.py`, and `--cov` takes an
+  OPTIONAL argument: it swallowed the test path as the coverage SOURCE rather
+  than as a test selector. So the whole suite ran (4210 passed, 16m55s) while
+  coverage measured a source that recorded nothing - hence 0.00%, which is the
+  shortfall being real about a measurement of nothing rather than about the
+  tree.
+
+  ANOTHER INSTRUMENT NOTE (J76), and a sharper one than the first: `--cov <path>`
+  and `--cov=<source>` are different flags wearing the same name. The narrow-run
+  form is `pytest --cov=<package> <testpath>`; writing `--cov <testpath>` silently
+  converts a test filter into a source filter and reports a number about neither.
+  The 90.5403% above came from the explicit `--cov=drydocs --cov=drydocs_core ...`
+  form, which is why it is the number this floor is set from and this one is not.
+
+  Not re-run narrowly: enforcement is what needed proving and it is proven. A
+  second 17-minute run would re-measure the same fact.

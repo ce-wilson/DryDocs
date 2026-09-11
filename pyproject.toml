@@ -291,3 +291,56 @@ filterwarnings = [
     # removes the variable. When it goes, this line must go with it.
     "ignore:SPIDERP_LOGDIR is deprecated:DeprecationWarning",
 ]
+
+
+# --- the Python coverage floor (GRAPH3, 2026-09-11) ---------------------------
+# THE RULING: a floor EXISTS, it lives HERE, it is 90, and it only goes UP.
+#
+# WHY IT EXISTS. `pytest-cov` has been in the dev group for the life of this
+# tree and is invoked NOWHERE - not in CI, not in a script, not in the session
+# ritual. That is the same defect WEB13 closed on the web side, in as many
+# words: "@vitest/coverage-v8 was declared and never read - the instrument was
+# bought and the numbers went unlooked-at." This is its Python twin.
+#
+# WHY THE NUMBER LIVES HERE AND NOT IN CI. The web floor's NUMBER lives in
+# web/package.json and the PROSE explaining it lives in .github/workflows/ci.yml
+# - and they have already drifted: WEB21 (affa37eb) ratcheted the number to 22.5
+# and the ci.yml comment still says "The floor is 9.8% statements" (WEB13,
+# ebf9ca7d). One file holds both here, so the ratchet cannot outrun its reason.
+#
+# WHAT 90 IS, MEASURED rather than chosen (WEB21's method: pin against a
+# measurement this venue can actually take). Laptop, 2026-09-11, over the seven
+# packages below with the SAME addopts CI runs (`-m 'not integration'`, so
+# integration is deselected on both):
+#
+#     23468 statements, 2220 missed -> 90.5403% covered
+#
+# READ THE PRECISE NUMBER, NEVER THE DISPLAYED ONE. `coverage` printed `91%`,
+# rounded UP from 90.54. A floor of 91 taken from that display would have failed
+# on its first run - which is exactly the "impression wearing a number's
+# clothes" this item exists to prevent, met in the act of setting the number.
+# 90 sits 0.54 points under the measurement: a real gate, with room for the
+# venue-to-venue skip differences (duckdb, google-adk and the production CSVs
+# are absent here and may not be absent everywhere).
+#
+# THE RATCHET (WEB13 (a) shape): this number only ever goes UP, and it moves by
+# re-measuring, never by estimating. Lowering it is not a ratchet adjustment -
+# it is a decision to cover less, and belongs in an item.
+#
+# `source` is declared so `--cov` with no arguments measures the SAME set this
+# number came from. J57's third clause is about comparing runs across
+# invocations; a floor is that problem with one side of the comparison written
+# down, so the invocation is pinned here rather than spelled at each call site.
+[tool.coverage.run]
+source = [
+    "drydocs",
+    "drydocs_core",
+    "drydocs_remediation",
+    "drydocs_lineage",
+    "drydocs_deepdoc",
+    "drydocs_docmeta",
+    "drydocs_api",
+]
+
+[tool.coverage.report]
+fail_under = 90
