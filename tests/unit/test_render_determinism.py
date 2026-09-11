@@ -158,6 +158,7 @@ COMMITTED_SURFACE_WRITERS = (
     "scripts/render_load_map.py",
     "scripts/render_module_map.py",  # MODULE_MAP.md component-map section (ADR 0018 D1)
     "scripts/render_remediation_diff.py",
+    "scripts/render_remediation_lookup.py",  # G85: the citation chain beside the fix diff
     "scripts/render_software_registry.py",
     "knowledge/depgraph-snapshots/filter_ignored.py",
     # Added 2026-08-17: MISSED by the original list and by the Idea-129 pass, and

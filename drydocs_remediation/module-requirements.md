@@ -30,7 +30,7 @@ splicing) and stays that way.
 
 | Artifact | Status | Where to get it |
 |---|---|---|
-| Utility `.dtd` files (`deftable.dtd` and siblings) | **NOT ACQUIRED** | Likely already ON the company EM host: `<version>\Default\data\Resource` (per the vendor-doc capture in `external/orchestration/bmc-controlm/controlm-xml-definition-format.md` §3) — check there before fighting the 403-blocked docs site |
+| Utility `.dtd` files (`defjob.dtd`, `deffolder.dtd` and six siblings) | **NOT ACQUIRED** | Likely already ON the company EM host: `<version>\Default\data\Resource` (per the vendor-doc capture in `external/orchestration/bmc-controlm/controlm-xml-definition-format.md` §3) — check there before fighting the 403-blocked docs site |
 | `Folder.xsd` (folder-grain schema) | **NOT ACQUIRED** | Same EM-host directory, or the 9.0.21 Utilities doc tree (fetch list in the acquisition stub) |
 
 **Status change (2026-08-12): these are no longer a blocker for emission.**
@@ -59,12 +59,17 @@ corpus (VERBATIM / GROUNDED / SYNTHESIZED per `SOURCE-MANIFEST.md`):
 | `[GROUNDED — search-result snippets only]` (e.g. the XML-definition stub) | citable ONLY as a lead — the answer must say so, never present it as vendor ground truth |
 | 403-blocked fetch-list entries | not citable; the gap itself is the answer |
 
-Current known gaps (from the acquisition stub): the `defjob`/`exportdefjob`/
-`deftable`/`exportdeftable` utility pages, `XML_File_Rules.htm`, and the XML
-deprecation notice. Re-run the fetch from a network that reaches
-`documents.bmc.com` (the company network did on 2026-06-11); the raw capture
-lands in `vendor_docs_dir()` (never committed), the publishable summary in
-`external/orchestration/bmc-controlm/`.
+**Fetch list re-run 2026-09-11 (G85).** The `defjob`, `exportdefjob`,
+`deffolder`, `exportdeffolder` and XML File Rules pages were fetched in a real
+browser session (direct fetches still get the 403) and summarized in
+`external/orchestration/bmc-controlm/controlm-xml-definition-format.md`. The
+folder utilities are `deffolder`/`exportdeffolder`; the old stub's
+`deftable`/`exportdeftable` names were wrong. Still missing: the two
+docs.bmc.com deprecation pages (not reachable from the capture browser; their
+substance is repeated on every utility page) and the `.dtd`/`.xsd` files
+themselves (section 2). The one finding that matters most here: no captured
+page documents the `VARIABLE NAME` + `VALUE` form our exports use, so the lookup
+beside the diff says that, and names the schema as the thing that settles it.
 
 ## Filesystem (configuration, not dependency)
 

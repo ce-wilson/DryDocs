@@ -288,7 +288,7 @@ components:
   # outside this ledger's .tsx scope caveat).
   - { id: CorpusStatus,            area: docs,         path: docs/CorpusStatus.tsx,                       module: docs,       module_evidence: directory }
 
-  # --- remediation (4) ---
+  # --- remediation (5) ---
   # (demo frames live in demoRemediation.ts, data-only; FixDiff is the first
   # .tsx: the SME working-session diff over generated/remediation-diff.json)
   #
@@ -302,3 +302,6 @@ components:
   - { id: ProfileFrame,            area: remediation,  path: remediation/ProfileFrame.tsx,                module: remediation, module_evidence: directory }
   - { id: StandardsFindings,       area: remediation,  path: remediation/StandardsFindings.tsx,           module: remediation, module_evidence: directory }
   - { id: Substitutions,           area: remediation,  path: remediation/Substitutions.tsx,               module: remediation, module_evidence: directory }
+  # G85: the vendor -> standards -> team citation chain beside FixDiff, read
+  # from a generated artifact that cites the corpus by line and trust tier.
+  - { id: RemediationLookup,       area: remediation,  path: remediation/RemediationLookup.tsx,           module: remediation, module_evidence: directory }

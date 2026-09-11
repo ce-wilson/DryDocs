@@ -97,14 +97,15 @@ def test_captured_header_fallback_when_no_date_scraped_line() -> None:
     assert preamble["source_page"] is None
 
 
-def test_acquisition_stub_has_no_header_fields() -> None:
-    """controlm-xml-definition-format.md carries Status/Classification lines
-    instead of Source/Date Scraped/Purpose — every header field not present
+def test_xml_definition_doc_reads_its_capture_date_and_nulls_the_rest() -> None:
+    """controlm-xml-definition-format.md was a header-less acquisition stub until
+    G85 fetched its pages (2026-09-11), so its capture date is now a real header
+    fact. It still carries no Document, Purpose or Source line, and each of those
     must resolve to None, never raise."""
     rows = _rows_by_doc(_all_rows())["controlm-xml-definition-format"]
     preamble = rows[0]
     assert preamble["title"].startswith("Control-M XML Definition Format")
-    assert preamble["scraped_on"] is None
+    assert preamble["scraped_on"] == "2026-09-11"
     assert preamble["source_page"] is None
     assert preamble["purpose"] is None
     assert preamble["source_url"] is None

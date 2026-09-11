@@ -475,10 +475,14 @@ def test_unbound_components_are_counted_not_hidden() -> None:
     reference attribute survives import, as unmodeled residue -- so the
     component exists to prove the rendering approach and the year-boundary
     refusal the acceptance names, not to ship a page with nothing behind it.
+    110 -> 111 at G85 (2026-09-11): RemediationLookup, BOUND to `remediation` by
+    directory evidence -- FixDiff's rule unchanged: it lives under remediation/
+    and renders on exactly the one route whose Fix diff tab it sits beside. Both
+    counts move by one.
     """
     comps = _ui()["components"]
     bound = [c for c in comps if c.get("module")]
     assert (len(bound), len(comps)) == (
-        43,
-        110,
+        44,
+        111,
     ), f"module-binding coverage changed: {len(bound)}/{len(comps)} bound"
