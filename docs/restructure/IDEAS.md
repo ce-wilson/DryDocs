@@ -110,6 +110,11 @@ question a 1,000-line file with the trail at the bottom could not answer.
 
 ## Inbox
 
+- **`Idea-321`** · 2026-09-11 · `[bug]` · **open** · prio? **High** —
+  **The J31 remote-branch check returns zero lines for every id, because `-r` lists
+  `origin/wip/...` and the prescribed pattern is `wip/*` — four items record its emptiness as
+  the evidence for releasing a claim.**
+
 - **`Idea-319`** · 2026-09-11 · `[bug]` · **open** · prio? **High** —
   **Four open items say in their acceptance that the pull loop skips them and carry no `hold:`,
   so the board's Ready strip lists them anyway — Y7 was applied to two of six.**
