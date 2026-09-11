@@ -1,0 +1,206 @@
+# SME gate-prompt spec — whether a second UI track (Salt DS) opens at all, and if it does,
+# the five rulings the Idea-192 PoC left open (backlog WEB24 drafts AND runs this page).
+# GATE-BOUND AND DECIDES NOTHING: drafting a page is not a ruling (the G27/W1/U11 precedent).
+# The locked single-track stack (docs/design/ui-exploration/site-plan.md section 1) and its
+# pin (tests/unit/test_software_registry.py::test_web_console_stack_matches_the_locked_site_plan)
+# change ONLY on a signed record, and even then only through the follow-up item the record names.
+# Section A is asked FIRST: sections B and C are moot unless A1 opens a track.
+classification: Internal-Public
+schema: drydocs.gate-prompt.v1
+updated: 2026-09-11
+
+id: salt-ds-second-track
+title: "SME Gate — does a second UI track (Salt DS) open, and if it does: provider shape, status vocabulary, grids, brand and version policy"
+step: "The Idea-192 PoC (/lab/salt-poc on branch wip/idea-192-desktop) renders /load-map three ways over the same committed artifact: as it ships, on Salt's own theme, and on Salt with the DryDocs tokens. It answered the four questions a cost estimate was blocked on and raised five rulings in their place. Findings: docs/design/ui-exploration/salt-ds-poc.md. Nothing changes before this page signs, and the PoC code stays off main until A1 has an answer."
+summary: >
+  Section A asks the one question everything else waits on: does a second UI track open at all,
+  given the locked single-track stack and the 2026-08-27 ruling that Salt is preferred
+  company-side and not mandated. Section B asks the five rulings the PoC left open, each with
+  the measurement behind it: provider shape, status vocabulary, grids, brand against Kept
+  Orbit, and version policy. Section C names what follows a ruling. Section D fences what this
+  page does not ask.
+meta:
+  Module: "drydocs-web (web/src, the console's component layer). No graph, ontology, loader or data-source surface is touched"
+  Source: "docs/design/ui-exploration/salt-ds-poc.md (the PoC findings, measured 2026-09-11) · branch wip/idea-192-desktop (the PoC code: web/src/routes/SaltPocRoute.tsx and .css, not on main by WEB24 clause f) · docs/design/ui-exploration/site-plan.md section 1 · docs/design/ui-exploration/ui-conventions.md section 1 · docs/design/ui-exploration/kept-orbit-philosophy.md · config/taxonomy/software-registry.yaml (stack: web-console) · upstream https://github.com/jpmorganchase/salt-ds.git (Apache-2.0), read at commit deb1ee156"
+  Precedent: "site-plan.md decision 2026-07-17 (one track; Salt DS dropped) · user ruling 2026-08-27 recorded on Idea-192 (Salt preferred company-side, NOT mandated) · O81 (2026-08-31) — NVL joined the locked stack by AMENDING the site-plan row once a requirement existed, the shape any adoption here would take · G27/W1/U11 — a drafted prompt decides nothing"
+  Registry ref: "no config/source-registry.yaml row — this gate binds no data source. The one register it can move is config/taxonomy/software-registry.yaml (stack: web-console), and only through a follow-up item after a signed A1 (i)"
+  Classification: "Internal-Public — mechanism and public-package facts only: a public Apache-2.0 library, its published npm versions, and sizes and styles measured in the producer's own console. No company application, host or value"
+  Source of record: "backlog WEB24 (draft and run) · config/gate-log.md (transcription target; the lane drafts the record and Lane A appends it) · WEB25 (the next measurable unit; depends on WEB24)"
+
+mapping:
+  - n: 1
+    element: "Salt DS (@salt-ds/core 1.67.0, @salt-ds/theme 1.43.0, @salt-ds/icons 1.18.0, exact pins)"
+    target: "TODAY: on wip/idea-192-desktop only, behind /lab/salt-poc (sme-gated, lazy chunk); NOT in the locked stack and NOT on main"
+    edge: "section A: does a second track open at all"
+  - n: 2
+    element: "The Salt provider (SaltProvider / SaltProviderNext)"
+    target: "scoped per page, or one root provider for the whole console"
+    edge: "R1 provider shape"
+  - n: 3
+    element: "The status vocabulary (ui-conventions.md section 1: five tokens)"
+    target: "Salt's four statuses: success, warning, error, info"
+    edge: "R2 status vocabulary"
+  - n: 4
+    element: "The console's grids (the tableControls idiom: load-map Sources, DomainGridTable, SpecGrid)"
+    target: "Salt Table with our tableControls, or the AG Grid data grid with @salt-ds/ag-grid-theme"
+    edge: "R3 grids"
+  - n: 5
+    element: "The console's brand (Kept Orbit; styles/tokens.css)"
+    target: "Salt's density scale, uppercase action text, type scale and corner shape"
+    edge: "R4 brand"
+  - n: 6
+    element: "The npm version window"
+    target: "exact pins, gated on the icons dependency resolving"
+    edge: "R5 version policy"
+
+provenance:
+  - label: "What the PoC SETTLED — measured, and not re-asked on this page"
+    source_object: "docs/design/ui-exploration/salt-ds-poc.md sections 3, 4 and 6"
+    key: "findings F2, F3, F4, F8 and F9; the crosswalk in section 3"
+    loader: "measured in headless Edge (Playwright 1.62.1) against the running console on the producer desktop, 2026-09-11; the doc's section 6 names the venue, the ports and the throwaway credential store"
+    properties:
+      - name: "the seam holds"
+        origin: derived
+        from: "salt-ds-poc.md section 3: useTableControls, useTableView, toCsv, download and the load-map model ported with ZERO edits; ModuleToolbar and ResizableSplit are shared by all three skins"
+        note: "only presentation moved, which is the library-agnostic-shell mitigation the 2026-07-17 assessment asked for (lifted into salt-ds-poc.md section 7). A second track is a skin over the same shell, not a second shell."
+      - name: "Tailwind stays for layout on plain elements"
+        origin: source
+        from: "salt-ds-poc.md F3: no Salt component stylesheet uses @layer; Salt injects its CSS unlayered at runtime; Tailwind v4 utilities are layered"
+        note: "measured: px-4 and p-3 on a Salt FlowLayout or StackLayout computed to zero, and moved onto a plain div they applied; the console's @layer base input styles never reached Salt's Input (computed padding 0, no border). So spacing moves to Salt props on anything that becomes a Salt component. This answered Idea-192's largest cost term, and WEB25 measures the real subset."
+      - name: "a scoped provider works and tears down cleanly"
+        origin: source
+        from: "salt-ds-poc.md F2 and section 6: <html> never received a Salt class or data-mode in any skin; after a client-side navigation to /load-map no .salt-theme element remained"
+        note: "the precondition for R1 (i). Salt's injected <style> elements stay in <head> after unmount, but every selector is scoped, so they are inert elsewhere (F4)."
+      - name: "an offline install works"
+        origin: source
+        from: "salt-ds-poc.md F1: exact pins; fonts self-hosted through @fontsource (Open Sans, PT Mono); no external request at runtime"
+        note: "meets site-plan.md section 1's intranet rule (no CDN). The version window is R5's question, not this row's."
+      - name: "bundle cost"
+        origin: source
+        from: "salt-ds-poc.md F9: the PoC's lazy chunk is 231,740 bytes JS (57.9 KB gzip) and 282,810 bytes CSS (44.1 KB gzip); the entry chunk is unchanged at 2,424,600 bytes against the 2,500,000 ceiling (web/scripts/checkBundleSize.mjs)"
+        note: "lazy and sme-gated, so the Salt chunk reached nobody who cannot already open /load-map; a user-tier persona was redirected and never requested it (section 6). The CSS carries both theme.css and theme-next.css."
+  - label: "R1 evidence — where Salt applies its theme"
+    source_object: "@salt-ds/core salt-provider/SaltProvider.tsx and ThemeApplicator.tsx (upstream deb1ee156; 1.67.0 as installed)"
+    key: "applyClassesTo: 'root' | 'scope' | 'child'"
+    loader: "a read of the library source; behaviour measured in the PoC"
+    properties:
+      - name: "a root provider defaults to the root"
+        origin: source
+        from: "ThemeApplicator: 'Defaults to \"root\" for a root provider, otherwise \"scope\"'; the root mode adds the salt-theme classes and data-mode (plus corner, accent and font attributes on the next theme) to document.documentElement"
+        note: "one root provider re-themes every page the console renders, not just a Salt page."
+      - name: "one root provider per window"
+        origin: source
+        from: "ThemeApplicator warning: 'There can be only one level root level SaltProvider per window.'"
+        note: "so R1 (ii) is a whole-console decision by construction; there is no partial root."
+      - name: "what R1 (ii) ends"
+        origin: derived
+        from: "web/src/styles/tokens.css is the single palette today: dark and light sheets on :root and :root.dark, aliased into Tailwind through @theme"
+        note: "under a root provider Salt's theme becomes the palette of record and tokens.css becomes an override layer on top of it (the branded skin's mechanism, F7), which inverts which file is authoritative."
+  - label: "R2 evidence — two status vocabularies that do not map one to one"
+    source_object: "docs/design/ui-exploration/ui-conventions.md section 1 · @salt-ds/core ValidationStatuses"
+    key: "the section 1 token table · ValidationStatus = error | warning | success | info"
+    loader: "a read of both; the PoC's mapping rendered on /lab/salt-poc"
+    properties:
+      - name: "our five tokens"
+        origin: source
+        from: "ui-conventions.md section 1: --green (done and well), --status-fail (broken), --teal (running), --yellow (pending), --muted (intentionally inert)"
+        note: "section 1 is 'one mapping for every status-shaped word in the ecosystem'; StatusChip, LoadsTimeline, Meter and ResultChip consume it, and a grep enforces it."
+      - name: "Salt's four statuses"
+        origin: source
+        from: "@salt-ds/core: interface ValidationStatuses { error; warning; success; info }"
+        note: "consumed by StatusIndicator, Banner, Text color and form validation."
+      - name: "the mapping the PoC used, and what it lost"
+        origin: derived
+        from: "SaltPocRoute.tsx STATUS_FOR_TOKEN on the PoC branch: --green to success, --yellow to warning, --blue-br to info, --muted to nothing"
+        note: "running (--teal) and inert (--muted) have no Salt status; pending lands on warning, which reads as caution; on /load-map `planned` rendered as a warning and `registered` got no indicator. The pill shape of StatusChip (token-tinted border, fill and text) is also lost. A ruling here re-rules section 1 or extends it; it is not a styling choice."
+  - label: "R3 evidence — Salt's own answer for complex data is a different component"
+    source_object: "Salt site docs site/docs/components/table/usage.mdx · packages/ag-grid-theme (upstream deb1ee156)"
+    key: "usage guidance; @salt-ds/ag-grid-theme 2.9.0 in the checkout"
+    loader: "a read of the upstream docs and package manifest"
+    properties:
+      - name: "Salt Table is for simple data"
+        origin: source
+        from: "usage.mdx: 'When you need to show complex data, instead use [Data grid](../ag-grid-theme/examples)'"
+        note: "core has no sortable header; the PoC hand-built one (TH holding a transparent Button and an arrow icon) and kept our three-state sort and aria-sort."
+      - name: "the console's grid idiom"
+        origin: source
+        from: "web/src/components/ui/tableControls.tsx (filter, three-state sort, group, CSV) and its consumers; 45 raw <table> elements across web/src (measured 2026-09-11)"
+        note: "the idiom that ported unchanged under R3 (i)."
+      - name: "AG Grid was not tested"
+        origin: derived
+        from: "no AG Grid package was installed or rendered in the PoC"
+        note: "R3 (ii) adds AG Grid (a separate dependency with its own licence tiers) and the Salt theme for it, and replaces the tableControls idiom rather than re-skinning it. That is a larger decision than the skin, so ruling (ii) mints a spike, not an adoption."
+  - label: "R4 evidence — Salt's look against the console's"
+    source_object: "docs/design/ui-exploration/salt-ds-poc.md F5 and F7 · docs/design/ui-exploration/kept-orbit-philosophy.md · styles/tokens.css"
+    key: "computed styles in headless Edge, three skins, 2026-09-11"
+    loader: "measured on /lab/salt-poc (salt-ds-poc.md section 6)"
+    properties:
+      - name: "type scale follows density"
+        origin: source
+        from: "salt-ds-poc.md F5: h2 14px at high density and 18px at medium, against the console's 22.5px; table cells 11px and 12px against 13.1px; first row height 39px and 53px against 50px"
+        note: "the default density is the brand decision with the largest visual effect."
+      - name: "uppercase action text is one variable"
+        origin: source
+        from: "@salt-ds/theme: --salt-text-action-textTransform: uppercase in both theme.css and theme-next.css; consumed by Text (action) and ToggleButton"
+        note: "the branded skin sets it to none and buttons render in sentence case (verified). The house style is sentence case."
+      - name: "the tokens reach Salt through leaf variables only"
+        origin: derived
+        from: "salt-ds-poc.md F7: about 75 declarations in SaltPocRoute.css (var() only, no hex) re-point Salt's leaf tokens at tokens.css"
+        note: "IBM Plex, the DryDocs neutrals, accent and status colors carried into Salt components in both modes. Shape stays Salt's: corner radius, bordered cards, table rhythm. A foundation token re-pointed on a descendant does NOT reach components, because Salt resolves its alias chain on the .salt-theme element."
+      - name: "the brand's own rule for type"
+        origin: source
+        from: "kept-orbit-philosophy.md: 'Typography, when it must exist, is clinical and whispered: a thin mono for coordinates and captions ... Text annotates the orbit; it never competes with it.'"
+        note: "the red core is brand-only and never a status color (ui-conventions section 1, DL-2); the branded skin keeps that rule because it maps error to --status-fail, not --red."
+      - name: "the variant Salt's docs recommend"
+        origin: source
+        from: "Salt site docs getting-started/developing.mdx: the J.P. Morgan theme also needs the Amplitude web font"
+        note: "Amplitude is not public and was not tested; the PoC ran Salt's next theme on Open Sans and PT Mono."
+  - label: "R5 evidence — the newest Salt releases do not install from public npm"
+    source_object: "registry.npmjs.org @salt-ds/core, @salt-ds/icons, @salt-ds/theme (queried 2026-09-11) · upstream packages/icons/CHANGELOG.md"
+    key: "published versions, publish dates and the core-to-icons dependency ranges"
+    loader: "npm view, and a read of the upstream changelog"
+    properties:
+      - name: "core depends on icons npm has never published"
+        origin: source
+        from: "npm view: @salt-ds/core 1.67.1 requires @salt-ds/icons ^1.18.1; 1.68.0, 1.69.0 and 1.70.0 require ^1.18.2; the newest icons on npm is 1.18.0 (published 2026-03-31)"
+        note: "icons 1.18.1 and 1.18.2 exist in the upstream CHANGELOG (1.18.2: 'Updated dependencies ... @salt-ds/styles@0.4.0'), so the gap is a publishing omission, not a missing release."
+      - name: "the newest clean install"
+        origin: derived
+        from: "@salt-ds/core 1.67.0 (published 2026-07-08) with @salt-ds/theme 1.43.0, the newest theme published at or before it"
+        note: "any internal registry that mirrors npm inherits the gap. The window can close (upstream publishes icons) or widen (core moves further ahead); the PoC's evidence ages with it, which is why this page runs now."
+  - label: "The locked-stack pin, and what it does not observe"
+    source_object: "tests/unit/test_software_registry.py::test_web_console_stack_matches_the_locked_site_plan"
+    key: "asserts the SET of config/taxonomy/software-registry.yaml products carrying stack: web-console"
+    loader: "a read of the guard"
+    properties:
+      - name: "what the pin asserts"
+        origin: source
+        from: "the set equals {react, reui, react-flow, tailwindcss, neo4j, neo4j-nvl}"
+        note: "pinned 'so a swap is deliberate'; O81 moved it once, by amending the site-plan row with a requirement."
+      - name: "what the pin never reads"
+        origin: source
+        from: "the guard reads the registry and never web/package.json"
+        note: "the PoC's five exact pins did not trip it, and an adoption that added Salt to package.json without a registry row would not trip it either. WEB24 clause (e) names this in advance; C1 below carries it."
+
+sections:
+  - title: "A. The first question — does a second UI track open at all"
+    confirmations:
+      - "A1. OPEN, DECLINE OR DEFER. The locked single-track stack (site-plan.md section 1, decision 2026-07-17: 'Salt DS is dropped — no company-variant skin track') stands until this page says otherwise. The 2026-08-27 ruling makes Salt PREFERRED company-side and NOT mandated, so this is an option costed on its merits. Rule one. (i) OPEN: Salt is costed as a skin over the same shell, section B is ruled now, and WEB25 (re-skin ModuleTemplate behind the same skin switch, measure the className subset) is the next unit. (ii) DECLINE: the PoC was costed and declined; wip/idea-192-desktop is deleted at WEB24's close with that recorded; section B is not asked. (iii) DEFER: name the re-arm trigger (for example, a company-side requirement to ship on Salt, or upstream publishing @salt-ds/icons 1.18.2); the branch stays, referenced by the deferral record."
+      - "A2. WHAT OPENING DOES NOT DO. A1 (i) puts Salt on the default render path of no page, merges no PoC code, and edits no pin. It authorizes costed work under the rulings in section B; every adoption is its own item with its own acceptance, and a page moves to Salt only through one of them."
+  - title: "B. The five rulings the PoC left open — asked only if A1 is (i)"
+    confirmations:
+      - "B1 (R1). PROVIDER SHAPE. (i) A SCOPED provider per page (applyClassesTo=\"scope\"): measured clean in the PoC, adoption page by page, and styles/tokens.css stays the single palette. (ii) ONE ROOT provider for the console: Salt writes its classes and data-mode onto <html>, Salt allows one per window, and tokens.css becomes an override layer on Salt's palette rather than the palette of record. (i) is the proposed default because it is the one measured; (ii) is a whole-console migration and would be its own item."
+      - "B2 (R2). STATUS VOCABULARY. ui-conventions.md section 1 has five tokens and Salt has four statuses; running (--teal) and inert (--muted) map to none of them, pending lands on warning (caution), and StatusChip's pill shape is lost. Rule one. (i) Section 1 STAYS the authority: Salt's four statuses cover done, broken, pending-as-info or pending-as-warning (say which), and first-party indicators keep running and inert, so StatusChip survives beside Salt. (ii) COLLAPSE to Salt's four, re-ruling section 1 and every consumer it names (StatusChip, LoadsTimeline, Meter, ResultChip). (iii) Name another mapping. Say where pending lands in every case."
+      - "B3 (R3). GRIDS. (i) Salt Table with our tableControls: proven in the PoC, with a hand-built sortable header; the idiom ports unchanged. (ii) The AG Grid data grid with @salt-ds/ag-grid-theme: Salt's own guidance for complex data, a new dependency with its own licence tiers, and a replacement of the tableControls idiom rather than a re-skin; NOT tested, so ruling (ii) mints a spike, not an adoption. (i) is the proposed default."
+      - "B4 (R4). BRAND AGAINST KEPT ORBIT. Rule (a) the LOOK: Salt with the DryDocs tokens (the branded skin: IBM Plex, tokens.css colors, sentence-case actions, error on --status-fail and never the brand red), or Salt's own look (Open Sans and PT Mono, uppercase actions); and (b) the DEFAULT DENSITY: high (h2 14px, cells 11px) or medium (h2 18px, cells 12px), against the console's 22.5px and 13.1px. Corner shape and card borders stay Salt's in either look; say whether that is acceptable for Kept Orbit or names a blocker."
+      - "B5 (R5). VERSION POLICY. @salt-ds/core 1.67.1 through 1.70.0 depend on an icons version npm has never published, so the newest clean install is core 1.67.0 (2026-07-08) and any registry mirroring npm inherits the gap. (i) PIN EXACT and gate every core bump on its icons dependency resolving (proposed default; what the PoC does). (ii) WAIT: no adoption until upstream publishes icons 1.18.2 or later. (iii) OVERRIDE the icons dependency (npm overrides) to install a newer core now, knowingly running an icons version that core was not released against."
+  - title: "C. What follows a ruling"
+    confirmations:
+      - "C1. FOLLOW-UP ITEMS, OR AN EXPLICIT NONE. Every practice the ruling adopts becomes its own item with its own acceptance, minted by the sender from the signed record; the running lane drafts, it does not mint. Named in advance because it is already measured: if any adoption lands npm packages, test_web_console_stack_matches_the_locked_site_plan does not observe them (it reads the registry, never web/package.json). The adoption item therefore adds the software-registry row and amends the site-plan row and the pin (the O81 shape), and a guard that reads web/package.json against the registry is a candidate item in its own right."
+      - "C2. THE POC BRANCH FOLLOWS A1. (i) A follow-up item lands the route on its own terms, squashing or rewording its first commit (its subject begins with a byte-order mark). (ii) The branch is deleted with git branch -d, never -D, and WEB24's close records that the PoC was costed and declined. (iii) The branch stays, and the deferral record names it."
+  - title: "D. Fence — what this page does NOT ask"
+    confirmations:
+      - "D1. NOT RE-LITIGATED: the 2026-08-27 ruling that Salt is preferred company-side and not mandated. This page costs an option; it does not ask whether the option is mandatory."
+      - "D2. NOT ASKED: the graph canvases. React Flow and NVL are untouched by every answer on this page."
+      - "D3. NOTHING IS APPLIED BY DRAFTING OR BY SIGNING. Merging the PoC route, its npm pins or its ui-components ledger row onto main follows a ruling rather than making one, and editing the locked-stack pin is a consequence of a ruling, never a way of reaching one (WEB24 clause f). The company side runs its own gate; the ruling reaches it as a relay line."
+      - "D4. SAFE TO TRANSCRIBE into config/gate-log.md as SIGNED, SME-DEFERRED with a named re-arm trigger, or BLOCKED with a named blocker. The running lane drafts the record; Lane A appends it (the gate log is Lane A's pen this burst)."

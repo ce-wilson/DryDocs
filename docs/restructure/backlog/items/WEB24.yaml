@@ -9,6 +9,7 @@ model: fable
 priority: p2
 status: in_progress
 depends_on: []
+gates: [salt-ds-second-track]
 inputs:
 - docs/restructure/IDEAS.md
 - docs/design/ui-exploration/site-plan.md
