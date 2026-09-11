@@ -8440,6 +8440,21 @@ hand-carried and nothing parked.
     RED AT PUSH (J77): none in this range. UNVERIFIED (J78): checked at the tag.
 
 ACCEPTANCE GATE (behavior is the contract, not a byte-compare):
+- Track 0 (RUNTIME SMOKE — added 2026-09-10, and it is FIRST because it is the cheapest
+  and it is the one this gate has been missing):
+    python -c "import drydocs.cli"
+    drydocs --help
+  Two commands, about a second, no database needed. **THE GATE HAS NEVER RUN THEM, and the
+  cost is already on this roll's record.** RELAY-56: `constraints_detail()` was absent on the
+  consumer tree while `drydocs/cli_schema.py` called it — every unit test passed, for TEN
+  DAYS, and it surfaced only when a person typed `drydocs bootstrap`. RELAY-57 names a worse
+  one in the same family: a module-scope import of three constants from a hand-merged file,
+  whose symptom is `ImportError` while `drydocs/cli.py` is still importing, so EVERY command
+  dies — `drydocs --help` included. A suite that imports modules individually never sees
+  either. `CLAUDE.md` §6 has required all three parts of this gate (`pytest`, the root
+  import, `--help`) for ordinary commits the whole time; a port was being held to a weaker
+  standard than a one-line change. If Track 0 fails, stop: the remaining tracks will tell you
+  which tests pass in a tree whose CLI does not start.
 - Track 1 (portable):
     poetry run pytest tests/unit/test_variable_classifier.py tests/unit/test_variable_resolver.py \
                       tests/unit/test_variable_staging.py tests/unit/test_command_parser.py \
