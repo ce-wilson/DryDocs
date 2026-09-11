@@ -7,7 +7,7 @@ phase: 12
 agent: main
 model: fable
 priority: p2
-status: todo
+status: in_progress
 depends_on: []
 inputs:
 - docs/restructure/IDEAS.md
